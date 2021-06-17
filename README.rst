@@ -8,6 +8,6 @@ The project is maintained by the research team of the Natural Systems Simulation
 The intro video about EPDE is available here:
 
 
-.. image:: https://res.cloudinary.com/marcomontalbano/image/upload/v1606396758/video_to_markdown/images/youtube--RjbuV6i6de4-c05b58ac6eb4c4700831b2b3070cd403.jpg
+.. image:: https://res.cloudinary.com/richarddedekind/image/upload/v1623953424/EDPE_front_j3jyla.png
    :target: https://www.youtube.com/watch?v=BSXGCeuTcdc
    :alt: Introducing EPDE
