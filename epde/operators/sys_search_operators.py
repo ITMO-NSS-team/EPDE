@@ -72,8 +72,6 @@ class sys_search_evolutionary_operator(object): # Возможно, органи
         self._mutation = mutation
         
     def mutation(self, solution):
-#        output = deepcopy(solution)
-#        output.vals = self._mutation(output.vals) #output.vals + np.random.normal(scale = )
         output = self._mutation(solution)
         output.create_equations()
         return output
@@ -88,12 +86,13 @@ class sys_search_evolutionary_operator(object): # Возможно, органи
             offspring.create_equations()
         return offspring_pool
     
+    
 def gaussian_mutation(solution):
     assert type(solution) == SoEq, 'Object of other type, than the system of equation (SoEq), has been passed to the mutation operator'
     solution_new = deepcopy(solution)
     solution_new.vals += np.random.normal(size = solution_new.vals.size)
     return solution_new
-#mixing_xover = lambda parents: parents[1].obj_
+
 
 def mixing_xover(parents):
     assert all([type(parent) == SoEq for parent in parents]), 'Object of other type, than the system of equation (SoEq), has been passed to the crossover operator'

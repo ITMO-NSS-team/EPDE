@@ -10,6 +10,7 @@ import numpy as np
 
 import epde.globals as global_var
 from epde.factor import Factor
+from typing import Union
 
 def constancy_hard_equality(tensor, epsilon = 1e-7):
     print(np.abs(np.max(tensor) - np.min(tensor)), epsilon, type(np.abs(np.max(tensor) - np.min(tensor))),  type(epsilon))
@@ -114,7 +115,8 @@ class Token_family(object):
         Method, which uses the specific token evaluator to evaluate the passed token with its parameters
     
     """
-    def __init__(self, token_type):
+    def __init__(self, token_type : str, family_of_derivs : bool = False):
+
         """
         Initialize the token family;
         
@@ -123,7 +125,9 @@ class Token_family(object):
         token_type : string
             The name of the token family; must be unique among other families.
         """
+        
         self.type = token_type
+        self.family_of_derivs = family_of_derivs
         self.evaluator_set = False; self.params_set = False; self.cache_set = False
         
     def set_status(self, meaningful = False, s_and_d_merged = True, 
@@ -155,7 +159,7 @@ class Token_family(object):
         self.status['unique_for_right_part'] = unique_for_right_part
         self.status['requires_grid'] = requires_grid
 
-    def set_params(self, tokens, token_params, equality_ranges):
+    def set_params(self, tokens, token_params, equality_ranges, derivs_solver_orders = None):
         """
         Define the token family with list of tokens and their parameters
         
@@ -177,13 +181,18 @@ class Token_family(object):
         >>> trigonometric_tokens.set_params(token_names_trig, trig_token_params)
         
         """
+        assert bool(derivs_solver_orders is not None) == bool(self.family_of_derivs), 'Solver form must be set for derivatives, and only for them.'
+        
         self.tokens = tokens; self.token_params = token_params
+        if self.family_of_derivs: 
+            self.derivs_ords = {token : derivs_solver_orders[idx] for idx, token in enumerate(tokens)}
         self.params_set = True
         self.equality_ranges = equality_ranges
+        
         if self.evaluator_set:
             self.test_evaluator()
 
-    def set_evaluator(self, eval_function, eval_kwargs_keys = [], suppress_eval_test = True):#, **eval_params):    #Test, if the evaluator works properly
+    def set_evaluator(self, eval_function, eval_kwargs_keys = [], suppress_eval_test = True):#, ): , **eval_params   #Test, if the evaluator works properly
         """
         Define the evaluator for the token family and its parameters
         
@@ -239,6 +248,7 @@ class Token_family(object):
             self._evaluator = eval_function
         else:
             self._evaluator = Evaluator(eval_function, eval_kwargs_keys)
+#        self._evaluator.set_params(**eval_params)
         self.evaluator_set = True
         if self.params_set and not suppress_eval_test :
             self.test_evaluator()
@@ -299,10 +309,20 @@ class Token_family(object):
     def create(self, label = None, occupied : list = [], def_term_tokens = [], **factor_params):
         if type(label) == type(None): 
 #            print('tokens in the term:', def_term_tokens)
-            label = np.random.choice([token for token in self.tokens 
-                                      if not token in occupied and 
-                                      not def_term_tokens.count(token) >= self.token_params['power'][1] ])
-        new_factor = Factor(token_name = label, 
+            try:
+                label = np.random.choice([token for token in self.tokens 
+                                          if not token in occupied and 
+                                          not def_term_tokens.count(token) >= self.token_params['power'][1]])
+            except ValueError:
+                print(f'An error while creating factor of {self.type} token family')
+                print('occupied:', occupied, ' all:', self.tokens)
+                for token in self.tokens:
+                    if not token in occupied: print(f'{token} is free')
+                    if def_term_tokens.count(token) >= self.token_params['power'][1]: print(f"max power {self.token_params['power'][1]} not reached") 
+                raise ValueError("'a' cannot be empty unless no samples are taken")
+
+        factor_deriv_code = self.derivs_ords[label] if self.family_of_derivs else [None,]
+        new_factor = Factor(token_name = label, deriv_code=factor_deriv_code,
                             status = self.status, family_type = self.type)
         
         if self.status['unique_token_type']:
@@ -329,9 +349,9 @@ class Token_family(object):
 #            self.set_params['token_matrices'][key] = value - prev_operator # С индексом? 
 
     def cardinality(self, occupied : list = []):
-        return len([token for token in self.tokens if not token in occupied])
+#        print('type', self.type)
+        return len([token for token in self.tokens if not token in occupied])    
 
-    
 #class Derivatives_like_tokens(Token_family):
 #    def __init__(self, token_type, data_tensor, coord_tensors = None, 
 #                 deriv_tensors = None, smooth_field = True, sigma = 5, max_order = 1, 
@@ -386,6 +406,7 @@ class TF_Pool(object):
         
     def create(self, label = None, create_meaningful : bool = False, 
                       occupied : list = [], def_term_tokens = [], **kwargs) -> (str, Factor):
+#        print('in create method are occupied: ', occupied)
         if create_meaningful:
 #            print('a', self.families, 'p', self.families_cardinality(True, occupied))
             if np.sum(self.families_cardinality(True, occupied)) == 0:
@@ -398,7 +419,7 @@ class TF_Pool(object):
                                                                  **kwargs)
         else:
             return np.random.choice(a = self.families, 
-                                    p = self.families_cardinality(False)  / np.sum(self.families_cardinality(False))).create(label = label, 
+                                    p = self.families_cardinality(False, occupied)  / np.sum(self.families_cardinality(False, occupied))).create(label = label, 
                                                                  occupied = occupied,
                                                                  def_term_tokens = def_term_tokens,
                                                                  **kwargs)
@@ -406,3 +427,11 @@ class TF_Pool(object):
     def __add__(self, other):
         return TF_Pool(families = self.families + other.families)
     
+    
+def factor_from_str(text_form, pool):   # В проект: работы по обрезке сетки, на которых нулевые значения производных
+    label_str, params_str = text_form.split('{')
+    if not '}' in params_str:
+        raise ValueError('Missing brackets, denoting parameters part of factor text form. Possible explanation: passing wrong argument')
+    params_str = params_str.replace('}', '')
+    factor_family = [family for family in pool if label_str in family.tokens][0]    
+    factor = Factor()    

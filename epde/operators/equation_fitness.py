@@ -7,9 +7,15 @@ Created on Fri Jun  4 13:20:59 2021
 """
 
 import numpy as np
+import torch
+from copy import deepcopy
+
+import matplotlib.pyplot as plt
+from matplotlib import cm
 
 from epde.operators.template import Compound_Operator
-
+import epde.globals as global_var
+from epde.solver.solver import point_sort_shift_solver
 #class PopLevel_fitness(Compound_Operator):
 #    def apply(self, population):
 #        for equation in population:
@@ -78,4 +84,80 @@ class L2_fitness(Compound_Operator):
 
     @property
     def operator_tags(self):
-        return {'fitness evaluation', 'equation level', 'contains suboperators'}        
+        return {'fitness evaluation', 'equation level', 'contains suboperators'}  
+
+
+class Solver_based_fitness(Compound_Operator):
+    def __init__(self, param_keys : list, model_architecture = None):
+        super().__init__(param_keys)
+        if model_architecture is None:
+            self.model_architecture = torch.nn.Sequential(
+                torch.nn.Linear(1, 100),
+                torch.nn.Tanh(),
+                torch.nn.Linear(100, 100),
+                torch.nn.Tanh(),
+                torch.nn.Linear(100, 1)#,
+#                torch.nn.Tanh()
+                )
+        else:
+            self.model_architecture = model_architecture
+        
+        keys, training_grid = global_var.grid_cache.get_all()
+        assert len(keys) == training_grid[0].ndim, 'Mismatching dimensionalities'
+        training_grid = np.array(training_grid).reshape((len(training_grid), -1))
+        self.training_grid = torch.from_numpy(training_grid).T.type(torch.FloatTensor)
+#        print('grid after creation:', self.training_grid[:10], '...', self.training_grid[-10:])
+        self.device = torch.device('cpu')
+        self.training_grid.to(self.device)                
+        
+    def apply(self, equation):
+        self.suboperators['sparsity'].apply(equation)
+        self.suboperators['coeff_calc'].apply(equation)        
+        
+        equation.model = deepcopy(self.model_architecture)
+
+        eq_bc = equation.boundary_conditions()
+        eq_form = equation.solver_form()
+#        print('ann training grid shape', self.training_grid.shape)
+#        print('operator form', [(form[0].shape, ' for ', form[1], form[2]) for form in eq_form])
+#        print('operator bc', eq_bc)        
+#        print('grid before calling:', self.training_grid[:10])        
+        print(equation.text_form)
+        equation.model = point_sort_shift_solver(self.training_grid, equation.model, eq_form, eq_bc,
+                       lambda_bound = self.params['lambda_bound'], verbose = False, 
+                       learning_rate = self.params['learning_rate'], eps = self.params['eps'], 
+                       tmin = self.params['tmin'], tmax = self.params['tmax'])
+        
+        main_var_key = ('u', (1.0,))        
+        u_modeled = equation.model(self.training_grid).detach().numpy()
+        rl_error = np.linalg.norm(u_modeled - global_var.tensor_cache.get(main_var_key), ord = 2)
+        
+        if self.params['verbose']:
+            self.plot_data_vs_solution(global_var.tensor_cache.get(main_var_key), u_modeled)
+            
+        if rl_error == 0:
+            fitness_value = np.inf
+            print('infinite fitness!', equation.text_form)
+        else:
+            fitness_value = 1 / (rl_error)
+
+        equation.fitness_calculated = True
+        equation.fitness_value = fitness_value      
+        
+    def plot_data_vs_solution(self, data, solution):
+        if self.training_grid.shape[1]==2:
+            fig = plt.figure()
+            ax = fig.add_subplot(111, projection='3d')
+            ax.plot_trisurf(self.training_grid[:,0].reshape(-1), self.training_grid[:,1].reshape(-1),
+                            solution.reshape(-1), cmap=cm.jet, linewidth=0.2)
+            ax.set_xlabel("x1")
+            ax.set_ylabel("x2")
+            plt.show()
+        if self.training_grid.shape[1]==1:
+            fig = plt.figure()
+            plt.scatter(self.training_grid.reshape(-1), solution.reshape(-1), color = 'r')
+            plt.scatter(self.training_grid.reshape(-1), data.reshape(-1), color = 'k')            
+            plt.show()        
+        # Возможная проблема, когда подаётся тензор со значениями коэфф-тов перед производными
+        
+        

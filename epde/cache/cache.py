@@ -49,8 +49,9 @@ def upload_grids(grids, cache):
     upload_simple_tokens(labels = labels, cache = cache, tensors = tensors, grid_setting = True)
     cache.use_structural()
 
-def np_ndarray_section(matrix, boundary, except_idx : list = []):
-    if boundary != 0:
+def np_ndarray_section(matrix, boundary = None, except_idx : list = []):
+    #Добавить проверку на случай, когда boundary = 0, чтобы тогда возвращало матрицу без изменения
+    if isinstance(boundary, int):
         for idx in except_idx:
             if idx < 0:
                 except_idx.append(matrix.ndim - 1)
@@ -59,27 +60,32 @@ def np_ndarray_section(matrix, boundary, except_idx : list = []):
                 matrix = np.moveaxis(matrix, source = dim_idx, destination=0)
                 matrix = matrix[boundary:-boundary, ...]
                 matrix = np.moveaxis(matrix, source = 0, destination=dim_idx)
+    elif isinstance(boundary, (list, tuple)):
+        if len(boundary) != matrix.ndim:
+            raise IndexError('Sizes of boundary do not match the dimensionality of data')
+        for idx in except_idx:
+            if idx < 0:
+                except_idx.append(matrix.ndim - 1)
+        for dim_idx in np.arange(matrix.ndim):
+            if not dim_idx in except_idx:
+                matrix = np.moveaxis(matrix, source = dim_idx, destination=0)
+                matrix = matrix[boundary[dim_idx]:-boundary[dim_idx], ...]
+                matrix = np.moveaxis(matrix, source = 0, destination=dim_idx)    
     return matrix
-    
 
-def prepare_var_tensor(var_tensor, derivs_tensor, time_axis, boundary, cut_except = [], axes = None,
-                       cut_axes : bool = True):
+    
+def prepare_var_tensor(var_tensor, derivs_tensor, time_axis, boundary, cut_except = []):
     initial_shape = var_tensor.shape
     var_tensor = np.moveaxis(var_tensor, time_axis, 0)
-    if axes is not None:
-        if all(ax.shape == var_tensor.shape for ax in axes):
-            axes = [np_ndarray_section(ax, boundary, cut_except) if cut_axes else ax for ax in axes]
-        elif not all(ax.shape == (shape - 2*boundary for shape in var_tensor.shape) for ax in axes):
-#            print(ax.shape, (shape - 2*boundary for shape in var_tensor.shape))
-            raise ValueError('Shapes of axes not fitting')
-        increment = len(axes) + 1
-        result = np.ones((increment + derivs_tensor.shape[-1], ) + tuple([shape - 2*boundary for shape in var_tensor.shape]))
-        for ax_idx, ax in enumerate(axes):
-            result[ax_idx, ... ] = ax
-#    print(result.shape, var_tensor.shape, boundary, initial_shape)
-    else:
+    if isinstance(boundary, int):
         result = np.ones((1 + derivs_tensor.shape[-1], ) + tuple([shape - 2*boundary for shape in var_tensor.shape]))
-        increment = 1
+    elif isinstance(boundary, (tuple, list)):
+        result = np.ones((1 + derivs_tensor.shape[-1], ) + tuple([shape - 2*boundary[dim_idx] for dim_idx, 
+                                                                  shape in enumerate(var_tensor.shape)]))
+    else:
+        raise TypeError('')
+    increment = 1
+    print('var_tensor.shape', var_tensor.shape, np_ndarray_section(var_tensor, boundary, cut_except).shape, boundary)
     result[increment - 1, :] = np_ndarray_section(var_tensor, boundary, cut_except)
     if derivs_tensor.ndim == 2:
         for i_outer in range(0, derivs_tensor.shape[1]):
@@ -94,8 +100,7 @@ def prepare_var_tensor(var_tensor, derivs_tensor, time_axis, boundary, cut_excep
     return result
 
 
-def download_variable(var_filename, deriv_filename, boundary, time_axis = 0):
-#    print('loading', var_filename, deriv_filename)
+def download_variable(var_filename, deriv_filename, boundary, time_axis):
     var = np.load(var_filename)
     derivs = np.load(deriv_filename)
     tokens_tensor = prepare_var_tensor(var, derivs, time_axis, boundary)
@@ -107,14 +112,8 @@ class Cache(object):
         self.memory_default = dict()
         self.memory_normalized = dict()
         self.memory_structural = dict()
-        # if use_structural else False
         self.mem_prop_set = False
         self.base_tensors = [] #storage of non-normalized tensors, that will not be affected by change of variables
-#        self.base_tensors_scaled = dict()
-#        
-#    def merge_structural_and_base(self, except_labels = []):
-#        for key in self.memory_structural.keys():
-#            self.structural_and_base_merged[key] = True if not key in except_labels else True
 
     def use_structural(self, use_base_data = True, label = None, replacing_data = None):
         assert use_base_data or not type(replacing_data) == type(None), 'Structural data must be declared with base data or by additional tensors.'
@@ -311,6 +310,21 @@ class Cache(object):
                 print('fetched label:', label, ' prev. known as ', saved_as)
                 raise KeyError('Can not fetch tensor from cache with non-normalied data')
 
+    def get_all(self, normalized = False, structural = False):
+        if normalized:
+            processed_mem = self.memory_normalized
+        elif structural:
+            processed_mem = self.memory_structural
+        else:
+            processed_mem = self.memory_default
+
+        keys = []; tensors = []
+        for key, value in processed_mem.items():
+            keys.append(key)
+            tensors.append(value)
+        
+        return keys, tensors
+            
     def __contains__(self, obj):
         '''
         Valid input type:
@@ -318,7 +332,6 @@ class Cache(object):
             np.ndarray of values (checked in unnormalized data); (np.ndarray, normalized), where normalized is bool 
             (T if norm, else F) and np.ndarray is np.ndarray of tensor values. Does not support scaled vals
         '''
-#        raise NotImplementedError
         if type(obj) == str:
             return obj in self.memory_default.keys()
         elif (type(obj) == tuple or type(obj) == list) and type(obj[0]) == str and type(obj[1]) == bool:

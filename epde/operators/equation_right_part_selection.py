@@ -95,17 +95,24 @@ class Eq_Right_Part_Selector(Compound_Operator):
     def apply(self, equation, separate_vars):
         max_fitness = 0
         max_idx = 0
+#        print('Kek!')
         for target_idx, _ in enumerate(equation.structure): # target_term
             equation.target_idx = target_idx
             self.suboperators['fitness_calculation'].apply(equation)
-            if equation.described_variables in separate_vars:
-                equation.penalize_fitness(coeff = 0.)             
             if equation.fitness_value > max_fitness: 
+#                print(max_fitness, 'replaced by', equation.fitness_value)
                 max_fitness = equation.fitness_value
                 max_idx = target_idx                 
+            else:
+                pass
+#                print(max_fitness, 'not replaced by', equation.fitness_value)
+
         equation.target_idx = max_idx
         self.suboperators['fitness_calculation'].apply(equation)
-        assert np.isclose(equation.fitness_value, max_fitness), 'Something went wrong: incorrect term was selected as target'
+        if not np.isclose(equation.fitness_value, max_fitness):
+            print(equation.fitness_value, max_fitness)
+            print(equation.text_form)
+            raise ValueError('Something went wrong: incorrect term was selected as target')
         equation.right_part_selected = True    
 
     @property

@@ -88,3 +88,8 @@ class History_Extender():
                         element.add_history(beginner + 'after operation: ' + element.state + ' || \n')
             return result
         return wrapper
+    
+    
+#class Ray_parallelizer():
+#    def __init__(self):
+#        

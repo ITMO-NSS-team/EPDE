@@ -15,15 +15,18 @@ from epde.supplementary import factor_params_to_str
 class Factor(TerminalToken):
     def __init__(self, token_name : str, status : dict, family_type : str, 
                  randomize : bool = False, params_description = None, 
-                 deriv_code = None, equality_ranges = None):#, token_family, randomize = False):
+                 deriv_code = [None,], equality_ranges = None):#, token_family, randomize = False):
         self.label = token_name
         self.type = family_type
         self.status = status
         self.grid_set = False
         
         
-        self.is_deriv = not deriv_code is None
-        self.deriv_code = deriv_code if not deriv_code == [] else None
+        self.is_deriv = not (deriv_code is None)
+        self.deriv_code = deriv_code
+#        print(self.deriv_code)
+#        self.deriv_code = deriv_code if not deriv_code == [] else None
+
         
         self.reset_saved_state()
         if type(global_var.tensor_cache) != type(None):
@@ -112,6 +115,7 @@ class Factor(TerminalToken):
         else:
 #            self.structural = structural
             value = self._evaluator.apply(self)
+#            print(self.label, 'value is ', value)
 #            print(self.cache_label)
 #            if self.params.size > 1:
 #                raise NotImplementedError('Currently cache processing is implemented only for the single parameter token')
@@ -162,3 +166,8 @@ class Factor(TerminalToken):
     
     def use_cache(self):      
         self.cache_linked = True
+        
+        
+        
+        
+        

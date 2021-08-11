@@ -94,10 +94,7 @@ class Term(Complex_Structure):
         if type(global_var.tensor_cache) != type(None):
             self.use_cache()
         self.reset_saved_state() # key - state of normalization, value - if the variable is saved in cache
-        
-#    def reset_saved_state(self):
-#        super().reset_saved_state()
-#        self.saved_solver_form = False
+
         
     @property
     def cache_label(self):
@@ -242,12 +239,13 @@ class Term(Complex_Structure):
                 deriv_orders.append(factor.deriv_code); deriv_powers.append(factor.params[power_param_idx])
             else:
                 coeff_tensor = coeff_tensor * factor.evaluate()
+                deriv_orders.append(factor.deriv_code); deriv_powers.append(1)
         if len(deriv_powers) == 1:
             deriv_powers = deriv_powers[0]
             deriv_orders = deriv_orders[0]
             
         coeff_tensor = torch.from_numpy(coeff_tensor)
-        return [coeff_tensor, deriv_powers, deriv_orders]
+        return [coeff_tensor, deriv_orders, deriv_powers]
                 
                 
     def __eq__(self, other):
@@ -332,46 +330,9 @@ class Equation(Complex_Structure):
         
         '''
         raise NotImplementedError
-#        assert (type(self.operator) != type(None) or type(operator) != type(None)) or type(target_idx_fixed) != type(None)
-#        if type(self.operator) == type(None) and type(operator) != type(None): self.operator = operator
-#
-#        if type(target_idx_fixed) == type(None):
-#            max_fitness = 0
-#            max_idx = 0
-#            for target_idx, _ in enumerate(self.structure): # target_term
-#                self.target_idx = target_idx
-##                print('target:', self.structure[self.target_idx].name)
-#                self.operator.get_fitness(self)
-#                if self.described_variables in separate_vars:
-##                    print('penalizing')
-#                    self.penalize_fitness(coeff = 0.) 
-##                print('idx:', self.target_idx, self.fitness_value, max_fitness, max_idx, '\n\t', self.weights_internal, self.weights_final)
-##                print(self.text_form)                     
-#                if self.fitness_value > max_fitness: 
-#                    max_fitness = self.fitness_value
-#                    max_idx = target_idx                  # Ошибка, когда target_idx == 0
-#            self.target_idx = max_idx
-#            self.operator.get_fitness(self)
-#            eps = 1e-5
-#            assert np.abs(self.fitness_value - max_fitness) < eps
-#        else:
-#            self.target_idx = target_idx_fixed
-#      
 
     def check_split_correctness(self): #  Refactor for needs of system discovery
-        pass
-#        if True:
-#            pass
-#        else:
-#            target = self.structure[self.target_idx]
-#            for term_idx in range(len(self.structure)):
-#                if term_idx == self.target_idx: continue
-#                for factor in self.structure[term_idx].structure:
-#                    if factor.token.status['unique_for_right_part'] and any([factor == rp_factor for rp_factor in target.structure]):
-#                        print('In target:', target.name) 
-#                        print('In other structure discovered:', [factor.label for factor in self.structure[term_idx].structure])
-#                        print([term.name for term in self.structure])
-#                        raise ValueError('Forbidden factor ')                            
+        pass                
         
     @property 
     def forbidden_token_labels(self):
@@ -506,16 +467,20 @@ class Equation(Complex_Structure):
                     term_form = self.structure[term_idx].solver_form
                     weight = self.weights_final[term_idx] if term_idx < self.target_idx else self.weights_final[term_idx-1]
                     term_form[0] = term_form[0] * weight
+                    term_form[0] = torch.flatten(term_form[0]).unsqueeze(1).type(torch.FloatTensor)
                     self._solver_form.append(term_form)
                     
             free_coeff_weight = torch.from_numpy(np.full_like(a = global_var.grid_cache.get('0'), 
                                                               fill_value = self.weights_final[-1]))
+            free_coeff_weight = torch.flatten(free_coeff_weight).unsqueeze(1).type(torch.FloatTensor)
             target_weight = torch.from_numpy(np.full_like(a = global_var.grid_cache.get('0'), 
                                                               fill_value = -1))            
             target_form = self.structure[self.target_idx].solver_form
             target_form[0] = target_form[0] * target_weight
+            target_form[0] = torch.flatten(target_form[0]).unsqueeze(1).type(torch.FloatTensor)
+#            print(target_form[0].shape)
             
-            self._solver_form.append([free_coeff_weight, None, 0])
+            self._solver_form.append([free_coeff_weight, [None,], 0])
             self._solver_form.append(target_form)
             self.solver_form_defined = True            
             return self._solver_form
@@ -539,67 +504,82 @@ class Equation(Complex_Structure):
         described = frozenset(described)
         return described
     
-    def required_BC(self):
-        solver_form = self.solver_form
+    def max_deriv_orders(self):
+        solver_form = self.solver_form()
         max_orders = np.zeros(global_var.grid_cache.get('0').ndim)
+        
+        def count_order(obj, deriv_ax):
+            if obj is None:
+                return 0
+            else:
+                return obj.count(deriv_ax)
+                
         for term in solver_form:
             if isinstance(term[2], list):
                 for deriv_factor in term[1]:
-                    orders = np.array([deriv_factor.count(ax) for ax 
-                                       in np.arange(max_orders.shape)])
+                    orders = np.array([count_order(deriv_factor, ax) for ax #deriv_factor.count(ax)
+                                       in np.arange(max_orders.size)])
+#                    print(max_orders, orders, deriv_factor)
                     max_orders = np.maximum(max_orders, orders)
             else:
-                orders = np.array([term[1].count(ax) for ax 
-                                   in np.arange(max_orders.shape)])
+                orders = np.array([count_order(term[1], ax) for ax # term[1].count(ax)
+                                   in np.arange(max_orders.size)])
+#                print(max_orders, orders, term[1])
                 max_orders = np.maximum(max_orders, orders)
-        if np.max(max_orders) <= 2:
+        if np.max(max_orders) > 2:
             raise NotImplementedError('The current implementation allows does not allow higher orders of equation, than 2.')
         return max_orders
+    
+    def boundary_conditions(self, main_var_key = ('u', (1.0,))):
+        required_bc_ord = self.max_deriv_orders()   # We assume, that the maximum order of the equation here is 2
+        if global_var.grid_cache is None:
+            raise NameError('Grid cache has not been initialized yet.')
+        
+        bconds = []
+        hardcoded_bc_relative_locations = {0 : None, 1 : (0,), 2 : (0, 1)}
+        tensor_shape = global_var.grid_cache.get('0').shape
+    
+        def get_boundary_ind(tensor_shape, axis, rel_loc, old_way = False):
+            return tuple(np.meshgrid(*[np.arange(shape) if dim_idx != axis else min(int(rel_loc * shape), shape-1)
+                       for dim_idx, shape in enumerate(tensor_shape)], indexing = 'ij'))
+        
+        for ax_idx, ax_ord in enumerate(required_bc_ord):
+            for loc_fraction in hardcoded_bc_relative_locations[ax_ord]:
+                indexes = get_boundary_ind(tensor_shape, axis = ax_idx, rel_loc = loc_fraction)
+                coords = np.array([global_var.grid_cache.get(str(idx))[indexes] for idx in np.arange(len(tensor_shape))])
+                vals = global_var.tensor_cache.get(main_var_key)[indexes]
+                
+                coords = torch.from_numpy(coords).type(torch.FloatTensor)
+                vals = torch.from_numpy(vals).type(torch.FloatTensor)
+                bconds.append([coords, vals])    
+        
+        return bconds
 
-#def Get_true_coeffs(equation): # Не забыть про то, что последний коэф - для константы
-#    assert equation.weights_internal_evald, 'Trying to calculate final weights before evaluating intermeidate ones (no sparcity).'
-#    target = equation.structure[equation.target_idx]
-#
-#    equation.check_split_correctness()
-#            
-##    print(type(target.value))
-#    target_vals = target.evaluate(False)
-#    features_vals = []
-#    nonzero_features_indexes = []
-#    for i in range(len(equation.structure)):
-#        if i == equation.target_idx:
-#            continue
-#        idx = i if i < equation.target_idx else i-1
-#        if equation.weights_internal[idx] != 0:
-#            features_vals.append(equation.structure[i].evaluate(False))
-#            nonzero_features_indexes.append(idx)
-#            
-##    print('Indexes of nonzero elements:', nonzero_features_indexes)
-#    if len(features_vals) == 0:
-#        return np.zeros(len(equation.structure)) #Bind_Params([(token.label, token.params) for token in target.structure]), [('0', 1)]
-#    
-#    features = features_vals[0]
-#    if len(features_vals) > 1:
-#        for i in range(1, len(features_vals)):
-#            features = np.vstack([features, features_vals[i]])
-#    features = np.vstack([features, np.ones(features_vals[0].shape)]) # Добавляем константную фичу
-#    features = np.transpose(features)  
-#    
-#    estimator = LinearRegression(fit_intercept=False)
-#    try:
-#        estimator.fit(features, target_vals)
-#    except ValueError:
-#        features = features.reshape(-1, 1)
-#        estimator.fit(features, target_vals)
-#        
-#    valueable_weights = estimator.coef_
-#    weights = np.zeros(len(equation.structure))
-#    for weight_idx in range(len(weights)-1):
-#        if weight_idx in nonzero_features_indexes:
-#            weights[weight_idx] = valueable_weights[nonzero_features_indexes.index(weight_idx)]
-#    weights[-1] = valueable_weights[-1]    
-##    print('weights check:', weights, equation.weights_internal)
-#    return weights
+    
+def standalone_boundary_conditions(max_deriv_orders, main_var_key = ('u', (1.0,))):
+    required_bc_ord = max_deriv_orders   # We assume, that the maximum order of the equation here is 2
+    if global_var.grid_cache is None:
+        raise NameError('Grid cache has not been initialized yet.')
+    
+    bconds = []
+    hardcoded_bc_relative_locations = {0 : None, 1 : (0,), 2 : (0, 1)}
+    tensor_shape = global_var.grid_cache.get('0').shape
+
+    def get_boundary_ind(tensor_shape, axis, rel_loc, old_way = False):
+        return tuple(np.meshgrid(*[np.arange(shape) if dim_idx != axis else min(int(rel_loc * shape), shape-1)
+                   for dim_idx, shape in enumerate(tensor_shape)], indexing = 'ij'))
+    
+    for ax_idx, ax_ord in enumerate(required_bc_ord):
+        for loc_fraction in hardcoded_bc_relative_locations[ax_ord]:
+            indexes = get_boundary_ind(tensor_shape, axis = ax_idx, rel_loc = loc_fraction)
+            coords = np.array([global_var.grid_cache.get(str(idx))[indexes] for idx in np.arange(len(tensor_shape))])
+            vals = global_var.tensor_cache.get(main_var_key)[indexes]
+            
+            coords = torch.from_numpy(coords)
+            vals = torch.from_numpy(vals)
+            bconds.append([coords, vals])    
+    return bconds    
+                
 
 class SoEq(Complex_Structure, moeadd.moeadd_solution):
     def __init__(self, pool, terms_number, max_factors_in_term, sparcity = None, eq_search_iters = 100):
@@ -739,14 +719,13 @@ class SoEq(Complex_Structure, moeadd.moeadd_solution):
 #            return NotImplemented
         
     def evaluate(self, normalize = True):
-#            self.evaluated = True
         if len(self.structure) == 1:
             value = self.structure[0].evaluate(normalize = normalize, return_val = True)[0]
         else:
             value = np.sum([equation.evaluate(normalize, return_val = True)[0] for equation in self.structure])
         value = np.sum(np.abs(value))
         return value
-        
+
     @property
     def obj_fun(self):
 #        print('objective functions:', self.obj_funs)

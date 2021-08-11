@@ -22,10 +22,11 @@ from epde.supplementary import Define_Derivatives
 from epde.cache.cache import upload_simple_tokens, upload_grids, prepare_var_tensor, np_ndarray_section
 from epde.prep.derivatives import Preprocess_derivatives
 from epde.eq_search_strategy import Strategy_director
+from epde.structure import Equation
 
 from epde.interface.token_family import TF_Pool, Token_family
 from epde.interface.type_checks import *
-from epde.interface.prepared_tokens import Prepared_tokens
+from epde.interface.prepared_tokens import Prepared_tokens, Custom_tokens
 
 class Input_data_entry(object):
     def __init__(self, var_name, data_tensor, coord_tensors = None):
@@ -45,11 +46,11 @@ class Input_data_entry(object):
         
     def set_derivatives(self, deriv_tensors = None, data_filename = None, 
                         deriv_filename = None, smooth = True, sigma = 5, max_order = 1):
-        coord_names = ['x' + str(coord_idx) for coord_idx in range(len(self.coord_tensors))]
+#        coord_names = ['x' + str(coord_idx) for coord_idx in range(len(self.coord_tensors))]
         deriv_names, _ = Define_Derivatives(self.var_name, dimensionality=self.data_tensor.ndim, 
                                                       max_order = max_order)
 
-        self.names = coord_names + deriv_names #Define_Derivatives(self.var_name, dimensionality=self.data_tensor.ndim, 
+        self.names = deriv_names # coord_names +  Define_Derivatives(self.var_name, dimensionality=self.data_tensor.ndim, 
                                     #                  max_order = max_order)
         if deriv_tensors is None:
             _, self.derivatives = Preprocess_derivatives(self.data_tensor, grid = self.coord_tensors,
@@ -61,15 +62,23 @@ class Input_data_entry(object):
             self.derivatives = deriv_tensors
     
     def use_global_cache(self, grids_as_tokens = True, set_grids = True, memory_for_cache = 5, 
-                         time_axis : int = 0, boundary : int = 0):
+                         boundary : int = 0):
 
         print(type(self.data_tensor), type(self.derivatives))
         derivs_stacked = prepare_var_tensor(self.data_tensor, self.derivatives,
-                                            time_axis = time_axis, boundary = boundary, 
-                                            axes = self.coord_tensors)
-        coord_tensors_cut = np_ndarray_section(self.coord_tensors, boundary = boundary)
+                                            time_axis = global_var.time_axis, boundary = boundary) 
+#                                            axes = self.coord_tensors)
+        if isinstance(self.coord_tensors, (list, tuple)):
+            coord_tensors_cut = []
+            for tensor in self.coord_tensors:
+                coord_tensors_cut.append(np_ndarray_section(tensor, boundary = boundary))
+        elif isinstance(self.coord_tensors, np.ndarray):
+            coord_tensors_cut = np_ndarray_section(self.coord_tensors, boundary = boundary)
+        else:
+            raise TypeError('Coordinate tensors are presented in format, other than np.ndarray or list/tuple of np.ndarray`s')
         
         try:
+            print(self.names, derivs_stacked.shape)            
             upload_simple_tokens(self.names, global_var.tensor_cache, derivs_stacked)
         except AttributeError:            
             global_var.init_caches(set_grids = set_grids)
@@ -82,6 +91,7 @@ class Input_data_entry(object):
     
             global_var.tensor_cache.memory_usage_properties(obj_test_case = self.data_tensor,
                                                             mem_for_cache_frac = memory_for_cache)
+            print(self.names, derivs_stacked.shape)
             upload_simple_tokens(self.names, global_var.tensor_cache, derivs_stacked)
 
         global_var.tensor_cache.use_structural()
@@ -202,6 +212,7 @@ class epde_search(object):
                               'solution_params': solution_params,
                               'NDS_method' : NDS_method, 
                               'NDL_update' : NDL_update_method}
+        
         self.moeadd_optimization_params = {'neighborhood_selector' : neighborhood_selector,
                                            'neighborhood_selector_params' : neighborhood_selector_params,
                                            'delta' : subregion_mating_limitation, 
@@ -309,7 +320,7 @@ class epde_search(object):
                                   sigma = sigma, max_order = max_deriv_order)
             print(f'set grids parameter is {set_grids}')
             entry.use_global_cache(grids_as_tokens = set_grids_among_tokens,
-                                   set_grids=set_grids, memory_for_cache=memory_for_cache)
+                                   set_grids=set_grids, memory_for_cache=memory_for_cache, boundary=boundary)
             set_grids = False; set_grids_among_tokens = False
             
             entry_token_family = Token_family(entry.var_name)
@@ -329,7 +340,9 @@ class epde_search(object):
         elif isinstance(additional_tokens, (Token_family, Prepared_tokens)):
             additional_tokens = [additional_tokens,]
         else:
-            print(type(additional_tokens) == Token_family)
+            print(isinstance(additional_tokens, Prepared_tokens))
+#            print(isinstance(additional_tokens, Custom_tokens))
+#            print(issubclass(Custom_tokens, Prepared_tokens) or issubclass(Prepared_tokens, Custom_tokens))
             raise TypeError(f'Incorrect type of additional tokens: expected list or Token_family/Prepared_tokens - obj, instead got {type(additional_tokens)}')
         pool = TF_Pool(data_tokens + [tf if isinstance(tf, Token_family) else tf.token_family 
                                       for tf in additional_tokens])
@@ -365,6 +378,11 @@ class epde_search(object):
                 print('\n')
                 print(f'{idx}-th non-dominated level')    
                 print('\n')                
-                [print(f'{solution.text_form} , with error {solution.evaluate()} \n')  for solution in self.equations_pareto_frontier[idx]]
+                [print(f'{solution.text_form} , with objective function values of {solution.obj_fun} \n')  
+                for solution in self.equations_pareto_frontier[idx]]
         else:
             return self.optimizer.pareto_levels.levels
+        
+#    def test_equation(self, equation_text_form : str):
+#        
+#    

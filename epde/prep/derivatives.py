@@ -39,13 +39,13 @@ def scaling_test(field, steps = None, ff_name = None, output_file_name = None, s
     return derivs_raw, derivs_scaled
     
 
-def Preprocess_derivatives(field, steps = None, ff_name = None, output_file_name = None, smooth = True, sigma = 9,
+def Preprocess_derivatives(field, grid = None, steps = None, data_name = None, output_file_name = None, smooth = True, sigma = 9,
                            mp_poolsize = 4, max_order = 2, polynomial_window = 9, poly_order = None, scaling = False):
     '''
     
     Main preprocessing function for the calculation of derivatives on uniform grid
     
-    Parameters:
+    Parameters (old):
     ---------
     
     field : numpy.ndarray
@@ -78,16 +78,19 @@ def Preprocess_derivatives(field, steps = None, ff_name = None, output_file_name
     polynomial_boundary = polynomial_window//2 + 1
 
     print('Executing on grid with uniform nodes:')
-    if type(steps) == type(None):
+    if steps is None and grid is None:
         steps = np.ones(np.ndim(field))
-    dim_coords = []
-    for dim in np.arange(np.ndim(field)):
-        dim_coords.append(np.arange(0, field.shape[dim] * steps[dim], steps[dim]))
 
     if smooth: field = Smoothing(field, 'gaussian', sigma = sigma)
     index_array = []
 
-    grid = np.meshgrid(*dim_coords, indexing = 'ij')
+    if grid is None: 
+        dim_coords = []
+        for dim in np.arange(np.ndim(field)):
+            dim_coords.append(np.arange(0, field.shape[dim] * steps[dim], steps[dim]))
+
+        grid = np.meshgrid(*dim_coords, indexing = 'ij') 
+
     index_array = []
 
     
@@ -111,8 +114,8 @@ def Preprocess_derivatives(field, steps = None, ff_name = None, output_file_name
     
 #    raise TabError
     #np.save('ssh_field.npy', field)   
-    if type(ff_name) != type(None):
-        np.save(ff_name, field)
+    if type(data_name) != type(None):
+        np.save(data_name, field)
     if type(output_file_name) != type(None):
         if not '.npy' in output_file_name:
             output_file_name += '.npy'        

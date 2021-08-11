@@ -14,6 +14,14 @@ from warnings import warn
 
 from epde.operators.template import Compound_Operator
 
+from epde.operators.equation_selections import Tournament_selection
+from epde.operators.equation_elitism import Fraction_elitism
+from epde.operators.equation_mutations import PopLevel_mutation, PopLevel_mutation_elite, Refining_Equation_mutation, Equation_mutation, Term_mutation, Parameter_mutation
+from epde.operators.equation_crossovers import PopLevel_crossover, Equation_crossover, Param_crossover, Term_crossover
+from epde.operators.equation_sparcity import LASSO_sparsity
+from epde.operators.equation_coeffcalc import LinReg_based_coeffs
+from epde.operators.equation_fitness import L2_fitness, Solver_based_fitness
+from epde.operators.equation_right_part_selection import Poplevel_Right_Part_Selector, Eq_Right_Part_Selector
 
 class Operator_builder(ABC):    
     
@@ -127,15 +135,12 @@ class Strategy_director(object):
         self._constructor = constructor
 
     def strategy_assembly(self, **kwargs):
-        from epde.operators.equation_selections import Tournament_selection
         selection = Tournament_selection(['part_with_offsprings', 'tournament_groups'])
         selection.params = {'part_with_offsprings' : 0.2, 'tournament_groups' : 2} if not 'selection_params' in kwargs.keys() else  kwargs['selection_params']
 
-        from epde.operators.equation_elitism import Fraction_elitism
         elitism = Fraction_elitism(['elite_fraction'])
         elitism.params = {'elite_fraction' : 0.2}
 
-        from epde.operators.equation_mutations import PopLevel_mutation, PopLevel_mutation_elite, Refining_Equation_mutation, Equation_mutation, Term_mutation, Parameter_mutation
         param_mutation = Parameter_mutation(['r_param_mutation', 'strict_restrictions', 'multiplier'])
         term_mutation = Term_mutation(['forbidden_tokens'])
         eq_mutation = Equation_mutation(['r_mutation', 'type_probabilities'])
@@ -159,7 +164,6 @@ class Strategy_director(object):
         mutation.suboperators = {'Equatiion_mutation' : {'elite' : ref_eq_mutation, 'non-elite' : eq_mutation}}
 
 
-        from epde.operators.equation_crossovers import PopLevel_crossover, Equation_crossover, Param_crossover, Term_crossover
         param_crossover = Param_crossover(['proportion'])
         term_crossover = Term_crossover(['crossover_probability'])
         eq_crossover = Equation_crossover([])
@@ -173,22 +177,16 @@ class Strategy_director(object):
         eq_crossover.suboperators = {'Param_crossover' : param_crossover, 'Term_crossover' : term_crossover} 
         crossover.suboperators = {'Equation_crossover' : eq_crossover}
         
-        from epde.operators.equation_sparcity import LASSO_sparsity
         lasso_coeffs = LASSO_sparsity(['sparcity'])
-        from epde.operators.equation_coeffcalc import LinReg_based_coeffs
         linreg_coeffs = LinReg_based_coeffs([])
         
         lasso_coeffs.params = {'sparcity' : 1} if not 'lasso_coeffs_params' in kwargs.keys() else kwargs['lasso_coeffs_params']
         linreg_coeffs.params = {} if not 'linreg_coeffs_params' in kwargs.keys() else kwargs['linreg_coeffs_params']
 
-        from epde.operators.equation_fitness import L2_fitness
         fitness_eval = L2_fitness(['penalty_coeff'])
         fitness_eval.suboperators = {'sparsity' : lasso_coeffs, 'coeff_calc' : linreg_coeffs}
         fitness_eval.params = {'penalty_coeff' : 0.5} if not 'fitness_eval_params' in kwargs.keys() else kwargs['fitness_eval_params']
         
-        
-        
-        from epde.operators.equation_right_part_selection import Poplevel_Right_Part_Selector, Eq_Right_Part_Selector
         rps1 = Poplevel_Right_Part_Selector([])
         rps1.params = {} if not 'rps_params' in kwargs.keys() else kwargs['rps_params']
         
@@ -199,12 +197,6 @@ class Strategy_director(object):
         rps1.suboperators = {'eq_level_rps' : eq_rps}
         
         rps2 = deepcopy(rps1)
-        
-        
-#        rps2 = Right_Part_Selector([])
-#        rps2.suboperators = {'fitness_calculation' : fitness_eval}
-#        rps2.params = {} if not 'rps_params' in kwargs.keys() else kwargs['rps_params']
-
         
         self._constructor.add_init_operator('initial')
 
@@ -231,7 +223,6 @@ class Strategy_director(object):
         self._constructor.link('initial', 'rps1')
         self._constructor.link('rps1', 'selection')
         self._constructor.link('selection', 'crossover')
-#        self._constructor.link('crossover', 'mutation')
 
         self._constructor.link('crossover', 'elitism')
         self._constructor.link('elitism', 'mutation')
@@ -241,8 +232,120 @@ class Strategy_director(object):
         
         self._constructor.assemble()
         
-#        self._constructor.set_evolution(crossover, mutation)
-#        self._constructor.set_fitness(fitness_eval)
+    
+class Strategy_director_solver(object):    
+    def __init__(self, stop_criterion, stop_criterion_kwargs): # baseline = True
+#        self._constructor = None
+#        if baseline:
+        self._constructor = Strategy_builder(stop_criterion, stop_criterion_kwargs)
+    
+    @property
+    def constructor(self):
+        return self._constructor
+    
+    @constructor.setter
+    def constructor(self, constructor):
+        self._constructor = constructor
+
+    def strategy_assembly(self, **kwargs):
+        selection = Tournament_selection(['part_with_offsprings', 'tournament_groups'])
+        selection.params = {'part_with_offsprings' : 0.2, 'tournament_groups' : 2} if not 'selection_params' in kwargs.keys() else  kwargs['selection_params']
+
+        elitism = Fraction_elitism(['elite_fraction'])
+        elitism.params = {'elite_fraction' : 0.2}
+
+        param_mutation = Parameter_mutation(['r_param_mutation', 'strict_restrictions', 'multiplier'])
+        term_mutation = Term_mutation(['forbidden_tokens'])
+        eq_mutation = Equation_mutation(['r_mutation', 'type_probabilities'])
+        ref_eq_mutation = Refining_Equation_mutation(['r_mutation', 'type_probabilities'])
+#        mutation = PopLevel_mutation(['indiv_mutation_prob', 'elitism'])
+        mutation = PopLevel_mutation_elite(['indiv_mutation_prob'])
+        
+
+        param_mutation.params = {'r_param_mutation' : 0.2, 'strict_restrictions' : True, 'multiplier' : 0.1} if not 'param_mutation_params' in kwargs.keys() else kwargs['param_mutation_params']
+        term_mutation.params = {'forbidden_tokens': []} if not 'term_mutation_params' in kwargs.keys() else kwargs['term_mutation_params']
+        eq_mutation.params = {'r_mutation' : 0.3, 'type_probabilities' : []}
+        ref_eq_mutation.params = {'r_mutation' : 0.3, 'type_probabilities' : []}
+#        mutation.params = {'indiv_mutation_prob' : 0.5, 'elitism' : 1} if not 'mutation_params' in kwargs.keys() else kwargs['mutation_params']
+        mutation.params = {'indiv_mutation_prob' : 0.5} if not 'mutation_params' in kwargs.keys() else kwargs['mutation_params']
+
+
+        
+        ref_eq_mutation.suboperators = {'Mutation' : [param_mutation, term_mutation]}
+        eq_mutation.suboperators = {'Mutation' : [param_mutation, term_mutation]}
+#        mutation.suboperators = {'Equatiion_mutation' : eq_mutation}
+        mutation.suboperators = {'Equatiion_mutation' : {'elite' : ref_eq_mutation, 'non-elite' : eq_mutation}}
+
+
+        param_crossover = Param_crossover(['proportion'])
+        term_crossover = Term_crossover(['crossover_probability'])
+        eq_crossover = Equation_crossover([])
+        crossover = PopLevel_crossover([])        
+
+        param_crossover.params = {'proportion' : 0.4} if not 'param_crossover_params' in kwargs.keys() else kwargs['param_crossover_params']
+        term_crossover.params = {'crossover_probability' : 0.3} if not 'term_crossover_params' in kwargs.keys() else kwargs['term_crossover_params']
+        eq_crossover.params = {} if not 'eq_crossover_params' in kwargs.keys() else kwargs['eq_crossover_params']
+        crossover.params = {} if not 'crossover_params' in kwargs.keys() else kwargs['crossover_params']
+
+        eq_crossover.suboperators = {'Param_crossover' : param_crossover, 'Term_crossover' : term_crossover} 
+        crossover.suboperators = {'Equation_crossover' : eq_crossover}
+        
+        lasso_coeffs = LASSO_sparsity(['sparcity'])
+        linreg_coeffs = LinReg_based_coeffs([])
+        
+        lasso_coeffs.params = {'sparcity' : 1} if not 'lasso_coeffs_params' in kwargs.keys() else kwargs['lasso_coeffs_params']
+        linreg_coeffs.params = {} if not 'linreg_coeffs_params' in kwargs.keys() else kwargs['linreg_coeffs_params']
+
+        fitness_eval = Solver_based_fitness(['lambda_bound', 'learning_rate', 'eps', 'tmin', 'tmax', 'verbose'])
+        fitness_eval.suboperators = {'sparsity' : lasso_coeffs, 'coeff_calc' : linreg_coeffs}
+        fitness_eval.params = {'lambda_bound' : 10, 'learning_rate' : 1e-3, 
+                               'eps' : 0.1, 'tmin' : 1000, 'tmax' : 1e5, 'verbose' : True} if not 'fitness_eval_params' in kwargs.keys() else kwargs['fitness_eval_params']
+        
+        rps1 = Poplevel_Right_Part_Selector([])
+        rps1.params = {} if not 'rps_params' in kwargs.keys() else kwargs['rps_params']
+        
+        eq_rps = Eq_Right_Part_Selector([])
+        eq_rps.suboperators = {'fitness_calculation' : fitness_eval}
+        eq_rps.params = {} if not 'eq_rps_params' in kwargs.keys() else kwargs['eq_rps_params']
+        
+        rps1.suboperators = {'eq_level_rps' : eq_rps}
+        
+        rps2 = deepcopy(rps1)
+        
+        self._constructor.add_init_operator('initial')
+
+        self._constructor.add_operator('rps1', rps1, parse_operator_args = 'inspect', 
+                                       terminal_operator = False)
+
+        self._constructor.add_operator('selection', selection, parse_operator_args = 'inspect', 
+                                       terminal_operator = False)
+        
+        self._constructor.add_operator('crossover', crossover, parse_operator_args = 'inspect', 
+                                       terminal_operator = False)
+
+        self._constructor.add_operator('elitism', elitism, parse_operator_args = 'inspect', 
+                                       terminal_operator = False)
+        
+        self._constructor.add_operator('mutation', mutation, parse_operator_args = 'inspect', 
+                                       terminal_operator = False)        
+
+        self._constructor.add_operator('rps2', rps2, parse_operator_args = 'inspect', 
+                                       terminal_operator = True)        
+        
+        self._constructor.set_input_combinator()
+        
+        self._constructor.link('initial', 'rps1')
+        self._constructor.link('rps1', 'selection')
+        self._constructor.link('selection', 'crossover')
+
+        self._constructor.link('crossover', 'elitism')
+        self._constructor.link('elitism', 'mutation')
+
+
+        self._constructor.link('mutation', 'rps2')
+        
+        self._constructor.assemble()
+        
         
 def link(op1, op2):
     '''
@@ -511,8 +614,13 @@ class Evolutionary_strategy(object):
         return self.linked_blocks.output
         
     def apply_block(self, label, operator_kwargs):
+#        try:
         self.linked_blocks.blocks_labeled[label]._operator.apply(**operator_kwargs)
+#        except KeyError:
+#            print('label', label, 'keys:', self.linked_blocks.blocks_labeled.keys(), label in self.linked_blocks.blocks_labeled.keys())
+#            raise KeyError('...')
             
+        
     def modify_block_params(self, block_label, param_label, value, suboperator_sequence = None):
         '''
         example call: ``evo_strat.modify_block_params(block_label = 'rps', param_label = 'sparsity', value = some_value, suboperator_sequence = ['fitness_calculation', 'sparsity'])``

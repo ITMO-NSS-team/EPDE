@@ -7,14 +7,19 @@ Created on Tue Feb  9 16:14:57 2021
 """
 
 from epde.cache.cache import Cache
+#from epde.supplementary import flatten
 
-def init_caches(set_grids = False):
+def init_caches(set_grids : bool = False):
     global tensor_cache, grid_cache
     tensor_cache = Cache()
     if set_grids:
         grid_cache = Cache()
     else:
         grid_cache = None
+    
+def set_time_axis(axis : int):
+    global time_axis
+    time_axis = axis
     
 def init_eq_search_operator(operator):
     global eq_search_operator
@@ -34,4 +39,3 @@ def delete_cache():
         del grid_cache
     except NameError:
         print('Failed to delete grid cache due to its inexistance')
-        
