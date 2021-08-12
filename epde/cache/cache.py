@@ -52,14 +52,15 @@ def upload_grids(grids, cache):
 def np_ndarray_section(matrix, boundary = None, except_idx : list = []):
     #Добавить проверку на случай, когда boundary = 0, чтобы тогда возвращало матрицу без изменения
     if isinstance(boundary, int):
-        for idx in except_idx:
-            if idx < 0:
-                except_idx.append(matrix.ndim - 1)
-        for dim_idx in np.arange(matrix.ndim):
-            if not dim_idx in except_idx:
-                matrix = np.moveaxis(matrix, source = dim_idx, destination=0)
-                matrix = matrix[boundary:-boundary, ...]
-                matrix = np.moveaxis(matrix, source = 0, destination=dim_idx)
+        if boundary != 0:
+            for idx in except_idx:
+                if idx < 0:
+                    except_idx.append(matrix.ndim - 1)
+            for dim_idx in np.arange(matrix.ndim):
+                if not dim_idx in except_idx:
+                    matrix = np.moveaxis(matrix, source = dim_idx, destination=0)
+                    matrix = matrix[boundary:-boundary, ...]
+                    matrix = np.moveaxis(matrix, source = 0, destination=dim_idx)
     elif isinstance(boundary, (list, tuple)):
         if len(boundary) != matrix.ndim:
             raise IndexError('Sizes of boundary do not match the dimensionality of data')
@@ -67,7 +68,7 @@ def np_ndarray_section(matrix, boundary = None, except_idx : list = []):
             if idx < 0:
                 except_idx.append(matrix.ndim - 1)
         for dim_idx in np.arange(matrix.ndim):
-            if not dim_idx in except_idx:
+            if not dim_idx in except_idx and boundary[dim_idx] > 0:
                 matrix = np.moveaxis(matrix, source = dim_idx, destination=0)
                 matrix = matrix[boundary[dim_idx]:-boundary[dim_idx], ...]
                 matrix = np.moveaxis(matrix, source = 0, destination=dim_idx)    

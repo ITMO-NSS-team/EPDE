@@ -16,15 +16,13 @@ Created on Tue Jul 13 14:45:14 2021
 
 import numpy as np
 import epde.interface.interface as epde_alg
-import epde.globals as global_var
+
 from epde.interface.prepared_tokens import Trigonometric_tokens
 
 if __name__ == '__main__':
 
     t = np.linspace(0, 4*np.pi, 1000) # setting time axis, corresonding to the solution of ODE
     u = np.load('/media/mike_ubuntu/DATA/EPDE_publication/tests/system/Test_data/fill366.npy') # loading data with the solution of ODE
-    
-    global_var.set_time_axis(0)
     
     # Trying to create population for mulit-objective optimization with only 
     # derivatives as allowed tokens. Spoiler: only one equation structure will be 

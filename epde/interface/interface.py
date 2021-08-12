@@ -101,7 +101,7 @@ def simple_selector(sorted_neighbors, number_of_neighbors = 4):
      
 class epde_search(object):
     def __init__(self, use_default_strategy : bool = True, eq_search_stop_criterion : Stop_condition = Iteration_limit,
-                 director = None, equation_type : set = {'PDE', 'derivatives only'}):
+                 director = None, equation_type : set = {'PDE', 'derivatives only'}, time_axis : int = 0):
         '''
         
         Intialization of the epde search object. Here, the user can declare the properties of the 
@@ -126,6 +126,7 @@ class epde_search(object):
             Will define equation type, TBD later.
         
         '''
+        global_var.set_time_axis(time_axis)
 #        eq_search_stop_criterion_obj = eq_search_stop_criterion()
         if director is not None and not use_default_strategy:
             self.director = director
