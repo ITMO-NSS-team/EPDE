@@ -153,7 +153,7 @@ class Refining_Equation_mutation(Compound_Operator):
         return True
     
     @Reset_equation_status(reset_input = True)#, reset_right_part = False)
-    @History_Extender(f'\n -> mutating equation', 'ba')
+    @History_Extender(f'\n -> refining mutating equation', 'ba')
     def apply(self, equation):
         for term_idx in range(equation.n_immutable, len(equation.structure)):
             if term_idx == equation.target_idx:
@@ -192,7 +192,10 @@ class Equation_mutation(Compound_Operator):
                     mut_operator = self.suboperators['Mutation']
                 if 'forbidden_tokens' in mut_operator.params.keys():
                     mut_operator.params['forbidden_tokens'] = [factor for factor in equation.structure[equation.target_idx].structure if factor.status['unique_for_right_part']]   # [factor.label for factor in equation.structure[].structure]
+#                temp = equation.structure[term_idx]
+#                print('before mutation:', temp.name)
                 equation.structure[term_idx] = mut_operator.apply(term_idx, equation)
+#                print('after mutation:', temp.name, 'to', equation.structure[term_idx].name)
                 equation.check_split_correctness()
 
     @property

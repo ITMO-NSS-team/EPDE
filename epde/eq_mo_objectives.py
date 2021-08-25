@@ -23,7 +23,9 @@ def system_discrepancy(system):
         discrepancy : float.
         The value of the error metric.
     '''
-    return system.evaluate(normalize = False)
+    res = system.evaluate(normalize = False)
+    print(f'achieved system discrepancy is {res}')
+    return res
 
 def system_complexity_by_terms(system):
     '''

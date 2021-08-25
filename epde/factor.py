@@ -72,7 +72,7 @@ class Factor(TerminalToken):
             _params = np.empty(len(params_description))#OrderedDict()
             for param_idx, param_info in enumerate(params_description.items()):
                 if param_info[0] != 'power':
-                    _params[param_idx] = (np.random.randint(param_info[1][0], param_info[1][1]) if isinstance(param_info[1][0], int) 
+                    _params[param_idx] = (np.random.randint(param_info[1][0], param_info[1][1] + 1) if isinstance(param_info[1][0], int) 
                     else np.random.uniform(param_info[1][0], param_info[1][1])) if param_info[1][1] > param_info[1][0] else param_info[1][0]
                 else:
                     _params[param_idx] = 1
@@ -148,7 +148,9 @@ class Factor(TerminalToken):
 
     @property
     def grids(self):
-        return global_var.grid_cache.get(str(self.grid_idx))
+        _, grids = global_var.grid_cache.get_all()
+        return grids
+#        return global_var.grid_cache.get(str(self.grid_idx))
 
     def use_grids_cache(self):
         dim_param_idx = np.inf
@@ -160,8 +162,6 @@ class Factor(TerminalToken):
 #        if dim_set:
 #            assert self.params[name_param_idx] != np.inf, 'No dimension parameter for grid selection'
         self.grid_idx = int(self.params[dim_param_idx]) if dim_set else 0
-#        else:
-#            self.grid_idx = 0
         self.grid_set = True
     
     def use_cache(self):      

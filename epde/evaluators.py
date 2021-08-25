@@ -47,13 +47,20 @@ class Custom_Evaluator(Evaluator_template):
         for key in self.eval_fun_params_labels:
             for param_idx, param_descr in factor.params_description.items():
                 if param_descr['name'] == key: eval_fun_kwargs[key] = factor.params[param_idx]
-                
-#        grid_function = np.vectorize(evaluation_function, excluded=eval_fun_kwargs.keys())
-#        print('for', factor.label, 'kwargs:', eval_fun_kwargs)
-        grid_function = np.vectorize(lambda *args: evaluation_function(*args, **eval_fun_kwargs))
+        
+#        print('type:', type(factor.grids), 'len', len(factor.grids), 'ndim', factor.grids[0].ndim, 'shape', factor.grids[0].shape)
+        grid_function = np.vectorize(lambda args: evaluation_function(*args, **eval_fun_kwargs))
                                      #, excluded=eval_fun_kwargs.keys())
+                                     
+        try:
+            self.indexes_vect
+        except AttributeError:
+            self.indexes_vect = np.empty_like(factor.grids[0], dtype = object)
+            for tensor_idx, _ in np.ndenumerate(factor.grids[0]):
+                self.indexes_vect[tensor_idx] = tuple([grid[tensor_idx]
+                                                        for grid in factor.grids])
 
-        value = grid_function(factor.grids)#, **eval_fun_kwargs) #[int(factor.params[dim_param_idx])]
+        value = grid_function(self.indexes_vect)
         return value
         
 
@@ -92,69 +99,78 @@ def simple_function_evaluator(factor, structural : bool = False, **kwargs):
         value = value**(factor.params[power_param_idx])
         return value
 
-
-def trigonometric_evaluator(factor, structual = False, **kwargs):
-    
-    '''
-    
-    Example of the evaluator of token values, appropriate for case of trigonometric functions to be calculated on grid, with results in forms of tensors
-    
-    Parameters
-    ----------
-
-    factor : epde.factor.Factor object,
-        Object, that represents a factor from the equation terms, for that we want to calculate the values.
-        
-    structural : bool,
-        Mark, if the evaluated value will be used for discovering equation structure (True), or calculating coefficients (False)
-        
-    Returns
-    ----------
-    value : numpy.ndarray
-        Vector of the evaluation of the token values, that can be used as target, or feature during the LASSO regression.
-        
-    '''
-    
-    assert factor.grid_set, 'Evaluation grid is not defined for the trigonometric token'
-    trig_functions = {'sin' : np.sin, 'cos' : np.cos}
-    function = trig_functions[factor.label]
-    for param_idx, param_descr in factor.params_description.items():
-        if param_descr['name'] == 'freq': freq_param_idx = param_idx
-        if param_descr['name'] == 'dim': dim_param_idx = param_idx
-        if param_descr['name'] == 'power': power_param_idx = param_idx
-    grid_function = np.vectorize(lambda *args: function(factor.params[freq_param_idx] * #args[int(factor.params[dim_param_idx])]
-                                                        args[int(factor.params[dim_param_idx])])**factor.params[power_param_idx])
-    value = grid_function(factor.grids)#[int(factor.params[dim_param_idx])]
-    return value
+trig_eval_fun = {'cos' : lambda *grids, **kwargs: np.cos(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power'], 
+                   'sin' : lambda *grids, **kwargs: np.sin(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power']}
+inverse_eval_fun = lambda *grids, **kwargs: np.power(grids[int(kwargs['dim'])], - kwargs['power']) 
 
 
-def inverse_function_evaluator(factor, structual = False, **kwargs):
-    
-    '''
-    
-    Example of the evaluator of token values, appropriate for case of inverse functions of grid values to be calculated on grid, 
-    with results in forms of tensors. 
-    
-    Parameters
-    ----------
+trigonometric_evaluator = Custom_Evaluator(trig_eval_fun, eval_fun_params_labels = ['freq', 'dim', 'power'])
 
-    factor : epde.factor.Factor object,
-        Object, that represents a factor from the equation terms, for that we want to calculate the values.
-        
-    structural : bool,
-        Mark, if the evaluated value will be used for discovering equation structure (True), or calculating coefficients (False)
-        
-    Returns
-    ----------
-    value : numpy.ndarray
-        Vector of the evaluation of the token values, that can be used as target, or feature during the LASSO regression.
-        
-    '''
-    
-    assert factor.grid_set, 'Evaluation grid is not defined for the trigonometric token'
-    for param_idx, param_descr in factor.params_description.items():
-        if param_descr['name'] == 'dim': dim_param_idx = param_idx
-        if param_descr['name'] == 'power': power_param_idx = param_idx
-    grid_function = np.vectorize(lambda *args: pow(args[int(factor.params[dim_param_idx])], - factor.params[power_param_idx]))
-    value = grid_function(factor.grids)#[int(factor.params[dim_param_idx])]
-    return value
+inverse_function_evaluator = Custom_Evaluator(inverse_eval_fun, eval_fun_params_labels = ['dim', 'power'], use_factors_grids = True)    
+
+
+#def trigonometric_evaluator(factor, structual = False, **kwargs):
+#    
+#    '''
+#    
+#    Example of the evaluator of token values, appropriate for case of trigonometric functions to be calculated on grid, with results in forms of tensors
+#    
+#    Parameters
+#    ----------
+#
+#    factor : epde.factor.Factor object,
+#        Object, that represents a factor from the equation terms, for that we want to calculate the values.
+#        
+#    structural : bool,
+#        Mark, if the evaluated value will be used for discovering equation structure (True), or calculating coefficients (False)
+#        
+#    Returns
+#    ----------
+#    value : numpy.ndarray
+#        Vector of the evaluation of the token values, that can be used as target, or feature during the LASSO regression.
+#        
+#    '''
+#    
+#    assert factor.grid_set, 'Evaluation grid is not defined for the trigonometric token'
+#    trig_functions = {'sin' : np.sin, 'cos' : np.cos}
+#    function = trig_functions[factor.label]
+#    for param_idx, param_descr in factor.params_description.items():
+#        if param_descr['name'] == 'freq': freq_param_idx = param_idx
+#        if param_descr['name'] == 'dim': dim_param_idx = param_idx
+#        if param_descr['name'] == 'power': power_param_idx = param_idx
+#    grid_function = np.vectorize(lambda *args: function(factor.params[freq_param_idx] * #args[int(factor.params[dim_param_idx])]
+#                                                        args[int(factor.params[dim_param_idx])])**factor.params[power_param_idx])
+#    value = grid_function(factor.grids)#[int(factor.params[dim_param_idx])]
+#    return value
+
+
+#def inverse_function_evaluator(factor, structual = False, **kwargs):
+#    
+#    '''
+#    
+#    Example of the evaluator of token values, appropriate for case of inverse functions of grid values to be calculated on grid, 
+#    with results in forms of tensors. 
+#    
+#    Parameters
+#    ----------
+#
+#    factor : epde.factor.Factor object,
+#        Object, that represents a factor from the equation terms, for that we want to calculate the values.
+#        
+#    structural : bool,
+#        Mark, if the evaluated value will be used for discovering equation structure (True), or calculating coefficients (False)
+#        
+#    Returns
+#    ----------
+#    value : numpy.ndarray
+#        Vector of the evaluation of the token values, that can be used as target, or feature during the LASSO regression.
+#        
+#    '''
+#    
+#    assert factor.grid_set, 'Evaluation grid is not defined for the trigonometric token'
+#    for param_idx, param_descr in factor.params_description.items():
+#        if param_descr['name'] == 'dim': dim_param_idx = param_idx
+#        if param_descr['name'] == 'power': power_param_idx = param_idx
+#    grid_function = np.vectorize(lambda *args: pow(args[int(factor.params[dim_param_idx])], - factor.params[power_param_idx]))
+#    value = grid_function(factor.grids)#[int(factor.params[dim_param_idx])]
+#    return value

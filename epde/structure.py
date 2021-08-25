@@ -113,11 +113,11 @@ class Term(Complex_Structure):
                 self.structure[idx].use_cache()
 
 
-    def Defined(self, passed_term):   
+    def Defined(self, passed_term):
         self.structure = []
         print('passed_term:', passed_term)
 
-        if type(passed_term) == list or type(passed_term) == tuple:
+        if isinstance(passed_term, (list, tuple)): #type(passed_term) == list or type(passed_term) == tuple:
             for i, factor in enumerate(passed_term):
                 if type(factor) == str:
                     _, temp_f = self.pool.create(label = factor)
@@ -257,8 +257,7 @@ class Term(Complex_Structure):
                 len(other.structure) == len(self.structure))
 
 
-class Equation(Complex_Structure):
-#    @Reset_equation_status()   
+class Equation(Complex_Structure): 
     def __init__(self, pool, basic_structure, terms_number = 6, max_factors_in_term = 2, interelement_operator = np.add): #eq_weights_eval
 
         """
@@ -308,8 +307,15 @@ class Equation(Complex_Structure):
         self.operator = None
         if (terms_number < self.n_immutable): 
             raise Exception('Number of terms ({}) is too low to even contain all of the pre-determined ones'.format(terms_number))        
+
+        for passed_term in basic_structure:
+            if isinstance(passed_term, Term):
+                self.structure.append(passed_term)
+            elif isinstance(passed_term, str):
+                self.structure.append(Term(self.pool, passed_term = passed_term, 
+                                           max_factors_in_term = self.max_factors_in_term))
             
-        self.structure.extend([Term(self.pool, passed_term = label, max_factors_in_term = self.max_factors_in_term) for label in basic_structure])
+#        self.structure.extend([Term(self.pool, passed_term = label, max_factors_in_term = self.max_factors_in_term) for label in basic_structure])
     
         for i in range(len(basic_structure), terms_number):
             check_test = 0
@@ -357,6 +363,8 @@ class Equation(Complex_Structure):
                 self._features = np.vstack([self._features, temp])
             else:
                 continue
+        if self._features.ndim == 1:
+            self._features = np.expand_dims(self._features, 1)
         temp_feats = np.vstack([self._features, np.ones(self._features.shape[1])])
         self._features = np.transpose(self._features); temp_feats = np.transpose(temp_feats)
         if return_val:

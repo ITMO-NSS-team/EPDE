@@ -29,9 +29,6 @@ def upload_simple_tokens(labels, cache, tensors, grid_setting = False):
         else:
             label_completed = (label, (1.0,))
         cache.add(label_completed, tensors[idx])
-#        if type(tensors_scaled) != type(None):
-#            print('uploading scaled data into cache, label: ', label_completed)
-#            cache.add(label_completed, tensors_scaled[idx], scaled = True)        
         cache.add(label_completed, tensors[idx])        
         cache.add_base_matrix(label_completed)
 
@@ -110,6 +107,7 @@ def download_variable(var_filename, deriv_filename, boundary, time_axis):
 
 class Cache(object):
     def __init__(self):
+        self.max_allowed_tensors = None
         self.memory_default = dict()
         self.memory_normalized = dict()
         self.memory_structural = dict()
@@ -236,6 +234,8 @@ class Cache(object):
 #        assert not scaled or self.scale_used, 'Trying to add scaled data, while the cache it not allowed to get it'
 #        assert not structural, 'the structural data must be added with cache.use_structural method'
         if normalized:
+            if self.max_allowed_tensors is None:
+                self.memory_usage_properties(obj_test_case = tensor, mem_for_cache_frac = 5)
             if (len(self.memory_normalized) + len(self.memory_default) + len(self.memory_structural) < self.max_allowed_tensors and 
                 label not in self.memory_default.keys()):
                 self.memory_normalized[label] = tensor
@@ -254,6 +254,8 @@ class Cache(object):
         elif structural:
             raise NotImplementedError('The structural data must be added with cache.use_structural method')
         else:
+            if self.max_allowed_tensors is None:
+                self.memory_usage_properties(obj_test_case = tensor, mem_for_cache_frac = 5)            
             if (len(self.memory_normalized) + len(self.memory_default) + len(self.memory_structural) < self.max_allowed_tensors and 
                 label not in self.memory_default.keys()):
                 self.memory_default[label] = tensor
@@ -355,7 +357,21 @@ class Cache(object):
                 return False
         else:
             raise NotImplementedError('Invalid format of function input to check, if the object is in cache')
-            
+    
+#    def __iter__(self):
+#        for key in self.memory_default.keys()
+    def prune_tensors(self, pruner, mem_to_process : list = ['default', 'structural', 'normalized']):
+        mem_arranged = {'default' : self.memory_default, 
+                            'structural' : self.memory_structural, 
+                            'normalized' : self.memory_normalized}
+        
+        for key in self.memory_default.keys():
+            for mem_type in mem_to_process:
+                try:
+                    mem_arranged[mem_type][key] = pruner.prune(mem_arranged[mem_type][key])
+                except (NameError, KeyError) as e:
+                    pass
+        
     @property
     def consumed_memory(self):
         memsize = np.sum([value.nbytes for _, value in self.memory_default.items()])

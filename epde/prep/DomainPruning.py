@@ -12,6 +12,9 @@ import copy
 
 import epde.globals as global_var
 
+def scale_values(tensor):
+    return tensor/np.max(tensor)
+
 def split_tensor(tensor, fraction_along_axis : Union[int, list, tuple]):
     assert isinstance(tensor, np.ndarray)
     fragments = [tensor,]
@@ -30,10 +33,8 @@ def split_tensor(tensor, fraction_along_axis : Union[int, list, tuple]):
         split_indexes = [int(tensor.shape[axis_idx]/fraction * element) for element in range(fraction) if element != 0]
         split_indexes_along_axis.append([0,] + split_indexes + [tensor.shape[axis_idx]])
         for ts_idx, tensor_section in enumerate(fragments):
-            print(axis_idx, split_indexes, tensor_section.shape)
             splitted_op = np.split(tensor_section, split_indexes, axis = axis_idx)
-            print([elem.shape for elem in splitted_op])
-            temp_fragments.extend(splitted_op) # array_split   fraction
+            temp_fragments.extend(splitted_op)
             for index_idx, idx in enumerate([indexes[ts_idx] for i in range(fraction)]):
                 temp = copy.copy(idx); temp[axis_idx] = index_idx
                 temp_indexes.append(temp)
@@ -47,12 +48,9 @@ def split_tensor(tensor, fraction_along_axis : Union[int, list, tuple]):
         block_matrix[tuple(indexes[idx])] = tensor_fragment
     return split_indexes_along_axis, block_matrix
 
-
-def majority_rule(tensors : Union[list, np.ndarray], threshold : int = 1e-5):
-    print([np.linalg.norm(tensor) for tensor in tensors])
+def majority_rule(tensors : Union[list, np.ndarray], threshold : float = 1e-2):
     non_constancy_cond = lambda x: np.linalg.norm(x) > (threshold * x.size)
     return sum([non_constancy_cond(x_elem) for x_elem in tensors])/len(tensors) >= 0.5
-
 
 def get_subdomains_mask(tensor, division_fractions : Union[int, list, tuple], domain_selector : Callable, 
                         domain_selector_kwargs : dict, time_axis : int):
@@ -61,20 +59,18 @@ def get_subdomains_mask(tensor, division_fractions : Union[int, list, tuple], do
     else:
         sd_shape = tuple([div_frac for idx, div_frac in enumerate(division_fractions) if idx != time_axis])
     accepted_spatial_domains = np.full(shape = (sd_shape), fill_value = True, dtype = bool) # [division_fraction for i in self.]
+    tensor = scale_values(tensor)    
     split_idxs, time_deriv_fragments = split_tensor(tensor, division_fractions)
-    print('obtained block matrix shape', time_deriv_fragments.shape)
     time_deriv_fragments = np.moveaxis(a = time_deriv_fragments, source = time_axis, destination = -1)#    for 
     
     temp = []; counter = 0
-    for idx, tensor in np.ndenumerate(time_deriv_fragments):
+    for idx, partial_tensor in np.ndenumerate(time_deriv_fragments):
         if counter < time_deriv_fragments.shape[-1] - 1:
-            temp.append(tensor)
-            print(idx, np.linalg.norm(tensor))
+            temp.append(partial_tensor)
             counter += 1
         else:
-            temp.append(tensor)
+            temp.append(partial_tensor)
             accepted_spatial_domains[idx[:-1]] = domain_selector(temp, **domain_selector_kwargs)
-            print(idx, np.linalg.norm(tensor), 'processed', domain_selector(temp, **domain_selector_kwargs))
             temp = []; counter = 0
     return split_idxs, accepted_spatial_domains
 
@@ -103,17 +99,26 @@ class Domain_Pruner(object):
     def __init__(self, domain_selector : Callable = majority_rule, domain_selector_kwargs : dict = dict()):
         self.domain_selector = domain_selector
         self.domain_selector_kwargs = domain_selector_kwargs
+        self.bds_init = False
     
     def get_boundaries(self, pivotal_tensor : np.ndarray, division_fractions : Union[int, list, tuple] = 3, 
-                       time_axis : int = global_var.time_axis, rectangular : bool = True):
+                       time_axis = None, rectangular : bool = True):
+        if time_axis is None:
+            try:
+                time_axis = global_var.time_axis
+            except AttributeError:
+                time_axis = 0
         self.time_axis = time_axis
         self.split_idxs, self.accepted_spatial_domains = get_subdomains_mask(pivotal_tensor, division_fractions, 
                                                                    self.domain_selector, 
                                                                    self.domain_selector_kwargs, self.time_axis)
         self.bds = pruned_domain_boundaries(self.accepted_spatial_domains, self.split_idxs, self.time_axis,
                                             rectangular)
+        self.bds_init = True
 
     def prune(self, tensor):
+        if not self.bds_init:
+            raise AttributeError('Tring to use domain pruning boundaries before defining them. Use self.get_boundaries(...) beforehand.')
         tensor_new = np.copy(tensor)
         for axis_idx in np.arange(tensor_new.ndim):
             if axis_idx != self.time_axis:
@@ -121,4 +126,4 @@ class Domain_Pruner(object):
                 bd_idx = axis_idx if axis_idx < self.time_axis else axis_idx - 1
                 tensor_new = tensor_new[self.bds[bd_idx][0] : self.bds[bd_idx][1], ...]
                 tensor_new = np.moveaxis(tensor_new, source = 0, destination=axis_idx)                
-        return tensor_new    
+        return tensor_new

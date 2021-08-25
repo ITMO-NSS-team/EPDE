@@ -134,8 +134,10 @@ def Slice_Data_3D(matrix, part = 4, part_tuple = None):     # Input matrix slici
 def Define_Derivatives(var_name = 'u', dimensionality = 1, max_order = 2):
     deriv_names = [var_name,]
     var_deriv_orders = [[] ,]
+    if isinstance(max_order, int):
+        max_order = [max_order for dim in range(dimensionality)]
     for var_idx in range(dimensionality):
-        for order in range(max_order):
+        for order in range(max_order[var_idx]):
             var_deriv_orders.append([var_idx,] * (order+1))
             if order == 0:
                 deriv_names.append('d'+ var_name + '/dx'+str(var_idx+1))
@@ -152,9 +154,9 @@ def Population_Sort(input_population):
 def parse_equation(text_form):
     '''
     
-    Example input: '0.0 * d^3u/dx2^3{power: 1.0} * du/dx2{power: 1.0} + 0.0 * d^3u/dx1^3{power: 1.0} +
-    0.015167810810763344 * d^2u/dx1^2{power: 1.0} + 0.0 * d^3u/dx2^3{power: 1.0} + 0.0 * du/dx2{power: 1.0} + 
-    4.261009307104081e-07 = d^2u/dx1^2{power: 1.0} * du/dx1{power: 1.0}'
+    Example input: '0.0 * d^3u/dx2^3{power: 1} * du/dx2{power: 1} + 0.0 * d^3u/dx1^3{power: 1} +
+    0.015167810810763344 * d^2u/dx1^2{power: 1} + 0.0 * d^3u/dx2^3{power: 1} + 0.0 * du/dx2{power: 1} + 
+    4.261009307104081e-07 = d^2u/dx1^2{power: 1} * du/dx1{power: 1}'
     
     '''
     left, right = text_form.split(' = ')

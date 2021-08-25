@@ -426,12 +426,3 @@ class TF_Pool(object):
     
     def __add__(self, other):
         return TF_Pool(families = self.families + other.families)
-    
-    
-def factor_from_str(text_form, pool):   # В проект: работы по обрезке сетки, на которых нулевые значения производных
-    label_str, params_str = text_form.split('{')
-    if not '}' in params_str:
-        raise ValueError('Missing brackets, denoting parameters part of factor text form. Possible explanation: passing wrong argument')
-    params_str = params_str.replace('}', '')
-    factor_family = [family for family in pool if label_str in family.tokens][0]    
-    factor = Factor()    
