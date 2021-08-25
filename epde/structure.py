@@ -10,6 +10,7 @@ import numpy as np
 from functools import reduce
 import copy
 import gc
+import time
 
 import epde.globals as global_var
 
@@ -147,12 +148,25 @@ class Term(Complex_Structure):
                                                            occupied = self.occupied_tokens_labels, **kwargs)
             self.structure = [factor,]
             self.occupied_tokens_labels.extend(occupied_by_factor)
+            factors_powers = {factor.label : 1}
             
             for i in np.arange(1, factors_num):
+#                print(occupied_by_factor, self.occupied_tokens_labels)
+#                time.sleep(5)
                 occupied_by_factor, factor = self.pool.create(label = None, create_meaningful = False, 
                                                                occupied = self.occupied_tokens_labels, 
                                                                def_term_tokens = [token.label for token in self.structure], 
                                                                **kwargs) 
+                if factor.label in factors_powers:
+                    factors_powers[factor.label] += 1
+                else:
+                    factors_powers[factor.label] = 1
+                    
+                for param_idx, param_descr in factor.params_description.items():
+                    if param_descr['name'] == 'power': power_param_idx = param_idx
+                        
+                if factors_powers[factor.label] == factor.params_description[power_param_idx]['bounds'][1]:
+                    self.occupied_tokens_labels.append(factor.label)
                 self.structure.append(factor)
                 self.occupied_tokens_labels.extend(occupied_by_factor)                
             self.structure = Filter_powers(self.structure)

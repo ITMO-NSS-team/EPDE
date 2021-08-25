@@ -9,7 +9,7 @@ Created on Tue Jul 13 14:45:14 2021
 import numpy as np
 import epde.interface.interface as epde_alg
 
-from epde.interface.prepared_tokens import Custom_tokens, Trigonometric_tokens
+from epde.interface.prepared_tokens import Custom_tokens, Trigonometric_tokens, Cache_stored_tokens
 from epde.evaluators import Custom_Evaluator
 
 if __name__ == '__main__':
@@ -20,7 +20,7 @@ if __name__ == '__main__':
     # derivatives as allowed tokens. Spoiler: only one equation structure will be 
     # discovered, thus MOO algorithm will not be launched.
     
-    dimensionality = t.ndim
+    dimensionality = t.ndim - 1
     
     epde_search_obj = epde_alg.epde_search()
 
@@ -76,7 +76,7 @@ if __name__ == '__main__':
     По умолчанию, для дискретных параметров равенство выполняется только при полном соответствии, а для действительно-значных аргументов
     равенство выполняется при разнице меньше, чем 0.05 * (max_param_value - min_param_value).
     '''
-    trig_params_equal_ranges = {'freq' : 0.02}
+    trig_params_equal_ranges = {'freq' : 0.05}
 
     custom_trig_tokens = Custom_tokens(token_type = 'trigonometric', # Выбираем название для семейства токенов.
                                        token_labels = ['sin', 'cos'], # Задаём названия токенов семейства в формате python-list'a.
@@ -104,8 +104,15 @@ if __name__ == '__main__':
                                                                       # (равенство при лишь полном совпадении дискретных параметров)
                                                                       # нас устраивает.
 
+    boundary = 10
+    custom_grid_tokens = Cache_stored_tokens(token_type = 'grid', 
+                                       boundary = boundary,
+                                       token_labels = ['t'], 
+                                       token_tensors={'t' : t},
+                                       params_ranges = {'power' : (1, 1)},
+                                       params_equality_ranges = None)
     
-    epde_search_obj.fit(data = u, boundary=10, equation_factors_max_number = 2, coordinate_tensors = [t,], 
-                        additional_tokens = [custom_trig_tokens, custom_inv_fun_tokens], field_smooth = False, memory_for_cache=5)
+    epde_search_obj.fit(data = u, boundary=boundary, equation_factors_max_number = 2, coordinate_tensors = [t,], 
+                        additional_tokens = [custom_trig_tokens, custom_inv_fun_tokens, custom_grid_tokens], field_smooth = False, memory_for_cache=5, data_fun_pow = 2)
     
     epde_search_obj.equation_search_results(only_print = True, level_num = 1) # showing the Pareto-optimal set of discovered equations 
