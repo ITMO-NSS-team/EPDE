@@ -51,7 +51,7 @@ class PopLevel_crossover(Compound_Operator):
             the new population, containing both parents and offsprings;
         
         """
-        print('Running crossover')
+        # print('Running crossover')
         crossover_pool = []
         for solution in population:
             crossover_pool.extend([solution,] * solution.crossover_selected_times)

@@ -353,7 +353,7 @@ class Equation(Complex_Structure):
         self.reset_state()
 
         self.n_immutable = len(basic_structure)
-        print('n_immutable', self.n_immutable)
+        # print('n_immutable', self.n_immutable)
         self.pool = pool
         self.structure = []
         self.terms_number = terms_number; self.max_factors_in_term = max_factors_in_term

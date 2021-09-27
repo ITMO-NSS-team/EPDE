@@ -41,7 +41,7 @@ class Tournament_selection(Compound_Operator):
 #        print('\n')
 #        print('size of the selection:', int(len(population)*self.params['part_with_offsprings']), 'from', len(population), self.params['part_with_offsprings'])
 #        print('\n')
-        print('Running selection')
+        # print('Running selection')
         ssize = int(len(population)*self.params['part_with_offsprings']) 
         if ssize == 0: ssize += 2
         if ssize & 0x1: ssize += 1

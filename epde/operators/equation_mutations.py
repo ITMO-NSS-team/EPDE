@@ -61,7 +61,7 @@ class PopLevel_mutation(Compound_Operator):
             The input population, altered by mutation operators.
             
         """
-        print('Running mutation')
+        # print('Running mutation')
         population = Population_Sort(population)
         for indiv_idx in range(self.params['elitism'], len(population)):
             if np.random.uniform(0, 1) <= self.params['indiv_mutation_prob']:
@@ -119,7 +119,7 @@ class PopLevel_mutation_elite(Compound_Operator):
             The input population, altered by mutation operators.
             
         """
-        print('Running mutation')        
+        # print('Running mutation')        
         for equation in population:
             if np.random.uniform(0, 1) <= self.params['indiv_mutation_prob']:
                 if equation.elite == 'elite':
