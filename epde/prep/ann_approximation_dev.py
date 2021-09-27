@@ -9,7 +9,8 @@ import time
 from collections import Counter
 
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_eager_execution()
 import copy
 from scipy.interpolate import RegularGridInterpolator
 
@@ -49,7 +50,8 @@ def approximator_shallow(*args):
 def approximator_deep(*args):
     data = tf.stack(args, axis = 1, name = 'data_stacked')
     data = tf.squeeze(data)
-    with tf.name_scope("UA_fit"):   
+    with tf.name_scope("UA_fit"): 
+        tf.disable_eager_execution()
         w1 = tf.get_default_graph().get_tensor_by_name("w1:0")
         b1 = tf.get_default_graph().get_tensor_by_name("b1:0")
         w2 = tf.get_default_graph().get_tensor_by_name("w2:0")
@@ -61,7 +63,7 @@ def approximator_deep(*args):
         w5 = tf.get_default_graph().get_tensor_by_name("w5:0")
         b5 = tf.get_default_graph().get_tensor_by_name("b5:0")        
         w_out = tf.get_default_graph().get_tensor_by_name("w_out:0")
-        
+        print(data.shape, w1.shape)
         ws1 = tf.matmul(data, w1) + b1
         a1 = tf.nn.sigmoid(ws1) 
 
@@ -113,6 +115,7 @@ def approximate_ann_deep(data):
     output_dim = 1
     
     with tf.name_scope("UA_fit"):
+        tf.disable_eager_execution()
         w1 = tf.get_variable(name = "w1", dtype = tf.float32, shape=[input_layers, hidden_layers_1], 
                             initializer=tf.random_normal_initializer(stddev = 1.))
         b1 = tf.get_variable(name = "b1", dtype = tf.float32, shape=[hidden_layers_1], 
@@ -157,7 +160,7 @@ def approximate_ann_deep(data):
         w_out = tf.get_variable(name = "w_out", dtype = tf.float32, shape=[hidden_layers_5, output_dim], 
                             initializer=tf.random_normal_initializer(stddev = 1.))
         ws_out = tf.matmul(a5, w_out)
-#    print(w1.name)        
+    print(w1.name, w1.shape)        
     return ws_out    
 
 class Differentiable_Function(object):
@@ -180,7 +183,7 @@ class Differentiable_Function(object):
             return derivatives, deriv_history
 
 class Approximator(object):
-    def __init__(self, data, steps, *kwargs):
+    def __init__(self, data, steps, **kwargs):
         self.training_session = tf.Session()
         self.data = data; 
         self.steps = steps
@@ -200,7 +203,7 @@ class Approximator(object):
                 return self.data[idx]        
         return -np.inf        
         
-    def train(self, batch_proportion = 0.9, epochs = 100):       
+    def train(self, batch_proportion = 0.9, epochs = None, loss_bnd = None):       
         x = tf.placeholder(tf.float32, shape = [None, self.data.ndim], name="x")
         y_appr = approximate_ann_deep(x)
         y_true = tf.placeholder(tf.float32, shape = [None, 1], name="y_true")
@@ -211,26 +214,55 @@ class Approximator(object):
         adam = tf.train.AdamOptimizer(learning_rate=1e-2)
         train_optimizer = adam.minimize(loss)
 
-        self.training_session.run(tf.global_variables_initializer())        
-        for epoch in np.arange(epochs):
-            dgr = copy.deepcopy(self.dgr)
-            np.random.shuffle(dgr)
-            idx_train, idx_val = dgr[:int(dgr.shape[0]*batch_proportion), :], dgr[int(dgr.shape[0]*batch_proportion):, :]            
-            x_train = np.matrix([self.coords[tuple(idx)] for idx in idx_train])
-            x_val = np.matrix([self.coords[tuple(idx)] for idx in idx_val])
-            y_train = [self.interp_function(self.coords[tuple(idx)]) for idx in idx_train]
-            y_train = np.asarray(y_train).reshape((len(y_train), 1))
-            y_val = [self.interp_function(self.coords[tuple(idx)]) for idx in idx_val]
-            y_val = np.asarray(y_val).reshape((len(y_val), 1))
-            print(y_train.shape)
+        self.training_session.run(tf.global_variables_initializer())
+        if epochs is not None and loss_bnd is None:        
+            for epoch in np.arange(epochs):
+                dgr = copy.deepcopy(self.dgr)
+                np.random.shuffle(dgr)
+                idx_train, idx_val = dgr[:int(dgr.shape[0]*batch_proportion), :], dgr[int(dgr.shape[0]*batch_proportion):, :]            
+                x_train = np.matrix([self.coords[tuple(idx)] for idx in idx_train])
+                x_val = np.matrix([self.coords[tuple(idx)] for idx in idx_val])
+                y_train = [self.interp_function(self.coords[tuple(idx)]) for idx in idx_train]
+                y_train = np.asarray(y_train).reshape((len(y_train), 1))
+                y_val = [self.interp_function(self.coords[tuple(idx)]) for idx in idx_val]
+                y_val = np.asarray(y_val).reshape((len(y_val), 1))
+                print(y_train.shape)
+    
+                feed_t = {x: x_train, y_true: y_train}; feed_val = {x: x_val, y_true: y_val}
+                current_loss, _, x_cur, y_cur, y_approx = self.training_session.run([loss, train_optimizer,x, y_true, y_appr], feed_dict = feed_t)
+                val_loss = self.training_session.run([loss], feed_dict = feed_val)
+                w1 = tf.get_default_graph().get_tensor_by_name("w1:0")
+                print('w1 shape', w1.shape)
+                print(epoch, ' loss on train: ', current_loss, ',', ' loss on val (after weight adjustment): ', val_loss[0])
+        elif epochs is None and loss_bnd is not None:
+            val_loss = np.inf
+            while val_loss > loss_bnd:
+                dgr = copy.deepcopy(self.dgr)
+                np.random.shuffle(dgr)
+                idx_train, idx_val = dgr[:int(dgr.shape[0]*batch_proportion), :], dgr[int(dgr.shape[0]*batch_proportion):, :]            
+                x_train = np.matrix([self.coords[tuple(idx)] for idx in idx_train])
+                x_val = np.matrix([self.coords[tuple(idx)] for idx in idx_val])
+                y_train = [self.interp_function(self.coords[tuple(idx)]) for idx in idx_train]
+                y_train = np.asarray(y_train).reshape((len(y_train), 1))
+                y_val = [self.interp_function(self.coords[tuple(idx)]) for idx in idx_val]
+                y_val = np.asarray(y_val).reshape((len(y_val), 1))
+                print(y_train.shape)
+    
+                feed_t = {x: x_train, y_true: y_train}; feed_val = {x: x_val, y_true: y_val}
+                current_loss, _, x_cur, y_cur, y_approx = self.training_session.run([loss, train_optimizer,x, y_true, y_appr], feed_dict = feed_t)
+                val_loss = self.training_session.run([loss], feed_dict = feed_val)
+                w1 = tf.get_default_graph().get_tensor_by_name("w1:0")
+                print('w1 shape', w1.shape)
 
-            feed_t = {x: x_train, y_true: y_train}; feed_val = {x: x_val, y_true: y_val}
-            current_loss, _, x_cur, y_cur, y_approx = self.training_session.run([loss, train_optimizer,x, y_true, y_appr], feed_dict = feed_t)
-            val_loss = self.training_session.run([loss], feed_dict = feed_val)
-            print(epoch, ' loss on train: ', current_loss, ',', ' loss on val (after weight adjustment): ', val_loss[0])
+                print(epoch, ' loss on train: ', current_loss, ',', ' loss on val (after weight adjustment): ', val_loss[0])
+            
+        else:
+            raise NotImplementedError('Epochs number or loss function value must be set')
+        w1 = tf.get_default_graph().get_tensor_by_name("w1:0")
+        print(w1.shape)
 
-
-    def apply(self, dims = ['t', 'x', 'y', 'z']):        
+    def apply(self, dims = ['t', 'x', 'y', 'z']):
+        # self.dims = dims        
         self.inputs = self.coords.reshape((np.prod(self.coords.shape[:-1]), self.coords.shape[-1]))
         self.coords_tensors = []
         for dim_idx in range(self.dgr.shape[-1]):
@@ -250,7 +282,7 @@ class Approximator(object):
             self.inputs = self.coords.reshape((np.prod(self.coords.shape[:-1]), self.coords.shape[-1]))
             self.coords_tensors = []
             for dim_idx in range(self.dgr.shape[-1]):
-                var_name = dims[dim_idx] + '_coords'
+                var_name = axes[dim_idx] + '_coords'
                 self.coords_tensors.append(tf.placeholder(dtype = tf.float32, shape = (self.dgr.shape[0],), name = var_name))  
             self.approximation = approximator_deep(*self.coords_tensors)
             
@@ -295,7 +327,7 @@ class Approximator(object):
     
     
 if __name__ == '__main__':
-    
+
     def ic_1(x):
         x_max = 5.
         return np.sin(x/x_max*np.pi)*np.sin((5-x)/x_max*np.pi)
@@ -326,7 +358,7 @@ if __name__ == '__main__':
     
     tf.reset_default_graph()
     test_approx = Approximator(solution, (delta_t, delta_x))
-    test_approx.train(batch_proportion = 0.8, epochs=500)
+    test_approx.train(batch_proportion = 0.8, epochs=4)
     sol_approximation = test_approx.apply()
     derivatives = test_approx.get_derivatives(order = 2)
     

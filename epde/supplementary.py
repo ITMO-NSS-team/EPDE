@@ -133,7 +133,7 @@ def Slice_Data_3D(matrix, part = 4, part_tuple = None):     # Input matrix slici
 
 def Define_Derivatives(var_name = 'u', dimensionality = 1, max_order = 2):
     deriv_names = [var_name,]
-    var_deriv_orders = [[] ,]
+    var_deriv_orders = [[None,] ,]
     if isinstance(max_order, int):
         max_order = [max_order for dim in range(dimensionality)]
     for var_idx in range(dimensionality):
@@ -143,6 +143,7 @@ def Define_Derivatives(var_name = 'u', dimensionality = 1, max_order = 2):
                 deriv_names.append('d'+ var_name + '/dx'+str(var_idx+1))
             else:
                 deriv_names.append('d^'+str(order+1) + var_name + '/dx'+str(var_idx+1)+'^'+str(order+1))
+    print('Deriv orders after definition', var_deriv_orders)
     return deriv_names, var_deriv_orders
 
 
@@ -151,16 +152,16 @@ def Population_Sort(input_population):
     pop_sorted = [x for x, _ in sorted(zip(input_population, individ_fitvals), key=lambda pair: pair[1])]
     return list(reversed(pop_sorted))
 
-def parse_equation(text_form):
-    '''
+# def parse_equation(text_form):
+#     '''
     
-    Example input: '0.0 * d^3u/dx2^3{power: 1} * du/dx2{power: 1} + 0.0 * d^3u/dx1^3{power: 1} +
-    0.015167810810763344 * d^2u/dx1^2{power: 1} + 0.0 * d^3u/dx2^3{power: 1} + 0.0 * du/dx2{power: 1} + 
-    4.261009307104081e-07 = d^2u/dx1^2{power: 1} * du/dx1{power: 1}'
+#     Example input: '0.0 * d^3u/dx2^3{power: 1} * du/dx2{power: 1} + 0.0 * d^3u/dx1^3{power: 1} +
+#     0.015167810810763344 * d^2u/dx1^2{power: 1} + 0.0 * d^3u/dx2^3{power: 1} + 0.0 * du/dx2{power: 1} + 
+#     4.261009307104081e-07 = d^2u/dx1^2{power: 1} * du/dx1{power: 1}'
     
-    '''
-    left, right = text_form.split(' = ')
-    left = left.split(' + '); right = right.split(' + ')
-    for idx in np.arange(len(left)):
-        left[idx] = left[idx].split(' * ') 
-    return left + right
+#     '''
+#     left, right = text_form.split(' = ')
+#     left = left.split(' + '); right = right.split(' + ')
+#     for idx in np.arange(len(left)):
+#         left[idx] = left[idx].split(' * ') 
+#     return left + right

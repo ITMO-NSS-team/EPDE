@@ -26,24 +26,24 @@ class Reset_equation_status():
                     if isinstance(element, (list, tuple, set)):
                         for subelement in element:
                             try: 
-                                subelement.reset_eval(self.reset_right_part)
+                                subelement.reset_state(self.reset_right_part)
                             except AttributeError:
                                 pass
                     else:
                         try: 
-                            element.reset_eval(self.reset_right_part )
+                            element.reset_state(self.reset_right_part )
                         except AttributeError:
                             pass
             if self.reset_output:
                 try:
                     for equation in result:
                         try: 
-                            equation.reset_eval(self.reset_right_part )
+                            equation.reset_state(self.reset_right_part )
                         except AttributeError:
                             pass
                 except TypeError:
                     try: 
-                        result.reset_eval(self.reset_right_part )
+                        result.reset_state(self.reset_right_part )
                     except AttributeError:
                         pass                    
             return result
@@ -88,6 +88,9 @@ class History_Extender():
                         element.add_history(beginner + 'after operation: ' + element.state + ' || \n')
             return result
         return wrapper
+    
+class Parallelize_operator():
+    pass
     
     
 #class Ray_parallelizer():

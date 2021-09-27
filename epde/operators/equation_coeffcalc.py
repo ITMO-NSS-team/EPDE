@@ -51,9 +51,6 @@ class LinReg_based_coeffs(Compound_Operator):
         assert equation.weights_internal_evald, 'Trying to calculate final weights before evaluating intermeidate ones (no sparcity).'
         target = equation.structure[equation.target_idx]
     
-        equation.check_split_correctness()
-                
-    #    print(type(target.value))
         target_vals = target.evaluate(False)
         features_vals = []
         nonzero_features_indexes = []
@@ -77,10 +74,13 @@ class LinReg_based_coeffs(Compound_Operator):
             features = np.transpose(features)  
     #        print('Done 2')        
             estimator = LinearRegression(fit_intercept=False)
-            try:
-                estimator.fit(features, target_vals)
-            except ValueError:
+            if features.ndim == 1:
                 features = features.reshape(-1, 1)
+                estimator.fit(features, target_vals)
+            else:                
+                # print('features', features.shape, 'target', target_vals.shape)
+                # print((features == None).any())
+                # print(features[:100, 1])
                 estimator.fit(features, target_vals)
                 
             valueable_weights = estimator.coef_

@@ -46,8 +46,6 @@ class PopLevel_mutation(Compound_Operator):
     
     """
 
-#    def indiv_mut(self, population):
-#        
     def apply(self, population):
         """
         Return the new population, created with the specified operators and containing mutated population.
@@ -63,14 +61,11 @@ class PopLevel_mutation(Compound_Operator):
             The input population, altered by mutation operators.
             
         """
-        
+        print('Running mutation')
         population = Population_Sort(population)
         for indiv_idx in range(self.params['elitism'], len(population)):
             if np.random.uniform(0, 1) <= self.params['indiv_mutation_prob']:
                 self.suboperators['Equatiion_mutation'].apply(population[indiv_idx])
-
-#                self.suboperators['Coeff_calc'].apply(population[indiv_idx])
-#                self.suboperators['Fitness_eval'].apply(population[indiv_idx])
         return population
 
     @property
@@ -107,13 +102,7 @@ class PopLevel_mutation_elite(Compound_Operator):
     apply(population)
         return the new population, created with the specified operators and containing mutated population.    
     
-    """
-
-#    def __init__(self, param_keys : list):
-#        from epde.src.operators.equation_elitism import Percentage_elitism
-#        super().__init__(param_keys = param_keys)
-#        elitism = 
-#        self.suboperators = {'elitism' :}        
+    """   
         
     def apply(self, population):
         """
@@ -130,13 +119,15 @@ class PopLevel_mutation_elite(Compound_Operator):
             The input population, altered by mutation operators.
             
         """
-        
+        print('Running mutation')        
         for equation in population:
             if np.random.uniform(0, 1) <= self.params['indiv_mutation_prob']:
                 if equation.elite == 'elite':
-                    self.suboperators['Equatiion_mutation']['elite'].apply(equation)
+                    self.suboperators['Equatiion_mutation']['elite'].apply(equation)              
+                    # print(equation, equation.n_immutable)
                 elif equation.elite == 'non-elite':
                     self.suboperators['Equatiion_mutation']['non-elite'].apply(equation)
+                    # print(equation, equation.n_immutable)
                 elif equation.elite == 'immutable':
                     pass
                 else:
@@ -152,9 +143,10 @@ class Refining_Equation_mutation(Compound_Operator):
     def elitist(self):
         return True
     
-    @Reset_equation_status(reset_input = True)#, reset_right_part = False)
+    @Reset_equation_status(reset_input = True)
     @History_Extender(f'\n -> refining mutating equation', 'ba')
     def apply(self, equation):
+        # print('equation.__dict__', type(equation))
         for term_idx in range(equation.n_immutable, len(equation.structure)):
             if term_idx == equation.target_idx:
                 continue
@@ -168,7 +160,6 @@ class Refining_Equation_mutation(Compound_Operator):
                 if 'forbidden_tokens' in mut_operator.params.keys():
                     mut_operator.params['forbidden_tokens'] = [factor for factor in equation.structure[equation.target_idx].structure if factor.status['unique_for_right_part']]   # [factor.label for factor in equation.structure[].structure]
                 equation.structure[term_idx] = mut_operator.apply(term_idx, equation)
-                equation.check_split_correctness()
 
     @property
     def operator_tags(self):
@@ -183,6 +174,7 @@ class Equation_mutation(Compound_Operator):
     @Reset_equation_status(reset_input = True)
     @History_Extender(f'\n -> mutating equation', 'ba')
     def apply(self, equation):
+        # print('equation.__dict__', equation.__dict__, type(equation))        
         for term_idx in range(equation.n_immutable, len(equation.structure)):
             if np.random.uniform(0, 1) <= self.params['r_mutation']:
                 self.params['type_probabilities'] = [1 - 1/pow(equation.structure[term_idx].total_params, 2), 1/pow(equation.structure[term_idx].total_params, 2)]
@@ -192,11 +184,7 @@ class Equation_mutation(Compound_Operator):
                     mut_operator = self.suboperators['Mutation']
                 if 'forbidden_tokens' in mut_operator.params.keys():
                     mut_operator.params['forbidden_tokens'] = [factor for factor in equation.structure[equation.target_idx].structure if factor.status['unique_for_right_part']]   # [factor.label for factor in equation.structure[].structure]
-#                temp = equation.structure[term_idx]
-#                print('before mutation:', temp.name)
                 equation.structure[term_idx] = mut_operator.apply(term_idx, equation)
-#                print('after mutation:', temp.name, 'to', equation.structure[term_idx].name)
-                equation.check_split_correctness()
 
     @property
     def operator_tags(self):
@@ -224,7 +212,6 @@ class Term_mutation(Compound_Operator):
             The new, randomly created, term.
             
         """       
-#        print('reference forbidden tokens:', self.params['forbidden_tokens'])
         new_term = Term(equation.pool, max_factors_in_term = equation.max_factors_in_term, forbidden_tokens = self.params['forbidden_tokens'])        #) #
         while not Check_Unqueness(new_term, equation.structure[:term_idx] + equation.structure[term_idx+1:]):
             new_term = Term(equation.pool, max_factors_in_term = equation.max_factors_in_term, forbidden_tokens = self.params['forbidden_tokens'])
@@ -234,58 +221,6 @@ class Term_mutation(Compound_Operator):
     @property
     def operator_tags(self):
         return {'mutation', 'term level', 'exploration', 'no suboperators'}    
-
-#class Parameter_mutation_old(Compound_Operator):
-#    """
-#    Specific operator of the term mutation, where the term parameters are changed with a random increment.
-#    """
-#    def apply(self, term_idx, equation):
-#        """
-#        Specific operator of the term mutation, where the term parameters are changed with a random increment.
-#        
-#        Parameters:
-#        -----------
-#        term_idx : integer
-#            The index of the mutating term in the equation.
-#            
-#        equation : Equation object
-#            The equation object, in which the term is present.
-#        
-#        Returns:
-#        ----------
-#        new_term : Term object
-#            The new, created from the previous one with random parameters increment, term.
-#            
-#        """                
-#        unmutable_params = {'dim'}
-#        while True:
-#            term = equation.structure[term_idx] 
-#            for factor in term.structure:   # Возможное место ошибок
-#                parameter_selection = deepcopy(factor.params)
-#                token_family = [token_family for token_family in term.tokens if factor.label in token_family.tokens][0]
-#                for param, interval in token_family.token_params.items():
-#                    if param == 'power':
-#                        continue
-#                    if np.random.random() < self.params['r_param_mutation'] and param not in unmutable_params:
-#                        if interval[0] == interval[1]:
-#                            shift = 0
-#                            continue
-#                        if isinstance(interval[0], int):
-#                            shift = np.rint(np.random.normal(loc= 0, scale = self.params['multiplier']*(interval[1] - interval[0]))).astype(int) #
-#                        elif isinstance(interval[0], float):
-#                            shift = np.random.normal(loc= 0, scale = self.params['multiplier']*(interval[1] - interval[0]))
-#                        else:
-#                            raise ValueError('In current version of framework only integer and real values for parameters are supported') 
-#                        if self.params['strict_restrictions']:
-#                            parameter_selection[param] = np.min((np.max((parameter_selection[param] + shift, interval[0])), interval[1]))
-#                        else:
-#                            parameter_selection[param] = parameter_selection[param] + shift
-#                factor.Set_parameters(**parameter_selection)
-#            term.structure = Filter_powers(term.structure)        
-#            if Check_Unqueness(term, equation.structure[:term_idx] + equation.structure[term_idx+1:]):
-#                break
-#        term.reset_saved_state()
-#        return term
 
 
 class Parameter_mutation(Compound_Operator):
@@ -313,7 +248,7 @@ class Parameter_mutation(Compound_Operator):
         unmutable_params = {'dim', 'power'}
         while True:
             term = equation.structure[term_idx] 
-            for factor in term.structure:   # Возможное место ошибок
+            for factor in term.structure:
                 parameter_selection = deepcopy(factor.params)
                 for param_idx, param_properties in factor.params_description.items():
                     if np.random.random() < self.params['r_param_mutation'] and param_properties['name'] not in unmutable_params:

@@ -15,12 +15,7 @@ from matplotlib import cm
 
 from epde.operators.template import Compound_Operator
 import epde.globals as global_var
-from epde.solver.solver import point_sort_shift_solver
-#class PopLevel_fitness(Compound_Operator):
-#    def apply(self, population):
-#        for equation in population:
-#            if not equation.fitness_calculated:
-#                self.suboperators['Equation_fitness'].apply(equation)
+from solver.solver import point_sort_shift_solver
 
 class L2_fitness(Compound_Operator):
     """
@@ -81,6 +76,7 @@ class L2_fitness(Compound_Operator):
 
         equation.fitness_calculated = True
         equation.fitness_value = fitness_value
+        # print(equation.fitness_value)
 
     @property
     def operator_tags(self):
@@ -88,11 +84,11 @@ class L2_fitness(Compound_Operator):
 
 
 class Solver_based_fitness(Compound_Operator):
-    def __init__(self, param_keys : list, model_architecture = None):
+    def __init__(self, param_keys : list, model_architecture = None, dimensionality = 1):
         super().__init__(param_keys)
         if model_architecture is None:
             self.model_architecture = torch.nn.Sequential(
-                torch.nn.Linear(1, 100),
+                torch.nn.Linear(dimensionality, 100),
                 torch.nn.Tanh(),
                 torch.nn.Linear(100, 100),
                 torch.nn.Tanh(),
@@ -101,35 +97,26 @@ class Solver_based_fitness(Compound_Operator):
                 )
         else:
             self.model_architecture = model_architecture
-        
-        keys, training_grid = global_var.grid_cache.get_all()
-        assert len(keys) == training_grid[0].ndim, 'Mismatching dimensionalities'
-        training_grid = np.array(training_grid).reshape((len(training_grid), -1))
-        self.training_grid = torch.from_numpy(training_grid).T.type(torch.FloatTensor)
-#        print('grid after creation:', self.training_grid[:10], '...', self.training_grid[-10:])
-        self.device = torch.device('cpu')
-        self.training_grid.to(self.device)                
+        self.training_grid_set = False
         
     def apply(self, equation):
+        if not self.training_grid_set:
+            self.set_training_grid()
         self.suboperators['sparsity'].apply(equation)
         self.suboperators['coeff_calc'].apply(equation)        
         
         equation.model = deepcopy(self.model_architecture)
 
         eq_bc = equation.boundary_conditions()
-        eq_form = equation.solver_form()
-#        print('ann training grid shape', self.training_grid.shape)
-#        print('operator form', [(form[0].shape, ' for ', form[1], form[2]) for form in eq_form])
-#        print('operator bc', eq_bc)        
-#        print('grid before calling:', self.training_grid[:10])        
+        eq_form = equation.solver_form()   
         print(equation.text_form)
         equation.model = point_sort_shift_solver(self.training_grid, equation.model, eq_form, eq_bc,
-                       lambda_bound = self.params['lambda_bound'], verbose = False, 
+                       lambda_bound = self.params['lambda_bound'], verbose = True, 
                        learning_rate = self.params['learning_rate'], eps = self.params['eps'], 
-                       tmin = self.params['tmin'], tmax = self.params['tmax'])
+                       tmin = self.params['tmin'], tmax = self.params['tmax'], use_cache=True, cache_dir='/home/maslyaev/epde/EPDE/solver/cache/')
         
         main_var_key = ('u', (1.0,))        
-        u_modeled = equation.model(self.training_grid).detach().numpy()
+        u_modeled = equation.model(self.training_grid).detach().numpy().reshape(global_var.tensor_cache.get(main_var_key).shape)
         rl_error = np.linalg.norm(u_modeled - global_var.tensor_cache.get(main_var_key), ord = 2)
         
         if self.params['verbose']:
@@ -145,6 +132,7 @@ class Solver_based_fitness(Compound_Operator):
         equation.fitness_value = fitness_value      
         
     def plot_data_vs_solution(self, data, solution):
+
         if self.training_grid.shape[1]==2:
             fig = plt.figure()
             ax = fig.add_subplot(111, projection='3d')
@@ -158,6 +146,16 @@ class Solver_based_fitness(Compound_Operator):
             plt.scatter(self.training_grid.reshape(-1), solution.reshape(-1), color = 'r')
             plt.scatter(self.training_grid.reshape(-1), data.reshape(-1), color = 'k')            
             plt.show()        
+            
+    def set_training_grid(self):
+        keys, training_grid = global_var.grid_cache.get_all()
+        assert len(keys) == training_grid[0].ndim, 'Mismatching dimensionalities'
+        training_grid = np.array(training_grid).reshape((len(training_grid), -1))
+        self.training_grid = torch.from_numpy(training_grid).T.type(torch.FloatTensor)
+#        print('grid after creation:', self.training_grid[:10], '...', self.training_grid[-10:])
+        self.device = torch.device('cpu')
+        self.training_grid.to(self.device)     
+        self.training_grid_set = True
         # Возможная проблема, когда подаётся тензор со значениями коэфф-тов перед производными
         
         

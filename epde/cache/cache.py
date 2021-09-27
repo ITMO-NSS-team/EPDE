@@ -20,7 +20,9 @@ The recommended way to declare the cache object isto declare it as a global vari
 
 import numpy as np
 import psutil
+
 from copy import deepcopy
+from collections import OrderedDict
 
 def upload_simple_tokens(labels, cache, tensors, grid_setting = False):
     for idx, label in enumerate(labels):
@@ -29,7 +31,7 @@ def upload_simple_tokens(labels, cache, tensors, grid_setting = False):
         else:
             label_completed = (label, (1.0,))
         cache.add(label_completed, tensors[idx])
-        cache.add(label_completed, tensors[idx])        
+        # cache.add(label_completed, tensors[idx])        
         cache.add_base_matrix(label_completed)
 
 
@@ -45,6 +47,7 @@ def upload_grids(grids, cache):
         tensors = [grids,]
     upload_simple_tokens(labels = labels, cache = cache, tensors = tensors, grid_setting = True)
     cache.use_structural()
+
 
 def np_ndarray_section(matrix, boundary = None, except_idx : list = []):
     #Добавить проверку на случай, когда boundary = 0, чтобы тогда возвращало матрицу без изменения
@@ -74,6 +77,7 @@ def np_ndarray_section(matrix, boundary = None, except_idx : list = []):
     
 def prepare_var_tensor(var_tensor, derivs_tensor, time_axis, boundary, cut_except = []):
     initial_shape = var_tensor.shape
+    print('initial_shape', initial_shape, 'derivs_tensor.shape', derivs_tensor.shape)
     var_tensor = np.moveaxis(var_tensor, time_axis, 0)
     if isinstance(boundary, int):
         result = np.ones((1 + derivs_tensor.shape[-1], ) + tuple([shape - 2*boundary for shape in var_tensor.shape]))
@@ -237,7 +241,7 @@ class Cache(object):
             if self.max_allowed_tensors is None:
                 self.memory_usage_properties(obj_test_case = tensor, mem_for_cache_frac = 5)
             if (len(self.memory_normalized) + len(self.memory_default) + len(self.memory_structural) < self.max_allowed_tensors and 
-                label not in self.memory_default.keys()):
+                label not in self.memory_normalized.keys()):
                 self.memory_normalized[label] = tensor
                 if indication: 
                     print('Enough space for saved normalized term ', label, tensor.nbytes)
@@ -249,7 +253,7 @@ class Cache(object):
                 return True
             else:
                 if indication: 
-                    print('Not enough space for term ', label, tensor.nbytes)
+                    print('Not enough space for term ', label, tensor.nbytes, 'Can save only', self.max_allowed_tensors, 'tensors. While already uploaded ', len(self.memory_normalized) + len(self.memory_default) + len(self.memory_structural))
                 return False         
         elif structural:
             raise NotImplementedError('The structural data must be added with cache.use_structural method')
@@ -335,13 +339,13 @@ class Cache(object):
             np.ndarray of values (checked in unnormalized data); (np.ndarray, normalized), where normalized is bool 
             (T if norm, else F) and np.ndarray is np.ndarray of tensor values. Does not support scaled vals
         '''
-        if type(obj) == str:
+        if (type(obj) == tuple or type(obj) == list) and type(obj[0]) == str:
             return obj in self.memory_default.keys()
-        elif (type(obj) == tuple or type(obj) == list) and type(obj[0]) == str and type(obj[1]) == bool:
+        elif (type(obj) == tuple or type(obj) == list) and type(obj[0]) == tuple and type(obj[1]) == bool:
             if obj[1]:
-                return obj in self.memory_normalized.keys()
+                return obj[0] in self.memory_normalized.keys()
             else:
-                return obj in self.memory_default.keys()
+                return obj[0] in self.memory_default.keys()
         elif type(obj) == np.ndarray:
             try:
                 return np.any([np.all(obj == entry_values) for entry_values in self.memory_default.values()])
@@ -379,3 +383,21 @@ class Cache(object):
         for label, merged_state in self.structural_and_base_merged.items():
             if not merged_state: memsize += self.memory_structural[label].nbytes
         return memsize
+    
+
+def upload_complex_token(label : str, params_values : OrderedDict, evaluator, tensor_cache : Cache, grid_cache : Cache):
+    # label_completed = (label, (1.0,))
+    # value = evaluator.apply(self)
+    # global_var.tensor_cache.add(self.cache_label, value, structural = False)
+    try:
+        evaluation_function = evaluator.evaluation_functions[label] 
+    except TypeError:
+        evaluation_function = evaluator.evaluation_functions    
+    _, grids = grid_cache.get_all()
+    grid_function = np.vectorize(lambda args: evaluation_function(*args, **params_values))
+    indexes_vect = np.empty_like(grids[0], dtype = object)
+    for tensor_idx, _ in np.ndenumerate(grids[0]):
+        indexes_vect[tensor_idx] = tuple([grid[tensor_idx] for grid in grids])    
+        
+    label_completed = (label, tuple(params_values.values()))
+    tensor_cache.add(label_completed, grid_function(indexes_vect))

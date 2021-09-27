@@ -21,7 +21,8 @@ from epde.operators.equation_crossovers import PopLevel_crossover, Equation_cros
 from epde.operators.equation_sparcity import LASSO_sparsity
 from epde.operators.equation_coeffcalc import LinReg_based_coeffs
 from epde.operators.equation_fitness import L2_fitness, Solver_based_fitness
-from epde.operators.equation_right_part_selection import Poplevel_Right_Part_Selector, Eq_Right_Part_Selector
+from epde.operators.equation_right_part_selection import Poplevel_Right_Part_Selector, Eq_Right_Part_Selector, Status_respecting_ERPS
+from epde.operators.equation_truncate import Truncate_worst
 
 class Operator_builder(ABC):    
     
@@ -141,28 +142,24 @@ class Strategy_director(object):
         elitism = Fraction_elitism(['elite_fraction'])
         elitism.params = {'elite_fraction' : 0.2}
 
+        truncation = Truncate_worst(['population_size'])
+        truncation.params = {'population_size' : None}
+
         param_mutation = Parameter_mutation(['r_param_mutation', 'strict_restrictions', 'multiplier'])
         term_mutation = Term_mutation(['forbidden_tokens'])
         eq_mutation = Equation_mutation(['r_mutation', 'type_probabilities'])
         ref_eq_mutation = Refining_Equation_mutation(['r_mutation', 'type_probabilities'])
-#        mutation = PopLevel_mutation(['indiv_mutation_prob', 'elitism'])
         mutation = PopLevel_mutation_elite(['indiv_mutation_prob'])
-        
 
         param_mutation.params = {'r_param_mutation' : 0.2, 'strict_restrictions' : True, 'multiplier' : 0.1} if not 'param_mutation_params' in kwargs.keys() else kwargs['param_mutation_params']
         term_mutation.params = {'forbidden_tokens': []} if not 'term_mutation_params' in kwargs.keys() else kwargs['term_mutation_params']
         eq_mutation.params = {'r_mutation' : 0.3, 'type_probabilities' : []}
         ref_eq_mutation.params = {'r_mutation' : 0.3, 'type_probabilities' : []}
-#        mutation.params = {'indiv_mutation_prob' : 0.5, 'elitism' : 1} if not 'mutation_params' in kwargs.keys() else kwargs['mutation_params']
         mutation.params = {'indiv_mutation_prob' : 0.5} if not 'mutation_params' in kwargs.keys() else kwargs['mutation_params']
 
-
-        
         ref_eq_mutation.suboperators = {'Mutation' : [param_mutation, term_mutation]}
         eq_mutation.suboperators = {'Mutation' : [param_mutation, term_mutation]}
-#        mutation.suboperators = {'Equatiion_mutation' : eq_mutation}
         mutation.suboperators = {'Equatiion_mutation' : {'elite' : ref_eq_mutation, 'non-elite' : eq_mutation}}
-
 
         param_crossover = Param_crossover(['proportion'])
         term_crossover = Term_crossover(['crossover_probability'])
@@ -190,7 +187,7 @@ class Strategy_director(object):
         rps1 = Poplevel_Right_Part_Selector([])
         rps1.params = {} if not 'rps_params' in kwargs.keys() else kwargs['rps_params']
         
-        eq_rps = Eq_Right_Part_Selector([])
+        eq_rps = Status_respecting_ERPS([])
         eq_rps.suboperators = {'fitness_calculation' : fitness_eval}
         eq_rps.params = {} if not 'eq_rps_params' in kwargs.keys() else kwargs['eq_rps_params']
         
@@ -216,6 +213,9 @@ class Strategy_director(object):
                                        terminal_operator = False)        
 
         self._constructor.add_operator('rps2', rps2, parse_operator_args = 'inspect', 
+                                       terminal_operator = False)        
+        
+        self._constructor.add_operator('truncation', truncation, parse_operator_args = 'inspect', 
                                        terminal_operator = True)        
         
         self._constructor.set_input_combinator()
@@ -223,21 +223,20 @@ class Strategy_director(object):
         self._constructor.link('initial', 'rps1')
         self._constructor.link('rps1', 'selection')
         self._constructor.link('selection', 'crossover')
-
         self._constructor.link('crossover', 'elitism')
         self._constructor.link('elitism', 'mutation')
-
-
         self._constructor.link('mutation', 'rps2')
+        self._constructor.link('rps2', 'truncation')
         
         self._constructor.assemble()
         
     
 class Strategy_director_solver(object):    
-    def __init__(self, stop_criterion, stop_criterion_kwargs): # baseline = True
+    def __init__(self, stop_criterion, stop_criterion_kwargs, dimensionality = 1): # baseline = True
 #        self._constructor = None
 #        if baseline:
         self._constructor = Strategy_builder(stop_criterion, stop_criterion_kwargs)
+        self.dimensionality = dimensionality
     
     @property
     def constructor(self):
@@ -254,26 +253,24 @@ class Strategy_director_solver(object):
         elitism = Fraction_elitism(['elite_fraction'])
         elitism.params = {'elite_fraction' : 0.2}
 
+        truncation = Truncate_worst(['population_size'])
+        truncation.params = {'population_size' : None}
+
         param_mutation = Parameter_mutation(['r_param_mutation', 'strict_restrictions', 'multiplier'])
         term_mutation = Term_mutation(['forbidden_tokens'])
         eq_mutation = Equation_mutation(['r_mutation', 'type_probabilities'])
         ref_eq_mutation = Refining_Equation_mutation(['r_mutation', 'type_probabilities'])
 #        mutation = PopLevel_mutation(['indiv_mutation_prob', 'elitism'])
         mutation = PopLevel_mutation_elite(['indiv_mutation_prob'])
-        
 
         param_mutation.params = {'r_param_mutation' : 0.2, 'strict_restrictions' : True, 'multiplier' : 0.1} if not 'param_mutation_params' in kwargs.keys() else kwargs['param_mutation_params']
         term_mutation.params = {'forbidden_tokens': []} if not 'term_mutation_params' in kwargs.keys() else kwargs['term_mutation_params']
         eq_mutation.params = {'r_mutation' : 0.3, 'type_probabilities' : []}
         ref_eq_mutation.params = {'r_mutation' : 0.3, 'type_probabilities' : []}
-#        mutation.params = {'indiv_mutation_prob' : 0.5, 'elitism' : 1} if not 'mutation_params' in kwargs.keys() else kwargs['mutation_params']
         mutation.params = {'indiv_mutation_prob' : 0.5} if not 'mutation_params' in kwargs.keys() else kwargs['mutation_params']
-
-
         
         ref_eq_mutation.suboperators = {'Mutation' : [param_mutation, term_mutation]}
         eq_mutation.suboperators = {'Mutation' : [param_mutation, term_mutation]}
-#        mutation.suboperators = {'Equatiion_mutation' : eq_mutation}
         mutation.suboperators = {'Equatiion_mutation' : {'elite' : ref_eq_mutation, 'non-elite' : eq_mutation}}
 
 
@@ -296,15 +293,16 @@ class Strategy_director_solver(object):
         lasso_coeffs.params = {'sparcity' : 1} if not 'lasso_coeffs_params' in kwargs.keys() else kwargs['lasso_coeffs_params']
         linreg_coeffs.params = {} if not 'linreg_coeffs_params' in kwargs.keys() else kwargs['linreg_coeffs_params']
 
-        fitness_eval = Solver_based_fitness(['lambda_bound', 'learning_rate', 'eps', 'tmin', 'tmax', 'verbose'])
+        fitness_eval = Solver_based_fitness(['lambda_bound', 'learning_rate', 'eps', 'tmin', 'tmax', 'verbose'], 
+                                            dimensionality=self.dimensionality)
         fitness_eval.suboperators = {'sparsity' : lasso_coeffs, 'coeff_calc' : linreg_coeffs}
-        fitness_eval.params = {'lambda_bound' : 10, 'learning_rate' : 1e-3, 
-                               'eps' : 0.1, 'tmin' : 1000, 'tmax' : 1e5, 'verbose' : True} if not 'fitness_eval_params' in kwargs.keys() else kwargs['fitness_eval_params']
+        fitness_eval.params = {'lambda_bound' : 1000, 'learning_rate' : 1e-4, 
+                               'eps' : 1e-6, 'tmin' : 1000, 'tmax' : 1e5, 'verbose' : True} if not 'fitness_eval_params' in kwargs.keys() else kwargs['fitness_eval_params']
         
         rps1 = Poplevel_Right_Part_Selector([])
         rps1.params = {} if not 'rps_params' in kwargs.keys() else kwargs['rps_params']
-        
-        eq_rps = Eq_Right_Part_Selector([])
+
+        eq_rps = Status_respecting_ERPS([])
         eq_rps.suboperators = {'fitness_calculation' : fitness_eval}
         eq_rps.params = {} if not 'eq_rps_params' in kwargs.keys() else kwargs['eq_rps_params']
         
@@ -330,19 +328,20 @@ class Strategy_director_solver(object):
                                        terminal_operator = False)        
 
         self._constructor.add_operator('rps2', rps2, parse_operator_args = 'inspect', 
-                                       terminal_operator = True)        
+                                       terminal_operator = False)        
+        
+        self._constructor.add_operator('truncation', truncation, parse_operator_args = 'inspect', 
+                                       terminal_operator = True)                
         
         self._constructor.set_input_combinator()
         
         self._constructor.link('initial', 'rps1')
         self._constructor.link('rps1', 'selection')
         self._constructor.link('selection', 'crossover')
-
         self._constructor.link('crossover', 'elitism')
         self._constructor.link('elitism', 'mutation')
-
-
         self._constructor.link('mutation', 'rps2')
+        self._constructor.link('rps2', 'truncation')
         
         self._constructor.assemble()
         
@@ -430,7 +429,7 @@ class Evolutionary_block(Block):
         self._operator = operator
         if parse_operator_args is None:
             self.arg_keys = []
-        elif parse_operator_args is 'inspect':
+        elif parse_operator_args == 'inspect':
             import inspect
             self.arg_keys = inspect.getfullargspec(self._operator.apply).args
             extra = ['self', 'population_subset', 'population']
@@ -439,7 +438,7 @@ class Evolutionary_block(Block):
                     self.arg_keys.remove(arg_key)
                 except:
                     pass
-        elif parse_operator_args is 'use operator attribute':
+        elif parse_operator_args == 'use operator attribute':
             self.arg_keys = self._operator.arg_keys
         elif isinstance(parse_operator_args, (list, tuple)):
             self.arg_keys = parse_operator_args
@@ -530,26 +529,18 @@ class Linked_Blocks(object):
         self.initial[0][1].set_output(input_obj)
         delayed = []; processed = [self.initial[0][1],]
         self.terminated = False
-#        iteration = 0
         while not self.terminated:
-#            print(iteration)
             processed_new = []
             for vertex in processed:
-#                print('ID', vertex.op_id, )
                 if vertex.available:
-#                    print(vertex.available, 'available')
                     vertex.apply(EA_kwargs)
                     processed_new.extend(vertex._outgoing)
                     if vertex.terminal:
                         self.terminated = True
                         self.final_vertex = vertex
                 else:
-#                    print(vertex.available, 'not available')
                     delayed.append(vertex)
-#            print('prev processed', processed)
             processed = delayed + processed_new
-#            print('delayed', delayed, 'processed_new', processed_new)
-#            time.sleep(10)
             delayed = []
         
     @property
@@ -614,12 +605,7 @@ class Evolutionary_strategy(object):
         return self.linked_blocks.output
         
     def apply_block(self, label, operator_kwargs):
-#        try:
         self.linked_blocks.blocks_labeled[label]._operator.apply(**operator_kwargs)
-#        except KeyError:
-#            print('label', label, 'keys:', self.linked_blocks.blocks_labeled.keys(), label in self.linked_blocks.blocks_labeled.keys())
-#            raise KeyError('...')
-            
         
     def modify_block_params(self, block_label, param_label, value, suboperator_sequence = None):
         '''

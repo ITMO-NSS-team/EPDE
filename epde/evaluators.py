@@ -28,9 +28,6 @@ class Custom_Evaluator(Evaluator_template):
         else:
             self.single_function_token = True
             
-#        if global_var.grid_cache is None:
-#            raise Exception('Trying to set evaluation, that uses grids, without declaring grids first.')
-            
         self.evaluation_functions = evaluation_functions
         self.use_factors_grids = use_factors_grids
         self.eval_fun_params_labels = eval_fun_params_labels
@@ -48,7 +45,6 @@ class Custom_Evaluator(Evaluator_template):
             for param_idx, param_descr in factor.params_description.items():
                 if param_descr['name'] == key: eval_fun_kwargs[key] = factor.params[param_idx]
         
-#        print('type:', type(factor.grids), 'len', len(factor.grids), 'ndim', factor.grids[0].ndim, 'shape', factor.grids[0].shape)
         grid_function = np.vectorize(lambda args: evaluation_function(*args, **eval_fun_kwargs))
                                      #, excluded=eval_fun_kwargs.keys())
                                      

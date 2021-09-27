@@ -6,6 +6,8 @@ Created on Tue Feb  9 16:14:57 2021
 @author: mike_ubuntu
 """
 
+from dataclasses import dataclass
+
 from epde.cache.cache import Cache
 #from epde.supplementary import flatten
 
@@ -39,3 +41,18 @@ def delete_cache():
         del grid_cache
     except NameError:
         print('Failed to delete grid cache due to its inexistance')
+        
+@dataclass
+class Verbose_Manager:
+    plot_DE_solutions : bool
+    iter_idx : bool
+    iter_fitness : bool
+    iter_stats : bool
+    show_warnings : bool
+    
+def init_verbose(plot_DE_solutions : bool = False, show_iter_idx : bool = False, 
+                 show_iter_fitness : bool = False, show_iter_stats : bool = False, 
+                 show_warnings : bool = False):
+    global verbose
+    verbose = Verbose_Manager(plot_DE_solutions, show_iter_idx, show_iter_fitness, show_iter_stats)
+    

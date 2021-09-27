@@ -13,9 +13,13 @@ import epde.globals as global_var
 from epde.supplementary import factor_params_to_str
 
 class Factor(TerminalToken):
+    __slots__ = ['_params', '_params_description', 
+                 'label', 'type', 'grid_set', 'grid_idx', 'is_deriv', 'deriv_code', 
+                 'cache_linked', '_status', 'equality_ranges', '_evaluator', 'saved']
+    
     def __init__(self, token_name : str, status : dict, family_type : str, 
                  randomize : bool = False, params_description = None, 
-                 deriv_code = [None,], equality_ranges = None):#, token_family, randomize = False):
+                 deriv_code = None, equality_ranges = None):#, token_family, randomize = False):
         self.label = token_name
         self.type = family_type
         self.status = status
@@ -24,9 +28,6 @@ class Factor(TerminalToken):
         
         self.is_deriv = not (deriv_code is None)
         self.deriv_code = deriv_code
-#        print(self.deriv_code)
-#        self.deriv_code = deriv_code if not deriv_code == [] else None
-
         
         self.reset_saved_state()
         if type(global_var.tensor_cache) != type(None):
@@ -50,6 +51,27 @@ class Factor(TerminalToken):
 
     @status.setter
     def status(self, status_dict):
+        '''
+        
+
+        Parameters
+        ----------
+        status_dict : dict
+            Description of token behaviour during the equation construction and processsing.
+            Keys:
+                'mandatory' - if True, a token from the family must be present in every term; 
+                
+                'unique_token_type' - if True, only one token of the family can be present in the term; 
+                
+                'unique_for_right_part' - if True, the tokens, present in the "right part" of the equation, can not 
+                be present in the terms of the "left part". Recommended to select "True", if any token of the 
+                familiy can have 0 values on the majority of studied area;
+            
+                'unique_specific_token' - if True, a specific token can be present only once per term;            
+
+                'requires_grid' - if True, the token requires grid for evaluation, if False, the tokens will be
+                loaded from cache.
+        '''
         self._status = status_dict
         
     def Set_parameters(self, params_description : dict, equality_ranges : dict, random = True, **kwargs):
@@ -78,8 +100,7 @@ class Factor(TerminalToken):
                     _params[param_idx] = 1
                 _params_description[param_idx] = {'name' : param_info[0], 
                                                       'bounds' : param_info[1]} 
-        self.equality_ranges = equality_ranges
-#        print(_params_description, params_description)        
+        self.equality_ranges = equality_ranges    
         super().__init__(number_params = _params.size, params_description = _params_description, 
                          params = _params)
         if not self.grid_set:
@@ -113,13 +134,7 @@ class Factor(TerminalToken):
             return global_var.tensor_cache.get(self.cache_label,
                                                structural = structural)
         else:
-#            self.structural = structural
             value = self._evaluator.apply(self)
-#            print(self.label, 'value is ', value)
-#            print(self.cache_label)
-#            if self.params.size > 1:
-#                raise NotImplementedError('Currently cache processing is implemented only for the single parameter token')
-#            if self.params.size == 1:
             if key == 'structural' and self.status['structural_and_defalut_merged']:
                 global_var.tensor_cache.use_structural(use_base_data = True)
             elif key == 'structural' and not self.status['structural_and_defalut_merged']:
@@ -138,8 +153,7 @@ class Factor(TerminalToken):
     @property
     def name(self):
         form = self.label + '{' 
-        for param_idx, param_info in self.params_description.items(): # param_name, param_val 
-#            print(param_idx, param_info)
+        for param_idx, param_info in self.params_description.items():
             form += param_info['name'] + ': ' + str(self.params[param_idx])
             if param_idx < len(self.params_description.items()) - 1:
                 form += ', '
@@ -150,7 +164,6 @@ class Factor(TerminalToken):
     def grids(self):
         _, grids = global_var.grid_cache.get_all()
         return grids
-#        return global_var.grid_cache.get(str(self.grid_idx))
 
     def use_grids_cache(self):
         dim_param_idx = np.inf
@@ -159,15 +172,8 @@ class Factor(TerminalToken):
             if param_descr['name'] == 'dim': 
                 dim_param_idx = param_idx
                 dim_set = True
-#        if dim_set:
-#            assert self.params[name_param_idx] != np.inf, 'No dimension parameter for grid selection'
         self.grid_idx = int(self.params[dim_param_idx]) if dim_set else 0
         self.grid_set = True
     
     def use_cache(self):      
         self.cache_linked = True
-        
-        
-        
-        
-        

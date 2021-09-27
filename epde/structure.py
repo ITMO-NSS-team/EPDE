@@ -11,6 +11,9 @@ from functools import reduce
 import copy
 import gc
 import time
+import datetime
+import pickle
+import warnings
 
 import epde.globals as global_var
 
@@ -32,10 +35,11 @@ def normalize_ts(Input):
 #    print(Matrix.shape)
     if np.ndim(matrix) == 0:
         raise ValueError('Incorrect input to the normalizaton: the data has 0 dimensions')
-    elif np.ndim(matrix) == 0:
+    elif np.ndim(matrix) == 1:
         return matrix
     else:
         for i in np.arange(matrix.shape[0]):
+            # print(matrix[i].shape)
             std = np.std(matrix[i])
             if std != 0:
                 matrix[i] = (matrix[i] - np.mean(matrix[i])) / std
@@ -81,8 +85,11 @@ class Complex_Structure(object):
 
 
 class Term(Complex_Structure):
-    def __init__(self, pool, 
-                 passed_term = None, max_factors_in_term = 1, forbidden_tokens = None, interelement_operator = np.multiply):
+    __slots__ = ['_history', 'structure', 'interelement_operator', 'saved', 'saved_as', 
+                 'pool', 'max_factors_in_term', 'cache_linked', 'occupied_tokens_labels']
+    
+    def __init__(self, pool, passed_term = None, max_factors_in_term = 1, forbidden_tokens = None, 
+                 interelement_operator = np.multiply):
         super().__init__(interelement_operator)
         self.pool = pool
         self.max_factors_in_term = max_factors_in_term
@@ -141,8 +148,7 @@ class Term(Complex_Structure):
         if np.sum(self.pool.families_cardinality(meaningful_only = True)) == 0:
             raise ValueError('No token families are declared as meaningful for the process of the system search')
         factors_num = np.random.randint(1, self.max_factors_in_term +1)
-#        print('factors:', factors_num)
-        while True:        
+        while True:
             self.occupied_tokens_labels = []
             occupied_by_factor, factor = self.pool.create(label = None, create_meaningful = True, 
                                                            occupied = self.occupied_tokens_labels, **kwargs)
@@ -151,8 +157,6 @@ class Term(Complex_Structure):
             factors_powers = {factor.label : 1}
             
             for i in np.arange(1, factors_num):
-#                print(occupied_by_factor, self.occupied_tokens_labels)
-#                time.sleep(5)
                 occupied_by_factor, factor = self.pool.create(label = None, create_meaningful = False, 
                                                                occupied = self.occupied_tokens_labels, 
                                                                def_term_tokens = [token.label for token in self.structure], 
@@ -179,7 +183,7 @@ class Term(Complex_Structure):
     def evaluate(self, structural):
         assert type(global_var.tensor_cache) != type(None), 'Currently working only with connected cache'
         normalize = structural
-        if self.saved[structural]:
+        if self.saved[structural] or (self.cache_label, normalize) in global_var.tensor_cache: #  
             value = global_var.tensor_cache.get(self.cache_label, normalized = normalize,
                                                 saved_as = self.saved_as[normalize]) 
             value = value.reshape(value.size)
@@ -195,9 +199,39 @@ class Term(Complex_Structure):
                 value = (value - np.mean(value))   
             if np.all([len(factor.params) == 1 for factor in self.structure]):
                 self.saved[normalize] = global_var.tensor_cache.add(self.cache_label, value, normalized = normalize) # Место возможных проблем: сохранение/загрузка нормализованных данных
-                if self.saved[normalize]: self.saved_as[normalize] = self.cache_label 
+                if self.saved[normalize]: self.saved_as[normalize] = self.cache_label
             value = value.reshape(value.size)
             return value            
+
+    def Filter_tokens_by_right_part(self, reference_target, equation, equation_position):
+        taken_tokens = [factor.label for factor in reference_target.structure if factor.status['unique_for_right_part']]
+        meaningful_taken = any([factor.status['meaningful'] for factor in reference_target.structure
+                            if factor.status['unique_for_right_part']])
+        
+        accept_term_try = 0
+        while True:
+            accept_term_try += 1
+            new_term = copy.deepcopy(self)            
+            for factor_idx, factor in enumerate(new_term.structure):
+                if factor.label in taken_tokens:
+                    new_term.Reset_occupied_tokens()
+                    _, new_term.structure[factor_idx] = self.pool.create(create_meaningful=meaningful_taken, 
+                                                             occupied = new_term.occupied_tokens_labels + taken_tokens)
+                    # print('try:', accept_term_try, 'suggested:', new_term.name)
+                    #Возможная ошибка из-за (не) использования "create meaningful"
+            if Check_Unqueness(new_term, equation.structure[:equation_position] + 
+                                         equation.structure[equation_position + 1 :]):
+                self.structure = new_term.structure
+                self.structure = Filter_powers(self.structure)
+                self.reset_saved_state()
+                break
+            if accept_term_try == 10:
+                warnings.warn('Can not create unique term, while filtering equation tokens in regards to the right part.')
+            if accept_term_try >= 10:
+                self.Randomize(forbidden_factors = new_term.occupied_tokens_labels + taken_tokens)
+            if accept_term_try == 100:
+                print('Something wrong with the random generation of term while running "Filter_tokens_by_right_part"')
+                print('proposed', new_term.name, 'for ', equation.text_form, 'with respect to', reference_target.name)
 
     def Reset_occupied_tokens(self):
         occupied_tokens_new = []
@@ -207,11 +241,6 @@ class Term(Complex_Structure):
                     occupied_tokens_new.extend([token for token in token_family.tokens])
                 elif factor.status['unique_specific_token']:
                     occupied_tokens_new.append(factor.label)
-#            for token_family in self.tokens:
-#                if factor.label in token_family.tokens and token_family.status['unique_token_type']:
-#                    occupied_tokens_new.extend([token for token in token_family.tokens])
-#                elif factor.label in token_family.tokens and token_family.status['unique_specific_token']:
-#                    occupied_tokens_new.append(factor.label)
         self.occupied_tokens_labels = occupied_tokens_new
 
     @property
@@ -238,6 +267,10 @@ class Term(Complex_Structure):
         return form
     
     @property
+    def contains_deriv(self):
+        return any([factor.is_deriv and factor.deriv_code != [None,] for factor in self.structure])
+    
+    @property
     def solver_form(self):
         
         deriv_orders = []
@@ -253,7 +286,7 @@ class Term(Complex_Structure):
                 deriv_orders.append(factor.deriv_code); deriv_powers.append(factor.params[power_param_idx])
             else:
                 coeff_tensor = coeff_tensor * factor.evaluate()
-                deriv_orders.append(factor.deriv_code); deriv_powers.append(1)
+#                deriv_orders.append(factor.deriv_code); deriv_powers.append(1)
         if len(deriv_powers) == 1:
             deriv_powers = deriv_powers[0]
             deriv_orders = deriv_orders[0]
@@ -263,16 +296,21 @@ class Term(Complex_Structure):
                 
                 
     def __eq__(self, other):
-#        if type(other) != type(self):
-#            print(type(self), type(other), isinstance(self, type(other)))
-#            raise TypeError('Equality check between terms failed. Wrong type passed')
         return (all([any([other_elem == self_elem for other_elem in other.structure]) for self_elem in self.structure]) and 
                 all([any([other_elem == self_elem for self_elem in self.structure]) for other_elem in other.structure]) and 
                 len(other.structure) == len(self.structure))
 
 
 class Equation(Complex_Structure): 
-    def __init__(self, pool, basic_structure, terms_number = 6, max_factors_in_term = 2, interelement_operator = np.add): #eq_weights_eval
+    __slots__ = ['_history', 'structure', 'interelement_operator', 'saved', 'saved_as', 
+                 'n_immutable', 'pool', 'terms_number', 'max_factors_in_term', 'operator', 
+                  '_target', 'target_idx', '_features', 'right_part_selected', 
+                  '_weights_final', 'weights_final_evald', '_weights_internal', 'weights_internal_evald', 
+                  'fitness_calculated', 'solver_form_defined', '_solver_form', '_fitness_value', 
+                  'crossover_selected_times', 'elite']
+
+    def __init__(self, pool, basic_structure, terms_number = 6, max_factors_in_term = 2, 
+                 interelement_operator = np.add): #eq_weights_eval
 
         """
 
@@ -315,6 +353,7 @@ class Equation(Complex_Structure):
         self.reset_state()
 
         self.n_immutable = len(basic_structure)
+        print('n_immutable', self.n_immutable)
         self.pool = pool
         self.structure = []
         self.terms_number = terms_number; self.max_factors_in_term = max_factors_in_term
@@ -329,8 +368,6 @@ class Equation(Complex_Structure):
                 self.structure.append(Term(self.pool, passed_term = passed_term, 
                                            max_factors_in_term = self.max_factors_in_term))
             
-#        self.structure.extend([Term(self.pool, passed_term = label, max_factors_in_term = self.max_factors_in_term) for label in basic_structure])
-    
         for i in range(len(basic_structure), terms_number):
             check_test = 0
             while True:
@@ -341,19 +378,12 @@ class Equation(Complex_Structure):
             self.structure.append(new_term)
 
         for idx, _ in enumerate(self.structure):
-            self.structure[idx].use_cache()    
-
-    def select_target_idx(self, separate_vars = [], operator = None, target_idx_fixed = None): 
-        '''
+            self.structure[idx].use_cache()            
         
-        Separation of target term from features & removal of factors, that are in target, from features
-        
-        '''
-        raise NotImplementedError
-
-    def check_split_correctness(self): #  Refactor for needs of system discovery
-        pass                
-        
+    @property
+    def contains_deriv(self):
+        return any([term.contains_deriv for term in self.structure])
+    
     @property 
     def forbidden_token_labels(self):
         target_symbolic = [factor.label for factor in self.structure[self.target_idx].structure]
@@ -361,9 +391,29 @@ class Equation(Complex_Structure):
 
         for token_family in self.pool.families:
             for token in token_family.tokens:
-                if token in target_symbolic and token.status['unique_for_right_part']:
+                if token in target_symbolic and token_family.status['unique_for_right_part']:
                     forbidden_tokens.add(token)        
         return forbidden_tokens
+
+    def reconstruct_to_contain_deriv(self):
+        while True:
+            replacement_idx = np.random.randint(low = 0, high = len(self.structure))
+            temp = Term(self.pool, max_factors_in_term=self.max_factors_in_term) # ,  forbidden_tokens=self.forbidden_token_labels
+            if temp.contains_deriv:
+                self.structure[replacement_idx] = temp
+                break
+
+    def reconstruct_by_right_part(self, right_part_idx):
+        new_eq = copy.deepcopy(self)
+        self.copy_properties_to(new_eq)
+        new_eq.target_idx = right_part_idx
+        if any([factor.status['unique_for_right_part'] for factor in new_eq.structure[right_part_idx].structure]):
+            for term_idx, term in enumerate(new_eq.structure):
+                if term_idx != right_part_idx:
+                    term.Filter_tokens_by_right_part(new_eq.structure[right_part_idx], self, term_idx)
+
+        new_eq.reset_saved_state()
+        return new_eq
 
     def evaluate(self, normalize = True, return_val = False, save = True):
         self._target = self.structure[self.target_idx].evaluate(normalize)
@@ -395,7 +445,7 @@ class Equation(Complex_Structure):
             return value, self._target, self._features
         else:
             return None, self._target, self._features
-            
+        
     def reset_state(self, reset_right_part : bool = True):
         if reset_right_part: self.right_part_selected = False
         self.weights_internal_evald = False
@@ -404,13 +454,39 @@ class Equation(Complex_Structure):
         self.solver_form_defined = False
     
     @Reset_equation_status(reset_input = False, reset_output = True)
-    @History_Extender(f'\n -> was copied by deepcopy(self)', 'n')
+    @History_Extender('\n -> was copied by deepcopy(self)', 'n')
     def __deepcopy__(self, memo = None):
         clss = self.__class__
         new_struct = clss.__new__(clss)
-        new_struct.__dict__.update(self.__dict__)        
-#        print('new_struct:', type(new_struct), new_struct)
+        memo[id(self)] = new_struct
+        
+        attrs_to_avoid_copy = ['_features', '_target']
+        # print(self.__slots__)
+        for k in self.__slots__:
+            try:
+                # print('successful writing', k, getattr(self, k))
+                if k not in attrs_to_avoid_copy:
+                    setattr(new_struct, k, copy.deepcopy(getattr(self, k), memo))
+                else:
+                    setattr(new_struct, k, None)
+            except AttributeError:
+                # print('unsuccessful writing', k)                
+                pass
+                
+        # new_struct.__dict__.update(self.__dict__)        
+        # new_struct.structure = copy.deepcopy(self.structure)
         return new_struct
+            
+    def copy_properties_to(self, new_equation):
+        new_equation.weights_internal_evald = self.weights_internal_evald
+        new_equation.weights_final_evald = self.weights_final_evald
+        new_equation.right_part_selected = self.right_part_selected
+        new_equation.fitness_calculated = self.fitness_calculated
+        new_equation.solver_form_defined = self.solver_form_defined
+        try:
+            new_equation._fitness_value = self._fitness_value
+        except AttributeError:
+            pass
             
     def add_history(self, add):
         self._history += add
@@ -429,10 +505,6 @@ class Equation(Complex_Structure):
     
     def penalize_fitness(self, coeff = 1.):
         self._fitness_value = self._fitness_value*coeff
-#    
-#    @property
-#    def L0_norm(self):
-#        return np.count_nonzero(self.weights_internal)
 
     @property
     def weights_internal(self):    
@@ -442,20 +514,20 @@ class Equation(Complex_Structure):
             raise AttributeError('Internal weights called before initialization')
         
     @weights_internal.setter
-    def weights_internal(self, weights):    # Ошибка!
+    def weights_internal(self, weights):
         self._weights_internal = weights
         self.weights_internal_evald = True
         self.weights_final_evald = False
         
     @property
-    def weights_final(self): # ошибка из-за одинаковых фин. весов для различных индексов правых частей уравнений
-        if self.weights_final_evald: # Настроить переоценку после любых изменений структуры уравнения
+    def weights_final(self): 
+        if self.weights_final_evald:
             return self._weights_final
         else:
             raise AttributeError('Final weights called before initialization')
             
     @weights_final.setter
-    def weights_final(self, weights):    # Ошибка!
+    def weights_final(self, weights):
         self._weights_final = weights
         self.weights_final_evald = True
             
@@ -472,11 +544,16 @@ class Equation(Complex_Structure):
     @property
     def text_form(self):
         form = ''
-        for term_idx in range(len(self.structure)):
-            if term_idx != self.target_idx:
-                form += str(self.weights_final[term_idx]) if term_idx < self.target_idx else str(self.weights_final[term_idx-1])
-                form += ' * ' + self.structure[term_idx].name + ' + '
-        form += str(self.weights_final[-1]) + ' = ' + self.structure[self.target_idx].name
+        if self.weights_final_evald:
+            for term_idx in range(len(self.structure)):
+                if term_idx != self.target_idx:
+                    form += str(self.weights_final[term_idx]) if term_idx < self.target_idx else str(self.weights_final[term_idx-1])
+                    form += ' * ' + self.structure[term_idx].name + ' + '
+            form += str(self.weights_final[-1]) + ' = ' + self.structure[self.target_idx].name            
+        else:
+            for term_idx in range(len(self.structure)):
+                    form += 'k_'+ str(term_idx) + ' ' + self.structure[term_idx].name + ' + '
+            form +=  'k_' + str(len(self.structure)) + ' = 0'
         return form
 
     def solver_form(self):
@@ -500,7 +577,6 @@ class Equation(Complex_Structure):
             target_form = self.structure[self.target_idx].solver_form
             target_form[0] = target_form[0] * target_weight
             target_form[0] = torch.flatten(target_form[0]).unsqueeze(1).type(torch.FloatTensor)
-#            print(target_form[0].shape)
             
             self._solver_form.append([free_coeff_weight, [None,], 0])
             self._solver_form.append(target_form)
@@ -521,7 +597,6 @@ class Equation(Complex_Structure):
             else:
                 weight_idx = term_idx if term_idx < term_idx else term_idx - 1
                 if np.abs(self.weights_final[weight_idx]) > eps:
-#                    print('to described', self.weights_final[weight_idx], {factor.token.type for factor in term.structure})
                     described.update({factor.type for factor in term.structure})
         described = frozenset(described)
         return described
@@ -541,12 +616,10 @@ class Equation(Complex_Structure):
                 for deriv_factor in term[1]:
                     orders = np.array([count_order(deriv_factor, ax) for ax #deriv_factor.count(ax)
                                        in np.arange(max_orders.size)])
-#                    print(max_orders, orders, deriv_factor)
                     max_orders = np.maximum(max_orders, orders)
             else:
                 orders = np.array([count_order(term[1], ax) for ax # term[1].count(ax)
                                    in np.arange(max_orders.size)])
-#                print(max_orders, orders, term[1])
                 max_orders = np.maximum(max_orders, orders)
         if np.max(max_orders) > 2:
             raise NotImplementedError('The current implementation allows does not allow higher orders of equation, than 2.')
@@ -560,21 +633,24 @@ class Equation(Complex_Structure):
         bconds = []
         hardcoded_bc_relative_locations = {0 : None, 1 : (0,), 2 : (0, 1)}
         tensor_shape = global_var.grid_cache.get('0').shape
-    
-        def get_boundary_ind(tensor_shape, axis, rel_loc, old_way = False):
+
+        def get_boundary_ind(tensor_shape, axis, rel_loc):
             return tuple(np.meshgrid(*[np.arange(shape) if dim_idx != axis else min(int(rel_loc * shape), shape-1)
                        for dim_idx, shape in enumerate(tensor_shape)], indexing = 'ij'))
-        
+
         for ax_idx, ax_ord in enumerate(required_bc_ord):
+
             for loc_fraction in hardcoded_bc_relative_locations[ax_ord]:
                 indexes = get_boundary_ind(tensor_shape, axis = ax_idx, rel_loc = loc_fraction)
-                coords = np.array([global_var.grid_cache.get(str(idx))[indexes] for idx in np.arange(len(tensor_shape))])
-                vals = global_var.tensor_cache.get(main_var_key)[indexes]
+                coords = np.squeeze(np.array([global_var.grid_cache.get(str(idx))[indexes] for idx in np.arange(len(tensor_shape))])).T
+                vals = np.squeeze(global_var.tensor_cache.get(main_var_key)[indexes]).T
                 
                 coords = torch.from_numpy(coords).type(torch.FloatTensor)
                 vals = torch.from_numpy(vals).type(torch.FloatTensor)
                 bconds.append([coords, vals])    
-        
+
+        print('shape of the grid', global_var.grid_cache.get('0').shape)
+        print('Obtained boundary conditions', len(bconds[0]))
         return bconds
 
     
@@ -604,6 +680,7 @@ def standalone_boundary_conditions(max_deriv_orders, main_var_key = ('u', (1.0,)
                 
 
 class SoEq(Complex_Structure, moeadd.moeadd_solution):
+    # __slots__ = ['tokens_indep', 'tokens_dep', 'equation_number']
     def __init__(self, pool, terms_number, max_factors_in_term, sparcity = None, eq_search_iters = 100):
         self.tokens_indep = TF_Pool(pool.families_meaningful) #[family for family in token_families if family.status['meaningful']]
         self.tokens_dep = TF_Pool(pool.families_supplementary) #[family for family in token_families if not family.status['meaningful']]
@@ -653,7 +730,12 @@ class SoEq(Complex_Structure, moeadd.moeadd_solution):
             sparcity = self.vals
         else:
             self.vals = sparcity
+
         self.population_size = population_size
+        self.eq_search_evolutionary_strategy.modify_block_params(block_label = 'truncation', 
+                                                                 param_label = 'population_size', 
+                                                                 value = population_size)
+        
         self.structure = []; self.eq_search_iters = eq_search_iters
         token_selection = self.tokens_indep
         
@@ -695,22 +777,6 @@ class SoEq(Complex_Structure, moeadd.moeadd_solution):
                         for i in range(population_size)]
         EA_kwargs['separate_vars'] = separate_vars
         strategy.run(initial_population = population, EA_kwargs = EA_kwargs)
-#        for idx, equation in enumerate(population):
-#            equation.select_target_idx(separate_vars, operator)
-#            equation.check_split_correctness()
-#            operator.get_fitness(equation)
-#            if equation.described_variables in separate_vars:
-#                equation.penalize_fitness(coeff = 0.)
-#        
-#        for idx in range(eq_search_iters):
-#            strict_restrictions = False if idx < eq_search_iters - 1 else True
-#            population = self.equation_opt_iteration(population, self.eq_search_evolutionary_operator, 
-#                                        population_size, idx, separate_vars, strict_restrictions)
-#            for equation in population:
-#                if equation.described_variables in separate_vars:
-#                    equation.penalize_fitness(coeff = 0.)            
-#        population = Population_Sort(population)
-#        del population[1:]
         result = strategy.result
         
         return result[0], result[0].evaluate(normalize = False, return_val=True)[0], result[0].evaluate(normalize = True, return_val=True)[0]
@@ -722,23 +788,9 @@ class SoEq(Complex_Structure, moeadd.moeadd_solution):
                 equation.penalize_fitness(coeff = 0.)           
         population = Population_Sort(population)
         population = population[:population_size]
-#        print(iter_index, population[0].fitness_value, population[0].L0_norm)#, population[0].described_variables, separate_vars, population[0].described_variables in separate_vars)
-#        print('Cache size', np.round(global_var.tensor_cache.consumed_memory / 1024**2, decimals=3), 'MB')
         gc.collect()
-#        if iter_index == 2:
-#            memory_assesment()
-#        time.sleep(10)
-#        prev_population = copy.deepcopy(population) # copy.deepcopy?
         population = evol_operator.apply(population, separate_vars)
         return population
-    
-#    def __eq__(self, other):
-#        assert self.moeadd_set, 'The structure of the equation is not defined, therefore no moeadd operations can be called'
-#        epsilon = 1e-6
-#        if isinstance(other, type(self)):
-#            return np.all(np.abs(self.vals - other.vals) < epsilon)
-#        else:
-#            return NotImplemented
         
     def evaluate(self, normalize = True):
         if len(self.structure) == 1:

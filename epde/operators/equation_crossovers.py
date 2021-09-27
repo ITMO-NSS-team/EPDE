@@ -51,26 +51,25 @@ class PopLevel_crossover(Compound_Operator):
             the new population, containing both parents and offsprings;
         
         """
-#        indexes = self.suboperators['Selection'].apply(population)
+        print('Running crossover')
         crossover_pool = []
-#        print(population)
         for solution in population:
             crossover_pool.extend([solution,] * solution.crossover_selected_times)
         
         if len(crossover_pool) == 0:
             raise ValueError('crossover pool not created, probably solution.crossover_selected_times error')
         np.random.shuffle(crossover_pool)
-#        print(len(crossover_pool))
         crossover_pool = np.array(crossover_pool, dtype = object).reshape((-1,2))
 
-        
         offsprings = []    
         for pair_idx in np.arange(crossover_pool.shape[0]):
             if len(crossover_pool[pair_idx, 0].structure) != len(crossover_pool[pair_idx, 1].structure):
                 raise IndexError('Equations have diffferent number of terms')
             new_equation_1 = deepcopy(crossover_pool[pair_idx, 0])
-            new_equation_2 = deepcopy(crossover_pool[pair_idx, 1])    
+            new_equation_2 = deepcopy(crossover_pool[pair_idx, 1])
+            
             self.suboperators['Equation_crossover'].apply(new_equation_1, new_equation_2, separate_vars)
+            offsprings.extend([new_equation_1, new_equation_2])
 
         population.extend(offsprings)             
         return population        

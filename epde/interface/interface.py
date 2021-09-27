@@ -8,7 +8,7 @@ Created on Tue Jul  6 15:55:12 2021
 import numpy as np
 from typing import Union, Callable
 from collections import OrderedDict
-#import time
+import warnings
 
 import epde.globals as global_var
 
@@ -24,7 +24,7 @@ from epde.evaluators import simple_function_evaluator, trigonometric_evaluator
 from epde.supplementary import Define_Derivatives
 from epde.cache.cache import upload_simple_tokens, upload_grids, prepare_var_tensor, np_ndarray_section
 from epde.prep.derivatives import Preprocess_derivatives
-from epde.eq_search_strategy import Strategy_director
+from epde.eq_search_strategy import Strategy_director, Strategy_director_solver
 from epde.structure import Equation
 
 from epde.interface.token_family import TF_Pool, Token_family
@@ -45,27 +45,34 @@ class Input_data_entry(object):
         else:
             axes = []
             for ax_idx in range(data_tensor.ndim):
-                axes.append(np.data_tensor(0., 1., data_tensor.shape[ax_idx]))
+                axes.append(np.linspace(0., 1., data_tensor.shape[ax_idx]))
             self.coord_tensors = np.meshgrid(*axes)
         self.data_tensor = data_tensor
         
-    def set_derivatives(self, deriv_tensors = None, data_filename = None, 
-                        deriv_filename = None, smooth = True, sigma = 5, max_order = 1, mp_poolsize = 2):
+    # def set_derivatives(self, deriv_tensors = None, data_filename = None, 
+    #                     deriv_filename = None, smooth = True, sigma = 5, max_order = 1, mp_poolsize = 2):
 #        coord_names = ['x' + str(coord_idx) for coord_idx in range(len(self.coord_tensors))]
-        deriv_names, _ = Define_Derivatives(self.var_name, dimensionality=self.data_tensor.ndim, 
-                                                      max_order = max_order)
+    def set_derivatives(self, deriv_tensors = None, method = 'ANN', max_order = 1, method_kwargs = {}):
+
+        deriv_names, deriv_orders = Define_Derivatives(self.var_name, dimensionality=self.data_tensor.ndim, 
+                                                       max_order = max_order)
 
         self.names = deriv_names # coord_names +  Define_Derivatives(self.var_name, dimensionality=self.data_tensor.ndim, 
                                     #                  max_order = max_order)
+        self.d_orders = deriv_orders
         if deriv_tensors is None:
-            _, self.derivatives = Preprocess_derivatives(self.data_tensor, grid = self.coord_tensors,
-                                data_name = data_filename, output_file_name = deriv_filename,
-                                smooth = smooth, sigma = sigma, max_order = max_order, mp_poolsize=mp_poolsize)
+            method_kwargs['max_order'] = max_order
+            if self.coord_tensors is not None and 'grid' not in method_kwargs.keys():
+                method_kwargs['grid'] = self.coord_tensors
+            _, self.derivatives = Preprocess_derivatives(self.data_tensor, method=method, 
+                                                         method_kwargs=method_kwargs)
             self.deriv_properties = {'max order' : max_order,
                                      'dimensionality' : self.data_tensor.ndim}
         else:
             self.derivatives = deriv_tensors
-    
+            self.deriv_properties = {'max order' : max_order,
+                                     'dimensionality' : self.data_tensor.ndim}
+            
     def use_global_cache(self, grids_as_tokens = True, set_grids = True, memory_for_cache = 5, 
                          boundary : int = 0):
 
@@ -122,7 +129,8 @@ class epde_search(object):
     def __init__(self, use_default_strategy : bool = True, eq_search_stop_criterion : Stop_condition = Iteration_limit,
                  director = None, equation_type : set = {'PDE', 'derivatives only'}, time_axis : int = 0, 
                  init_cache : bool = True, example_tensor_shape : Union[tuple, list] = (1000,), 
-                 set_grids : bool = True, eq_search_iter : int = 300):
+                 set_grids : bool = True, eq_search_iter : int = 300, use_solver : bool = False, 
+                 dimensionality : int = 1):
         '''
         
         Intialization of the epde search object. Here, the user can declare the properties of the 
@@ -152,7 +160,11 @@ class epde_search(object):
         if director is not None and not use_default_strategy:
             self.director = director
         elif director is None and use_default_strategy:
-            self.director = Strategy_director(eq_search_stop_criterion, {'limit' : eq_search_iter})
+            if use_solver:
+                self.director = Strategy_director_solver(eq_search_stop_criterion, {'limit' : eq_search_iter}, 
+                                                         dimensionality=dimensionality)
+            else:
+                self.director = Strategy_director(eq_search_stop_criterion, {'limit' : eq_search_iter})
             self.director.strategy_assembly()
         else: 
             raise NotImplementedError('Wrong arguments passed during the epde search initialization')
@@ -277,13 +289,74 @@ class epde_search(object):
         if global_var.grid_cache is not None:
             global_var.grid_cache.prune_tensors(self.pruner)
     
+    def create_pool(self, data : Union[np.ndarray, list, tuple], time_axis : int = 0, boundary : int = 0, 
+                    variable_names = ['u',], derivs = None, method = 'ANN', method_kwargs : dict = {},
+                    max_deriv_order = 1, additional_tokens = [], coordinate_tensors = None,
+                    memory_for_cache = 5, prune_domain : bool = False,
+                    pivotal_tensor_label = None, pruner = None, threshold : float = 1e-2, 
+                    division_fractions = 3, rectangular : bool = True, data_fun_pow : int = 1):
+        assert (isinstance(derivs, list) and isinstance(derivs[0], np.ndarray)) or derivs is None
+        if isinstance(data, np.ndarray):
+            data = [data,]
+
+        set_grids = coordinate_tensors is not None
+        set_grids_among_tokens = coordinate_tensors is not None
+        if derivs is None:
+            if len(data) != len(variable_names):
+                print(len(data), len(variable_names))
+                raise ValueError('Mismatching lengths of data tensors and the names of the variables')
+        else:
+            if not (len(data) == len(variable_names) == len(derivs)): 
+                raise ValueError('Mismatching lengths of data tensors, names of the variables and passed derivatives')            
+        data_tokens = []
+        for data_elem_idx, data_tensor in enumerate(data):
+            assert isinstance(data_tensor, np.ndarray), 'Input data must be in format of numpy ndarrays or iterable (list or tuple) of numpy arrays'
+            entry = Input_data_entry(var_name = variable_names[data_elem_idx],
+                                     data_tensor = data_tensor, 
+                                     coord_tensors = coordinate_tensors)
+            derivs_tensor = derivs[data_elem_idx] if derivs is not None else None
+            entry.set_derivatives(deriv_tensors = derivs_tensor, method = method, max_order = max_deriv_order, 
+                                  method_kwargs=method_kwargs)
+            print(f'set grids parameter is {set_grids}')
+            entry.use_global_cache(grids_as_tokens = set_grids_among_tokens,
+                                   set_grids=set_grids, memory_for_cache=memory_for_cache, boundary=boundary)
+            set_grids = False; set_grids_among_tokens = False
+            
+            entry_token_family = Token_family(entry.var_name, family_of_derivs = True)
+            entry_token_family.set_status(unique_specific_token=False, unique_token_type=False, 
+                                 s_and_d_merged = False, meaningful = True, 
+                                 unique_for_right_part = True)     
+            entry_token_family.set_params(entry.names, OrderedDict([('power', (1, data_fun_pow))]),
+                                          {'power' : 0}, entry.d_orders)
+            entry_token_family.set_evaluator(simple_function_evaluator, [])
+                
+            print(entry_token_family.tokens)
+            data_tokens.append(entry_token_family)
+        if prune_domain:            
+            self.set_domain_pruning(pivotal_tensor_label, pruner, threshold, division_fractions, rectangular)
+            
+        if isinstance(additional_tokens, list):
+            if not all([isinstance(tf, (Token_family, Prepared_tokens)) for tf in additional_tokens]):
+                raise TypeError(f'Incorrect type of additional tokens: expected list or Token_family/Prepared_tokens - obj, instead got list of {type(additional_tokens[0])}')                
+        elif isinstance(additional_tokens, (Token_family, Prepared_tokens)):
+            additional_tokens = [additional_tokens,]
+        else:
+            print(isinstance(additional_tokens, Prepared_tokens))
+#            print(isinstance(additional_tokens, Custom_tokens))
+#            print(issubclass(Custom_tokens, Prepared_tokens) or issubclass(Prepared_tokens, Custom_tokens))
+            raise TypeError(f'Incorrect type of additional tokens: expected list or Token_family/Prepared_tokens - obj, instead got {type(additional_tokens)}')
+        self.pool = TF_Pool(data_tokens + [tf if isinstance(tf, Token_family) else tf.token_family 
+                                      for tf in additional_tokens])
+        print(f'The cardinality of defined token pool is {self.pool.families_cardinality()}')
+    
     def fit(self, data : Union[np.ndarray, list, tuple], time_axis : int = 0, boundary : int = 0, 
             equation_terms_max_number = 6, equation_factors_max_number = 1, variable_names = ['u',], 
-            eq_sparsity_interval = (1e-4, 2.5), derivs = None, max_deriv_order = 1, additional_tokens = [],
-            coordinate_tensors = None, field_smooth = True, sigma = 1, memory_for_cache = 5,
-            mp_poolsize : int = 2, prune_domain : bool = False,
-            pivotal_tensor_label = None, pruner = None, threshold : float = 1e-2, 
-            division_fractions = 3, rectangular : bool = True, data_fun_pow : int = 1):
+            eq_sparsity_interval = (1e-4, 2.5), derivs = None, max_deriv_order = 1, 
+            deriv_method = 'ANN', deriv_method_kwargs : dict = {},
+            additional_tokens = [], coordinate_tensors = None, memory_for_cache = 5,
+            prune_domain : bool = False, pivotal_tensor_label = None, pruner = None, 
+            threshold : float = 1e-2, division_fractions = 3, rectangular : bool = True, 
+            data_fun_pow : int = 1):
         '''
         
         Fit epde search algorithm to obtain differential equations, describing passed data.
@@ -344,11 +417,6 @@ class epde_search(object):
             Parameter, if the input variable fields shall be smoothed to avoid the errors. If the data is 
             assumed to be noiseless, shall be set to False, otherwise - True. Default value: False.
 
-        sigma : scalar or sequence of scalars, optional
-            Description taken from np.ndimage.gaussian_filter. Standard deviation for Gaussian kernel. 
-            The standard deviations of the Gaussian filter are given for each axis as a sequence, or 
-            as a single number, in which case it is equal for all axes. Defalt value: 1.
-            
         memory_for_cache : int or float, optional
             Limit for the cache (in fraction of the memory) for precomputed tensor values to be stored: 
             if int, will be considered as the percentage of the entire memory, and if float, 
@@ -358,76 +426,31 @@ class epde_search(object):
             Maximum power of token,
             
         '''
-        assert (isinstance(derivs, list) and isinstance(derivs[0], np.ndarray)) or derivs is None
-        if isinstance(data, np.ndarray):
-            data = [data,]
-            
-        set_grids = coordinate_tensors is not None
-        set_grids_among_tokens = coordinate_tensors is not None
-        if derivs is None:
-            if len(data) != len(variable_names):
-                print(len(data), len(variable_names))
-                raise ValueError('Mismatching lengths of data tensors and the names of the variables')
-        else:
-            if not (len(data) == len(variable_names) == len(derivs)): 
-                raise ValueError('Mismatching lengths of data tensors, names of the variables and passed derivatives')            
-        data_tokens = []
-        for data_elem_idx, data_tensor in enumerate(data):
-            assert isinstance(data_tensor, np.ndarray), 'Input data must be in format of numpy ndarrays or iterable (list or tuple) of numpy arrays'
-            entry = Input_data_entry(var_name = variable_names[data_elem_idx],
-                                     data_tensor = data_tensor, 
-                                     coord_tensors = coordinate_tensors)
-            derivs_tensor = derivs[data_elem_idx] if derivs is not None else None
-            entry.set_derivatives(deriv_tensors = derivs_tensor, smooth = field_smooth, 
-                                  sigma = sigma, max_order = max_deriv_order, mp_poolsize = mp_poolsize)
-            print(f'set grids parameter is {set_grids}')
-            entry.use_global_cache(grids_as_tokens = set_grids_among_tokens,
-                                   set_grids=set_grids, memory_for_cache=memory_for_cache, boundary=boundary)
-            set_grids = False; set_grids_among_tokens = False
-            
-            entry_token_family = Token_family(entry.var_name)
-            entry_token_family.set_status(unique_specific_token=False, unique_token_type=False, 
-                                 s_and_d_merged = False, meaningful = True, 
-                                 unique_for_right_part = False)     
-            entry_token_family.set_params(entry.names, OrderedDict([('power', (1, data_fun_pow))]),
-                                          {'power' : 0})
-            entry_token_family.set_evaluator(simple_function_evaluator, [])
-                
-            print(entry_token_family.tokens)
-            data_tokens.append(entry_token_family)
-        if prune_domain:            
-            self.set_domain_pruning(pivotal_tensor_label, pruner, threshold, division_fractions, rectangular)
-            
-        if isinstance(additional_tokens, list):
-            if not all([isinstance(tf, (Token_family, Prepared_tokens)) for tf in additional_tokens]):
-                raise TypeError(f'Incorrect type of additional tokens: expected list or Token_family/Prepared_tokens - obj, instead got list of {type(additional_tokens[0])}')                
-        elif isinstance(additional_tokens, (Token_family, Prepared_tokens)):
-            additional_tokens = [additional_tokens,]
-        else:
-            print(isinstance(additional_tokens, Prepared_tokens))
-#            print(isinstance(additional_tokens, Custom_tokens))
-#            print(issubclass(Custom_tokens, Prepared_tokens) or issubclass(Prepared_tokens, Custom_tokens))
-            raise TypeError(f'Incorrect type of additional tokens: expected list or Token_family/Prepared_tokens - obj, instead got {type(additional_tokens)}')
-        pool = TF_Pool(data_tokens + [tf if isinstance(tf, Token_family) else tf.token_family 
-                                      for tf in additional_tokens])
-        print(f'The cardinality of defined token pool is {pool.families_cardinality()}')
+
+        self.create_pool(data = data, time_axis=time_axis, boundary=boundary, variable_names=variable_names, 
+                         derivs=derivs, method=deriv_method, method_kwargs=deriv_method_kwargs, 
+                         max_deriv_order=max_deriv_order, additional_tokens=additional_tokens, 
+                         coordinate_tensors=coordinate_tensors, memory_for_cache=memory_for_cache, 
+                         prune_domain=prune_domain, pivotal_tensor_label=pivotal_tensor_label, 
+                         pruner=pruner, threshold=threshold, division_fractions=division_fractions, 
+                         rectangular=rectangular, data_fun_pow=data_fun_pow)
         
-        pop_constructor = operators.systems_population_constructor(pool = pool, terms_number = equation_terms_max_number, 
+        pop_constructor = operators.systems_population_constructor(pool = self.pool, terms_number = equation_terms_max_number, 
                                                                max_factors_in_term=equation_factors_max_number, 
                                                                eq_search_evo=self.director.constructor.strategy,
                                                                sparcity_interval = eq_sparsity_interval)
-        
+
         self.moeadd_params['pop_constructor'] = pop_constructor
         self.optimizer = moeadd_optimizer(**self.moeadd_params)
         evo_operator = operators.sys_search_evolutionary_operator(operators.mixing_xover, 
                                                                   operators.gaussian_mutation)
         self.optimizer.set_evolutionary(operator=evo_operator)        
-        best_obj = np.concatenate((np.ones([1,]), 
-                                  np.zeros(shape=len([1 for token_family in pool.families if token_family.status['meaningful']]))))  
-        self.optimizer.pass_best_objectives(*best_obj)        
+        best_obj = np.concatenate((np.ones([1,]),
+                                  np.zeros(shape=len([1 for token_family in self.pool.families if token_family.status['meaningful']]))))  
+        self.optimizer.pass_best_objectives(*best_obj)
         self.optimizer.optimize(**self.moeadd_optimization_params)
-        
-        print(f'The optimization has been conducted.')
+
+        print('The optimization has been conducted.')
         self.search_conducted = True
         
     @property
@@ -445,7 +468,18 @@ class epde_search(object):
                 [print(f'{solution.text_form} , with objective function values of {solution.obj_fun} \n')  
                 for solution in self.equations_pareto_frontier[idx]]
         else:
-            return self.optimizer.pareto_levels.levels
+            return self.optimizer.pareto_levels.levels[:level_num]
+        
+    def solver_forms(self):
+        '''
+        Method returns solver forms of the equations on 1-st non-dominated levels in a form of Python list.
+        '''
+        sf = []
+        for system in self.equations_pareto_frontier[0]:
+            if len(system.structure) > 1:
+                raise NotImplementedError('Currently, only "systems", containing a single equations, can be passed to solvers.')
+            sf.append(system.structure[0].solver_form())
+        return sf
         
     @property
     def cache(self):
