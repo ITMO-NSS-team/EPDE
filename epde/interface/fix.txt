@@ -1,0 +1,90 @@
+class Input_data_entry(object):
+    def __init__(self, var_name, data_tensor, coord_tensors = None):
+        self.var_name = var_name
+        check_nparray(data_tensor)
+        if coord_tensors is not None:
+            check_nparray_iterable(coord_tensors)
+            if any([tensor.shape != data_tensor.shape for tensor in coord_tensors]):
+                print('data_tensor.shape', data_tensor.shape, 'tensors:', 
+                      [tensor.shape for tensor in coord_tensors])
+                raise ValueError('mismatching shapes of coordinate tensors and input data')
+            self.coord_tensors = coord_tensors
+        else:
+            axes = []
+            for ax_idx in range(data_tensor.ndim):
+                axes.append(np.linspace(0., 1., data_tensor.shape[ax_idx]))
+            self.coord_tensors = np.meshgrid(*axes)
+        self.data_tensor = data_tensor
+        
+    # def set_derivatives(self, deriv_tensors = None, data_filename = None, 
+    #                     deriv_filename = None, smooth = True, sigma = 5, max_order = 1, mp_poolsize = 2):
+#        coord_names = ['x' + str(coord_idx) for coord_idx in range(len(self.coord_tensors))]
+    def set_derivatives(self, deriv_tensors = None, method = 'ANN', max_order = 1, method_kwargs = {}):
+
+        deriv_names, deriv_orders = Define_Derivatives(self.var_name, dimensionality=self.data_tensor.ndim, 
+                                                       max_order = max_order)
+
+        self.names = deriv_names # coord_names +  Define_Derivatives(self.var_name, dimensionality=self.data_tensor.ndim, 
+                                    #                  max_order = max_order)
+        self.d_orders = deriv_orders
+        if deriv_tensors is None:
+            method_kwargs['max_order'] = max_order
+            if self.coord_tensors is not None and 'grid' not in method_kwargs.keys():
+                method_kwargs['grid'] = self.coord_tensors
+            _, self.derivatives = Preprocess_derivatives(self.data_tensor, method=method, 
+                                                         method_kwargs=method_kwargs)
+            self.deriv_properties = {'max order' : max_order,
+                                     'dimensionality' : self.data_tensor.ndim}
+        else:
+            self.derivatives = deriv_tensors
+            self.deriv_properties = {'max order' : max_order,
+                                     'dimensionality' : self.data_tensor.ndim}
+            
+    def use_global_cache(self, grids_as_tokens = True, set_grids = True, memory_for_cache = 5, 
+                         boundary : int = 0):
+
+        print(type(self.data_tensor), type(self.derivatives))
+        derivs_stacked = prepare_var_tensor(self.data_tensor, self.derivatives,
+                                            time_axis = global_var.time_axis, boundary = boundary) 
+#                                            axes = self.coord_tensors)
+        if isinstance(self.coord_tensors, (list, tuple)):
+            coord_tensors_cut = []
+            for tensor in self.coord_tensors:
+#                print('appending grid of shape', tensor.shape, 'cut to ', np_ndarray_section(tensor, boundary = boundary))
+                coord_tensors_cut.append(np_ndarray_section(tensor, boundary = boundary))
+        elif isinstance(self.coord_tensors, np.ndarray):
+            coord_tensors_cut = np_ndarray_section(self.coord_tensors, boundary = boundary)
+        else:
+            raise TypeError('Coordinate tensors are presented in format, other than np.ndarray or list/tuple of np.ndarray`s')
+        
+        try:
+#            print(self.names, derivs_stacked.shape)            
+            upload_simple_tokens(self.names, global_var.tensor_cache, derivs_stacked)
+            if set_grids: 
+    #                print('setting grids')
+                memory_for_cache = int(memory_for_cache/2)
+    #                global_var.grid_cache.memory_usage_properties(obj_test_case = self.data_tensor,
+    #                                                                mem_for_cache_frac = memory_for_cache)
+                upload_grids(coord_tensors_cut, global_var.grid_cache)
+                print(f'completed grid cache with {len(global_var.grid_cache.memory_default)} tensors with labels {global_var.grid_cache.memory_default.keys()}')
+
+        except AttributeError:         
+            print('Somehow, cache had not been initialized')
+            print(self.names, derivs_stacked.shape)            
+            print(global_var.tensor_cache.memory_default.keys())
+            global_var.init_caches(set_grids = set_grids)
+            if set_grids: 
+                print('setting grids')
+                memory_for_cache = int(memory_for_cache/2)
+                global_var.grid_cache.memory_usage_properties(obj_test_case = self.data_tensor,
+                                                                mem_for_cache_frac = memory_for_cache)
+                upload_grids(coord_tensors_cut, global_var.grid_cache)
+                print(f'completed grid cache with {len(global_var.grid_cache.memory_default)} tensors with labels {global_var.grid_cache.memory_default.keys()}')
+#                print()
+    
+            global_var.tensor_cache.memory_usage_properties(obj_test_case = self.data_tensor,
+                                                            mem_for_cache_frac = memory_for_cache)
+            print(self.names, derivs_stacked.shape)
+            upload_simple_tokens(self.names, global_var.tensor_cache, derivs_stacked)
+
+        global_var.tensor_cache.use_structural()

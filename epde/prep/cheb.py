@@ -33,26 +33,38 @@ def Get_cheb_for_point(matrix, axis, idx, grid, max_der_order = 3, points = 9, p
 def Process_Point_Cheb(args):
     global PolyBoundary
     idx = np.array(args[0]); matrix = args[1]; grid = args[2]; points = args[3]; n_der = args[4]; poly_bound = args[5]; poly_order = args[6]
-    print(args[0])
+#    print(args[0])
+
+    if isinstance(n_der, int):
+        n_der = tuple([n_der for i in range(matrix.ndim)])
+    elif isinstance(n_der, (list, tuple)):
+        assert len(n_der) == matrix.ndim, 'Given derivative orders do not match the data tensor dimensionality'
+    else:
+        raise TypeError('Derivatives were given in the incorrect format. A single integer or list/tuple of integers required')
+
     poly_mask = [idx[dim] >= poly_bound and idx[dim] <= matrix.shape[dim] - poly_bound for dim in np.arange(matrix.ndim)]
     polynomials = np.empty(matrix.ndim, dtype = np.polynomial.chebyshev.Chebyshev)
     x = np.empty(idx.shape)
     for i in range(matrix.ndim):
         if poly_mask[i]:
-            x_temp, poly_temp = Get_cheb_for_point(matrix, i, idx, grid, max_der_order=n_der, points = points, poly_order = poly_order)
+            x_temp, poly_temp = Get_cheb_for_point(matrix, i, idx, grid, max_der_order=n_der[i], points = points, poly_order = poly_order)
             x[i] = x_temp
             polynomials[i] = poly_temp 
-
-    derivatives = np.empty(matrix.ndim * (n_der))
+    
+    derivatives = np.empty(sum(n_der))
+    
+    deriv_idx = 0
     for var_idx in np.arange(matrix.ndim):
         if poly_mask[var_idx]:
-            for der_idx in np.arange(1, n_der+1):
-                derivatives[var_idx*(n_der) + (der_idx-1)] = polynomials[var_idx].deriv(m=der_idx)(x[var_idx])
+            for der_idx in np.arange(1, n_der[var_idx]+1): # var_idx*(n_der[var_idx]) + (der_idx-1)
+                derivatives[deriv_idx] = polynomials[var_idx].deriv(m=der_idx)(x[var_idx])
+                deriv_idx += 1
         else:
 #            print(derivatives[var_idx*(n_der) : (var_idx+1)*(n_der)].shape, FD_derivatives(matrix, 
 #                        axis = var_idx, idx = idx, grid = grid, max_order = n_der, poly_bound = poly_bound).shape)
-            derivatives[var_idx*(n_der) : (var_idx+1)*(n_der)] = FD_derivatives(matrix, 
-                        axis = var_idx, idx = idx, grid = grid, max_order = n_der, poly_bound = poly_bound)
-    
+            derivatives[deriv_idx : deriv_idx + n_der[var_idx]] = FD_derivatives(matrix, 
+                        axis = var_idx, idx = idx, grid = grid, max_order = n_der[var_idx], poly_bound = poly_bound)
+            deriv_idx += n_der[var_idx]
 #    print(derivatives.shape)
+#    print('derivatives length', len(derivatives), 'type', type(derivatives))
     return(derivatives)

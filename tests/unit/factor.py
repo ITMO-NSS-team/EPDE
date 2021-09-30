@@ -19,11 +19,12 @@ import numpy as np
 from collections import OrderedDict
 
 
-import epde.src.globals as global_var
-from epde.src.token_family import Token_family, Evaluator
-from epde.src.factor import Factor
-from epde.src.cache.cache import upload_grids, upload_simple_tokens
-from epde.src.supplementary import Define_Derivatives
+import epde.globals as global_var
+from epde.interface.token_family import TF_Pool, Token_family, Evaluator
+from epde.factor import Factor
+from epde.cache.cache import upload_grids, upload_simple_tokens
+from epde.supplementary import Define_Derivatives
+from epde.evaluators import Custom_Evaluator
 
 def mock_eval_function(factor,  structural = False, **kwargs):
     return np.ones((10, 10, 10))
@@ -137,3 +138,47 @@ def test_factor():
     test_factor.evaluate()
     assert test_factor.name is not None
 #    raise NotImplementedError
+    
+    
+def test_custom_evaluator():
+    x = np.linspace(0, 4*np.pi, 1000)
+#    ts = np.ones()
+    
+    global_var.init_caches(set_grids=True)
+#    global_var.tensor_cache.memory_usage_properties(obj_test_case=ts, mem_for_cache_frac = 5)  
+    global_var.grid_cache.memory_usage_properties(obj_test_case=x, mem_for_cache_frac = 5)
+    upload_grids(x, global_var.grid_cache)     
+    
+    test_lambdas = {'cos' : lambda *grids, **kwargs: np.cos(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power'], 
+                   'sin' : lambda *grids, **kwargs: np.sin(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power']}
+    test_eval = Custom_Evaluator(test_lambdas, eval_fun_params_labels = ['freq', 'dim', 'power'], use_factors_grids = True)
+
+    trig_tokens = Token_family('Trigonometric')
+    trig_names = ['sin', 'cos']
+    trig_tokens.set_status(unique_specific_token=True, unique_token_type=True, 
+                           meaningful = False, unique_for_right_part = False)
+    trig_token_params = OrderedDict([('power', (1, 1)), ('freq', (0.95, 1.05)), ('dim', (0, 0))])
+    trig_equal_params = {'power' : 0, 'freq' : 0.05, 'dim' : 0}
+    trig_tokens.set_params(trig_names, trig_token_params, trig_equal_params)
+    trig_tokens.set_evaluator(test_eval, [])
+    
+    global_var.tensor_cache.use_structural()
+
+    pool = TF_Pool([trig_tokens])
+    pool.families_cardinality()    
+    _, test_factor = pool.create()
+    test_factor.evaluate()
+    
+    test_lambdas = lambda *grids, **kwargs: np.cos(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power']
+    test_eval = Custom_Evaluator(test_lambdas, eval_fun_params_labels = ['freq', 'dim', 'power'], use_factors_grids = True)    
+    trig_tokens.set_evaluator(test_eval, [])
+
+    pool = TF_Pool([trig_tokens])
+    pool.families_cardinality()    
+    _, test_factor = pool.create()
+    test_factor.evaluate()
+    
+    
+    
+#    test_factor = 
+    

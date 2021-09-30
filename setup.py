@@ -14,7 +14,7 @@ import pathlib
 here = pathlib.Path(__file__).parent.resolve()
 
 # Get the long description from the README file
-long_description = (here / 'README.md').read_text(encoding='utf-8')
+long_description = (here / 'README.rst').read_text(encoding='utf-8')
 
 
 def read(*names, **kwargs):
@@ -35,7 +35,7 @@ def get_requirements():
 
 setup(
       name = 'epde',
-      version = '1.1.2',
+      version = '1.1.4',
       description = 'EPDE package',
       author = 'Mikhail Maslyaev',
       author_email = 'miklemas@list.ru',
@@ -45,6 +45,7 @@ setup(
               'License :: OSI Approved :: MIT License',
               'Operating System :: OS Independent',
       ],
-      packages = find_packages(include = ['epde', 'epde.src', 'epde.prep', 'epde.src.*']), 
+      packages = find_packages(include = ['epde', 'epde.cache', 'epde.interface', 'epde.moeadd', 
+                                          'epde.operators', 'epde.prep', 'epde.solver']), 
       python_requires =' >=3.6'
       )
