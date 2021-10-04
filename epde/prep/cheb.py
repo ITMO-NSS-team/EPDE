@@ -38,6 +38,7 @@ def Process_Point_Cheb(args):
     if isinstance(n_der, int):
         n_der = tuple([n_der for i in range(matrix.ndim)])
     elif isinstance(n_der, (list, tuple)):
+        # print('len(n_der)', len(n_der))
         assert len(n_der) == matrix.ndim, 'Given derivative orders do not match the data tensor dimensionality'
     else:
         raise TypeError('Derivatives were given in the incorrect format. A single integer or list/tuple of integers required')

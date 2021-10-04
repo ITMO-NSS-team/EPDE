@@ -106,9 +106,10 @@ def Filter_powers(gene):    # Разобраться и переделать
         power_idx = np.inf
         for param_idx, param_info in powered_token.params_description.items():
             if param_info['name'] == 'power': 
+                max_power = param_info['bounds'][1]
                 power_idx = param_idx
                 break
-        powered_token.params[power_idx] = total_power
+        powered_token.params[power_idx] = total_power if total_power < max_power else max_power
         if powered_token not in gene_filtered:
             gene_filtered.append(powered_token)
     return gene_filtered

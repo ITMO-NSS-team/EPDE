@@ -7,6 +7,7 @@ Created on Tue Feb  9 16:14:57 2021
 """
 
 from dataclasses import dataclass
+import warnings
 
 from epde.cache.cache import Cache
 #from epde.supplementary import flatten
@@ -49,10 +50,15 @@ class Verbose_Manager:
     iter_fitness : bool
     iter_stats : bool
     show_warnings : bool
+    show_moeadd_epochs : bool
     
 def init_verbose(plot_DE_solutions : bool = False, show_iter_idx : bool = False, 
                  show_iter_fitness : bool = False, show_iter_stats : bool = False, 
-                 show_warnings : bool = False):
+                 show_warnings : bool = False, show_moeadd_epochs : bool = False):
     global verbose
-    verbose = Verbose_Manager(plot_DE_solutions, show_iter_idx, show_iter_fitness, show_iter_stats)
+    # import warnings
+    if not show_warnings:
+        warnings.filterwarnings("ignore")
+    verbose = Verbose_Manager(plot_DE_solutions, show_iter_idx, show_iter_fitness, 
+                              show_iter_stats, show_warnings, show_moeadd_epochs)
     

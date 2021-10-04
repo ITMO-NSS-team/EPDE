@@ -46,6 +46,6 @@ setup(
               'Operating System :: OS Independent',
       ],
       packages = find_packages(include = ['epde', 'epde.cache', 'epde.interface', 'epde.moeadd', 
-                                          'epde.operators', 'epde.prep', 'epde.solver']), 
+                                          'epde.operators', 'epde.prep']), 
       python_requires =' >=3.6'
       )

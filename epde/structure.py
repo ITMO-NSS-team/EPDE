@@ -94,12 +94,12 @@ class Term(Complex_Structure):
         self.pool = pool
         self.max_factors_in_term = max_factors_in_term
         
-        if type(passed_term) == type(None):
+        if passed_term is None:
             self.Randomize(forbidden_tokens)     
         else:
             self.Defined(passed_term)
 
-        if type(global_var.tensor_cache) != type(None):
+        if global_var.tensor_cache is not None:
             self.use_cache()
         self.reset_saved_state() # key - state of normalization, value - if the variable is saved in cache
 
@@ -127,18 +127,18 @@ class Term(Complex_Structure):
 
         if isinstance(passed_term, (list, tuple)): #type(passed_term) == list or type(passed_term) == tuple:
             for i, factor in enumerate(passed_term):
-                if type(factor) == str:
+                if isinstance(factor, str):
                     _, temp_f = self.pool.create(label = factor)
                     self.structure.append(temp_f)#; raise NotImplementedError
-                elif type(factor) == Factor:
+                elif isinstance(factor, Factor):
                     self.structure.append(factor)
                 else:
                     raise ValueError('The structure of a term should be declared with str or factor.Factor obj, instead got', type(factor))
         else:   # Случай, если подается лишь 1 токен
-            if type(passed_term) == str:
+            if isinstance(passed_term, str):
                 _, temp_f = self.pool.create(label = passed_term)
                 self.structure.append(temp_f)#; raise NotImplementedError
-            elif type(passed_term) == Factor:
+            elif isinstance(passed_term, Factor):
                 self.structure.append(passed_term)
             else:
                 raise ValueError('The structure of a term should be declared with str or factor.Factor obj, instead got', type(passed_term))
@@ -174,14 +174,14 @@ class Term(Complex_Structure):
                 self.structure.append(factor)
                 self.occupied_tokens_labels.extend(occupied_by_factor)                
             self.structure = Filter_powers(self.structure)
-            if type(forbidden_factors) == type(None):
+            if forbidden_factors is None:
                 break
             elif all([(Check_Unqueness(factor, forbidden_factors) or not factor.status['unique_for_right_part']) for factor in self.structure]):
                 break            
 
 
     def evaluate(self, structural):
-        assert type(global_var.tensor_cache) != type(None), 'Currently working only with connected cache'
+        assert global_var.tensor_cache is not None, 'Currently working only with connected cache'
         normalize = structural
         if self.saved[structural] or (self.cache_label, normalize) in global_var.tensor_cache: #  
             value = global_var.tensor_cache.get(self.cache_label, normalized = normalize,
@@ -225,7 +225,7 @@ class Term(Complex_Structure):
                 self.structure = Filter_powers(self.structure)
                 self.reset_saved_state()
                 break
-            if accept_term_try == 10:
+            if accept_term_try == 10 and global_var.verbose.show_warnings:
                 warnings.warn('Can not create unique term, while filtering equation tokens in regards to the right part.')
             if accept_term_try >= 10:
                 self.Randomize(forbidden_factors = new_term.occupied_tokens_labels + taken_tokens)
@@ -286,7 +286,6 @@ class Term(Complex_Structure):
                 deriv_orders.append(factor.deriv_code); deriv_powers.append(factor.params[power_param_idx])
             else:
                 coeff_tensor = coeff_tensor * factor.evaluate()
-#                deriv_orders.append(factor.deriv_code); deriv_powers.append(1)
         if len(deriv_powers) == 1:
             deriv_powers = deriv_powers[0]
             deriv_orders = deriv_orders[0]
@@ -294,11 +293,34 @@ class Term(Complex_Structure):
         coeff_tensor = torch.from_numpy(coeff_tensor)
         return [coeff_tensor, deriv_orders, deriv_powers]
                 
-                
     def __eq__(self, other):
         return (all([any([other_elem == self_elem for other_elem in other.structure]) for self_elem in self.structure]) and 
                 all([any([other_elem == self_elem for self_elem in self.structure]) for other_elem in other.structure]) and 
                 len(other.structure) == len(self.structure))
+
+    @History_Extender('\n -> was copied by deepcopy(self)', 'n')
+    def __deepcopy__(self, memo = None):
+        clss = self.__class__
+        new_struct = clss.__new__(clss)
+        memo[id(self)] = new_struct
+        
+        attrs_to_avoid_copy = [] # Add attributes to avoid copying during deepcopy, if needed
+        for k in self.__slots__:
+            try:
+                if k not in attrs_to_avoid_copy:
+                    if not isinstance(k, list):
+                        setattr(new_struct, k, copy.deepcopy(getattr(self, k), memo))
+                    else:
+                        temp = []
+                        for elem in getattr(self, k):
+                            temp.append(copy.deepcopy(elem, memo))
+                        setattr(new_struct, k, temp)
+                else:
+                    setattr(new_struct, k, None)
+            except AttributeError:
+                pass
+
+        return new_struct
 
 
 class Equation(Complex_Structure): 
@@ -461,20 +483,21 @@ class Equation(Complex_Structure):
         memo[id(self)] = new_struct
         
         attrs_to_avoid_copy = ['_features', '_target']
-        # print(self.__slots__)
         for k in self.__slots__:
             try:
-                # print('successful writing', k, getattr(self, k))
                 if k not in attrs_to_avoid_copy:
-                    setattr(new_struct, k, copy.deepcopy(getattr(self, k), memo))
+                    if not isinstance(k, list):
+                        setattr(new_struct, k, copy.deepcopy(getattr(self, k), memo))
+                    else:
+                        temp = []
+                        for elem in getattr(self, k):
+                            temp.append(copy.deepcopy(elem, memo))
+                        setattr(new_struct, k, temp)
                 else:
                     setattr(new_struct, k, None)
             except AttributeError:
-                # print('unsuccessful writing', k)                
                 pass
-                
-        # new_struct.__dict__.update(self.__dict__)        
-        # new_struct.structure = copy.deepcopy(self.structure)
+
         return new_struct
             
     def copy_properties_to(self, new_equation):
@@ -524,6 +547,7 @@ class Equation(Complex_Structure):
         if self.weights_final_evald:
             return self._weights_final
         else:
+            print(self.text_form)
             raise AttributeError('Final weights called before initialization')
             
     @weights_final.setter
@@ -686,14 +710,14 @@ class SoEq(Complex_Structure, moeadd.moeadd_solution):
         self.tokens_dep = TF_Pool(pool.families_supplementary) #[family for family in token_families if not family.status['meaningful']]
         self.equation_number = np.size(self.tokens_indep.families_cardinality())
         
-        if type(sparcity) != None: self.vals = sparcity 
+        if sparcity is not None: self.vals = sparcity 
         self.max_terms_number = terms_number; self.max_factors_in_term = max_factors_in_term
         self.moeadd_set = False; self.eq_search_operator_set = False# ; self.evaluated = False
         self.def_eq_search_iters = eq_search_iters
         
     def use_default_objective_function(self):
-        from epde.eq_mo_objectives import system_discrepancy, system_complexity_by_terms
-        self.set_objective_functions([system_discrepancy, system_complexity_by_terms])
+        from epde.eq_mo_objectives import system_discrepancy, system_complexity_by_terms, system_complexity_by_factors
+        self.set_objective_functions([system_discrepancy, system_complexity_by_factors])
         
     def set_objective_functions(self, obj_funs):
         '''
@@ -725,8 +749,8 @@ class SoEq(Complex_Structure, moeadd.moeadd_solution):
 #            raise ValueError('Number of iterations is not defied both in method parameter or in object attribute')
         assert self.eq_search_operator_set
         
-        if type(eq_search_iters) == type(None): eq_search_iters = self.def_eq_search_iters
-        if type(sparcity) == type(None): 
+        if eq_search_iters is None: eq_search_iters = self.def_eq_search_iters
+        if sparcity is None: 
             sparcity = self.vals
         else:
             self.vals = sparcity
@@ -842,5 +866,26 @@ class SoEq(Complex_Structure, moeadd.moeadd_solution):
             
     def __hash__(self):
         return hash(tuple(self.vals))
-                
         
+    def __deepcopy__(self, memo = None):
+        clss = self.__class__
+        new_struct = clss.__new__(clss)
+        memo[id(self)] = new_struct
+        
+        new_struct.__dict__.update(self.__dict__)
+        
+        for k in self.__slots__:
+                try:
+                    if not isinstance(k, list):
+                        setattr(new_struct, k, copy.deepcopy(getattr(self, k), memo))
+                    else:
+                        temp = []
+                        for elem in getattr(self, k):
+                            temp.append(copy.deepcopy(elem, memo))
+                        setattr(new_struct, k, temp)                            
+                except AttributeError:
+                    pass     
+
+        for idx, eq in enumerate(self.structure):
+            eq.copy_properties_to(new_struct)
+        return new_struct

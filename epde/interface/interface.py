@@ -130,7 +130,7 @@ class epde_search(object):
                  director = None, equation_type : set = {'PDE', 'derivatives only'}, time_axis : int = 0, 
                  init_cache : bool = True, example_tensor_shape : Union[tuple, list] = (1000,), 
                  set_grids : bool = True, eq_search_iter : int = 300, use_solver : bool = False, 
-                 dimensionality : int = 1):
+                 dimensionality : int = 1, verbose_params : dict = {}):
         '''
         
         Intialization of the epde search object. Here, the user can declare the properties of the 
@@ -156,6 +156,7 @@ class epde_search(object):
         
         '''
         global_var.set_time_axis(time_axis)
+        global_var.init_verbose(**verbose_params)
 #        eq_search_stop_criterion_obj = eq_search_stop_criterion()
         if director is not None and not use_default_strategy:
             self.director = director
@@ -325,7 +326,7 @@ class epde_search(object):
             entry_token_family = Token_family(entry.var_name, family_of_derivs = True)
             entry_token_family.set_status(unique_specific_token=False, unique_token_type=False, 
                                  s_and_d_merged = False, meaningful = True, 
-                                 unique_for_right_part = True)     
+                                 unique_for_right_part = False)     
             entry_token_family.set_params(entry.names, OrderedDict([('power', (1, data_fun_pow))]),
                                           {'power' : 0}, entry.d_orders)
             entry_token_family.set_evaluator(simple_function_evaluator, [])
@@ -435,7 +436,7 @@ class epde_search(object):
                          pruner=pruner, threshold=threshold, division_fractions=division_fractions, 
                          rectangular=rectangular, data_fun_pow=data_fun_pow)
         
-        pop_constructor = operators.systems_population_constructor(pool = self.pool, terms_number = equation_terms_max_number, 
+        pop_constructor = operators.Systems_population_constructor(pool = self.pool, terms_number = equation_terms_max_number, 
                                                                max_factors_in_term=equation_factors_max_number, 
                                                                eq_search_evo=self.director.constructor.strategy,
                                                                sparcity_interval = eq_sparsity_interval)
@@ -487,7 +488,3 @@ class epde_search(object):
             return global_var.grid_cache, global_var.tensor_cache
         else:
             return None, global_var.tensor_cache
-            
-#    def test_equation(self, equation_text_form : str):
-#        
-#    

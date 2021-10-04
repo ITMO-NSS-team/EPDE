@@ -15,7 +15,7 @@ from matplotlib import cm
 
 from epde.operators.template import Compound_Operator
 import epde.globals as global_var
-from solver.solver import point_sort_shift_solver
+from TEDEouS.solver import point_sort_shift_solver
 
 class L2_fitness(Compound_Operator):
     """

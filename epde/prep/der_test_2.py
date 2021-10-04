@@ -18,8 +18,8 @@ import sys
 sys.path.append('../')
 
 
-from solver.solver import apply_operator_set
-from solver.input_preprocessing import grid_prepare, operator_prepare
+from TEDEouS.solver import apply_operator_set
+from TEDEouS.input_preprocessing import grid_prepare, operator_prepare
 
 diff_results={}
 

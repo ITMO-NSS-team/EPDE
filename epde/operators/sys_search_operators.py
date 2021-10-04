@@ -18,7 +18,7 @@ def set_argument(var, fun_kwargs, base_value):
         res = base_value
     return res
 
-class systems_population_constructor(object):
+class Systems_population_constructor(object):
     def __init__(self, pool, terms_number, max_factors_in_term, eq_search_evo, 
                  obj_functions = None, sparcity_interval = (0, 1)):
         self.pool = pool; self.terms_number = terms_number
@@ -32,9 +32,9 @@ class systems_population_constructor(object):
     
     def create(self, **kwargs): # Дописать
         pop_size = set_argument('population_size', kwargs, 16)
-        sparcity = set_argument('sparcity', kwargs, np.random.uniform(low = self.sparcity_interval[0], 
-                                                                      high = self.sparcity_interval[1],
-                                                                      size = self.equation_number))
+        sparcity = set_argument('sparcity', kwargs, np.power(np.e, np.random.uniform(low = np.log(self.sparcity_interval[0]),
+                                                                      high = np.log(self.sparcity_interval[1]),
+                                                                      size = self.equation_number)))
 #        eq_search_iters = set_argument('eq_search_iters', kwargs, 50)
         
         print(f'Creating new equation, sparsity value {sparcity}')
@@ -88,21 +88,30 @@ class sys_search_evolutionary_operator(object): # Возможно, органи
     
     
 def gaussian_mutation(solution):
-    assert type(solution) == SoEq, 'Object of other type, than the system of equation (SoEq), has been passed to the mutation operator'
+    assert isinstance(solution, SoEq), 'Object of other type, than the system of equation (SoEq), has been passed to the mutation operator'
     solution_new = deepcopy(solution)
+    solution_new.set_eq_search_evolutionary(solution.eq_search_evolutionary_strategy)
+    
     solution_new.vals += np.random.normal(size = solution_new.vals.size)
     return solution_new
 
 
 def mixing_xover(parents):
-    assert all([type(parent) == SoEq for parent in parents]), 'Object of other type, than the system of equation (SoEq), has been passed to the crossover operator'
+    assert all([isinstance(parent, SoEq) for parent in parents]), 'Object of other type, than the system of equation (SoEq), has been passed to the crossover operator'
     proportion = np.random.uniform(low = 1e-6, high = 0.5-1e-6)
     offsprings = [deepcopy(parent) for parent in parents]
+
     offsprings[0].precomputed_value = False; offsprings[1].precomputed_value = False
     offsprings[0].precomputed_domain = False; offsprings[1].precomputed_domain = False
     
+    # strategy = parents[0].eq_search_evolutionary_strategy
+    # offsprings[0].set_eq_search_evolutionary(strategy)
+    # offsprings[1].set_eq_search_evolutionary(strategy)
+    # offsprings[0].def_eq_search_iters = parents[0].def_eq_search_iters
+    # offsprings[1].def_eq_search_iters = parents[0].def_eq_search_iters
+
     offsprings[0].vals = parents[0].vals + proportion * (parents[1].vals - parents[0].vals)
     offsprings[1].vals = parents[0].vals + (1 - proportion) * (parents[1].vals - parents[0].vals)
-    
+
     return offsprings
 

@@ -11,6 +11,7 @@ import numpy as np
 from copy import deepcopy
 import warnings
 
+import epde.globals as global_var
 from epde.operators.template import Compound_Operator
 from epde.decorators import History_Extender
 
@@ -118,7 +119,7 @@ class Eq_Right_Part_Selector(Compound_Operator):
 
         equation.target_idx = max_idx
         self.suboperators['fitness_calculation'].apply(equation)
-        if not np.isclose(equation.fitness_value, max_fitness):
+        if not np.isclose(equation.fitness_value, max_fitness) and global_var.verbose.show_warnings:
             # print(equation.fitness_value, max_fitness)
             # print(equation.text_form)
             warnings.warn('Reevaluation of fitness function for equation has obtained different result. Not an error, if ANN DE solver is used.')
@@ -186,7 +187,7 @@ class Status_respecting_ERPS(Compound_Operator):
         equation.target_idx = max_idx
         
         self.suboperators['fitness_calculation'].apply(equation)
-        if not np.isclose(equation.fitness_value, max_fitness):
+        if not np.isclose(equation.fitness_value, max_fitness) and global_var.verbose.show_warnings:
             warnings.warn('Reevaluation of fitness function for equation has obtained different result. Not an error, if ANN DE solver is used.')
         equation.right_part_selected = True    
           

@@ -18,8 +18,8 @@ from epde.prep.cheb import Process_Point_Cheb
 from epde.prep.smoothing import Smoothing
 from epde.supplementary import Define_Derivatives
 
-from solver.solver import apply_operator_set
-from solver.input_preprocessing import grid_prepare, operator_prepare
+from TEDEouS.solver import apply_operator_set
+from TEDEouS.input_preprocessing import grid_prepare, operator_prepare
 
 def scaling_test(field, steps = None, ff_name = None, output_file_name = None, smooth = True, sigma = 9,
                            mp_poolsize = 4, max_order = 2, polynomial_window = 9, poly_order = None, boundary = 1):

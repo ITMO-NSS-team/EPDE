@@ -12,6 +12,8 @@ from abc import ABC, abstractmethod, abstractproperty
 from typing import Callable, Iterable
 from warnings import warn
 
+import epde.globals as global_var
+
 from epde.operators.template import Compound_Operator
 
 from epde.operators.equation_selections import Tournament_selection
@@ -500,17 +502,11 @@ class Linked_Blocks(object):
             if not 'initial' in self.blocks_labeled.keys():
                 raise KeyError('Mandatory initial block is missing, or incorrectly labeled')            
             
-#            if not 'fitness' in self.blocks_labeled.keys():
-#                raise KeyError('Required evolutionary operator of fitness calculation is missing, or incorrectly labeled')
-    
             if not 'mutation' in self.blocks_labeled.keys():
                 raise KeyError('Required evolutionary operator of mutation calculation is missing, or incorrectly labeled')
     
             if not 'crossover' in self.blocks_labeled.keys():
                 raise KeyError('Required evolutionary operator of crossover calculation is missing, or incorrectly labeled')
-    
-#            if not 'sparsity' in self.blocks_labeled.keys():
-#                raise KeyError('Required evolutionary operator of sparsity calculation is missing, or incorrectly labeled')
 
 
     def reset_traversal_cond(self):
@@ -563,7 +559,7 @@ class Evolutionary_strategy(object):
         
     def create_linked_blocks(self, blocks = None, suppress_structure_check = False):
         self.suppress_structure_check = suppress_structure_check
-        if self.suppress_structure_check:
+        if self.suppress_structure_check and global_var.verbose.show_warnings:
             warn('The tests of the strategy integrity are suppressed: valuable blocks of EA may go missing and that will not be noticed')
         if blocks is None:
             if len(self.blocks) == 0:
@@ -590,8 +586,18 @@ class Evolutionary_strategy(object):
     def run(self, initial_population : Iterable, EA_kwargs : dict):
         self._stop_criterion.reset()
         population = initial_population
+        iter_idx = 0
         while not self._stop_criterion.check():
+            iter_idx += 1; log_message = ''
+            if global_var.verbose.iter_idx:
+                log_message += f'Equation search epoch {iter_idx}.'
+            if global_var.verbose.iter_fitness:
+                log_message += f'Achieved fitness of {np.max([equation.fitness_value for equation in population])}'
+            if global_var.verbose.iter_stats:
+                raise NotImplementedError('Evolutionary optimizer statistics output not yet implemented')
             self.linked_blocks.traversal(population, EA_kwargs)
+            if log_message:
+                print(log_message)
             population = self.linked_blocks.output
         self.run_performed = True
         

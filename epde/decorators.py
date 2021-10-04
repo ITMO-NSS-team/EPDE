@@ -7,6 +7,7 @@ Created on Tue Jun  1 15:56:10 2021
 """
 
 from functools import wraps
+import ray
 
 changelog_entry_templates = {}
 
@@ -89,8 +90,15 @@ class History_Extender():
             return result
         return wrapper
     
-class Parallelize_operator():
-    pass
+# class Parallelize_method():
+#     def __init__(self, num_cpus = 1):
+#         self.num_cpus = num_cpus
+        
+#     def __call__(self, method):
+#         @wraps(method)
+#         @ray.remote(num_cpus = self.num_cpus)
+#         def wrapper(*args, **kwargs):
+#             return method(*args, **kwargs)
     
     
 #class Ray_parallelizer():

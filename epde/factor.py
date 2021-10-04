@@ -7,6 +7,7 @@ Created on Thu Mar  5 13:16:43 2020
 """
 
 import numpy as np
+import copy
 
 from epde.Tokens import TerminalToken
 import epde.globals as global_var
@@ -30,7 +31,7 @@ class Factor(TerminalToken):
         self.deriv_code = deriv_code
         
         self.reset_saved_state()
-        if type(global_var.tensor_cache) != type(None):
+        if global_var.tensor_cache is not None:
             self.use_cache()
         else:
             self.cache_linked = False
@@ -39,7 +40,7 @@ class Factor(TerminalToken):
             self.use_grids_cache()
 
         if randomize:
-            assert type(params_description) != type(None) and type(equality_ranges) != type(None)
+            assert params_description is not None and equality_ranges is not None
             self.Set_parameters(params_description, equality_ranges, random = True)
 
     def reset_saved_state(self):
@@ -174,6 +175,31 @@ class Factor(TerminalToken):
                 dim_set = True
         self.grid_idx = int(self.params[dim_param_idx]) if dim_set else 0
         self.grid_set = True
+    
+    def __deepcopy__(self, memo = None):
+        clss = self.__class__
+        new_struct = clss.__new__(clss)
+        memo[id(self)] = new_struct
+        
+        new_struct.__dict__.update(self.__dict__)
+        
+        attrs_to_avoid_copy = []
+        for k in self.__slots__:
+            try:
+                if k not in attrs_to_avoid_copy:
+                    if not isinstance(k, list):
+                        setattr(new_struct, k, copy.deepcopy(getattr(self, k), memo))
+                    else:
+                        temp = []
+                        for elem in getattr(self, k):
+                            temp.append(copy.deepcopy(elem, memo))
+                        setattr(new_struct, k, temp)
+                else:
+                    setattr(new_struct, k, None)
+            except AttributeError:
+                pass
+
+        return new_struct    
     
     def use_cache(self):      
         self.cache_linked = True
