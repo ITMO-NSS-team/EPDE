@@ -83,21 +83,16 @@ class Input_data_entry(object):
         if isinstance(self.coord_tensors, (list, tuple)):
             coord_tensors_cut = []
             for tensor in self.coord_tensors:
-#                print('appending grid of shape', tensor.shape, 'cut to ', np_ndarray_section(tensor, boundary = boundary))
                 coord_tensors_cut.append(np_ndarray_section(tensor, boundary = boundary))
         elif isinstance(self.coord_tensors, np.ndarray):
             coord_tensors_cut = np_ndarray_section(self.coord_tensors, boundary = boundary)
         else:
             raise TypeError('Coordinate tensors are presented in format, other than np.ndarray or list/tuple of np.ndarray`s')
         
-        try:
-#            print(self.names, derivs_stacked.shape)            
+        try:       
             upload_simple_tokens(self.names, global_var.tensor_cache, derivs_stacked)
             if set_grids: 
-    #                print('setting grids')
                 memory_for_cache = int(memory_for_cache/2)
-    #                global_var.grid_cache.memory_usage_properties(obj_test_case = self.data_tensor,
-    #                                                                mem_for_cache_frac = memory_for_cache)
                 upload_grids(coord_tensors_cut, global_var.grid_cache)
                 print(f'completed grid cache with {len(global_var.grid_cache.memory_default)} tensors with labels {global_var.grid_cache.memory_default.keys()}')
 
@@ -113,8 +108,6 @@ class Input_data_entry(object):
                                                                 mem_for_cache_frac = memory_for_cache)
                 upload_grids(coord_tensors_cut, global_var.grid_cache)
                 print(f'completed grid cache with {len(global_var.grid_cache.memory_default)} tensors with labels {global_var.grid_cache.memory_default.keys()}')
-#                print()
-    
             global_var.tensor_cache.memory_usage_properties(obj_test_case = self.data_tensor,
                                                             mem_for_cache_frac = memory_for_cache)
             print(self.names, derivs_stacked.shape)
@@ -157,7 +150,7 @@ class epde_search(object):
         '''
         global_var.set_time_axis(time_axis)
         global_var.init_verbose(**verbose_params)
-#        eq_search_stop_criterion_obj = eq_search_stop_criterion()
+
         if director is not None and not use_default_strategy:
             self.director = director
         elif director is None and use_default_strategy:
@@ -427,7 +420,10 @@ class epde_search(object):
             Maximum power of token,
             
         '''
-
+        if equation_terms_max_number < self.moeadd_params['pop_size']:
+            self.moeadd_params['pop_size'] = equation_terms_max_number
+            self.moeadd_params['weights_num'] = equation_terms_max_number
+        
         self.create_pool(data = data, time_axis=time_axis, boundary=boundary, variable_names=variable_names, 
                          derivs=derivs, method=deriv_method, method_kwargs=deriv_method_kwargs, 
                          max_deriv_order=max_deriv_order, additional_tokens=additional_tokens, 

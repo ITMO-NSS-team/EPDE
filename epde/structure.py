@@ -450,7 +450,9 @@ class Equation(Complex_Structure):
             else:
                 continue
         if self._features.ndim == 1:
-            self._features = np.expand_dims(self._features, 1)
+            # print('before dim extension', self._features.shape)
+            self._features = np.expand_dims(self._features, 1).T
+            # print('after dim extension', self._features.shape)
         temp_feats = np.vstack([self._features, np.ones(self._features.shape[1])])
         self._features = np.transpose(self._features); temp_feats = np.transpose(temp_feats)
         if return_val:
