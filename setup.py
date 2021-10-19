@@ -35,7 +35,7 @@ def get_requirements():
 
 setup(
       name = 'epde',
-      version = '1.1.6',
+      version = '1.1.7',
       description = 'EPDE package',
       author = 'Mikhail Maslyaev',
       author_email = 'miklemas@list.ru',
