@@ -321,7 +321,10 @@ class Token_family(object):
                     if def_term_tokens.count(token) >= self.token_params['power'][1]: print(f"max power {self.token_params['power'][1]} not reached") 
                 raise ValueError("'a' cannot be empty unless no samples are taken")
 
-        factor_deriv_code = self.derivs_ords[label] if self.family_of_derivs else None
+        if self.family_of_derivs:
+            factor_deriv_code = self.derivs_ords[label]
+        else:
+            factor_deriv_code = None
         new_factor = Factor(token_name = label, deriv_code=factor_deriv_code,
                             status = self.status, family_type = self.type)
         
