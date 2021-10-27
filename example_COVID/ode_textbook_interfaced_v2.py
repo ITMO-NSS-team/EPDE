@@ -8,6 +8,7 @@ Created on Tue Jul 13 14:45:14 2021
 #v2 - visualisation elements for testing purposes
 
 import numpy as np
+import matplotlib
 import epde.interface.interface as epde_alg
 from epde.interface.prepared_tokens import Trigonometric_tokens
 
@@ -19,16 +20,30 @@ if __name__ == '__main__':
     #u = np.load('Test_data/fill366.npy') # loading data with the solution of ODE
     #np.savetxt('Test_data/input.txt', u)
 
-    u = np.loadtxt('Test_data\\input.txt')  # loading data with the solution of ODE
+    #Flu data
+
+    # exp_name = "flu"
+    # u = np.loadtxt('input\\prev_weekly.txt')  # loading data with the solution of ODE
+    # tick_title = "Week"
+
+    exp_name = "flu"
+    u = np.loadtxt('input\\prev_daily.txt')
+    tick_title = "Day"
 
     N = len(u)
     print(N)
 
-    t = np.linspace(0, 4 * np.pi, N)  # setting time axis, corresonding to the solution of ODE
-    #t = np.linspace(0, 1000, N)  # setting time axis, corresonding to the solution of ODE
+    t = np.arange(0,N)
 
-    plt.plot(t,u)
-    plt.show()
+    matplotlib.rcParams.update({'font.size': 20})
+    plt.rcParams["figure.figsize"] = [14, 7]
+
+    plt.plot(t,u, 'bo')
+    plt.xlabel(tick_title)
+    plt.ylabel("Number of registered cases")
+    # plt.savefig(exp_name+"_"+tick_title+"_input.png", dpi=150, bbox_inches='tight')
+    # plt.savefig(exp_name + "_" + tick_title + "_input.pdf", dpi=150, bbox_inches='tight')
+    # plt.show()
 
     # Trying to create population for mulit-objective optimization with only 
     # derivatives as allowed tokens. Spoiler: only one equation structure will be 
@@ -42,8 +57,21 @@ if __name__ == '__main__':
     add_tokens = Trigonometric_tokens(freq = (0.95, 1.05))
 
     epde_search_obj.set_moeadd_params(population_size=1)
-    epde_search_obj.fit(data = u, max_deriv_order=(1,), boundary=(10,), equation_terms_max_number = 2,
-                        equation_factors_max_number = 2, deriv_method='poly', eq_sparsity_interval = (1e-7, 10),
-                        deriv_method_kwargs = {'smooth' : False, 'grid' : [t,]}, coordinate_tensors = [t,])    
-    
+
+    # Вариант запуска по дефолту: equation_terms_max_number=2 - суммарно два слагаемых в левой и правой части (без учёта констант)
+    # data_fun_pow = 1 - максимальная степень одного множителя (переменной) в слагаемом
+    # equation_factors_max_number =2 - максимальное количество множителей в слагаемом
+
+    # epde_search_obj.fit(data = u, max_deriv_order=(1,), boundary=(10,), equation_terms_max_number = 2,
+    #                     equation_factors_max_number = 2, deriv_method='poly', eq_sparsity_interval = (1e-7, 10),
+    #                     deriv_method_kwargs = {'smooth' : False, 'grid' : [t,]}, coordinate_tensors = [t,])
+
+    # Вариант 2: equation_terms_max_number=3
+    # data_fun_pow = 2
+    # equation_factors_max_number = 2
+
+    epde_search_obj.fit(data=u, max_deriv_order=(1,), boundary=(10,), equation_terms_max_number=3, data_fun_pow = 2,
+                        equation_factors_max_number=2, deriv_method='poly', eq_sparsity_interval=(1e-7, 10),
+                        deriv_method_kwargs={'smooth': False, 'grid': [t, ]}, coordinate_tensors=[t, ])
+
     epde_search_obj.equation_search_results(only_print = True, level_num = 1) # showing the Pareto-optimal set of discovered equations 
