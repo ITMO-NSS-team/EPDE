@@ -705,6 +705,15 @@ def standalone_boundary_conditions(max_deriv_orders, main_var_key = ('u', (1.0,)
     return bconds    
                 
 
+def solver_formed_grid():
+    keys, training_grid = global_var.grid_cache.get_all()
+    assert len(keys) == training_grid[0].ndim, 'Mismatching dimensionalities'
+    
+    training_grid = np.array(training_grid).reshape((len(training_grid), -1))
+    return torch.from_numpy(training_grid).T.type(torch.FloatTensor)
+    
+
+
 class SoEq(Complex_Structure, moeadd.moeadd_solution):
     # __slots__ = ['tokens_indep', 'tokens_dep', 'equation_number']
     def __init__(self, pool, terms_number, max_factors_in_term, sparcity = None, eq_search_iters = 100):
@@ -891,3 +900,12 @@ class SoEq(Complex_Structure, moeadd.moeadd_solution):
         for idx, eq in enumerate(self.structure):
             eq.copy_properties_to(new_struct)
         return new_struct
+    
+    def solver_params(self):
+        '''
+        Returns solver form, grid and boundary conditions
+        '''
+        if len(self.structure) > 1:
+            raise Exception('Solver form is defined only for a "system", that contains a single equation.')
+        else:
+            return self.structure[0].solver_form(), solver_formed_grid(), self.structure[0].boundary_conditions()
