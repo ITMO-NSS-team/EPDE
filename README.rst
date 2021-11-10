@@ -1,3 +1,6 @@
+.. image:: docs/epde_logo.png
+   :alt: Logo of EPDE framework
+
 We use this repository as the main entry point for the EDPE framework.
 
 We are of opinion that partial differential equations (PDE) discovery is more that the regression in the prescribed differential terms space. We propose the novel method of evolutionary equation discovery. Apart from the differential equations we have the algrbraic expressions discovery algorithm that is now uses same abstractions.
