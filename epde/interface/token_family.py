@@ -410,22 +410,34 @@ class TF_Pool(object):
     def create(self, label = None, create_meaningful : bool = False, 
                       occupied : list = [], def_term_tokens = [], **kwargs) -> (str, Factor):
 #        print('in create method are occupied: ', occupied)
-        if create_meaningful:
-#            print('a', self.families, 'p', self.families_cardinality(True, occupied))
-            if np.sum(self.families_cardinality(True, occupied)) == 0:
-                print('occupied', occupied)
-                raise ValueError('Tring to create a term from an empty pool')
-            return np.random.choice(a = self.families_meaningful, 
-                                    p = self.families_cardinality(True, occupied) / np.sum(self.families_cardinality(True, occupied))).create(label = label, 
-                                                                 occupied = occupied,
-                                                                 def_term_tokens = def_term_tokens,
-                                                                 **kwargs)
+        if label is None:
+            if create_meaningful:
+    #            print('a', self.families, 'p', self.families_cardinality(True, occupied))
+                if np.sum(self.families_cardinality(True, occupied)) == 0:
+                    print('occupied', occupied)
+                    raise ValueError('Tring to create a term from an empty pool')
+                return np.random.choice(a = self.families_meaningful, 
+                                        p = self.families_cardinality(True, occupied) / np.sum(self.families_cardinality(True, occupied))).create(label = None, 
+                                                                     occupied = occupied,
+                                                                     def_term_tokens = def_term_tokens,
+                                                                     **kwargs)
+            else:
+                return np.random.choice(a = self.families, 
+                                        p = self.families_cardinality(False, occupied)  / np.sum(self.families_cardinality(False, occupied))).create(label = None, 
+                                                                     occupied = occupied,
+                                                                     def_term_tokens = def_term_tokens,
+                                                                     **kwargs)
         else:
-            return np.random.choice(a = self.families, 
-                                    p = self.families_cardinality(False, occupied)  / np.sum(self.families_cardinality(False, occupied))).create(label = label, 
-                                                                 occupied = occupied,
-                                                                 def_term_tokens = def_term_tokens,
-                                                                 **kwargs)
-    
+            token_families = [family for family in self.families if label in family.tokens]
+            if len(token_families) > 1:
+                print([family.tokens for family in token_families])
+                raise Exception('More than one family contains token with desired label.')
+            elif len(token_families) == 0:
+                raise Exception('Desired label does not match tokens in any family.')
+            else:
+                return token_families[0].create(label = None, occupied = occupied,
+                                                def_term_tokens = def_term_tokens,
+                                                **kwargs)
+                                                                             
     def __add__(self, other):
         return TF_Pool(families = self.families + other.families)

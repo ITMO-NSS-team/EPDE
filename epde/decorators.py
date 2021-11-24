@@ -7,7 +7,6 @@ Created on Tue Jun  1 15:56:10 2021
 """
 
 from functools import wraps
-import ray
 
 changelog_entry_templates = {}
 

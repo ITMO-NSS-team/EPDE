@@ -12,6 +12,7 @@ from abc import ABC, abstractmethod, abstractproperty
 from typing import Callable, Iterable
 from warnings import warn
 
+
 import epde.globals as global_var
 
 from epde.operators.template import Compound_Operator
