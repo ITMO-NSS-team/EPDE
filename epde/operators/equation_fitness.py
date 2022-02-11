@@ -130,7 +130,7 @@ class Solver_based_fitness(Compound_Operator):
                        learning_rate = self.params['learning_rate'], eps = self.params['eps'], 
                        tmin = self.params['tmin'], tmax = self.params['tmax'], use_cache=True, 
                        print_every=None,
-                       cache_dir=''../cache/')
+                       cache_dir='../cache/')
         
         main_var_key = ('u', (1.0,))        
         u_modeled = equation.model(self.training_grid).detach().numpy().reshape(global_var.tensor_cache.get(main_var_key).shape)
