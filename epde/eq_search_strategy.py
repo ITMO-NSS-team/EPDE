@@ -12,16 +12,14 @@ from abc import ABC, abstractmethod, abstractproperty
 from typing import Callable, Iterable
 from warnings import warn
 
-
 import epde.globals as global_var
-
 from epde.operators.template import Compound_Operator
 
 from epde.operators.equation_selections import Tournament_selection
 from epde.operators.equation_elitism import Fraction_elitism
 from epde.operators.equation_mutations import PopLevel_mutation, PopLevel_mutation_elite, Refining_Equation_mutation, Equation_mutation, Term_mutation, Parameter_mutation
 from epde.operators.equation_crossovers import PopLevel_crossover, Equation_crossover, Param_crossover, Term_crossover
-from epde.operators.equation_sparcity import LASSO_sparsity
+from epde.operators.equation_sparsity import LASSO_sparsity
 from epde.operators.equation_coeffcalc import LinReg_based_coeffs
 from epde.operators.equation_fitness import L2_fitness, Solver_based_fitness
 from epde.operators.equation_right_part_selection import Poplevel_Right_Part_Selector, Eq_Right_Part_Selector, Status_respecting_ERPS
@@ -177,10 +175,10 @@ class Strategy_director(object):
         eq_crossover.suboperators = {'Param_crossover' : param_crossover, 'Term_crossover' : term_crossover} 
         crossover.suboperators = {'Equation_crossover' : eq_crossover}
         
-        lasso_coeffs = LASSO_sparsity(['sparcity'])
+        lasso_coeffs = LASSO_sparsity(['sparsity'])
         linreg_coeffs = LinReg_based_coeffs([])
         
-        lasso_coeffs.params = {'sparcity' : 1} if not 'lasso_coeffs_params' in kwargs.keys() else kwargs['lasso_coeffs_params']
+        lasso_coeffs.params = {'sparsity' : 1} if not 'lasso_coeffs_params' in kwargs.keys() else kwargs['lasso_coeffs_params']
         linreg_coeffs.params = {} if not 'linreg_coeffs_params' in kwargs.keys() else kwargs['linreg_coeffs_params']
 
         fitness_eval = L2_fitness(['penalty_coeff'])
@@ -235,11 +233,10 @@ class Strategy_director(object):
         
     
 class Strategy_director_solver(object):    
-    def __init__(self, stop_criterion, stop_criterion_kwargs, dimensionality = 1): # baseline = True
+    def __init__(self, stop_criterion, stop_criterion_kwargs): # baseline = True
 #        self._constructor = None
 #        if baseline:
         self._constructor = Strategy_builder(stop_criterion, stop_criterion_kwargs)
-        self.dimensionality = dimensionality
     
     @property
     def constructor(self):
@@ -290,17 +287,16 @@ class Strategy_director_solver(object):
         eq_crossover.suboperators = {'Param_crossover' : param_crossover, 'Term_crossover' : term_crossover} 
         crossover.suboperators = {'Equation_crossover' : eq_crossover}
         
-        lasso_coeffs = LASSO_sparsity(['sparcity'])
+        lasso_coeffs = LASSO_sparsity(['sparsity'])
         linreg_coeffs = LinReg_based_coeffs([])
         
-        lasso_coeffs.params = {'sparcity' : 1} if not 'lasso_coeffs_params' in kwargs.keys() else kwargs['lasso_coeffs_params']
+        lasso_coeffs.params = {'sparsity' : 1} if not 'lasso_coeffs_params' in kwargs.keys() else kwargs['lasso_coeffs_params']
         linreg_coeffs.params = {} if not 'linreg_coeffs_params' in kwargs.keys() else kwargs['linreg_coeffs_params']
 
-        fitness_eval = Solver_based_fitness(['lambda_bound', 'learning_rate', 'eps', 'tmin', 'tmax', 'verbose'], 
-                                            dimensionality=self.dimensionality)
+        fitness_eval = Solver_based_fitness(['lambda_bound', 'learning_rate', 'eps', 'tmin', 'tmax', 'verbose'])
         fitness_eval.suboperators = {'sparsity' : lasso_coeffs, 'coeff_calc' : linreg_coeffs}
-        fitness_eval.params = {'lambda_bound' : 1000, 'learning_rate' : 1e-4, 
-                               'eps' : 1e-6, 'tmin' : 1000, 'tmax' : 1e5, 'verbose' : True} if not 'fitness_eval_params' in kwargs.keys() else kwargs['fitness_eval_params']
+        fitness_eval.params = {'lambda_bound' : 1000, 'learning_rate' : 1e-5, 
+                               'eps' : 1e-6, 'tmin' : 1000, 'tmax' : 1e5, 'verbose' : False} if not 'fitness_eval_params' in kwargs.keys() else kwargs['fitness_eval_params']
         
         rps1 = Poplevel_Right_Part_Selector([])
         rps1.params = {} if not 'rps_params' in kwargs.keys() else kwargs['rps_params']

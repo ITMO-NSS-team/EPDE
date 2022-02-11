@@ -13,14 +13,14 @@ from typing import Callable, Union
 import epde.globals as global_var
 from epde.supplementary import factor_params_to_str
 
-class Evaluator_template(ABC):
+class EvaluatorTemplate(ABC):
     def __init__(self):
         pass
     
     def __call__(self, factor, structural : bool = False, **kwargs):
         raise NotImplementedError('Trying to call the method of an abstract class')
 
-class Custom_Evaluator(Evaluator_template):
+class CustomEvaluator(EvaluatorTemplate):
     def __init__(self, evaluation_functions : Union[Callable, dict], 
                  eval_fun_params_labels : Union[list, tuple, set], use_factors_grids : bool = True):
         if isinstance(evaluation_functions, dict):
@@ -100,9 +100,9 @@ trig_eval_fun = {'cos' : lambda *grids, **kwargs: np.cos(kwargs['freq'] * grids[
 inverse_eval_fun = lambda *grids, **kwargs: np.power(grids[int(kwargs['dim'])], - kwargs['power']) 
 
 
-trigonometric_evaluator = Custom_Evaluator(trig_eval_fun, eval_fun_params_labels = ['freq', 'dim', 'power'])
+trigonometric_evaluator = CustomEvaluator(trig_eval_fun, eval_fun_params_labels = ['freq', 'dim', 'power'])
 
-inverse_function_evaluator = Custom_Evaluator(inverse_eval_fun, eval_fun_params_labels = ['dim', 'power'], use_factors_grids = True)    
+inverse_function_evaluator = CustomEvaluator(inverse_eval_fun, eval_fun_params_labels = ['dim', 'power'], use_factors_grids = True)    
 
 
 #def trigonometric_evaluator(factor, structual = False, **kwargs):

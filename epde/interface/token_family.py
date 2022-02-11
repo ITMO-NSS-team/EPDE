@@ -13,10 +13,10 @@ from epde.factor import Factor
 from typing import Union
 
 def constancy_hard_equality(tensor, epsilon = 1e-7):
-    print(np.abs(np.max(tensor) - np.min(tensor)), epsilon, type(np.abs(np.max(tensor) - np.min(tensor))),  type(epsilon))
+    # print(np.abs(np.max(tensor) - np.min(tensor)), epsilon, type(np.abs(np.max(tensor) - np.min(tensor))),  type(epsilon))
     return np.abs(np.max(tensor) - np.min(tensor)) < epsilon
     
-class Evaluator(object):
+class EvaluatorContained(object):
     """
     Class for evaluator of token (factor of the term in the sought equation) values with arbitrary function
        
@@ -65,7 +65,7 @@ class Evaluator(object):
         return self._evaluator(token, structural, **kwargs)
             
 
-class Token_family(object):
+class TokenFamily(object):
     """
     Class for the type (family) of tokens, from which the tokens are taken as factors in the terms of the equation
     
@@ -86,7 +86,7 @@ class Token_family(object):
     
         'unique_specific_token' - if True, a specific token can be present only once per term;
         
-    _evaluator : Evaluator object
+    _evaluator : EvaluatorContained object
         Evaluator, which is used to get values of the tokens from that family;
     
     tokens : list of strings
@@ -198,7 +198,7 @@ class Token_family(object):
         
         Parameters:
         ------------
-        eval_function : function or Evaluator object
+        eval_function : function or EvaluatorContained object
             Function, used in the evaluator, or the evaluator
             
         **eval_params : keyword arguments
@@ -244,10 +244,10 @@ class Token_family(object):
         >>> trigonometric_tokens.set_evaluator(trigonometric_evaluator, **trig_eval_params)
         
         """
-        if isinstance(eval_function, Evaluator):
+        if isinstance(eval_function, EvaluatorContained):
             self._evaluator = eval_function
         else:
-            self._evaluator = Evaluator(eval_function, eval_kwargs_keys)
+            self._evaluator = EvaluatorContained(eval_function, eval_kwargs_keys)
 #        self._evaluator.set_params(**eval_params)
         self.evaluator_set = True
         if self.params_set and not suppress_eval_test :
@@ -261,7 +261,7 @@ class Token_family(object):
         """
 #        assert self.cache_set, 'Cache not passed into the token familiy before test of evaluator'
         _, self.test_token = self.create()
-#        self.test_token.Set_parameters(random = True)
+#        self.test_token.set_parameters(random = True)
         self.test_token.use_cache()
         if self.status['requires_grid']:
             self.test_token.use_grids_cache()
@@ -335,15 +335,15 @@ class Token_family(object):
         else:
             occupied_by_factor = []
         if len(factor_params) == 0: 
-            new_factor.Set_parameters(params_description = self.token_params, 
+            new_factor.set_parameters(params_description = self.token_params, 
                                       equality_ranges = self.equality_ranges, 
                                       random = True)
         else:
-            new_factor.Set_parameters(params_description = self.token_params, 
+            new_factor.set_parameters(params_description = self.token_params, 
                                       equality_ranges = self.equality_ranges, 
                                       random = False, 
                                       **factor_params)            
-        new_factor.Set_evaluator(self._evaluator)
+        new_factor.set_evaluator(self._evaluator)
         return occupied_by_factor, new_factor
     
 #    def change_variables(self, prev_operator):
@@ -355,7 +355,7 @@ class Token_family(object):
 #        print('type', self.type)
         return len([token for token in self.tokens if not token in occupied])    
 
-#class Derivatives_like_tokens(Token_family):
+#class Derivatives_like_tokens(TokenFamily):
 #    def __init__(self, token_type, data_tensor, coord_tensors = None, 
 #                 deriv_tensors = None, smooth_field = True, sigma = 5, max_order = 1, 
 #                 memory_for_cache = 5):
@@ -414,14 +414,17 @@ class TF_Pool(object):
             if create_meaningful:
     #            print('a', self.families, 'p', self.families_cardinality(True, occupied))
                 if np.sum(self.families_cardinality(True, occupied)) == 0:
-                    print('occupied', occupied)
+                    print('occupied', occupied, 'meaningful', create_meaningful)
+                    print('family', [(fml.type, fml.tokens, fml.status) for fml in self.families])
                     raise ValueError('Tring to create a term from an empty pool')
-                return np.random.choice(a = self.families_meaningful, 
+                return np.random.choice(a = self.families_meaningful,
                                         p = self.families_cardinality(True, occupied) / np.sum(self.families_cardinality(True, occupied))).create(label = None, 
                                                                      occupied = occupied,
                                                                      def_term_tokens = def_term_tokens,
                                                                      **kwargs)
             else:
+                # print(occupied)
+                # print(self.families_cardinality(False, occupied)  / np.sum(self.families_cardinality(False, occupied)))
                 return np.random.choice(a = self.families, 
                                         p = self.families_cardinality(False, occupied)  / np.sum(self.families_cardinality(False, occupied))).create(label = None, 
                                                                      occupied = occupied,
@@ -435,7 +438,7 @@ class TF_Pool(object):
             elif len(token_families) == 0:
                 raise Exception('Desired label does not match tokens in any family.')
             else:
-                return token_families[0].create(label = None, occupied = occupied,
+                return token_families[0].create(label = label, occupied = occupied,
                                                 def_term_tokens = def_term_tokens,
                                                 **kwargs)
                                                                              

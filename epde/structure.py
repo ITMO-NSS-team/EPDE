@@ -60,7 +60,7 @@ class Complex_Structure(object):
         return (all([any([other_elem == self_elem for other_elem in other.structure]) for self_elem in self.structure]) and 
                 all([any([other_elem == self_elem for self_elem in self.structure]) for other_elem in other.structure]) and 
                 len(other.structure) == len(self.structure))
-    
+
     def set_evaluator(self, evaluator):
         raise NotImplementedError('Functionality of this method has been moved to the evolutionary operator declaration')
     
@@ -69,7 +69,6 @@ class Complex_Structure(object):
         if len(self.structure) == 1:
             return self.structure[0].evaluate(structural)
         else:
-#            print([type(elem) for elem in self.structure])
             return reduce(lambda x, y: self.interelement_operator(x, y.evaluate(structural)),
                           self.structure[1:], self.structure[0].evaluate(structural))        
 
@@ -78,7 +77,7 @@ class Complex_Structure(object):
         self.saved_as = {True:None, False:None}
         for elem in self.structure:
             elem.reset_saved_state()
-            
+
     @property
     def name(self):
         pass
@@ -95,9 +94,9 @@ class Term(Complex_Structure):
         self.max_factors_in_term = max_factors_in_term
         
         if passed_term is None:
-            self.Randomize(forbidden_tokens)     
+            self.randomize(forbidden_tokens)     
         else:
-            self.Defined(passed_term)
+            self.defined(passed_term)
 
         if global_var.tensor_cache is not None:
             self.use_cache()
@@ -121,7 +120,7 @@ class Term(Complex_Structure):
                 self.structure[idx].use_cache()
 
 
-    def Defined(self, passed_term):
+    def defined(self, passed_term):
         self.structure = []
         print('passed_term:', passed_term)
 
@@ -144,12 +143,15 @@ class Term(Complex_Structure):
                 raise ValueError('The structure of a term should be declared with str or factor.Factor obj, instead got', type(passed_term))
                 
                 
-    def Randomize(self, forbidden_factors = None, **kwargs):
+    def randomize(self, forbidden_factors = None, **kwargs):
         if np.sum(self.pool.families_cardinality(meaningful_only = True)) == 0:
             raise ValueError('No token families are declared as meaningful for the process of the system search')
         factors_num = np.random.randint(1, self.max_factors_in_term +1)
+        if forbidden_factors is None:
+            forbidden_factors = []
+            
         while True:
-            self.occupied_tokens_labels = []
+            self.occupied_tokens_labels = copy.copy(forbidden_factors)
             occupied_by_factor, factor = self.pool.create(label = None, create_meaningful = True, 
                                                            occupied = self.occupied_tokens_labels, **kwargs)
             self.structure = [factor,]
@@ -228,7 +230,7 @@ class Term(Complex_Structure):
             if accept_term_try == 10 and global_var.verbose.show_warnings:
                 warnings.warn('Can not create unique term, while filtering equation tokens in regards to the right part.')
             if accept_term_try >= 10:
-                self.Randomize(forbidden_factors = new_term.occupied_tokens_labels + taken_tokens)
+                self.randomize(forbidden_factors = new_term.occupied_tokens_labels + taken_tokens)
             if accept_term_try == 100:
                 print('Something wrong with the random generation of term while running "Filter_tokens_by_right_part"')
                 print('proposed', new_term.name, 'for ', equation.text_form, 'with respect to', reference_target.name)
@@ -375,7 +377,6 @@ class Equation(Complex_Structure):
         self.reset_state()
 
         self.n_immutable = len(basic_structure)
-        # print('n_immutable', self.n_immutable)
         self.pool = pool
         self.structure = []
         self.terms_number = terms_number; self.max_factors_in_term = max_factors_in_term
@@ -507,7 +508,8 @@ class Equation(Complex_Structure):
         new_equation.weights_final_evald = self.weights_final_evald
         new_equation.right_part_selected = self.right_part_selected
         new_equation.fitness_calculated = self.fitness_calculated
-        new_equation.solver_form_defined = self.solver_form_defined
+        new_equation.solver_form_defined = False
+
         try:
             new_equation._fitness_value = self._fitness_value
         except AttributeError:
@@ -584,6 +586,7 @@ class Equation(Complex_Structure):
 
     def solver_form(self):
         if self.solver_form_defined:
+            print(self.text_form)
             return self._solver_form
         else:
             self._solver_form = []
@@ -599,14 +602,14 @@ class Equation(Complex_Structure):
                                                               fill_value = self.weights_final[-1]))
             free_coeff_weight = torch.flatten(free_coeff_weight).unsqueeze(1).type(torch.FloatTensor)
             target_weight = torch.from_numpy(np.full_like(a = global_var.grid_cache.get('0'), 
-                                                              fill_value = -1))            
+                                                              fill_value = -1.))            
             target_form = self.structure[self.target_idx].solver_form
             target_form[0] = target_form[0] * target_weight
             target_form[0] = torch.flatten(target_form[0]).unsqueeze(1).type(torch.FloatTensor)
             
-            self._solver_form.append([free_coeff_weight, [None,], 0])
+            self._solver_form.append([free_coeff_weight, [None], 0])
             self._solver_form.append(target_form)
-            self.solver_form_defined = True            
+            self.solver_form_defined = True
             return self._solver_form
     
     @property
@@ -640,69 +643,66 @@ class Equation(Complex_Structure):
         for term in solver_form:
             if isinstance(term[2], list):
                 for deriv_factor in term[1]:
-                    orders = np.array([count_order(deriv_factor, ax) for ax #deriv_factor.count(ax)
+                    orders = np.array([count_order(deriv_factor, ax) for ax
                                        in np.arange(max_orders.size)])
                     max_orders = np.maximum(max_orders, orders)
             else:
-                orders = np.array([count_order(term[1], ax) for ax # term[1].count(ax)
+                orders = np.array([count_order(term[1], ax) for ax
                                    in np.arange(max_orders.size)])
                 max_orders = np.maximum(max_orders, orders)
-        if np.max(max_orders) > 2:
+        if np.max(max_orders) > 4:
             raise NotImplementedError('The current implementation allows does not allow higher orders of equation, than 2.')
         return max_orders
     
-    def boundary_conditions(self, main_var_key = ('u', (1.0,))):
+    def boundary_conditions(self, main_var_key = ('u', (1.0,)), full_domain : bool = False):
         required_bc_ord = self.max_deriv_orders()   # We assume, that the maximum order of the equation here is 2
         if global_var.grid_cache is None:
             raise NameError('Grid cache has not been initialized yet.')
         
         bconds = []
-        hardcoded_bc_relative_locations = {0 : None, 1 : (0,), 2 : (0, 1)}
-        tensor_shape = global_var.grid_cache.get('0').shape
+        hardcoded_bc_relative_locations = {0 : (), 1 : (0,), 2 : (0, 1), 
+                                           3 : (0., 0.5, 1.), 4 : (0., 1/3., 2/3., 1.)}
+    
+        if full_domain:
+            grid_cache = global_var.initial_data_cache
+            tensor_cache = global_var.initial_data_cache
+        else:
+            grid_cache = global_var.grid_cache
+            tensor_cache = global_var.tensor_cache
+            
+        tensor_shape = grid_cache.get('0').shape
 
         def get_boundary_ind(tensor_shape, axis, rel_loc):
             return tuple(np.meshgrid(*[np.arange(shape) if dim_idx != axis else min(int(rel_loc * shape), shape-1)
                        for dim_idx, shape in enumerate(tensor_shape)], indexing = 'ij'))
-
+        print(required_bc_ord)
+        print(self.text_form)
+        print('hardcoded_bc_relative_locations', hardcoded_bc_relative_locations)
         for ax_idx, ax_ord in enumerate(required_bc_ord):
-
+            print(ax_idx, ax_ord)
             for loc_fraction in hardcoded_bc_relative_locations[ax_ord]:
                 indexes = get_boundary_ind(tensor_shape, axis = ax_idx, rel_loc = loc_fraction)
-                coords = np.squeeze(np.array([global_var.grid_cache.get(str(idx))[indexes] for idx in np.arange(len(tensor_shape))])).T
-                vals = np.squeeze(global_var.tensor_cache.get(main_var_key)[indexes]).T
+                # if len(tensor_shape) > 0:                
+                coords_raw = np.array([grid_cache.get(str(idx))[indexes] for idx 
+                                  in np.arange(len(tensor_shape))]) 
+                coords = coords_raw.T # np.squeeze(coords_raw).T
+                if coords.ndim > 2:
+                    coords = coords.squeeze()
+                vals = np.expand_dims(tensor_cache.get(main_var_key)[indexes], axis = 0).T # np.squeeze(tensor_cache.get(main_var_key)[indexes]).T
                 
                 coords = torch.from_numpy(coords).type(torch.FloatTensor)
+                
                 vals = torch.from_numpy(vals).type(torch.FloatTensor)
                 bconds.append([coords, vals])    
 
-        print('shape of the grid', global_var.grid_cache.get('0').shape)
+        print('shape of the grid', grid_cache.get('0').shape)
         print('Obtained boundary conditions', len(bconds[0]))
-        return bconds
-
+        return bconds   
     
-def standalone_boundary_conditions(max_deriv_orders, main_var_key = ('u', (1.0,))):
-    required_bc_ord = max_deriv_orders   # We assume, that the maximum order of the equation here is 2
-    if global_var.grid_cache is None:
-        raise NameError('Grid cache has not been initialized yet.')
-    
-    bconds = []
-    hardcoded_bc_relative_locations = {0 : None, 1 : (0,), 2 : (0, 1)}
-    tensor_shape = global_var.grid_cache.get('0').shape
-
-    def get_boundary_ind(tensor_shape, axis, rel_loc, old_way = False):
-        return tuple(np.meshgrid(*[np.arange(shape) if dim_idx != axis else min(int(rel_loc * shape), shape-1)
-                   for dim_idx, shape in enumerate(tensor_shape)], indexing = 'ij'))
-    
-    for ax_idx, ax_ord in enumerate(required_bc_ord):
-        for loc_fraction in hardcoded_bc_relative_locations[ax_ord]:
-            indexes = get_boundary_ind(tensor_shape, axis = ax_idx, rel_loc = loc_fraction)
-            coords = np.array([global_var.grid_cache.get(str(idx))[indexes] for idx in np.arange(len(tensor_shape))])
-            vals = global_var.tensor_cache.get(main_var_key)[indexes]
-            
-            coords = torch.from_numpy(coords)
-            vals = torch.from_numpy(vals)
-            bconds.append([coords, vals])    
-    return bconds    
+    def clear_after_solver(self):
+        del self.model
+        del self._solver_form; self.solver_form_defined = False
+        gc.collect()
                 
 
 def solver_formed_grid():
@@ -716,12 +716,12 @@ def solver_formed_grid():
 
 class SoEq(Complex_Structure, moeadd.moeadd_solution):
     # __slots__ = ['tokens_indep', 'tokens_dep', 'equation_number']
-    def __init__(self, pool, terms_number, max_factors_in_term, sparcity = None, eq_search_iters = 100):
+    def __init__(self, pool, terms_number, max_factors_in_term, sparsity = None, eq_search_iters = 100):
         self.tokens_indep = TF_Pool(pool.families_meaningful) #[family for family in token_families if family.status['meaningful']]
         self.tokens_dep = TF_Pool(pool.families_supplementary) #[family for family in token_families if not family.status['meaningful']]
         self.equation_number = np.size(self.tokens_indep.families_cardinality())
         
-        if sparcity is not None: self.vals = sparcity 
+        if sparsity is not None: self.vals = sparsity 
         self.max_terms_number = terms_number; self.max_factors_in_term = max_factors_in_term
         self.moeadd_set = False; self.eq_search_operator_set = False# ; self.evaluated = False
         self.def_eq_search_iters = eq_search_iters
@@ -755,16 +755,16 @@ class SoEq(Complex_Structure, moeadd.moeadd_solution):
         self.eq_search_evolutionary_strategy = evolutionary
         self.eq_search_operator_set = True
         
-    def create_equations(self, population_size = 16, sparcity = None, eq_search_iters = None, EA_kwargs = dict()):
+    def create_equations(self, population_size = 16, sparsity = None, eq_search_iters = None, EA_kwargs = dict()):
 #        if type(eq_search_iters) == type(None) and type(self.def_eq_search_iters) == type(None):
 #            raise ValueError('Number of iterations is not defied both in method parameter or in object attribute')
         assert self.eq_search_operator_set
         
         if eq_search_iters is None: eq_search_iters = self.def_eq_search_iters
-        if sparcity is None: 
-            sparcity = self.vals
+        if sparsity is None: 
+            sparsity = self.vals
         else:
-            self.vals = sparcity
+            self.vals = sparsity
 
         self.population_size = population_size
         self.eq_search_evolutionary_strategy.modify_block_params(block_label = 'truncation', 
@@ -782,9 +782,9 @@ class SoEq(Complex_Structure, moeadd.moeadd_solution):
             current_tokens = token_selection + self.tokens_dep
 #            print('Equation index', eq_idx, self.vals)
             self.eq_search_evolutionary_strategy.modify_block_params(block_label = 'rps1', param_label = 'sparsity', 
-                                                                     value = self.vals[eq_idx], suboperator_sequence = ['eq_level_rps', 'fitness_calculation', 'sparsity'])#(sparcity_value = self.vals[eq_idx])
+                                                                     value = self.vals[eq_idx], suboperator_sequence = ['eq_level_rps', 'fitness_calculation', 'sparsity'])#(sparsity_value = self.vals[eq_idx])
             self.eq_search_evolutionary_strategy.modify_block_params(block_label = 'rps2', param_label = 'sparsity', 
-                                                                     value = self.vals[eq_idx], suboperator_sequence = ['eq_level_rps', 'fitness_calculation', 'sparsity'])#(sparcity_value = self.vals[eq_idx])
+                                                                     value = self.vals[eq_idx], suboperator_sequence = ['eq_level_rps', 'fitness_calculation', 'sparsity'])#(sparsity_value = self.vals[eq_idx])
 
             cur_equation, cur_eq_operator_error_abs, cur_eq_operator_error_structural = self.optimize_equation(pool = current_tokens, 
                                                   strategy = self.eq_search_evolutionary_strategy, population_size = self.population_size,
@@ -851,11 +851,11 @@ class SoEq(Complex_Structure, moeadd.moeadd_solution):
         if len(self.structure) > 1:
             for eq_idx, equation in enumerate(self.structure):
                 if eq_idx == 0:
-                    form += '/ ' + equation.text_form + '\n'                                        
+                    form += ' / ' + equation.text_form + '\n'                                        
                 elif eq_idx == len(self.structure) - 1:
-                    form += '\ ' + equation.text_form + '\n'
+                    form += ' \ ' + equation.text_form + '\n'
                 else:
-                    form += '| ' + equation.text_form + '\n'
+                    form += ' | ' + equation.text_form + '\n'
         else:
             form += self.structure[0].text_form + '\n'
         return form
@@ -901,11 +901,14 @@ class SoEq(Complex_Structure, moeadd.moeadd_solution):
             eq.copy_properties_to(new_struct)
         return new_struct
     
-    def solver_params(self):
+    def solver_params(self, full_domain):
         '''
         Returns solver form, grid and boundary conditions
         '''
         if len(self.structure) > 1:
             raise Exception('Solver form is defined only for a "system", that contains a single equation.')
         else:
-            return self.structure[0].solver_form(), solver_formed_grid(), self.structure[0].boundary_conditions()
+            form = self.structure[0].solver_form()
+            grid = solver_formed_grid()
+            bconds = self.structure[0].boundary_conditions(full_domain = full_domain)
+            return form, grid, bconds

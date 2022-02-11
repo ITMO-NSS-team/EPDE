@@ -20,7 +20,7 @@ The main features of the framework are as follows:
 - We dont need to create prescribed library of terms - our 'building blocks' are single differential terms or simple functions
 - We have the multi-objective version that allows to obtain Pareto frontier of the equations, which helps the expert to choose one from several equation. 
 - We use our own numerical differntiaion scheme, which allows to deal with high noise values
-- (WIP) We have solver to visualize the differential equations discovery process to add more control
+- We have solver to visualize the differential equations discovery process to add more control (https://github.com/ITMO-NSS-team/torch_DE_solver)
 
 Installation
 ============

@@ -13,8 +13,9 @@ from epde.cache.cache import Cache
 #from epde.supplementary import flatten
 
 def init_caches(set_grids : bool = False):
-    global tensor_cache, grid_cache
+    global tensor_cache, grid_cache, initial_data_cache
     tensor_cache = Cache()
+    initial_data_cache = Cache()
     if set_grids:
         grid_cache = Cache()
     else:

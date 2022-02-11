@@ -48,7 +48,7 @@ class LinReg_based_coeffs(Compound_Operator):
         
         None
         """        
-        assert equation.weights_internal_evald, 'Trying to calculate final weights before evaluating intermeidate ones (no sparcity).'
+        assert equation.weights_internal_evald, 'Trying to calculate final weights before evaluating intermeidate ones (no sparsity).'
         target = equation.structure[equation.target_idx]
     
         target_vals = target.evaluate(False)

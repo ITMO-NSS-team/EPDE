@@ -36,12 +36,12 @@ class Factor(TerminalToken):
         else:
             self.cache_linked = False
 
-        if self.status['requires_grid']:
-            self.use_grids_cache()
-
         if randomize:
             assert params_description is not None and equality_ranges is not None
-            self.Set_parameters(params_description, equality_ranges, random = True)
+            self.set_parameters(params_description, equality_ranges, random = True)
+    
+            if self.status['requires_grid']:
+                self.use_grids_cache()
 
     def reset_saved_state(self):
         self.saved = {'base':False, 'structural':False}
@@ -75,7 +75,8 @@ class Factor(TerminalToken):
         '''
         self._status = status_dict
         
-    def Set_parameters(self, params_description : dict, equality_ranges : dict, random = True, **kwargs):
+    def set_parameters(self, params_description : dict, equality_ranges : dict, 
+                       random = True, **kwargs):
         '''
         
         Avoid periodic parameters (e.g. phase shift) 
@@ -125,7 +126,7 @@ class Factor(TerminalToken):
         raise NotImplementedError('Delete me')
         return self.evaluate(self)    
     
-    def Set_evaluator(self, evaluator):
+    def set_evaluator(self, evaluator):
         self._evaluator = evaluator
     
     def evaluate(self, structural = False): # Переработать/удалить __call__, т.к. его функции уже тут

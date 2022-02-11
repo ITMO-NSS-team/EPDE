@@ -14,12 +14,13 @@ from typing import Union
 import torch
 device = torch.device('cpu')
 
+import epde.globals as global_var
 from epde.prep.cheb import Process_Point_Cheb
 from epde.prep.smoothing import Smoothing
 from epde.supplementary import Define_Derivatives
 
-#from TEDEouS.solver import apply_operator_set
-from TEDEouS.input_preprocessing import grid_prepare, operator_prepare
+# from TEDEouS.solver import apply_operator_set
+# from TEDEouS.input_preprocessing import grid_prepare, operator_prepare
 
 def scaling_test(field, steps = None, ff_name = None, output_file_name = None, smooth = True, sigma = 9,
                            mp_poolsize = 4, max_order = 2, polynomial_window = 9, poly_order = None, boundary = 1):
@@ -127,16 +128,20 @@ def Preprocess_derivatives_poly(field, grid = None, steps = None, data_name = No
         np.save(output_file_name, derivatives)
     return field, np.array(derivatives)        
 
-
-model = torch.nn.Sequential(
-        torch.nn.Linear(2, 256),
+def init_ann(dim):
+    # dim = global_var.tensor_cache.get(label = None).ndim
+    model = torch.nn.Sequential(
+        torch.nn.Linear(dim, 256),
         torch.nn.Tanh(),
         torch.nn.Linear(256, 64),
+        torch.nn.Tanh(),       
+        torch.nn.Linear(64, 64),
         torch.nn.Tanh(),
         torch.nn.Linear(64, 1024),
         torch.nn.Tanh(),
         torch.nn.Linear(1024, 1)
     )
+    return model
 
 def differentiate(data, order : Union[int, list], mixed : bool = False, axis = None, *grids):
     print('order', order)
@@ -144,33 +149,49 @@ def differentiate(data, order : Union[int, list], mixed : bool = False, axis = N
         order = [order,] * data.ndim
     if any([ord_ax != order[0] for ord_ax in order]) and mixed:
         raise Exception('Mixed derivatives can be taken only if the orders are same along all axes.')
-    if not data.ndim == len(grids):
+    if data.ndim != len(grids) and (len(grids) != 1 or data.ndim != 2):
         print(data.ndim, len(grids))
         raise ValueError('Data dimensionality does not fit passed grids.')
-    derivs = []
-    if axis == None:
-        for dim_idx in np.arange(data.ndim):
-            print(data.shape, grids[dim_idx].shape)
-            grad = np.gradient(data, grids[dim_idx], axis = dim_idx)
-            derivs.append(grad)
-            ord_marker = order[dim_idx] if axis is None else order[axis]
-            if ord_marker > 1:
-                higher_ord_der_axis = None if mixed else dim_idx
-                ord_reduced = [ord_ax - 1 for ord_ax in order]
-                derivs.extend(differentiate(grad, ord_reduced, mixed, higher_ord_der_axis, *grids))
-    else:
-        grad = np.gradient(data, grids[axis], axis = axis)
+        
+    if len(grids) == 1 and data.ndim == 2:
+        assert np.any(data.shape) == 1
+        derivs = []
+        dim_idx = 0 if data.shape[1] == 1 else 1
+        grad = np.gradient(data, grids[0], axis = dim_idx)
         derivs.append(grad)
-        if order[axis] > 1:
-                ord_reduced = [ord_ax - 1 for ord_ax in order]
-                derivs.extend(differentiate(grad, ord_reduced, False, axis, *grids))
+        ord_marker = order[dim_idx] if axis is None else order[axis]
+        if ord_marker > 1:
+            higher_ord_der_axis = None if mixed else dim_idx
+            ord_reduced = [ord_ax - 1 for ord_ax in order]
+            derivs.extend(differentiate(grad, ord_reduced, mixed, higher_ord_der_axis, *grids))
+    else:
+        derivs = []
+        if axis == None:
+            for dim_idx in np.arange(data.ndim):
+                print(data.shape, grids[dim_idx].shape)
+                grad = np.gradient(data, grids[dim_idx], axis = dim_idx)
+                derivs.append(grad)
+                ord_marker = order[dim_idx] if axis is None else order[axis]
+                if ord_marker > 1:
+                    higher_ord_der_axis = None if mixed else dim_idx
+                    ord_reduced = [ord_ax - 1 for ord_ax in order]
+                    derivs.extend(differentiate(grad, ord_reduced, mixed, higher_ord_der_axis, *grids))
+        else:
+            grad = np.gradient(data, grids[axis], axis = axis)
+            derivs.append(grad)
+            if order[axis] > 1:
+                    ord_reduced = [ord_ax - 1 for ord_ax in order]
+                    derivs.extend(differentiate(grad, ord_reduced, False, axis, *grids))
     return derivs
 
 def Preprocess_derivatives_ANN(field, grid, max_order, test_output = False, 
                                epochs_max = 1e3, loss_mean = 1000):
     assert grid is not None, 'Grid needed for derivatives preprocessing with ANN'
     grid_unique = [np.unique(ax_grid) for ax_grid in grid]
-    # print('0:', grid_unique[0], '1:', grid_unique[1])
+    
+    dim = 1 if np.any([s == 1 for s in field.shape]) and field.ndim == 2 else field.ndim
+    print('dim', dim, field.shape, np.any([s == 1 for s in field.shape]), field.ndim == 2)
+    model = init_ann(dim)
     grid_flattened = [subgrid.reshape(-1) for subgrid in grid]
     grid_flattened=torch.from_numpy(np.array(grid_flattened)).float().T
     dimensionality = field.ndim
@@ -180,7 +201,6 @@ def Preprocess_derivatives_ANN(field, grid, max_order, test_output = False,
     field = torch.from_numpy(field.reshape(-1, 1)).float()
     grid_flattened.to(device)
     field.to(device)
-
     optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
     
     batch_size = 128 # or whatever

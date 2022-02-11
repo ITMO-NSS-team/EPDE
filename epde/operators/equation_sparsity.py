@@ -27,7 +27,7 @@ class LASSO_sparsity(Compound_Operator):
         Inhereted from the ``Compound_Operator`` class. 
         Parameters of the operator; main parameters: 
             
-            sparcity - value of the sparcity constant in the LASSO operator;
+            sparsity - value of the sparsity constant in the LASSO operator;
             
     Methods:
     -----------

@@ -10,7 +10,7 @@ import numpy as np
 from epde.prep.fin_der import FD_derivatives
 
 def Get_cheb_for_point(matrix, axis, idx, grid, max_der_order = 3, points = 9, poly_order = None):
-    if type(poly_order) == type(None):
+    if poly_order is None:
         max_power = max_der_order + 1
     else:
         max_power = poly_order
@@ -38,7 +38,6 @@ def Process_Point_Cheb(args):
     if isinstance(n_der, int):
         n_der = tuple([n_der for i in range(matrix.ndim)])
     elif isinstance(n_der, (list, tuple)):
-        # print('len(n_der)', len(n_der))
         assert len(n_der) == matrix.ndim, 'Given derivative orders do not match the data tensor dimensionality'
     else:
         raise TypeError('Derivatives were given in the incorrect format. A single integer or list/tuple of integers required')
