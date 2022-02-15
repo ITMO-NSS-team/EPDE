@@ -323,9 +323,9 @@ class epde_search(object):
             set_grids = False; set_grids_among_tokens = False
             
             entry_token_family = TokenFamily(entry.var_name, family_of_derivs = True)
-            entry_token_family.set_status(unique_specific_token=False, unique_token_type=True, 
+            entry_token_family.set_status(unique_specific_token=False, unique_token_type=False, 
                                  s_and_d_merged = False, meaningful = True, 
-                                 unique_for_right_part = True)     
+                                 unique_for_right_part = False)     
             entry_token_family.set_params(entry.names, OrderedDict([('power', (1, data_fun_pow))]),
                                           {'power' : 0}, entry.d_orders)
             entry_token_family.set_evaluator(simple_function_evaluator, [])
