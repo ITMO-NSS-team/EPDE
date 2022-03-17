@@ -61,8 +61,9 @@ class Input_data_entry(object):
             method_kwargs['max_order'] = max_order
             if self.coord_tensors is not None and 'grid' not in method_kwargs.keys():
                 method_kwargs['grid'] = self.coord_tensors
-            _, self.derivatives = Preprocess_derivatives(self.data_tensor, method=method, 
+            self.data_tensor, self.derivatives = Preprocess_derivatives(self.data_tensor, method=method, 
                                                          method_kwargs=method_kwargs)
+            # Added setting of data tensor from filtered field
             self.deriv_properties = {'max order' : max_order,
                                      'dimensionality' : self.data_tensor.ndim}
         else:
@@ -324,8 +325,7 @@ class epde_search(object):
             
             entry_token_family = TokenFamily(entry.var_name, family_of_derivs = True)
             entry_token_family.set_status(unique_specific_token=False, unique_token_type=False, 
-                                 s_and_d_merged = False, meaningful = True, 
-                                 unique_for_right_part = False)     
+                                 s_and_d_merged = False, meaningful = True)     
             entry_token_family.set_params(entry.names, OrderedDict([('power', (1, data_fun_pow))]),
                                           {'power' : 0}, entry.d_orders)
             entry_token_family.set_evaluator(simple_function_evaluator, [])

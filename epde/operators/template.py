@@ -6,20 +6,19 @@ Created on Wed Jun  2 15:55:18 2021
 @author: mike_ubuntu
 """
 
-class Compound_Operator(): #(GeneticOperator)
+class Compound_Operator():
     '''
     Universal class for operator of an arbitrary purpose
     '''
-    def __init__(self, param_keys : list):
+    def __init__(self, param_keys : list = []):
         self.param_keys = param_keys
     
     @property
     def params(self):
-        return self._params #list(self._params.keys()), self._param.values()
+        return self._params
     
     @params.setter
     def params(self, param_dict : dict):
-#        print(list(param_dict.keys()), self.param_keys)
         if set(self.param_keys) != set(param_dict.keys()):
             print('self.param_keys:', set(self.param_keys), ' param_dict.keys():', set(param_dict.keys()))
             raise KeyError('Wrong keys of param dict')
@@ -42,8 +41,3 @@ class Compound_Operator(): #(GeneticOperator)
     @property
     def operator_tags(self):
         return set()
-    
-#    def set_next(self, operators):
-#        
-#    
-#    def apply_next()

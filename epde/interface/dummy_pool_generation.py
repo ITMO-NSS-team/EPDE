@@ -47,8 +47,7 @@ def create_pool(data : Union[np.ndarray, list, tuple], time_axis : int = 0, boun
         
         entry_token_family = TokenFamily(entry.var_name, family_of_derivs = True)
         entry_token_family.set_status(unique_specific_token=False, unique_token_type=False, 
-                             s_and_d_merged = False, meaningful = True, 
-                             unique_for_right_part = True)     
+                             s_and_d_merged = False, meaningful = True)     
         entry_token_family.set_params(entry.names, OrderedDict([('power', (1, data_fun_pow))]),
                                       {'power' : 0}, entry.d_orders)
         entry_token_family.set_evaluator(simple_function_evaluator, [])

@@ -87,14 +87,14 @@ class Term(Complex_Structure):
     __slots__ = ['_history', 'structure', 'interelement_operator', 'saved', 'saved_as', 
                  'pool', 'max_factors_in_term', 'cache_linked', 'occupied_tokens_labels']
     
-    def __init__(self, pool, passed_term = None, max_factors_in_term = 1, forbidden_tokens = None, 
+    def __init__(self, pool, passed_term = None, max_factors_in_term = 1, 
                  interelement_operator = np.multiply):
         super().__init__(interelement_operator)
         self.pool = pool
         self.max_factors_in_term = max_factors_in_term
-        
+
         if passed_term is None:
-            self.randomize(forbidden_tokens)     
+            self.randomize()
         else:
             self.defined(passed_term)
 
@@ -102,7 +102,6 @@ class Term(Complex_Structure):
             self.use_cache()
         self.reset_saved_state() # key - state of normalization, value - if the variable is saved in cache
 
-        
     @property
     def cache_label(self):
         if len(self.structure) > 1:
@@ -114,11 +113,9 @@ class Term(Complex_Structure):
 
     def use_cache(self):    
         self.cache_linked = True
-#        print('structure:', self.structure)
         for idx, _ in enumerate(self.structure):
             if not self.structure[idx].cache_linked:
                 self.structure[idx].use_cache()
-
 
     def defined(self, passed_term):
         self.structure = []
@@ -142,45 +139,44 @@ class Term(Complex_Structure):
             else:
                 raise ValueError('The structure of a term should be declared with str or factor.Factor obj, instead got', type(passed_term))
                 
-                
     def randomize(self, forbidden_factors = None, **kwargs):
         if np.sum(self.pool.families_cardinality(meaningful_only = True)) == 0:
             raise ValueError('No token families are declared as meaningful for the process of the system search')
-        factors_num = np.random.randint(1, self.max_factors_in_term +1)
-        if forbidden_factors is None:
-            forbidden_factors = []
-            
-        while True:
-            self.occupied_tokens_labels = copy.copy(forbidden_factors)
-            occupied_by_factor, factor = self.pool.create(label = None, create_meaningful = True, 
-                                                           occupied = self.occupied_tokens_labels, **kwargs)
-            self.structure = [factor,]
-            self.occupied_tokens_labels.extend(occupied_by_factor)
-            factors_powers = {factor.label : 1}
-            
-            for i in np.arange(1, factors_num):
-                occupied_by_factor, factor = self.pool.create(label = None, create_meaningful = False, 
-                                                               occupied = self.occupied_tokens_labels, 
-                                                               def_term_tokens = [token.label for token in self.structure], 
-                                                               **kwargs) 
-                if factor.label in factors_powers:
-                    factors_powers[factor.label] += 1
-                else:
-                    factors_powers[factor.label] = 1
-                    
-                for param_idx, param_descr in factor.params_description.items():
-                    if param_descr['name'] == 'power': power_param_idx = param_idx
-                        
-                if factors_powers[factor.label] == factor.params_description[power_param_idx]['bounds'][1]:
-                    self.occupied_tokens_labels.append(factor.label)
-                self.structure.append(factor)
-                self.occupied_tokens_labels.extend(occupied_by_factor)                
-            self.structure = Filter_powers(self.structure)
-            if forbidden_factors is None:
-                break
-            elif all([(Check_Unqueness(factor, forbidden_factors) or not factor.status['unique_for_right_part']) for factor in self.structure]):
-                break            
 
+        def update_token_status(token_status, changes):
+            for key, value in changes.items():
+                token_status[key][0] += value
+                if token_status[key][0] >= token_status[key][1]:
+                    token_status[key][2] = True
+                else:
+                    token_status[key][2] = False                    
+            return token_status
+
+        if forbidden_factors is None:
+            forbidden_factors = {}
+            for family in self.pool.labels_overview:
+                for token_label in family[0]:
+                    forbidden_factors[token_label] = [0, min(self.max_factors_in_term, family[1]), False]
+            # Changed f_f type to dict, add all tokens in format of token : 
+            #    (quantity (int), max_quantity (int), forbidden (bool))
+            
+        factors_num = np.random.randint(1, self.max_factors_in_term + 1)
+        self.occupied_tokens_labels = copy.copy(forbidden_factors)
+
+        occupied_by_factor, factor = self.pool.create(label = None, create_meaningful = True, 
+                                                       token_status = self.occupied_tokens_labels, **kwargs)
+        self.structure = [factor,]
+        update_token_status(self.occupied_tokens_labels, occupied_by_factor)
+        
+        for i in np.arange(1, factors_num):
+            occupied_by_factor, factor = self.pool.create(label = None, create_meaningful = False,
+                                                           token_status = self.occupied_tokens_labels,
+                                                           **kwargs)
+                    
+            update_token_status(self.occupied_tokens_labels, occupied_by_factor)
+            self.structure.append(factor)
+            # self.occupied_tokens_labels.extend(occupied_by_factor)                
+        self.structure = Filter_powers(self.structure)  
 
     def evaluate(self, structural):
         assert global_var.tensor_cache is not None, 'Currently working only with connected cache'
@@ -205,7 +201,9 @@ class Term(Complex_Structure):
             value = value.reshape(value.size)
             return value            
 
-    def Filter_tokens_by_right_part(self, reference_target, equation, equation_position):
+    def filter_tokens_by_right_part(self, reference_target, equation, equation_position):
+        warnings.warn(message = 'Tokens can no longer be set as right-part-unique',
+                      category=DeprecationWarning)
         taken_tokens = [factor.label for factor in reference_target.structure if factor.status['unique_for_right_part']]
         meaningful_taken = any([factor.status['meaningful'] for factor in reference_target.structure
                             if factor.status['unique_for_right_part']])
@@ -217,6 +215,7 @@ class Term(Complex_Structure):
             for factor_idx, factor in enumerate(new_term.structure):
                 if factor.label in taken_tokens:
                     new_term.Reset_occupied_tokens()
+                    # print('filter_tokens_by_right_part', new_term.name, reference_target.name)
                     _, new_term.structure[factor_idx] = self.pool.create(create_meaningful=meaningful_taken, 
                                                              occupied = new_term.occupied_tokens_labels + taken_tokens)
                     # print('try:', accept_term_try, 'suggested:', new_term.name)
@@ -232,7 +231,7 @@ class Term(Complex_Structure):
             if accept_term_try >= 10:
                 self.randomize(forbidden_factors = new_term.occupied_tokens_labels + taken_tokens)
             if accept_term_try == 100:
-                print('Something wrong with the random generation of term while running "Filter_tokens_by_right_part"')
+                print('Something wrong with the random generation of term while running "filter_tokens_by_right_part"')
                 print('proposed', new_term.name, 'for ', equation.text_form, 'with respect to', reference_target.name)
 
     def Reset_occupied_tokens(self):
@@ -409,6 +408,8 @@ class Equation(Complex_Structure):
     
     @property 
     def forbidden_token_labels(self):
+        warnings.warn(message = 'Tokens can no longer be set as right-part-unique',
+                      category=DeprecationWarning)
         target_symbolic = [factor.label for factor in self.structure[self.target_idx].structure]
         forbidden_tokens = set()
 
@@ -427,13 +428,15 @@ class Equation(Complex_Structure):
                 break
 
     def reconstruct_by_right_part(self, right_part_idx):
+        warnings.warn(message = 'Tokens can no longer be set as right-part-unique',
+                      category=DeprecationWarning)
         new_eq = copy.deepcopy(self)
         self.copy_properties_to(new_eq)
         new_eq.target_idx = right_part_idx
         if any([factor.status['unique_for_right_part'] for factor in new_eq.structure[right_part_idx].structure]):
             for term_idx, term in enumerate(new_eq.structure):
                 if term_idx != right_part_idx:
-                    term.Filter_tokens_by_right_part(new_eq.structure[right_part_idx], self, term_idx)
+                    term.filter_tokens_by_right_part(new_eq.structure[right_part_idx], self, term_idx)
 
         new_eq.reset_saved_state()
         return new_eq

@@ -147,13 +147,13 @@ class Strategy_director(object):
         truncation.params = {'population_size' : None}
 
         param_mutation = Parameter_mutation(['r_param_mutation', 'strict_restrictions', 'multiplier'])
-        term_mutation = Term_mutation(['forbidden_tokens'])
+        term_mutation = Term_mutation()
         eq_mutation = Equation_mutation(['r_mutation', 'type_probabilities'])
         ref_eq_mutation = Refining_Equation_mutation(['r_mutation', 'type_probabilities'])
         mutation = PopLevel_mutation_elite(['indiv_mutation_prob'])
 
         param_mutation.params = {'r_param_mutation' : 0.2, 'strict_restrictions' : True, 'multiplier' : 0.1} if not 'param_mutation_params' in kwargs.keys() else kwargs['param_mutation_params']
-        term_mutation.params = {'forbidden_tokens': []} if not 'term_mutation_params' in kwargs.keys() else kwargs['term_mutation_params']
+        term_mutation.params = {} if not 'term_mutation_params' in kwargs.keys() else kwargs['term_mutation_params']
         eq_mutation.params = {'r_mutation' : 0.3, 'type_probabilities' : []}
         ref_eq_mutation.params = {'r_mutation' : 0.3, 'type_probabilities' : []}
         mutation.params = {'indiv_mutation_prob' : 0.5} if not 'mutation_params' in kwargs.keys() else kwargs['mutation_params']
@@ -164,8 +164,8 @@ class Strategy_director(object):
 
         param_crossover = Param_crossover(['proportion'])
         term_crossover = Term_crossover(['crossover_probability'])
-        eq_crossover = Equation_crossover([])
-        crossover = PopLevel_crossover([])        
+        eq_crossover = Equation_crossover()
+        crossover = PopLevel_crossover()        
 
         param_crossover.params = {'proportion' : 0.4} if not 'param_crossover_params' in kwargs.keys() else kwargs['param_crossover_params']
         term_crossover.params = {'crossover_probability' : 0.3} if not 'term_crossover_params' in kwargs.keys() else kwargs['term_crossover_params']
@@ -176,7 +176,7 @@ class Strategy_director(object):
         crossover.suboperators = {'Equation_crossover' : eq_crossover}
         
         lasso_coeffs = LASSO_sparsity(['sparsity'])
-        linreg_coeffs = LinReg_based_coeffs([])
+        linreg_coeffs = LinReg_based_coeffs()
         
         lasso_coeffs.params = {'sparsity' : 1} if not 'lasso_coeffs_params' in kwargs.keys() else kwargs['lasso_coeffs_params']
         linreg_coeffs.params = {} if not 'linreg_coeffs_params' in kwargs.keys() else kwargs['linreg_coeffs_params']
@@ -185,10 +185,10 @@ class Strategy_director(object):
         fitness_eval.suboperators = {'sparsity' : lasso_coeffs, 'coeff_calc' : linreg_coeffs}
         fitness_eval.params = {'penalty_coeff' : 0.5} if not 'fitness_eval_params' in kwargs.keys() else kwargs['fitness_eval_params']
         
-        rps1 = Poplevel_Right_Part_Selector([])
+        rps1 = Poplevel_Right_Part_Selector()
         rps1.params = {} if not 'rps_params' in kwargs.keys() else kwargs['rps_params']
         
-        eq_rps = Status_respecting_ERPS([])
+        eq_rps = Eq_Right_Part_Selector()
         eq_rps.suboperators = {'fitness_calculation' : fitness_eval}
         eq_rps.params = {} if not 'eq_rps_params' in kwargs.keys() else kwargs['eq_rps_params']
         
@@ -257,14 +257,14 @@ class Strategy_director_solver(object):
         truncation.params = {'population_size' : None}
 
         param_mutation = Parameter_mutation(['r_param_mutation', 'strict_restrictions', 'multiplier'])
-        term_mutation = Term_mutation(['forbidden_tokens'])
+        term_mutation = Term_mutation()
         eq_mutation = Equation_mutation(['r_mutation', 'type_probabilities'])
         ref_eq_mutation = Refining_Equation_mutation(['r_mutation', 'type_probabilities'])
 #        mutation = PopLevel_mutation(['indiv_mutation_prob', 'elitism'])
         mutation = PopLevel_mutation_elite(['indiv_mutation_prob'])
 
         param_mutation.params = {'r_param_mutation' : 0.2, 'strict_restrictions' : True, 'multiplier' : 0.1} if not 'param_mutation_params' in kwargs.keys() else kwargs['param_mutation_params']
-        term_mutation.params = {'forbidden_tokens': []} if not 'term_mutation_params' in kwargs.keys() else kwargs['term_mutation_params']
+        term_mutation.params = {} if not 'term_mutation_params' in kwargs.keys() else kwargs['term_mutation_params']
         eq_mutation.params = {'r_mutation' : 0.3, 'type_probabilities' : []}
         ref_eq_mutation.params = {'r_mutation' : 0.3, 'type_probabilities' : []}
         mutation.params = {'indiv_mutation_prob' : 0.5} if not 'mutation_params' in kwargs.keys() else kwargs['mutation_params']
@@ -276,8 +276,8 @@ class Strategy_director_solver(object):
 
         param_crossover = Param_crossover(['proportion'])
         term_crossover = Term_crossover(['crossover_probability'])
-        eq_crossover = Equation_crossover([])
-        crossover = PopLevel_crossover([])        
+        eq_crossover = Equation_crossover()
+        crossover = PopLevel_crossover()        
 
         param_crossover.params = {'proportion' : 0.4} if not 'param_crossover_params' in kwargs.keys() else kwargs['param_crossover_params']
         term_crossover.params = {'crossover_probability' : 0.3} if not 'term_crossover_params' in kwargs.keys() else kwargs['term_crossover_params']
@@ -288,7 +288,7 @@ class Strategy_director_solver(object):
         crossover.suboperators = {'Equation_crossover' : eq_crossover}
         
         lasso_coeffs = LASSO_sparsity(['sparsity'])
-        linreg_coeffs = LinReg_based_coeffs([])
+        linreg_coeffs = LinReg_based_coeffs()
         
         lasso_coeffs.params = {'sparsity' : 1} if not 'lasso_coeffs_params' in kwargs.keys() else kwargs['lasso_coeffs_params']
         linreg_coeffs.params = {} if not 'linreg_coeffs_params' in kwargs.keys() else kwargs['linreg_coeffs_params']
@@ -298,10 +298,10 @@ class Strategy_director_solver(object):
         fitness_eval.params = {'lambda_bound' : 1000, 'learning_rate' : 1e-5, 
                                'eps' : 1e-6, 'tmin' : 1000, 'tmax' : 1e5, 'verbose' : False} if not 'fitness_eval_params' in kwargs.keys() else kwargs['fitness_eval_params']
         
-        rps1 = Poplevel_Right_Part_Selector([])
+        rps1 = Poplevel_Right_Part_Selector()
         rps1.params = {} if not 'rps_params' in kwargs.keys() else kwargs['rps_params']
 
-        eq_rps = Status_respecting_ERPS([])
+        eq_rps = Eq_Right_Part_Selector()
         eq_rps.suboperators = {'fitness_calculation' : fitness_eval}
         eq_rps.params = {} if not 'eq_rps_params' in kwargs.keys() else kwargs['eq_rps_params']
         

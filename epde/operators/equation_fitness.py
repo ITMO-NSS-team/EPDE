@@ -93,13 +93,16 @@ class Solver_based_fitness(Compound_Operator):
             except ValueError:
                 dim = global_var.dimensionality
             self.model_architecture = torch.nn.Sequential(
-                torch.nn.Linear(dim, 100),
+                torch.nn.Linear(dim, 256),
                 torch.nn.Tanh(),
-                torch.nn.Linear(100, 100),
+                torch.nn.Linear(256, 64),
+                torch.nn.Tanh(),       
+                torch.nn.Linear(64, 64),
                 torch.nn.Tanh(),
-                torch.nn.Linear(100, 1)#,
-#                torch.nn.Tanh()
-                )
+                torch.nn.Linear(64, 1024),
+                torch.nn.Tanh(),
+                torch.nn.Linear(1024, 1)
+            )
         else:
             self.model_architecture = model_architecture
         self.training_grid_set = False
@@ -119,7 +122,6 @@ class Solver_based_fitness(Compound_Operator):
             equation.weights_final = weights_final
             equation.weights_final_evald = True
         
-        print('Inside fitness evaluation routine: ', equation.text_form)
         architecture = deepcopy(self.model_architecture)
 
         eq_bc = equation.boundary_conditions()

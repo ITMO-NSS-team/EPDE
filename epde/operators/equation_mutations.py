@@ -118,16 +118,13 @@ class PopLevel_mutation_elite(Compound_Operator):
         population : list of Equation objects
             The input population, altered by mutation operators.
             
-        """
-        # print('Running mutation')        
+        """    
         for equation in population:
             if np.random.uniform(0, 1) <= self.params['indiv_mutation_prob']:
                 if equation.elite == 'elite':
                     self.suboperators['Equatiion_mutation']['elite'].apply(equation)              
-                    # print(equation, equation.n_immutable)
                 elif equation.elite == 'non-elite':
                     self.suboperators['Equatiion_mutation']['non-elite'].apply(equation)
-                    # print(equation, equation.n_immutable)
                 elif equation.elite == 'immutable':
                     pass
                 else:
@@ -146,7 +143,6 @@ class Refining_Equation_mutation(Compound_Operator):
     @Reset_equation_status(reset_input = True)
     @History_Extender(f'\n -> refining mutating equation', 'ba')
     def apply(self, equation):
-        # print('equation.__dict__', type(equation))
         for term_idx in range(equation.n_immutable, len(equation.structure)):
             if term_idx == equation.target_idx:
                 continue
@@ -157,8 +153,6 @@ class Refining_Equation_mutation(Compound_Operator):
                     mut_operator = np.random.choice(self.suboperators['Mutation'], p=self.params['type_probabilities'])
                 else:
                     mut_operator = self.suboperators['Mutation']
-                if 'forbidden_tokens' in mut_operator.params.keys():
-                    mut_operator.params['forbidden_tokens'] = [factor for factor in equation.structure[equation.target_idx].structure if factor.status['unique_for_right_part']]   # [factor.label for factor in equation.structure[].structure]
                 equation.structure[term_idx] = mut_operator.apply(term_idx, equation)
 
     @property
@@ -174,7 +168,6 @@ class Equation_mutation(Compound_Operator):
     @Reset_equation_status(reset_input = True)
     @History_Extender(f'\n -> mutating equation', 'ba')
     def apply(self, equation):
-        # print('equation.__dict__', equation.__dict__, type(equation))        
         for term_idx in range(equation.n_immutable, len(equation.structure)):
             if np.random.uniform(0, 1) <= self.params['r_mutation']:
                 self.params['type_probabilities'] = [1 - 1/pow(equation.structure[term_idx].total_params, 2), 1/pow(equation.structure[term_idx].total_params, 2)]
@@ -182,8 +175,6 @@ class Equation_mutation(Compound_Operator):
                     mut_operator = np.random.choice(self.suboperators['Mutation'], p=self.params['type_probabilities'])
                 else:
                     mut_operator = self.suboperators['Mutation']
-                if 'forbidden_tokens' in mut_operator.params.keys():
-                    mut_operator.params['forbidden_tokens'] = [factor for factor in equation.structure[equation.target_idx].structure if factor.status['unique_for_right_part']]   # [factor.label for factor in equation.structure[].structure]
                 equation.structure[term_idx] = mut_operator.apply(term_idx, equation)
 
     @property
@@ -212,9 +203,9 @@ class Term_mutation(Compound_Operator):
             The new, randomly created, term.
             
         """       
-        new_term = Term(equation.pool, max_factors_in_term = equation.max_factors_in_term, forbidden_tokens = self.params['forbidden_tokens'])        #) #
+        new_term = Term(equation.pool, max_factors_in_term = equation.max_factors_in_term)        #) #
         while not Check_Unqueness(new_term, equation.structure[:term_idx] + equation.structure[term_idx+1:]):
-            new_term = Term(equation.pool, max_factors_in_term = equation.max_factors_in_term, forbidden_tokens = self.params['forbidden_tokens'])
+            new_term = Term(equation.pool, max_factors_in_term = equation.max_factors_in_term)
         new_term.use_cache()
         return new_term
 

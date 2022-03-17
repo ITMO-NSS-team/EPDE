@@ -80,10 +80,7 @@ class TokenFamily(object):
         'mandatory' - if True, a token from the family must be present in every term; 
         
         'unique_token_type' - if True, only one token of the family can be present in the term; 
-        
-        'unique_for_right_part' - if True, the tokens, present in the "right part" of the equation, can not be present in the terms of the "left part". 
-        Recommended to select "True", if any token of the familiy can have 0 values on the majority of studied area;
-    
+            
         'unique_specific_token' - if True, a specific token can be present only once per term;
         
     _evaluator : EvaluatorContained object
@@ -99,7 +96,7 @@ class TokenFamily(object):
         
     Methods:
     -----------
-    set_status(mandatory = False, unique_specific_token = False, unique_token_type = False, unique_for_right_part = False)
+    set_status(mandatory = False, unique_specific_token = False, unique_token_type = False)
         Method to set the markers of the token status;
         
     set_params(tokens, token_params)
@@ -132,7 +129,7 @@ class TokenFamily(object):
         
     def set_status(self, meaningful = False, s_and_d_merged = True, 
                    unique_specific_token = False, unique_token_type = False, 
-                   unique_for_right_part = False, requires_grid = False):
+                   requires_grid = False):
         """
         Set the status of the elements of the token family; 
         
@@ -144,10 +141,6 @@ class TokenFamily(object):
         unique_token_type : Bool
             if True, only one token of the family can be present in the term; 
         
-        unique_for_right_part : Bool
-            if True, the tokens, present in the "right part" of the equation, can not be present in the terms of the "left part". 
-            Recommended to select "True", if any token of the familiy can have 0 values on the majority of studied area;
-    
         unique_specific_token : Bool
             if True, a specific token can be present only once per term;
         """
@@ -156,7 +149,6 @@ class TokenFamily(object):
         self.status['structural_and_defalut_merged'] = s_and_d_merged
         self.status['unique_specific_token'] = unique_specific_token
         self.status['unique_token_type'] = unique_token_type
-        self.status['unique_for_right_part'] = unique_for_right_part
         self.status['requires_grid'] = requires_grid
 
     def set_params(self, tokens, token_params, equality_ranges, derivs_solver_orders = None):
@@ -259,28 +251,14 @@ class TokenFamily(object):
         
         Raises Exception, if the evaluator does not work properly.
         """
-#        assert self.cache_set, 'Cache not passed into the token familiy before test of evaluator'
         _, self.test_token = self.create()
-#        self.test_token.set_parameters(random = True)
         self.test_token.use_cache()
         if self.status['requires_grid']:
             self.test_token.use_grids_cache()
         print(self.test_token.grid_idx, self.test_token.params)
-#        self.test_params = {}
-#        for key in self.token_params.keys():
-#            if self.token_params[key][0] == self.token_params[key][1]:
-#                self.test_params[key] = self.token_params[key][0]
-#            else:
-#                if isinstance(self.token_params[key][0], float):
-#                    self.test_params[key] = np.random.uniform(low = self.token_params[key][0], high = self.token_params[key][0]) 
-#                else:
-#                    self.test_params[key] = np.random.randint(self.token_params[key][0], self.token_params[key][1])
-#        try:
         self.test_token.scaled = False
         self.test_evaluation = self._evaluator.apply(self.test_token)
         print('Test evaluation performed correctly')
-#        except:
-#            raise Exception('Something went wrong during the test evaluation')
 
     def chech_constancy(self, test_function, **tfkwargs):
         '''
@@ -301,24 +279,26 @@ class TokenFamily(object):
       
     def evaluate(self, token):    # Return tensor of values of applied evaluator
         raise NotImplementedError('Method has been moved to the Factor class')
-        if self.evaluator_set:# and self.cache_set:
+        if self.evaluator_set:
             return self._evaluator.apply(token)
         else:
             raise TypeError('Evaluator function or its parameters not set brfore evaluator application.')
     
-    def create(self, label = None, occupied : list = [], def_term_tokens = [], **factor_params):
-        if type(label) == type(None): 
-#            print('tokens in the term:', def_term_tokens)
+    def create(self, label = None, token_status : Union[dict, None] = None, **factor_params):
+        # print('factor params', factor_params)
+        if token_status is None or token_status == {}:
+            token_status = {label : (0, self.token_params['power'][1], False) 
+                            for label in self.tokens}
+        if type(label) == type(None):
             try:
                 label = np.random.choice([token for token in self.tokens 
-                                          if not token in occupied and 
-                                          not def_term_tokens.count(token) >= self.token_params['power'][1]])
+                                          if not token_status[token][0] + 1 > token_status[token][1]])
             except ValueError:
                 print(f'An error while creating factor of {self.type} token family')
-                print('occupied:', occupied, ' all:', self.tokens)
-                for token in self.tokens:
-                    if not token in occupied: print(f'{token} is free')
-                    if def_term_tokens.count(token) >= self.token_params['power'][1]: print(f"max power {self.token_params['power'][1]} not reached") 
+                print('Status description:', token_status, ' all:', self.tokens)
+                # for token in self.tokens:
+                #     if not token in occupied: print(f'{token} is free')
+                #     if def_term_tokens.count(token) >= self.token_params['power'][1]: print(f"max power {self.token_params['power'][1]} not reached") 
                 raise ValueError("'a' cannot be empty unless no samples are taken")
 
         if self.family_of_derivs:
@@ -329,11 +309,11 @@ class TokenFamily(object):
                             status = self.status, family_type = self.type)
         
         if self.status['unique_token_type']:
-            occupied_by_factor = self.tokens
+            occupied_by_factor = {token : self.token_params['power'][1] for token in self.tokens}
         elif self.status['unique_specific_token']:
-            occupied_by_factor = [label,]
+            occupied_by_factor = {label : self.token_params['power'][1]}
         else:
-            occupied_by_factor = []
+            occupied_by_factor = {label : 1}
         if len(factor_params) == 0: 
             new_factor.set_parameters(params_description = self.token_params, 
                                       equality_ranges = self.equality_ranges, 
@@ -341,56 +321,24 @@ class TokenFamily(object):
         else:
             new_factor.set_parameters(params_description = self.token_params, 
                                       equality_ranges = self.equality_ranges, 
-                                      random = False, 
-                                      **factor_params)            
+                                      random = False,
+                                      **factor_params)
         new_factor.set_evaluator(self._evaluator)
         return occupied_by_factor, new_factor
-    
-#    def change_variables(self, prev_operator):
-#        assert 'token_matrices' in self.eval_params
-#        for key, value in self.set_params['token_matrices'].items():
-#            self.set_params['token_matrices'][key] = value - prev_operator # С индексом? 
 
-    def cardinality(self, occupied : list = []):
-#        print('type', self.type)
-        return len([token for token in self.tokens if not token in occupied])    
+    def cardinality(self, token_status : Union[dict, None] = None):
+        if token_status is None or token_status == {}:
+            token_status = {label : (0, self.token_params['power'][1], False) 
+                            for label in self.tokens}
+        return len([token for token in self.tokens if token_status[token][0] < token_status[token][1]])    
 
-#class Derivatives_like_tokens(TokenFamily):
-#    def __init__(self, token_type, data_tensor, coord_tensors = None, 
-#                 deriv_tensors = None, smooth_field = True, sigma = 5, max_order = 1, 
-#                 memory_for_cache = 5):
-#        derivs_names = Define_Derivatives(var_name = token_type, dimensionality = data_tensor.ndim,
-#                                          max_order = max_order)
-#        
-#        derivs_data_processor = Input_data_entry(data_tensor = data_tensor, 
-#                                                 coord_tensors = coord_tensors)
-#        
-#        derivs_data_processor.set_derivatives(deriv_tensors, None, None, smooth_field, 
-#                                              sigma, max_order)
-#        
-#        set_grids = coord_tensors is not None and not all([str(ax) in global_var.grid_cache for ax in range(data_tensor.ndim)])
-#        coord_tensors_passed = coord_tensors is not None
-#        
-#        derivs_data_processor.use_global_cache(grids_as_tokens = coord_tensors_passed, 
-#                                               set_grids = set_grids,
-#                                               memory_for_cache = memory_for_cache)
-#
-#        super().__init__(token_type = token_type)
-#        self.set_status(unique_specific_token=False, unique_token_type=False, s_and_d_merged = False, 
-#                        meaningful = True, unique_for_right_part = False)
-#        self.set_params(token_names, OrderedDict([('power', (1, 1))]), {'power' : 0})
-#        self.set_evaluator(simple_function_evaluator, [])
-#    
+
 class TF_Pool(object):
     '''
     
     '''
     def __init__(self, families):
         self.families = families
-        
-    @property
-    def pool_tokens(self):
-        raise NotImplementedError 
         
     @property
     def families_meaningful(self):
@@ -400,36 +348,43 @@ class TF_Pool(object):
     def families_supplementary(self):
         return [family for family in self.families if not family.status['meaningful']]
 
+    @property
+    def labels_overview(self):
+        overview = []
+        for family in self.families:
+            overview.append((family.tokens, family.token_params['power'][1]))
+        return overview
        
-    def families_cardinality(self, meaningful_only : bool = False, occupied : list = []):
+    def families_cardinality(self, meaningful_only : bool = False, 
+                             token_status : Union[dict, None] = None):
         if meaningful_only:
-            return np.array([family.cardinality(occupied) for family in self.families_meaningful])
+            return np.array([family.cardinality(token_status) for family in self.families_meaningful])
         else:
-            return np.array([family.cardinality(occupied) for family in self.families])
+            return np.array([family.cardinality(token_status) for family in self.families])
         
     def create(self, label = None, create_meaningful : bool = False, 
-                      occupied : list = [], def_term_tokens = [], **kwargs) -> (str, Factor):
-#        print('in create method are occupied: ', occupied)
+                      token_status = None, **kwargs) -> (str, Factor):
         if label is None:
             if create_meaningful:
-    #            print('a', self.families, 'p', self.families_cardinality(True, occupied))
-                if np.sum(self.families_cardinality(True, occupied)) == 0:
-                    print('occupied', occupied, 'meaningful', create_meaningful)
-                    print('family', [(fml.type, fml.tokens, fml.status) for fml in self.families])
+                if np.sum(self.families_cardinality(True, token_status)) == 0:
+                    # print('occupied', occupied, 'meaningful', create_meaningful)
+                    # print('family', [(fml.type, fml.tokens, fml.status) for fml in self.families])
                     raise ValueError('Tring to create a term from an empty pool')
+                probabilities = (self.families_cardinality(False, token_status) / 
+                                 np.sum(self.families_cardinality(False, token_status)))
+                # print(probabilities, self.families_cardinality(False, token_status))                
                 return np.random.choice(a = self.families_meaningful,
-                                        p = self.families_cardinality(True, occupied) / np.sum(self.families_cardinality(True, occupied))).create(label = None, 
-                                                                     occupied = occupied,
-                                                                     def_term_tokens = def_term_tokens,
-                                                                     **kwargs)
+                                        p = probabilities).create(label = None, 
+                                                                  token_status = token_status,
+                                                                  **kwargs)
             else:
-                # print(occupied)
-                # print(self.families_cardinality(False, occupied)  / np.sum(self.families_cardinality(False, occupied)))
+                probabilities = (self.families_cardinality(False, token_status) / 
+                                 np.sum(self.families_cardinality(False, token_status)))
+                # print(probabilities, self.families_cardinality(False, token_status))
                 return np.random.choice(a = self.families, 
-                                        p = self.families_cardinality(False, occupied)  / np.sum(self.families_cardinality(False, occupied))).create(label = None, 
-                                                                     occupied = occupied,
-                                                                     def_term_tokens = def_term_tokens,
-                                                                     **kwargs)
+                                        p = probabilities).create(label = None, 
+                                                                  token_status = token_status,
+                                                                  **kwargs)
         else:
             token_families = [family for family in self.families if label in family.tokens]
             if len(token_families) > 1:
@@ -438,8 +393,8 @@ class TF_Pool(object):
             elif len(token_families) == 0:
                 raise Exception('Desired label does not match tokens in any family.')
             else:
-                return token_families[0].create(label = label, occupied = occupied,
-                                                def_term_tokens = def_term_tokens,
+                return token_families[0].create(label = label,
+                                                token_status = token_status,
                                                 **kwargs)
                                                                              
     def __add__(self, other):

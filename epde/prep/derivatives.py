@@ -185,7 +185,7 @@ def differentiate(data, order : Union[int, list], mixed : bool = False, axis = N
     return derivs
 
 def Preprocess_derivatives_ANN(field, grid, max_order, test_output = False, 
-                               epochs_max = 1e3, loss_mean = 1000):
+                               epochs_max = 1e3, loss_mean = 1000, batch_frac = 0.5):
     assert grid is not None, 'Grid needed for derivatives preprocessing with ANN'
     grid_unique = [np.unique(ax_grid) for ax_grid in grid]
     
@@ -198,16 +198,16 @@ def Preprocess_derivatives_ANN(field, grid, max_order, test_output = False,
     original_shape = field.shape
     test_output = True
     
-    field = torch.from_numpy(field.reshape(-1, 1)).float()
+    field_ = torch.from_numpy(field.reshape(-1, 1)).float()
     grid_flattened.to(device)
-    field.to(device)
+    field_.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
     
-    batch_size = 128 # or whatever
+    batch_size = int(field.size * batch_frac) # or whatever
     
-    t=0 
+    t=0
 
-    print('grid_flattened.shape', grid_flattened.shape, 'field.shape', field.shape)
+    print('grid_flattened.shape', grid_flattened.shape, 'field.shape', field_.shape)
     
     # loss_mean=1000
     min_loss=np.inf
@@ -222,7 +222,7 @@ def Preprocess_derivatives_ANN(field, grid, max_order, test_output = False,
             optimizer.zero_grad()
     
             indices = permutation[i:i+batch_size]
-            batch_x, batch_y = grid_flattened[indices], field[indices]
+            batch_x, batch_y = grid_flattened[indices], field_[indices]
     
             # in case you wanted a semi-full example
             # outputs = model.forward(batch_x)
@@ -239,10 +239,13 @@ def Preprocess_derivatives_ANN(field, grid, max_order, test_output = False,
         t+=1
     
     approximation = best_model(grid_flattened).detach().numpy().reshape(original_shape)
-    print('shapes after & before', approximation.shape, original_shape)
-    time.sleep(3)
     derivs = differentiate(approximation, max_order, False, None, *grid_unique)
     derivs = np.vstack([der.reshape(-1) for der in derivs]).T
+
+    print(np.linalg.norm(approximation - field))
+    print('shapes after & before', approximation.shape, original_shape)
+    time.sleep(3)
+
     return approximation, derivs
     
     # derivs = []

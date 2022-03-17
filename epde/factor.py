@@ -63,10 +63,6 @@ class Factor(TerminalToken):
                 'mandatory' - if True, a token from the family must be present in every term; 
                 
                 'unique_token_type' - if True, only one token of the family can be present in the term; 
-                
-                'unique_for_right_part' - if True, the tokens, present in the "right part" of the equation, can not 
-                be present in the terms of the "left part". Recommended to select "True", if any token of the 
-                familiy can have 0 values on the majority of studied area;
             
                 'unique_specific_token' - if True, a specific token can be present only once per term;            
 
