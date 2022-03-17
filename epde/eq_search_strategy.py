@@ -22,7 +22,7 @@ from epde.operators.equation_crossovers import PopLevel_crossover, Equation_cros
 from epde.operators.equation_sparsity import LASSO_sparsity
 from epde.operators.equation_coeffcalc import LinReg_based_coeffs
 from epde.operators.equation_fitness import L2_fitness, Solver_based_fitness
-from epde.operators.equation_right_part_selection import Poplevel_Right_Part_Selector, Eq_Right_Part_Selector, Status_respecting_ERPS
+from epde.operators.equation_right_part_selection import Poplevel_Right_Part_Selector, Eq_Right_Part_Selector
 from epde.operators.equation_truncate import Truncate_worst
 
 class Operator_builder(ABC):    
