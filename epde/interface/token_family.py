@@ -370,9 +370,10 @@ class TF_Pool(object):
                     # print('occupied', occupied, 'meaningful', create_meaningful)
                     # print('family', [(fml.type, fml.tokens, fml.status) for fml in self.families])
                     raise ValueError('Tring to create a term from an empty pool')
-                probabilities = (self.families_cardinality(False, token_status) / 
-                                 np.sum(self.families_cardinality(False, token_status)))
-                # print(probabilities, self.families_cardinality(False, token_status))                
+                
+                probabilities = (self.families_cardinality(True, token_status) / 
+                                 np.sum(self.families_cardinality(True, token_status)))
+
                 return np.random.choice(a = self.families_meaningful,
                                         p = probabilities).create(label = None, 
                                                                   token_status = token_status,

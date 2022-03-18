@@ -67,7 +67,6 @@ class Strategy_builder(Operator_builder):
     
     def reset(self, stop_criterion, stop_criterion_kwargs):
         self._strategy = Evolutionary_strategy(stop_criterion, stop_criterion_kwargs)
-#        self.operators = []
         self.blocks_labeled = dict()
         self.blocks_connected = dict() # dict of format {op_label : (True, True)}, where in 
                                     # value dict first element is "connected with input" and
