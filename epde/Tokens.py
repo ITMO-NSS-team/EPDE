@@ -141,7 +141,7 @@ class TerminalToken(Token):
         params_description: dict
             Dictionary with description for each parameter
         """
-        assert type(params_description) == dict
+        assert isinstance(params_description, dict)
         self._params_description = params_description
 
     def check_params_description(self):
@@ -149,12 +149,12 @@ class TerminalToken(Token):
         Check params_description for requirements for current token.
         """
         recomendations = "\nUse methods 'params_description.setter' or 'set_descriptor' to change params_descriptions"
-        assert type( self._params_description) == dict, "Invalid params_description structure," \
+        assert isinstance(self._params_description, dict), "Invalid params_description structure," \
                                                         " must be a dictionary of dictionaries" + recomendations
         assert len(self._params_description) == self._number_params, "The number of parameters does not" \
                                                                      " match the number of descriptors" + recomendations
         for key, value in self._params_description.items():
-            assert type(value) == dict, "Invalid params_description structure, must be a dictionary of dictionaries"
+            assert isinstance(value, dict), "Invalid params_description structure, must be a dictionary of dictionaries"
             assert 'name' in value.keys(), "Key 'name' must be in the nested" \
                                            " dictionary for each parameter" + recomendations
             assert 'bounds' in value.keys(), "Key 'bounds' must be in the nested " \

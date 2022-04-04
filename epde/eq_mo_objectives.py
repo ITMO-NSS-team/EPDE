@@ -65,7 +65,10 @@ def system_complexity_by_factors(system):
     complexities = []
     for equation in system.structure:
         eq_compl = 0
-        for idx, term in enumerate(equation.stucture):
+        # print(equation)
+        # print(equation.text_form)
+        
+        for idx, term in enumerate(equation.structure):
             if idx < equation.target_idx:
                 if not equation.weights_final[idx] == 0: eq_compl += len(term.structure)
             elif idx > equation.target_idx:

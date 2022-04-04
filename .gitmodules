@@ -1,3 +1,0 @@
-[submodule "solver"]
-	path = solver
-	url = https://github.com/ITMO-NSS-team/torch_DE_solver.git

@@ -13,7 +13,7 @@ import epde.globals as global_var
 
 from epde.interface.prepared_tokens import Prepared_tokens
 from epde.evaluators import simple_function_evaluator
-from epde.interface.token_family import Token_family, TF_Pool
+from epde.interface.token_family import TokenFamily, TF_Pool
 from epde.interface.interface import Input_data_entry
 
 def create_pool(data : Union[np.ndarray, list, tuple], time_axis : int = 0, boundary : int = 0, 
@@ -45,10 +45,9 @@ def create_pool(data : Union[np.ndarray, list, tuple], time_axis : int = 0, boun
                                set_grids=set_grids, memory_for_cache=memory_for_cache, boundary=boundary)
         set_grids = False; set_grids_among_tokens = False
         
-        entry_token_family = Token_family(entry.var_name, family_of_derivs = True)
+        entry_token_family = TokenFamily(entry.var_name, family_of_derivs = True)
         entry_token_family.set_status(unique_specific_token=False, unique_token_type=False, 
-                             s_and_d_merged = False, meaningful = True, 
-                             unique_for_right_part = True)     
+                             s_and_d_merged = False, meaningful = True)     
         entry_token_family.set_params(entry.names, OrderedDict([('power', (1, data_fun_pow))]),
                                       {'power' : 0}, entry.d_orders)
         entry_token_family.set_evaluator(simple_function_evaluator, [])
@@ -57,14 +56,14 @@ def create_pool(data : Union[np.ndarray, list, tuple], time_axis : int = 0, boun
         data_tokens.append(entry_token_family)
  
     if isinstance(additional_tokens, list):
-        if not all([isinstance(tf, (Token_family, Prepared_tokens)) for tf in additional_tokens]):
-            raise TypeError(f'Incorrect type of additional tokens: expected list or Token_family/Prepared_tokens - obj, instead got list of {type(additional_tokens[0])}')                
-    elif isinstance(additional_tokens, (Token_family, Prepared_tokens)):
+        if not all([isinstance(tf, (TokenFamily, Prepared_tokens)) for tf in additional_tokens]):
+            raise TypeError(f'Incorrect type of additional tokens: expected list or TokenFamily/Prepared_tokens - obj, instead got list of {type(additional_tokens[0])}')                
+    elif isinstance(additional_tokens, (TokenFamily, Prepared_tokens)):
         additional_tokens = [additional_tokens,]
     else:
         print(isinstance(additional_tokens, Prepared_tokens))
-        raise TypeError(f'Incorrect type of additional tokens: expected list or Token_family/Prepared_tokens - obj, instead got {type(additional_tokens)}')
-    return TF_Pool(data_tokens + [tf if isinstance(tf, Token_family) else tf.token_family 
+        raise TypeError(f'Incorrect type of additional tokens: expected list or TokenFamily/Prepared_tokens - obj, instead got {type(additional_tokens)}')
+    return TF_Pool(data_tokens + [tf if isinstance(tf, TokenFamily) else tf.token_family 
                                   for tf in additional_tokens])
 
 if __name__ == '__main__':

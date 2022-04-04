@@ -292,6 +292,8 @@ class Cache(object):
     def get(self, label, normalized = False, structural = False, saved_as = None):
         assert not (normalized and structural), 'The added matrix can not be simultaneously normalized and scaled'
 #        assert not scaled or self.scale_used, 'Trying to add scaled data, while the cache it not allowed to get it'
+        if label is None:
+            return np.random.choice(list(self.memory_default.values()))
         if normalized:
             try:
                 return self.memory_normalized[label]

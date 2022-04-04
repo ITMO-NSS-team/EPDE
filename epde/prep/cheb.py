@@ -10,7 +10,7 @@ import numpy as np
 from epde.prep.fin_der import FD_derivatives
 
 def Get_cheb_for_point(matrix, axis, idx, grid, max_der_order = 3, points = 9, poly_order = None):
-    if type(poly_order) == type(None):
+    if poly_order is None:
         max_power = max_der_order + 1
     else:
         max_power = poly_order

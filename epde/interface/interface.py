@@ -27,7 +27,7 @@ from epde.prep.derivatives import Preprocess_derivatives
 from epde.eq_search_strategy import Strategy_director, Strategy_director_solver
 from epde.structure import Equation
 
-from epde.interface.token_family import TF_Pool, Token_family
+from epde.interface.token_family import TF_Pool, TokenFamily
 from epde.interface.type_checks import *
 from epde.interface.prepared_tokens import Prepared_tokens, Custom_tokens
 
@@ -49,9 +49,6 @@ class Input_data_entry(object):
             self.coord_tensors = np.meshgrid(*axes)
         self.data_tensor = data_tensor
         
-    # def set_derivatives(self, deriv_tensors = None, data_filename = None, 
-    #                     deriv_filename = None, smooth = True, sigma = 5, max_order = 1, mp_poolsize = 2):
-#        coord_names = ['x' + str(coord_idx) for coord_idx in range(len(self.coord_tensors))]
     def set_derivatives(self, deriv_tensors = None, method = 'ANN', max_order = 1, method_kwargs = {}):
 
         deriv_names, deriv_orders = Define_Derivatives(self.var_name, dimensionality=self.data_tensor.ndim, 
@@ -64,8 +61,9 @@ class Input_data_entry(object):
             method_kwargs['max_order'] = max_order
             if self.coord_tensors is not None and 'grid' not in method_kwargs.keys():
                 method_kwargs['grid'] = self.coord_tensors
-            _, self.derivatives = Preprocess_derivatives(self.data_tensor, method=method, 
+            self.data_tensor, self.derivatives = Preprocess_derivatives(self.data_tensor, method=method, 
                                                          method_kwargs=method_kwargs)
+            # Added setting of data tensor from filtered field
             self.deriv_properties = {'max order' : max_order,
                                      'dimensionality' : self.data_tensor.ndim}
         else:
@@ -83,21 +81,18 @@ class Input_data_entry(object):
         if isinstance(self.coord_tensors, (list, tuple)):
             coord_tensors_cut = []
             for tensor in self.coord_tensors:
-#                print('appending grid of shape', tensor.shape, 'cut to ', np_ndarray_section(tensor, boundary = boundary))
                 coord_tensors_cut.append(np_ndarray_section(tensor, boundary = boundary))
         elif isinstance(self.coord_tensors, np.ndarray):
             coord_tensors_cut = np_ndarray_section(self.coord_tensors, boundary = boundary)
         else:
             raise TypeError('Coordinate tensors are presented in format, other than np.ndarray or list/tuple of np.ndarray`s')
         
-        try:
-#            print(self.names, derivs_stacked.shape)            
+        try:       
             upload_simple_tokens(self.names, global_var.tensor_cache, derivs_stacked)
+            upload_simple_tokens(['u',], global_var.initial_data_cache, [self.data_tensor,])            
             if set_grids: 
-    #                print('setting grids')
                 memory_for_cache = int(memory_for_cache/2)
-    #                global_var.grid_cache.memory_usage_properties(obj_test_case = self.data_tensor,
-    #                                                                mem_for_cache_frac = memory_for_cache)
+                upload_grids(self.coord_tensors, global_var.initial_data_cache)
                 upload_grids(coord_tensors_cut, global_var.grid_cache)
                 print(f'completed grid cache with {len(global_var.grid_cache.memory_default)} tensors with labels {global_var.grid_cache.memory_default.keys()}')
 
@@ -111,14 +106,14 @@ class Input_data_entry(object):
                 memory_for_cache = int(memory_for_cache/2)
                 global_var.grid_cache.memory_usage_properties(obj_test_case = self.data_tensor,
                                                                 mem_for_cache_frac = memory_for_cache)
+                upload_grids(self.coord_tensors, global_var.initial_data_cache)
                 upload_grids(coord_tensors_cut, global_var.grid_cache)
                 print(f'completed grid cache with {len(global_var.grid_cache.memory_default)} tensors with labels {global_var.grid_cache.memory_default.keys()}')
-#                print()
-    
             global_var.tensor_cache.memory_usage_properties(obj_test_case = self.data_tensor,
                                                             mem_for_cache_frac = memory_for_cache)
             print(self.names, derivs_stacked.shape)
             upload_simple_tokens(self.names, global_var.tensor_cache, derivs_stacked)
+            upload_simple_tokens(['u',], global_var.initial_data_cache, [self.data_tensor,])
 
         global_var.tensor_cache.use_structural()
     
@@ -130,7 +125,7 @@ class epde_search(object):
                  director = None, equation_type : set = {'PDE', 'derivatives only'}, time_axis : int = 0, 
                  init_cache : bool = True, example_tensor_shape : Union[tuple, list] = (1000,), 
                  set_grids : bool = True, eq_search_iter : int = 300, use_solver : bool = False, 
-                 dimensionality : int = 1):
+                 dimensionality : int = 1, verbose_params : dict = {}):
         '''
         
         Intialization of the epde search object. Here, the user can declare the properties of the 
@@ -156,13 +151,20 @@ class epde_search(object):
         
         '''
         global_var.set_time_axis(time_axis)
-#        eq_search_stop_criterion_obj = eq_search_stop_criterion()
+        global_var.init_verbose(**verbose_params)
+
+        if init_cache:
+            global_var.init_caches(set_grids)
+
+        if use_solver:
+            global_var.dimensionality = dimensionality
+
         if director is not None and not use_default_strategy:
             self.director = director
         elif director is None and use_default_strategy:
             if use_solver:
-                self.director = Strategy_director_solver(eq_search_stop_criterion, {'limit' : eq_search_iter}, 
-                                                         dimensionality=dimensionality)
+                self.director = Strategy_director_solver(eq_search_stop_criterion, {'limit' : eq_search_iter})#, 
+                                                         # dimensionality=dimensionality)
             else:
                 self.director = Strategy_director(eq_search_stop_criterion, {'limit' : eq_search_iter})
             self.director.strategy_assembly()
@@ -171,8 +173,6 @@ class epde_search(object):
         self.set_moeadd_params()
         self.search_conducted = False
         
-        if init_cache:
-            global_var.init_caches(set_grids)
             
     def set_memory_properties(self, example_tensor, mem_for_cache_frac = None, mem_for_cache_abs = None):
         if global_var.grid_cache is not None:
@@ -319,13 +319,13 @@ class epde_search(object):
                                   method_kwargs=method_kwargs)
             print(f'set grids parameter is {set_grids}')
             entry.use_global_cache(grids_as_tokens = set_grids_among_tokens,
-                                   set_grids=set_grids, memory_for_cache=memory_for_cache, boundary=boundary)
+                                   set_grids=set_grids, memory_for_cache=memory_for_cache, 
+                                   boundary=boundary)
             set_grids = False; set_grids_among_tokens = False
             
-            entry_token_family = Token_family(entry.var_name, family_of_derivs = True)
+            entry_token_family = TokenFamily(entry.var_name, family_of_derivs = True)
             entry_token_family.set_status(unique_specific_token=False, unique_token_type=False, 
-                                 s_and_d_merged = False, meaningful = True, 
-                                 unique_for_right_part = True)     
+                                 s_and_d_merged = False, meaningful = True)     
             entry_token_family.set_params(entry.names, OrderedDict([('power', (1, data_fun_pow))]),
                                           {'power' : 0}, entry.d_orders)
             entry_token_family.set_evaluator(simple_function_evaluator, [])
@@ -336,16 +336,14 @@ class epde_search(object):
             self.set_domain_pruning(pivotal_tensor_label, pruner, threshold, division_fractions, rectangular)
             
         if isinstance(additional_tokens, list):
-            if not all([isinstance(tf, (Token_family, Prepared_tokens)) for tf in additional_tokens]):
-                raise TypeError(f'Incorrect type of additional tokens: expected list or Token_family/Prepared_tokens - obj, instead got list of {type(additional_tokens[0])}')                
-        elif isinstance(additional_tokens, (Token_family, Prepared_tokens)):
+            if not all([isinstance(tf, (TokenFamily, Prepared_tokens)) for tf in additional_tokens]):
+                raise TypeError(f'Incorrect type of additional tokens: expected list or TokenFamily/Prepared_tokens - obj, instead got list of {type(additional_tokens[0])}')                
+        elif isinstance(additional_tokens, (TokenFamily, Prepared_tokens)):
             additional_tokens = [additional_tokens,]
         else:
             print(isinstance(additional_tokens, Prepared_tokens))
-#            print(isinstance(additional_tokens, Custom_tokens))
-#            print(issubclass(Custom_tokens, Prepared_tokens) or issubclass(Prepared_tokens, Custom_tokens))
-            raise TypeError(f'Incorrect type of additional tokens: expected list or Token_family/Prepared_tokens - obj, instead got {type(additional_tokens)}')
-        self.pool = TF_Pool(data_tokens + [tf if isinstance(tf, Token_family) else tf.token_family 
+            raise TypeError(f'Incorrect type of additional tokens: expected list or TokenFamily/Prepared_tokens - obj, instead got {type(additional_tokens)}')
+        self.pool = TF_Pool(data_tokens + [tf if isinstance(tf, TokenFamily) else tf.token_family 
                                       for tf in additional_tokens])
         print(f'The cardinality of defined token pool is {self.pool.families_cardinality()}')
     
@@ -402,9 +400,9 @@ class epde_search(object):
         max_deriv_order : int or tuple/list, optional,
             Highest order of calculated derivatives. Default value: 1.
             
-        additional_tokens : None or list of ``Token_family`` or ``Prepared_tokens`` objects, optional
+        additional_tokens : None or list of ``TokenFamily`` or ``Prepared_tokens`` objects, optional
             Additional tokens, that would be used to construct the equations among the main variables and their 
-            derivatives. Objects of this list must be of type ``epde.interface.token_family.Token_family`` or 
+            derivatives. Objects of this list must be of type ``epde.interface.token_family.TokenFamily`` or 
             of ``epde.interface.prepared_tokens.Prepared_tokens`` subclasses types. Default value: None.
         
         coordinate_tensors : list of np.ndarrays, optional
@@ -426,7 +424,10 @@ class epde_search(object):
             Maximum power of token,
             
         '''
-
+        if equation_terms_max_number < self.moeadd_params['pop_size']:
+            self.moeadd_params['pop_size'] = equation_terms_max_number
+            self.moeadd_params['weights_num'] = equation_terms_max_number
+        
         self.create_pool(data = data, time_axis=time_axis, boundary=boundary, variable_names=variable_names, 
                          derivs=derivs, method=deriv_method, method_kwargs=deriv_method_kwargs, 
                          max_deriv_order=max_deriv_order, additional_tokens=additional_tokens, 
@@ -435,10 +436,10 @@ class epde_search(object):
                          pruner=pruner, threshold=threshold, division_fractions=division_fractions, 
                          rectangular=rectangular, data_fun_pow=data_fun_pow)
         
-        pop_constructor = operators.systems_population_constructor(pool = self.pool, terms_number = equation_terms_max_number, 
+        pop_constructor = operators.Systems_population_constructor(pool = self.pool, terms_number = equation_terms_max_number, 
                                                                max_factors_in_term=equation_factors_max_number, 
                                                                eq_search_evo=self.director.constructor.strategy,
-                                                               sparcity_interval = eq_sparsity_interval)
+                                                               sparsity_interval = eq_sparsity_interval)
 
         self.moeadd_params['pop_constructor'] = pop_constructor
         self.optimizer = moeadd_optimizer(**self.moeadd_params)
@@ -487,7 +488,4 @@ class epde_search(object):
             return global_var.grid_cache, global_var.tensor_cache
         else:
             return None, global_var.tensor_cache
-            
-#    def test_equation(self, equation_text_form : str):
-#        
-#    
+

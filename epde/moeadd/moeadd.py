@@ -9,6 +9,8 @@ import time
 import warnings
 from copy import deepcopy
 from functools import reduce
+
+import epde.globals as global_var
 from epde.moeadd.moeadd_supplementary import fast_non_dominated_sorting, slow_non_dominated_sorting, NDL_update, Equality, Inequality, acute_angle        
 
 def get_domain_idx(solution, weights) -> int:
@@ -400,9 +402,9 @@ class moeadd_optimizer(object):
                 temp_solution = pop_constructor.create(**solution_params)
                 if not np.any([temp_solution == solution for solution in population]):
                     population.append(temp_solution)
-                    print('New solution accepted')
+                    print(f'New solution accepted, confirmed {len(population)}/{pop_size} solutions.')
                     break
-                if solution_gen_idx == soluton_creation_attempts_softmax:
+                if solution_gen_idx == soluton_creation_attempts_softmax and global_var.verbose.show_warnings:
                     print('solutions tried:', solution_gen_idx)
                     warnings.warn('Too many failed attempts to create unique solutions for multiobjective optimization. Change solution parameters to allow more diversity.')
                 if solution_gen_idx == soluton_creation_attempts_hardmax:
@@ -411,7 +413,6 @@ class moeadd_optimizer(object):
                 solution_gen_idx += 1
         self.pareto_levels = pareto_levels(population, sorting_method=NDS_method, update_method=NDL_update)
         
-#        self.opt_functionals = optimized_functionals
         self.weights = []; weights_size = len(population[0].obj_funs) #np.empty((pop_size, len(optimized_functionals)))
         for weights_idx in range(weights_num):
             while True:
@@ -433,10 +434,11 @@ class moeadd_optimizer(object):
 
     def abbreviated_search(self, population, sorting_method, update_method):
         self.pareto_levels = pareto_levels(population, sorting_method=sorting_method, update_method=update_method)
-        if len(population) == 1:
-            warnings.warn('The multiobjective optimization algorithm has been able to create only a single unique solution. The search has been abbreviated.')
-        else:
-            warnings.warn(f'The multiobjective optimization algorithm has been able to create only {len(population)} unique solution. The search has been abbreviated.')
+        if global_var.verbose.show_warnings:
+            if len(population) == 1:
+                warnings.warn('The multiobjective optimization algorithm has been able to create only a single unique solution. The search has been abbreviated.')
+            else:
+                warnings.warn(f'The multiobjective optimization algorithm has been able to create only {len(population)} unique solution. The search has been abbreviated.')
         self.abbreviated_search_executed = True
             
     @staticmethod
@@ -657,17 +659,28 @@ class moeadd_optimizer(object):
         if not self.abbreviated_search_executed:
             assert not type(self.best_obj) == type(None)
             for epoch_idx in np.arange(epochs):
+                if global_var.verbose.show_moeadd_epochs:
+                    print(f'Multiobjective optimization : {epoch_idx}-th epoch.')
                 for weight_idx in np.arange(len(self.weights)):
+                    if global_var.verbose.show_moeadd_epochs:
+                        print(f'During MO : processing {weight_idx}-th weight.')                    
                     parent_idxs = self.mating_selection(weight_idx, self.weights, self.neighborhood_lists, self.pareto_levels.population,
                                                    neighborhood_selector, neighborhood_selector_params, delta)
                     offsprings = self.evolutionary_operator.crossover([self.pareto_levels.population[int(idx)] for idx in parent_idxs]) # В объекте эволюционного оператора выделять кроссовер
                     # try:
                     for offspring_idx, offspring in enumerate(offsprings):
+                        if global_var.verbose.show_moeadd_epochs:
+                            print(f'Offsping {offspring_idx}.')   
+                        attempt = 1; attempt_limit = 2
                         while True:
                             temp_offspring = self.evolutionary_operator.mutation(offspring)
                             if not np.any([temp_offspring == solution for solution in self.pareto_levels.population]):
+                                self.update_population(temp_offspring, PBI_penalty)
                                 break
-                        self.update_population(temp_offspring, PBI_penalty)
+                            elif attempt >= attempt_limit:
+                                break
+                            attempt += 1
+                        
                 if len(self.pareto_levels.levels) == 1:
                     break
                     
@@ -955,8 +968,11 @@ class moeadd_optimizer_constrained(moeadd_optimizer):
             assert not type(self.best_obj) == type(None)
             self.train_hist = []
             for epoch_idx in np.arange(epochs):
+                if global_var.verbose.show_moeadd_epochs:
+                    print(f'Multiobjective optimization : {epoch_idx}-th epoch.')                
                 for weight_idx in np.arange(len(self.weights)):
-                    print(epoch_idx, weight_idx)
+                    if global_var.verbose.show_moeadd_epochs:
+                        print(f'During MO : processing {weight_idx}-th weight.')     
                     obj_fun = np.array([solution.obj_fun for solution in self.pareto_levels.population])
                     self.train_hist.append(np.mean(obj_fun, axis=0))
                     parent_idxs = self.mating_selection(weight_idx, self.weights, self.neighborhood_lists, self.pareto_levels.population,
@@ -971,16 +987,29 @@ class moeadd_optimizer_constrained(moeadd_optimizer):
                     offsprings = self.evolutionary_operator.crossover(parents_selected) # В объекте эволюционного оператора выделять кроссовер
                     if type(offsprings) == list or type(offsprings) == tuple:
                         for offspring_idx, offspring in enumerate(offsprings):
+                            if global_var.verbose.show_moeadd_epochs:
+                                print(f'Offsping {offspring_idx}.')
+                            attempt = 1; attempt_limit = 2
                             while True:
                                 temp_offspring = self.evolutionary_operator.mutation(offspring)
                                 if not np.any([temp_offspring == solution for solution in self.pareto_levels.population]):
+                                    self.update_population(temp_offspring, PBI_penalty)
                                     break
-                            self.update_population(temp_offspring, PBI_penalty)
+                                elif attempt >= attempt_limit:
+                                    break
+                                attempt += 1
+                            
                     else:
+                        if global_var.verbose.show_moeadd_epochs:
+                            print(f'Offsping {offsprings}.')   
+                        attempt = 1; attempt_limit = 2                            
                         while True:
                             temp_offspring = self.evolutionary_operator.mutation(offsprings)
                             if not any([temp_offspring == solution for solution in self.pareto_levels.population]):
+                                self.update_population(temp_offspring, PBI_penalty)
                                 break
-                        self.update_population(temp_offspring, PBI_penalty)
+                            elif attempt >= attempt_limit:
+                                break
+                            attempt += 1                            
                 if len(self.pareto_levels.levels) == 1:
                     break

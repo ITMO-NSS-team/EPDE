@@ -7,6 +7,7 @@ Created on Thu Mar  5 13:16:43 2020
 """
 
 import numpy as np
+import copy
 
 from epde.Tokens import TerminalToken
 import epde.globals as global_var
@@ -30,17 +31,17 @@ class Factor(TerminalToken):
         self.deriv_code = deriv_code
         
         self.reset_saved_state()
-        if type(global_var.tensor_cache) != type(None):
+        if global_var.tensor_cache is not None:
             self.use_cache()
         else:
             self.cache_linked = False
 
-        if self.status['requires_grid']:
-            self.use_grids_cache()
-
         if randomize:
-            assert type(params_description) != type(None) and type(equality_ranges) != type(None)
-            self.Set_parameters(params_description, equality_ranges, random = True)
+            assert params_description is not None and equality_ranges is not None
+            self.set_parameters(params_description, equality_ranges, random = True)
+    
+            if self.status['requires_grid']:
+                self.use_grids_cache()
 
     def reset_saved_state(self):
         self.saved = {'base':False, 'structural':False}
@@ -62,10 +63,6 @@ class Factor(TerminalToken):
                 'mandatory' - if True, a token from the family must be present in every term; 
                 
                 'unique_token_type' - if True, only one token of the family can be present in the term; 
-                
-                'unique_for_right_part' - if True, the tokens, present in the "right part" of the equation, can not 
-                be present in the terms of the "left part". Recommended to select "True", if any token of the 
-                familiy can have 0 values on the majority of studied area;
             
                 'unique_specific_token' - if True, a specific token can be present only once per term;            
 
@@ -74,7 +71,8 @@ class Factor(TerminalToken):
         '''
         self._status = status_dict
         
-    def Set_parameters(self, params_description : dict, equality_ranges : dict, random = True, **kwargs):
+    def set_parameters(self, params_description : dict, equality_ranges : dict, 
+                       random = True, **kwargs):
         '''
         
         Avoid periodic parameters (e.g. phase shift) 
@@ -124,7 +122,7 @@ class Factor(TerminalToken):
         raise NotImplementedError('Delete me')
         return self.evaluate(self)    
     
-    def Set_evaluator(self, evaluator):
+    def set_evaluator(self, evaluator):
         self._evaluator = evaluator
     
     def evaluate(self, structural = False): # Переработать/удалить __call__, т.к. его функции уже тут
@@ -174,6 +172,31 @@ class Factor(TerminalToken):
                 dim_set = True
         self.grid_idx = int(self.params[dim_param_idx]) if dim_set else 0
         self.grid_set = True
+    
+    def __deepcopy__(self, memo = None):
+        clss = self.__class__
+        new_struct = clss.__new__(clss)
+        memo[id(self)] = new_struct
+        
+        new_struct.__dict__.update(self.__dict__)
+        
+        attrs_to_avoid_copy = []
+        for k in self.__slots__:
+            try:
+                if k not in attrs_to_avoid_copy:
+                    if not isinstance(k, list):
+                        setattr(new_struct, k, copy.deepcopy(getattr(self, k), memo))
+                    else:
+                        temp = []
+                        for elem in getattr(self, k):
+                            temp.append(copy.deepcopy(elem, memo))
+                        setattr(new_struct, k, temp)
+                else:
+                    setattr(new_struct, k, None)
+            except AttributeError:
+                pass
+
+        return new_struct    
     
     def use_cache(self):      
         self.cache_linked = True

@@ -15,15 +15,15 @@ from epde.evaluators import Custom_Evaluator
 if __name__ == '__main__':
 
     t = np.linspace(0, 4*np.pi, 1000)
-    u = np.load('/media/mike_ubuntu/DATA/EPDE_publication/tests/system/Test_data/fill366.npy') # loading data with the solution of ODE
+    u = np.load('/home/maslyaev/epde/EPDE/tests/system/Test_data/fill366.npy') # loading data with the solution of ODE
     # Trying to create population for mulit-objective optimization with only 
     # derivatives as allowed tokens. Spoiler: only one equation structure will be 
     # discovered, thus MOO algorithm will not be launched.
     
     dimensionality = t.ndim - 1
     
-    epde_search_obj = epde_alg.epde_search()
-
+    epde_search_obj = epde_alg.epde_search(use_solver=False, eq_search_iter = 100, dimensionality=dimensionality,
+                                       verbose_params={'show_moeadd_epochs' : True})
     '''
     --------------------------------------------------------------------------------------------------------------------------------
     Так как в этом примере мы будем использовать собственноручно-заданные семейства токенов, то для начала нужно ввести 
@@ -112,7 +112,16 @@ if __name__ == '__main__':
                                        params_ranges = {'power' : (1, 1)},
                                        params_equality_ranges = None)
     
-    epde_search_obj.fit(data = u, boundary=boundary, equation_factors_max_number = 2, coordinate_tensors = [t,], 
-                        additional_tokens = [custom_trig_tokens, custom_inv_fun_tokens, custom_grid_tokens], field_smooth = False, memory_for_cache=5, data_fun_pow = 2)
+    epde_search_obj.set_moeadd_params(population_size=4)
+    # epde_search_obj.fit(data = u, boundary=boundary, equation_factors_max_number = 2, coordinate_tensors = [t,], 
+    #                     additional_tokens = [custom_trig_tokens, custom_grid_tokens], field_smooth = False, 
+    #                     memory_for_cache=5, data_fun_pow = 1, eq_sparsity_interval=(1e-4, 0.2))
+    print('u.shape', u.shape, u.ndim)
+    epde_search_obj.fit(data = u, max_deriv_order=(1,), boundary=(10,), equation_terms_max_number = 4,
+                        equation_factors_max_number = 2, deriv_method='poly', eq_sparsity_interval = (1e-4, 0.4), #'smooth' : True, 'sigma' : 5
+                        deriv_method_kwargs = {'smooth' : False, 'grid' : [t,]}, coordinate_tensors = [t,], 
+                        additional_tokens = [custom_grid_tokens, custom_trig_tokens], 
+                        memory_for_cache=25, prune_domain = False,
+                        division_fractions = None)
     
     epde_search_obj.equation_search_results(only_print = True, level_num = 1) # showing the Pareto-optimal set of discovered equations 

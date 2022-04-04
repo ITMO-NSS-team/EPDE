@@ -12,16 +12,17 @@ from abc import ABC, abstractmethod, abstractproperty
 from typing import Callable, Iterable
 from warnings import warn
 
+import epde.globals as global_var
 from epde.operators.template import Compound_Operator
 
 from epde.operators.equation_selections import Tournament_selection
 from epde.operators.equation_elitism import Fraction_elitism
 from epde.operators.equation_mutations import PopLevel_mutation, PopLevel_mutation_elite, Refining_Equation_mutation, Equation_mutation, Term_mutation, Parameter_mutation
 from epde.operators.equation_crossovers import PopLevel_crossover, Equation_crossover, Param_crossover, Term_crossover
-from epde.operators.equation_sparcity import LASSO_sparsity
+from epde.operators.equation_sparsity import LASSO_sparsity
 from epde.operators.equation_coeffcalc import LinReg_based_coeffs
 from epde.operators.equation_fitness import L2_fitness, Solver_based_fitness
-from epde.operators.equation_right_part_selection import Poplevel_Right_Part_Selector, Eq_Right_Part_Selector, Status_respecting_ERPS
+from epde.operators.equation_right_part_selection import Poplevel_Right_Part_Selector, Eq_Right_Part_Selector
 from epde.operators.equation_truncate import Truncate_worst
 
 class Operator_builder(ABC):    
@@ -66,7 +67,6 @@ class Strategy_builder(Operator_builder):
     
     def reset(self, stop_criterion, stop_criterion_kwargs):
         self._strategy = Evolutionary_strategy(stop_criterion, stop_criterion_kwargs)
-#        self.operators = []
         self.blocks_labeled = dict()
         self.blocks_connected = dict() # dict of format {op_label : (True, True)}, where in 
                                     # value dict first element is "connected with input" and
@@ -146,13 +146,13 @@ class Strategy_director(object):
         truncation.params = {'population_size' : None}
 
         param_mutation = Parameter_mutation(['r_param_mutation', 'strict_restrictions', 'multiplier'])
-        term_mutation = Term_mutation(['forbidden_tokens'])
+        term_mutation = Term_mutation()
         eq_mutation = Equation_mutation(['r_mutation', 'type_probabilities'])
         ref_eq_mutation = Refining_Equation_mutation(['r_mutation', 'type_probabilities'])
         mutation = PopLevel_mutation_elite(['indiv_mutation_prob'])
 
         param_mutation.params = {'r_param_mutation' : 0.2, 'strict_restrictions' : True, 'multiplier' : 0.1} if not 'param_mutation_params' in kwargs.keys() else kwargs['param_mutation_params']
-        term_mutation.params = {'forbidden_tokens': []} if not 'term_mutation_params' in kwargs.keys() else kwargs['term_mutation_params']
+        term_mutation.params = {} if not 'term_mutation_params' in kwargs.keys() else kwargs['term_mutation_params']
         eq_mutation.params = {'r_mutation' : 0.3, 'type_probabilities' : []}
         ref_eq_mutation.params = {'r_mutation' : 0.3, 'type_probabilities' : []}
         mutation.params = {'indiv_mutation_prob' : 0.5} if not 'mutation_params' in kwargs.keys() else kwargs['mutation_params']
@@ -163,8 +163,8 @@ class Strategy_director(object):
 
         param_crossover = Param_crossover(['proportion'])
         term_crossover = Term_crossover(['crossover_probability'])
-        eq_crossover = Equation_crossover([])
-        crossover = PopLevel_crossover([])        
+        eq_crossover = Equation_crossover()
+        crossover = PopLevel_crossover()        
 
         param_crossover.params = {'proportion' : 0.4} if not 'param_crossover_params' in kwargs.keys() else kwargs['param_crossover_params']
         term_crossover.params = {'crossover_probability' : 0.3} if not 'term_crossover_params' in kwargs.keys() else kwargs['term_crossover_params']
@@ -174,20 +174,20 @@ class Strategy_director(object):
         eq_crossover.suboperators = {'Param_crossover' : param_crossover, 'Term_crossover' : term_crossover} 
         crossover.suboperators = {'Equation_crossover' : eq_crossover}
         
-        lasso_coeffs = LASSO_sparsity(['sparcity'])
-        linreg_coeffs = LinReg_based_coeffs([])
+        lasso_coeffs = LASSO_sparsity(['sparsity'])
+        linreg_coeffs = LinReg_based_coeffs()
         
-        lasso_coeffs.params = {'sparcity' : 1} if not 'lasso_coeffs_params' in kwargs.keys() else kwargs['lasso_coeffs_params']
+        lasso_coeffs.params = {'sparsity' : 1} if not 'lasso_coeffs_params' in kwargs.keys() else kwargs['lasso_coeffs_params']
         linreg_coeffs.params = {} if not 'linreg_coeffs_params' in kwargs.keys() else kwargs['linreg_coeffs_params']
 
         fitness_eval = L2_fitness(['penalty_coeff'])
         fitness_eval.suboperators = {'sparsity' : lasso_coeffs, 'coeff_calc' : linreg_coeffs}
         fitness_eval.params = {'penalty_coeff' : 0.5} if not 'fitness_eval_params' in kwargs.keys() else kwargs['fitness_eval_params']
         
-        rps1 = Poplevel_Right_Part_Selector([])
+        rps1 = Poplevel_Right_Part_Selector()
         rps1.params = {} if not 'rps_params' in kwargs.keys() else kwargs['rps_params']
         
-        eq_rps = Status_respecting_ERPS([])
+        eq_rps = Eq_Right_Part_Selector()
         eq_rps.suboperators = {'fitness_calculation' : fitness_eval}
         eq_rps.params = {} if not 'eq_rps_params' in kwargs.keys() else kwargs['eq_rps_params']
         
@@ -232,11 +232,10 @@ class Strategy_director(object):
         
     
 class Strategy_director_solver(object):    
-    def __init__(self, stop_criterion, stop_criterion_kwargs, dimensionality = 1): # baseline = True
+    def __init__(self, stop_criterion, stop_criterion_kwargs): # baseline = True
 #        self._constructor = None
 #        if baseline:
         self._constructor = Strategy_builder(stop_criterion, stop_criterion_kwargs)
-        self.dimensionality = dimensionality
     
     @property
     def constructor(self):
@@ -257,14 +256,14 @@ class Strategy_director_solver(object):
         truncation.params = {'population_size' : None}
 
         param_mutation = Parameter_mutation(['r_param_mutation', 'strict_restrictions', 'multiplier'])
-        term_mutation = Term_mutation(['forbidden_tokens'])
+        term_mutation = Term_mutation()
         eq_mutation = Equation_mutation(['r_mutation', 'type_probabilities'])
         ref_eq_mutation = Refining_Equation_mutation(['r_mutation', 'type_probabilities'])
 #        mutation = PopLevel_mutation(['indiv_mutation_prob', 'elitism'])
         mutation = PopLevel_mutation_elite(['indiv_mutation_prob'])
 
         param_mutation.params = {'r_param_mutation' : 0.2, 'strict_restrictions' : True, 'multiplier' : 0.1} if not 'param_mutation_params' in kwargs.keys() else kwargs['param_mutation_params']
-        term_mutation.params = {'forbidden_tokens': []} if not 'term_mutation_params' in kwargs.keys() else kwargs['term_mutation_params']
+        term_mutation.params = {} if not 'term_mutation_params' in kwargs.keys() else kwargs['term_mutation_params']
         eq_mutation.params = {'r_mutation' : 0.3, 'type_probabilities' : []}
         ref_eq_mutation.params = {'r_mutation' : 0.3, 'type_probabilities' : []}
         mutation.params = {'indiv_mutation_prob' : 0.5} if not 'mutation_params' in kwargs.keys() else kwargs['mutation_params']
@@ -276,8 +275,8 @@ class Strategy_director_solver(object):
 
         param_crossover = Param_crossover(['proportion'])
         term_crossover = Term_crossover(['crossover_probability'])
-        eq_crossover = Equation_crossover([])
-        crossover = PopLevel_crossover([])        
+        eq_crossover = Equation_crossover()
+        crossover = PopLevel_crossover()        
 
         param_crossover.params = {'proportion' : 0.4} if not 'param_crossover_params' in kwargs.keys() else kwargs['param_crossover_params']
         term_crossover.params = {'crossover_probability' : 0.3} if not 'term_crossover_params' in kwargs.keys() else kwargs['term_crossover_params']
@@ -287,22 +286,21 @@ class Strategy_director_solver(object):
         eq_crossover.suboperators = {'Param_crossover' : param_crossover, 'Term_crossover' : term_crossover} 
         crossover.suboperators = {'Equation_crossover' : eq_crossover}
         
-        lasso_coeffs = LASSO_sparsity(['sparcity'])
-        linreg_coeffs = LinReg_based_coeffs([])
+        lasso_coeffs = LASSO_sparsity(['sparsity'])
+        linreg_coeffs = LinReg_based_coeffs()
         
-        lasso_coeffs.params = {'sparcity' : 1} if not 'lasso_coeffs_params' in kwargs.keys() else kwargs['lasso_coeffs_params']
+        lasso_coeffs.params = {'sparsity' : 1} if not 'lasso_coeffs_params' in kwargs.keys() else kwargs['lasso_coeffs_params']
         linreg_coeffs.params = {} if not 'linreg_coeffs_params' in kwargs.keys() else kwargs['linreg_coeffs_params']
 
-        fitness_eval = Solver_based_fitness(['lambda_bound', 'learning_rate', 'eps', 'tmin', 'tmax', 'verbose'], 
-                                            dimensionality=self.dimensionality)
+        fitness_eval = Solver_based_fitness(['lambda_bound', 'learning_rate', 'eps', 'tmin', 'tmax', 'verbose'])
         fitness_eval.suboperators = {'sparsity' : lasso_coeffs, 'coeff_calc' : linreg_coeffs}
-        fitness_eval.params = {'lambda_bound' : 1000, 'learning_rate' : 1e-4, 
-                               'eps' : 1e-6, 'tmin' : 1000, 'tmax' : 1e5, 'verbose' : True} if not 'fitness_eval_params' in kwargs.keys() else kwargs['fitness_eval_params']
+        fitness_eval.params = {'lambda_bound' : 1000, 'learning_rate' : 1e-5, 
+                               'eps' : 1e-6, 'tmin' : 1000, 'tmax' : 1e5, 'verbose' : False} if not 'fitness_eval_params' in kwargs.keys() else kwargs['fitness_eval_params']
         
-        rps1 = Poplevel_Right_Part_Selector([])
+        rps1 = Poplevel_Right_Part_Selector()
         rps1.params = {} if not 'rps_params' in kwargs.keys() else kwargs['rps_params']
 
-        eq_rps = Status_respecting_ERPS([])
+        eq_rps = Eq_Right_Part_Selector()
         eq_rps.suboperators = {'fitness_calculation' : fitness_eval}
         eq_rps.params = {} if not 'eq_rps_params' in kwargs.keys() else kwargs['eq_rps_params']
         
@@ -500,17 +498,11 @@ class Linked_Blocks(object):
             if not 'initial' in self.blocks_labeled.keys():
                 raise KeyError('Mandatory initial block is missing, or incorrectly labeled')            
             
-#            if not 'fitness' in self.blocks_labeled.keys():
-#                raise KeyError('Required evolutionary operator of fitness calculation is missing, or incorrectly labeled')
-    
             if not 'mutation' in self.blocks_labeled.keys():
                 raise KeyError('Required evolutionary operator of mutation calculation is missing, or incorrectly labeled')
     
             if not 'crossover' in self.blocks_labeled.keys():
                 raise KeyError('Required evolutionary operator of crossover calculation is missing, or incorrectly labeled')
-    
-#            if not 'sparsity' in self.blocks_labeled.keys():
-#                raise KeyError('Required evolutionary operator of sparsity calculation is missing, or incorrectly labeled')
 
 
     def reset_traversal_cond(self):
@@ -563,7 +555,7 @@ class Evolutionary_strategy(object):
         
     def create_linked_blocks(self, blocks = None, suppress_structure_check = False):
         self.suppress_structure_check = suppress_structure_check
-        if self.suppress_structure_check:
+        if self.suppress_structure_check and global_var.verbose.show_warnings:
             warn('The tests of the strategy integrity are suppressed: valuable blocks of EA may go missing and that will not be noticed')
         if blocks is None:
             if len(self.blocks) == 0:
@@ -590,8 +582,18 @@ class Evolutionary_strategy(object):
     def run(self, initial_population : Iterable, EA_kwargs : dict):
         self._stop_criterion.reset()
         population = initial_population
+        iter_idx = 0
         while not self._stop_criterion.check():
+            iter_idx += 1; log_message = ''
+            if global_var.verbose.iter_idx:
+                log_message += f'Equation search epoch {iter_idx}.'
+            if global_var.verbose.iter_fitness:
+                log_message += f'Achieved fitness of {np.max([equation.fitness_value for equation in population])}'
+            if global_var.verbose.iter_stats:
+                raise NotImplementedError('Evolutionary optimizer statistics output not yet implemented')
             self.linked_blocks.traversal(population, EA_kwargs)
+            if log_message:
+                print(log_message)
             population = self.linked_blocks.output
         self.run_performed = True
         

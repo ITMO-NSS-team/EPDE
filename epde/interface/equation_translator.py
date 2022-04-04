@@ -5,8 +5,10 @@ Created on Fri Aug 20 17:05:58 2021
 
 @author: mike_ubuntu
 """
-
+from typing import Union
 import numpy as np
+from sklearn.linear_model import LinearRegression
+
 from epde.structure import Term, Equation
 
 def float_convertable(obj):
@@ -83,3 +85,22 @@ def parse_params_str(param_str):
         params_parsed[temp[0]] = float(temp[1]) if '.' in temp[1] else int(temp[1])
     return params_parsed
     
+class Coeff_less_equation():
+    def __init__(self, lp_terms : Union[list, tuple], rp_term : Union[list, tuple], pool):
+        self.lp_terms_translated = [Term(pool, passed_term = [parse_factor(factor, pool) for factor in term]) for term in lp_terms]
+        self.rp_translated = Term(pool, passed_term = [parse_factor(factor, pool) for factor in rp_term])
+        
+        self.lp_values = np.vstack(list(map(lambda x: x.evaluate(False).reshape(-1), self.lp_terms_translated)))
+        self.rp_value = self.rp_translated.evaluate(False).reshape(-1)
+        lr = LinearRegression()
+        lr.fit(self.lp_values.T, self.rp_value)
+        print(lr.coef_, lr.intercept_, type(lr.coef_))
+        terms_aggregated = self.lp_terms_translated + [self.rp_translated,]
+        max_factors = max([len(term.structure) for term in terms_aggregated])
+        self.equation = Equation(pool = pool, basic_structure = terms_aggregated, 
+                            terms_number = len(lp_terms) + 1, max_factors_in_term = max_factors)
+        self.equation.target_idx = len(terms_aggregated) - 1
+        self.equation.weights_internal = np.append(lr.coef_, lr.intercept_)    
+        self.equation.weights_final = np.append(lr.coef_, lr.intercept_)
+
+        
