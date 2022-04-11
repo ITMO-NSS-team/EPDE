@@ -10,14 +10,14 @@ import numpy as np
 import epde.interface.interface as epde_alg
 
 from epde.interface.prepared_tokens import Custom_tokens, Trigonometric_tokens, Cache_stored_tokens
-from epde.evaluators import Custom_Evaluator
+from epde.evaluators import CustomEvaluator
 
 if __name__ == '__main__':
 
     t = np.linspace(0, 4*np.pi, 1000)
     u = np.load('/home/maslyaev/epde/EPDE/tests/system/Test_data/fill366.npy') # loading data with the solution of ODE
     # Trying to create population for mulit-objective optimization with only 
-    # derivatives as allowed tokens. Spoiler: only one equation structure will be 
+    # derivatives as allowed tokens. Here only one equation structure will be 
     # discovered, thus MOO algorithm will not be launched.
     
     dimensionality = t.ndim - 1
@@ -45,7 +45,7 @@ if __name__ == '__main__':
     Задаём объект для оценки значений токенов в эволюционном алгоритме. Аргументы - заданная выше функция/функции оценки значений 
     токенов и лист с названиями параметров. 
     '''
-    custom_trig_evaluator = Custom_Evaluator(custom_trigonometric_eval_fun, eval_fun_params_labels = ['freq', 'dim', 'power'])
+    custom_trig_evaluator = CustomEvaluator(custom_trigonometric_eval_fun, eval_fun_params_labels = ['freq', 'dim', 'power'])
     
     '''
     --------------------------------------------------------------------------------------------------------------------------------
@@ -91,7 +91,7 @@ if __name__ == '__main__':
     
     '''
     custom_inverse_eval_fun = lambda *grids, **kwargs: np.power(grids[int(kwargs['dim'])], - kwargs['power']) 
-    custom_inv_fun_evaluator = Custom_Evaluator(custom_inverse_eval_fun, eval_fun_params_labels = ['dim', 'power'], use_factors_grids = True)    
+    custom_inv_fun_evaluator = CustomEvaluator(custom_inverse_eval_fun, eval_fun_params_labels = ['dim', 'power'], use_factors_grids = True)    
 
     inv_fun_params_ranges = {'power' : (1, 2), 'dim' : (0, dimensionality)}
     
@@ -111,11 +111,9 @@ if __name__ == '__main__':
                                        token_tensors={'t' : t},
                                        params_ranges = {'power' : (1, 1)},
                                        params_equality_ranges = None)
-    
+
     epde_search_obj.set_moeadd_params(population_size=4)
-    # epde_search_obj.fit(data = u, boundary=boundary, equation_factors_max_number = 2, coordinate_tensors = [t,], 
-    #                     additional_tokens = [custom_trig_tokens, custom_grid_tokens], field_smooth = False, 
-    #                     memory_for_cache=5, data_fun_pow = 1, eq_sparsity_interval=(1e-4, 0.2))
+
     print('u.shape', u.shape, u.ndim)
     epde_search_obj.fit(data = u, max_deriv_order=(1,), boundary=(10,), equation_terms_max_number = 4,
                         equation_factors_max_number = 2, deriv_method='poly', eq_sparsity_interval = (1e-4, 0.4), #'smooth' : True, 'sigma' : 5
