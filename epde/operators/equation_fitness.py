@@ -9,6 +9,7 @@ Created on Fri Jun  4 13:20:59 2021
 import numpy as np
 import torch
 import time
+from typing import Union
 from copy import deepcopy
 
 import matplotlib.pyplot as plt
@@ -42,6 +43,13 @@ class L2_fitness(Compound_Operator):
         calculate the fitness function of the equation, that will be stored in the equation.fitness_value.    
         
     """
+    def __init__(self, param_keys : list = [], g_fun : Union[np.ndarray, type(None)] = None):
+        self.weak_deriv_appr = g_fun is not None
+        if self.weak_deriv_appr:
+            self.g_fun = g_fun.reshape(-1)
+            
+        super().__init__(param_keys = param_keys)
+        
     def apply(self, equation):
         """
         Calculate the fitness function values. The result is not returned, but stored in the equation.fitness_value attribute.
@@ -62,8 +70,12 @@ class L2_fitness(Compound_Operator):
         
         _, target, features = equation.evaluate(normalize = False, return_val = False)
         try:
-            rl_error = np.linalg.norm(np.dot(features, equation.weights_final[:-1]) + 
-                                  np.full(target.shape, equation.weights_final[-1]) - target, ord = 2)
+            discr = (np.dot(features, equation.weights_final[:-1]) + 
+                                  np.full(target.shape, equation.weights_final[-1]) - target)
+            if self.weak_deriv_appr:
+                print('Evaluating fitness with the weak derivatives approach')
+                discr = np.multiply(discr, self.g_fun)
+            rl_error = np.linalg.norm(discr, ord = 2)
 
         except ValueError:
             raise ValueError('An error in getting weights ')

@@ -235,7 +235,7 @@ def Preprocess_derivatives_ANN(field, grid, max_order, test_output = False,
         if loss_mean<min_loss:
             best_model=model
             min_loss=loss_mean
-        print('Surface trainig t={}, loss={}'.format(t,loss_mean))
+        print('Surface training t={}, loss={}'.format(t,loss_mean))
         t+=1
     
     approximation = best_model(grid_flattened).detach().numpy().reshape(original_shape)

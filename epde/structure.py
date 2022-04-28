@@ -184,7 +184,7 @@ class Term(Complex_Structure):
         if self.saved[structural] or (self.cache_label, normalize) in global_var.tensor_cache: #  
             value = global_var.tensor_cache.get(self.cache_label, normalized = normalize,
                                                 saved_as = self.saved_as[normalize]) 
-            value = value.reshape(value.size)
+            value = value.reshape(-1)
             return value
         else:
             self.prev_normalized = normalize
@@ -198,7 +198,7 @@ class Term(Complex_Structure):
             if np.all([len(factor.params) == 1 for factor in self.structure]):
                 self.saved[normalize] = global_var.tensor_cache.add(self.cache_label, value, normalized = normalize) # Место возможных проблем: сохранение/загрузка нормализованных данных
                 if self.saved[normalize]: self.saved_as[normalize] = self.cache_label
-            value = value.reshape(value.size)
+            value = value.reshape(-1)
             return value            
 
     def filter_tokens_by_right_part(self, reference_target, equation, equation_position):

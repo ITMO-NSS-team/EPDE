@@ -7,6 +7,7 @@ Created on Mon Jul  6 15:39:18 2020
 """
 
 import numpy as np
+import itertools
 
 import epde.globals as global_var
 from epde.factor import Factor
@@ -331,6 +332,32 @@ class TokenFamily(object):
             token_status = {label : (0, self.token_params['power'][1], False) 
                             for label in self.tokens}
         return len([token for token in self.tokens if token_status[token][0] < token_status[token][1]])    
+
+
+    def evaluate_all(self):
+        for token_label in self.tokens:
+            params_vals = []
+            for param_label, param_range in self.token_params.items():
+                if param_label != 'power' and isinstance(param_range[0], int):
+                    params_vals.append(np.arange(param_range[0], param_range[1] + 1))
+                elif param_label == 'power':
+                    params_vals.append([1,])
+                else:
+                    params_vals.append(np.random.uniform(param_range[0], param_range[1]))
+            params_sets = list(itertools.product(*params_vals))
+            for params_selection in params_sets:
+                params_sets_labeled = dict(zip(list(self.token_params.keys()), params_selection))
+
+                _, generated_token = self.create(token_label, **params_sets_labeled)
+                generated_token.use_cache()
+                if self.status['requires_grid']:
+                    generated_token.use_grids_cache()
+                generated_token.scaled = False
+                # _ = self._evaluator.apply(generated_token)
+                _ = generated_token.evaluate()
+                print(generated_token.cache_label)
+                if generated_token.cache_label not in global_var.tensor_cache.memory_default.keys():
+                    raise KeyError('Generated token somehow was not stored in cache.')
 
 
 class TF_Pool(object):

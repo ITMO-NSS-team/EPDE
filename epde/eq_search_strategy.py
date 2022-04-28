@@ -122,9 +122,7 @@ class Strategy_builder(Operator_builder):
 
 
 class Strategy_director(object):    
-    def __init__(self, stop_criterion, stop_criterion_kwargs): # baseline = True
-#        self._constructor = None
-#        if baseline:
+    def __init__(self, stop_criterion, stop_criterion_kwargs):
         self._constructor = Strategy_builder(stop_criterion, stop_criterion_kwargs)
     
     @property
@@ -174,13 +172,26 @@ class Strategy_director(object):
         eq_crossover.suboperators = {'Param_crossover' : param_crossover, 'Term_crossover' : term_crossover} 
         crossover.suboperators = {'Equation_crossover' : eq_crossover}
         
-        lasso_coeffs = LASSO_sparsity(['sparsity'])
+        # def baseline_exp_function(grids):
+        #     def func_val(grid):
+        #         return np.exp( - (grids - np.mean(grids))**2).reshape((-1, 1))
+        #     return np.hstack([func_val(grid) for grid in grids])
+        
+        def baseline_exp_function(grids):
+            exponent_partial = np.array([-(grid - np.mean(grid))**2 for grid in grids])
+            exponent = np.add.reduce(exponent_partial, axis = 0)
+            return (exponent - np.min(exponent)) / np.std(exponent) 
+        
+        weak_deriv_fun = (baseline_exp_function(global_var.grid_cache.get_all()[0]) if not 'weak_deriv_fun' 
+                          in kwargs.keys() else kwargs['weak_deriv_fun'])
+        
+        lasso_coeffs = LASSO_sparsity(['sparsity'], weak_deriv_fun)
         linreg_coeffs = LinReg_based_coeffs()
         
         lasso_coeffs.params = {'sparsity' : 1} if not 'lasso_coeffs_params' in kwargs.keys() else kwargs['lasso_coeffs_params']
         linreg_coeffs.params = {} if not 'linreg_coeffs_params' in kwargs.keys() else kwargs['linreg_coeffs_params']
 
-        fitness_eval = L2_fitness(['penalty_coeff'])
+        fitness_eval = L2_fitness(['penalty_coeff'], weak_deriv_fun)
         fitness_eval.suboperators = {'sparsity' : lasso_coeffs, 'coeff_calc' : linreg_coeffs}
         fitness_eval.params = {'penalty_coeff' : 0.5} if not 'fitness_eval_params' in kwargs.keys() else kwargs['fitness_eval_params']
         
