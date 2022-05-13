@@ -7,6 +7,7 @@ Created on Mon Jul  6 15:39:18 2020
 """
 
 import numpy as np
+import itertools
 
 import epde.globals as global_var
 from epde.factor import Factor
@@ -96,7 +97,9 @@ class TokenFamily(object):
         
     Methods:
     -----------
-    set_status(mandatory = False, unique_specific_token = False, unique_token_type = False)
+    set_status(demands_equation = False, meaningful = False, 
+               s_and_d_merged = True, unique_specific_token = False, 
+               unique_token_type = False, requires_grid = False))
         Method to set the markers of the token status;
         
     set_params(tokens, token_params)
@@ -127,9 +130,9 @@ class TokenFamily(object):
         self.family_of_derivs = family_of_derivs
         self.evaluator_set = False; self.params_set = False; self.cache_set = False
         
-    def set_status(self, meaningful = False, s_and_d_merged = True, 
-                   unique_specific_token = False, unique_token_type = False, 
-                   requires_grid = False):
+    def set_status(self, demands_equation = False, meaningful = False, 
+                   s_and_d_merged = True, unique_specific_token = False, 
+                   unique_token_type = False, requires_grid = False):
         """
         Set the status of the elements of the token family; 
         
@@ -145,6 +148,7 @@ class TokenFamily(object):
             if True, a specific token can be present only once per term;
         """
         self.status = {}
+        self.status['demands_equation'] = demands_equation
         self.status['meaningful'] = meaningful
         self.status['structural_and_defalut_merged'] = s_and_d_merged
         self.status['unique_specific_token'] = unique_specific_token
@@ -333,6 +337,32 @@ class TokenFamily(object):
         return len([token for token in self.tokens if token_status[token][0] < token_status[token][1]])    
 
 
+    def evaluate_all(self):
+        for token_label in self.tokens:
+            params_vals = []
+            for param_label, param_range in self.token_params.items():
+                if param_label != 'power' and isinstance(param_range[0], int):
+                    params_vals.append(np.arange(param_range[0], param_range[1] + 1))
+                elif param_label == 'power':
+                    params_vals.append([1,])
+                else:
+                    params_vals.append(np.random.uniform(param_range[0], param_range[1]))
+            params_sets = list(itertools.product(*params_vals))
+            for params_selection in params_sets:
+                params_sets_labeled = dict(zip(list(self.token_params.keys()), params_selection))
+
+                _, generated_token = self.create(token_label, **params_sets_labeled)
+                generated_token.use_cache()
+                if self.status['requires_grid']:
+                    generated_token.use_grids_cache()
+                generated_token.scaled = False
+                # _ = self._evaluator.apply(generated_token)
+                _ = generated_token.evaluate()
+                print(generated_token.cache_label)
+                if generated_token.cache_label not in global_var.tensor_cache.memory_default.keys():
+                    raise KeyError('Generated token somehow was not stored in cache.')
+
+
 class TF_Pool(object):
     '''
     
@@ -343,6 +373,10 @@ class TF_Pool(object):
     @property
     def families_meaningful(self):
         return [family for family in self.families if family.status['meaningful']]
+
+    @property
+    def families_demand_equation(self):
+        return [family for family in self.families if family.status['demands_equation']]
 
     @property
     def families_supplementary(self):

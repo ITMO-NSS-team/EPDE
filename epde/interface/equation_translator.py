@@ -84,7 +84,7 @@ def parse_params_str(param_str):
         temp[0] = temp[0].replace(' ', '')
         params_parsed[temp[0]] = float(temp[1]) if '.' in temp[1] else int(temp[1])
     return params_parsed
-    
+
 class Coeff_less_equation():
     def __init__(self, lp_terms : Union[list, tuple], rp_term : Union[list, tuple], pool):
         self.lp_terms_translated = [Term(pool, passed_term = [parse_factor(factor, pool) for factor in term]) for term in lp_terms]
@@ -97,10 +97,8 @@ class Coeff_less_equation():
         print(lr.coef_, lr.intercept_, type(lr.coef_))
         terms_aggregated = self.lp_terms_translated + [self.rp_translated,]
         max_factors = max([len(term.structure) for term in terms_aggregated])
-        self.equation = Equation(pool = pool, basic_structure = terms_aggregated, 
+        self.equation = Equation(pool = pool, basic_structure = terms_aggregated,
                             terms_number = len(lp_terms) + 1, max_factors_in_term = max_factors)
         self.equation.target_idx = len(terms_aggregated) - 1
-        self.equation.weights_internal = np.append(lr.coef_, lr.intercept_)    
+        self.equation.weights_internal = np.append(lr.coef_, lr.intercept_)
         self.equation.weights_final = np.append(lr.coef_, lr.intercept_)
-
-        

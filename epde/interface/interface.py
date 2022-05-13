@@ -324,8 +324,9 @@ class epde_search(object):
             set_grids = False; set_grids_among_tokens = False
             
             entry_token_family = TokenFamily(entry.var_name, family_of_derivs = True)
-            entry_token_family.set_status(unique_specific_token=False, unique_token_type=False, 
-                                 s_and_d_merged = False, meaningful = True)     
+            entry_token_family.set_status(demands_equation=True, unique_specific_token=False, 
+                                          unique_token_type=False, s_and_d_merged = False, 
+                                          meaningful = True)     
             entry_token_family.set_params(entry.names, OrderedDict([('power', (1, data_fun_pow))]),
                                           {'power' : 0}, entry.d_orders)
             entry_token_family.set_evaluator(simple_function_evaluator, [])
@@ -346,6 +347,8 @@ class epde_search(object):
         self.pool = TF_Pool(data_tokens + [tf if isinstance(tf, TokenFamily) else tf.token_family 
                                       for tf in additional_tokens])
         print(f'The cardinality of defined token pool is {self.pool.families_cardinality()}')
+        print(f'Among them, the pool contains {self.pool.families_cardinality(meaningful_only = True)}')
+        
     
     def fit(self, data : Union[np.ndarray, list, tuple], time_axis : int = 0, boundary : int = 0, 
             equation_terms_max_number = 6, equation_factors_max_number = 1, variable_names = ['u',], 
@@ -447,7 +450,7 @@ class epde_search(object):
                                                                   operators.gaussian_mutation)
         self.optimizer.set_evolutionary(operator=evo_operator)        
         best_obj = np.concatenate((np.ones([1,]),
-                                  np.zeros(shape=len([1 for token_family in self.pool.families if token_family.status['meaningful']]))))  
+                                  np.zeros(shape=len([1 for token_family in self.pool.families if token_family.status['demands_equation']]))))  
         self.optimizer.pass_best_objectives(*best_obj)
         self.optimizer.optimize(**self.moeadd_optimization_params)
 

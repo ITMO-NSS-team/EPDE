@@ -24,7 +24,7 @@ class Systems_population_constructor(object):
         self.pool = pool; self.terms_number = terms_number
         self.eq_search_evo = eq_search_evo
         self.max_factors_in_term = max_factors_in_term; #self.eq_search_iters = eq_search_iters
-        self.equation_number = len(self.pool.families_meaningful)
+        self.equation_number = len(self.pool.families_demand_equation)
         self.sparsity_interval = sparsity_interval
 #        print(self.equation_number)
 #        raise NotImplementedError
