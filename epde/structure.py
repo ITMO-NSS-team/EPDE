@@ -276,6 +276,8 @@ class Term(Complex_Structure):
         
         deriv_orders = []
         deriv_powers = []
+        derivs_detected = False
+        
         try:
             coeff_tensor = np.ones_like(global_var.grid_cache.get('0'))
         except KeyError:
@@ -285,8 +287,11 @@ class Term(Complex_Structure):
                 for param_idx, param_descr in factor.params_description.items():
                     if param_descr['name'] == 'power': power_param_idx = param_idx
                 deriv_orders.append(factor.deriv_code); deriv_powers.append(factor.params[power_param_idx])
+                derivs_detected = True
             else:
                 coeff_tensor = coeff_tensor * factor.evaluate()
+        if not derivs_detected:
+           deriv_powers = 0; deriv_orders = [None]
         if len(deriv_powers) == 1:
             deriv_powers = deriv_powers[0]
             deriv_orders = deriv_orders[0]
