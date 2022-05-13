@@ -162,7 +162,7 @@ class Strategy_director(object):
         param_crossover = Param_crossover(['proportion'])
         term_crossover = Term_crossover(['crossover_probability'])
         eq_crossover = Equation_crossover()
-        crossover = PopLevel_crossover()        
+        crossover = PopLevel_crossover()
 
         param_crossover.params = {'proportion' : 0.4} if not 'param_crossover_params' in kwargs.keys() else kwargs['param_crossover_params']
         term_crossover.params = {'crossover_probability' : 0.3} if not 'term_crossover_params' in kwargs.keys() else kwargs['term_crossover_params']
@@ -172,17 +172,19 @@ class Strategy_director(object):
         eq_crossover.suboperators = {'Param_crossover' : param_crossover, 'Term_crossover' : term_crossover} 
         crossover.suboperators = {'Equation_crossover' : eq_crossover}
         
-        # def baseline_exp_function(grids):
-        #     def func_val(grid):
-        #         return np.exp( - (grids - np.mean(grids))**2).reshape((-1, 1))
-        #     return np.hstack([func_val(grid) for grid in grids])
+        grids = global_var.grid_cache.get_all()
+        # print(global_var.grid_cache.memory_default.keys())
+        # print(grids, len(grids), type(grids[0]))
         
         def baseline_exp_function(grids):
             exponent_partial = np.array([-(grid - np.mean(grid))**2 for grid in grids])
             exponent = np.add.reduce(exponent_partial, axis = 0)
             return (exponent - np.min(exponent)) / np.std(exponent) 
         
-        weak_deriv_fun = (baseline_exp_function(global_var.grid_cache.get_all()[0]) if not 'weak_deriv_fun' 
+        def apply_baseline_exp_function():
+            return baseline_exp_function(global_var.grid_cache.get_all()[1])
+            
+        weak_deriv_fun = (apply_baseline_exp_function if not 'weak_deriv_fun' 
                           in kwargs.keys() else kwargs['weak_deriv_fun'])
         
         lasso_coeffs = LASSO_sparsity(['sparsity'], weak_deriv_fun)

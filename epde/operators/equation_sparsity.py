@@ -6,7 +6,7 @@ Created on Fri Jun  4 13:35:18 2021
 @author: mike_ubuntu
 """
 
-from typing import Union
+from typing import Union, Callable
 import numpy as np
 from sklearn.linear_model import Lasso
 
@@ -39,10 +39,11 @@ class LASSO_sparsity(Compound_Operator):
         calculate the coefficients of the equation, that will be stored in the equation.weights np.ndarray.    
         
     """
-    def __init__(self, param_keys : list = [], g_fun : Union[np.ndarray, type(None)] = None):
+    def __init__(self, param_keys : list = [], g_fun : Union[Callable, type(None)] = None):
         self.weak_deriv_appr = g_fun is not None
         if self.weak_deriv_appr:
-            self.g_fun = g_fun.reshape(-1)
+            self.g_fun = g_fun
+            self.g_fun_vals = None            
             
         super().__init__(param_keys = param_keys)
     
@@ -63,18 +64,19 @@ class LASSO_sparsity(Compound_Operator):
         ------------
         None
         """
-        print('Using sparsity.')
+
         estimator = Lasso(alpha = self.params['sparsity'], copy_X=True, fit_intercept=True, max_iter=1000,
                           normalize=False, positive=False, precompute=False, random_state=None,
                           selection='cyclic', tol=0.0001, warm_start=False)
         _, target, features = equation.evaluate(normalize = True, return_val = False)
         if self.weak_deriv_appr:
-            print('Using sparsity with the weak derivatives approach')
-            
-            target = np.multiply(target, self.g_fun)
-            
-            g_fun_casted = np.broadcast_to(self.g_fun, features.shape)
-            features = np.multiply(target, g_fun_casted)
+            # print('Using sparsity with the weak derivatives approach')
+            if self.g_fun_vals is None:
+                self.g_fun_vals = self.g_fun().reshape(-1)
+            target = np.multiply(target, self.g_fun_vals)
+            g_fun_casted = np.broadcast_to(self.g_fun_vals, features.T.shape).T
+            # print('g_fun_casted details:', g_fun_casted.min(), g_fun_casted.max())
+            features = np.multiply(features, g_fun_casted)
         else:
             print('Using sparsity without the weak derivatives approach')
         estimator.fit(features, target)

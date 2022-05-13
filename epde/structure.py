@@ -718,11 +718,10 @@ def solver_formed_grid():
 
 
 class SoEq(Complex_Structure, moeadd.moeadd_solution):
-    # __slots__ = ['tokens_indep', 'tokens_dep', 'equation_number']
     def __init__(self, pool, terms_number, max_factors_in_term, sparsity = None, eq_search_iters = 100):
-        self.tokens_indep = TF_Pool(pool.families_meaningful) #[family for family in token_families if family.status['meaningful']]
-        self.tokens_dep = TF_Pool(pool.families_supplementary) #[family for family in token_families if not family.status['meaningful']]
-        self.equation_number = np.size(self.tokens_indep.families_cardinality())
+        self.tokens_indep = TF_Pool(pool.families_meaningful)
+        self.tokens_dep = TF_Pool(pool.families_supplementary)
+        self.equation_number = len(pool.families_demand_equation)
         
         if sparsity is not None: self.vals = sparsity 
         self.max_terms_number = terms_number; self.max_factors_in_term = max_factors_in_term
@@ -748,19 +747,12 @@ class SoEq(Complex_Structure, moeadd.moeadd_solution):
         '''
         assert callable(obj_funs) or all([callable(fun) for fun in obj_funs])
         self.obj_funs = obj_funs
-#        import time
-#        print(len(self.obj_funs))
-#        time.sleep(10)
-    
+
     def set_eq_search_evolutionary(self, evolutionary):
-#        raise NotImplementedError('In current version, the evolutionary operatorshall be taken from global variables')
-#        assert type(evolutionary.coeff_calculator) != type(None), 'Defined evolutionary operator lacks coefficient calculator'
         self.eq_search_evolutionary_strategy = evolutionary
         self.eq_search_operator_set = True
         
     def create_equations(self, population_size = 16, sparsity = None, eq_search_iters = None, EA_kwargs = dict()):
-#        if type(eq_search_iters) == type(None) and type(self.def_eq_search_iters) == type(None):
-#            raise ValueError('Number of iterations is not defied both in method parameter or in object attribute')
         assert self.eq_search_operator_set
         
         if eq_search_iters is None: eq_search_iters = self.def_eq_search_iters
@@ -770,8 +762,8 @@ class SoEq(Complex_Structure, moeadd.moeadd_solution):
             self.vals = sparsity
 
         self.population_size = population_size
-        self.eq_search_evolutionary_strategy.modify_block_params(block_label = 'truncation', 
-                                                                 param_label = 'population_size', 
+        self.eq_search_evolutionary_strategy.modify_block_params(block_label = 'truncation',
+                                                                 param_label = 'population_size',
                                                                  value = population_size)
         
         self.structure = []; self.eq_search_iters = eq_search_iters

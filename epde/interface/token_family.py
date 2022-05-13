@@ -97,7 +97,9 @@ class TokenFamily(object):
         
     Methods:
     -----------
-    set_status(mandatory = False, unique_specific_token = False, unique_token_type = False)
+    set_status(demands_equation = False, meaningful = False, 
+               s_and_d_merged = True, unique_specific_token = False, 
+               unique_token_type = False, requires_grid = False))
         Method to set the markers of the token status;
         
     set_params(tokens, token_params)
@@ -128,9 +130,9 @@ class TokenFamily(object):
         self.family_of_derivs = family_of_derivs
         self.evaluator_set = False; self.params_set = False; self.cache_set = False
         
-    def set_status(self, meaningful = False, s_and_d_merged = True, 
-                   unique_specific_token = False, unique_token_type = False, 
-                   requires_grid = False):
+    def set_status(self, demands_equation = False, meaningful = False, 
+                   s_and_d_merged = True, unique_specific_token = False, 
+                   unique_token_type = False, requires_grid = False):
         """
         Set the status of the elements of the token family; 
         
@@ -146,6 +148,7 @@ class TokenFamily(object):
             if True, a specific token can be present only once per term;
         """
         self.status = {}
+        self.status['demands_equation'] = demands_equation
         self.status['meaningful'] = meaningful
         self.status['structural_and_defalut_merged'] = s_and_d_merged
         self.status['unique_specific_token'] = unique_specific_token
@@ -370,6 +373,10 @@ class TF_Pool(object):
     @property
     def families_meaningful(self):
         return [family for family in self.families if family.status['meaningful']]
+
+    @property
+    def families_demand_equation(self):
+        return [family for family in self.families if family.status['demands_equation']]
 
     @property
     def families_supplementary(self):

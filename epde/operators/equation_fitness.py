@@ -46,7 +46,8 @@ class L2_fitness(Compound_Operator):
     def __init__(self, param_keys : list = [], g_fun : Union[np.ndarray, type(None)] = None):
         self.weak_deriv_appr = g_fun is not None
         if self.weak_deriv_appr:
-            self.g_fun = g_fun.reshape(-1)
+            self.g_fun = g_fun
+            self.g_fun_vals = None
             
         super().__init__(param_keys = param_keys)
         
@@ -73,8 +74,10 @@ class L2_fitness(Compound_Operator):
             discr = (np.dot(features, equation.weights_final[:-1]) + 
                                   np.full(target.shape, equation.weights_final[-1]) - target)
             if self.weak_deriv_appr:
-                print('Evaluating fitness with the weak derivatives approach')
-                discr = np.multiply(discr, self.g_fun)
+                # print('Evaluating fitness with the weak derivatives approach')
+                if self.g_fun_vals is None:
+                    self.g_fun_vals = self.g_fun()
+                discr = np.multiply(discr, self.g_fun_vals)
             rl_error = np.linalg.norm(discr, ord = 2)
 
         except ValueError:
