@@ -291,7 +291,7 @@ class Term(Complex_Structure):
             else:
                 coeff_tensor = coeff_tensor * factor.evaluate()
         if not derivs_detected:
-           deriv_powers = 0; deriv_orders = [None]
+           deriv_powers = [0]; deriv_orders = [[None,],]
         if len(deriv_powers) == 1:
             deriv_powers = deriv_powers[0]
             deriv_orders = deriv_orders[0]
