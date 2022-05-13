@@ -14,7 +14,7 @@ import pathlib
 here = pathlib.Path(__file__).parent.resolve()
 
 # Get the long description from the README file
-long_description = ''#(here / 'README.rst').read_text(encoding='utf-8')
+long_description = ' '#(here / 'README.rst').read_text(encoding='utf-8')
 
 
 def read(*names, **kwargs):
