@@ -7,7 +7,7 @@ Created on Wed May 26 13:36:47 2021
 """
 
 from setuptools import setup, find_packages
-from os.path import dirname, join
+import os
 from pathlib import Path
 import pathlib
 
@@ -20,7 +20,7 @@ LONG_DESCRIPTION = (Path(os.path.join(HERE, "README.rst"))).read_text()
 
 def read(*names, **kwargs):
     with open(
-            join(dirname(__file__), *names),
+            os.path.join(os.path.dirname(__file__), *names),
             encoding=kwargs.get('encoding', 'utf8')
     ) as fh:
         return fh.read()
