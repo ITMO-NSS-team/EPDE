@@ -47,8 +47,7 @@ Citations
   journal={Journal of Computational Science},
   pages={101345},
   year={2021},
-  publisher={Elsevier}
-}
+  publisher={Elsevier}}
 
 
 @article{maslyaev2019discovery,
@@ -58,5 +57,6 @@ Citations
   volume={156},
   pages={367--376},
   year={2019},
-  publisher={Elsevier}
-}
+  publisher={Elsevier}}
+
+
