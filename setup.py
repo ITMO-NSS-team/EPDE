@@ -11,10 +11,11 @@ from os.path import dirname, join
 from pathlib import Path
 import pathlib
 
-here = pathlib.Path(__file__).parent.resolve()
+HERE = os.path.abspath(os.path.dirname(__file__))
 
 # Get the long description from the README file
-long_description = ' '#(here / 'README.rst').read_text(encoding='utf-8')
+SHORT_DESCRIPTION = 'Framework for automated ordinary/partial differential equation discovery'
+LONG_DESCRIPTION = (Path(os.path.join(HERE, "README.rst"))).read_text()
 
 
 def read(*names, **kwargs):
@@ -39,6 +40,9 @@ setup(
       description = 'EPDE package',
       author = 'Mikhail Maslyaev',
       author_email = 'miklemas@list.ru',
+      description=SHORT_DESCRIPTION,
+      long_description=LONG_DESCRIPTION,
+      long_description_content_type="text/x-rst",
       classifiers = [      
               'Development Status :: 3 - Alpha',
               'Programming Language :: Python :: 3',
