@@ -554,8 +554,8 @@ class Linked_Blocks(object):
 class Evolutionary_strategy(object):
     '''
 
-    Class, containing the evolutionary strategyfor evolutionary algorithm of equation 
-    discovery: the 
+    Class, containing the evolutionary strategy for evolutionary algorithm of equation 
+    discovery.
     
     '''
     def __init__(self, stop_criterion, sc_init_kwargs):
@@ -643,12 +643,3 @@ class Evolutionary_strategy(object):
             else:
                 raise TypeError('Incorrect type of suboperator sequence. Need str or list/tuple of str')
             temp.params[param_label] = value
-
-        
-    def get_fitness(self, solution, return_res = False):
-        raise NotImplementedError
-        if not 'fitness' in self.linked_blocks.blocks_labeled.keys():
-            raise KeyError('Required evolutionary operator of fitness calculation is missing, or incorrectly labeled')
-        self.linked_blocks.blocks_labeled['fitness']._operator.apply(solution)
-        if return_res:
-            return solution.fitness_value

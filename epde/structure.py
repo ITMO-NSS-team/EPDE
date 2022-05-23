@@ -6,13 +6,11 @@ Created on Mon Jan 11 16:22:17 2021
 @author: mike_ubuntu
 """
 
+from typing import Union
 import numpy as np
-from functools import reduce
+from functools import reduce, singledispatchmethod
 import copy
 import gc
-import time
-import datetime
-import pickle
 import warnings
 
 import epde.globals as global_var
@@ -70,7 +68,7 @@ class Complex_Structure(object):
             return self.structure[0].evaluate(structural)
         else:
             return reduce(lambda x, y: self.interelement_operator(x, y.evaluate(structural)),
-                          self.structure[1:], self.structure[0].evaluate(structural))        
+                          self.structure[1:], self.structure[0].evaluate(structural))
 
     def reset_saved_state(self):
         self.saved = {True:False, False:False}
@@ -117,28 +115,37 @@ class Term(Complex_Structure):
             if not self.structure[idx].cache_linked:
                 self.structure[idx].use_cache()
 
+    @singledispatchmethod
     def defined(self, passed_term):
+        raise NotImplementedError(f'passed term should have string or list/dict types, not {type(passed_term)}')
+
+    @defined.register
+    def defined(self, passed_term : Union[list, tuple]):
         self.structure = []
         print('passed_term:', passed_term)
 
-        if isinstance(passed_term, (list, tuple)): #type(passed_term) == list or type(passed_term) == tuple:
-            for i, factor in enumerate(passed_term):
-                if isinstance(factor, str):
-                    _, temp_f = self.pool.create(label = factor)
-                    self.structure.append(temp_f)#; raise NotImplementedError
-                elif isinstance(factor, Factor):
-                    self.structure.append(factor)
-                else:
-                    raise ValueError('The structure of a term should be declared with str or factor.Factor obj, instead got', type(factor))
-        else:   # Случай, если подается лишь 1 токен
-            if isinstance(passed_term, str):
-                _, temp_f = self.pool.create(label = passed_term)
+        for _, factor in enumerate(passed_term):
+            if isinstance(factor, str):
+                _, temp_f = self.pool.create(label = factor)
                 self.structure.append(temp_f)#; raise NotImplementedError
-            elif isinstance(passed_term, Factor):
-                self.structure.append(passed_term)
+            elif isinstance(factor, Factor):
+                self.structure.append(factor)
             else:
-                raise ValueError('The structure of a term should be declared with str or factor.Factor obj, instead got', type(passed_term))
-                
+                raise ValueError('The structure of a term should be declared with str or factor.Factor obj, instead got', type(factor))
+
+    @defined.register
+    def defined(self, passed_term : str):
+        self.structure = []
+        print('passed_term:', passed_term)
+        if isinstance(passed_term, str):
+            _, temp_f = self.pool.create(label = passed_term)
+            self.structure.append(temp_f)#; raise NotImplementedError
+        elif isinstance(passed_term, Factor):
+            self.structure.append(passed_term)
+        else:
+            raise ValueError('The structure of a term should be declared with str or factor.Factor obj, instead got', type(passed_term))
+
+
     def randomize(self, forbidden_factors = None, **kwargs):
         if np.sum(self.pool.families_cardinality(meaningful_only = True)) == 0:
             raise ValueError('No token families are declared as meaningful for the process of the system search')

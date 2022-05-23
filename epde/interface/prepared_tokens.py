@@ -14,6 +14,7 @@ import time
 import epde.globals as global_var
 from epde.interface.token_family import TokenFamily
 from epde.evaluators import CustomEvaluator, EvaluatorTemplate, trigonometric_evaluator, simple_function_evaluator 
+from epde.evaluators import velocity_heating_eval_fun, vhef_grad
 from epde.cache.cache import upload_simple_tokens, np_ndarray_section
 
 class Prepared_tokens(ABC):
@@ -90,3 +91,19 @@ class Cache_stored_tokens(Custom_tokens):
                          params_ranges = params_ranges, params_equality_ranges = params_equality_ranges, 
                          dimensionality = dimensionality, unique_specific_token = unique_specific_token, 
                          unique_token_type = unique_token_type, meaningful = meaningful)
+
+class Velocity_HEQ_tokens(Prepared_tokens):
+    def __init__(self, param_ranges):
+        assert len(param_ranges) == 15
+        self._token_family = TokenFamily(token_type='velocity_assuption')
+        self._token_family.set_status(unique_specific_token=True, unique_token_type=True, 
+                           meaningful = False)
+        
+        opt_params = [('p' + str(idx), p_range) for idx, p_range in enumerate(param_ranges)]
+        token_params = OrderedDict([('power', (1, 1)),] + opt_params)
+
+        p_equality_fraction = 0.05 # fraction of allowed frequency interval, that is considered as the same
+        opt_params_equality = {'p' + str(idx) : (p_range[1] - p_range[0]) / p_equality_fraction for idx, p_range in enumerate(param_ranges)}
+        equal_params = {'power' : 0} + opt_params_equality
+        self._token_family.set_params(['v'], token_params, equal_params)
+        self._token_family.set_evaluator(velocity_heating_eval_fun, vhef_grad, [])

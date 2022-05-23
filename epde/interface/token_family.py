@@ -39,11 +39,12 @@ class EvaluatorContained(object):
     apply(token, token_params)
         apply the defined evaluator to evaluate the token with specific parameters
     """
-    def __init__(self, eval_function, eval_kwargs_keys):
+    def __init__(self, eval_function, deriv_eval_function = None, eval_kwargs_keys = {}):
         self._evaluator = eval_function
+        if deriv_eval_function is not None: self._deriv_evaluator = deriv_eval_function
         self.eval_kwargs_keys = eval_kwargs_keys
         
-    def apply(self, token, structural = False, **kwargs):
+    def apply(self, token, structural = False, deriv = False, **kwargs):
         """
         Apply the defined evaluator to evaluate the token with specific parameters.
         
@@ -63,7 +64,10 @@ class EvaluatorContained(object):
         
         """
         assert list(kwargs.keys()) == self.eval_kwargs_keys
-        return self._evaluator(token, structural, **kwargs)
+        if deriv:
+            return self._deriv_evaluator(token, False, **kwargs)    
+        else:
+            return self._evaluator(token, structural, **kwargs)
             
 
 class TokenFamily(object):
@@ -127,7 +131,8 @@ class TokenFamily(object):
         self.type = token_type
         self.family_of_derivs = family_of_derivs
         self.evaluator_set = False; self.params_set = False; self.cache_set = False
-        
+        self.deriv_evaluator_set = True    
+
     def set_status(self, meaningful = False, s_and_d_merged = True, 
                    unique_specific_token = False, unique_token_type = False, 
                    requires_grid = False):
@@ -246,7 +251,33 @@ class TokenFamily(object):
         if self.params_set and not suppress_eval_test :
             self.test_evaluator()
 
-    def test_evaluator(self):
+    def set_deriv_evaluator(self, eval_functions, eval_kwargs_keys = [], suppress_eval_test = True):
+        """
+        Define the evaluator for the derivatives of the token family and its parameters
+        
+        Parameters:
+        ------------
+        eval_functions : dict of function or EvaluatorContained object
+            Dict containing the derivatives by each of the token parameter, where elements are the functions, used in the evaluator, or the evaluators.
+            Keys represent the parameter name, and values are the corresponding functions.
+            
+        **eval_params : keyword arguments
+            The parameters for evaluator; must contain params_names (names of the token parameters) &
+            param_equality (for each of the token parameters, range in which it considered as the same),         
+        """
+        self._deriv_evaluators = {}
+        for param_key, eval_function in eval_functions.items():
+            if isinstance(eval_function, EvaluatorContained):
+                _deriv_evaluator = eval_function
+            else:
+                _deriv_evaluator = EvaluatorContained(eval_function, eval_kwargs_keys)
+            self._deriv_evaluators[param_key] = _deriv_evaluator
+        self.opt_param_labels = eval_functions.keys()
+        self.deriv_evaluator_set = True
+        if self.params_set and not suppress_eval_test :
+            self.test_evaluator(deriv = True)
+
+    def test_evaluator(self, deriv = False):
         """
         Method to test, if the evaluator and tokens are set properly
         
@@ -258,7 +289,11 @@ class TokenFamily(object):
             self.test_token.use_grids_cache()
         print(self.test_token.grid_idx, self.test_token.params)
         self.test_token.scaled = False
-        self.test_evaluation = self._evaluator.apply(self.test_token)
+        if deriv:
+            for _deriv_evaluator in self._deriv_evaluators.values():
+                self.test_evaluation = _deriv_evaluator.apply(self.test_token)
+        else:
+            self.test_evaluation = self._evaluator.apply(self.test_token)
         print('Test evaluation performed correctly')
 
     def chech_constancy(self, test_function, **tfkwargs):
@@ -390,7 +425,7 @@ class TF_Pool(object):
             return np.array([family.cardinality(token_status) for family in self.families])
         
     def create(self, label = None, create_meaningful : bool = False, 
-                      token_status = None, **kwargs) -> (str, Factor):
+                      token_status = None, **kwargs) -> Union[str, Factor]:
         if label is None:
             if create_meaningful:
                 if np.sum(self.families_cardinality(True, token_status)) == 0:
@@ -427,3 +462,10 @@ class TF_Pool(object):
                                                                              
     def __add__(self, other):
         return TF_Pool(families = self.families + other.families)
+
+    def get_families_by_label(self, label):
+        containing_families = [family for family in self.families 
+                               if label in family.tokens]
+        if len(containing_families) > 1:
+            raise ValueError('More than one families contain the same tokens.')
+        raise containing_families[0]

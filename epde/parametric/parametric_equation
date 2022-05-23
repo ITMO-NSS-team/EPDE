@@ -1,0 +1,102 @@
+import numpy as np
+import scipy.optimize as optimize
+
+from copy import deepcopy
+from collections import OrderedDict
+from typing import Union
+from functools import reduce, singledispatchmethod
+
+from epde.structure import Equation
+
+class ParametricEquation(object):
+    def __init__(self, pool, terms : Union[list, tuple], right_part_index : int = -1):
+        self.pool = pool
+        self.terms = terms
+
+        self.total_params_count = [term.opt_params_num for term in self.terms]
+        total_count = 0; self.param_term_beloning = {}
+        for term_idx, term_params_num in enumerate(self.total_params_count):
+            for _ in range(term_params_num):
+                self.param_term_beloning[total_count] = term_idx
+                total_count += 1
+
+        self.rpi = right_part_index
+        self._optimization_held = False
+
+    def optimize_equations(self, initial_params = None):
+        def opt_func(params, *variables):
+            '''
+
+            Into the params the parametric tokens (or better their parameters) shall be passed,
+            the variables: variables[0] - the object, containing parametric equation.  
+            
+            '''
+            return np.linalg.norm(variables[0].evaluate_with_params(params))
+
+        def opt_fun_grad(params, *variables):
+            grad = np.zeros_like(params)
+            for param_idx, _ in enumerate(grad):
+                
+                grad = 2 * variables[0].evaluate_with_params(params) * \
+                       variables[0].get_term_for_param(param_idx).eval_grad(param_idx)
+        
+        if initial_params is None:
+            initial_params = np.zeros(np.sum(self.total_params_count))
+
+        optimizational_copy = deepcopy(self)
+        optimal_params = optimize.fmin_cg(opt_func, x0 = initial_params, fprome = opt_fun_grad, 
+                                          args = (optimizational_copy,))
+        self.set_term_params(optimal_params)
+        self._optimization_held = True  
+
+    def parse_eq_terms(self):
+        weights = []; equation_term = []
+        for idx, term in enumerate(self.terms):
+            weights[idx], equivalent_term = term.equivalent_common_term()
+            equation_term.append(equivalent_term)
+        return weights, equation_term
+
+    def parse_opt_params(self, params):
+        params_parsed = OrderedDict()
+        cur_idx = 0
+        for term in self.terms:
+            params_parsed[hash(term)] = term.parse_opt_params(params[cur_idx, cur_idx + term.params_num])
+            cur_idx += term.params_num
+        return params_parsed
+
+    def set_term_params(self, params):
+        params_parsed = self.parse_opt_params(params)
+        for term in self.terms:
+            term.set_params(params_parsed[hash(term)])
+
+    def evaluate_with_params(self, params):
+        self.set_term_params(params)
+        return np.add.reduce([term.evaluate() for term_idx, term in enumerate(self.terms) if term_idx != self.rpi]) - self.terms[self.rpi].evaluate()
+
+    @property
+    def equation(self):
+        if self._optimization_held:
+            return self._equation
+        else:
+            raise AttributeError('Equation terms have not been initialized before calling.')  
+
+    def set_equation(self, rpi : int = -1):
+        weights, terms = self.parse_eq_terms()
+        self.equation = Equation(pool = self.pool, basic_structure = terms, terms_number = len(self.terms),
+                                 max_factors_in_term = max([len(term.structure) for term in self.terms]))
+        self.equation.target_idx = rpi if rpi >= 0 else len(self.equation.structure) - 1  
+        self.equation.weights_internal = weights
+        self.equation.weights_final = weights
+
+    @singledispatchmethod
+    def get_term_for_param(self, param):
+        raise NotImplementedError('The term must be called by parameter index or label')
+
+    @get_term_for_param.register
+    def _(self, param : str):
+        term_index = [idx for idx, term in enumerate(self.terms) if param in term][0]
+        return self.terms[term_index]
+
+    @get_term_for_param.register
+    def _(self, param : int):
+        return self.terms[self.param_term_beloning[param]]

@@ -26,7 +26,6 @@ class Factor(TerminalToken):
         self.status = status
         self.grid_set = False
         
-        
         self.is_deriv = not (deriv_code is None)
         self.deriv_code = deriv_code
         
@@ -53,8 +52,6 @@ class Factor(TerminalToken):
     @status.setter
     def status(self, status_dict):
         '''
-        
-
         Parameters
         ----------
         status_dict : dict

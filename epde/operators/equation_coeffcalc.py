@@ -98,4 +98,3 @@ class LinReg_based_coeffs(Compound_Operator):
     @property
     def operator_tags(self):
         return {'coefficient calculation', 'equation level', 'no suboperators'}
-            
