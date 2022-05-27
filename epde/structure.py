@@ -120,7 +120,7 @@ class Term(Complex_Structure):
         raise NotImplementedError(f'passed term should have string or list/dict types, not {type(passed_term)}')
 
     @defined.register
-    def defined(self, passed_term : Union[list, tuple]):
+    def _(self, passed_term : list):
         self.structure = []
         print('passed_term:', passed_term)
 
@@ -134,7 +134,7 @@ class Term(Complex_Structure):
                 raise ValueError('The structure of a term should be declared with str or factor.Factor obj, instead got', type(factor))
 
     @defined.register
-    def defined(self, passed_term : str):
+    def _(self, passed_term : str):
         self.structure = []
         print('passed_term:', passed_term)
         if isinstance(passed_term, str):

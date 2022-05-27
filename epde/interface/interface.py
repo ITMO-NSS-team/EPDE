@@ -29,7 +29,7 @@ from epde.structure import Equation
 
 from epde.interface.token_family import TF_Pool, TokenFamily
 from epde.interface.type_checks import *
-from epde.interface.prepared_tokens import Prepared_tokens, Custom_tokens
+from epde.interface.prepared_tokens import PreparedTokens, CustomTokens
 
 class Input_data_entry(object):
     def __init__(self, var_name, data_tensor, coord_tensors = None):
@@ -336,12 +336,12 @@ class epde_search(object):
             self.set_domain_pruning(pivotal_tensor_label, pruner, threshold, division_fractions, rectangular)
             
         if isinstance(additional_tokens, list):
-            if not all([isinstance(tf, (TokenFamily, Prepared_tokens)) for tf in additional_tokens]):
+            if not all([isinstance(tf, (TokenFamily, PreparedTokens)) for tf in additional_tokens]):
                 raise TypeError(f'Incorrect type of additional tokens: expected list or TokenFamily/Prepared_tokens - obj, instead got list of {type(additional_tokens[0])}')                
-        elif isinstance(additional_tokens, (TokenFamily, Prepared_tokens)):
+        elif isinstance(additional_tokens, (TokenFamily, PreparedTokens)):
             additional_tokens = [additional_tokens,]
         else:
-            print(isinstance(additional_tokens, Prepared_tokens))
+            print(isinstance(additional_tokens, PreparedTokens))
             raise TypeError(f'Incorrect type of additional tokens: expected list or TokenFamily/Prepared_tokens - obj, instead got {type(additional_tokens)}')
         self.pool = TF_Pool(data_tokens + [tf if isinstance(tf, TokenFamily) else tf.token_family 
                                       for tf in additional_tokens])

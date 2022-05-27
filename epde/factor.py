@@ -8,13 +8,14 @@ Created on Thu Mar  5 13:16:43 2020
 
 import numpy as np
 import copy
+from pprint import pprint
 
 from epde.Tokens import TerminalToken
 import epde.globals as global_var
 from epde.supplementary import factor_params_to_str
 
 class Factor(TerminalToken):
-    __slots__ = ['_params', '_params_description', 
+    __slots__ = ['_params', '_params_description', '_hash_val',
                  'label', 'type', 'grid_set', 'grid_idx', 'is_deriv', 'deriv_code', 
                  'cache_linked', '_status', 'equality_ranges', '_evaluator', 'saved']
     
@@ -25,6 +26,7 @@ class Factor(TerminalToken):
         self.type = family_type
         self.status = status
         self.grid_set = False
+        self._hash_val = np.random.randint(0, 1e9)
         
         self.is_deriv = not (deriv_code is None)
         self.deriv_code = deriv_code
@@ -89,8 +91,9 @@ class Factor(TerminalToken):
             _params = np.empty(len(params_description))#OrderedDict()
             for param_idx, param_info in enumerate(params_description.items()):
                 if param_info[0] != 'power':
+                    print('val ranges', param_info[1][0], param_info[1][1])
                     _params[param_idx] = (np.random.randint(param_info[1][0], param_info[1][1] + 1) if isinstance(param_info[1][0], int) 
-                    else np.random.uniform(param_info[1][0], param_info[1][1])) if param_info[1][1] > param_info[1][0] else param_info[1][0]
+                    else np.random.uniform()) if param_info[1][1] > param_info[1][0] else param_info[1][0]
                 else:
                     _params[param_idx] = 1
                 _params_description[param_idx] = {'name' : param_info[0], 
@@ -129,6 +132,11 @@ class Factor(TerminalToken):
             return global_var.tensor_cache.get(self.cache_label,
                                                structural = structural)
         else:
+            try:
+                print('parameters info', self.params, self.params_description)
+            except AttributeError:
+                pprint(vars(self))
+                raise AttributeError
             value = self._evaluator.apply(self)
             if key == 'structural' and self.status['structural_and_defalut_merged']:
                 global_var.tensor_cache.use_structural(use_base_data = True)
@@ -148,12 +156,17 @@ class Factor(TerminalToken):
     @property
     def name(self):
         form = self.label + '{' 
+        print(self.params_description)
         for param_idx, param_info in self.params_description.items():
             form += param_info['name'] + ': ' + str(self.params[param_idx])
             if param_idx < len(self.params_description.items()) - 1:
                 form += ', '
         form += '}'
         return form
+
+    @property
+    def factor_id(self) -> int:
+        return self._hash_val
 
     @property
     def grids(self):

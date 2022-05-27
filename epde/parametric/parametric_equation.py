@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.optimize as optimize
 
+from pprint import pprint
 from copy import deepcopy
 from collections import OrderedDict
 from typing import Union
@@ -13,7 +14,7 @@ class ParametricEquation(object):
         self.pool = pool
         self.terms = terms
 
-        self.total_params_count = [term.opt_params_num for term in self.terms]
+        self.total_params_count = [term.opt_params_num() for term in self.terms]
         total_count = 0; self.param_term_beloning = {}
         for term_idx, term_params_num in enumerate(self.total_params_count):
             for _ in range(term_params_num):
@@ -31,6 +32,7 @@ class ParametricEquation(object):
             the variables: variables[0] - the object, containing parametric equation.  
             
             '''
+            print('params in opt_func', params)
             return np.linalg.norm(variables[0].evaluate_with_params(params))
 
         def opt_fun_grad(params, *variables):
@@ -39,13 +41,29 @@ class ParametricEquation(object):
                 
                 grad = 2 * variables[0].evaluate_with_params(params) * \
                        variables[0].get_term_for_param(param_idx).eval_grad(param_idx)
+            return grad
+        
+
         
         if initial_params is None:
             initial_params = np.zeros(np.sum(self.total_params_count))
 
+        print('Reaching copy moment')
         optimizational_copy = deepcopy(self)
-        optimal_params = optimize.fmin_cg(opt_func, x0 = initial_params, fprome = opt_fun_grad, 
-                                          args = (optimizational_copy,))
+
+        print("----------------------------------------")
+        pprint(vars(optimizational_copy))
+        print("----------------------------------------")
+
+        print(initial_params)
+        print('Optimized function test run', opt_func(initial_params, self))
+        print('Grad function test run', opt_fun_grad(initial_params, self))
+
+
+        opt_lbd = lambda params: opt_func(params, optimizational_copy)
+        opt_grd = lambda params: opt_fun_grad(params, optimizational_copy)
+        
+        optimal_params = optimize.fmin_cg(opt_lbd, x0 = initial_params, fprime = opt_grd)
         self.set_term_params(optimal_params)
         self._optimization_held = True  
 
@@ -60,18 +78,30 @@ class ParametricEquation(object):
         params_parsed = OrderedDict()
         cur_idx = 0
         for term in self.terms:
-            params_parsed[hash(term)] = term.parse_opt_params(params[cur_idx, cur_idx + term.params_num])
-            cur_idx += term.params_num
+            params_parsed[term.term_id] = term.parse_opt_params(params[cur_idx : cur_idx + term.opt_params_num()])
+            cur_idx += term.opt_params_num()
         return params_parsed
 
     def set_term_params(self, params):
         params_parsed = self.parse_opt_params(params)
         for term in self.terms:
-            term.set_params(params_parsed[hash(term)])
+            term.use_params(params_parsed[term.term_id])
 
     def evaluate_with_params(self, params):
         self.set_term_params(params)
-        return np.add.reduce([term.evaluate() for term_idx, term in enumerate(self.terms) if term_idx != self.rpi]) - self.terms[self.rpi].evaluate()
+        print("mur", params)
+        pprint(vars(self))
+        for idx, term in enumerate(self.terms):
+            print(f'For term {idx}:')
+            pprint(vars(term))
+            print('factors:', term.parametric_factors)
+            for _idx, parametric_factor in enumerate(term.parametric_factors.values()):
+                print(f'For term {_idx}:')
+                print(type(parametric_factor))
+                pprint(vars(parametric_factor))
+        val1 = np.add.reduce([term.evaluate() for term_idx, term in enumerate(self.terms) if term_idx != self.rpi])
+        val2 = self.terms[self.rpi].evaluate()
+        return val1 - val2
 
     @property
     def equation(self):

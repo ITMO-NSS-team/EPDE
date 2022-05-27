@@ -99,6 +99,13 @@ trig_eval_fun = {'cos' : lambda *grids, **kwargs: np.cos(kwargs['freq'] * grids[
                    'sin' : lambda *grids, **kwargs: np.sin(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power']}
 inverse_eval_fun = lambda *grids, **kwargs: np.power(grids[int(kwargs['dim'])], - kwargs['power']) 
 
+def const_eval_fun(*grids, **kwargs):
+    return np.full_like(a = grids[0], fill_value = kwargs['value'])
+
+def const_grad_fun(*grids, **kwargs):
+    return np.zeros_like(a = grids[0])
+
+
 def velocity_heating_eval_fun(*grids, **kwargs):
     '''
     Assumption of the velocity field for two-dimensional heat equation with convetion.
@@ -141,47 +148,47 @@ def vhef_grad_6(*grids, **kwargs):
     
 def vhef_grad_7(*grids, **kwargs):
     a = [kwargs['p' + str(idx*3)] * grids[1]**2 + kwargs['p' + str(idx*3 + 1)] * grids[1] + kwargs['p' + str(idx*3 + 2)] for idx in range(5)]
-    alpha = np.exp(a[0] * grids[1] + a[1]); beta = a[2] * grids[1]**2 + a[3] * grids[1] + a[4]
+    alpha = np.exp(a[0] * grids[1] + a[1])#; beta = a[2] * grids[1]**2 + a[3] * grids[1] + a[4]
     return grids[0]**2 * grids[1]**2 * alpha
 
 def vhef_grad_8(*grids, **kwargs):
     a = [kwargs['p' + str(idx*3)] * grids[1]**2 + kwargs['p' + str(idx*3 + 1)] * grids[1] + kwargs['p' + str(idx*3 + 2)] for idx in range(5)]
-    alpha = np.exp(a[0] * grids[1] + a[1]); beta = a[2] * grids[1]**2 + a[3] * grids[1] + a[4]
+    alpha = np.exp(a[0] * grids[1] + a[1])#; beta = a[2] * grids[1]**2 + a[3] * grids[1] + a[4]
     return grids[0] * grids[1]**2 * alpha
 
 def vhef_grad_9(*grids, **kwargs):
     a = [kwargs['p' + str(idx*3)] * grids[1]**2 + kwargs['p' + str(idx*3 + 1)] * grids[1] + kwargs['p' + str(idx*3 + 2)] for idx in range(5)]
-    alpha = np.exp(a[0] * grids[1] + a[1]); beta = a[2] * grids[1]**2 + a[3] * grids[1] + a[4]
+    alpha = np.exp(a[0] * grids[1] + a[1])#; beta = a[2] * grids[1]**2 + a[3] * grids[1] + a[4]
     return grids[1]**2 * alpha
 
 def vhef_grad_10(*grids, **kwargs):
     a = [kwargs['p' + str(idx*3)] * grids[1]**2 + kwargs['p' + str(idx*3 + 1)] * grids[1] + kwargs['p' + str(idx*3 + 2)] for idx in range(5)]
-    alpha = np.exp(a[0] * grids[1] + a[1]); beta = a[2] * grids[1]**2 + a[3] * grids[1] + a[4]
+    alpha = np.exp(a[0] * grids[1] + a[1])#; beta = a[2] * grids[1]**2 + a[3] * grids[1] + a[4]
     return grids[0]**2 * grids[1] * alpha
 
 def vhef_grad_11(*grids, **kwargs):
     a = [kwargs['p' + str(idx*3)] * grids[1]**2 + kwargs['p' + str(idx*3 + 1)] * grids[1] + kwargs['p' + str(idx*3 + 2)] for idx in range(5)]
-    alpha = np.exp(a[0] * grids[1] + a[1]); beta = a[2] * grids[1]**2 + a[3] * grids[1] + a[4]
+    alpha = np.exp(a[0] * grids[1] + a[1])#; beta = a[2] * grids[1]**2 + a[3] * grids[1] + a[4]
     return grids[0] * grids[1] * alpha
 
 def vhef_grad_12(*grids, **kwargs):
     a = [kwargs['p' + str(idx*3)] * grids[1]**2 + kwargs['p' + str(idx*3 + 1)] * grids[1] + kwargs['p' + str(idx*3 + 2)] for idx in range(5)]
-    alpha = np.exp(a[0] * grids[1] + a[1]); beta = a[2] * grids[1]**2 + a[3] * grids[1] + a[4]
+    alpha = np.exp(a[0] * grids[1] + a[1])#; beta = a[2] * grids[1]**2 + a[3] * grids[1] + a[4]
     return grids[1] * alpha
 
 def vhef_grad_13(*grids, **kwargs):
     a = [kwargs['p' + str(idx*3)] * grids[1]**2 + kwargs['p' + str(idx*3 + 1)] * grids[1] + kwargs['p' + str(idx*3 + 2)] for idx in range(5)]
-    alpha = np.exp(a[0] * grids[1] + a[1]); beta = a[2] * grids[1]**2 + a[3] * grids[1] + a[4]
+    alpha = np.exp(a[0] * grids[1] + a[1])#; beta = a[2] * grids[1]**2 + a[3] * grids[1] + a[4]
     return grids[0]**2 * alpha
 
 def vhef_grad_14(*grids, **kwargs):
     a = [kwargs['p' + str(idx*3)] * grids[1]**2 + kwargs['p' + str(idx*3 + 1)] * grids[1] + kwargs['p' + str(idx*3 + 2)] for idx in range(5)]
-    alpha = np.exp(a[0] * grids[1] + a[1]); beta = a[2] * grids[1]**2 + a[3] * grids[1] + a[4]
+    alpha = np.exp(a[0] * grids[1] + a[1])#; beta = a[2] * grids[1]**2 + a[3] * grids[1] + a[4]
     return grids[0] * alpha
 
 def vhef_grad_15(*grids, **kwargs):
     a = [kwargs['p' + str(idx*3)] * grids[1]**2 + kwargs['p' + str(idx*3 + 1)] * grids[1] + kwargs['p' + str(idx*3 + 2)] for idx in range(5)]
-    alpha = np.exp(a[0] * grids[1] + a[1]); beta = a[2] * grids[1]**2 + a[3] * grids[1] + a[4]
+    alpha = np.exp(a[0] * grids[1] + a[1])#; beta = a[2] * grids[1]**2 + a[3] * grids[1] + a[4]
     return alpha
 
 vhef_grad = [vhef_grad_1, vhef_grad_2, vhef_grad_3,
@@ -193,6 +200,13 @@ vhef_grad = [vhef_grad_1, vhef_grad_2, vhef_grad_3,
 trigonometric_evaluator = CustomEvaluator(trig_eval_fun, eval_fun_params_labels = ['freq', 'dim', 'power'])
 
 inverse_function_evaluator = CustomEvaluator(inverse_eval_fun, eval_fun_params_labels = ['dim', 'power'], use_factors_grids = True)    
+
+const_evaluator = CustomEvaluator(const_eval_fun, ['power', 'value']) 
+const_grad_evaluator = CustomEvaluator(const_grad_fun, ['power', 'value']) 
+
+velocity_evaluator = CustomEvaluator(velocity_heating_eval_fun, ['p' + str(idx) for idx in range(15)]) 
+velocity_grad_evaluators = [CustomEvaluator(component, ['p' + str(idx) for idx in range(15)]) 
+                            for component in vhef_grad] 
 
 
 #def trigonometric_evaluator(factor, structual = False, **kwargs):

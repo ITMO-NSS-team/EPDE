@@ -39,12 +39,12 @@ class EvaluatorContained(object):
     apply(token, token_params)
         apply the defined evaluator to evaluate the token with specific parameters
     """
-    def __init__(self, eval_function, deriv_eval_function = None, eval_kwargs_keys = {}):
+    def __init__(self, eval_function, eval_kwargs_keys = {}): # , deriv_eval_function = None
         self._evaluator = eval_function
-        if deriv_eval_function is not None: self._deriv_evaluator = deriv_eval_function
+        # if deriv_eval_function is not None: self._deriv_evaluator = deriv_eval_function
         self.eval_kwargs_keys = eval_kwargs_keys
         
-    def apply(self, token, structural = False, deriv = False, **kwargs):
+    def apply(self, token, structural = False, **kwargs): # , deriv = False
         """
         Apply the defined evaluator to evaluate the token with specific parameters.
         
@@ -63,11 +63,12 @@ class EvaluatorContained(object):
             If the evaluator could not be applied to the token.
         
         """
+        print(self.eval_kwargs_keys, list(kwargs.keys()))
         assert list(kwargs.keys()) == self.eval_kwargs_keys
-        if deriv:
-            return self._deriv_evaluator(token, False, **kwargs)    
-        else:
-            return self._evaluator(token, structural, **kwargs)
+        # if deriv:
+            # return self._deriv_evaluator(token, False, **kwargs)    
+        # else:
+        return self._evaluator(token, structural, **kwargs)
             
 
 class TokenFamily(object):
@@ -270,9 +271,10 @@ class TokenFamily(object):
             if isinstance(eval_function, EvaluatorContained):
                 _deriv_evaluator = eval_function
             else:
+                print('Setting evaluator kwargs:', eval_kwargs_keys)
                 _deriv_evaluator = EvaluatorContained(eval_function, eval_kwargs_keys)
             self._deriv_evaluators[param_key] = _deriv_evaluator
-        self.opt_param_labels = eval_functions.keys()
+        self.opt_param_labels = list(eval_functions.keys())
         self.deriv_evaluator_set = True
         if self.params_set and not suppress_eval_test :
             self.test_evaluator(deriv = True)
@@ -293,6 +295,7 @@ class TokenFamily(object):
             for _deriv_evaluator in self._deriv_evaluators.values():
                 self.test_evaluation = _deriv_evaluator.apply(self.test_token)
         else:
+            print('Test in the evaluator:', self._evaluator.eval_kwargs_keys)
             self.test_evaluation = self._evaluator.apply(self.test_token)
         print('Test evaluation performed correctly')
 
@@ -468,4 +471,8 @@ class TF_Pool(object):
                                if label in family.tokens]
         if len(containing_families) > 1:
             raise ValueError('More than one families contain the same tokens.')
-        raise containing_families[0]
+        try:
+            return containing_families[0]
+        except IndexError:
+            print(label, [family.tokens for family in self.families])
+            raise IndexError('No family for token.')

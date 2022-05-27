@@ -6,9 +6,16 @@ from epde.factor import Factor
 from epde.structure import Term
 from epde.supplementary import factor_params_to_str
 
+from copy import deepcopy
+# from pprint import pprint
 import epde.globals as global_var
 
 class ParametricFactor(Factor):
+    __slot__ = ['_params', '_params_description', '_hash_val',
+                 'label', 'type', 'grid_set', 'grid_idx', 'is_deriv', 'deriv_code', 
+                 'cache_linked', '_status', 'equality_ranges', '_evaluator', 'saved',
+                 'params_defined', 'params_to_optimize']
+    
     def __init__(self, token_name : str, status : dict, family_type : str, params_description = None, 
                  params_to_optimize = None, deriv_code = None, equality_ranges = None):
         super().__init__(token_name, status, family_type, False,
@@ -20,11 +27,16 @@ class ParametricFactor(Factor):
 
         self.reset_saved_state()
 
+    def __deepcopy__(self, memo):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            setattr(result, k, deepcopy(v, memo))
+        return result
+
     def set_grad_evaluator(self, evaluator):
         self._grad_evaluator = evaluator
-
-    def __hash__(self) -> int:
-        return hash(self.name)
 
     @property
     def grad_cache_label(self):
@@ -34,7 +46,7 @@ class ParametricFactor(Factor):
 
     @property
     def required_params(self):
-        return self.__hash__(), self.params_to_optimize
+        return self.factor_id, self.params_to_optimize
 
     def __contains__(self, element):
         return element in self.params_to_optimize
@@ -48,9 +60,10 @@ class ParametricFactor(Factor):
                     else np.random.uniform(param_info[1][0], param_info[1][1])) if param_info[1][1] > param_info[1][0] else param_info[1][0]
             elif param_info[0] in self.params_to_optimize:
                 opt_param_idx = self.params_to_optimize.index(param_info[0])
-                _params[param_idx] = params[opt_param_idx]
-        _kw_params = {param_label : _params[idx] for idx, param_label in enumerate(self.params_description.keys())}
-        super.set_parameters(self.params_description, self.equality_ranges, **_kw_params)
+                print('params:', params, 'opt_param_idx:', opt_param_idx, params[opt_param_idx])
+                _params[param_idx] = params[opt_param_idx][1]
+        _kw_params = {param_label : _params[idx] for idx, param_label in enumerate(list(self.params_description.keys()))}
+        super().set_parameters(self.params_description, self.equality_ranges, **_kw_params)
 
     def set_defined_params(self, defined_params : dict):
         for param_label, val in defined_params:
@@ -72,35 +85,52 @@ class ParametricFactor(Factor):
             return value    
 
 class ParametricTerm(Term):
+    __slots__ = ['_history', 'structure', 'interelement_operator', 'saved', 'saved_as', 
+                 'pool', 'max_factors_in_term', 'cache_linked', 'occupied_tokens_labels',
+                 'parametric_factors', 'defined_factors', 'params_to_optimize']
+    
     def __init__(self, pool, parametric_factors : dict, defined_factors : dict, interelement_operator = np.multiply):
         self.parametric_factors = parametric_factors
         self.defined_factors = defined_factors
-        self.all_params = reduce(lambda x, y: x+y, [factor.params_to_optimize for factor in self.parametric_factors])
+        print(self.parametric_factors)
+        self.all_params = reduce(lambda x, y: x+y, [factor.params_to_optimize for factor in self.parametric_factors.values()], [])
+        print('Params in term:', self.all_params, len(self.all_params))
         self.pool = pool; self.operator = interelement_operator
 
-    def __hash__(self) -> int:
-        return sum([hash(factor) for factor in self.parametric_factors.values()])
+    def __deepcopy__(self, memo):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            setattr(result, k, deepcopy(v, memo))
+        return result
+
+    @property
+    def term_id(self) -> int:
+        return sum([factor.factor_id for factor in self.parametric_factors.values()])
 
     def parse_opt_params(self, params : np.ndarray):
         params_dict = OrderedDict()
         init_idx = 0
         for factor in self.parametric_factors.values():
-            factor_hash, factor_params = factor.required_params
-            params_dict[factor_hash] = list(zip(factor_params, params[init_idx, init_idx + len(factor_params)]))
+            factor_id, factor_params = factor.required_params
+            params_dict[factor_id] = list(zip(factor_params, params[init_idx : init_idx + len(factor_params)]))
             init_idx += len(factor_params)
         return params_dict
 
-    @property
     def opt_params_num(self):
-        return sum([len(params) for params in self.parse_opt_params.values()])
+        # print('Examining ParametricTerm')
+        # pprint(vars(self))
+        return len(self.all_params)
+    #sum([len(params) for params in self.parse_opt_params().values()]) 
 
     def use_params(self, params : dict):
         for factor_label, factor_params in params.items():
             self.parametric_factors[factor_label].use_params(factor_params)
     
     def evaluate(self):
-        value = np.prod.reduce([factor.evaluate() for factor in self.parametric_factors.values()] + 
-                               [factor.evaluate() for factor in self.defined_factors.values()])
+        value = np.multiply.reduce([factor.evaluate() for factor in self.parametric_factors.values()] + 
+                               [factor.evaluate() for factor in self.defined_factors.values()]) #, initial = 
         return value.reshape(-1)
 
     def evaluate_grad(self, parameter):

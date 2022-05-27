@@ -26,7 +26,9 @@ def parse_params_str(param_str):
     params_to_optimize = []
     for param in params_split:
         temp = param.split(':')
+        print(temp)
         temp[0] = temp[0].replace(' ', '')
+        temp[1] = temp[1].replace(' ', '')
         if temp[1] == 'None':
             params_parsed[temp[0]] = None
             params_to_optimize.append(temp[0])    
@@ -89,22 +91,26 @@ def optimize_parametric_form(terms : list, pool, **kwargs):
                                                               
     terms_parsed = []
     for term_list in terms:
-        temp_factors_param = []
-        temp_factors_defined = []
+        temp_factors_param = {}
+        temp_factors_defined = {}
         for factor in term_list:
-            factor_is_parametric, label, params = parse_parametric_factor(factor)
+            factor_is_parametric, label, params = parse_parametric_factor(factor, pool)
             cur_family = pool.get_families_by_label(label)
             assert cur_family.params_set and cur_family.evaluator_set, 'Family has not been completed before the call.'
             if factor_is_parametric:
                 factor = construct_parametric_factor(label = label, param_equality=cur_family.equality_ranges, 
-                                                    status = cur_family.status, family_type=cur_family.type, 
-                                                    params_description=cur_family.token_params)
-                temp_factors_param[hash(factor)] = factor
+                                                     status = cur_family.status, family_type=cur_family.type, 
+                                                     params_description=cur_family.token_params, params_to_opt = params)
+                factor.set_evaluator(cur_family._evaluator)
+                factor.set_grad_evaluator(cur_family._deriv_evaluators)
+                temp_factors_param[factor.factor_id] = factor
             else:
-                factor = construct_parametric_factor(label = label, param_equality=cur_family.equality_ranges, 
+                factor = construct_ordinary_factor(label = label, param_equality=cur_family.equality_ranges, 
                                                     status = cur_family.status, family_type=cur_family.type, 
                                                     params_description=cur_family.token_params)
-                temp_factors_defined[hash(factor)] = factor
+                factor.set_evaluator(cur_family._evaluator)
+                temp_factors_defined[factor.factor_id] = factor
+                
         terms_parsed.append(ParametricTerm(pool, parametric_factors = temp_factors_param,
                                           defined_factors = temp_factors_defined))
     

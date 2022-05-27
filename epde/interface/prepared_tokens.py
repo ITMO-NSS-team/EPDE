@@ -13,11 +13,12 @@ import time
 
 import epde.globals as global_var
 from epde.interface.token_family import TokenFamily
-from epde.evaluators import CustomEvaluator, EvaluatorTemplate, trigonometric_evaluator, simple_function_evaluator 
-from epde.evaluators import velocity_heating_eval_fun, vhef_grad
+from epde.evaluators import CustomEvaluator, EvaluatorTemplate, trigonometric_evaluator, simple_function_evaluator
+from epde.evaluators import const_evaluator, const_grad_evaluator
+from epde.evaluators import velocity_evaluator, velocity_grad_evaluators
 from epde.cache.cache import upload_simple_tokens, np_ndarray_section
 
-class Prepared_tokens(ABC):
+class PreparedTokens(ABC):
     def __init__(self, *args, **kwargs):
         self._token_family = TokenFamily(token_type = 'Placeholder')
         
@@ -28,7 +29,7 @@ class Prepared_tokens(ABC):
         return self._token_family
     
     
-class Trigonometric_tokens(Prepared_tokens):
+class TrigonometricTokens(PreparedTokens):
     def __init__(self, freq : tuple = (np.pi/2., 2*np.pi), dimensionality = 1):
         assert freq[1] > freq[0] and len(freq) == 2, 'The tuple, defining frequncy interval, shall contain 2 elements with first - the left boundary of interval and the second - the right one. '
 
@@ -46,11 +47,11 @@ class Trigonometric_tokens(Prepared_tokens):
         self._token_family.set_evaluator(trigonometric_evaluator, [])
         
         
-class Logfun_tokens(Prepared_tokens):
+class LogfunTokens(PreparedTokens):
     def __init__(self, *args, **kwargs):
         raise NotImplementedError
         
-class Custom_tokens(Prepared_tokens):
+class CustomTokens(PreparedTokens):
     def __init__(self, token_type : str, token_labels : list, 
                  evaluator : Union[CustomEvaluator, EvaluatorTemplate, Callable], 
                  params_ranges : dict, params_equality_ranges : Union[None, dict], dimensionality : int = 1,
@@ -77,7 +78,7 @@ class Custom_tokens(Prepared_tokens):
         self._token_family.set_params(token_labels, params_ranges, params_equality_ranges)
         self._token_family.set_evaluator(evaluator, [])      
         
-class Cache_stored_tokens(Custom_tokens):
+class CacheStoredTokens(CustomTokens):
     def __init__(self, token_type : str, boundary : Union[list, tuple],
                  token_labels : list, token_tensors : dict, params_ranges : dict,
                  params_equality_ranges : Union[None, dict], dimensionality : int = 1,
@@ -92,18 +93,42 @@ class Cache_stored_tokens(Custom_tokens):
                          dimensionality = dimensionality, unique_specific_token = unique_specific_token, 
                          unique_token_type = unique_token_type, meaningful = meaningful)
 
-class Velocity_HEQ_tokens(Prepared_tokens):
+class ConstantToken(PreparedTokens):
+    def __init__(self, values_range = (-np.inf, np.inf)):
+        assert len(values_range) == 2 and values_range[0] < values_range[1], 'Range of the values has not been stated correctly.'
+        self._token_family = TokenFamily(token_type='constants')
+        self._token_family.set_status(unique_specific_token=True, unique_token_type=True, 
+                                      meaningful = False)
+        const_token_params = OrderedDict([('power', (1, 1)),
+                                          ('value', values_range)])
+        if - values_range[0] == np.inf or values_range[0] == np.inf:
+            value_equal_range = 0.1
+        else:
+            val_equality_fraction = 0.01
+            value_equal_range = (values_range[1] - values_range[0]) / val_equality_fraction
+        const_equal_params = {'power' : 0, 'value' : value_equal_range}
+        print('Conducting init procedure for ConstantToken:')
+        self._token_family.set_params(['const'], const_token_params, const_equal_params)
+        print('Parameters set')
+        self._token_family.set_evaluator(const_evaluator, []) 
+        print('Evaluator set')
+        self._token_family.set_deriv_evaluator({'value' : const_grad_evaluator}, [])
+
+class Velocity_HEQ_tokens(PreparedTokens):
     def __init__(self, param_ranges):
         assert len(param_ranges) == 15
         self._token_family = TokenFamily(token_type='velocity_assuption')
         self._token_family.set_status(unique_specific_token=True, unique_token_type=True, 
-                           meaningful = False)
+                                      meaningful = False)
         
         opt_params = [('p' + str(idx), p_range) for idx, p_range in enumerate(param_ranges)]
         token_params = OrderedDict([('power', (1, 1)),] + opt_params)
+        # print(token_params)
 
         p_equality_fraction = 0.05 # fraction of allowed frequency interval, that is considered as the same
         opt_params_equality = {'p' + str(idx) : (p_range[1] - p_range[0]) / p_equality_fraction for idx, p_range in enumerate(param_ranges)}
-        equal_params = {'power' : 0} + opt_params_equality
+        equal_params = {'power' : 0}.update(opt_params_equality)
         self._token_family.set_params(['v'], token_params, equal_params)
-        self._token_family.set_evaluator(velocity_heating_eval_fun, vhef_grad, [])
+        self._token_family.set_evaluator(velocity_evaluator, [])
+        grad_eval_labeled = {'p'+str(idx) : fun for idx, fun in enumerate(velocity_grad_evaluators)}
+        self._token_family.set_deriv_evaluator(grad_eval_labeled, [])

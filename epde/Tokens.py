@@ -13,6 +13,7 @@ from copy import deepcopy, copy
 from functools import reduce
 from abc import ABC, abstractmethod, abstractproperty
 
+from pprint import pprint
 
 class Token(ABC):
     """
@@ -122,7 +123,13 @@ class TerminalToken(Token):
     # Methods for work with params and its descriptions
     @property
     def params_description(self):
-        return self._params_description
+        # print('Attributes, present on params_description call location')
+        # pprint(vars(self))
+        try:
+            return self._params_description
+        except AttributeError:
+            pprint(vars(self))
+            raise AttributeError
 
     @params_description.setter
     def params_description(self, params_description: dict):
