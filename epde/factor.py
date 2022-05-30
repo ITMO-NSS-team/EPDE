@@ -135,7 +135,7 @@ class Factor(TerminalToken):
             try:
                 print('parameters info', self.params, self.params_description)
             except AttributeError:
-                pprint(vars(self))
+                print(self.name)
                 raise AttributeError
             value = self._evaluator.apply(self)
             if key == 'structural' and self.status['structural_and_defalut_merged']:

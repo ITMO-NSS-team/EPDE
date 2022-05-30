@@ -7,7 +7,7 @@ from epde.structure import Term
 from epde.supplementary import factor_params_to_str
 
 from copy import deepcopy
-# from pprint import pprint
+from pprint import pprint
 import epde.globals as global_var
 
 class ParametricFactor(Factor):
@@ -33,6 +33,19 @@ class ParametricFactor(Factor):
         memo[id(self)] = result
         for k, v in self.__dict__.items():
             setattr(result, k, deepcopy(v, memo))
+
+        for k in self.__slots__:
+            try:
+                if not isinstance(k, list):
+                    setattr(result, k, deepcopy(getattr(self, k), memo))
+                else:
+                    temp = []
+                    for elem in getattr(self, k):
+                        temp.append(deepcopy(elem, memo))
+                    setattr(result, k, temp)
+            except AttributeError:
+                pass                        
+            
         return result
 
     def set_grad_evaluator(self, evaluator):
@@ -55,15 +68,21 @@ class ParametricFactor(Factor):
         assert len(params) == len(self.params_to_optimize), 'The number of the passed parameters does not match declared problem'
         _params = np.ones(shape=len(self.params_description))
         for param_idx, param_info in enumerate(self.params_description.items()):
-            if param_info[0] not in self.params_to_optimize and param_info[0] != 'power':
+            if param_info[1] not in self.params_to_optimize and param_info[0] != 'power':
+                if not self.defined_params_passed:
                     _params[param_idx] = (np.random.randint(param_info[1][0], param_info[1][1] + 1) if isinstance(param_info[1][0], int) 
                     else np.random.uniform(param_info[1][0], param_info[1][1])) if param_info[1][1] > param_info[1][0] else param_info[1][0]
+                # except KeyError:
+                #     print('self.params_description.items():', self.params_description.items())
+                #     print('param_info', param_info)
+                #     raise KeyError
             elif param_info[0] in self.params_to_optimize:
                 opt_param_idx = self.params_to_optimize.index(param_info[0])
                 print('params:', params, 'opt_param_idx:', opt_param_idx, params[opt_param_idx])
                 _params[param_idx] = params[opt_param_idx][1]
+                print('set', _params[param_idx], 'with', params[opt_param_idx][1])
         _kw_params = {param_label : _params[idx] for idx, param_label in enumerate(list(self.params_description.keys()))}
-        super().set_parameters(self.params_description, self.equality_ranges, **_kw_params)
+        super().set_parameters(self.params_description, self.equality_ranges, random=False, **_kw_params)
 
     def set_defined_params(self, defined_params : dict):
         for param_label, val in defined_params:
@@ -87,22 +106,48 @@ class ParametricFactor(Factor):
 class ParametricTerm(Term):
     __slots__ = ['_history', 'structure', 'interelement_operator', 'saved', 'saved_as', 
                  'pool', 'max_factors_in_term', 'cache_linked', 'occupied_tokens_labels',
-                 'parametric_factors', 'defined_factors', 'params_to_optimize']
+                 'parametric_factors', 'defined_factors', 'params_to_optimize', 'all_params']
     
     def __init__(self, pool, parametric_factors : dict, defined_factors : dict, interelement_operator = np.multiply):
         self.parametric_factors = parametric_factors
         self.defined_factors = defined_factors
-        print(self.parametric_factors)
+        print('parametric factors:', self.parametric_factors)
         self.all_params = reduce(lambda x, y: x+y, [factor.params_to_optimize for factor in self.parametric_factors.values()], [])
         print('Params in term:', self.all_params, len(self.all_params))
         self.pool = pool; self.operator = interelement_operator
 
     def __deepcopy__(self, memo):
+        print('while copying factor:')
+        print('properties of self')        
+        pprint(vars(self))
+        
         cls = self.__class__
         result = cls.__new__(cls)
         memo[id(self)] = result
         for k, v in self.__dict__.items():
             setattr(result, k, deepcopy(v, memo))
+
+        # clss = self.__class__
+        # new_struct = clss.__new__(clss)
+        # memo[id(self)] = new_struct
+        
+        # new_struct.__dict__.update(self.__dict__)
+        
+        # attrs_to_avoid_copy = []
+
+        for k in self.__slots__:
+            try:
+                if not isinstance(k, list):
+                    setattr(result, k, deepcopy(getattr(self, k), memo))
+                else:
+                    temp = []
+                    for elem in getattr(self, k):
+                        temp.append(deepcopy(elem, memo))
+                    setattr(result, k, temp)
+            except AttributeError:
+                pass            
+        print('properties of copy')        
+        pprint(vars(result))
         return result
 
     @property
@@ -119,13 +164,12 @@ class ParametricTerm(Term):
         return params_dict
 
     def opt_params_num(self):
-        # print('Examining ParametricTerm')
-        # pprint(vars(self))
         return len(self.all_params)
     #sum([len(params) for params in self.parse_opt_params().values()]) 
 
     def use_params(self, params : dict):
         for factor_label, factor_params in params.items():
+            print('setting params:', params)
             self.parametric_factors[factor_label].use_params(factor_params)
     
     def evaluate(self):

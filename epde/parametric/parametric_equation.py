@@ -36,6 +36,7 @@ class ParametricEquation(object):
             return np.linalg.norm(variables[0].evaluate_with_params(params))
 
         def opt_fun_grad(params, *variables):
+            print('evaluating gradient')
             grad = np.zeros_like(params)
             for param_idx, _ in enumerate(grad):
                 
@@ -51,13 +52,13 @@ class ParametricEquation(object):
         print('Reaching copy moment')
         optimizational_copy = deepcopy(self)
 
-        print("----------------------------------------")
-        pprint(vars(optimizational_copy))
-        print("----------------------------------------")
+        # print("----------------------------------------")
+        # pprint(vars(optimizational_copy))
+        # print("----------------------------------------")
 
-        print(initial_params)
-        print('Optimized function test run', opt_func(initial_params, self))
-        print('Grad function test run', opt_fun_grad(initial_params, self))
+        # print(initial_params)
+        # print('Optimized function test run', opt_func(initial_params, self))
+        # print('Grad function test run', opt_fun_grad(initial_params, self))
 
 
         opt_lbd = lambda params: opt_func(params, optimizational_copy)
@@ -89,16 +90,16 @@ class ParametricEquation(object):
 
     def evaluate_with_params(self, params):
         self.set_term_params(params)
-        print("mur", params)
-        pprint(vars(self))
-        for idx, term in enumerate(self.terms):
-            print(f'For term {idx}:')
-            pprint(vars(term))
-            print('factors:', term.parametric_factors)
-            for _idx, parametric_factor in enumerate(term.parametric_factors.values()):
-                print(f'For term {_idx}:')
-                print(type(parametric_factor))
-                pprint(vars(parametric_factor))
+        # print("mur", params)
+        # pprint(vars(self))
+        # for idx, term in enumerate(self.terms):
+        #     print(f'For term {idx}:')
+        #     pprint(vars(term))
+        #     print('factors:', term.parametric_factors)
+        #     for _idx, parametric_factor in enumerate(term.parametric_factors.values()):
+        #         print(f'For term {_idx}:')
+        #         print(type(parametric_factor))
+        #         pprint(vars(parametric_factor))
         val1 = np.add.reduce([term.evaluate() for term_idx, term in enumerate(self.terms) if term_idx != self.rpi])
         val2 = self.terms[self.rpi].evaluate()
         return val1 - val2

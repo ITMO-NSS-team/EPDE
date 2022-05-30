@@ -128,7 +128,7 @@ class TerminalToken(Token):
         try:
             return self._params_description
         except AttributeError:
-            pprint(vars(self))
+            # pprint(vars(self))
             raise AttributeError
 
     @params_description.setter
