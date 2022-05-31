@@ -17,11 +17,13 @@ class ParametricEquation(object):
         self.total_params_count = [term.opt_params_num() for term in self.terms]
         total_count = 0; self.param_term_beloning = {}
         for term_idx, term_params_num in enumerate(self.total_params_count):
+            local_count = 0
             for _ in range(term_params_num):
-                self.param_term_beloning[total_count] = term_idx
+                self.param_term_beloning[total_count] = (term_idx, local_count)
                 total_count += 1
+                local_count += 1
 
-        self.rpi = right_part_index
+        self.rpi = right_part_index if right_part_index >= 0 else len(terms) + right_part_index
         self._optimization_held = False
 
     def optimize_equations(self, initial_params = None):
@@ -32,16 +34,17 @@ class ParametricEquation(object):
             the variables: variables[0] - the object, containing parametric equation.  
             
             '''
-            print('params in opt_func', params)
-            return np.linalg.norm(variables[0].evaluate_with_params(params))
+            # print('params in opt_func', params)
+            err = np.linalg.norm(variables[0].evaluate_with_params(params))
+            print('error:', err)
+            return err
 
         def opt_fun_grad(params, *variables):
-            print('evaluating gradient')
+            # print('evaluating gradient')
             grad = np.zeros_like(params)
-            for param_idx, _ in enumerate(grad):
-                
-                grad = 2 * variables[0].evaluate_with_params(params) * \
-                       variables[0].get_term_for_param(param_idx).eval_grad(param_idx)
+            for param_idx, param_in_term_props in variables[0].param_term_beloning.items():
+                grad[param_idx] = np.sum(variables[0].evaluate_grad(params, param_in_term_props))
+            print('gradient:', grad)
             return grad
         
 
@@ -49,7 +52,7 @@ class ParametricEquation(object):
         if initial_params is None:
             initial_params = np.zeros(np.sum(self.total_params_count))
 
-        print('Reaching copy moment')
+        # print('Reaching copy moment')
         optimizational_copy = deepcopy(self)
 
         # print("----------------------------------------")
@@ -71,8 +74,12 @@ class ParametricEquation(object):
     def parse_eq_terms(self):
         weights = []; equation_term = []
         for idx, term in enumerate(self.terms):
-            weights[idx], equivalent_term = term.equivalent_common_term()
+            weight, equivalent_term = term.equivalent_common_term()
             equation_term.append(equivalent_term)
+            
+            if idx != self.rpi:
+                weights.append(weight)
+        weights.append(0)
         return weights, equation_term
 
     def parse_opt_params(self, params):
@@ -90,19 +97,23 @@ class ParametricEquation(object):
 
     def evaluate_with_params(self, params):
         self.set_term_params(params)
-        # print("mur", params)
-        # pprint(vars(self))
-        # for idx, term in enumerate(self.terms):
-        #     print(f'For term {idx}:')
-        #     pprint(vars(term))
-        #     print('factors:', term.parametric_factors)
-        #     for _idx, parametric_factor in enumerate(term.parametric_factors.values()):
-        #         print(f'For term {_idx}:')
-        #         print(type(parametric_factor))
-        #         pprint(vars(parametric_factor))
-        val1 = np.add.reduce([term.evaluate() for term_idx, term in enumerate(self.terms) if term_idx != self.rpi])
+        if self.rpi < 0:
+            val1 = np.add.reduce([term.evaluate() for term_idx, term in enumerate(self.terms) if term_idx != len(self.terms) + self.rpi])
+        else:#if self.rpi > 0:
+            val1 = np.add.reduce([term.evaluate() for term_idx, term in enumerate(self.terms) if term_idx != self.rpi])
         val2 = self.terms[self.rpi].evaluate()
         return val1 - val2
+
+    def evaluate_grad(self, params, param_in_term_props):
+        param_label = self.terms[param_in_term_props[0]].all_params[param_in_term_props[1]]
+        param_grad_vals = 2 * self.evaluate_with_params(params) * \
+                       self.terms[param_in_term_props[0]].evaluate_grad(param_label).reshape(-1)     
+        print('------------------------------------------------------------------')
+        print(f'grad for param {param_label} is {np.linalg.norm(param_grad_vals)}')
+        print(f'while eq value is {np.linalg.norm(self.evaluate_with_params(params))} and grad of factor is {np.linalg.norm(self.terms[param_in_term_props[0]].evaluate_grad(param_label))}')
+        
+        
+        return param_grad_vals
 
     @property
     def equation(self):
@@ -113,11 +124,11 @@ class ParametricEquation(object):
 
     def set_equation(self, rpi : int = -1):
         weights, terms = self.parse_eq_terms()
-        self.equation = Equation(pool = self.pool, basic_structure = terms, terms_number = len(self.terms),
-                                 max_factors_in_term = max([len(term.structure) for term in self.terms]))
-        self.equation.target_idx = rpi if rpi >= 0 else len(self.equation.structure) - 1  
-        self.equation.weights_internal = weights
-        self.equation.weights_final = weights
+        self._equation = Equation(pool = self.pool, basic_structure = terms, terms_number = len(terms),
+                                 max_factors_in_term = max([len(term.structure) for term in terms]))
+        self._equation.target_idx = rpi if rpi >= 0 else len(self.equation.structure) - 1  
+        self._equation.weights_internal = weights
+        self._equation.weights_final = weights
 
     @singledispatchmethod
     def get_term_for_param(self, param):

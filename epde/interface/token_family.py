@@ -63,7 +63,7 @@ class EvaluatorContained(object):
             If the evaluator could not be applied to the token.
         
         """
-        print(self.eval_kwargs_keys, list(kwargs.keys()))
+        # print(self.eval_kwargs_keys, list(kwargs.keys()))
         assert list(kwargs.keys()) == self.eval_kwargs_keys
         # if deriv:
             # return self._deriv_evaluator(token, False, **kwargs)    

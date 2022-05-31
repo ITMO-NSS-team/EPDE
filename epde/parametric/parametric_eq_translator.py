@@ -121,5 +121,5 @@ def optimize_parametric_form(terms : list, pool, **kwargs):
                                           defined_factors = temp_factors_defined))
     
     equation = ParametricEquation(pool, terms_parsed)
-    # equation.optimize_equations(kwargs['initial_params'])
+    equation.optimize_equations(kwargs['initial_params'])
     return equation

@@ -18,12 +18,21 @@ class ParametricFactor(Factor):
     
     def __init__(self, token_name : str, status : dict, family_type : str, params_description = None, 
                  params_to_optimize = None, deriv_code = None, equality_ranges = None):
-        super().__init__(token_name, status, family_type, False,
-                         params_description, deriv_code, equality_ranges)
         self.params_defined = False
         self.params_to_optimize = params_to_optimize
-        self.params_description = params_description; self.equality_ranges = equality_ranges
+        super().__init__(token_name, status, family_type, False,
+                         params_description, deriv_code, equality_ranges)
+
+        
+        _params_description = {}
+        for param_idx, param_info in enumerate(params_description.items()):
+            _params_description[param_idx] = {'name' : param_info[0], 
+                                                  'bounds' : param_info[1]} 
+        self.params_description = _params_description
+        self.params_description_odict = params_description # Костыль, разобраться с лишними объектами
+        self.equality_ranges = equality_ranges
         self.defined_params_passed = False
+        self.params_predefined = {}
 
         self.reset_saved_state()
 
@@ -53,9 +62,9 @@ class ParametricFactor(Factor):
 
     @property
     def grad_cache_label(self):
-        grad_cache_label = factor_params_to_str(self)
+        grad_cache_label = list(factor_params_to_str(self))
         grad_cache_label[0] += '_grad'
-        return grad_cache_label
+        return tuple(grad_cache_label)
 
     @property
     def required_params(self):
@@ -65,42 +74,42 @@ class ParametricFactor(Factor):
         return element in self.params_to_optimize
 
     def use_params(self, params):
+        self.reset_saved_state()      
         assert len(params) == len(self.params_to_optimize), 'The number of the passed parameters does not match declared problem'
         _params = np.ones(shape=len(self.params_description))
-        for param_idx, param_info in enumerate(self.params_description.items()):
-            if param_info[1] not in self.params_to_optimize and param_info[0] != 'power':
+        for param_idx, param_info in self.params_description.items():
+            if param_info['name'] not in self.params_to_optimize and param_info['name'] != 'power':
                 if not self.defined_params_passed:
-                    _params[param_idx] = (np.random.randint(param_info[1][0], param_info[1][1] + 1) if isinstance(param_info[1][0], int) 
-                    else np.random.uniform(param_info[1][0], param_info[1][1])) if param_info[1][1] > param_info[1][0] else param_info[1][0]
-                # except KeyError:
-                #     print('self.params_description.items():', self.params_description.items())
-                #     print('param_info', param_info)
-                #     raise KeyError
-            elif param_info[0] in self.params_to_optimize:
-                opt_param_idx = self.params_to_optimize.index(param_info[0])
-                print('params:', params, 'opt_param_idx:', opt_param_idx, params[opt_param_idx])
+                    _params[param_idx] = (np.random.randint(param_info['bounds'][0], param_info['bounds'][1] + 1) if isinstance(param_info['bounds'][0], int) 
+                    else np.random.uniform(param_info['bounds'][0], param_info['bounds'][1])) if param_info['bounds'][1] > param_info['bounds'][0] else param_info['bounds'][0]
+                else:
+                    _params[param_idx] = self.params_predefined[param_info['name']]
+
+            elif param_info['name'] in self.params_to_optimize:
+                opt_param_idx = self.params_to_optimize.index(param_info['name'])
                 _params[param_idx] = params[opt_param_idx][1]
-                print('set', _params[param_idx], 'with', params[opt_param_idx][1])
-        _kw_params = {param_label : _params[idx] for idx, param_label in enumerate(list(self.params_description.keys()))}
-        super().set_parameters(self.params_description, self.equality_ranges, random=False, **_kw_params)
+        _kw_params = {param_info['name'] : _params[idx] for idx, param_info in enumerate(list(self.params_description.values()))}
+        
+        super().set_parameters(self.params_description_odict, self.equality_ranges, random=False, **_kw_params)
 
     def set_defined_params(self, defined_params : dict):
-        for param_label, val in defined_params:
+        for param_label, val in defined_params.items():
             if val is None:
                 raise ValueError('Trying to set the parameter with None value')
-            self.set_param(val, name = param_label)
+            self.params_predefined[param_label] = val
         self.defined_params_passed = True
 
     def reset_saved_state(self):
-        self.saved = {'base':False, 'deriv':False, 'structural':False}
+        deriv_eval_dict = {label : False for label in self.params_to_optimize}
+        self.saved = {'base':False, 'deriv' : deriv_eval_dict, 'structural':False}
 
-    def eval_grad(self, param_idx : int):
-        if self.saved['deriv']:
-            return global_var.tensor_cache.get(self.grad_cache_label,
-                                               structural = False)
-        else:
-            value = self._grad_evaluator.apply(self)
-            self.saved['deriv'] = global_var.tensor_cache.add(self.grad_cache_label, value, structural = False)
+    def eval_grad(self, param_label : str):
+        # if self.saved['deriv'][param_label]:
+        #     return global_var.tensor_cache.get(self.grad_cache_label,
+        #                                        structural = False)
+        # else:
+            value = self._grad_evaluator[param_label].apply(self)
+            # self.saved['deriv'][param_label] = global_var.tensor_cache.add(self.grad_cache_label, value, structural = False)
             return value    
 
 class ParametricTerm(Term):
@@ -111,15 +120,15 @@ class ParametricTerm(Term):
     def __init__(self, pool, parametric_factors : dict, defined_factors : dict, interelement_operator = np.multiply):
         self.parametric_factors = parametric_factors
         self.defined_factors = defined_factors
-        print('parametric factors:', self.parametric_factors)
+        # print('parametric factors:', self.parametric_factors)
         self.all_params = reduce(lambda x, y: x+y, [factor.params_to_optimize for factor in self.parametric_factors.values()], [])
-        print('Params in term:', self.all_params, len(self.all_params))
+        # print('Params in term:', self.all_params, len(self.all_params))
         self.pool = pool; self.operator = interelement_operator
 
     def __deepcopy__(self, memo):
-        print('while copying factor:')
-        print('properties of self')        
-        pprint(vars(self))
+        # print('while copying factor:')
+        # print('properties of self')        
+        # pprint(vars(self))
         
         cls = self.__class__
         result = cls.__new__(cls)
@@ -146,8 +155,8 @@ class ParametricTerm(Term):
                     setattr(result, k, temp)
             except AttributeError:
                 pass            
-        print('properties of copy')        
-        pprint(vars(result))
+        # print('properties of copy')        
+        # pprint(vars(result))
         return result
 
     @property
@@ -169,7 +178,7 @@ class ParametricTerm(Term):
 
     def use_params(self, params : dict):
         for factor_label, factor_params in params.items():
-            print('setting params:', params)
+            # print('setting params:', params)
             self.parametric_factors[factor_label].use_params(factor_params)
     
     def evaluate(self):
@@ -178,20 +187,28 @@ class ParametricTerm(Term):
         return value.reshape(-1)
 
     def evaluate_grad(self, parameter):
-        param_factor_idxs = [idx for idx, factor in enumerate(self.parametric_factors) if parameter in factor]
+        # print(self.parametric_factors, parameter)
+        param_factor_idxs = [idx for idx, factor in enumerate(self.parametric_factors.values()) if parameter in factor]
+        # print(param_factor_idxs)
         assert len(param_factor_idxs) == 1, 'More than one factor in a term contains the same parameter'
 
-        return np.prod.reduce([factor.evaluate() for idx, factor in enumerate(self.parametric_factors.values()) if idx != param_factor_idxs[0]] + 
-                              [factor.evaluate() for factor in self.defined_factors]) * self.parametric_factors[param_factor_idxs[0]].eval_grad()
+        return np.multiply.reduce([factor.evaluate() for idx, factor in enumerate(self.parametric_factors.values()) if idx != param_factor_idxs[0]] + 
+                              [factor.evaluate() for factor in self.defined_factors.values()]) * list(self.parametric_factors.values())[param_factor_idxs[0]].eval_grad(parameter)
 
     def equivalent_common_term(self):
         factors_to_convert = []
+        const_set = False
         for factor in self.parametric_factors.values():
             if factor.label != 'const':
                 factors_to_convert.append(factor)
             else:
+                const_set = True
                 const_val = factor.params[0]
-         
+        
+        for factor in self.defined_factors.values():
+            factors_to_convert.append(factor)
+        
+        if not const_set: const_val = 1
         equilvalent_term = Term(pool = self.pool, passed_term=factors_to_convert, max_factors_in_term=len(factors_to_convert))
         return const_val, equilvalent_term
 

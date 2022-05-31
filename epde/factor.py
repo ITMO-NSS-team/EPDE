@@ -8,7 +8,6 @@ Created on Thu Mar  5 13:16:43 2020
 
 import numpy as np
 import copy
-from pprint import pprint
 
 from epde.Tokens import TerminalToken
 import epde.globals as global_var
@@ -91,7 +90,6 @@ class Factor(TerminalToken):
             _params = np.empty(len(params_description))#OrderedDict()
             for param_idx, param_info in enumerate(params_description.items()):
                 if param_info[0] != 'power':
-                    print('val ranges', param_info[1][0], param_info[1][1])
                     _params[param_idx] = (np.random.randint(param_info[1][0], param_info[1][1] + 1) if isinstance(param_info[1][0], int) 
                     else np.random.uniform()) if param_info[1][1] > param_info[1][0] else param_info[1][0]
                 else:
@@ -103,6 +101,7 @@ class Factor(TerminalToken):
                          params = _params)
         if not self.grid_set:
             self.use_grids_cache()
+
         
     def __eq__(self, other):
         if type(self) != type(other):
@@ -132,11 +131,11 @@ class Factor(TerminalToken):
             return global_var.tensor_cache.get(self.cache_label,
                                                structural = structural)
         else:
-            try:
-                print('parameters info', self.params, self.params_description)
-            except AttributeError:
-                print(self.name)
-                raise AttributeError
+            # try:
+            #     print('parameters info', self.params, self.params_description)
+            # except AttributeError:
+            #     print(self.name)
+            #     raise AttributeError
             value = self._evaluator.apply(self)
             if key == 'structural' and self.status['structural_and_defalut_merged']:
                 global_var.tensor_cache.use_structural(use_base_data = True)
