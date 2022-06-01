@@ -84,7 +84,7 @@ def construct_ordinary_factor(label, param_equality, status = None, family_type 
                     equality_ranges = param_equality)
     return factor
 
-def optimize_parametric_form(terms : list, pool, **kwargs):
+def optimize_parametric_form(terms : list, pool, method = 'L-BFGS-B', **kwargs):
     assert all([isinstance(term_form, list) for term_form in terms])
 
     # factor_constructor = partial(construct_parametric_factor, param_equality = kwargs['param_equality']),
@@ -121,5 +121,5 @@ def optimize_parametric_form(terms : list, pool, **kwargs):
                                           defined_factors = temp_factors_defined))
     
     equation = ParametricEquation(pool, terms_parsed)
-    equation.optimize_equations(kwargs['initial_params'])
+    equation.optimize_equations(kwargs['initial_params'], method = method)
     return equation

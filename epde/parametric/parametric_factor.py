@@ -161,7 +161,9 @@ class ParametricTerm(Term):
 
     @property
     def term_id(self) -> int:
-        return sum([factor.factor_id for factor in self.parametric_factors.values()])
+        _term_id = sum([factor.factor_id for factor in self.parametric_factors.values()])
+        # print('_term_id', _term_id)
+        return _term_id
 
     def parse_opt_params(self, params : np.ndarray):
         params_dict = OrderedDict()
@@ -203,7 +205,7 @@ class ParametricTerm(Term):
                 factors_to_convert.append(factor)
             else:
                 const_set = True
-                const_val = factor.params[0]
+                const_val = factor.param(name = 'value')
         
         for factor in self.defined_factors.values():
             factors_to_convert.append(factor)

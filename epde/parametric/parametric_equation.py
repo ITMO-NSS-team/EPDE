@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.optimize as optimize
+import time
 
 from pprint import pprint
 from copy import deepcopy
@@ -26,7 +27,7 @@ class ParametricEquation(object):
         self.rpi = right_part_index if right_part_index >= 0 else len(terms) + right_part_index
         self._optimization_held = False
 
-    def optimize_equations(self, initial_params = None):
+    def optimize_equations(self, initial_params = None, method = 'L-BFGS-B'):
         def opt_func(params, *variables):
             '''
 
@@ -67,9 +68,19 @@ class ParametricEquation(object):
         opt_lbd = lambda params: opt_func(params, optimizational_copy)
         opt_grd = lambda params: opt_fun_grad(params, optimizational_copy)
         
-        optimal_params = optimize.fmin_cg(opt_lbd, x0 = initial_params, fprime = opt_grd)
-        self.set_term_params(optimal_params)
-        self._optimization_held = True  
+        if method == 'L-BFGS-B':
+            optimal_params = optimize.minimize(opt_lbd, x0 = initial_params)#(, fprime = opt_grd)
+        elif method == 'GD':
+            optimal_params = optimize.fmin_cg(opt_lbd, x0 = initial_params, fprime = opt_grd)
+        else:
+            raise NotImplementedError('Implemented methods of parameter optimization are limited to "L-BFGS-B" and gradient descent as "GD"')
+        print(type(optimal_params))
+
+        if type(optimal_params) == np.ndarray:
+            self.set_term_params(optimal_params) 
+        elif type(optimal_params) == optimize.optimize.OptimizeResult:
+            self.set_term_params(optimal_params.x) 
+        self._optimization_held = True; self.equation_set = False
 
     def parse_eq_terms(self):
         weights = []; equation_term = []
@@ -86,6 +97,7 @@ class ParametricEquation(object):
         params_parsed = OrderedDict()
         cur_idx = 0
         for term in self.terms:
+            # print('params', params)
             params_parsed[term.term_id] = term.parse_opt_params(params[cur_idx : cur_idx + term.opt_params_num()])
             cur_idx += term.opt_params_num()
         return params_parsed
@@ -118,6 +130,8 @@ class ParametricEquation(object):
     @property
     def equation(self):
         if self._optimization_held:
+            if not self.equation_set:
+                self.set_equation()
             return self._equation
         else:
             raise AttributeError('Equation terms have not been initialized before calling.')  
@@ -126,9 +140,10 @@ class ParametricEquation(object):
         weights, terms = self.parse_eq_terms()
         self._equation = Equation(pool = self.pool, basic_structure = terms, terms_number = len(terms),
                                  max_factors_in_term = max([len(term.structure) for term in terms]))
-        self._equation.target_idx = rpi if rpi >= 0 else len(self.equation.structure) - 1  
+        self._equation.target_idx = rpi if rpi >= 0 else len(self._equation.structure) - 1  
         self._equation.weights_internal = weights
         self._equation.weights_final = weights
+        self.equation_set = True
 
     @singledispatchmethod
     def get_term_for_param(self, param):
