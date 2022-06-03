@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Apr  7 19:43:32 2022
-
-@author: maslyaev
-"""
 
 import numpy as np
 import epde.interface.interface as epde_alg

@@ -6,8 +6,9 @@ Created on Mon Jan 11 16:22:17 2021
 @author: mike_ubuntu
 """
 
+from typing import Union
 import numpy as np
-from functools import reduce
+from functools import reduce, singledispatchmethod
 import copy
 import gc
 import time
@@ -70,7 +71,7 @@ class Complex_Structure(object):
             return self.structure[0].evaluate(structural)
         else:
             return reduce(lambda x, y: self.interelement_operator(x, y.evaluate(structural)),
-                          self.structure[1:], self.structure[0].evaluate(structural))        
+                          self.structure[1:], self.structure[0].evaluate(structural))
 
     def reset_saved_state(self):
         self.saved = {True:False, False:False}
@@ -117,28 +118,37 @@ class Term(Complex_Structure):
             if not self.structure[idx].cache_linked:
                 self.structure[idx].use_cache()
 
+    @singledispatchmethod
     def defined(self, passed_term):
+        raise NotImplementedError(f'passed term should have string or list/dict types, not {type(passed_term)}')
+
+    @defined.register
+    def _(self, passed_term : list):
         self.structure = []
         print('passed_term:', passed_term)
 
-        if isinstance(passed_term, (list, tuple)): #type(passed_term) == list or type(passed_term) == tuple:
-            for i, factor in enumerate(passed_term):
-                if isinstance(factor, str):
-                    _, temp_f = self.pool.create(label = factor)
-                    self.structure.append(temp_f)#; raise NotImplementedError
-                elif isinstance(factor, Factor):
-                    self.structure.append(factor)
-                else:
-                    raise ValueError('The structure of a term should be declared with str or factor.Factor obj, instead got', type(factor))
-        else:   # Случай, если подается лишь 1 токен
-            if isinstance(passed_term, str):
-                _, temp_f = self.pool.create(label = passed_term)
+        for _, factor in enumerate(passed_term):
+            if isinstance(factor, str):
+                _, temp_f = self.pool.create(label = factor)
                 self.structure.append(temp_f)#; raise NotImplementedError
-            elif isinstance(passed_term, Factor):
-                self.structure.append(passed_term)
+            elif isinstance(factor, Factor):
+                self.structure.append(factor)
             else:
-                raise ValueError('The structure of a term should be declared with str or factor.Factor obj, instead got', type(passed_term))
-                
+                raise ValueError('The structure of a term should be declared with str or factor.Factor obj, instead got', type(factor))
+
+    @defined.register
+    def _(self, passed_term : str):
+        self.structure = []
+        print('passed_term:', passed_term)
+        if isinstance(passed_term, str):
+            _, temp_f = self.pool.create(label = passed_term)
+            self.structure.append(temp_f)#; raise NotImplementedError
+        elif isinstance(passed_term, Factor):
+            self.structure.append(passed_term)
+        else:
+            raise ValueError('The structure of a term should be declared with str or factor.Factor obj, instead got', type(passed_term))
+
+
     def randomize(self, forbidden_factors = None, **kwargs):
         if np.sum(self.pool.families_cardinality(meaningful_only = True)) == 0:
             raise ValueError('No token families are declared as meaningful for the process of the system search')
@@ -276,6 +286,8 @@ class Term(Complex_Structure):
         
         deriv_orders = []
         deriv_powers = []
+        derivs_detected = False
+        
         try:
             coeff_tensor = np.ones_like(global_var.grid_cache.get('0'))
         except KeyError:
@@ -285,8 +297,11 @@ class Term(Complex_Structure):
                 for param_idx, param_descr in factor.params_description.items():
                     if param_descr['name'] == 'power': power_param_idx = param_idx
                 deriv_orders.append(factor.deriv_code); deriv_powers.append(factor.params[power_param_idx])
+                derivs_detected = True
             else:
                 coeff_tensor = coeff_tensor * factor.evaluate()
+        if not derivs_detected:
+           deriv_powers = [0]; deriv_orders = [[None,],]
         if len(deriv_powers) == 1:
             deriv_powers = deriv_powers[0]
             deriv_orders = deriv_orders[0]
@@ -775,7 +790,6 @@ class SoEq(Complex_Structure, moeadd.moeadd_solution):
         
         for eq_idx in range(self.equation_number):
             current_tokens = token_selection + self.tokens_dep
-#            print('Equation index', eq_idx, self.vals)
             self.eq_search_evolutionary_strategy.modify_block_params(block_label = 'rps1', param_label = 'sparsity', 
                                                                      value = self.vals[eq_idx], suboperator_sequence = ['eq_level_rps', 'fitness_calculation', 'sparsity'])#(sparsity_value = self.vals[eq_idx])
             self.eq_search_evolutionary_strategy.modify_block_params(block_label = 'rps2', param_label = 'sparsity', 
@@ -788,16 +802,9 @@ class SoEq(Complex_Structure, moeadd.moeadd_solution):
             self.separated_vars.add(frozenset(cur_equation.described_variables))
 
             self.structure.append(cur_equation)
-#            self.single_vars_in_equation.update()
-#            cache.clear(full = False)
             if not eq_idx == self.equation_number - 1:
                 global_var.tensor_cache.change_variables(cur_eq_operator_error_abs, 
                                                          cur_eq_operator_error_structural)
-#            for idx, _ in enumerate(token_selection):
-#                 token_selection[idx].change_variables(cur_eq_operator_error)               
-        
-#        obj_funs = np.array(flatten([func(self) for func in self.obj_funs]))
-#        np.array([self.evaluate(normalize = False),] + [eq.L0_norm for eq in self.structure])
         moeadd.moeadd_solution.__init__(self, self.vals, self.obj_funs) # , return_val = True, self) super(
         self.moeadd_set = True
             
