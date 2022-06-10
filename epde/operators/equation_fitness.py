@@ -76,7 +76,7 @@ class L2_fitness(Compound_Operator):
             if self.weak_deriv_appr:
                 # print('Evaluating fitness with the weak derivatives approach')
                 if self.g_fun_vals is None:
-                    self.g_fun_vals = self.g_fun()
+                    self.g_fun_vals = self.g_fun().reshape(-1)
                 discr = np.multiply(discr, self.g_fun_vals)
             rl_error = np.linalg.norm(discr, ord = 2)
 
