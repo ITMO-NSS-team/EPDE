@@ -19,6 +19,7 @@ def flatten(obj):
     for idx, elem in enumerate(obj):
         if not isinstance(elem, (list, tuple)):
             obj[idx] = [elem,]
+    # print('objectives', obj)
     return reduce(lambda x,y: x+y, obj)
 
 def try_iterable(arg):

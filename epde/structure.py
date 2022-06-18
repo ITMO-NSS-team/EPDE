@@ -640,11 +640,11 @@ class Equation(Complex_Structure):
         described = set()
         for term_idx, term in enumerate(self.structure):
             if term_idx == self.target_idx:
-                described.update({factor.type for factor in term.structure})
+                described.update({factor.type for factor in term.structure if factor.is_deriv})
             else:
                 weight_idx = term_idx if term_idx < term_idx else term_idx - 1
                 if np.abs(self.weights_final[weight_idx]) > eps:
-                    described.update({factor.type for factor in term.structure})
+                    described.update({factor.type for factor in term.structure if factor.is_deriv})
         described = frozenset(described)
         return described
     
@@ -744,8 +744,10 @@ class SoEq(Complex_Structure, moeadd.moeadd_solution):
         self.def_eq_search_iters = eq_search_iters
         
     def use_default_objective_function(self):
-        from epde.eq_mo_objectives import system_discrepancy, system_complexity_by_terms, system_complexity_by_factors
-        self.set_objective_functions([system_discrepancy, system_complexity_by_factors])
+        from epde.eq_mo_objectives import generate_partial, equation_discrepancy, equation_complexity_by_factors
+        quality_objectives = [generate_partial(equation_discrepancy, eq_idx) for eq_idx in range(self.equation_number)]
+        complexity_objectives = [generate_partial(equation_complexity_by_factors, eq_idx) for eq_idx in range(self.equation_number)]
+        self.set_objective_functions(quality_objectives + complexity_objectives)
         
     def set_objective_functions(self, obj_funs):
         '''

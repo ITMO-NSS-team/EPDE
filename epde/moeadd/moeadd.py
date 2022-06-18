@@ -491,7 +491,7 @@ class moeadd_optimizer(object):
             problem.
         
         '''
-        
+        print('comparing lengths', len(args), len(self.pareto_levels.population[0].obj_funs))
         assert len(args) == len(self.pareto_levels.population[0].obj_funs)
         self.best_obj = np.empty(len(self.pareto_levels.population[0].obj_funs))
         for arg_idx, arg in enumerate(args):
