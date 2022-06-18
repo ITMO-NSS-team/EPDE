@@ -19,7 +19,7 @@ from epde.interface.token_family import TokenFamily
 from epde.evaluators import CustomEvaluator, EvaluatorTemplate, trigonometric_evaluator, simple_function_evaluator
 from epde.evaluators import const_evaluator, const_grad_evaluator
 from epde.evaluators import velocity_evaluator, velocity_grad_evaluators
-from epde.cache.cache import upload_simple_tokens, np_ndarray_section
+from epde.cache.cache import upload_simple_tokens, np_ndarray_section, prepare_var_tensor
 
 class PreparedTokens(ABC):
     def __init__(self, *args, **kwargs):
@@ -96,16 +96,25 @@ class CacheStoredTokens(CustomTokens):
                          dimensionality = dimensionality, unique_specific_token = unique_specific_token, 
                          unique_token_type = unique_token_type, meaningful = meaningful)
 
-class ExternalDerivativesTokens(CacheStoredTokens):
-    def __init__(self, token_type : str, boundary : Union[list, tuple],
-                 base_token_label : list, token_tensor : np.ndarray, deriv_orders : Union[str, tuple],
-                 deriv_calc_method : str, deriv_calc_method_kwargs : dict, params_ranges : dict,
+class ExternalDerivativesTokens(CustomTokens):
+    def __init__(self, token_type : str, boundary : Union[list, tuple], time_axis : int,
+                 base_token_label : list, token_tensor : np.ndarray, max_orders : Union[int, tuple],
+                 deriv_method : str, deriv_method_kwargs : dict, params_ranges : dict,
                  params_equality_ranges : Union[None, dict], dimensionality : int = 1,
                  unique_specific_token=True, unique_token_type=True, meaningful = False):
-        data_tensor, derivatives = Preprocess_derivatives(token_tensor, method = deriv_calc_method, 
-                                                          method_kwargs = deriv_calc_method_kwargs)
+        data_tensor, derivs_tensor = Preprocess_derivatives(token_tensor, method = deriv_method, 
+                                                          method_kwargs = deriv_method_kwargs)
         deriv_names, deriv_orders = Define_Derivatives(base_token_label, dimensionality=token_tensor.ndim, 
-                                                       max_order = deriv_orders)
+                                                       max_order = max_orders)
+
+        derivs_stacked = prepare_var_tensor(token_tensor, derivs_tensor, time_axis, boundary)
+        upload_simple_tokens(deriv_names, global_var.tensor_cache, derivs_stacked)
+
+        super().__init__(token_type = token_type, token_labels = deriv_names,
+                         evaluator = simple_function_evaluator, params_ranges = params_ranges,
+                         params_equality_ranges = params_equality_ranges,
+                         dimensionality = dimensionality, unique_specific_token = unique_specific_token,
+                         unique_token_type = unique_token_type, meaningful = meaningful)
 
 class ConstantToken(PreparedTokens):
     def __init__(self, values_range = (-np.inf, np.inf)):
