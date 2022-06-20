@@ -29,7 +29,7 @@ from epde.structure import Equation
 
 from epde.interface.token_family import TF_Pool, TokenFamily
 from epde.interface.type_checks import *
-from epde.interface.prepared_tokens import Prepared_tokens, Custom_tokens
+from epde.interface.prepared_tokens import PreparedTokens, CustomTokens
 
 class Input_data_entry(object):
     def __init__(self, var_name, data_tensor, coord_tensors = None):
@@ -77,7 +77,6 @@ class Input_data_entry(object):
         print(type(self.data_tensor), type(self.derivatives))
         derivs_stacked = prepare_var_tensor(self.data_tensor, self.derivatives,
                                             time_axis = global_var.time_axis, boundary = boundary) 
-#                                            axes = self.coord_tensors)
         if isinstance(self.coord_tensors, (list, tuple)):
             coord_tensors_cut = []
             for tensor in self.coord_tensors:
@@ -89,7 +88,7 @@ class Input_data_entry(object):
         
         try:       
             upload_simple_tokens(self.names, global_var.tensor_cache, derivs_stacked)
-            upload_simple_tokens(['u',], global_var.initial_data_cache, [self.data_tensor,])            
+            upload_simple_tokens([self.var_name,], global_var.initial_data_cache, [self.data_tensor,])            
             if set_grids: 
                 memory_for_cache = int(memory_for_cache/2)
                 upload_grids(self.coord_tensors, global_var.initial_data_cache)
@@ -113,7 +112,7 @@ class Input_data_entry(object):
                                                             mem_for_cache_frac = memory_for_cache)
             print(self.names, derivs_stacked.shape)
             upload_simple_tokens(self.names, global_var.tensor_cache, derivs_stacked)
-            upload_simple_tokens(['u',], global_var.initial_data_cache, [self.data_tensor,])
+            upload_simple_tokens([self.var_name,], global_var.initial_data_cache, [self.data_tensor,])
 
         global_var.tensor_cache.use_structural()
     
@@ -337,12 +336,12 @@ class epde_search(object):
             self.set_domain_pruning(pivotal_tensor_label, pruner, threshold, division_fractions, rectangular)
             
         if isinstance(additional_tokens, list):
-            if not all([isinstance(tf, (TokenFamily, Prepared_tokens)) for tf in additional_tokens]):
+            if not all([isinstance(tf, (TokenFamily, PreparedTokens)) for tf in additional_tokens]):
                 raise TypeError(f'Incorrect type of additional tokens: expected list or TokenFamily/Prepared_tokens - obj, instead got list of {type(additional_tokens[0])}')                
-        elif isinstance(additional_tokens, (TokenFamily, Prepared_tokens)):
+        elif isinstance(additional_tokens, (TokenFamily, PreparedTokens)):
             additional_tokens = [additional_tokens,]
         else:
-            print(isinstance(additional_tokens, Prepared_tokens))
+            print(isinstance(additional_tokens, PreparedTokens))
             raise TypeError(f'Incorrect type of additional tokens: expected list or TokenFamily/Prepared_tokens - obj, instead got {type(additional_tokens)}')
         self.pool = TF_Pool(data_tokens + [tf if isinstance(tf, TokenFamily) else tf.token_family 
                                       for tf in additional_tokens])
@@ -449,8 +448,9 @@ class epde_search(object):
         evo_operator = operators.sys_search_evolutionary_operator(operators.mixing_xover, 
                                                                   operators.gaussian_mutation)
         self.optimizer.set_evolutionary(operator=evo_operator)        
-        best_obj = np.concatenate((np.ones([1,]),
-                                  np.zeros(shape=len([1 for token_family in self.pool.families if token_family.status['demands_equation']]))))  
+        best_obj = np.concatenate((np.zeros(shape =len([1 for token_family in self.pool.families if token_family.status['demands_equation']])),
+                                   np.ones(shape=len([1 for token_family in self.pool.families if token_family.status['demands_equation']]))))  
+        print('best_obj', len(best_obj))
         self.optimizer.pass_best_objectives(*best_obj)
         self.optimizer.optimize(**self.moeadd_optimization_params)
 

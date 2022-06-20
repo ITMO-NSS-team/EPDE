@@ -70,12 +70,10 @@ class LASSO_sparsity(Compound_Operator):
                           selection='cyclic', tol=0.0001, warm_start=False)
         _, target, features = equation.evaluate(normalize = True, return_val = False)
         if self.weak_deriv_appr:
-            # print('Using sparsity with the weak derivatives approach')
             if self.g_fun_vals is None:
                 self.g_fun_vals = self.g_fun().reshape(-1)
             target = np.multiply(target, self.g_fun_vals)
             g_fun_casted = np.broadcast_to(self.g_fun_vals, features.T.shape).T
-            # print('g_fun_casted details:', g_fun_casted.min(), g_fun_casted.max())
             features = np.multiply(features, g_fun_casted)
         else:
             print('Using sparsity without the weak derivatives approach')

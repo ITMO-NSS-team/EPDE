@@ -7,8 +7,12 @@ Created on Mon Jul  5 18:48:23 2021
 """
 
 import numpy as np
+from functools import partial
 
-def system_discrepancy(system):
+def generate_partial(obj_function, equation_idx):
+    return partial(obj_function, equation_idx = equation_idx)
+
+def equation_discrepancy(system, equation_idx):
     '''
     Evaluate the discrepancy of the system of PDEs, using sum of the L2 norm of the discrepancy 
     of each equation in the system from zero.
@@ -23,11 +27,10 @@ def system_discrepancy(system):
         discrepancy : float.
         The value of the error metric.
     '''
-    res = system.evaluate(normalize = False)
-    # print(f'achieved system discrepancy is {res}')
+    res = np.sum(np.abs(system.structure[equation_idx].evaluate(normalize = False, return_val = True)[0]))
     return res
 
-def system_complexity_by_terms(system):
+def equation_complexity_by_terms(system, equation_idx):
     '''
     Evaluate the complexity of the system of PDEs, evaluating a number of terms for each equation. 
     In the evaluation, we consider only terms with non-zero weights, and the target term with the free 
@@ -43,9 +46,9 @@ def system_complexity_by_terms(system):
         discrepancy : list of integers.
         The values of the error metric: list entry for each of the equations.
     '''    
-    return [np.count_nonzero(eq.weights_internal) for eq in system.structure] 
+    return np.count_nonzero(system.structure[equation_idx].weights_internal)
 
-def system_complexity_by_factors(system):
+def equation_complexity_by_factors(system, equation_idx):
     '''
     Evaluate the complexity of the system of PDEs, evaluating a number of factors in terms for each 
     equation. In the evaluation, we consider only terms with non-zero weights and target, while
@@ -62,18 +65,16 @@ def system_complexity_by_factors(system):
         discrepancy : list of integers.
         The values of the error metric: list entry for each of the equations.
     '''    
-    complexities = []
-    for equation in system.structure:
-        eq_compl = 0
-        # print(equation)
-        # print(equation.text_form)
-        
-        for idx, term in enumerate(equation.structure):
-            if idx < equation.target_idx:
-                if not equation.weights_final[idx] == 0: eq_compl += len(term.structure)
-            elif idx > equation.target_idx:
-                if not equation.weights_final[idx-1] == 0: eq_compl += len(term.structure)
-            else:
+    eq_compl = 0
+    # print(equation)
+    # print(equation.text_form)
+    
+    for idx, term in enumerate(system.structure[equation_idx].structure):
+        if idx < system.structure[equation_idx].target_idx:
+            if not system.structure[equation_idx].weights_final[idx] == 0: 
                 eq_compl += len(term.structure)
-        complexities.append(eq_compl)
-    return complexities 
+        elif idx > system.structure[equation_idx].target_idx:
+            if not system.structure[equation_idx].weights_final[idx-1] == 0: eq_compl += len(term.structure)
+        else:
+            eq_compl += len(term.structure)
+    return eq_compl 

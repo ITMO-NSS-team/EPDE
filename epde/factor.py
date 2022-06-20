@@ -14,7 +14,7 @@ import epde.globals as global_var
 from epde.supplementary import factor_params_to_str
 
 class Factor(TerminalToken):
-    __slots__ = ['_params', '_params_description', 
+    __slots__ = ['_params', '_params_description', '_hash_val',
                  'label', 'type', 'grid_set', 'grid_idx', 'is_deriv', 'deriv_code', 
                  'cache_linked', '_status', 'equality_ranges', '_evaluator', 'saved']
     
@@ -25,7 +25,7 @@ class Factor(TerminalToken):
         self.type = family_type
         self.status = status
         self.grid_set = False
-        
+        self._hash_val = np.random.randint(0, 1e9)
         
         self.is_deriv = not (deriv_code is None)
         self.deriv_code = deriv_code
@@ -53,8 +53,6 @@ class Factor(TerminalToken):
     @status.setter
     def status(self, status_dict):
         '''
-        
-
         Parameters
         ----------
         status_dict : dict
@@ -157,6 +155,10 @@ class Factor(TerminalToken):
                 form += ', '
         form += '}'
         return form
+
+    @property
+    def factor_id(self) -> int:
+        return self._hash_val
 
     @property
     def grids(self):
