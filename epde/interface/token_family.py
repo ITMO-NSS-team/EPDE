@@ -44,7 +44,7 @@ class EvaluatorContained(object):
         # if deriv_eval_function is not None: self._deriv_evaluator = deriv_eval_function
         self.eval_kwargs_keys = eval_kwargs_keys
         
-    def apply(self, token, structural = False, **kwargs): # , deriv = False
+    def apply(self, token, structural = False, **kwargs):
         """
         Apply the defined evaluator to evaluate the token with specific parameters.
         
@@ -63,11 +63,7 @@ class EvaluatorContained(object):
             If the evaluator could not be applied to the token.
         
         """
-        # print(self.eval_kwargs_keys, list(kwargs.keys()))
         assert list(kwargs.keys()) == self.eval_kwargs_keys
-        # if deriv:
-            # return self._deriv_evaluator(token, False, **kwargs)    
-        # else:
         return self._evaluator(token, structural, **kwargs)
             
 

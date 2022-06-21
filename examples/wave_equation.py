@@ -4,7 +4,7 @@
 import numpy as np
 import epde.interface.interface as epde_alg
 
-from epde.interface.prepared_tokens import Custom_tokens, Cache_stored_tokens
+from epde.interface.prepared_tokens import CustomTokens, CacheStoredTokens
 
 if __name__ == '__main__':
     
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     inclusion.
     '''
 
-    custom_grid_tokens = Cache_stored_tokens(token_type = 'grid',
+    custom_grid_tokens = CacheStoredTokens(token_type = 'grid',
                                    boundary = boundary,
                                    token_labels = ['t', 'x', 'y'],
                                    token_tensors={'t' : grids[0], 'x' : grids[1], 'y' : grids[2]},

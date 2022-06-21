@@ -11,19 +11,17 @@ Created on Wed Nov  3 13:50:09 2021
 import numpy as np
 import matplotlib
 import epde.interface.interface as epde_alg
-import epde.globals as global_var
-from epde.evaluators import CustomEvaluator
 import os
-from epde.interface.prepared_tokens import Custom_tokens, TrigonometricTokens, CacheStoredTokens
+from epde.interface.prepared_tokens import TrigonometricTokens, CacheStoredTokens, ExternalDerivativesTokens
 
 import matplotlib.pyplot as plt
 import torch
 import TEDEouS
 
-from TEDEouS import solver
+# from TEDEouS import solver
 
 
-from TEDEouS import config 
+# from TEDEouS import config 
 
 
 os.chdir(os.path.dirname( __file__ ))
@@ -87,7 +85,7 @@ def equation_fit(grid,data):
         #                                   params_equality_ranges = trig_params_equal_ranges) # Используем заявленные диапазоны "равенства" параметров
             
             
-            
+        ExternalDerivativesTokens
         
         epde_search_obj.set_moeadd_params(population_size=20)
     
@@ -140,7 +138,7 @@ if __name__ == '__main__':
         t*=0.25*1e-3
         
         print(t)
-        
+        raise NotImplementedError()
         f0=50
         tick_title = "time, ms"
         matplotlib.rcParams.update({'font.size': 20})
