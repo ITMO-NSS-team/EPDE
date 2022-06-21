@@ -62,7 +62,7 @@ class Input_data_entry(object):
             if self.coord_tensors is not None and 'grid' not in method_kwargs.keys():
                 method_kwargs['grid'] = self.coord_tensors
             self.data_tensor, self.derivatives = Preprocess_derivatives(self.data_tensor, method=method, 
-                                                         method_kwargs=method_kwargs)
+                                                                        method_kwargs=method_kwargs)
             # Added setting of data tensor from filtered field
             self.deriv_properties = {'max order' : max_order,
                                      'dimensionality' : self.data_tensor.ndim}
