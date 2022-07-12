@@ -16,7 +16,7 @@ from epde.evaluators import simple_function_evaluator
 from epde.interface.token_family import TokenFamily, TF_Pool
 from epde.interface.interface import Input_data_entry
 
-def create_pool(data : Union[np.ndarray, list, tuple], time_axis : int = 0, boundary : int = 0, 
+def create_pool(data : Union[np.ndarray, list, tuple], time_axis : int = 0, 
                 variable_names = ['u',], derivs = None, max_deriv_order = 1, additional_tokens = [], 
                 coordinate_tensors = None, memory_for_cache = 5, data_fun_pow : int = 1):
     assert (isinstance(derivs, list) and isinstance(derivs[0], np.ndarray)) or derivs is None
@@ -42,7 +42,7 @@ def create_pool(data : Union[np.ndarray, list, tuple], time_axis : int = 0, boun
         entry.set_derivatives(deriv_tensors = derivs_tensor, max_order = max_deriv_order)
         print(f'set grids parameter is {set_grids}')
         entry.use_global_cache(grids_as_tokens = set_grids_among_tokens,
-                               set_grids=set_grids, memory_for_cache=memory_for_cache, boundary=boundary)
+                               set_grids=set_grids, memory_for_cache=memory_for_cache)
         set_grids = False; set_grids_among_tokens = False
         
         entry_token_family = TokenFamily(entry.var_name, family_of_derivs = True)

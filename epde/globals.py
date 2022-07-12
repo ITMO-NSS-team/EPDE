@@ -10,7 +10,6 @@ from dataclasses import dataclass
 import warnings
 
 from epde.cache.cache import Cache
-#from epde.supplementary import flatten
 
 def init_caches(set_grids : bool = False):
     global tensor_cache, grid_cache, initial_data_cache

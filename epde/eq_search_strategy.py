@@ -26,7 +26,6 @@ from epde.operators.equation_right_part_selection import Poplevel_Right_Part_Sel
 from epde.operators.equation_truncate import Truncate_worst
 
 class Operator_builder(ABC):    
-    
     @abstractproperty
     def strategy(self):
         pass
@@ -93,8 +92,6 @@ class Strategy_builder(Operator_builder):
 
     def add_operator(self, operator_label, operator, parse_operator_args = None, 
                      terminal_operator : bool = False): #, input_operator : bool = False
-#        if input_operator: 
-#        else:
         new_block = Evolutionary_block(operator, parse_operator_args = parse_operator_args,
                                                    terminal=terminal_operator)            
         self.blocks_labeled[operator_label] = new_block
@@ -117,8 +114,6 @@ class Strategy_builder(Operator_builder):
     def strategy(self):
         self._strategy.check_correctness()
         return self._strategy
-        #self.reset()
-#        return strategy
 
 
 class Strategy_director(object):    
@@ -172,28 +167,19 @@ class Strategy_director(object):
         eq_crossover.suboperators = {'Param_crossover' : param_crossover, 'Term_crossover' : term_crossover} 
         crossover.suboperators = {'Equation_crossover' : eq_crossover}
         
-        grids = global_var.grid_cache.get_all()
-        # print(global_var.grid_cache.memory_default.keys())
-        # print(grids, len(grids), type(grids[0]))
-        
-        def baseline_exp_function(grids):
-            exponent_partial = np.array([-(grid - np.mean(grid))**2 for grid in grids])
-            exponent = np.add.reduce(exponent_partial, axis = 0)
-            return (exponent - np.min(exponent)) / np.std(exponent) 
-        
-        def apply_baseline_exp_function():
-            return baseline_exp_function(global_var.grid_cache.get_all()[1])
+        # def apply_baseline_exp_function():
+        #     return baseline_exp_function(global_var.grid_cache.get_all()[1])
             
-        weak_deriv_fun = (apply_baseline_exp_function if not 'weak_deriv_fun' 
-                          in kwargs.keys() else kwargs['weak_deriv_fun'])
+        # weak_deriv_fun = (apply_baseline_exp_function if not 'weak_deriv_fun' 
+        #                   in kwargs.keys() else kwargs['weak_deriv_fun'])
         
-        lasso_coeffs = LASSO_sparsity(['sparsity'], weak_deriv_fun)
+        lasso_coeffs = LASSO_sparsity(['sparsity'])
         linreg_coeffs = LinReg_based_coeffs()
         
         lasso_coeffs.params = {'sparsity' : 1} if not 'lasso_coeffs_params' in kwargs.keys() else kwargs['lasso_coeffs_params']
         linreg_coeffs.params = {} if not 'linreg_coeffs_params' in kwargs.keys() else kwargs['linreg_coeffs_params']
 
-        fitness_eval = L2_fitness(['penalty_coeff'], weak_deriv_fun)
+        fitness_eval = L2_fitness(['penalty_coeff'])
         fitness_eval.suboperators = {'sparsity' : lasso_coeffs, 'coeff_calc' : linreg_coeffs}
         fitness_eval.params = {'penalty_coeff' : 0.5} if not 'fitness_eval_params' in kwargs.keys() else kwargs['fitness_eval_params']
         

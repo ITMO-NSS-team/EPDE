@@ -19,7 +19,7 @@ from epde.interface.token_family import TokenFamily
 from epde.evaluators import CustomEvaluator, EvaluatorTemplate, trigonometric_evaluator, simple_function_evaluator
 from epde.evaluators import const_evaluator, const_grad_evaluator
 from epde.evaluators import velocity_evaluator, velocity_grad_evaluators
-from epde.cache.cache import upload_simple_tokens, np_ndarray_section, prepare_var_tensor
+from epde.cache.cache import upload_simple_tokens, prepare_var_tensor # np_ndarray_section, 
 
 class PreparedTokens(ABC):
     def __init__(self, *args, **kwargs):
@@ -82,14 +82,13 @@ class CustomTokens(PreparedTokens):
         self._token_family.set_evaluator(evaluator, [])      
         
 class CacheStoredTokens(CustomTokens):
-    def __init__(self, token_type : str, boundary : Union[list, tuple],
-                 token_labels : list, token_tensors : dict, params_ranges : dict,
+    def __init__(self, token_type : str, token_labels : list, token_tensors : dict, params_ranges : dict,
                  params_equality_ranges : Union[None, dict], dimensionality : int = 1,
                  unique_specific_token=True, unique_token_type=True, meaningful = False):
         if set(token_labels) != set(list(token_tensors.keys())):
             raise KeyError('The labels of tokens do not match the labels of passed tensors')
-        for key, val in token_tensors.items():
-            token_tensors[key] = np_ndarray_section(val, boundary = boundary)
+        # for key, val in token_tensors.items():
+        #     token_tensors[key] = np_ndarray_section(val, boundary = boundary)
         upload_simple_tokens(list(token_tensors.keys()), global_var.tensor_cache, list(token_tensors.values()))
         super().__init__(token_type = token_type, token_labels = token_labels, evaluator = simple_function_evaluator, 
                          params_ranges = params_ranges, params_equality_ranges = params_equality_ranges, 
@@ -97,9 +96,8 @@ class CacheStoredTokens(CustomTokens):
                          unique_token_type = unique_token_type, meaningful = meaningful)
 
 class ExternalDerivativesTokens(CustomTokens):
-    def __init__(self, token_type : str, boundary : Union[list, tuple], time_axis : int,
-                 base_token_label : list, token_tensor : np.ndarray, max_orders : Union[int, tuple],
-                 deriv_method : str, deriv_method_kwargs : dict, params_ranges : dict,
+    def __init__(self, token_type : str, time_axis : int, base_token_label : list, token_tensor : np.ndarray,
+                 max_orders : Union[int, tuple], deriv_method : str, deriv_method_kwargs : dict, params_ranges : dict,
                  params_equality_ranges : Union[None, dict], dimensionality : int = 1,
                  unique_specific_token=True, unique_token_type=True, meaningful = False):
         deriv_method_kwargs['max_order'] = max_orders
@@ -108,7 +106,7 @@ class ExternalDerivativesTokens(CustomTokens):
         deriv_names, deriv_orders = Define_Derivatives(base_token_label, dimensionality=token_tensor.ndim, 
                                                        max_order = max_orders)
 
-        derivs_stacked = prepare_var_tensor(token_tensor, derivs_tensor, time_axis, boundary)
+        derivs_stacked = prepare_var_tensor(token_tensor, derivs_tensor, time_axis)
         upload_simple_tokens(deriv_names, global_var.tensor_cache, derivs_stacked)
 
         super().__init__(token_type = token_type, token_labels = deriv_names,

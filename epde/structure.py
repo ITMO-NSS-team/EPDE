@@ -629,11 +629,11 @@ class Equation(Complex_Structure):
             self._solver_form.append(target_form)
             self.solver_form_defined = True
             return self._solver_form
-    
+
     @property
     def state(self):
         return self.text_form    
-    
+
     @property
     def described_variables(self):
         eps=1e-7
@@ -647,17 +647,17 @@ class Equation(Complex_Structure):
                     described.update({factor.type for factor in term.structure if factor.is_deriv})
         described = frozenset(described)
         return described
-    
+
     def max_deriv_orders(self):
         solver_form = self.solver_form()
         max_orders = np.zeros(global_var.grid_cache.get('0').ndim)
-        
+
         def count_order(obj, deriv_ax):
             if obj is None:
                 return 0
             else:
                 return obj.count(deriv_ax)
-                
+
         for term in solver_form:
             if isinstance(term[2], list):
                 for deriv_factor in term[1]:
@@ -700,10 +700,9 @@ class Equation(Complex_Structure):
             print(ax_idx, ax_ord)
             for loc_fraction in hardcoded_bc_relative_locations[ax_ord]:
                 indexes = get_boundary_ind(tensor_shape, axis = ax_idx, rel_loc = loc_fraction)
-                # if len(tensor_shape) > 0:                
                 coords_raw = np.array([grid_cache.get(str(idx))[indexes] for idx 
                                   in np.arange(len(tensor_shape))]) 
-                coords = coords_raw.T # np.squeeze(coords_raw).T
+                coords = coords_raw.T
                 if coords.ndim > 2:
                     coords = coords.squeeze()
                 vals = np.expand_dims(tensor_cache.get(main_var_key)[indexes], axis = 0).T # np.squeeze(tensor_cache.get(main_var_key)[indexes]).T

@@ -70,7 +70,7 @@ if __name__ == '__main__':
     # data_fun_pow = 2
     # equation_factors_max_number = 2
 
-    epde_search_obj.fit(data=u, max_deriv_order=(1,), boundary=(10,), equation_terms_max_number=3, data_fun_pow = 2,
+    epde_search_obj.fit(data=u, max_deriv_order=(1,), equation_terms_max_number=3, data_fun_pow = 2,
                         equation_factors_max_number=2, deriv_method='poly', eq_sparsity_interval=(1e-7, 10),
                         deriv_method_kwargs={'smooth': False, 'grid': [t, ]}, coordinate_tensors=[t, ])
 

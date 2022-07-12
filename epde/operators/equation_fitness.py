@@ -43,13 +43,13 @@ class L2_fitness(Compound_Operator):
         calculate the fitness function of the equation, that will be stored in the equation.fitness_value.    
         
     """
-    def __init__(self, param_keys : list = [], g_fun : Union[np.ndarray, type(None)] = None):
-        self.weak_deriv_appr = g_fun is not None
-        if self.weak_deriv_appr:
-            self.g_fun = g_fun
-            self.g_fun_vals = None
+    # def __init__(self, param_keys : list = [], g_fun : Union[np.ndarray, type(None)] = None):
+    #     self.weak_deriv_appr = g_fun is not None
+    #     if self.weak_deriv_appr:
+    #         self.g_fun = g_fun
+    #         self.g_fun_vals = None
             
-        super().__init__(param_keys = param_keys)
+    #     super().__init__(param_keys = param_keys)
         
     def apply(self, equation):
         """
@@ -73,11 +73,8 @@ class L2_fitness(Compound_Operator):
         try:
             discr = (np.dot(features, equation.weights_final[:-1]) + 
                                   np.full(target.shape, equation.weights_final[-1]) - target)
-            if self.weak_deriv_appr:
-                # print('Evaluating fitness with the weak derivatives approach')
-                if self.g_fun_vals is None:
-                    self.g_fun_vals = self.g_fun().reshape(-1)
-                discr = np.multiply(discr, self.g_fun_vals)
+            self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)
+            discr = np.multiply(discr, self.g_fun_vals)
             rl_error = np.linalg.norm(discr, ord = 2)
 
         except ValueError:
@@ -92,7 +89,6 @@ class L2_fitness(Compound_Operator):
 
         equation.fitness_calculated = True
         equation.fitness_value = fitness_value
-        # print(equation.fitness_value)
 
     @property
     def operator_tags(self):

@@ -10,6 +10,7 @@ from typing import Union, Callable
 import numpy as np
 from sklearn.linear_model import Lasso
 
+import epde.globals as global_var
 from epde.operators.template import Compound_Operator
 
 #class Poplevel_sparsity(Compound_Operator):
@@ -39,13 +40,13 @@ class LASSO_sparsity(Compound_Operator):
         calculate the coefficients of the equation, that will be stored in the equation.weights np.ndarray.    
         
     """
-    def __init__(self, param_keys : list = [], g_fun : Union[Callable, type(None)] = None):
-        self.weak_deriv_appr = g_fun is not None
-        if self.weak_deriv_appr:
-            self.g_fun = g_fun
-            self.g_fun_vals = None            
+    # def __init__(self, param_keys : list = [], g_fun : Union[Callable, type(None)] = None):
+    #     self.weak_deriv_appr = g_fun is not None
+    #     if self.weak_deriv_appr:
+    #         self.g_fun = g_fun
+    #         self.g_fun_vals = None            
             
-        super().__init__(param_keys = param_keys)
+    #     super().__init__(param_keys = param_keys)
     
     def apply(self, equation):
         """
@@ -69,14 +70,12 @@ class LASSO_sparsity(Compound_Operator):
                           normalize=False, positive=False, precompute=False, random_state=None,
                           selection='cyclic', tol=0.0001, warm_start=False)
         _, target, features = equation.evaluate(normalize = True, return_val = False)
-        if self.weak_deriv_appr:
-            if self.g_fun_vals is None:
-                self.g_fun_vals = self.g_fun().reshape(-1)
-            target = np.multiply(target, self.g_fun_vals)
-            g_fun_casted = np.broadcast_to(self.g_fun_vals, features.T.shape).T
-            features = np.multiply(features, g_fun_casted)
-        else:
-            print('Using sparsity without the weak derivatives approach')
+        self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)
+
+        target = np.multiply(target, self.g_fun_vals)
+        g_fun_casted = np.broadcast_to(self.g_fun_vals, features.T.shape).T
+        features = np.multiply(features, g_fun_casted)
+
         estimator.fit(features, target)
         equation.weights_internal = estimator.coef_
         

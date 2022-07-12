@@ -83,9 +83,8 @@ def test_ode_auto():
 
     print(type(derivs))
 
-    boundary = 10
-    upload_grids(x[boundary:-boundary], global_var.grid_cache)   
-    u_derivs_stacked = prepare_var_tensor(ts_smoothed, derivs, time_axis = 0, boundary = boundary)
+    upload_grids(x, global_var.grid_cache)   
+    u_derivs_stacked = prepare_var_tensor(ts_smoothed, derivs, time_axis = 0)
     
     u_names, u_deriv_orders = Define_Derivatives('u', 1, 1) 
     u_names = u_names; u_deriv_orders = u_deriv_orders 
@@ -117,7 +116,7 @@ def test_ode_auto():
     trig_tokens.set_params(trig_names, trig_token_params, trig_equal_params)
     trig_tokens.set_evaluator(trigonometric_evaluator, [])
 
-    upload_simple_tokens(grid_names, global_var.tensor_cache, [x[boundary:-boundary],])    
+    upload_simple_tokens(grid_names, global_var.tensor_cache, [x,])    
     global_var.tensor_cache.use_structural()
 
     pool = TF_Pool([u_tokens, trig_tokens]) # grid_tokens, 

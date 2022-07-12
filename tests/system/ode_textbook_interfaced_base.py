@@ -32,7 +32,7 @@ if __name__ == '__main__':
     
     trig_tokens = Trigonometric_tokens(freq = (0.95, 1.05))
     
-    epde_search_obj.fit(data = u, boundary=10, equation_factors_max_number = 2, coordinate_tensors = [t,], 
+    epde_search_obj.fit(data = u, equation_factors_max_number = 2, coordinate_tensors = [t,], 
                         additional_tokens = trig_tokens, field_smooth = False)
     
     epde_search_obj.equation_search_results(only_print = True, level_num = 1) # showing the Pareto-optimal set of discovered equations 

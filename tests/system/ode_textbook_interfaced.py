@@ -104,9 +104,7 @@ if __name__ == '__main__':
                                                                       # (равенство при лишь полном совпадении дискретных параметров)
                                                                       # нас устраивает.
 
-    boundary = 10
     custom_grid_tokens = Cache_stored_tokens(token_type = 'grid', 
-                                       boundary = boundary,
                                        token_labels = ['t'], 
                                        token_tensors={'t' : t},
                                        params_ranges = {'power' : (1, 1)},
@@ -115,7 +113,7 @@ if __name__ == '__main__':
     epde_search_obj.set_moeadd_params(population_size=4)
 
     print('u.shape', u.shape, u.ndim)
-    epde_search_obj.fit(data = u, max_deriv_order=(1,), boundary=(10,), equation_terms_max_number = 4,
+    epde_search_obj.fit(data = u, max_deriv_order=(1,), equation_terms_max_number = 4,
                         equation_factors_max_number = 2, deriv_method='poly', eq_sparsity_interval = (1e-4, 0.4), #'smooth' : True, 'sigma' : 5
                         deriv_method_kwargs = {'smooth' : False, 'grid' : [t,]}, coordinate_tensors = [t,], 
                         additional_tokens = [custom_grid_tokens, custom_trig_tokens], 
