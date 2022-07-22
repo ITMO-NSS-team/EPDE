@@ -122,7 +122,7 @@ def test_equation():
                                                              value = 1., suboperator_sequence = ['eq_level_rps', 'fitness_calculation', 'sparsity'])
 
     director._constructor._strategy.apply_block('rps1', 
-                                                {'population' : [eq1,], 'separate_vars' : []})
+                                                {'population' : [eq1,], 'unexplained_vars' : []})
     
     eq1.described_variables
     eq1.evaluate(normalize = False, return_val = True)
@@ -230,7 +230,7 @@ def test_solver_forms():
                                                                  value = 0.1, suboperator_sequence = ['eq_level_rps', 'fitness_calculation', 'sparsity'])
     
         test_strat._constructor._strategy.apply_block('rps1', 
-                                                    {'population' : [eq1,], 'separate_vars' : []})
+                                                    {'population' : [eq1,], 'unexplained_vars' : []})
         
         print('text form:', eq1.text_form)
     #    print('solver form:', eq1.solver_form())

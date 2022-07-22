@@ -20,7 +20,7 @@ class Factor(TerminalToken):
     
     def __init__(self, token_name : str, status : dict, family_type : str, 
                  randomize : bool = False, params_description = None, 
-                 deriv_code = None, equality_ranges = None):#, token_family, randomize = False):
+                 deriv_code = None, equality_ranges = None):
         self.label = token_name
         self.type = family_type
         self.status = status
@@ -44,7 +44,7 @@ class Factor(TerminalToken):
                 self.use_grids_cache()
 
     def reset_saved_state(self):
-        self.saved = {'base':False, 'structural':False}
+        self.saved = {'base' : False, 'structural' : False}
 
     @property
     def status(self):

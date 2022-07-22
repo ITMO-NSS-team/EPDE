@@ -323,7 +323,6 @@ class TokenFamily(object):
             raise TypeError('Evaluator function or its parameters not set brfore evaluator application.')
     
     def create(self, label = None, token_status : Union[dict, None] = None, **factor_params):
-        # print('factor params', factor_params)
         if token_status is None or token_status == {}:
             token_status = {label : (0, self.token_params['power'][1], False) 
                             for label in self.tokens}
@@ -363,6 +362,7 @@ class TokenFamily(object):
                                       **factor_params)
         new_factor.set_evaluator(self._evaluator)
         return occupied_by_factor, new_factor
+        
 
     def cardinality(self, token_status : Union[dict, None] = None):
         if token_status is None or token_status == {}:
@@ -435,8 +435,6 @@ class TF_Pool(object):
         if label is None:
             if create_meaningful:
                 if np.sum(self.families_cardinality(True, token_status)) == 0:
-                    # print('occupied', occupied, 'meaningful', create_meaningful)
-                    # print('family', [(fml.type, fml.tokens, fml.status) for fml in self.families])
                     raise ValueError('Tring to create a term from an empty pool')
                 
                 probabilities = (self.families_cardinality(True, token_status) / 
@@ -449,7 +447,6 @@ class TF_Pool(object):
             else:
                 probabilities = (self.families_cardinality(False, token_status) / 
                                  np.sum(self.families_cardinality(False, token_status)))
-                # print(probabilities, self.families_cardinality(False, token_status))
                 return np.random.choice(a = self.families, 
                                         p = probabilities).create(label = None, 
                                                                   token_status = token_status,
@@ -465,7 +462,11 @@ class TF_Pool(object):
                 return token_families[0].create(label = label,
                                                 token_status = token_status,
                                                 **kwargs)
-                                                                             
+                          
+    def create_from_family(self, family_label : str, token_status = None, **kwargs):
+        family = [f for f in self.families if family_label == f.type][0]
+        return family(label = None, token_status = token_status, **kwargs)
+                                                   
     def __add__(self, other):
         return TF_Pool(families = self.families + other.families)
 

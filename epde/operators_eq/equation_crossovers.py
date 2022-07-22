@@ -78,17 +78,6 @@ class PopLevel_crossover(Compound_Operator):
     def operator_tags(self):
         return {'crossover', 'population level', 'contains suboperators'}      
 
-class System_mutation(Compound_Operator):
-    @property
-    def elitist(self):
-        return True
-    
-    def apply(self, system):
-        for eq_idx in range(system.structure):
-            self.suboperators()
-    @property
-    def operator_tags(self):
-        return {'crossover', 'system level', 'contains suboperators'}       
 
 class Equation_crossover(Compound_Operator):
     @Reset_equation_status(reset_input = True)

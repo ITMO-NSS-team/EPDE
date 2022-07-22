@@ -6,10 +6,8 @@ Created on Thu Feb 13 19:33:43 2020
 @author: mike_ubuntu
 """
 
-from scipy.ndimage import gaussian_filter
 import numpy as np
-
-#Extend pool of smoothers
+from scipy.ndimage import gaussian_filter
 
 def Smoothing(data, kernel_fun, **params):
     smoothed = np.empty(data.shape)

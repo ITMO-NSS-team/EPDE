@@ -20,6 +20,9 @@ The recommended way to declare the cache object isto declare it as a global vari
 
 import numpy as np
 import psutil
+from functools import partial
+
+from typing import Union, Callable
 
 from copy import deepcopy
 from collections import OrderedDict
@@ -31,7 +34,6 @@ def upload_simple_tokens(labels, cache, tensors, grid_setting = False):
         else:
             label_completed = (label, (1.0,))
         cache.add(label_completed, tensors[idx])
-        # cache.add(label_completed, tensors[idx])        
         cache.add_base_matrix(label_completed)
 
 
@@ -51,61 +53,55 @@ def upload_grids(grids, cache):
 
 def np_ndarray_section(matrix, boundary = None, except_idx : list = []):
     #Добавить проверку на случай, когда boundary = 0, чтобы тогда возвращало матрицу без изменения
-    if isinstance(boundary, int):
-        if boundary != 0:
-            for idx in except_idx:
-                if idx < 0:
-                    except_idx.append(matrix.ndim - 1)
-            for dim_idx in np.arange(matrix.ndim):
-                if not dim_idx in except_idx:
-                    matrix = np.moveaxis(matrix, source = dim_idx, destination=0)
-                    matrix = matrix[boundary:-boundary, ...]
-                    matrix = np.moveaxis(matrix, source = 0, destination=dim_idx)
-    elif isinstance(boundary, (list, tuple)):
-        if len(boundary) != matrix.ndim:
-            raise IndexError('Sizes of boundary do not match the dimensionality of data')
-        for idx in except_idx:
-            if idx < 0:
-                except_idx.append(matrix.ndim - 1)
-        for dim_idx in np.arange(matrix.ndim):
-            if not dim_idx in except_idx and boundary[dim_idx] > 0:
-                matrix = np.moveaxis(matrix, source = dim_idx, destination=0)
-                matrix = matrix[boundary[dim_idx]:-boundary[dim_idx], ...]
-                matrix = np.moveaxis(matrix, source = 0, destination=dim_idx)    
-    return matrix
+    raise DeprecationWarning('No data section shall be used during equation discovery!')
+    # if isinstance(boundary, int):
+    #     if boundary != 0:
+    #         for idx in except_idx:
+    #             if idx < 0:
+    #                 except_idx.append(matrix.ndim - 1)
+    #         for dim_idx in np.arange(matrix.ndim):
+    #             if not dim_idx in except_idx:
+    #                 matrix = np.moveaxis(matrix, source = dim_idx, destination=0)
+    #                 matrix = matrix[boundary:-boundary, ...]
+    #                 matrix = np.moveaxis(matrix, source = 0, destination=dim_idx)
+    # elif isinstance(boundary, (list, tuple)):
+    #     if len(boundary) != matrix.ndim:
+    #         raise IndexError('Sizes of boundary do not match the dimensionality of data')
+    #     for idx in except_idx:
+    #         if idx < 0:
+    #             except_idx.append(matrix.ndim - 1)
+    #     for dim_idx in np.arange(matrix.ndim):
+    #         if not dim_idx in except_idx and boundary[dim_idx] > 0:
+    #             matrix = np.moveaxis(matrix, source = dim_idx, destination=0)
+    #             matrix = matrix[boundary[dim_idx]:-boundary[dim_idx], ...]
+    #             matrix = np.moveaxis(matrix, source = 0, destination=dim_idx)    
+    # return matrix
 
     
-def prepare_var_tensor(var_tensor, derivs_tensor, time_axis, boundary, cut_except = []):
+def prepare_var_tensor(var_tensor, derivs_tensor, time_axis, cut_except = []):
     initial_shape = var_tensor.shape
     print('initial_shape', initial_shape, 'derivs_tensor.shape', derivs_tensor.shape)
     var_tensor = np.moveaxis(var_tensor, time_axis, 0)
-    if isinstance(boundary, int):
-        result = np.ones((1 + derivs_tensor.shape[-1], ) + tuple([shape - 2*boundary for shape in var_tensor.shape]))
-    elif isinstance(boundary, (tuple, list)):
-        result = np.ones((1 + derivs_tensor.shape[-1], ) + tuple([shape - 2*boundary[dim_idx] for dim_idx, 
-                                                                  shape in enumerate(var_tensor.shape)]))
-    else:
-        raise TypeError('')
+    result = np.ones((1 + derivs_tensor.shape[-1], ) + tuple([shape for shape in var_tensor.shape])) #  - 2*boundary
+
     increment = 1
-    print('var_tensor.shape', var_tensor.shape, np_ndarray_section(var_tensor, boundary, cut_except).shape, boundary)
-    result[increment - 1, :] = np_ndarray_section(var_tensor, boundary, cut_except)
+    result[increment - 1, :] = var_tensor#, boundary, cut_except)
     if derivs_tensor.ndim == 2:
         for i_outer in range(0, derivs_tensor.shape[1]):
-            result[i_outer+increment, ...] = np.moveaxis(np_ndarray_section(derivs_tensor[:, i_outer].reshape(initial_shape), boundary, cut_except),
+            result[i_outer+increment, ...] = np.moveaxis(derivs_tensor[:, i_outer].reshape(initial_shape), # np_ndarray_section( , boundary, cut_except)
                          source=time_axis, destination=0)
     else:
         for i_outer in range(0, derivs_tensor.shape[-1]):
-#            print(np_ndarray_section(derivs_tensor[..., i_outer], boundary, []).shape, result[i_outer+1, ...].shape)
             assert derivs_tensor.ndim == var_tensor.ndim + increment, 'The shape of tensor of derivatives does not correspond '
-            result[i_outer+increment, ...] = np.moveaxis(np_ndarray_section(derivs_tensor[..., i_outer], boundary, []), #-1,
+            result[i_outer+increment, ...] = np.moveaxis(derivs_tensor[..., i_outer], # np_ndarray_section( -1, , boundary, [])
                              source=time_axis, destination=0)    
     return result
 
 
-def download_variable(var_filename, deriv_filename, boundary, time_axis):
+def download_variable(var_filename, deriv_filename, time_axis):
     var = np.load(var_filename)
     derivs = np.load(deriv_filename)
-    tokens_tensor = prepare_var_tensor(var, derivs, time_axis, boundary)
+    tokens_tensor = prepare_var_tensor(var, derivs, time_axis)
     return tokens_tensor
 
 
@@ -117,6 +113,7 @@ class Cache(object):
         self.memory_structural = dict()
         self.mem_prop_set = False
         self.base_tensors = [] #storage of non-normalized tensors, that will not be affected by change of variables
+        
 
     def use_structural(self, use_base_data = True, label = None, replacing_data = None):
         assert use_base_data or not type(replacing_data) == type(None), 'Structural data must be declared with base data or by additional tensors.'
@@ -160,11 +157,22 @@ class Cache(object):
                         raise ValueError('Shapes of tensors in new structural data do not match their counterparts in the base data')
                 self.memory_structural[label] = replacing_data
 
+    @property
+    def g_func(self): # , g_func : Union[Callable, type(None)] = None
+        assert '0' in self.memory_default.keys()    # Check if we are working with the grid cache
+        return self._g_func(self.get_all()[1])
+
+    @g_func.setter
+    def g_func(self, function : Callable):
+        self._g_func = function
+
     def add_base_matrix(self, label):
         assert label in self.memory_default.keys()
-        self.base_tensors.append(label)#$] = deepcopy(self.memory[label])
-#        if self.scale_used:
-#            self.base_tensors_scaled[label] = deepcopy(self.memory_scaled[label])
+        self.base_tensors.append(label)
+
+    def set_boundaries(self, boundary_width : Union[int, list]):
+        assert '0' in self.memory_default.keys(), 'Boundaries should be specified for grid cache.'
+        self.boundary_width = boundary_width
 
     def memory_usage_properties(self, obj_test_case = None, mem_for_cache_frac = None, mem_for_cache_abs = None):
         '''
@@ -216,14 +224,12 @@ class Cache(object):
         '''
         assert not (increment_structral is None and not all(self.structural_and_base_merged)), 'Not all structural data taken from the default, and the increment for structural was not sent' 
         random_key = list(self.memory_default.keys())[0]
-#        print(random_key)
         increment = np.reshape(increment, newshape=self.memory_default[random_key].shape)
         del self.memory_normalized
         self.memory_default = {key : self.memory_default[key] for key in self.base_tensors} #deepcopy(self.base_tensors); 
         self.memory_structural = {key : self.memory_structural[key] for key in self.base_tensors} #deepcopy(self.base_tensors_structural) 
         self.memory_normalized = dict()
         for key in self.memory_default.keys():
-#            print(self.memory[key].shape, increment.shape)
             assert np.all(self.memory_default[key].shape == increment.shape) 
             self.memory_default[key] = self.memory_default[key] - increment
             if not self.structural_and_base_merged[key]:
@@ -235,8 +241,6 @@ class Cache(object):
         Method for addition of a new tensor into the cache. Returns True if there was enough memory and the tensor was save, and False otherwise. 
         '''
         assert not (normalized and structural), 'The added matrix can not be simultaneously normalized and structural. Possibly, bug in token/term saving'
-#        assert not scaled or self.scale_used, 'Trying to add scaled data, while the cache it not allowed to get it'
-#        assert not structural, 'the structural data must be added with cache.use_structural method'
         if normalized:
             if self.max_allowed_tensors is None:
                 self.memory_usage_properties(obj_test_case = tensor, mem_for_cache_frac = 5)
@@ -293,6 +297,7 @@ class Cache(object):
         assert not (normalized and structural), 'The added matrix can not be simultaneously normalized and scaled'
 #        assert not scaled or self.scale_used, 'Trying to add scaled data, while the cache it not allowed to get it'
         if label is None:
+            print(self.memory_default.keys())
             return np.random.choice(list(self.memory_default.values()))
         if normalized:
             try:

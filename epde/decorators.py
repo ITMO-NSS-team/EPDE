@@ -6,7 +6,12 @@ Created on Tue Jun  1 15:56:10 2021
 @author: mike_ubuntu
 """
 
+import numpy as np
+
 from functools import wraps
+from typing import Union
+
+import epde.globals as global_var
 
 changelog_entry_templates = {}
 
@@ -89,17 +94,26 @@ class History_Extender():
             return result
         return wrapper
     
-# class Parallelize_method():
-#     def __init__(self, num_cpus = 1):
-#         self.num_cpus = num_cpus
+class Boundary_exclusion():
+    def __init__(self, boundary_width = 0):
+        self.boundary_width = boundary_width
+    
+    def __call__(self, func):
+        @wraps(func)
+        def wrapper(grids, boundary_width : Union[int, list] = 0):
+            assert len(grids) == grids[0].ndim
+            if isinstance(self.boundary_width, int): self.boundary_width = len(grids)*[self.boundary_width,]
+            indexes_shape = grids[0].shape
+            indexes = np.indices(indexes_shape)
+                        
+            mask_partial = np.array([np.where((indexes[idx, ...] >= self.boundary_width[idx]) &
+                                              (indexes[idx, ...] < indexes_shape[idx] - self.boundary_width[idx]),
+                                              1, 0)
+                                     for idx in np.arange(indexes.shape[0])])
+            
+            mask = np.multiply.reduce(mask_partial, axis = 0)
+            g_function_res = func(grids)
+            assert np.shape(g_function_res) == np.shape(mask)
+            return func(grids) * mask
         
-#     def __call__(self, method):
-#         @wraps(method)
-#         @ray.remote(num_cpus = self.num_cpus)
-#         def wrapper(*args, **kwargs):
-#             return method(*args, **kwargs)
-    
-    
-#class Ray_parallelizer():
-#    def __init__(self):
-#        
+        return wrapper

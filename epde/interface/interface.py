@@ -15,14 +15,15 @@ import epde.globals as global_var
 from epde.moeadd.moeadd import *
 from epde.moeadd.moeadd_supplementary import *
 
-from epde.prep.DomainPruning import Domain_Pruner
+from epde.prep.DomainPruning import DomainPruner
+from epde.decorators import Boundary_exclusion
 
 from epde.operators.ea_stop_criteria import Stop_condition, Iteration_limit
 import epde.operators.sys_search_operators as operators
 
 from epde.evaluators import simple_function_evaluator, trigonometric_evaluator
 from epde.supplementary import Define_Derivatives
-from epde.cache.cache import upload_simple_tokens, upload_grids, prepare_var_tensor, np_ndarray_section
+from epde.cache.cache import upload_simple_tokens, upload_grids, prepare_var_tensor#, np_ndarray_section
 from epde.prep.derivatives import Preprocess_derivatives
 from epde.eq_search_strategy import Strategy_director, Strategy_director_solver
 from epde.structure import Equation
@@ -32,35 +33,36 @@ from epde.interface.type_checks import *
 from epde.interface.prepared_tokens import PreparedTokens, CustomTokens
 
 class Input_data_entry(object):
-    def __init__(self, var_name, data_tensor, coord_tensors = None):
+    def __init__(self, var_name, data_tensor): # , coord_tensors = None
         self.var_name = var_name
         check_nparray(data_tensor)
-        if coord_tensors is not None:
-            check_nparray_iterable(coord_tensors)
-            if any([tensor.shape != data_tensor.shape for tensor in coord_tensors]):
-                print('data_tensor.shape', data_tensor.shape, 'tensors:', 
-                      [tensor.shape for tensor in coord_tensors])
-                raise ValueError('mismatching shapes of coordinate tensors and input data')
-            self.coord_tensors = coord_tensors
-        else:
-            axes = []
-            for ax_idx in range(data_tensor.ndim):
-                axes.append(np.linspace(0., 1., data_tensor.shape[ax_idx]))
-            self.coord_tensors = np.meshgrid(*axes)
-        self.data_tensor = data_tensor
+        self.data_tensor = data_tensor        
+        # if coord_tensors is not None:
+            # check_nparray_iterable(coord_tensors)
+            # if any([tensor.shape != data_tensor.shape for tensor in coord_tensors]):
+                # print('data_tensor.shape', data_tensor.shape, 'tensors:', 
+                       # [tensor.shape for tensor in coord_tensors])
+                # raise ValueError('mismatching shapes of coordinate tensors and input data')
+            # self.coord_tensors = coord_tensors
+        # else:
+            # axes = []
+            # for ax_idx in range(data_tensor.ndim):
+                # axes.append(np.linspace(0., 1., data_tensor.shape[ax_idx]))
+            # self.coord_tensors = np.meshgrid(*axes)
+
         
     def set_derivatives(self, deriv_tensors = None, method = 'ANN', max_order = 1, method_kwargs = {}):
 
         deriv_names, deriv_orders = Define_Derivatives(self.var_name, dimensionality=self.data_tensor.ndim, 
                                                        max_order = max_order)
 
-        self.names = deriv_names # coord_names +  Define_Derivatives(self.var_name, dimensionality=self.data_tensor.ndim, 
-                                    #                  max_order = max_order)
+        self.names = deriv_names 
         self.d_orders = deriv_orders
         if deriv_tensors is None:
             method_kwargs['max_order'] = max_order
-            if self.coord_tensors is not None and 'grid' not in method_kwargs.keys():
-                method_kwargs['grid'] = self.coord_tensors
+            # if self.coord_tensors is not None and 'grid' not in method_kwargs.keys():
+            _, method_kwargs['grid'] = global_var.grid_cache.get_all()
+            print(method_kwargs['grid'])
             self.data_tensor, self.derivatives = Preprocess_derivatives(self.data_tensor, method=method, 
                                                                         method_kwargs=method_kwargs)
             # Added setting of data tensor from filtered field
@@ -71,48 +73,39 @@ class Input_data_entry(object):
             self.deriv_properties = {'max order' : max_order,
                                      'dimensionality' : self.data_tensor.ndim}
             
-    def use_global_cache(self, grids_as_tokens = True, set_grids = True, memory_for_cache = 5, 
-                         boundary : int = 0):
+    def use_global_cache(self): # , set_grids = True
 
         print(type(self.data_tensor), type(self.derivatives))
-        derivs_stacked = prepare_var_tensor(self.data_tensor, self.derivatives,
-                                            time_axis = global_var.time_axis, boundary = boundary) 
-        if isinstance(self.coord_tensors, (list, tuple)):
-            coord_tensors_cut = []
-            for tensor in self.coord_tensors:
-                coord_tensors_cut.append(np_ndarray_section(tensor, boundary = boundary))
-        elif isinstance(self.coord_tensors, np.ndarray):
-            coord_tensors_cut = np_ndarray_section(self.coord_tensors, boundary = boundary)
-        else:
-            raise TypeError('Coordinate tensors are presented in format, other than np.ndarray or list/tuple of np.ndarray`s')
+        derivs_stacked = prepare_var_tensor(self.data_tensor, self.derivatives, time_axis = global_var.time_axis)
         
         try:       
             upload_simple_tokens(self.names, global_var.tensor_cache, derivs_stacked)
             upload_simple_tokens([self.var_name,], global_var.initial_data_cache, [self.data_tensor,])            
-            if set_grids: 
-                memory_for_cache = int(memory_for_cache/2)
-                upload_grids(self.coord_tensors, global_var.initial_data_cache)
-                upload_grids(coord_tensors_cut, global_var.grid_cache)
-                print(f'completed grid cache with {len(global_var.grid_cache.memory_default)} tensors with labels {global_var.grid_cache.memory_default.keys()}')
+            # if set_grids: 
+            #     memory_for_cache = int(memory_for_cache/2)
+            #     upload_grids(self.coord_tensors, global_var.initial_data_cache)
+            #     upload_grids(self.coord_tensors, global_var.grid_cache)
+            #     print(f'completed grid cache with {len(global_var.grid_cache.memory_default)} tensors with labels {global_var.grid_cache.memory_default.keys()}')
 
         except AttributeError:         
-            print('Somehow, cache had not been initialized')
-            print(self.names, derivs_stacked.shape)            
-            print(global_var.tensor_cache.memory_default.keys())
-            global_var.init_caches(set_grids = set_grids)
-            if set_grids: 
-                print('setting grids')
-                memory_for_cache = int(memory_for_cache/2)
-                global_var.grid_cache.memory_usage_properties(obj_test_case = self.data_tensor,
-                                                                mem_for_cache_frac = memory_for_cache)
-                upload_grids(self.coord_tensors, global_var.initial_data_cache)
-                upload_grids(coord_tensors_cut, global_var.grid_cache)
-                print(f'completed grid cache with {len(global_var.grid_cache.memory_default)} tensors with labels {global_var.grid_cache.memory_default.keys()}')
-            global_var.tensor_cache.memory_usage_properties(obj_test_case = self.data_tensor,
-                                                            mem_for_cache_frac = memory_for_cache)
-            print(self.names, derivs_stacked.shape)
-            upload_simple_tokens(self.names, global_var.tensor_cache, derivs_stacked)
-            upload_simple_tokens([self.var_name,], global_var.initial_data_cache, [self.data_tensor,])
+            raise NameError('Cache has not been declared before tensor addition.')
+            # print('Somehow, cache had not been initialized')
+            # print(self.names, derivs_stacked.shape)
+            # print(global_var.tensor_cache.memory_default.keys())
+            # global_var.init_caches(set_grids = set_grids)
+            # if set_grids:
+            #     print('setting grids')
+            #     memory_for_cache = int(memory_for_cache/2)
+            #     global_var.grid_cache.memory_usage_properties(obj_test_case = self.data_tensor,
+            #                                                     mem_for_cache_frac = memory_for_cache)
+            #     upload_grids(self.coord_tensors, global_var.initial_data_cache)
+            #     upload_grids(self.coord_tensors, global_var.grid_cache)
+            #     print(f'completed grid cache with {len(global_var.grid_cache.memory_default)} tensors with labels {global_var.grid_cache.memory_default.keys()}')
+            # global_var.tensor_cache.memory_usage_properties(obj_test_case = self.data_tensor,
+            #                                                 mem_for_cache_frac = memory_for_cache)
+            # print(self.names, derivs_stacked.shape)
+            # upload_simple_tokens(self.names, global_var.tensor_cache, derivs_stacked)
+            # upload_simple_tokens([self.var_name,], global_var.initial_data_cache, [self.data_tensor,])
 
         global_var.tensor_cache.use_structural()
     
@@ -122,9 +115,11 @@ def simple_selector(sorted_neighbors, number_of_neighbors = 4):
 class epde_search(object):
     def __init__(self, use_default_strategy : bool = True, eq_search_stop_criterion : Stop_condition = Iteration_limit,
                  director = None, equation_type : set = {'PDE', 'derivatives only'}, time_axis : int = 0, 
-                 init_cache : bool = True, example_tensor_shape : Union[tuple, list] = (1000,), 
-                 set_grids : bool = True, eq_search_iter : int = 300, use_solver : bool = False, 
-                 dimensionality : int = 1, verbose_params : dict = {}):
+                 define_domain : bool = True, set_grids : bool = True, function_form = None, boundary : int = 0, 
+                 eq_search_iter : int = 300, use_solver : bool = False, dimensionality : int = 1, 
+                 verbose_params : dict = {}, coordinate_tensors = None, memory_for_cache = 5, 
+                 prune_domain : bool = False, pivotal_tensor_label = None, pruner = None, threshold : float = 1e-2, 
+                 division_fractions = 3, rectangular : bool = True, ):
         '''
         
         Intialization of the epde search object. Here, the user can declare the properties of the 
@@ -152,9 +147,14 @@ class epde_search(object):
         global_var.set_time_axis(time_axis)
         global_var.init_verbose(**verbose_params)
 
-        if init_cache:
-            global_var.init_caches(set_grids)
-
+        if define_domain:
+            if coordinate_tensors is None:
+                raise ValueError('Grids can not be empty during calculations.')
+            self.set_domain_properties(coordinate_tensors, memory_for_cache, boundary, function_form = function_form, 
+                                       prune_domain = prune_domain, pivotal_tensor_label = pivotal_tensor_label,
+                                       threshold = threshold, division_fractions = division_fractions,
+                                       rectangular = rectangular)
+            
         if use_solver:
             global_var.dimensionality = dimensionality
 
@@ -172,7 +172,6 @@ class epde_search(object):
         self.set_moeadd_params()
         self.search_conducted = False
         
-            
     def set_memory_properties(self, example_tensor, mem_for_cache_frac = None, mem_for_cache_abs = None):
         if global_var.grid_cache is not None:
             if mem_for_cache_frac is not None:
@@ -182,14 +181,13 @@ class epde_search(object):
             global_var.tensor_cache.memory_usage_properties(example_tensor, mem_for_cache_frac, mem_for_cache_abs)            
         global_var.tensor_cache.memory_usage_properties(example_tensor, mem_for_cache_frac, mem_for_cache_abs )
 
-    
-    def set_moeadd_params(self, population_size : int = 6, solution_params : dict = {}, 
-                          delta : float = 1/50., neighbors_number : int = 3, 
-                          NDS_method : Callable = fast_non_dominated_sorting, 
+    def set_moeadd_params(self, population_size : int = 6, solution_params : dict = {},
+                          delta : float = 1/50., neighbors_number : int = 3,
+                          NDS_method : Callable = fast_non_dominated_sorting,
                           NDL_update_method : Callable = NDL_update,
-                          subregion_mating_limitation : float = .95, 
-                          PBI_penalty : float = 1., training_epochs : int = 100, 
-                          neighborhood_selector : Callable = simple_selector, 
+                          subregion_mating_limitation : float = .95,
+                          PBI_penalty : float = 1., training_epochs : int = 100,
+                          neighborhood_selector : Callable = simple_selector,
                           neighborhood_selector_params : tuple = (4,)):
         '''        
         
@@ -265,13 +263,13 @@ class epde_search(object):
                                            'epochs' : training_epochs, 
                                            'PBI_penalty' : PBI_penalty}
  
-    def set_domain_pruning(self, pivotal_tensor_label = None, pruner = None, 
+    def domain_pruning(self, pivotal_tensor_label = None, pruner = None, 
                              threshold : float = 1e-5, division_fractions = 3, 
                              rectangular : bool = True):
         if pruner is not None:
             self.pruner = pruner
         else:
-            self.pruner = Domain_Pruner(domain_selector_kwargs={'threshold' : threshold})
+            self.pruner = DomainPruner(domain_selector_kwargs={'threshold' : threshold})
         if not self.pruner.bds_init:
             if pivotal_tensor_label is None:
                 pivotal_tensor_label = ('du/dx'+str(global_var.time_axis + 1), (1.0,))
@@ -288,18 +286,56 @@ class epde_search(object):
         if global_var.grid_cache is not None:
             global_var.grid_cache.prune_tensors(self.pruner)
     
-    def create_pool(self, data : Union[np.ndarray, list, tuple], time_axis : int = 0, boundary : int = 0, 
+    def create_caches(self, coordinate_tensors, memory_for_cache):
+        global_var.init_caches(set_grids = True)
+        example = coordinate_tensors if isinstance(coordinate_tensors, np.ndarray) else coordinate_tensors[0]
+        self.set_memory_properties(example_tensor = example, mem_for_cache_frac = memory_for_cache)
+        upload_grids(coordinate_tensors, global_var.initial_data_cache)
+        upload_grids(coordinate_tensors, global_var.grid_cache)
+
+    def set_boundaries(self, boundary_width : Union[int, list]):
+        global_var.grid_cache.set_boundaries(boundary_width = boundary_width)
+
+    def upload_g_func(self, function_form : Union[Callable, type(None)] = None):
+        try:
+            decorator = Boundary_exclusion(boundary_width = global_var.grid_cache.boundary_width)
+            if function_form is None:
+                def baseline_exp_function(grids):
+                    def uniformize(data):
+                        temp = -(data - np.mean(data))**2
+                        if np.min(temp) == np.max(temp):
+                            return np.ones_like(temp)
+                        else:
+                            return (temp - np.min(temp)) / (np.max(temp) - np.min(temp))
+                    
+                    exponent_partial = np.array([uniformize(grid) for grid in grids])
+                    exponent = np.multiply.reduce(exponent_partial, axis = 0) 
+                    return exponent
+                
+                global_var.grid_cache.g_func = decorator(baseline_exp_function)
+            else:
+                global_var.grid_cache.g_func = decorator(function_form)
+                
+        except NameError:
+            raise NameError('Cache for grids has not been initilized yet!')
+    
+    def set_domain_properties(self, coordinate_tensors, memory_for_cache, boundary_width : Union[int, list], 
+                              function_form : Union[Callable, type(None)] = None, prune_domain : bool = False, 
+                              pivotal_tensor_label = None, pruner = None, threshold : float = 1e-5, 
+                              division_fractions : int = 3, rectangular : bool = True):
+        self.create_caches(coordinate_tensors = coordinate_tensors, memory_for_cache = memory_for_cache)
+        if prune_domain:
+            self.domain_pruning(pivotal_tensor_label, pruner, threshold, division_fractions, rectangular)
+        self.set_boundaries(boundary_width)
+        self.upload_g_func(function_form)
+    
+    def create_pool(self, data : Union[np.ndarray, list, tuple], time_axis : int = 0,
                     variable_names = ['u',], derivs = None, method = 'ANN', method_kwargs : dict = {},
-                    max_deriv_order = 1, additional_tokens = [], coordinate_tensors = None,
-                    memory_for_cache = 5, prune_domain : bool = False,
-                    pivotal_tensor_label = None, pruner = None, threshold : float = 1e-2, 
-                    division_fractions = 3, rectangular : bool = True, data_fun_pow : int = 1):
+                    max_deriv_order = 1, additional_tokens = [], data_fun_pow : int = 1):
         assert (isinstance(derivs, list) and isinstance(derivs[0], np.ndarray)) or derivs is None
         if isinstance(data, np.ndarray):
             data = [data,]
 
-        set_grids = coordinate_tensors is not None
-        set_grids_among_tokens = coordinate_tensors is not None
         if derivs is None:
             if len(data) != len(variable_names):
                 print(len(data), len(variable_names))
@@ -311,16 +347,11 @@ class epde_search(object):
         for data_elem_idx, data_tensor in enumerate(data):
             assert isinstance(data_tensor, np.ndarray), 'Input data must be in format of numpy ndarrays or iterable (list or tuple) of numpy arrays'
             entry = Input_data_entry(var_name = variable_names[data_elem_idx],
-                                     data_tensor = data_tensor, 
-                                     coord_tensors = coordinate_tensors)
+                                     data_tensor = data_tensor)
             derivs_tensor = derivs[data_elem_idx] if derivs is not None else None
             entry.set_derivatives(deriv_tensors = derivs_tensor, method = method, max_order = max_deriv_order, 
                                   method_kwargs=method_kwargs)
-            print(f'set grids parameter is {set_grids}')
-            entry.use_global_cache(grids_as_tokens = set_grids_among_tokens,
-                                   set_grids=set_grids, memory_for_cache=memory_for_cache, 
-                                   boundary=boundary)
-            set_grids = False; set_grids_among_tokens = False
+            entry.use_global_cache()
             
             entry_token_family = TokenFamily(entry.var_name, family_of_derivs = True)
             entry_token_family.set_status(demands_equation=True, unique_specific_token=False, 
@@ -332,8 +363,6 @@ class epde_search(object):
                 
             print(entry_token_family.tokens)
             data_tokens.append(entry_token_family)
-        if prune_domain:            
-            self.set_domain_pruning(pivotal_tensor_label, pruner, threshold, division_fractions, rectangular)
             
         if isinstance(additional_tokens, list):
             if not all([isinstance(tf, (TokenFamily, PreparedTokens)) for tf in additional_tokens]):
@@ -349,7 +378,7 @@ class epde_search(object):
         print(f'Among them, the pool contains {self.pool.families_cardinality(meaningful_only = True)}')
         
     
-    def fit(self, data : Union[np.ndarray, list, tuple], time_axis : int = 0, boundary : int = 0, 
+    def fit(self, data : Union[np.ndarray, list, tuple], time_axis : int = 0, boundary : int = 0,
             equation_terms_max_number = 6, equation_factors_max_number = 1, variable_names = ['u',], 
             eq_sparsity_interval = (1e-4, 2.5), derivs = None, max_deriv_order = 1, 
             deriv_method = 'ANN', deriv_method_kwargs : dict = {},
@@ -371,11 +400,6 @@ class epde_search(object):
             
         time_axis : int, optional,
             Index of the axis in the data, representing time. Default value: 0.
-            
-        boundary : int, optional,
-            The number of grid nodes, considered as the boundary of the studied domain,
-            that are excluded during equation search to avoid wrong results, linked to 
-            errors in derivatives estimation. Default value: 0.
             
         equation_terms_max_number : int, optional,
             The maximum number of terms, present in the derived equations. Default value: 6.
@@ -430,13 +454,10 @@ class epde_search(object):
             self.moeadd_params['pop_size'] = equation_terms_max_number
             self.moeadd_params['weights_num'] = equation_terms_max_number
         
-        self.create_pool(data = data, time_axis=time_axis, boundary=boundary, variable_names=variable_names, 
+        self.create_pool(data = data, time_axis=time_axis, variable_names=variable_names, 
                          derivs=derivs, method=deriv_method, method_kwargs=deriv_method_kwargs, 
                          max_deriv_order=max_deriv_order, additional_tokens=additional_tokens, 
-                         coordinate_tensors=coordinate_tensors, memory_for_cache=memory_for_cache, 
-                         prune_domain=prune_domain, pivotal_tensor_label=pivotal_tensor_label, 
-                         pruner=pruner, threshold=threshold, division_fractions=division_fractions, 
-                         rectangular=rectangular, data_fun_pow=data_fun_pow)
+                         data_fun_pow=data_fun_pow)
         
         pop_constructor = operators.Systems_population_constructor(pool = self.pool, terms_number = equation_terms_max_number, 
                                                                max_factors_in_term=equation_factors_max_number, 

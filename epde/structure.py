@@ -31,9 +31,7 @@ def Check_Unqueness(obj, background):
 
 
 def normalize_ts(Input):
-#    print('normalize_ts Input:', Input)
     matrix = np.copy(Input)
-#    print(Matrix.shape)
     if np.ndim(matrix) == 0:
         raise ValueError('Incorrect input to the normalizaton: the data has 0 dimensions')
     elif np.ndim(matrix) == 1:
@@ -88,14 +86,14 @@ class Term(Complex_Structure):
     __slots__ = ['_history', 'structure', 'interelement_operator', 'saved', 'saved_as', 
                  'pool', 'max_factors_in_term', 'cache_linked', 'occupied_tokens_labels']
     
-    def __init__(self, pool, passed_term = None, max_factors_in_term = 1, 
+    def __init__(self, pool, passed_term = None, mandatory_family = None, max_factors_in_term = 1, 
                  interelement_operator = np.multiply):
         super().__init__(interelement_operator)
         self.pool = pool
         self.max_factors_in_term = max_factors_in_term
 
         if passed_term is None:
-            self.randomize()
+            self.randomize(mandatory_family = mandatory_family)
         else:
             self.defined(passed_term)
 
@@ -130,7 +128,7 @@ class Term(Complex_Structure):
         for _, factor in enumerate(passed_term):
             if isinstance(factor, str):
                 _, temp_f = self.pool.create(label = factor)
-                self.structure.append(temp_f)#; raise NotImplementedError
+                self.structure.append(temp_f)
             elif isinstance(factor, Factor):
                 self.structure.append(factor)
             else:
@@ -142,14 +140,14 @@ class Term(Complex_Structure):
         print('passed_term:', passed_term)
         if isinstance(passed_term, str):
             _, temp_f = self.pool.create(label = passed_term)
-            self.structure.append(temp_f)#; raise NotImplementedError
+            self.structure.append(temp_f)
         elif isinstance(passed_term, Factor):
             self.structure.append(passed_term)
         else:
             raise ValueError('The structure of a term should be declared with str or factor.Factor obj, instead got', type(passed_term))
 
 
-    def randomize(self, forbidden_factors = None, **kwargs):
+    def randomize(self, mandatory_family = None, forbidden_factors = None, **kwargs):
         if np.sum(self.pool.families_cardinality(meaningful_only = True)) == 0:
             raise ValueError('No token families are declared as meaningful for the process of the system search')
 
@@ -167,14 +165,16 @@ class Term(Complex_Structure):
             for family in self.pool.labels_overview:
                 for token_label in family[0]:
                     forbidden_factors[token_label] = [0, min(self.max_factors_in_term, family[1]), False]
-            # Changed f_f type to dict, add all tokens in format of token : 
-            #    (quantity (int), max_quantity (int), forbidden (bool))
             
         factors_num = np.random.randint(1, self.max_factors_in_term + 1)
         self.occupied_tokens_labels = copy.copy(forbidden_factors)
 
-        occupied_by_factor, factor = self.pool.create(label = None, create_meaningful = True, 
-                                                       token_status = self.occupied_tokens_labels, **kwargs)
+        if mandatory_family is None:
+            occupied_by_factor, factor = self.pool.create(label = None, create_meaningful = True, 
+                                                          token_status = self.occupied_tokens_labels, **kwargs)
+        else:
+            occupied_by_factor, factor = self.pool.create_from_family(family_label = mandatory_family,
+                                                                      token_status = self.occupied_tokens_labels, **kwargs)
         self.structure = [factor,]
         update_token_status(self.occupied_tokens_labels, occupied_by_factor)
         
@@ -185,7 +185,6 @@ class Term(Complex_Structure):
                     
             update_token_status(self.occupied_tokens_labels, occupied_by_factor)
             self.structure.append(factor)
-            # self.occupied_tokens_labels.extend(occupied_by_factor)                
         self.structure = Filter_powers(self.structure)  
 
     def evaluate(self, structural):
@@ -224,12 +223,9 @@ class Term(Complex_Structure):
             new_term = copy.deepcopy(self)            
             for factor_idx, factor in enumerate(new_term.structure):
                 if factor.label in taken_tokens:
-                    new_term.Reset_occupied_tokens()
-                    # print('filter_tokens_by_right_part', new_term.name, reference_target.name)
+                    new_term.reset_occupied_tokens()
                     _, new_term.structure[factor_idx] = self.pool.create(create_meaningful=meaningful_taken, 
                                                              occupied = new_term.occupied_tokens_labels + taken_tokens)
-                    # print('try:', accept_term_try, 'suggested:', new_term.name)
-                    #Возможная ошибка из-за (не) использования "create meaningful"
             if Check_Unqueness(new_term, equation.structure[:equation_position] + 
                                          equation.structure[equation_position + 1 :]):
                 self.structure = new_term.structure
@@ -244,7 +240,7 @@ class Term(Complex_Structure):
                 print('Something wrong with the random generation of term while running "filter_tokens_by_right_part"')
                 print('proposed', new_term.name, 'for ', equation.text_form, 'with respect to', reference_target.name)
 
-    def Reset_occupied_tokens(self):
+    def reset_occupied_tokens(self):
         occupied_tokens_new = []
         for factor in self.structure:
             for token_family in self.pool.families:
@@ -347,8 +343,8 @@ class Equation(Complex_Structure):
                   'fitness_calculated', 'solver_form_defined', '_solver_form', '_fitness_value', 
                   'crossover_selected_times', 'elite']
 
-    def __init__(self, pool, basic_structure, terms_number = 6, max_factors_in_term = 2, 
-                 interelement_operator = np.add): #eq_weights_eval
+    def __init__(self, pool, basic_structure, terms_number = 6, var_to_explain = None, max_factors_in_term = 2, 
+                 interelement_operator = np.add):
 
         """
 
@@ -404,19 +400,23 @@ class Equation(Complex_Structure):
             elif isinstance(passed_term, str):
                 self.structure.append(Term(self.pool, passed_term = passed_term, 
                                            max_factors_in_term = self.max_factors_in_term))
-            
+                
+        force_var_to_explain = False
         for i in range(len(basic_structure), terms_number):
             check_test = 0
             while True:
                 check_test += 1 
-                new_term = Term(self.pool, max_factors_in_term = self.max_factors_in_term, passed_term = None)
+                mf = var_to_explain if force_var_to_explain else None
+                new_term = Term(self.pool, max_factors_in_term = self.max_factors_in_term, 
+                                mandatory_family = mf, passed_term = None)
                 if Check_Unqueness(new_term, self.structure):
+                    force_var_to_explain = False
                     break
             self.structure.append(new_term)
 
         for idx, _ in enumerate(self.structure):
-            self.structure[idx].use_cache()            
-        
+            self.structure[idx].use_cache()
+
     @property
     def contains_deriv(self):
         return any([term.contains_deriv for term in self.structure])
@@ -629,35 +629,37 @@ class Equation(Complex_Structure):
             self._solver_form.append(target_form)
             self.solver_form_defined = True
             return self._solver_form
-    
+
     @property
     def state(self):
         return self.text_form    
-    
+
     @property
     def described_variables(self):
         eps=1e-7
         described = set()
         for term_idx, term in enumerate(self.structure):
             if term_idx == self.target_idx:
-                described.update({factor.type for factor in term.structure if factor.is_deriv})
+                described.update({factor.family_type for factor in term.structure 
+                                  if factor.is_deriv and factor.deriv_code != [None]})
             else:
                 weight_idx = term_idx if term_idx < term_idx else term_idx - 1
                 if np.abs(self.weights_final[weight_idx]) > eps:
-                    described.update({factor.type for factor in term.structure if factor.is_deriv})
+                    described.update({factor.family_type for factor in term.structure 
+                                      if factor.is_deriv and factor.deriv_code != [None]})
         described = frozenset(described)
         return described
-    
+
     def max_deriv_orders(self):
         solver_form = self.solver_form()
         max_orders = np.zeros(global_var.grid_cache.get('0').ndim)
-        
+
         def count_order(obj, deriv_ax):
             if obj is None:
                 return 0
             else:
                 return obj.count(deriv_ax)
-                
+
         for term in solver_form:
             if isinstance(term[2], list):
                 for deriv_factor in term[1]:
@@ -700,10 +702,9 @@ class Equation(Complex_Structure):
             print(ax_idx, ax_ord)
             for loc_fraction in hardcoded_bc_relative_locations[ax_ord]:
                 indexes = get_boundary_ind(tensor_shape, axis = ax_idx, rel_loc = loc_fraction)
-                # if len(tensor_shape) > 0:                
                 coords_raw = np.array([grid_cache.get(str(idx))[indexes] for idx 
                                   in np.arange(len(tensor_shape))]) 
-                coords = coords_raw.T # np.squeeze(coords_raw).T
+                coords = coords_raw.T
                 if coords.ndim > 2:
                     coords = coords.squeeze()
                 vals = np.expand_dims(tensor_cache.get(main_var_key)[indexes], axis = 0).T # np.squeeze(tensor_cache.get(main_var_key)[indexes]).T
@@ -734,19 +735,18 @@ def solver_formed_grid():
 
 class SoEq(Complex_Structure, moeadd.moeadd_solution):
     def __init__(self, pool, terms_number, max_factors_in_term, sparsity = None, eq_search_iters = 100):
-        self.tokens_indep = TF_Pool(pool.families_meaningful)
-        self.tokens_dep = TF_Pool(pool.families_supplementary)
-        self.equation_number = len(pool.families_demand_equation)
+        self.tokens_for_eq = TF_Pool(pool.families_demand_equation)
+        self.tokens_supp = TF_Pool(pool.families_supplementary)
         
-        if sparsity is not None: self.vals = sparsity 
+        if sparsity is not None: self.sparsity = sparsity #self.vals = [sparsity,]
         self.max_terms_number = terms_number; self.max_factors_in_term = max_factors_in_term
-        self.moeadd_set = False; self.eq_search_operator_set = False# ; self.evaluated = False
+        self.moeadd_set = False; self.eq_search_operator_set = False
         self.def_eq_search_iters = eq_search_iters
         
     def use_default_objective_function(self):
         from epde.eq_mo_objectives import generate_partial, equation_discrepancy, equation_complexity_by_factors
-        quality_objectives = [generate_partial(equation_discrepancy, eq_idx) for eq_idx in range(self.equation_number)]
-        complexity_objectives = [generate_partial(equation_complexity_by_factors, eq_idx) for eq_idx in range(self.equation_number)]
+        quality_objectives = [generate_partial(equation_discrepancy, eq_idx) for eq_idx in range(len(self.tokens_for_eq))]
+        complexity_objectives = [generate_partial(equation_complexity_by_factors, eq_idx) for eq_idx in range(len(self.tokens_for_eq))]
         self.set_objective_functions(quality_objectives + complexity_objectives)
         
     def set_objective_functions(self, obj_funs):
@@ -783,52 +783,57 @@ class SoEq(Complex_Structure, moeadd.moeadd_solution):
                                                                  param_label = 'population_size',
                                                                  value = population_size)
         
-        self.structure = []; self.eq_search_iters = eq_search_iters
-        token_selection = self.tokens_indep
+        self.structure = {}; self.eq_search_iters = eq_search_iters
+        token_selection = self.tokens_supp
         
-        self.vars_to_describe = {token_family.type for token_family in self.tokens_dep.families}
-        self.vars_to_describe = self.vars_to_describe.union({token_family.type for token_family in self.tokens_indep.families})
-        self.separated_vars = set()
+        self.vars_to_describe = {token_family.type for token_family in self.tokens_for_eq.families}
+
         
-        for eq_idx in range(self.equation_number):
-            current_tokens = token_selection + self.tokens_dep
+        for eq_idx, variable in enumerate(self.vars_to_describe):
+            current_tokens = token_selection + self.tokens_for_eq
             self.eq_search_evolutionary_strategy.modify_block_params(block_label = 'rps1', param_label = 'sparsity', 
                                                                      value = self.vals[eq_idx], suboperator_sequence = ['eq_level_rps', 'fitness_calculation', 'sparsity'])#(sparsity_value = self.vals[eq_idx])
             self.eq_search_evolutionary_strategy.modify_block_params(block_label = 'rps2', param_label = 'sparsity', 
                                                                      value = self.vals[eq_idx], suboperator_sequence = ['eq_level_rps', 'fitness_calculation', 'sparsity'])#(sparsity_value = self.vals[eq_idx])
 
             cur_equation, cur_eq_operator_error_abs, cur_eq_operator_error_structural = self.optimize_equation(pool = current_tokens, 
-                                                  strategy = self.eq_search_evolutionary_strategy, population_size = self.population_size,
-                                                  separate_vars = self.separated_vars, EA_kwargs = EA_kwargs)
-            self.vars_to_describe.difference_update(cur_equation.described_variables)
-            self.separated_vars.add(frozenset(cur_equation.described_variables))
+                                                                                                               strategy = self.eq_search_evolutionary_strategy, 
+                                                                                                               population_size = self.population_size,
+                                                                                                               var_to_explain = variable, 
+                                                                                                               EA_kwargs = EA_kwargs)
+            # self.vars_to_describe.difference_update(cur_equation.described_variables)
+            # if len(self.vars_to_describe) == 0 or described_all_vars:
+            #     described_all_vars = True
+            #     self.vars_to_describe = {token_family.type for token_family in self.tokens_for_eq.families}
 
-            self.structure.append(cur_equation)
-            if not eq_idx == self.equation_number - 1:
-                global_var.tensor_cache.change_variables(cur_eq_operator_error_abs, 
+            self.structure[cur_equation.descr] = cur_equation
+            if False:
+                global_var.tensor_cache.change_variables(cur_eq_operator_error_abs,
                                                          cur_eq_operator_error_structural)
-        moeadd.moeadd_solution.__init__(self, self.vals, self.obj_funs) # , return_val = True, self) super(
+        self.vals = copy.deepcopy(self.structure)
+        self.vals.update({'opt_params' : sparsity}) # optimization parameters shall include sparsity constants for each equation
+        moeadd.moeadd_solution.__init__(self, self.vals, self.obj_funs)
         self.moeadd_set = True
             
     def optimize_equation(self, pool, strategy, population_size, basic_terms : list = [], 
-                          separate_vars : set = None, EA_kwargs = dict()):
+                          var_to_explain : str = None, EA_kwargs = dict()):
         population = [Equation(pool, basic_terms, self.max_terms_number, self.max_factors_in_term) 
-                        for i in range(population_size)]
-        EA_kwargs['separate_vars'] = separate_vars
+                      for i in range(population_size)]
+        # EA_kwargs['var_to_explain'] = var_to_explain
         strategy.run(initial_population = population, EA_kwargs = EA_kwargs)
         result = strategy.result
         
         return result[0], result[0].evaluate(normalize = False, return_val=True)[0], result[0].evaluate(normalize = True, return_val=True)[0]
         
     @staticmethod
-    def equation_opt_iteration(population, evol_operator, population_size, iter_index, separate_vars, strict_restrictions = True):
+    def equation_opt_iteration(population, evol_operator, population_size, iter_index, unexplained_vars, strict_restrictions = True):
         for equation in population:
-            if equation.described_variables in separate_vars:
+            if equation.described_variables in unexplained_vars:
                 equation.penalize_fitness(coeff = 0.)           
         population = Population_Sort(population)
         population = population[:population_size]
         gc.collect()
-        population = evol_operator.apply(population, separate_vars)
+        population = evol_operator.apply(population, unexplained_vars)
         return population
         
     def evaluate(self, normalize = True):
@@ -841,8 +846,6 @@ class SoEq(Complex_Structure, moeadd.moeadd_solution):
 
     @property
     def obj_fun(self):
-#        print('objective functions:', self.obj_funs)
-#        print('objective function values:', [func(self) for func in self.obj_funs], flatten([func(self) for func in self.obj_funs]))
         return np.array(flatten([func(self) for func in self.obj_funs]))
         
     def __call__(self):

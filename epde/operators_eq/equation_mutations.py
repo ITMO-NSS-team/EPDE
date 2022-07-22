@@ -61,6 +61,7 @@ class PopLevel_mutation(Compound_Operator):
             The input population, altered by mutation operators.
             
         """
+        # print('Running mutation')
         population = Population_Sort(population)
         for indiv_idx in range(self.params['elitism'], len(population)):
             if np.random.uniform(0, 1) <= self.params['indiv_mutation_prob']:
@@ -158,19 +159,6 @@ class Refining_Equation_mutation(Compound_Operator):
     def operator_tags(self):
         return {'mutation', 'equation level', 'elitist', 'contains suboperators'}
     
-class System_mutation(Compound_Operator):
-    @property
-    def elitist(self):
-        return True
-    
-    def apply(self, system):
-        for eq_idx in range(system.structure):
-            self.suboperators['Equation_level_mutation'].apply(system.structure[eq_idx])
-            
-    @property
-    def operator_tags(self):
-        return {'mutation', 'system level', 'contains suboperators'}        
-
 
 class Equation_mutation(Compound_Operator):
     @property

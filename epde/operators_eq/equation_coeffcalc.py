@@ -11,12 +11,15 @@ from sklearn.linear_model import LinearRegression
 
 from epde.operators.template import Compound_Operator
 
+#class PopLevel_true_coeffs(Compound_Operator):
+#    def apply(self, population):
+#        for equation in population:
+#            if not equation.weights_final_evald:
+#                self.suboperators['True_coeff_calc'].apply(equation)
+##                equation.weights_final_evald = True
+#        return population
+    
 class LinReg_based_coeffs(Compound_Operator):
-    def apply(self, system):
-        for eq_idx in range(len(system.structure)):
-            self.suboperators['Equation_level_linreg'].apply(system.structure[eq_idx])        
-
-class LinReg_based_coeffs_equation(Compound_Operator):
     '''
     
     The operatror, dedicated to the calculation of the weights of the equation (for the free coefficient and 
@@ -58,7 +61,8 @@ class LinReg_based_coeffs_equation(Compound_Operator):
             if equation.weights_internal[idx] != 0:
                 features_vals.append(equation.structure[i].evaluate(False))
                 nonzero_features_indexes.append(idx)
-
+                
+    #    print('Indexes of nonzero elements:', nonzero_features_indexes)
         if len(features_vals) == 0:
             equation.weights_final = np.zeros(len(equation.structure)) #Bind_Params([(token.label, token.params) for token in target.structure]), [('0', 1)]
         else:
@@ -67,21 +71,28 @@ class LinReg_based_coeffs_equation(Compound_Operator):
                 for i in range(1, len(features_vals)):
                     features = np.vstack([features, features_vals[i]])
             features = np.vstack([features, np.ones(features_vals[0].shape)]) # Добавляем константную фичу
-            features = np.transpose(features)
+            features = np.transpose(features)  
+    #        print('Done 2')        
             estimator = LinearRegression(fit_intercept=False)
             if features.ndim == 1:
                 features = features.reshape(-1, 1)
                 estimator.fit(features, target_vals)
-            else:
+            else:                
+                # print('features', features.shape, 'target', target_vals.shape)
+                # print((features == None).any())
+                # print(features[:100, 1])
                 estimator.fit(features, target_vals)
-
+                
             valueable_weights = estimator.coef_
             weights = np.zeros(len(equation.structure))
             for weight_idx in range(len(weights)-1):
                 if weight_idx in nonzero_features_indexes:
                     weights[weight_idx] = valueable_weights[nonzero_features_indexes.index(weight_idx)]
             weights[-1] = valueable_weights[-1]    
+        #    print('weights check:', weights, equation.weights_internal)
             equation.weights_final_evald = True
+    #        print('Set final weights')
+    #        print('Done 3')
             equation.weights_final = weights
             
     @property

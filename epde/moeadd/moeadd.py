@@ -211,22 +211,15 @@ class pareto_levels(object):
             The point, removed from the candidate solutions pool.
         
         '''        
-#        print('deleting', point.vals)
         new_levels = []
         for level in self.levels:
-            #print('New level processing')
-            # temp = deepcopy(level)
             temp = []
             for element in level:
                 if element != point:
-                    #print('found point')
                     temp.append(element)
             if not len(temp) == 0:
                 new_levels.append(temp) # Точка находится в нескольких уровнях
 
-#        print(point, point.vals, type(point), '\n')
-#        print('population vals:', [solution.vals for solution in self.population], '\n')
-#        print('population objects:', [solution for solution in self.population], '\n')        
         population_cleared = []
 
         for elem in self.population:
@@ -808,9 +801,6 @@ class moeadd_optimizer_constrained(moeadd_optimizer):
         self.constraints = args
 
 
-#    def constaint_violation(self, solution) -> float:
-#        return np.sum(np.fromiter(map(lambda constr: constr(solution.vals), self.constraints), dtype = float))
-
     def constaint_violation(self, solution) -> float:
         '''
         
@@ -835,7 +825,6 @@ class moeadd_optimizer_constrained(moeadd_optimizer):
         for constraint in self.constraints:
             summ += constraint(x)
         return summ
-        # return np.sum(np.fromiter(map(lambda constr: constr(solution.vals), self.constraints), dtype = float))
 
     def tournament_selection(self, candidate_1, candidate_2):
         '''

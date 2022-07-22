@@ -25,13 +25,12 @@ from epde.operators.equation_fitness import L2_fitness, Solver_based_fitness
 from epde.operators.equation_right_part_selection import Poplevel_Right_Part_Selector, Eq_Right_Part_Selector
 from epde.operators.equation_truncate import Truncate_worst
 
-class Operator_builder(ABC):    
-    
+class OperatorBuilder(ABC):    
     @abstractproperty
     def strategy(self):
         pass
 
-class Strategy_builder(Operator_builder):
+class StrategyBuilder(OperatorBuilder):
     """
     Class of evolutionary operator builder. 
     
@@ -66,7 +65,7 @@ class Strategy_builder(Operator_builder):
         self.reset(stop_criterion, stop_criterion_kwargs)
     
     def reset(self, stop_criterion, stop_criterion_kwargs):
-        self._strategy = Evolutionary_strategy(stop_criterion, stop_criterion_kwargs)
+        self._strategy = EvolutionaryStrategy(stop_criterion, stop_criterion_kwargs)
         self.blocks_labeled = dict()
         self.blocks_connected = dict() # dict of format {op_label : (True, True)}, where in 
                                     # value dict first element is "connected with input" and
@@ -76,7 +75,7 @@ class Strategy_builder(Operator_builder):
     
     def add_init_operator(self, operator_label : str = 'initial'):
         self.initial_label = operator_label
-        new_block = Input_block(to_pass = None)
+        new_block = InputBlock(to_pass = None)
         self.reachable[operator_label] = {new_block.op_id,}
         self.blocks_labeled[operator_label] = new_block        
         self.blocks_connected[operator_label] = [True, False]
@@ -93,9 +92,7 @@ class Strategy_builder(Operator_builder):
 
     def add_operator(self, operator_label, operator, parse_operator_args = None, 
                      terminal_operator : bool = False): #, input_operator : bool = False
-#        if input_operator: 
-#        else:
-        new_block = Evolutionary_block(operator, parse_operator_args = parse_operator_args,
+        new_block = EvolutionaryBlock(operator, parse_operator_args = parse_operator_args,
                                                    terminal=terminal_operator)            
         self.blocks_labeled[operator_label] = new_block
         self.reachable[operator_label] = {new_block.op_id,}
@@ -117,13 +114,11 @@ class Strategy_builder(Operator_builder):
     def strategy(self):
         self._strategy.check_correctness()
         return self._strategy
-        #self.reset()
-#        return strategy
 
 
-class Strategy_director(object):    
+class StrategyDirector(object):    
     def __init__(self, stop_criterion, stop_criterion_kwargs):
-        self._constructor = Strategy_builder(stop_criterion, stop_criterion_kwargs)
+        self._constructor = StrategyBuilder(stop_criterion, stop_criterion_kwargs)
     
     @property
     def constructor(self):
@@ -172,28 +167,19 @@ class Strategy_director(object):
         eq_crossover.suboperators = {'Param_crossover' : param_crossover, 'Term_crossover' : term_crossover} 
         crossover.suboperators = {'Equation_crossover' : eq_crossover}
         
-        grids = global_var.grid_cache.get_all()
-        # print(global_var.grid_cache.memory_default.keys())
-        # print(grids, len(grids), type(grids[0]))
-        
-        def baseline_exp_function(grids):
-            exponent_partial = np.array([-(grid - np.mean(grid))**2 for grid in grids])
-            exponent = np.add.reduce(exponent_partial, axis = 0)
-            return (exponent - np.min(exponent)) / np.std(exponent) 
-        
-        def apply_baseline_exp_function():
-            return baseline_exp_function(global_var.grid_cache.get_all()[1])
+        # def apply_baseline_exp_function():
+        #     return baseline_exp_function(global_var.grid_cache.get_all()[1])
             
-        weak_deriv_fun = (apply_baseline_exp_function if not 'weak_deriv_fun' 
-                          in kwargs.keys() else kwargs['weak_deriv_fun'])
+        # weak_deriv_fun = (apply_baseline_exp_function if not 'weak_deriv_fun' 
+        #                   in kwargs.keys() else kwargs['weak_deriv_fun'])
         
-        lasso_coeffs = LASSO_sparsity(['sparsity'], weak_deriv_fun)
+        lasso_coeffs = LASSO_sparsity(['sparsity'])
         linreg_coeffs = LinReg_based_coeffs()
         
         lasso_coeffs.params = {'sparsity' : 1} if not 'lasso_coeffs_params' in kwargs.keys() else kwargs['lasso_coeffs_params']
         linreg_coeffs.params = {} if not 'linreg_coeffs_params' in kwargs.keys() else kwargs['linreg_coeffs_params']
 
-        fitness_eval = L2_fitness(['penalty_coeff'], weak_deriv_fun)
+        fitness_eval = L2_fitness(['penalty_coeff'])
         fitness_eval.suboperators = {'sparsity' : lasso_coeffs, 'coeff_calc' : linreg_coeffs}
         fitness_eval.params = {'penalty_coeff' : 0.5} if not 'fitness_eval_params' in kwargs.keys() else kwargs['fitness_eval_params']
         
@@ -244,11 +230,11 @@ class Strategy_director(object):
         self._constructor.assemble()
         
     
-class Strategy_director_solver(object):    
+class StrategyDirectorSolver(object):    
     def __init__(self, stop_criterion, stop_criterion_kwargs): # baseline = True
 #        self._constructor = None
 #        if baseline:
-        self._constructor = Strategy_builder(stop_criterion, stop_criterion_kwargs)
+        self._constructor = StrategyBuilder(stop_criterion, stop_criterion_kwargs)
     
     @property
     def constructor(self):
@@ -363,7 +349,7 @@ def link(op1, op2):
     Set the connection of operators in format op1 -> op2
     
     '''
-    assert isinstance(op1, (Evolutionary_block, Input_block)) and isinstance(op2, (Evolutionary_block, Input_block)), 'An operator is not defined as the Placed operator object'
+    assert isinstance(op1, (EvolutionaryBlock, InputBlock)) and isinstance(op2, (EvolutionaryBlock, InputBlock)), 'An operator is not defined as the Placed operator object'
     op1.add_outgoing(op2)
     op2.add_incoming(op1)
         
@@ -404,7 +390,7 @@ class Block(ABC):
         '''
         self.combinator = combinator
     
-class Evolutionary_block(Block):
+class EvolutionaryBlock(Block):
     '''
     
     Class, that represents an evolutionary operator, placed into the analogue of the 
@@ -433,7 +419,7 @@ class Evolutionary_block(Block):
             
         terminal : bool
             The terminality marker of the evolutionary block: if ``True``, than the execution of 
-            the Linked_Blocks will terminate after appying the block's operator.
+            the LinkedBlocks will terminate after appying the block's operator.
             
     '''
     def __init__(self, operator, parse_operator_args = None, terminal = False): #, initial = False
@@ -472,7 +458,7 @@ class Evolutionary_block(Block):
         super().apply()
 
      
-class Input_block(Block):
+class InputBlock(Block):
     def __init__(self, to_pass):
         self.set_output(to_pass); self.applied = True
         super().__init__(initial = True)
@@ -489,7 +475,7 @@ class Input_block(Block):
         return True
         
     
-class Linked_Blocks(object):
+class LinkedBlocks(object):
     '''
     
     The sequence (not necessarily chain: divergencies can be present) of blocks with evolutionary
@@ -520,7 +506,7 @@ class Linked_Blocks(object):
 
     def reset_traversal_cond(self):
         for block in self.blocks_labeled.values():
-            if not isinstance(block, Input_block): block.applied = False 
+            if not isinstance(block, InputBlock): block.applied = False 
             
     def traversal(self, input_obj, EA_kwargs):
         '''
@@ -530,7 +516,6 @@ class Linked_Blocks(object):
         '''
         self.reset_traversal_cond()
         
-#        import time
         self.initial[0][1].set_output(input_obj)
         delayed = []; processed = [self.initial[0][1],]
         self.terminated = False
@@ -553,7 +538,7 @@ class Linked_Blocks(object):
         return self.final_vertex.output
     
     
-class Evolutionary_strategy(object):
+class EvolutionaryStrategy(object):
     '''
 
     Class, containing the evolutionary strategy for evolutionary algorithm of equation 
@@ -573,17 +558,17 @@ class Evolutionary_strategy(object):
         if blocks is None:
             if len(self.blocks) == 0:
                 raise ValueError('Attempted to construct linked blocks object without defined evolutionary blocks')
-            self.linked_blocks = Linked_Blocks(self.blocks, suppress_structure_check)
+            self.linked_blocks = LinkedBlocks(self.blocks, suppress_structure_check)
         else:
             if not isinstance(blocks, dict):
                 raise TypeError('Blocks object must be of type dict with key - symbolic name of the block (e.g. "crossover", or "mutation", and value of type block')
-            self.linked_blocks = Linked_Blocks(blocks, suppress_structure_check)
+            self.linked_blocks = LinkedBlocks(blocks, suppress_structure_check)
             
     def check_integrity(self):
         if not isinstance(self.blocks, dict):
             raise TypeError('Blocks object must be of type dict with key - symbolic name of the block (e.g. "crossover", or "mutation", and value of type block')
-        if not isinstance(self.linked_blocks, Linked_Blocks):
-            raise TypeError('self.linked_blocks object is not of type Linked_Blocks')
+        if not isinstance(self.linked_blocks, LinkedBlocks):
+            raise TypeError('self.linked_blocks object is not of type LinkedBlocks')
         self.check_correctness()
         
     def iteration(self, population_subset, EA_kwargs = None):
