@@ -9,13 +9,14 @@ Created on Wed Jun  2 15:46:31 2021
 import numpy as np
 from copy import deepcopy
 
-from epde.structure import Term, Check_Unqueness
-from epde.supplementary import Population_Sort, Filter_powers, try_iterable
-from epde.operators.template import Compound_Operator
+from epde.structure import Term
+from epde.structure.structure_template import check_uniqueness
+from epde.supplementary import population_sort, filter_powers, try_iterable
+from epde.operators.template import CompoundOperator
 
 from epde.decorators import History_Extender, Reset_equation_status
 
-class PopLevel_mutation(Compound_Operator):
+class PopLevelMutation(CompoundOperator):
     """
     The general operator of mutation, which applies all off the mutation suboperators, which are selected in its self.suboperators['Mutation'] 
     to the population    
@@ -61,17 +62,16 @@ class PopLevel_mutation(Compound_Operator):
             The input population, altered by mutation operators.
             
         """
-        population = Population_Sort(population)
+        population = population_sort(population)
         for indiv_idx in range(self.params['elitism'], len(population)):
             if np.random.uniform(0, 1) <= self.params['indiv_mutation_prob']:
                 self.suboperators['Equatiion_mutation'].apply(population[indiv_idx])
         return population
 
-    @property
-    def operator_tags(self):
-        return {'mutation', 'population level', 'contains suboperators'}
+    def use_default_tags(self):
+        self._tags = {'mutation', 'population level', 'contains suboperators'}
 
-class PopLevel_mutation_elite(Compound_Operator):
+class PopLevelMutationElite(CompoundOperator):
     """
     The general operator of mutation, which applies all off the mutation suboperators, which are selected in its self.suboperators['Mutation'] 
     to the population    
@@ -95,7 +95,7 @@ class PopLevel_mutation_elite(Compound_Operator):
             r_mutation - probability of a term in an equation, selected for mutation, to be affected by any mutation operator;
             
             type_probabilities - propabilities for selecting each mutation suboperator to affect the equation (In this operator, set by euristic, to be updated).
-            
+
     Methods:
     -----------
     apply(population)
@@ -130,11 +130,10 @@ class PopLevel_mutation_elite(Compound_Operator):
                     raise AttributeError(f'Incorrect value of elitism attribute: {equation.elite}')
         return population        
 
-    @property
-    def operator_tags(self):
-        return {'mutation', 'population level', 'elitist'}
+    def use_default_tags(self):
+        self._tags = {'mutation', 'population level', 'elitist'}
 
-class Refining_Equation_mutation(Compound_Operator):
+class RefiningEquationMutation(CompoundOperator):
     @property
     def elitist(self):
         return True
@@ -154,25 +153,11 @@ class Refining_Equation_mutation(Compound_Operator):
                     mut_operator = self.suboperators['Mutation']
                 equation.structure[term_idx] = mut_operator.apply(term_idx, equation)
 
-    @property
-    def operator_tags(self):
-        return {'mutation', 'equation level', 'elitist', 'contains suboperators'}
+    def use_default_tags(self):
+        self._tags = {'mutation', 'equation level', 'elitist', 'contains suboperators'}
     
-class System_mutation(Compound_Operator):
-    @property
-    def elitist(self):
-        return True
-    
-    def apply(self, system):
-        for eq_idx in range(system.structure):
-            self.suboperators['Equation_level_mutation'].apply(system.structure[eq_idx])
-            
-    @property
-    def operator_tags(self):
-        return {'mutation', 'system level', 'contains suboperators'}        
 
-
-class Equation_mutation(Compound_Operator):
+class EquationMutation(CompoundOperator):
     @property
     def elitist(self):
         return True
@@ -189,11 +174,10 @@ class Equation_mutation(Compound_Operator):
                     mut_operator = self.suboperators['Mutation']
                 equation.structure[term_idx] = mut_operator.apply(term_idx, equation)
 
-    @property
-    def operator_tags(self):
-        return {'mutation', 'equation level', 'contains suboperators'}        
+    def use_default_tags(self):
+        self._tags = {'mutation', 'equation level', 'contains suboperators'}        
         
-class Term_mutation(Compound_Operator):
+class TermMutation(CompoundOperator):
     """
     Specific operator of the term mutation, where the term is replaced with a randomly created new one.
     """
@@ -216,17 +200,16 @@ class Term_mutation(Compound_Operator):
             
         """       
         new_term = Term(equation.pool, max_factors_in_term = equation.max_factors_in_term)        #) #
-        while not Check_Unqueness(new_term, equation.structure[:term_idx] + equation.structure[term_idx+1:]):
+        while not check_uniqueness(new_term, equation.structure[:term_idx] + equation.structure[term_idx+1:]):
             new_term = Term(equation.pool, max_factors_in_term = equation.max_factors_in_term)
         new_term.use_cache()
         return new_term
 
-    @property
-    def operator_tags(self):
-        return {'mutation', 'term level', 'exploration', 'no suboperators'}    
+    def use_default_tags(self):
+        self._tags = {'mutation', 'term level', 'exploration', 'no suboperators'}    
 
 
-class Parameter_mutation(Compound_Operator):
+class ParameterMutation(CompoundOperator):
     """
     Specific operator of the term mutation, where the term parameters are changed with a random increment.
     """
@@ -270,12 +253,11 @@ class Parameter_mutation(Compound_Operator):
                         else:
                             parameter_selection[param_idx] = parameter_selection[param_idx] + shift
                 factor.params = parameter_selection
-            term.structure = Filter_powers(term.structure)        
-            if Check_Unqueness(term, equation.structure[:term_idx] + equation.structure[term_idx+1:]):
+            term.structure = filter_powers(term.structure)        
+            if check_uniqueness(term, equation.structure[:term_idx] + equation.structure[term_idx+1:]):
                 break
         term.reset_saved_state()
         return term
     
-    @property
-    def operator_tags(self):
-        return {'mutation', 'term level', 'exploitation', 'no suboperators'}        
+    def use_default_tags(self):
+        self._tags = {'mutation', 'term level', 'exploitation', 'no suboperators'}

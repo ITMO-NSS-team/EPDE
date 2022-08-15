@@ -11,7 +11,11 @@ from copy import deepcopy
 from functools import reduce
 
 import epde.globals as global_var
-from epde.moeadd.moeadd_supplementary import fast_non_dominated_sorting, slow_non_dominated_sorting, NDL_update, Equality, Inequality, acute_angle        
+
+from epde.moeadd.moeadd_strategy_elems import MOEADDSectorProcesser
+from epde.moeadd.moeadd_supplementary import fast_non_dominated_sorting, slow_non_dominated_sorting, ndl_update, Equality, Inequality, acute_angle        
+
+
 
 def get_domain_idx(solution, weights) -> int:
     '''
@@ -126,8 +130,8 @@ def clear_list_of_lists(inp_list) -> list:
     '''
     return [elem for elem in inp_list if len(elem) > 0]
 
-    
-class pareto_levels(object):
+
+class ParetoLevels(object):
     '''
     
     The representation of Pareto levels, comprised of a finite number of objects in the 
@@ -143,7 +147,7 @@ class pareto_levels(object):
     sorting_method : function, optional, default - ``src.moeadd.moeadd_supplementary.fast_non_dominated_sorting``
         The method of population separation into non-dominated levels.
         
-    update_method : function, optional, defalut - ``src.moeadd.moeadd_supplementary.NDL_update``
+    update_method : function, optional, defalut - ``src.moeadd.moeadd_supplementary.ndl_update``
         The method of point addition into the population and onto the non-dominated levels.
     
     Attributes:
@@ -170,12 +174,19 @@ class pareto_levels(object):
     moeadd optimizer, thus no extra interactions of a user with this class are necessary.
     
     '''
-    def __init__(self, population, sorting_method = fast_non_dominated_sorting, update_method = NDL_update):
+    def __init__(self, population, sorting_method = fast_non_dominated_sorting, update_method = ndl_update):
         self._sorting_method = sorting_method
         self.population = population
         self._update_method = update_method
         self.levels = self._sorting_method(self.population)
         
+    @property
+    def levels(self):
+        return self._sorting_method(self.population)
+    
+    def __iter__(self):
+        return ParetoLevelsIterator()
+    
     def sort(self):
         '''
         
@@ -199,7 +210,7 @@ class pareto_levels(object):
         self.levels = self._update_method(point, self.levels)
         self.population.append(point)
 
-    def delete_point(self, point):  # Разобраться с удалением.  Потенциально ошибка
+    def delete_point(self, point):
         '''
         
         Deletion of a candidate solution point from the pareto levels and the population list.
@@ -218,7 +229,7 @@ class pareto_levels(object):
                 if element != point:
                     temp.append(element)
             if not len(temp) == 0:
-                new_levels.append(temp) # Точка находится в нескольких уровнях
+                new_levels.append(temp)
 
         population_cleared = []
 
@@ -234,8 +245,21 @@ class pareto_levels(object):
             raise Exception('Deleted something extra')
         self.levels = new_levels
         self.population = population_cleared
-#        self.population.remove(point)
-            
+
+
+class ParetoLevelsIterator(object):
+    def __init__(self, pareto_levels):
+        self._levels = pareto_levels
+        self._idx = 0
+
+    def __next__(self):
+        if self._idx < len(self._level.population):
+            res = self._level.population[self._idx]
+            self._idx += 1
+            return res
+        else:
+            raise StopIteration
+
 
 def locate_pareto_worst(levels, weights, best_obj, penalty_factor = 1.):
     '''
@@ -272,12 +296,6 @@ def locate_pareto_worst(levels, weights, best_obj, penalty_factor = 1.):
     domain_solution_NDL_idxs = np.empty(most_crowded_count)
     len_lvls = len(levels.levels)
     for solution_idx, solution in enumerate(domain_solutions[most_crowded_domain]):
-#        for level_idx in np.arange(len_lvls):
-#            if any([solution == level_solution for level_solution in levels.levels[level_idx]]):
-#                    domain_solution_NDL_idxs[solution_idx] = level_idx
-#                    break
-#            if level_idx == len_lvls - 1:
-#                raise StopIteration('Solution not located on pareto frontier')
         domain_solution_NDL_idxs[solution_idx] = [level_idx for level_idx in np.arange(len(levels.levels)) 
                                                     if any([solution == level_solution for level_solution in levels.levels[level_idx]])][0]
         
@@ -285,10 +303,10 @@ def locate_pareto_worst(levels, weights, best_obj, penalty_factor = 1.):
     worst_NDL_section = [domain_solutions[most_crowded_domain][sol_idx] for sol_idx in np.arange(len(domain_solutions[most_crowded_domain])) 
                         if domain_solution_NDL_idxs[sol_idx] == max_level]
     PBIS = np.fromiter(map(lambda solution: penalty_based_intersection(solution, weights[most_crowded_domain], best_obj, penalty_factor), worst_NDL_section), dtype = float)
-    return worst_NDL_section[np.argmax(PBIS)]        
+    return worst_NDL_section[np.argmax(PBIS)]
 
 
-class moeadd_optimizer(object):
+class MOEADDOptimizer(object):
     '''
     Solving multiobjective optimization problem (minimizing set of functions) with an 
     evolutionary approach. In this class, the unconstrained variation of the problem is 
@@ -328,13 +346,13 @@ class moeadd_optimizer(object):
         number of neighboring weight vectors to be considered during the operation 
         of evolutionary operators as the "neighbors" of the processed sectors.
         
-    NDS_method : function, optional, default ``moeadd.moeadd_supplementary.fast_non_dominated_sorting``
+    nds_method : function, optional, default ``moeadd.moeadd_supplementary.fast_non_dominated_sorting``
         Method of non-dominated sorting of the candidate solutions. The default method is implemented according to the article 
         *K. Deb, A. Pratap, S. Agarwal, and T. Meyarivan, “A fast and elitist
         multiobjective genetic algorithm: NSGA-II,” IEEE Trans. Evol. Comput.,
         vol. 6, no. 2, pp. 182–197, Apr. 2002.*
         
-    NDL_update : function, optional, defalut ``moeadd.moeadd_supplementary.NDL_update``
+    ndl_update : function, optional, defalut ``moeadd.moeadd_supplementary.ndl_update``
         Method of adding a new solution point into the objective functions space, introduced 
         to minimize the recalculation of the non-dominated levels for the entire population. 
         The default method was taken from the *K. Li, K. Deb, Q. Zhang, and S. Kwong, “Efficient non-domination level
@@ -380,7 +398,7 @@ class moeadd_optimizer(object):
     
     '''
     def __init__(self, pop_constructor, weights_num, pop_size, solution_params, delta, neighbors_number, 
-                 NDS_method = fast_non_dominated_sorting, NDL_update = NDL_update):
+                 nds_method = fast_non_dominated_sorting, ndl_update = ndl_update):
 
         self.abbreviated_search_executed = False
         soluton_creation_attempts_softmax = 10
@@ -401,10 +419,10 @@ class moeadd_optimizer(object):
                     print('solutions tried:', solution_gen_idx)
                     warnings.warn('Too many failed attempts to create unique solutions for multiobjective optimization. Change solution parameters to allow more diversity.')
                 if solution_gen_idx == soluton_creation_attempts_hardmax:
-                    self.abbreviated_search(population, sorting_method = NDS_method, update_method = NDL_update)
+                    self.abbreviated_search(population, sorting_method = nds_method, update_method = ndl_update)
                     return None
                 solution_gen_idx += 1
-        self.pareto_levels = pareto_levels(population, sorting_method=NDS_method, update_method=NDL_update)
+        self.pareto_levels = ParetoLevels(population, sorting_method=nds_method, update_method=ndl_update)
         
         self.weights = []; weights_size = len(population[0].obj_funs) #np.empty((pop_size, len(optimized_functionals)))
         for weights_idx in range(weights_num):
@@ -426,7 +444,7 @@ class moeadd_optimizer(object):
         self.best_obj = None
 
     def abbreviated_search(self, population, sorting_method, update_method):
-        self.pareto_levels = pareto_levels(population, sorting_method=sorting_method, update_method=update_method)
+        self.pareto_levels = ParetoLevels(population, sorting_method=sorting_method, update_method=update_method)
         if global_var.verbose.show_warnings:
             if len(population) == 1:
                 warnings.warn('The multiobjective optimization algorithm has been able to create only a single unique solution. The search has been abbreviated.')
@@ -468,7 +486,7 @@ class moeadd_optimizer(object):
             m[weight_idx] = weights[weight_idx]/delta
         weights[-1] = 1 - np.sum(weights[:-1])
         assert (weights[-1] <= 1 and weights[-1] >= 0)
-        return list(weights) # Переделать, т.к. костыль
+        return list(weights)
     
         
     def pass_best_objectives(self, *args) -> None:
@@ -492,21 +510,21 @@ class moeadd_optimizer(object):
     
     
     
-    def set_evolutionary(self, operator) -> None:
+    def set_sector_processer(self, processer : MOEADDSectorProcesser) -> None:
         '''
         
-        Setter of the `moeadd_optimizer.evolutionary_operator` attribute.
+        Setter of the `moeadd_optimizer.sector_processer` attribute.
         
         Arguments:
         ----------
         
-        operator : object of subclass of ``moe_evolutionary_operator``
+        operator : object of subclass of ``MOEADDSectorProcesser``
             The operator, which defines the evolutionary process
         
         '''
         
         # добавить возможность теста оператора
-        self.evolutionary_operator = operator
+        self.sector_processer = processer
     
     
     @staticmethod
@@ -579,7 +597,7 @@ class moeadd_optimizer(object):
         '''
 #        domain = get_domain_idx(offspring, self.weights)        
         
-        self.pareto_levels.update(offspring)  #levels_updated = NDL_update(offspring, levels)
+        self.pareto_levels.update(offspring)  #levels_updated = ndl_update(offspring, levels)
         if len(self.pareto_levels.levels) == 1:
             worst_solution = locate_pareto_worst(self.pareto_levels, self.weights, self.best_obj, PBI_penalty)
         else:
@@ -657,29 +675,31 @@ class moeadd_optimizer(object):
                 for weight_idx in np.arange(len(self.weights)):
                     if global_var.verbose.show_moeadd_epochs:
                         print(f'During MO : processing {weight_idx}-th weight.')                    
-                    parent_idxs = self.mating_selection(weight_idx, self.weights, self.neighborhood_lists, self.pareto_levels.population,
-                                                   neighborhood_selector, neighborhood_selector_params, delta)
-                    offsprings = self.evolutionary_operator.crossover([self.pareto_levels.population[int(idx)] for idx in parent_idxs]) # В объекте эволюционного оператора выделять кроссовер
-                    # try:
-                    for offspring_idx, offspring in enumerate(offsprings):
-                        if global_var.verbose.show_moeadd_epochs:
-                            print(f'Offsping {offspring_idx}.')   
-                        attempt = 1; attempt_limit = 2
-                        while True:
-                            temp_offspring = self.evolutionary_operator.mutation(offspring)
-                            if not np.any([temp_offspring == solution for solution in self.pareto_levels.population]):
-                                self.update_population(temp_offspring, PBI_penalty)
-                                break
-                            elif attempt >= attempt_limit:
-                                break
-                            attempt += 1
+                    # parent_idxs = self.mating_selection(weight_idx, self.weights, self.neighborhood_lists, self.pareto_levels.population,
+                    #                                neighborhood_selector, neighborhood_selector_params, delta)
+                    # offsprings = self.evolutionary_operator.crossover([self.pareto_levels.population[int(idx)] for idx in parent_idxs]) # В объекте эволюционного оператора выделять кроссовер
+                    # # try:
+                    # for offspring_idx, offspring in enumerate(offsprings):
+                    #     if global_var.verbose.show_moeadd_epochs:
+                    #         print(f'Offsping {offspring_idx}.')   
+                    #     attempt = 1; attempt_limit = 2
+                    #     while True:
+                    #         temp_offspring = self.evolutionary_operator.mutation(offspring)
+                    #         if not np.any([temp_offspring == solution for solution in self.pareto_levels.population]):
+                    #             self.update_population(temp_offspring, PBI_penalty)
+                    #             break
+                    #         elif attempt >= attempt_limit:
+                    #             break
+                    #         attempt += 1
+                    sp_kwargs = self.form_processer_args()
+                    self.sector_processer.run(**sp_kwargs)
                         
                 if len(self.pareto_levels.levels) == 1:
                     break
                     
                     
                     
-class moeadd_optimizer_constrained(moeadd_optimizer):
+class MOEADDOptimizerConstrained(MOEADDOptimizer):
     '''
     Solving multiobjective optimization problem (minimizing set of functions) with an 
     evolutionary approach. Here, the constrained variation of the problem is 
@@ -718,13 +738,13 @@ class moeadd_optimizer_constrained(moeadd_optimizer):
         number of neighboring weight vectors to be considered during the operation 
         of evolutionary operators as the "neighbors" of the processed sectors.
         
-    NDS_method : function, optional, default ``moeadd.moeadd_supplementary.fast_non_dominated_sorting``
+    nds_method : function, optional, default ``moeadd.moeadd_supplementary.fast_non_dominated_sorting``
         Method of non-dominated sorting of the candidate solutions. The default method is implemented according to the article 
         *K. Deb, A. Pratap, S. Agarwal, and T. Meyarivan, “A fast and elitist
         multiobjective genetic algorithm: NSGA-II,” IEEE Trans. Evol. Comput.,
         vol. 6, no. 2, pp. 182–197, Apr. 2002.*
         
-    NDL_update : function, optional, defalut ``moeadd.moeadd_supplementary.NDL_update``
+    ndl_update : function, optional, defalut ``moeadd.moeadd_supplementary.ndl_update``
         Method of adding a new solution point into the objective functions space, introduced 
         to minimize the recalculation of the non-dominated levels for the entire population. 
         The default method was taken from the *K. Li, K. Deb, Q. Zhang, and S. Kwong, “Efficient non-domination level
@@ -954,7 +974,6 @@ class moeadd_optimizer_constrained(moeadd_optimizer):
         
         '''
         if not self.abbreviated_search_executed:        
-            assert not type(self.best_obj) == type(None)
             self.train_hist = []
             for epoch_idx in np.arange(epochs):
                 if global_var.verbose.show_moeadd_epochs:
@@ -970,8 +989,8 @@ class moeadd_optimizer_constrained(moeadd_optimizer):
                         parent_idxs = parent_idxs[:-1]
                     np.random.shuffle(parent_idxs) 
                     parents_selected = [self.tournament_selection(self.pareto_levels.population[int(parent_idxs[2*p_metaidx])], 
-                                            self.pareto_levels.population[int(parent_idxs[2*p_metaidx+1])]) for 
-                                            p_metaidx in np.arange(int(len(parent_idxs)/2.))]
+                                                                  self.pareto_levels.population[int(parent_idxs[2*p_metaidx+1])]) for 
+                                        p_metaidx in np.arange(int(len(parent_idxs)/2.))]
                     
                     offsprings = self.evolutionary_operator.crossover(parents_selected) # В объекте эволюционного оператора выделять кроссовер
                     if type(offsprings) == list or type(offsprings) == tuple:

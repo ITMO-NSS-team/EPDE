@@ -9,14 +9,14 @@ Created on Wed Jun  2 15:43:19 2021
 import numpy as np
 from copy import deepcopy
 
-from epde.structure import Check_Unqueness
-#from epde.supplementary import *
-from epde.supplementary import Detect_Similar_Terms, flatten
-from epde.operators.template import Compound_Operator
-
+from epde.structure.structure_template import check_uniqueness
+from epde.supplementary import detect_similar_terms, flatten
 from epde.decorators import History_Extender, Reset_equation_status
 
-class PopLevel_crossover(Compound_Operator):
+from epde.operators.template import CompoundOperator
+from epde.operators.supplementary_operators import PopulationUpdaterConstrained
+
+class ParetoLevelCrossover(CompoundOperator):
     """
     The crossover operator, combining parameter crossover for terms with same 
     factors but different parameters & full exchange of terms between the 
@@ -36,7 +36,7 @@ class PopLevel_crossover(Compound_Operator):
         return the new population, created with the noted operators and containing both parent individuals and their offsprings.    
     
     """
-    def apply(self, population, separate_vars):
+    def apply(self, objective, separate_vars):
         """
         Method to obtain a new population by selection of parent individuals (equations) and performing a crossover between them to get the offsprings.
         
@@ -51,73 +51,92 @@ class PopLevel_crossover(Compound_Operator):
             the new population, containing both parents and offsprings;
         
         """
-        # print('Running crossover')
         crossover_pool = []
-        for solution in population:
-            crossover_pool.extend([solution,] * solution.crossover_selected_times)
-        
+        for solution in objective.population:
+            crossover_pool.extend([solution,] * solution.crossover_times())
+
         if len(crossover_pool) == 0:
             raise ValueError('crossover pool not created, probably solution.crossover_selected_times error')
         np.random.shuffle(crossover_pool)
         crossover_pool = np.array(crossover_pool, dtype = object).reshape((-1,2))
 
-        offsprings = []    
+        offsprings = []
         for pair_idx in np.arange(crossover_pool.shape[0]):
             if len(crossover_pool[pair_idx, 0].structure) != len(crossover_pool[pair_idx, 1].structure):
                 raise IndexError('Equations have diffferent number of terms')
             new_equation_1 = deepcopy(crossover_pool[pair_idx, 0])
             new_equation_2 = deepcopy(crossover_pool[pair_idx, 1])
-            
-            self.suboperators['Equation_crossover'].apply(new_equation_1, new_equation_2, separate_vars)
+
+            new_equation_1, new_equation_2 = self.suboperators['system_crossover'].apply(new_equation_1, new_equation_2)
             offsprings.extend([new_equation_1, new_equation_2])
 
-        population.extend(offsprings)             
-        return population        
-    
-    @property
-    def operator_tags(self):
-        return {'crossover', 'population level', 'contains suboperators'}      
+        for offspring in offsprings:
+            objective = self.suboperators(offspring, objective, self.params['PBI_penalty'])
+        return objective
 
-class System_mutation(Compound_Operator):
-    @property
-    def elitist(self):
-        return True
-    
-    def apply(self, system):
-        for eq_idx in range(system.structure):
-            self.suboperators()
-    @property
-    def operator_tags(self):
-        return {'crossover', 'system level', 'contains suboperators'}       
+    def use_default_tags(self):
+        self._tags = {'crossover', 'population level', 'contains suboperators'}      
 
-class Equation_crossover(Compound_Operator):
+
+class SystemCrossover(CompoundOperator):
+    def apply(self, objective_1, objective_2):
+        assert objective_1.vals.same_encoding(objective_2.vals)
+        
+        eqs_keys = objective_1.vals.equation_keys; params_keys = objective_2.vals.params_keys
+        for eq_key in eqs_keys:
+            objective_1, objective_2= self.suboperators['equation_crossover'].apply(objective_1.vals[eq_key],
+                                                                                    objective_2.vals[eq_key])
+            objective_1.vals.replace_gene(gene_key = eq_key, value = objective_1)
+            objective_2.vals.replace_gene(gene_key = eq_key, value = objective_2)
+            
+        for param_key in params_keys:
+            objective_1, objective_2 = self.suboperators['param_crossover'].apply(objective_1.vals[param_key],
+                                                                                  objective_2.vals[param_key])
+            objective_1.vals.replace_gene(gene_key = param_key, value = objective_1)
+            objective_2.vals.replace_gene(gene_key = param_key, value = objective_2)
+        return objective_1, objective_2
+
+    def use_default_tags(self):
+        self._tags = {'crossover', 'system level', 'contains suboperators'}
+
+
+class ParamsCrossover(CompoundOperator):
+    def apply(self, objective_1, objective_2):
+        offspring_1 = objective_1 + self.params['proportion'] * (objective_2 - objective_1)
+        offspring_2 = objective_1 + (1 - self.params['proportion']) * (objective_2 - objective_1)
+        return offspring_1, offspring_2
+
+    def use_default_tags(self):
+        self._tags = {'crossover', 'custom level', 'no suboperators'}       
+
+
+class EquationCrossover(CompoundOperator):
     @Reset_equation_status(reset_input = True)
-    @History_Extender(f'\n -> performing equation', 'ba')
+    @History_Extender(f'\n -> performing equation crossover', 'ba')
     def apply(self, equation1, equation2, separate_vars):
-        equation1_terms, equation2_terms = Detect_Similar_Terms(equation1, equation2)
+        equation1_terms, equation2_terms = detect_similar_terms(equation1, equation2)
         assert len(equation1_terms[0]) == len(equation2_terms[0]) and len(equation1_terms[1]) == len(equation2_terms[1])
         same_num = len(equation1_terms[0]); similar_num = len(equation1_terms[1])
         equation1.structure = flatten(equation1_terms); equation2.structure = flatten(equation2_terms)
     
         for i in range(same_num, same_num + similar_num):
-            temp_term_1, temp_term_2 = self.suboperators['Param_crossover'].apply(equation1.structure[i], equation2.structure[i]) 
-            if (Check_Unqueness(temp_term_1, equation1.structure[:i] + equation1.structure[i+1:]) and 
-                Check_Unqueness(temp_term_2, equation2.structure[:i] + equation2.structure[i+1:])):                     
+            temp_term_1, temp_term_2 = self.suboperators['param_crossover'].apply(equation1.structure[i], equation2.structure[i]) 
+            if (check_uniqueness(temp_term_1, equation1.structure[:i] + equation1.structure[i+1:]) and 
+                check_uniqueness(temp_term_2, equation2.structure[:i] + equation2.structure[i+1:])):                     
                 equation1.structure[i] = temp_term_1; equation2.structure[i] = temp_term_2
 
         for i in range(same_num + similar_num, len(equation1.structure)):
-            if Check_Unqueness(equation1.structure[i], equation2.structure) and Check_Unqueness(equation2.structure[i], equation1.structure):
+            if check_uniqueness(equation1.structure[i], equation2.structure) and check_uniqueness(equation2.structure[i], equation1.structure):
                 internal_term = equation1.structure[i]
                 equation1.structure[i] = equation2.structure[i]
                 equation2.structure[i] = internal_term
-                temp_term_1, temp_term_2 = self.suboperators['Term_crossover'].apply(equation1.structure[i], equation2.structure[i])
+                temp_term_1, temp_term_2 = self.suboperators['term_crossover'].apply(equation1.structure[i], equation2.structure[i])
 
-    @property
-    def operator_tags(self):
-        return {'crossover', 'equation level', 'contains suboperators'}
-        
+    def use_default_tags(self):
+        self._tags = {'crossover', 'equation level', 'contains suboperators'}
 
-class Param_crossover(Compound_Operator):
+
+class EqParamCrossover(CompoundOperator):
     """
     The crossover exchange between parent terms with the same factor functions, that differ only in the factor parameters. 
 
@@ -175,11 +194,10 @@ class Param_crossover(Compound_Operator):
         offspring_1.reset_occupied_tokens(); offspring_2.reset_occupied_tokens()
         return offspring_1, offspring_2
 
-    @property
-    def operator_tags(self):
-        return {'crossover', 'term level', 'exploitation', 'no suboperators'}
+    def use_default_tags(self):
+        self._tags = {'crossover', 'term level', 'exploitation', 'no suboperators'}
 
-class Term_crossover(Compound_Operator):
+class TermCrossover(CompoundOperator):
     """
     The crossover exchange between parent terms, done by complete exchange of terms. 
 
@@ -215,7 +233,5 @@ class Term_crossover(Compound_Operator):
         else:
             return term_1, term_2
         
-    @property
-    def operator_tags(self):
-        return {'crossover', 'term level', 'exploration', 'no suboperators'}
-        
+    def use_default_tags(self):
+        self._tags = {'crossover', 'term level', 'exploration', 'no suboperators'}

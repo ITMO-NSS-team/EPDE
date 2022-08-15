@@ -9,8 +9,9 @@ Created on Wed Jun  2 15:46:31 2021
 import numpy as np
 from copy import deepcopy
 
-from epde.structure import Term, Check_Unqueness
-from epde.supplementary import Population_Sort, Filter_powers, try_iterable
+from epde.structure.structure_template import check_uniqueness
+from epde.structure import Term
+from epde.supplementary import population_sort, filter_powers, try_iterable
 from epde.operators.template import Compound_Operator
 
 from epde.decorators import History_Extender, Reset_equation_status
@@ -62,7 +63,7 @@ class PopLevel_mutation(Compound_Operator):
             
         """
         # print('Running mutation')
-        population = Population_Sort(population)
+        population = population_sort(population)
         for indiv_idx in range(self.params['elitism'], len(population)):
             if np.random.uniform(0, 1) <= self.params['indiv_mutation_prob']:
                 self.suboperators['Equatiion_mutation'].apply(population[indiv_idx])
@@ -204,7 +205,7 @@ class Term_mutation(Compound_Operator):
             
         """       
         new_term = Term(equation.pool, max_factors_in_term = equation.max_factors_in_term)        #) #
-        while not Check_Unqueness(new_term, equation.structure[:term_idx] + equation.structure[term_idx+1:]):
+        while not check_uniqueness(new_term, equation.structure[:term_idx] + equation.structure[term_idx+1:]):
             new_term = Term(equation.pool, max_factors_in_term = equation.max_factors_in_term)
         new_term.use_cache()
         return new_term
@@ -258,8 +259,8 @@ class Parameter_mutation(Compound_Operator):
                         else:
                             parameter_selection[param_idx] = parameter_selection[param_idx] + shift
                 factor.params = parameter_selection
-            term.structure = Filter_powers(term.structure)        
-            if Check_Unqueness(term, equation.structure[:term_idx] + equation.structure[term_idx+1:]):
+            term.structure = filter_powers(term.structure)        
+            if check_uniqueness(term, equation.structure[:term_idx] + equation.structure[term_idx+1:]):
                 break
         term.reset_saved_state()
         return term

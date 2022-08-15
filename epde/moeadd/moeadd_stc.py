@@ -30,11 +30,27 @@ in form of non-dominated levels, using matplotlib tools.
 '''
 
 import numpy as np
-from epde.moeadd.moeadd import *
-from epde.moeadd.moeadd_supplementary import *
 from copy import deepcopy
 from abc import ABC, abstractproperty, abstractmethod
 import matplotlib.pyplot as plt
+
+from epde.moeadd.moeadd_strategy import *
+from epde.moeadd.moeadd import *
+from epde.moeadd.moeadd_supplementary import *
+
+
+class CrossoverSelectionCounter(object):
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self._counter = 0
+
+    def incr(self):
+        self._counter += 1
+
+    def call(self):
+        return self._counter
 
 class moeadd_solution(ABC):
     '''
@@ -85,7 +101,8 @@ class moeadd_solution(ABC):
         self.obj_funs = obj_funs
         self.precomputed_value = False
         self.precomputed_domain = False
-    
+        self.crossover_selected_times = CrossoverSelectionCounter()
+
     @property
     def obj_fun(self):
         if self.precomputed_value: 
@@ -102,8 +119,7 @@ class moeadd_solution(ABC):
             self._domain = get_domain_idx(self, weights)
             self.precomputed_domain = True
             return self._domain
-    
-    
+
     def __eq__(self, other):
         if isinstance(other, type(self)):
             return self.vals == other.vals
@@ -117,8 +133,27 @@ class moeadd_solution(ABC):
     def __hash__(self):
         raise NotImplementedError('The hash needs to be defined in the subclass')
 
+    def incr_counter(self, incr_val : int = 1):
+        '''
+        Increase counter of allowed participations in the crossover process for and individual.
 
-class moe_population_constructor(ABC):
+        Parameters
+        ----------
+        incr_val : int, optional
+            Value, for which the counter is increased. The default is 1.
+
+        '''
+        for i in range(incr_val):
+            self.crossover_selected_times.incr()
+    
+    def crossover_times(self):
+        return self.crossover_selected_times()
+        
+    def reset_counter(self):
+        self.crossover_selected_times.reset()
+
+
+class MOEPopulationConstructor(ABC):
     '''
     
     Abstract class of the creator of new moeadd solutions, utilized in its initialization phase. 
@@ -156,7 +191,7 @@ class moe_population_constructor(ABC):
         return None
 
 
-class moe_evolutionary_operator(ABC):
+class MOEEvolutionaryOperator(ABC):
     '''
     
     Abstract class of the moeadd evolutionary operator. The subclass implementations shall
@@ -231,28 +266,6 @@ def mixing_xover(parents):
     offsprings[1].vals = parents[0].vals + (1 - proportion) * (parents[1].vals - parents[0].vals)
     return offsprings
 
-def simple_selector(sorted_neighbors, number_of_neighbors = 4):
-    '''
-        Simple selector of neighboring weight vectors: takes n-closest (*n = number_of_neighbors*)ones to the 
-        processed one. Defined to be used inside the moeadd algorithm.
-    
-        Arguments:
-        ----------
-        
-        sorted_neighbors : list
-            proximity list of neighboring vectors, ranged in the ascending order of the angles between vectors.
-            
-        number_of_neighbors : int
-            numbers of vectors to be considered as the adjacent ones
-            
-        Returns:
-        ---------
-        
-        sorted_neighbors[:number_of_neighbors] : list
-            self evident slice of proximity list
-    '''
-    return sorted_neighbors[:number_of_neighbors]
-
 
 def plot_pareto(levels, weights = None, max_level = None, logscale = (False, False)):
     '''
@@ -277,14 +290,12 @@ def plot_pareto(levels, weights = None, max_level = None, logscale = (False, Fal
         Indication, of will the axis use logscale on the plot, if all values are positive. 
         First element of tuple - if the x-axis will use logscale. Second - y-scale.
         
-    
     '''
     if max_level is None:
         max_level = np.inf
     else:
         max_level += 1
     assert levels.population[0].obj_fun.size == 2
-    print([front_idx for front_idx in np.arange(min((len(levels.levels), max_level)))])
     coords = [[(solution.obj_fun[1], solution.obj_fun[0]) for solution in levels.levels[front_idx]] for front_idx in np.arange(min((len(levels.levels), max_level)))]
     coords_arrays = []
     for coord_set in coords:
@@ -307,11 +318,7 @@ def plot_pareto(levels, weights = None, max_level = None, logscale = (False, Fal
     
     fig, ax = plt.subplots()
     for front_idx in np.arange(len(coords_arrays)):
-#        ax.plot([1.04862679e-18, 1.29891486e-14, 1.30104261e-11, 0.00401406], [6, 2, 1, 0], color = 'r', linewidth = 1)
         ax.scatter(coords_arrays[front_idx][:, 0], coords_arrays[front_idx][:, 1], color = colors[front_idx], s = 20)
-#        plt.ylabel('RMSE')
-#        plt.xlabel('Model complexity')
-#        ax.set_yscale('log')
         if boundaries_min[0] > 0 and logscale[0]:
             ax.set_xscale('log')
         if boundaries_min[1] > 0 and logscale[1]:

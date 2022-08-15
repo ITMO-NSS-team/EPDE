@@ -8,7 +8,7 @@ Contains:
 **check_dominance(target, compared_with) -> bool** : Function to check, if one
 solution is dominated by another;
 
-**NDL_update(new_solution, levels) -> list** : Function to add a new solution into
+**ndl_update(new_solution, levels) -> list** : Function to add a new solution into
 the existing levels;
 
 **fast_non_dominated_sorting(population) -> list** : Sorting of a population into
@@ -31,10 +31,6 @@ import numpy as np
 from abc import ABC, abstractproperty, abstractmethod
     
 
-#def check_dominance(target, compared_with) -> bool:
-#    return (all([target.obj_fun[obj_fun_idx] <= compared_with.obj_fun[obj_fun_idx] for obj_fun_idx in np.arange(target.obj_fun.size)]) and 
-#            any([target.obj_fun[obj_fun_idx] < compared_with.obj_fun[obj_fun_idx] for obj_fun_idx in np.arange(target.obj_fun.size)]))
-   
 def check_dominance(target, compared_with) -> bool:
     '''
     
@@ -67,7 +63,7 @@ def check_dominance(target, compared_with) -> bool:
             return False
     return flag
  
-def NDL_update(new_solution, levels) -> list:   # efficient_NDL_update
+def ndl_update(new_solution, levels) -> list:   # efficient_ndl_update
     '''
     
     Computationally-cheap method of adding new solution into the existing Pareto levels.
@@ -231,8 +227,8 @@ def slow_non_dominated_sorting(population) -> list:
         locked_idxs.extend(processed_idxs); levels_elems += len(processed_idxs)
         levels.append([population[elem_idx] for elem_idx in processed_idxs])
     return levels
- 
-    
+
+
 def acute_angle(vector_a, vector_b) -> float:
     return np.arccos(np.dot(vector_a, vector_b)/(np.sqrt(np.dot(vector_a, vector_a))*np.sqrt(np.dot(vector_b, vector_b))))
 
@@ -250,8 +246,8 @@ class Constraint(ABC):
     @abstractmethod
     def __call__(self, *args):
         pass
-    
-    
+
+
 class Inequality(Constraint):
     '''
         

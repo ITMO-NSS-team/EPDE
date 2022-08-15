@@ -9,14 +9,10 @@ Created on Thu Jun 17 13:58:18 2021
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
-from epde.operators.template import Compound_Operator
+from epde.operators.template import CompoundOperator
+     
 
-class LinReg_based_coeffs(Compound_Operator):
-    def apply(self, system):
-        for eq_idx in range(len(system.structure)):
-            self.suboperators['Equation_level_linreg'].apply(system.structure[eq_idx])        
-
-class LinReg_based_coeffs_equation(Compound_Operator):
+class LinRegBasedCoeffsEquation(CompoundOperator):
     '''
     
     The operatror, dedicated to the calculation of the weights of the equation (for the free coefficient and 
@@ -30,14 +26,14 @@ class LinReg_based_coeffs_equation(Compound_Operator):
             
     
     '''
-    def apply(self, equation):
+    def apply(self, objective):
         """
         Calculate the coefficients of the equation, using the linear regression.The result is stored in the 
-        equation.weights_final attribute
+        objective.weights_final attribute
 
         Parameters:
         ------------
-        equation : Equation object
+        objective : Equation object
             the equation object, to that the fitness function is obtained.
             
         Returns:
@@ -45,22 +41,22 @@ class LinReg_based_coeffs_equation(Compound_Operator):
         
         None
         """        
-        assert equation.weights_internal_evald, 'Trying to calculate final weights before evaluating intermeidate ones (no sparsity).'
-        target = equation.structure[equation.target_idx]
+        assert objective.weights_internal_evald, 'Trying to calculate final weights before evaluating intermeidate ones (no sparsity).'
+        target = objective.structure[objective.target_idx]
     
         target_vals = target.evaluate(False)
         features_vals = []
         nonzero_features_indexes = []
-        for i in range(len(equation.structure)):
-            if i == equation.target_idx:
+        for i in range(len(objective.structure)):
+            if i == objective.target_idx:
                 continue
-            idx = i if i < equation.target_idx else i-1
-            if equation.weights_internal[idx] != 0:
-                features_vals.append(equation.structure[i].evaluate(False))
+            idx = i if i < objective.target_idx else i-1
+            if objective.weights_internal[idx] != 0:
+                features_vals.append(objective.structure[i].evaluate(False))
                 nonzero_features_indexes.append(idx)
 
         if len(features_vals) == 0:
-            equation.weights_final = np.zeros(len(equation.structure)) #Bind_Params([(token.label, token.params) for token in target.structure]), [('0', 1)]
+            objective.weights_final = np.zeros(len(objective.structure)) #Bind_Params([(token.label, token.params) for token in target.structure]), [('0', 1)]
         else:
             features = features_vals[0]
             if len(features_vals) > 1:
@@ -76,14 +72,13 @@ class LinReg_based_coeffs_equation(Compound_Operator):
                 estimator.fit(features, target_vals)
 
             valueable_weights = estimator.coef_
-            weights = np.zeros(len(equation.structure))
+            weights = np.zeros(len(objective.structure))
             for weight_idx in range(len(weights)-1):
                 if weight_idx in nonzero_features_indexes:
                     weights[weight_idx] = valueable_weights[nonzero_features_indexes.index(weight_idx)]
             weights[-1] = valueable_weights[-1]    
-            equation.weights_final_evald = True
-            equation.weights_final = weights
+            objective.weights_final_evald = True
+            objective.weights_final = weights
             
-    @property
-    def operator_tags(self):
-        return {'coefficient calculation', 'equation level', 'no suboperators'}
+    def use_default_tags(self):
+        self._tags = {'coefficient calculation', 'equation level', 'no suboperators'}

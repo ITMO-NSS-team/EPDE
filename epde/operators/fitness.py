@@ -15,11 +15,11 @@ from copy import deepcopy
 import matplotlib.pyplot as plt
 from matplotlib import cm
 
-from epde.operators.template import Compound_Operator
+from epde.operators.template import CompoundOperator
 import epde.globals as global_var
 from TEDEouS.solver import point_sort_shift_solver
 
-class L2_fitness(Compound_Operator):
+class L2Fitness(CompoundOperator):
     """
     The operator, which calculates fitness function to the individual (equation) as the L2 norm 
     of the vector of disrepancy between left part of the equation and the right part, evaluated
@@ -29,7 +29,7 @@ class L2_fitness(Compound_Operator):
     -------------------
         
     params : dict
-        Inhereted from the ``Compound_Operator`` class. 
+        Inhereted from the ``CompoundOperator`` class. 
         Parameters of the operator; main parameters: 
             
             penalty_coeff - penalty coefficient, to that the fitness function value of equation with no non-zero coefficients, is multiplied;
@@ -43,14 +43,6 @@ class L2_fitness(Compound_Operator):
         calculate the fitness function of the equation, that will be stored in the equation.fitness_value.    
         
     """
-    # def __init__(self, param_keys : list = [], g_fun : Union[np.ndarray, type(None)] = None):
-    #     self.weak_deriv_appr = g_fun is not None
-    #     if self.weak_deriv_appr:
-    #         self.g_fun = g_fun
-    #         self.g_fun_vals = None
-            
-    #     super().__init__(param_keys = param_keys)
-        
     def apply(self, equation):
         """
         Calculate the fitness function values. The result is not returned, but stored in the equation.fitness_value attribute.
@@ -90,12 +82,15 @@ class L2_fitness(Compound_Operator):
         equation.fitness_calculated = True
         equation.fitness_value = fitness_value
 
-    @property
-    def operator_tags(self):
-        return {'fitness evaluation', 'equation level', 'contains suboperators'}  
+    def use_default_tags(self):
+        self._tags = {'fitness evaluation', 'equation level', 'contains suboperators'}
+
+    # @property
+    # def operator_tags(self):
+    #     return {'fitness evaluation', 'equation level', 'contains suboperators'}  
 
 
-class Solver_based_fitness(Compound_Operator):
+class SolverBasedFitness(CompoundOperator):
     def __init__(self, param_keys : list, model_architecture = None):
         super().__init__(param_keys)
         if model_architecture is None:
@@ -187,3 +182,6 @@ class Solver_based_fitness(Compound_Operator):
         self.training_grid.to(self.device)     
         self.training_grid_set = True
         # Возможная проблема, когда подаётся тензор со значениями коэфф-тов перед производными
+        
+    def use_default_tags(self):
+        self._tags = {'fitness evaluation', 'equation level', 'contains suboperators'}        

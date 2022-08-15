@@ -9,9 +9,9 @@ Created on Wed Jun  2 15:43:19 2021
 import numpy as np
 from copy import deepcopy
 
-from epde.structure import Check_Unqueness
+from epde.structure.structure_template import check_uniqueness
 #from epde.supplementary import *
-from epde.supplementary import Detect_Similar_Terms, flatten
+from epde.supplementary import detect_similar_terms, flatten
 from epde.operators.template import Compound_Operator
 
 from epde.decorators import History_Extender, Reset_equation_status
@@ -83,19 +83,19 @@ class Equation_crossover(Compound_Operator):
     @Reset_equation_status(reset_input = True)
     @History_Extender(f'\n -> performing equation', 'ba')
     def apply(self, equation1, equation2, separate_vars):
-        equation1_terms, equation2_terms = Detect_Similar_Terms(equation1, equation2)
+        equation1_terms, equation2_terms = detect_similar_terms(equation1, equation2)
         assert len(equation1_terms[0]) == len(equation2_terms[0]) and len(equation1_terms[1]) == len(equation2_terms[1])
         same_num = len(equation1_terms[0]); similar_num = len(equation1_terms[1])
         equation1.structure = flatten(equation1_terms); equation2.structure = flatten(equation2_terms)
     
         for i in range(same_num, same_num + similar_num):
             temp_term_1, temp_term_2 = self.suboperators['Param_crossover'].apply(equation1.structure[i], equation2.structure[i]) 
-            if (Check_Unqueness(temp_term_1, equation1.structure[:i] + equation1.structure[i+1:]) and 
-                Check_Unqueness(temp_term_2, equation2.structure[:i] + equation2.structure[i+1:])):                     
+            if (check_uniqueness(temp_term_1, equation1.structure[:i] + equation1.structure[i+1:]) and 
+                check_uniqueness(temp_term_2, equation2.structure[:i] + equation2.structure[i+1:])):                     
                 equation1.structure[i] = temp_term_1; equation2.structure[i] = temp_term_2
 
         for i in range(same_num + similar_num, len(equation1.structure)):
-            if Check_Unqueness(equation1.structure[i], equation2.structure) and Check_Unqueness(equation2.structure[i], equation1.structure):
+            if check_uniqueness(equation1.structure[i], equation2.structure) and check_uniqueness(equation2.structure[i], equation1.structure):
                 internal_term = equation1.structure[i]
                 equation1.structure[i] = equation2.structure[i]
                 equation2.structure[i] = internal_term

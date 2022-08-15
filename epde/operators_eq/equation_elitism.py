@@ -8,11 +8,11 @@ Created on Thu Jul  1 15:17:46 2021
 
 import numpy as np
 from epde.operators.template import Compound_Operator
-from epde.supplementary import Population_Sort
+from epde.supplementary import population_sort
 
 class Fraction_elitism(Compound_Operator):
     def apply(self, population):
-        population = Population_Sort(population)
+        population = population_sort(population)
         if isinstance(self.params['elite_fraction'], float):
             assert self.params['elite_fraction'] <= 1 and self.params['elite_fraction'] >= 0
             fraction = int(np.ceil(self.params['elite_fraction'] * len(population)))

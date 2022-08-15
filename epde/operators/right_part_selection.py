@@ -12,10 +12,10 @@ from copy import deepcopy
 import warnings
 
 import epde.globals as global_var
-from epde.operators.template import Compound_Operator
+from epde.operators.template import CompoundOperator
 from epde.decorators import History_Extender
 
-class Poplevel_Right_Part_Selector(Compound_Operator):
+class PoplevelRightPartSelector(CompoundOperator):
     '''
     
     Operator for selection of the right part of the equation to emulate approximation of non-trivial function. 
@@ -27,8 +27,8 @@ class Poplevel_Right_Part_Selector(Compound_Operator):
     Noteable attributes:
     -----------
     suboperators : dict
-        Inhereted from the Compound_Operator class
-        key - str, value - instance of a class, inhereted from the Compound_Operator. 
+        Inhereted from the CompoundOperator class
+        key - str, value - instance of a class, inhereted from the CompoundOperator. 
         Suboperators, performing tasks of population/equation processing. In this case, only one suboperator is present: 
         fitness_calculation, dedicated to calculation of fitness function value.
 
@@ -69,11 +69,10 @@ class Poplevel_Right_Part_Selector(Compound_Operator):
                 self.suboperators['eq_level_rps'].apply(equation, separate_vars)
         return population
 
-    @property
-    def operator_tags(self):
-        return {'equation right part selection', 'population level', 'contains suboperators'}
+    def use_default_tags(self):
+        self._tags = {'equation right part selection', 'population level', 'contains suboperators'}
     
-class Eq_Right_Part_Selector(Compound_Operator):
+class EqRightPartSelector(CompoundOperator):
     '''
     
     Operator for selection of the right part of the equation to emulate approximation of non-trivial function. 
@@ -84,8 +83,8 @@ class Eq_Right_Part_Selector(Compound_Operator):
     Noteable attributes:
     -----------
     suboperators : dict
-        Inhereted from the Compound_Operator class
-        key - str, value - instance of a class, inhereted from the Compound_Operator. 
+        Inhereted from the CompoundOperator class
+        key - str, value - instance of a class, inhereted from the CompoundOperator. 
         Suboperators, performing tasks of equation processing. In this case, only one suboperator is present: 
         fitness_calculation, dedicated to calculation of fitness function value.
 
@@ -99,7 +98,6 @@ class Eq_Right_Part_Selector(Compound_Operator):
     '''    
     @History_Extender('\n -> The equation structure was detected: ', 'a')        
     def apply(self, equation, separate_vars):
-        # print('Running ordinary evolution') 
         max_fitness = 0
         max_idx = 0
         if not equation.contains_deriv:
@@ -108,7 +106,6 @@ class Eq_Right_Part_Selector(Compound_Operator):
             if not equation.structure[target_idx].contains_deriv:
                 continue
             equation.target_idx = target_idx
-            # print(equation.target_idx, '-th term ')
             self.suboperators['fitness_calculation'].apply(equation)
             if equation.fitness_value > max_fitness:
                 max_fitness = equation.fitness_value
@@ -119,13 +116,8 @@ class Eq_Right_Part_Selector(Compound_Operator):
         equation.target_idx = max_idx
         self.suboperators['fitness_calculation'].apply(equation)
         if not np.isclose(equation.fitness_value, max_fitness) and global_var.verbose.show_warnings:
-            # print(equation.fitness_value, max_fitness)
-            # print(equation.text_form)
             warnings.warn('Reevaluation of fitness function for equation has obtained different result. Not an error, if ANN DE solver is used.')
         equation.right_part_selected = True    
 
-    @property
-    def operator_tags(self):
-        return {'equation right part selection', 'equation level', 'contains suboperators'}    
-
-
+    def use_default_tags(self):
+        self._tags = {'equation right part selection', 'equation level', 'contains suboperators'}

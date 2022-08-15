@@ -183,8 +183,8 @@ class epde_search(object):
 
     def set_moeadd_params(self, population_size : int = 6, solution_params : dict = {},
                           delta : float = 1/50., neighbors_number : int = 3,
-                          NDS_method : Callable = fast_non_dominated_sorting,
-                          NDL_update_method : Callable = NDL_update,
+                          nds_method : Callable = fast_non_dominated_sorting,
+                          ndl_update_method : Callable = ndl_update,
                           subregion_mating_limitation : float = .95,
                           PBI_penalty : float = 1., training_epochs : int = 100,
                           neighborhood_selector : Callable = simple_selector,
@@ -212,13 +212,13 @@ class epde_search(object):
             number of neighboring weight vectors to be considered during the operation 
             of evolutionary operators as the "neighbors" of the processed sectors.
             
-        NDS_method : function, optional, default ``moeadd.moeadd_supplementary.fast_non_dominated_sorting``
+        nds_method : function, optional, default ``moeadd.moeadd_supplementary.fast_non_dominated_sorting``
             Method of non-dominated sorting of the candidate solutions. The default method is implemented according to the article 
             *K. Deb, A. Pratap, S. Agarwal, and T. Meyarivan, “A fast and elitist
             multiobjective genetic algorithm: NSGA-II,” IEEE Trans. Evol. Comput.,
             vol. 6, no. 2, pp. 182–197, Apr. 2002.*
             
-        NDL_update : function, optional, defalut ``moeadd.moeadd_supplementary.NDL_update``
+        ndl_update : function, optional, defalut ``moeadd.moeadd_supplementary.NDL_update``
             Method of adding a new solution point into the objective functions space, introduced 
             to minimize the recalculation of the non-dominated levels for the entire population. 
             The default method was taken from the *K. Li, K. Deb, Q. Zhang, and S. Kwong, “Efficient non-domination level
@@ -254,8 +254,8 @@ class epde_search(object):
         self.moeadd_params = {'weights_num' : population_size, 'pop_size' : population_size, 
                               'delta' : delta, 'neighbors_number' : neighbors_number, 
                               'solution_params': solution_params,
-                              'NDS_method' : NDS_method, 
-                              'NDL_update' : NDL_update_method}
+                              'nds_method' : nds_method, 
+                              'ndl_update' : ndl_update_method}
         
         self.moeadd_optimization_params = {'neighborhood_selector' : neighborhood_selector,
                                            'neighborhood_selector_params' : neighborhood_selector_params,

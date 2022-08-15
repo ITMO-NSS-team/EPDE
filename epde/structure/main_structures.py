@@ -1,88 +1,30 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Jan 11 16:22:17 2021
+Created on Tue Jul 26 13:46:45 2022
 
-@author: mike_ubuntu
+@author: maslyaev
 """
 
-from typing import Union
-import numpy as np
-from functools import reduce, singledispatchmethod
-import copy
 import gc
-import time
-import datetime
-import pickle
 import warnings
+import copy
+from functools import singledispatchmethod, reduce
+
+import numpy as np
+import torch
 
 import epde.globals as global_var
-
-import torch
-from epde.decorators import History_Extender, Reset_equation_status
-from epde.interface.token_family import TF_Pool
-from epde.factor import Factor
-from epde.supplementary import Filter_powers, Population_Sort, flatten
 import epde.moeadd.moeadd_stc as moeadd
 
+from epde.structure.encoding import Chromosome
+from epde.interface.token_family import TF_Pool
+from epde.decorators import History_Extender, Reset_equation_status
+from epde.supplementary import filter_powers, normalize_ts, population_sort, flatten
+from epde.structures.factor import Factor
+from epde.structure.structure_template import ComplexStructure, check_uniqueness
 
-def Check_Unqueness(obj, background):
-    return not any([elem == obj for elem in background]) 
-
-
-def normalize_ts(Input):
-    matrix = np.copy(Input)
-    if np.ndim(matrix) == 0:
-        raise ValueError('Incorrect input to the normalizaton: the data has 0 dimensions')
-    elif np.ndim(matrix) == 1:
-        return matrix
-    else:
-        for i in np.arange(matrix.shape[0]):
-            # print(matrix[i].shape)
-            std = np.std(matrix[i])
-            if std != 0:
-                matrix[i] = (matrix[i] - np.mean(matrix[i])) / std
-            else:
-                matrix[i] = 1
-        return matrix
-
-
-class Complex_Structure(object):
-    def __init__(self, interelement_operator = np.add, *params):
-        self._history = ''
-        self.structure = None        
-        self.interelement_operator = interelement_operator
-    
-    def __eq__(self, other):
-        if type(other) != type(self):
-            raise ValueError('Type of self and other are different')
-        return (all([any([other_elem == self_elem for other_elem in other.structure]) for self_elem in self.structure]) and 
-                all([any([other_elem == self_elem for self_elem in self.structure]) for other_elem in other.structure]) and 
-                len(other.structure) == len(self.structure))
-
-    def set_evaluator(self, evaluator):
-        raise NotImplementedError('Functionality of this method has been moved to the evolutionary operator declaration')
-    
-    def evaluate(self, structural = False):
-        assert len(self.structure) > 0, 'Attempt to evaluate an empty complex structure'
-        if len(self.structure) == 1:
-            return self.structure[0].evaluate(structural)
-        else:
-            return reduce(lambda x, y: self.interelement_operator(x, y.evaluate(structural)),
-                          self.structure[1:], self.structure[0].evaluate(structural))
-
-    def reset_saved_state(self):
-        self.saved = {True:False, False:False}
-        self.saved_as = {True:None, False:None}
-        for elem in self.structure:
-            elem.reset_saved_state()
-
-    @property
-    def name(self):
-        pass
-
-
-class Term(Complex_Structure):
+class Term(ComplexStructure):
     __slots__ = ['_history', 'structure', 'interelement_operator', 'saved', 'saved_as', 
                  'pool', 'max_factors_in_term', 'cache_linked', 'occupied_tokens_labels']
     
@@ -123,8 +65,6 @@ class Term(Complex_Structure):
     @defined.register
     def _(self, passed_term : list):
         self.structure = []
-        print('passed_term:', passed_term)
-
         for _, factor in enumerate(passed_term):
             if isinstance(factor, str):
                 _, temp_f = self.pool.create(label = factor)
@@ -137,7 +77,6 @@ class Term(Complex_Structure):
     @defined.register
     def _(self, passed_term : str):
         self.structure = []
-        print('passed_term:', passed_term)
         if isinstance(passed_term, str):
             _, temp_f = self.pool.create(label = passed_term)
             self.structure.append(temp_f)
@@ -145,7 +84,6 @@ class Term(Complex_Structure):
             self.structure.append(passed_term)
         else:
             raise ValueError('The structure of a term should be declared with str or factor.Factor obj, instead got', type(passed_term))
-
 
     def randomize(self, mandatory_family = None, forbidden_factors = None, **kwargs):
         if np.sum(self.pool.families_cardinality(meaningful_only = True)) == 0:
@@ -165,7 +103,7 @@ class Term(Complex_Structure):
             for family in self.pool.labels_overview:
                 for token_label in family[0]:
                     forbidden_factors[token_label] = [0, min(self.max_factors_in_term, family[1]), False]
-            
+
         factors_num = np.random.randint(1, self.max_factors_in_term + 1)
         self.occupied_tokens_labels = copy.copy(forbidden_factors)
 
@@ -185,7 +123,7 @@ class Term(Complex_Structure):
                     
             update_token_status(self.occupied_tokens_labels, occupied_by_factor)
             self.structure.append(factor)
-        self.structure = Filter_powers(self.structure)  
+        self.structure = filter_powers(self.structure)  
 
     def evaluate(self, structural):
         assert global_var.tensor_cache is not None, 'Currently working only with connected cache'
@@ -226,10 +164,10 @@ class Term(Complex_Structure):
                     new_term.reset_occupied_tokens()
                     _, new_term.structure[factor_idx] = self.pool.create(create_meaningful=meaningful_taken, 
                                                              occupied = new_term.occupied_tokens_labels + taken_tokens)
-            if Check_Unqueness(new_term, equation.structure[:equation_position] + 
+            if check_uniqueness(new_term, equation.structure[:equation_position] + 
                                          equation.structure[equation_position + 1 :]):
                 self.structure = new_term.structure
-                self.structure = Filter_powers(self.structure)
+                self.structure = filter_powers(self.structure)
                 self.reset_saved_state()
                 break
             if accept_term_try == 10 and global_var.verbose.show_warnings:
@@ -335,7 +273,7 @@ class Term(Complex_Structure):
         return new_struct
 
 
-class Equation(Complex_Structure): 
+class Equation(ComplexStructure): 
     __slots__ = ['_history', 'structure', 'interelement_operator', 'saved', 'saved_as', 
                  'n_immutable', 'pool', 'terms_number', 'max_factors_in_term', 'operator', 
                   '_target', 'target_idx', '_features', 'right_part_selected', 
@@ -401,6 +339,8 @@ class Equation(Complex_Structure):
                 self.structure.append(Term(self.pool, passed_term = passed_term, 
                                            max_factors_in_term = self.max_factors_in_term))
                 
+        self.main_var_to_explain = var_to_explain
+                
         force_var_to_explain = False
         for i in range(len(basic_structure), terms_number):
             check_test = 0
@@ -409,7 +349,7 @@ class Equation(Complex_Structure):
                 mf = var_to_explain if force_var_to_explain else None
                 new_term = Term(self.pool, max_factors_in_term = self.max_factors_in_term, 
                                 mandatory_family = mf, passed_term = None)
-                if Check_Unqueness(new_term, self.structure):
+                if check_uniqueness(new_term, self.structure):
                     force_var_to_explain = False
                     break
             self.structure.append(new_term)
@@ -730,18 +670,27 @@ def solver_formed_grid():
     
     training_grid = np.array(training_grid).reshape((len(training_grid), -1))
     return torch.from_numpy(training_grid).T.type(torch.FloatTensor)
-    
 
 
-class SoEq(Complex_Structure, moeadd.moeadd_solution):
+class SoEq(ComplexStructure, moeadd.moeadd_solution):
     def __init__(self, pool, terms_number, max_factors_in_term, sparsity = None, eq_search_iters = 100):
         self.tokens_for_eq = TF_Pool(pool.families_demand_equation)
         self.tokens_supp = TF_Pool(pool.families_supplementary)
-        
-        if sparsity is not None: self.sparsity = sparsity #self.vals = [sparsity,]
+
+        if sparsity is not None: self.sparsity = sparsity
         self.max_terms_number = terms_number; self.max_factors_in_term = max_factors_in_term
         self.moeadd_set = False; self.eq_search_operator_set = False
         self.def_eq_search_iters = eq_search_iters
+        
+    @property
+    def elite(self):
+        res = self._elite
+        self.elite = False
+        return res
+    
+    @elite.setter
+    def elite(self, marker):
+        self._elite = marker
         
     def use_default_objective_function(self):
         from epde.eq_mo_objectives import generate_partial, equation_discrepancy, equation_complexity_by_factors
@@ -773,10 +722,6 @@ class SoEq(Complex_Structure, moeadd.moeadd_solution):
         assert self.eq_search_operator_set
         
         if eq_search_iters is None: eq_search_iters = self.def_eq_search_iters
-        if sparsity is None: 
-            sparsity = self.vals
-        else:
-            self.vals = sparsity
 
         self.population_size = population_size
         self.eq_search_evolutionary_strategy.modify_block_params(block_label = 'truncation',
@@ -787,31 +732,27 @@ class SoEq(Complex_Structure, moeadd.moeadd_solution):
         token_selection = self.tokens_supp
         
         self.vars_to_describe = {token_family.type for token_family in self.tokens_for_eq.families}
-
         
         for eq_idx, variable in enumerate(self.vars_to_describe):
             current_tokens = token_selection + self.tokens_for_eq
             self.eq_search_evolutionary_strategy.modify_block_params(block_label = 'rps1', param_label = 'sparsity', 
-                                                                     value = self.vals[eq_idx], suboperator_sequence = ['eq_level_rps', 'fitness_calculation', 'sparsity'])#(sparsity_value = self.vals[eq_idx])
+                                                                     value = self.vals.get('sparsity'),
+                                                                     suboperator_sequence = ['eq_level_rps', 'fitness_calculation', 'sparsity'])
             self.eq_search_evolutionary_strategy.modify_block_params(block_label = 'rps2', param_label = 'sparsity', 
-                                                                     value = self.vals[eq_idx], suboperator_sequence = ['eq_level_rps', 'fitness_calculation', 'sparsity'])#(sparsity_value = self.vals[eq_idx])
+                                                                     value = self.vals.get('sparsity'), 
+                                                                     suboperator_sequence = ['eq_level_rps', 'fitness_calculation', 'sparsity'])#(sparsity_value = self.vals[eq_idx])
 
             cur_equation, cur_eq_operator_error_abs, cur_eq_operator_error_structural = self.optimize_equation(pool = current_tokens, 
                                                                                                                strategy = self.eq_search_evolutionary_strategy, 
                                                                                                                population_size = self.population_size,
                                                                                                                var_to_explain = variable, 
                                                                                                                EA_kwargs = EA_kwargs)
-            # self.vars_to_describe.difference_update(cur_equation.described_variables)
-            # if len(self.vars_to_describe) == 0 or described_all_vars:
-            #     described_all_vars = True
-            #     self.vars_to_describe = {token_family.type for token_family in self.tokens_for_eq.families}
 
             self.structure[cur_equation.descr] = cur_equation
             if False:
                 global_var.tensor_cache.change_variables(cur_eq_operator_error_abs,
                                                          cur_eq_operator_error_structural)
-        self.vals = copy.deepcopy(self.structure)
-        self.vals.update({'opt_params' : sparsity}) # optimization parameters shall include sparsity constants for each equation
+        self.vals = Chromosome(self.structure, sparsity)
         moeadd.moeadd_solution.__init__(self, self.vals, self.obj_funs)
         self.moeadd_set = True
             
@@ -819,7 +760,6 @@ class SoEq(Complex_Structure, moeadd.moeadd_solution):
                           var_to_explain : str = None, EA_kwargs = dict()):
         population = [Equation(pool, basic_terms, self.max_terms_number, self.max_factors_in_term) 
                       for i in range(population_size)]
-        # EA_kwargs['var_to_explain'] = var_to_explain
         strategy.run(initial_population = population, EA_kwargs = EA_kwargs)
         result = strategy.result
         
@@ -830,7 +770,7 @@ class SoEq(Complex_Structure, moeadd.moeadd_solution):
         for equation in population:
             if equation.described_variables in unexplained_vars:
                 equation.penalize_fitness(coeff = 0.)           
-        population = Population_Sort(population)
+        population = population_sort(population)
         population = population[:population_size]
         gc.collect()
         population = evol_operator.apply(population, unexplained_vars)
@@ -868,10 +808,9 @@ class SoEq(Complex_Structure, moeadd.moeadd_solution):
         return form
 
     def __eq__(self, other):
-        assert self.moeadd_set, 'The structure of the equation is not defined, therefore no moeadd operations can be called'        
-#        eps = 1e-9
-        return (all([any([other_elem == self_elem for other_elem in other.structure]) for self_elem in self.structure]) and 
-                all([any([other_elem == self_elem for self_elem in self.structure]) for other_elem in other.structure]) and 
+        assert self.moeadd_set, 'The structure of the equation is not defined, therefore no moeadd operations can be called'
+        return (all([any([other_elem == self_elem for other_elem in other.structure]) for self_elem in self.structure]) and
+                all([any([other_elem == self_elem for self_elem in self.structure]) for other_elem in other.structure]) and
                 len(other.structure) == len(self.structure)) or all(np.isclose(self.obj_fun, other.obj_fun))        
 
     @property
@@ -880,10 +819,9 @@ class SoEq(Complex_Structure, moeadd.moeadd_solution):
         for equation in self.structure:
             form += equation.latex_form + r", \\ "
         form += r"\end{eqnarray*}"
-        
             
     def __hash__(self):
-        return hash(tuple(self.vals))
+        return self.vals.hash_descr
         
     def __deepcopy__(self, memo = None):
         clss = self.__class__

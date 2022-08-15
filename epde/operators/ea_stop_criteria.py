@@ -8,7 +8,7 @@ Created on Tue Jun 15 20:51:55 2021
 
 from abc import ABC, abstractproperty
 
-class Stop_condition(ABC):
+class StopCondition(ABC):
     '''
     
     Abstract class for generalized stop condition for the evolutionary algorithm.
@@ -31,10 +31,10 @@ class Stop_condition(ABC):
     def check(self):
         pass
     
-class Iteration_limit(Stop_condition):
-    def __init__(self, limit = 100): # estrategy, 
+class IterationLimit(StopCondition):
+    def __init__(self, limit = 100):
         self.limit = limit + 1
-        self.checks = 0 # shortcut^ checking a number of calls instead of the estrategy attr of some sort
+        self.checks = 0
         
     def reset(self):
         self.checks = 0
@@ -43,6 +43,6 @@ class Iteration_limit(Stop_condition):
         self.checks += 1
         return self.checks > self.limit
     
-class Fitness_stabilized(Stop_condition):
+class FitnessStabilized(StopCondition):
     def __init__(self, estrategy):
         raise NotImplementedError

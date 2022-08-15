@@ -11,13 +11,13 @@ import numpy as np
 from sklearn.linear_model import Lasso
 
 import epde.globals as global_var
-from epde.operators.template import Compound_Operator
+from epde.operators.template import CompoundOperator
 
-#class Poplevel_sparsity(Compound_Operator):
+#class Poplevel_sparsity(CompoundOperator):
 #    def apply(self, population):
 #        for 
 
-class LASSO_sparsity(Compound_Operator):
+class LASSOSparsity(CompoundOperator):
     """
     The operator, which applies LASSO regression to the equation object to detect the 
     valuable term coefficients.
@@ -26,7 +26,7 @@ class LASSO_sparsity(Compound_Operator):
     -------------------
         
     params : dict
-        Inhereted from the ``Compound_Operator`` class. 
+        Inhereted from the ``CompoundOperator`` class. 
         Parameters of the operator; main parameters: 
             
             sparsity - value of the sparsity constant in the LASSO operator;
@@ -47,6 +47,7 @@ class LASSO_sparsity(Compound_Operator):
     #         self.g_fun_vals = None            
             
     #     super().__init__(param_keys = param_keys)
+    
     
     def apply(self, equation):
         """
@@ -79,6 +80,5 @@ class LASSO_sparsity(Compound_Operator):
         estimator.fit(features, target)
         equation.weights_internal = estimator.coef_
         
-    @property
-    def operator_tags(self):
-        return {'sparsity', 'equation level', 'no suboperators'}        
+    def use_default_tags(self):
+        self._tags = {'sparsity', 'equation level', 'no suboperators'}        
