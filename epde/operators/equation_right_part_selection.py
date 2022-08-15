@@ -67,8 +67,6 @@ class Poplevel_Right_Part_Selector(Compound_Operator):
         for equation in population:
             if not equation.right_part_selected:
                 self.suboperators['eq_level_rps'].apply(equation, separate_vars)
-                # to_rps += 1
-        # print(f'Running right part selection. Equation w/o rp: {to_rps}')                
         return population
 
     @property

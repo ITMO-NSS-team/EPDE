@@ -43,14 +43,7 @@ class L2_fitness(Compound_Operator):
         calculate the fitness function of the equation, that will be stored in the equation.fitness_value.    
         
     """
-    # def __init__(self, param_keys : list = [], g_fun : Union[np.ndarray, type(None)] = None):
-    #     self.weak_deriv_appr = g_fun is not None
-    #     if self.weak_deriv_appr:
-    #         self.g_fun = g_fun
-    #         self.g_fun_vals = None
-            
-    #     super().__init__(param_keys = param_keys)
-        
+
     def apply(self, equation):
         """
         Calculate the fitness function values. The result is not returned, but stored in the equation.fitness_value attribute.

@@ -1,0 +1,82 @@
+Чистые данные:
+
+0.0 * d^2u/dx2^2{power: 1.0} * 1/x_[dim]{power: 1.0, dim: 1.0} + 0.0 * d^2u/dx2^2{power: 1.0} + 0.0 * du/dx2{power: 1.0} + 0.0 = du/dx1{power: 1.0} * 1/x_[dim]{power: 1.0, dim: 0.0}
+ , with objective function values of [1.24844444 0.        ] 
+
+0.006977642314970398 * du/dx2{power: 1.0} * 1/x_[dim]{power: 1.0, dim: 1.0} + 0.006753729992655715 * d^2u/dx2^2{power: 1.0} + 0.0 * d^2u/dx2^2{power: 1.0} * t{power: 1.0} + 1.4932753723655157e-07 = du/dx1{power: 1.0}
+ , with objective function values of [0.02413284 2.        ] 
+ 
+ 
+ шум - 01: 0.025560351086904878
+ 
+0.006919875914561586 * du/dx2{power: 1.0} * 1/x_[dim]{power: 1.0, dim: 1.0} + 0.00670070205556048 * d^2u/dx2^2{power: 1.0} + 0.0 * du/dx2{power: 1.0} * t{power: 1.0} + 1.0003284931761666e-07 = du/dx1{power: 1.0}
+ , with objective function values of [1.5577516 2.       ] 
+ 
+0.0 * d^2u/dx2^2{power: 1.0} + 0.0 * u{power: 1.0} * d^2u/dx2^2{power: 1.0} + -0.471169350908118 * du/dx2{power: 1.0} * 1/x_[dim]{power: 1.0, dim: 0.0} + -0.00025915342357178055 = du/dx1{power: 1.0} * 1/x_[dim]{power: 1.0, dim: 1.0}
+ , with objective function values of [1.65848577 1.        ] 
+ 
+0.0 * du/dx2{power: 1.0} * t{power: 1.0} + 0.0 * d^2u/dx2^2{power: 1.0} * u{power: 1.0} + 0.0 * u{power: 1.0} + 0.0 = du/dx1{power: 1.0} * 1/x_[dim]{power: 1.0, dim: 0.0}
+ , with objective function values of [10.63639074  0.        ] 
+ 
+ 
+ шум - 03: 0.07668054454915374
+ 
+ 0.0 * d^2u/dx2^2{power: 1.0} * du/dx2{power: 1.0} + 0.0 * u{power: 1.0} * d^2u/dx2^2{power: 1.0} + 0.0 * du/dx2{power: 1.0} * r{power: 1.0} + 0.0 = du/dx1{power: 1.0} * 1/x_[dim]{power: 1.0, dim: 0.0}
+ , with objective function values of [10.54900651  0.        ] 
+
+-1.6289400754714888e-05 * du/dx2{power: 1.0} * u{power: 1.0} + 0.0 * d^2u/dx2^2{power: 1.0} + 0.0 * u{power: 1.0} * 1/x_[dim]{power: 1.0, dim: 1.0} + 0.0033252640706064357 = du/dx1{power: 1.0} * 1/x_[dim]{power: 1.0, dim: 0.0}
+, with objective function values of [5.07087058 1.        ] 
+
+0.007262513167557854 * d^2u/dx2^2{power: 1.0} + 0.0 * u{power: 1.0} * du/dx2{power: 1.0} + 0.008388997932704689 * du/dx2{power: 1.0} * 1/x_[dim]{power: 1.0, dim: 1.0} + 0.002311773439048904 = du/dx1{power: 1.0}
+ , with objective function values of [1.60563685 2.        ] 
+ 
+ 
+ шум - 05: 0.17892156909799795
+ 
+0.0 * u{power: 1.0} + 0.0 * u{power: 1.0} * 1/x_[dim]{power: 1.0, dim: 1.0} + 0.0 * d^2u/dx2^2{power: 1.0} * u{power: 1.0} + 0.0 = du/dx1{power: 1.0} * 1/x_[dim]{power: 1.0, dim: 0.0}
+ , with objective function values of [10.18966947  0.        ] 
+
+0.0071987591456158660 * du/dx2{power: 1.0} * 1/x_[dim]{power: 1.0, dim: 1.0}  + -0.22060070205556048 * du/dx2{power: 1.0} + -0.41254156063561037 * du/dx2{power: 1.0} * 1/x_[dim]{power: 1.0, dim: 0.0} + -0.0003284931761666221 = du/dx1{power: 1.0} * 1/x_[dim]{power: 1.0, dim: 1.0}
+ , with objective function values of [1.18872232 2.          ] 
+
+0.0 * d^2u/dx2^2{power: 1.0} + -0.474538435672078 * du/dx2{power: 1.0} * 1/x_[dim]{power: 1.0, dim: 0.0} + 0.0 * du/dx2{power: 1.0} * d^2u/dx2^2{power: 1.0} + -0.00019815846877149765 = du/dx1{power: 1.0} * 1/x_[dim]{power: 1.0, dim: 1.0}
+
+ , with objective function values of [6.82029821 1.        ]  
+
+ 
+шум - 07: 0.17892156909799795
+
+0.0 * d^2u/dx2^2{power: 1.0} + 0.0 * d^2u/dx2^2{power: 1.0} * 1/x_[dim]{power: 1.0, dim: 1.0} + 0.0 * d^2u/dx2^2{power: 1.0} * du/dx2{power: 1.0} + 0.0 = du/dx1{power: 2.0}
+ , with objective function values of [9.10152476 0.        ] 
+
+-0.004678809692016297 * du/dx2{power: 1.0} + -0.4230261419432602 * du/dx2{power: 1.0} * 1/x_[dim]{power: 1.0, dim: 0.0} + 0.0 * u{power: 1.0} + -0.00035516900033355503 = du/dx1{power: 1.0} * 1/x_[dim]{power: 1.0, dim: 1.0}
+ , with objective function values of [2.75934141 2.        ] 
+ 
+ 
+шум - 1:
+
+0.0 * du/dx1{power: 1.0} + -0.4943900462453198 * d^2u/dx2^2{power: 1.0} * du/dx1{power: 1.0} + 0.0 * du/dx1{power: 1.0} * r{power: 1.0} + -0.01696220262599609 = du/dx2{power: 1.0} * 1/x_[dim]{power: 1.0, dim: 0.0}
+ , with objective function values of [16.6068246  1.       ] 
+
+0.0 * u{power: 1.0} + 0.0 * du/dx2{power: 1.0} * t{power: 1.0} + 0.0 * u{power: 1.0} * r{power: 1.0} + 0.0 = du/dx1{power: 2.0}
+ , with objective function values of [22.12656494  0.        ] 
+
+ 
+шум - 3:
+
+0.0 * du/dx2{power: 1.0} * d^2u/dx2^2{power: 1.0} + 0.0 * u{power: 1.0} * 1/x_[dim]{power: 1.0, dim: 1.0} + 0.0 * u{power: 1.0} + 0.0 = du/dx1{power: 1.0} * 1/x_[dim]{power: 1.0, dim: 1.0}
+ , with objective function values of [95.24063508  0.        ] 
+
+0.0006562175234830688 * u{power: 1.0} * du/dx2{power: 1.0} + 0.00981789703485725 * du/dx2{power: 1.0} * t{power: 1.0} + -0.3894573628466188 * du/dx2{power: 1.0} + -0.002692054307787487 = du/dx1{power: 1.0} * 1/x_[dim]{power: 1.0, dim: 1.0}
+ , with objective function values of [63.07638435  3.        ] 
+ 
+ 
+
+ 
+
+
+ 
+ 
+  
+ 
+ 

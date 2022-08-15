@@ -1,0 +1,36 @@
+/home/maslyaev/epde/EPDE_stable/tests/cylinder/data/Noise_2/Data_20_random_07.dat
+0.04057824476587545 * 1/x_[dim]{power: 1.0, dim: 1.0} * du/dx2{power: 1.0} + 0.5531091042804342 * d^2u/dx2^2{power: 1.0} + -0.0066055698152325095 = du/dx1{power: 1.0}
+-2.398321565346873e-18
+
+/home/maslyaev/epde/EPDE_stable/tests/cylinder/data/Noise_2/Data_20_random_05.dat
+0.04169080148295778 * 1/x_[dim]{power: 1.0, dim: 1.0} * du/dx2{power: 1.0} + 0.5582796317596073 * d^2u/dx2^2{power: 1.0} + -0.006653249293962263 = du/dx1{power: 1.0}
+7.994405217822909e-19
+
+/home/maslyaev/epde/EPDE_stable/tests/cylinder/data/Noise_2/Data_20_random_01.dat
+0.04252211063751348 * 1/x_[dim]{power: 1.0, dim: 1.0} * du/dx2{power: 1.0} + 0.5623778341061476 * d^2u/dx2^2{power: 1.0} + -0.0067441782067680905 = du/dx1{power: 1.0}
+2.997901956683591e-18
+
+/home/maslyaev/epde/EPDE_stable/tests/cylinder/data/Noise_2/Data_20_random_7.dat
+-0.06620642050783142 * 1/x_[dim]{power: 1.0, dim: 1.0} * du/dx2{power: 1.0} + -0.12005935760090894 * d^2u/dx2^2{power: 1.0} + -0.00225508533758974 = du/dx1{power: 1.0}
+-2.398321565346873e-18
+
+/home/maslyaev/epde/EPDE_stable/tests/cylinder/data/Noise_2/Data_20_random_03.dat
+0.04233936151278742 * 1/x_[dim]{power: 1.0, dim: 1.0} * du/dx2{power: 1.0} + 0.5613729859173359 * d^2u/dx2^2{power: 1.0} + -0.006699454140171196 = du/dx1{power: 1.0}
+-1.7987411740101547e-18
+
+/home/maslyaev/epde/EPDE_stable/tests/cylinder/data/Noise_2/Data_20_random_3.dat
+0.0029209444596015282 * 1/x_[dim]{power: 1.0, dim: 1.0} * du/dx2{power: 1.0} + 0.37171553489805625 * d^2u/dx2^2{power: 1.0} + -0.005840606319011553 = du/dx1{power: 1.0}
+3.797342478465882e-18
+
+/home/maslyaev/epde/EPDE_stable/tests/cylinder/data/Noise_2/Data_20_random_5.dat
+-0.03988987739781314 * 1/x_[dim]{power: 1.0, dim: 1.0} * du/dx2{power: 1.0} + 0.12199369076125008 * d^2u/dx2^2{power: 1.0} + -0.004492034336975613 = du/dx1{power: 1.0}
+-5.196363391584891e-18
+
+/home/maslyaev/epde/EPDE_stable/tests/cylinder/data/Noise_2/Data_20_random_1.dat
+0.03809100057342604 * 1/x_[dim]{power: 1.0, dim: 1.0} * du/dx2{power: 1.0} + 0.5416105509433836 * d^2u/dx2^2{power: 1.0} + -0.006530646052655404 = du/dx1{power: 1.0}
+-3.3976222175747363e-18
+
+/home/maslyaev/epde/EPDE_stable/tests/cylinder/data/Noise_2/Data_20_random_10.dat
+-0.06630398721795984 * 1/x_[dim]{power: 1.0, dim: 1.0} * du/dx2{power: 1.0} + -0.4076222558738834 * d^2u/dx2^2{power: 1.0} + 0.0024239005179953295 = du/dx1{power: 1.0}
+-9.193566000496346e-18
+Data_20_random_7.png

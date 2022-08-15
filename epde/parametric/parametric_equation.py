@@ -16,11 +16,11 @@ class ParametricEquation(object):
         self.terms = terms
 
         self.total_params_count = [term.opt_params_num() for term in self.terms]
-        total_count = 0; self.param_term_beloning = {}
+        total_count = 0; self.param_term_belonging = {}
         for term_idx, term_params_num in enumerate(self.total_params_count):
             local_count = 0
             for _ in range(term_params_num):
-                self.param_term_beloning[total_count] = (term_idx, local_count)
+                self.param_term_belonging[total_count] = (term_idx, local_count)
                 total_count += 1
                 local_count += 1
 
@@ -36,14 +36,14 @@ class ParametricEquation(object):
             
             '''
             # print('params in opt_func', params)
-            err = np.linalg.norm(variables[0].evaluate_with_params(params))
+            err = np.linalg.norm(variables[0].evaluate_with_params(params), ord = 1)
             print('error:', err)
             return err
 
         def opt_fun_grad(params, *variables):
             # print('evaluating gradient')
             grad = np.zeros_like(params)
-            for param_idx, param_in_term_props in variables[0].param_term_beloning.items():
+            for param_idx, param_in_term_props in variables[0].param_term_belonging.items():
                 grad[param_idx] = np.sum(variables[0].evaluate_grad(params, param_in_term_props))
             print('gradient:', grad)
             return grad
@@ -156,4 +156,4 @@ class ParametricEquation(object):
 
     @get_term_for_param.register
     def _(self, param : int):
-        return self.terms[self.param_term_beloning[param]]
+        return self.terms[self.param_term_belonging[param]]
