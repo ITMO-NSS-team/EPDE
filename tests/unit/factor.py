@@ -21,7 +21,7 @@ from collections import OrderedDict
 
 import epde.globals as global_var
 from epde.interface.token_family import TF_Pool, Token_family, Evaluator
-from epde.factor import Factor
+from epde.structure.factor import Factor
 from epde.cache.cache import upload_grids, upload_simple_tokens
 from epde.supplementary import Define_Derivatives
 from epde.evaluators import Custom_Evaluator

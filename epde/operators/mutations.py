@@ -9,129 +9,55 @@ Created on Wed Jun  2 15:46:31 2021
 import numpy as np
 from copy import deepcopy
 
-from epde.structure import Term
+from epde.structure.main_structures import Equation, SoEq, Term
 from epde.structure.structure_template import check_uniqueness
-from epde.supplementary import population_sort, filter_powers, try_iterable
+from epde.supplementary import filter_powers, try_iterable
 from epde.operators.template import CompoundOperator
+
 
 from epde.decorators import History_Extender, Reset_equation_status
 
-class PopLevelMutation(CompoundOperator):
-    """
-    The general operator of mutation, which applies all off the mutation suboperators, which are selected in its self.suboperators['Mutation'] 
-    to the population    
-    
-    Noteable attributes:
-    -----------
-    suboperators : dict
-        Inhereted from the Specific_Operator class. 
-        Suboperators, performing tasks of calculation of weights for each terms & fitness function calculation. 
-        Additionally, it contains suboperators of different mutation types. Dictionary: keys - strings from 'Mutation', 'Coeff_calc', 'Fitness_eval'.
-        values - corresponding operators (objects of Specific_Operator class).
-    params : dict
-        Inhereted from the Specific_Operator class. 
-        Parameters of the operator; main parameters: 
-            
-            elitism - number of inidividuals with highest fitness values, spared from the mutation to preserve their quality;
-                
-            indiv_mutation_prob - probability of an individual in a population to be affected by a mutation;
-            
-            r_mutation - probability of a term in an equation, selected for mutation, to be affected by any mutation operator;
-            
-            type_probabilities - propabilities for selecting each mutation suboperator to affect the equation (In this operator, set by euristic, to be updated).
-            
-    Methods:
-    -----------
-    apply(population)
-        return the new population, created with the specified operators and containing mutated population.    
-    
-    """
+# Pareto level and chromosome processers shall be declare as mappings of 
+# equation-level operators onto the corresponding types.  
 
-    def apply(self, population):
-        """
-        Return the new population, created with the specified operators and containing mutated population.
-        
-        Parameters:
-        -----------
-        population : list of Equation objects
-            The population, to which the mutation operators would be applied.
-            
-        Returns:
-        ----------
-        population : list of Equation objects
-            The input population, altered by mutation operators.
-            
-        """
-        population = population_sort(population)
-        for indiv_idx in range(self.params['elitism'], len(population)):
-            if np.random.uniform(0, 1) <= self.params['indiv_mutation_prob']:
-                self.suboperators['Equatiion_mutation'].apply(population[indiv_idx])
-        return population
+def validate_indiviual_suitability(individual, best_inidividual, worst_individual):
+    '''
+    We assert, that the problem is the problem of minimization
+    '''
+    elite_fraction = 0.2 # TODO: set better initialization
+    return individual < best_inidividual + elite_fraction * (worst_individual - best_inidividual)
+
+
+class ChromosomeMutation(CompoundOperator):
+    def apply(self, objective : SoEq): # TODO: add setter for best_individuals & worst individuals 
+        eqs_keys = objective.vals.equation_keys; params_keys = objective.vals.params_keys
+        if np.random.uniform(0, 1) > self.params['indiv_mutation_prob'] and objective.elite == 0:
+            for eq_key in eqs_keys:
+                objective = self.suboperators['equation_mutation'].apply(objective.vals[eq_key])
+                objective.vals.replace_gene(gene_key = eq_key, value = objective)
+                
+            for param_key in params_keys:
+                objective = self.suboperators['param_mutation'].apply(objective.vals[param_key])
+                objective.vals.replace_gene(gene_key = param_key, value = objective)
+
+        if np.random.uniform(0, 1) > self.params['indiv_mutation_prob'] and objective.elite == 1:            
+            for eq_key in eqs_keys:
+                if validate_indiviual_suitability(objective[objective.vals[eq_key]].evaluate(False, True, True), # Call by index?
+                                                  self.params['best_individuals'][eq_key],
+                                                  self.params['worst_individuals'][eq_key]):
+                    objective = self.suboperators['refining_equation_mutation'].apply(objective.vals[eq_key])
+                    objective.vals.replace_gene(gene_key = eq_key, value = objective)
+
+            for param_key in params_keys:
+                objective = self.suboperators['refining_param_mutation'].apply(objective.vals[param_key])
+                objective.vals.replace_gene(gene_key = param_key, value = objective)
+
+
+        return objective
 
     def use_default_tags(self):
-        self._tags = {'mutation', 'population level', 'contains suboperators'}
+        self._tags = {'mutation', 'chromosome level', 'contains suboperators'}
 
-class PopLevelMutationElite(CompoundOperator):
-    """
-    The general operator of mutation, which applies all off the mutation suboperators, which are selected in its self.suboperators['Mutation'] 
-    to the population    
-    
-    Noteable attributes:
-    -----------
-    suboperators : dict
-        Inhereted from the Specific_Operator class. 
-        Suboperators, performing tasks of calculation of weights for each terms & fitness function calculation. 
-        Additionally, it contains suboperators of different mutation types. Dictionary: keys - strings from 'Mutation', 'Coeff_calc', 'Fitness_eval'.
-        values - corresponding operators (objects of Specific_Operator class).
-
-    params : dict
-        Inhereted from the Specific_Operator class. 
-        Parameters of the operator; main parameters: 
-            
-            elitism - number of inidividuals with highest fitness values, spared from the mutation to preserve their quality;
-                
-            indiv_mutation_prob - probability of an individual in a population to be affected by a mutation;
-            
-            r_mutation - probability of a term in an equation, selected for mutation, to be affected by any mutation operator;
-            
-            type_probabilities - propabilities for selecting each mutation suboperator to affect the equation (In this operator, set by euristic, to be updated).
-
-    Methods:
-    -----------
-    apply(population)
-        return the new population, created with the specified operators and containing mutated population.    
-    
-    """   
-        
-    def apply(self, population):
-        """
-        Return the new population, created with the specified operators and containing mutated population.
-        
-        Parameters:
-        -----------
-        population : list of Equation objects
-            The population, to which the mutation operators would be applied.
-            
-        Returns:
-        ----------
-        population : list of Equation objects
-            The input population, altered by mutation operators.
-            
-        """    
-        for equation in population:
-            if np.random.uniform(0, 1) <= self.params['indiv_mutation_prob']:
-                if equation.elite == 'elite':
-                    self.suboperators['Equatiion_mutation']['elite'].apply(equation)              
-                elif equation.elite == 'non-elite':
-                    self.suboperators['Equatiion_mutation']['non-elite'].apply(equation)
-                elif equation.elite == 'immutable':
-                    pass
-                else:
-                    raise AttributeError(f'Incorrect value of elitism attribute: {equation.elite}')
-        return population        
-
-    def use_default_tags(self):
-        self._tags = {'mutation', 'population level', 'elitist'}
 
 class RefiningEquationMutation(CompoundOperator):
     @property
@@ -140,21 +66,21 @@ class RefiningEquationMutation(CompoundOperator):
     
     @Reset_equation_status(reset_input = True)
     @History_Extender(f'\n -> refining mutating equation', 'ba')
-    def apply(self, equation):
-        for term_idx in range(equation.n_immutable, len(equation.structure)):
-            if term_idx == equation.target_idx:
+    def apply(self, objective : Equation):
+        for term_idx in range(objective.n_immutable, len(objective.structure)):
+            if term_idx == objective.target_idx:
                 continue
-            corresponding_weight = equation.weights_internal[term_idx] if term_idx < equation.target_idx else equation.weights_internal[term_idx - 1]
+            corresponding_weight = objective.weights_internal[term_idx] if term_idx < objective.target_idx else objective.weights_internal[term_idx - 1]
             if corresponding_weight == 0 and np.random.uniform(0, 1) <= self.params['r_mutation']:
-                self.params['type_probabilities'] = [1 - 1/pow(equation.structure[term_idx].total_params, 2), 1/pow(equation.structure[term_idx].total_params, 2)]
+                self.params['type_probabilities'] = [1 - 1/pow(objective.structure[term_idx].total_params, 2), 1/pow(objective.structure[term_idx].total_params, 2)]
                 if try_iterable(self.suboperators['Mutation']):
                     mut_operator = np.random.choice(self.suboperators['Mutation'], p=self.params['type_probabilities'])
                 else:
                     mut_operator = self.suboperators['Mutation']
-                equation.structure[term_idx] = mut_operator.apply(term_idx, equation)
+                objective.structure[term_idx] = mut_operator.apply(term_idx, objective)
 
     def use_default_tags(self):
-        self._tags = {'mutation', 'equation level', 'elitist', 'contains suboperators'}
+        self._tags = {'mutation', 'gene level', 'elitist', 'contains suboperators'}
     
 
 class EquationMutation(CompoundOperator):
@@ -196,14 +122,21 @@ class TermMutation(CompoundOperator):
         Returns:
         ----------
         new_term : Term object
-            The new, randomly created, term.
+            A new, randomly created, term.
             
         """       
-        new_term = Term(equation.pool, max_factors_in_term = equation.max_factors_in_term)        #) #
-        while not check_uniqueness(new_term, equation.structure[:term_idx] + equation.structure[term_idx+1:]):
+        if term_idx == equation.target_idx: # TODO: implement mutation, that preserves meaningful family?
             new_term = Term(equation.pool, max_factors_in_term = equation.max_factors_in_term)
-        new_term.use_cache()
-        return new_term
+            while not check_uniqueness(new_term, equation.structure[:term_idx] + equation.structure[term_idx+1:]):
+                new_term = Term(equation.pool, max_factors_in_term = equation.max_factors_in_term)
+            new_term.use_cache()
+            return new_term
+        else:            
+            new_term = Term(equation.pool, max_factors_in_term = equation.max_factors_in_term)        #) #
+            while not check_uniqueness(new_term, equation.structure[:term_idx] + equation.structure[term_idx+1:]):
+                new_term = Term(equation.pool, max_factors_in_term = equation.max_factors_in_term)
+            new_term.use_cache()
+            return new_term
 
     def use_default_tags(self):
         self._tags = {'mutation', 'term level', 'exploration', 'no suboperators'}    

@@ -17,7 +17,7 @@ def set_argument(var, fun_kwargs, base_value):
         res = base_value
     return res
 
-class Systems_population_constructor(object):
+class SystemsPopulationConstructor(object):
     def __init__(self, pool, terms_number, max_factors_in_term, eq_search_evo, 
                  obj_functions = None, sparsity_interval = (0, 1)):
         self.pool = pool; self.terms_number = terms_number
@@ -26,7 +26,7 @@ class Systems_population_constructor(object):
         self.equation_number = len(self.pool.families_demand_equation)
         self.sparsity_interval = sparsity_interval
     
-    def create(self, **kwargs): # Дописать
+    def create(self, **kwargs):
         pop_size = set_argument('population_size', kwargs, 16)
         sparsity = set_argument('sparsity', kwargs, np.power(np.e, np.random.uniform(low = np.log(self.sparsity_interval[0]),
                                                                       high = np.log(self.sparsity_interval[1]),
@@ -49,7 +49,7 @@ class Systems_population_constructor(object):
 class sys_search_evolutionary_operator(object): # Возможно, организовать наследование от эвол. оператора из eq_search_operators
     def __init__(self, xover, mutation):
         '''
-        Define the evolutionary operator to be used in the search of system of differential equations. 
+        Define the evolutionary operator to be used in the search of system of differential equations.
         
         Parameters:
             xover : function

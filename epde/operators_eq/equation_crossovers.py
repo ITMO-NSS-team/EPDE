@@ -96,10 +96,7 @@ class Equation_crossover(Compound_Operator):
 
         for i in range(same_num + similar_num, len(equation1.structure)):
             if check_uniqueness(equation1.structure[i], equation2.structure) and check_uniqueness(equation2.structure[i], equation1.structure):
-                internal_term = equation1.structure[i]
-                equation1.structure[i] = equation2.structure[i]
-                equation2.structure[i] = internal_term
-                temp_term_1, temp_term_2 = self.suboperators['Term_crossover'].apply(equation1.structure[i], equation2.structure[i])
+                equation1.structure[i], equation2.structure[i] = self.suboperators['Term_crossover'].apply(equation1.structure[i], equation2.structure[i])
 
     @property
     def operator_tags(self):

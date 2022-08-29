@@ -2,7 +2,7 @@ import numpy as np
 from collections import OrderedDict
 from functools import reduce, singledispatchmethod
 
-from epde.factor import Factor
+from epde.structure.factor import Factor
 from epde.structure import Term
 from epde.supplementary import factor_params_to_str
 

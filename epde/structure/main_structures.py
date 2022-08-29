@@ -21,7 +21,7 @@ from epde.structure.encoding import Chromosome
 from epde.interface.token_family import TF_Pool
 from epde.decorators import History_Extender, Reset_equation_status
 from epde.supplementary import filter_powers, normalize_ts, population_sort, flatten
-from epde.structures.factor import Factor
+from epde.structure.factor import Factor
 from epde.structure.structure_template import ComplexStructure, check_uniqueness
 
 class Term(ComplexStructure):
@@ -215,6 +215,9 @@ class Term(ComplexStructure):
     def contains_deriv(self):
         return any([factor.is_deriv and factor.deriv_code != [None,] for factor in self.structure])
     
+    def contains_family(self, family):
+        return any([factor.type == family for factor in self.structure])
+
     @property
     def solver_form(self):
         
@@ -374,11 +377,17 @@ class Equation(ComplexStructure):
                     forbidden_tokens.add(token)        
         return forbidden_tokens
 
-    def reconstruct_to_contain_deriv(self):
+    def restore_property(self, deriv : bool = False, mandatory_family : bool = False):
+        # TODO: rewrite for an arbitrary equation property check
+        if not (bool or mandatory_family):
+            raise ValueError('No property passed for restoration.')
         while True:
             replacement_idx = np.random.randint(low = 0, high = len(self.structure))
             temp = Term(self.pool, max_factors_in_term=self.max_factors_in_term) # ,  forbidden_tokens=self.forbidden_token_labels
-            if temp.contains_deriv:
+            if deriv and temp.contains_deriv:
+                self.structure[replacement_idx] = temp
+                break
+            elif mandatory_family and temp.contains_family(self.main_var_to_explain):
                 self.structure[replacement_idx] = temp
                 break
 
@@ -684,15 +693,23 @@ class SoEq(ComplexStructure, moeadd.moeadd_solution):
         
     @property
     def elite(self):
+        '''
+        For elitism the following markers shall be used:
+        0 - non-elite individual;
+        1 - may be worth improvement, refining mutation will be applied;
+        2 - elite individual, no mutation will be applied to avoid all probable harm.
+        '''
         res = self._elite
-        self.elite = False
+        self._elite_marker = 0
         return res
     
     @elite.setter
     def elite(self, marker):
-        self._elite = marker
+        self._elite_marker = marker
         
     def use_default_objective_function(self):
+        raise DeprecationWarning('Call for the default MO criteria. In normal conditions, this method shall not be called.')
+        # TODO: Erase me from existence!
         from epde.eq_mo_objectives import generate_partial, equation_discrepancy, equation_complexity_by_factors
         quality_objectives = [generate_partial(equation_discrepancy, eq_idx) for eq_idx in range(len(self.tokens_for_eq))]
         complexity_objectives = [generate_partial(equation_complexity_by_factors, eq_idx) for eq_idx in range(len(self.tokens_for_eq))]

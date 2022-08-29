@@ -5,6 +5,7 @@ Created on Tue Jul  6 15:55:12 2021
 
 @author: mike_ubuntu
 """
+from types import NoneType
 import numpy as np
 from typing import Union, Callable
 from collections import OrderedDict

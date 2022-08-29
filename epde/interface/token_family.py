@@ -10,7 +10,7 @@ import numpy as np
 import itertools
 
 import epde.globals as global_var
-from epde.factor import Factor
+from epde.structure.factor import Factor
 from typing import Union
 
 def constancy_hard_equality(tensor, epsilon = 1e-7):

@@ -11,8 +11,14 @@ from functools import partial, singledispatch
 from epde.operators.operator_mappers import map_operator_between_levels
 from epde.operators.selections import MOEADDSelection, MOEADDSelectionConstrained
 from epde.operators.elitism import NDLElitism
-from epde.operators.mutations import * # TODO: write pregen operator chains
-from epde.operators.crossover import * # TODO: write pregen operator chains
+from epde.operators.mutations import ,  # TODO: write pregen operator chains
+from epde.operators.crossovers import (
+                                       ParetoLevelCrossover, 
+                                       SystemCrossover, 
+                                       ParamsCrossover, 
+                                       EquationCrossover,
+                                       EquationExchangeCrossoverб
+                                       )  # TODO: write pregen operator chains
 from epde.operators.fitness import L2Fitness
 from epde.operators.right_part_selection import PoplevelRightPartSelector
 
@@ -32,11 +38,6 @@ from epde.moeadd.moeadd_strategy_elems import SectorProcesserBuilder, MOEADDSect
 #         operator.param[lbl] = target_dict[lbl] if lbl in target_dict.keys() else base_val[idx]
 
 
-def add_param_to_operator(operator, target_dict, labeled_base_val):
-    for key, base_val in labeled_base_val.items():
-        if base_val is None and key not in target_dict.keys():
-            raise ValueError('Mandatory parameter for evolutionary operator')
-        operator.param[key] = target_dict[key] if key in target_dict.keys() else base_val
 
 def form_basic_crossover(**kwargs):
     add_kwarg_to_operator = partial(func = detect_in_dict, target_dict = kwargs)
