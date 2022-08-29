@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+import inspect
+
 from functools import wraps
 
 from epde.structure.main_structures import Term, Equation, SoEq
@@ -50,6 +52,23 @@ class CompoundOperator():
                     in operators.items()]):
             raise TypeError('The suboperators of an evolutionary operator must be declared in format key : value, where key is str and value - CompoundOperator, list, tuple or dict')
         self._suboperators = SuboperatorContainer(suboperators = operators, probas = probas) 
+
+    def get_suboperator_args(self):
+        '''
+        
+        
+        Returns
+        -------
+        args : list
+            Arguments of the operator and its suboperators.
+
+        '''
+        args = [operator.get_suboperator_args() for operator in self.suboperators]
+        args.extend(inspect.getfullargspec(self.apply).args)
+        
+        if 'objective' in args:
+            args.remove('objective')
+        return args
 
     def _check_objective_type(method):
         @wraps

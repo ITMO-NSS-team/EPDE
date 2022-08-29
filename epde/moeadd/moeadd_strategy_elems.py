@@ -192,8 +192,7 @@ class EvolutionaryBlock(Block):
         if parse_operator_args is None:
             self.arg_keys = []
         elif parse_operator_args == 'inspect':
-            import inspect
-            self.arg_keys = inspect.getfullargspec(self._operator.apply).args
+            self.arg_keys = self._operator.get_suboperator_args()
             extra = ['self', 'population_subset', 'population']
             for arg_key in extra:
                 try:

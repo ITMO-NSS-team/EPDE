@@ -7,7 +7,6 @@ Created on Wed Jun  2 15:43:19 2021
 """
 
 from ast import operator
-from inspect import Parameter
 from operator import eq
 import numpy as np
 from copy import deepcopy
@@ -19,10 +18,10 @@ from epde.supplementary import detect_similar_terms, flatten
 from epde.decorators import History_Extender, Reset_equation_status
 
 from epde.operators.template import CompoundOperator, add_param_to_operator
-#from epde.operators.supplementary_operators import PopulationUpdaterConstrained
+from epde.operators.supplementary_operators import PopulationUpdater, PopulationUpdaterConstrained
 from epde.moeadd.moeadd import ParetoLevels
 
-class ParetoLevelCrossover(CompoundOperator):
+class ParetoLevelsCrossover(CompoundOperator):
     """
     The crossover operator, combining parameter crossover for terms with same 
     factors but different parameters & full exchange of terms between the 
@@ -73,7 +72,7 @@ class ParetoLevelCrossover(CompoundOperator):
             new_equation_1 = deepcopy(crossover_pool[pair_idx, 0])
             new_equation_2 = deepcopy(crossover_pool[pair_idx, 1])
 
-            new_equation_1, new_equation_2 = self.suboperators['system_crossover'].apply(new_equation_1, new_equation_2)
+            new_equation_1, new_equation_2 = self.suboperators['chromosome_crossover'].apply(new_equation_1, new_equation_2)
             offsprings.extend([new_equation_1, new_equation_2])
 
         for offspring in offsprings:
@@ -84,14 +83,14 @@ class ParetoLevelCrossover(CompoundOperator):
         self._tags = {'crossover', 'population level', 'contains suboperators'}      
 
 
-class SystemCrossover(CompoundOperator):
+class ChromosomeCrossover(CompoundOperator):
     def apply(self, objective : tuple):
         assert objective[0].vals.same_encoding(objective[1].vals)
         
         eqs_keys = objective[0].vals.equation_keys; params_keys = objective[1].vals.params_keys
         for eq_key in eqs_keys:
-            objective[0], objective[1] = self.suboperators['equation_crossover'].apply((objective[0].vals[param_key],
-                                                                                        objective[1].vals[param_key]))
+            objective[0], objective[1] = self.suboperators['equation_crossover'].apply((objective[0].vals[eq_key],
+                                                                                        objective[1].vals[eq_key]))
             objective[0].vals.replace_gene(gene_key = eq_key, value = objective[0])
             objective[1].vals.replace_gene(gene_key = eq_key, value = objective[1])
             
@@ -149,7 +148,7 @@ class EquationExchangeCrossover(CompoundOperator):
         self._tags = {'crossover', 'gene level', 'contains suboperators'}
 
 
-class EqParamCrossover(CompoundOperator):
+class TermParamCrossover(CompoundOperator):
     """
     The crossover exchange between parent terms with the same factor functions, that differ only in the factor parameters. 
 
@@ -256,7 +255,7 @@ def get_basic_crossover(**kwargs):
     # TODO: generalize initiation with test runs and simultaneous parameter and object initiation.
     add_kwarg_to_operator = partial(func = add_param_to_operator, target_dict = kwargs)    
     
-    term_param_crossover = EqParamCrossover(['term_param_proportion'])
+    term_param_crossover = TermParamCrossover(['term_param_proportion'])
     add_kwarg_to_operator(term_param_crossover, {'term_param_proportion' : 0.4})
     term_crossover = TermCrossover(['crossover_probability'])
     add_kwarg_to_operator(term_crossover, {'crossover_probability' : 0.3})
@@ -266,17 +265,18 @@ def get_basic_crossover(**kwargs):
     add_kwarg_to_operator(metaparameter_crossover, {'term_param_proportion' : 0.4})
     equation_exchange_crossover = EquationExchangeCrossover()
 
-    system_crossover = SystemCrossover()
+    chromosome_crossover = ChromosomeCrossover()
 
-    pl_crossover = ParetoLevelCrossover(['PBI_penalty'])
+    pl_updater = PopulationUpdater()
+    
+    pl_crossover = ParetoLevelsCrossover(['PBI_penalty'])
     add_kwarg_to_operator(pl_crossover, {'PBI_penalty' : 1.})
 
     # TODO: set probability for suboperator application
 
     equation_crossover.set_suboperators(operators = {'term_param_crossover' : term_param_crossover, 'term_crossover' : term_crossover})
-    system_crossover.set_suboperators(operators = {'equation_crossover' : [equation_crossover, equation_exchange_crossover], 
+    chromosome_crossover.set_suboperators(operators = {'equation_crossover' : [equation_crossover, equation_exchange_crossover], 
                                                    'param_crossover' : metaparameter_crossover},
-                                      probas = {'equation_crossover' : [0.9, 0.1]})
-    pl_crossover.set_suboperators()
+                                          probas = {'equation_crossover' : [0.9, 0.1]})
+    pl_crossover.set_suboperators(operators = {PopulationUpdater})
     return pl_crossover
-        

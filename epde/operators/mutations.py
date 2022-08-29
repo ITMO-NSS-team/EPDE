@@ -53,8 +53,6 @@ class ChromosomeMutation(CompoundOperator):
                 objective.vals.replace_gene(gene_key = param_key, value = objective)
 
 
-        return objective
-
     def use_default_tags(self):
         self._tags = {'mutation', 'chromosome level', 'contains suboperators'}
 
@@ -101,7 +99,7 @@ class EquationMutation(CompoundOperator):
                 equation.structure[term_idx] = mut_operator.apply(term_idx, equation)
 
     def use_default_tags(self):
-        self._tags = {'mutation', 'equation level', 'contains suboperators'}        
+        self._tags = {'mutation', 'gene level', 'contains suboperators'}        
         
 class TermMutation(CompoundOperator):
     """
@@ -142,7 +140,7 @@ class TermMutation(CompoundOperator):
         self._tags = {'mutation', 'term level', 'exploration', 'no suboperators'}    
 
 
-class ParameterMutation(CompoundOperator):
+class TermParameterMutation(CompoundOperator):
     """
     Specific operator of the term mutation, where the term parameters are changed with a random increment.
     """
