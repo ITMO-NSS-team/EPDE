@@ -112,6 +112,9 @@ class ParetoLevels(object):
     def levels(self):
         return self._sorting_method(self.population)
     
+    def __len__(self):
+        return len(self.population)
+    
     def __iter__(self):
         return ParetoLevelsIterator()
     
@@ -704,7 +707,7 @@ class MOEADDOptimizerConstrained(MOEADDOptimizer):
         self.constraints = args
 
 
-    def constaint_violation(self, solution) -> float:
+    def constraint_violation(self, solution) -> float:
         '''
         
         Method to obtain the constraint violation of a particular solution.
@@ -718,7 +721,7 @@ class MOEADDOptimizerConstrained(MOEADDOptimizer):
         Returns:
         --------
         
-        constaint_violation : float
+        constraint_violation : float
             Value, equals to the sum of all constraint violations. == 0, if the solution 
             satisfies all constraints. 
         
@@ -747,9 +750,9 @@ class MOEADDOptimizerConstrained(MOEADDOptimizer):
             If the values of **candidate_1**, and **candidate_2** are equal, the 
             **candidate** is chosen among them.
         '''
-        if self.constaint_violation(candidate_1) < self.constaint_violation(candidate_2):
+        if self.constraint_violation(candidate_1) < self.constraint_violation(candidate_2):
             return candidate_1
-        elif self.constaint_violation(candidate_1) > self.constaint_violation(candidate_2):
+        elif self.constraint_violation(candidate_1) > self.constraint_violation(candidate_2):
             return candidate_2
         else:
             return np.random.choice((candidate_1, candidate_2))
@@ -767,7 +770,7 @@ class MOEADDOptimizerConstrained(MOEADDOptimizer):
     #     self.pareto_levels.update(offspring)
     #     cv_values = np.zeros(len(self.pareto_levels.population))
     #     for sol_idx, solution in enumerate(self.pareto_levels.population):
-    #         cv_val = self.constaint_violation(solution)
+    #         cv_val = self.constraint_violation(solution)
     #         if cv_val > 0:
     #             cv_values[sol_idx] = cv_val 
     #     if sum(cv_values) == 0:

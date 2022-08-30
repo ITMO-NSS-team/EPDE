@@ -7,6 +7,7 @@ Created on Fri Jul 29 19:08:51 2022
 """
 import copy
 import numpy as np
+from typing import Union
 from functools import reduce
 
 from epde.moeadd.moeadd_stc import Constraint
@@ -127,6 +128,164 @@ def locate_pareto_worst(levels, weights, best_obj, penalty_factor = 1.):
     return worst_NDL_section[np.argmax(PBIS)]
 
 
+class PopulationUpdater(CompoundOperator):
+    def apply(self, objective, best_obj, weights):
+        '''
+        Update population to get the pareto-nondomiated levels with the worst element removed. 
+        Here, "worst" means the solution with highest PBI value (penalty-based boundary intersection)
+        '''         
+        # objective = {offspring, pareto_levels}        
+        
+        objective[1].update(objective[0])  #levels_updated = ndl_update(offspring, levels)
+        if len(objective[1].levels) == 1:
+            worst_solution = locate_pareto_worst(objective[1], weights, 
+                                                 best_obj, self.params['PBI_penalty'])
+        else:
+            if objective[1].levels[len(objective[1].levels) - 1] == 1:
+                domain_solutions = population_to_sectors(objective[1].population, weights)
+                reference_solution = objective[1].levels[len(objective[1].levels) - 1][0]
+                reference_solution_domain = [idx for idx in np.arange(domain_solutions) if reference_solution in domain_solutions[idx]]
+                if len(domain_solutions[reference_solution_domain] == 1):
+                    worst_solution = locate_pareto_worst(objective[1].levels, weights,
+                                                         best_obj, self.params['PBI_penalty'])                            
+                else:
+                    worst_solution = reference_solution
+            else:
+                last_level_by_domains = population_to_sectors(objective[1].levels[len(objective[1].levels)-1], weights)
+                most_crowded_count = np.max([len(domain) for domain in last_level_by_domains]); 
+                crowded_domains = [domain_idx for domain_idx in np.arange(len(weights)) 
+                                   if len(last_level_by_domains[domain_idx]) == most_crowded_count]
+        
+                if len(crowded_domains) == 1:
+                    most_crowded_domain = crowded_domains[0]
+                else:
+                    PBI = lambda domain_idx: np.sum([penalty_based_intersection(sol_obj, weights[domain_idx],
+                                                                                best_obj, self.params['PBI_penalty'])
+                                                     for sol_obj in last_level_by_domains[domain_idx]])
+                    PBIS = np.fromiter(map(PBI, crowded_domains), dtype = float)
+                    most_crowded_domain = crowded_domains[np.argmax(PBIS)]
+                    
+                if len(last_level_by_domains[most_crowded_domain]) == 1:
+                    worst_solution = locate_pareto_worst(objective[1], weights, 
+                                                         best_obj, self.params['PBI_penalty'])
+                else:
+                    PBIS = np.fromiter(map(lambda solution: penalty_based_intersection(solution, weights[most_crowded_domain], 
+                                                                                       best_obj, self.params['PBI_penalty']),
+                                               last_level_by_domains[most_crowded_domain]), dtype = float)
+                    worst_solution = last_level_by_domains[most_crowded_domain][np.argmax(PBIS)]                    
+        
+        objective[1].delete_point(worst_solution)
+
+def use_item_if_no_default(arg : dict, key, replacement):
+    if key not in arg.keys():
+        arg[key] = replacement
+    return arg
+
+def get_basic_populator_updater(params : dict = {}, suboperators : dict = {}):
+    pop_updater = PopulationUpdater()
+    base_params = {'PBI_penalty' : 1}
+    pop_updater.params = params
+    
+    pop_updater.set_suboperators(operators = suboperators)
+
+
+
+class PopulationUpdaterConstrained(object):
+    def __init__(self, param_keys : list = [], constraints : Union[list, tuple, set] = []):
+        super().__init__(param_keys = param_keys)
+        self.constraints = constraints
+        # TODO: add constraint setting for the constructor        
+        
+    def apply(self, objective, best_obj, weights):
+        '''
+        
+        Update population to get the pareto-nondomiated levels with the worst element removed. 
+        Here, "worst" means the solution with highest PBI value (penalty-based boundary intersection). 
+        Additionally, the constraint violations are considered in the selection of the 
+        "worst" individual.
+        
+        '''
+        # objective = {offspring, pareto_levels}
+        
+        objective[1].update(objective[0])
+        cv_values = np.empty(len(objective[1])) #self.suboperators['constraint_violation'].apply(objective[0])
+        
+        for idx, elem in enumerate(objective[1]):
+            cv_values[idx] = np.sum([constraint(elem) for constraint in self.constraints])
+        
+        if sum(cv_values) == 0:
+            if len(objective[1].levels) == 1:
+                worst_solution = locate_pareto_worst(objective[1], weights, best_obj, 
+                                                     self.params['PBI_penalty'])
+            else:
+                if objective[1].levels[len(objective[1].levels) - 1] == 1:
+                    domain_solutions = population_to_sectors(objective[1].population, weights)
+                    reference_solution = objective[1].levels[len(objective[1].levels) - 1][0]
+                    reference_solution_domain = [idx for idx in np.arange(domain_solutions) if reference_solution in domain_solutions[idx]]
+                    if len(domain_solutions[reference_solution_domain] == 1):
+                        worst_solution = locate_pareto_worst(objective[1].levels, weights, best_obj, 
+                                                             self.params['PBI_penalty'])
+                    else:
+                        worst_solution = reference_solution
+                else:
+                    last_level_by_domains = population_to_sectors(objective[1].levels[len(objective[1].levels)-1], 
+                                                                  weights)
+                    most_crowded_count = np.max([len(domain) for domain in last_level_by_domains]); 
+                    crowded_domains = [domain_idx for domain_idx in np.arange(len(weights)) 
+                                       if len(last_level_by_domains[domain_idx]) == most_crowded_count]
+    
+                    if len(crowded_domains) == 1:
+                        most_crowded_domain = crowded_domains[0]
+                    else:
+                        PBI = lambda domain_idx: np.sum([penalty_based_intersection(sol_obj, weights[domain_idx], 
+                                                                                    best_obj, self.params['PBI_penalty']) 
+                                                            for sol_obj in last_level_by_domains[domain_idx]])
+                        PBIS = np.fromiter(map(PBI, crowded_domains), dtype = float)
+                        most_crowded_domain = crowded_domains[np.argmax(PBIS)]
+                        
+                    if len(last_level_by_domains[most_crowded_domain]) == 1:
+                        worst_solution = locate_pareto_worst(objective[1], weights, 
+                                                             best_obj, self.params['PBI_penalty'])
+                    else:
+                        PBIS = np.fromiter(map(lambda solution: population_to_sectors(solution, weights[most_crowded_domain], 
+                                                                                      best_obj, self.params['PBI_penalty']), 
+                                               last_level_by_domains[most_crowded_domain]), dtype = float)
+                        worst_solution = last_level_by_domains[most_crowded_domain][np.argmax(PBIS)]                    
+        else:
+            infeasible = [solution for solution, _ in sorted(list(zip(objective[1].population, cv_values)), key = lambda pair: pair[1])]
+            infeasible.reverse()
+            infeasible = infeasible[:np.nonzero(cv_values)[0].size]
+            deleted = False
+            domain_solutions = population_to_sectors(objective[1].population, weights)
+            
+            for infeasable_element in infeasible:
+                domain_idx = [domain_idx for domain_idx, domain in enumerate(domain_solutions) if infeasable_element in domain][0]
+                if len(domain_solutions[domain_idx]) > 1:
+                    deleted = True
+                    worst_solution = infeasable_element
+                    break
+            if not deleted:
+                worst_solution = infeasible[0]
+
+        objective[1].delete_point(worst_solution)
+
+
+class ConstraintViolationCalculator(object):
+    def __init__(self, constraints = None):
+        assert all(isinstance(constraints, Constraint) for constr in constraints)
+        self._constraints = constraints
+    
+    def apply(self, pareto_levels, indexes = None):
+        def violation(individual):
+            return reduce(lambda y, z: y + z(individual.vals()), self._constraints, initial = 0)
+
+        if indexes is None:
+            indexes = np.arange(len(pareto_levels.population))
+        constraint_violations = np.array(list(map(lambda x: violation(pareto_levels.population[x]), indexes)))
+        
+        return constraint_violations
+
+
 class SimpleNeighborSelector(CompoundOperator):
     def apply(self, neighbors):
         '''
@@ -149,159 +308,3 @@ class SimpleNeighborSelector(CompoundOperator):
                 self evident slice of proximity list
         '''
         return neighbors[:self.params['number_of_neighbors']]
-
-
-class PopulationUpdater(CompoundOperator):
-    def apply(self, objective, best_obj, weights):
-        '''
-        Update population to get the pareto-nondomiated levels with the worst element removed. 
-        Here, "worst" means the solution with highest PBI value (penalty-based boundary intersection)
-        '''         
-        # objective = {offspring, pareto_levels}        
-        
-        objective[1].update(objective[0])  #levels_updated = ndl_update(offspring, levels)
-        if len(objective[1].levels) == 1:
-            worst_solution = self.suboperators['locate_pareto_worst'].apply(objective[1], weights, 
-                                                                            best_obj, self.params['PBI_penalty'])
-        else:
-            if objective[1].levels[len(objective[1].levels) - 1] == 1:
-                domain_solutions = self.suboperators['population_to_sectors'].apply(objective[1].population, weights)
-                reference_solution = objective[1].levels[len(objective[1].levels) - 1][0]
-                reference_solution_domain = [idx for idx in np.arange(domain_solutions) if reference_solution in domain_solutions[idx]]
-                if len(domain_solutions[reference_solution_domain] == 1):
-                    worst_solution = self.suboperators['locate_pareto_worst'].apply(objective[1].levels, weights,
-                                                                                    best_obj, self.params['PBI_penalty'])                            
-                else:
-                    worst_solution = reference_solution
-            else:
-                last_level_by_domains = self.suboperators['population_to_sectors'].apply(objective[1].levels[len(objective[1].levels)-1], weights)
-                most_crowded_count = np.max([len(domain) for domain in last_level_by_domains]); 
-                crowded_domains = [domain_idx for domain_idx in np.arange(len(weights)) 
-                                   if len(last_level_by_domains[domain_idx]) == most_crowded_count]
-        
-                if len(crowded_domains) == 1:
-                    most_crowded_domain = crowded_domains[0]
-                else:
-                    PBI = lambda domain_idx: np.sum([self.suboperators.apply['penalty_based_intersection'].apply(sol_obj, weights[domain_idx],
-                                                                                                                 best_obj, self.params['PBI_penalty'])
-                                                     for sol_obj in last_level_by_domains[domain_idx]])
-                    PBIS = np.fromiter(map(PBI, crowded_domains), dtype = float)
-                    most_crowded_domain = crowded_domains[np.argmax(PBIS)]
-                    
-                if len(last_level_by_domains[most_crowded_domain]) == 1:
-                    worst_solution = self.suboperators['locate_pareto_worst'].apply(self.pareto_levels, weights, 
-                                                                                    best_obj, self.params['PBI_penalty'])
-                else:
-                    PBIS = np.fromiter(map(lambda solution: self.suboperators.apply['penalty_based_intersection'].apply(solution, weights[most_crowded_domain], 
-                                                                                                                        best_obj, self.params['PBI_penalty']),
-                                               last_level_by_domains[most_crowded_domain]), dtype = float)
-                    worst_solution = last_level_by_domains[most_crowded_domain][np.argmax(PBIS)]                    
-        
-        objective[1].delete_point(worst_solution)
-
-def use_item_if_no_default(arg : dict, key, replacement):
-    if key not in arg.keys():
-        arg[key] = replacement
-    return arg
-
-def get_basic_populator_updater(params : dict = {}, suboperators : dict = {}):
-    pop_updater = PopulationUpdater()
-    base_params = {'PBI_penalty' : 1}
-    pop_updater.params = params
-    
-    pop_updater.set_suboperators(operators = suboperators)
-
-
-
-class PopulationUpdaterConstrained(object):
-    def apply(self, objective, best_obj, weights):
-        '''
-        
-        Update population to get the pareto-nondomiated levels with the worst element removed. 
-        Here, "worst" means the solution with highest PBI value (penalty-based boundary intersection). 
-        Additionally, the constraint violations are considered in the selection of the 
-        "worst" individual.
-        
-        '''        
-        # objective = {offspring, pareto_levels}
-        
-        objective[1].update(objective[0])
-        cv_values = self.suboperators['constaint_violation'].apply(objective[0])
-        
-        if sum(cv_values) == 0:
-            if len(objective[1].levels) == 1:
-                worst_solution = self.suboperators['locate_pareto_worst'].apply(objective[1], weights, 
-                                                                                best_obj, self.params['PBI_penalty'])
-            else:
-                if objective[1].levels[len(objective[1].levels) - 1] == 1:
-                    domain_solutions = self.suboperators['population_to_sectors'].apply(objective[1].population, 
-                                                                                        weights)
-                    reference_solution = objective[1].levels[len(objective[1].levels) - 1][0]
-                    reference_solution_domain = [idx for idx in np.arange(domain_solutions) if reference_solution in domain_solutions[idx]]
-                    if len(domain_solutions[reference_solution_domain] == 1):
-                        worst_solution = self.suboperators['locate_pareto_worst'].apply(objective[1].levels, 
-                                                                                        weights, best_obj, 
-                                                                                        self.params['PBI_penalty'])
-                    else:
-                        worst_solution = reference_solution
-                else:
-                    last_level_by_domains = self.suboperators['population_to_sectors'].apply(objective[1].levels[len(objective[1].levels)-1], 
-                                                                                             self.weights)
-                    most_crowded_count = np.max([len(domain) for domain in last_level_by_domains]); 
-                    crowded_domains = [domain_idx for domain_idx in np.arange(len(self.weights)) 
-                                       if len(last_level_by_domains[domain_idx]) == most_crowded_count]
-    
-                    if len(crowded_domains) == 1:
-                        most_crowded_domain = crowded_domains[0]
-                    else:
-                        PBI = lambda domain_idx: np.sum([self.suboperators['penalty_based_intersection'].apply(sol_obj, self.weights[domain_idx], 
-                                                                                                               best_obj, self.params['PBI_penalty']) 
-                                                            for sol_obj in last_level_by_domains[domain_idx]])
-                        PBIS = np.fromiter(map(PBI, crowded_domains), dtype = float)
-                        most_crowded_domain = crowded_domains[np.argmax(PBIS)]
-                        
-                    if len(last_level_by_domains[most_crowded_domain]) == 1:
-                        worst_solution = self.suboperators['locate_pareto_worst'].apply(objective[1], weights, 
-                                                                                        best_obj, self.params['PBI_penalty'])
-                    else:
-                        PBIS = np.fromiter(map(lambda solution: self.suboperators['population_to_sectors'].apply(solution, self.weights[most_crowded_domain], 
-                                                                                                                 best_obj, self.params['PBI_penalty']), 
-                                               last_level_by_domains[most_crowded_domain]), dtype = float)
-                        worst_solution = last_level_by_domains[most_crowded_domain][np.argmax(PBIS)]                    
-        else:
-            infeasible = [solution for solution, _ in sorted(list(zip(objective[1].population, cv_values)), key = lambda pair: pair[1])]
-            infeasible.reverse()
-            infeasible = infeasible[:np.nonzero(cv_values)[0].size]
-            deleted = False
-            domain_solutions = self.suboperators['population_to_sectors'].apply(objective[1].population, weights)
-            
-            for infeasable_element in infeasible:
-                domain_idx = [domain_idx for domain_idx, domain in enumerate(domain_solutions) if infeasable_element in domain][0]
-                if len(domain_solutions[domain_idx]) > 1:
-                    deleted = True
-                    worst_solution = infeasable_element
-                    break
-            if not deleted:
-                worst_solution = infeasible[0]
-
-        objective[1].delete_point(worst_solution)
-
-
-class ConstraintViolationCalculator(object):
-    def __init__(self, constraints = None, param_keys = []):
-        assert all(isinstance(constraints, Constraint) for constr in constraints)
-        self._constraints = constraints
-        super().init(param_keys)
-    
-    def apply(self, pareto_levels, indexes = None):
-        def violation(individual):
-            return reduce(lambda y, z: y + z(individual.vals()), self._constraints, initial = 0)
-
-        if indexes is None:
-            indexes = np.arange(len(pareto_levels.population))
-        constraint_violations = np.array(list(map(lambda x: violation(pareto_levels.population[x]), indexes)))
-        
-        return constraint_violations
-    
-    def use_default_tags(self):
-        self._tags = {'constraint violation calculation', 'mixed input level', 'auxilary'}        
