@@ -373,8 +373,8 @@ class MOEADDOptimizer(object):
         weights[-1] = 1 - np.sum(weights[:-1])
         assert (weights[-1] <= 1 and weights[-1] >= 0)
         return list(weights)
+
     
-        
     def pass_best_objectives(self, *args) -> None:
         '''
         
@@ -394,8 +394,7 @@ class MOEADDOptimizer(object):
         for arg_idx, arg in enumerate(args):
             self.best_obj[arg_idx] = arg if isinstance(arg, int) or isinstance(arg, float) else arg() # Переделать под больше elif'ов
     
-    
-    
+
     def set_sector_processer(self, processer : MOEADDSectorProcesser) -> None:
         '''
         

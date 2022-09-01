@@ -28,4 +28,4 @@ class NDLElitism(CompoundOperator):
         return objective
 
     def use_default_tags(self):
-        self._tags = {'elitism', 'pareto level level', 'auxilary', 'no suboperators'}
+        self._tags = {'elitism', 'pareto level level', 'auxilary', 'no suboperators', 'standard'}

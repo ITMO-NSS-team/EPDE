@@ -26,11 +26,17 @@ class OperatorMapper(CompoundOperator):
         self._tags.add(objective_tag)
         print(f'Initializing operator mapper from {source_tag} to {objective_tag}')
 
+    def apply(self, objective):
+        if 'inplace' in self.operator_tags:
+            for elem in objective:
+                self.suboperators['to_map'].apply(elem)
+        elif 'standard' in self.operator_tags:
+            for idx, elem in enumerate(objective):
+                objective[idx] = self.suboperators['to_map'].apply(elem)
+        else:
+            raise TypeError('Incorrect type of mapping operator: not inplace nor returns similar object, as input.')
+    
 
-    def apply(self, target):
-        for elem in target:
-            self.suboperators['to_map'].apply(elem)
-                        
 def map_operator_between_levels(operator : CompoundOperator, original_level : Union[str, int], 
                            target_level : Union[str, int], param_keys : list):
     if isinstance(original_level, str): original_level = OPERATOR_LEVELS.index(original_level) 

@@ -9,6 +9,7 @@ Created on Tue Jul 26 13:46:45 2022
 import gc
 import warnings
 import copy
+from typing import Union
 from functools import singledispatchmethod, reduce
 
 import numpy as np
@@ -86,6 +87,7 @@ class Term(ComplexStructure):
             raise ValueError('The structure of a term should be declared with str or factor.Factor obj, instead got', type(passed_term))
 
     def randomize(self, mandatory_family = None, forbidden_factors = None, **kwargs):
+        
         if np.sum(self.pool.families_cardinality(meaningful_only = True)) == 0:
             raise ValueError('No token families are declared as meaningful for the process of the system search')
 
@@ -107,6 +109,8 @@ class Term(ComplexStructure):
         factors_num = np.random.randint(1, self.max_factors_in_term + 1)
         self.occupied_tokens_labels = copy.copy(forbidden_factors)
 
+        self.descr_variable_marker = mandatory_family
+        
         if mandatory_family is None:
             occupied_by_factor, factor = self.pool.create(label = None, create_meaningful = True, 
                                                           token_status = self.occupied_tokens_labels, **kwargs)
@@ -124,6 +128,16 @@ class Term(ComplexStructure):
             update_token_status(self.occupied_tokens_labels, occupied_by_factor)
             self.structure.append(factor)
         self.structure = filter_powers(self.structure)  
+
+    @property
+    def descr_variable_marker(self):
+        return self._descr_variable_marker
+
+    @descr_variable_marker.setter
+    def descr_variable_marker(self, marker : False):
+        if marker is None or isinstance(marker, str):
+            raise ValueError('Described variable marker shall be a family label (i.e. "u") of "False"')
+        self._descr_variable_marker = marker
 
     def evaluate(self, structural):
         assert global_var.tensor_cache is not None, 'Currently working only with connected cache'

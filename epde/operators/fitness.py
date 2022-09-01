@@ -83,7 +83,7 @@ class L2Fitness(CompoundOperator):
         equation.fitness_value = fitness_value
 
     def use_default_tags(self):
-        self._tags = {'fitness evaluation', 'equation level', 'contains suboperators'}
+        self._tags = {'fitness evaluation', 'equation level', 'contains suboperators', 'standard'}
 
     # @property
     # def operator_tags(self):
@@ -184,4 +184,4 @@ class SolverBasedFitness(CompoundOperator):
         # Возможная проблема, когда подаётся тензор со значениями коэфф-тов перед производными
         
     def use_default_tags(self):
-        self._tags = {'fitness evaluation', 'equation level', 'contains suboperators'}        
+        self._tags = {'fitness evaluation', 'equation level', 'contains suboperators', 'standard'}        

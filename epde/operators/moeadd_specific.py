@@ -10,7 +10,7 @@ import numpy as np
 from typing import Union
 from functools import reduce
 
-from epde.moeadd.moeadd_stc import Constraint
+# from epde.moeadd.moeadd_stc import Constraint
 from epde.operators.template import CompoundOperator
 
 
@@ -176,19 +176,9 @@ class PopulationUpdater(CompoundOperator):
         
         objective[1].delete_point(worst_solution)
 
-def use_item_if_no_default(arg : dict, key, replacement):
-    if key not in arg.keys():
-        arg[key] = replacement
-    return arg
-
-def get_basic_populator_updater(params : dict = {}, suboperators : dict = {}):
-    pop_updater = PopulationUpdater()
-    base_params = {'PBI_penalty' : 1}
-    pop_updater.params = params
-    
-    pop_updater.set_suboperators(operators = suboperators)
-
-
+    def use_default_tags(self):
+        self._tags = {'pareto level update', 'custom level', 'no suboperators', 'inplace'}
+        
 
 class PopulationUpdaterConstrained(object):
     def __init__(self, param_keys : list = [], constraints : Union[list, tuple, set] = []):
@@ -269,21 +259,49 @@ class PopulationUpdaterConstrained(object):
 
         objective[1].delete_point(worst_solution)
 
+    def use_default_tags(self):
+        self._tags = {'pareto level update', 'custom level', 'no suboperators', 'inplace'}
 
-class ConstraintViolationCalculator(object):
-    def __init__(self, constraints = None):
-        assert all(isinstance(constraints, Constraint) for constr in constraints)
-        self._constraints = constraints
+# class ConstraintViolationCalculator(object):
+#     def __init__(self, constraints = None):
+#         assert all(isinstance(constraints, Constraint) for constr in constraints)
+#         self._constraints = constraints
     
-    def apply(self, pareto_levels, indexes = None):
-        def violation(individual):
-            return reduce(lambda y, z: y + z(individual.vals()), self._constraints, initial = 0)
+#     def apply(self, pareto_levels, indexes = None):
+#         def violation(individual):
+#             return reduce(lambda y, z: y + z(individual.vals()), self._constraints, initial = 0)
 
-        if indexes is None:
-            indexes = np.arange(len(pareto_levels.population))
-        constraint_violations = np.array(list(map(lambda x: violation(pareto_levels.population[x]), indexes)))
+#         if indexes is None:
+#             indexes = np.arange(len(pareto_levels.population))
+#         constraint_violations = np.array(list(map(lambda x: violation(pareto_levels.population[x]), indexes)))
         
-        return constraint_violations
+#         return constraint_violations
+
+
+def use_item_if_no_default(key, arg : dict, replacement_arg : dict):
+    if key in replacement_arg.keys():
+        arg[key] = replacement_arg[key]
+    return arg
+
+
+def get_basic_populator_updater(params : dict = {}):
+    pop_updater = PopulationUpdater()
+    base_params = {'PBI_penalty' : 1}
+    for key in base_params.keys():
+        use_item_if_no_default(key, base_params, params)
+    
+    pop_updater.params = params
+    return pop_updater
+
+
+def get_constrained_populator_updater(params : dict = {}, constraints : list = []):
+    pop_updater = PopulationUpdaterConstrained(constraints = constraints)
+    base_params = {'PBI_penalty' : 1}
+    for key in base_params.keys():
+        use_item_if_no_default(key, base_params, params)
+    
+    pop_updater.params = params
+    return pop_updater
 
 
 class SimpleNeighborSelector(CompoundOperator):
@@ -308,3 +326,6 @@ class SimpleNeighborSelector(CompoundOperator):
                 self evident slice of proximity list
         '''
         return neighbors[:self.params['number_of_neighbors']]
+    
+    def use_default_tags(self):
+        self._tags = {'neighbor selector', 'custom level', 'no suboperators', 'inplace'}    
