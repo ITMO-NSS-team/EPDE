@@ -62,6 +62,9 @@ class Chromosome(object):
     def __getitem__(self, key):
         return self.chromosome[key].value
     
+    def __len__(self):
+        return len(self.equation_keys)
+    
     @property
     def hash_descr(self):
         def get_gene_hash(gene):

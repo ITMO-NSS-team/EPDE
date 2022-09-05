@@ -80,7 +80,7 @@ class MOEADDSelection(CompoundOperator):
                              for solution_idx in candidate_solution_domains]
             available_in_proximity = sum(solution_mask)
             parent_idxs = np.random.choice([idx for idx in np.arange(len(pareto_levels.population)) if solution_mask[idx]], 
-                                            size = min(available_in_proximity, parents_number), 
+                                            size = min(available_in_proximity, parents_number),
                                             replace = False)
             if available_in_proximity < parents_number:
                 parent_idxs_additional = np.random.choice([idx for idx in np.arange(len(pareto_levels.population))
@@ -92,12 +92,12 @@ class MOEADDSelection(CompoundOperator):
                 parent_idxs = parent_idxs_temp
         else:
             parent_idxs = np.random.choice(np.arange(len(pareto_levels.population)), size = parents_number, replace = False)
-        for idx in parent_idxs:
+        for idx in parent_idxs.reshape(-1):
             pareto_levels.population[int(idx)].incr_counter()    
         return pareto_levels
     
     def use_default_tags(self):
-        self._tags = {'selection', 'pareto_levels level', 'auxilary', 'suboperators'}
+        self._tags = {'selection', 'pareto_levels level', 'auxilary', 'suboperators', 'standard'}
 
 
 class MOEADDSelectionConstrained(CompoundOperator):
@@ -190,7 +190,7 @@ class MOEADDSelectionConstrained(CompoundOperator):
         return pareto_levels
 
     def use_default_tags(self):
-        self._tags = {'selection', 'pareto_levels level', 'auxilary', 'suboperators'}
+        self._tags = {'selection', 'pareto_levels level', 'auxilary', 'suboperators', 'standard'}
 
 
 class SelectionConstraintProcesser(object):

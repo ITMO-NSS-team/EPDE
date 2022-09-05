@@ -10,7 +10,7 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 
 from epde.operators.template import CompoundOperator
-     
+from epde.structure.main_structures import Equation
 
 class LinRegBasedCoeffsEquation(CompoundOperator):
     '''
@@ -26,7 +26,7 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
             
     
     '''
-    def apply(self, objective):
+    def apply(self, objective : Equation):
         """
         Calculate the coefficients of the equation, using the linear regression.The result is stored in the 
         objective.weights_final attribute
@@ -56,7 +56,7 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
                 nonzero_features_indexes.append(idx)
 
         if len(features_vals) == 0:
-            objective.weights_final = np.zeros(len(objective.structure)) #Bind_Params([(token.label, token.params) for token in target.structure]), [('0', 1)]
+            objective.weights_final = np.zeros(len(objective.structure))
         else:
             features = features_vals[0]
             if len(features_vals) > 1:

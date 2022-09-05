@@ -49,23 +49,73 @@ class EqRightPartSelector(CompoundOperator):
                 equation.restore_property(deriv = True)
             if not equation.contains_family(equation.main_var_to_explain):
                 equation.restore_property(mandatory_family = True)
-            for target_idx, target_term in enumerate(equation.structure): # target_term
-                target_term.contains_family(equation.main_var_to_explain)
-                if not equation.structure[target_idx].contains_deriv:
-                    continue
-                equation.target_idx = target_idx
-                self.suboperators['fitness_calculation'].apply(equation)
-                if equation.fitness_value > max_fitness:
-                    max_fitness = equation.fitness_value
-                    max_idx = target_idx
-                else:
-                    pass
+                
+            
+                
+            for target_idx, target_term in enumerate(equation.structure):
+                if target_term.contains_family(equation.main_var_to_explain): #target_term.descr_variable_marker:
+                    # target_term.contains_family(equation.main_var_to_explain)
+                    if not equation.structure[target_idx].contains_deriv:
+                        continue
+                    equation.target_idx = target_idx
+                    self.suboperators['fitness_calculation'].apply(equation)
+                    if equation.fitness_value > max_fitness:
+                        max_fitness = equation.fitness_value
+                        max_idx = target_idx
+                    else:
+                        pass
 
             equation.target_idx = max_idx
+            equation.reset_explaining_term(equation.target_idx)
             self.suboperators['fitness_calculation'].apply(equation)
             if not np.isclose(equation.fitness_value, max_fitness) and global_var.verbose.show_warnings:
                 warnings.warn('Reevaluation of fitness function for equation has obtained different result. Not an error, if ANN DE solver is used.')
             equation.right_part_selected = True
 
     def use_default_tags(self):
-        self._tags = {'equation right part selection', 'gene level', 'contains suboperators'}
+        self._tags = {'equation right part selection', 'gene level', 'contains suboperators', 'inplace'}
+        
+class RandomRHPSelector(CompoundOperator):
+    '''
+    
+    Operator for selection of the right part of the equation to emulate approximation of non-trivial function. 
+    Works in the following manner: in a loop each term is considered as the right part, for this division the 
+    fitness function value is calculated. The term, corresponding to the separation with the highest FF value is 
+    saved as the correct right part. 
+    
+    Noteable attributes:
+    -----------
+    suboperators : dict
+        Inhereted from the CompoundOperator class
+        key - str, value - instance of a class, inhereted from the CompoundOperator. 
+        Suboperators, performing tasks of equation processing. In this case, only one suboperator is present: 
+        fitness_calculation, dedicated to calculation of fitness function value.
+
+    Methods:
+    -----------
+    apply(equation)
+        return None
+        Inplace detection of index of the best separation into right part, saved into ``equation.target_idx``
+
+    
+    '''    
+    @History_Extender('\n -> The equation structure was detected: ', 'a')        
+    def apply(self, equation : Equation):
+        if not equation.right_part_selected:
+            if not equation.contains_deriv:
+                equation.restore_property(deriv = True)
+            if not equation.contains_family(equation.main_var_to_explain):
+                equation.restore_property(mandatory_family = True)
+
+            idx = np.random.choice([term_idx for term_idx, term in enumerate(equation.structure)
+                                    if term.contains_family(equation.main_var_to_explain)])
+                
+            equation.target_idx = idx
+            equation.reset_explaining_term(idx)
+            # self.suboperators['fitness_calculation'].apply(equation)
+            # if not np.isclose(equation.fitness_value, max_fitness) and global_var.verbose.show_warnings:
+                # warnings.warn('Reevaluation of fitness function for equation has obtained different result. Not an error, if ANN DE solver is used.')
+            equation.right_part_selected = True
+
+    def use_default_tags(self):
+        self._tags = {'equation right part selection', 'gene level', 'contains suboperators', 'inplace'}

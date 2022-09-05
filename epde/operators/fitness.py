@@ -19,6 +19,10 @@ from epde.operators.template import CompoundOperator
 import epde.globals as global_var
 from TEDEouS.solver import point_sort_shift_solver
 
+class SystemFitness(CompoundOperator):
+    def apply(self, system):
+        equaiton.obj_funs = []
+
 class L2Fitness(CompoundOperator):
     """
     The operator, which calculates fitness function to the individual (equation) as the L2 norm 
@@ -83,11 +87,7 @@ class L2Fitness(CompoundOperator):
         equation.fitness_value = fitness_value
 
     def use_default_tags(self):
-        self._tags = {'fitness evaluation', 'equation level', 'contains suboperators', 'standard'}
-
-    # @property
-    # def operator_tags(self):
-    #     return {'fitness evaluation', 'equation level', 'contains suboperators'}  
+        self._tags = {'fitness evaluation', 'equation level', 'contains suboperators', 'inplace'}
 
 
 class SolverBasedFitness(CompoundOperator):
@@ -99,16 +99,16 @@ class SolverBasedFitness(CompoundOperator):
             except ValueError:
                 dim = global_var.dimensionality
             self.model_architecture = torch.nn.Sequential(
-                torch.nn.Linear(dim, 256),
-                torch.nn.Tanh(),
-                torch.nn.Linear(256, 64),
-                torch.nn.Tanh(),       
-                torch.nn.Linear(64, 64),
-                torch.nn.Tanh(),
-                torch.nn.Linear(64, 1024),
-                torch.nn.Tanh(),
-                torch.nn.Linear(1024, 1)
-            )
+                                                          torch.nn.Linear(dim, 256),
+                                                          torch.nn.Tanh(),
+                                                          torch.nn.Linear(256, 64),
+                                                          torch.nn.Tanh(),       
+                                                          torch.nn.Linear(64, 64),
+                                                          torch.nn.Tanh(),
+                                                          torch.nn.Linear(64, 1024),
+                                                          torch.nn.Tanh(),
+                                                          torch.nn.Linear(1024, 1)
+                                                         )
         else:
             self.model_architecture = model_architecture
         self.training_grid_set = False
@@ -184,4 +184,4 @@ class SolverBasedFitness(CompoundOperator):
         # Возможная проблема, когда подаётся тензор со значениями коэфф-тов перед производными
         
     def use_default_tags(self):
-        self._tags = {'fitness evaluation', 'equation level', 'contains suboperators', 'standard'}        
+        self._tags = {'fitness evaluation', 'equation level', 'contains suboperators', 'inplace'}        

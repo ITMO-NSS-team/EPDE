@@ -8,10 +8,11 @@ Created on Fri Jul 29 19:08:51 2022
 import copy
 import numpy as np
 from typing import Union
-from functools import reduce
+from functools import reduce, partial
 
-# from epde.moeadd.moeadd_stc import Constraint
-from epde.operators.template import CompoundOperator
+from epde.moeadd.moeadd import ParetoLevels
+from epde.operators.template import CompoundOperator, add_param_to_operator
+from epde.operators.mutations import get_basic_mutation
 
 
 def penalty_based_intersection(sol_obj, weight, ideal_obj, penalty_factor = 1.) -> float:
@@ -285,21 +286,19 @@ def use_item_if_no_default(key, arg : dict, replacement_arg : dict):
 
 
 def get_basic_populator_updater(params : dict = {}):
-    pop_updater = PopulationUpdater()
-    base_params = {'PBI_penalty' : 1}
-    for key in base_params.keys():
-        use_item_if_no_default(key, base_params, params)
+    add_kwarg_to_operator = partial(func = add_param_to_operator, target_dict = params)    
     
+    pop_updater = PopulationUpdater()
+    add_kwarg_to_operator(pop_updater, {'PBI_penalty' : 1})    
     pop_updater.params = params
     return pop_updater
 
 
 def get_constrained_populator_updater(params : dict = {}, constraints : list = []):
-    pop_updater = PopulationUpdaterConstrained(constraints = constraints)
-    base_params = {'PBI_penalty' : 1}
-    for key in base_params.keys():
-        use_item_if_no_default(key, base_params, params)
+    add_kwarg_to_operator = partial(func = add_param_to_operator, target_dict = params)
     
+    pop_updater = PopulationUpdaterConstrained(constraints = constraints)
+    add_kwarg_to_operator(pop_updater, {'PBI_penalty' : 1})        
     pop_updater.params = params
     return pop_updater
 
@@ -329,3 +328,40 @@ class SimpleNeighborSelector(CompoundOperator):
     
     def use_default_tags(self):
         self._tags = {'neighbor selector', 'custom level', 'no suboperators', 'inplace'}    
+
+
+def best_obj_values(levels : ParetoLevels):
+    vals = np.array([solution.obj_fun for solution in levels])
+    return np.sort(vals, axis = 0)[(0, -1), ...]
+
+
+class OffspringUpdater(CompoundOperator):
+    def apply(self, objective : ParetoLevels):
+        values = best_obj_values(objective)
+
+        for offspring in objective.unplaced_candidates:
+            attempt = 1; attempt_limit = self.params['attempt_limit']
+            while True:
+                temp_offspring = self.suboperators['chromosome_mutation'].apply(offspring,
+                                                                                values[1, ...],
+                                                                                values[0, ...])
+                if not any([temp_offspring == solution for solution in self.pareto_levels.population]):
+                    objective = self.suboperators['pareto_level_updater'].apply(temp_offspring, objective,
+                                                                                self.params['PBI_penalty'])
+                    break
+                elif attempt >= attempt_limit:
+                    break
+                attempt += 1
+        return objective
+    
+def get_pareto_levels_updater(constrained : bool = False, mutation_params : dict = {}, 
+                              pl_updater_params : dict = {}, combiner_params : dict = {}):
+    add_kwarg_to_updater = partial(func = add_param_to_operator, target_dict = combiner_params)
+    updater = OffspringUpdater()
+    add_kwarg_to_updater(updater, {'attempt_limit' : 5})
+    
+    mutation = get_basic_mutation(mutation_params)
+    pl_updater = get_basic_populator_updater(pl_updater_params)
+    updater.set_suboperators(operators = {'chromosome_mutation' : mutation,
+                                          'pareto_level_updater' : pl_updater})
+    return updater

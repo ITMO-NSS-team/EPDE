@@ -59,6 +59,7 @@ class Term(ComplexStructure):
             if not self.structure[idx].cache_linked:
                 self.structure[idx].use_cache()
 
+    # TODO: make self.descr_variable_marker setting for defined parameter
     @singledispatchmethod
     def defined(self, passed_term):
         raise NotImplementedError(f'passed term should have string or list/dict types, not {type(passed_term)}')
@@ -296,7 +297,7 @@ class Equation(ComplexStructure):
                   '_target', 'target_idx', '_features', 'right_part_selected', 
                   '_weights_final', 'weights_final_evald', '_weights_internal', 'weights_internal_evald', 
                   'fitness_calculated', 'solver_form_defined', '_solver_form', '_fitness_value', 
-                  'crossover_selected_times', 'elite']
+                  'crossover_selected_times']
 
     def __init__(self, pool, basic_structure, terms_number = 6, var_to_explain = None, max_factors_in_term = 2, 
                  interelement_operator = np.add):
@@ -357,8 +358,8 @@ class Equation(ComplexStructure):
                                            max_factors_in_term = self.max_factors_in_term))
                 
         self.main_var_to_explain = var_to_explain
-                
-        force_var_to_explain = False
+
+        force_var_to_explain = True # False
         for i in range(len(basic_structure), terms_number):
             check_test = 0
             while True:
@@ -373,6 +374,14 @@ class Equation(ComplexStructure):
 
         for idx, _ in enumerate(self.structure):
             self.structure[idx].use_cache()
+
+    def reset_explaining_term(self, term_idx = 0):
+        for idx, term in enumerate(self.structure):
+            if idx != term_idx:
+                assert term.contains_family(self.main_var_to_explain), 'Trying explain a variable with term without right family.'
+                term.descr_variable_marker = self.main_var_to_explain
+            else:
+                term.descr_variable_marker = None
 
     @property
     def contains_deriv(self):
@@ -658,11 +667,7 @@ class Equation(ComplexStructure):
         def get_boundary_ind(tensor_shape, axis, rel_loc):
             return tuple(np.meshgrid(*[np.arange(shape) if dim_idx != axis else min(int(rel_loc * shape), shape-1)
                        for dim_idx, shape in enumerate(tensor_shape)], indexing = 'ij'))
-        print(required_bc_ord)
-        print(self.text_form)
-        print('hardcoded_bc_relative_locations', hardcoded_bc_relative_locations)
         for ax_idx, ax_ord in enumerate(required_bc_ord):
-            print(ax_idx, ax_ord)
             for loc_fraction in hardcoded_bc_relative_locations[ax_ord]:
                 indexes = get_boundary_ind(tensor_shape, axis = ax_idx, rel_loc = loc_fraction)
                 coords_raw = np.array([grid_cache.get(str(idx))[indexes] for idx 
@@ -677,8 +682,6 @@ class Equation(ComplexStructure):
                 vals = torch.from_numpy(vals).type(torch.FloatTensor)
                 bconds.append([coords, vals])    
 
-        print('shape of the grid', grid_cache.get('0').shape)
-        print('Obtained boundary conditions', len(bconds[0]))
         return bconds   
     
     def clear_after_solver(self):
@@ -695,7 +698,7 @@ def solver_formed_grid():
     return torch.from_numpy(training_grid).T.type(torch.FloatTensor)
 
 
-class SoEq(ComplexStructure, moeadd.moeadd_solution):
+class SoEq(moeadd.moeadd_solution):
     def __init__(self, pool, terms_number, max_factors_in_term, sparsity = None, eq_search_iters = 100):
         self.tokens_for_eq = TF_Pool(pool.families_demand_equation)
         self.tokens_supp = TF_Pool(pool.families_supplementary)
@@ -705,24 +708,8 @@ class SoEq(ComplexStructure, moeadd.moeadd_solution):
         self.moeadd_set = False; self.eq_search_operator_set = False
         self.def_eq_search_iters = eq_search_iters
         
-    @property
-    def elite(self):
-        '''
-        For elitism the following markers shall be used:
-        0 - non-elite individual;
-        1 - may be worth improvement, refining mutation will be applied;
-        2 - elite individual, no mutation will be applied to avoid all probable harm.
-        '''
-        res = self._elite
-        self._elite_marker = 0
-        return res
-    
-    @elite.setter
-    def elite(self, marker):
-        self._elite_marker = marker
-        
     def use_default_objective_function(self):
-        raise DeprecationWarning('Call for the default MO criteria. In normal conditions, this method shall not be called.')
+        # raise DeprecationWarning('Call for the default MO criteria. In normal conditions, this method shall not be called.')
         # TODO: Erase me from existence!
         from epde.eq_mo_objectives import generate_partial, equation_discrepancy, equation_complexity_by_factors
         quality_objectives = [generate_partial(equation_discrepancy, eq_idx) for eq_idx in range(len(self.tokens_for_eq))]
@@ -759,7 +746,7 @@ class SoEq(ComplexStructure, moeadd.moeadd_solution):
                                                                  param_label = 'population_size',
                                                                  value = population_size)
         
-        self.structure = {}; self.eq_search_iters = eq_search_iters
+        structure = {}; self.eq_search_iters = eq_search_iters
         token_selection = self.tokens_supp
         
         self.vars_to_describe = {token_family.type for token_family in self.tokens_for_eq.families}
@@ -779,11 +766,11 @@ class SoEq(ComplexStructure, moeadd.moeadd_solution):
                                                                                                                var_to_explain = variable, 
                                                                                                                EA_kwargs = EA_kwargs)
 
-            self.structure[cur_equation.descr] = cur_equation
+            structure[cur_equation.descr] = cur_equation
             if False:
                 global_var.tensor_cache.change_variables(cur_eq_operator_error_abs,
                                                          cur_eq_operator_error_structural)
-        self.vals = Chromosome(self.structure, sparsity)
+        self.vals = Chromosome(structure, sparsity)
         moeadd.moeadd_solution.__init__(self, self.vals, self.obj_funs)
         self.moeadd_set = True
             
@@ -800,7 +787,7 @@ class SoEq(ComplexStructure, moeadd.moeadd_solution):
     def equation_opt_iteration(population, evol_operator, population_size, iter_index, unexplained_vars, strict_restrictions = True):
         for equation in population:
             if equation.described_variables in unexplained_vars:
-                equation.penalize_fitness(coeff = 0.)           
+                equation.penalize_fitness(coeff = 0.)
         population = population_sort(population)
         population = population[:population_size]
         gc.collect()
@@ -808,10 +795,10 @@ class SoEq(ComplexStructure, moeadd.moeadd_solution):
         return population
         
     def evaluate(self, normalize = True):
-        if len(self.structure) == 1:
-            value = self.structure[0].evaluate(normalize = normalize, return_val = True)[0]
+        if len(self.vals) == 1:
+            value = self.vals[0].evaluate(normalize = normalize, return_val = True)[0]
         else:
-            value = np.sum([equation.evaluate(normalize, return_val = True)[0] for equation in self.structure])
+            value = np.sum([equation.evaluate(normalize, return_val = True)[0] for equation in self.vals])
         value = np.sum(np.abs(value))
         return value
 
@@ -826,28 +813,28 @@ class SoEq(ComplexStructure, moeadd.moeadd_solution):
     @property
     def text_form(self):
         form = ''
-        if len(self.structure) > 1:
-            for eq_idx, equation in enumerate(self.structure):
+        if len(self.vals) > 1:
+            for eq_idx, equation in enumerate(self.vals):
                 if eq_idx == 0:
                     form += ' / ' + equation.text_form + '\n'                                        
-                elif eq_idx == len(self.structure) - 1:
+                elif eq_idx == len(self.vals) - 1:
                     form += ' \ ' + equation.text_form + '\n'
                 else:
                     form += ' | ' + equation.text_form + '\n'
         else:
-            form += self.structure[0].text_form + '\n'
+            form += self.vals[0].text_form + '\n'
         return form
 
     def __eq__(self, other):
         assert self.moeadd_set, 'The structure of the equation is not defined, therefore no moeadd operations can be called'
-        return (all([any([other_elem == self_elem for other_elem in other.structure]) for self_elem in self.structure]) and
-                all([any([other_elem == self_elem for self_elem in self.structure]) for other_elem in other.structure]) and
-                len(other.structure) == len(self.structure)) or all(np.isclose(self.obj_fun, other.obj_fun))        
+        return (all([any([other_elem == self_elem for other_elem in other.vals]) for self_elem in self.vals]) and
+                all([any([other_elem == self_elem for self_elem in self.vals]) for other_elem in other.structure]) and
+                len(other.vals) == len(self.vals)) or all(np.isclose(self.obj_fun, other.obj_fun))        
 
     @property
     def latex_form(self):
         form = r"\begin{eqnarray*}"
-        for equation in self.structure:
+        for equation in self.vals:
             form += equation.latex_form + r", \\ "
         form += r"\end{eqnarray*}"
             
@@ -873,7 +860,7 @@ class SoEq(ComplexStructure, moeadd.moeadd_solution):
                 except AttributeError:
                     pass     
 
-        for idx, eq in enumerate(self.structure):
+        for idx, eq in enumerate(self.vals):
             eq.copy_properties_to(new_struct)
         return new_struct
     
@@ -881,10 +868,10 @@ class SoEq(ComplexStructure, moeadd.moeadd_solution):
         '''
         Returns solver form, grid and boundary conditions
         '''
-        if len(self.structure) > 1:
+        if len(self.vals) > 1:
             raise Exception('Solver form is defined only for a "system", that contains a single equation.')
         else:
-            form = self.structure[0].solver_form()
+            form = self.vals[0].solver_form()
             grid = solver_formed_grid()
-            bconds = self.structure[0].boundary_conditions(full_domain = full_domain)
+            bconds = self.vals[0].boundary_conditions(full_domain = full_domain)
             return form, grid, bconds

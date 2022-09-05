@@ -7,6 +7,8 @@ Main classes and functions of the moeadd optimizer.
 import numpy as np
 import time
 import warnings
+
+from typing import Union
 from copy import deepcopy
 from functools import reduce
 
@@ -125,6 +127,14 @@ class ParetoLevels(object):
         
         '''
         self.levels = self._sorting_method(self.population)
+    
+    @property
+    def unplaced_candidates(self):
+        return self._unplaced_candidates
+    
+    @unplaced_candidates.setter
+    def unplaced_candidates(self, candidates : Union[list, set, tuple]):
+        self._unplaced_candidates = candidates
     
     def update(self, point):
         '''

@@ -20,38 +20,18 @@ from epde.operators.template import CompoundOperator, add_param_to_operator
 
 from epde.decorators import History_Extender, Reset_equation_status
 
-# Pareto level and chromosome processers shall be declare as mappings of 
-# equation-level operators onto the corresponding types.  
 
-
-def validate_indiviual_suitability(individual, best_inidividual, worst_individual):
-    '''
-    We assert, that the problem is the problem of minimization
-    '''
-    elite_fraction = 0.2 # TODO: set better initialization
-    return individual < best_inidividual + elite_fraction * (worst_individual - best_inidividual)
-
-
-class ChromosomeMutation(CompoundOperator):
+class SystemMutation(CompoundOperator):
     def apply(self, objective : SoEq, best_inidividuals, worst_individuals): # TODO: add setter for best_individuals & worst individuals 
         altered_objective = deepcopy(objective)
         eqs_keys = altered_objective.vals.equation_keys; params_keys = altered_objective.vals.params_keys
         affected_by_mutation = np.random.uniform(0, 1) > self.params['indiv_mutation_prob']
     
-        if affected_by_mutation and altered_objective.elite == 0:
+        if affected_by_mutation:
             for eq_key in eqs_keys:
                 altered_objective = self.suboperators['equation_mutation'].apply(altered_objective.vals[eq_key])
                 altered_objective.vals.replace_gene(gene_key = eq_key, value = altered_objective)
-                
-        if affected_by_mutation > self.params['indiv_mutation_prob'] and altered_objective.elite == 1:          
-            for eq_key in eqs_keys:
-                if validate_indiviual_suitability(altered_objective[altered_objective.vals[eq_key]].evaluate(False, True, True), # Call by index?
-                                                  best_inidividuals[eq_key],
-                                                  worst_individuals[eq_key]):
-                    altered_objective = self.suboperators['refining_equation_mutation'].apply(altered_objective.vals[eq_key])
-                    altered_objective.vals.replace_gene(gene_key = eq_key, value = altered_objective)
 
-        if affected_by_mutation and (altered_objective.elite == 0 or altered_objective.elite == 1):
             for param_key in params_keys:
                 altered_objective = self.suboperators['param_mutation'].apply(altered_objective.vals[param_key])
                 altered_objective.vals.replace_gene(gene_key = param_key, value = altered_objective)
@@ -60,59 +40,20 @@ class ChromosomeMutation(CompoundOperator):
 
     def use_default_tags(self):
         self._tags = {'mutation', 'chromosome level', 'contains suboperators'}
-
-
-class RefiningEquationMutation(CompoundOperator):
-    @property
-    def elitist(self):
-        return True
-    
-    @Reset_equation_status(reset_input = True)
-    @History_Extender(f'\n -> refining mutating equation', 'ba')
-    def apply(self, objective : Equation):
-        altered_objective = deepcopy(objective)
-        for term_idx in range(altered_objective.n_immutable, len(altered_objective.structure)):
-            if term_idx == altered_objective.target_idx:
-                continue
-            if term_idx < altered_objective.target_idx:
-                corresponding_weight = altered_objective.weights_internal[term_idx] 
-            else:
-                corresponding_weight = altered_objective.weights_internal[term_idx - 1]
-            if corresponding_weight == 0 and np.random.uniform(0, 1) <= self.params['r_mutation']:
-                self.params['type_probabilities'] = [1 - 1/pow(altered_objective.structure[term_idx].total_params, 2), 1/pow(altered_objective.structure[term_idx].total_params, 2)]
-                if try_iterable(self.suboperators['mutation']):
-                    mut_operator = np.random.choice(self.suboperators['mutation'], p=self.params['type_probabilities'])
-                else:
-                    mut_operator = self.suboperators['mutation']
-                altered_objective.structure[term_idx] = mut_operator.apply(term_idx, altered_objective)
-        return altered_objective
-
-    def use_default_tags(self):
-        self._tags = {'mutation', 'gene level', 'elitist', 'contains suboperators'}
     
 
 class EquationMutation(CompoundOperator):
-    @property
-    def elitist(self):
-        return True
-
     @Reset_equation_status(reset_input = True)
     @History_Extender(f'\n -> mutating equation', 'ba')
     def apply(self, objective : Equation):
         altered_objective = deepcopy(objective)
         for term_idx in range(objective.n_immutable, len(objective.structure)):
             if np.random.uniform(0, 1) <= self.params['r_mutation']:
-                # self.params['type_probabilities'] = [1 - 1/pow(objective.structure[term_idx].total_params, 2),
-                #                                      1/pow(objective.structure[term_idx].total_params, 2)]
-                # if try_iterable(self.suboperators['mutation']):
-                #     mut_operator = np.random.choice(self.suboperators['mutation'], p=self.params['type_probabilities'])
-                # else:
-                #     mut_operator = self.suboperators['mutation']
                 altered_objective.structure[term_idx] = self.suboperators['mutation'].apply(term_idx, altered_objective)
         return altered_objective
-    
+
     def use_default_tags(self):
-        self._tags = {'mutation', 'gene level', 'contains suboperators'}        
+        self._tags = {'mutation', 'gene level', 'contains suboperators'}
 
 
 class MetaparameterMutation(CompoundOperator):
@@ -232,22 +173,17 @@ def get_basic_mutation(**kwargs):
 
     equation_mutation = EquationMutation(['r_mutation', 'type_probabilities'])
     add_kwarg_to_operator(equation_mutation, {'r_mutation' : 0.3, 'type_probabilities' : []})
-    refining_equation_mutation = RefiningEquationMutation([])
-    add_kwarg_to_operator(refining_equation_mutation, {'r_mutation' : 0.5, 'type_probabilities' : []})
     
     metaparameter_mutation = MetaparameterMutation(['std', 'mean'])
     add_kwarg_to_operator(metaparameter_mutation, {'std' : 0, 'mean' : 0.4})
 
-    chromosome_mutation = ChromosomeMutation(['indiv_mutation_prob'])
+    chromosome_mutation = SystemMutation(['indiv_mutation_prob'])
     add_kwarg_to_operator(chromosome_mutation, {'indiv_mutation_prob' : 0.5})
     chromosome_mutation.params = {'indiv_mutation_prob' : 0.5} if not 'mutation_params' in kwargs.keys() else kwargs['mutation_params']
 
     equation_mutation.set_suboperators(operators = {'mutation' : [term_param_mutation, term_mutation]},
                                        probas = {'equation_crossover' : [0.9, 0.1]})
-    refining_equation_mutation.set_suboperators(operators = {'mutation' : [term_param_mutation, term_mutation]},
-                                                probas = {'equation_crossover' : [0.9, 0.1]})
 
     chromosome_mutation.set_suboperators(operators = {'equation_mutation' : equation_mutation, 
-                                                      'refining_equation_mutation' : refining_equation_mutation, 
                                                       'param_mutation' : metaparameter_mutation})
     return chromosome_mutation
