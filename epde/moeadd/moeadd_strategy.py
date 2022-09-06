@@ -14,6 +14,7 @@ from epde.operators.variation import get_basic_variation
 from epde.operators.fitness import L2Fitness
 from epde.operators.right_part_selection import PoplevelRightPartSelector
 from epde.operators.moeadd_specific import get_pareto_levels_updater
+from epde.operators.sparsity import LASSOSparsity
 
 from epde.moeadd.moeadd_strategy_elems import SectorProcesserBuilder, MOEADDSectorProcesser
 
@@ -45,7 +46,13 @@ class OptimizationPatternDirector(object):
         population_updater = get_pareto_levels_updater(pareto_updater_params)
 
         right_part_selector = PoplevelRightPartSelector()
-        fitness = 
+        eq_fitness = L2Fitness(['penalty_coeff'])
+        add_kwarg_to_operator(eq_fitness, {'penalty_coeff' : 0.2})
+        sys_fitness = map_operator_between_levels(eq_fitness, 'gene level', 'chromosome level', param_keys)()
+        
+        sparsity = LASSOSparsity()
+        
+        # fitness = ()
 
         self._builder.
     

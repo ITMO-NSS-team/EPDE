@@ -8,10 +8,13 @@ Created on Mon Jul  6 15:39:18 2020
 
 import numpy as np
 import itertools
+from typing import Union
+
+import pickle
 
 import epde.globals as global_var
 from epde.structure.factor import Factor
-from typing import Union
+
 
 def constancy_hard_equality(tensor, epsilon = 1e-7):
     # print(np.abs(np.max(tensor) - np.min(tensor)), epsilon, type(np.abs(np.max(tensor) - np.min(tensor))),  type(epsilon))
@@ -401,7 +404,9 @@ class TF_Pool(object):
     '''
     
     '''
-    def __init__(self, families):
+    def __init__(self, families : list, stored_pool = None):
+        if stored_pool is not None:
+            self = pickle.load(stored_pool)
         self.families = families
         
     @property
@@ -480,3 +485,8 @@ class TF_Pool(object):
         except IndexError:
             print(label, [family.tokens for family in self.families])
             raise IndexError('No family for token.')
+
+    def save(self, filename : str):
+        file_to_store = open(filename, "wb")
+        pickle.dump(self, file_to_store)
+        file_to_store.close()        

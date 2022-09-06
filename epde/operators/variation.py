@@ -102,6 +102,10 @@ class ChromosomeCrossover(CompoundOperator):
                                                                                    offspring_2.vals[param_key]))
             offspring_1.vals.replace_gene(gene_key = param_key, value = offspring_1)
             offspring_2.vals.replace_gene(gene_key = param_key, value = offspring_2)
+            
+            offspring_1.vals.pass_parametric_gene(key = param_key, value = offspring_1)
+            offspring_2.vals.pass_parametric_gene(key = param_key, value = offspring_2)
+            
         return offspring_1, offspring_2
 
     def use_default_tags(self):

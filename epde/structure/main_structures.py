@@ -9,7 +9,7 @@ Created on Tue Jul 26 13:46:45 2022
 import gc
 import warnings
 import copy
-from typing import Union
+from typing import Union, Callable
 from functools import singledispatchmethod, reduce
 
 import numpy as np
@@ -299,8 +299,11 @@ class Equation(ComplexStructure):
                   'fitness_calculated', 'solver_form_defined', '_solver_form', '_fitness_value', 
                   'crossover_selected_times']
 
-    def __init__(self, pool, basic_structure, terms_number = 6, var_to_explain = None, max_factors_in_term = 2, 
-                 interelement_operator = np.add):
+    def __init__(self, pool : TF_Pool, basic_structure : Union[list, tuple, set], var_to_explain : str = None,
+                 metaparameters : dict = {'sparsity' : {'optimizable' : True, 'value' : 1.},
+                                          'terms_number' : {'optimizable' : False, 'value' : 5.},
+                                          'max_factors_in_term' : {'optimizable' : False, 'value' : 1.}},
+                 interelement_operator : Callable = np.add):
 
         """
 
@@ -345,27 +348,26 @@ class Equation(ComplexStructure):
         self.n_immutable = len(basic_structure)
         self.pool = pool
         self.structure = []
-        self.terms_number = terms_number; self.max_factors_in_term = max_factors_in_term
-        self.operator = None
-        if (terms_number < self.n_immutable): 
-            raise Exception('Number of terms ({}) is too low to even contain all of the pre-determined ones'.format(terms_number))        
+        self.metaparameters = metaparameters
+        if (self.metaparameters['terms_number']['value'] < self.n_immutable): 
+            raise ValueError('Maximum number of terms parameter is lower, than number of passed basic terms.')        
 
         for passed_term in basic_structure:
             if isinstance(passed_term, Term):
                 self.structure.append(passed_term)
             elif isinstance(passed_term, str):
                 self.structure.append(Term(self.pool, passed_term = passed_term, 
-                                           max_factors_in_term = self.max_factors_in_term))
+                                           max_factors_in_term = self.metaparameters['max_factors_in_term']['value']))
                 
         self.main_var_to_explain = var_to_explain
 
         force_var_to_explain = True # False
-        for i in range(len(basic_structure), terms_number):
+        for i in range(len(basic_structure), self.metaparameters['terms_number']['value']):
             check_test = 0
             while True:
                 check_test += 1 
                 mf = var_to_explain if force_var_to_explain else None
-                new_term = Term(self.pool, max_factors_in_term = self.max_factors_in_term, 
+                new_term = Term(self.pool, max_factors_in_term = self.metaparameters['max_factors_in_term']['value'], 
                                 mandatory_family = mf, passed_term = None)
                 if check_uniqueness(new_term, self.structure):
                     force_var_to_explain = False
@@ -406,7 +408,7 @@ class Equation(ComplexStructure):
             raise ValueError('No property passed for restoration.')
         while True:
             replacement_idx = np.random.randint(low = 0, high = len(self.structure))
-            temp = Term(self.pool, max_factors_in_term=self.max_factors_in_term) # ,  forbidden_tokens=self.forbidden_token_labels
+            temp = Term(self.pool, max_factors_in_term = self.metaparameters['max_factors_in_term']['value'])
             if deriv and temp.contains_deriv:
                 self.structure[replacement_idx] = temp
                 break
@@ -441,9 +443,7 @@ class Equation(ComplexStructure):
             else:
                 continue
         if self._features.ndim == 1:
-            # print('before dim extension', self._features.shape)
             self._features = np.expand_dims(self._features, 1).T
-            # print('after dim extension', self._features.shape)
         temp_feats = np.vstack([self._features, np.ones(self._features.shape[1])])
         self._features = np.transpose(self._features); temp_feats = np.transpose(temp_feats)
         if return_val:
@@ -451,12 +451,12 @@ class Equation(ComplexStructure):
             if normalize:
                 elem1 = np.expand_dims(self._target, axis = 1)
                 value = np.add(elem1, - reduce(lambda x,y: np.add(x, y), [np.multiply(weight, temp_feats[:,feature_idx])
-                                                    for feature_idx, weight in np.ndenumerate(self.weights_internal)])) 
+                                                                          for feature_idx, weight in np.ndenumerate(self.weights_internal)])) 
             else:
                 elem1 = np.expand_dims(self._target, axis = 1)
 
                 value = np.add(elem1, - reduce(lambda x,y: np.add(x, y), [np.multiply(weight, temp_feats[:,feature_idx])
-                                                    for feature_idx, weight in np.ndenumerate(self.weights_final)])) 
+                                                                          for feature_idx, weight in np.ndenumerate(self.weights_final)])) 
             return value, self._target, self._features
         else:
             return None, self._target, self._features
@@ -697,29 +697,46 @@ def solver_formed_grid():
     training_grid = np.array(training_grid).reshape((len(training_grid), -1))
     return torch.from_numpy(training_grid).T.type(torch.FloatTensor)
 
+def check_metaparameters(metaparams : dict):
+    metaparam_labels = ['terms_number', 'max_factors_in_term', 'sparsity']
+    if any([(label not in metaparams.keys()) for label in metaparam_labels]):
+        raise ValueError('Only partial metaparameter vector has been passed.')
+    
 
 class SoEq(moeadd.moeadd_solution):
-    def __init__(self, pool, terms_number, max_factors_in_term, sparsity = None, eq_search_iters = 100):
+    def __init__(self, pool : TF_Pool, metaparameters : dict):
+        '''
+
+        Parameters
+        ----------
+        pool : epde.interface.token_familiy.TF_Pool
+            Pool, containing token families for the equation search algorithm.
+        metaparams : dict
+            Metaparameters dictionary for the search. Key - label of the parameter (e.g. 'sparsity'),
+            value - tuple, containing flag for metaoptimization and initial value.
+
+        Returns
+        -------
+        None.
+
+        '''
+        check_metaparameters(metaparameters)
+        
+        self.metaparams = metaparameters
         self.tokens_for_eq = TF_Pool(pool.families_demand_equation)
         self.tokens_supp = TF_Pool(pool.families_supplementary)
-
-        if sparsity is not None: self.sparsity = sparsity
-        self.max_terms_number = terms_number; self.max_factors_in_term = max_factors_in_term
         self.moeadd_set = False; self.eq_search_operator_set = False
-        self.def_eq_search_iters = eq_search_iters
         
     def use_default_objective_function(self):
-        # raise DeprecationWarning('Call for the default MO criteria. In normal conditions, this method shall not be called.')
-        # TODO: Erase me from existence!
         from epde.eq_mo_objectives import generate_partial, equation_discrepancy, equation_complexity_by_factors
-        quality_objectives = [generate_partial(equation_discrepancy, eq_idx) for eq_idx in range(len(self.tokens_for_eq))]
         complexity_objectives = [generate_partial(equation_complexity_by_factors, eq_idx) for eq_idx in range(len(self.tokens_for_eq))]
+        quality_objectives = [generate_partial(equation_discrepancy, eq_idx) for eq_idx in range(len(self.tokens_for_eq))]
         self.set_objective_functions(quality_objectives + complexity_objectives)
         
     def set_objective_functions(self, obj_funs):
         '''
         Method to set the objective functions to evaluate the "quality" of the system of equations.
-        
+
         Parameters:
         -----------
             obj_funs - callable or list of callables;
@@ -727,7 +744,7 @@ class SoEq(moeadd.moeadd_solution):
             metric (for example, quality of the process modelling with specific system), or 
             a list of metrics (for example, number of terms for each equation in the system).
             The function results will be flattened after their application. 
-            
+
         '''
         assert callable(obj_funs) or all([callable(fun) for fun in obj_funs])
         self.obj_funs = obj_funs
@@ -736,52 +753,33 @@ class SoEq(moeadd.moeadd_solution):
         self.eq_search_evolutionary_strategy = evolutionary
         self.eq_search_operator_set = True
         
-    def create_equations(self, population_size = 16, sparsity = None, eq_search_iters = None, EA_kwargs = dict()):
+    def create_equations(self, sparsity = None, eq_search_iters = None, EA_kwargs = dict()):
         assert self.eq_search_operator_set
         
         if eq_search_iters is None: eq_search_iters = self.def_eq_search_iters
-
-        self.population_size = population_size
-        self.eq_search_evolutionary_strategy.modify_block_params(block_label = 'truncation',
-                                                                 param_label = 'population_size',
-                                                                 value = population_size)
         
         structure = {}; self.eq_search_iters = eq_search_iters
         token_selection = self.tokens_supp
         
         self.vars_to_describe = {token_family.type for token_family in self.tokens_for_eq.families}
+        current_tokens_pool = token_selection + self.tokens_for_eq
         
         for eq_idx, variable in enumerate(self.vars_to_describe):
-            current_tokens = token_selection + self.tokens_for_eq
-#            self.eq_search_evolutionary_strategy.modify_block_params(block_label = 'rps1', param_label = 'sparsity', 
-#                                                                     value = self.vals.get('sparsity'),
-#                                                                     suboperator_sequence = ['eq_level_rps', 'fitness_calculation', 'sparsity'])
-#            self.eq_search_evolutionary_strategy.modify_block_params(block_label = 'rps2', param_label = 'sparsity', 
-#                                                                     value = self.vals.get('sparsity'), 
-#                                                                     suboperator_sequence = ['eq_level_rps', 'fitness_calculation', 'sparsity'])#(sparsity_value = self.vals[eq_idx])#
-#
-#            cur_equation, cur_eq_operator_error_abs, cur_eq_operator_error_structural = self.optimize_equation(pool = current_tokens, 
-#                                                                                                               strategy = self.eq_search_evolutionary_strategy, 
-#                                                                                                               population_size = self.population_size,
-#                                                                                                               var_to_explain = variable, 
-#                                                                                                               EA_kwargs = EA_kwargs)
-            # TODO: random structure intitation + parameter selection
-            structure[cur_equation.descr] = cur_equation
-            if False:
-                global_var.tensor_cache.change_variables(cur_eq_operator_error_abs,
-                                                         cur_eq_operator_error_structural)
-        self.chromo = Chromosome(structure, sparsity)
+            structure[variable] = Equation(current_tokens_pool, basic_structure = [], var_to_explain = variable, 
+                                           metaparameters = self.metaparameters)
+        self.chromo = Chromosome(structure, params = {key : val for key, val in self.metaparameters.items()
+                                                      if val['optimizable']})
         moeadd.moeadd_solution.__init__(self, self.vals, self.obj_funs)
         self.moeadd_set = True
             
-    def optimize_equation(self, pool, strategy, population_size, basic_terms : list = [], 
-                          var_to_explain : str = None, EA_kwargs = dict()):
-        population = [Equation(pool, basic_terms, self.max_terms_number, self.max_factors_in_term) 
-                      for i in range(population_size)]
-        strategy.run(initial_population = population, EA_kwargs = EA_kwargs)
-        result = strategy.result
+    # def optimize_equation(self, pool, strategy, population_size, basic_terms : list = [], 
+    #                       var_to_explain : str = None, EA_kwargs = dict()):
+    #     population = [Equation(pool, basic_terms, self.max_terms_number, self.max_factors_in_term) 
+    #                   for i in range(population_size)]
+    #     strategy.run(initial_population = population, EA_kwargs = EA_kwargs)
+    #     result = strategy.result
         
-        return result[0], result[0].evaluate(normalize = False, return_val=True)[0], result[0].evaluate(normalize = True, return_val=True)[0]
+    #     return result[0], result[0].evaluate(normalize = False, return_val=True)[0], result[0].evaluate(normalize = True, return_val=True)[0]
         
     @staticmethod
     def equation_opt_iteration(population, evol_operator, population_size, iter_index, unexplained_vars, strict_restrictions = True):

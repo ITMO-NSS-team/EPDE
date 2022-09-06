@@ -15,16 +15,22 @@ from copy import deepcopy
 import matplotlib.pyplot as plt
 from matplotlib import cm
 
-from epde.structure.main_structures import SoEq
+from epde.structure.main_structures import SoEq, Equation
 from epde.operators.template import CompoundOperator
 import epde.globals as global_var
 from TEDEouS.solver import point_sort_shift_solver
 
-class SystemFitness(CompoundOperator):
-    def apply(self, objective : SoEq):
-        if objective.
-        for equation in objective.vals:
-            
+
+# class SystemFitness(CompoundOperator):
+#     """
+#     Operator, dedicated to calculation of fitness for the element equations of passed system of equations.
+#     """
+#     def apply(self, objective : SoEq):
+#         raise DeprecationWarning('Remake me as an operator mapping')
+#         if not objective.fitness_calculated:
+#             for equation in objective.vals:
+#                 self.suboperators['equation_fitness_calculation'].apply(equation)
+
 
 class L2Fitness(CompoundOperator):
     """
@@ -50,7 +56,7 @@ class L2Fitness(CompoundOperator):
         calculate the fitness function of the equation, that will be stored in the equation.fitness_value.    
         
     """
-    def apply(self, equation):
+    def apply(self, objective : Equation):
         """
         Calculate the fitness function values. The result is not returned, but stored in the equation.fitness_value attribute.
         
@@ -65,29 +71,28 @@ class L2Fitness(CompoundOperator):
         None
         """        
 
-        self.suboperators['sparsity'].apply(equation)
-        self.suboperators['coeff_calc'].apply(equation)
+        self.suboperators['sparsity'].apply(objective)
+        self.suboperators['coeff_calc'].apply(objective)
         
-        _, target, features = equation.evaluate(normalize = False, return_val = False)
+        _, target, features = objective.evaluate(normalize = False, return_val = False)
         try:
-            discr = (np.dot(features, equation.weights_final[:-1]) + 
-                                  np.full(target.shape, equation.weights_final[-1]) - target)
+            discr = (np.dot(features, objective.weights_final[:-1]) + 
+                                  np.full(target.shape, objective.weights_final[-1]) - target)
             self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)
             discr = np.multiply(discr, self.g_fun_vals)
             rl_error = np.linalg.norm(discr, ord = 2)
-
         except ValueError:
             raise ValueError('An error in getting weights ')
-        if rl_error == 0:
-            fitness_value = np.inf
-            print('infinite fitness!', equation.text_form)
-        else:
-            fitness_value = 1 / (rl_error)
-        if np.sum(equation.weights_final) == 0:
-            fitness_value = fitness_value * self.params['penalty_coeff']
 
-        equation.fitness_calculated = True
-        equation.fitness_value = fitness_value
+        if not (self.params['penalty_coeff'] > 0. and self.params['penalty_coeff'] < 1.):
+            raise ValueError('Incorrect penalty coefficient set, value shall be in (0, 1).')
+            
+        fitness_value = rl_error
+        if np.sum(objective.weights_final) == 0:
+            fitness_value /= self.params['penalty_coeff']
+            
+        objective.fitness_calculated = True
+        objective.fitness_value = fitness_value
 
     def use_default_tags(self):
         self._tags = {'fitness evaluation', 'equation level', 'contains suboperators', 'inplace'}

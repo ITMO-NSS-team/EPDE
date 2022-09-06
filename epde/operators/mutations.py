@@ -35,6 +35,7 @@ class SystemMutation(CompoundOperator):
             for param_key in params_keys:
                 altered_objective = self.suboperators['param_mutation'].apply(altered_objective.vals[param_key])
                 altered_objective.vals.replace_gene(gene_key = param_key, value = altered_objective)
+                altered_objective.vals.pass_parametric_gene(key = param_key, value = altered_objective)
 
         return altered_objective
 

@@ -6,7 +6,10 @@ Created on Tue Jul 26 12:40:00 2022
 @author: maslyaev
 """
 
+import numpy as np
 import warnings
+
+from typing import Union
 
 class Gene(object):
     def __init__(self, key, value = None, value_type = None):
@@ -38,9 +41,28 @@ class Gene(object):
         except AttributeError:
             warnings.warn(f'The equality method is not implemented for object of type {type(self)} or {type(other)}')
 
-
+    def set_metaparam(self, key : str, value : Union[float, int]):
+        assert key in self._value.metaparameters, f'Incorrect parameter key {key} passed into the gene, containing {self.key}'
+        self._value.metaparameters[key]['value'] = value
+            
+                
 class Chromosome(object):
+
     def __init__(self, equations, **kwargs):
+        '''
+        
+        Parameters
+        ----------
+        equations : list of epde.strucutre.main_structures.Equation objects
+            List of equation, that form the chromosome.
+        **kwargs : TYPE
+            DESCRIPTION.
+
+        Returns
+        -------
+        None.
+
+        '''
         self.equation_type = type(equations[0])
         
         self.chromosome = {eq.main_var_to_explain : Gene(key = eq.main_var_to_explain, value = eq)
@@ -53,6 +75,30 @@ class Chromosome(object):
             
     def replace_gene(self, gene_key, value):
         self.chromosome[gene_key].value = value
+        
+    def pass_parametric_gene(self, key, value): # TODO: Merge with replace_gene when ready.
+        '''
+
+        Parameters
+        ----------
+        key : tuple of format (parameter_name, variable_name) of 'str', or 'str' for parameter_name,
+            The key, encoding with a tuple, dedicated to the altered metaparametric gene of the chromosome.
+            First element of the key is the label of the parameter, while the second is the name of the parameter
+        value : float or integer,
+            The value, which is replacing the previous gene value.
+
+        Returns
+        -------
+        None.
+
+        '''
+        if isinstance(key, str) and (key in self.chromosome[np.random.choice(self.equation_keys)]):
+            for eq_name in self.equation_keys:
+                self.chromosome[eq_name].set_metaparam(key = key, value = value)
+        elif isinstance(key, [list, tuple]):    
+            self.chromosome[key[1]].set_metaparam(key = key[0], value = value)
+        else:
+            raise ValueError('Incorrect value passed into genes parameters setting.')
         
     def __eq__(self, other):
         if set(self.chromosome.keys()) != set(self.chromosome.keys()):

@@ -12,10 +12,9 @@ from functools import partial
 def generate_partial(obj_function, equation_idx):
     return partial(obj_function, equation_idx = equation_idx)
 
-def equation_discrepancy(system, equation_idx):
+def equation_fitness(system, equation_idx):
     '''
-    Evaluate the discrepancy of the system of PDEs, using sum of the L2 norm of the discrepancy 
-    of each equation in the system from zero.
+    Evaluate the quality of the system of PDEs, using the individual values of fitness function for equations.
     
     Parameters:
     -----------
@@ -24,10 +23,11 @@ def equation_discrepancy(system, equation_idx):
         
     Returns:
     ----------
-        discrepancy : float.
+        error : float.
         The value of the error metric.
     '''
-    res = np.sum(np.abs(system.structure[equation_idx].evaluate(normalize = False, return_val = True)[0]))
+    assert system.structure[equation_idx].fitness_calculated, 'Trying to call fitness before its evaluation.'
+    res = system.structure[equation_idx].fitness_value
     return res
 
 def equation_complexity_by_terms(system, equation_idx):
