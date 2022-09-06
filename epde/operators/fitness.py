@@ -22,7 +22,9 @@ from TEDEouS.solver import point_sort_shift_solver
 
 class SystemFitness(CompoundOperator):
     def apply(self, objective : SoEq):
-        for 
+        if objective.
+        for equation in objective.vals:
+            
 
 class L2Fitness(CompoundOperator):
     """

@@ -753,24 +753,24 @@ class SoEq(moeadd.moeadd_solution):
         
         for eq_idx, variable in enumerate(self.vars_to_describe):
             current_tokens = token_selection + self.tokens_for_eq
-            self.eq_search_evolutionary_strategy.modify_block_params(block_label = 'rps1', param_label = 'sparsity', 
-                                                                     value = self.vals.get('sparsity'),
-                                                                     suboperator_sequence = ['eq_level_rps', 'fitness_calculation', 'sparsity'])
-            self.eq_search_evolutionary_strategy.modify_block_params(block_label = 'rps2', param_label = 'sparsity', 
-                                                                     value = self.vals.get('sparsity'), 
-                                                                     suboperator_sequence = ['eq_level_rps', 'fitness_calculation', 'sparsity'])#(sparsity_value = self.vals[eq_idx])
-
-            cur_equation, cur_eq_operator_error_abs, cur_eq_operator_error_structural = self.optimize_equation(pool = current_tokens, 
-                                                                                                               strategy = self.eq_search_evolutionary_strategy, 
-                                                                                                               population_size = self.population_size,
-                                                                                                               var_to_explain = variable, 
-                                                                                                               EA_kwargs = EA_kwargs)
-
+#            self.eq_search_evolutionary_strategy.modify_block_params(block_label = 'rps1', param_label = 'sparsity', 
+#                                                                     value = self.vals.get('sparsity'),
+#                                                                     suboperator_sequence = ['eq_level_rps', 'fitness_calculation', 'sparsity'])
+#            self.eq_search_evolutionary_strategy.modify_block_params(block_label = 'rps2', param_label = 'sparsity', 
+#                                                                     value = self.vals.get('sparsity'), 
+#                                                                     suboperator_sequence = ['eq_level_rps', 'fitness_calculation', 'sparsity'])#(sparsity_value = self.vals[eq_idx])#
+#
+#            cur_equation, cur_eq_operator_error_abs, cur_eq_operator_error_structural = self.optimize_equation(pool = current_tokens, 
+#                                                                                                               strategy = self.eq_search_evolutionary_strategy, 
+#                                                                                                               population_size = self.population_size,
+#                                                                                                               var_to_explain = variable, 
+#                                                                                                               EA_kwargs = EA_kwargs)
+            # TODO: random structure intitation + parameter selection
             structure[cur_equation.descr] = cur_equation
             if False:
                 global_var.tensor_cache.change_variables(cur_eq_operator_error_abs,
                                                          cur_eq_operator_error_structural)
-        self.vals = Chromosome(structure, sparsity)
+        self.chromo = Chromosome(structure, sparsity)
         moeadd.moeadd_solution.__init__(self, self.vals, self.obj_funs)
         self.moeadd_set = True
             
