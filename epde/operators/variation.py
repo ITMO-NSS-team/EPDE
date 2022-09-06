@@ -72,11 +72,11 @@ class ParetoLevelsCrossover(CompoundOperator):
         for pair_idx in np.arange(crossover_pool.shape[0]):
             if len(crossover_pool[pair_idx, 0].vals) != len(crossover_pool[pair_idx, 1].vals):
                 raise IndexError('Equations have diffferent number of terms')
-            new_equation_1 = deepcopy(crossover_pool[pair_idx, 0])
-            new_equation_2 = deepcopy(crossover_pool[pair_idx, 1])
+            new_system_1 = deepcopy(crossover_pool[pair_idx, 0])
+            new_system_2 = deepcopy(crossover_pool[pair_idx, 1])
 
-            new_equation_1, new_equation_2 = self.suboperators['chromosome_crossover'].apply(new_equation_1, new_equation_2)
-            offsprings.extend([new_equation_1, new_equation_2])
+            new_system_1, new_system_2 = self.suboperators['chromosome_crossover'].apply(new_system_1, new_system_2)
+            offsprings.extend([new_system_1, new_system_2])
 
         objective.unplaced_candidates = offsprings
         return objective

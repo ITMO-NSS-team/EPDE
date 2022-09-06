@@ -15,13 +15,14 @@ from copy import deepcopy
 import matplotlib.pyplot as plt
 from matplotlib import cm
 
+from epde.structure.main_structures import SoEq
 from epde.operators.template import CompoundOperator
 import epde.globals as global_var
 from TEDEouS.solver import point_sort_shift_solver
 
 class SystemFitness(CompoundOperator):
-    def apply(self, system):
-        equaiton.obj_funs = []
+    def apply(self, objective : SoEq):
+        for 
 
 class L2Fitness(CompoundOperator):
     """
