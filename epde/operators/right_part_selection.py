@@ -41,36 +41,36 @@ class EqRightPartSelector(CompoundOperator):
     
     '''    
     @History_Extender('\n -> The equation structure was detected: ', 'a')        
-    def apply(self, equation : Equation):
-        if not equation.right_part_selected:
+    def apply(self, objective : Equation):
+        if not objective.right_part_selected:
             max_fitness = 0
             max_idx = 0
-            if not equation.contains_deriv:
-                equation.restore_property(deriv = True)
-            if not equation.contains_family(equation.main_var_to_explain):
-                equation.restore_property(mandatory_family = True)
+            if not objective.contains_deriv:
+                objective.restore_property(deriv = True)
+            if not objective.contains_family(objective.main_var_to_explain):
+                objective.restore_property(mandatory_family = True)
                 
             
                 
-            for target_idx, target_term in enumerate(equation.structure):
-                if target_term.contains_family(equation.main_var_to_explain): #target_term.descr_variable_marker:
+            for target_idx, target_term in enumerate(objective.structure):
+                if target_term.contains_family(objective.main_var_to_explain): #target_term.descr_variable_marker:
                     # target_term.contains_family(equation.main_var_to_explain)
-                    if not equation.structure[target_idx].contains_deriv:
+                    if not objective.structure[target_idx].contains_deriv:
                         continue
-                    equation.target_idx = target_idx
-                    self.suboperators['fitness_calculation'].apply(equation)
-                    if equation.fitness_value > max_fitness:
-                        max_fitness = equation.fitness_value
+                    objective.target_idx = target_idx
+                    self.suboperators['fitness_calculation'].apply(objective)
+                    if objective.fitness_value > max_fitness:
+                        max_fitness = objective.fitness_value
                         max_idx = target_idx
                     else:
                         pass
 
-            equation.target_idx = max_idx
-            equation.reset_explaining_term(equation.target_idx)
-            self.suboperators['fitness_calculation'].apply(equation)
-            if not np.isclose(equation.fitness_value, max_fitness) and global_var.verbose.show_warnings:
+            objective.target_idx = max_idx
+            objective.reset_explaining_term(objective.target_idx)
+            self.suboperators['fitness_calculation'].apply(objective)
+            if not np.isclose(objective.fitness_value, max_fitness) and global_var.verbose.show_warnings:
                 warnings.warn('Reevaluation of fitness function for equation has obtained different result. Not an error, if ANN DE solver is used.')
-            equation.right_part_selected = True
+            objective.right_part_selected = True
 
     def use_default_tags(self):
         self._tags = {'equation right part selection', 'gene level', 'contains suboperators', 'inplace'}
@@ -100,22 +100,19 @@ class RandomRHPSelector(CompoundOperator):
     
     '''    
     @History_Extender('\n -> The equation structure was detected: ', 'a')        
-    def apply(self, equation : Equation):
-        if not equation.right_part_selected:
-            if not equation.contains_deriv:
-                equation.restore_property(deriv = True)
-            if not equation.contains_family(equation.main_var_to_explain):
-                equation.restore_property(mandatory_family = True)
+    def apply(self, objective : Equation):
+        if not objective.right_part_selected:
+            if not objective.contains_deriv:
+                objective.restore_property(deriv = True)
+            if not objective.contains_family(objective.main_var_to_explain):
+                objective.restore_property(mandatory_family = True)
 
-            idx = np.random.choice([term_idx for term_idx, term in enumerate(equation.structure)
-                                    if term.contains_family(equation.main_var_to_explain)])
+            idx = np.random.choice([term_idx for term_idx, term in enumerate(objective.structure)
+                                    if term.contains_family(objective.main_var_to_explain)])
                 
-            equation.target_idx = idx
-            equation.reset_explaining_term(idx)
-            # self.suboperators['fitness_calculation'].apply(equation)
-            # if not np.isclose(equation.fitness_value, max_fitness) and global_var.verbose.show_warnings:
-                # warnings.warn('Reevaluation of fitness function for equation has obtained different result. Not an error, if ANN DE solver is used.')
-            equation.right_part_selected = True
+            objective.target_idx = idx
+            objective.reset_explaining_term(idx)
+            objective.right_part_selected = True
 
     def use_default_tags(self):
         self._tags = {'equation right part selection', 'gene level', 'contains suboperators', 'inplace'}

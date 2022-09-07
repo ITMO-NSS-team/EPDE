@@ -345,6 +345,8 @@ class OffspringUpdater(CompoundOperator):
                 temp_offspring = self.suboperators['chromosome_mutation'].apply(offspring,
                                                                                 values[1, ...],
                                                                                 values[0, ...])
+                self.suboperators['right_part_selector'].apply(temp_offspring)                
+                self.suboperators['chromosome_fitness'].apply(temp_offspring)
                 if not any([temp_offspring == solution for solution in self.pareto_levels.population]):
                     objective = self.suboperators['pareto_level_updater'].apply(temp_offspring, objective,
                                                                                 self.params['PBI_penalty'])
@@ -354,7 +356,8 @@ class OffspringUpdater(CompoundOperator):
                 attempt += 1
         return objective
     
-def get_pareto_levels_updater(constrained : bool = False, mutation_params : dict = {}, 
+def get_pareto_levels_updater(right_part_selector : CompoundOperator, chromosome_fitness : CompoundOperator,
+                              constrained : bool = False, mutation_params : dict = {}, 
                               pl_updater_params : dict = {}, combiner_params : dict = {}):
     add_kwarg_to_updater = partial(func = add_param_to_operator, target_dict = combiner_params)
     updater = OffspringUpdater()
@@ -363,5 +366,7 @@ def get_pareto_levels_updater(constrained : bool = False, mutation_params : dict
     mutation = get_basic_mutation(mutation_params)
     pl_updater = get_basic_populator_updater(pl_updater_params)
     updater.set_suboperators(operators = {'chromosome_mutation' : mutation,
-                                          'pareto_level_updater' : pl_updater})
+                                          'pareto_level_updater' : pl_updater,
+                                          'right_part_selector' : right_part_selector,
+                                          'chromosome_fitness' : chromosome_fitness})
     return updater

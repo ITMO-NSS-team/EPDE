@@ -91,7 +91,7 @@ class SectorProcesserBuilder(OperatorBuilder):
             else:
                 op.set_input_combinator(non_default[key])
 
-    def add_operator(self, operator_label, operator, parse_operator_args = None,
+    def add_operator(self, operator_label, operator, parse_operator_args = 'inspect',
                      terminal_operator : bool = False):
         new_block = EvolutionaryBlock(operator, parse_operator_args = parse_operator_args,
                                                    terminal=terminal_operator)
@@ -330,7 +330,7 @@ class MOEADDSectorProcesser(object):
             raise TypeError('self.linked_blocks object is not of type LinkedBlocks')
         self.check_correctness()
         
-    def iteration(self, population_subset, EA_kwargs : dict):
+    def run(self, population_subset, EA_kwargs : dict):
         if not 'weight' in EA_kwargs:
             raise ValueError('Internal logic error: MOEADD iteration requires weight to process.')
         self.check_integrity()

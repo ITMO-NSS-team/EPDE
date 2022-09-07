@@ -40,14 +40,15 @@ class OperatorMapper(CompoundOperator):
     
 
 def map_operator_between_levels(operator : CompoundOperator, original_level : Union[str, int], 
-                           target_level : Union[str, int]):
+                           target_level : Union[str, int], objective_condition : Callable = None):
     if isinstance(original_level, str): original_level = OPERATOR_LEVELS.index(original_level)
     if isinstance(target_level, str): target_level = OPERATOR_LEVELS.index(target_level)
     
     print(f'mapping between {original_level} and {target_level}, that is {np.arange(original_level, target_level + 1)}')
-    resulting_operator = reduce(lambda x, y: OperatorMapper(operator_to_map = x, 
-                                                            objective_tag   = OPERATOR_LEVELS[y], 
-                                                            source_tag      = OPERATOR_LEVELS[y-1]), 
+    resulting_operator = reduce(lambda x, y: OperatorMapper(operator_to_map     = x, 
+                                                            objective_tag       = OPERATOR_LEVELS[y], 
+                                                            source_tag          = OPERATOR_LEVELS[y-1],
+                                                            objective_condition = objective_condition),
                                 np.arange(original_level + 1, target_level + 1),
                                 operator)
     return resulting_operator

@@ -13,8 +13,8 @@ from epde.moeadd.moeadd import ParetoLevels
 OPERATOR_LEVELS = ('custom level', 'term level', 'gene level', 'chromosome level',
                    'population level')
 
-OPERATOR_LEVELS_SUPPORTED_TYPES = {'custom level' : [], 'term level' : [Term], 'gene level' : [Gene], 
-                                   'chromosome level' : [Chromosome], 'population level' : [ParetoLevels]}
+OPERATOR_LEVELS_SUPPORTED_TYPES = {'custom level' : None, 'term level' : Term, 'gene level' : Gene, 
+                                   'chromosome level' : Chromosome, 'population level' : ParetoLevels}
 
 
 def add_param_to_operator(operator, target_dict, labeled_base_val):

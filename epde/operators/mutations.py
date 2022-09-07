@@ -9,6 +9,7 @@ Created on Wed Jun  2 15:46:31 2021
 import numpy as np
 from copy import deepcopy
 from functools import partial
+from typing import Union
 
 from epde.moeadd.moeadd import ParetoLevels
 
@@ -22,7 +23,7 @@ from epde.decorators import History_Extender, Reset_equation_status
 
 
 class SystemMutation(CompoundOperator):
-    def apply(self, objective : SoEq, best_inidividuals, worst_individuals): # TODO: add setter for best_individuals & worst individuals 
+    def apply(self, objective : SoEq): # TODO: add setter for best_individuals & worst individuals 
         altered_objective = deepcopy(objective)
         eqs_keys = altered_objective.vals.equation_keys; params_keys = altered_objective.vals.params_keys
         affected_by_mutation = np.random.uniform(0, 1) > self.params['indiv_mutation_prob']
@@ -58,7 +59,7 @@ class EquationMutation(CompoundOperator):
 
 
 class MetaparameterMutation(CompoundOperator):
-    def apply(self, objective):
+    def apply(self, objective : Union[int, float]):
         altered_objective = objective + np.random.normal(loc = self.params['mean'], scale = self.params['std'])        
         return altered_objective
 
@@ -70,7 +71,7 @@ class TermMutation(CompoundOperator):
     """
     Specific operator of the term mutation, where the term is replaced with a randomly created new one.
     """
-    def apply(self, term_idx, equation):
+    def apply(self, objective : tuple): #term_idx, equation):
         """
         Return a new term, randomly created to be unique from other terms of this particular equation.
         
@@ -88,11 +89,11 @@ class TermMutation(CompoundOperator):
             A new, randomly created, term.
             
         """       
-        new_term = Term(equation.pool, mandatory_family = equation[term_idx].descr_variable_marker, 
-                        max_factors_in_term = equation.max_factors_in_term)
-        while not check_uniqueness(new_term, equation.structure[:term_idx] + equation.structure[term_idx+1:]):
-            new_term = Term(equation.pool, mandatory_family = equation[term_idx].descr_variable_marker, 
-                            max_factors_in_term = equation.max_factors_in_term)
+        new_term = Term(objective[1].pool, mandatory_family = objective[1][objective[0]].descr_variable_marker, 
+                        max_factors_in_term = objective[1].max_factors_in_term)
+        while not check_uniqueness(new_term, objective[1].structure[:objective[0]] + objective[1].structure[objective[0]+1:]):
+            new_term = Term(objective[1].pool, mandatory_family = objective[1][objective[0]].descr_variable_marker, 
+                            max_factors_in_term = objective[1].max_factors_in_term)
         new_term.use_cache()
         return new_term
     
@@ -104,8 +105,8 @@ class TermParameterMutation(CompoundOperator):
     """
     Specific operator of the term mutation, where the term parameters are changed with a random increment.
     """
-    def apply(self, term_idx, objective):
-        """
+    def apply(self, objective : tuple): # term_idx, objective
+        """ 
         Specific operator of the term mutation, where the term parameters are changed with a random increment.
         
         Parameters:
@@ -123,16 +124,16 @@ class TermParameterMutation(CompoundOperator):
             
         """                
         unmutable_params = {'dim', 'power'}
-        altered_objective = deepcopy(objective)
+        altered_objective = deepcopy(objective[1])
         while True:
-            term = altered_objective.structure[term_idx] 
+            term = altered_objective.structure[objective[0]] 
             for factor in term.structure:
-                if term_idx == altered_objective.target_idx:
+                if objective[0] == altered_objective.target_idx:
                     continue
-                if term_idx < altered_objective.target_idx:
-                    corresponding_weight = altered_objective.weights_internal[term_idx] 
+                if objective[0] < altered_objective.target_idx:
+                    corresponding_weight = altered_objective.weights_internal[objective[0]] 
                 else:
-                    corresponding_weight = altered_objective.weights_internal[term_idx - 1]
+                    corresponding_weight = altered_objective.weights_internal[objective[0] - 1]
                 if corresponding_weight == 0:                
                     parameter_selection = deepcopy(factor.params)
                     for param_idx, param_properties in factor.params_description.items():
@@ -153,8 +154,8 @@ class TermParameterMutation(CompoundOperator):
                                 parameter_selection[param_idx] = parameter_selection[param_idx] + shift
                     factor.params = parameter_selection
             term.structure = filter_powers(term.structure)        
-            if check_uniqueness(term, altered_objective.structure[:term_idx] + 
-                                altered_objective.structure[term_idx+1:]):
+            if check_uniqueness(term, altered_objective.structure[:objective[0]] + 
+                                altered_objective.structure[objective[0]+1:]):
                 break
         term.reset_saved_state()
         return term

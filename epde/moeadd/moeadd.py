@@ -422,110 +422,6 @@ class MOEADDOptimizer(object):
         self.sector_processer = processer
     
     
-    @staticmethod
-    def mating_selection(weight_idx, weights, neighborhood_vectors, population, neighborhood_selector, neighborhood_selector_params, delta) -> list:
-        '''
-        
-        The mating operator, designed to select parents for the crossover with respect 
-        to the location of the point in the objective functions values space and the 
-        connected weight vector.
-        
-        Parameters:
-        ------------
-        
-        weight_idx : int,
-            Index of the processed weight vector.
-            
-        weights : np.ndarray,        
-            Numpy array, containing weight vectors.
-            
-        neighborhood_vectors : list,
-            List of lists, containing indexes: i-th element is the list of 
-            k - closest to the i-the weight vector weight vectors.
-            
-        population : list,
-            List of candidate solutions.
-            
-        neighborhood_selector : function,
-            Method of finding "close neighbors" of the vector with proximity list.
-            The baseline example of the selector, presented in 
-            ``moeadd.moeadd_stc.simple_selector``, selects n-adjacent ones.
-            
-        delta : float
-            The probability of mating selection to be limited only to the selected
-            subregions (adjacent to the weight vector domain). :math:`\delta \in [0., 1.)`
-            
-        Returns:
-        ---------
-        
-        parent_idxs : list
-            List of the selected parents in the population pool.
-        
-        '''
-
-        parents_number = int(len(population)/4.) # Странное упрощение   
-        if np.random.uniform() < delta:
-            selected_regions_idxs = neighborhood_selector(neighborhood_vectors[weight_idx], *neighborhood_selector_params)
-            candidate_solution_domains = list(map(lambda x: x.get_domain(weights), [candidate for candidate in population]))
-
-            solution_mask = [(population[solution_idx].get_domain(weights) in selected_regions_idxs) for solution_idx in candidate_solution_domains]
-            available_in_proximity = sum(solution_mask)
-            parent_idxs = np.random.choice([idx for idx in np.arange(len(population)) if solution_mask[idx]], 
-                                            size = min(available_in_proximity, parents_number), 
-                                            replace = False)
-            if available_in_proximity < parents_number:
-                parent_idxs_additional = np.random.choice([idx for idx in np.arange(len(population)) if not solution_mask[idx]], 
-                                            size = parents_number - available_in_proximity, 
-                                            replace = False)
-                parent_idxs_temp = np.empty(shape = parent_idxs.size + parent_idxs_additional.size)
-                parent_idxs_temp[:parent_idxs.size] = parent_idxs; parent_idxs_temp[parent_idxs.size:] = parent_idxs_additional
-                parent_idxs = parent_idxs_temp
-        else:
-            parent_idxs = np.random.choice(np.arange(len(population)), size = parents_number, replace = False)
-        return parent_idxs
-    
-    
-#     def update_population(self, offspring, PBI_penalty):
-#         '''
-#         Update population to get the pareto-nondomiated levels with the worst element removed. 
-#         Here, "worst" means the solution with highest PBI value (penalty-based boundary intersection)
-#         '''
-# #        domain = get_domain_idx(offspring, self.weights)        
-        
-#         self.pareto_levels.update(offspring)  #levels_updated = ndl_update(offspring, levels)
-#         if len(self.pareto_levels.levels) == 1:
-#             worst_solution = locate_pareto_worst(self.pareto_levels, self.weights, self.best_obj, PBI_penalty)
-#         else:
-#             if self.pareto_levels.levels[len(self.pareto_levels.levels) - 1] == 1:
-#                 domain_solutions = population_to_sectors(self.pareto_levels.population, self.weights)
-#                 reference_solution = self.pareto_levels.levels[len(self.pareto_levels.levels) - 1][0]
-#                 reference_solution_domain = [idx for idx in np.arange(domain_solutions) if reference_solution in domain_solutions[idx]]
-#                 if len(domain_solutions[reference_solution_domain] == 1):
-#                     worst_solution = locate_pareto_worst(self.pareto_levels.levels, self.weights, self.best_obj, PBI_penalty)                            
-#                 else:
-#                     worst_solution = reference_solution
-#             else:
-#                 last_level_by_domains = population_to_sectors(self.pareto_levels.levels[len(self.pareto_levels.levels)-1], self.weights)
-#                 most_crowded_count = np.max([len(domain) for domain in last_level_by_domains]); 
-#                 crowded_domains = [domain_idx for domain_idx in np.arange(len(self.weights)) if len(last_level_by_domains[domain_idx]) == most_crowded_count]
-
-#                 if len(crowded_domains) == 1:
-#                     most_crowded_domain = crowded_domains[0]
-#                 else:
-#                     PBI = lambda domain_idx: np.sum([penalty_based_intersection(sol_obj, self.weights[domain_idx], self.best_obj, PBI_penalty) 
-#                                                         for sol_obj in last_level_by_domains[domain_idx]])
-#                     PBIS = np.fromiter(map(PBI, crowded_domains), dtype = float)
-#                     most_crowded_domain = crowded_domains[np.argmax(PBIS)]
-                    
-#                 if len(last_level_by_domains[most_crowded_domain]) == 1:
-#                     worst_solution = locate_pareto_worst(self.pareto_levels, self.weights, self.best_obj, PBI_penalty)
-#                 else:
-#                     PBIS = np.fromiter(map(lambda solution: penalty_based_intersection(solution, self.weights[most_crowded_domain], self.best_obj, PBI_penalty),
-#                                                last_level_by_domains[most_crowded_domain]), dtype = float)
-#                     worst_solution = last_level_by_domains[most_crowded_domain][np.argmax(PBIS)]                    
-        
-#         self.pareto_levels.delete_point(worst_solution)
-        
         
     def optimize(self, neighborhood_selector, delta, neighborhood_selector_params, epochs, PBI_penalty = 1.):
         '''
@@ -570,31 +466,20 @@ class MOEADDOptimizer(object):
                 for weight_idx in np.arange(len(self.weights)):
                     if global_var.verbose.show_moeadd_epochs:
                         print(f'During MO : processing {weight_idx}-th weight.')                    
-                    # parent_idxs = self.mating_selection(weight_idx, self.weights, self.neighborhood_lists, self.pareto_levels.population,
-                    #                                neighborhood_selector, neighborhood_selector_params, delta)
-                    # offsprings = self.evolutionary_operator.crossover([self.pareto_levels.population[int(idx)] for idx in parent_idxs]) # В объекте эволюционного оператора выделять кроссовер
-                    # # try:
-                    # for offspring_idx, offspring in enumerate(offsprings):
-                    #     if global_var.verbose.show_moeadd_epochs:
-                    #         print(f'Offsping {offspring_idx}.')   
-                    #     attempt = 1; attempt_limit = 2
-                    #     while True:
-                    #         temp_offspring = self.evolutionary_operator.mutation(offspring)
-                    #         if not np.any([temp_offspring == solution for solution in self.pareto_levels.population]):
-                    #             self.update_population(temp_offspring, PBI_penalty)
-                    #             break
-                    #         elif attempt >= attempt_limit:
-                    #             break
-                    #         attempt += 1
                     sp_kwargs = self.form_processer_args()
-                    self.sector_processer.run(**sp_kwargs)
+                    self.sector_processer.run(population_subset = self.pareto_levels, 
+                                              EA_kwargs = sp_kwargs)
                         
                 if len(self.pareto_levels.levels) == 1:
                     break
                     
-                    
-                    
+    def form_processer_args(self, cur_weight : int): # TODO: inspect the most convenient input format
+        return {'weight_idx' : cur_weight, 'weights' : self.weights, 'best_obj' : self.best_obj, 
+                'neighborhood_vectors' : self.neighborhood_lists}
+
+
 class MOEADDOptimizerConstrained(MOEADDOptimizer):
+    #   TODO: rewrite in a better way, according to the new operators
     '''
     Solving multiobjective optimization problem (minimizing set of functions) with an 
     evolutionary approach. Here, the constrained variation of the problem is 

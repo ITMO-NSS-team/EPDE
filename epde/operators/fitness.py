@@ -21,17 +21,6 @@ import epde.globals as global_var
 from TEDEouS.solver import point_sort_shift_solver
 
 
-# class SystemFitness(CompoundOperator):
-#     """
-#     Operator, dedicated to calculation of fitness for the element equations of passed system of equations.
-#     """
-#     def apply(self, objective : SoEq):
-#         raise DeprecationWarning('Remake me as an operator mapping')
-#         if not objective.fitness_calculated:
-#             for equation in objective.vals:
-#                 self.suboperators['equation_fitness_calculation'].apply(equation)
-
-
 class L2Fitness(CompoundOperator):
     """
     The operator, which calculates fitness function to the individual (equation) as the L2 norm 
@@ -122,6 +111,7 @@ class SolverBasedFitness(CompoundOperator):
         self.training_grid_set = False
         
     def apply(self, equation, weights_internal = None, weights_final = None):
+        raise NotImplementedError('Solver evaluation approach is a subject to be done.')
         if not self.training_grid_set:
             self.set_training_grid()
             

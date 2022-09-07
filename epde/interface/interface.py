@@ -26,7 +26,7 @@ from epde.evaluators import simple_function_evaluator, trigonometric_evaluator
 from epde.supplementary import Define_Derivatives
 from epde.cache.cache import upload_simple_tokens, upload_grids, prepare_var_tensor#, np_ndarray_section
 from epde.prep.derivatives import Preprocess_derivatives
-from epde.eq_search_strategy import Strategy_director, Strategy_director_solver
+from epde.moeadd.moeadd_strategy import OptimizationPatternDirector
 from epde.structure import Equation
 
 from epde.interface.token_family import TF_Pool, TokenFamily
@@ -34,10 +34,10 @@ from epde.interface.type_checks import *
 from epde.interface.prepared_tokens import PreparedTokens, CustomTokens
 
 class Input_data_entry(object):
-    def __init__(self, var_name, data_tensor): # , coord_tensors = None
+    def __init__(self, var_name : str, data_tensor : np.ndarray): # , coord_tensors = None
         self.var_name = var_name
         check_nparray(data_tensor)
-        self.data_tensor = data_tensor        
+        self.data_tensor = data_tensor
         # if coord_tensors is not None:
             # check_nparray_iterable(coord_tensors)
             # if any([tensor.shape != data_tensor.shape for tensor in coord_tensors]):
@@ -52,7 +52,8 @@ class Input_data_entry(object):
             # self.coord_tensors = np.meshgrid(*axes)
 
         
-    def set_derivatives(self, deriv_tensors = None, method = 'ANN', max_order = 1, method_kwargs = {}):
+    def set_derivatives(self, deriv_tensors = None, method : str = 'ANN', max_order : Union[list, tuple, int] = 1,
+                        method_kwargs : dict = {}):
 
         deriv_names, deriv_orders = Define_Derivatives(self.var_name, dimensionality=self.data_tensor.ndim, 
                                                        max_order = max_order)
@@ -113,9 +114,12 @@ class Input_data_entry(object):
 def simple_selector(sorted_neighbors, number_of_neighbors = 4):
     return sorted_neighbors[:number_of_neighbors]
      
+
 class epde_search(object):
     def __init__(self, use_default_strategy : bool = True, eq_search_stop_criterion : Stop_condition = Iteration_limit,
-                 director = None, equation_type : set = {'PDE', 'derivatives only'}, time_axis : int = 0, 
+                 director = None, director_params : dict = {'variation_params' : {}, 'mutation_params' : {},
+                                                            'pareto_combiner_params' : {}, 'pareto_updater_params' : {}}, 
+                 equation_type : set = {'PDE', 'derivatives only'}, time_axis : int = 0, 
                  define_domain : bool = True, set_grids : bool = True, function_form = None, boundary : int = 0, 
                  eq_search_iter : int = 300, use_solver : bool = False, dimensionality : int = 1, 
                  verbose_params : dict = {}, coordinate_tensors = None, memory_for_cache = 5, 
@@ -145,6 +149,7 @@ class epde_search(object):
             Will define equation type, TBD later.
         
         '''
+        # TODO: rewrite intitialization
         global_var.set_time_axis(time_axis)
         global_var.init_verbose(**verbose_params)
 
@@ -162,12 +167,11 @@ class epde_search(object):
         if director is not None and not use_default_strategy:
             self.director = director
         elif director is None and use_default_strategy:
-            if use_solver:
-                self.director = Strategy_director_solver(eq_search_stop_criterion, {'limit' : eq_search_iter})#, 
-                                                         # dimensionality=dimensionality)
-            else:
-                self.director = Strategy_director(eq_search_stop_criterion, {'limit' : eq_search_iter})
-            self.director.strategy_assembly()
+            self.director = OptimizationPatternDirector()     #,  eq_search_stop_criterion, {'limit' : eq_search_iter}
+                                                                  # dimensionality=dimensionality)
+            # else:
+            #     self.director = Strategy_director(eq_search_stop_criterion, {'limit' : eq_search_iter})
+            self.director.use_unconstrained_eq_search(variation_params = director_params['variation_params'])
         else: 
             raise NotImplementedError('Wrong arguments passed during the epde search initialization')
         self.set_moeadd_params()
@@ -330,8 +334,8 @@ class epde_search(object):
         self.set_boundaries(boundary_width)
         self.upload_g_func(function_form)
     
-    def create_pool(self, data : Union[np.ndarray, list, tuple], time_axis : int = 0,
-                    variable_names = ['u',], derivs = None, method = 'ANN', method_kwargs : dict = {},
+    def create_pool(self, data : Union[np.ndarray, list, tuple], variable_names = ['u',], 
+                    derivs = None, method = 'ANN', method_kwargs : dict = {},
                     max_deriv_order = 1, additional_tokens = [], data_fun_pow : int = 1):
         assert (isinstance(derivs, list) and isinstance(derivs[0], np.ndarray)) or derivs is None
         if isinstance(data, np.ndarray):
@@ -379,10 +383,9 @@ class epde_search(object):
         print(f'Among them, the pool contains {self.pool.families_cardinality(meaningful_only = True)}')
         
     
-    def fit(self, data : Union[np.ndarray, list, tuple], time_axis : int = 0, boundary : int = 0,
-            equation_terms_max_number = 6, equation_factors_max_number = 1, variable_names = ['u',], 
-            eq_sparsity_interval = (1e-4, 2.5), derivs = None, max_deriv_order = 1, 
-            deriv_method = 'ANN', deriv_method_kwargs : dict = {},
+    def fit(self, data : Union[np.ndarray, list, tuple], boundary : int = 0, equation_terms_max_number = 6,
+            equation_factors_max_number = 1, variable_names = ['u',], eq_sparsity_interval = (1e-4, 2.5), 
+            derivs = None, max_deriv_order = 1, deriv_method = 'ANN', deriv_method_kwargs : dict = {},
             additional_tokens = [], coordinate_tensors = None, memory_for_cache = 5,
             prune_domain : bool = False, pivotal_tensor_label = None, pruner = None, 
             threshold : float = 1e-2, division_fractions = 3, rectangular : bool = True, 
@@ -455,15 +458,15 @@ class epde_search(object):
             self.moeadd_params['pop_size'] = equation_terms_max_number
             self.moeadd_params['weights_num'] = equation_terms_max_number
         
-        self.create_pool(data = data, time_axis=time_axis, variable_names=variable_names, 
+        self.create_pool(data = data, variable_names=variable_names, 
                          derivs=derivs, method=deriv_method, method_kwargs=deriv_method_kwargs, 
                          max_deriv_order=max_deriv_order, additional_tokens=additional_tokens, 
                          data_fun_pow=data_fun_pow)
         
         pop_constructor = operators.Systems_population_constructor(pool = self.pool, terms_number = equation_terms_max_number, 
-                                                               max_factors_in_term=equation_factors_max_number, 
-                                                               eq_search_evo=self.director.constructor.strategy,
-                                                               sparsity_interval = eq_sparsity_interval)
+                                                                   max_factors_in_term=equation_factors_max_number, 
+                                                                   eq_search_evo=self.director.constructor.strategy,
+                                                                   sparsity_interval = eq_sparsity_interval)
 
         self.moeadd_params['pop_constructor'] = pop_constructor
         self.optimizer = moeadd_optimizer(**self.moeadd_params)
