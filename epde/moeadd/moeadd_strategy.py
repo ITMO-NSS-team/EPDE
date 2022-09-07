@@ -48,7 +48,9 @@ class OptimizationPatternDirector(object):
         right_part_selector = PoplevelRightPartSelector()
         eq_fitness = L2Fitness(['penalty_coeff'])
         add_kwarg_to_operator(eq_fitness, {'penalty_coeff' : 0.2})
-        sys_fitness = map_operator_between_levels(eq_fitness, 'gene level', 'chromosome level', param_keys)()
+
+        fitness_cond = lambda x: getattr(x, 'fitness_evaluated')
+        sys_fitness = map_operator_between_levels(eq_fitness, 'gene level', 'chromosome level')
         
         sparsity = LASSOSparsity()
         

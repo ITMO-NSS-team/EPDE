@@ -12,8 +12,6 @@ from functools import reduce
 from epde.moeadd.moeadd_supplementary import Constraint
 
 from epde.operators.template import CompoundOperator
-from epde.operators.supplementary_operators import SimpleNeighborSelector
-
 
 class MOEADDSelection(CompoundOperator):
     def __init__(self, param_keys : list = []):
