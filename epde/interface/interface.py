@@ -20,13 +20,13 @@ from epde.prep.DomainPruning import DomainPruner
 from epde.decorators import Boundary_exclusion
 
 from epde.operators.ea_stop_criteria import Stop_condition, Iteration_limit
-import epde.operators.sys_search_operators as operators
+from epde.moeadd.moeadd_population_constr import SystemsPopulationConstructor
+from epde.moeadd.moeadd_strategy import OptimizationPatternDirector
 
 from epde.evaluators import simple_function_evaluator, trigonometric_evaluator
 from epde.supplementary import Define_Derivatives
 from epde.cache.cache import upload_simple_tokens, upload_grids, prepare_var_tensor#, np_ndarray_section
 from epde.prep.derivatives import Preprocess_derivatives
-from epde.moeadd.moeadd_strategy import OptimizationPatternDirector
 from epde.structure import Equation
 
 from epde.interface.token_family import TF_Pool, TokenFamily
@@ -34,22 +34,10 @@ from epde.interface.type_checks import *
 from epde.interface.prepared_tokens import PreparedTokens, CustomTokens
 
 class Input_data_entry(object):
-    def __init__(self, var_name : str, data_tensor : np.ndarray): # , coord_tensors = None
+    def __init__(self, var_name : str, data_tensor : np.ndarray):
         self.var_name = var_name
         check_nparray(data_tensor)
         self.data_tensor = data_tensor
-        # if coord_tensors is not None:
-            # check_nparray_iterable(coord_tensors)
-            # if any([tensor.shape != data_tensor.shape for tensor in coord_tensors]):
-                # print('data_tensor.shape', data_tensor.shape, 'tensors:', 
-                       # [tensor.shape for tensor in coord_tensors])
-                # raise ValueError('mismatching shapes of coordinate tensors and input data')
-            # self.coord_tensors = coord_tensors
-        # else:
-            # axes = []
-            # for ax_idx in range(data_tensor.ndim):
-                # axes.append(np.linspace(0., 1., data_tensor.shape[ax_idx]))
-            # self.coord_tensors = np.meshgrid(*axes)
 
         
     def set_derivatives(self, deriv_tensors = None, method : str = 'ANN', max_order : Union[list, tuple, int] = 1,
@@ -75,39 +63,15 @@ class Input_data_entry(object):
             self.deriv_properties = {'max order' : max_order,
                                      'dimensionality' : self.data_tensor.ndim}
             
-    def use_global_cache(self): # , set_grids = True
-
-        print(type(self.data_tensor), type(self.derivatives))
+    def use_global_cache(self):
         derivs_stacked = prepare_var_tensor(self.data_tensor, self.derivatives, time_axis = global_var.time_axis)
         
         try:       
             upload_simple_tokens(self.names, global_var.tensor_cache, derivs_stacked)
             upload_simple_tokens([self.var_name,], global_var.initial_data_cache, [self.data_tensor,])            
-            # if set_grids: 
-            #     memory_for_cache = int(memory_for_cache/2)
-            #     upload_grids(self.coord_tensors, global_var.initial_data_cache)
-            #     upload_grids(self.coord_tensors, global_var.grid_cache)
-            #     print(f'completed grid cache with {len(global_var.grid_cache.memory_default)} tensors with labels {global_var.grid_cache.memory_default.keys()}')
 
         except AttributeError:         
             raise NameError('Cache has not been declared before tensor addition.')
-            # print('Somehow, cache had not been initialized')
-            # print(self.names, derivs_stacked.shape)
-            # print(global_var.tensor_cache.memory_default.keys())
-            # global_var.init_caches(set_grids = set_grids)
-            # if set_grids:
-            #     print('setting grids')
-            #     memory_for_cache = int(memory_for_cache/2)
-            #     global_var.grid_cache.memory_usage_properties(obj_test_case = self.data_tensor,
-            #                                                     mem_for_cache_frac = memory_for_cache)
-            #     upload_grids(self.coord_tensors, global_var.initial_data_cache)
-            #     upload_grids(self.coord_tensors, global_var.grid_cache)
-            #     print(f'completed grid cache with {len(global_var.grid_cache.memory_default)} tensors with labels {global_var.grid_cache.memory_default.keys()}')
-            # global_var.tensor_cache.memory_usage_properties(obj_test_case = self.data_tensor,
-            #                                                 mem_for_cache_frac = memory_for_cache)
-            # print(self.names, derivs_stacked.shape)
-            # upload_simple_tokens(self.names, global_var.tensor_cache, derivs_stacked)
-            # upload_simple_tokens([self.var_name,], global_var.initial_data_cache, [self.data_tensor,])
 
         global_var.tensor_cache.use_structural()
     
@@ -116,15 +80,14 @@ def simple_selector(sorted_neighbors, number_of_neighbors = 4):
      
 
 class epde_search(object):
-    def __init__(self, use_default_strategy : bool = True, eq_search_stop_criterion : Stop_condition = Iteration_limit,
-                 director = None, director_params : dict = {'variation_params' : {}, 'mutation_params' : {},
-                                                            'pareto_combiner_params' : {}, 'pareto_updater_params' : {}}, 
-                 equation_type : set = {'PDE', 'derivatives only'}, time_axis : int = 0, 
-                 define_domain : bool = True, set_grids : bool = True, function_form = None, boundary : int = 0, 
-                 eq_search_iter : int = 300, use_solver : bool = False, dimensionality : int = 1, 
-                 verbose_params : dict = {}, coordinate_tensors = None, memory_for_cache = 5, 
-                 prune_domain : bool = False, pivotal_tensor_label = None, pruner = None, threshold : float = 1e-2, 
-                 division_fractions = 3, rectangular : bool = True, ):
+    def __init__(self, use_default_strategy : bool = True, director = None, 
+                 director_params : dict = {'variation_params' : {}, 'mutation_params' : {},
+                                           'pareto_combiner_params' : {}, 'pareto_updater_params' : {}}, 
+                 time_axis : int = 0, define_domain : bool = True, function_form = None, boundary : int = 0, 
+                 use_solver : bool = False, dimensionality : int = 1, verbose_params : dict = {}, 
+                 coordinate_tensors = None, memory_for_cache = 5, prune_domain : bool = False, 
+                 pivotal_tensor_label = None, pruner = None, threshold : float = 1e-2, 
+                 division_fractions = 3, rectangular : bool = True):
         '''
         
         Intialization of the epde search object. Here, the user can declare the properties of the 
@@ -157,7 +120,7 @@ class epde_search(object):
             if coordinate_tensors is None:
                 raise ValueError('Grids can not be empty during calculations.')
             self.set_domain_properties(coordinate_tensors, memory_for_cache, boundary, function_form = function_form, 
-                                       prune_domain = prune_domain, pivotal_tensor_label = pivotal_tensor_label,
+                                       prune_domain = prune_domain, pruner = pruner, pivotal_tensor_label = pivotal_tensor_label,
                                        threshold = threshold, division_fractions = division_fractions,
                                        rectangular = rectangular)
             
@@ -167,11 +130,11 @@ class epde_search(object):
         if director is not None and not use_default_strategy:
             self.director = director
         elif director is None and use_default_strategy:
-            self.director = OptimizationPatternDirector()     #,  eq_search_stop_criterion, {'limit' : eq_search_iter}
-                                                                  # dimensionality=dimensionality)
-            # else:
-            #     self.director = Strategy_director(eq_search_stop_criterion, {'limit' : eq_search_iter})
-            self.director.use_unconstrained_eq_search(variation_params = director_params['variation_params'])
+            self.director = OptimizationPatternDirector()
+            self.director.use_unconstrained_eq_search(variation_params       = director_params['variation_params'], 
+                                                      mutation_params        = director_params['mutation_params'],
+                                                      pareto_combiner_params = director_params['pareto_combiner_params'],
+                                                      pareto_updater_params  = director_params['pareto_updater_params'])
         else: 
             raise NotImplementedError('Wrong arguments passed during the epde search initialization')
         self.set_moeadd_params()
@@ -463,18 +426,19 @@ class epde_search(object):
                          max_deriv_order=max_deriv_order, additional_tokens=additional_tokens, 
                          data_fun_pow=data_fun_pow)
         
-        pop_constructor = operators.Systems_population_constructor(pool = self.pool, terms_number = equation_terms_max_number, 
-                                                                   max_factors_in_term=equation_factors_max_number, 
-                                                                   eq_search_evo=self.director.constructor.strategy,
-                                                                   sparsity_interval = eq_sparsity_interval)
+        pop_constructor = SystemsPopulationConstructor(pool = self.pool, terms_number = equation_terms_max_number, 
+                                                                 max_factors_in_term = equation_factors_max_number,
+                                                                 sparsity_interval = eq_sparsity_interval)
 
         self.moeadd_params['pop_constructor'] = pop_constructor
         self.optimizer = moeadd_optimizer(**self.moeadd_params)
-        evo_operator = operators.sys_search_evolutionary_operator(operators.mixing_xover, 
-                                                                  operators.gaussian_mutation)
-        self.optimizer.set_evolutionary(operator=evo_operator)        
-        best_obj = np.concatenate((np.zeros(shape =len([1 for token_family in self.pool.families if token_family.status['demands_equation']])),
-                                   np.ones(shape=len([1 for token_family in self.pool.families if token_family.status['demands_equation']]))))  
+        # evo_operator = operators.sys_search_evolutionary_operator(operators.mixing_xover, 
+        #                                                           operators.gaussian_mutation)
+        
+        
+        self.optimizer.set_sector_processer(operator = evo_operator)        
+        best_obj = np.concatenate((np.zeros(shape = len([1 for token_family in self.pool.families if token_family.status['demands_equation']])),
+                                   np.ones(shape = len([1 for token_family in self.pool.families if token_family.status['demands_equation']]))))  
         print('best_obj', len(best_obj))
         self.optimizer.pass_best_objectives(*best_obj)
         self.optimizer.optimize(**self.moeadd_optimization_params)

@@ -6,7 +6,8 @@ Created on Wed Aug 10 12:54:02 2022
 @author: maslyaev
 """
 
-from functools import partial, singledispatch
+import numpy as np
+from functools import partial
 
 from epde.operators.operator_mappers import map_operator_between_levels
 
@@ -21,6 +22,38 @@ from epde.operators.coeff_calculation import LinRegBasedCoeffsEquation
 
 from epde.moeadd.moeadd_strategy_elems import SectorProcesserBuilder, MOEADDSectorProcesser
 
+
+def add_sequential_operators(builder : SectorProcesserBuilder, operators : list):
+    '''
+    
+
+    Parameters
+    ----------
+    builder : SectorProcesserBuilder,
+        MOEADD evolutionary strategy builder (sector processer), which will contain added operators.
+    operators : list,
+        Operators, which will be added into the processer. The elements of the list shall be tuple in 
+        format of (label, operator), where the label is str (e.g. 'selection'), while the operator is 
+        an object of subclass of CompoundOperator.
+
+    Returns
+    -------
+    builder : SectorProcesserBuilder
+        Modified builder.
+
+    '''
+    builder.add_init_operator('initial')
+    for idx, operator in enumerate(operators):
+        builder.add_operator(operator[0], operator[1], terminal_operator = (idx == len(operators - 1)))
+
+    builder.set_input_combinator()
+    for op_idx, _ in enumerate(operators[:-1]):
+        builder.link(operators[op_idx][0], operators[op_idx + 1][0])
+
+    builder.assemble()
+    return builder
+
+
 class OptimizationPatternDirector(object):
     def __init__(self):
         self._builder = None
@@ -33,7 +66,7 @@ class OptimizationPatternDirector(object):
     def builder(self, sector_processer_builder : SectorProcesserBuilder):
         self._builder = sector_processer_builder
 
-    def use_unconstrained_eq_search(self, variation_params : dict = {},  mutation_params : dict = {},
+    def use_unconstrained_eq_search(self, variation_params : dict = {}, mutation_params : dict = {},
                                     pareto_combiner_params : dict = {}, pareto_updater_params : dict = {},
                                     **kwargs):
         add_kwarg_to_operator = partial(func = add_param_to_operator, target_dict = kwargs)
@@ -65,22 +98,10 @@ class OptimizationPatternDirector(object):
                                                        pareto_updater_params = pareto_updater_params, 
                                                        combiner_params = pareto_combiner_params)
 
-        self._builder.add_init_operator('initial')
 
-        self._builder.add_operator('selection', selection)
-        self._builder.add_operator('variation', variation)
-        self._builder.add_operator('pareto_updater', population_updater, terminal_operator = True)
-
-        self._builder.set_input_combinator()
-
-        self._builder.link('initial', 'selection')
-        self._builder.link('rps1', 'selection')
-        self._builder.link('selection', 'variation')
-        self._builder.link('variation', 'pareto_updater')
-
-        self._builder.assemble()
-
+        self._builder = add_sequential_operators(self._builder, [('selection', selection), 
+                                                                 ('variation', variation), 
+                                                                 ('pareto_updater', population_updater)])
     
     def use_constrained_eq_search(self):
         raise NotImplementedError('No constraints have been implemented yest')
-    

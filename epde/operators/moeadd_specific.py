@@ -135,8 +135,6 @@ class PopulationUpdater(CompoundOperator):
         Update population to get the pareto-nondomiated levels with the worst element removed. 
         Here, "worst" means the solution with highest PBI value (penalty-based boundary intersection)
         '''         
-        # objective = {offspring, pareto_levels}        
-        
         objective[1].update(objective[0])  #levels_updated = ndl_update(offspring, levels)
         if len(objective[1].levels) == 1:
             worst_solution = locate_pareto_worst(objective[1], weights, 
@@ -189,15 +187,11 @@ class PopulationUpdaterConstrained(object):
         
     def apply(self, objective, best_obj, weights):
         '''
-        
         Update population to get the pareto-nondomiated levels with the worst element removed. 
         Here, "worst" means the solution with highest PBI value (penalty-based boundary intersection). 
         Additionally, the constraint violations are considered in the selection of the 
         "worst" individual.
-        
         '''
-        # objective = {offspring, pareto_levels}
-        
         objective[1].update(objective[0])
         cv_values = np.empty(len(objective[1])) #self.suboperators['constraint_violation'].apply(objective[0])
         
@@ -262,21 +256,6 @@ class PopulationUpdaterConstrained(object):
 
     def use_default_tags(self):
         self._tags = {'pareto level update', 'custom level', 'no suboperators', 'inplace'}
-
-# class ConstraintViolationCalculator(object):
-#     def __init__(self, constraints = None):
-#         assert all(isinstance(constraints, Constraint) for constr in constraints)
-#         self._constraints = constraints
-    
-#     def apply(self, pareto_levels, indexes = None):
-#         def violation(individual):
-#             return reduce(lambda y, z: y + z(individual.vals()), self._constraints, initial = 0)
-
-#         if indexes is None:
-#             indexes = np.arange(len(pareto_levels.population))
-#         constraint_violations = np.array(list(map(lambda x: violation(pareto_levels.population[x]), indexes)))
-        
-#         return constraint_violations
 
 
 def use_item_if_no_default(key, arg : dict, replacement_arg : dict):
@@ -357,13 +336,15 @@ class OffspringUpdater(CompoundOperator):
         return objective
     
 def get_pareto_levels_updater(right_part_selector : CompoundOperator, chromosome_fitness : CompoundOperator,
-                              constrained : bool = False, mutation_params : dict = {}, 
-                              pl_updater_params : dict = {}, combiner_params : dict = {}):
+                              mutation : CompoundOperator = None, constrained : bool = False, 
+                              mutation_params : dict = {}, pl_updater_params : dict = {}, 
+                              combiner_params : dict = {}):
     add_kwarg_to_updater = partial(func = add_param_to_operator, target_dict = combiner_params)
     updater = OffspringUpdater()
     add_kwarg_to_updater(updater, {'attempt_limit' : 5})
     
-    mutation = get_basic_mutation(mutation_params)
+    if mutation is None:
+        mutation = get_basic_mutation(mutation_params)
     pl_updater = get_basic_populator_updater(pl_updater_params)
     updater.set_suboperators(operators = {'chromosome_mutation' : mutation,
                                           'pareto_level_updater' : pl_updater,

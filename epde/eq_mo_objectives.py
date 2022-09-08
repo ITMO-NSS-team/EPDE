@@ -66,8 +66,6 @@ def equation_complexity_by_factors(system, equation_idx):
         The values of the error metric: list entry for each of the equations.
     '''    
     eq_compl = 0
-    # print(equation)
-    # print(equation.text_form)
     
     for idx, term in enumerate(system.structure[equation_idx].structure):
         if idx < system.structure[equation_idx].target_idx:

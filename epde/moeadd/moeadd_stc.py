@@ -105,7 +105,7 @@ class moeadd_solution(ABC):
 
     @property
     def obj_fun(self):
-        if self.precomputed_value: 
+        if self.precomputed_value:
             return self._obj_fun
         else:
             self._obj_fun = np.fromiter(map(lambda obj_fun: obj_fun(self.vals), self.obj_funs), dtype = float)

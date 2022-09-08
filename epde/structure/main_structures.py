@@ -725,7 +725,7 @@ class SoEq(moeadd.moeadd_solution):
         self.metaparams = metaparameters
         self.tokens_for_eq = TF_Pool(pool.families_demand_equation)
         self.tokens_supp = TF_Pool(pool.families_supplementary)
-        self.moeadd_set = False; self.eq_search_operator_set = False
+        self.moeadd_set = False
         
     def use_default_objective_function(self):
         from epde.eq_mo_objectives import generate_partial, equation_discrepancy, equation_complexity_by_factors
@@ -749,16 +749,8 @@ class SoEq(moeadd.moeadd_solution):
         assert callable(obj_funs) or all([callable(fun) for fun in obj_funs])
         self.obj_funs = obj_funs
 
-    def set_eq_search_evolutionary(self, evolutionary):
-        self.eq_search_evolutionary_strategy = evolutionary
-        self.eq_search_operator_set = True
-        
-    def create_equations(self, sparsity = None, eq_search_iters = None, EA_kwargs = dict()):
-        assert self.eq_search_operator_set
-        
-        if eq_search_iters is None: eq_search_iters = self.def_eq_search_iters
-        
-        structure = {}; self.eq_search_iters = eq_search_iters
+    def create_equations(self):
+        structure = {}
         token_selection = self.tokens_supp
         
         self.vars_to_describe = {token_family.type for token_family in self.tokens_for_eq.families}
@@ -767,19 +759,10 @@ class SoEq(moeadd.moeadd_solution):
         for eq_idx, variable in enumerate(self.vars_to_describe):
             structure[variable] = Equation(current_tokens_pool, basic_structure = [], var_to_explain = variable, 
                                            metaparameters = self.metaparameters)
-        self.chromo = Chromosome(structure, params = {key : val for key, val in self.metaparameters.items()
+        self.vals = Chromosome(structure, params = {key : val for key, val in self.metaparameters.items()
                                                       if val['optimizable']})
         moeadd.moeadd_solution.__init__(self, self.vals, self.obj_funs)
         self.moeadd_set = True
-            
-    # def optimize_equation(self, pool, strategy, population_size, basic_terms : list = [], 
-    #                       var_to_explain : str = None, EA_kwargs = dict()):
-    #     population = [Equation(pool, basic_terms, self.max_terms_number, self.max_factors_in_term) 
-    #                   for i in range(population_size)]
-    #     strategy.run(initial_population = population, EA_kwargs = EA_kwargs)
-    #     result = strategy.result
-        
-    #     return result[0], result[0].evaluate(normalize = False, return_val=True)[0], result[0].evaluate(normalize = True, return_val=True)[0]
         
     @staticmethod
     def equation_opt_iteration(population, evol_operator, population_size, iter_index, unexplained_vars, strict_restrictions = True):
@@ -793,6 +776,7 @@ class SoEq(moeadd.moeadd_solution):
         return population
         
     def evaluate(self, normalize = True):
+        raise DeprecationWarning('Evaluation of system is not necessary')
         if len(self.vals) == 1:
             value = self.vals[0].evaluate(normalize = normalize, return_val = True)[0]
         else:
@@ -814,7 +798,7 @@ class SoEq(moeadd.moeadd_solution):
         if len(self.vals) > 1:
             for eq_idx, equation in enumerate(self.vals):
                 if eq_idx == 0:
-                    form += ' / ' + equation.text_form + '\n'                                        
+                    form += ' / ' + equation.text_form + '\n'                          
                 elif eq_idx == len(self.vals) - 1:
                     form += ' \ ' + equation.text_form + '\n'
                 else:
@@ -827,7 +811,7 @@ class SoEq(moeadd.moeadd_solution):
         assert self.moeadd_set, 'The structure of the equation is not defined, therefore no moeadd operations can be called'
         return (all([any([other_elem == self_elem for other_elem in other.vals]) for self_elem in self.vals]) and
                 all([any([other_elem == self_elem for self_elem in self.vals]) for other_elem in other.structure]) and
-                len(other.vals) == len(self.vals)) or all(np.isclose(self.obj_fun, other.obj_fun))        
+                len(other.vals) == len(self.vals)) or all(np.isclose(self.obj_fun, other.obj_fun))
 
     @property
     def latex_form(self):
