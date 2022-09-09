@@ -11,7 +11,7 @@ import numpy as np
 import multiprocessing as mp
 from typing import Union
 
-from epde.prep.cheb import Process_Point_Cheb
+from epde.preprocessing.cheb import Process_Point_Cheb
 
 
 def differentiate(data, order : Union[int, list], mixed : bool = False, axis = None, *grids):

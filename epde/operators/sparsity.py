@@ -71,4 +71,4 @@ class LASSOSparsity(CompoundOperator):
         objective.weights_internal = estimator.coef_
 
     def use_default_tags(self):
-        self._tags = {'sparsity', 'equation level', 'no suboperators', 'inplace'}
+        self._tags = {'sparsity', 'gene level', 'no suboperators', 'inplace'}

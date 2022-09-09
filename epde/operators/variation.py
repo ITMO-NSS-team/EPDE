@@ -267,16 +267,16 @@ class TermCrossover(CompoundOperator):
 
 def get_basic_variation(variation_params : dict = {}):
     # TODO: generalize initiation with test runs and simultaneous parameter and object initiation.
-    add_kwarg_to_operator = partial(func = add_param_to_operator, target_dict = variation_params)    
+    add_kwarg_to_operator = partial(add_param_to_operator, target_dict = variation_params)    
 
     term_param_crossover = TermParamCrossover(['term_param_proportion'])
-    add_kwarg_to_operator(term_param_crossover, {'term_param_proportion' : 0.4})
+    add_kwarg_to_operator(operator = term_param_crossover, labeled_base_val = {'term_param_proportion' : 0.4})
     term_crossover = TermCrossover(['crossover_probability'])
-    add_kwarg_to_operator(term_crossover, {'crossover_probability' : 0.3})
+    add_kwarg_to_operator(operator = term_crossover, labeled_base_val = {'crossover_probability' : 0.3})
 
     equation_crossover = EquationCrossover()
     metaparameter_crossover = MetaparamerCrossover(['metaparam_proportion'])
-    add_kwarg_to_operator(metaparameter_crossover, {'term_param_proportion' : 0.4})
+    add_kwarg_to_operator(operator = metaparameter_crossover, labeled_base_val = {'term_param_proportion' : 0.4})
     equation_exchange_crossover = EquationExchangeCrossover()
 
     chromosome_crossover = ChromosomeCrossover()
@@ -285,7 +285,7 @@ def get_basic_variation(variation_params : dict = {}):
     # pl_updater = get_basic_populator_updater
 
     pl_cross = ParetoLevelsCrossover(['PBI_penalty'])
-    add_kwarg_to_operator(pl_cross, {'PBI_penalty' : 1.})
+    add_kwarg_to_operator(operator = pl_cross, labeled_base_val = {'PBI_penalty' : 1.})
 
     equation_crossover.set_suboperators(operators = {'term_param_crossover' : term_param_crossover, 
                                                      'term_crossover' : term_crossover})

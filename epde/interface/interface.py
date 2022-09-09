@@ -5,7 +5,6 @@ Created on Tue Jul  6 15:55:12 2021
 
 @author: mike_ubuntu
 """
-from types import NoneType
 import numpy as np
 from typing import Union, Callable
 from collections import OrderedDict
@@ -15,19 +14,19 @@ import epde.globals as global_var
 
 from epde.moeadd.moeadd import *
 from epde.moeadd.moeadd_supplementary import *
+from epde.moeadd.moeadd_strategy_elems import SectorProcesserBuilder
 
-from epde.prep.DomainPruning import DomainPruner
+from epde.preprocessing.DomainPruning import DomainPruner
 from epde.decorators import Boundary_exclusion
 
-from epde.operators.ea_stop_criteria import Stop_condition, Iteration_limit
 from epde.moeadd.moeadd_population_constr import SystemsPopulationConstructor
 from epde.moeadd.moeadd_strategy import OptimizationPatternDirector
 
 from epde.evaluators import simple_function_evaluator, trigonometric_evaluator
 from epde.supplementary import Define_Derivatives
 from epde.cache.cache import upload_simple_tokens, upload_grids, prepare_var_tensor#, np_ndarray_section
-from epde.prep.derivatives import Preprocess_derivatives
-from epde.structure import Equation
+from epde.preprocessing.derivatives import Preprocess_derivatives
+from epde.structure.main_structures import Equation
 
 from epde.interface.token_family import TF_Pool, TokenFamily
 from epde.interface.type_checks import *
@@ -131,6 +130,8 @@ class epde_search(object):
             self.director = director
         elif director is None and use_default_strategy:
             self.director = OptimizationPatternDirector()
+            self.director.builder = SectorProcesserBuilder()
+            # print('!')
             self.director.use_unconstrained_eq_search(variation_params       = director_params['variation_params'], 
                                                       mutation_params        = director_params['mutation_params'],
                                                       pareto_combiner_params = director_params['pareto_combiner_params'],
@@ -387,7 +388,7 @@ class epde_search(object):
         derivs : list of lists of np.ndarrays or None, optional,
             Pre-computed values of derivatives. If ``None`` is passed, the derivatives are calculated in the 
             method. Recommended to use, if the computations of derivatives take too long. For further information 
-            about using data, prepared in advance, check ``epde.prep.derivatives.Preprocess_derivatives`` function.
+            about using data, prepared in advance, check ``epde.preprocessing.derivatives.Preprocess_derivatives`` function.
             Default value: None.
             
         max_deriv_order : int or tuple/list, optional,
@@ -432,9 +433,6 @@ class epde_search(object):
 
         self.moeadd_params['pop_constructor'] = pop_constructor
         self.optimizer = moeadd_optimizer(**self.moeadd_params)
-        # evo_operator = operators.sys_search_evolutionary_operator(operators.mixing_xover, 
-        #                                                           operators.gaussian_mutation)
-        
         
         self.optimizer.set_sector_processer(operator = evo_operator)        
         best_obj = np.concatenate((np.zeros(shape = len([1 for token_family in self.pool.families if token_family.status['demands_equation']])),

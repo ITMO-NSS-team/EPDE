@@ -15,8 +15,8 @@ import torch
 device = torch.device('cpu')
 
 import epde.globals as global_var
-from epde.prep.cheb import Process_Point_Cheb
-from epde.prep.smoothing import Smoothing
+from epde.preprocessing.cheb import Process_Point_Cheb
+from epde.preprocessing.smoothing import Smoothing
 from epde.supplementary import Define_Derivatives
     
 

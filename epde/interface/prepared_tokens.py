@@ -12,7 +12,7 @@ from typing import Union, Callable
 import time
 
 from epde.supplementary import Define_Derivatives
-from epde.prep.derivatives import Preprocess_derivatives
+from epde.preprocessing.derivatives import Preprocess_derivatives
 
 import epde.globals as global_var
 from epde.interface.token_family import TokenFamily

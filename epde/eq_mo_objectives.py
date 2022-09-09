@@ -18,7 +18,7 @@ def equation_fitness(system, equation_idx):
     
     Parameters:
     -----------
-        system - ``epde.structure.SoEq`` object
+        system - ``epde.structure.main_structures.SoEq`` object
         The system, that is to be evaluated.
         
     Returns:
@@ -38,7 +38,7 @@ def equation_complexity_by_terms(system, equation_idx):
     
     Parameters:
     -----------
-        system - ``epde.structure.SoEq`` object
+        system - ``epde.structure.main_structures.SoEq`` object
         The system, that is to be evaluated.
         
     Returns:
@@ -57,7 +57,7 @@ def equation_complexity_by_factors(system, equation_idx):
     
     Parameters:
     -----------
-        system - ``epde.structure.SoEq`` object
+        system - ``epde.structure.main_structures.SoEq`` object
         The system, that is to be evaluated.
         
     Returns:

@@ -164,24 +164,25 @@ class TermParameterMutation(CompoundOperator):
         self._tags = {'mutation', 'term level', 'exploitation', 'no suboperators'}
 
 
-def get_basic_mutation(**kwargs):
+def get_basic_mutation(mutation_params):
     # TODO: generalize initiation with test runs and simultaneous parameter and object initiation.
-    add_kwarg_to_operator = partial(func = add_param_to_operator, target_dict = kwargs)    
+    add_kwarg_to_operator = partial(add_param_to_operator, target_dict = mutation_params)    
 
     term_mutation = TermMutation([])
     term_param_mutation = TermParameterMutation(['r_param_mutation', 'multiplier'])
-    add_kwarg_to_operator(term_param_mutation, {'r_param_mutation' : 0.2, 'strict_restrictions' : True,
-                                                'multiplier' : 0.1})
+    add_kwarg_to_operator(operator = term_param_mutation, labeled_base_val = {'r_param_mutation' : 0.2, 
+                                                                              'strict_restrictions' : True,
+                                                                              'multiplier' : 0.1})
 
     equation_mutation = EquationMutation(['r_mutation', 'type_probabilities'])
-    add_kwarg_to_operator(equation_mutation, {'r_mutation' : 0.3, 'type_probabilities' : []})
+    add_kwarg_to_operator(operator = equation_mutation, labeled_base_val = {'r_mutation' : 0.3, 'type_probabilities' : []})
     
     metaparameter_mutation = MetaparameterMutation(['std', 'mean'])
-    add_kwarg_to_operator(metaparameter_mutation, {'std' : 0, 'mean' : 0.4})
+    add_kwarg_to_operator(operator = metaparameter_mutation, labeled_base_val = {'std' : 0, 'mean' : 0.4})
 
     chromosome_mutation = SystemMutation(['indiv_mutation_prob'])
-    add_kwarg_to_operator(chromosome_mutation, {'indiv_mutation_prob' : 0.5})
-    chromosome_mutation.params = {'indiv_mutation_prob' : 0.5} if not 'mutation_params' in kwargs.keys() else kwargs['mutation_params']
+    add_kwarg_to_operator(operator = chromosome_mutation, labeled_base_val = {'indiv_mutation_prob' : 0.5})
+    # chromosome_mutation.params = {'indiv_mutation_prob' : 0.5} if not 'mutation_params' in kwargs.keys() else kwargs['mutation_params']
 
     equation_mutation.set_suboperators(operators = {'mutation' : [term_param_mutation, term_mutation]},
                                        probas = {'equation_crossover' : [0.9, 0.1]})

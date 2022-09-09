@@ -34,7 +34,7 @@ def penalty_based_intersection(sol_obj, weight, ideal_obj, penalty_factor = 1.) 
     Arguments:
     ----------
     
-    sol_obj : object of subclass of ``src.moeadd.moeadd_stc.moeadd_solution``
+    sol_obj : object of subclass of ``src.moeadd.moeadd_solution_template.MOEADDSolution``
         The solution, for which the penalty based intersection is calculated. In the equations above,
         it denotes :math:`\mathbf{x}`, with the :math:`\mathbf{F}(\mathbf{x})` representing the
         objective function values.
@@ -66,7 +66,7 @@ def population_to_sectors(population, weights):
     
     population : list
         List, containing the candidate solutions for the evolutionary algorithm. Elements shall
-        belong to the case-specific subclass of ``src.moeadd.moeadd_stc.moeadd_solution``.
+        belong to the case-specific subclass of ``src.moeadd.moeadd_solution_template.MOEADDSolution``.
         
     weights : np.ndarray
         Numpy ndarray of weight vectors; first dimension - weight index, second dimension - 
@@ -182,6 +182,7 @@ class PopulationUpdater(CompoundOperator):
 class PopulationUpdaterConstrained(object):
     def __init__(self, param_keys : list = [], constraints : Union[list, tuple, set] = []):
         super().__init__(param_keys = param_keys)
+        raise NotImplementedError('Constrained optimization has not been implemented yet.')
         self.constraints = constraints
         # TODO: add constraint setting for the constructor        
         
@@ -265,25 +266,25 @@ def use_item_if_no_default(key, arg : dict, replacement_arg : dict):
 
 
 def get_basic_populator_updater(params : dict = {}):
-    add_kwarg_to_operator = partial(func = add_param_to_operator, target_dict = params)    
+    add_kwarg_to_operator = partial(add_param_to_operator, target_dict = params)    
     
     pop_updater = PopulationUpdater()
-    add_kwarg_to_operator(pop_updater, {'PBI_penalty' : 1})    
+    add_kwarg_to_operator(operator = pop_updater, labeled_base_val = {'PBI_penalty' : 1})    
     pop_updater.params = params
     return pop_updater
 
 
 def get_constrained_populator_updater(params : dict = {}, constraints : list = []):
-    add_kwarg_to_operator = partial(func = add_param_to_operator, target_dict = params)
+    add_kwarg_to_operator = partial(add_param_to_operator, target_dict = params)
     
     pop_updater = PopulationUpdaterConstrained(constraints = constraints)
-    add_kwarg_to_operator(pop_updater, {'PBI_penalty' : 1})        
+    add_kwarg_to_operator(operator = pop_updater, labeled_base_val = {'PBI_penalty' : 1})        
     pop_updater.params = params
     return pop_updater
 
 
 class SimpleNeighborSelector(CompoundOperator):
-    def apply(self, neighbors):
+    def apply(self, objective : list):
         '''
             Simple selector of neighboring weight vectors: takes n-closest (*n = number_of_neighbors*)ones to the 
             processed one. Defined to be used inside the moeadd algorithm.
@@ -303,7 +304,7 @@ class SimpleNeighborSelector(CompoundOperator):
             sorted_neighbors[:number_of_neighbors] : list
                 self evident slice of proximity list
         '''
-        return neighbors[:self.params['number_of_neighbors']]
+        return objective[:self.params['number_of_neighbors']]
     
     def use_default_tags(self):
         self._tags = {'neighbor selector', 'custom level', 'no suboperators', 'inplace'}    
@@ -339,9 +340,9 @@ def get_pareto_levels_updater(right_part_selector : CompoundOperator, chromosome
                               mutation : CompoundOperator = None, constrained : bool = False, 
                               mutation_params : dict = {}, pl_updater_params : dict = {}, 
                               combiner_params : dict = {}):
-    add_kwarg_to_updater = partial(func = add_param_to_operator, target_dict = combiner_params)
+    add_kwarg_to_updater = partial(add_param_to_operator, target_dict = combiner_params)
     updater = OffspringUpdater()
-    add_kwarg_to_updater(updater, {'attempt_limit' : 5})
+    add_kwarg_to_updater(operator = updater, labeled_base_val = {'attempt_limit' : 5})
     
     if mutation is None:
         mutation = get_basic_mutation(mutation_params)

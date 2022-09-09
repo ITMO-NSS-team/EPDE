@@ -20,7 +20,7 @@ import epde.globals as global_var
 from epde.cache.cache import upload_grids
 
 from epde.interface.token_family import Token_family, TF_Pool
-from epde.structure import Term, Equation, SoEq
+from epde.structure.main_structures import Term, Equation, SoEq
 from epde.evaluators import trigonometric_evaluator
 #from epde.src.evo_optimizer import Operator_director
 
@@ -134,7 +134,7 @@ def test_equation():
     
 def test_solver_forms():
     from epde.cache.cache import upload_simple_tokens, upload_grids, prepare_var_tensor
-    from epde.prep.derivatives import Preprocess_derivatives
+    from epde.preprocessing.derivatives import Preprocess_derivatives
     from epde.supplementary import Define_Derivatives
     from epde.evaluators import simple_function_evaluator, trigonometric_evaluator
     from epde.operators.ea_stop_criteria import Iteration_limit

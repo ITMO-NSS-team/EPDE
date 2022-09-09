@@ -15,43 +15,7 @@ from functools import reduce
 import epde.globals as global_var
 
 from epde.moeadd.moeadd_strategy_elems import MOEADDSectorProcesser
-from epde.moeadd.moeadd_supplementary import fast_non_dominated_sorting, slow_non_dominated_sorting, ndl_update, Equality, Inequality, acute_angle        
-
-
-
-def get_domain_idx(solution, weights) -> int:
-    '''
-    
-    Function, devoted to finding the domain, defined by **weights**, to which the 
-    **solutions** belongs. The belonging is determined by the acute angle between solution and 
-    the weight vector, defining the domain.
-    
-    Parameters:
-    ----------
-    
-    solution : np.ndarray or object of subclass of ``src.moeadd.moeadd_stc.moeadd_solution``
-        The candidate solution, for which we are determining the domain, or its objective 
-        function values, stored in np.ndarray.
-    
-    weights : np.ndarray
-        Numpy ndarray, containing weights from the moeadd optimizer. 
-        
-    Returns:
-    --------
-    
-    idx : int
-        Index of the domain (i.e. index of corresponing weight vector), to which the solution belongs.
-        
-    
-    '''
-#    print(list(map(lambda x: x, weights)), type(weights))
-#    time.sleep(5)
-    if type(solution) == np.ndarray:
-        return np.fromiter(map(lambda x: acute_angle(x, solution), weights), dtype=float).argmin()
-    elif type(solution.obj_fun) == np.ndarray:
-        return np.fromiter(map(lambda x: acute_angle(x, solution.obj_fun), weights), dtype=float).argmin()
-    else:
-        raise ValueError('Can not detect the vector of objective function for solution')
+from epde.moeadd.moeadd_supplementary import fast_non_dominated_sorting, ndl_update, Equality, Inequality        
     
 
 def clear_list_of_lists(inp_list) -> list:
@@ -72,7 +36,7 @@ class ParetoLevels(object):
     
     population : list
         List with the elements - canidate solutions of the case-specific subclass of 
-        ``src.moeadd.moeadd_stc.moeadd_solution``.
+        ``src.moeadd.moeadd_solution_template.MOEADDSolution``.
         
     sorting_method : function, optional, default - ``src.moeadd.moeadd_supplementary.fast_non_dominated_sorting``
         The method of population separation into non-dominated levels.
@@ -85,7 +49,7 @@ class ParetoLevels(object):
     
     population : list
         List with the elements - canidate solutions of the case-specific subclass of 
-        ``src.moeadd.moeadd_stc.moeadd_solution``.
+        ``src.moeadd.moeadd_solution_template.MOEADDSolution``.
         
     levels : list
         List with the elements - lists of solutions, representing non-dominated levels. 
@@ -144,7 +108,7 @@ class ParetoLevels(object):
         Arguments:
         ----------
         
-        point : the case-specific subclass of ``src.moeadd.moeadd_stc.moeadd_solution``
+        point : the case-specific subclass of ``src.moeadd.moeadd_solution_template.MOEADDSolution``
             The point, added into the candidate solutions pool.
             
         '''
@@ -159,7 +123,7 @@ class ParetoLevels(object):
         Arguments:
         -----------
         
-        point : the case-specific subclass of ``src.moeadd.moeadd_stc.moeadd_solution``
+        point : the case-specific subclass of ``src.moeadd.moeadd_solution_template.MOEADDSolution``
             The point, removed from the candidate solutions pool.
         
         '''        
@@ -609,7 +573,7 @@ class MOEADDOptimizerConstrained(MOEADDOptimizer):
         Parameters:
         -----------
         
-        solution : object of subclass of ``src.moeadd.moeadd_stc.moeadd_solution``
+        solution : object of subclass of ``src.moeadd.moeadd_solution_template.MOEADDSolution``
             The solution, for which the constriant violations are calculated. 
             
         Returns:
@@ -633,13 +597,13 @@ class MOEADDOptimizerConstrained(MOEADDOptimizer):
         Parameters:
         -----------
         
-        candidate_1, candidate_2 : objects of subclass of ``src.moeadd.moeadd_stc.moeadd_solution``
+        candidate_1, candidate_2 : objects of subclass of ``src.moeadd.moeadd_solution_template.MOEADDSolution``
             The compared individuals.
             
         Returns:
         --------
         
-        candidate : object of subclass of ``src.moeadd.moeadd_stc.moeadd_solution``
+        candidate : object of subclass of ``src.moeadd.moeadd_solution_template.MOEADDSolution``
             The individual with lower value of constraint violation between two input ones. 
             If the values of **candidate_1**, and **candidate_2** are equal, the 
             **candidate** is chosen among them.

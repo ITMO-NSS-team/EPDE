@@ -3,7 +3,7 @@ from collections import OrderedDict
 from functools import reduce, singledispatchmethod
 
 from epde.structure.factor import Factor
-from epde.structure import Term
+from epde.structure.main_structures import Term
 from epde.supplementary import factor_params_to_str
 
 from copy import deepcopy

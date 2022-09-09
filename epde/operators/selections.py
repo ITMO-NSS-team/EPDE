@@ -88,7 +88,7 @@ class MOEADDSelection(CompoundOperator):
         return objective
     
     def use_default_tags(self):
-        self._tags = {'selection', 'pareto_levels level', 'auxilary', 'suboperators', 'standard'}
+        self._tags = {'selection', 'population level', 'auxilary', 'suboperators', 'standard'}
 
 
 class MOEADDSelectionConstrained(CompoundOperator):
@@ -172,7 +172,7 @@ class MOEADDSelectionConstrained(CompoundOperator):
         return objective
 
     def use_default_tags(self):
-        self._tags = {'selection', 'pareto_levels level', 'auxilary', 'suboperators', 'standard'}
+        self._tags = {'selection', 'population level', 'auxilary', 'suboperators', 'standard'}
 
 
 class SelectionConstraintProcesser(object):
@@ -197,4 +197,4 @@ class SelectionConstraintProcesser(object):
         return selected_idxs
     
     def use_default_tags(self):
-        self._tags = {'constraints', 'selection', 'mixed input level', 'auxilary'}
+        self._tags = {'constraints', 'selection', 'custom level', 'auxilary'}

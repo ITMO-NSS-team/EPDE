@@ -81,4 +81,4 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
             objective.weights_final = weights
             
     def use_default_tags(self):
-        self._tags = {'coefficient calculation', 'equation level', 'no suboperators', 'inplace'}
+        self._tags = {'coefficient calculation', 'chromosome level', 'no suboperators', 'inplace'}

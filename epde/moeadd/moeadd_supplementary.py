@@ -39,10 +39,10 @@ def check_dominance(target, compared_with) -> bool:
     Arguments:
     ----------
     
-    target : ``src.moeadd.moeadd_stc.moeadd_solution`` case-specific subclass object
+    target : ``src.moeadd.moeadd_solution_template.MOEADDSolution`` case-specific subclass object
         The individual solution on the pareto levels, compared with the other element.
         
-    compared_with : ``src.moeadd.moeadd_stc.moeadd_solution`` case-specific subclass object
+    compared_with : ``src.moeadd.moeadd_solution_template.MOEADDSolution`` case-specific subclass object
         The individual solution on the pareto levels, with with the target is compared.
     
     Returns:
@@ -71,18 +71,18 @@ def ndl_update(new_solution, levels) -> list:   # efficient_ndl_update
     Parameters:
     -----------
     
-    new_solution : ``src.moeadd.moeadd_stc.moeadd_solution`` case-specific subclass object
+    new_solution : ``src.moeadd.moeadd_solution_template.MOEADDSolution`` case-specific subclass object
         The solution, that is to be added onto the non-dominated levels.
         
     levels : list
-        List of lists of ``src.moeadd.moeadd_stc.moeadd_solution`` case-specific subclass 
+        List of lists of ``src.moeadd.moeadd_solution_template.MOEADDSolution`` case-specific subclass 
         object, representing the input non-dominated levels.
         
     Returns:
     --------
     
     new_levels : list
-        List of lists of ``src.moeadd.moeadd_stc.moeadd_solution`` case-specific subclass 
+        List of lists of ``src.moeadd.moeadd_solution_template.MOEADDSolution`` case-specific subclass 
         object, containing the solution from input parameter *level* with *new_solution*, 
         added to it.
     

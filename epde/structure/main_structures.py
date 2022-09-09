@@ -16,7 +16,7 @@ import numpy as np
 import torch
 
 import epde.globals as global_var
-import epde.moeadd.moeadd_stc as moeadd
+import epde.moeadd.moeadd_solution_template as moeadd
 
 from epde.structure.encoding import Chromosome
 from epde.interface.token_family import TF_Pool
@@ -703,7 +703,7 @@ def check_metaparameters(metaparams : dict):
         raise ValueError('Only partial metaparameter vector has been passed.')
     
 
-class SoEq(moeadd.moeadd_solution):
+class SoEq(moeadd.MOEADDSolution):
     def __init__(self, pool : TF_Pool, metaparameters : dict):
         '''
 
@@ -761,7 +761,7 @@ class SoEq(moeadd.moeadd_solution):
                                            metaparameters = self.metaparameters)
         self.vals = Chromosome(structure, params = {key : val for key, val in self.metaparameters.items()
                                                       if val['optimizable']})
-        moeadd.moeadd_solution.__init__(self, self.vals, self.obj_funs)
+        moeadd.MOEADDSolution.__init__(self, self.vals, self.obj_funs)
         self.moeadd_set = True
         
     @staticmethod

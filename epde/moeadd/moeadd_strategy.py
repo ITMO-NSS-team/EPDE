@@ -15,7 +15,7 @@ from epde.operators.template import add_param_to_operator
 from epde.operators.selections import MOEADDSelection
 from epde.operators.variation import get_basic_variation
 from epde.operators.fitness import L2Fitness
-from epde.operators.right_part_selection import PoplevelRightPartSelector
+from epde.operators.right_part_selection import RandomRHPSelector
 from epde.operators.moeadd_specific import get_pareto_levels_updater, SimpleNeighborSelector
 from epde.operators.sparsity import LASSOSparsity
 from epde.operators.coeff_calculation import LinRegBasedCoeffsEquation
@@ -44,7 +44,7 @@ def add_sequential_operators(builder : SectorProcesserBuilder, operators : list)
     '''
     builder.add_init_operator('initial')
     for idx, operator in enumerate(operators):
-        builder.add_operator(operator[0], operator[1], terminal_operator = (idx == len(operators - 1)))
+        builder.add_operator(operator[0], operator[1], terminal_operator = (idx == len(operators) - 1))
 
     builder.set_input_combinator()
     for op_idx, _ in enumerate(operators[:-1]):
@@ -64,42 +64,43 @@ class OptimizationPatternDirector(object):
 
     @builder.setter
     def builder(self, sector_processer_builder : SectorProcesserBuilder):
+        print(f'setting builder with {sector_processer_builder}')
         self._builder = sector_processer_builder
 
     def use_unconstrained_eq_search(self, variation_params : dict = {}, mutation_params : dict = {},
                                     pareto_combiner_params : dict = {}, pareto_updater_params : dict = {},
                                     **kwargs):
-        add_kwarg_to_operator = partial(func = add_param_to_operator, target_dict = kwargs)
+        add_kwarg_to_operator = partial(add_param_to_operator, target_dict = kwargs)
 
         neighborhood_selector = SimpleNeighborSelector(['number_of_neighbors'])
-        add_kwarg_to_operator(neighborhood_selector, {'number_of_neighbors' : 4})
+        add_kwarg_to_operator(operator = neighborhood_selector, labeled_base_val = {'number_of_neighbors' : 4})
 
         selection = MOEADDSelection(['delta', 'parents_fraction'])
-        add_kwarg_to_operator(selection, {'delta' : 0.9, 'parents_fraction' : 4})
-        selection.suboperators = {'neighborhood_selector' : neighborhood_selector}
+        add_kwarg_to_operator(operator = selection, labeled_base_val = {'delta' : 0.9, 'parents_fraction' : 4})
+        selection.set_suboperators({'neighborhood_selector' : neighborhood_selector})
 
         variation = get_basic_variation(variation_params)
 
-        right_part_selector = PoplevelRightPartSelector()
+        right_part_selector = RandomRHPSelector()
         
         eq_fitness = L2Fitness(['penalty_coeff'])
-        add_kwarg_to_operator(eq_fitness, {'penalty_coeff' : 0.2})
+        add_kwarg_to_operator(operator = eq_fitness, labeled_base_val = {'penalty_coeff' : 0.2})
         
         sparsity = LASSOSparsity()
         coeff_calc = LinRegBasedCoeffsEquation()
 
-        eq_fitness.suboperators = {'sparsity' : sparsity, 'coeff_calc' : coeff_calc}
+        eq_fitness.set_suboperators({'sparsity' : sparsity, 'coeff_calc' : coeff_calc})
         fitness_cond = lambda x: getattr(x, 'fitness_calculated')
         sys_fitness = map_operator_between_levels(eq_fitness, 'gene level', 'chromosome level', fitness_cond)
         
         # Separate mutation from population updater for better customization.
-        population_updater = get_pareto_levels_updater(right_part_selector, sys_fitness,
+        population_updater = get_pareto_levels_updater(right_part_selector = right_part_selector, chromosome_fitness = sys_fitness,
                                                        constrained = False, mutation_params = mutation_params, 
-                                                       pareto_updater_params = pareto_updater_params, 
+                                                       pl_updater_params = pareto_updater_params, 
                                                        combiner_params = pareto_combiner_params)
 
 
-        self._builder = add_sequential_operators(self._builder, [('selection', selection), 
+        self.builder = add_sequential_operators(self.builder, [('selection', selection), 
                                                                  ('variation', variation), 
                                                                  ('pareto_updater', population_updater)])
     

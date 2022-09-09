@@ -19,7 +19,7 @@ class OperatorMapper(CompoundOperator):
                  objective_condition : Callable = None):
         super().__init__()
 
-        self.suboperators = {'to_map' : operator_to_map}; self.objective_condition = objective_condition
+        self.set_suboperators({'to_map' : operator_to_map}); self.objective_condition = objective_condition
         if not source_tag in operator_to_map.operator_tags:
             raise ValueError(f'Only {source_tag}-level operators can be mapped to the elements of a {objective_tag}.')
         self._tags = copy.copy(operator_to_map.operator_tags)
@@ -37,7 +37,7 @@ class OperatorMapper(CompoundOperator):
                     objective[idx] = self.suboperators['to_map'].apply(elem)
             else:
                 raise TypeError('Incorrect type of mapping operator: not inplace nor returns similar object, as input.')
-    
+
 
 def map_operator_between_levels(operator : CompoundOperator, original_level : Union[str, int], 
                            target_level : Union[str, int], objective_condition : Callable = None):

@@ -21,7 +21,7 @@ def add_param_to_operator(operator, target_dict, labeled_base_val):
     for key, base_val in labeled_base_val.items():
         if base_val is None and key not in target_dict.keys():
             raise ValueError('Mandatory parameter for evolutionary operator')
-        operator.param[key] = target_dict[key] if key in target_dict.keys() else base_val
+        operator.params[key] = target_dict[key] if key in target_dict.keys() else base_val
 
 
 class CompoundOperator():
@@ -30,6 +30,7 @@ class CompoundOperator():
     '''
     def __init__(self, param_keys : list = []):
         self.param_keys = param_keys
+        self._params = {}
         self.use_default_tags()
 
     @property
@@ -48,8 +49,9 @@ class CompoundOperator():
         return self._suboperators
 
     def set_suboperators(self, operators : dict, probas : dict = {}):
-        if not all([isinstance(key, str) and isinstance(value, (CompoundOperator, list, tuple, dict)) for key, value
-                    in operators.items()]):
+        if not all([isinstance(key, str) and (isinstance(value, (list, tuple, dict)) or 
+                                              issubclass(type(value), CompoundOperator))
+                    for key, value in operators.items()]):
             raise TypeError('The suboperators of an evolutionary operator must be declared in format key : value, where key is str and value - CompoundOperator, list, tuple or dict')
         self._suboperators = SuboperatorContainer(suboperators = operators, probas = probas) 
 
@@ -90,7 +92,7 @@ class CompoundOperator():
                 return result
         return wrapper
     
-    _check_objective_type = staticmethod(_check_objective_type)
+    # _check_objective_type = staticmethod(_check_objective_type)
     
     @_check_objective_type
     def apply(self, objective):
@@ -121,7 +123,7 @@ class SuboperatorContainer():
         self.suboperators = suboperators
         self.probas = {}
 
-        for label, oper in suboperators:
+        for label, oper in suboperators.items():
             if isinstance(oper, CompoundOperator):
                 operator_probability = 1
             elif isinstance(oper, (list, tuple, np.ndarray)) and label not in probas.keys():
@@ -137,3 +139,22 @@ class SuboperatorContainer():
             return self.suboperators[label]
         elif isinstance(self.suboperators[label], (list, tuple, np.ndarray)):
             return np.random.choice(a = self.suboperators[label], p = self.probas[label])
+        
+    def __iter__(self):
+        return SuboperatorContainerIterator(self)
+    
+
+class SuboperatorContainerIterator(object):
+    def __init__(self, container):
+        self._suboperators = []
+        for val in container.suboperators.values():
+            self._suboperators.append(val) if isinstance(val, CompoundOperator) else self._suboperators.extend(val)
+        self._idx = 0
+
+    def __next__(self):
+        if self._idx < len(self._suboperators):
+            res = self._suboperators[self._idx]
+            self._idx += 1
+            return res
+        else:
+            raise StopIteration    

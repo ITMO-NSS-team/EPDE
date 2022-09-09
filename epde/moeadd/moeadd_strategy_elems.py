@@ -63,11 +63,11 @@ class SectorProcesserBuilder(OperatorBuilder):
     
     """
     
-    def __init__(self, stop_criterion, stop_criterion_kwargs):
-        self.reset(stop_criterion, stop_criterion_kwargs)
+    def __init__(self):  # , stop_criterion, stop_criterion_kwargs
+        self.reset() # stop_criterion, stop_criterion_kwargs
     
-    def reset(self, stop_criterion, stop_criterion_kwargs):
-        self._processer = MOEADDSectorProcesser(stop_criterion, stop_criterion_kwargs)
+    def reset(self): # stop_criterion, stop_criterion_kwargs
+        self._processer = MOEADDSectorProcesser() # stop_criterion, stop_criterion_kwargs
         self.blocks_labeled = dict()
         self.blocks_connected = dict() # dict of format {op_label : (True, True)}, where in 
                                        # value dict first element is "connected with input" and

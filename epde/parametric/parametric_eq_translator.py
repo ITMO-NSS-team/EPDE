@@ -4,7 +4,7 @@ from functools import partial
 
 from epde.interface.equation_translator import parse_factor
 from epde.moeadd.moeadd_supplementary import Equality
-from epde.structure import Term
+from epde.structure.main_structures import Term
 from epde.structure.factor import Factor
 
 from epde.parametric.parametric_factor import ParametricFactor, ParametricTerm
