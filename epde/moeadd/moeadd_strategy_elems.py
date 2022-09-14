@@ -132,7 +132,7 @@ class Block(ABC):
     @property
     def op_id(self):
         if not self.id_set:
-            self._id =  np.random.randint(0, 1e6)
+            self._id = np.random.randint(0, 1e6)
             self.id_set = True
         return self._id
     
@@ -216,13 +216,14 @@ class EvolutionaryBlock(Block):
     def apply(self, EA_kwargs):
         self.check_integrity()
         kwargs = {kwarg_key : EA_kwargs[kwarg_key] for kwarg_key in self.arg_keys}
-        self.output = self._operator.apply(self.combinator([block.output for block in self._incoming]), **kwargs)
+        self.output = self._operator.apply(self.combinator([block.output for block in self._incoming]),
+                                           arguments = kwargs)
         super().apply()
 
     @property
     def op_id(self):
         if not self.id_set:
-            self._id = self._operator.op_id
+            self._id = np.random.randint(0, 1e6) #self._operator.op_id
             self.id_set = True
         return self._id
 
@@ -260,15 +261,16 @@ class LinkedBlocks(object):
             raise NotImplementedError('The ability to process the multiple initial blocks is not implemented')
     
     def check_correctness(self):
-        if not self.suppress_structure_check:        
-            if not 'initial' in self.blocks_labeled.keys():
-                raise KeyError('Mandatory initial block is missing, or incorrectly labeled')            
+        return True
+        # if not self.suppress_structure_check:        
+        #     if not 'initial' in self.blocks_labeled.keys():
+        #         raise KeyError('Mandatory initial block is missing, or incorrectly labeled')            
             
-            if not 'mutation' in self.blocks_labeled.keys():
-                raise KeyError('Required evolutionary operator of mutation calculation is missing, or incorrectly labeled')
+        #     if not 'mutation' in self.blocks_labeled.keys():
+        #         raise KeyError('Required evolutionary operator of mutation calculation is missing, or incorrectly labeled')
     
-            if not 'crossover' in self.blocks_labeled.keys():
-                raise KeyError('Required evolutionary operator of crossover calculation is missing, or incorrectly labeled')
+        #     if not 'crossover' in self.blocks_labeled.keys():
+        #         raise KeyError('Required evolutionary operator of crossover calculation is missing, or incorrectly labeled')
 
 
     def reset_traversal_cond(self):
@@ -290,6 +292,7 @@ class LinkedBlocks(object):
             processed_new = []
             for vertex in processed:
                 if vertex.available:
+                    print(f'applying {vertex}')                    
                     vertex.apply(EA_kwargs)
                     processed_new.extend(vertex._outgoing)
                     if vertex.terminal:
@@ -331,11 +334,8 @@ class MOEADDSectorProcesser(object):
         self.check_correctness()
         
     def run(self, population_subset, EA_kwargs : dict):
-        if not 'weight' in EA_kwargs:
-            raise ValueError('Internal logic error: MOEADD iteration requires weight to process.')
         self.check_integrity()
-        self.linked_blocks.blocks_labeled['initial'].set_output(population_subset)
-        self.linked_blocks.traversal(EA_kwargs)
+        self.linked_blocks.traversal(population_subset, EA_kwargs)
         return self.linked_blocks.output
 
     def check_correctness(self):

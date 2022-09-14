@@ -24,7 +24,7 @@ class SystemsPopulationConstructor(object):
                  obj_functions : Callable = None, sparsity_interval : tuple = (0, 1)):
         self.pool = pool; self.terms_number = terms_number
         self.max_factors_in_term = max_factors_in_term 
-        self.vars_demand_equation = [family.type for family in self.pool.families_demand_equation]
+        self.vars_demand_equation = [family.ftype for family in self.pool.families_demand_equation]
         self.sparsity_interval = sparsity_interval
 
     def create(self, **kwargs): # Дописать
@@ -38,7 +38,7 @@ class SystemsPopulationConstructor(object):
         metaparameters = {'terms_number'        : {'optimizable' : False, 'value' : terms_number},
                           'max_factors_in_term' : {'optimizable' : False, 'value' : max_factors_in_term}}
         for idx, variable in enumerate(self.vars_demand_equation):
-            metaparameters[('sparsity', variable)] = sparsity[idx]
+            metaparameters[('sparsity', variable)] = {'optimizable' : True, 'value' : sparsity[idx]}
 
         created_solution = SoEq(pool = self.pool, metaparameters = metaparameters)
 

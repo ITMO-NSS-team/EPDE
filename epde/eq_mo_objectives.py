@@ -9,10 +9,10 @@ Created on Mon Jul  5 18:48:23 2021
 import numpy as np
 from functools import partial
 
-def generate_partial(obj_function, equation_idx):
-    return partial(obj_function, equation_idx = equation_idx)
+def generate_partial(obj_function, equation_key):
+    return partial(obj_function, equation_key = equation_key)
 
-def equation_fitness(system, equation_idx):
+def equation_fitness(system, equation_key):
     '''
     Evaluate the quality of the system of PDEs, using the individual values of fitness function for equations.
     
@@ -26,11 +26,11 @@ def equation_fitness(system, equation_idx):
         error : float.
         The value of the error metric.
     '''
-    assert system.structure[equation_idx].fitness_calculated, 'Trying to call fitness before its evaluation.'
-    res = system.structure[equation_idx].fitness_value
+    assert system.vals[equation_key].fitness_calculated, 'Trying to call fitness before its evaluation.'
+    res = system.vals[equation_key].fitness_value
     return res
 
-def equation_complexity_by_terms(system, equation_idx):
+def equation_complexity_by_terms(system, equation_key):
     '''
     Evaluate the complexity of the system of PDEs, evaluating a number of terms for each equation. 
     In the evaluation, we consider only terms with non-zero weights, and the target term with the free 
@@ -46,9 +46,9 @@ def equation_complexity_by_terms(system, equation_idx):
         discrepancy : list of integers.
         The values of the error metric: list entry for each of the equations.
     '''    
-    return np.count_nonzero(system.structure[equation_idx].weights_internal)
+    return np.count_nonzero(system.vals[equation_key].weights_internal)
 
-def equation_complexity_by_factors(system, equation_idx):
+def equation_complexity_by_factors(system, equation_key):
     '''
     Evaluate the complexity of the system of PDEs, evaluating a number of factors in terms for each 
     equation. In the evaluation, we consider only terms with non-zero weights and target, while
@@ -67,12 +67,12 @@ def equation_complexity_by_factors(system, equation_idx):
     '''    
     eq_compl = 0
     
-    for idx, term in enumerate(system.structure[equation_idx].structure):
-        if idx < system.structure[equation_idx].target_idx:
-            if not system.structure[equation_idx].weights_final[idx] == 0: 
+    for idx, term in enumerate(system.vals[equation_key].structure):
+        if idx < system.vals[equation_key].target_idx:
+            if not system.vals[equation_key].weights_final[idx] == 0: 
                 eq_compl += len(term.structure)
-        elif idx > system.structure[equation_idx].target_idx:
-            if not system.structure[equation_idx].weights_final[idx-1] == 0: eq_compl += len(term.structure)
+        elif idx > system.vals[equation_key].target_idx:
+            if not system.vals[equation_key].weights_final[idx-1] == 0: eq_compl += len(term.structure)
         else:
             eq_compl += len(term.structure)
     return eq_compl 

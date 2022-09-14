@@ -27,7 +27,8 @@ from epde.structure.structure_template import ComplexStructure, check_uniqueness
 
 class Term(ComplexStructure):
     __slots__ = ['_history', 'structure', 'interelement_operator', 'saved', 'saved_as', 
-                 'pool', 'max_factors_in_term', 'cache_linked', 'occupied_tokens_labels']
+                 'pool', 'max_factors_in_term', 'cache_linked', 'occupied_tokens_labels', 
+                 '_descr_variable_marker']
     
     def __init__(self, pool, passed_term = None, mandatory_family = None, max_factors_in_term = 1, 
                  interelement_operator = np.multiply):
@@ -88,7 +89,6 @@ class Term(ComplexStructure):
             raise ValueError('The structure of a term should be declared with str or factor.Factor obj, instead got', type(passed_term))
 
     def randomize(self, mandatory_family = None, forbidden_factors = None, **kwargs):
-        
         if np.sum(self.pool.families_cardinality(meaningful_only = True)) == 0:
             raise ValueError('No token families are declared as meaningful for the process of the system search')
 
@@ -110,9 +110,10 @@ class Term(ComplexStructure):
         factors_num = np.random.randint(1, self.max_factors_in_term + 1)
         self.occupied_tokens_labels = copy.copy(forbidden_factors)
 
-        self.descr_variable_marker = mandatory_family
+        self.descr_variable_marker = mandatory_family if mandatory_family is not None else False
+        # print(f'self.descr_variable_marker is set as {self.descr_variable_marker}')
         
-        if mandatory_family is None:
+        if not mandatory_family:
             occupied_by_factor, factor = self.pool.create(label = None, create_meaningful = True, 
                                                           token_status = self.occupied_tokens_labels, **kwargs)
         else:
@@ -136,9 +137,11 @@ class Term(ComplexStructure):
 
     @descr_variable_marker.setter
     def descr_variable_marker(self, marker : False):
-        if marker is None or isinstance(marker, str):
+        if not marker or isinstance(marker, str):
+            self._descr_variable_marker = marker
+        else:
             raise ValueError('Described variable marker shall be a family label (i.e. "u") of "False"')
-        self._descr_variable_marker = marker
+        
 
     def evaluate(self, structural):
         assert global_var.tensor_cache is not None, 'Currently working only with connected cache'
@@ -231,7 +234,8 @@ class Term(ComplexStructure):
         return any([factor.is_deriv and factor.deriv_code != [None,] for factor in self.structure])
     
     def contains_family(self, family):
-        return any([factor.type == family for factor in self.structure])
+        print(f'In "contains_family": family - {family}, {[factor.ftype for factor in self.structure]}')
+        return any([factor.ftype == family for factor in self.structure])
 
     @property
     def solver_form(self):
@@ -297,7 +301,7 @@ class Equation(ComplexStructure):
                   '_target', 'target_idx', '_features', 'right_part_selected', 
                   '_weights_final', 'weights_final_evald', '_weights_internal', 'weights_internal_evald', 
                   'fitness_calculated', 'solver_form_defined', '_solver_form', '_fitness_value', 
-                  'crossover_selected_times']
+                  'crossover_selected_times', 'metaparameters', 'main_var_to_explain']
 
     def __init__(self, pool : TF_Pool, basic_structure : Union[list, tuple, set], var_to_explain : str = None,
                  metaparameters : dict = {'sparsity' : {'optimizable' : True, 'value' : 1.},
@@ -376,6 +380,9 @@ class Equation(ComplexStructure):
 
         for idx, _ in enumerate(self.structure):
             self.structure[idx].use_cache()
+            
+        # print(f'generated equation: {self.text_form} with len {self.metaparameters["terms_number"]["value"]}')
+        # print([term.descr_variable_marker for term in self.structure])
 
     def reset_explaining_term(self, term_idx = 0):
         for idx, term in enumerate(self.structure):
@@ -383,11 +390,14 @@ class Equation(ComplexStructure):
                 assert term.contains_family(self.main_var_to_explain), 'Trying explain a variable with term without right family.'
                 term.descr_variable_marker = self.main_var_to_explain
             else:
-                term.descr_variable_marker = None
+                term.descr_variable_marker = False
 
     @property
     def contains_deriv(self):
         return any([term.contains_deriv for term in self.structure])
+
+    def contains_family(self, family):
+        return any([term.contains_family(family) for term in self.structure])
     
     @property 
     def forbidden_token_labels(self):
@@ -407,14 +417,20 @@ class Equation(ComplexStructure):
         if not (bool or mandatory_family):
             raise ValueError('No property passed for restoration.')
         while True:
+            print(f'Restoring containment of {mandatory_family} in {self.text_form}.')
             replacement_idx = np.random.randint(low = 0, high = len(self.structure))
-            temp = Term(self.pool, max_factors_in_term = self.metaparameters['max_factors_in_term']['value'])
+            mf_marker = mandatory_family if mandatory_family else None
+            temp = Term(self.pool, mandatory_family = mf_marker, 
+                        max_factors_in_term = self.metaparameters['max_factors_in_term']['value'])
             if deriv and temp.contains_deriv:
                 self.structure[replacement_idx] = temp
                 break
             elif mandatory_family and temp.contains_family(self.main_var_to_explain):
                 self.structure[replacement_idx] = temp
                 break
+            else:
+                print('temp', temp.name, 'self.main_var_to_explain', self.main_var_to_explain)
+                
 
     def reconstruct_by_right_part(self, right_part_idx):
         warnings.warn(message = 'Tokens can no longer be set as right-part-unique',
@@ -576,7 +592,7 @@ class Equation(ComplexStructure):
 
     def solver_form(self):
         if self.solver_form_defined:
-            print(self.text_form)
+            # print(self.text_form)
             return self._solver_form
         else:
             self._solver_form = []
@@ -697,10 +713,13 @@ def solver_formed_grid():
     training_grid = np.array(training_grid).reshape((len(training_grid), -1))
     return torch.from_numpy(training_grid).T.type(torch.FloatTensor)
 
-def check_metaparameters(metaparams : dict):
+def check_metaparameters(metaparameters : dict):
     metaparam_labels = ['terms_number', 'max_factors_in_term', 'sparsity']
-    if any([(label not in metaparams.keys()) for label in metaparam_labels]):
-        raise ValueError('Only partial metaparameter vector has been passed.')
+    return True
+    # TODO: fix this check
+    # if any([((label not in metaparameters.keys()) and ) for label in metaparam_labels]):
+    #     print('required metaparameters:', metaparam_labels, 'metaparameters:', metaparameters)
+    #     raise ValueError('Only partial metaparameter vector has been passed.')
     
 
 class SoEq(moeadd.MOEADDSolution):
@@ -711,7 +730,7 @@ class SoEq(moeadd.MOEADDSolution):
         ----------
         pool : epde.interface.token_familiy.TF_Pool
             Pool, containing token families for the equation search algorithm.
-        metaparams : dict
+        metaparameters : dict
             Metaparameters dictionary for the search. Key - label of the parameter (e.g. 'sparsity'),
             value - tuple, containing flag for metaoptimization and initial value.
 
@@ -722,15 +741,19 @@ class SoEq(moeadd.MOEADDSolution):
         '''
         check_metaparameters(metaparameters)
         
-        self.metaparams = metaparameters
+        self.metaparameters = metaparameters
         self.tokens_for_eq = TF_Pool(pool.families_demand_equation)
         self.tokens_supp = TF_Pool(pool.families_supplementary)
         self.moeadd_set = False
+              
+        self.vars_to_describe = {token_family.ftype for token_family in self.tokens_for_eq.families}
+
         
     def use_default_objective_function(self):
-        from epde.eq_mo_objectives import generate_partial, equation_discrepancy, equation_complexity_by_factors
-        complexity_objectives = [generate_partial(equation_complexity_by_factors, eq_idx) for eq_idx in range(len(self.tokens_for_eq))]
-        quality_objectives = [generate_partial(equation_discrepancy, eq_idx) for eq_idx in range(len(self.tokens_for_eq))]
+        from epde.eq_mo_objectives import generate_partial, equation_fitness, equation_complexity_by_factors
+        complexity_objectives = [generate_partial(equation_complexity_by_factors, eq_key) 
+                                 for eq_key in self.vars_to_describe]# range(len(self.tokens_for_eq))]
+        quality_objectives = [generate_partial(equation_fitness, eq_key) for eq_key in self.vars_to_describe]#range(len(self.tokens_for_eq))]
         self.set_objective_functions(quality_objectives + complexity_objectives)
         
     def set_objective_functions(self, obj_funs):
@@ -751,19 +774,19 @@ class SoEq(moeadd.MOEADDSolution):
 
     def create_equations(self):
         structure = {}
-        token_selection = self.tokens_supp
-        
-        self.vars_to_describe = {token_family.type for token_family in self.tokens_for_eq.families}
+
+        token_selection = self.tokens_supp  
         current_tokens_pool = token_selection + self.tokens_for_eq
-        
+
         for eq_idx, variable in enumerate(self.vars_to_describe):
             structure[variable] = Equation(current_tokens_pool, basic_structure = [], var_to_explain = variable, 
                                            metaparameters = self.metaparameters)
+
         self.vals = Chromosome(structure, params = {key : val for key, val in self.metaparameters.items()
-                                                      if val['optimizable']})
+                                                    if val['optimizable']})
         moeadd.MOEADDSolution.__init__(self, self.vals, self.obj_funs)
         self.moeadd_set = True
-        
+
     @staticmethod
     def equation_opt_iteration(population, evol_operator, population_size, iter_index, unexplained_vars, strict_restrictions = True):
         for equation in population:
@@ -810,8 +833,8 @@ class SoEq(moeadd.MOEADDSolution):
     def __eq__(self, other):
         assert self.moeadd_set, 'The structure of the equation is not defined, therefore no moeadd operations can be called'
         return (all([any([other_elem == self_elem for other_elem in other.vals]) for self_elem in self.vals]) and
-                all([any([other_elem == self_elem for self_elem in self.vals]) for other_elem in other.structure]) and
-                len(other.vals) == len(self.vals)) or all(np.isclose(self.obj_fun, other.obj_fun))
+                all([any([other_elem == self_elem for self_elem in self.vals]) for other_elem in other.vals]) and
+                len(other.vals) == len(self.vals)) # or all(np.isclose(self.obj_fun, other.obj_fun)
 
     @property
     def latex_form(self):
@@ -857,3 +880,21 @@ class SoEq(moeadd.MOEADDSolution):
             grid = solver_formed_grid()
             bconds = self.vals[0].boundary_conditions(full_domain = full_domain)
             return form, grid, bconds
+
+    def __iter__(self):
+        return SoEqIterator(self)
+
+        
+class SoEqIterator(object):
+    def __init__(self, system : SoEq):
+        self._idx = 0
+        self.system = system
+        self.keys = list(system.vars_to_describe)
+
+    def __next__(self):
+        if self._idx < len(self.keys):
+            res = self.system.vals[self.keys[self._idx]]
+            self._idx += 1
+            return res
+        else:
+            raise StopIteration        

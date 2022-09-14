@@ -68,11 +68,15 @@ class ParetoLevels(object):
     moeadd optimizer, thus no extra interactions of a user with this class are necessary.
     
     '''
-    def __init__(self, population, sorting_method = fast_non_dominated_sorting, update_method = ndl_update):
+    def __init__(self, population, sorting_method = fast_non_dominated_sorting, 
+                 update_method = ndl_update, initial_sort : bool = False):
         self._sorting_method = sorting_method
         self.population = population
         self._update_method = update_method
-        self.levels = self._sorting_method(self.population)
+        if initial_sort:
+            self.levels = self._sorting_method(self.population)
+        else:
+            self.unplaced_candidates = population
         
     @property
     def levels(self):
@@ -82,7 +86,7 @@ class ParetoLevels(object):
         return len(self.population)
     
     def __iter__(self):
-        return ParetoLevelsIterator()
+        return ParetoLevelsIterator(self)
     
     def sort(self):
         '''
@@ -158,8 +162,8 @@ class ParetoLevelsIterator(object):
         self._idx = 0
 
     def __next__(self):
-        if self._idx < len(self._level.population):
-            res = self._level.population[self._idx]
+        if self._idx < len(self._levels.population):
+            res = self._levels.population[self._idx]
             self._idx += 1
             return res
         else:
@@ -282,7 +286,8 @@ class MOEADDOptimizer(object):
                     self.abbreviated_search(population, sorting_method = nds_method, update_method = ndl_update)
                     return None
                 solution_gen_idx += 1
-        self.pareto_levels = ParetoLevels(population, sorting_method=nds_method, update_method=ndl_update)
+        self.pareto_levels = ParetoLevels(population, sorting_method = nds_method, update_method = ndl_update,
+                                          initial_sort = False)
         
         self.weights = []; weights_size = len(population[0].obj_funs) #np.empty((pop_size, len(optimized_functionals)))
         for weights_idx in range(weights_num):
@@ -342,6 +347,7 @@ class MOEADDOptimizer(object):
         assert 1./delta == round(1./delta) # check, if 1/delta is integer number
         m = np.zeros(weights_num)
         for weight_idx in np.arange(weights_num):
+            print('1./delta + 1 - np.sum(m[:weight_idx + 1])', 1./delta + 1 - np.sum(m[:weight_idx + 1]))
             weights[weight_idx] = np.random.choice([div_idx * delta for div_idx in np.arange(1./delta + 1 - np.sum(m[:weight_idx + 1]))])
             m[weight_idx] = weights[weight_idx]/delta
         weights[-1] = 1 - np.sum(weights[:-1])
@@ -383,7 +389,9 @@ class MOEADDOptimizer(object):
         '''
         
         # добавить возможность теста оператора
+        print("sector_processer is set")
         self.sector_processer = processer
+        print(self.sector_processer)
     
     
         
@@ -430,7 +438,7 @@ class MOEADDOptimizer(object):
                 for weight_idx in np.arange(len(self.weights)):
                     if global_var.verbose.show_moeadd_epochs:
                         print(f'During MO : processing {weight_idx}-th weight.')                    
-                    sp_kwargs = self.form_processer_args()
+                    sp_kwargs = self.form_processer_args(weight_idx)
                     self.sector_processer.run(population_subset = self.pareto_levels, 
                                               EA_kwargs = sp_kwargs)
                         

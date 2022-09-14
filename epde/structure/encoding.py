@@ -48,12 +48,12 @@ class Gene(object):
                 
 class Chromosome(object):
 
-    def __init__(self, equations, **kwargs):
+    def __init__(self, equations, params):
         '''
         
         Parameters
         ----------
-        equations : list of epde.strucutre.main_structures.Equation objects
+        equations : dict of epde.strucutre.main_structures.Equation objects
             List of equation, that form the chromosome.
         **kwargs : TYPE
             DESCRIPTION.
@@ -63,14 +63,15 @@ class Chromosome(object):
         None.
 
         '''
-        self.equation_type = type(equations[0])
+        # print('equations', equations)
         
-        self.chromosome = {eq.main_var_to_explain : Gene(key = eq.main_var_to_explain, value = eq)
-                           for eq in equations}
+        self.equation_type = type(next(iter(equations)))
+        
+        self.chromosome = {key : Gene(key = key, value = eq) for key, eq in equations.items()}  # eq.main_var_to_explain
         self.equation_keys = list(self.chromosome.keys())
-        self.params_keys = list(kwargs.keys())
-        for key, arg in kwargs.items():
-            self.chromosome[key] = Gene(key = key, value = arg)
+        self.params_keys = list(params.keys())
+        for key, arg in params.items():
+            self.chromosome[key] = Gene(key = key, value = arg['value'])
             
             
     def replace_gene(self, gene_key, value):
@@ -95,8 +96,8 @@ class Chromosome(object):
         if isinstance(key, str) and (key in self.chromosome[np.random.choice(self.equation_keys)]):
             for eq_name in self.equation_keys:
                 self.chromosome[eq_name].set_metaparam(key = key, value = value)
-        elif isinstance(key, [list, tuple]):    
-            self.chromosome[key[1]].set_metaparam(key = key[0], value = value)
+        elif isinstance(key, (list, tuple)):    
+            self.chromosome[key[1]].set_metaparam(key = key, value = value)
         else:
             raise ValueError('Incorrect value passed into genes parameters setting.')
         
@@ -110,6 +111,10 @@ class Chromosome(object):
     
     def __len__(self):
         return len(self.equation_keys)
+    
+    @property
+    def text_form(self):
+        return [(key, gene.value) for key, gene in self.chromosome.items()]
     
     @property
     def hash_descr(self):

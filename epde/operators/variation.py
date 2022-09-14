@@ -44,7 +44,7 @@ class ParetoLevelsCrossover(CompoundOperator):
         return the new population, created with the noted operators and containing both parent individuals and their offsprings.    
     
     """
-    def apply(self, objective : ParetoLevels):
+    def apply(self, objective : ParetoLevels, arguments : dict):
         """
         Method to obtain a new population by selection of parent individuals (equations) and performing a crossover between them to get the offsprings.
         
@@ -59,6 +59,8 @@ class ParetoLevelsCrossover(CompoundOperator):
             the new population, containing both parents and offsprings;
         
         """
+        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)        
+        
         crossover_pool = []
         for solution in objective.population:
             crossover_pool.extend([solution,] * solution.crossover_times())
@@ -75,7 +77,8 @@ class ParetoLevelsCrossover(CompoundOperator):
             new_system_1 = deepcopy(crossover_pool[pair_idx, 0])
             new_system_2 = deepcopy(crossover_pool[pair_idx, 1])
 
-            new_system_1, new_system_2 = self.suboperators['chromosome_crossover'].apply(new_system_1, new_system_2)
+            new_system_1, new_system_2 = self.suboperators['chromosome_crossover'].apply(objective = (new_system_1, new_system_2), 
+                                                                                         arguments = subop_args['chromosome_crossover'])
             offsprings.extend([new_system_1, new_system_2])
 
         objective.unplaced_candidates = offsprings
@@ -86,20 +89,24 @@ class ParetoLevelsCrossover(CompoundOperator):
 
 
 class ChromosomeCrossover(CompoundOperator):
-    def apply(self, objective : tuple):
+    def apply(self, objective : tuple, arguments : dict):
+        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
+   
         assert objective[0].vals.same_encoding(objective[1].vals)
         offspring_1 = deepcopy(objective[0]); offspring_2 = deepcopy(objective[1])        
         
         eqs_keys = offspring_1.vals.equation_keys; params_keys = offspring_2.vals.params_keys
         for eq_key in eqs_keys:
-            offspring_1, offspring_2 = self.suboperators['equation_crossover'].apply((offspring_1.vals[eq_key],
-                                                                                        offspring_2.vals[eq_key]))
+            offspring_1, offspring_2 = self.suboperators['equation_crossover'].apply(objective = (offspring_1.vals[eq_key],
+                                                                                                  offspring_2.vals[eq_key]),
+                                                                                     arguments = subop_args['equation_crossover'])
             offspring_1.vals.replace_gene(gene_key = eq_key, value = offspring_1)
             offspring_2.vals.replace_gene(gene_key = eq_key, value = offspring_2)
             
         for param_key in params_keys:
-            offspring_1, offspring_2 = self.suboperators['param_crossover'].apply((offspring_1.vals[param_key],
-                                                                                   offspring_2.vals[param_key]))
+            offspring_1, offspring_2 = self.suboperators['param_crossover'].apply(objective = (offspring_1.vals[param_key],
+                                                                                               offspring_2.vals[param_key]),
+                                                                                  arguments = subop_args['param_crossover'])
             offspring_1.vals.replace_gene(gene_key = param_key, value = offspring_1)
             offspring_2.vals.replace_gene(gene_key = param_key, value = offspring_2)
             
@@ -113,7 +120,9 @@ class ChromosomeCrossover(CompoundOperator):
 
 
 class MetaparamerCrossover(CompoundOperator):
-    def apply(self, objective : tuple):
+    def apply(self, objective : tuple, arguments : dict):
+        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
+        
         offspring_1 = objective[0] + self.params['metaparam_proportion'] * (objective[1] - objective[0])
         offspring_2 = objective[0] + (1 - self.params['metaparam_proportion']) * (objective[1] - objective[0])
         return offspring_1, offspring_2
@@ -125,7 +134,9 @@ class MetaparamerCrossover(CompoundOperator):
 class EquationCrossover(CompoundOperator):
     @Reset_equation_status(reset_input = True)
     @History_Extender(f'\n -> performing equation crossover', 'ba')
-    def apply(self, objective : tuple):
+    def apply(self, objective : tuple, arguments : dict):
+        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
+        
         offspring_1 = deepcopy(objective[0]); offspring_2 = deepcopy(objective[1])
         
         equation1_terms, equation2_terms = detect_similar_terms(objective[0], objective[1])
@@ -134,15 +145,18 @@ class EquationCrossover(CompoundOperator):
         offspring_1.structure = flatten(equation1_terms); offspring_2.structure = flatten(equation2_terms)
     
         for i in range(same_num, same_num + similar_num):
-            temp_term_1, temp_term_2 = self.suboperators['term_crossover'].apply((offspring_1.structure[i], offspring_2.structure[i])) 
+            temp_term_1, temp_term_2 = self.suboperators['term_param_crossover'].apply(objective = (offspring_1.structure[i], 
+                                                                                                    offspring_2.structure[i]),
+                                                                                       arguments = subop_args['term_param_crossover']) 
             if (check_uniqueness(temp_term_1, offspring_1.structure[:i] + offspring_1.structure[i+1:]) and 
                 check_uniqueness(temp_term_2, offspring_2.structure[:i] + offspring_2.structure[i+1:])):                     
                 offspring_1.structure[i] = temp_term_1; offspring_2.structure[i] = temp_term_2
 
         for i in range(same_num + similar_num, len(offspring_1.structure)):
             if check_uniqueness(offspring_1.structure[i], offspring_2.structure) and check_uniqueness(offspring_2.structure[i], offspring_1.structure):
-                offspring_1.structure[i], offspring_2.structure[i] = self.suboperators['term_crossover'].apply((offspring_1.structure[i], 
-                                                                                                                offspring_2.structure[i]))
+                offspring_1.structure[i], offspring_2.structure[i] = self.suboperators['term_crossover'].apply(objective = (offspring_1.structure[i], 
+                                                                                                                            offspring_2.structure[i]),
+                                                                                                               arguments = subop_args['term_crossover'])
                 
         return offspring_1, offspring_2
 
@@ -152,7 +166,9 @@ class EquationCrossover(CompoundOperator):
 class EquationExchangeCrossover(CompoundOperator):
     @Reset_equation_status(reset_input = True)
     @History_Extender(f'\n -> performing equation exchange crossover', 'ba')
-    def apply(self, objective : tuple):
+    def apply(self, objective : tuple, arguments : dict):
+        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
+        
         offspring_1 = deepcopy(objective[0]); offspring_2 = deepcopy(objective[1])
         offspring_1.structure, offspring_2.structure = objective[1].structure, objective[0].structure
         return offspring_1, offspring_2
@@ -176,7 +192,7 @@ class TermParamCrossover(CompoundOperator):
     apply(population)
         return the offspring terms, constructed as the parents' factors with parameter values, selected between the parents' ones.        
     """
-    def apply(self, objective : tuple):
+    def apply(self, objective : tuple, arguments : dict):
         """
         Get the offspring terms, constructed as the parents' factors with parameter values, selected between the parents' ones.
         
@@ -191,6 +207,8 @@ class TermParamCrossover(CompoundOperator):
             The offspring terms.
         
         """
+        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
+        
         offspring_1 = deepcopy(objective[0]); offspring_2 = deepcopy(objective[1])
         offspring_1.reset_saved_state(); offspring_2.reset_saved_state()
         
@@ -240,7 +258,7 @@ class TermCrossover(CompoundOperator):
         return the offspring terms, which are the same parents' ones, but in different order, if the crossover occured.
         .        
     """    
-    def apply(self, objective : tuple):
+    def apply(self, objective : tuple, arguments : dict):
         """
         Get the offspring terms, which are the same parents' ones, but in different order, if the crossover occured.
         
@@ -254,7 +272,9 @@ class TermCrossover(CompoundOperator):
         offspring_1, offspring_2 : Term objects
             The offspring terms.
         
-        """        
+        """
+        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
+        
         if (np.random.uniform(0, 1) <= self.params['crossover_probability'] and 
             objective[1].descr_variable_marker == objective[0].descr_variable_marker):
                 return objective[1], objective[0]
@@ -280,9 +300,6 @@ def get_basic_variation(variation_params : dict = {}):
     equation_exchange_crossover = EquationExchangeCrossover()
 
     chromosome_crossover = ChromosomeCrossover()
-
-    # chromosome_mutation = get_basic_mutation()
-    # pl_updater = get_basic_populator_updater
 
     pl_cross = ParetoLevelsCrossover(['PBI_penalty'])
     add_kwarg_to_operator(operator = pl_cross, labeled_base_val = {'PBI_penalty' : 1.})

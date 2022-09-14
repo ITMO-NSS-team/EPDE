@@ -15,14 +15,14 @@ from epde.supplementary import factor_params_to_str
 
 class Factor(TerminalToken):
     __slots__ = ['_params', '_params_description', '_hash_val',
-                 'label', 'type', 'grid_set', 'grid_idx', 'is_deriv', 'deriv_code', 
+                 'label', 'ftype', 'grid_set', 'grid_idx', 'is_deriv', 'deriv_code', 
                  'cache_linked', '_status', 'equality_ranges', '_evaluator', 'saved']
     
     def __init__(self, token_name : str, status : dict, family_type : str, 
                  randomize : bool = False, params_description = None, 
                  deriv_code = None, equality_ranges = None):
         self.label = token_name
-        self.type = family_type
+        self.ftype = family_type
         self.status = status
         self.grid_set = False
         self._hash_val = np.random.randint(0, 1e9)

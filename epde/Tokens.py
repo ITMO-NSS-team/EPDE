@@ -108,7 +108,7 @@ class TerminalToken(Token):
         self.fix = fix
         self.cache_val = cache_val
         self._fix_val = fix_val
-        self.type = type_
+        self.ftype = type_
         self.optimizer = optimizer
         self.name_ = name_
         self.mandatory = mandatory

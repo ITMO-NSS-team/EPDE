@@ -99,7 +99,7 @@ def optimize_parametric_form(terms : list, pool, method = 'L-BFGS-B', **kwargs):
             assert cur_family.params_set and cur_family.evaluator_set, 'Family has not been completed before the call.'
             if factor_is_parametric:
                 factor = construct_parametric_factor(label = label, param_equality=cur_family.equality_ranges, 
-                                                     status = cur_family.status, family_type=cur_family.type, 
+                                                     status = cur_family.status, family_type=cur_family.ftype, 
                                                      params_description=cur_family.token_params, params_to_opt = params)
                 factor.set_defined_params({key : value for key, value in params_vals.items() if value is not None})
                 factor.set_evaluator(cur_family._evaluator)
@@ -107,7 +107,7 @@ def optimize_parametric_form(terms : list, pool, method = 'L-BFGS-B', **kwargs):
                 temp_factors_param[factor.factor_id] = factor
             else:
                 factor = construct_ordinary_factor(label = label, param_equality=cur_family.equality_ranges, 
-                                                    status = cur_family.status, family_type=cur_family.type, 
+                                                    status = cur_family.status, family_type=cur_family.ftype, 
                                                     params_description=cur_family.token_params)
                 assert all([value is not None for key, value in params_vals.items()])
                 factor.set_parameters(params_description = cur_family.token_params, 

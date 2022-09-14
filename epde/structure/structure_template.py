@@ -26,6 +26,9 @@ class ComplexStructure(object):
                 all([any([other_elem == self_elem for self_elem in self.structure]) for other_elem in other.structure]) and 
                 len(other.structure) == len(self.structure))
 
+    def __iter__(self):
+        return CSIterator(self)
+
     def set_evaluator(self, evaluator):
         raise NotImplementedError('Functionality of this method has been moved to the evolutionary operator declaration')
     
@@ -46,3 +49,17 @@ class ComplexStructure(object):
     @property
     def name(self):
         pass
+    
+
+class CSIterator(object):
+    def __init__(self, complex_structure : ComplexStructure):
+        self._idx = 0
+        self._complex_structure = complex_structure
+
+    def __next__(self):
+        if self._idx < len(self._complex_structure.structure):
+            res = self._complex_structure.structure[self._idx]
+            self._idx += 1
+            return res
+        else:
+            raise StopIteration

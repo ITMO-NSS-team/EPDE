@@ -31,6 +31,8 @@ class CompoundOperator():
     def __init__(self, param_keys : list = []):
         self.param_keys = param_keys
         self._params = {}
+        self._suboperators = {}
+        
         self.use_default_tags()
 
     @property
@@ -55,7 +57,7 @@ class CompoundOperator():
             raise TypeError('The suboperators of an evolutionary operator must be declared in format key : value, where key is str and value - CompoundOperator, list, tuple or dict')
         self._suboperators = SuboperatorContainer(suboperators = operators, probas = probas) 
 
-    def get_suboperator_args(self):
+    def get_suboperator_args(self, personal = False):
         '''
         
         
@@ -65,11 +67,16 @@ class CompoundOperator():
             Arguments of the operator and its suboperators.
 
         '''
-        args = [operator.get_suboperator_args() for operator in self.suboperators]
-        args.extend(inspect.getfullargspec(self.apply).args)
+        args = self.arguments
+        if not personal:
+            for operator in self.suboperators:
+                args = args.union(operator.get_suboperator_args())
         
-        if 'objective' in args:
-            args.remove('objective')
+        technical_args = ['arguments', 'objective', 'obj', 'self']
+        for arg in technical_args:
+            if arg in args:
+                args.remove(arg)
+                
         return args
 
     def _check_objective_type(method):
@@ -92,11 +99,21 @@ class CompoundOperator():
                 return result
         return wrapper
     
-    # _check_objective_type = staticmethod(_check_objective_type)
+    def parse_suboperator_args(self, arguments : dict):
+        def parse_args(keys, args):
+            return {key : args[key] for key in keys}
+        
+        operators_args = {}
+        for key in self.suboperators.keys():
+            operators_args[key] = parse_args(self.suboperators[key].get_suboperator_args(), arguments)
+            
+        return parse_args(self.get_suboperator_args(True), arguments), operators_args
+        
     
     @_check_objective_type
-    def apply(self, objective):
-        pass
+    def apply(self, objective, arguments : dict):
+        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
+        raise NotImplementedError('Trying to apply abstract superclass of the operator.')
 
     @property
     def level_index(self):
@@ -113,7 +130,10 @@ class CompoundOperator():
     def operator_tags(self):
         return self._tags
 
-
+    @property
+    def arguments(self):
+        return set()
+    
 class SuboperatorContainer():
     def __init__(self, suboperators : dict = {}, probas : dict = {}):
         '''
@@ -134,11 +154,14 @@ class SuboperatorContainer():
                 operator_probability = probas[label]
             self.probas[label] = operator_probability
     
-    def __call__(self, label):
-        if isinstance(self.suboperators[label], CompoundOperator):
-            return self.suboperators[label]
-        elif isinstance(self.suboperators[label], (list, tuple, np.ndarray)):
-            return np.random.choice(a = self.suboperators[label], p = self.probas[label])
+    def __getitem__(self, item):
+        if isinstance(self.suboperators[item], CompoundOperator):
+            return self.suboperators[item]
+        elif isinstance(self.suboperators[item], (list, tuple, np.ndarray)):
+            return np.random.choice(a = self.suboperators[item], p = self.probas[item])
+        
+    def keys(self):
+        return self.suboperators.keys()
         
     def __iter__(self):
         return SuboperatorContainerIterator(self)

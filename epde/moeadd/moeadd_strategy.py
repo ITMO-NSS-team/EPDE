@@ -47,6 +47,7 @@ def add_sequential_operators(builder : SectorProcesserBuilder, operators : list)
         builder.add_operator(operator[0], operator[1], terminal_operator = (idx == len(operators) - 1))
 
     builder.set_input_combinator()
+    builder.link('initial', operators[0][0])
     for op_idx, _ in enumerate(operators[:-1]):
         builder.link(operators[op_idx][0], operators[op_idx + 1][0])
 
@@ -93,16 +94,19 @@ class OptimizationPatternDirector(object):
         fitness_cond = lambda x: getattr(x, 'fitness_calculated')
         sys_fitness = map_operator_between_levels(eq_fitness, 'gene level', 'chromosome level', fitness_cond)
         
+        rps_cond = lambda x: any([not elem_eq.right_part_selected for elem_eq in x.vals])
+        sys_rps = map_operator_between_levels(right_part_selector, 'gene level', 'chromosome level', rps_cond)
+        
         # Separate mutation from population updater for better customization.
-        population_updater = get_pareto_levels_updater(right_part_selector = right_part_selector, chromosome_fitness = sys_fitness,
+        population_updater = get_pareto_levels_updater(right_part_selector = sys_rps, chromosome_fitness = sys_fitness,
                                                        constrained = False, mutation_params = mutation_params, 
                                                        pl_updater_params = pareto_updater_params, 
                                                        combiner_params = pareto_combiner_params)
 
-
-        self.builder = add_sequential_operators(self.builder, [('selection', selection), 
-                                                                 ('variation', variation), 
-                                                                 ('pareto_updater', population_updater)])
+        self.builder = add_sequential_operators(self.builder, [('pareto_updater_initial', population_updater),
+                                                               ('selection', selection),
+                                                               ('variation', variation),
+                                                               ('pareto_updater_compl', population_updater)])
     
     def use_constrained_eq_search(self):
         raise NotImplementedError('No constraints have been implemented yest')

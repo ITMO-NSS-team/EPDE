@@ -5,6 +5,7 @@ Created on Tue Jul  6 15:55:12 2021
 
 @author: mike_ubuntu
 """
+import time
 import numpy as np
 from typing import Union, Callable
 from collections import OrderedDict
@@ -51,7 +52,6 @@ class Input_data_entry(object):
             method_kwargs['max_order'] = max_order
             # if self.coord_tensors is not None and 'grid' not in method_kwargs.keys():
             _, method_kwargs['grid'] = global_var.grid_cache.get_all()
-            print(method_kwargs['grid'])
             self.data_tensor, self.derivatives = Preprocess_derivatives(self.data_tensor, method=method, 
                                                                         method_kwargs=method_kwargs)
             # Added setting of data tensor from filtered field
@@ -322,6 +322,8 @@ class epde_search(object):
                                   method_kwargs=method_kwargs)
             entry.use_global_cache()
             
+            print(f'creating TokenFamily entry {entry.var_name}')
+            time.sleep(10)
             entry_token_family = TokenFamily(entry.var_name, family_of_derivs = True)
             entry_token_family.set_status(demands_equation=True, unique_specific_token=False, 
                                           unique_token_type=False, s_and_d_merged = False, 
@@ -428,13 +430,17 @@ class epde_search(object):
                          data_fun_pow=data_fun_pow)
         
         pop_constructor = SystemsPopulationConstructor(pool = self.pool, terms_number = equation_terms_max_number, 
-                                                                 max_factors_in_term = equation_factors_max_number,
-                                                                 sparsity_interval = eq_sparsity_interval)
+                                                       max_factors_in_term = equation_factors_max_number,
+                                                       sparsity_interval = eq_sparsity_interval)
 
         self.moeadd_params['pop_constructor'] = pop_constructor
-        self.optimizer = moeadd_optimizer(**self.moeadd_params)
+        self.optimizer = MOEADDOptimizer(**self.moeadd_params)
         
-        self.optimizer.set_sector_processer(operator = evo_operator)        
+        evo_operator_builder = self.director.builder
+        evo_operator_builder.assemble(True)
+        evo_operator = evo_operator_builder.processer
+        
+        self.optimizer.set_sector_processer(processer = evo_operator)        
         best_obj = np.concatenate((np.zeros(shape = len([1 for token_family in self.pool.families if token_family.status['demands_equation']])),
                                    np.ones(shape = len([1 for token_family in self.pool.families if token_family.status['demands_equation']]))))  
         print('best_obj', len(best_obj))

@@ -67,8 +67,8 @@ def test_pool():
                equal_params=mock_equal_params, evaluator=mock_evaluator, meaningful=True)
     
     pool = TF_Pool([f1, f2, f3])
-    print('meaningful:', [(family.type, family.tokens) for family in pool.families_meaningful])
-    print('all:', [(family.type, family.tokens) for family in pool.families])
+    print('meaningful:', [(family.ftype, family.tokens) for family in pool.families_meaningful])
+    print('all:', [(family.ftype, family.tokens) for family in pool.families])
     pool.families_cardinality(meaningful_only = True)
     pool.families_cardinality(meaningful_only = False)
 #    raise NotImplementedError

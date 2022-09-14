@@ -45,7 +45,7 @@ class L2Fitness(CompoundOperator):
         calculate the fitness function of the equation, that will be stored in the equation.fitness_value.    
         
     """
-    def apply(self, objective : Equation):
+    def apply(self, objective : Equation, arguments : dict):
         """
         Calculate the fitness function values. The result is not returned, but stored in the equation.fitness_value attribute.
         
@@ -60,13 +60,15 @@ class L2Fitness(CompoundOperator):
         None
         """        
 
-        self.suboperators['sparsity'].apply(objective)
-        self.suboperators['coeff_calc'].apply(objective)
+        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
+
+        self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
+        self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
         
         _, target, features = objective.evaluate(normalize = False, return_val = False)
         try:
             discr = (np.dot(features, objective.weights_final[:-1]) + 
-                                  np.full(target.shape, objective.weights_final[-1]) - target)
+                     np.full(target.shape, objective.weights_final[-1]) - target)
             self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)
             discr = np.multiply(discr, self.g_fun_vals)
             rl_error = np.linalg.norm(discr, ord = 2)

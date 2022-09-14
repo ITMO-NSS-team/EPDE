@@ -108,10 +108,10 @@ def test_tensor_cache():
     for idx, key in enumerate(global_var.tensor_cache.memory_default.keys()):
         replacing_data[key] = replacing_tensors[idx, ... ]
         
-    print(replacing_data[list(global_var.tensor_cache.memory_default.keys())[0]].shape, list(global_var.tensor_cache.memory_default.values())[0].shape)
+    # print(replacing_data[list(global_var.tensor_cache.memory_default.keys())[0]].shape, list(global_var.tensor_cache.memory_default.values())[0].shape)
     global_var.tensor_cache.use_structural(use_base_data = False, replacing_data = replacing_data)
-    print(global_var.tensor_cache.memory_default.keys())
-    print(list(global_var.tensor_cache.memory_default.keys()))
+    # print(global_var.tensor_cache.memory_default.keys())
+    # print(list(global_var.tensor_cache.memory_default.keys()))
     key = list(global_var.tensor_cache.memory_default.keys())[np.random.randint(low = 0,
                                                                                 high = len(global_var.tensor_cache.memory_default.keys()))]
     global_var.tensor_cache.use_structural(use_base_data = False, 

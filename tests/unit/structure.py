@@ -176,9 +176,6 @@ def test_solver_forms():
         global_var.tensor_cache.memory_usage_properties(obj_test_case=ts, mem_for_cache_frac = 5)  
         global_var.grid_cache.memory_usage_properties(obj_test_case=x, mem_for_cache_frac = 5)
     
-        
-        print(type(derivs))
-    
         boundary = 10
         upload_grids(x[boundary:-boundary], global_var.grid_cache)   
         u_derivs_stacked = prepare_var_tensor(ts_smoothed, derivs, time_axis = 0, boundary = boundary)

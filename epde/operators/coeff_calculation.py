@@ -26,7 +26,7 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
             
     
     '''
-    def apply(self, objective : Equation):
+    def apply(self, objective : Equation, arguments : dict):
         """
         Calculate the coefficients of the equation, using the linear regression.The result is stored in the 
         objective.weights_final attribute
@@ -41,6 +41,8 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
         
         None
         """        
+        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
+        
         assert objective.weights_internal_evald, 'Trying to calculate final weights before evaluating intermeidate ones (no sparsity).'
         target = objective.structure[objective.target_idx]
     

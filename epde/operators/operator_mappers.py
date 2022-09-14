@@ -25,16 +25,16 @@ class OperatorMapper(CompoundOperator):
         self._tags = copy.copy(operator_to_map.operator_tags)
         self._tags.remove(source_tag)
         self._tags.add(objective_tag)
-        print(f'Initializing operator mapper from {source_tag} to {objective_tag}')
+        # print(f'Initializing operator mapper from {source_tag} to {objective_tag}')
 
-    def apply(self, objective : CompoundOperator):
+    def apply(self, objective : CompoundOperator, arguments : dict):
         if self.objective_condition is None or self.objective_condition(objective):
             if 'inplace' in self.operator_tags:
                 for elem in objective:
-                    self.suboperators['to_map'].apply(elem)
+                    self.suboperators['to_map'].apply(elem, arguments)
             elif 'standard' in self.operator_tags:
                 for idx, elem in enumerate(objective):
-                    objective[idx] = self.suboperators['to_map'].apply(elem)
+                    objective[idx] = self.suboperators['to_map'].apply(elem, arguments)
             else:
                 raise TypeError('Incorrect type of mapping operator: not inplace nor returns similar object, as input.')
 
@@ -44,7 +44,7 @@ def map_operator_between_levels(operator : CompoundOperator, original_level : Un
     if isinstance(original_level, str): original_level = OPERATOR_LEVELS.index(original_level)
     if isinstance(target_level, str): target_level = OPERATOR_LEVELS.index(target_level)
     
-    print(f'mapping between {original_level} and {target_level}, that is {np.arange(original_level, target_level + 1)}')
+    # print(f'mapping between {original_level} and {target_level}, that is {np.arange(original_level, target_level + 1)}')
     resulting_operator = reduce(lambda x, y: OperatorMapper(operator_to_map     = x, 
                                                             objective_tag       = OPERATOR_LEVELS[y], 
                                                             source_tag          = OPERATOR_LEVELS[y-1],

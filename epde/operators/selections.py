@@ -16,8 +16,7 @@ from epde.operators.template import CompoundOperator
 
 
 class MOEADDSelection(CompoundOperator):
-    def apply(self, objective : ParetoLevels, weight_idx : int, weights : np.ndarray,
-              neighborhood_vectors : list): # pareto_levels
+    def apply(self, objective : ParetoLevels, arguments : dict): # pareto_levels
         '''
         
         The mating operator, designed to select parents for the crossover with respect 
@@ -56,18 +55,22 @@ class MOEADDSelection(CompoundOperator):
             List of the selected parents in the population pool.
         
         '''
-        if not self.neighborhoods_set:
-            raise AttributeError('Neighborhood properties have not been set before the selection call.')
-    
-    
+        # weight_idx : int, weights : np.ndarray, neighborhood_vectors : list
+        
+        # if not self.neighborhoods_set:
+            # raise AttributeError('Neighborhood properties have not been set before the selection call.')
+        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
+        # self_args['weight_idx']    self_args['weights']   self_args['neighborhood_vectors']
+        
         parents_number = int(len(objective.population) * self.params['parents_fraction']) # Странное упрощение   
         if np.random.uniform() < self.params['delta']:
-            selected_regions_idxs = self.suboperators['neighborhood_selector'].apply(self.neighborhood_vectors[weight_idx]) #, 
-                                                                                     # *self.neighborhood_selector_params)
-            candidate_solution_domains = list(map(lambda x: x.get_domain(self.weights), [candidate for candidate in 
-                                                                                         objective.population]))
-    
-            solution_mask = [(objective.population[solution_idx].get_domain(self.weights) in selected_regions_idxs) 
+            selected_regions_idxs = self.suboperators['neighborhood_selector'].apply(self_args['neighborhood_vectors'][self_args['weight_idx']],
+                                                                                     arguments = subop_args['neighborhood_selector']) #, 
+
+            candidate_solution_domains = list(map(lambda x: x.get_domain(self_args['weights']), [candidate for candidate in 
+                                                                                                 objective.population]))
+
+            solution_mask = [(objective.population[solution_idx].get_domain(self_args['weights']) in selected_regions_idxs) 
                              for solution_idx in candidate_solution_domains]
             available_in_proximity = sum(solution_mask)
             parent_idxs = np.random.choice([idx for idx in np.arange(len(objective.population)) if solution_mask[idx]], 
@@ -82,18 +85,22 @@ class MOEADDSelection(CompoundOperator):
                 parent_idxs_temp[:parent_idxs.size] = parent_idxs; parent_idxs_temp[parent_idxs.size:] = parent_idxs_additional
                 parent_idxs = parent_idxs_temp
         else:
+            # print('len(objective.population)', len(objective.population), 'parents_number', parents_number)
             parent_idxs = np.random.choice(np.arange(len(objective.population)), size = parents_number, replace = False)
         for idx in parent_idxs.reshape(-1):
             objective.population[int(idx)].incr_counter()
         return objective
+    
+    @property
+    def arguments(self):
+        return set(['neighborhood_vectors', 'weight_idx', 'weights'])    
     
     def use_default_tags(self):
         self._tags = {'selection', 'population level', 'auxilary', 'suboperators', 'standard'}
 
 
 class MOEADDSelectionConstrained(CompoundOperator):
-    def apply(self, objective : ParetoLevels, weight_idx : int, weights : np.ndarray,
-              neighborhood_vectors : list):
+    def apply(self, objective : ParetoLevels, arguments : dict):
         '''
         
         The mating operator, designed to select parents for the crossover with respect 
@@ -132,21 +139,18 @@ class MOEADDSelectionConstrained(CompoundOperator):
             List of the selected parents in the population pool.
         
         '''
-        if not self.neighborhoods_set:
-            raise AttributeError('Neighborhood properties have not been set before the selection call.')
-    
+        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
     
         if 'constraint_processer' in list(self.suboperators.keys()):
             multiplier = self.suboperators['constraint_processer'].params['group_size']
             
         parents_number = int(len(objective.population) * self.params['parents_fraction'] * multiplier)
         if np.random.uniform() < self.params['delta']:
-            selected_regions_idxs = self.suboperators['neighborhood_selector'].apply(self.neighborhood_vectors[weight_idx], 
-                                                                                     *self.neighborhood_selector_params)
-            candidate_solution_domains = list(map(lambda x: x.get_domain(self.weights), [candidate for candidate in 
-                                                                                         objective.population]))
+            selected_regions_idxs = self.suboperators['neighborhood_selector'].apply(self_args['neighborhood_vectors'][self_args['weight_idx']])
+            candidate_solution_domains = list(map(lambda x: x.get_domain(self_args['weights']), [candidate for candidate in 
+                                                                                                 objective.population]))
     
-            solution_mask = [(objective.population[solution_idx].get_domain(self.weights) in selected_regions_idxs) 
+            solution_mask = [(objective.population[solution_idx].get_domain(self_args['weights']) in selected_regions_idxs) 
                              for solution_idx in candidate_solution_domains]
             available_in_proximity = sum(solution_mask)
             parent_idxs = np.random.choice([idx for idx in np.arange(len(objective.population)) if solution_mask[idx]], 
@@ -170,6 +174,10 @@ class MOEADDSelectionConstrained(CompoundOperator):
         for idx in parent_idxs:
             objective.population[int(idx)].incr_counter()
         return objective
+    
+    @property
+    def arguments(self):
+        return set(['neighborhood_vectors', 'weight_idx', 'weights'])    
 
     def use_default_tags(self):
         self._tags = {'selection', 'population level', 'auxilary', 'suboperators', 'standard'}

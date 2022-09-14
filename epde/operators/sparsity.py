@@ -39,7 +39,7 @@ class LASSOSparsity(CompoundOperator):
         
     """
     
-    def apply(self, objective : Equation):
+    def apply(self, objective : Equation, arguments : dict):
         """
         Apply the operator, to fit the LASSO regression to the equation object to detect the 
         valueable terms. In the Equation class, a term is selected to represent the right part of
@@ -56,8 +56,9 @@ class LASSOSparsity(CompoundOperator):
         ------------
         None
         """
+        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
-        estimator = Lasso(alpha = objective.metaparams['sparsity']['value'], copy_X=True, fit_intercept=True, max_iter=1000,
+        estimator = Lasso(alpha = objective.metaparameters['sparsity']['value'], copy_X=True, fit_intercept=True, max_iter=1000,
                           normalize=False, positive=False, precompute=False, random_state=None,
                           selection='cyclic', tol=0.0001, warm_start=False)
         _, target, features = objective.evaluate(normalize = True, return_val = False)

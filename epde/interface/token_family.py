@@ -130,10 +130,14 @@ class TokenFamily(object):
             The name of the token family; must be unique among other families.
         """
         
-        self.type = token_type
+        self.ftype = token_type
         self.family_of_derivs = family_of_derivs
         self.evaluator_set = False; self.params_set = False; self.cache_set = False
         self.deriv_evaluator_set = True    
+
+    def __len__(self):
+        assert self.params_set, 'Familiy is not fully initialized.'
+        return len(self.tokens)
 
     def set_status(self, demands_equation = False, meaningful = False, 
                    s_and_d_merged = True, unique_specific_token = False, 
@@ -334,7 +338,7 @@ class TokenFamily(object):
                 label = np.random.choice([token for token in self.tokens 
                                           if not token_status[token][0] + 1 > token_status[token][1]])
             except ValueError:
-                print(f'An error while creating factor of {self.type} token family')
+                print(f'An error while creating factor of {self.ftype} token family')
                 print('Status description:', token_status, ' all:', self.tokens)
                 # for token in self.tokens:
                 #     if not token in occupied: print(f'{token} is free')
@@ -346,7 +350,7 @@ class TokenFamily(object):
         else:
             factor_deriv_code = None
         new_factor = Factor(token_name = label, deriv_code=factor_deriv_code,
-                            status = self.status, family_type = self.type)
+                            status = self.status, family_type = self.ftype)
         
         if self.status['unique_token_type']:
             occupied_by_factor = {token : self.token_params['power'][1] for token in self.tokens}
@@ -469,11 +473,15 @@ class TF_Pool(object):
                                                 **kwargs)
                           
     def create_from_family(self, family_label : str, token_status = None, **kwargs):
-        family = [f for f in self.families if family_label == f.type][0]
-        return family(label = None, token_status = token_status, **kwargs)
+        print('family_label', family_label, 'self.families', self.families)
+        family = [f for f in self.families if family_label == f.ftype][0]
+        return family.create(label = None, token_status = token_status, **kwargs)
                                                    
     def __add__(self, other):
         return TF_Pool(families = self.families + other.families)
+
+    def __len__(self):
+        return len(self.families)
 
     def get_families_by_label(self, label):
         containing_families = [family for family in self.families 

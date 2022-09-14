@@ -41,7 +41,9 @@ class EqRightPartSelector(CompoundOperator):
     
     '''    
     @History_Extender('\n -> The equation structure was detected: ', 'a')        
-    def apply(self, objective : Equation):
+    def apply(self, objective : Equation, arguments : dict):
+        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
+        
         if not objective.right_part_selected:
             max_fitness = 0
             max_idx = 0
@@ -58,7 +60,7 @@ class EqRightPartSelector(CompoundOperator):
                     if not objective.structure[target_idx].contains_deriv:
                         continue
                     objective.target_idx = target_idx
-                    self.suboperators['fitness_calculation'].apply(objective)
+                    self.suboperators['fitness_calculation'].apply(objective, arguments = subop_args['fitness_calculation'])
                     if objective.fitness_value > max_fitness:
                         max_fitness = objective.fitness_value
                         max_idx = target_idx
@@ -67,7 +69,7 @@ class EqRightPartSelector(CompoundOperator):
 
             objective.target_idx = max_idx
             objective.reset_explaining_term(objective.target_idx)
-            self.suboperators['fitness_calculation'].apply(objective)
+            self.suboperators['fitness_calculation'].apply(objective, arguments = subop_args['fitness_calculation'])
             if not np.isclose(objective.fitness_value, max_fitness) and global_var.verbose.show_warnings:
                 warnings.warn('Reevaluation of fitness function for equation has obtained different result. Not an error, if ANN DE solver is used.')
             objective.right_part_selected = True
@@ -98,18 +100,21 @@ class RandomRHPSelector(CompoundOperator):
         Inplace detection of index of the best separation into right part, saved into ``equation.target_idx``
 
     
-    '''    
-    @History_Extender('\n -> The equation structure was detected: ', 'a')        
-    def apply(self, objective : Equation):
+    '''
+    @History_Extender('\n -> The equation structure was detected: ', 'a')
+    def apply(self, objective : Equation, arguments : dict):
+        print(f'CALLING RIGHT PART SELECTOR FOR {objective.text_form}')
+        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
+
         if not objective.right_part_selected:
             if not objective.contains_deriv:
                 objective.restore_property(deriv = True)
             if not objective.contains_family(objective.main_var_to_explain):
-                objective.restore_property(mandatory_family = True)
+                objective.restore_property(mandatory_family = objective.main_var_to_explain)
 
             idx = np.random.choice([term_idx for term_idx, term in enumerate(objective.structure)
                                     if term.contains_family(objective.main_var_to_explain)])
-                
+
             objective.target_idx = idx
             objective.reset_explaining_term(idx)
             objective.right_part_selected = True
