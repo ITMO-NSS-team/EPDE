@@ -118,6 +118,8 @@ class Cache(object):
         self.mem_prop_set = False
         self.base_tensors = [] #storage of non-normalized tensors, that will not be affected by change of variables
 
+
+
     def use_structural(self, use_base_data = True, label = None, replacing_data = None):
         assert use_base_data or not type(replacing_data) == type(None), 'Structural data must be declared with base data or by additional tensors.'
         if type(label) == type(None):        
