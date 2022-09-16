@@ -335,13 +335,14 @@ def best_obj_values(levels : ParetoLevels):
 
 class OffspringUpdater(CompoundOperator):
     def apply(self, objective : ParetoLevels, arguments : dict):
-        print('CALLIND PARETO LEVELS UPDATER')
+        # print('CALLIND PARETO LEVELS UPDATER')
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
         for offspring in objective.unplaced_candidates:
+            # print(f'Placing an offspring.')
             attempt = 1; attempt_limit = self.params['attempt_limit']
             while True:
-                print(f'attempting to place new solution to the objective pareto levels, attempt {attempt}.')
+                # print(f'attempting to place new solution to the objective pareto levels, attempt {attempt}.')
                 temp_offspring = self.suboperators['chromosome_mutation'].apply(objective = offspring,
                                                                                 arguments = subop_args['chromosome_mutation'])
                 self.suboperators['right_part_selector'].apply(objective = temp_offspring,

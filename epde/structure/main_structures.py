@@ -20,7 +20,7 @@ import epde.moeadd.moeadd_solution_template as moeadd
 
 from epde.structure.encoding import Chromosome
 from epde.interface.token_family import TF_Pool
-from epde.decorators import History_Extender, Reset_equation_status
+from epde.decorators import History_Extender, ResetEquationStatus
 from epde.supplementary import filter_powers, normalize_ts, population_sort, flatten
 from epde.structure.factor import Factor
 from epde.structure.structure_template import ComplexStructure, check_uniqueness
@@ -234,7 +234,7 @@ class Term(ComplexStructure):
         return any([factor.is_deriv and factor.deriv_code != [None,] for factor in self.structure])
     
     def contains_family(self, family):
-        print(f'In "contains_family": family - {family}, {[factor.ftype for factor in self.structure]}')
+        # print(f'In "contains_family": family - {family}, {[factor.ftype for factor in self.structure]}, {any([factor.ftype == family for factor in self.structure])}')
         return any([factor.ftype == family for factor in self.structure])
 
     @property
@@ -266,9 +266,9 @@ class Term(ComplexStructure):
         return [coeff_tensor, deriv_orders, deriv_powers]
                 
     def __eq__(self, other):
-        return (all([any([other_elem == self_elem for other_elem in other.structure]) for self_elem in self.structure]) and 
-                all([any([other_elem == self_elem for self_elem in self.structure]) for other_elem in other.structure]) and 
-                len(other.structure) == len(self.structure))
+        return (all([any([other_elem == self_elem for other_elem in other.structure]) for self_elem in self.structure])
+                and all([any([other_elem == self_elem for self_elem in self.structure]) for other_elem in other.structure])
+                and len(other.structure) == len(self.structure))
 
     @History_Extender('\n -> was copied by deepcopy(self)', 'n')
     def __deepcopy__(self, memo = None):
@@ -381,16 +381,25 @@ class Equation(ComplexStructure):
         for idx, _ in enumerate(self.structure):
             self.structure[idx].use_cache()
             
-        # print(f'generated equation: {self.text_form} with len {self.metaparameters["terms_number"]["value"]}')
-        # print([term.descr_variable_marker for term in self.structure])
-
     def reset_explaining_term(self, term_idx = 0):
         for idx, term in enumerate(self.structure):
-            if idx != term_idx:
+            if idx == term_idx:
+                print(f'Checking if {self.main_var_to_explain} is in {term.name}')
                 assert term.contains_family(self.main_var_to_explain), 'Trying explain a variable with term without right family.'
                 term.descr_variable_marker = self.main_var_to_explain
             else:
                 term.descr_variable_marker = False
+
+    def __eq__(self, other):
+        if self.weights_final_evald and other.weights_final_evald:
+            return (all([any([other_elem == self_elem for other_elem in other.structure]) for self_elem in self.structure])
+                    and all([any([other_elem == self_elem for self_elem in self.structure]) for other_elem in other.structure])
+                    and len(other.structure) == len(self.structure)
+                    and np.all(np.isclose(self.weights_final, other.weights_final)))
+        else:
+            return (all([any([other_elem == self_elem for other_elem in other.structure]) for self_elem in self.structure]) 
+                    and all([any([other_elem == self_elem for self_elem in self.structure]) for other_elem in other.structure])
+                    and len(other.structure) == len(self.structure))
 
     @property
     def contains_deriv(self):
@@ -484,7 +493,7 @@ class Equation(ComplexStructure):
         self.fitness_calculated = False
         self.solver_form_defined = False
     
-    @Reset_equation_status(reset_input = False, reset_output = True)
+    @ResetEquationStatus(reset_input = False, reset_output = True)
     @History_Extender('\n -> was copied by deepcopy(self)', 'n')
     def __deepcopy__(self, memo = None):
         clss = self.__class__
@@ -861,9 +870,9 @@ class SoEq(moeadd.MOEADDSolution):
                         temp = []
                         for elem in getattr(self, k):
                             temp.append(copy.deepcopy(elem, memo))
-                        setattr(new_struct, k, temp)                            
+                        setattr(new_struct, k, temp)
                 except AttributeError:
-                    pass     
+                    pass
 
         for idx, eq in enumerate(self.vals):
             eq.copy_properties_to(new_struct)

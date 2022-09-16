@@ -9,7 +9,7 @@ Created on Thu Mar  5 13:16:43 2020
 import numpy as np
 import copy
 
-from epde.Tokens import TerminalToken
+from epde.structure.Tokens import TerminalToken
 import epde.globals as global_var
 from epde.supplementary import factor_params_to_str
 

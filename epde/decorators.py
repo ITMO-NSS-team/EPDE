@@ -15,7 +15,7 @@ import epde.globals as global_var
 
 changelog_entry_templates = {}
 
-class Reset_equation_status():
+class ResetEquationStatus():
     def __init__(self, reset_input : bool = True, reset_output : bool = False, 
                  reset_right_part : bool = True):
         self.reset_input = reset_input; self.reset_output = reset_output

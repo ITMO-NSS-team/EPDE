@@ -292,7 +292,7 @@ class LinkedBlocks(object):
             processed_new = []
             for vertex in processed:
                 if vertex.available:
-                    print(f'applying {vertex}')                    
+                    # print(f'applying {vertex}')                    
                     vertex.apply(EA_kwargs)
                     processed_new.extend(vertex._outgoing)
                     if vertex.terminal:

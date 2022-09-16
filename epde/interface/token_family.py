@@ -473,7 +473,7 @@ class TF_Pool(object):
                                                 **kwargs)
                           
     def create_from_family(self, family_label : str, token_status = None, **kwargs):
-        print('family_label', family_label, 'self.families', self.families)
+        # print('family_label', family_label, 'self.families', self.families)
         family = [f for f in self.families if family_label == f.ftype][0]
         return family.create(label = None, token_status = token_status, **kwargs)
                                                    

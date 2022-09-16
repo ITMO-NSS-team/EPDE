@@ -57,7 +57,7 @@ class CrossoverSelectionCounter(object):
     def incr(self):
         self._counter += 1
 
-    def call(self):
+    def __call__(self):
         return self._counter
 
 class MOEADDSolution(ABC):

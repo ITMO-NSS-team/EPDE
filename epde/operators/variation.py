@@ -17,7 +17,7 @@ from epde.structure.structure_template import check_uniqueness
 from epde.moeadd.moeadd import ParetoLevels
 
 from epde.supplementary import detect_similar_terms, flatten
-from epde.decorators import History_Extender, Reset_equation_status
+from epde.decorators import History_Extender, ResetEquationStatus
 
 from epde.operators.template import CompoundOperator, add_param_to_operator
 from epde.operators.moeadd_specific import get_basic_populator_updater
@@ -97,21 +97,25 @@ class ChromosomeCrossover(CompoundOperator):
         
         eqs_keys = offspring_1.vals.equation_keys; params_keys = offspring_2.vals.params_keys
         for eq_key in eqs_keys:
-            offspring_1, offspring_2 = self.suboperators['equation_crossover'].apply(objective = (offspring_1.vals[eq_key],
+            temp_eq_1, temp_eq_2 = self.suboperators['equation_crossover'].apply(objective = (offspring_1.vals[eq_key],
                                                                                                   offspring_2.vals[eq_key]),
                                                                                      arguments = subop_args['equation_crossover'])
-            offspring_1.vals.replace_gene(gene_key = eq_key, value = offspring_1)
-            offspring_2.vals.replace_gene(gene_key = eq_key, value = offspring_2)
+
+            # print(f'Equation status after crossover: temp_eq_1.fitness_calculated - {temp_eq_1.fitness_calculated}')
+            # print(f'Equation status after crossover: temp_eq_2.fitness_calculated - {temp_eq_2.fitness_calculated}')
+
+            offspring_1.vals.replace_gene(gene_key = eq_key, value = temp_eq_1)
+            offspring_2.vals.replace_gene(gene_key = eq_key, value = temp_eq_2)
             
         for param_key in params_keys:
-            offspring_1, offspring_2 = self.suboperators['param_crossover'].apply(objective = (offspring_1.vals[param_key],
+            temp_param_1, temp_param_2 = self.suboperators['param_crossover'].apply(objective = (offspring_1.vals[param_key],
                                                                                                offspring_2.vals[param_key]),
                                                                                   arguments = subop_args['param_crossover'])
-            offspring_1.vals.replace_gene(gene_key = param_key, value = offspring_1)
-            offspring_2.vals.replace_gene(gene_key = param_key, value = offspring_2)
+            offspring_1.vals.replace_gene(gene_key = param_key, value = temp_param_1)
+            offspring_2.vals.replace_gene(gene_key = param_key, value = temp_param_2)
             
-            offspring_1.vals.pass_parametric_gene(key = param_key, value = offspring_1)
-            offspring_2.vals.pass_parametric_gene(key = param_key, value = offspring_2)
+            offspring_1.vals.pass_parametric_gene(key = param_key, value = temp_param_1)
+            offspring_2.vals.pass_parametric_gene(key = param_key, value = temp_param_2)
             
         return offspring_1, offspring_2
 
@@ -132,7 +136,7 @@ class MetaparamerCrossover(CompoundOperator):
 
 
 class EquationCrossover(CompoundOperator):
-    @Reset_equation_status(reset_input = True)
+    @ResetEquationStatus(reset_output = True)
     @History_Extender(f'\n -> performing equation crossover', 'ba')
     def apply(self, objective : tuple, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
@@ -164,7 +168,7 @@ class EquationCrossover(CompoundOperator):
         self._tags = {'crossover', 'gene level', 'contains suboperators', 'standard'}
 
 class EquationExchangeCrossover(CompoundOperator):
-    @Reset_equation_status(reset_input = True)
+    @ResetEquationStatus(reset_input = True)
     @History_Extender(f'\n -> performing equation exchange crossover', 'ba')
     def apply(self, objective : tuple, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
@@ -296,7 +300,7 @@ def get_basic_variation(variation_params : dict = {}):
 
     equation_crossover = EquationCrossover()
     metaparameter_crossover = MetaparamerCrossover(['metaparam_proportion'])
-    add_kwarg_to_operator(operator = metaparameter_crossover, labeled_base_val = {'term_param_proportion' : 0.4})
+    add_kwarg_to_operator(operator = metaparameter_crossover, labeled_base_val = {'metaparam_proportion' : 0.4})
     equation_exchange_crossover = EquationExchangeCrossover()
 
     chromosome_crossover = ChromosomeCrossover()

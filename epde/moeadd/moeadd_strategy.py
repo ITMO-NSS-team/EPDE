@@ -77,7 +77,7 @@ class OptimizationPatternDirector(object):
         add_kwarg_to_operator(operator = neighborhood_selector, labeled_base_val = {'number_of_neighbors' : 4})
 
         selection = MOEADDSelection(['delta', 'parents_fraction'])
-        add_kwarg_to_operator(operator = selection, labeled_base_val = {'delta' : 0.9, 'parents_fraction' : 4})
+        add_kwarg_to_operator(operator = selection, labeled_base_val = {'delta' : 0.9, 'parents_fraction' : 0.4})
         selection.set_suboperators({'neighborhood_selector' : neighborhood_selector})
 
         variation = get_basic_variation(variation_params)
@@ -91,7 +91,7 @@ class OptimizationPatternDirector(object):
         coeff_calc = LinRegBasedCoeffsEquation()
 
         eq_fitness.set_suboperators({'sparsity' : sparsity, 'coeff_calc' : coeff_calc})
-        fitness_cond = lambda x: getattr(x, 'fitness_calculated')
+        fitness_cond = lambda x: not getattr(x, 'fitness_calculated')
         sys_fitness = map_operator_between_levels(eq_fitness, 'gene level', 'chromosome level', fitness_cond)
         
         rps_cond = lambda x: any([not elem_eq.right_part_selected for elem_eq in x.vals])

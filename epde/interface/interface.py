@@ -150,7 +150,7 @@ class epde_search(object):
             global_var.tensor_cache.memory_usage_properties(example_tensor, mem_for_cache_frac, mem_for_cache_abs)            
         global_var.tensor_cache.memory_usage_properties(example_tensor, mem_for_cache_frac, mem_for_cache_abs )
 
-    def set_moeadd_params(self, population_size : int = 6, solution_params : dict = {},
+    def set_moeadd_params(self, population_size : int = 6, weight_num : int = 4, solution_params : dict = {},
                           delta : float = 1/50., neighbors_number : int = 3,
                           nds_method : Callable = fast_non_dominated_sorting,
                           ndl_update_method : Callable = ndl_update,
@@ -220,7 +220,7 @@ class epde_search(object):
             calculation, defalut value is 1.        
         
         '''    
-        self.moeadd_params = {'weights_num' : population_size, 'pop_size' : population_size, 
+        self.moeadd_params = {'weights_num' : weight_num, 'pop_size' : population_size, 
                               'delta' : delta, 'neighbors_number' : neighbors_number, 
                               'solution_params': solution_params,
                               'nds_method' : nds_method, 
@@ -420,9 +420,9 @@ class epde_search(object):
             Maximum power of token,
             
         '''
-        if equation_terms_max_number < self.moeadd_params['pop_size']:
-            self.moeadd_params['pop_size'] = equation_terms_max_number
-            self.moeadd_params['weights_num'] = equation_terms_max_number
+        # if equation_terms_max_number < self.moeadd_params['pop_size']:
+        #     self.moeadd_params['pop_size'] = equation_terms_max_number
+        #     self.moeadd_params['weights_num'] = equation_terms_max_number
         
         self.create_pool(data = data, variable_names=variable_names, 
                          derivs=derivs, method=deriv_method, method_kwargs=deriv_method_kwargs, 

@@ -116,6 +116,11 @@ class RandomRHPSelector(CompoundOperator):
                                     if term.contains_family(objective.main_var_to_explain)])
 
             objective.target_idx = idx
+            # print('--------------------------------------------------------------')
+            # print(f'Trying to set explaining of objective {objective.main_var_to_explain} with {idx} : {objective.structure[idx].name}.')
+            # print(f'{[term.contains_family(objective.main_var_to_explain) for term in objective.structure]}')
+            # print(objective.text_form)
+            # print('--------------------------------------------------------------')
             objective.reset_explaining_term(idx)
             objective.right_part_selected = True
 
