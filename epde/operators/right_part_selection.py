@@ -14,7 +14,7 @@ import warnings
 import epde.globals as global_var
 from epde.operators.template import CompoundOperator
 from epde.decorators import History_Extender
-from epde.structure.main_structures import Equation
+from epde.structure.main_structures import Term, Equation
     
 class EqRightPartSelector(CompoundOperator):
     '''
@@ -47,7 +47,7 @@ class EqRightPartSelector(CompoundOperator):
         if not objective.right_part_selected:
             max_fitness = 0
             max_idx = 0
-            if not objective.contains_deriv:
+            if not objective.contains_deriv():
                 objective.restore_property(deriv = True)
             if not objective.contains_family(objective.main_var_to_explain):
                 objective.restore_property(mandatory_family = True)
@@ -103,26 +103,45 @@ class RandomRHPSelector(CompoundOperator):
     '''
     @History_Extender('\n -> The equation structure was detected: ', 'a')
     def apply(self, objective : Equation, arguments : dict):
-        print(f'CALLING RIGHT PART SELECTOR FOR {objective.text_form}')
+        # print(f'CALLING RIGHT PART SELECTOR FOR {objective.text_form}')
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
         if not objective.right_part_selected:
-            if not objective.contains_deriv:
-                objective.restore_property(deriv = True)
-            if not objective.contains_family(objective.main_var_to_explain):
-                objective.restore_property(mandatory_family = objective.main_var_to_explain)
-
-            idx = np.random.choice([term_idx for term_idx, term in enumerate(objective.structure)
-                                    if term.contains_family(objective.main_var_to_explain)])
+            term_selection = [term_idx for term_idx, term in enumerate(objective.structure)
+                              if term.contains_deriv(family = objective.main_var_to_explain)]
+            
+            if len(term_selection) == 0:
+                idx = np.random.choice([term_idx for term_idx, _ in enumerate(objective.structure)])
+                prev_term = objective.structure[idx]
+                while True:
+                    candidate_term = Term(pool = prev_term.pool, mandatory_family = objective.main_var_to_explain,
+                                          max_factors_in_term = len(prev_term.structure))
+                    if candidate_term.contains_deriv(family = objective.main_var_to_explain):
+                        break
+                
+                objective.structure[idx] = candidate_term
+            else:
+                idx = np.random.choice(term_selection)
 
             objective.target_idx = idx
-            # print('--------------------------------------------------------------')
-            # print(f'Trying to set explaining of objective {objective.main_var_to_explain} with {idx} : {objective.structure[idx].name}.')
-            # print(f'{[term.contains_family(objective.main_var_to_explain) for term in objective.structure]}')
-            # print(objective.text_form)
-            # print('--------------------------------------------------------------')
             objective.reset_explaining_term(idx)
-            objective.right_part_selected = True
+            objective.right_part_selected = True                
+
+            print('target is ', objective.structure[objective.target_idx].name)
+            
+            # for try_idx in range(max_tries):
+                    
+            #     idx = np.random.choice([term_idx for term_idx, term in enumerate(objective.structure)
+            #                             if term.contains_deriv(family = objective.main_var_to_explain)])
+            #     if objective.structure[idx].contains_deriv(family = objective.main_var_to_explain):
+            #     objective.target_idx = idx
+            #     # print('--------------------------------------------------------------')
+            #     # print(f'Trying to set explaining of objective {objective.main_var_to_explain} with {idx} : {objective.structure[idx].name}.')
+            #     # print(f'{[term.contains_family(objective.main_var_to_explain) for term in objective.structure]}')
+            #     # print(objective.text_form)
+            #     # print('--------------------------------------------------------------')
+            #     objective.reset_explaining_term(idx)
+            #     objective.right_part_selected = True
 
     def use_default_tags(self):
         self._tags = {'equation right part selection', 'gene level', 'contains suboperators', 'inplace'}

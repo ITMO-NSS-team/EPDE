@@ -96,9 +96,15 @@ class epde_search(object):
         --------------
         
         use_default_strategy : bool, optional
-            True (base and recommended value), if the default evolutionary strategy shall be used, 
-            False if the user - defined strategy will be passed further.
-        
+            True (base and recommended value), if the default evolutionary strategy will be used, 
+            False if the user-defined strategy will be passed further. Otherwise, the search will 
+            not be conducted.
+            
+        director_params : dict, optional
+            Contains parameters for evolutionary operator builder / construction director, that 
+            can be passed to individual operators. Keys shall be 'variation_params', 'mutation_params',
+            'pareto_combiner_params', 'pareto_updater_params'.
+            
         eq_search_stop_criterion : epde.operators.ea_stop_criteria.Stop_condition object, optional
             The stop condition for the evolutionary search of the equation. Default value 
             represents loop over 300 evolutionary epochs.

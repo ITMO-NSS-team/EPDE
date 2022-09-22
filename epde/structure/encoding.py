@@ -96,7 +96,7 @@ class Chromosome(object):
         if isinstance(key, str) and (key in self.chromosome[np.random.choice(self.equation_keys)]):
             for eq_name in self.equation_keys:
                 self.chromosome[eq_name].set_metaparam(key = key, value = value)
-        elif isinstance(key, (list, tuple)):    
+        elif isinstance(key, (list, tuple)):
             self.chromosome[key[1]].set_metaparam(key = key, value = value)
         else:
             raise ValueError('Incorrect value passed into genes parameters setting.')

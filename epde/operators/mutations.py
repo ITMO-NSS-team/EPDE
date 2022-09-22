@@ -209,7 +209,7 @@ def get_basic_mutation(mutation_params):
     add_kwarg_to_operator(operator = equation_mutation, labeled_base_val = {'r_mutation' : 0.3, 'type_probabilities' : []})
     
     metaparameter_mutation = MetaparameterMutation(['std', 'mean'])
-    add_kwarg_to_operator(operator = metaparameter_mutation, labeled_base_val = {'std' : 0, 'mean' : 0.4})
+    add_kwarg_to_operator(operator = metaparameter_mutation, labeled_base_val = {'std' : 0.1, 'mean' : 0.0})
 
     chromosome_mutation = SystemMutation(['indiv_mutation_prob'])
     add_kwarg_to_operator(operator = chromosome_mutation, labeled_base_val = {'indiv_mutation_prob' : 0.5})

@@ -59,7 +59,7 @@ class L2Fitness(CompoundOperator):
         
         None
         """        
-        print(f'CALCULATING FITNESS FOR {objective.text_form}')
+        # print(f'CALCULATING FITNESS FOR {objective.text_form}')
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
         self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])

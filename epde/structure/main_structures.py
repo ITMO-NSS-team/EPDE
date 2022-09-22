@@ -229,12 +229,13 @@ class Term(ComplexStructure):
                 form += ' * '
         return form
     
-    @property
-    def contains_deriv(self):
-        return any([factor.is_deriv and factor.deriv_code != [None,] for factor in self.structure])
-    
+    def contains_deriv(self, family = None):
+        if family is None:
+            return any([factor.is_deriv and factor.deriv_code != [None,] for factor in self.structure])
+        else:
+            return any([factor.ftype == family and factor.deriv_code != [None,] for factor in self.structure])
+                
     def contains_family(self, family):
-        # print(f'In "contains_family": family - {family}, {[factor.ftype for factor in self.structure]}, {any([factor.ftype == family for factor in self.structure])}')
         return any([factor.ftype == family for factor in self.structure])
 
     @property
@@ -384,7 +385,7 @@ class Equation(ComplexStructure):
     def reset_explaining_term(self, term_idx = 0):
         for idx, term in enumerate(self.structure):
             if idx == term_idx:
-                print(f'Checking if {self.main_var_to_explain} is in {term.name}')
+                # print(f'Checking if {self.main_var_to_explain} is in {term.name}')
                 assert term.contains_family(self.main_var_to_explain), 'Trying explain a variable with term without right family.'
                 term.descr_variable_marker = self.main_var_to_explain
             else:
@@ -401,9 +402,8 @@ class Equation(ComplexStructure):
                     and all([any([other_elem == self_elem for self_elem in self.structure]) for other_elem in other.structure])
                     and len(other.structure) == len(self.structure))
 
-    @property
-    def contains_deriv(self):
-        return any([term.contains_deriv for term in self.structure])
+    def contains_deriv(self, family = None):
+        return any([term.contains_deriv(family) for term in self.structure])
 
     def contains_family(self, family):
         return any([term.contains_family(family) for term in self.structure])
@@ -431,7 +431,7 @@ class Equation(ComplexStructure):
             mf_marker = mandatory_family if mandatory_family else None
             temp = Term(self.pool, mandatory_family = mf_marker, 
                         max_factors_in_term = self.metaparameters['max_factors_in_term']['value'])
-            if deriv and temp.contains_deriv:
+            if deriv and temp.contains_deriv():
                 self.structure[replacement_idx] = temp
                 break
             elif mandatory_family and temp.contains_family(self.main_var_to_explain):
@@ -837,6 +837,7 @@ class SoEq(moeadd.MOEADDSolution):
                     form += ' | ' + equation.text_form + '\n'
         else:
             form += self.vals[0].text_form + '\n'
+        form += str(self.metaparameters)
         return form
 
     def __eq__(self, other):

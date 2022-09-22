@@ -168,7 +168,7 @@ class EquationCrossover(CompoundOperator):
         self._tags = {'crossover', 'gene level', 'contains suboperators', 'standard'}
 
 class EquationExchangeCrossover(CompoundOperator):
-    @ResetEquationStatus(reset_input = True)
+    @ResetEquationStatus(reset_output = True)
     @History_Extender(f'\n -> performing equation exchange crossover', 'ba')
     def apply(self, objective : tuple, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
