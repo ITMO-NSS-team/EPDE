@@ -71,6 +71,7 @@ class LASSOSparsity(CompoundOperator):
         features = np.multiply(features, g_fun_casted)
 
         estimator.fit(features, target)
+        # print(f'LASSO estimator coefficients: {estimator.coef_}')
         objective.weights_internal = estimator.coef_
 
     def use_default_tags(self):

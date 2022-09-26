@@ -115,7 +115,8 @@ class RandomRHPSelector(CompoundOperator):
                 prev_term = objective.structure[idx]
                 while True:
                     candidate_term = Term(pool = prev_term.pool, mandatory_family = objective.main_var_to_explain,
-                                          max_factors_in_term = len(prev_term.structure))
+                                          max_factors_in_term = len(prev_term.structure), 
+                                          create_derivs = True)
                     if candidate_term.contains_deriv(family = objective.main_var_to_explain):
                         break
                 
@@ -127,21 +128,6 @@ class RandomRHPSelector(CompoundOperator):
             objective.reset_explaining_term(idx)
             objective.right_part_selected = True                
 
-            print('target is ', objective.structure[objective.target_idx].name)
-            
-            # for try_idx in range(max_tries):
-                    
-            #     idx = np.random.choice([term_idx for term_idx, term in enumerate(objective.structure)
-            #                             if term.contains_deriv(family = objective.main_var_to_explain)])
-            #     if objective.structure[idx].contains_deriv(family = objective.main_var_to_explain):
-            #     objective.target_idx = idx
-            #     # print('--------------------------------------------------------------')
-            #     # print(f'Trying to set explaining of objective {objective.main_var_to_explain} with {idx} : {objective.structure[idx].name}.')
-            #     # print(f'{[term.contains_family(objective.main_var_to_explain) for term in objective.structure]}')
-            #     # print(objective.text_form)
-            #     # print('--------------------------------------------------------------')
-            #     objective.reset_explaining_term(idx)
-            #     objective.right_part_selected = True
 
     def use_default_tags(self):
         self._tags = {'equation right part selection', 'gene level', 'contains suboperators', 'inplace'}

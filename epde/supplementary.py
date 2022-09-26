@@ -138,7 +138,7 @@ def Define_Derivatives(var_name = 'u', dimensionality = 1, max_order = 2):
                 deriv_names.append('d'+ var_name + '/dx'+str(var_idx+1))
             else:
                 deriv_names.append('d^'+str(order+1) + var_name + '/dx'+str(var_idx+1)+'^'+str(order+1))
-    # print('Deriv orders after definition', var_deriv_orders)
+    print('Deriv orders after definition', var_deriv_orders)
     return deriv_names, var_deriv_orders
 
 

@@ -7,6 +7,7 @@ Created on Fri Jul 29 19:08:51 2022
 """
 import copy
 import numpy as np
+import time
 from typing import Union
 from functools import reduce, partial
 
@@ -339,8 +340,9 @@ class OffspringUpdater(CompoundOperator):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
         for offspring in objective.unplaced_candidates:
-            # print(f'Placing an offspring.')
             attempt = 1; attempt_limit = self.params['attempt_limit']
+            print('BEFORE RPS:', offspring.text_form)
+
             while True:
                 # print(f'attempting to place new solution to the objective pareto levels, attempt {attempt}.')
                 temp_offspring = self.suboperators['chromosome_mutation'].apply(objective = offspring,
@@ -349,12 +351,24 @@ class OffspringUpdater(CompoundOperator):
                                                                arguments = subop_args['right_part_selector'])                
                 self.suboperators['chromosome_fitness'].apply(objective = temp_offspring,
                                                               arguments = subop_args['chromosome_fitness'])
-                if not any([temp_offspring == solution for solution in objective.population]):
+                print('DURING RPS:', temp_offspring.text_form)
+
+                if all([temp_offspring != solution for solution in objective.population]):
                     objective = self.suboperators['pareto_level_updater'].apply(objective = (temp_offspring, objective),
                                                                                 arguments = subop_args['pareto_level_updater'])
+                    print('AFTER RPS:', temp_offspring.text_form)
+                    print('-------------------------------------')
+                    time.sleep(5)
                     break
                 elif attempt >= attempt_limit:
+                    print(temp_offspring.text_form)
+                    print('-----------------------')
+                    print([individual.text_form for individual in objective.population])
+                    raise Exception('Can not place individual into the population.')
+                    time.sleep(5)
                     break
+                print(f'Attempt {attempt} of attempt limit {attempt_limit}')
+                print([temp_offspring != solution for solution in objective.population])
                 attempt += 1
         return objective
     

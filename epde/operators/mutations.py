@@ -116,6 +116,7 @@ class TermMutation(CompoundOperator):
             new_term = Term(objective[1].pool, mandatory_family = objective[1].structure[objective[0]].descr_variable_marker, 
                             max_factors_in_term = objective[1].metaparameters['max_factors_in_term']['value'])
         new_term.use_cache()
+        print(f'CREATED DURING MUTATION: {new_term.name}, while contatining {objective[1].structure[objective[0]].descr_variable_marker}')
         return new_term
     
     def use_default_tags(self):
@@ -209,7 +210,7 @@ def get_basic_mutation(mutation_params):
     add_kwarg_to_operator(operator = equation_mutation, labeled_base_val = {'r_mutation' : 0.3, 'type_probabilities' : []})
     
     metaparameter_mutation = MetaparameterMutation(['std', 'mean'])
-    add_kwarg_to_operator(operator = metaparameter_mutation, labeled_base_val = {'std' : 0.1, 'mean' : 0.0})
+    add_kwarg_to_operator(operator = metaparameter_mutation, labeled_base_val = {'std' : 1e-4, 'mean' : 0.0})
 
     chromosome_mutation = SystemMutation(['indiv_mutation_prob'])
     add_kwarg_to_operator(operator = chromosome_mutation, labeled_base_val = {'indiv_mutation_prob' : 0.5})

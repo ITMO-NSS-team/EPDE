@@ -31,13 +31,14 @@ class Term(ComplexStructure):
                  '_descr_variable_marker']
     
     def __init__(self, pool, passed_term = None, mandatory_family = None, max_factors_in_term = 1, 
-                 interelement_operator = np.multiply):
+                 create_derivs : bool = False, interelement_operator = np.multiply):
         super().__init__(interelement_operator)
         self.pool = pool
         self.max_factors_in_term = max_factors_in_term
 
         if passed_term is None:
-            self.randomize(mandatory_family = mandatory_family)
+            self.randomize(mandatory_family = mandatory_family, 
+                           create_derivs = create_derivs)
         else:
             self.defined(passed_term)
 
@@ -88,7 +89,8 @@ class Term(ComplexStructure):
         else:
             raise ValueError('The structure of a term should be declared with str or factor.Factor obj, instead got', type(passed_term))
 
-    def randomize(self, mandatory_family = None, forbidden_factors = None, **kwargs):
+    def randomize(self, mandatory_family = None, forbidden_factors = None, 
+                  create_derivs = False, **kwargs):
         if np.sum(self.pool.families_cardinality(meaningful_only = True)) == 0:
             raise ValueError('No token families are declared as meaningful for the process of the system search')
 
@@ -104,10 +106,22 @@ class Term(ComplexStructure):
         if forbidden_factors is None:
             forbidden_factors = {}
             for family in self.pool.labels_overview:
+                # print('family is ', family)
                 for token_label in family[0]:
-                    forbidden_factors[token_label] = [0, min(self.max_factors_in_term, family[1]), False]
+                    if isinstance(self.max_factors_in_term, int):
+                        forbidden_factors[token_label] = [0, min(self.max_factors_in_term, family[1]), False]
+                    elif isinstance(self.max_factors_in_term, dict) and 'probas' in self.max_factors_in_term.keys():
+                        forbidden_factors[token_label] = [0, min(self.max_factors_in_term['factors_num'][-1], family[1]), 
+                                                          False]
 
-        factors_num = np.random.randint(1, self.max_factors_in_term + 1)
+        if isinstance(self.max_factors_in_term, int):
+            factors_num = np.random.randint(1, self.max_factors_in_term + 1)
+        elif isinstance(self.max_factors_in_term, dict) and 'probas' in self.max_factors_in_term.keys():
+            factors_num = np.random.choice(a = self.max_factors_in_term['factors_num'],
+                                           p = self.max_factors_in_term['probas'])
+        else:
+            raise ValueError('Incorrect value of max_factors_in_term metaparameters')
+            
         self.occupied_tokens_labels = copy.copy(forbidden_factors)
 
         self.descr_variable_marker = mandatory_family if mandatory_family is not None else False
@@ -115,7 +129,8 @@ class Term(ComplexStructure):
         
         if not mandatory_family:
             occupied_by_factor, factor = self.pool.create(label = None, create_meaningful = True, 
-                                                          token_status = self.occupied_tokens_labels, **kwargs)
+                                                          token_status = self.occupied_tokens_labels,
+                                                          create_derivs = create_derivs, **kwargs)
         else:
             occupied_by_factor, factor = self.pool.create_from_family(family_label = mandatory_family,
                                                                       token_status = self.occupied_tokens_labels, **kwargs)

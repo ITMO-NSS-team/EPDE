@@ -48,5 +48,6 @@ class SystemsPopulationConstructor(object):
             created_solution.use_default_objective_function()
 
         created_solution.create_equations()
+        # print(f'Initial solution for MOEADD: {created_solution.text_form}')
 
         return created_solution

@@ -193,7 +193,10 @@ class TokenFamily(object):
             self.derivs_ords = {token : derivs_solver_orders[idx] for idx, token in enumerate(tokens)}
         self.params_set = True
         self.equality_ranges = equality_ranges
-        
+
+        if self.family_of_derivs:         
+            print(f'self.tokens is {self.tokens}')
+            print(f'Here, derivs order is {self.derivs_ords}')
         if self.evaluator_set:
             self.test_evaluator()
 
@@ -329,20 +332,23 @@ class TokenFamily(object):
         else:
             raise TypeError('Evaluator function or its parameters not set brfore evaluator application.')
     
-    def create(self, label = None, token_status : Union[dict, None] = None, **factor_params):
+    def create(self, label = None, token_status : Union[dict, None] = None, 
+               create_deriv : bool = False, **factor_params):
         if token_status is None or token_status == {}:
             token_status = {label : (0, self.token_params['power'][1], False) 
                             for label in self.tokens}
-        if type(label) == type(None):
+        if label is None:
             try:
-                label = np.random.choice([token for token in self.tokens 
-                                          if not token_status[token][0] + 1 > token_status[token][1]])
+                if create_deriv:
+                    label = np.random.choice([token for token in self.tokens 
+                                              if (not token_status[token][0] + 1 > token_status[token][1]
+                                                  and self.derivs_ords[token][0] is not None)])
+                else:                    
+                    label = np.random.choice([token for token in self.tokens 
+                                              if not token_status[token][0] + 1 > token_status[token][1]])
             except ValueError:
                 print(f'An error while creating factor of {self.ftype} token family')
                 print('Status description:', token_status, ' all:', self.tokens)
-                # for token in self.tokens:
-                #     if not token in occupied: print(f'{token} is free')
-                #     if def_term_tokens.count(token) >= self.token_params['power'][1]: print(f"max power {self.token_params['power'][1]} not reached") 
                 raise ValueError("'a' cannot be empty unless no samples are taken")
 
         if self.family_of_derivs:
@@ -439,8 +445,8 @@ class TF_Pool(object):
         else:
             return np.array([family.cardinality(token_status) for family in self.families])
         
-    def create(self, label = None, create_meaningful : bool = False, 
-                      token_status = None, **kwargs) -> Union[str, Factor]:
+    def create(self, label = None, create_meaningful : bool = False, token_status = None, 
+               create_derivs : bool = False, **kwargs) -> Union[str, Factor]:
         if label is None:
             if create_meaningful:
                 if np.sum(self.families_cardinality(True, token_status)) == 0:
@@ -452,6 +458,7 @@ class TF_Pool(object):
                 return np.random.choice(a = self.families_meaningful,
                                         p = probabilities).create(label = None, 
                                                                   token_status = token_status,
+                                                                  create_derivs = create_derivs,
                                                                   **kwargs)
             else:
                 probabilities = (self.families_cardinality(False, token_status) / 
@@ -459,6 +466,7 @@ class TF_Pool(object):
                 return np.random.choice(a = self.families, 
                                         p = probabilities).create(label = None, 
                                                                   token_status = token_status,
+                                                                  create_derivs = create_derivs,
                                                                   **kwargs)
         else:
             token_families = [family for family in self.families if label in family.tokens]
