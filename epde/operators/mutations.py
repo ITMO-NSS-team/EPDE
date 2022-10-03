@@ -73,7 +73,11 @@ class MetaparameterMutation(CompoundOperator):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
         # print('objective', objective)
+        
         altered_objective = objective + np.random.normal(loc = self.params['mean'], scale = self.params['std'])        
+        if altered_objective < 0:
+            altered_objective = - altered_objective
+        
         return altered_objective
 
     def use_default_tags(self):
