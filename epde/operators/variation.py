@@ -42,7 +42,7 @@ class ParetoLevelsCrossover(CompoundOperator):
     -----------
     apply(population)
         return the new population, created with the noted operators and containing both parent individuals and their offsprings.    
-    
+    copy_properties_to
     """
     def apply(self, objective : ParetoLevels, arguments : dict):
         """
@@ -68,6 +68,8 @@ class ParetoLevelsCrossover(CompoundOperator):
         if len(crossover_pool) == 0:
             raise ValueError('crossover pool not created, probably solution.crossover_selected_times error')
         np.random.shuffle(crossover_pool)
+        if len(crossover_pool) % 2:
+            crossover_pool = crossover_pool[:-1]
         crossover_pool = np.array(crossover_pool, dtype = object).reshape((-1,2))
 
         offsprings = []
@@ -76,7 +78,8 @@ class ParetoLevelsCrossover(CompoundOperator):
                 raise IndexError('Equations have diffferent number of terms')
             new_system_1 = deepcopy(crossover_pool[pair_idx, 0])
             new_system_2 = deepcopy(crossover_pool[pair_idx, 1])
-
+            new_system_1.reset_state(); new_system_2.reset_state()
+            
             new_system_1, new_system_2 = self.suboperators['chromosome_crossover'].apply(objective = (new_system_1, new_system_2), 
                                                                                          arguments = subop_args['chromosome_crossover'])
             offsprings.extend([new_system_1, new_system_2])
@@ -93,31 +96,33 @@ class ChromosomeCrossover(CompoundOperator):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
    
         assert objective[0].vals.same_encoding(objective[1].vals)
-        offspring_1 = deepcopy(objective[0]); offspring_2 = deepcopy(objective[1])        
-        
-        eqs_keys = offspring_1.vals.equation_keys; params_keys = offspring_2.vals.params_keys
+        # offspring_1 = deepcopy(objective[0]); offspring_2 = deepcopy(objective[1])      
+        offspring_1 = objective[0]; offspring_2 = objective[1]
+                
+        eqs_keys = objective[0].vals.equation_keys; params_keys = objective[1].vals.params_keys
         for eq_key in eqs_keys:
-            temp_eq_1, temp_eq_2 = self.suboperators['equation_crossover'].apply(objective = (offspring_1.vals[eq_key],
-                                                                                                  offspring_2.vals[eq_key]),
-                                                                                     arguments = subop_args['equation_crossover'])
-
-            # print(f'Equation status after crossover: temp_eq_1.fitness_calculated - {temp_eq_1.fitness_calculated}')
-            # print(f'Equation status after crossover: temp_eq_2.fitness_calculated - {temp_eq_2.fitness_calculated}')
-
-            offspring_1.vals.replace_gene(gene_key = eq_key, value = temp_eq_1)
+            temp_eq_1, temp_eq_2 = self.suboperators['equation_crossover'].apply(objective = (objective[0].vals[eq_key],
+                                                                                              objective[1].vals[eq_key]),
+                                                                                 arguments = subop_args['equation_crossover'])
+            # print(f'PARENT 1: objective[0].vals[eq_key] is {objective[0].vals[eq_key].text_form}')
+            # print(f'PARENT 2: objective[1].vals[eq_key] is {objective[1].vals[eq_key].text_form}')            
+            # print(f'OFFSPRING: temp_eq_1.vals[eq_key] is {temp_eq_1.text_form}')
+            objective[0].vals.replace_gene(gene_key = eq_key, value = temp_eq_1)
             offspring_2.vals.replace_gene(gene_key = eq_key, value = temp_eq_2)
             
         for param_key in params_keys:
-            temp_param_1, temp_param_2 = self.suboperators['param_crossover'].apply(objective = (offspring_1.vals[param_key],
-                                                                                               offspring_2.vals[param_key]),
-                                                                                  arguments = subop_args['param_crossover'])
-            offspring_1.vals.replace_gene(gene_key = param_key, value = temp_param_1)
-            offspring_2.vals.replace_gene(gene_key = param_key, value = temp_param_2)
-            
-            offspring_1.vals.pass_parametric_gene(key = param_key, value = temp_param_1)
-            offspring_2.vals.pass_parametric_gene(key = param_key, value = temp_param_2)
-            
-        return offspring_1, offspring_2
+            temp_param_1, temp_param_2 = self.suboperators['param_crossover'].apply(objective = (objective[0].vals[param_key],
+                                                                                                 objective[1].vals[param_key]),
+                                                                                    arguments = subop_args['param_crossover'])
+            objective[0].vals.replace_gene(gene_key = param_key, value = temp_param_1)
+            objective[1].vals.replace_gene(gene_key = param_key, value = temp_param_2)
+
+            objective[0].vals.pass_parametric_gene(key = param_key, value = temp_param_1)
+            objective[1].vals.pass_parametric_gene(key = param_key, value = temp_param_2)
+
+        # print(f'OFFSPRING CROSSOVER: {[ind.text_form for ind in objective[0].vals]}')
+        # print(f'OFFSPRING CROSSOVER: {[ind.text_form for ind in objective[1].vals]}')
+        return objective[0], objective[1]
 
     def use_default_tags(self):
         self._tags = {'crossover', 'chromosome level', 'contains suboperators', 'standard'}
@@ -136,46 +141,43 @@ class MetaparamerCrossover(CompoundOperator):
 
 
 class EquationCrossover(CompoundOperator):
-    @ResetEquationStatus(reset_output = True)
+    # @ResetEquationStatus(reset_output = True)
     @History_Extender(f'\n -> performing equation crossover', 'ba')
     def apply(self, objective : tuple, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
-        offspring_1 = deepcopy(objective[0]); offspring_2 = deepcopy(objective[1])
-        
         equation1_terms, equation2_terms = detect_similar_terms(objective[0], objective[1])
         assert len(equation1_terms[0]) == len(equation2_terms[0]) and len(equation1_terms[1]) == len(equation2_terms[1])
         same_num = len(equation1_terms[0]); similar_num = len(equation1_terms[1])
-        offspring_1.structure = flatten(equation1_terms); offspring_2.structure = flatten(equation2_terms)
+        objective[0].structure = flatten(equation1_terms); objective[0].structure = flatten(equation2_terms)
     
         for i in range(same_num, same_num + similar_num):
-            temp_term_1, temp_term_2 = self.suboperators['term_param_crossover'].apply(objective = (offspring_1.structure[i], 
-                                                                                                    offspring_2.structure[i]),
+            temp_term_1, temp_term_2 = self.suboperators['term_param_crossover'].apply(objective = (objective[0].structure[i], 
+                                                                                                    objective[1].structure[i]),
                                                                                        arguments = subop_args['term_param_crossover']) 
-            if (check_uniqueness(temp_term_1, offspring_1.structure[:i] + offspring_1.structure[i+1:]) and 
-                check_uniqueness(temp_term_2, offspring_2.structure[:i] + offspring_2.structure[i+1:])):                     
-                offspring_1.structure[i] = temp_term_1; offspring_2.structure[i] = temp_term_2
+            if (check_uniqueness(temp_term_1, objective[0].structure[:i] + objective[0].structure[i+1:]) and 
+                check_uniqueness(temp_term_2, objective[1].structure[:i] + objective[1].structure[i+1:])):                     
+                objective[0].structure[i] = temp_term_1; objective[1].structure[i] = temp_term_2
 
-        for i in range(same_num + similar_num, len(offspring_1.structure)):
-            if check_uniqueness(offspring_1.structure[i], offspring_2.structure) and check_uniqueness(offspring_2.structure[i], offspring_1.structure):
-                offspring_1.structure[i], offspring_2.structure[i] = self.suboperators['term_crossover'].apply(objective = (offspring_1.structure[i], 
-                                                                                                                            offspring_2.structure[i]),
+        for i in range(same_num + similar_num, len(objective[0].structure)):
+            if check_uniqueness(objective[0].structure[i], objective[1].structure) and check_uniqueness(objective[1].structure[i], objective[0].structure):
+                objective[0].structure[i], objective[0].structure[i] = self.suboperators['term_crossover'].apply(objective = (objective[0].structure[i], 
+                                                                                                                              objective[1].structure[i]),
                                                                                                                arguments = subop_args['term_crossover'])
                 
-        return offspring_1, offspring_2
+        return objective[0], objective[1]
 
     def use_default_tags(self):
         self._tags = {'crossover', 'gene level', 'contains suboperators', 'standard'}
 
 class EquationExchangeCrossover(CompoundOperator):
-    @ResetEquationStatus(reset_output = True)
+    # @ResetEquationStatus(reset_output = True)
     @History_Extender(f'\n -> performing equation exchange crossover', 'ba')
     def apply(self, objective : tuple, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
-        offspring_1 = deepcopy(objective[0]); offspring_2 = deepcopy(objective[1])
-        offspring_1.structure, offspring_2.structure = objective[1].structure, objective[0].structure
-        return offspring_1, offspring_2
+        objective[0].structure, objective[1].structure = objective[1].structure, objective[0].structure
+        return objective[0], objective[1]
 
     def use_default_tags(self):
         self._tags = {'crossover', 'gene level', 'contains suboperators', 'standard'}
@@ -213,35 +215,35 @@ class TermParamCrossover(CompoundOperator):
         """
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
-        offspring_1 = deepcopy(objective[0]); offspring_2 = deepcopy(objective[1])
-        offspring_1.reset_saved_state(); offspring_2.reset_saved_state()
+        # offspring_1 = deepcopy(objective[0]); offspring_2 = deepcopy(objective[1])
+        objective[0].reset_saved_state(); objective[1].reset_saved_state()
         
-        if len(offspring_1.structure) != len(offspring_2.structure):
-            print([(token.label, token.params) for token in offspring_1.structure], [(token.label, token.params) for token in offspring_2.structure])
+        if len(objective[0].structure) != len(objective[1].structure):
+            print([(token.label, token.params) for token in objective[0].structure], [(token.label, token.params) for token in objective[1].structure])
             raise Exception('Wrong terms passed:')
         for term1_token_idx in np.arange(len(objective[0].structure)):
             term2_token_idx = [i for i in np.arange(len(objective[1].structure)) 
                                if objective[1].structure[i].label == objective[0].structure[term1_token_idx].label][0]
-            for param_idx, param_descr in offspring_1.structure[term1_token_idx].params_description.items():
+            for param_idx, param_descr in objective[0].structure[term1_token_idx].params_description.items():
                 if param_descr['name'] == 'power': power_param_idx = param_idx
                 if param_descr['name'] == 'dim': dim_param_idx = param_idx                
 
-            for param_idx in np.arange(offspring_1.structure[term1_token_idx].params.size):
+            for param_idx in np.arange(objective[0].structure[term1_token_idx].params.size):
                 if param_idx != power_param_idx and param_idx != dim_param_idx:
                     try:
-                        offspring_1.structure[term1_token_idx].params[param_idx] = (offspring_1.structure[term1_token_idx].params[param_idx] + 
-                                                                                    self.params['term_param_proportion'] 
-                                                                                    * (offspring_2.structure[term2_token_idx].params[param_idx] 
-                                                                                    - offspring_1.structure[term1_token_idx].params[param_idx]))
+                        objective[0].structure[term1_token_idx].params[param_idx] = (objective[0].structure[term1_token_idx].params[param_idx] + 
+                                                                                     self.params['term_param_proportion'] 
+                                                                                     * (objective[0].structure[term2_token_idx].params[param_idx] 
+                                                                                        - objective[0].structure[term1_token_idx].params[param_idx]))
                     except KeyError:
-                        print([(token.label, token.params) for token in offspring_1.structure], [(token.label, token.params) for token in offspring_2.structure])
-                        raise Exception('Wrong set of parameters:', offspring_1.structure[term1_token_idx].params_description, offspring_2.structure[term1_token_idx].params_description)
-                    offspring_2.structure[term2_token_idx].params[param_idx] = (offspring_1.structure[term1_token_idx].params[param_idx] + 
+                        print([(token.label, token.params) for token in objective[0].structure], [(token.label, token.params) for token in objective[1].structure])
+                        raise Exception('Wrong set of parameters:', objective[0].structure[term1_token_idx].params_description, objective[1].structure[term1_token_idx].params_description)
+                    objective[1].structure[term2_token_idx].params[param_idx] = (objective[0].structure[term1_token_idx].params[param_idx] + 
                                                                                 (1 - self.params['term_param_proportion']) 
-                                                                                * (offspring_2.structure[term2_token_idx].params[param_idx] 
-                                                                                - offspring_1.structure[term1_token_idx].params[param_idx]))
-        offspring_1.reset_occupied_tokens(); offspring_2.reset_occupied_tokens()
-        return offspring_1, offspring_2
+                                                                                * (objective[1].structure[term2_token_idx].params[param_idx] 
+                                                                                - objective[0].structure[term1_token_idx].params[param_idx]))
+        objective[0].reset_occupied_tokens(); objective[1].reset_occupied_tokens()
+        return objective[0], objective[1]
 
     def use_default_tags(self):
         self._tags = {'crossover', 'term level', 'exploitation', 'no suboperators', 'standard'}

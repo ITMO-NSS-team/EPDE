@@ -235,8 +235,7 @@ class epde_search(object):
         self.moeadd_optimization_params = {'neighborhood_selector' : neighborhood_selector,
                                            'neighborhood_selector_params' : neighborhood_selector_params,
                                            'delta' : subregion_mating_limitation, 
-                                           'epochs' : training_epochs, 
-                                           'PBI_penalty' : PBI_penalty}
+                                           'epochs' : training_epochs}
  
     def domain_pruning(self, pivotal_tensor_label = None, pruner = None, 
                              threshold : float = 1e-5, division_fractions = 3, 

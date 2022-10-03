@@ -333,13 +333,13 @@ class TokenFamily(object):
             raise TypeError('Evaluator function or its parameters not set brfore evaluator application.')
     
     def create(self, label = None, token_status : Union[dict, None] = None, 
-               create_deriv : bool = False, **factor_params):
+               create_derivs : bool = False, **factor_params):
         if token_status is None or token_status == {}:
             token_status = {label : (0, self.token_params['power'][1], False) 
                             for label in self.tokens}
         if label is None:
             try:
-                if create_deriv:
+                if create_derivs:
                     label = np.random.choice([token for token in self.tokens 
                                               if (not token_status[token][0] + 1 > token_status[token][1]
                                                   and self.derivs_ords[token][0] is not None)])

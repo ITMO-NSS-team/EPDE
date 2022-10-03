@@ -29,6 +29,9 @@ class ComplexStructure(object):
     def __iter__(self):
         return CSIterator(self)
 
+    def hash_descr(self):
+        return tuple([term.hash_descr for term in self.structure])
+
     def set_evaluator(self, evaluator):
         raise NotImplementedError('Functionality of this method has been moved to the evolutionary operator declaration')
     

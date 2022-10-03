@@ -138,6 +138,7 @@ class PopulationUpdater(CompoundOperator):
         Here, "worst" means the solution with highest PBI value (penalty-based boundary intersection)
         '''         
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
+        # print(f'PopulationUpdater.params is {self.params}')
         
         objective[1].update(objective[0])  #levels_updated = ndl_update(offspring, levels)
         if len(objective[1].levels) == 1:
@@ -288,7 +289,7 @@ def get_basic_populator_updater(params : dict = {}):
     
     pop_updater = PopulationUpdater()
     add_kwarg_to_operator(operator = pop_updater, labeled_base_val = {'PBI_penalty' : 1})    
-    pop_updater.params = params
+    # pop_updater.params = params
     return pop_updater
 
 
@@ -297,7 +298,7 @@ def get_constrained_populator_updater(params : dict = {}, constraints : list = [
     
     pop_updater = PopulationUpdaterConstrained(constraints = constraints)
     add_kwarg_to_operator(operator = pop_updater, labeled_base_val = {'PBI_penalty' : 1})        
-    pop_updater.params = params
+    # pop_updater.params = params
     return pop_updater
 
 
@@ -336,12 +337,13 @@ def best_obj_values(levels : ParetoLevels):
 
 class OffspringUpdater(CompoundOperator):
     def apply(self, objective : ParetoLevels, arguments : dict):
-        # print('CALLIND PARETO LEVELS UPDATER')
+        # print(f'IN OFFSPRING UPDATER : objective is {objective}, arguments : {arguments}')
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
-        for offspring in objective.unplaced_candidates:
+        while objective.unplaced_candidates:
+            offspring = objective.unplaced_candidates.pop()
             attempt = 1; attempt_limit = self.params['attempt_limit']
-            print('BEFORE RPS:', offspring.text_form)
+            # print('BEFORE RPS:', offspring.text_form)
 
             while True:
                 # print(f'attempting to place new solution to the objective pareto levels, attempt {attempt}.')
@@ -351,24 +353,30 @@ class OffspringUpdater(CompoundOperator):
                                                                arguments = subop_args['right_part_selector'])                
                 self.suboperators['chromosome_fitness'].apply(objective = temp_offspring,
                                                               arguments = subop_args['chromosome_fitness'])
-                print('DURING RPS:', temp_offspring.text_form)
+                # print('DURING RPS:', temp_offspring.text_form)
+                # print(f'During placing of an individual: {temp_offspring.vals["u"].fitness_calculated}')
+                # print(f'During placing of an individual: {temp_offspring.obj_fun}')
 
                 if all([temp_offspring != solution for solution in objective.population]):
-                    objective = self.suboperators['pareto_level_updater'].apply(objective = (temp_offspring, objective),
-                                                                                arguments = subop_args['pareto_level_updater'])
-                    print('AFTER RPS:', temp_offspring.text_form)
-                    print('-------------------------------------')
+                    self.suboperators['pareto_level_updater'].apply(objective = (temp_offspring, objective),
+                                                                    arguments = subop_args['pareto_level_updater'])
+                    # objective =  
+                    # print('AFTER RPS:', temp_offspring.text_form)
+                    # print('-------------------------------------')
                     time.sleep(5)
                     break
                 elif attempt >= attempt_limit:
                     print(temp_offspring.text_form)
                     print('-----------------------')
-                    print([individual.text_form for individual in objective.population])
+                    for idx, individual in enumerate(objective.population):
+                        print(f'Individual {idx}')
+                        print(individual.text_form)
+                        print('-----------------------')
+                    # print([individual.text_form for ])
                     raise Exception('Can not place individual into the population.')
-                    time.sleep(5)
                     break
-                print(f'Attempt {attempt} of attempt limit {attempt_limit}')
-                print([temp_offspring != solution for solution in objective.population])
+                # print(f'Attempt {attempt} of attempt limit {attempt_limit}')
+                # print([temp_offspring != solution for solution in objective.population])
                 attempt += 1
         return objective
     
@@ -388,3 +396,46 @@ def get_pareto_levels_updater(right_part_selector : CompoundOperator, chromosome
                                           'right_part_selector' : right_part_selector,
                                           'chromosome_fitness' : chromosome_fitness})
     return updater
+
+class InitialParetoLevelSorting(CompoundOperator):
+    def apply(self, objective : ParetoLevels, arguments : dict):
+        '''
+        Initial sorting of the candidates in pareto levels. 
+
+        Parameters
+        ----------
+        objective : ParetoLevels
+            DESCRIPTION.
+        arguments : dict
+            DESCRIPTION.
+
+        Returns
+        -------
+        None.
+
+        '''
+        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
+        
+        if len(objective.population) == 0:
+            for candidate in objective.unplaced_candidates:
+                self.suboperators['right_part_selector'].apply(objective = candidate,
+                                                   arguments = subop_args['right_part_selector'])                
+                self.suboperators['chromosome_fitness'].apply(objective = candidate,
+                                                              arguments = subop_args['chromosome_fitness'])
+                # print(f'candidate: {candidate.text_form}')
+            objective.initial_placing()
+            
+            
+        # print(f'unplaced candidates: {objective.unplaced_candidates}')
+        # print(f'placed candidates: {[solution.text_form for solution in objective.population]}')
+        return objective
+    
+def get_initial_sorter(right_part_selector : CompoundOperator, 
+                               chromosome_fitness : CompoundOperator, 
+                               sorter_params : dict = {}):
+    add_kwarg_to_updater = partial(add_param_to_operator, target_dict = sorter_params)
+    sorter = InitialParetoLevelSorting()
+    add_kwarg_to_updater(operator = sorter, labeled_base_val = {})
+    sorter.set_suboperators(operators = {'right_part_selector' : right_part_selector,
+                                          'chromosome_fitness' : chromosome_fitness})
+    return sorter

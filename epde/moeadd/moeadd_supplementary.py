@@ -55,6 +55,7 @@ def check_dominance(target, compared_with) -> bool:
     
     '''
     flag = False
+    
     for obj_fun_idx in range(len(target.obj_fun)):
         if target.obj_fun[obj_fun_idx] <= compared_with.obj_fun[obj_fun_idx]:
             if target.obj_fun[obj_fun_idx] < compared_with.obj_fun[obj_fun_idx]:
@@ -96,7 +97,8 @@ def ndl_update(new_solution, levels) -> list:   # efficient_ndl_update
     
     '''
     moving_set = {new_solution}
-    new_levels = deepcopy(levels) #levels#
+    new_levels = deepcopy(levels) #levels# CAUSES ERRORS DUE TO DEEPCOPY
+    # print(f'type(levels) is {type(levels)}')
     for level_idx in np.arange(len(levels)):
         moving_set_new = set()
         for ms_idx, moving_set_elem in enumerate(moving_set):

@@ -8,6 +8,7 @@ Created on Tue Jul 26 12:40:00 2022
 
 import numpy as np
 import warnings
+from copy import deepcopy
 
 from typing import Union
 
@@ -44,8 +45,16 @@ class Gene(object):
     def set_metaparam(self, key : str, value : Union[float, int]):
         assert key in self._value.metaparameters, f'Incorrect parameter key {key} passed into the gene, containing {self.key}'
         self._value.metaparameters[key]['value'] = value
-            
-                
+
+    def __deepcopy__(self, memo): # TODO: overload
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            setattr(result, k, deepcopy(v, memo))
+        return result
+
+
 class Chromosome(object):
 
     def __init__(self, equations, params):
@@ -126,7 +135,7 @@ class Chromosome(object):
                     return gene.value.hash_descr
                 except AttributeError:
                     return None
-        
+
         return tuple(map(get_gene_hash, self.chromosome.values()))
 
     def __iter__(self):
@@ -137,6 +146,13 @@ class Chromosome(object):
         cond_2 = all([key in self.chromosome.keys() for key in other.chromosome.keys()])
         return cond_1 and cond_2
     
+    def __deepcopy__(self, memo): # TODO: overload
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            setattr(result, k, deepcopy(v, memo))
+        return result    
 
 class ChromosomeEqIterator(object):
     def __init__(self, chromosome):

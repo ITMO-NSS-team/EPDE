@@ -61,6 +61,7 @@ class Term(ComplexStructure):
             if not self.structure[idx].cache_linked:
                 self.structure[idx].use_cache()
 
+
     # TODO: make self.descr_variable_marker setting for defined parameter
     @singledispatchmethod
     def defined(self, passed_term):
@@ -133,7 +134,9 @@ class Term(ComplexStructure):
                                                           create_derivs = create_derivs, **kwargs)
         else:
             occupied_by_factor, factor = self.pool.create_from_family(family_label = mandatory_family,
-                                                                      token_status = self.occupied_tokens_labels, **kwargs)
+                                                                      token_status = self.occupied_tokens_labels, 
+                                                                      create_derivs = create_derivs, 
+                                                                      **kwargs)
         self.structure = [factor,]
         update_token_status(self.occupied_tokens_labels, occupied_by_factor)
         
@@ -507,10 +510,14 @@ class Equation(ComplexStructure):
         self.weights_final_evald = False
         self.fitness_calculated = False
         self.solver_form_defined = False
+        # print('Resetting!')
+        # if self.structure is not None:
+            # print(f'RESETTING {self.text_form}')        
     
-    @ResetEquationStatus(reset_input = False, reset_output = True)
+    # @ResetEquationStatus(reset_input = False, reset_output = True)
     @History_Extender('\n -> was copied by deepcopy(self)', 'n')
     def __deepcopy__(self, memo = None):
+        # print(f'Deepcopying equation {self}')
         clss = self.__class__
         new_struct = clss.__new__(clss)
         memo[id(self)] = new_struct
@@ -519,7 +526,7 @@ class Equation(ComplexStructure):
         for k in self.__slots__:
             try:
                 if k not in attrs_to_avoid_copy:
-                    if not isinstance(k, list):
+                    if not isinstance(k, list): # , tuple, np.ndarray Проблема в недоучёте типов?
                         setattr(new_struct, k, copy.deepcopy(getattr(self, k), memo))
                     else:
                         temp = []
@@ -772,14 +779,13 @@ class SoEq(moeadd.MOEADDSolution):
               
         self.vars_to_describe = {token_family.ftype for token_family in self.tokens_for_eq.families}
 
-        
     def use_default_objective_function(self):
         from epde.eq_mo_objectives import generate_partial, equation_fitness, equation_complexity_by_factors
         complexity_objectives = [generate_partial(equation_complexity_by_factors, eq_key) 
                                  for eq_key in self.vars_to_describe]# range(len(self.tokens_for_eq))]
         quality_objectives = [generate_partial(equation_fitness, eq_key) for eq_key in self.vars_to_describe]#range(len(self.tokens_for_eq))]
         self.set_objective_functions(quality_objectives + complexity_objectives)
-        
+
     def set_objective_functions(self, obj_funs):
         '''
         Method to set the objective functions to evaluate the "quality" of the system of equations.
@@ -799,11 +805,12 @@ class SoEq(moeadd.MOEADDSolution):
     def create_equations(self):
         structure = {}
 
-        token_selection = self.tokens_supp  
+        token_selection = self.tokens_supp
         current_tokens_pool = token_selection + self.tokens_for_eq
 
         for eq_idx, variable in enumerate(self.vars_to_describe):
-            structure[variable] = Equation(current_tokens_pool, basic_structure = [], var_to_explain = variable, 
+            structure[variable] = Equation(current_tokens_pool, basic_structure = [],
+                                           var_to_explain = variable,
                                            metaparameters = self.metaparameters)
 
         self.vals = Chromosome(structure, params = {key : val for key, val in self.metaparameters.items()
@@ -821,7 +828,7 @@ class SoEq(moeadd.MOEADDSolution):
         gc.collect()
         population = evol_operator.apply(population, unexplained_vars)
         return population
-        
+
     def evaluate(self, normalize = True):
         raise DeprecationWarning('Evaluation of system is not necessary')
         if len(self.vals) == 1:
@@ -834,7 +841,7 @@ class SoEq(moeadd.MOEADDSolution):
     @property
     def obj_fun(self):
         return np.array(flatten([func(self) for func in self.obj_funs]))
-        
+
     def __call__(self):
         assert self.moeadd_set, 'The structure of the equation is not defined, therefore no moeadd operations can be called'
         return self.obj_fun
@@ -869,14 +876,16 @@ class SoEq(moeadd.MOEADDSolution):
         form += r"\end{eqnarray*}"
             
     def __hash__(self):
-        return self.vals.hash_descr
+        # print(f'GETTING HASH VALUE OF SoEq: {self.vals.hash_descr}')
+        return hash(self.vals.hash_descr)
         
     def __deepcopy__(self, memo = None):
         clss = self.__class__
         new_struct = clss.__new__(clss)
         memo[id(self)] = new_struct
         
-        new_struct.__dict__.update(self.__dict__)
+        for k, v in self.__dict__.items():
+            setattr(new_struct, k, copy.deepcopy(v, memo))
         
         for k in self.__slots__:
                 try:
@@ -889,10 +898,15 @@ class SoEq(moeadd.MOEADDSolution):
                         setattr(new_struct, k, temp)
                 except AttributeError:
                     pass
-
-        for idx, eq in enumerate(self.vals):
-            eq.copy_properties_to(new_struct)
         return new_struct
+    
+    def reset_state(self, reset_right_part : bool = True):
+        for equation in self.vals:
+            equation.reset_state(reset_right_part)
+    
+    def copy_properties_to(self, objective):
+        for eq_label in self.vals.equation_keys: # Not the best code possible here
+            self.vals[eq_label].copy_properties_to(objective.vals[eq_label])
     
     def solver_params(self, full_domain):
         '''
@@ -908,7 +922,10 @@ class SoEq(moeadd.MOEADDSolution):
 
     def __iter__(self):
         return SoEqIterator(self)
-
+    
+    @property
+    def fitness_calculated(self):
+        return all([equation.fitness_calculated for equation in self.vals])
         
 class SoEqIterator(object):
     def __init__(self, system : SoEq):

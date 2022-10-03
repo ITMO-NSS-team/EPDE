@@ -16,7 +16,7 @@ import epde.globals as global_var
 changelog_entry_templates = {}
 
 class ResetEquationStatus():
-    def __init__(self, reset_input : bool = True, reset_output : bool = False, 
+    def __init__(self, reset_input : bool = False, reset_output : bool = False, 
                  reset_right_part : bool = True):
         self.reset_input = reset_input; self.reset_output = reset_output
         self.reset_right_part = reset_right_part
@@ -40,17 +40,32 @@ class ResetEquationStatus():
                         except AttributeError:
                             pass
             if self.reset_output:
-                try:
+                if isinstance(result, (list, tuple, set)):
                     for equation in result:
                         try: 
-                            equation.reset_state(self.reset_right_part )
+                            equation.reset_state(self.reset_right_part)
                         except AttributeError:
                             pass
-                except TypeError:
-                    try: 
-                        result.reset_state(self.reset_right_part )
+                else:
+                    try:
+                        result.reset_state(self.reset_right_part)
                     except AttributeError:
-                        pass                    
+                        pass              
+                
+                # print(f'result in resetter: {result}')
+                # try:
+                #     for equation in result:
+                #         try: 
+                #             print(f'Here I must reset state of {equation}')
+                #             equation.reset_state(self.reset_right_part)
+                #         except AttributeError:
+                #             pass
+                # except TypeError:
+                #     try:
+                #         print(f'Here I must reset state of {result}')
+                #         result.reset_state(self.reset_right_part)
+                #     except AttributeError:
+                #         pass                    
             return result
         return wrapper
                 

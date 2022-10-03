@@ -71,16 +71,20 @@ class ParetoLevels(object):
     def __init__(self, population, sorting_method = fast_non_dominated_sorting, 
                  update_method = ndl_update, initial_sort : bool = False):
         self._sorting_method = sorting_method
-        self.population = population
+        self.population = [] #population
         self._update_method = update_method
-        if initial_sort:
-            self.levels = self._sorting_method(self.population)
-        else:
-            self.unplaced_candidates = population
+        # if initial_sort:
+        #     self.levels = self._sorting_method(self.population)
+        # else:
+        self.unplaced_candidates = population # tabulation deleted
         
     @property
     def levels(self):
-        return self._sorting_method(self.population)
+        return self._levels     #sort(self.population)
+    
+    @levels.setter
+    def levels(self, value : list):
+        self._levels = value
     
     def __len__(self):
         return len(self.population)
@@ -88,13 +92,22 @@ class ParetoLevels(object):
     def __iter__(self):
         return ParetoLevelsIterator(self)
     
+    def initial_placing(self):
+        while self._unplaced_candidates:
+            self.population.append(self._unplaced_candidates.pop())
+        if any([any([candidate == other_candidate for other_candidate in self.population[:idx] + self.population[idx+1:]])
+                for idx, candidate in enumerate(self.population)]):
+            raise Exception('Duplicating initial candidates')
+        self.levels = self.sort()
+
     def sort(self):
         '''
         
         Sorting of the population into Pareto non-dominated levels.
         
         '''
-        self.levels = self._sorting_method(self.population)
+        # self.levels = self._sorting_method(self.population)
+        return self._sorting_method(self.population)
     
     @property
     def unplaced_candidates(self):
@@ -102,6 +115,8 @@ class ParetoLevels(object):
     
     @unplaced_candidates.setter
     def unplaced_candidates(self, candidates : Union[list, set, tuple]):
+        
+        # ADD EXTRA CHECKS IF NECESSARY
         self._unplaced_candidates = candidates
     
     def update(self, point):
@@ -116,6 +131,7 @@ class ParetoLevels(object):
             The point, added into the candidate solutions pool.
             
         '''
+        # print(f'IN MOEADD UPDATE {point.text_form}')        
         self.levels = self._update_method(point, self.levels)
         self.population.append(point)
 
@@ -367,9 +383,14 @@ class MOEADDOptimizer(object):
             problem.
         
         '''
-        print('comparing lengths', len(args), len(self.pareto_levels.population[0].obj_funs))
-        assert len(args) == len(self.pareto_levels.population[0].obj_funs)
-        self.best_obj = np.empty(len(self.pareto_levels.population[0].obj_funs))
+        if len(self.pareto_levels.population) != 0:
+            print('comparing lengths', len(args), len(self.pareto_levels.population[0].obj_funs))
+            assert len(args) == len(self.pareto_levels.population[0].obj_funs)
+            self.best_obj = np.empty(len(self.pareto_levels.population[0].obj_funs))
+        elif len(self.pareto_levels.unplaced_candidates) != 0:
+            self.best_obj = np.empty(len(self.pareto_levels.unplaced_candidates[0].obj_funs))
+        else:
+            raise IndexError('No candidates added into the Pareto levels while they must not be empty.')
         for arg_idx, arg in enumerate(args):
             self.best_obj[arg_idx] = arg if isinstance(arg, int) or isinstance(arg, float) else arg() # Переделать под больше elif'ов
     
@@ -394,7 +415,7 @@ class MOEADDOptimizer(object):
     
     
         
-    def optimize(self, neighborhood_selector, delta, neighborhood_selector_params, epochs, PBI_penalty = 1.):
+    def optimize(self, neighborhood_selector, delta, neighborhood_selector_params, epochs):
         '''
         
         Method for the main unconstrained evolutionary optimization. Can be applied repeatedly to 
@@ -423,10 +444,6 @@ class MOEADDOptimizer(object):
             Maximum number of iterations, during that the optimization will be held.
             Note, that if the algorithm converges to a single Pareto frontier, 
             the optimization is stopped.
-            
-        PBI_penalty :  float, optional, default 1.
-            The penalty parameter, used in penalty based intersection 
-            calculation.
         
         '''
         if not self.abbreviated_search_executed:
@@ -441,8 +458,8 @@ class MOEADDOptimizer(object):
                     self.sector_processer.run(population_subset = self.pareto_levels, 
                                               EA_kwargs = sp_kwargs)
                         
-                if len(self.pareto_levels.levels) == 1:
-                    break
+                # if len(self.pareto_levels.levels) == 1:
+                #     break
                     
     def form_processer_args(self, cur_weight : int): # TODO: inspect the most convenient input format
         return {'weight_idx' : cur_weight, 'weights' : self.weights, 'best_obj' : self.best_obj, 

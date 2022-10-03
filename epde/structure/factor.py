@@ -85,7 +85,7 @@ class Factor(TerminalToken):
             for param_idx, param_info in enumerate(kwargs.items()): #param_name, param_val 
                 _params[param_idx] = param_info[1]
                 _params_description[param_idx] = {'name' : param_info[0], 
-                                                          'bounds' : params_description[param_info[0]]} 
+                                                  'bounds' : params_description[param_info[0]]} 
         else:
             _params = np.empty(len(params_description))#OrderedDict()
             for param_idx, param_info in enumerate(params_description.items()):
@@ -157,7 +157,7 @@ class Factor(TerminalToken):
         return form
 
     @property
-    def factor_id(self) -> int:
+    def hash_descr(self) -> int:
         return self._hash_val
 
     @property

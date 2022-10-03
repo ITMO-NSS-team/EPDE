@@ -16,7 +16,7 @@ from epde.operators.selections import MOEADDSelection
 from epde.operators.variation import get_basic_variation
 from epde.operators.fitness import L2Fitness
 from epde.operators.right_part_selection import RandomRHPSelector
-from epde.operators.moeadd_specific import get_pareto_levels_updater, SimpleNeighborSelector
+from epde.operators.moeadd_specific import get_pareto_levels_updater, SimpleNeighborSelector, get_initial_sorter
 from epde.operators.sparsity import LASSOSparsity
 from epde.operators.coeff_calculation import LinRegBasedCoeffsEquation
 
@@ -68,7 +68,7 @@ class OptimizationPatternDirector(object):
         print(f'setting builder with {sector_processer_builder}')
         self._builder = sector_processer_builder
 
-    def use_unconstrained_eq_search(self, variation_params : dict = {}, mutation_params : dict = {},
+    def use_unconstrained_eq_search(self, variation_params : dict = {}, mutation_params : dict = {}, sorter_params : dict = {},
                                     pareto_combiner_params : dict = {}, pareto_updater_params : dict = {},
                                     **kwargs):
         add_kwarg_to_operator = partial(add_param_to_operator, target_dict = kwargs)
@@ -93,17 +93,20 @@ class OptimizationPatternDirector(object):
         eq_fitness.set_suboperators({'sparsity' : sparsity, 'coeff_calc' : coeff_calc})
         fitness_cond = lambda x: not getattr(x, 'fitness_calculated')
         sys_fitness = map_operator_between_levels(eq_fitness, 'gene level', 'chromosome level', fitness_cond)
-        
+
         rps_cond = lambda x: any([not elem_eq.right_part_selected for elem_eq in x.vals])
         sys_rps = map_operator_between_levels(right_part_selector, 'gene level', 'chromosome level', rps_cond)
-        
+
         # Separate mutation from population updater for better customization.
+        initial_sorter = get_initial_sorter(right_part_selector = sys_rps, chromosome_fitness = sys_fitness, 
+                                            sorter_params = sorter_params)
         population_updater = get_pareto_levels_updater(right_part_selector = sys_rps, chromosome_fitness = sys_fitness,
                                                        constrained = False, mutation_params = mutation_params, 
                                                        pl_updater_params = pareto_updater_params, 
                                                        combiner_params = pareto_combiner_params)
 
-        self.builder = add_sequential_operators(self.builder, [('pareto_updater_initial', population_updater),
+        self.builder = add_sequential_operators(self.builder, [('initial_sorter', initial_sorter),
+                                                               # ('pareto_updater_initial', population_updater),
                                                                ('selection', selection),
                                                                ('variation', variation),
                                                                ('pareto_updater_compl', population_updater)])

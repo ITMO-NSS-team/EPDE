@@ -27,26 +27,25 @@ class SystemMutation(CompoundOperator):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)    
     
         altered_objective = deepcopy(objective)
+        # objective.copy_properties_to(altered_objective)
+        
         eqs_keys = altered_objective.vals.equation_keys; params_keys = altered_objective.vals.params_keys
-        affected_by_mutation = np.random.uniform(0, 1) > self.params['indiv_mutation_prob']
-    
+        affected_by_mutation = True
+
         if affected_by_mutation:
-            # print('chromosome', objective.vals.text_form)
             for eq_key in eqs_keys:
                 altered_eq = self.suboperators['equation_mutation'].apply(altered_objective.vals[eq_key],
                                                                           subop_args['equation_mutation'])
 
-                # print(f'Equation status after mutation: altered_eq.fitness_calculated - {altered_eq.fitness_calculated}')
-
                 altered_objective.vals.replace_gene(gene_key = eq_key, value = altered_eq)
-
 
             for param_key in params_keys:
                 altered_param = self.suboperators['param_mutation'].apply(altered_objective.vals[param_key],
                                                                           subop_args['param_mutation'])
                 altered_objective.vals.replace_gene(gene_key = param_key, value = altered_param)
                 altered_objective.vals.pass_parametric_gene(key = param_key, value = altered_param)
-
+        
+        altered_objective.reset_state() # Использовать ли reset_right_part
         return altered_objective
 
     def use_default_tags(self):
@@ -54,19 +53,16 @@ class SystemMutation(CompoundOperator):
     
 
 class EquationMutation(CompoundOperator):
-    @ResetEquationStatus(reset_output = True)
+    # @ResetEquationStatus(reset_output = True)
     @History_Extender(f'\n -> mutating equation', 'ba')
     def apply(self, objective : Equation, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)  
-        
-        # print('For objective of equation mutation:', [term._descr_variable_marker for term in objective.structure])
-        
-        altered_objective = deepcopy(objective)
+
         for term_idx in range(objective.n_immutable, len(objective.structure)):
             if np.random.uniform(0, 1) <= self.params['r_mutation']:
-                altered_objective.structure[term_idx] = self.suboperators['mutation'].apply(objective = (term_idx, altered_objective),
-                                                                                            arguments = subop_args['mutation'])
-        return altered_objective
+                objective.structure[term_idx] = self.suboperators['mutation'].apply(objective = (term_idx, objective),
+                                                                                    arguments = subop_args['mutation'])
+        return objective
 
     def use_default_tags(self):
         self._tags = {'mutation', 'gene level', 'contains suboperators'}
@@ -108,19 +104,21 @@ class TermMutation(CompoundOperator):
         """       
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
-        # print('objective[1].text_form', objective[1].text_form, 'idx', objective[0])
-        # TODO: FIX
+        create_derivs = bool(objective[1].structure[objective[0]].descr_variable_marker)
+        
         new_term = Term(objective[1].pool, mandatory_family = objective[1].structure[objective[0]].descr_variable_marker, 
+                        create_derivs=create_derivs,
                         max_factors_in_term = objective[1].metaparameters['max_factors_in_term']['value'])
         while not check_uniqueness(new_term, objective[1].structure[:objective[0]] + objective[1].structure[objective[0]+1:]):
             new_term = Term(objective[1].pool, mandatory_family = objective[1].structure[objective[0]].descr_variable_marker, 
+                            create_derivs=create_derivs,
                             max_factors_in_term = objective[1].metaparameters['max_factors_in_term']['value'])
         new_term.use_cache()
-        print(f'CREATED DURING MUTATION: {new_term.name}, while contatining {objective[1].structure[objective[0]].descr_variable_marker}')
+        # print(f'CREATED DURING MUTATION: {new_term.name}, while contatining {objective[1].structure[objective[0]].descr_variable_marker}')
         return new_term
-    
+
     def use_default_tags(self):
-        self._tags = {'mutation', 'term level', 'exploration', 'no suboperators'}    
+        self._tags = {'mutation', 'term level', 'exploration', 'no suboperators'}
 
 
 class TermParameterMutation(CompoundOperator):
@@ -148,18 +146,18 @@ class TermParameterMutation(CompoundOperator):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
         unmutable_params = {'dim', 'power'}
-        altered_objective = deepcopy(objective[1])
+        # objective[1] = deepcopy(objective[1])
         while True:
             # Костыль!
             print('ENTERING LOOP')
             try:
-                altered_objective.target_idx
+                objective[1].target_idx
             except AttributeError:
-                altered_objective.target_idx = 0
+                objective[1].target_idx = 0
             #
-            term = altered_objective.structure[objective[0]] 
+            term = objective[1].structure[objective[0]] 
             for factor in term.structure:
-                if objective[0] == altered_objective.target_idx:
+                if objective[0] == objective[1].target_idx:
                     continue
                 # if objective[0] < altered_objective.target_idx:
                 #     corresponding_weight = altered_objective.weights_internal[objective[0]] 
@@ -186,8 +184,8 @@ class TermParameterMutation(CompoundOperator):
                     factor.params = parameter_selection
             term.structure = filter_powers(term.structure)
             print(f'checking presence of {term.name} as {objective[0]}-th element in {objective[1].text_form}')
-            if check_uniqueness(term, altered_objective.structure[:objective[0]] + 
-                                altered_objective.structure[objective[0]+1:]):
+            if check_uniqueness(term, objective[1].structure[:objective[0]] + 
+                                objective[1].structure[objective[0]+1:]):
                 break
         term.reset_saved_state()
         return term
@@ -207,13 +205,13 @@ def get_basic_mutation(mutation_params):
     #                                                                           'multiplier' : 0.1})
 
     equation_mutation = EquationMutation(['r_mutation', 'type_probabilities'])
-    add_kwarg_to_operator(operator = equation_mutation, labeled_base_val = {'r_mutation' : 0.3, 'type_probabilities' : []})
+    add_kwarg_to_operator(operator = equation_mutation, labeled_base_val = {'r_mutation' : 0.6, 'type_probabilities' : []})
     
     metaparameter_mutation = MetaparameterMutation(['std', 'mean'])
     add_kwarg_to_operator(operator = metaparameter_mutation, labeled_base_val = {'std' : 1e-4, 'mean' : 0.0})
 
     chromosome_mutation = SystemMutation(['indiv_mutation_prob'])
-    add_kwarg_to_operator(operator = chromosome_mutation, labeled_base_val = {'indiv_mutation_prob' : 0.5})
+    # add_kwarg_to_operator(operator = chromosome_mutation, labeled_base_val = {'indiv_mutation_prob' : 0.5})
     # chromosome_mutation.params = {'indiv_mutation_prob' : 0.5} if not 'mutation_params' in kwargs.keys() else kwargs['mutation_params']
 
     equation_mutation.set_suboperators(operators = {'mutation' : term_mutation})#, [term_param_mutation, ]

@@ -68,7 +68,7 @@ class ParametricFactor(Factor):
 
     @property
     def required_params(self):
-        return self.factor_id, self.params_to_optimize
+        return self.hash_descr, self.params_to_optimize
 
     def __contains__(self, element):
         return element in self.params_to_optimize
@@ -161,7 +161,7 @@ class ParametricTerm(Term):
 
     @property
     def term_id(self) -> int:
-        _term_id = sum([factor.factor_id for factor in self.parametric_factors.values()])
+        _term_id = sum([factor.hash_descr for factor in self.parametric_factors.values()])
         # print('_term_id', _term_id)
         return _term_id
 
@@ -169,8 +169,8 @@ class ParametricTerm(Term):
         params_dict = OrderedDict()
         init_idx = 0
         for factor in self.parametric_factors.values():
-            factor_id, factor_params = factor.required_params
-            params_dict[factor_id] = list(zip(factor_params, params[init_idx : init_idx + len(factor_params)]))
+            hash_descr, factor_params = factor.required_params
+            params_dict[hash_descr] = list(zip(factor_params, params[init_idx : init_idx + len(factor_params)]))
             init_idx += len(factor_params)
         return params_dict
 
