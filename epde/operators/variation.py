@@ -149,7 +149,7 @@ class EquationCrossover(CompoundOperator):
         equation1_terms, equation2_terms = detect_similar_terms(objective[0], objective[1])
         assert len(equation1_terms[0]) == len(equation2_terms[0]) and len(equation1_terms[1]) == len(equation2_terms[1])
         same_num = len(equation1_terms[0]); similar_num = len(equation1_terms[1])
-        objective[0].structure = flatten(equation1_terms); objective[0].structure = flatten(equation2_terms)
+        objective[0].structure = flatten(equation1_terms); objective[1].structure = flatten(equation2_terms)
     
         for i in range(same_num, same_num + similar_num):
             temp_term_1, temp_term_2 = self.suboperators['term_param_crossover'].apply(objective = (objective[0].structure[i], 
@@ -161,7 +161,7 @@ class EquationCrossover(CompoundOperator):
 
         for i in range(same_num + similar_num, len(objective[0].structure)):
             if check_uniqueness(objective[0].structure[i], objective[1].structure) and check_uniqueness(objective[1].structure[i], objective[0].structure):
-                objective[0].structure[i], objective[0].structure[i] = self.suboperators['term_crossover'].apply(objective = (objective[0].structure[i], 
+                objective[0].structure[i], objective[1].structure[i] = self.suboperators['term_crossover'].apply(objective = (objective[0].structure[i], 
                                                                                                                               objective[1].structure[i]),
                                                                                                                arguments = subop_args['term_crossover'])
                 

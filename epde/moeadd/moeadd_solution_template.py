@@ -122,11 +122,16 @@ class MOEADDSolution(ABC):
 
     def get_domain(self, weights):
         if self.precomputed_domain:
+            # print(self, 'DOMAIN IS:', self._domain)            
             return self._domain
         else:
             self._domain = get_domain_idx(self, weights)
             self.precomputed_domain = True
             return self._domain
+
+    def set_domain(self, idx):
+        self.precomputed_domain = True
+        self._domain = idx
 
     def __eq__(self, other):
         if isinstance(other, type(self)):

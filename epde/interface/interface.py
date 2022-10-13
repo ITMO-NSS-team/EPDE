@@ -354,7 +354,7 @@ class epde_search(object):
         print(f'Among them, the pool contains {self.pool.families_cardinality(meaningful_only = True)}')
         
     
-    def fit(self, data : Union[np.ndarray, list, tuple], boundary : int = 0, equation_terms_max_number = 6,
+    def fit(self, data : Union[np.ndarray, list, tuple], equation_terms_max_number = 6,
             equation_factors_max_number = 1, variable_names = ['u',], eq_sparsity_interval = (1e-4, 2.5), 
             derivs = None, max_deriv_order = 1, deriv_method = 'ANN', deriv_method_kwargs : dict = {},
             additional_tokens = [], coordinate_tensors = None, memory_for_cache = 5,

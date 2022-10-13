@@ -832,7 +832,8 @@ class SoEq(moeadd.MOEADDSolution):
     def evaluate(self, normalize = True):
         raise DeprecationWarning('Evaluation of system is not necessary')
         if len(self.vals) == 1:
-            value = self.vals[0].evaluate(normalize = normalize, return_val = True)[0]
+            value = [equation.evaluate(normalize, return_val = True)[0] for equation in self.vals][0]
+            # self.vals[0].evaluate(normalize = normalize, return_val = True)[0]
         else:
             value = np.sum([equation.evaluate(normalize, return_val = True)[0] for equation in self.vals])
         value = np.sum(np.abs(value))
@@ -858,7 +859,7 @@ class SoEq(moeadd.MOEADDSolution):
                 else:
                     form += ' | ' + equation.text_form + '\n'
         else:
-            form += self.vals[0].text_form + '\n'
+            form += [val.text_form for val in self.vals][0] + '\n'
         form += str(self.metaparameters)
         return form
 

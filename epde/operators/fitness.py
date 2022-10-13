@@ -107,7 +107,7 @@ class SolverBasedFitness(CompoundOperator):
                                                           torch.nn.Linear(64, 1024),
                                                           torch.nn.Tanh(),
                                                           torch.nn.Linear(1024, 1)
-                                                         )
+                                                          )
         else:
             self.model_architecture = model_architecture
         self.training_grid_set = False

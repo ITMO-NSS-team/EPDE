@@ -291,6 +291,8 @@ class MOEADDOptimizer(object):
             while True:
                 if type(solution_params) == type(None): solution_params = {}
                 temp_solution = pop_constructor.create(**solution_params)
+                #TODO: check domain belonging
+                temp_solution.set_domain(solution_idx)
                 if not np.any([temp_solution == solution for solution in population]):
                     population.append(temp_solution)
                     print(f'New solution accepted, confirmed {len(population)}/{pop_size} solutions.')
