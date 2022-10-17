@@ -233,7 +233,7 @@ class TermParamCrossover(CompoundOperator):
                     try:
                         objective[0].structure[term1_token_idx].params[param_idx] = (objective[0].structure[term1_token_idx].params[param_idx] + 
                                                                                      self.params['term_param_proportion'] 
-                                                                                     * (objective[0].structure[term2_token_idx].params[param_idx] 
+                                                                                     * (objective[1].structure[term2_token_idx].params[param_idx] 
                                                                                         - objective[0].structure[term1_token_idx].params[param_idx]))
                     except KeyError:
                         print([(token.label, token.params) for token in objective[0].structure], [(token.label, token.params) for token in objective[1].structure])

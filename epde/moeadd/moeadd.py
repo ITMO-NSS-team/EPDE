@@ -280,6 +280,7 @@ class MOEADDOptimizer(object):
     def __init__(self, pop_constructor, weights_num, pop_size, solution_params, delta, neighbors_number, 
                  nds_method = fast_non_dominated_sorting, ndl_update = ndl_update):
 
+        assert weights_num == pop_size, 'Each individual in population has to correspond to a sector'
         self.abbreviated_search_executed = False
         soluton_creation_attempts_softmax = 10
         soluton_creation_attempts_hardmax = 100
