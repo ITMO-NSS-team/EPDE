@@ -774,7 +774,9 @@ class SoEq(moeadd.MOEADDSolution):
         
         self.metaparameters = metaparameters
         self.tokens_for_eq = TF_Pool(pool.families_demand_equation)
-        self.tokens_supp = TF_Pool(pool.families_supplementary)
+        print(f'tokens_for_eq: {[family.ftype for family in self.tokens_for_eq.families]}')        
+        self.tokens_supp = TF_Pool(pool.families_equationless)
+        print(f'tokens_supp: {[family.ftype for family in self.tokens_supp.families]}')
         self.moeadd_set = False
               
         self.vars_to_describe = {token_family.ftype for token_family in self.tokens_for_eq.families}

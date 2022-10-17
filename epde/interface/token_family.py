@@ -432,6 +432,10 @@ class TF_Pool(object):
         return [family for family in self.families if not family.status['meaningful']]
 
     @property
+    def families_equationless(self):
+        return [family for family in self.families if not family.status['demands_equation']]
+
+    @property
     def labels_overview(self):
         overview = []
         for family in self.families:
