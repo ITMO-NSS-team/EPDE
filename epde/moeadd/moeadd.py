@@ -412,10 +412,7 @@ class MOEADDOptimizer(object):
         '''
         
         # добавить возможность теста оператора
-        print("sector_processer is set")
         self.sector_processer = processer
-        print(self.sector_processer)
-    
     
         
     def optimize(self, neighborhood_selector, delta, neighborhood_selector_params, epochs):
