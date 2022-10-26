@@ -105,7 +105,7 @@ class ChromosomeCrossover(CompoundOperator):
                                                                                               objective[1].vals[eq_key]),
                                                                                  arguments = subop_args['equation_crossover'])
             # print(f'PARENT 1: objective[0].vals[eq_key] is {objective[0].vals[eq_key].text_form}')
-            # print(f'PARENT 2: objective[1].vals[eq_key] is {objective[1].vals[eq_key].text_form}')            
+            # print(f'PARENT 2: objective[1].vals[eq_key] is {objective[1].vals[eq_key].text_form}')
             # print(f'OFFSPRING: temp_eq_1.vals[eq_key] is {temp_eq_1.text_form}')
             objective[0].vals.replace_gene(gene_key = eq_key, value = temp_eq_1)
             offspring_2.vals.replace_gene(gene_key = eq_key, value = temp_eq_2)
@@ -145,25 +145,26 @@ class EquationCrossover(CompoundOperator):
     @History_Extender(f'\n -> performing equation crossover', 'ba')
     def apply(self, objective : tuple, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
-        
+
         equation1_terms, equation2_terms = detect_similar_terms(objective[0], objective[1])
         assert len(equation1_terms[0]) == len(equation2_terms[0]) and len(equation1_terms[1]) == len(equation2_terms[1])
         same_num = len(equation1_terms[0]); similar_num = len(equation1_terms[1])
-        objective[0].structure = flatten(equation1_terms); objective[0].structure = flatten(equation2_terms)
-    
+        objective[0].structure = flatten(equation1_terms); objective[1].structure = flatten(equation2_terms)
+
         for i in range(same_num, same_num + similar_num):
-            temp_term_1, temp_term_2 = self.suboperators['term_param_crossover'].apply(objective = (objective[0].structure[i], 
+            temp_term_1, temp_term_2 = self.suboperators['term_param_crossover'].apply(objective=(objective[0].structure[i],
                                                                                                     objective[1].structure[i]),
-                                                                                       arguments = subop_args['term_param_crossover']) 
+                                                                                       arguments=subop_args['term_param_crossover'])
             if (check_uniqueness(temp_term_1, objective[0].structure[:i] + objective[0].structure[i+1:]) and 
                 check_uniqueness(temp_term_2, objective[1].structure[:i] + objective[1].structure[i+1:])):                     
                 objective[0].structure[i] = temp_term_1; objective[1].structure[i] = temp_term_2
 
         for i in range(same_num + similar_num, len(objective[0].structure)):
             if check_uniqueness(objective[0].structure[i], objective[1].structure) and check_uniqueness(objective[1].structure[i], objective[0].structure):
-                objective[0].structure[i], objective[0].structure[i] = self.suboperators['term_crossover'].apply(objective = (objective[0].structure[i], 
-                                                                                                                              objective[1].structure[i]),
-                                                                                                               arguments = subop_args['term_crossover'])
+                objective[0].structure[i], objective[1].structure[i] = \
+                    self.suboperators['term_crossover'].apply(objective=(objective[0].structure[i],
+                                                                         objective[1].structure[i]),
+                                                              arguments=subop_args['term_crossover'])
                 
         return objective[0], objective[1]
 
@@ -233,7 +234,7 @@ class TermParamCrossover(CompoundOperator):
                     try:
                         objective[0].structure[term1_token_idx].params[param_idx] = (objective[0].structure[term1_token_idx].params[param_idx] + 
                                                                                      self.params['term_param_proportion'] 
-                                                                                     * (objective[0].structure[term2_token_idx].params[param_idx] 
+                                                                                     * (objective[1].structure[term2_token_idx].params[param_idx]
                                                                                         - objective[0].structure[term1_token_idx].params[param_idx]))
                     except KeyError:
                         print([(token.label, token.params) for token in objective[0].structure], [(token.label, token.params) for token in objective[1].structure])

@@ -410,14 +410,52 @@ class TokenFamily(object):
                     raise KeyError('Generated token somehow was not stored in cache.')
 
 
+class CustomProbInfo:
+    def __init__(self, pool):
+        self.pool = pool
+
+        token_ls = []
+        for family in self.pool.families:
+            token_ls += family.tokens
+        term_ls = []
+        for i in range(1, self.pool.max_factors_in_term + 1):
+            term_ls += list(itertools.combinations(token_ls, i))
+
+        term_ls_hashed = [self.hash_term(term) for term in term_ls]
+        custom_prob_hashed = [self.hash_term(term) for term in self.pool.custom_prob_terms.keys()]
+
+        # два полных словаря
+        self.term_ls_dict = dict(zip(term_ls_hashed, term_ls))
+        self.custom_prob_dict = dict(zip(custom_prob_hashed, self.pool.custom_prob_terms.values()))
+
+        self.term_set_hashed = set(term_ls_hashed)
+        self.custom_prob_set_hashed = set(custom_prob_hashed)
+
+    @staticmethod
+    def hash_term(term):
+        total_term = 0
+        for token in term:
+            total_token = 1
+            for char in token:
+                total_token += ord(char)
+            total_term += total_token * total_token
+        return total_term
+
+
 class TF_Pool(object):
     '''
     
     '''
-    def __init__(self, families : list, stored_pool = None):
+    def __init__(self, families : list, stored_pool = None, custom_prob_terms : dict = {},
+                 custom_cross_prob : dict = {}, max_factors_in_term: int = 1):
         if stored_pool is not None:
             self = pickle.load(stored_pool)
         self.families = families
+        self.custom_prob_terms = custom_prob_terms
+        self.custom_cross_prob = custom_cross_prob
+        self.max_factors_in_term = max_factors_in_term
+
+        self.prob_info = CustomProbInfo(self)
         
     @property
     def families_meaningful(self):
@@ -486,7 +524,8 @@ class TF_Pool(object):
         return family.create(label = None, token_status = token_status, **kwargs)
                                                    
     def __add__(self, other):
-        return TF_Pool(families = self.families + other.families)
+        return TF_Pool(families=self.families + other.families, custom_prob_terms=self.custom_prob_terms,
+                       custom_cross_prob=self.custom_cross_prob, max_factors_in_term=self.max_factors_in_term)
 
     def __len__(self):
         return len(self.families)

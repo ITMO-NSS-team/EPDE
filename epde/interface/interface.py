@@ -305,7 +305,9 @@ class epde_search(object):
     
     def create_pool(self, data : Union[np.ndarray, list, tuple], variable_names = ['u',], 
                     derivs = None, method = 'ANN', method_kwargs : dict = {},
-                    max_deriv_order = 1, additional_tokens = [], data_fun_pow : int = 1):
+                    max_deriv_order = 1, additional_tokens = [], data_fun_pow : int = 1,
+                    custom_prob_terms: dict = {}, custom_cross_prob: dict = {},
+                    max_factors_in_term : int = 1):
         assert (isinstance(derivs, list) and isinstance(derivs[0], np.ndarray)) or derivs is None
         if isinstance(data, np.ndarray):
             data = [data,]
@@ -348,8 +350,10 @@ class epde_search(object):
         else:
             print(isinstance(additional_tokens, PreparedTokens))
             raise TypeError(f'Incorrect type of additional tokens: expected list or TokenFamily/Prepared_tokens - obj, instead got {type(additional_tokens)}')
-        self.pool = TF_Pool(data_tokens + [tf if isinstance(tf, TokenFamily) else tf.token_family 
-                                      for tf in additional_tokens])
+        self.pool = TF_Pool(data_tokens + [tf if isinstance(tf, TokenFamily) else tf.token_family
+                                           for tf in additional_tokens], custom_prob_terms=custom_prob_terms,
+                                                                    custom_cross_prob=custom_cross_prob,
+                                                                    max_factors_in_term=max_factors_in_term)
         print(f'The cardinality of defined token pool is {self.pool.families_cardinality()}')
         print(f'Among them, the pool contains {self.pool.families_cardinality(meaningful_only = True)}')
         
@@ -360,7 +364,7 @@ class epde_search(object):
             additional_tokens = [], coordinate_tensors = None, memory_for_cache = 5,
             prune_domain : bool = False, pivotal_tensor_label = None, pruner = None, 
             threshold : float = 1e-2, division_fractions = 3, rectangular : bool = True, 
-            data_fun_pow : int = 1):
+            data_fun_pow : int = 1, custom_prob_terms : dict = {}, custom_cross_prob : dict = {}):
         '''
         
         Fit epde search algorithm to obtain differential equations, describing passed data.
@@ -432,7 +436,10 @@ class epde_search(object):
         self.create_pool(data = data, variable_names=variable_names, 
                          derivs=derivs, method=deriv_method, method_kwargs=deriv_method_kwargs, 
                          max_deriv_order=max_deriv_order, additional_tokens=additional_tokens, 
-                         data_fun_pow=data_fun_pow)
+                         data_fun_pow=data_fun_pow,
+                         custom_prob_terms=custom_prob_terms,
+                         custom_cross_prob=custom_cross_prob,
+                         max_factors_in_term=equation_factors_max_number)
         
         pop_constructor = SystemsPopulationConstructor(pool = self.pool, terms_number = equation_terms_max_number, 
                                                        max_factors_in_term = equation_factors_max_number,

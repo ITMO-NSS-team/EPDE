@@ -44,7 +44,7 @@ class SystemMutation(CompoundOperator):
                                                                           subop_args['param_mutation'])
                 altered_objective.vals.replace_gene(gene_key = param_key, value = altered_param)
                 altered_objective.vals.pass_parametric_gene(key = param_key, value = altered_param)
-        
+
         altered_objective.reset_state() # Использовать ли reset_right_part
         return altered_objective
 
@@ -56,12 +56,12 @@ class EquationMutation(CompoundOperator):
     # @ResetEquationStatus(reset_output = True)
     @History_Extender(f'\n -> mutating equation', 'ba')
     def apply(self, objective : Equation, arguments : dict):
-        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)  
+        self_args, subop_args = self.parse_suboperator_args(arguments=arguments)
 
         for term_idx in range(objective.n_immutable, len(objective.structure)):
             if np.random.uniform(0, 1) <= self.params['r_mutation']:
-                objective.structure[term_idx] = self.suboperators['mutation'].apply(objective = (term_idx, objective),
-                                                                                    arguments = subop_args['mutation'])
+                objective.structure[term_idx] = self.suboperators['mutation'].apply(objective=(term_idx, objective),
+                                                                                    arguments=subop_args['mutation'])
         return objective
 
     def use_default_tags(self):
@@ -109,12 +109,18 @@ class TermMutation(CompoundOperator):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
         create_derivs = bool(objective[1].structure[objective[0]].descr_variable_marker)
+
+
+        # term_ls, prob_ls = objective[1].equation_status.define_mutation_prob()
+        # new_term_hash = np.random.choice(a=term_ls, p=prob_ls)   # !!! возвращает float64, если на входе большой int ..??
+        # new_term = Term(objective[1].pool, max_factors_in_term=objective[1].metaparameters['max_factors_in_term']['value'],
+        #                 passed_term=list(objective[1].pool.prob_info.term_ls_dict.get(new_term_hash)))
         
-        new_term = Term(objective[1].pool, mandatory_family = objective[1].structure[objective[0]].descr_variable_marker, 
+        new_term = Term(objective[1].pool, mandatory_family = objective[1].structure[objective[0]].descr_variable_marker,
                         create_derivs=create_derivs,
                         max_factors_in_term = objective[1].metaparameters['max_factors_in_term']['value'])
         while not check_uniqueness(new_term, objective[1].structure[:objective[0]] + objective[1].structure[objective[0]+1:]):
-            new_term = Term(objective[1].pool, mandatory_family = objective[1].structure[objective[0]].descr_variable_marker, 
+            new_term = Term(objective[1].pool, mandatory_family = objective[1].structure[objective[0]].descr_variable_marker,
                             create_derivs=create_derivs,
                             max_factors_in_term = objective[1].metaparameters['max_factors_in_term']['value'])
         new_term.use_cache()
