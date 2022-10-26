@@ -8,7 +8,7 @@ Contains:
 **check_dominance(target, compared_with) -> bool** : Function to check, if one
 solution is dominated by another;
 
-**NDL_update(new_solution, levels) -> list** : Function to add a new solution into
+**ndl_update(new_solution, levels) -> list** : Function to add a new solution into
 the existing levels;
 
 **fast_non_dominated_sorting(population) -> list** : Sorting of a population into
@@ -31,10 +31,6 @@ import numpy as np
 from abc import ABC, abstractproperty, abstractmethod
     
 
-#def check_dominance(target, compared_with) -> bool:
-#    return (all([target.obj_fun[obj_fun_idx] <= compared_with.obj_fun[obj_fun_idx] for obj_fun_idx in np.arange(target.obj_fun.size)]) and 
-#            any([target.obj_fun[obj_fun_idx] < compared_with.obj_fun[obj_fun_idx] for obj_fun_idx in np.arange(target.obj_fun.size)]))
-   
 def check_dominance(target, compared_with) -> bool:
     '''
     
@@ -43,10 +39,10 @@ def check_dominance(target, compared_with) -> bool:
     Arguments:
     ----------
     
-    target : ``src.moeadd.moeadd_stc.moeadd_solution`` case-specific subclass object
+    target : ``src.moeadd.moeadd_solution_template.MOEADDSolution`` case-specific subclass object
         The individual solution on the pareto levels, compared with the other element.
         
-    compared_with : ``src.moeadd.moeadd_stc.moeadd_solution`` case-specific subclass object
+    compared_with : ``src.moeadd.moeadd_solution_template.MOEADDSolution`` case-specific subclass object
         The individual solution on the pareto levels, with with the target is compared.
     
     Returns:
@@ -59,6 +55,7 @@ def check_dominance(target, compared_with) -> bool:
     
     '''
     flag = False
+    
     for obj_fun_idx in range(len(target.obj_fun)):
         if target.obj_fun[obj_fun_idx] <= compared_with.obj_fun[obj_fun_idx]:
             if target.obj_fun[obj_fun_idx] < compared_with.obj_fun[obj_fun_idx]:
@@ -67,7 +64,7 @@ def check_dominance(target, compared_with) -> bool:
             return False
     return flag
  
-def NDL_update(new_solution, levels) -> list:   # efficient_NDL_update
+def ndl_update(new_solution, levels) -> list:   # efficient_ndl_update
     '''
     
     Computationally-cheap method of adding new solution into the existing Pareto levels.
@@ -75,18 +72,18 @@ def NDL_update(new_solution, levels) -> list:   # efficient_NDL_update
     Parameters:
     -----------
     
-    new_solution : ``src.moeadd.moeadd_stc.moeadd_solution`` case-specific subclass object
+    new_solution : ``src.moeadd.moeadd_solution_template.MOEADDSolution`` case-specific subclass object
         The solution, that is to be added onto the non-dominated levels.
         
     levels : list
-        List of lists of ``src.moeadd.moeadd_stc.moeadd_solution`` case-specific subclass 
+        List of lists of ``src.moeadd.moeadd_solution_template.MOEADDSolution`` case-specific subclass 
         object, representing the input non-dominated levels.
         
     Returns:
     --------
     
     new_levels : list
-        List of lists of ``src.moeadd.moeadd_stc.moeadd_solution`` case-specific subclass 
+        List of lists of ``src.moeadd.moeadd_solution_template.MOEADDSolution`` case-specific subclass 
         object, containing the solution from input parameter *level* with *new_solution*, 
         added to it.
     
@@ -100,7 +97,8 @@ def NDL_update(new_solution, levels) -> list:   # efficient_NDL_update
     
     '''
     moving_set = {new_solution}
-    new_levels = deepcopy(levels) #levels#
+    new_levels = deepcopy(levels) #levels# CAUSES ERRORS DUE TO DEEPCOPY
+    # print(f'type(levels) is {type(levels)}')
     for level_idx in np.arange(len(levels)):
         moving_set_new = set()
         for ms_idx, moving_set_elem in enumerate(moving_set):
@@ -231,8 +229,8 @@ def slow_non_dominated_sorting(population) -> list:
         locked_idxs.extend(processed_idxs); levels_elems += len(processed_idxs)
         levels.append([population[elem_idx] for elem_idx in processed_idxs])
     return levels
- 
-    
+
+
 def acute_angle(vector_a, vector_b) -> float:
     return np.arccos(np.dot(vector_a, vector_b)/(np.sqrt(np.dot(vector_a, vector_a))*np.sqrt(np.dot(vector_b, vector_b))))
 
@@ -250,8 +248,8 @@ class Constraint(ABC):
     @abstractmethod
     def __call__(self, *args):
         pass
-    
-    
+
+
 class Inequality(Constraint):
     '''
         

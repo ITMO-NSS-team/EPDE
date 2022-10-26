@@ -27,6 +27,8 @@ if __name__ == '__main__':
     t = np.linspace(0, 1, u.shape[0])
     x = np.linspace(0, 0.2, u.shape[1])
     y = np.linspace(0, 0.2, u.shape[2])
+    
+    boundary = 20
 
     dimensionality = u.ndim    
     grids = np.meshgrid(t, x, y, indexing = 'ij')

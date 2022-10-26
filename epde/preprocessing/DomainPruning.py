@@ -12,8 +12,10 @@ import copy
 
 import epde.globals as global_var
 
+
 def scale_values(tensor):
     return tensor/np.max(tensor)
+
 
 def split_tensor(tensor, fraction_along_axis : Union[int, list, tuple]):
     assert isinstance(tensor, np.ndarray)
@@ -48,9 +50,11 @@ def split_tensor(tensor, fraction_along_axis : Union[int, list, tuple]):
         block_matrix[tuple(indexes[idx])] = tensor_fragment
     return split_indexes_along_axis, block_matrix
 
+
 def majority_rule(tensors : Union[list, np.ndarray], threshold : float = 1e-2):
     non_constancy_cond = lambda x: np.linalg.norm(x) > (threshold * x.size)
     return sum([non_constancy_cond(x_elem) for x_elem in tensors])/len(tensors) >= 0.5
+
 
 def get_subdomains_mask(tensor, division_fractions : Union[int, list, tuple], domain_selector : Callable, 
                         domain_selector_kwargs : dict, time_axis : int):
@@ -74,6 +78,7 @@ def get_subdomains_mask(tensor, division_fractions : Union[int, list, tuple], do
             temp = []; counter = 0
     return split_idxs, accepted_spatial_domains
 
+
 def pruned_domain_boundaries(mask : np.ndarray, split_idxs : list, time_axis : int, 
                              rectangular : bool = True, threshold : float = 0.5): # Разбораться с методом
     if rectangular:
@@ -95,7 +100,7 @@ def pruned_domain_boundaries(mask : np.ndarray, split_idxs : list, time_axis : i
     return boundaries
 
 
-class Domain_Pruner(object):
+class DomainPruner(object):
     def __init__(self, domain_selector : Callable = majority_rule, domain_selector_kwargs : dict = dict()):
         self.domain_selector = domain_selector
         self.domain_selector_kwargs = domain_selector_kwargs

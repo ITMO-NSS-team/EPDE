@@ -9,20 +9,20 @@ Created on Thu Mar  5 13:16:43 2020
 import numpy as np
 import copy
 
-from epde.Tokens import TerminalToken
+from epde.structure.Tokens import TerminalToken
 import epde.globals as global_var
 from epde.supplementary import factor_params_to_str
 
 class Factor(TerminalToken):
     __slots__ = ['_params', '_params_description', '_hash_val',
-                 'label', 'type', 'grid_set', 'grid_idx', 'is_deriv', 'deriv_code', 
+                 'label', 'ftype', 'grid_set', 'grid_idx', 'is_deriv', 'deriv_code', 
                  'cache_linked', '_status', 'equality_ranges', '_evaluator', 'saved']
     
     def __init__(self, token_name : str, status : dict, family_type : str, 
                  randomize : bool = False, params_description = None, 
-                 deriv_code = None, equality_ranges = None):#, token_family, randomize = False):
+                 deriv_code = None, equality_ranges = None):
         self.label = token_name
-        self.type = family_type
+        self.ftype = family_type
         self.status = status
         self.grid_set = False
         self._hash_val = np.random.randint(0, 1e9)
@@ -44,7 +44,7 @@ class Factor(TerminalToken):
                 self.use_grids_cache()
 
     def reset_saved_state(self):
-        self.saved = {'base':False, 'structural':False}
+        self.saved = {'base' : False, 'structural' : False}
 
     @property
     def status(self):
@@ -85,7 +85,7 @@ class Factor(TerminalToken):
             for param_idx, param_info in enumerate(kwargs.items()): #param_name, param_val 
                 _params[param_idx] = param_info[1]
                 _params_description[param_idx] = {'name' : param_info[0], 
-                                                          'bounds' : params_description[param_info[0]]} 
+                                                  'bounds' : params_description[param_info[0]]} 
         else:
             _params = np.empty(len(params_description))#OrderedDict()
             for param_idx, param_info in enumerate(params_description.items()):
@@ -157,7 +157,7 @@ class Factor(TerminalToken):
         return form
 
     @property
-    def factor_id(self) -> int:
+    def hash_descr(self) -> int:
         return self._hash_val
 
     @property

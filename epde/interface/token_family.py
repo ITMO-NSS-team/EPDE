@@ -8,10 +8,13 @@ Created on Mon Jul  6 15:39:18 2020
 
 import numpy as np
 import itertools
+from typing import Union
+
+import pickle
 
 import epde.globals as global_var
-from epde.factor import Factor
-from typing import Union
+from epde.structure.factor import Factor
+
 
 def constancy_hard_equality(tensor, epsilon = 1e-7):
     # print(np.abs(np.max(tensor) - np.min(tensor)), epsilon, type(np.abs(np.max(tensor) - np.min(tensor))),  type(epsilon))
@@ -127,10 +130,14 @@ class TokenFamily(object):
             The name of the token family; must be unique among other families.
         """
         
-        self.type = token_type
+        self.ftype = token_type
         self.family_of_derivs = family_of_derivs
         self.evaluator_set = False; self.params_set = False; self.cache_set = False
         self.deriv_evaluator_set = True    
+
+    def __len__(self):
+        assert self.params_set, 'Familiy is not fully initialized.'
+        return len(self.tokens)
 
     def set_status(self, demands_equation = False, meaningful = False, 
                    s_and_d_merged = True, unique_specific_token = False, 
@@ -186,7 +193,10 @@ class TokenFamily(object):
             self.derivs_ords = {token : derivs_solver_orders[idx] for idx, token in enumerate(tokens)}
         self.params_set = True
         self.equality_ranges = equality_ranges
-        
+
+        if self.family_of_derivs:         
+            print(f'self.tokens is {self.tokens}')
+            print(f'Here, derivs order is {self.derivs_ords}')
         if self.evaluator_set:
             self.test_evaluator()
 
@@ -322,21 +332,23 @@ class TokenFamily(object):
         else:
             raise TypeError('Evaluator function or its parameters not set brfore evaluator application.')
     
-    def create(self, label = None, token_status : Union[dict, None] = None, **factor_params):
-        # print('factor params', factor_params)
+    def create(self, label = None, token_status : Union[dict, None] = None, 
+               create_derivs : bool = False, **factor_params):
         if token_status is None or token_status == {}:
             token_status = {label : (0, self.token_params['power'][1], False) 
                             for label in self.tokens}
-        if type(label) == type(None):
+        if label is None:
             try:
-                label = np.random.choice([token for token in self.tokens 
-                                          if not token_status[token][0] + 1 > token_status[token][1]])
+                if create_derivs:
+                    label = np.random.choice([token for token in self.tokens 
+                                              if (not token_status[token][0] + 1 > token_status[token][1]
+                                                  and self.derivs_ords[token][0] is not None)])
+                else:                    
+                    label = np.random.choice([token for token in self.tokens 
+                                              if not token_status[token][0] + 1 > token_status[token][1]])
             except ValueError:
-                print(f'An error while creating factor of {self.type} token family')
+                print(f'An error while creating factor of {self.ftype} token family')
                 print('Status description:', token_status, ' all:', self.tokens)
-                # for token in self.tokens:
-                #     if not token in occupied: print(f'{token} is free')
-                #     if def_term_tokens.count(token) >= self.token_params['power'][1]: print(f"max power {self.token_params['power'][1]} not reached") 
                 raise ValueError("'a' cannot be empty unless no samples are taken")
 
         if self.family_of_derivs:
@@ -344,7 +356,7 @@ class TokenFamily(object):
         else:
             factor_deriv_code = None
         new_factor = Factor(token_name = label, deriv_code=factor_deriv_code,
-                            status = self.status, family_type = self.type)
+                            status = self.status, family_type = self.ftype)
         
         if self.status['unique_token_type']:
             occupied_by_factor = {token : self.token_params['power'][1] for token in self.tokens}
@@ -363,6 +375,7 @@ class TokenFamily(object):
                                       **factor_params)
         new_factor.set_evaluator(self._evaluator)
         return occupied_by_factor, new_factor
+        
 
     def cardinality(self, token_status : Union[dict, None] = None):
         if token_status is None or token_status == {}:
@@ -401,7 +414,9 @@ class TF_Pool(object):
     '''
     
     '''
-    def __init__(self, families):
+    def __init__(self, families : list, stored_pool = None):
+        if stored_pool is not None:
+            self = pickle.load(stored_pool)
         self.families = families
         
     @property
@@ -417,6 +432,10 @@ class TF_Pool(object):
         return [family for family in self.families if not family.status['meaningful']]
 
     @property
+    def families_equationless(self):
+        return [family for family in self.families if not family.status['demands_equation']]
+
+    @property
     def labels_overview(self):
         overview = []
         for family in self.families:
@@ -430,13 +449,11 @@ class TF_Pool(object):
         else:
             return np.array([family.cardinality(token_status) for family in self.families])
         
-    def create(self, label = None, create_meaningful : bool = False, 
-                      token_status = None, **kwargs) -> Union[str, Factor]:
+    def create(self, label = None, create_meaningful : bool = False, token_status = None, 
+               create_derivs : bool = False, **kwargs) -> Union[str, Factor]:
         if label is None:
             if create_meaningful:
                 if np.sum(self.families_cardinality(True, token_status)) == 0:
-                    # print('occupied', occupied, 'meaningful', create_meaningful)
-                    # print('family', [(fml.type, fml.tokens, fml.status) for fml in self.families])
                     raise ValueError('Tring to create a term from an empty pool')
                 
                 probabilities = (self.families_cardinality(True, token_status) / 
@@ -445,14 +462,15 @@ class TF_Pool(object):
                 return np.random.choice(a = self.families_meaningful,
                                         p = probabilities).create(label = None, 
                                                                   token_status = token_status,
+                                                                  create_derivs = create_derivs,
                                                                   **kwargs)
             else:
                 probabilities = (self.families_cardinality(False, token_status) / 
                                  np.sum(self.families_cardinality(False, token_status)))
-                # print(probabilities, self.families_cardinality(False, token_status))
                 return np.random.choice(a = self.families, 
                                         p = probabilities).create(label = None, 
                                                                   token_status = token_status,
+                                                                  create_derivs = create_derivs,
                                                                   **kwargs)
         else:
             token_families = [family for family in self.families if label in family.tokens]
@@ -465,9 +483,17 @@ class TF_Pool(object):
                 return token_families[0].create(label = label,
                                                 token_status = token_status,
                                                 **kwargs)
-                                                                             
+                          
+    def create_from_family(self, family_label : str, token_status = None, **kwargs):
+        # print('family_label', family_label, 'self.families', self.families)
+        family = [f for f in self.families if family_label == f.ftype][0]
+        return family.create(label = None, token_status = token_status, **kwargs)
+                                                   
     def __add__(self, other):
         return TF_Pool(families = self.families + other.families)
+
+    def __len__(self):
+        return len(self.families)
 
     def get_families_by_label(self, label):
         containing_families = [family for family in self.families 
@@ -479,3 +505,8 @@ class TF_Pool(object):
         except IndexError:
             print(label, [family.tokens for family in self.families])
             raise IndexError('No family for token.')
+
+    def save(self, filename : str):
+        file_to_store = open(filename, "wb")
+        pickle.dump(self, file_to_store)
+        file_to_store.close()        

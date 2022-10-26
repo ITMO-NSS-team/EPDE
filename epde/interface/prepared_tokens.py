@@ -12,7 +12,7 @@ from typing import Union, Callable
 import time
 
 from epde.supplementary import Define_Derivatives
-from epde.prep.derivatives import Preprocess_derivatives
+from epde.preprocessing.derivatives import Preprocess_derivatives
 
 import epde.globals as global_var
 from epde.interface.token_family import TokenFamily
@@ -38,11 +38,12 @@ class TrigonometricTokens(PreparedTokens):
 
         self._token_family = TokenFamily(token_type='trigonometric')
         self._token_family.set_status(unique_specific_token=True, unique_token_type=True, 
-                           meaningful = False)
+                                      meaningful = False)
         
         trig_token_params = OrderedDict([('power', (1, 1)), 
                                          ('freq', freq), 
                                          ('dim', (0, dimensionality))])
+        print(f'trig_token_params : VALUES = {trig_token_params["dim"]}')
         freq_equality_fraction = 0.05 # fraction of allowed frequency interval, that is considered as the same
         trig_equal_params = {'power' : 0, 'freq' : (freq[1] - freq[0]) / freq_equality_fraction, 
                              'dim' : 0}

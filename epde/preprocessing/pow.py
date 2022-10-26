@@ -7,7 +7,7 @@ Created on Thu Feb 13 19:29:43 2020
 """
 
 import numpy as np
-from edpe.prep.fin_der import FD_derivatives
+from edpe.preprocessing.fin_der import FD_derivatives
 from sklearn.linear_model import LinearRegression
 
 def Get_LSQ_for_point(matrix, axis, idx, grid, max_der_order = 3, points = 9):

@@ -46,7 +46,6 @@ class CustomEvaluator(EvaluatorTemplate):
                 if param_descr['name'] == key: eval_fun_kwargs[key] = factor.params[param_idx]
         
         grid_function = np.vectorize(lambda args: evaluation_function(*args, **eval_fun_kwargs))
-                                     #, excluded=eval_fun_kwargs.keys())
                                      
         try:
             self.indexes_vect
@@ -96,7 +95,7 @@ def simple_function_evaluator(factor, structural : bool = False, **kwargs):
         return value
 
 trig_eval_fun = {'cos' : lambda *grids, **kwargs: np.cos(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power'], 
-                   'sin' : lambda *grids, **kwargs: np.sin(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power']}
+                 'sin' : lambda *grids, **kwargs: np.sin(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power']}
 inverse_eval_fun = lambda *grids, **kwargs: np.power(grids[int(kwargs['dim'])], - kwargs['power']) 
 
 def const_eval_fun(*grids, **kwargs):

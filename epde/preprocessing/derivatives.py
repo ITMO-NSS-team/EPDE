@@ -15,34 +15,9 @@ import torch
 device = torch.device('cpu')
 
 import epde.globals as global_var
-from epde.prep.cheb import Process_Point_Cheb
-from epde.prep.smoothing import Smoothing
+from epde.preprocessing.cheb import Process_Point_Cheb
+from epde.preprocessing.smoothing import Smoothing
 from epde.supplementary import Define_Derivatives
-
-# from TEDEouS.solver import apply_operator_set
-# from TEDEouS.input_preprocessing import grid_prepare, operator_prepare
-
-def scaling_test(field, steps = None, ff_name = None, output_file_name = None, smooth = True, sigma = 9,
-                           mp_poolsize = 4, max_order = 2, polynomial_window = 9, poly_order = None):
-    assert field.ndim == 2, 'Test condition of 2D input field was not fullfilled'
-    _, derivs_raw = Preprocess_derivatives(field, steps, ff_name = ff_name, output_file_name = output_file_name,
-                       smooth=smooth, sigma = sigma, mp_poolsize=mp_poolsize, max_order = 1, polynomial_window=polynomial_window, poly_order=poly_order)
-#    return derivs_fa
-    derivs_raw = derivs_raw.reshape((int(np.sqrt(derivs_raw.shape[0])), int(np.sqrt(derivs_raw.shape[0])), derivs_raw.shape[1]))
-    new_coords = np.empty_like(steps)
-    for dim_idx in np.arange(new_coords.size):
-        new_coords[dim_idx] = np.linalg.norm(derivs_raw[..., dim_idx])**(-1) * np.linalg.norm(derivs_raw[..., 0])
-        print(dim_idx, new_coords[dim_idx], np.linalg.norm(derivs_raw[..., dim_idx]))    
-    time.sleep(10)
-    steps = np.array(steps) / new_coords
-    print('new steps:', steps)
-    time.sleep(5)
-    
-    _, derivs_scaled = Preprocess_derivatives(field, steps, ff_name = None, output_file_name = output_file_name,
-                       smooth=smooth, sigma = sigma, mp_poolsize=mp_poolsize, max_order = max_order, polynomial_window=polynomial_window, poly_order=poly_order)    
-    derivs_scaled = derivs_scaled.reshape((int(np.sqrt(derivs_scaled.shape[0])), int(np.sqrt(derivs_scaled.shape[0])), derivs_scaled.shape[1]))
-    
-    return derivs_raw, derivs_scaled
     
 
 def Preprocess_derivatives_poly(field, grid = None, steps = None, data_name = None, output_file_name = None, smooth = True, sigma = 9,

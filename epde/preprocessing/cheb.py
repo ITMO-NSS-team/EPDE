@@ -7,7 +7,7 @@ Created on Thu Feb 13 19:16:50 2020
 """
 
 import numpy as np
-from epde.prep.fin_der import FD_derivatives
+from epde.preprocessing.fin_der import FD_derivatives
 
 def Get_cheb_for_point(matrix, axis, idx, grid, max_der_order = 3, points = 9, poly_order = None):
     if poly_order is None:

@@ -8,7 +8,7 @@ from collections import OrderedDict
 from typing import Union
 from functools import reduce, singledispatchmethod
 
-from epde.structure import Equation
+from epde.structure.main_structures import Equation
 
 class ParametricEquation(object):
     def __init__(self, pool, terms : Union[list, tuple], right_part_index : int = -1):

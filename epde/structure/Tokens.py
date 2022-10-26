@@ -109,6 +109,7 @@ class TerminalToken(Token):
         self.cache_val = cache_val
         self._fix_val = fix_val
         self.type = type_
+        # print(f'setting type as {self.ftype}')
         self.optimizer = optimizer
         self.name_ = name_
         self.mandatory = mandatory

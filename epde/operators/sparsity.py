@@ -11,13 +11,11 @@ import numpy as np
 from sklearn.linear_model import Lasso
 
 import epde.globals as global_var
-from epde.operators.template import Compound_Operator
+from epde.operators.template import CompoundOperator
+from epde.structure.main_structures import Equation
 
-#class Poplevel_sparsity(Compound_Operator):
-#    def apply(self, population):
-#        for 
 
-class LASSO_sparsity(Compound_Operator):
+class LASSOSparsity(CompoundOperator):
     """
     The operator, which applies LASSO regression to the equation object to detect the 
     valuable term coefficients.
@@ -26,7 +24,7 @@ class LASSO_sparsity(Compound_Operator):
     -------------------
         
     params : dict
-        Inhereted from the ``Compound_Operator`` class. 
+        Inhereted from the ``CompoundOperator`` class. 
         Parameters of the operator; main parameters: 
             
             sparsity - value of the sparsity constant in the LASSO operator;
@@ -40,15 +38,8 @@ class LASSO_sparsity(Compound_Operator):
         calculate the coefficients of the equation, that will be stored in the equation.weights np.ndarray.    
         
     """
-    # def __init__(self, param_keys : list = [], g_fun : Union[Callable, type(None)] = None):
-    #     self.weak_deriv_appr = g_fun is not None
-    #     if self.weak_deriv_appr:
-    #         self.g_fun = g_fun
-    #         self.g_fun_vals = None            
-            
-    #     super().__init__(param_keys = param_keys)
     
-    def apply(self, equation):
+    def apply(self, objective : Equation, arguments : dict):
         """
         Apply the operator, to fit the LASSO regression to the equation object to detect the 
         valueable terms. In the Equation class, a term is selected to represent the right part of
@@ -65,11 +56,14 @@ class LASSO_sparsity(Compound_Operator):
         ------------
         None
         """
+        # print(f'Metaparameter: {objective.metaparameters}, objective.metaparameters[("sparsity", objective.main_var_to_explain)]')
+        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
-        estimator = Lasso(alpha = self.params['sparsity'], copy_X=True, fit_intercept=True, max_iter=1000,
-                          normalize=False, positive=False, precompute=False, random_state=None,
+        estimator = Lasso(alpha = objective.metaparameters[('sparsity', objective.main_var_to_explain)]['value'], 
+                          copy_X=True, fit_intercept=True, max_iter=1000, normalize=False, 
+                          positive=False, precompute=False, random_state=None,
                           selection='cyclic', tol=0.0001, warm_start=False)
-        _, target, features = equation.evaluate(normalize = True, return_val = False)
+        _, target, features = objective.evaluate(normalize = True, return_val = False)
         self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)
 
         target = np.multiply(target, self.g_fun_vals)
@@ -77,8 +71,8 @@ class LASSO_sparsity(Compound_Operator):
         features = np.multiply(features, g_fun_casted)
 
         estimator.fit(features, target)
-        equation.weights_internal = estimator.coef_
-        
-    @property
-    def operator_tags(self):
-        return {'sparsity', 'equation level', 'no suboperators'}        
+        # print(f'LASSO estimator coefficients: {estimator.coef_}')
+        objective.weights_internal = estimator.coef_
+
+    def use_default_tags(self):
+        self._tags = {'sparsity', 'gene level', 'no suboperators', 'inplace'}

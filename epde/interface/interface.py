@@ -5,6 +5,7 @@ Created on Tue Jul  6 15:55:12 2021
 
 @author: mike_ubuntu
 """
+import time
 import numpy as np
 from typing import Union, Callable
 from collections import OrderedDict
@@ -14,44 +15,33 @@ import epde.globals as global_var
 
 from epde.moeadd.moeadd import *
 from epde.moeadd.moeadd_supplementary import *
+from epde.moeadd.moeadd_strategy_elems import SectorProcesserBuilder
 
-from epde.prep.DomainPruning import Domain_Pruner
+from epde.preprocessing.DomainPruning import DomainPruner
 from epde.decorators import Boundary_exclusion
 
-from epde.operators.ea_stop_criteria import Stop_condition, Iteration_limit
-import epde.operators.sys_search_operators as operators
+from epde.moeadd.moeadd_population_constr import SystemsPopulationConstructor
+from epde.moeadd.moeadd_strategy import OptimizationPatternDirector
 
 from epde.evaluators import simple_function_evaluator, trigonometric_evaluator
 from epde.supplementary import Define_Derivatives
 from epde.cache.cache import upload_simple_tokens, upload_grids, prepare_var_tensor#, np_ndarray_section
-from epde.prep.derivatives import Preprocess_derivatives
-from epde.eq_search_strategy import Strategy_director, Strategy_director_solver
-from epde.structure import Equation
+from epde.preprocessing.derivatives import Preprocess_derivatives
+from epde.structure.main_structures import Equation
 
 from epde.interface.token_family import TF_Pool, TokenFamily
 from epde.interface.type_checks import *
 from epde.interface.prepared_tokens import PreparedTokens, CustomTokens
 
 class Input_data_entry(object):
-    def __init__(self, var_name, data_tensor): # , coord_tensors = None
+    def __init__(self, var_name : str, data_tensor : np.ndarray):
         self.var_name = var_name
         check_nparray(data_tensor)
-        self.data_tensor = data_tensor        
-        # if coord_tensors is not None:
-            # check_nparray_iterable(coord_tensors)
-            # if any([tensor.shape != data_tensor.shape for tensor in coord_tensors]):
-                # print('data_tensor.shape', data_tensor.shape, 'tensors:', 
-                       # [tensor.shape for tensor in coord_tensors])
-                # raise ValueError('mismatching shapes of coordinate tensors and input data')
-            # self.coord_tensors = coord_tensors
-        # else:
-            # axes = []
-            # for ax_idx in range(data_tensor.ndim):
-                # axes.append(np.linspace(0., 1., data_tensor.shape[ax_idx]))
-            # self.coord_tensors = np.meshgrid(*axes)
+        self.data_tensor = data_tensor
 
         
-    def set_derivatives(self, deriv_tensors = None, method = 'ANN', max_order = 1, method_kwargs = {}):
+    def set_derivatives(self, deriv_tensors = None, method : str = 'ANN', max_order : Union[list, tuple, int] = 1,
+                        method_kwargs : dict = {}):
 
         deriv_names, deriv_orders = Define_Derivatives(self.var_name, dimensionality=self.data_tensor.ndim, 
                                                        max_order = max_order)
@@ -62,7 +52,6 @@ class Input_data_entry(object):
             method_kwargs['max_order'] = max_order
             # if self.coord_tensors is not None and 'grid' not in method_kwargs.keys():
             _, method_kwargs['grid'] = global_var.grid_cache.get_all()
-            print(method_kwargs['grid'])
             self.data_tensor, self.derivatives = Preprocess_derivatives(self.data_tensor, method=method, 
                                                                         method_kwargs=method_kwargs)
             # Added setting of data tensor from filtered field
@@ -73,53 +62,31 @@ class Input_data_entry(object):
             self.deriv_properties = {'max order' : max_order,
                                      'dimensionality' : self.data_tensor.ndim}
             
-    def use_global_cache(self): # , set_grids = True
-
-        print(type(self.data_tensor), type(self.derivatives))
+    def use_global_cache(self):
         derivs_stacked = prepare_var_tensor(self.data_tensor, self.derivatives, time_axis = global_var.time_axis)
         
         try:       
             upload_simple_tokens(self.names, global_var.tensor_cache, derivs_stacked)
             upload_simple_tokens([self.var_name,], global_var.initial_data_cache, [self.data_tensor,])            
-            # if set_grids: 
-            #     memory_for_cache = int(memory_for_cache/2)
-            #     upload_grids(self.coord_tensors, global_var.initial_data_cache)
-            #     upload_grids(self.coord_tensors, global_var.grid_cache)
-            #     print(f'completed grid cache with {len(global_var.grid_cache.memory_default)} tensors with labels {global_var.grid_cache.memory_default.keys()}')
 
         except AttributeError:         
             raise NameError('Cache has not been declared before tensor addition.')
-            # print('Somehow, cache had not been initialized')
-            # print(self.names, derivs_stacked.shape)
-            # print(global_var.tensor_cache.memory_default.keys())
-            # global_var.init_caches(set_grids = set_grids)
-            # if set_grids:
-            #     print('setting grids')
-            #     memory_for_cache = int(memory_for_cache/2)
-            #     global_var.grid_cache.memory_usage_properties(obj_test_case = self.data_tensor,
-            #                                                     mem_for_cache_frac = memory_for_cache)
-            #     upload_grids(self.coord_tensors, global_var.initial_data_cache)
-            #     upload_grids(self.coord_tensors, global_var.grid_cache)
-            #     print(f'completed grid cache with {len(global_var.grid_cache.memory_default)} tensors with labels {global_var.grid_cache.memory_default.keys()}')
-            # global_var.tensor_cache.memory_usage_properties(obj_test_case = self.data_tensor,
-            #                                                 mem_for_cache_frac = memory_for_cache)
-            # print(self.names, derivs_stacked.shape)
-            # upload_simple_tokens(self.names, global_var.tensor_cache, derivs_stacked)
-            # upload_simple_tokens([self.var_name,], global_var.initial_data_cache, [self.data_tensor,])
 
         global_var.tensor_cache.use_structural()
     
 def simple_selector(sorted_neighbors, number_of_neighbors = 4):
     return sorted_neighbors[:number_of_neighbors]
      
+
 class epde_search(object):
-    def __init__(self, use_default_strategy : bool = True, eq_search_stop_criterion : Stop_condition = Iteration_limit,
-                 director = None, equation_type : set = {'PDE', 'derivatives only'}, time_axis : int = 0, 
-                 define_domain : bool = True, set_grids : bool = True, function_form = None, boundary : int = 0, 
-                 eq_search_iter : int = 300, use_solver : bool = False, dimensionality : int = 1, 
-                 verbose_params : dict = {}, coordinate_tensors = None, memory_for_cache = 5, 
-                 prune_domain : bool = False, pivotal_tensor_label = None, pruner = None, threshold : float = 1e-2, 
-                 division_fractions = 3, rectangular : bool = True, ):
+    def __init__(self, use_default_strategy : bool = True, director = None, 
+                 director_params : dict = {'variation_params' : {}, 'mutation_params' : {},
+                                           'pareto_combiner_params' : {}, 'pareto_updater_params' : {}}, 
+                 time_axis : int = 0, define_domain : bool = True, function_form = None, boundary : int = 0, 
+                 use_solver : bool = False, dimensionality : int = 1, verbose_params : dict = {}, 
+                 coordinate_tensors = None, memory_for_cache = 5, prune_domain : bool = False, 
+                 pivotal_tensor_label = None, pruner = None, threshold : float = 1e-2, 
+                 division_fractions = 3, rectangular : bool = True):
         '''
         
         Intialization of the epde search object. Here, the user can declare the properties of the 
@@ -129,9 +96,15 @@ class epde_search(object):
         --------------
         
         use_default_strategy : bool, optional
-            True (base and recommended value), if the default evolutionary strategy shall be used, 
-            False if the user - defined strategy will be passed further.
-        
+            True (base and recommended value), if the default evolutionary strategy will be used, 
+            False if the user-defined strategy will be passed further. Otherwise, the search will 
+            not be conducted.
+            
+        director_params : dict, optional
+            Contains parameters for evolutionary operator builder / construction director, that 
+            can be passed to individual operators. Keys shall be 'variation_params', 'mutation_params',
+            'pareto_combiner_params', 'pareto_updater_params'.
+            
         eq_search_stop_criterion : epde.operators.ea_stop_criteria.Stop_condition object, optional
             The stop condition for the evolutionary search of the equation. Default value 
             represents loop over 300 evolutionary epochs.
@@ -144,6 +117,7 @@ class epde_search(object):
             Will define equation type, TBD later.
         
         '''
+        # TODO: rewrite intitialization
         global_var.set_time_axis(time_axis)
         global_var.init_verbose(**verbose_params)
 
@@ -151,7 +125,7 @@ class epde_search(object):
             if coordinate_tensors is None:
                 raise ValueError('Grids can not be empty during calculations.')
             self.set_domain_properties(coordinate_tensors, memory_for_cache, boundary, function_form = function_form, 
-                                       prune_domain = prune_domain, pivotal_tensor_label = pivotal_tensor_label,
+                                       prune_domain = prune_domain, pruner = pruner, pivotal_tensor_label = pivotal_tensor_label,
                                        threshold = threshold, division_fractions = division_fractions,
                                        rectangular = rectangular)
             
@@ -161,12 +135,13 @@ class epde_search(object):
         if director is not None and not use_default_strategy:
             self.director = director
         elif director is None and use_default_strategy:
-            if use_solver:
-                self.director = Strategy_director_solver(eq_search_stop_criterion, {'limit' : eq_search_iter})#, 
-                                                         # dimensionality=dimensionality)
-            else:
-                self.director = Strategy_director(eq_search_stop_criterion, {'limit' : eq_search_iter})
-            self.director.strategy_assembly()
+            self.director = OptimizationPatternDirector()
+            self.director.builder = SectorProcesserBuilder()
+            # print('!')
+            self.director.use_unconstrained_eq_search(variation_params       = director_params['variation_params'], 
+                                                      mutation_params        = director_params['mutation_params'],
+                                                      pareto_combiner_params = director_params['pareto_combiner_params'],
+                                                      pareto_updater_params  = director_params['pareto_updater_params'])
         else: 
             raise NotImplementedError('Wrong arguments passed during the epde search initialization')
         self.set_moeadd_params()
@@ -183,8 +158,8 @@ class epde_search(object):
 
     def set_moeadd_params(self, population_size : int = 6, solution_params : dict = {},
                           delta : float = 1/50., neighbors_number : int = 3,
-                          NDS_method : Callable = fast_non_dominated_sorting,
-                          NDL_update_method : Callable = NDL_update,
+                          nds_method : Callable = fast_non_dominated_sorting,
+                          ndl_update_method : Callable = ndl_update,
                           subregion_mating_limitation : float = .95,
                           PBI_penalty : float = 1., training_epochs : int = 100,
                           neighborhood_selector : Callable = simple_selector,
@@ -212,13 +187,13 @@ class epde_search(object):
             number of neighboring weight vectors to be considered during the operation 
             of evolutionary operators as the "neighbors" of the processed sectors.
             
-        NDS_method : function, optional, default ``moeadd.moeadd_supplementary.fast_non_dominated_sorting``
+        nds_method : function, optional, default ``moeadd.moeadd_supplementary.fast_non_dominated_sorting``
             Method of non-dominated sorting of the candidate solutions. The default method is implemented according to the article 
             *K. Deb, A. Pratap, S. Agarwal, and T. Meyarivan, “A fast and elitist
             multiobjective genetic algorithm: NSGA-II,” IEEE Trans. Evol. Comput.,
             vol. 6, no. 2, pp. 182–197, Apr. 2002.*
             
-        NDL_update : function, optional, defalut ``moeadd.moeadd_supplementary.NDL_update``
+        ndl_update : function, optional, defalut ``moeadd.moeadd_supplementary.NDL_update``
             Method of adding a new solution point into the objective functions space, introduced 
             to minimize the recalculation of the non-dominated levels for the entire population. 
             The default method was taken from the *K. Li, K. Deb, Q. Zhang, and S. Kwong, “Efficient non-domination level
@@ -254,14 +229,13 @@ class epde_search(object):
         self.moeadd_params = {'weights_num' : population_size, 'pop_size' : population_size, 
                               'delta' : delta, 'neighbors_number' : neighbors_number, 
                               'solution_params': solution_params,
-                              'NDS_method' : NDS_method, 
-                              'NDL_update' : NDL_update_method}
+                              'nds_method' : nds_method, 
+                              'ndl_update' : ndl_update_method}
         
         self.moeadd_optimization_params = {'neighborhood_selector' : neighborhood_selector,
                                            'neighborhood_selector_params' : neighborhood_selector_params,
                                            'delta' : subregion_mating_limitation, 
-                                           'epochs' : training_epochs, 
-                                           'PBI_penalty' : PBI_penalty}
+                                           'epochs' : training_epochs}
  
     def domain_pruning(self, pivotal_tensor_label = None, pruner = None, 
                              threshold : float = 1e-5, division_fractions = 3, 
@@ -269,7 +243,7 @@ class epde_search(object):
         if pruner is not None:
             self.pruner = pruner
         else:
-            self.pruner = Domain_Pruner(domain_selector_kwargs={'threshold' : threshold})
+            self.pruner = DomainPruner(domain_selector_kwargs={'threshold' : threshold})
         if not self.pruner.bds_init:
             if pivotal_tensor_label is None:
                 pivotal_tensor_label = ('du/dx'+str(global_var.time_axis + 1), (1.0,))
@@ -329,8 +303,8 @@ class epde_search(object):
         self.set_boundaries(boundary_width)
         self.upload_g_func(function_form)
     
-    def create_pool(self, data : Union[np.ndarray, list, tuple], time_axis : int = 0,
-                    variable_names = ['u',], derivs = None, method = 'ANN', method_kwargs : dict = {},
+    def create_pool(self, data : Union[np.ndarray, list, tuple], variable_names = ['u',], 
+                    derivs = None, method = 'ANN', method_kwargs : dict = {},
                     max_deriv_order = 1, additional_tokens = [], data_fun_pow : int = 1):
         assert (isinstance(derivs, list) and isinstance(derivs[0], np.ndarray)) or derivs is None
         if isinstance(data, np.ndarray):
@@ -353,6 +327,8 @@ class epde_search(object):
                                   method_kwargs=method_kwargs)
             entry.use_global_cache()
             
+            print(f'creating TokenFamily entry {entry.var_name}')
+            time.sleep(10)
             entry_token_family = TokenFamily(entry.var_name, family_of_derivs = True)
             entry_token_family.set_status(demands_equation=True, unique_specific_token=False, 
                                           unique_token_type=False, s_and_d_merged = False, 
@@ -378,10 +354,9 @@ class epde_search(object):
         print(f'Among them, the pool contains {self.pool.families_cardinality(meaningful_only = True)}')
         
     
-    def fit(self, data : Union[np.ndarray, list, tuple], time_axis : int = 0, boundary : int = 0,
-            equation_terms_max_number = 6, equation_factors_max_number = 1, variable_names = ['u',], 
-            eq_sparsity_interval = (1e-4, 2.5), derivs = None, max_deriv_order = 1, 
-            deriv_method = 'ANN', deriv_method_kwargs : dict = {},
+    def fit(self, data : Union[np.ndarray, list, tuple], equation_terms_max_number = 6,
+            equation_factors_max_number = 1, variable_names = ['u',], eq_sparsity_interval = (1e-4, 2.5), 
+            derivs = None, max_deriv_order = 1, deriv_method = 'ANN', deriv_method_kwargs : dict = {},
             additional_tokens = [], coordinate_tensors = None, memory_for_cache = 5,
             prune_domain : bool = False, pivotal_tensor_label = None, pruner = None, 
             threshold : float = 1e-2, division_fractions = 3, rectangular : bool = True, 
@@ -420,7 +395,7 @@ class epde_search(object):
         derivs : list of lists of np.ndarrays or None, optional,
             Pre-computed values of derivatives. If ``None`` is passed, the derivatives are calculated in the 
             method. Recommended to use, if the computations of derivatives take too long. For further information 
-            about using data, prepared in advance, check ``epde.prep.derivatives.Preprocess_derivatives`` function.
+            about using data, prepared in advance, check ``epde.preprocessing.derivatives.Preprocess_derivatives`` function.
             Default value: None.
             
         max_deriv_order : int or tuple/list, optional,
@@ -450,27 +425,29 @@ class epde_search(object):
             Maximum power of token,
             
         '''
-        if equation_terms_max_number < self.moeadd_params['pop_size']:
-            self.moeadd_params['pop_size'] = equation_terms_max_number
-            self.moeadd_params['weights_num'] = equation_terms_max_number
+        # if equation_terms_max_number < self.moeadd_params['pop_size']:
+        #     self.moeadd_params['pop_size'] = equation_terms_max_number
+        #     self.moeadd_params['weights_num'] = equation_terms_max_number
         
-        self.create_pool(data = data, time_axis=time_axis, variable_names=variable_names, 
+        self.create_pool(data = data, variable_names=variable_names, 
                          derivs=derivs, method=deriv_method, method_kwargs=deriv_method_kwargs, 
                          max_deriv_order=max_deriv_order, additional_tokens=additional_tokens, 
                          data_fun_pow=data_fun_pow)
         
-        pop_constructor = operators.Systems_population_constructor(pool = self.pool, terms_number = equation_terms_max_number, 
-                                                               max_factors_in_term=equation_factors_max_number, 
-                                                               eq_search_evo=self.director.constructor.strategy,
-                                                               sparsity_interval = eq_sparsity_interval)
+        pop_constructor = SystemsPopulationConstructor(pool = self.pool, terms_number = equation_terms_max_number, 
+                                                       max_factors_in_term = equation_factors_max_number,
+                                                       sparsity_interval = eq_sparsity_interval)
 
         self.moeadd_params['pop_constructor'] = pop_constructor
-        self.optimizer = moeadd_optimizer(**self.moeadd_params)
-        evo_operator = operators.sys_search_evolutionary_operator(operators.mixing_xover, 
-                                                                  operators.gaussian_mutation)
-        self.optimizer.set_evolutionary(operator=evo_operator)        
-        best_obj = np.concatenate((np.zeros(shape =len([1 for token_family in self.pool.families if token_family.status['demands_equation']])),
-                                   np.ones(shape=len([1 for token_family in self.pool.families if token_family.status['demands_equation']]))))  
+        self.optimizer = MOEADDOptimizer(**self.moeadd_params)
+        
+        evo_operator_builder = self.director.builder
+        evo_operator_builder.assemble(True)
+        evo_operator = evo_operator_builder.processer
+        
+        self.optimizer.set_sector_processer(processer = evo_operator)        
+        best_obj = np.concatenate((np.zeros(shape = len([1 for token_family in self.pool.families if token_family.status['demands_equation']])),
+                                   np.ones(shape = len([1 for token_family in self.pool.families if token_family.status['demands_equation']]))))  
         print('best_obj', len(best_obj))
         self.optimizer.pass_best_objectives(*best_obj)
         self.optimizer.optimize(**self.moeadd_optimization_params)
@@ -512,4 +489,3 @@ class epde_search(object):
             return global_var.grid_cache, global_var.tensor_cache
         else:
             return None, global_var.tensor_cache
-
