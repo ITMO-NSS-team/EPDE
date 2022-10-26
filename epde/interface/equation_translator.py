@@ -9,7 +9,7 @@ from typing import Union
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
-from epde.structure import Term, Equation
+from epde.structure.main_structures import Term, Equation
 
 def float_convertable(obj):
     try:

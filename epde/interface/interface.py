@@ -153,7 +153,7 @@ class epde_search(object):
                 mem_for_cache_frac = int(mem_for_cache_frac/2.)
             else:
                 mem_for_cache_abs = int(mem_for_cache_abs/2.)
-            global_var.tensor_cache.memory_usage_properties(example_tensor, mem_for_cache_frac, mem_for_cache_abs)            
+            global_var.grid_cache.memory_usage_properties(example_tensor, mem_for_cache_frac, mem_for_cache_abs)            
         global_var.tensor_cache.memory_usage_properties(example_tensor, mem_for_cache_frac, mem_for_cache_abs )
 
     def set_moeadd_params(self, population_size : int = 6, solution_params : dict = {},
