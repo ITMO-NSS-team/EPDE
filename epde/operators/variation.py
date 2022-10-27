@@ -64,6 +64,7 @@ class ParetoLevelsCrossover(CompoundOperator):
         crossover_pool = []
         for solution in objective.population:
             crossover_pool.extend([solution,] * solution.crossover_times())
+            solution.reset_counter()
 
         if len(crossover_pool) == 0:
             raise ValueError('crossover pool not created, probably solution.crossover_selected_times error')

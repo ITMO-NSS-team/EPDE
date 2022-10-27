@@ -9,7 +9,7 @@ from typing import Union
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
-from epde.structure import Term, Equation
+from epde.structure.main_structures import Term, Equation
 
 def float_convertable(obj):
     try:
@@ -37,10 +37,12 @@ def translate_equation(text_form, pool):
             factors = [parse_factor(factor, pool) for factor in term]
             if len(factors) > max_factors:
                 max_factors = len(factors)
-            term_list.append(Term(pool, passed_term=factors))            
+            term_list.append(Term(pool, passed_term=factors))
 
-    equation = Equation(pool = pool, basic_structure = term_list, terms_number = len(term_list), 
-                        max_factors_in_term = max_factors)
+    equation = Equation(pool = pool, basic_structure = term_list,
+                        metaparameters = {'sparsity' : {'optimizable' : True, 'value' : 1.},
+                                          'terms_number' : {'optimizable' : False, 'value' : len(term_list)},
+                                          'max_factors_in_term' : {'optimizable' : False, 'value' : max_factors}})   
     equation.target_idx = len(term_list) - 1
     equation.weights_internal = weights    
     equation.weights_final = weights
