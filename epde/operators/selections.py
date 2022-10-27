@@ -55,19 +55,13 @@ class MOEADDSelection(CompoundOperator):
             List of the selected parents in the population pool.
         
         '''
-        # weight_idx : int, weights : np.ndarray, neighborhood_vectors : list
-        
-        # if not self.neighborhoods_set:
-            # raise AttributeError('Neighborhood properties have not been set before the selection call.')
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
-        # self_args['weight_idx']    self_args['weights']   self_args['neighborhood_vectors']
         
         parents_number_counted = int(len(objective.population) * self.params['parents_fraction']) # Странное упрощение 
         parents_number_counted = parents_number_counted if not parents_number_counted % 2 else parents_number_counted + 1
         
         parents_number = min(max(2, parents_number_counted), len(objective.population))
                              
-        # print(f'PARENTS NUMBER : {parents_number}, with FRACTION : {self.params["parents_fraction"]}')
         if np.random.uniform() < self.params['delta']:
             selected_regions_idxs = self.suboperators['neighborhood_selector'].apply(self_args['neighborhood_vectors'][self_args['weight_idx']],
                                                                                      arguments = subop_args['neighborhood_selector']) #, 
@@ -82,9 +76,6 @@ class MOEADDSelection(CompoundOperator):
                                             size = min(available_in_proximity, parents_number),
                                             replace = False)
             if available_in_proximity < parents_number: # <
-                # print(f'Checking availability in proximity, available in proximity {available_in_proximity, parent_idxs}:')
-                # print(f'solution_mask : {solution_mask}, population size : {len(objective.population)}')
-                # print(f'indexes: {[idx for idx in np.arange(len(objective.population)) if not solution_mask[idx]]}')
                 parent_idxs_additional = np.random.choice([idx for idx in np.arange(len(objective.population))
                                                            if not solution_mask[idx]],
                                                           size = parents_number - available_in_proximity,
@@ -93,9 +84,7 @@ class MOEADDSelection(CompoundOperator):
                 parent_idxs_temp[:parent_idxs.size] = parent_idxs; parent_idxs_temp[parent_idxs.size:] = parent_idxs_additional
                 parent_idxs = parent_idxs_temp
         else:
-            # print('len(objective.population) & obj.pop : ', len(objective.population), objective.population, 'parents_number', parents_number)
             parent_idxs = np.random.choice(np.arange(len(objective.population)), size = parents_number, replace = False)
-        # print(f'PARENTS : {parent_idxs.reshape(-1)}')
         for idx in parent_idxs.reshape(-1):
             objective.population[int(idx)].incr_counter()
         return objective

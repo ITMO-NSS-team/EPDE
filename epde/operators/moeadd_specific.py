@@ -337,33 +337,22 @@ def best_obj_values(levels : ParetoLevels):
 
 class OffspringUpdater(CompoundOperator):
     def apply(self, objective : ParetoLevels, arguments : dict):
-        # print(f'IN OFFSPRING UPDATER : objective is {objective}, arguments : {arguments}')
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
         while objective.unplaced_candidates:
             offspring = objective.unplaced_candidates.pop()
             attempt = 1; attempt_limit = self.params['attempt_limit']
-            # print('BEFORE RPS:', offspring.text_form)
-
             while True:
-                # print(f'attempting to place new solution to the objective pareto levels, attempt {attempt}.')
                 temp_offspring = self.suboperators['chromosome_mutation'].apply(objective = offspring,
                                                                                 arguments = subop_args['chromosome_mutation'])
                 self.suboperators['right_part_selector'].apply(objective = temp_offspring,
                                                                arguments = subop_args['right_part_selector'])                
                 self.suboperators['chromosome_fitness'].apply(objective = temp_offspring,
                                                               arguments = subop_args['chromosome_fitness'])
-                # print('DURING RPS:', temp_offspring.text_form)
-                # print(f'During placing of an individual: {temp_offspring.vals["u"].fitness_calculated}')
-                # print(f'During placing of an individual: {temp_offspring.obj_fun}')
 
                 if all([temp_offspring != solution for solution in objective.population]):
                     self.suboperators['pareto_level_updater'].apply(objective = (temp_offspring, objective),
                                                                     arguments = subop_args['pareto_level_updater'])
-                    # objective =  
-                    # print('AFTER RPS:', temp_offspring.text_form)
-                    # print('-------------------------------------')
-                    time.sleep(5)
                     break
                 elif attempt >= attempt_limit:
                     print(temp_offspring.text_form)
@@ -372,11 +361,8 @@ class OffspringUpdater(CompoundOperator):
                         print(f'Individual {idx}')
                         print(individual.text_form)
                         print('-----------------------')
-                    # print([individual.text_form for ])
-                    raise Exception('Can not place individual into the population.')
+                    raise Exception('Can not place individual into the population. Try decreasing population size or increasing token variety. ')
                     break
-                # print(f'Attempt {attempt} of attempt limit {attempt_limit}')
-                # print([temp_offspring != solution for solution in objective.population])
                 attempt += 1
         return objective
     
