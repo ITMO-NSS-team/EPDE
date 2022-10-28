@@ -14,9 +14,9 @@ from functools import reduce
 
 import epde.globals as global_var
 
-from epde.optimizers.moeadd.strategy_elems import MOEADDSectorProcesser
-from epde.optimizers.moeadd.supplementary import fast_non_dominated_sorting, ndl_update, Equality, Inequality
-from scipy.spatial import ConvexHull    
+from epde.moeadd.moeadd_strategy_elems import MOEADDSectorProcesser
+from epde.moeadd.moeadd_supplementary import fast_non_dominated_sorting, ndl_update, Equality, Inequality        
+    
 
 def clear_list_of_lists(inp_list) -> list:
     '''
@@ -73,6 +73,9 @@ class ParetoLevels(object):
         self._sorting_method = sorting_method
         self.population = [] #population
         self._update_method = update_method
+        # if initial_sort:
+        #     self.levels = self._sorting_method(self.population)
+        # else:
         self.unplaced_candidates = population # tabulation deleted
         
     @property
@@ -94,7 +97,6 @@ class ParetoLevels(object):
             self.population.append(self._unplaced_candidates.pop())
         if any([any([candidate == other_candidate for other_candidate in self.population[:idx] + self.population[idx+1:]])
                 for idx, candidate in enumerate(self.population)]):
-            print([candidate.text_form for candidate in self.population])
             raise Exception('Duplicating initial candidates')
         self.levels = self.sort()
 
@@ -169,15 +171,6 @@ class ParetoLevels(object):
         self.levels = new_levels
         self.population = population_cleared
 
-    def fit_convex_hull(self):
-        if len(self.levels) > 1:
-            warnings.warn('Algorithm has not converged to a single Pareto level yet!')
-        points = np.vstack([sol.obj_fun for sol in self.population])
-        points = np.concatenate((points, np.max(points, axis = 0).reshape((1, -1))))
-        points_unique = np.unique(points, axis = 0)
-        
-        hull = ConvexHull(points = points_unique, qhull_options='Qt')
-        
 
 class ParetoLevelsIterator(object):
     def __init__(self, pareto_levels):
@@ -366,18 +359,17 @@ class MOEADDOptimizer(object):
         
         Weights : np.ndarray
             Weight vectors, introduced to decompose the optimization problem into 
-            several subproblems by dividing Pareto frontier into a number of sectors.
+            several subproblems by dividing Pareto frontier into a numeber of sectors.
         
         '''
         weights = np.empty(weights_num)
         assert 1./delta == round(1./delta) # check, if 1/delta is integer number
         m = np.zeros(weights_num)
         for weight_idx in np.arange(weights_num):
-            weights[weight_idx] = np.random.choice([div_idx * delta for div_idx in np.arange(1./delta + 1e-8 - np.sum(m[:weight_idx + 1]))])
+            weights[weight_idx] = np.random.choice([div_idx * delta for div_idx in np.arange(1./delta + 1 - np.sum(m[:weight_idx + 1]))])
             m[weight_idx] = weights[weight_idx]/delta
         weights[-1] = 1 - np.sum(weights[:-1])
-
-        weights = np.abs(weights)  
+        assert (weights[-1] <= 1 and weights[-1] >= 0)
         return list(weights)
 
     
@@ -406,7 +398,7 @@ class MOEADDOptimizer(object):
             self.best_obj[arg_idx] = arg if isinstance(arg, int) or isinstance(arg, float) else arg() # Переделать под больше elif'ов
     
 
-    def set_sector_processer(self, processer: MOEADDSectorProcesser) -> None:
+    def set_sector_processer(self, processer : MOEADDSectorProcesser) -> None:
         '''
         
         Setter of the `moeadd_optimizer.sector_processer` attribute.
@@ -419,10 +411,11 @@ class MOEADDOptimizer(object):
         
         '''
         
+        # добавить возможность теста оператора
         self.sector_processer = processer
     
         
-    def optimize(self, epochs):
+    def optimize(self, neighborhood_selector, delta, neighborhood_selector_params, epochs):
         '''
         
         Method for the main unconstrained evolutionary optimization. Can be applied repeatedly to 
@@ -432,7 +425,21 @@ class MOEADDOptimizer(object):
         
         Parameters:
         -----------
-                    
+        
+        neighborhood_selector : function,
+            Method of finding "close neighbors" of the vector with proximity list.
+            The baseline example of the selector, presented in 
+            ``moeadd.moeadd_stc.simple_selector``, selects n-adjacent ones.
+            
+        delta : float
+            The probability of mating selection to be limited only to the selected
+            subregions (adjacent to the weight vector domain). :math:`\delta \in [0., 1.)
+        
+        neighborhood_selector_params : tuple/list or None
+            Iterable, which will be passed into neighborhood_selector, as 
+            an arugument. *None*, is no additional arguments are required inside
+            the selector.
+            
         epochs : int
             Maximum number of iterations, during that the optimization will be held.
             Note, that if the algorithm converges to a single Pareto frontier, 
@@ -451,6 +458,9 @@ class MOEADDOptimizer(object):
                     self.sector_processer.run(population_subset = self.pareto_levels, 
                                               EA_kwargs = sp_kwargs)
                         
+                # if len(self.pareto_levels.levels) == 1:
+                #     break
+                    
     def form_processer_args(self, cur_weight : int): # TODO: inspect the most convenient input format
         return {'weight_idx' : cur_weight, 'weights' : self.weights, 'best_obj' : self.best_obj, 
                 'neighborhood_vectors' : self.neighborhood_lists}
