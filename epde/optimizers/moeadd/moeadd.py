@@ -359,7 +359,7 @@ class MOEADDOptimizer(object):
         
         Weights : np.ndarray
             Weight vectors, introduced to decompose the optimization problem into 
-            several subproblems by dividing Pareto frontier into a numeber of sectors.
+            several subproblems by dividing Pareto frontier into a number of sectors.
         
         '''
         weights = np.empty(weights_num)
@@ -369,7 +369,8 @@ class MOEADDOptimizer(object):
             weights[weight_idx] = np.random.choice([div_idx * delta for div_idx in np.arange(1./delta + 1 - np.sum(m[:weight_idx + 1]))])
             m[weight_idx] = weights[weight_idx]/delta
         weights[-1] = 1 - np.sum(weights[:-1])
-        assert (weights[-1] <= 1 and weights[-1] >= 0)
+        
+        weights = np.abs(weights)  
         return list(weights)
 
     
