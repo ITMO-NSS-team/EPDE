@@ -366,10 +366,10 @@ class MOEADDOptimizer(object):
         assert 1./delta == round(1./delta) # check, if 1/delta is integer number
         m = np.zeros(weights_num)
         for weight_idx in np.arange(weights_num):
-            weights[weight_idx] = np.random.choice([div_idx * delta for div_idx in np.arange(1./delta + 1 - np.sum(m[:weight_idx + 1]))])
+            weights[weight_idx] = np.random.choice([div_idx * delta for div_idx in np.arange(1./delta + 1e-8 - np.sum(m[:weight_idx + 1]))])
             m[weight_idx] = weights[weight_idx]/delta
         weights[-1] = 1 - np.sum(weights[:-1])
-        
+
         weights = np.abs(weights)  
         return list(weights)
 
