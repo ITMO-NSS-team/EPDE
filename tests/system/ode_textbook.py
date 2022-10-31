@@ -27,7 +27,7 @@ import epde.operators.sys_search_operators as operators
 from epde.evaluators import simple_function_evaluator, trigonometric_evaluator
 from epde.supplementary import Define_Derivatives
 from epde.cache.cache import upload_simple_tokens, upload_grids, prepare_var_tensor
-from epde.prep.derivatives import Preprocess_derivatives
+from epde.preprocessing.derivatives import Preprocess_derivatives
 from epde.interface.token_family import TF_Pool, Token_family
 
 from epde.eq_search_strategy import Strategy_director, Strategy_director_solver

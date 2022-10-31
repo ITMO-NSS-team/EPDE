@@ -17,7 +17,7 @@ Created on Tue Jul 13 14:45:14 2021
 import numpy as np
 import epde.interface.interface as epde_alg
 
-from epde.interface.prepared_tokens import Trigonometric_tokens
+from epde.interface.prepared_tokens import TrigonometricTokens
 
 if __name__ == '__main__':
 
@@ -30,7 +30,7 @@ if __name__ == '__main__':
     
     epde_search_obj = epde_alg.epde_search()
     
-    trig_tokens = Trigonometric_tokens(freq = (0.95, 1.05))
+    trig_tokens = TrigonometricTokens(freq = (0.95, 1.05))
     
     epde_search_obj.fit(data = u, equation_factors_max_number = 2, coordinate_tensors = [t,], 
                         additional_tokens = trig_tokens, field_smooth = False)
