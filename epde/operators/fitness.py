@@ -18,7 +18,7 @@ from matplotlib import cm
 from epde.structure.main_structures import SoEq, Equation
 from epde.operators.template import CompoundOperator
 import epde.globals as global_var
-from TEDEouS.solver import point_sort_shift_solver
+# from TEDEouS.solver import point_sort_shift_solver
 
 
 class L2Fitness(CompoundOperator):
@@ -89,99 +89,99 @@ class L2Fitness(CompoundOperator):
         self._tags = {'fitness evaluation', 'gene level', 'contains suboperators', 'inplace'}
 
 
-class SolverBasedFitness(CompoundOperator):
-    def __init__(self, param_keys : list, model_architecture = None):
-        super().__init__(param_keys)
-        if model_architecture is None:
-            try:
-                dim = global_var.tensor_cache.get(label = None).ndim
-            except ValueError:
-                dim = global_var.dimensionality
-            self.model_architecture = torch.nn.Sequential(
-                                                          torch.nn.Linear(dim, 256),
-                                                          torch.nn.Tanh(),
-                                                          torch.nn.Linear(256, 64),
-                                                          torch.nn.Tanh(),       
-                                                          torch.nn.Linear(64, 64),
-                                                          torch.nn.Tanh(),
-                                                          torch.nn.Linear(64, 1024),
-                                                          torch.nn.Tanh(),
-                                                          torch.nn.Linear(1024, 1)
-                                                          )
-        else:
-            self.model_architecture = model_architecture
-        self.training_grid_set = False
+# class SolverBasedFitness(CompoundOperator):
+#     def __init__(self, param_keys : list, model_architecture = None):
+#         super().__init__(param_keys)
+#         if model_architecture is None:
+#             try:
+#                 dim = global_var.tensor_cache.get(label = None).ndim
+#             except ValueError:
+#                 dim = global_var.dimensionality
+#             self.model_architecture = torch.nn.Sequential(
+#                                                           torch.nn.Linear(dim, 256),
+#                                                           torch.nn.Tanh(),
+#                                                           torch.nn.Linear(256, 64),
+#                                                           torch.nn.Tanh(),       
+#                                                           torch.nn.Linear(64, 64),
+#                                                           torch.nn.Tanh(),
+#                                                           torch.nn.Linear(64, 1024),
+#                                                           torch.nn.Tanh(),
+#                                                           torch.nn.Linear(1024, 1)
+#                                                           )
+#         else:
+#             self.model_architecture = model_architecture
+#         self.training_grid_set = False
         
-    def apply(self, equation, weights_internal = None, weights_final = None):
-        raise NotImplementedError('Solver evaluation approach is a subject to be done.')
-        if not self.training_grid_set:
-            self.set_training_grid()
+#     def apply(self, equation, weights_internal = None, weights_final = None):
+#         raise NotImplementedError('Solver evaluation approach is a subject to be done.')
+#         if not self.training_grid_set:
+#             self.set_training_grid()
             
-        if weights_internal is None:
-            self.suboperators['sparsity'].apply(equation)
-        else:
-            equation.weights_internal = weights_internal
-            equation.weights_internal_evald = True
-        if weights_final is None:
-            self.suboperators['coeff_calc'].apply(equation)        
-        else:
-            equation.weights_final = weights_final
-            equation.weights_final_evald = True
+#         if weights_internal is None:
+#             self.suboperators['sparsity'].apply(equation)
+#         else:
+#             equation.weights_internal = weights_internal
+#             equation.weights_internal_evald = True
+#         if weights_final is None:
+#             self.suboperators['coeff_calc'].apply(equation)        
+#         else:
+#             equation.weights_final = weights_final
+#             equation.weights_final_evald = True
         
-        architecture = deepcopy(self.model_architecture)
+#         architecture = deepcopy(self.model_architecture)
 
-        eq_bc = equation.boundary_conditions()
-        eq_form = equation.solver_form()   
+#         eq_bc = equation.boundary_conditions()
+#         eq_form = equation.solver_form()   
 
-        equation.model = point_sort_shift_solver(self.training_grid, architecture, eq_form, eq_bc,
-                       lambda_bound = self.params['lambda_bound'], verbose = False, 
-                       learning_rate = self.params['learning_rate'], eps = self.params['eps'], 
-                       tmin = self.params['tmin'], tmax = self.params['tmax'], use_cache=True, 
-                       print_every=None,
-                       cache_dir='../cache/')
+#         equation.model = point_sort_shift_solver(self.training_grid, architecture, eq_form, eq_bc,
+#                        lambda_bound = self.params['lambda_bound'], verbose = False, 
+#                        learning_rate = self.params['learning_rate'], eps = self.params['eps'], 
+#                        tmin = self.params['tmin'], tmax = self.params['tmax'], use_cache=True, 
+#                        print_every=None,
+#                        cache_dir='../cache/')
         
-        main_var_key = ('u', (1.0,))        
-        u_modeled = equation.model(self.training_grid).detach().numpy().reshape(global_var.tensor_cache.get(main_var_key).shape)
-        rl_error = np.linalg.norm(u_modeled - global_var.tensor_cache.get(main_var_key), ord = 2)
+#         main_var_key = ('u', (1.0,))        
+#         u_modeled = equation.model(self.training_grid).detach().numpy().reshape(global_var.tensor_cache.get(main_var_key).shape)
+#         rl_error = np.linalg.norm(u_modeled - global_var.tensor_cache.get(main_var_key), ord = 2)
         
-        if self.params['verbose']:
-            self.plot_data_vs_solution(global_var.tensor_cache.get(main_var_key), u_modeled)
+#         if self.params['verbose']:
+#             self.plot_data_vs_solution(global_var.tensor_cache.get(main_var_key), u_modeled)
             
-        if rl_error == 0:
-            fitness_value = np.inf
-            print('infinite fitness!', equation.text_form)
-        else:
-            fitness_value = 1 / (rl_error)
+#         if rl_error == 0:
+#             fitness_value = np.inf
+#             print('infinite fitness!', equation.text_form)
+#         else:
+#             fitness_value = 1 / (rl_error)
 
-        equation.fitness_calculated = True
-        equation.fitness_value = fitness_value      
-        equation.clear_after_solver()
+#         equation.fitness_calculated = True
+#         equation.fitness_value = fitness_value      
+#         equation.clear_after_solver()
         
-    def plot_data_vs_solution(self, data, solution):
+#     def plot_data_vs_solution(self, data, solution):
 
-        if self.training_grid.shape[1]==2:
-            fig = plt.figure()
-            ax = fig.add_subplot(111, projection='3d')
-            ax.plot_trisurf(self.training_grid[:,0].reshape(-1), self.training_grid[:,1].reshape(-1),
-                            solution.reshape(-1), cmap=cm.jet, linewidth=0.2)
-            ax.set_xlabel("x1")
-            ax.set_ylabel("x2")
-            plt.show()
-        if self.training_grid.shape[1]==1:
-            fig = plt.figure()
-            plt.scatter(self.training_grid.reshape(-1), solution.reshape(-1), color = 'r')
-            plt.scatter(self.training_grid.reshape(-1), data.reshape(-1), color = 'k')            
-            plt.show()        
+#         if self.training_grid.shape[1]==2:
+#             fig = plt.figure()
+#             ax = fig.add_subplot(111, projection='3d')
+#             ax.plot_trisurf(self.training_grid[:,0].reshape(-1), self.training_grid[:,1].reshape(-1),
+#                             solution.reshape(-1), cmap=cm.jet, linewidth=0.2)
+#             ax.set_xlabel("x1")
+#             ax.set_ylabel("x2")
+#             plt.show()
+#         if self.training_grid.shape[1]==1:
+#             fig = plt.figure()
+#             plt.scatter(self.training_grid.reshape(-1), solution.reshape(-1), color = 'r')
+#             plt.scatter(self.training_grid.reshape(-1), data.reshape(-1), color = 'k')            
+#             plt.show()        
             
-    def set_training_grid(self):
-        keys, training_grid = global_var.grid_cache.get_all()
-        assert len(keys) == training_grid[0].ndim, 'Mismatching dimensionalities'
-        training_grid = np.array(training_grid).reshape((len(training_grid), -1))
-        self.training_grid = torch.from_numpy(training_grid).T.type(torch.FloatTensor)
-        self.device = torch.device('cpu')
-        self.training_grid.to(self.device)     
-        self.training_grid_set = True
-        # Возможная проблема, когда подаётся тензор со значениями коэфф-тов перед производными
+#     def set_training_grid(self):
+#         keys, training_grid = global_var.grid_cache.get_all()
+#         assert len(keys) == training_grid[0].ndim, 'Mismatching dimensionalities'
+#         training_grid = np.array(training_grid).reshape((len(training_grid), -1))
+#         self.training_grid = torch.from_numpy(training_grid).T.type(torch.FloatTensor)
+#         self.device = torch.device('cpu')
+#         self.training_grid.to(self.device)     
+#         self.training_grid_set = True
+#         # Возможная проблема, когда подаётся тензор со значениями коэфф-тов перед производными
         
-    def use_default_tags(self):
-        self._tags = {'fitness evaluation', 'gene level', 'contains suboperators', 'inplace'}        
+#     def use_default_tags(self):
+#         self._tags = {'fitness evaluation', 'gene level', 'contains suboperators', 'inplace'}        

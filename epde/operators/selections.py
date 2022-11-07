@@ -69,13 +69,18 @@ class MOEADDSelection(CompoundOperator):
             candidate_solution_domains = list(map(lambda x: x.get_domain(self_args['weights']), [candidate for candidate in 
                                                                                                  objective.population]))
 
-            solution_mask = [(objective.population[solution_idx].get_domain(self_args['weights']) in selected_regions_idxs) 
-                             for solution_idx in candidate_solution_domains]
+            try:
+                solution_mask = [(objective.population[solution_idx].get_domain(self_args['weights']) in selected_regions_idxs) 
+                                 for solution_idx in candidate_solution_domains]
+            except IndexError:
+                print(f'Indexes are: {[solution_idx for solution_idx in candidate_solution_domains]}')
+                print(len(objective.population), len(candidate_solution_domains))
+                raise IndexError('list index out of range')
             available_in_proximity = sum(solution_mask)
             parent_idxs = np.random.choice([idx for idx in np.arange(len(objective.population)) if solution_mask[idx]], 
                                             size = min(available_in_proximity, parents_number),
                                             replace = False)
-            if available_in_proximity < parents_number: # <
+            if available_in_proximity < parents_number: 
                 parent_idxs_additional = np.random.choice([idx for idx in np.arange(len(objective.population))
                                                            if not solution_mask[idx]],
                                                           size = parents_number - available_in_proximity,
