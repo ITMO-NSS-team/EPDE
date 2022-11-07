@@ -73,9 +73,6 @@ class ParetoLevels(object):
         self._sorting_method = sorting_method
         self.population = [] #population
         self._update_method = update_method
-        # if initial_sort:
-        #     self.levels = self._sorting_method(self.population)
-        # else:
         self.unplaced_candidates = population # tabulation deleted
         
     @property
@@ -97,6 +94,7 @@ class ParetoLevels(object):
             self.population.append(self._unplaced_candidates.pop())
         if any([any([candidate == other_candidate for other_candidate in self.population[:idx] + self.population[idx+1:]])
                 for idx, candidate in enumerate(self.population)]):
+            print([candidate.text_form for candidate in self.population])
             raise Exception('Duplicating initial candidates')
         self.levels = self.sort()
 
