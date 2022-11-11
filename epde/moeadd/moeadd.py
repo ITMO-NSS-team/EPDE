@@ -73,9 +73,6 @@ class ParetoLevels(object):
         self._sorting_method = sorting_method
         self.population = [] #population
         self._update_method = update_method
-        # if initial_sort:
-        #     self.levels = self._sorting_method(self.population)
-        # else:
         self.unplaced_candidates = population # tabulation deleted
         
     @property
@@ -97,6 +94,7 @@ class ParetoLevels(object):
             self.population.append(self._unplaced_candidates.pop())
         if any([any([candidate == other_candidate for other_candidate in self.population[:idx] + self.population[idx+1:]])
                 for idx, candidate in enumerate(self.population)]):
+            print([candidate.text_form for candidate in self.population])
             raise Exception('Duplicating initial candidates')
         self.levels = self.sort()
 
@@ -359,17 +357,18 @@ class MOEADDOptimizer(object):
         
         Weights : np.ndarray
             Weight vectors, introduced to decompose the optimization problem into 
-            several subproblems by dividing Pareto frontier into a numeber of sectors.
+            several subproblems by dividing Pareto frontier into a number of sectors.
         
         '''
         weights = np.empty(weights_num)
         assert 1./delta == round(1./delta) # check, if 1/delta is integer number
         m = np.zeros(weights_num)
         for weight_idx in np.arange(weights_num):
-            weights[weight_idx] = np.random.choice([div_idx * delta for div_idx in np.arange(1./delta + 1 - np.sum(m[:weight_idx + 1]))])
+            weights[weight_idx] = np.random.choice([div_idx * delta for div_idx in np.arange(1./delta + 1e-8 - np.sum(m[:weight_idx + 1]))])
             m[weight_idx] = weights[weight_idx]/delta
         weights[-1] = 1 - np.sum(weights[:-1])
-        assert (weights[-1] <= 1 and weights[-1] >= 0)
+
+        weights = np.abs(weights)  
         return list(weights)
 
     

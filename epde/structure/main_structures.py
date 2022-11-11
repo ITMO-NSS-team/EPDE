@@ -161,7 +161,7 @@ class Term(ComplexStructure):
             raise ValueError('Described variable marker shall be a family label (i.e. "u") of "False"')
         
 
-    def evaluate(self, structural):
+    def evaluate(self, structural, grids = None):
         assert global_var.tensor_cache is not None, 'Currently working only with connected cache'
         normalize = structural
         if self.saved[structural] or (self.cache_label, normalize) in global_var.tensor_cache: #  
@@ -178,7 +178,7 @@ class Term(ComplexStructure):
                 value = (value - np.mean(value))/np.std(value)
             elif normalize and np.ndim(value) == 1 and np.std(value) == 0:
                 value = (value - np.mean(value))   
-            if np.all([len(factor.params) == 1 for factor in self.structure]):
+            if np.all([len(factor.params) == 1 for factor in self.structure]) and grids is not None:
                 self.saved[normalize] = global_var.tensor_cache.add(self.cache_label, value, normalized = normalize) # Место возможных проблем: сохранение/загрузка нормализованных данных
                 if self.saved[normalize]: self.saved_as[normalize] = self.cache_label
             value = value.reshape(-1)
@@ -255,34 +255,6 @@ class Term(ComplexStructure):
                 
     def contains_family(self, family):
         return any([factor.ftype == family for factor in self.structure])
-
-    @property
-    def solver_form(self):
-        
-        deriv_orders = []
-        deriv_powers = []
-        derivs_detected = False
-        
-        try:
-            coeff_tensor = np.ones_like(global_var.grid_cache.get('0'))
-        except KeyError:
-            raise NotImplementedError('No cache implemented')
-        for factor in self.structure:
-            if factor.is_deriv:
-                for param_idx, param_descr in factor.params_description.items():
-                    if param_descr['name'] == 'power': power_param_idx = param_idx
-                deriv_orders.append(factor.deriv_code); deriv_powers.append(factor.params[power_param_idx])
-                derivs_detected = True
-            else:
-                coeff_tensor = coeff_tensor * factor.evaluate()
-        if not derivs_detected:
-           deriv_powers = [0]; deriv_orders = [[None,],]
-        if len(deriv_powers) == 1:
-            deriv_powers = deriv_powers[0]
-            deriv_orders = deriv_orders[0]
-            
-        coeff_tensor = torch.from_numpy(coeff_tensor)
-        return [coeff_tensor, deriv_orders, deriv_powers]
                 
     def __eq__(self, other):
         return (all([any([other_elem == self_elem for other_elem in other.structure]) for self_elem in self.structure])
@@ -473,15 +445,15 @@ class Equation(ComplexStructure):
         new_eq.reset_saved_state()
         return new_eq
 
-    def evaluate(self, normalize = True, return_val = False, save = True):
-        self._target = self.structure[self.target_idx].evaluate(normalize)
+    def evaluate(self, normalize = True, return_val = False, grids = None):
+        self._target = self.structure[self.target_idx].evaluate(normalize, grids = grids)
         feature_indexes = list(range(len(self.structure)))
         feature_indexes.remove(self.target_idx)
         for feat_idx in range(len(feature_indexes)):
             if feat_idx == 0:
-                self._features = self.structure[feature_indexes[feat_idx]].evaluate(normalize)
+                self._features = self.structure[feature_indexes[feat_idx]].evaluate(normalize, grids = grids)
             elif feat_idx != 0:
-                temp = self.structure[feature_indexes[feat_idx]].evaluate(normalize)
+                temp = self.structure[feature_indexes[feat_idx]].evaluate(normalize, grids = grids)
                 self._features = np.vstack([self._features, temp])
             else:
                 continue
@@ -621,34 +593,6 @@ class Equation(ComplexStructure):
             form +=  'k_' + str(len(self.structure)) + ' = 0'
         return form
 
-    def solver_form(self):
-        if self.solver_form_defined:
-            # print(self.text_form)
-            return self._solver_form
-        else:
-            self._solver_form = []
-            for term_idx in range(len(self.structure)):
-                if term_idx != self.target_idx:
-                    term_form = self.structure[term_idx].solver_form
-                    weight = self.weights_final[term_idx] if term_idx < self.target_idx else self.weights_final[term_idx-1]
-                    term_form[0] = term_form[0] * weight
-                    term_form[0] = torch.flatten(term_form[0]).unsqueeze(1).type(torch.FloatTensor)
-                    self._solver_form.append(term_form)
-                    
-            free_coeff_weight = torch.from_numpy(np.full_like(a = global_var.grid_cache.get('0'), 
-                                                              fill_value = self.weights_final[-1]))
-            free_coeff_weight = torch.flatten(free_coeff_weight).unsqueeze(1).type(torch.FloatTensor)
-            target_weight = torch.from_numpy(np.full_like(a = global_var.grid_cache.get('0'), 
-                                                              fill_value = -1.))            
-            target_form = self.structure[self.target_idx].solver_form
-            target_form[0] = target_form[0] * target_weight
-            target_form[0] = torch.flatten(target_form[0]).unsqueeze(1).type(torch.FloatTensor)
-            
-            self._solver_form.append([free_coeff_weight, [None], 0])
-            self._solver_form.append(target_form)
-            self.solver_form_defined = True
-            return self._solver_form
-
     @property
     def state(self):
         return self.text_form    
@@ -693,7 +637,8 @@ class Equation(ComplexStructure):
             raise NotImplementedError('The current implementation allows does not allow higher orders of equation, than 2.')
         return max_orders
     
-    def boundary_conditions(self, main_var_key = ('u', (1.0,)), full_domain : bool = False):
+    def boundary_conditions(self, main_var_key = ('u', (1.0,)), full_domain : bool = False,
+                            grids : list = None):
         required_bc_ord = self.max_deriv_orders()   # We assume, that the maximum order of the equation here is 2
         if global_var.grid_cache is None:
             raise NameError('Grid cache has not been initialized yet.')
@@ -737,13 +682,6 @@ class Equation(ComplexStructure):
         gc.collect()
                 
 
-def solver_formed_grid():
-    keys, training_grid = global_var.grid_cache.get_all()
-    assert len(keys) == training_grid[0].ndim, 'Mismatching dimensionalities'
-    
-    training_grid = np.array(training_grid).reshape((len(training_grid), -1))
-    return torch.from_numpy(training_grid).T.type(torch.FloatTensor)
-
 def check_metaparameters(metaparameters : dict):
     metaparam_labels = ['terms_number', 'max_factors_in_term', 'sparsity']
     return True
@@ -774,9 +712,7 @@ class SoEq(moeadd.MOEADDSolution):
         
         self.metaparameters = metaparameters
         self.tokens_for_eq = TF_Pool(pool.families_demand_equation)
-        # print(f'tokens_for_eq: {[family.ftype for family in self.tokens_for_eq.families]}')        
         self.tokens_supp = TF_Pool(pool.families_equationless)
-        # print(f'tokens_supp: {[family.ftype for family in self.tokens_supp.families]}')
         self.moeadd_set = False
               
         self.vars_to_describe = {token_family.ftype for token_family in self.tokens_for_eq.families}
@@ -831,7 +767,7 @@ class SoEq(moeadd.MOEADDSolution):
         population = evol_operator.apply(population, unexplained_vars)
         return population
 
-    def evaluate(self, normalize = True):
+    def evaluate(self, normalize = True, grids : list = None):
         raise DeprecationWarning('Evaluation of system is not necessary')
         if len(self.vals) == 1:
             value = [equation.evaluate(normalize, return_val = True)[0] for equation in self.vals][0]
@@ -911,17 +847,19 @@ class SoEq(moeadd.MOEADDSolution):
         for eq_label in self.vals.equation_keys: # Not the best code possible here
             self.vals[eq_label].copy_properties_to(objective.vals[eq_label])
     
-    def solver_params(self, full_domain):
-        '''
-        Returns solver form, grid and boundary conditions
-        '''
-        if len(self.vals) > 1:
-            raise Exception('Solver form is defined only for a "system", that contains a single equation.')
-        else:
-            form = self.vals[0].solver_form()
-            grid = solver_formed_grid()
-            bconds = self.vals[0].boundary_conditions(full_domain = full_domain)
-            return form, grid, bconds
+    # def solver_params(self, full_domain, grids = None):
+    #     '''
+    #     Returns solver form, grid and boundary conditions
+    #     '''
+    #     # if len(self.vals) > 1:
+    #     #     raise Exception('Solver form is defined only for a "system", that contains a single equation.')
+    #     # else:
+    #     #     form = self.vals[0].solver_form()
+    #     #     grid = solver_formed_grid()
+    #     #     bconds = self.vals[0].boundary_conditions(full_domain = full_domain)
+    #     #     return form, grid, bconds
+        
+
 
     def __iter__(self):
         return SoEqIterator(self)

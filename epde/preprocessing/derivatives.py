@@ -17,7 +17,7 @@ device = torch.device('cpu')
 import epde.globals as global_var
 from epde.preprocessing.cheb import Process_Point_Cheb
 from epde.preprocessing.smoothing import Smoothing
-from epde.supplementary import Define_Derivatives
+from epde.supplementary import Define_Derivatives, train_ann, use_ann_to_predict
     
 
 def Preprocess_derivatives_poly(field, grid = None, steps = None, data_name = None, output_file_name = None, smooth = True, sigma = 9,
@@ -156,61 +156,16 @@ def differentiate(data, order : Union[int, list], mixed : bool = False, axis = N
                     derivs.extend(differentiate(grad, ord_reduced, False, axis, *grids))
     return derivs
 
-def Preprocess_derivatives_ANN(field, grid, max_order, test_output = False, 
+def Preprocess_derivatives_ANN(field, grid, max_order, test_output = False,
                                epochs_max = 1e3, loss_mean = 1000, batch_frac = 0.5):
     assert grid is not None, 'Grid needed for derivatives preprocessing with ANN'
+    if isinstance(grid, np.ndarray): grid = [grid,]
     grid_unique = [np.unique(ax_grid) for ax_grid in grid]
-    
-    dim = 1 if np.any([s == 1 for s in field.shape]) and field.ndim == 2 else field.ndim
-    print('dim', dim, field.shape, np.any([s == 1 for s in field.shape]), field.ndim == 2)
-    model = init_ann(dim)
-    grid_flattened = [subgrid.reshape(-1) for subgrid in grid]
-    grid_flattened=torch.from_numpy(np.array(grid_flattened)).float().T
-    dimensionality = field.ndim
     original_shape = field.shape
-    test_output = True
-    
-    field_ = torch.from_numpy(field.reshape(-1, 1)).float()
-    grid_flattened.to(device)
-    field_.to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
-    
-    batch_size = int(field.size * batch_frac) # or whatever
-    
-    t=0
 
-    print('grid_flattened.shape', grid_flattened.shape, 'field.shape', field_.shape)
-    
-    # loss_mean=1000
-    min_loss=np.inf
-    while loss_mean>1e-5 and t<epochs_max:
-    
-        # X is a torch Variable
-        permutation = torch.randperm(grid_flattened.size()[0])
-        
-        loss_list=[]
-        
-        for i in range(0,grid_flattened.size()[0], batch_size):
-            optimizer.zero_grad()
-    
-            indices = permutation[i:i+batch_size]
-            batch_x, batch_y = grid_flattened[indices], field_[indices]
-    
-            # in case you wanted a semi-full example
-            # outputs = model.forward(batch_x)
-            loss = torch.mean(torch.abs(batch_y-model(batch_x)))
-    
-            loss.backward()
-            optimizer.step()
-            loss_list.append(loss.item())
-        loss_mean=np.mean(loss_list)
-        if loss_mean<min_loss:
-            best_model=model
-            min_loss=loss_mean
-        print('Surface training t={}, loss={}'.format(t,loss_mean))
-        t+=1
-    
-    approximation = best_model(grid_flattened).detach().numpy().reshape(original_shape)
+    best_model = train_ann(grids = grid, data = field)
+    approximation = use_ann_to_predict(model = best_model, recalc_grids = grid)
+
     derivs = differentiate(approximation, max_order, False, None, *grid_unique)
     derivs = np.vstack([der.reshape(-1) for der in derivs]).T
 
@@ -219,21 +174,7 @@ def Preprocess_derivatives_ANN(field, grid, max_order, test_output = False,
     time.sleep(3)
 
     return approximation, derivs
-    
-    # derivs = []
-    # _, operators = Define_Derivatives(dimensionality=dimensionality, max_order = max_order)
-    # for operator in operators[1:]:
-    #     temp_operator = [[1, operator, 1]]
-    #     operator = operator_prepare(temp_operator, prepared_grid, subset=None, true_grid=grid, h=0.3)
-    #     op_clean = apply_operator_set(best_model, operator)
-    #     if test_output:
-    #         derivs.append(op_clean)
-    #     else:
-    #         derivs.append(op_clean.detach().numpy().reshape(-1))
-    # if test_output:
-    #     return field, derivs
-    # else:
-        # return field, np.vstack(derivs).T
+
 
 implemented_methods = {'ANN' : Preprocess_derivatives_ANN, 'poly' : Preprocess_derivatives_poly}
 
