@@ -593,6 +593,34 @@ class Equation(ComplexStructure):
             form +=  'k_' + str(len(self.structure)) + ' = 0'
         return form
 
+    def solver_form(self, grids : list = None):
+        if self.solver_form_defined:
+            # print(self.text_form)
+            return self._solver_form
+        else:
+            self._solver_form = []
+            for term_idx in range(len(self.structure)):
+                if term_idx != self.target_idx:
+                    term_form = self.structure[term_idx].solver_form
+                    weight = self.weights_final[term_idx] if term_idx < self.target_idx else self.weights_final[term_idx-1]
+                    term_form[0] = term_form[0] * weight
+                    term_form[0] = torch.flatten(term_form[0]).unsqueeze(1).type(torch.FloatTensor)
+                    self._solver_form.append(term_form)
+                    
+            free_coeff_weight = torch.from_numpy(np.full_like(a = global_var.grid_cache.get('0'), 
+                                                              fill_value = self.weights_final[-1]))
+            free_coeff_weight = torch.flatten(free_coeff_weight).unsqueeze(1).type(torch.FloatTensor)
+            target_weight = torch.from_numpy(np.full_like(a = global_var.grid_cache.get('0'), 
+                                                              fill_value = -1.))            
+            target_form = self.structure[self.target_idx].solver_form
+            target_form[0] = target_form[0] * target_weight
+            target_form[0] = torch.flatten(target_form[0]).unsqueeze(1).type(torch.FloatTensor)
+            
+            self._solver_form.append([free_coeff_weight, [None], 0])
+            self._solver_form.append(target_form)
+            self.solver_form_defined = True
+            return self._solver_form
+
     @property
     def state(self):
         return self.text_form    
@@ -681,6 +709,17 @@ class Equation(ComplexStructure):
         del self._solver_form; self.solver_form_defined = False
         gc.collect()
                 
+
+def solver_formed_grid(training_grid = None):
+    if training_grid is None: 
+        keys, training_grid = global_var.grid_cache.get_all()
+    else:
+        keys, _ = global_var.grid_cache.get_all()
+        
+    assert len(keys) == training_grid[0].ndim, 'Mismatching dimensionalities'
+    
+    training_grid = np.array(training_grid).reshape((len(training_grid), -1))
+    return torch.from_numpy(training_grid).T.type(torch.FloatTensor)
 
 def check_metaparameters(metaparameters : dict):
     metaparam_labels = ['terms_number', 'max_factors_in_term', 'sparsity']
@@ -847,19 +886,27 @@ class SoEq(moeadd.MOEADDSolution):
         for eq_label in self.vals.equation_keys: # Not the best code possible here
             self.vals[eq_label].copy_properties_to(objective.vals[eq_label])
     
-    # def solver_params(self, full_domain, grids = None):
-    #     '''
-    #     Returns solver form, grid and boundary conditions
-    #     '''
-    #     # if len(self.vals) > 1:
-    #     #     raise Exception('Solver form is defined only for a "system", that contains a single equation.')
-    #     # else:
-    #     #     form = self.vals[0].solver_form()
-    #     #     grid = solver_formed_grid()
-    #     #     bconds = self.vals[0].boundary_conditions(full_domain = full_domain)
-    #     #     return form, grid, bconds
+    def solver_params(self, full_domain, grids = None):
+        '''
+        Returns solver form, grid and boundary conditions
+        '''
+        # if len(self.vals) > 1:
+        #     raise Exception('Solver form is defined only for a "system", that contains a single equation.')
+        # else:
+        #     form = self.vals[0].solver_form()
+        #     grid = solver_formed_grid()
+        #     bconds = self.vals[0].boundary_conditions(full_domain = full_domain)
+        #     return form, grid, bconds
         
-
+        equation_forms = []
+        bconds = []
+        
+        for idx, equation in enumerate(self.vals):
+            equation_forms.append(equation.solver_form(grids = grids))
+            bconds.append(equation.boundary_conditions(full_domain = full_domain, grids = grids, 
+                                                       index = idx))
+        
+        return equation_forms, solver_formed_grid(grids), bconds
 
     def __iter__(self):
         return SoEqIterator(self)
