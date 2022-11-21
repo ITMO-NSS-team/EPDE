@@ -126,12 +126,14 @@ class PregenOperator(object):
         
         if grids is None:
             grids = global_var.grid_cache.get_all()
+            
+        
+        
         
 
 class BOPElement(object):
-    def __init__(self, key : str, coeff : VAL_TYPES, term : list = [None], 
-                 power : Union[list, int] = 1, var : Union[list, int] = 0, 
-                 grids : list = None):
+    def __init__(self, key : str, coeff : float = 1., term : list = [None], 
+                 power : Union[list, int] = 1, var : Union[list, int] = 1):
         self.key = key
         self.coefficient = coeff
         self.term = term
@@ -141,15 +143,6 @@ class BOPElement(object):
         self.status = {'boundary_location_set'  : False,
                        'boundary_operator_set'  : False,
                        'boundary_values_set'    : False}
-        if grids is None:
-            self.grids_set = False
-        else:
-            self.grids_set = True
-            self.set_grids(grids)
-    
-    # def set_grids(self, grids : list):
-    #     assert isinstance(grids[0], np.ndarray), 'Grids have to be in formats of numpy.ndarray.'
-    #     self.grids = grids
     
     def form_operator(self):
         form = {
@@ -160,26 +153,26 @@ class BOPElement(object):
                 }
         return self.key, form
         
-    @property
-    def coefficient(self):
-        if isinstance(self._coefficient, FunctionType):
-            assert self.grid_set, 'Tring to evaluate variable coefficent without a proper grid.'
-            res = self._coefficient(self.grids)
-            assert res.shape == self.grids[0].shape
-            return torch.from_numpy(res)
-        else:
-            return self._coefficient
+    # @property
+    # def coefficient(self):
+    #     if isinstance(self._coefficient, FunctionType):
+    #         assert self.grid_set, 'Tring to evaluate variable coefficent without a proper grid.'
+    #         res = self._coefficient(self.grids)
+    #         assert res.shape == self.grids[0].shape
+    #         return torch.from_numpy(res)
+    #     else:
+    #         return self._coefficient
     
-    @coefficient.setter
-    def coefficient(self, coeff):
-        if isinstance(coeff, (FunctionType, int, float, torch.Tensor)):
-            self._coefficient = coeff
-        elif isinstance(coeff, np.ndarray):
-            if self.grids is not None and np.shape(coeff) != np.shape(self.grids[0]):
-                raise ValueError('Numpy array of coefficients does not match the grid.')
-            self._coefficient = torch.from_numpy(coeff)
-        else:
-            raise TypeError(f'Incorrect type of coefficients. Must be a type from list {VAL_TYPES}.')
+    # @coefficient.setter
+    # def coefficient(self, coeff):
+    #     if isinstance(coeff, (FunctionType, int, float, torch.Tensor)):
+    #         self._coefficient = coeff
+    #     elif isinstance(coeff, np.ndarray):
+    #         if self.grids is not None and np.shape(coeff) != np.shape(self.grids[0]):
+    #             raise ValueError('Numpy array of coefficients does not match the grid.')
+    #         self._coefficient = torch.from_numpy(coeff)
+    #     else:
+    #         raise TypeError(f'Incorrect type of coefficients. Must be a type from list {VAL_TYPES}.')
     
     @property
     def values(self):
@@ -189,18 +182,32 @@ class BOPElement(object):
     def values(self, vals):
         if isinstance(vals, (FunctionType, int, float, torch.Tensor)):
             self._values = vals
+            self.vals_set = True
         elif isinstance(vals, np.ndarray):
-            # if self.grids is not None and np.shape(vals) != np.shape(self.grids[0]):
-                # raise ValueError('Numpy array of coefficients does not match the grid.')
             self._values = torch.from_numpy(vals)
+            self.vals_set = True
         else:
             raise TypeError(f'Incorrect type of coefficients. Must be a type from list {VAL_TYPES}.')
         
-    def __call__(self, grids : list = None):
-        if grids is None:
+    def __call__(self, values : VAL_TYPES = None, boundary : list = None, 
+                 rel_location : float = None):
+        if boundary is None and rel_location is not None:
+            # try:
+            _, all_grids = global_var.grid_cache.get_all() # str(self.axis)
             
-        self.location = self
-        
+            with np.moveaxis(all_grids[0], source = self.axis, destination = 0)[0, ...] as tmp:
+                bnd_shape = (tmp.size, np.squeeze(tmp))
+            boundary = torch.from_numpy(np.array(all_grids[:self.axis] + all_grids[self.axis+1:]).reshape(bnd_shape))
+            
+            # boundary = np.squeeze(general_grid[rel_location * general_grid.shape[0], ...])
+            boundary = torch.cartesian_prod(boundary, torch.from_numpy(np.array([0], dtype=np.float64))).float()
+            boundary = torch.moveaxis(boundary, source = 0, destination = self.axis).resize()
+            
+            
+        elif boundary is None and rel_location is None:
+            raise ValueError('No location passed into the BOP.')
+            
+        # boundary = torch.reshape(boundary, ())
         
         return boundary, boundary_operator, boundary_value
 
@@ -230,7 +237,7 @@ class SolverAdapter(object):
     def __init__(self, system_to_adapt : SoEq):
         self.variables = system_to_adapt.vars_to_describe
         self.adaptee = system_to_adapt
-        assert self.adaptee.weights_final_evald      
+        assert self.adaptee.weights_final_evald
     
     @staticmethod
     def old_term_solver_form(term, grids):
