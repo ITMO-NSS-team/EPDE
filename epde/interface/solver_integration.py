@@ -176,7 +176,13 @@ class BOPElement(object):
     
     @property
     def values(self):
-        return self._values    
+        if isinstance(self._values, FunctionType):
+            assert self.grid_set, 'Tring to evaluate variable coefficent without a proper grid.'
+            res = self._values(self.grids)
+            assert res.shape == self.grids[0].shape
+            return torch.from_numpy(res)
+        else:
+            return self._values
         
     @values.setter
     def values(self, vals):
@@ -189,15 +195,24 @@ class BOPElement(object):
         else:
             raise TypeError(f'Incorrect type of coefficients. Must be a type from list {VAL_TYPES}.')
         
+        
+        
     def __call__(self, values : VAL_TYPES = None, boundary : list = None, 
                  rel_location : float = None):
+        if not self.vals_set and values is not None:
+            self.values = values
+        elif values is None:
+            raise ValueError('No location passed into the BOP.')
         if boundary is None and rel_location is not None:
             # try:
             _, all_grids = global_var.grid_cache.get_all() # str(self.axis)
             
             with np.moveaxis(all_grids[0], source = self.axis, destination = 0)[0, ...] as tmp:
                 bnd_shape = (tmp.size, np.squeeze(tmp))
-            boundary = torch.from_numpy(np.array(all_grids[:self.axis] + all_grids[self.axis+1:]).reshape(bnd_shape))
+            boundary = np.array(all_grids[:self.axis] + all_grids[self.axis+1:])
+            if isinstance(values, FunctionType):
+                self.grid = 
+            boundary = torch.from_numpy(boundary.reshape(bnd_shape))
             
             # boundary = np.squeeze(general_grid[rel_location * general_grid.shape[0], ...])
             boundary = torch.cartesian_prod(boundary, torch.from_numpy(np.array([0], dtype=np.float64))).float()
@@ -207,6 +222,7 @@ class BOPElement(object):
         elif boundary is None and rel_location is None:
             raise ValueError('No location passed into the BOP.')
             
+    
         # boundary = torch.reshape(boundary, ())
         
         return boundary, boundary_operator, boundary_value
