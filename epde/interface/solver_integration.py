@@ -18,6 +18,8 @@ from functools import singledispatchmethod, singledispatch
 from epde.structure.main_structures import Equation, SoEq
 import epde.globals as global_var
 
+from TEDEouS.input_preprocessing import Equation as SolverEquation
+import TEDEouS.solver as solver
 
 class PregenOperator(object):
     def __init__(self, system : SoEq, s_of_equation_solver_form : list):
@@ -126,6 +128,8 @@ class PregenOperator(object):
         
         if grids is None:
             grids = global_var.grid_cache.get_all()
+
+        relative_bc_location
             
         
         
@@ -144,7 +148,8 @@ class BOPElement(object):
                        'boundary_operator_set'  : False,
                        'boundary_values_set'    : False}
     
-    def form_operator(self):
+    @property
+    def operator_form(self):
         form = {
                 'coeffs' : self.coefficient,
                 self.key   : self.term,
@@ -196,7 +201,6 @@ class BOPElement(object):
             raise TypeError(f'Incorrect type of coefficients. Must be a type from list {VAL_TYPES}.')
         
         
-        
     def __call__(self, values : VAL_TYPES = None, boundary : list = None, 
                  rel_location : float = None):
         if not self.vals_set and values is not None:
@@ -225,9 +229,14 @@ class BOPElement(object):
     
         # boundary = torch.reshape(boundary, ())
         
+        form = self.operator_form
+        boundary_operator = {form[0] : form[1]}
+
+        boundary_value = self.values # TODO: inspect boundary value setter with an arbitrary function in symb form
+
         return boundary, boundary_operator, boundary_value
 
-class BoundaryCondition(object):
+class BoundaryConditions(object):
     def __init__(self, grids = None, partial_operators : dict = []):
         self.grids_set = (grids is not None)
         if grids is not None:
@@ -235,7 +244,7 @@ class BoundaryCondition(object):
         self.operators = partial_operators
 
     def form_operator(self):
-        return 
+        return [list(bcond()) for bcond in self.operators.values()]
 
 
 def solver_formed_grid(training_grid = None):
@@ -249,7 +258,7 @@ def solver_formed_grid(training_grid = None):
     training_grid = np.array(training_grid).reshape((len(training_grid), -1))
     return torch.from_numpy(training_grid).T.type(torch.FloatTensor)
 
-class SolverAdapter(object):
+class SystemSolverInterface(object):
     def __init__(self, system_to_adapt : SoEq):
         self.variables = system_to_adapt.vars_to_describe
         self.adaptee = system_to_adapt
@@ -326,32 +335,6 @@ class SolverAdapter(object):
     def set_boundary_operator(self, operator_info):
         raise NotImplementedError()
         
-    # def old_equation_solver_form(self, equation, grids):
-    #     _solver_form = []
-    #     for term_idx in range(len(equation.structure)):
-    #         if term_idx != equation.target_idx:
-    #             term_form = self.term_solver_form(equation.structure[term_idx], grids)  #equation.structure[term_idx].solver_form
-    #             if term_idx < equation.target_idx:
-    #                 weight = equation.weights_final[term_idx] 
-    #             else:
-    #                 weight = equation.weights_final[term_idx-1]
-    #             term_form[0] = term_form[0] * weight
-    #             term_form[0] = torch.flatten(term_form[0]).unsqueeze(1).type(torch.FloatTensor)
-    #             _solver_form.append(term_form)
-                
-    #     free_coeff_weight = torch.from_numpy(np.full_like(a = global_var.grid_cache.get('0'), 
-    #                                                       fill_value = equation.weights_final[-1]))
-    #     free_coeff_weight = torch.flatten(free_coeff_weight).unsqueeze(1).type(torch.FloatTensor)
-    #     target_weight = torch.from_numpy(np.full_like(a = global_var.grid_cache.get('0'), 
-    #                                                       fill_value = -1.))            
-    #     target_form = equation.structure[equation.target_idx].solver_form
-    #     target_form[0] = target_form[0] * target_weight
-    #     target_form[0] = torch.flatten(target_form[0]).unsqueeze(1).type(torch.FloatTensor)
-        
-    #     _solver_form.append([free_coeff_weight, [None], 0])
-    #     _solver_form.append(target_form)
-    #     return _solver_form    
-        
     def equation_solver_form(self, equation, variables, grids = None):
         if grids is None:
             grids = self.grids
@@ -384,7 +367,7 @@ class SolverAdapter(object):
         _solver_form[equation.structure[equation.target_idx].name] = target_form
         return _solver_form
 
-    def use_grid(self, grids):
+    def use_grid(self, grids = None):
         if grids is None:
             self.grids = global_var.grid_cache.get_all()
         else:
@@ -392,9 +375,12 @@ class SolverAdapter(object):
                 raise ValueError('Number of passed grids does not match the problem')
             self.grids = grids
 
-    def form(self, full_domain : bool = True, grids : list = None):
+    def form(self, full_domain : bool = True, grids : list = None, bconds : list = None):
         equation_forms = []
-        bconds = []
+
+        if bconds is None:
+            
+            bconds = []
         
         for idx, equation in enumerate(self.adaptee.vals):
             equation_forms.append(self.equation_solver_form(equation, grids = grids))
@@ -402,3 +388,70 @@ class SolverAdapter(object):
                                                        index = idx))
         
         return equation_forms, solver_formed_grid(grids), bconds
+
+class SolverAdapter(object):
+    def __init__(self, model = None, use_cache : bool = True):
+        if model is None:
+            model = torch.nn.Sequential(
+               torch.nn.Linear(1, 100),
+                torch.nn.Tanh(),
+                torch.nn.Linear(100, 100),
+                torch.nn.Tanh(),
+                torch.nn.Linear(100, 1),
+            )
+        self.default_model = model
+
+
+        self._solver_params = {'model' : self.default_model, 'learning_rate' : 1e-3, 'eps' : 1e-5, 'tmin' : 1000,
+                               'tmax' : 1e5, 'use_cache' : True, 'cache_verbose' : True, 
+                               'save_always' : False, 'print_every' : False, 
+                               'model_randomize_parameter' : 1e-6, 'step_plot_print' : False, 
+                               'step_plot_save' : False, 'image_save_dir' : None}
+
+        self.set_solver_params()
+        self.use_cache = use_cache
+        self.prev_solution = None
+
+    # def use_default(self, key, vals, base_vals):
+    #     self._params = key
+
+
+    # def set_solver_params(self, params = {'model' : None, 'learning_rate' : None, 'eps' : None, 'tmin' : None, 
+    #                                       'tmax' : None, 'use_cache' : None, 'cache_verbose' : None, 
+    #                                       'save_always' : None, 'print_every' : None, 
+    #                                       'model_randomize_parameter' : None, 'step_plot_print' : None, 
+    #                                       'step_plot_save' : None, 'image_save_dir' : None}):
+
+    def set_solver_params(self, model = None, learning_rate : float = None, eps : float = None, 
+                          tmin : int = None, tmax : int = None, use_cache : bool = None, cache_verbose : bool = None, 
+                          save_always : bool = None, print_every : bool = None, 
+                          model_randomize_parameter : bool = None, step_plot_print : bool = None, 
+                          step_plot_save : bool = None, image_save_dir : str = None):
+        params = {'model' : model, 'learning_rate' : learning_rate, 'eps' : eps, 'tmin' : tmin,
+                  'tmax' : tmax, 'use_cache' : use_cache, 'cache_verbose' : cache_verbose, 
+                  'save_always' : save_always, 'print_every' : print_every, 
+                  'model_randomize_parameter' : model_randomize_parameter, 'step_plot_print' : step_plot_print, 
+                  'step_plot_save' : step_plot_save, 'image_save_dir' : image_save_dir}
+        
+        if model is None:
+            model = self.default_model 
+        for param_key, param_vals in params.items():
+            if params is not None:
+                try:
+                    self._solver_params[param_key] = param_vals
+                except KeyError:
+                    print(f'Parameter {param_key} can not be passed into the solver.')
+
+    def set_param(self, param_key, value):
+        self._solver_params[param_key] = value
+
+    def solve_epde_system(self, system : SoEq, grid = None, boundary_conditions = None):
+        system_interface = SystemSolverInterface(system_to_adapt = system)
+
+        solver_form, grid, bconds = system_interface()
+
+    def solve(self, system_form = None, grid = None, boundary_conditions = None):
+        if system_form is None and grid is None and boundary_conditions is None:
+            self.equation = SolverEquation(grid, system_form, boundary_conditions).set_strategy('NN')
+        self.prev_solution = solver.Solver(grid, self.equation, self.model, 'NN').solver(**self._solver_params)
+        return self.prev_solution

@@ -6,6 +6,7 @@ Created on Tue Jul  6 15:55:12 2021
 @author: mike_ubuntu
 """
 import time
+import pickle
 import numpy as np
 from typing import Union, Callable
 from collections import OrderedDict
@@ -27,11 +28,12 @@ from epde.evaluators import simple_function_evaluator, trigonometric_evaluator
 from epde.supplementary import Define_Derivatives
 from epde.cache.cache import upload_simple_tokens, upload_grids, prepare_var_tensor#, np_ndarray_section
 from epde.preprocessing.derivatives import Preprocess_derivatives
-from epde.structure.main_structures import Equation
+from epde.structure.main_structures import Equation, SoEq
 
 from epde.interface.token_family import TF_Pool, TokenFamily
 from epde.interface.type_checks import *
 from epde.interface.prepared_tokens import PreparedTokens, CustomTokens
+from epde.interface.solver_integration import BoundaryConditions, SolverAdapter
 
 class Input_data_entry(object):
     def __init__(self, var_name : str, data_tensor : np.ndarray):
@@ -270,7 +272,7 @@ class epde_search(object):
     def set_boundaries(self, boundary_width : Union[int, list]):
         global_var.grid_cache.set_boundaries(boundary_width = boundary_width)
 
-    def upload_g_func(self, function_form : Union[Callable, type(None)] = None):
+    def upload_g_func(self, function_form : Callable = None):
         try:
             decorator = Boundary_exclusion(boundary_width = global_var.grid_cache.boundary_width)
             if function_form is None:
@@ -294,7 +296,7 @@ class epde_search(object):
             raise NameError('Cache for grids has not been initilized yet!')
     
     def set_domain_properties(self, coordinate_tensors, memory_for_cache, boundary_width : Union[int, list], 
-                              function_form : Union[Callable, type(None)] = None, prune_domain : bool = False, 
+                              function_form : Callable = None, prune_domain : bool = False, 
                               pivotal_tensor_label = None, pruner = None, threshold : float = 1e-5, 
                               division_fractions : int = 3, rectangular : bool = True):
         self.create_caches(coordinate_tensors = coordinate_tensors, memory_for_cache = memory_for_cache)
@@ -489,3 +491,17 @@ class epde_search(object):
             return global_var.grid_cache, global_var.tensor_cache
         else:
             return None, global_var.tensor_cache
+
+    def predict(bounary_conditions : BoundaryConditions, system : SoEq = None, system_file : str = None, ):
+        if system is not None:
+            print('Using explicitly sent system of equations.') 
+        elif system_file is not None:
+            assert '.pickle' in system_file
+            print('Loading equation from pickled file.')
+
+            system = pickle.load(file=system_file)
+        else:
+            raise ValueError('Missing system, that was not passed in any form.')
+        
+        adapter = SolverAdapter(system)
+        adapter.solve()

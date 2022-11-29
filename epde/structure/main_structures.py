@@ -9,6 +9,8 @@ Created on Tue Jul 26 13:46:45 2022
 import gc
 import warnings
 import copy
+import os
+import pickle
 from typing import Union, Callable
 from functools import singledispatchmethod, reduce
 
@@ -78,6 +80,7 @@ class Term(ComplexStructure):
                 self.structure.append(factor)
             else:
                 raise ValueError('The structure of a term should be declared with str or factor.Factor obj, instead got', type(factor))
+        self.structure = filter_powers(self.structure)
 
     @defined.register
     def _(self, passed_term : str):
@@ -914,6 +917,12 @@ class SoEq(moeadd.MOEADDSolution):
     @property
     def fitness_calculated(self):
         return all([equation.fitness_calculated for equation in self.vals])
+
+    def save(self, file_name = 'epde_systems.pickle'):
+        dir = os.getcwd()
+        with open(file_name, 'wb') as file:
+            to_save = ([equation.text_form for equation in self.vals], self.tokens_for_eq + self.tokens_supp)
+            pickle.dump(obj = to_save, file = file) 
         
 class SoEqIterator(object):
     def __init__(self, system : SoEq):
