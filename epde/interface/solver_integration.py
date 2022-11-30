@@ -21,10 +21,10 @@ import epde.globals as global_var
 from TEDEouS.input_preprocessing import Equation as SolverEquation
 import TEDEouS.solver as solver
 
-class PregenOperator(object):
-    def __init__(self, system : SoEq, s_of_equation_solver_form : list):
+class PregenBOperator(object):
+    def __init__(self, system : SoEq, system_of_equation_solver_form : list):
         self.system = system
-        self.equation_sf = [eq for eq in s_of_equation_solver_form]
+        self.equation_sf = [eq for eq in system_of_equation_solver_form]
         self.max_ord = self.max_deriv_orders()
         self.variables = system.vars_to_describe
         
@@ -52,7 +52,7 @@ class PregenOperator(object):
                 # self.bconds = BOPElement(key, coeff)
                 raise NotImplementedError('In-place initialization of boundary operator has not been implemented yet.')
         
-        if self.max_deriv_orders(self.equation_sf) != [count_var_bc(self._bconds, v) for v in np.arange(v)]:
+        if self.max_deriv_orders(self.equation_sf) != [count_var_bc(self._bconds, v) for v in np.arange(v)]: # TODO: correct check
             raise ValueError('Numbers of conditions do not match requirements of equations.')
             
     
@@ -130,6 +130,8 @@ class PregenOperator(object):
             grids = global_var.grid_cache.get_all()
 
         relative_bc_location
+
+        # TODO: finish
             
         
         
@@ -215,7 +217,7 @@ class BOPElement(object):
                 bnd_shape = (tmp.size, np.squeeze(tmp))
             boundary = np.array(all_grids[:self.axis] + all_grids[self.axis+1:])
             if isinstance(values, FunctionType):
-                self.grid = 
+                raise NotImplementedError # TODO: evaluation of BCs passed as functions or lambdas 
             boundary = torch.from_numpy(boundary.reshape(bnd_shape))
             
             # boundary = np.squeeze(general_grid[rel_location * general_grid.shape[0], ...])
@@ -263,36 +265,38 @@ class SystemSolverInterface(object):
         self.variables = system_to_adapt.vars_to_describe
         self.adaptee = system_to_adapt
         assert self.adaptee.weights_final_evald
+
+        self.grids = None
     
-    @staticmethod
-    def old_term_solver_form(term, grids):
-        deriv_orders = []
-        deriv_powers = []
-        derivs_detected = False
+    # @staticmethod
+    # def old_term_solver_form(term, grids):
+    #     deriv_orders = []
+    #     deriv_powers = []
+    #     derivs_detected = False
         
-        try:
-            coeff_tensor = np.ones_like(global_var.grid_cache.get('0'))
-        except KeyError:
-            raise NotImplementedError('No cache implemented')
-        for factor in term.structure:
-            if factor.is_deriv:
-                for param_idx, param_descr in factor.params_description.items():
-                    if param_descr['name'] == 'power': power_param_idx = param_idx
-                deriv_orders.append(factor.deriv_code); deriv_powers.append(factor.params[power_param_idx])
-                derivs_detected = True
-            else:
-                coeff_tensor = coeff_tensor * factor.evaluate(grids = grids)
-        if not derivs_detected:
-           deriv_powers = [0]; deriv_orders = [[None,],]
-        if len(deriv_powers) == 1:
-            deriv_powers = deriv_powers[0]
-            deriv_orders = deriv_orders[0]
+    #     try:
+    #         coeff_tensor = np.ones_like(global_var.grid_cache.get('0'))
+    #     except KeyError:
+    #         raise NotImplementedError('No cache implemented')
+    #     for factor in term.structure:
+    #         if factor.is_deriv:
+    #             for param_idx, param_descr in factor.params_description.items():
+    #                 if param_descr['name'] == 'power': power_param_idx = param_idx
+    #             deriv_orders.append(factor.deriv_code); deriv_powers.append(factor.params[power_param_idx])
+    #             derivs_detected = True
+    #         else:
+    #             coeff_tensor = coeff_tensor * factor.evaluate(grids = grids)
+    #     if not derivs_detected:
+    #        deriv_powers = [0]; deriv_orders = [[None,],]
+    #     if len(deriv_powers) == 1:
+    #         deriv_powers = deriv_powers[0]
+    #         deriv_orders = deriv_orders[0]
             
-        coeff_tensor = torch.from_numpy(coeff_tensor)
-        return [coeff_tensor, deriv_orders, deriv_powers]
+    #     coeff_tensor = torch.from_numpy(coeff_tensor)
+    #     return [coeff_tensor, deriv_orders, deriv_powers]
 
     @staticmethod
-    def term_solver_form(term, grids, variables : list = ['u',]):
+    def _term_solver_form(term, grids, variables : list = ['u',]):
         deriv_orders = []
         deriv_powers = []
         deriv_vars = []
@@ -335,13 +339,13 @@ class SystemSolverInterface(object):
     def set_boundary_operator(self, operator_info):
         raise NotImplementedError()
         
-    def equation_solver_form(self, equation, variables, grids = None):
+    def _equation_solver_form(self, equation, variables, grids = None):
         if grids is None:
             grids = self.grids
         _solver_form = {}
         for term_idx, term in enumerate(equation.structure):
             if term_idx != equation.target_idx:
-                _solver_form[term.name] = self.term_solver_form(term, grids, variables)
+                _solver_form[term.name] = self._term_solver_form(term, grids, variables)
                 if term_idx < equation.target_idx:
                     weight = equation.weights_final[term_idx] 
                 else:
@@ -360,34 +364,29 @@ class SystemSolverInterface(object):
 
         target_weight = torch.from_numpy(np.full_like(a = global_var.grid_cache.get('0'), 
                                                           fill_value = -1.))               
-        target_form = self.term_solver_form(equation.structure[equation.target_idx], grids, variables)
+        target_form = self._term_solver_form(equation.structure[equation.target_idx], grids, variables)
         target_form['const'] = target_form['const'] * target_weight
         target_form['const'] = torch.flatten(target_form['const']).unsqueeze(1).type(torch.FloatTensor)        
         
         _solver_form[equation.structure[equation.target_idx].name] = target_form
         return _solver_form
 
-    def use_grid(self, grids = None):
-        if grids is None:
+    def use_grids(self, grids = None):
+        if grids is None and self.grids is None:
             self.grids = global_var.grid_cache.get_all()
-        else:
-            if len(self.grids) != len(global_var.grid_cache.get_all()):
+        elif grids is None :
+            if len(grids) != len(global_var.grid_cache.get_all()):
                 raise ValueError('Number of passed grids does not match the problem')
             self.grids = grids
 
-    def form(self, full_domain : bool = True, grids : list = None, bconds : list = None):
+    def form(self, grids = None):
+        self.use_grids(grids = grids)
         equation_forms = []
 
-        if bconds is None:
-            
-            bconds = []
-        
-        for idx, equation in enumerate(self.adaptee.vals):
-            equation_forms.append(self.equation_solver_form(equation, grids = grids))
-            bconds.append(equation.boundary_conditions(full_domain = full_domain, grids = grids, 
-                                                       index = idx))
-        
-        return equation_forms, solver_formed_grid(grids), bconds
+        for equation in self.adaptee.vals:  # Deleted enumeration
+            equation_forms.append((equation.main_var_to_explain, self._equation_solver_form(equation, grids = grids)))
+        return equation_forms
+
 
 class SolverAdapter(object):
     def __init__(self, model = None, use_cache : bool = True):
@@ -445,10 +444,18 @@ class SolverAdapter(object):
     def set_param(self, param_key, value):
         self._solver_params[param_key] = value
 
-    def solve_epde_system(self, system : SoEq, grid = None, boundary_conditions = None):
+    def solve_epde_system(self, system : SoEq, grids : list = None, boundary_conditions = None):
         system_interface = SystemSolverInterface(system_to_adapt = system)
 
-        solver_form, grid, bconds = system_interface()
+        system_solver_forms = system_interface.form(grids)
+        if boundary_conditions is None:
+            bop_gen = PregenBOperator(system = system, s_of_equation_solver_form = [sf_labeled[1] for sf_labeled in system_solver_forms])
+        
+        if grids is None:
+            grids = global_var.grid_cache.get_all()
+
+        return self.solve(system_form = [form[1] for form in system_solver_forms], grid = grids)
+
 
     def solve(self, system_form = None, grid = None, boundary_conditions = None):
         if system_form is None and grid is None and boundary_conditions is None:
