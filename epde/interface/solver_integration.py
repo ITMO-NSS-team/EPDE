@@ -52,7 +52,8 @@ class PregenBOperator(object):
                 # self.bconds = BOPElement(key, coeff)
                 raise NotImplementedError('In-place initialization of boundary operator has not been implemented yet.')
         
-        if self.max_deriv_orders(self.equation_sf) != [count_var_bc(self._bconds, v) for v in np.arange(v)]: # TODO: correct check
+        if self.max_deriv_orders(self.equation_sf) != [count_var_bc(self._bconds, v+1) for v, _ 
+                                                       in enumerate(self.variables)]: # TODO: correct check
             raise ValueError('Numbers of conditions do not match requirements of equations.')
             
     
@@ -128,9 +129,11 @@ class PregenBOperator(object):
         
         if grids is None:
             grids = global_var.grid_cache.get_all()
-
-        relative_bc_location
-
+            
+        relative_bc_location = {0 : (), 1 : (0,), 2 : (0, 1), 
+                                3 : (0., 0.5, 1.), 4 : (0., 1/3., 2/3., 1.)}
+        # for bc
+        raise NotImplementedError()
         # TODO: finish
             
         
@@ -264,7 +267,7 @@ class SystemSolverInterface(object):
     def __init__(self, system_to_adapt : SoEq):
         self.variables = system_to_adapt.vars_to_describe
         self.adaptee = system_to_adapt
-        assert self.adaptee.weights_final_evald
+        # assert self.adaptee.weights_final_evald
 
         self.grids = None
     
@@ -384,7 +387,9 @@ class SystemSolverInterface(object):
         equation_forms = []
 
         for equation in self.adaptee.vals:  # Deleted enumeration
-            equation_forms.append((equation.main_var_to_explain, self._equation_solver_form(equation, grids = grids)))
+            equation_forms.append((equation.main_var_to_explain, 
+                                   self._equation_solver_form(equation, variables = self.adaptee.vars_to_describe,
+                                                              grids = grids)))
         return equation_forms
 
 
@@ -402,7 +407,7 @@ class SolverAdapter(object):
 
 
         self._solver_params = {'model' : self.default_model, 'learning_rate' : 1e-3, 'eps' : 1e-5, 'tmin' : 1000,
-                               'tmax' : 1e5, 'use_cache' : True, 'cache_verbose' : True, 
+                               'tmax' : 1e5, 'use_cache' : use_cache, 'cache_verbose' : True, 
                                'save_always' : False, 'print_every' : False, 
                                'model_randomize_parameter' : 1e-6, 'step_plot_print' : False, 
                                'step_plot_save' : False, 'image_save_dir' : None}

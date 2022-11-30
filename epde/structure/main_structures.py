@@ -181,7 +181,7 @@ class Term(ComplexStructure):
                 value = (value - np.mean(value))/np.std(value)
             elif normalize and np.ndim(value) == 1 and np.std(value) == 0:
                 value = (value - np.mean(value))   
-            if np.all([len(factor.params) == 1 for factor in self.structure]) and grids is not None:
+            if np.all([len(factor.params) == 1 for factor in self.structure]) and grids is None:
                 self.saved[normalize] = global_var.tensor_cache.add(self.cache_label, value, normalized = normalize) # Место возможных проблем: сохранение/загрузка нормализованных данных
                 if self.saved[normalize]: self.saved_as[normalize] = self.cache_label
             value = value.reshape(-1)

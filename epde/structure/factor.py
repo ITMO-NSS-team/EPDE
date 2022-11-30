@@ -146,7 +146,7 @@ class Factor(TerminalToken):
                                                structural = structural)
         else:
             value = self._evaluator.apply(self, structural = structural, grids = grids)
-            if grids is not None:
+            if grids is None:
                 if key == 'structural' and self.status['structural_and_defalut_merged']:
                     global_var.tensor_cache.use_structural(use_base_data = True)
                 elif key == 'structural' and not self.status['structural_and_defalut_merged']:
