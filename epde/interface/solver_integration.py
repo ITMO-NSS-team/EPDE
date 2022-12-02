@@ -25,12 +25,14 @@ class PregenBOperator(object):
     def __init__(self, system : SoEq, system_of_equation_solver_form : list):
         self.system = system
         self.equation_sf = [eq for eq in system_of_equation_solver_form]
-        self.max_ord = self.max_deriv_orders()
-        self.variables = system.vars_to_describe
+        self.variables = list(system.vars_to_describe)        
+        self.max_ord = self.max_deriv_orders(system_sf = self.equation_sf,
+                                             variables = self.variables)
         
     def demonstrate_required_ords(self):
         linked_ords = list(zip([eq.main_var_to_explain for eq in self.system], 
-                               self.max_deriv_orders(self.equation_sf)))
+                               self.max_deriv_orders(system_sf = self.equation_sf, 
+                                                     variables = self.variables)))
         print(f'Orders, required by an equation, are as follows: {linked_ords}')
         
     @property
@@ -43,7 +45,8 @@ class PregenBOperator(object):
             return sum([cond[1]['var'] == var or var in cond[1]['var'] for cond in conds])
         
         self._bconds = []
-        if len(conds) != sum(self.max_deriv_orders(self.equation_sf)):
+        if len(conds) != sum(self.max_deriv_orders(system_sf = self.equation_sf, 
+                                                   variables = self.variables)):
             raise ValueError('Number of passed boundry conditions does not match requirements of the system.')
         for condition in conds:
             if isinstance(condition, BOPElement):
@@ -52,14 +55,14 @@ class PregenBOperator(object):
                 # self.bconds = BOPElement(key, coeff)
                 raise NotImplementedError('In-place initialization of boundary operator has not been implemented yet.')
         
-        if self.max_deriv_orders(self.equation_sf) != [count_var_bc(self._bconds, v+1) for v, _ 
-                                                       in enumerate(self.variables)]: # TODO: correct check
+        if self.max_deriv_orders(self.equation_sf, self.variables) != [count_var_bc(self._bconds, v+1) for v, _ 
+                                                                       in enumerate(self.variables)]: # TODO: correct check
             raise ValueError('Numbers of conditions do not match requirements of equations.')
             
     
     
     def parse_equation(self, conditions : list, full_domain : bool = True, grids = None):
-        required_orders = self.max_deriv_orders(self.equation_sf)
+        required_orders = self.max_deriv_orders(self.equation_sf, variables = self.variables)
         assert len(conditions)
     
     @staticmethod
@@ -75,29 +78,33 @@ class PregenBOperator(object):
             raise NotImplementedError('Single-dispatch called in generalized form')
         
         @get_equation_requirements.register
-        def _(equation_sf : dict, variables = ['u',]):# dict = {u : 0}):
+        def _(equation_sf : dict, variables = ['u',]) -> dict:# dict = {u : 0}):
             dim = global_var.grid_cache.get('0').ndim
             if len(variables) > 1:
                 var_max_orders = np.zeros(dim)
                 for term in equation_sf.values():
-                    if isinstance(term[2], list):
-                        for deriv_factor in term[1]:
+                    print(term['term'])
+                    if isinstance(term['power'], list):
+                        for deriv_factor in term['term']:
                             orders = np.array([count_factor_order(deriv_factor, ax) for ax
                                                in np.arange(dim)])
                             var_max_orders = np.maximum(var_max_orders, orders)
                     else:
-                        orders = np.array([count_factor_order(term[1], ax) for ax
+                        orders = np.array([count_factor_order(term['term'], ax) for ax
                                            in np.arange(dim)])
                 var_max_orders = {variables[0] : np.maximum(var_max_orders, orders)}
+                return var_max_orders
             else:
                 var_max_orders = {var_key : np.zeros(dim) for var_key in variables}
-                if list(var_max_orders.keys()) != list(equation_sf.keys()):
-                    raise ValueError('Variables are not ordered correctily or differ from the solver form.')
+                # if list(var_max_orders.keys()) != list(equation_sf.keys()):
+                #     print('max_ords:', var_max_orders.keys(), 'SF keys:', equation_sf.keys())
+                #     raise ValueError('Variables are not ordered correctily or differ from the solver form.')
                 for term_key, symb_form in equation_sf.items():
                     if isinstance(symb_form['var'], list):
                         assert len(symb_form['term']) == len(symb_form['var'])
                         for factor_idx, factor in enumerate([count_factor_order(symb_form['term'], ax) for ax
-                                                            in np.arange(dim)]):
+                                                             in np.arange(dim)]):
+                            print(f'factor_idx {factor_idx}, factor {factor}')
                             var_orders = np.array([count_factor_order(deriv_factor, ax) for ax
                                                    in np.arange(dim)])
                             var_key = symb_form['var'][factor_idx]
@@ -120,12 +127,13 @@ class PregenBOperator(object):
         for equation_form in system_sf:
             eq_forms.append(get_equation_requirements(equation_form, variables))
         
-        max_orders = {var : np.accumulate([eq_list[var] for eq_list in eq_forms])
+        print(f'eq_forms {eq_forms}')
+        max_orders = {var : np.maximum.accumulate([eq_list[var] for eq_list in eq_forms])
                       for var in variables}    # TODO
         return max_orders
     
     def generate_default_bc(self, grids : list = None, allow_high_ords : bool = True):
-        required_bc_ord = self.max_deriv_orders()
+        # required_bc_ord = self.max_deriv_orders()
         
         if grids is None:
             grids = global_var.grid_cache.get_all()
@@ -265,7 +273,7 @@ def solver_formed_grid(training_grid = None):
 
 class SystemSolverInterface(object):
     def __init__(self, system_to_adapt : SoEq):
-        self.variables = system_to_adapt.vars_to_describe
+        self.variables = list(system_to_adapt.vars_to_describe)
         self.adaptee = system_to_adapt
         # assert self.adaptee.weights_final_evald
 
@@ -388,7 +396,7 @@ class SystemSolverInterface(object):
 
         for equation in self.adaptee.vals:  # Deleted enumeration
             equation_forms.append((equation.main_var_to_explain, 
-                                   self._equation_solver_form(equation, variables = self.adaptee.vars_to_describe,
+                                   self._equation_solver_form(equation, variables = self.variables,
                                                               grids = grids)))
         return equation_forms
 
@@ -454,12 +462,15 @@ class SolverAdapter(object):
 
         system_solver_forms = system_interface.form(grids)
         if boundary_conditions is None:
-            bop_gen = PregenBOperator(system = system, s_of_equation_solver_form = [sf_labeled[1] for sf_labeled in system_solver_forms])
+            boundary_conditions = PregenBOperator(system = system, 
+                                                  system_of_equation_solver_form = [sf_labeled[1] for sf_labeled 
+                                                                                    in system_solver_forms])
         
         if grids is None:
             grids = global_var.grid_cache.get_all()
 
-        return self.solve(system_form = [form[1] for form in system_solver_forms], grid = grids)
+        return self.solve(system_form = [form[1] for form in system_solver_forms], grid = grids,
+                          boundary_conditions = boundary_conditions)
 
 
     def solve(self, system_form = None, grid = None, boundary_conditions = None):

@@ -37,7 +37,7 @@ if __name__ == '__main__':
                                            coordinate_tensors = [t,], verbose_params = {'show_moeadd_epochs' : True})    
     
     popsize = 7
-    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=50)
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=70)
     trig_tokens = TrigonometricTokens(dimensionality = dimensionality)
     factors_max_number = {'factors_num' : [1, 2], 'probas' : [0.8, 0.2]}
     
