@@ -27,7 +27,10 @@ from epde.moeadd.moeadd_strategy import OptimizationPatternDirector
 from epde.evaluators import simple_function_evaluator, trigonometric_evaluator
 from epde.supplementary import Define_Derivatives
 from epde.cache.cache import upload_simple_tokens, upload_grids, prepare_var_tensor#, np_ndarray_section
-from epde.preprocessing.derivatives import Preprocess_derivatives
+
+from epde.preprocessing.preprocessor_setups import PreprocessorSetup
+from epde.preprocessing.preprocessor import ConcretePrepBuilder, PreprocessingPipe
+
 from epde.structure.main_structures import Equation, SoEq
 
 from epde.interface.token_family import TF_Pool, TokenFamily
@@ -42,7 +45,8 @@ class Input_data_entry(object):
         self.data_tensor = data_tensor
 
         
-    def set_derivatives(self, deriv_tensors = None, method : str = 'ANN', max_order : Union[list, tuple, int] = 1,
+    def set_derivatives(self, preprocesser : PreprocessingPipe, deriv_tensors = None, 
+                        method : str = 'ANN', max_order : Union[list, tuple, int] = 1,
                         method_kwargs : dict = {}):
 
         deriv_names, deriv_orders = Define_Derivatives(self.var_name, dimensionality=self.data_tensor.ndim, 
@@ -122,6 +126,7 @@ class epde_search(object):
         # TODO: rewrite intitialization
         global_var.set_time_axis(time_axis)
         global_var.init_verbose(**verbose_params)
+        self.preprocessor_set = False
 
         if define_domain:
             if coordinate_tensors is None:
@@ -305,6 +310,29 @@ class epde_search(object):
         self.set_boundaries(boundary_width)
         self.upload_g_func(function_form)
     
+    @staticmethod
+    def set_preprocessor(preprocessor_pipeline : PreprocessingPipe = None, 
+                         default_preprocessor_type : str = 'ANN',
+                         preprocessor_kwargs : dict = {}):
+        if preprocessor_pipeline is None:
+            # assert default_preprocessor_type == 'ANN' or 'poly', 
+            setup = PreprocessorSetup()
+            builder = ConcretePrepBuilder()
+            setup.builder = builder
+            
+            if default_preprocessor_type == 'ANN':
+                setup.build_ANN_preprocessing(**preprocessor_kwargs)
+            elif default_preprocessor_type == 'poly':
+                setup.build_poly_diff_preprocessing(**preprocessor_kwargs)
+            else:
+                raise NotImplementedError('Incorrect default preprocessor type. Only ANN or poly are allowed.')
+            preprocessor_pipeline = setup.builder.prep_pipeline
+            
+        if 'max_order' not in preprocessor_pipeline.deriv_calculator_kwargs.keys():
+            preprocessor_pipeline.deriv_calculator_kwargs['max_order'] = None
+        
+        return preprocessor_pipeline
+    
     def create_pool(self, data : Union[np.ndarray, list, tuple], variable_names = ['u',], 
                     derivs = None, method = 'ANN', method_kwargs : dict = {},
                     max_deriv_order = 1, additional_tokens = [], data_fun_pow : int = 1):
@@ -319,6 +347,16 @@ class epde_search(object):
         else:
             if not (len(data) == len(variable_names) == len(derivs)): 
                 raise ValueError('Mismatching lengths of data tensors, names of the variables and passed derivatives')            
+
+        setup = PreprocessorSetup()
+        builder = ConcretePrepBuilder()
+        setup.builder = builder
+        
+        setup.build_ANN_preprocessing(epochs_max = 1e6) # TODO: edit selection of derivative calculation tool
+        pipe = setup.builder.prep_pipeline
+        pipe.deriv_calculator_kwargs['max_order'] = None
+        res = pipe.run(u, [t,], max_order = 1)        
+
         data_tokens = []
         for data_elem_idx, data_tensor in enumerate(data):
             assert isinstance(data_tensor, np.ndarray), 'Input data must be in format of numpy ndarrays or iterable (list or tuple) of numpy arrays'
@@ -492,9 +530,13 @@ class epde_search(object):
         else:
             return None, global_var.tensor_cache
 
-    def predict(bounary_conditions : BoundaryConditions, system : SoEq = None, system_file : str = None, ):
+    def predict(bounary_conditions : BoundaryConditions, grid : list, system : SoEq = None, 
+                system_file : str = None, solver_kwargs : dict = {'model' : None, 'use_cache' : True}):
+        solver_kwargs['dim'] = len(global_var.grid_cache.get_all()[1])
+        solver_kwargs['dim']
+        
         if system is not None:
-            print('Using explicitly sent system of equations.') 
+            print('Using explicitly sent system of equations.')
         elif system_file is not None:
             assert '.pickle' in system_file
             print('Loading equation from pickled file.')
@@ -503,5 +545,6 @@ class epde_search(object):
         else:
             raise ValueError('Missing system, that was not passed in any form.')
         
-        adapter = SolverAdapter(system)
-        adapter.solve()
+        adapter = SolverAdapter()
+        solution_model = adapter.solve(grid = grid, boundary_conditions = boundary_conditions)
+        

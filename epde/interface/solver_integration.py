@@ -25,14 +25,13 @@ class PregenBOperator(object):
     def __init__(self, system : SoEq, system_of_equation_solver_form : list):
         self.system = system
         self.equation_sf = [eq for eq in system_of_equation_solver_form]
-        self.variables = list(system.vars_to_describe)        
-        self.max_ord = self.max_deriv_orders(system_sf = self.equation_sf,
-                                             variables = self.variables)
+        self.variables = list(system.vars_to_describe)
+        # print('Varibales:', self.variables)
+        # self.max_ord = self.max_deriv_orders
         
     def demonstrate_required_ords(self):
         linked_ords = list(zip([eq.main_var_to_explain for eq in self.system], 
-                               self.max_deriv_orders(system_sf = self.equation_sf, 
-                                                     variables = self.variables)))
+                               self.max_deriv_orders))
         print(f'Orders, required by an equation, are as follows: {linked_ords}')
         
     @property
@@ -41,38 +40,33 @@ class PregenBOperator(object):
     
     @conditions.setter
     def conditions(self, conds : list):
-        def count_var_bc(conds, var : int):
-            return sum([cond[1]['var'] == var or var in cond[1]['var'] for cond in conds])
-        
         self._bconds = []
-        if len(conds) != sum(self.max_deriv_orders(system_sf = self.equation_sf, 
-                                                   variables = self.variables)):
+        if len(conds) != int(sum([value.sum() for value in self.max_deriv_orders.values()])):
             raise ValueError('Number of passed boundry conditions does not match requirements of the system.')
         for condition in conds:
             if isinstance(condition, BOPElement):
                 self._bconds.append(condition())
             else:
-                # self.bconds = BOPElement(key, coeff)
+                print('condition is ', type(condition), condition)
                 raise NotImplementedError('In-place initialization of boundary operator has not been implemented yet.')
-        
-        if self.max_deriv_orders(self.equation_sf, self.variables) != [count_var_bc(self._bconds, v+1) for v, _ 
-                                                                       in enumerate(self.variables)]: # TODO: correct check
-            raise ValueError('Numbers of conditions do not match requirements of equations.')
-            
     
-    
-    def parse_equation(self, conditions : list, full_domain : bool = True, grids = None):
-        required_orders = self.max_deriv_orders(self.equation_sf, variables = self.variables)
-        assert len(conditions)
+    @property
+    def max_deriv_orders(self):
+        return self.get_max_deriv_orders(self.equation_sf, self.variables)
     
     @staticmethod
-    def max_deriv_orders(system_sf : list, variables : list = ['u',]) -> np.ndarray:
-        def count_factor_order(obj, deriv_ax):
-            if obj is None:
+    def get_max_deriv_orders(system_sf : list, variables : list = ['u',]) -> np.ndarray:
+        def count_factor_order(factor_code, deriv_ax):
+            if factor_code is None:
                 return 0
             else:
-                return obj.count(deriv_ax)
-        
+                if isinstance(factor_code, list):
+                    return factor_code.count(deriv_ax)
+                elif isinstance(factor_code, int):
+                    return 1 if factor_code == deriv_ax else 0
+                else:
+                    raise TypeError('Incorrect type of the input.')
+                
         @singledispatch
         def get_equation_requirements(equation_sf, variables = ['u',]):
             raise NotImplementedError('Single-dispatch called in generalized form')
@@ -80,10 +74,10 @@ class PregenBOperator(object):
         @get_equation_requirements.register
         def _(equation_sf : dict, variables = ['u',]) -> dict:# dict = {u : 0}):
             dim = global_var.grid_cache.get('0').ndim
-            if len(variables) > 1:
+            if len(variables) == 1:
+                print('processing a single variable')                
                 var_max_orders = np.zeros(dim)
                 for term in equation_sf.values():
-                    print(term['term'])
                     if isinstance(term['power'], list):
                         for deriv_factor in term['term']:
                             orders = np.array([count_factor_order(deriv_factor, ax) for ax
@@ -96,20 +90,17 @@ class PregenBOperator(object):
                 return var_max_orders
             else:
                 var_max_orders = {var_key : np.zeros(dim) for var_key in variables}
-                # if list(var_max_orders.keys()) != list(equation_sf.keys()):
-                #     print('max_ords:', var_max_orders.keys(), 'SF keys:', equation_sf.keys())
-                #     raise ValueError('Variables are not ordered correctily or differ from the solver form.')
                 for term_key, symb_form in equation_sf.items():
                     if isinstance(symb_form['var'], list):
                         assert len(symb_form['term']) == len(symb_form['var'])
-                        for factor_idx, factor in enumerate([count_factor_order(symb_form['term'], ax) for ax
-                                                             in np.arange(dim)]):
-                            print(f'factor_idx {factor_idx}, factor {factor}')
+                        for factor_idx, deriv_factor in enumerate(symb_form['term']):
                             var_orders = np.array([count_factor_order(deriv_factor, ax) for ax
                                                    in np.arange(dim)])
-                            var_key = symb_form['var'][factor_idx]
-                            var_max_orders[var_key] = np.maximum(var_max_orders[var_key], var_orders)
+                            var_key = symb_form['var'][factor_idx] - 1
+                            var_max_orders[variables[var_key]] = np.maximum(var_max_orders[variables[var_key]],
+                                                                            var_orders)
                     elif isinstance(symb_form['var'], int):
+                        raise NotImplementedError()
                         assert len(symb_form['term']) == 1
                         for factor_idx, factor in enumerate([count_factor_order(symb_form['term'], ax) for ax
                                                             in np.arange(dim)]):
@@ -127,71 +118,89 @@ class PregenBOperator(object):
         for equation_form in system_sf:
             eq_forms.append(get_equation_requirements(equation_form, variables))
         
-        print(f'eq_forms {eq_forms}')
-        max_orders = {var : np.maximum.accumulate([eq_list[var] for eq_list in eq_forms])
+        max_orders = {var : np.maximum.accumulate([eq_list[var] for eq_list in eq_forms])[-1]
                       for var in variables}    # TODO
         return max_orders
     
-    def generate_default_bc(self, grids : list = None, allow_high_ords : bool = True):
-        # required_bc_ord = self.max_deriv_orders()
+    def generate_default_bc(self, vals : Union[np.ndarray, dict] = None, grids : list = None, 
+                            allow_high_ords : bool = False):
+        # Implement allow_high_ords - selection of derivatives from 
+        required_bc_ord = self.max_deriv_orders
+        assert set(self.variables) == set(required_bc_ord.keys()), 'Some conditions miss required orders.'
+        assert (len(self.variables) == 1) == isinstance(vals, dict), ''
+
+        grid_cache = global_var.initial_data_cache
+        tensor_cache = global_var.initial_data_cache
         
+        if vals is None:
+            val_keys = {key : (key, (1.0,)) for key in self.variables}
+
         if grids is None:
-            grids = global_var.grid_cache.get_all()
+            _, grids = grid_cache.get_all()
             
         relative_bc_location = {0 : (), 1 : (0,), 2 : (0, 1), 
                                 3 : (0., 0.5, 1.), 4 : (0., 1/3., 2/3., 1.)}
-        # for bc
-        raise NotImplementedError()
-        # TODO: finish
-            
         
+        bconds = []
+        tensor_shape = grids[0].shape
+
+        def get_boundary_ind(tensor_shape, axis, rel_loc):
+            return tuple(np.meshgrid(*[np.arange(shape) if dim_idx != axis else min(int(rel_loc * shape), shape-1)
+                       for dim_idx, shape in enumerate(tensor_shape)], indexing = 'ij'))        
         
-        
+        for var_idx, variable in enumerate(self.variables):            
+            for ax_idx, ax_ord in enumerate(required_bc_ord[variable]):
+                for loc in relative_bc_location[ax_ord]:
+                    indexes = get_boundary_ind(tensor_shape, ax_idx, rel_loc = loc)
+                    coords = np.array([grids[idx][indexes] for idx in np.arange(len(tensor_shape))]).T
+                    if coords.ndim > 2:
+                        coords.squeeze()
+                        
+                    if vals is None:
+                        bc_values = tensor_cache.get(val_keys[variable])[indexes]
+                    else:
+                        bc_values = vals[indexes]
+                        
+                    bc_values = np.expand_dims(bc_values, axis = 0).T
+                    coords = torch.from_numpy(coords).type(torch.FloatTensor)
+                    
+                    bc_values = torch.from_numpy(bc_values).type(torch.FloatTensor)
+                    operator = BOPElement(axis = ax_idx, key = variable, coeff = 1, term = [None], 
+                                          power = 1, var = var_idx, rel_location=loc)
+                    operator.set_grid(grid = coords)
+                    operator.values = bc_values
+                    bconds.append(operator) # )(rel_location=loc)
+        self.conditions = bconds
+
 
 class BOPElement(object):
-    def __init__(self, key : str, coeff : float = 1., term : list = [None], 
-                 power : Union[list, int] = 1, var : Union[list, int] = 1):
+    def __init__(self, axis : int, key : str, coeff : float = 1., term : list = [None], 
+                 power : Union[list, int] = 1, var : Union[list, int] = 1, rel_location : float = 0.):
+        self.axis = axis
         self.key = key
         self.coefficient = coeff
         self.term = term
         self.power = power
         self.variables = var
+        self.location = rel_location
         
         self.status = {'boundary_location_set'  : False,
-                       'boundary_operator_set'  : False,
                        'boundary_values_set'    : False}
+    
+    def set_grid(self, grid : torch.Tensor):
+        self.grid = grid
+        self.status['boundary_location_set'] = True
     
     @property
     def operator_form(self):
         form = {
                 'coeffs' : self.coefficient,
                 self.key   : self.term,
-                'pow'  : self.powers,
+                'pow'  : self.power,
                 'var'    : self.variables
                 }
         return self.key, form
         
-    # @property
-    # def coefficient(self):
-    #     if isinstance(self._coefficient, FunctionType):
-    #         assert self.grid_set, 'Tring to evaluate variable coefficent without a proper grid.'
-    #         res = self._coefficient(self.grids)
-    #         assert res.shape == self.grids[0].shape
-    #         return torch.from_numpy(res)
-    #     else:
-    #         return self._coefficient
-    
-    # @coefficient.setter
-    # def coefficient(self, coeff):
-    #     if isinstance(coeff, (FunctionType, int, float, torch.Tensor)):
-    #         self._coefficient = coeff
-    #     elif isinstance(coeff, np.ndarray):
-    #         if self.grids is not None and np.shape(coeff) != np.shape(self.grids[0]):
-    #             raise ValueError('Numpy array of coefficients does not match the grid.')
-    #         self._coefficient = torch.from_numpy(coeff)
-    #     else:
-    #         raise TypeError(f'Incorrect type of coefficients. Must be a type from list {VAL_TYPES}.')
-    
     @property
     def values(self):
         if isinstance(self._values, FunctionType):
@@ -214,29 +223,31 @@ class BOPElement(object):
             raise TypeError(f'Incorrect type of coefficients. Must be a type from list {VAL_TYPES}.')
         
         
-    def __call__(self, values : VAL_TYPES = None, boundary : list = None, 
-                 rel_location : float = None):
+    def __call__(self, values : VAL_TYPES = None, boundary : list = None):
         if not self.vals_set and values is not None:
             self.values = values
-        elif values is None:
+            self.status['boundary_values_set'] = True
+        elif not self.vals_set and values is None:
             raise ValueError('No location passed into the BOP.')
-        if boundary is None and rel_location is not None:
-            # try:
+        if boundary is None and self.location is not None:
             _, all_grids = global_var.grid_cache.get_all() # str(self.axis)
+
+            abs_loc = self.location * all_grids[0].shape[self.axis]            
+            if all_grids[0].ndim > 1:
+                boundary = np.array(all_grids[:self.axis] + all_grids[self.axis+1:])
+                if isinstance(values, FunctionType):
+                    raise NotImplementedError # TODO: evaluation of BCs passed as functions or lambdas 
+                boundary = torch.from_numpy(np.expand_dims(boundary, axis = self.axis)).float()  #.reshape(bnd_shape))
+
+                boundary = torch.cartesian_prod(boundary, 
+                                                torch.from_numpy(np.array([abs_loc,], dtype=np.float64))).float()
+                boundary = torch.moveaxis(boundary, source = 0, destination = self.axis).resize()
+            else:
+                boundary = torch.from_numpy(np.array([[abs_loc,],])) # TODO: work from here
+                # boundary = torch.expand_dims(boundary, axis = 0)
+            print('boundary.shape', boundary.shape, boundary.ndim)
             
-            with np.moveaxis(all_grids[0], source = self.axis, destination = 0)[0, ...] as tmp:
-                bnd_shape = (tmp.size, np.squeeze(tmp))
-            boundary = np.array(all_grids[:self.axis] + all_grids[self.axis+1:])
-            if isinstance(values, FunctionType):
-                raise NotImplementedError # TODO: evaluation of BCs passed as functions or lambdas 
-            boundary = torch.from_numpy(boundary.reshape(bnd_shape))
-            
-            # boundary = np.squeeze(general_grid[rel_location * general_grid.shape[0], ...])
-            boundary = torch.cartesian_prod(boundary, torch.from_numpy(np.array([0], dtype=np.float64))).float()
-            boundary = torch.moveaxis(boundary, source = 0, destination = self.axis).resize()
-            
-            
-        elif boundary is None and rel_location is None:
+        elif boundary is None and self.location is None:
             raise ValueError('No location passed into the BOP.')
             
     
@@ -246,7 +257,9 @@ class BOPElement(object):
         boundary_operator = {form[0] : form[1]}
 
         boundary_value = self.values # TODO: inspect boundary value setter with an arbitrary function in symb form
-
+        
+        print('Output of bc:')
+        print(boundary, boundary_value)
         return boundary, boundary_operator, boundary_value
 
 class BoundaryConditions(object):
@@ -328,7 +341,7 @@ class SystemSolverInterface(object):
                     raise ValueError(f'Variable family of passed derivative {variables}, other than {cur_deriv_var}')
                 derivs_detected = True
                 
-                deriv_vars.append(cur_deriv_var + 1)
+                deriv_vars.append(cur_deriv_var)
             else:
                 coeff_tensor = coeff_tensor * factor.evaluate(grids = grids)
         if not derivs_detected:
@@ -370,7 +383,7 @@ class SystemSolverInterface(object):
         free_coeff_term = {'const'  : free_coeff_weight,
                            'term'   : [None],
                            'power'  : 0,
-                           'var'    : 1}
+                           'var'    : [0,]}
         _solver_form['C'] = free_coeff_term
 
         target_weight = torch.from_numpy(np.full_like(a = global_var.grid_cache.get('0'), 
@@ -384,9 +397,9 @@ class SystemSolverInterface(object):
 
     def use_grids(self, grids = None):
         if grids is None and self.grids is None:
-            self.grids = global_var.grid_cache.get_all()
+            _, self.grids = global_var.grid_cache.get_all()
         elif grids is None :
-            if len(grids) != len(global_var.grid_cache.get_all()):
+            if len(grids) != len(global_var.grid_cache.get_all()[1]):
                 raise ValueError('Number of passed grids does not match the problem')
             self.grids = grids
 
@@ -402,25 +415,32 @@ class SystemSolverInterface(object):
 
 
 class SolverAdapter(object):
-    def __init__(self, model = None, use_cache : bool = True):
+    def __init__(self, model = None, use_cache : bool = True, var_number : int = 1, 
+                 dim_number : int = 1):
         if model is None:
             model = torch.nn.Sequential(
-               torch.nn.Linear(1, 100),
-                torch.nn.Tanh(),
-                torch.nn.Linear(100, 100),
-                torch.nn.Tanh(),
-                torch.nn.Linear(100, 1),
-            )
-        self.default_model = model
+                                        torch.nn.Linear(dim_number, 100),
+                                        torch.nn.Tanh(),
+                                        torch.nn.Linear(100, 100),
+                                        torch.nn.Tanh(),
+                                        torch.nn.Linear(100, 100),
+                                        torch.nn.Tanh(),
+                                        torch.nn.Linear(100, 100),
+                                        torch.nn.Tanh(),
+                                        torch.nn.Linear(100, var_number),
+                                        )
+        self.model = model
 
+        # self.
+        self._solver_params = dict()
+        _solver_params = {'lambda_bound' : 10, 'verbose' : False,
+                          'learning_rate' : 1e-3, 'eps' : 1e-5, 'tmin' : 1000,
+                          'tmax' : 1e5, 'use_cache' : use_cache, 'cache_verbose' : True, 
+                          'save_always' : False, 'print_every' : None, 
+                          'model_randomize_parameter' : 1e-6, 'step_plot_print' : False, 
+                          'step_plot_save' : False, 'image_save_dir' : None}
 
-        self._solver_params = {'model' : self.default_model, 'learning_rate' : 1e-3, 'eps' : 1e-5, 'tmin' : 1000,
-                               'tmax' : 1e5, 'use_cache' : use_cache, 'cache_verbose' : True, 
-                               'save_always' : False, 'print_every' : False, 
-                               'model_randomize_parameter' : 1e-6, 'step_plot_print' : False, 
-                               'step_plot_save' : False, 'image_save_dir' : None}
-
-        self.set_solver_params()
+        self.set_solver_params(**_solver_params)
         self.use_cache = use_cache
         self.prev_solution = None
 
@@ -434,19 +454,21 @@ class SolverAdapter(object):
     #                                       'model_randomize_parameter' : None, 'step_plot_print' : None, 
     #                                       'step_plot_save' : None, 'image_save_dir' : None}):
 
-    def set_solver_params(self, model = None, learning_rate : float = None, eps : float = None, 
-                          tmin : int = None, tmax : int = None, use_cache : bool = None, cache_verbose : bool = None, 
+    def set_solver_params(self, lambda_bound = None, verbose : bool = None, learning_rate : float = None, 
+                          eps : float = None, tmin : int = None, tmax : int = None, 
+                          use_cache : bool = None, cache_verbose : bool = None, 
                           save_always : bool = None, print_every : bool = None, 
                           model_randomize_parameter : bool = None, step_plot_print : bool = None, 
                           step_plot_save : bool = None, image_save_dir : str = None):
-        params = {'model' : model, 'learning_rate' : learning_rate, 'eps' : eps, 'tmin' : tmin,
+        #TODO: refactor
+        params = {'lambda_bound' : lambda_bound, 'verbose' : verbose,
+                  'learning_rate' : learning_rate, 'eps' : eps, 'tmin' : tmin,
                   'tmax' : tmax, 'use_cache' : use_cache, 'cache_verbose' : cache_verbose, 
                   'save_always' : save_always, 'print_every' : print_every, 
                   'model_randomize_parameter' : model_randomize_parameter, 'step_plot_print' : step_plot_print, 
                   'step_plot_save' : step_plot_save, 'image_save_dir' : image_save_dir}
         
-        if model is None:
-            model = self.default_model 
+        print('params: ', params)
         for param_key, param_vals in params.items():
             if params is not None:
                 try:
@@ -454,7 +476,7 @@ class SolverAdapter(object):
                 except KeyError:
                     print(f'Parameter {param_key} can not be passed into the solver.')
 
-    def set_param(self, param_key, value):
+    def set_param(self, param_key : str, value):
         self._solver_params[param_key] = value
 
     def solve_epde_system(self, system : SoEq, grids : list = None, boundary_conditions = None):
@@ -462,19 +484,39 @@ class SolverAdapter(object):
 
         system_solver_forms = system_interface.form(grids)
         if boundary_conditions is None:
-            boundary_conditions = PregenBOperator(system = system, 
-                                                  system_of_equation_solver_form = [sf_labeled[1] for sf_labeled 
-                                                                                    in system_solver_forms])
-        
+            op_gen = PregenBOperator(system = system, 
+                                     system_of_equation_solver_form = [sf_labeled[1] for sf_labeled 
+                                                                       in system_solver_forms])
+            op_gen.generate_default_bc()
+            boundary_conditions = op_gen.conditions
+
         if grids is None:
-            grids = global_var.grid_cache.get_all()
+            _, grids = global_var.grid_cache.get_all()
 
         return self.solve(system_form = [form[1] for form in system_solver_forms], grid = grids,
                           boundary_conditions = boundary_conditions)
 
 
+    @staticmethod
+    def convert_grid(grid):
+        assert isinstance(grid, (list, tuple)), 'Convertion of the tensor can be only held from tuple or list.'
+        dimensionality = len(grid)
+        
+        if grid[0].ndim == dimensionality:
+            conv_grid = np.stack([subgrid.reshape(-1) for subgrid in grid])
+            conv_grid = torch.from_numpy(conv_grid).float().T
+        else:
+            conv_grid = [torch.from_numpy(subgrid) for subgrid in grid]
+            conv_grid = torch.cartesian_prod(*conv_grid).float()
+        return conv_grid
+
+
     def solve(self, system_form = None, grid = None, boundary_conditions = None):
-        if system_form is None and grid is None and boundary_conditions is None:
-            self.equation = SolverEquation(grid, system_form, boundary_conditions).set_strategy('NN')
-        self.prev_solution = solver.Solver(grid, self.equation, self.model, 'NN').solver(**self._solver_params)
+        if isinstance(grid, (list, tuple)):
+            grid = self.convert_grid(grid)
+        # print(grid.shape)
+        # if system_form is None and grid is None and boundary_conditions is None:
+        self.equation = SolverEquation(grid, system_form, boundary_conditions).set_strategy('NN')
+        
+        self.prev_solution = solver.Solver(grid, self.equation, self.model, 'NN').solve(**self._solver_params)
         return self.prev_solution

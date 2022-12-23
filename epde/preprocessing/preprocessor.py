@@ -7,6 +7,7 @@ Created on Mon Jul 18 16:05:11 2022
 """
 
 import numpy as np
+from typing import Union
 
 from functools import reduce
 from abc import ABC, abstractmethod, abstractproperty
@@ -16,7 +17,7 @@ class GeneralizedPrepBuilder(ABC):
         pass
     
     @abstractproperty
-    def preprocessor(self):
+    def prep_pipeline(self):
         pass
     
     @abstractmethod
@@ -62,7 +63,7 @@ class ConcretePrepBuilder(GeneralizedPrepBuilder):
     def check_preprocessing_correctness(self):
         print("Checking correctness of the preprocessing tool:")
         try:
-            test_call = self._prep_pipeline.run
+            test_call = self._prep_pipeline.run()
             if len(self.output_tests) > 0:
                 test_call = reduce(lambda x, y: y(x), self.output_tests, test_call)
             _ = test_call(np.ones((100, 100)))
@@ -89,13 +90,16 @@ class PreprocessingPipe(object):
     
     def use_grid(self, grid):
         if 'grid' in self.smoother_kwargs.keys():
-            self.smoother_kwargs = grid
+            self.smoother_kwargs['grid'] = grid
         if 'grid' in self.deriv_calculator_kwargs.keys():
-            self.deriv_calculator_kwargs = grid
+            self.deriv_calculator_kwargs['grid'] = grid
     
-    def run(self, data, grid = None):
+    def run(self, data, grid = None, max_order : Union[list, int] = 1):
+        self.deriv_calculator_kwargs['max_order'] = max_order
         if grid is not None:
             self.use_grid(grid)
+            
+        # TODO: add an arbitrary preprocssing operators
         if self.smoother is not None:
             data = self.smoother(data, *self.smoother_args, **self.smoother_kwargs)
-        return self.deriv_calculator(data, *self.deriv_calculator_args, **self.deriv_calculator_kwargs)
+        return data, self.deriv_calculator(data, *self.deriv_calculator_args, **self.deriv_calculator_kwargs)

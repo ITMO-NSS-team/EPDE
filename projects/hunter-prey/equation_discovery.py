@@ -44,6 +44,6 @@ if __name__ == '__main__':
     epde_search_obj.fit(data=[x, y], variable_names=['u', 'v'], max_deriv_order=(1,),
                         equation_terms_max_number=3, data_fun_pow = 1, additional_tokens=[trig_tokens,], 
                         equation_factors_max_number=factors_max_number, deriv_method='poly', 
-                        eq_sparsity_interval=(1e-10, 1e-2),
+                        eq_sparsity_interval=(1e-10, 1e-4),
                         deriv_method_kwargs={'smooth': False, 'grid': [t, ]}, coordinate_tensors=[t, ])    
     epde_search_obj.equation_search_results(only_print = True, level_num = 1)

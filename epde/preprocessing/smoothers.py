@@ -12,6 +12,8 @@ import numpy as np
 import torch
 device = torch.device('cpu')
 
+def placeholder_smoother(data, *args, **kwargs):
+    return data
 
 def baseline_ann(dim):
     model = torch.nn.Sequential(
@@ -74,6 +76,7 @@ def ann_smoother(data, grid, epochs_max = 1e3, loss_mean = 1000, batch_frac = 0.
     return data_approx
 
 def gaussian(data, kernel_fun = 'gaussian', **kwargs):
+    print('kwargs', kwargs)
     smoothed_data = np.empty_like(data)
     if kernel_fun == 'gaussian':
         if np.ndim(data) > 1:
