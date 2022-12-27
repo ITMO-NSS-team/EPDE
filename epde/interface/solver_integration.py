@@ -327,7 +327,7 @@ class SystemSolverInterface(object):
         derivs_detected = False
         
         try:
-            coeff_tensor = np.ones_like(global_var.grid_cache.get('0'))
+            coeff_tensor = np.ones_like(grids[0])#global_var.grid_cache.get('0'))
         except KeyError:
             raise NotImplementedError('No cache implemented')
         for factor in term.structure:
@@ -364,6 +364,7 @@ class SystemSolverInterface(object):
         raise NotImplementedError()
         
     def _equation_solver_form(self, equation, variables, grids = None):
+        # TODO: fix performance on other, than default grids.
         if grids is None:
             grids = self.grids
         _solver_form = {}
@@ -371,13 +372,13 @@ class SystemSolverInterface(object):
             if term_idx != equation.target_idx:
                 _solver_form[term.name] = self._term_solver_form(term, grids, variables)
                 if term_idx < equation.target_idx:
-                    weight = equation.weights_final[term_idx] 
+                    weight = equation.weights_final[term_idx]
                 else:
                     weight = equation.weights_final[term_idx-1]
                 _solver_form[term.name]['const'] = _solver_form[term.name]['const'] * weight
                 _solver_form[term.name]['const'] = torch.flatten(_solver_form[term.name]['const']).unsqueeze(1).type(torch.FloatTensor)
 
-        free_coeff_weight = torch.from_numpy(np.full_like(a = global_var.grid_cache.get('0'), 
+        free_coeff_weight = torch.from_numpy(np.full_like(a = grids[0], # global_var.grid_cache.get('0'), 
                                                           fill_value = equation.weights_final[-1]))
         free_coeff_weight = torch.flatten(free_coeff_weight).unsqueeze(1).type(torch.FloatTensor)
         free_coeff_term = {'const'  : free_coeff_weight,
@@ -386,8 +387,8 @@ class SystemSolverInterface(object):
                            'var'    : [0,]}
         _solver_form['C'] = free_coeff_term
 
-        target_weight = torch.from_numpy(np.full_like(a = global_var.grid_cache.get('0'), 
-                                                          fill_value = -1.))               
+        target_weight = torch.from_numpy(np.full_like(a = grids[0], #global_var.grid_cache.get('0'), 
+                                                      fill_value = -1.))               
         target_form = self._term_solver_form(equation.structure[equation.target_idx], grids, variables)
         target_form['const'] = target_form['const'] * target_weight
         target_form['const'] = torch.flatten(target_form['const']).unsqueeze(1).type(torch.FloatTensor)        
@@ -431,7 +432,6 @@ class SolverAdapter(object):
                                         )
         self.model = model
 
-        # self.
         self._solver_params = dict()
         _solver_params = {'lambda_bound' : 10, 'verbose' : False,
                           'learning_rate' : 1e-3, 'eps' : 1e-5, 'tmin' : 1000,
@@ -443,16 +443,6 @@ class SolverAdapter(object):
         self.set_solver_params(**_solver_params)
         self.use_cache = use_cache
         self.prev_solution = None
-
-    # def use_default(self, key, vals, base_vals):
-    #     self._params = key
-
-
-    # def set_solver_params(self, params = {'model' : None, 'learning_rate' : None, 'eps' : None, 'tmin' : None, 
-    #                                       'tmax' : None, 'use_cache' : None, 'cache_verbose' : None, 
-    #                                       'save_always' : None, 'print_every' : None, 
-    #                                       'model_randomize_parameter' : None, 'step_plot_print' : None, 
-    #                                       'step_plot_save' : None, 'image_save_dir' : None}):
 
     def set_solver_params(self, lambda_bound = None, verbose : bool = None, learning_rate : float = None, 
                           eps : float = None, tmin : int = None, tmax : int = None, 
@@ -514,8 +504,6 @@ class SolverAdapter(object):
     def solve(self, system_form = None, grid = None, boundary_conditions = None):
         if isinstance(grid, (list, tuple)):
             grid = self.convert_grid(grid)
-        # print(grid.shape)
-        # if system_form is None and grid is None and boundary_conditions is None:
         self.equation = SolverEquation(grid, system_form, boundary_conditions).set_strategy('NN')
         
         self.prev_solution = solver.Solver(grid, self.equation, self.model, 'NN').solve(**self._solver_params)

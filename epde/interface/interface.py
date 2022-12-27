@@ -46,21 +46,17 @@ class Input_data_entry(object):
 
         
     def set_derivatives(self, preprocesser : PreprocessingPipe, deriv_tensors = None, 
-                        method : str = 'ANN', max_order : Union[list, tuple, int] = 1,
-                        method_kwargs : dict = {}):
+                        max_order : Union[list, tuple, int] = 1, grid : list = []):
 
         deriv_names, deriv_orders = Define_Derivatives(self.var_name, dimensionality=self.data_tensor.ndim, 
                                                        max_order = max_order)
 
         self.names = deriv_names 
         self.d_orders = deriv_orders
+
         if deriv_tensors is None:
-            method_kwargs['max_order'] = max_order
-            # if self.coord_tensors is not None and 'grid' not in method_kwargs.keys():
-            _, method_kwargs['grid'] = global_var.grid_cache.get_all()
-            self.data_tensor, self.derivatives = Preprocess_derivatives(self.data_tensor, method=method, 
-                                                                        method_kwargs=method_kwargs)
-            # Added setting of data tensor from filtered field
+            self.data_tensor, self.derivatives = preprocesser.run(self.data_tensor, grid = grid, 
+                                                                  max_order = max_order) 
             self.deriv_properties = {'max order' : max_order,
                                      'dimensionality' : self.data_tensor.ndim}
         else:
@@ -123,7 +119,6 @@ class epde_search(object):
             Will define equation type, TBD later.
         
         '''
-        # TODO: rewrite intitialization
         global_var.set_time_axis(time_axis)
         global_var.init_verbose(**verbose_params)
         self.preprocessor_set = False
@@ -310,12 +305,10 @@ class epde_search(object):
         self.set_boundaries(boundary_width)
         self.upload_g_func(function_form)
     
-    @staticmethod
-    def set_preprocessor(preprocessor_pipeline : PreprocessingPipe = None, 
-                         default_preprocessor_type : str = 'ANN',
+    def set_preprocessor(self, preprocessor_pipeline : PreprocessingPipe = None, 
+                         default_preprocessor_type : str = 'poly',
                          preprocessor_kwargs : dict = {}):
         if preprocessor_pipeline is None:
-            # assert default_preprocessor_type == 'ANN' or 'poly', 
             setup = PreprocessorSetup()
             builder = ConcretePrepBuilder()
             setup.builder = builder
@@ -331,11 +324,13 @@ class epde_search(object):
         if 'max_order' not in preprocessor_pipeline.deriv_calculator_kwargs.keys():
             preprocessor_pipeline.deriv_calculator_kwargs['max_order'] = None
         
-        return preprocessor_pipeline
+        self.preprocessor_set = True
+        self.preprocessor_pipeline = preprocessor_pipeline
     
     def create_pool(self, data : Union[np.ndarray, list, tuple], variable_names = ['u',], 
-                    derivs = None, method = 'ANN', method_kwargs : dict = {},
-                    max_deriv_order = 1, additional_tokens = [], data_fun_pow : int = 1):
+                    derivs = None, max_deriv_order = 1, additional_tokens = [], 
+                    data_fun_pow : int = 1):
+        # method = 'ANN', method_kwargs : dict = {},
         assert (isinstance(derivs, list) and isinstance(derivs[0], np.ndarray)) or derivs is None
         if isinstance(data, np.ndarray):
             data = [data,]
@@ -347,15 +342,9 @@ class epde_search(object):
         else:
             if not (len(data) == len(variable_names) == len(derivs)): 
                 raise ValueError('Mismatching lengths of data tensors, names of the variables and passed derivatives')            
-
-        setup = PreprocessorSetup()
-        builder = ConcretePrepBuilder()
-        setup.builder = builder
         
-        setup.build_ANN_preprocessing(epochs_max = 1e6) # TODO: edit selection of derivative calculation tool
-        pipe = setup.builder.prep_pipeline
-        pipe.deriv_calculator_kwargs['max_order'] = None
-        res = pipe.run(u, [t,], max_order = 1)        
+        if not self.preprocessor_set:
+            self.set_preprocessor()
 
         data_tokens = []
         for data_elem_idx, data_tensor in enumerate(data):
@@ -363,8 +352,8 @@ class epde_search(object):
             entry = Input_data_entry(var_name = variable_names[data_elem_idx],
                                      data_tensor = data_tensor)
             derivs_tensor = derivs[data_elem_idx] if derivs is not None else None
-            entry.set_derivatives(deriv_tensors = derivs_tensor, method = method, max_order = max_deriv_order, 
-                                  method_kwargs=method_kwargs)
+            entry.set_derivatives(preprocesser=self.preprocessor_pipeline, deriv_tensors = derivs_tensor, 
+                                  grid = global_var.grid_cache.get_all()[1], max_order = max_deriv_order)
             entry.use_global_cache()
             
             print(f'creating TokenFamily entry {entry.var_name}')
@@ -396,7 +385,7 @@ class epde_search(object):
     
     def fit(self, data : Union[np.ndarray, list, tuple], equation_terms_max_number = 6,
             equation_factors_max_number = 1, variable_names = ['u',], eq_sparsity_interval = (1e-4, 2.5), 
-            derivs = None, max_deriv_order = 1, deriv_method = 'ANN', deriv_method_kwargs : dict = {},
+            derivs = None, max_deriv_order = 1,
             additional_tokens = [], coordinate_tensors = None, memory_for_cache = 5,
             prune_domain : bool = False, pivotal_tensor_label = None, pruner = None, 
             threshold : float = 1e-2, division_fractions = 3, rectangular : bool = True, 
@@ -470,7 +459,7 @@ class epde_search(object):
         #     self.moeadd_params['weights_num'] = equation_terms_max_number
         
         self.create_pool(data = data, variable_names=variable_names, 
-                         derivs=derivs, method=deriv_method, method_kwargs=deriv_method_kwargs, 
+                         derivs=derivs, #method=deriv_method, method_kwargs=deriv_method_kwargs, 
                          max_deriv_order=max_deriv_order, additional_tokens=additional_tokens, 
                          data_fun_pow=data_fun_pow)
         
@@ -530,10 +519,10 @@ class epde_search(object):
         else:
             return None, global_var.tensor_cache
 
-    def predict(bounary_conditions : BoundaryConditions, grid : list, system : SoEq = None, 
+    def predict(boundary_conditions : BoundaryConditions, grid : list, system : SoEq = None, 
                 system_file : str = None, solver_kwargs : dict = {'model' : None, 'use_cache' : True}):
         solver_kwargs['dim'] = len(global_var.grid_cache.get_all()[1])
-        solver_kwargs['dim']
+        # solver_kwargs['dim']
         
         if system is not None:
             print('Using explicitly sent system of equations.')
@@ -547,4 +536,5 @@ class epde_search(object):
         
         adapter = SolverAdapter()
         solution_model = adapter.solve(grid = grid, boundary_conditions = boundary_conditions)
+        
         

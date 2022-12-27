@@ -35,15 +35,14 @@ if __name__ == '__main__':
     # for i in range(10000):
     epde_search_obj = epde_alg.epde_search(use_solver = False, dimensionality = dimensionality, boundary = 10,
                                            coordinate_tensors = [t,], verbose_params = {'show_moeadd_epochs' : True})    
-    
+    epde_search_obj.set_preprocessor(default_preprocessor_type='poly', preprocessor_kwargs={'use_smoothing' : False})
     popsize = 7
-    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=70)
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=100)
     trig_tokens = TrigonometricTokens(dimensionality = dimensionality)
     factors_max_number = {'factors_num' : [1, 2], 'probas' : [0.8, 0.2]}
     
     epde_search_obj.fit(data=[x, y], variable_names=['u', 'v'], max_deriv_order=(1,),
                         equation_terms_max_number=3, data_fun_pow = 1, additional_tokens=[trig_tokens,], 
-                        equation_factors_max_number=factors_max_number, deriv_method='poly', 
-                        eq_sparsity_interval=(1e-10, 1e-4),
-                        deriv_method_kwargs={'smooth': False, 'grid': [t, ]}, coordinate_tensors=[t, ])    
+                        equation_factors_max_number=factors_max_number,
+                        eq_sparsity_interval=(1e-10, 1e-4), coordinate_tensors=[t, ])    
     epde_search_obj.equation_search_results(only_print = True, level_num = 1)
