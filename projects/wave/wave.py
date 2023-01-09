@@ -57,7 +57,7 @@ if __name__ == "__main__":
         y = np.linspace(0, 0.2, u.shape[2])    
         grids = np.meshgrid(t, x, y, indexing = 'ij')
         
-        dimensionality = u.ndim - 1; boundary = 20
+        dimensionality = u.ndim - 1; boundary = 30
     
         paretos = []
         exp_num = 1
@@ -66,23 +66,24 @@ if __name__ == "__main__":
                                                    coordinate_tensors = grids, verbose_params = {'show_moeadd_epochs' : True})    
             
             popsize = 7
-            epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=100)
+            epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=40)
+            epde_search_obj.set_preprocessor(default_preprocessor_type='poly', 
+                                             preprocessor_kwargs={'use_smoothing' : False})
         
-            custom_grid_tokens = CacheStoredTokens(token_type = 'grid',
-                                                   # boundary = boundary,
-                                                   token_labels = ['t', 'x', 'y'],
-                                                   token_tensors={'t' : grids[0], 'x' : grids[1], 'y' : grids[2]},
-                                                   params_ranges = {'power' : (1, 1)},
-                                                   params_equality_ranges = None)
+            # custom_grid_tokens = CacheStoredTokens(token_type = 'grid',
+            #                                        # boundary = boundary,
+            #                                        token_labels = ['t', 'x', 'y'],
+            #                                        token_tensors={'t' : grids[0], 'x' : grids[1], 'y' : grids[2]},
+            #                                        params_ranges = {'power' : (1, 1)},
+            #                                        params_equality_ranges = None)
         
-            # trig_tokens = TrigonometricTokens(dimensionality = dimensionality)
-            factors_max_number = {'factors_num' : [1,], 'probas' : [1.]}
+            trig_tokens = TrigonometricTokens(dimensionality = dimensionality)
+            factors_max_number = {'factors_num' : [1, 2], 'probas' : [0.95, 0.05]}
             
             epde_search_obj.fit(data=[u, ], variable_names=['u',], max_deriv_order=(2, 2, 2),
-                                equation_terms_max_number=4, data_fun_pow = 1, additional_tokens=[custom_grid_tokens,], #trig_tokens, 
-                                equation_factors_max_number = factors_max_number, deriv_method = 'poly', 
-                                eq_sparsity_interval=(1e-10, 1e-1),
-                                deriv_method_kwargs={'smooth': False, 'grid': grids}, coordinate_tensors=grids)
+                                equation_terms_max_number=5, data_fun_pow = 1, additional_tokens=[trig_tokens,], #custom_grid_tokens 
+                                equation_factors_max_number = factors_max_number, 
+                                eq_sparsity_interval=(1e-10, 1e-4), coordinate_tensors=grids)
             paretos.append(epde_search_obj.equation_search_results(only_print = False, level_num = 1))
     #     return paretos
     

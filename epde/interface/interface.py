@@ -519,7 +519,7 @@ class epde_search(object):
         else:
             return None, global_var.tensor_cache
 
-    def predict(boundary_conditions : BoundaryConditions, grid : list, system : SoEq = None, 
+    def predict(self, system : SoEq, boundary_conditions : BoundaryConditions, grid : list = None, 
                 system_file : str = None, solver_kwargs : dict = {'model' : None, 'use_cache' : True}):
         solver_kwargs['dim'] = len(global_var.grid_cache.get_all()[1])
         # solver_kwargs['dim']
@@ -534,7 +534,10 @@ class epde_search(object):
         else:
             raise ValueError('Missing system, that was not passed in any form.')
         
-        adapter = SolverAdapter()
-        solution_model = adapter.solve(grid = grid, boundary_conditions = boundary_conditions)
+        if grid is None:
+            grid = global_var.grid_cache.get_all()[1]
         
-        
+        adapter = SolverAdapter(var_number = len(system.vars_to_describe))
+        solution_model = adapter.solve_epde_system(system = system, grids = grid, 
+                                                   boundary_conditions = boundary_conditions)
+        return solution_model(adapter.convert_grid(grid)).detach().numpy()
