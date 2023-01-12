@@ -26,7 +26,7 @@ def Get_cheb_for_point(matrix, axis, idx, grid, max_der_order = 3, points = 9, p
             x_raw = x_raw.take(idx[i], axis = 1)     
             
     # print(idx)
-    # print(x_raw, I, F)
+    # print(x_raw, I, F, max_power)
     poly = np.polynomial.chebyshev.Chebyshev.fit(x_raw, F, max_power)
     return x_raw[int(x_raw.size/2.)], poly
 

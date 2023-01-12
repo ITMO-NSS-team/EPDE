@@ -8,7 +8,84 @@ Created on Thu Feb 13 16:33:34 2020
 
 import numpy as np
 import copy
+import torch
+device = torch.device('cpu')
+
 from functools import reduce
+
+def train_ann(grids : list, data : np.ndarray, epochs_max : int = 10000):
+    dim = 1 if np.any([s == 1 for s in data.shape]) and data.ndim == 2 else data.ndim
+    assert len(grids) == dim, 'Dimensionality of data does not match with passed grids.'
+    data_size = data.size
+    
+    model = torch.nn.Sequential(
+                                torch.nn.Linear(dim, 256),
+                                torch.nn.Tanh(),
+                                torch.nn.Linear(256, 64),
+                                torch.nn.Tanh(),       
+                                torch.nn.Linear(64, 64),
+                                torch.nn.Tanh(),
+                                torch.nn.Linear(64, 1024),
+                                torch.nn.Tanh(),
+                                torch.nn.Linear(1024, 1)
+                                )
+
+    data_grid = np.stack([grid.reshape(-1) for grid in grids])
+    grid_tensor = torch.from_numpy(data_grid).float().T
+    grid_tensor.to(device)
+    data = torch.from_numpy(data.reshape(-1, 1)).float()
+    print(data.size)
+    data.to(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
+
+    batch_frac = 0.5; batch_size = int(data_size * batch_frac) # or whatever
+    
+    t=0
+
+    print('grid_flattened.shape', grid_tensor.shape, 'field.shape', data.shape)
+    
+    loss_mean=1000
+    min_loss=np.inf
+    while loss_mean>1e-2: # and t<epochs_max:
+    
+        permutation = torch.randperm(grid_tensor.size()[0])
+        
+        loss_list=[]
+        
+        for i in range(0,grid_tensor.size()[0], batch_size):
+            optimizer.zero_grad()
+    
+            indices = permutation[i:i+batch_size]
+            batch_x, batch_y = grid_tensor[indices], data[indices]
+            loss = torch.mean(torch.abs(batch_y-model(batch_x)))
+    
+            loss.backward()
+            optimizer.step()
+            loss_list.append(loss.item())
+        loss_mean=np.mean(loss_list)
+        if loss_mean<min_loss:
+            best_model=model
+            min_loss=loss_mean
+        print('Surface training t={}, loss={}'.format(t,loss_mean))
+        t+=1    
+
+    return best_model
+
+def use_ann_to_predict(model, recalc_grids : list):
+    data_grid = np.stack([grid.reshape(-1) for grid in recalc_grids])
+    recalc_grid_tensor = torch.from_numpy(data_grid).float().T
+    recalc_grid_tensor.to(device)
+    
+    return model(recalc_grid_tensor).detach().numpy().reshape(recalc_grids[0].shape)
+
+def np_cartesian_product(*arrays):
+    print(arrays)
+    la = len(arrays)
+    dtype = np.result_type(*arrays)
+    arr = np.empty([len(a) for a in arrays] + [la], dtype=dtype)
+    for i, a in enumerate(np.ix_(*arrays)):
+        arr[...,i] = a
+    return arr.reshape(-1, la)
 
 def flatten(obj):
     '''

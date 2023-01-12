@@ -171,17 +171,3 @@ class L2Fitness(CompoundOperator):
 #             fig = plt.figure()
 #             plt.scatter(self.training_grid.reshape(-1), solution.reshape(-1), color = 'r')
 #             plt.scatter(self.training_grid.reshape(-1), data.reshape(-1), color = 'k')            
-#             plt.show()        
-            
-#     def set_training_grid(self):
-#         keys, training_grid = global_var.grid_cache.get_all()
-#         assert len(keys) == training_grid[0].ndim, 'Mismatching dimensionalities'
-#         training_grid = np.array(training_grid).reshape((len(training_grid), -1))
-#         self.training_grid = torch.from_numpy(training_grid).T.type(torch.FloatTensor)
-#         self.device = torch.device('cpu')
-#         self.training_grid.to(self.device)     
-#         self.training_grid_set = True
-#         # Возможная проблема, когда подаётся тензор со значениями коэфф-тов перед производными
-        
-#     def use_default_tags(self):
-#         self._tags = {'fitness evaluation', 'gene level', 'contains suboperators', 'inplace'}        

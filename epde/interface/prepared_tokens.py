@@ -102,6 +102,7 @@ class ExternalDerivativesTokens(CustomTokens):
                  params_equality_ranges : Union[None, dict], dimensionality : int = 1,
                  unique_specific_token=True, unique_token_type=True, meaningful = False):
         deriv_method_kwargs['max_order'] = max_orders
+        # TODO: rewrite preprocessing of external derivatives
         data_tensor, derivs_tensor = Preprocess_derivatives(token_tensor, method = deriv_method, 
                                                           method_kwargs = deriv_method_kwargs)
         deriv_names, deriv_orders = Define_Derivatives(base_token_label, dimensionality=token_tensor.ndim, 

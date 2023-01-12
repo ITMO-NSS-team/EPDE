@@ -51,21 +51,6 @@ class ResetEquationStatus():
                         result.reset_state(self.reset_right_part)
                     except AttributeError:
                         pass              
-                
-                # print(f'result in resetter: {result}')
-                # try:
-                #     for equation in result:
-                #         try: 
-                #             print(f'Here I must reset state of {equation}')
-                #             equation.reset_state(self.reset_right_part)
-                #         except AttributeError:
-                #             pass
-                # except TypeError:
-                #     try:
-                #         print(f'Here I must reset state of {result}')
-                #         result.reset_state(self.reset_right_part)
-                #     except AttributeError:
-                #         pass                    
             return result
         return wrapper
                 

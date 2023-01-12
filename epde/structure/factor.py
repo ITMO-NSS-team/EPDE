@@ -8,10 +8,11 @@ Created on Thu Mar  5 13:16:43 2020
 
 import numpy as np
 import copy
+import torch
 
 from epde.structure.Tokens import TerminalToken
 import epde.globals as global_var
-from epde.supplementary import factor_params_to_str
+from epde.supplementary import factor_params_to_str, train_ann, use_ann_to_predict
 
 class Factor(TerminalToken):
     __slots__ = ['_params', '_params_description', '_hash_val',
@@ -43,13 +44,24 @@ class Factor(TerminalToken):
             if self.status['requires_grid']:
                 self.use_grids_cache()
 
+    @property
+    def ann_representation(self) -> torch.nn.modules.container.Sequential:
+        try:
+            return self._ann_repr
+        except AttributeError:
+            self._ann_repr = train_ann(grids = global_var.grid_cache.get_all(), data = self.evaluate())
+            return self._ann_repr
+
+    def predict_with_ann(self, grids : list):
+        return use_ann_to_predict(self.ann_representation, grids)
+    
     def reset_saved_state(self):
         self.saved = {'base' : False, 'structural' : False}
-
+    
     @property
     def status(self):
         return self._status
-
+    
     @status.setter
     def status(self, status_dict):
         '''
@@ -123,22 +135,27 @@ class Factor(TerminalToken):
     def set_evaluator(self, evaluator):
         self._evaluator = evaluator
     
-    def evaluate(self, structural = False): # Переработать/удалить __call__, т.к. его функции уже тут
+    def evaluate(self, structural = False, grids = None): # Переработать/удалить __call__, т.к. его функции уже тут
         assert self.cache_linked
+        if self.is_deriv and grids is not None:
+            raise Exception('Derivatives have to evaluated on the initial grid')
+        
         key = 'structural' if structural else 'base'
-        if self.saved[key]:
+        if self.saved[key] and grids is None:
             return global_var.tensor_cache.get(self.cache_label,
                                                structural = structural)
         else:
-            value = self._evaluator.apply(self)
-            if key == 'structural' and self.status['structural_and_defalut_merged']:
-                global_var.tensor_cache.use_structural(use_base_data = True)
-            elif key == 'structural' and not self.status['structural_and_defalut_merged']:
-                global_var.tensor_cache.use_structural(use_base_data = False, 
-                                                       label = self.cache_label,
-                                                       replacing_data = value)            
-            else:
-                self.saved[key] = global_var.tensor_cache.add(self.cache_label, value, structural = False)
+            value = self._evaluator.apply(self, structural = structural, grids = grids)
+            if grids is None:
+                if key == 'structural' and self.status['structural_and_defalut_merged']:
+                    global_var.tensor_cache.use_structural(use_base_data = True)
+                elif key == 'structural' and not self.status['structural_and_defalut_merged']:
+                    global_var.tensor_cache.use_structural(use_base_data = False,
+                                                           label = self.cache_label,
+                                                           replacing_data = value)
+                else:
+                    self.saved[key] = global_var.tensor_cache.add(self.cache_label, value,
+                                                                  structural = False)
             return value
 
     @property

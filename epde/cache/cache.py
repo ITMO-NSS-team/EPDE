@@ -116,14 +116,20 @@ class Cache(object):
         
 
     def use_structural(self, use_base_data = True, label = None, replacing_data = None):
+        # print(f'Setting structural data for {label}, for it: {use_base_data} - use_base_data')
         assert use_base_data or not type(replacing_data) == type(None), 'Structural data must be declared with base data or by additional tensors.'
         if type(label) == type(None):        
 #            self.structural_used = True
             if use_base_data:
                 self.memory_structural = {key:val for key, val in self.memory_default.items()}
                 try:
-                    for key in self.structural_and_base_merged.keys():
-                        self.structural_and_base_merged[key] = True
+                    if not all([key in list(self.structural_and_base_merged.keys()) 
+                                for key in self.memory_structural.keys()]):
+                        for key in self.memory_structural.keys():
+                            self.structural_and_base_merged[key] = True                        
+                    else:
+                        for key in self.structural_and_base_merged.keys():
+                            self.structural_and_base_merged[key] = True
                 except AttributeError:
                     self.structural_and_base_merged = {}
                     for key in self.memory_structural.keys():
@@ -222,6 +228,7 @@ class Cache(object):
             Additional regression in the search process, run on the structural data, is required to set the 
             increment_structral tensor. ToDo!
         '''
+        raise DeprecationWarning('No need to change variables in current version of EPDE.')
         assert not (increment_structral is None and not all(self.structural_and_base_merged)), 'Not all structural data taken from the default, and the increment for structural was not sent' 
         random_key = list(self.memory_default.keys())[0]
         increment = np.reshape(increment, newshape=self.memory_default[random_key].shape)
@@ -310,6 +317,9 @@ class Cache(object):
             try:
                 return self.memory_default[label] if self.structural_and_base_merged[label] else self.memory_structural[label]
             except KeyError:
+                print('structural', structural)
+                print('self.structural_and_base_merged', self.structural_and_base_merged.keys())
+                print('self.memory_default', self.memory_default.keys())
                 if self.structural_and_base_merged[label]:
                     print('memory keys (structural data taken from the default): ', self.memory_default.keys())
                 else:

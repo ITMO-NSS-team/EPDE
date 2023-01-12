@@ -7,6 +7,9 @@ Created on Fri Mar  5 13:41:07 2021
 """
 
 import numpy as np
+import torch
+device = torch.device('cpu')
+
 from abc import ABC
 from typing import Callable, Union
 
@@ -17,7 +20,7 @@ class EvaluatorTemplate(ABC):
     def __init__(self):
         pass
     
-    def __call__(self, factor, structural : bool = False, **kwargs):
+    def __call__(self, factor, structural : bool = False, grids : list = None, **kwargs):
         raise NotImplementedError('Trying to call the method of an abstract class')
 
 class CustomEvaluator(EvaluatorTemplate):
@@ -32,7 +35,7 @@ class CustomEvaluator(EvaluatorTemplate):
         self.use_factors_grids = use_factors_grids
         self.eval_fun_params_labels = eval_fun_params_labels
         
-    def __call__(self, factor, structural : bool = False, **kwargs):
+    def __call__(self, factor, structural : bool = False, grids : list = None, **kwargs):
         if not self.single_function_token and factor.label not in self.evaluation_functions.keys():
             raise KeyError('The label of the token function does not match keys of the evaluator functions')
         if self.single_function_token:
@@ -46,20 +49,22 @@ class CustomEvaluator(EvaluatorTemplate):
                 if param_descr['name'] == key: eval_fun_kwargs[key] = factor.params[param_idx]
         
         grid_function = np.vectorize(lambda args: evaluation_function(*args, **eval_fun_kwargs))
-                                     
+               
+        if grids is None:                      
+            grids = factor.grids
+        
         try:
             self.indexes_vect
         except AttributeError:
-            self.indexes_vect = np.empty_like(factor.grids[0], dtype = object)
-            for tensor_idx, _ in np.ndenumerate(factor.grids[0]):
+            self.indexes_vect = np.empty_like(grids[0], dtype = object)
+            for tensor_idx, _ in np.ndenumerate(grids[0]):
                 self.indexes_vect[tensor_idx] = tuple([grid[tensor_idx]
-                                                        for grid in factor.grids])
+                                                        for grid in grids])
 
         value = grid_function(self.indexes_vect)
         return value
-        
 
-def simple_function_evaluator(factor, structural : bool = False, **kwargs):
+def simple_function_evaluator(factor, structural : bool = False, grids = None, **kwargs):
     '''
 
     Example of the evaluator of token values, that can be used for uploading values of stored functions from cache. Cases, when 
@@ -85,14 +90,24 @@ def simple_function_evaluator(factor, structural : bool = False, **kwargs):
     for param_idx, param_descr in factor.params_description.items():
         if param_descr['name'] == 'power': power_param_idx = param_idx
         
-    if factor.params[power_param_idx] == 1:
-        value = global_var.tensor_cache.get(factor.cache_label, structural = structural)
-        return value
-    else:
-        value = global_var.tensor_cache.get(factor_params_to_str(factor, set_default_power = True, power_idx = power_param_idx), 
-                                            structural = structural)
+    if grids is not None:
+        base_val = global_var.tensor_cache.get(factor.cache_label, structural = structural)
+        # original_grids = factor.grids
+        # factor_model = train_ann(grids = original_grids, data = base_val)
+        
+        value = factor.predict_with_ann(grids)
         value = value**(factor.params[power_param_idx])
-        return value
+        return value        
+        
+    else:
+        if factor.params[power_param_idx] == 1:
+            value = global_var.tensor_cache.get(factor.cache_label, structural = structural)
+            return value
+        else:
+            value = global_var.tensor_cache.get(factor_params_to_str(factor, set_default_power = True, power_idx = power_param_idx), 
+                                                structural = structural)
+            value = value**(factor.params[power_param_idx])
+            return value
 
 trig_eval_fun = {'cos' : lambda *grids, **kwargs: np.cos(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power'], 
                  'sin' : lambda *grids, **kwargs: np.sin(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power']}
@@ -102,8 +117,7 @@ def const_eval_fun(*grids, **kwargs):
     return np.full_like(a = grids[0], fill_value = kwargs['value'])
 
 def const_grad_fun(*grids, **kwargs):
-    return np.ones_like(a = grids[0])
-
+    return np.zeros_like(a = grids[0])
 
 def velocity_heating_eval_fun(*grids, **kwargs):
     '''

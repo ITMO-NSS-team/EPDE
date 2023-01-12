@@ -125,8 +125,9 @@ class RandomRHPSelector(CompoundOperator):
                 idx = np.random.choice(term_selection)
 
             objective.target_idx = idx
+            # print('Selected right part term', objective.structure[idx].name)
             objective.reset_explaining_term(idx)
-            objective.right_part_selected = True                
+            objective.right_part_selected = True
 
 
     def use_default_tags(self):

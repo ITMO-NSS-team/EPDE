@@ -47,13 +47,13 @@ class EvaluatorContained(object):
         # if deriv_eval_function is not None: self._deriv_evaluator = deriv_eval_function
         self.eval_kwargs_keys = eval_kwargs_keys
         
-    def apply(self, token, structural = False, **kwargs):
+    def apply(self, token, structural = False, grids = None, **kwargs):
         """
         Apply the defined evaluator to evaluate the token with specific parameters.
         
         Parameters:
         ----------
-        token_label : string
+        token : epde.main_structures.factor.Factor
             symbolic label of the specific token, e.g. 'cos';
         
         token_params : dict
@@ -67,7 +67,7 @@ class EvaluatorContained(object):
         
         """
         assert list(kwargs.keys()) == self.eval_kwargs_keys
-        return self._evaluator(token, structural, **kwargs)
+        return self._evaluator(token, structural, grids, **kwargs)
             
 
 class TokenFamily(object):
