@@ -26,8 +26,8 @@ if __name__ == '__main__':
     '''
     epde_search_obj = epde_alg.epde_search(use_solver = False, dimensionality = dimensionality, boundary = 10,
                                            coordinate_tensors = [t,], verbose_params = {'show_moeadd_epochs' : True})    
-    epde_search_obj.set_preprocessor(default_preprocessor_type='poly', 
-                                     preprocessor_kwargs={'use_smoothing' : False})
+    epde_search_obj.set_preprocessor(default_preprocessor_type='spectral', 
+                                     preprocessor_kwargs={})
     popsize = 7
     epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=100)
     trig_tokens = TrigonometricTokens(dimensionality = dimensionality)
@@ -55,4 +55,4 @@ if __name__ == '__main__':
     '''
     Решаем уравнение (систему уравнений) при помощи метода .predict(...)
     '''
-    predictions = epde_search_obj.predict(system = sys, boundary_conditions=None)
+    # predictions = epde_search_obj.predict(system = sys, boundary_conditions=None)

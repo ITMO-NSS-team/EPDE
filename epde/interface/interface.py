@@ -317,6 +317,8 @@ class epde_search(object):
                 setup.build_ANN_preprocessing(**preprocessor_kwargs)
             elif default_preprocessor_type == 'poly':
                 setup.build_poly_diff_preprocessing(**preprocessor_kwargs)
+            elif default_preprocessor_type == 'spectral':
+                setup.build_spectral_preprocessing(**preprocessor_kwargs)
             else:
                 raise NotImplementedError('Incorrect default preprocessor type. Only ANN or poly are allowed.')
             preprocessor_pipeline = setup.builder.prep_pipeline

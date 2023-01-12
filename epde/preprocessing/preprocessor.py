@@ -47,14 +47,14 @@ class ConcretePrepBuilder(GeneralizedPrepBuilder):
         self.output_tests = tests
         
     def set_smoother(self, smoother, *args, **kwargs):
-        self._prep_pipeline.smoother = smoother
+        self._prep_pipeline.smoother = smoother()
         self._prep_pipeline.smoother_args = args
         self._prep_pipeline.smoother_kwargs = kwargs
         if self.deriv_calc_set and self.smoother_set:
             self.check_preprocessing_correctness()
         
     def set_deriv_calculator(self, deriv_calculator, *args, **kwargs):
-        self._prep_pipeline.deriv_calculator = deriv_calculator
+        self._prep_pipeline.deriv_calculator = deriv_calculator()
         self._prep_pipeline.deriv_calculator_args = args
         self._prep_pipeline.deriv_calculator_kwargs = kwargs
         if self.deriv_calc_set and self.smoother_set:

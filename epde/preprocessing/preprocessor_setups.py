@@ -6,8 +6,8 @@ Created on Tue Jul 19 20:13:46 2022
 @author: maslyaev
 """
 
-from epde.preprocessing.smoothers import gaussian, ann_smoother, placeholder_smoother
-from epde.preprocessing.deriv_calculators import adaptive_finite_difference, polynomial_diff
+from epde.preprocessing.smoothers import GaussianSmoother, ANNSmoother, PlaceholderSmoother
+from epde.preprocessing.deriv_calculators import AdaptiveFiniteDeriv, PolynomialDeriv, SpectralDeriv
 
 from epde.preprocessing.preprocessor import ConcretePrepBuilder
 
@@ -32,9 +32,20 @@ class PreprocessorSetup:
         deriv_calculator_args = ()
         deriv_calculator_kwargs = {'grid' : None}
         
-        self.builder.set_smoother(ann_smoother, *smoother_args, **smoother_kwargs)
-        self.builder.set_deriv_calculator(adaptive_finite_difference, *deriv_calculator_args, 
+        self.builder.set_smoother(ANNSmoother, *smoother_args, **smoother_kwargs)
+        self.builder.set_deriv_calculator(AdaptiveFiniteDeriv, *deriv_calculator_args, 
                                           **deriv_calculator_kwargs)
+        
+    def build_spectral_preprocessing(self, n = None, steepness = 1):
+        smoother_args = ()
+        smoother_kwargs = {}
+        
+        deriv_calculator_args = ()
+        deriv_calculator_kwargs = {'grid' : None, 'n' : n, 'steepness' : steepness}
+        
+        self.builder.set_smoother(PlaceholderSmoother, *smoother_args, **smoother_kwargs)
+        self.builder.set_deriv_calculator(SpectralDeriv, *deriv_calculator_args, 
+                                          **deriv_calculator_kwargs)        
         
     def build_poly_diff_preprocessing(self, use_smoothing = True, sigma = 1, mp_poolsize = 4, 
                                       polynomial_window = 9, poly_order = None):
@@ -45,10 +56,13 @@ class PreprocessorSetup:
         deriv_calculator_kwargs = {'grid' : None, 'mp_poolsize' : mp_poolsize, 'polynomial_window' : polynomial_window,
                                    'poly_order' : poly_order}
         
-        smoother = gaussian if use_smoothing else placeholder_smoother
+        smoother = GaussianSmoother if use_smoothing else PlaceholderSmoother
         self.builder.set_smoother(smoother, *smoother_args, **smoother_kwargs)
-        self.builder.set_deriv_calculator(polynomial_diff, *deriv_calculator_args,
+        self.builder.set_deriv_calculator(PolynomialDeriv, *deriv_calculator_args,
                                           **deriv_calculator_kwargs)
+        
+    # def build_spectral_deriv_preprocessing(self, *args, **kwargs):
+    #     pass
     
     # def build_with_custom_deriv()
     

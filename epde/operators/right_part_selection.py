@@ -103,7 +103,7 @@ class RandomRHPSelector(CompoundOperator):
     '''
     @History_Extender('\n -> The equation structure was detected: ', 'a')
     def apply(self, objective : Equation, arguments : dict):
-        print(f'CALLING RIGHT PART SELECTOR FOR {objective.text_form}')
+        # print(f'CALLING RIGHT PART SELECTOR FOR {objective.text_form}')
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
         if not objective.right_part_selected:
