@@ -1,0 +1,10 @@
+{
+"StopCriterion":{
+"eps":1e-6,
+"tmin":1000,
+"tmax":1e5 ,
+"patience":5,
+"loss_oscillation_window":100,
+"no_improvement_patience":1000   	
+}
+}
