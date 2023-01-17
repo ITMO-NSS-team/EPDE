@@ -3,8 +3,8 @@ import torch
 import numpy as np
 
 
-from TEDEouS.points_type import Points_type
-from TEDEouS.finite_diffs import Finite_diffs
+from epde.solver.points_type import Points_type
+from epde.solver.finite_diffs import Finite_diffs
 
 
 

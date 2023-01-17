@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 
-from TEDEouS.points_type import Points_type
+from epde.solver.points_type import Points_type
 flatten_list = lambda t: [item for sublist in t for item in sublist]
 
 class DerivativeInt():

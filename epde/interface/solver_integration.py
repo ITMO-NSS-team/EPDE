@@ -18,8 +18,8 @@ from functools import singledispatchmethod, singledispatch
 from epde.structure.main_structures import Equation, SoEq
 import epde.globals as global_var
 
-from TEDEouS.input_preprocessing import Equation as SolverEquation
-import TEDEouS.solver as solver
+from epde.solver.input_preprocessing import Equation as SolverEquation
+import epde.solver.solver as solver
 
 class PregenBOperator(object):
     def __init__(self, system : SoEq, system_of_equation_solver_form : list):

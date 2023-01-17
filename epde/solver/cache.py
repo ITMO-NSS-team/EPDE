@@ -11,8 +11,8 @@ import os
 import glob
 import numpy as np
 
-from TEDEouS.metrics import Solution
-from TEDEouS.input_preprocessing import Equation, EquationMixin
+from epde.solver.metrics import Solution
+from epde.solver.input_preprocessing import Equation, EquationMixin
 
 class Model_prepare(Solution):
     def __init__(self, grid, equal_cls, model, mode):

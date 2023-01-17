@@ -3,7 +3,7 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
-from TEDEouS.cache import Model_prepare
+from epde.solver.cache import Model_prepare
 import os
 import sys
 import datetime

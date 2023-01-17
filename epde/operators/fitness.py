@@ -171,3 +171,4 @@ class L2Fitness(CompoundOperator):
 #             fig = plt.figure()
 #             plt.scatter(self.training_grid.reshape(-1), solution.reshape(-1), color = 'r')
 #             plt.scatter(self.training_grid.reshape(-1), data.reshape(-1), color = 'k')            
+#             plt.show()
