@@ -66,11 +66,11 @@ class LASSOSparsity(CompoundOperator):
         _, target, features = objective.evaluate(normalize = True, return_val = False)
         self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)
 
-        target = np.multiply(target, self.g_fun_vals)
-        g_fun_casted = np.broadcast_to(self.g_fun_vals, features.T.shape).T
-        features = np.multiply(features, g_fun_casted)
+        # target = np.multiply(target, self.g_fun_vals)
+        # g_fun_casted = np.broadcast_to(self.g_fun_vals, features.T.shape).T
+        # features = np.multiply(features, g_fun_casted)
 
-        estimator.fit(features, target)
+        estimator.fit(features, target, sample_weight = self.g_fun_vals)
         # print(f'LASSO estimator coefficients: {estimator.coef_}')
         objective.weights_internal = estimator.coef_
 

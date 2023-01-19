@@ -87,7 +87,7 @@ def parse_params_str(param_str):
         params_parsed[temp[0]] = float(temp[1]) if '.' in temp[1] else int(temp[1])
     return params_parsed
 
-class Coeff_less_equation():
+class CoefflessEquation():
     def __init__(self, lp_terms : Union[list, tuple], rp_term : Union[list, tuple], pool):
         self.lp_terms_translated = [Term(pool, passed_term = [parse_factor(factor, pool) for factor in term]) for term in lp_terms]
         self.rp_translated = Term(pool, passed_term = [parse_factor(factor, pool) for factor in rp_term])
