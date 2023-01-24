@@ -140,21 +140,29 @@ class SpectralDeriv(AbstractDeriv):
         frequencies_filtered = self.butterworth_filter(frequencies, n, steepness)
         return np.real(np.fft.irfft(1j * 2 * np.pi * frequencies_filtered * func_projection_filtered))
     
-    def spectral_derivative_nd(self, func : np.ndarray, grid : list, n = None, steepness = 1, 
+def spectral_derivative_nd(self, func : np.ndarray, grid : list, n = None, steepness = 1, 
                                deriv_hist : list = []):
-        '''Многомерная спектральная производная,принимает на вход количество частот по каждой размерности и крутизну для фильтра Баттерворта, если они не указаны-фильтрация не производится'''
+    '''Многомерная спектральная производная,принимает на вход количество частот по каждой размерности и крутизну для фильтра Баттерворта, если они не указаны-фильтрация не производится'''
 
-        if isinstance(n, int) or isinstance(n, type(None)):
-            n = np.full(shape=len(self.grid), fill_value=n)
-        all_dim_derivative = []
-        # inverter = lambda x: 1 if x == 0 else (x if x != 1 else 0)
+    if isinstance(n, int):
+        n = np.full(shape=len(grid), fill_value=n)
+    if isinstance(n, type(None)):
+        n = np.min(func.shape)
+    all_dim_derivative = []
+    func_projection = np.fft.fftn(func, axes=[0,1])
+    print(func_projection.shape)
+    inverter = lambda x: 1 if x == 0 else (x if x != 1 else 0)
         
-        for counter, i in enumerate(self.grid):
-            deriv_descr = tuple(sorted(deriv_hist + [counter,])) # inverter(counter)
-            derivative = np.apply_along_axis(self.spectral_derivative_1d, counter, self.func, 
-                                             i, n[counter], steepness)
-            all_dim_derivative.append((deriv_descr, derivative))
-        return all_dim_derivative
+    for counter, i in enumerate(grid):
+        spacing_vector = np.reshape(grid[counter], (1, grid[counter].size))
+        frequencies = np.fft.fftfreq(spacing_vector.size, d=(spacing_vector[0][1] - spacing_vector[0][0]))
+        print(frequencies)
+        frequencies_filtered = self.butterworth_filter(frequencies, n, steepness)
+        deriv_descr = tuple(sorted(deriv_hist + [counter,])) # inverter(counter)
+        derivative = np.apply_along_axis(np.multiply, counter, func_projection, frequencies_filtered)
+        derivative = np.real(np.fft.ifftn(derivative*1j * 2 * np.pi))
+        all_dim_derivative.append((deriv_descr, derivative))
+    return all_dim_derivative
     
     def differentiate(self, field : np.ndarray, grid : list, max_order : Union[int, list], 
                       mixed : bool = False, n = None, steepness = 1, deriv_hist : list = []) -> list:
