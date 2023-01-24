@@ -12,6 +12,12 @@ from typing import Callable, Union
 from types import FunctionType
 
 VAL_TYPES = Union[FunctionType, int, float, torch.Tensor, np.ndarray]
+BASE_SOLVER_PARAMS = {'lambda_bound' : 10, 'verbose' : False,
+                      'learning_rate' : 1e-3, 'eps' : 1e-5, 'tmin' : 1000,
+                      'tmax' : 1e5, 'use_cache' : True, 'cache_verbose' : True, 
+                      'save_always' : False, 'print_every' : None, 
+                      'model_randomize_parameter' : 1e-6, 'step_plot_print' : False, 
+                      'step_plot_save' : False, 'image_save_dir' : None}
 
 from functools import singledispatchmethod, singledispatch
 
@@ -433,12 +439,7 @@ class SolverAdapter(object):
         self.model = model
 
         self._solver_params = dict()
-        _solver_params = {'lambda_bound' : 10, 'verbose' : False,
-                          'learning_rate' : 1e-3, 'eps' : 1e-5, 'tmin' : 1000,
-                          'tmax' : 1e5, 'use_cache' : use_cache, 'cache_verbose' : True, 
-                          'save_always' : False, 'print_every' : None, 
-                          'model_randomize_parameter' : 1e-6, 'step_plot_print' : False, 
-                          'step_plot_save' : False, 'image_save_dir' : None}
+        _solver_params = BASE_SOLVER_PARAMS
 
         self.set_solver_params(**_solver_params)
         self.use_cache = use_cache

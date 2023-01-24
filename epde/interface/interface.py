@@ -38,7 +38,7 @@ from epde.interface.type_checks import *
 from epde.interface.prepared_tokens import PreparedTokens, CustomTokens
 from epde.interface.solver_integration import BoundaryConditions, SolverAdapter
 
-class Input_data_entry(object):
+class InputDataEntry(object):
     def __init__(self, var_name : str, data_tensor : np.ndarray):
         self.var_name = var_name
         check_nparray(data_tensor)
@@ -351,7 +351,7 @@ class epde_search(object):
         data_tokens = []
         for data_elem_idx, data_tensor in enumerate(data):
             assert isinstance(data_tensor, np.ndarray), 'Input data must be in format of numpy ndarrays or iterable (list or tuple) of numpy arrays'
-            entry = Input_data_entry(var_name = variable_names[data_elem_idx],
+            entry = InputDataEntry(var_name = variable_names[data_elem_idx],
                                      data_tensor = data_tensor)
             derivs_tensor = derivs[data_elem_idx] if derivs is not None else None
             entry.set_derivatives(preprocesser=self.preprocessor_pipeline, deriv_tensors = derivs_tensor, 
