@@ -6,6 +6,9 @@ Created on Tue Jul 13 14:45:14 2021
 @author: mike_ubuntu
 """
 
+import os
+import sys
+
 import numpy as np
 import epde.interface.interface as epde_alg
 
