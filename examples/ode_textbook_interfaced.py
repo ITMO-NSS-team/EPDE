@@ -15,7 +15,7 @@ from epde.evaluators import CustomEvaluator
 if __name__ == '__main__':
 
     t = np.linspace(0, 4*np.pi, 1000)
-    u = np.load('/home/maslyaev/epde/EPDE/tests/system/Test_data/fill366.npy') # loading data with the solution of ODE
+    u = np.load('EPDE/tests/system/Test_data/fill366.npy') # loading data with the solution of ODE
     # Trying to create population for mulit-objective optimization with only 
     # derivatives as allowed tokens. Here only one equation structure will be 
     # discovered, thus MOO algorithm will not be launched.
