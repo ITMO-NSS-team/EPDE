@@ -223,15 +223,24 @@ class SpectralDeriv(AbstractDeriv):
         return derivatives
     
     def spectral_derivative_high_ord(self, func : np.ndarray, grid : list, axis : int = 0, 
-                                     max_order : int = 1, n : np.ndarray = None, steepness = 1) -> list:
+                                     max_order : int = 1, n = None, steepness = 1) -> list:
         derivs = []
         cur_deriv = func
+        func_projection = np.fft.fftn(func)
+        spacing_vector = np.reshape(grid[axis], (1, grid[axis].size))
+        frequencies = np.fft.fftfreq(spacing_vector.size, d=(spacing_vector[0][1] - spacing_vector[0][0]))
+        print(func_projection.shape) #marker
         # inverter = lambda x: 1 if x == 0 else (x if x != 1 else 0)
-        
-        for deriv_idx in range(max_order):
-            deriv_descr = tuple([axis,] * (deriv_idx + 1)) # inverter(axis) V
-            cur_deriv = np.apply_along_axis(self.spectral_derivative_1d, axis, cur_deriv, grid[axis], 
-                                            n[axis], steepness)
+        if isinstance(n, int):
+            n = np.full(shape=len(grid), fill_value=n)
+        if isinstance(n, type(None)):
+            n = np.min(func.shape)
+        frequencies_filtered = self.butterworth_filter(frequencies, n, steepness)
+        for deriv_idx in range(1,max_order+1):
+            deriv_descr = tuple([axis,] * (deriv_idx)) # inverter(axis) V
+            derivative = np.apply_along_axis(np.multiply, axis, func_projection,
+                                             np.power(frequencies_filtered*1j * 2 * np.pi, deriv_idx,dtype = complex))
+            cur_deriv= np.real(np.fft.ifftn(derivative))
             derivs.append((deriv_descr, cur_deriv))
             
         return derivs
