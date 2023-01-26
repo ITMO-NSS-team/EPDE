@@ -235,7 +235,7 @@ class SpectralDeriv(AbstractDeriv):
             n = np.full(shape=len(grid), fill_value=n)
         if isinstance(n, type(None)):
             n = np.min(func.shape)
-        frequencies_filtered = self.butterworth_filter(frequencies, n, steepness)
+        frequencies_filtered = self.butterworth_filter(frequencies, n[axis], steepness)
         for deriv_idx in range(1,max_order+1):
             deriv_descr = tuple([axis,] * (deriv_idx)) # inverter(axis) V
             derivative = np.apply_along_axis(np.multiply, axis, func_projection,
