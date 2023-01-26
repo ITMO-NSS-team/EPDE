@@ -9,7 +9,8 @@ Created on Thu Jun 17 13:58:18 2021
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
-from epde.operators.template import CompoundOperator
+import epde.globals as global_var
+from epde.operators.utils.template import CompoundOperator
 from epde.structure.main_structures import Equation
 
 class LinRegBasedCoeffsEquation(CompoundOperator):
@@ -69,9 +70,13 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
             estimator = LinearRegression(fit_intercept=False)
             if features.ndim == 1:
                 features = features.reshape(-1, 1)
-                estimator.fit(features, target_vals)
-            else:
-                estimator.fit(features, target_vals)
+                # estimator.fit(features, target_vals) #TODO
+            # else:
+            try:
+                self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)
+            except AttributeError:
+                self.g_fun_vals = None
+            estimator.fit(features, target_vals, sample_weight = self.g_fun_vals)
 
             valueable_weights = estimator.coef_
             weights = np.zeros(len(objective.structure))

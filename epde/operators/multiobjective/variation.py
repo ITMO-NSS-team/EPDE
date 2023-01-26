@@ -19,9 +19,9 @@ from epde.moeadd.moeadd import ParetoLevels
 from epde.supplementary import detect_similar_terms, flatten
 from epde.decorators import History_Extender, ResetEquationStatus
 
-from epde.operators.template import CompoundOperator, add_param_to_operator
+from epde.operators.utils.template import CompoundOperator, add_param_to_operator
 from epde.operators.moeadd_specific import get_basic_populator_updater
-from epde.operators.mutations import get_basic_mutation
+from epde.operators.multiobjective.mutations import get_basic_mutation
 
 
 class ParetoLevelsCrossover(CompoundOperator):
@@ -97,7 +97,6 @@ class ChromosomeCrossover(CompoundOperator):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
    
         assert objective[0].vals.same_encoding(objective[1].vals)
-        # offspring_1 = deepcopy(objective[0]); offspring_2 = deepcopy(objective[1])      
         offspring_1 = objective[0]; offspring_2 = objective[1]
                 
         eqs_keys = objective[0].vals.equation_keys; params_keys = objective[1].vals.params_keys
@@ -105,9 +104,6 @@ class ChromosomeCrossover(CompoundOperator):
             temp_eq_1, temp_eq_2 = self.suboperators['equation_crossover'].apply(objective = (objective[0].vals[eq_key],
                                                                                               objective[1].vals[eq_key]),
                                                                                  arguments = subop_args['equation_crossover'])
-            # print(f'PARENT 1: objective[0].vals[eq_key] is {objective[0].vals[eq_key].text_form}')
-            # print(f'PARENT 2: objective[1].vals[eq_key] is {objective[1].vals[eq_key].text_form}')            
-            # print(f'OFFSPRING: temp_eq_1.vals[eq_key] is {temp_eq_1.text_form}')
             objective[0].vals.replace_gene(gene_key = eq_key, value = temp_eq_1)
             offspring_2.vals.replace_gene(gene_key = eq_key, value = temp_eq_2)
             
@@ -121,8 +117,6 @@ class ChromosomeCrossover(CompoundOperator):
             objective[0].vals.pass_parametric_gene(key = param_key, value = temp_param_1)
             objective[1].vals.pass_parametric_gene(key = param_key, value = temp_param_2)
 
-        # print(f'OFFSPRING CROSSOVER: {[ind.text_form for ind in objective[0].vals]}')
-        # print(f'OFFSPRING CROSSOVER: {[ind.text_form for ind in objective[1].vals]}')
         return objective[0], objective[1]
 
     def use_default_tags(self):
@@ -142,7 +136,6 @@ class MetaparamerCrossover(CompoundOperator):
 
 
 class EquationCrossover(CompoundOperator):
-    # @ResetEquationStatus(reset_output = True)
     @History_Extender(f'\n -> performing equation crossover', 'ba')
     def apply(self, objective : tuple, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
@@ -164,7 +157,7 @@ class EquationCrossover(CompoundOperator):
             if check_uniqueness(objective[0].structure[i], objective[1].structure) and check_uniqueness(objective[1].structure[i], objective[0].structure):
                 objective[0].structure[i], objective[1].structure[i] = self.suboperators['term_crossover'].apply(objective = (objective[0].structure[i], 
                                                                                                                               objective[1].structure[i]),
-                                                                                                               arguments = subop_args['term_crossover'])
+                                                                                                                 arguments = subop_args['term_crossover'])
                 
         return objective[0], objective[1]
 
@@ -216,7 +209,6 @@ class TermParamCrossover(CompoundOperator):
         """
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
-        # offspring_1 = deepcopy(objective[0]); offspring_2 = deepcopy(objective[1])
         objective[0].reset_saved_state(); objective[1].reset_saved_state()
         
         if len(objective[0].structure) != len(objective[1].structure):

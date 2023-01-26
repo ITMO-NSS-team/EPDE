@@ -38,7 +38,7 @@ from epde.interface.type_checks import *
 from epde.interface.prepared_tokens import PreparedTokens, CustomTokens
 from epde.interface.solver_integration import BoundaryConditions, SolverAdapter
 
-class Input_data_entry(object):
+class InputDataEntry(object):
     def __init__(self, var_name : str, data_tensor : np.ndarray):
         self.var_name = var_name
         check_nparray(data_tensor)
@@ -81,6 +81,83 @@ def simple_selector(sorted_neighbors, number_of_neighbors = 4):
      
 
 class epde_search(object):
+    '''
+    
+    Intialization of the epde search object. Here, the user can declare the properties of the 
+    search mechainsm by defining evolutionary search strategy.
+    
+    Parameters:
+    --------------
+    
+    use_default_strategy : bool, optional
+        True (base and recommended value), if the default evolutionary strategy will be used, 
+        False if the user-defined strategy will be passed further. Otherwise, the search will 
+        not be conducted.
+        
+    director : OptimizationPatternDirector, optional
+        User-defined director, responsible for construction of multi-objective evolutionary optimization
+        strategy; shall not be interfered with unless for very specific tasks.
+        
+    director_params : dict, optional
+        Contains parameters for evolutionary operator builder / construction director, that
+        can be passed to individual operators. Keys shall be 'variation_params', 'mutation_params',
+        'pareto_combiner_params', 'pareto_updater_params'.
+        
+    time_axis : int, optional
+        Indicator of time axis in data and grids. Used in normalization for regressions.
+        
+    define_domain : bool, optional
+        Indicator, showing that if the domain will be set in the initialization of the search objects.
+        For more details view ``epde_search.set_domain_properties`` method.
+        
+    function_form : callable, optional
+        Auxilary function, used in the weak derivative definition. Default function is negative square function 
+        with maximum values in the center of the domain.
+        
+    boundary : int or tuple/list of integers, optional
+        Boundary width for the domain. Boundary points will be ignored for the purposes of equation discovery
+        
+    use_solver : bool, optional
+        Allow use of the automaic partial differential solver to evaluate fitness of the candidate solutions. 
+        
+    dimensionality : int, optional
+        Dimensionality of the problem. ! Currently you should pass value, reduced by one !
+    
+    verbose_params : dict, optional
+        Description, of algorithm details, that will be demonstrated to the user. Usual
+        
+    coordinate_tensors : list of np.ndarrays, optional
+        Values of the coordinates on the grid nodes with studied functions values. In case of 1D-problem, 
+        that will be ``numpy.array``, while the parameter for higher dimensionality problems can be set from 
+        ``numpy.meshgrid`` function. With None, the tensors will be created as ranges with step of 1 between 
+        nodes. Defalut value: None. 
+    
+    memory_for_cache : int or float, optional
+        Rough estimation of the memory, which can be used for cache of pre-evaluated tensors during the equation
+    
+    prune_domain : bool, optional
+        If ``True``, subdomains with no dynamics will be pruned from data. Default value: ``False``.
+        
+    pivotal_tensor_label : str, optional
+        Indicator, according to which token data will be pruned. Default value - ``'du/dt'``, where 
+        ``t`` is selected as a time axis from ``time_axis`` parameter.
+        
+    pruner : object, optional
+        Pruner object, which will remove subdomains with no dynamics i.e. with derivative 
+        identically equal to zero.
+    
+    threshold : float, optional
+        Pruner parameter, indicating the boundary of interval in which the pivotal tensor values are 
+        considered as zeros. Default value: 1e-2
+        
+    division_fractions : int, optional
+        Number of subdomains along each axis, defining the division of the domain for pruning.
+        Default value: 3
+    
+    rectangular: bool, optional
+        A line of subdomains along an axis can be removed if all values inside them are identical to zero.        
+    
+    '''    
     def __init__(self, use_default_strategy : bool = True, director = None, 
                  director_params : dict = {'variation_params' : {}, 'mutation_params' : {},
                                            'pareto_combiner_params' : {}, 'pareto_updater_params' : {}}, 
@@ -89,36 +166,7 @@ class epde_search(object):
                  coordinate_tensors = None, memory_for_cache = 5, prune_domain : bool = False, 
                  pivotal_tensor_label = None, pruner = None, threshold : float = 1e-2, 
                  division_fractions = 3, rectangular : bool = True):
-        '''
-        
-        Intialization of the epde search object. Here, the user can declare the properties of the 
-        search mechainsm by defining evolutionary search strategy.
-        
-        Parameters:
-        --------------
-        
-        use_default_strategy : bool, optional
-            True (base and recommended value), if the default evolutionary strategy will be used, 
-            False if the user-defined strategy will be passed further. Otherwise, the search will 
-            not be conducted.
-            
-        director_params : dict, optional
-            Contains parameters for evolutionary operator builder / construction director, that 
-            can be passed to individual operators. Keys shall be 'variation_params', 'mutation_params',
-            'pareto_combiner_params', 'pareto_updater_params'.
-            
-        eq_search_stop_criterion : epde.operators.ea_stop_criteria.Stop_condition object, optional
-            The stop condition for the evolutionary search of the equation. Default value 
-            represents loop over 300 evolutionary epochs.
-            
-        director : obj, optional
-            User-defined director, responsible for construction of evolutionary strategy; 
-            shall be declared for very specific tasks.
-        
-        equation_type : set of str, optional
-            Will define equation type, TBD later.
-        
-        '''
+
         global_var.set_time_axis(time_axis)
         global_var.init_verbose(**verbose_params)
         self.preprocessor_set = False
@@ -351,7 +399,7 @@ class epde_search(object):
         data_tokens = []
         for data_elem_idx, data_tensor in enumerate(data):
             assert isinstance(data_tensor, np.ndarray), 'Input data must be in format of numpy ndarrays or iterable (list or tuple) of numpy arrays'
-            entry = Input_data_entry(var_name = variable_names[data_elem_idx],
+            entry = InputDataEntry(var_name = variable_names[data_elem_idx],
                                      data_tensor = data_tensor)
             derivs_tensor = derivs[data_elem_idx] if derivs is not None else None
             entry.set_derivatives(preprocesser=self.preprocessor_pipeline, deriv_tensors = derivs_tensor, 
@@ -387,8 +435,7 @@ class epde_search(object):
     
     def fit(self, data : Union[np.ndarray, list, tuple], equation_terms_max_number = 6,
             equation_factors_max_number = 1, variable_names = ['u',], eq_sparsity_interval = (1e-4, 2.5), 
-            derivs = None, max_deriv_order = 1,
-            additional_tokens = [], coordinate_tensors = None, memory_for_cache = 5,
+            derivs = None, max_deriv_order = 1, additional_tokens = [], memory_for_cache = 5,
             prune_domain : bool = False, pivotal_tensor_label = None, pruner = None, 
             threshold : float = 1e-2, division_fractions = 3, rectangular : bool = True, 
             data_fun_pow : int = 1):
@@ -404,9 +451,6 @@ class epde_search(object):
             it can be passed as the numpy.ndarray or as the list/tuple with a single element;
             multiple variables are not supported yet, use older interfaces.
             
-        time_axis : int, optional,
-            Index of the axis in the data, representing time. Default value: 0.
-            
         equation_terms_max_number : int, optional,
             The maximum number of terms, present in the derived equations. Default value: 6.
             
@@ -416,8 +460,8 @@ class epde_search(object):
             
         variable_names : list of str, optional,
             Names of the independent variables, passed into search mechanism. Length of the list must correspond
-            to the number of np.ndarrays, sent with in ``data`` parameter. Defalut value: ``['u',]``, representing 
-            a single variable *u*.
+            to the number of np.ndarrays, sent with in ``data`` parameter. In case of system of differential equation discovery, 
+            all variables shall be named here. Defalut value: ``['u',]``, representing a single variable *u*.
             
         eq_sparsity_interval : tuple of two float values, optional,
             The left and right boundaries of interval with sparse regression values. Influence the number of 
@@ -436,12 +480,6 @@ class epde_search(object):
             Additional tokens, that would be used to construct the equations among the main variables and their 
             derivatives. Objects of this list must be of type ``epde.interface.token_family.TokenFamily`` or 
             of ``epde.interface.prepared_tokens.Prepared_tokens`` subclasses types. Default value: None.
-        
-        coordinate_tensors : list of np.ndarrays, optional
-            Values of the coordinates on the grid nodes with studied functions values. In case of 1D-problem, 
-            that will be ``numpy.array``, while the parameter for higher dimensionality problems can be set from 
-            ``numpy.meshgrid`` function. With None, the tensors will be created as ranges with step of 1 between 
-            nodes. Defalut value: None. 
             
         field_smooth : bool, optional
             Parameter, if the input variable fields shall be smoothed to avoid the errors. If the data is 
@@ -456,13 +494,10 @@ class epde_search(object):
             Maximum power of token,
             
         '''
-        # if equation_terms_max_number < self.moeadd_params['pop_size']:
-        #     self.moeadd_params['pop_size'] = equation_terms_max_number
-        #     self.moeadd_params['weights_num'] = equation_terms_max_number
         
         self.create_pool(data = data, variable_names=variable_names, 
-                         derivs=derivs, #method=deriv_method, method_kwargs=deriv_method_kwargs, 
-                         max_deriv_order=max_deriv_order, additional_tokens=additional_tokens, 
+                         derivs=derivs, max_deriv_order=max_deriv_order, 
+                         additional_tokens=additional_tokens, 
                          data_fun_pow=data_fun_pow)
         
         pop_constructor = SystemsPopulationConstructor(pool = self.pool, terms_number = equation_terms_max_number, 

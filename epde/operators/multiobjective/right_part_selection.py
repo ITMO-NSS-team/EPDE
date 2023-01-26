@@ -12,7 +12,7 @@ from copy import deepcopy
 import warnings
 
 import epde.globals as global_var
-from epde.operators.template import CompoundOperator
+from epde.operators.utils.template import CompoundOperator
 from epde.decorators import History_Extender
 from epde.structure.main_structures import Term, Equation
     

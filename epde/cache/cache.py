@@ -94,7 +94,7 @@ def prepare_var_tensor(var_tensor, derivs_tensor, time_axis, cut_except = []):
         for i_outer in range(0, derivs_tensor.shape[-1]):
             assert derivs_tensor.ndim == var_tensor.ndim + increment, 'The shape of tensor of derivatives does not correspond '
             result[i_outer+increment, ...] = np.moveaxis(derivs_tensor[..., i_outer], # np_ndarray_section( -1, , boundary, [])
-                             source=time_axis, destination=0)    
+                                                         source=time_axis, destination=0)    
     return result
 
 
@@ -199,7 +199,7 @@ class Cache(object):
             assert type(obj_test_case) != None
             self.max_allowed_tensors = np.int(np.floor(self.available_mem/obj_test_case.nbytes)/2)
         else:
-            self.max_allowed_tensors = np.int(np.floor(self.available_mem/self.memory_default[list(np.random.choice(self.memory_default.keys()))].nbytes))
+            self.max_allowed_tensors = np.int(np.floor(self.available_mem/self.memory_default[np.random.choice(list(self.memory_default.keys()))].nbytes))
 
         eps = 1e-7            
         if np.abs(self.available_mem) < eps:

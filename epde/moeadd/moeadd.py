@@ -16,7 +16,7 @@ import epde.globals as global_var
 
 from epde.moeadd.moeadd_strategy_elems import MOEADDSectorProcesser
 from epde.moeadd.moeadd_supplementary import fast_non_dominated_sorting, ndl_update, Equality, Inequality        
-    
+from scipy.spatial import ConvexHull    
 
 def clear_list_of_lists(inp_list) -> list:
     '''
@@ -169,6 +169,15 @@ class ParetoLevels(object):
         self.levels = new_levels
         self.population = population_cleared
 
+    def fit_convex_hull(self):
+        if len(self.levels) > 1:
+            warnings.warn('Algorithm has not converged to a single Pareto level yet!')
+        points = np.vstack([sol.obj_fun for sol in self.population])
+        points = np.concatenate((points, np.max(points, axis = 0).reshape((1, -1))))
+        points_unique = np.unique(points, axis = 0)
+        
+        hull = ConvexHull(points = points_unique, qhull_options='Qt')
+        
 
 class ParetoLevelsIterator(object):
     def __init__(self, pareto_levels):

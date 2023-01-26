@@ -115,8 +115,8 @@ class DomainPruner(object):
                 time_axis = 0
         self.time_axis = time_axis
         self.split_idxs, self.accepted_spatial_domains = get_subdomains_mask(pivotal_tensor, division_fractions, 
-                                                                   self.domain_selector, 
-                                                                   self.domain_selector_kwargs, self.time_axis)
+                                                                             self.domain_selector, 
+                                                                             self.domain_selector_kwargs, self.time_axis)
         self.bds = pruned_domain_boundaries(self.accepted_spatial_domains, self.split_idxs, self.time_axis,
                                             rectangular)
         self.bds_init = True

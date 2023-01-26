@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 
 from epde.structure.main_structures import SoEq, Equation
-from epde.operators.template import CompoundOperator
+from epde.operators.utils.template import CompoundOperator
 import epde.globals as global_var
 # from TEDEouS.solver import point_sort_shift_solver
 

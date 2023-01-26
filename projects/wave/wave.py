@@ -9,8 +9,7 @@ Created on Mon Dec 19 15:51:40 2022
 import numpy as np
 import epde.interface.interface as epde_alg
 
-from epde.interface.equation_translator import Coeff_less_equation
-from epde.interface.prepared_tokens import CustomTokens, CacheStoredTokens
+from epde.interface.equation_translator import CoefflessEquation
 from epde.interface.prepared_tokens import TrigonometricTokens
 
 
@@ -36,7 +35,7 @@ def translate_eq():
     epde_search_obj.create_pool(data = u, max_deriv_order=(2, 2, 2), additional_tokens = [], 
                                 method = 'poly', method_kwargs={'smooth': False, 'grid': grids})
 
-    test1 = Coeff_less_equation(lp_terms, rp_term, epde_search_obj.pool)
+    test1 = CoefflessEquation(lp_terms, rp_term, epde_search_obj.pool)
     def map_to_equation(equation, function, function_kwargs = dict()):
         _, target, features = equation.evaluate(normalize = False, return_val = False)
         return function(np.abs(np.dot(features, equation.weights_final[:-1]) + 

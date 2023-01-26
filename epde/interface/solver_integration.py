@@ -12,14 +12,20 @@ from typing import Callable, Union
 from types import FunctionType
 
 VAL_TYPES = Union[FunctionType, int, float, torch.Tensor, np.ndarray]
+BASE_SOLVER_PARAMS = {'lambda_bound' : 10, 'verbose' : False,
+                      'learning_rate' : 1e-3, 'eps' : 1e-5, 'tmin' : 1000,
+                      'tmax' : 1e5, 'use_cache' : True, 'cache_verbose' : True, 
+                      'save_always' : False, 'print_every' : None, 
+                      'model_randomize_parameter' : 1e-6, 'step_plot_print' : False, 
+                      'step_plot_save' : False, 'image_save_dir' : None}
 
 from functools import singledispatchmethod, singledispatch
 
 from epde.structure.main_structures import Equation, SoEq
 import epde.globals as global_var
 
-from TEDEouS.input_preprocessing import Equation as SolverEquation
-import TEDEouS.solver as solver
+from epde.solver.input_preprocessing import Equation as SolverEquation
+import epde.solver.solver as solver
 
 class PregenBOperator(object):
     def __init__(self, system : SoEq, system_of_equation_solver_form : list):
@@ -433,12 +439,7 @@ class SolverAdapter(object):
         self.model = model
 
         self._solver_params = dict()
-        _solver_params = {'lambda_bound' : 10, 'verbose' : False,
-                          'learning_rate' : 1e-3, 'eps' : 1e-5, 'tmin' : 1000,
-                          'tmax' : 1e5, 'use_cache' : use_cache, 'cache_verbose' : True, 
-                          'save_always' : False, 'print_every' : None, 
-                          'model_randomize_parameter' : 1e-6, 'step_plot_print' : False, 
-                          'step_plot_save' : False, 'image_save_dir' : None}
+        _solver_params = BASE_SOLVER_PARAMS
 
         self.set_solver_params(**_solver_params)
         self.use_cache = use_cache
@@ -506,5 +507,5 @@ class SolverAdapter(object):
             grid = self.convert_grid(grid)
         self.equation = SolverEquation(grid, system_form, boundary_conditions).set_strategy('NN')
         
-        self.prev_solution = solver.Solver(grid, self.equation, self.model, 'NN').solve(**self._solver_params)
+        self.prev_solution = solver.Solver(grid, self.equation, self.model, 'autograd').solve(**self._solver_params)
         return self.prev_solution

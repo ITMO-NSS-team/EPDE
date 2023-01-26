@@ -12,7 +12,7 @@ from functools import reduce
 from epde.moeadd.moeadd import ParetoLevels
 from epde.moeadd.moeadd_supplementary import Constraint
 
-from epde.operators.template import CompoundOperator
+from epde.operators.utils.template import CompoundOperator
 
 
 class MOEADDSelection(CompoundOperator):

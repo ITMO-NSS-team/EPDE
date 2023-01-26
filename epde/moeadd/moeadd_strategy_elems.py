@@ -163,7 +163,7 @@ class EvolutionaryBlock(Block):
     
     Arguments:
     -----------
-        operator : epde.operators.template.Compound_Operator
+        operator : epde.operators.utils.template.Compound_Operator
             The evolutionary operator, contained by the block.
     
         parse_operator_args : None, str, or tuple/list
@@ -179,7 +179,7 @@ class EvolutionaryBlock(Block):
     
     Parameters:
     -----------
-        _operator : epde.operators.template.Compound_Operator
+        _operator : epde.operators.utils.template.Compound_Operator
             The evolutionary operator, contained by the block
             
         terminal : bool

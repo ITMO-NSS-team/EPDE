@@ -9,16 +9,16 @@ Created on Wed Aug 10 12:54:02 2022
 import numpy as np
 from functools import partial
 
-from epde.operators.operator_mappers import map_operator_between_levels
+from epde.operators.utils.operator_mappers import map_operator_between_levels
 
-from epde.operators.template import add_param_to_operator
-from epde.operators.selections import MOEADDSelection
-from epde.operators.variation import get_basic_variation
-from epde.operators.fitness import L2Fitness
-from epde.operators.right_part_selection import RandomRHPSelector
-from epde.operators.moeadd_specific import get_pareto_levels_updater, SimpleNeighborSelector, get_initial_sorter
-from epde.operators.sparsity import LASSOSparsity
-from epde.operators.coeff_calculation import LinRegBasedCoeffsEquation
+from epde.operators.utils.template import add_param_to_operator
+from epde.operators.multiobjective.selections import MOEADDSelection
+from epde.operators.multiobjective.variation import get_basic_variation
+from epde.operators.multiobjective.fitness import L2Fitness
+from epde.operators.multiobjective.right_part_selection import RandomRHPSelector
+from epde.operators.multiobjective.moeadd_specific import get_pareto_levels_updater, SimpleNeighborSelector, get_initial_sorter
+from epde.operators.multiobjective.sparsity import LASSOSparsity
+from epde.operators.multiobjective.coeff_calculation import LinRegBasedCoeffsEquation
 
 from epde.moeadd.moeadd_strategy_elems import SectorProcesserBuilder, MOEADDSectorProcesser
 

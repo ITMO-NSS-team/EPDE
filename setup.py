@@ -35,7 +35,7 @@ def get_requirements():
 
 setup(
       name = 'epde',
-      version = '1.1.16',
+      version = '1.2.1',
       description = 'EPDE package',
       author = 'Mikhail Maslyaev',
       author_email = 'miklemas@list.ru',
@@ -46,6 +46,8 @@ setup(
               'Operating System :: OS Independent',
       ],
       packages = find_packages(include = ['epde', 'epde.cache', 'epde.interface', 'epde.moeadd', 
-                                          'epde.operators', 'epde.prep']), 
-      python_requires =' >=3.6'
+                                          'epde.operators', 'epde.operators.utils', 'epde.operators.multiobjective', 
+                                          'epde.operators.singleobjective', 'epde.preprocessing', 
+                                          'epde.parametric', 'epde.structure', 'epde.solver']), 
+      python_requires =' >=3.8'
       )

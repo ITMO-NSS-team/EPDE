@@ -13,7 +13,7 @@ from functools import reduce, partial
 
 from epde.moeadd.moeadd import ParetoLevels
 from epde.operators.utils.template import CompoundOperator, add_param_to_operator
-from epde.operators.mutations import get_basic_mutation
+from epde.operators.multiobjective.mutations import get_basic_mutation
 
 
 def penalty_based_intersection(sol_obj, weight, ideal_obj, penalty_factor = 1.) -> float:
