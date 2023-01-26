@@ -149,7 +149,7 @@ class SpectralDeriv(AbstractDeriv):
         if isinstance(n, type(None)):
             n = np.min(func.shape)
         all_dim_derivative = []
-        func_projection = np.fft.fftn(func, axes=[0,1])
+        func_projection = np.fft.fftn(func)
         print(func_projection.shape) #marker
         inverter = lambda x: 1 if x == 0 else (x if x != 1 else 0)
         
