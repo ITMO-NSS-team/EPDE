@@ -48,6 +48,7 @@ class Term(ComplexStructure):
             self.use_cache()
         self.reset_saved_state() # key - state of normalization, value - if the variable is saved in cache
 
+
     @property
     def cache_label(self):
         if len(self.structure) > 1:
@@ -150,7 +151,9 @@ class Term(ComplexStructure):
                     
             update_token_status(self.occupied_tokens_labels, occupied_by_factor)
             self.structure.append(factor)
-        self.structure = filter_powers(self.structure)  
+
+        # self.pool.update_distribution(self.structure)
+        self.structure = filter_powers(self.structure)
 
     @property
     def descr_variable_marker(self):
@@ -289,13 +292,53 @@ class Term(ComplexStructure):
         return new_struct
 
 
-class Equation(ComplexStructure): 
+class StructureStatus:
+    def __init__(self, equation):
+        self.equation = equation
+
+    def hash_forbid_terms(self):
+        forbidden_terms_hashed = set()
+        for term in self.equation.structure:
+            label = self.equation.pool.compile_term(term)
+            forbidden_terms_hashed.add(self.equation.pool.hash_term(label))
+        return forbidden_terms_hashed
+
+    def define_mutation_prob(self):
+        # custom_prob_dict: dict(keys=all_custom_prob_hashes, values=initial_weight)
+        forbidden_terms_hashed = self.hash_forbid_terms()
+
+        available_hashes = self.equation.pool.prob_info.term_set_hashed.difference(forbidden_terms_hashed)
+        available_custom_hashes = self.equation.pool.prob_info.custom_prob_set_hashed.difference(forbidden_terms_hashed)
+
+        units_quantity = len(available_hashes) - len(available_custom_hashes)
+        correction_units = 0.
+
+        for hash_key in available_custom_hashes:
+            correction_units += self.equation.pool.prob_info.custom_prob_dict.get(hash_key)
+        units_quantity += correction_units
+
+        '''формируем список вероятностей'''
+        prob_ls, term_ls = [], []
+        for available_hash in available_hashes:
+            term_ls.append(available_hash)
+            if available_hash in available_custom_hashes:
+                prob_ls.append(self.equation.pool.prob_info.custom_prob_dict.get(available_hash) / units_quantity)
+            else:
+                prob_ls.append(1. / units_quantity)
+
+        # for hashed in term_ls:
+        #     print(self.equation.pool.prob_info.term_ls_dict[hashed])
+        return term_ls, prob_ls
+
+
+class Equation(ComplexStructure):
     __slots__ = ['_history', 'structure', 'interelement_operator', 'saved', 'saved_as', 
                  'n_immutable', 'pool', 'terms_number', 'max_factors_in_term', 'operator', 
                   '_target', 'target_idx', '_features', 'right_part_selected', 
                   '_weights_final', 'weights_final_evald', '_weights_internal', 'weights_internal_evald', 
                   'fitness_calculated', 'solver_form_defined', '_solver_form', '_fitness_value', 
-                  'crossover_selected_times', 'metaparameters', 'main_var_to_explain']
+                  'crossover_selected_times', 'metaparameters', 'main_var_to_explain',
+                 'equation_status']
 
     def __init__(self, pool : TF_Pool, basic_structure : Union[list, tuple, set], var_to_explain : str = None,
                  metaparameters : dict = {'sparsity' : {'optimizable' : True, 'value' : 1.},
@@ -374,6 +417,7 @@ class Equation(ComplexStructure):
 
         for idx, _ in enumerate(self.structure):
             self.structure[idx].use_cache()
+        self.equation_status = StructureStatus(self)
             
     def reset_explaining_term(self, term_idx = 0):
         for idx, term in enumerate(self.structure):
@@ -753,8 +797,10 @@ class SoEq(moeadd.MOEADDSolution):
         check_metaparameters(metaparameters)
         
         self.metaparameters = metaparameters
-        self.tokens_for_eq = TF_Pool(pool.families_demand_equation)
-        self.tokens_supp = TF_Pool(pool.families_equationless)
+        self.tokens_for_eq = TF_Pool(pool.families_demand_equation, custom_prob_terms=pool.custom_prob_terms,
+                            custom_cross_prob=pool.custom_cross_prob, max_factors_in_term=pool.max_factors_in_term)
+        self.tokens_supp = TF_Pool(pool.families_equationless, custom_prob_terms=pool.custom_prob_terms,
+                            custom_cross_prob=pool.custom_cross_prob, max_factors_in_term=pool.max_factors_in_term)
         self.moeadd_set = False
               
         self.vars_to_describe = {token_family.ftype for token_family in self.tokens_for_eq.families}

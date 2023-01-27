@@ -107,16 +107,21 @@ class TermMutation(CompoundOperator):
             
         """       
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
-        
         create_derivs = bool(objective[1].structure[objective[0]].descr_variable_marker)
-        
-        new_term = Term(objective[1].pool, mandatory_family = objective[1].structure[objective[0]].descr_variable_marker, 
-                        create_derivs=create_derivs,
-                        max_factors_in_term = objective[1].metaparameters['max_factors_in_term']['value'])
-        while not check_uniqueness(new_term, objective[1].structure[:objective[0]] + objective[1].structure[objective[0]+1:]):
-            new_term = Term(objective[1].pool, mandatory_family = objective[1].structure[objective[0]].descr_variable_marker, 
+
+        if len(objective[1].pool.custom_prob_terms) != 0:
+            term_ls, prob_ls = objective[1].equation_status.define_mutation_prob()
+            new_term_hash = np.random.choice(a=term_ls, p=prob_ls)   # !!! возвращает float64, если на входе большой int ..??
+            new_term = Term(objective[1].pool, max_factors_in_term=objective[1].metaparameters['max_factors_in_term']['value'],
+                            passed_term=list(objective[1].pool.prob_info.term_ls_dict.get(new_term_hash)))
+        else:
+            new_term = Term(objective[1].pool, mandatory_family = objective[1].structure[objective[0]].descr_variable_marker,
                             create_derivs=create_derivs,
                             max_factors_in_term = objective[1].metaparameters['max_factors_in_term']['value'])
+            while not check_uniqueness(new_term, objective[1].structure[:objective[0]] + objective[1].structure[objective[0]+1:]):
+                new_term = Term(objective[1].pool, mandatory_family = objective[1].structure[objective[0]].descr_variable_marker,
+                                create_derivs=create_derivs,
+                                max_factors_in_term = objective[1].metaparameters['max_factors_in_term']['value'])
         new_term.use_cache()
         # print(f'CREATED DURING MUTATION: {new_term.name}, while contatining {objective[1].structure[objective[0]].descr_variable_marker}')
         return new_term

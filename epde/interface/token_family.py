@@ -14,6 +14,8 @@ import pickle
 
 import epde.globals as global_var
 from epde.structure.factor import Factor
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 
 def constancy_hard_equality(tensor, epsilon = 1e-7):
@@ -410,14 +412,99 @@ class TokenFamily(object):
                     raise KeyError('Generated token somehow was not stored in cache.')
 
 
+class CustomProbInfo:
+    def __init__(self, pool):
+        self.pool = pool
+
+        token_ls = []
+        for family in self.pool.families:
+            token_ls += family.tokens
+        term_ls = []
+        for i in range(1, self.pool.max_factors_in_term + 1):
+            term_ls += list(itertools.combinations(token_ls, i))
+
+        cross_terms_hashed = [self.pool.hash_term(term) for term in self.pool.custom_cross_prob.keys()]
+        term_ls_hashed = [self.pool.hash_term(term) for term in term_ls]
+        custom_prob_hashed = [self.pool.hash_term(term) for term in self.pool.custom_prob_terms.keys()]
+
+        # три неизменных словаря
+        self.term_ls_dict = dict(zip(term_ls_hashed, term_ls))
+        self.custom_prob_dict = dict(zip(custom_prob_hashed, self.pool.custom_prob_terms.values()))
+        self.custom_cross_dict = dict(zip(cross_terms_hashed, self.pool.custom_cross_prob.values()))
+
+        self.term_set_hashed = set(term_ls_hashed)
+        self.custom_prob_set_hashed = set(custom_prob_hashed)
+
+        index = [i for i in range(len(term_ls_hashed))]
+        self.distribution_dict = dict(zip(term_ls_hashed, index))
+        self.distribution_dict_idx = dict(zip(index, term_ls))
+
+
 class TF_Pool(object):
     '''
     
     '''
-    def __init__(self, families : list, stored_pool = None):
+    distribution_ls = []
+
+    def __init__(self, families : list, stored_pool = None, custom_prob_terms : dict = {},
+                 custom_cross_prob : dict = {}, max_factors_in_term: int = 1):
         if stored_pool is not None:
             self = pickle.load(stored_pool)
         self.families = families
+        self.custom_prob_terms = custom_prob_terms
+        self.custom_cross_prob = custom_cross_prob
+        self.max_factors_in_term = max_factors_in_term
+
+        self.prob_info = CustomProbInfo(self)
+
+    @staticmethod
+    def compile_term(term):
+        complete_term = []
+        for factor in term.structure:
+            complete_term.append(factor.label)
+        return tuple(complete_term)
+
+    @staticmethod
+    def hash_term(term):
+        total_term = 0
+        for token in term:
+            total_token = 1
+            if type(token) == tuple:
+                token = token[0]
+            for char in token:
+                total_token += ord(char)
+            total_term += total_token * total_token
+        return total_term
+
+
+    def update_distribution(self, term):
+
+        label = []
+        for factor in term:
+            label.append(factor.label)
+        hashed_label = self.hash_term(label)
+        self.distribution_ls.append(self.prob_info.distribution_dict[hashed_label])
+
+
+        if len(self.distribution_ls) % 50 == 0:
+            print('Length of list for drawing:', len(self.distribution_ls))
+        if len(self.distribution_ls) == 1100:
+
+            for item in range(len(self.prob_info.term_set_hashed)):
+                indexes = np.where(np.array(self.distribution_ls) == item)[0]
+                print(self.prob_info.distribution_dict_idx[item], ":", len(indexes))
+                # print(self.prob_info.distribution_dict_idx[item], ": N#:", len(indexes), ": p:",
+                      # len(indexes)/len(self.distribution_ls))
+
+            # sublist = self.distribution_ls[41:]
+            sublist = self.distribution_ls
+            fig, ax1 = plt.subplots()
+            sns.kdeplot(sublist, ax=ax1)
+            ax1.set_xlim(min(sublist), max(sublist))
+            ax2 = ax1.twinx()
+            sns.histplot(sublist, ax=ax2, bins=len(self.prob_info.term_set_hashed))  # discrete=True)
+            plt.grid()
+            plt.show()
         
     @property
     def families_meaningful(self):
@@ -490,7 +577,8 @@ class TF_Pool(object):
         return family.create(label = None, token_status = token_status, **kwargs)
                                                    
     def __add__(self, other):
-        return TF_Pool(families = self.families + other.families)
+        return TF_Pool(families=self.families + other.families, custom_prob_terms=self.custom_prob_terms,
+                       custom_cross_prob=self.custom_cross_prob, max_factors_in_term=self.max_factors_in_term)
 
     def __len__(self):
         return len(self.families)
