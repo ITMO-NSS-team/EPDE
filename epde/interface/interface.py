@@ -521,6 +521,9 @@ class epde_search(object):
         else:
             return None, global_var.tensor_cache
 
+    def get_equations_by_complexity(self, complexity : Union[int, list]):
+        return self.optimizer.pareto_levels.get_by_complexity(complexity)
+
     def predict(self, system : SoEq, boundary_conditions : BoundaryConditions, grid : list = None, 
                 system_file : str = None, solver_kwargs : dict = {'model' : None, 'use_cache' : True}):
         solver_kwargs['dim'] = len(global_var.grid_cache.get_all()[1])

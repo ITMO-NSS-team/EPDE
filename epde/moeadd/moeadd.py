@@ -175,6 +175,10 @@ class ParetoLevels(object):
         points = np.vstack([sol.obj_fun for sol in self.population])
         points = np.concatenate((points, np.max(points, axis = 0).reshape((1, -1))))
         
+    def get_by_complexity(self, complexity):
+        matching_solutions = [solution for solution in self.levels[0] 
+                              if solution.matches_complexitiy(complexity)]
+        return matching_solutions
 
 class ParetoLevelsIterator(object):
     def __init__(self, pareto_levels):
