@@ -783,10 +783,13 @@ class SoEq(moeadd.MOEADDSolution):
         self.obj_funs = obj_funs
 
     def matches_complexitiy(self, complexity : Union[int, list]):
-        if isinstance(complexity, int):    
-            return self.obj_fun[-1] == complexity
-        elif isinstance(complexity, list):
-            return list(self.obj_fun[-len(complexity):]) == complexity            
+        if isinstance(complexity, (int, float)):    
+            complexity = [complexity,]
+        
+        if not isinstance(complexity, list) or len(self.vars_to_describe) != len(complexity):
+            raise ValueError('Incorrect list of complexities passed.')
+        
+        return list(self.obj_fun[-len(complexity):]) == complexity            
     
     def create_equations(self):
         structure = {}
