@@ -29,11 +29,6 @@ def write_pareto(dict_of_exp):
                     f.write(ind + '\n\n')
 
 if __name__ == '__main__':
-    # pareto_frontiers = {}
-    # for err_factor in np.linspace(0, 1, 10):
-        # for sigma in np.linspace(0, 10, 20):
-            # pareto_frontiers[(err_factor, sigma)] = []
-            # for iter_idx in range(10):
     '''
     Подгружаем данные, содержащие временные ряды динамики "вида-охотника" и "вида-жертвы"
     '''
@@ -52,8 +47,6 @@ if __name__ == '__main__':
         data = np.load(data_file)
         
     x = data[:, 0]; y = data[:, 1]
-    # x += np.random.normal(0, err_factor*np.min(x), size = x.size)
-    # y += np.random.normal(0, err_factor*np.min(y), size = y.size)
         
     dimensionality = x.ndim - 1
     

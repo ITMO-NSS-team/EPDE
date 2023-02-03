@@ -14,13 +14,13 @@ from copy import deepcopy
 from functools import partial
 
 from epde.structure.structure_template import check_uniqueness
-from epde.moeadd.moeadd import ParetoLevels
+from epde.optimizers.moeadd.moeadd import ParetoLevels
 
 from epde.supplementary import detect_similar_terms, flatten
 from epde.decorators import History_Extender, ResetEquationStatus
 
 from epde.operators.utils.template import CompoundOperator, add_param_to_operator
-from epde.operators.moeadd_specific import get_basic_populator_updater
+from epde.operators.multiobjective.moeadd_specific import get_basic_populator_updater
 from epde.operators.multiobjective.mutations import get_basic_mutation
 
 
@@ -44,6 +44,8 @@ class ParetoLevelsCrossover(CompoundOperator):
         return the new population, created with the noted operators and containing both parent individuals and their offsprings.    
     copy_properties_to
     """
+    key = ["population level", "crossover"]
+    
     def apply(self, objective : ParetoLevels, arguments : dict):
         """
         Method to obtain a new population by selection of parent individuals (equations) and performing a crossover between them to get the offsprings.
@@ -93,6 +95,8 @@ class ParetoLevelsCrossover(CompoundOperator):
 
 
 class ChromosomeCrossover(CompoundOperator):
+    key = ["chromosome level", "crossover"]
+    
     def apply(self, objective : tuple, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
    
@@ -124,6 +128,8 @@ class ChromosomeCrossover(CompoundOperator):
 
 
 class MetaparamerCrossover(CompoundOperator):
+    key = ["gene level", "metaparameter crossover"]
+    
     def apply(self, objective : tuple, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
@@ -136,6 +142,8 @@ class MetaparamerCrossover(CompoundOperator):
 
 
 class EquationCrossover(CompoundOperator):
+    key = ["gene level", "structural crossover"]
+    
     @History_Extender(f'\n -> performing equation crossover', 'ba')
     def apply(self, objective : tuple, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
@@ -165,7 +173,8 @@ class EquationCrossover(CompoundOperator):
         self._tags = {'crossover', 'gene level', 'contains suboperators', 'standard'}
 
 class EquationExchangeCrossover(CompoundOperator):
-    # @ResetEquationStatus(reset_output = True)
+    key = ["gene level", "structural crossover"]
+    
     @History_Extender(f'\n -> performing equation exchange crossover', 'ba')
     def apply(self, objective : tuple, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
@@ -192,6 +201,8 @@ class TermParamCrossover(CompoundOperator):
     apply(population)
         return the offspring terms, constructed as the parents' factors with parameter values, selected between the parents' ones.        
     """
+    key = ["term level", "parameter crossover"]
+        
     def apply(self, objective : tuple, arguments : dict):
         """
         Get the offspring terms, constructed as the parents' factors with parameter values, selected between the parents' ones.
@@ -257,6 +268,8 @@ class TermCrossover(CompoundOperator):
         return the offspring terms, which are the same parents' ones, but in different order, if the crossover occured.
         .        
     """    
+    key = ["term level", "structural crossover"]
+
     def apply(self, objective : tuple, arguments : dict):
         """
         Get the offspring terms, which are the same parents' ones, but in different order, if the crossover occured.

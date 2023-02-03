@@ -1,15 +1,7 @@
-from typing import Union
-import numpy as np
-from functools import partial
-
-from epde.interface.equation_translator import parse_factor
-from epde.moeadd.moeadd_supplementary import Equality
-from epde.structure.main_structures import Term
 from epde.structure.factor import Factor
 
 from epde.parametric.parametric_factor import ParametricFactor, ParametricTerm
 from epde.parametric.parametric_equation import ParametricEquation
-from epde.interface.token_family import TokenFamily
 
 
 def float_convertable(obj):

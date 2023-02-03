@@ -9,13 +9,15 @@ Created on Fri Jun  4 13:49:36 2021
 import numpy as np
 from functools import reduce
 
-from epde.moeadd.moeadd import ParetoLevels
-from epde.moeadd.moeadd_supplementary import Constraint
+from epde.optimizers.moeadd.moeadd import ParetoLevels
+from epde.optimizers.moeadd.supplementary import Constraint
 
 from epde.operators.utils.template import CompoundOperator
 
 
 class MOEADDSelection(CompoundOperator):
+    key = ["population level", "selection"]
+    
     def apply(self, objective : ParetoLevels, arguments : dict): # pareto_levels
         '''
         
@@ -103,6 +105,8 @@ class MOEADDSelection(CompoundOperator):
 
 
 class MOEADDSelectionConstrained(CompoundOperator):
+    key = ["population level", "constrained selection"]
+    
     def apply(self, objective : ParetoLevels, arguments : dict):
         '''
         
@@ -187,6 +191,8 @@ class MOEADDSelectionConstrained(CompoundOperator):
 
 
 class SelectionConstraintProcesser(object):
+    key = ["custom level", "constrained processor"]
+    
     def __init__(self, constraints = None, param_keys = []):
         assert all(isinstance(constraints, Constraint) for constr in constraints)
         self._constraints = constraints

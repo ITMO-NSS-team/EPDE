@@ -27,6 +27,9 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
             
     
     '''
+    
+    key = ['chromosome level', 'coeff_calculator']
+    
     def apply(self, objective : Equation, arguments : dict):
         """
         Calculate the coefficients of the equation, using the linear regression.The result is stored in the 
@@ -70,8 +73,6 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
             estimator = LinearRegression(fit_intercept=False)
             if features.ndim == 1:
                 features = features.reshape(-1, 1)
-                # estimator.fit(features, target_vals) #TODO
-            # else:
             try:
                 self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)
             except AttributeError:

@@ -9,8 +9,8 @@ Created on Fri Jun  4 13:49:36 2021
 import numpy as np
 from functools import reduce
 
-from epde.moeadd.moeadd import ParetoLevels
-from epde.moeadd.moeadd_supplementary import Constraint
+from epde.optimizers.moeadd.moeadd import ParetoLevels
+from epde.optimizers.moeadd.supplementary import Constraint
 
 from epde.operators.utils.template import CompoundOperator
 

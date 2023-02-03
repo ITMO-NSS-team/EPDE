@@ -14,7 +14,7 @@ from copy import deepcopy
 from functools import partial
 
 from epde.structure.structure_template import check_uniqueness
-from epde.moeadd.moeadd import ParetoLevels
+from epde.optimizers.moeadd.moeadd import ParetoLevels
 
 from epde.supplementary import detect_similar_terms, flatten
 from epde.decorators import History_Extender, ResetEquationStatus

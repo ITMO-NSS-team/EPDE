@@ -11,7 +11,7 @@ from copy import deepcopy
 from functools import partial
 from typing import Union
 
-from epde.moeadd.moeadd import ParetoLevels
+from epde.optimizers.moeadd.moeadd import ParetoLevels
 
 from epde.structure.main_structures import Equation, SoEq, Term
 from epde.structure.structure_template import check_uniqueness
@@ -23,11 +23,11 @@ from epde.decorators import History_Extender, ResetEquationStatus
 
 
 class SystemMutation(CompoundOperator):
+    key = ["chromosome level", "mutation"]    
     def apply(self, objective : SoEq, arguments : dict): # TODO: add setter for best_individuals & worst individuals 
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)    
     
         altered_objective = deepcopy(objective)
-        # objective.copy_properties_to(altered_objective)
         
         eqs_keys = altered_objective.vals.equation_keys; params_keys = altered_objective.vals.params_keys
         affected_by_mutation = True
@@ -53,7 +53,8 @@ class SystemMutation(CompoundOperator):
     
 
 class EquationMutation(CompoundOperator):
-    # @ResetEquationStatus(reset_output = True)
+    key = ["gene mutation", "structural mutation"]
+
     @History_Extender(f'\n -> mutating equation', 'ba')
     def apply(self, objective : Equation, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)  
@@ -69,11 +70,11 @@ class EquationMutation(CompoundOperator):
 
 
 class MetaparameterMutation(CompoundOperator):
+    key = ["gene mutation", "metaparameter mutation"]
+
     def apply(self, objective : Union[int, float], arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
-        # print('objective', objective)
-        
         altered_objective = objective + np.random.normal(loc = self.params['mean'], scale = self.params['std'])        
         if altered_objective < 0:
             altered_objective = - altered_objective
@@ -88,6 +89,8 @@ class TermMutation(CompoundOperator):
     """
     Specific operator of the term mutation, where the term is replaced with a randomly created new one.
     """
+    key = ["term mutation", "metaparameter mutation"]
+    
     def apply(self, objective : tuple, arguments : dict): #term_idx, equation):
         """
         Return a new term, randomly created to be unique from other terms of this particular equation.
@@ -129,6 +132,8 @@ class TermParameterMutation(CompoundOperator):
     """
     Specific operator of the term mutation, where the term parameters are changed with a random increment.
     """
+    key = ["term mutation", "structural mutation"]    
+    
     def apply(self, objective : tuple, arguments : dict): # term_idx, objective
         """ 
         Specific operator of the term mutation, where the term parameters are changed with a random increment.

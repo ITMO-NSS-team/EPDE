@@ -14,8 +14,8 @@ from functools import reduce
 
 import epde.globals as global_var
 
-from epde.moeadd.moeadd_strategy_elems import MOEADDSectorProcesser
-from epde.moeadd.moeadd_supplementary import fast_non_dominated_sorting, ndl_update, Equality, Inequality        
+from epde.optimizers.moeadd.strategy_elems import MOEADDSectorProcesser
+from epde.optimizers.moeadd.supplementary import fast_non_dominated_sorting, ndl_update, Equality, Inequality
 from scipy.spatial import ConvexHull    
 
 def clear_list_of_lists(inp_list) -> list:
@@ -406,7 +406,7 @@ class MOEADDOptimizer(object):
             self.best_obj[arg_idx] = arg if isinstance(arg, int) or isinstance(arg, float) else arg() # Переделать под больше elif'ов
     
 
-    def set_sector_processer(self, processer : MOEADDSectorProcesser) -> None:
+    def set_sector_processer(self, processer: MOEADDSectorProcesser) -> None:
         '''
         
         Setter of the `moeadd_optimizer.sector_processer` attribute.
@@ -419,7 +419,6 @@ class MOEADDOptimizer(object):
         
         '''
         
-        # добавить возможность теста оператора
         self.sector_processer = processer
     
         
@@ -466,9 +465,6 @@ class MOEADDOptimizer(object):
                     self.sector_processer.run(population_subset = self.pareto_levels, 
                                               EA_kwargs = sp_kwargs)
                         
-                # if len(self.pareto_levels.levels) == 1:
-                #     break
-                    
     def form_processer_args(self, cur_weight : int): # TODO: inspect the most convenient input format
         return {'weight_idx' : cur_weight, 'weights' : self.weights, 'best_obj' : self.best_obj, 
                 'neighborhood_vectors' : self.neighborhood_lists}

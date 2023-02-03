@@ -1,24 +1,31 @@
 {
- "selection" : {
-   "delta" : 0.9,
-   "parents_fraction" : 0.4
- },
- "neighborhood_selector" : {
-   "number_of_neighbors" : 4
- },
- "eq_fitness" : {
-   "penalty_coeff" : 0.2
- },
- "pareto_level_crossover" : {
-   "PBI_penalty" : 1.0
- },
- "metaparameter_crossover" : {
-   "metaparam_proportion" : 0.4
- },
- "term_crossover" : {
-   "crossover_probability" : 0.3
- },
- "term_param_crossover" : {
-   "term_param_proportion" : 0.4
- }
+	"selection" : {
+	 	"description" : ["population level", "selection"],
+	 	"parameters" : {"delta" : 0.9, "parents_fraction" : 0.4}
+ 	},
+	"neighborhood_selector" : {
+		"description" : ["_ level", "neighborhood_selector"],
+   		"parameters" : {"number_of_neighbors" : 4}
+ 	},
+ 	"fitness" : {
+ 		"description" : ["gene level", "fitness"],
+   		"parameters" : {"penalty_coeff" : 0.2} 		
+ 	},
+ 	"pareto_level_crossover" : {
+ 		"description" : ["population level", "crossover"],
+   		"parameters" : {"PBI_penalty" : 1.0}
+ 	},
+ 	"metaparameter_crossover" : {
+ 		"description" : ["_ level", "crossover"],
+   		"parameters" : {"metaparam_proportion" : 0.4}
+	},
+ 	"term_crossover" : {
+ 		"description" : ["_ level", "crossover"],
+   		"parameters" : {"crossover_probability" : 0.3}
+	},
+ 	"term_param_crossover" : {
+ 		"description" : ["term level", "parameter crossover"],
+   		"parameters" : {"term_param_proportion" : 0.4}
+	},
+ ""
 }

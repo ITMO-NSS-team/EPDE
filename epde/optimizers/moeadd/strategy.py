@@ -10,8 +10,8 @@ import numpy as np
 from functools import partial
 
 from epde.operators.utils.operator_mappers import map_operator_between_levels
-
 from epde.operators.utils.template import add_param_to_operator
+
 from epde.operators.multiobjective.selections import MOEADDSelection
 from epde.operators.multiobjective.variation import get_basic_variation
 from epde.operators.multiobjective.fitness import L2Fitness
@@ -20,55 +20,11 @@ from epde.operators.multiobjective.moeadd_specific import get_pareto_levels_upda
 from epde.operators.multiobjective.sparsity import LASSOSparsity
 from epde.operators.multiobjective.coeff_calculation import LinRegBasedCoeffsEquation
 
-from epde.moeadd.moeadd_strategy_elems import SectorProcesserBuilder, MOEADDSectorProcesser
+from epde.optimizers.strategy import add_sequential_operators, OptimizationPatternDirector
 
 
-def add_sequential_operators(builder : SectorProcesserBuilder, operators : list):
-    '''
-    
-
-    Parameters
-    ----------
-    builder : SectorProcesserBuilder,
-        MOEADD evolutionary strategy builder (sector processer), which will contain added operators.
-    operators : list,
-        Operators, which will be added into the processer. The elements of the list shall be tuple in 
-        format of (label, operator), where the label is str (e.g. 'selection'), while the operator is 
-        an object of subclass of CompoundOperator.
-
-    Returns
-    -------
-    builder : SectorProcesserBuilder
-        Modified builder.
-
-    '''
-    builder.add_init_operator('initial')
-    for idx, operator in enumerate(operators):
-        builder.add_operator(operator[0], operator[1], terminal_operator = (idx == len(operators) - 1))
-
-    builder.set_input_combinator()
-    builder.link('initial', operators[0][0])
-    for op_idx, _ in enumerate(operators[:-1]):
-        builder.link(operators[op_idx][0], operators[op_idx + 1][0])
-
-    builder.assemble()
-    return builder
-
-
-class OptimizationPatternDirector(object):
-    def __init__(self):
-        self._builder = None
-
-    @property
-    def builder(self):
-        return self._builder
-
-    @builder.setter
-    def builder(self, sector_processer_builder : SectorProcesserBuilder):
-        print(f'setting builder with {sector_processer_builder}')
-        self._builder = sector_processer_builder
-
-    def use_unconstrained_eq_search(self, variation_params : dict = {}, mutation_params : dict = {}, sorter_params : dict = {},
+class MOEADDDirector(OptimizationPatternDirector):
+    def use_baseline(self, variation_params : dict = {}, mutation_params : dict = {}, sorter_params : dict = {},
                                     pareto_combiner_params : dict = {}, pareto_updater_params : dict = {},
                                     **kwargs):
         add_kwarg_to_operator = partial(add_param_to_operator, target_dict = kwargs)

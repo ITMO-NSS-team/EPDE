@@ -40,6 +40,8 @@ class EqRightPartSelector(CompoundOperator):
 
     
     '''    
+    key = ["gene level", "deterministic right part selector"]
+    
     @History_Extender('\n -> The equation structure was detected: ', 'a')        
     def apply(self, objective : Equation, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
@@ -101,6 +103,8 @@ class RandomRHPSelector(CompoundOperator):
 
     
     '''
+    key = ["gene level", "random right part selector"]
+
     @History_Extender('\n -> The equation structure was detected: ', 'a')
     def apply(self, objective : Equation, arguments : dict):
         # print(f'CALLING RIGHT PART SELECTOR FOR {objective.text_form}')

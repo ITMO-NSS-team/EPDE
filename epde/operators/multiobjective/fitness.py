@@ -45,6 +45,9 @@ class L2Fitness(CompoundOperator):
         calculate the fitness function of the equation, that will be stored in the equation.fitness_value.    
         
     """
+    
+    key = ['gene level', 'fitness']
+    
     def apply(self, objective : Equation, arguments : dict):
         """
         Calculate the fitness function values. The result is not returned, but stored in the equation.fitness_value attribute.

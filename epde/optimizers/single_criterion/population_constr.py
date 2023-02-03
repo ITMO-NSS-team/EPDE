@@ -6,39 +6,37 @@ Created on Thu Sep  8 11:57:44 2022
 @author: maslyaev
 """
 
-import numpy as np
 from typing import Callable
+from warnings import warn
 
 from epde.structure.main_structures import SoEq
 
-
-def set_argument(var, fun_kwargs, base_value):
-    try:
-        res = fun_kwargs[var]
-    except KeyError:
-        res = base_value
-    return res
-
 class SystemsPopulationConstructor(object):
     def __init__(self, pool, terms_number : int = 8, max_factors_in_term : int = 2, 
-                 obj_functions : Callable = None, sparsity_interval : tuple = (0, 1)):
+                 obj_functions : Callable = None, sparsity_interval : tuple = (1., 1.)):
+        if sparsity_interval[0] != sparsity_interval[1]:
+            warn(message = 'Single criterion optimization requires use of fixed sparsity constant. \
+                            The right boundary of iterval will be used the value')
+            sparsity_interval[0] = sparsity_interval[1]
+        
         self.pool = pool; self.terms_number = terms_number
         self.max_factors_in_term = max_factors_in_term 
         self.vars_demand_equation = [family.ftype for family in self.pool.families_demand_equation]
+        if len(self.vars_demand_equation) > 1:
+            raise ValueError('Trying to use single criterion optimization to discover a system of equations.')
+        
         self.sparsity_interval = sparsity_interval
 
-    def create(self, **kwargs): # Дописать
-        sparsity = set_argument('sparsity', kwargs, np.power(np.e, np.random.uniform(low = np.log(self.sparsity_interval[0]),
-                                                                      high = np.log(self.sparsity_interval[1]),
-                                                                      size = len(self.vars_demand_equation))))
-        terms_number = set_argument('terms_number', kwargs, self.terms_number)
-        max_factors_in_term = set_argument('max_factors_in_term', kwargs, self.max_factors_in_term)
+    def create(self, **kwargs):
+        sparsity = kwargs.get('sparsity', self.sparsity_interval[1])
+        terms_number = kwargs.get('terms_number', self.terms_number)
+        max_factors_in_term = kwargs.get('max_factors_in_term', self.max_factors_in_term)
         
         print(f'Creating new equation, sparsity value {sparsity}')
         metaparameters = {'terms_number'        : {'optimizable' : False, 'value' : terms_number},
                           'max_factors_in_term' : {'optimizable' : False, 'value' : max_factors_in_term}}
         for idx, variable in enumerate(self.vars_demand_equation):
-            metaparameters[('sparsity', variable)] = {'optimizable' : True, 'value' : sparsity[idx]}
+            metaparameters[('sparsity', variable)] = {'optimizable' : False, 'value' : sparsity}
 
         created_solution = SoEq(pool = self.pool, metaparameters = metaparameters)
 
@@ -48,6 +46,4 @@ class SystemsPopulationConstructor(object):
             created_solution.use_default_objective_function()
 
         created_solution.create_equations()
-        # print(f'Initial solution for MOEADD: {created_solution.text_form}')
-
         return created_solution

@@ -5,10 +5,11 @@ import numpy as np
 import inspect
 
 from functools import wraps
+from epde.operators.utils.default_parameter_loader import EvolutionaryParams
 
 from epde.structure.main_structures import Term, Equation, SoEq
 from epde.structure.encoding import Gene, Chromosome
-from epde.moeadd.moeadd import ParetoLevels
+from epde.optimizers.moeadd.moeadd import ParetoLevels
 
 OPERATOR_LEVELS = ('custom level', 'term level', 'gene level', 'chromosome level',
                    'population level')
@@ -17,12 +18,16 @@ OPERATOR_LEVELS_SUPPORTED_TYPES = {'custom level' : None, 'term level' : Term, '
                                    'chromosome level' : Chromosome, 'population level' : ParetoLevels}
 
 
+def add_base_param_to_operator(operator):
+    params_container = EvolutionaryParams()
+    for param_key, param_value in params_container[operator.key].items():
+        operator.params[param_key] = param_value
+
 def add_param_to_operator(operator, target_dict, labeled_base_val):
     for key, base_val in labeled_base_val.items():
         if base_val is None and key not in target_dict.keys():
             raise ValueError('Mandatory parameter for evolutionary operator')
         operator.params[key] = target_dict[key] if key in target_dict.keys() else base_val
-
 
 class CompoundOperator():
     '''

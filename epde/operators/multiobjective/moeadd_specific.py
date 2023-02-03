@@ -11,7 +11,7 @@ import time
 from typing import Union
 from functools import reduce, partial
 
-from epde.moeadd.moeadd import ParetoLevels
+from epde.optimizers.moeadd.moeadd import ParetoLevels
 from epde.operators.utils.template import CompoundOperator, add_param_to_operator
 from epde.operators.multiobjective.mutations import get_basic_mutation
 
@@ -132,6 +132,8 @@ def locate_pareto_worst(levels, weights, best_obj, penalty_factor = 1.):
 
 
 class PopulationUpdater(CompoundOperator):
+    key = ['custom level', 'population_updater']
+    
     def apply(self, objective : ParetoLevels, arguments : dict):
         '''
         Update population to get the pareto-nondomiated levels with the worst element removed. 
@@ -192,6 +194,8 @@ class PopulationUpdater(CompoundOperator):
         
 
 class PopulationUpdaterConstrained(object):
+    key = ['population level', 'population_updater'] # custom
+    
     def __init__(self, param_keys : list = [], constraints : Union[list, tuple, set] = []):
         super().__init__(param_keys = param_keys)
         raise NotImplementedError('Constrained optimization has not been implemented yet.')
@@ -303,6 +307,8 @@ def get_constrained_populator_updater(params : dict = {}, constraints : list = [
 
 
 class SimpleNeighborSelector(CompoundOperator):
+    key = ['custom level', 'neighbor_selector']
+    
     def apply(self, objective : list, arguments : dict):
         '''
             Simple selector of neighboring weight vectors: takes n-closest (*n = number_of_neighbors*)ones to the 
@@ -336,6 +342,8 @@ def best_obj_values(levels : ParetoLevels):
 
 
 class OffspringUpdater(CompoundOperator):
+    key = ['custom level', 'offspring_updater']
+    
     def apply(self, objective : ParetoLevels, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
@@ -384,6 +392,8 @@ def get_pareto_levels_updater(right_part_selector : CompoundOperator, chromosome
     return updater
 
 class InitialParetoLevelSorting(CompoundOperator):
+    key = ('custom level', 'pareto_level_sorting')   
+    
     def apply(self, objective : ParetoLevels, arguments : dict):
         '''
         Initial sorting of the candidates in pareto levels. 

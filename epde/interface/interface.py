@@ -14,15 +14,19 @@ import warnings
 
 import epde.globals as global_var
 
-from epde.moeadd.moeadd import *
-from epde.moeadd.moeadd_supplementary import *
-from epde.moeadd.moeadd_strategy_elems import SectorProcesserBuilder
+from epde.optimizers.moeadd.moeadd import *
+from epde.optimizers.moeadd.supplementary import *
+# from epde.optimizers.moeadd.strategy_elems import SectorProcesserBuilder
 
 from epde.preprocessing.DomainPruning import DomainPruner
 from epde.decorators import Boundary_exclusion
+from epde.operators.utils.default_parameter_loader import EvolutionaryParams
 
-from epde.moeadd.moeadd_population_constr import SystemsPopulationConstructor
-from epde.moeadd.moeadd_strategy import OptimizationPatternDirector
+from epde.optimizers.builder import StrategyBuilder
+from epde.optimizers.moeadd.strategy_elems import MOEADDSectorProcesser
+
+from epde.optimizers.moeadd.population_constr import SystemsPopulationConstructor
+from epde.optimizers.moeadd.strategy import OptimizationPatternDirector
 
 from epde.evaluators import simple_function_evaluator, trigonometric_evaluator
 from epde.supplementary import Define_Derivatives
@@ -158,7 +162,7 @@ class epde_search(object):
         A line of subdomains along an axis can be removed if all values inside them are identical to zero.        
     
     '''    
-    def __init__(self, use_default_strategy : bool = True, director = None, 
+    def __init__(self, multiobjective_mode: bool = True, use_default_strategy : bool = True, director = None, 
                  director_params : dict = {'variation_params' : {}, 'mutation_params' : {},
                                            'pareto_combiner_params' : {}, 'pareto_updater_params' : {}}, 
                  time_axis : int = 0, define_domain : bool = True, function_form = None, boundary : int = 0, 
@@ -175,9 +179,9 @@ class epde_search(object):
             if coordinate_tensors is None:
                 raise ValueError('Grids can not be empty during calculations.')
             self.set_domain_properties(coordinate_tensors, memory_for_cache, boundary, function_form = function_form, 
-                                       prune_domain = prune_domain, pruner = pruner, pivotal_tensor_label = pivotal_tensor_label,
-                                       threshold = threshold, division_fractions = division_fractions,
-                                       rectangular = rectangular)
+                                       prune_domain = prune_domain, pruner = pruner, 
+                                       pivotal_tensor_label = pivotal_tensor_label, threshold = threshold, 
+                                       division_fractions = division_fractions, rectangular = rectangular)
             
         if use_solver:
             global_var.dimensionality = dimensionality
@@ -186,18 +190,34 @@ class epde_search(object):
             self.director = director
         elif director is None and use_default_strategy:
             self.director = OptimizationPatternDirector()
-            self.director.builder = SectorProcesserBuilder()
-            # print('!')
-            self.director.use_unconstrained_eq_search(variation_params       = director_params['variation_params'], 
-                                                      mutation_params        = director_params['mutation_params'],
-                                                      pareto_combiner_params = director_params['pareto_combiner_params'],
-                                                      pareto_updater_params  = director_params['pareto_updater_params'])
+            self.director.builder = StrategyBuilder(MOEADDSectorProcesser)
+            
+            self.director.use_baseline(variation_params       = director_params['variation_params'], 
+                                       mutation_params        = director_params['mutation_params'],
+                                       pareto_combiner_params = director_params['pareto_combiner_params'],
+                                       pareto_updater_params  = director_params['pareto_updater_params'])
         else: 
             raise NotImplementedError('Wrong arguments passed during the epde search initialization')
         self.set_moeadd_params()
         self.search_conducted = False
         
     def set_memory_properties(self, example_tensor, mem_for_cache_frac = None, mem_for_cache_abs = None):
+        '''
+
+        Parameters
+        ----------
+        example_tensor : TYPE
+            DESCRIPTION.
+        mem_for_cache_frac : TYPE, optional
+            DESCRIPTION. The default is None.
+        mem_for_cache_abs : TYPE, optional
+            DESCRIPTION. The default is None.
+
+        Returns
+        -------
+        None.
+
+        '''
         if global_var.grid_cache is not None:
             if mem_for_cache_frac is not None:
                 mem_for_cache_frac = int(mem_for_cache_frac/2.)
@@ -290,6 +310,7 @@ class epde_search(object):
     def domain_pruning(self, pivotal_tensor_label = None, pruner = None, 
                              threshold : float = 1e-5, division_fractions = 3, 
                              rectangular : bool = True):
+        
         if pruner is not None:
             self.pruner = pruner
         else:
@@ -494,7 +515,14 @@ class epde_search(object):
             Maximum power of token,
             
         '''
-        
+        pass
+    
+    def fit_multiobjective(self, data : Union[np.ndarray, list, tuple], equation_terms_max_number = 6,
+            equation_factors_max_number = 1, variable_names = ['u',], eq_sparsity_interval = (1e-4, 2.5), 
+            derivs = None, max_deriv_order = 1, additional_tokens = [], memory_for_cache = 5,
+            prune_domain : bool = False, pivotal_tensor_label = None, pruner = None, 
+            threshold : float = 1e-2, division_fractions = 3, rectangular : bool = True, 
+            data_fun_pow : int = 1):    
         self.create_pool(data = data, variable_names=variable_names, 
                          derivs=derivs, max_deriv_order=max_deriv_order, 
                          additional_tokens=additional_tokens, 

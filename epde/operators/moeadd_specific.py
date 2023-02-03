@@ -11,7 +11,7 @@ import time
 from typing import Union
 from functools import reduce, partial
 
-from epde.moeadd.moeadd import ParetoLevels
+from epde.optimizers.moeadd.moeadd import ParetoLevels
 from epde.operators.utils.template import CompoundOperator, add_param_to_operator
 from epde.operators.mutations import get_basic_mutation
 

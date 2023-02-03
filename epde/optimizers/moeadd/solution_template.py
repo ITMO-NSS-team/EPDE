@@ -9,7 +9,7 @@ Created on Fri Sep  9 11:56:57 2022
 import numpy as np
 from abc import ABC, abstractmethod
 
-from epde.moeadd.moeadd_supplementary import acute_angle
+from epde.optimizers.moeadd.supplementary import acute_angle
 
 
 def get_domain_idx(solution, weights) -> int:

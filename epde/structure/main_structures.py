@@ -18,7 +18,7 @@ import numpy as np
 import torch
 
 import epde.globals as global_var
-import epde.moeadd.moeadd_solution_template as moeadd
+import epde.optimizers.moeadd.solution_template as moeadd
 
 from epde.structure.encoding import Chromosome
 from epde.interface.token_family import TF_Pool
