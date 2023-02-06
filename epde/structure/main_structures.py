@@ -759,12 +759,17 @@ class SoEq(moeadd.MOEADDSolution):
               
         self.vars_to_describe = {token_family.ftype for token_family in self.tokens_for_eq.families}
 
-    def use_default_objective_function(self):
+    def use_default_multiobjective_function(self):
         from epde.eq_mo_objectives import generate_partial, equation_fitness, equation_complexity_by_factors
         complexity_objectives = [generate_partial(equation_complexity_by_factors, eq_key) 
                                  for eq_key in self.vars_to_describe]# range(len(self.tokens_for_eq))]
         quality_objectives = [generate_partial(equation_fitness, eq_key) for eq_key in self.vars_to_describe]#range(len(self.tokens_for_eq))]
         self.set_objective_functions(quality_objectives + complexity_objectives)
+
+    def use_default_singleobjective_function(self):
+        from epde.eq_mo_objectives import generate_partial, equation_fitness
+        quality_objectives = [generate_partial(equation_fitness, eq_key) for eq_key in self.vars_to_describe]#range(len(self.tokens_for_eq))]
+        self.set_objective_functions(quality_objectives)
 
     def set_objective_functions(self, obj_funs):
         '''

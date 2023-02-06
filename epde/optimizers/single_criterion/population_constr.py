@@ -17,7 +17,7 @@ class SystemsPopulationConstructor(object):
         if sparsity_interval[0] != sparsity_interval[1]:
             warn(message = 'Single criterion optimization requires use of fixed sparsity constant. \
                             The right boundary of iterval will be used the value')
-            sparsity_interval[0] = sparsity_interval[1]
+            # sparsity_interval[0] = sparsity_interval[1]
         
         self.pool = pool; self.terms_number = terms_number
         self.max_factors_in_term = max_factors_in_term 
@@ -43,7 +43,7 @@ class SystemsPopulationConstructor(object):
         try:
             created_solution.set_objective_functions(kwargs['obj_funs'])
         except KeyError:
-            created_solution.use_default_objective_function()
+            created_solution.use_default_singleobjective_function()
 
         created_solution.create_equations()
         return created_solution

@@ -9,7 +9,7 @@ Created on Wed Feb  1 12:46:03 2023
 from warnings import warn
 
 import epde.globals as global_var
-from epde.optimizers.blocks import link, LinkedBlocks, EvolutionaryBlock, InputBlock, OperatorBuilder
+from epde.optimizers.blocks import LinkedBlocks
 
 
 class Strategy():

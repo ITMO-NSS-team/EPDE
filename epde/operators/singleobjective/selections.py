@@ -212,7 +212,7 @@ class SelectionConstraintProcesser(object):
         self._tags = {'constraints', 'selection', 'custom level', 'auxilary'}
 
 
-class RouletteWheelSelection(object):
+class RouletteWheelSelection(CompoundOperator):
     def apply(self, objective : Population, arguments: dict):
         # TODO: add docstring
         if isinstance(objective, ParetoLevels):
@@ -225,11 +225,15 @@ class RouletteWheelSelection(object):
         parents_number = min(max(2, parents_number_counted), len(objective.population))
 
         fitnesses = np.array([1/candidate.obj_fun for candidate in objective]) # Inspect for cases, when the solutions have relatively good fitness
-        probas = fitnesses/np.sum(fitnesses)
+        probas = (fitnesses/np.sum(fitnesses)).squeeze()
 
-
-        candidate_idxs = np.random.choice(range(objective), size = parents_number, replace = True, p = probas) # Experiment with roulette with replace = False
+        print(probas.shape)
+        candidate_idxs = np.random.choice(range(len(objective.population)), size = parents_number, 
+                                          replace = True, p = probas) # Experiment with roulette with replace = False
         for idx in candidate_idxs:
-            objective[idx].incr_counter()
+            objective.population[idx].incr_counter() # TODO: direct access
         
         return objective
+    
+    def use_default_tags(self):
+        self._tags = {'selection', 'population level', 'auxilary', 'suboperators', 'standard'}    

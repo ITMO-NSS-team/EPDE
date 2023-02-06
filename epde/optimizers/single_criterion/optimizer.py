@@ -6,7 +6,7 @@ Created on Tue Jan 31 20:17:30 2023
 @author: maslyaev
 """
 
-from typing import Iterable
+from typing import Iterable, Callable
 import warnings
 
 import numpy as np
@@ -14,7 +14,45 @@ import numpy as np
 import epde.globals as global_var
 from epde.optimizers.strategy import Strategy
 from epde.optimizers.single_criterion.ea_stop_conds import IterationLimit
+from epde.optimizers.single_criterion.supplementary import simple_sorting
 
+# class PopulationProcesserBuilder(StrategyBuilder):
+#     """
+#     Class of sector process builder for moeadd. 
+    
+#     Attributes:
+#     ------------
+    
+#     operator : Evolutionary_operator object
+#         the evolutionary operator, which is being constructed for the evolutionary algorithm, which is applied to a population;
+        
+#     Methods:
+#     ------------
+    
+#     reset()
+#         Reset the evolutionary operator, deleting all of the declared suboperators.
+        
+#     set_evolution(crossover_op, mutation_op)
+#         Set crossover and mutation operators with corresponding evolutionary operators, each of the Specific_Operator type object, to improve the 
+#         quality of the population.
+    
+#     set_param_optimization(param_optimizer)
+#         Set parameter optimizer with pre-defined Specific_Operator type object to optimize the parameters of the factors, present in the equation.
+        
+#     set_coeff_calculator(coef_calculator)
+#         Set coefficient calculator with Specific_Operator type object, which determines the weights of the terms in the equations.
+        
+#     set_fitness(fitness_estim)
+#         Set fitness function value estimator with the Specific_Operator type object. 
+    
+#     """
+#     def reset(self): # stop_criterion, stop_criterion_kwargs
+#         self._processer = EvolutionaryStrategy() # stop_criterion, stop_criterion_kwargs
+#         super().__init__()
+    
+#     @property
+#     def processer(self):
+#         return self._processer
 
 class EvolutionaryStrategy(Strategy):
     '''
@@ -22,7 +60,7 @@ class EvolutionaryStrategy(Strategy):
     iteration of the algotirhm & ``run`` for executing a full optimization.
     '''
     def __init__(self, stop_criterion = IterationLimit, sc_init_kwargs: dict = {'limit' : 50}):
-        super().__init__(self)
+        super().__init__()
         self._stop_criterion = stop_criterion(**sc_init_kwargs)
         self.run_performed = False
             
@@ -33,7 +71,7 @@ class EvolutionaryStrategy(Strategy):
         return self.linked_blocks.output
     
     def run(self, initial_population: Iterable, EA_kwargs: dict, stop_criterion_params: dict = {}):
-        self._stop_criterion.reset(stop_criterion_params)
+        self._stop_criterion.reset(**stop_criterion_params)
         population = initial_population
         while not self._stop_criterion.check():
             self.linked_blocks.traversal(population, EA_kwargs)
@@ -41,9 +79,10 @@ class EvolutionaryStrategy(Strategy):
         self.run_performed = True
 
 class Population(object):
-    def __init__(self, elements : list):
+    def __init__(self, elements: list, sorting_method: Callable):
         self.population = elements
         self.length = len(elements)
+        self._sorting_method = sorting_method
         
     def sort(self):
         '''
@@ -83,7 +122,7 @@ class PopulationIterator(object):
 
 
 class SimpleOptimizer(object):
-    def __init__(self, pop_constructor, pop_size, solution_params): 
+    def __init__(self, pop_constructor, pop_size, solution_params, sorting_method = simple_sorting): 
         soluton_creation_attempts_softmax = 10
         soluton_creation_attempts_hardmax = 100
         
@@ -105,7 +144,7 @@ class SimpleOptimizer(object):
                     raise RuntimeError('Can not place an individual into the population even with many attempts.')
                 solution_gen_idx += 1
                 
-        self.population = Population(elements = initial_population)
+        self.population = Population(elements = initial_population, sorting_method = sorting_method)
 
     def set_strategy(self, strategy: EvolutionaryStrategy):
         self.strategy = strategy

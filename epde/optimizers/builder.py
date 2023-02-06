@@ -22,11 +22,13 @@ def link(op1, op2):
     op2.add_incoming(op1)
 
 
-class StrategyBuilder(ABC):     # OperatorBuilder
+class StrategyBuilder():     # OperatorBuilder  ABC
     def __init__(self, strategy_class = Strategy):
-        self.reset()
+        self.strategy_class = strategy_class
+        self.reset(strategy_class)
     
-    def reset(self):
+    def reset(self, strategy_class):
+        self._processer = strategy_class()
         self.blocks_labeled = dict()
         self.blocks_connected = dict() # dict of format {op_label : (True, True)}, where in 
                                        # value dict first element is "connected with input" and
@@ -36,7 +38,8 @@ class StrategyBuilder(ABC):     # OperatorBuilder
     
     @abstractproperty
     def processer(self):
-        raise NotImplementedError('Tring to return a property of an abstract class.')
+        # raise NotImplementedError('Tring to return a property of an abstract class.')
+        return self._processer
 
     def add_init_operator(self, operator_label : str = 'initial'):
         self.initial_label = operator_label

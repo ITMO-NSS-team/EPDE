@@ -5,4 +5,7 @@ class SizeRestriction(CompoundOperator):
     def apply(self, objective: Population, arguments: dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)    
         objective.population = objective.sort()[:objective.length]
-        return 
+        return objective
+
+    def use_default_tags(self):
+        self._tags = {'size restriction', 'population level', 'no suboperators', 'standard'}    

@@ -12,8 +12,15 @@ import epde.interface.interface as epde_alg
 from epde.interface.equation_translator import CoefflessEquation
 from epde.interface.prepared_tokens import TrigonometricTokens
 
+import os
+import sys
 
-from epde.evaluators import CustomEvaluator, simple_function_evaluator, inverse_function_evaluator
+sys.path.append('../')
+
+sys.path.pop()
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')))
+
+# from epde.evaluators import CustomEvaluator, simple_function_evaluator, inverse_function_evaluator
 # TODO^ caching of the pre-calculated derivatives
 
 def translate_eq():
@@ -48,43 +55,50 @@ def translate_eq():
 if __name__ == "__main__":
 
     # def full_search():
-        u = np.loadtxt('/home/maslyaev/epde/EPDE_main/projects/wave/data.csv').reshape((101, 101, 101))
-        u = np.moveaxis(u, 2, 0)
-    
-        t = np.linspace(0, 1, u.shape[0])
-        x = np.linspace(0, 0.2, u.shape[1])
-        y = np.linspace(0, 0.2, u.shape[2])    
-        grids = np.meshgrid(t, x, y, indexing = 'ij')
+    try:
+        u_file = os.path.join(os.path.dirname( __file__ ), 'projects/benchmarking/wave/wave_sln_80.csv')
+        u = np.loadtxt(u_file, delimiter=',')
+    except (FileNotFoundError, OSError):
+        u_file = '/home/maslyaev/epde/EPDE_main/projects/benchmarking/wave/wave_sln_80.csv'
+        u = np.loadtxt(u_file, delimiter=',')
         
-        dimensionality = u.ndim - 1; boundary = 30
+    # u = np.loadtxt('/home/maslyaev/epde/EPDE_main/projects/wave/data.csv').reshape((101, 101, 101))
+    # u = np.moveaxis(u, 2, 0)
+
+    t = np.linspace(0, 1, u.shape[0])
+    x = np.linspace(0, 1, u.shape[1])
+    grids = np.meshgrid(t, x, indexing = 'ij')
     
-        paretos = []
-        exp_num = 1
-        for i in range(exp_num):
-            epde_search_obj = epde_alg.epde_search(use_solver = False, dimensionality = dimensionality, boundary = boundary,
-                                                   coordinate_tensors = grids, verbose_params = {'show_moeadd_epochs' : True})    
-            
-            popsize = 7
-            epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=40)
-            epde_search_obj.set_preprocessor(default_preprocessor_type='poly', 
-                                             preprocessor_kwargs={'use_smoothing' : False,
-                                                                  })
-        
-            # custom_grid_tokens = CacheStoredTokens(token_type = 'grid',
-            #                                        # boundary = boundary,
-            #                                        token_labels = ['t', 'x', 'y'],
-            #                                        token_tensors={'t' : grids[0], 'x' : grids[1], 'y' : grids[2]},
-            #                                        params_ranges = {'power' : (1, 1)},
-            #                                        params_equality_ranges = None)
-        
-            trig_tokens = TrigonometricTokens(dimensionality = dimensionality)
-            factors_max_number = {'factors_num' : [1, 2], 'probas' : [0.95, 0.05]}
-            
-            epde_search_obj.fit(data=[u, ], variable_names=['u',], max_deriv_order=(2, 2, 2),
-                                equation_terms_max_number=5, data_fun_pow = 1, additional_tokens=[trig_tokens,], #custom_grid_tokens 
-                                equation_factors_max_number = factors_max_number, 
-                                eq_sparsity_interval=(1e-10, 1e-4), coordinate_tensors=grids)
-            paretos.append(epde_search_obj.equation_search_results(only_print = False, level_num = 1))
-    #     return paretos
+    dimensionality = u.ndim - 1; boundary = 20
+
+    paretos = []
+    exp_num = 1
+    epde_search_obj = epde_alg.epde_search(multiobjective_mode=False, use_solver=False, 
+                                           dimensionality=dimensionality, boundary=10, 
+                                           coordinate_tensors = grids, 
+                                           verbose_params = {'show_moeadd_epochs' : True})    
+    epde_search_obj.set_preprocessor(default_preprocessor_type='poly', # use_smoothing = True
+                                     preprocessor_kwargs={})
+    popsize = 7
+    epde_search_obj.set_singleobjective_params(population_size = popsize, training_epochs=40)
+
+
+    # custom_grid_tokens = CacheStoredTokens(token_type = 'grid',
+    #                                        # boundary = boundary,
+    #                                        token_labels = ['t', 'x', 'y'],
+    #                                        token_tensors={'t' : grids[0], 'x' : grids[1], 'y' : grids[2]},
+    #                                        params_ranges = {'power' : (1, 1)},
+    #                                        params_equality_ranges = None)
+
+    trig_tokens = TrigonometricTokens(dimensionality = dimensionality)
+    factors_max_number = {'factors_num' : [1, 2], 'probas' : [0.95, 0.05]}
     
-    # translate_eq()
+    epde_search_obj.fit(data=[u, ], variable_names=['u',], max_deriv_order=(2, 2),
+                        equation_terms_max_number=5, data_fun_pow = 1, additional_tokens=[trig_tokens,], #custom_grid_tokens 
+                        equation_factors_max_number = factors_max_number, 
+                        eq_sparsity_interval=(1e-10, 1e-4))
+    epde_search_obj.equation_search_results(only_print = False, level_num = 1)
+    paretos.append(epde_search_obj.equation_search_results(only_print = False, level_num = 1))
+#     return paretos
+
+# translate_eq()

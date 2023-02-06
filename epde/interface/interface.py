@@ -16,6 +16,7 @@ import epde.globals as global_var
 
 from epde.optimizers.moeadd.moeadd import *
 from epde.optimizers.moeadd.supplementary import *
+from epde.optimizers.single_criterion.supplementary import simple_sorting
 # from epde.optimizers.moeadd.strategy_elems import SectorProcesserBuilder
 
 from epde.preprocessing.DomainPruning import DomainPruner
@@ -23,10 +24,13 @@ from epde.decorators import Boundary_exclusion
 from epde.operators.utils.default_parameter_loader import EvolutionaryParams
 
 from epde.optimizers.builder import StrategyBuilder
+from epde.optimizers.single_criterion.optimizer import EvolutionaryStrategy, SimpleOptimizer
 from epde.optimizers.moeadd.strategy_elems import MOEADDSectorProcesser
 
-from epde.optimizers.moeadd.population_constr import SystemsPopulationConstructor
-from epde.optimizers.moeadd.strategy import OptimizationPatternDirector
+from epde.optimizers.single_criterion.population_constr import SystemsPopulationConstructor as SOSystemPopConstr
+from epde.optimizers.moeadd.population_constr import SystemsPopulationConstructor as MOEADDSystemPopConstr
+from epde.optimizers.single_criterion.strategy import BaselineDirector
+from epde.optimizers.moeadd.strategy import MOEADDDirector
 
 from epde.evaluators import simple_function_evaluator, trigonometric_evaluator
 from epde.supplementary import Define_Derivatives
@@ -170,7 +174,7 @@ class epde_search(object):
                  coordinate_tensors = None, memory_for_cache = 5, prune_domain : bool = False, 
                  pivotal_tensor_label = None, pruner = None, threshold : float = 1e-2, 
                  division_fractions = 3, rectangular : bool = True):
-
+        self.multiobjective_mode = multiobjective_mode
         global_var.set_time_axis(time_axis)
         global_var.init_verbose(**verbose_params)
         self.preprocessor_set = False
@@ -188,17 +192,28 @@ class epde_search(object):
 
         if director is not None and not use_default_strategy:
             self.director = director
-        elif director is None and use_default_strategy:
-            self.director = OptimizationPatternDirector()
+        elif director is None and self.multiobjective_mode and use_default_strategy:
+            self.director = MOEADDDirector()
             self.director.builder = StrategyBuilder(MOEADDSectorProcesser)
             
             self.director.use_baseline(variation_params       = director_params['variation_params'], 
                                        mutation_params        = director_params['mutation_params'],
                                        pareto_combiner_params = director_params['pareto_combiner_params'],
                                        pareto_updater_params  = director_params['pareto_updater_params'])
+        elif director is None and not self.multiobjective_mode and use_default_strategy:
+            self.director = BaselineDirector()
+            # print('ZUL')
+            self.director.builder = StrategyBuilder(EvolutionaryStrategy)
+            
+            self.director.use_baseline(variation_params       = director_params['variation_params'], 
+                                       mutation_params        = director_params['mutation_params'])
+
         else: 
             raise NotImplementedError('Wrong arguments passed during the epde search initialization')
-        self.set_moeadd_params()
+        if self.multiobjective_mode:    
+            self.set_moeadd_params()
+        else:
+            self.set_singleobjective_params()
         self.search_conducted = False
         
     def set_memory_properties(self, example_tensor, mem_for_cache_frac = None, mem_for_cache_abs = None):
@@ -295,18 +310,25 @@ class epde_search(object):
             The penalty parameter, used in penalty based intersection 
             calculation, defalut value is 1.        
         
-        '''    
-        self.moeadd_params = {'weights_num' : population_size, 'pop_size' : population_size, 
+        '''
+        self.optimizer_init_params = {'weights_num' : population_size, 'pop_size' : population_size, 
                               'delta' : delta, 'neighbors_number' : neighbors_number, 
                               'solution_params': solution_params,
                               'nds_method' : nds_method, 
                               'ndl_update' : ndl_update_method}
         
-        self.moeadd_optimization_params = {'neighborhood_selector' : neighborhood_selector,
+        self.optimizer_exec_params = {'neighborhood_selector' : neighborhood_selector,
                                            'neighborhood_selector_params' : neighborhood_selector_params,
                                            'delta' : subregion_mating_limitation, 
                                            'epochs' : training_epochs}
  
+    def set_singleobjective_params(self, population_size: int = 4, solution_params: dict = {}, 
+                                   sorting_method: Callable = simple_sorting, training_epochs: int = 50):
+        self.optimizer_init_params = {'pop_size' : population_size, 'solution_params': solution_params,
+                                      'sorting_method' : sorting_method}
+        
+        self.optimizer_exec_params = {'epochs' : training_epochs}        
+    
     def domain_pruning(self, pivotal_tensor_label = None, pruner = None, 
                              threshold : float = 1e-5, division_fractions = 3, 
                              rectangular : bool = True):
@@ -515,25 +537,37 @@ class epde_search(object):
             Maximum power of token,
             
         '''
-        pass
-    
+        self.create_pool(data = data, variable_names=variable_names, 
+                         derivs=derivs, max_deriv_order=max_deriv_order, 
+                         additional_tokens=additional_tokens, 
+                         data_fun_pow=data_fun_pow)        
+        if self.multiobjective_mode:
+            self.fit_multiobjective(data, equation_terms_max_number,
+                                    equation_factors_max_number, variable_names,
+                                    eq_sparsity_interval, derivs, max_deriv_order,
+                                    additional_tokens, memory_for_cache, prune_domain, 
+                                    pivotal_tensor_label, pruner, threshold, division_fractions,
+                                    rectangular, data_fun_pow)
+        else:
+            self.fit_singleobjective(data, equation_terms_max_number,
+                                     equation_factors_max_number, variable_names,
+                                     eq_sparsity_interval, derivs, max_deriv_order,
+                                     additional_tokens, memory_for_cache, prune_domain, 
+                                     pivotal_tensor_label, pruner, threshold, division_fractions,
+                                     rectangular, data_fun_pow)
+            
     def fit_multiobjective(self, data : Union[np.ndarray, list, tuple], equation_terms_max_number = 6,
             equation_factors_max_number = 1, variable_names = ['u',], eq_sparsity_interval = (1e-4, 2.5), 
             derivs = None, max_deriv_order = 1, additional_tokens = [], memory_for_cache = 5,
             prune_domain : bool = False, pivotal_tensor_label = None, pruner = None, 
             threshold : float = 1e-2, division_fractions = 3, rectangular : bool = True, 
             data_fun_pow : int = 1):    
-        self.create_pool(data = data, variable_names=variable_names, 
-                         derivs=derivs, max_deriv_order=max_deriv_order, 
-                         additional_tokens=additional_tokens, 
-                         data_fun_pow=data_fun_pow)
-        
-        pop_constructor = SystemsPopulationConstructor(pool = self.pool, terms_number = equation_terms_max_number, 
-                                                       max_factors_in_term = equation_factors_max_number,
-                                                       sparsity_interval = eq_sparsity_interval)
+        pop_constructor = MOEADDSystemPopConstr(pool = self.pool, terms_number = equation_terms_max_number, 
+                                                max_factors_in_term = equation_factors_max_number,
+                                                sparsity_interval = eq_sparsity_interval)
 
-        self.moeadd_params['pop_constructor'] = pop_constructor
-        self.optimizer = MOEADDOptimizer(**self.moeadd_params)
+        self.optimizer_init_params['pop_constructor'] = pop_constructor
+        self.optimizer = MOEADDOptimizer(**self.optimizer_init_params)
         
         evo_operator_builder = self.director.builder
         evo_operator_builder.assemble(True)
@@ -544,34 +578,67 @@ class epde_search(object):
                                    np.ones(shape = len([1 for token_family in self.pool.families if token_family.status['demands_equation']]))))  
         print('best_obj', len(best_obj))
         self.optimizer.pass_best_objectives(*best_obj)
-        self.optimizer.optimize(**self.moeadd_optimization_params)
+        self.optimizer.optimize(**self.optimizer_exec_params)
+
+        print('The optimization has been conducted.')
+        self.search_conducted = True
+        
+    def fit_singleobjective(self, data : Union[np.ndarray, list, tuple], equation_terms_max_number = 6,
+                            equation_factors_max_number = 1, variable_names = ['u',], eq_sparsity_interval = (1e-4, 2.5), 
+                            derivs = None, max_deriv_order = 1, additional_tokens = [], memory_for_cache = 5,
+                            prune_domain : bool = False, pivotal_tensor_label = None, pruner = None, 
+                            threshold : float = 1e-2, division_fractions = 3, rectangular : bool = True, 
+                            data_fun_pow : int = 1):
+        pop_constructor = SOSystemPopConstr(pool = self.pool, terms_number = equation_terms_max_number, 
+                                            max_factors_in_term = equation_factors_max_number,
+                                            sparsity_interval = eq_sparsity_interval)
+        # self.optimizer_params['pop_constructor']
+        self.optimizer_init_params['pop_constructor'] = pop_constructor
+        self.optimizer = SimpleOptimizer(**self.optimizer_init_params)        
+
+        # TODO: Somehow generalize
+        evo_operator_builder = self.director.builder
+        evo_operator_builder.assemble(True)
+        evo_operator = evo_operator_builder.processer
+        self.optimizer.set_strategy(strategy = evo_operator)
+
+        self.optimizer.optimize(**self.optimizer_exec_params)
 
         print('The optimization has been conducted.')
         self.search_conducted = True
         
     @property
-    def equations_pareto_frontier(self):
+    def resulting_population(self):
         if not self.search_conducted:
             raise AttributeError('Pareto set of the best equations has not been discovered. Use ``self.fit`` method.')
-        return self.optimizer.pareto_levels.levels
+        if self.multiobjective_mode:
+            return self.optimizer.pareto_levels.levels
+        else:
+            return self.optimizer.population.population
+            
     
     def equation_search_results(self, only_print : bool = True, level_num = 1):
-        if only_print:
-            for idx in range(min(level_num, len(self.equations_pareto_frontier))):
-                print('\n')
-                print(f'{idx}-th non-dominated level')    
-                print('\n')                
-                [print(f'{solution.text_form} , with objective function values of {solution.obj_fun} \n')  
-                for solution in self.equations_pareto_frontier[idx]]
+        if self.multiobjective_mode:
+            if only_print:
+                for idx in range(min(level_num, len(self.resulting_population))):
+                    print('\n')
+                    print(f'{idx}-th non-dominated level')    
+                    print('\n')                
+                    [print(f'{solution.text_form} , with objective function values of {solution.obj_fun} \n')  
+                    for solution in self.resulting_population[idx]]
+            else:
+                return self.optimizer.pareto_levels.levels[:level_num]
         else:
-            return self.optimizer.pareto_levels.levels[:level_num]
+            if only_print:
+                [print(f'{solution.text_form} , with objective function values of {solution.obj_fun} \n')  
+                 for solution in self.resulting_population[idx]]
         
     def solver_forms(self):
         '''
         Method returns solver forms of the equations on 1-st non-dominated levels in a form of Python list.
         '''
         sf = []
-        for system in self.equations_pareto_frontier[0]:
+        for system in self.resulting_population[0]:
             if len(system.structure) > 1:
                 raise NotImplementedError('Currently, only "systems", containing a single equations, can be passed to solvers.')
             sf.append(system.structure[0].solver_form())

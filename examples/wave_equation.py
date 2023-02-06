@@ -40,8 +40,8 @@ if __name__ == '__main__':
     search iterations. 
     '''
 
-    epde_search_obj = epde_alg.epde_search(use_solver=False, eq_search_iter = 100,
-                                           dimensionality=dimensionality)
+    epde_search_obj = epde_alg.epde_search(multiobjective_mode=False, use_solver=False, 
+                                           eq_search_iter = 100, dimensionality=dimensionality)
 
     '''
     Setting memory usage for cache stored tokens and terms (that are the ones, that 
@@ -64,11 +64,12 @@ if __name__ == '__main__':
     '''
 
     custom_grid_tokens = CacheStoredTokens(token_type = 'grid',
-                                   boundary = boundary,
-                                   token_labels = ['t', 'x', 'y'],
-                                   token_tensors={'t' : grids[0], 'x' : grids[1], 'y' : grids[2]},
-                                   params_ranges = {'power' : (1, 1)},
-                                   params_equality_ranges = None)
+                                           boundary = boundary,
+                                           token_labels = ['t', 'x', 'y'],
+                                           token_tensors={'t' : grids[0], 'x' : grids[1], 
+                                                          'y' : grids[2]},
+                                           params_ranges = {'power' : (1, 1)},
+                                           params_equality_ranges = None)
 
     '''
     Method epde_search.fit() is used to initiate the equation search.

@@ -8,9 +8,9 @@ Created on Thu Jul 21 19:14:25 2022
 
 # from epde.optimizers.blocks import EvolutionaryBlock, InputBlock
 from epde.optimizers.strategy import Strategy # rename to strategy_elems
-from epde.optimizers.builder import OperatorBuilder
+from epde.optimizers.builder import StrategyBuilder
 
-# class SectorProcesserBuilder(OperatorBuilder):
+# class SectorProcesserBuilder(StrategyBuilder):
 #     """
 #     Class of sector process builder for moeadd. 
     

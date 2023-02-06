@@ -29,21 +29,25 @@ class OperatorMapper(CompoundOperator):
 
     def apply(self, objective : CompoundOperator, arguments : dict):
         if self.objective_condition is None or self.objective_condition(objective):
+            print(objective, self._tags)
             if 'inplace' in self.operator_tags:
                 for elem in objective:
                     self.suboperators['to_map'].apply(elem, arguments)
             elif 'standard' in self.operator_tags:
                 for idx, elem in enumerate(objective):
                     objective[idx] = self.suboperators['to_map'].apply(elem, arguments)
-                    return objective # Why are we here? Just to suffer?
-    # TODO: check, if the population-level operators after mapping have appropriate "return" 
-    # Do we need return here of some sort?                    
             else:
                 raise TypeError('Incorrect type of mapping operator: not inplace nor returns similar object, as input.')
 
+            if 'population level' in self._tags:
+                return objective
+                # return objective # Why are we here? Just to suffer?
+    # TODO: check, if the population-level operators after mapping have appropriate "return" 
+    # Do we need return here of some sort?                    
+
 
 def map_operator_between_levels(operator : CompoundOperator, original_level : Union[str, int], 
-                           target_level : Union[str, int], objective_condition : Callable = None):
+                                target_level : Union[str, int], objective_condition : Callable = None):
     # TODO: make objective conditon be passed with a tag, pointing, where it shall be used.
     if isinstance(original_level, str): original_level = OPERATOR_LEVELS.index(original_level)
     if isinstance(target_level, str): target_level = OPERATOR_LEVELS.index(target_level)
