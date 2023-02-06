@@ -11,19 +11,23 @@ from epde.operators.singleobjective.coeff_calculation import LinRegBasedCoeffsEq
 from epde.operators.singleobjective.mutations import get_singleobjective_mutation
 from epde.operators.singleobjective.variation import get_singleobjective_variation
 from epde.operators.singleobjective.selections import RouletteWheelSelection
-from epde.operators.singleobjective.so_specific import SizeRestriction
+from epde.operators.singleobjective.so_specific import SizeRestriction, FractionElitism
 
 class BaselineDirector(OptimizationPatternDirector):
     def use_baseline(self, variation_params: dict = {}, mutation_params: dict = {}, **kwargs):
         add_kwarg_to_operator = partial(add_param_to_operator, target_dict = kwargs)
 
+        elitism = FractionElitism()
+
         mutation = get_singleobjective_mutation(mutation_params = mutation_params)
-        
+        elitism_cond_for_mutation = lambda x: all([elem_eq.elite == 'non-elite' for elem_eq in x.vals])
+        mutation = map_operator_between_levels(mutation, 'chromosome level', 'population level', elitism_cond_for_mutation)
+
         variation = get_singleobjective_variation(variation_params = variation_params)
+        variation = map_operator_between_levels(variation, 'chromosome level', 'population level')
+
         selection = RouletteWheelSelection(['parents_fraction'])
         add_kwarg_to_operator(operator = selection, labeled_base_val = {'parents_fraction' : 0.4})
-
-
 
         sparsity = LASSOSparsity()
         coeff_calc = LinRegBasedCoeffsEquation()
@@ -47,8 +51,11 @@ class BaselineDirector(OptimizationPatternDirector):
                                                                ('fitness evaluation 1', pop_fitness),
                                                                ('selection', selection),
                                                                ('variation', variation),
-                                                               ('mutation', mutation), 
                                                                ('right part selection 2', pop_rps),
                                                                ('fitness evaluation 2', pop_fitness),
+                                                               ('elitism', elitism),
+                                                               ('mutation', mutation), 
+                                                               ('right part selection 3', pop_rps),
+                                                               ('fitness evaluation 3', pop_fitness),
                                                                ('size restriction', population_pruner)]) 
                                                                # TODO: assess the correctness of the pipe element return and general linkage
