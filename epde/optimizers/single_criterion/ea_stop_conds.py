@@ -35,9 +35,10 @@ class IterationLimit(StopCondition):
     def __init__(self, limit = 100):
         self.limit = limit + 1
         self.checks = 0 # shortcut^ checking a number of calls instead of the estrategy attr of some sort
-        
-    def reset(self):
+    
+    def reset(self, **kwargs):
         self.checks = 0
+        self.limit = kwargs.get('limit', self.limit)
     
     def check(self):
         self.checks += 1

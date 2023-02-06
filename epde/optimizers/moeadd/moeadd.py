@@ -422,7 +422,7 @@ class MOEADDOptimizer(object):
         self.sector_processer = processer
     
         
-    def optimize(self, neighborhood_selector, delta, neighborhood_selector_params, epochs):
+    def optimize(self, epochs):
         '''
         
         Method for the main unconstrained evolutionary optimization. Can be applied repeatedly to 
@@ -432,21 +432,7 @@ class MOEADDOptimizer(object):
         
         Parameters:
         -----------
-        
-        neighborhood_selector : function,
-            Method of finding "close neighbors" of the vector with proximity list.
-            The baseline example of the selector, presented in 
-            ``moeadd.moeadd_stc.simple_selector``, selects n-adjacent ones.
-            
-        delta : float
-            The probability of mating selection to be limited only to the selected
-            subregions (adjacent to the weight vector domain). :math:`\delta \in [0., 1.)
-        
-        neighborhood_selector_params : tuple/list or None
-            Iterable, which will be passed into neighborhood_selector, as 
-            an arugument. *None*, is no additional arguments are required inside
-            the selector.
-            
+                    
         epochs : int
             Maximum number of iterations, during that the optimization will be held.
             Note, that if the algorithm converges to a single Pareto frontier, 

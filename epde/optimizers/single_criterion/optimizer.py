@@ -21,7 +21,7 @@ class EvolutionaryStrategy(Strategy):
     Evolutionary strategy for the single criterion optimization. Includes method ``iteration`` for a single 
     iteration of the algotirhm & ``run`` for executing a full optimization.
     '''
-    def __init__(self, stop_criterion = IterationLimit, sc_init_kwargs:dict = {'limit' : 50}):
+    def __init__(self, stop_criterion = IterationLimit, sc_init_kwargs: dict = {'limit' : 50}):
         super().__init__(self)
         self._stop_criterion = stop_criterion(**sc_init_kwargs)
         self.run_performed = False
@@ -32,14 +32,13 @@ class EvolutionaryStrategy(Strategy):
         self.linked_blocks.traversal(EA_kwargs)
         return self.linked_blocks.output
     
-    def run(self, initial_population : Iterable, EA_kwargs : dict):
-        self._stop_criterion.reset()
+    def run(self, initial_population: Iterable, EA_kwargs: dict, stop_criterion_params: dict = {}):
+        self._stop_criterion.reset(stop_criterion_params)
         population = initial_population
         while not self._stop_criterion.check():
             self.linked_blocks.traversal(population, EA_kwargs)
             population = self.linked_blocks.output
         self.run_performed = True
-    
 
 class Population(object):
     def __init__(self, elements : list):
@@ -47,8 +46,18 @@ class Population(object):
         self.length = len(elements)
         
     def sort(self):
-        return self._sorting_method(self.population)
+        '''
+        Method, that returns sorted population of the candidates. 
+        Does not change anything inside the population.
+        '''
+        return self._sorting_method(self.population) # TODO: finish that piece of code.
     
+    def sorted(self):
+        '''
+        Method to sort the population. Operates in "in-place" mode.
+        '''
+        self.population = self.sort() 
+
     def update(self, point):
         self.population.append(point)
         
@@ -101,5 +110,8 @@ class SimpleOptimizer(object):
     def set_strategy(self, strategy: EvolutionaryStrategy):
         self.strategy = strategy
         
-    def optimize(self, epochs: int):
-        self.strategy.run(initial_population = self.population)
+    def optimize(self, EA_kwargs: dict = {},  epochs: int = None):
+        scp = {} if epochs is None else {'limit' : 50}
+
+        self.strategy.run(initial_population = self.population, EA_kwargs = EA_kwargs, 
+                          stop_criterion_params = scp)

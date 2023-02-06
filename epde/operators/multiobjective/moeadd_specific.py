@@ -429,8 +429,8 @@ class InitialParetoLevelSorting(CompoundOperator):
         return objective
     
 def get_initial_sorter(right_part_selector : CompoundOperator, 
-                               chromosome_fitness : CompoundOperator, 
-                               sorter_params : dict = {}):
+                       chromosome_fitness : CompoundOperator, 
+                       sorter_params : dict = {}):
     add_kwarg_to_updater = partial(add_param_to_operator, target_dict = sorter_params)
     sorter = InitialParetoLevelSorting()
     add_kwarg_to_updater(operator = sorter, labeled_base_val = {})

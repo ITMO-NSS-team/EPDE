@@ -6,15 +6,17 @@ Created on Wed Jun  2 15:43:19 2021
 @author: mike_ubuntu
 """
 
-from ast import operator
 from operator import eq
 import numpy as np
 from copy import deepcopy
+
+from typing import Union
 
 from functools import partial
 
 from epde.structure.structure_template import check_uniqueness
 from epde.optimizers.moeadd.moeadd import ParetoLevels
+from epde.optimizers.single_criterion.optimizer import Population
 
 from epde.supplementary import detect_similar_terms, flatten
 from epde.decorators import History_Extender, ResetEquationStatus
@@ -24,7 +26,7 @@ from epde.operators.multiobjective.moeadd_specific import get_basic_populator_up
 from epde.operators.multiobjective.mutations import get_basic_mutation
 
 
-class ParetoLevelsCrossover(CompoundOperator):
+class PopulationLevelCrossover(CompoundOperator):
     """
     The crossover operator, combining parameter crossover for terms with same 
     factors but different parameters & full exchange of terms between the 
@@ -44,7 +46,7 @@ class ParetoLevelsCrossover(CompoundOperator):
         return the new population, created with the noted operators and containing both parent individuals and their offsprings.    
     copy_properties_to
     """
-    def apply(self, objective : ParetoLevels, arguments : dict):
+    def apply(self, objective : Union[ParetoLevels, Population], arguments : dict):
         """
         Method to obtain a new population by selection of parent individuals (equations) and performing a crossover between them to get the offsprings.
         
@@ -85,7 +87,11 @@ class ParetoLevelsCrossover(CompoundOperator):
                                                                                          arguments = subop_args['chromosome_crossover'])
             offsprings.extend([new_system_1, new_system_2])
 
-        objective.unplaced_candidates = offsprings
+        # TODO: maybe a better operator will fit here?
+        if isinstance(objective, ParetoLevels):
+            objective.unplaced_candidates = offsprings
+        elif isinstance(objective, Population):
+            objective.population.append(offsprings)
         return objective
 
     def use_default_tags(self):
@@ -292,7 +298,31 @@ class TermCrossover(CompoundOperator):
         self._tags = {'crossover', 'term level', 'exploration', 'no suboperators', 'standard'}
 
 
-def get_basic_variation(variation_params : dict = {}):
+def get_singleobjective_variation(variation_params : dict = {}):
+    # TODO: generalize initiation with test runs and simultaneous parameter and object initiation.
+    add_kwarg_to_operator = partial(add_param_to_operator, target_dict = variation_params)    
+
+    term_param_crossover = TermParamCrossover(['term_param_proportion'])
+    add_kwarg_to_operator(operator = term_param_crossover, labeled_base_val = {'term_param_proportion' : 0.4})
+    term_crossover = TermCrossover(['crossover_probability'])
+    add_kwarg_to_operator(operator = term_crossover, labeled_base_val = {'crossover_probability' : 0.3})
+
+    equation_crossover = EquationCrossover()
+
+    chromosome_crossover = ChromosomeCrossover()
+
+    pl_cross = PopulationLevelCrossover(['PBI_penalty'])
+    add_kwarg_to_operator(operator = pl_cross, labeled_base_val = {'PBI_penalty' : 1.})
+
+    equation_crossover.set_suboperators(operators = {'term_param_crossover' : term_param_crossover, 
+                                                     'term_crossover' : term_crossover})
+    chromosome_crossover.set_suboperators(operators = {'equation_crossover' : equation_crossover},
+                                          probas = {'equation_crossover' : [0.9, 0.1]})
+    pl_cross.set_suboperators(operators = {'chromosome_crossover' : chromosome_crossover})
+    return pl_cross
+
+
+def get_multiobjective_variation(variation_params : dict = {}): # Rename function calls where necessary
     # TODO: generalize initiation with test runs and simultaneous parameter and object initiation.
     add_kwarg_to_operator = partial(add_param_to_operator, target_dict = variation_params)    
 
@@ -308,7 +338,7 @@ def get_basic_variation(variation_params : dict = {}):
 
     chromosome_crossover = ChromosomeCrossover()
 
-    pl_cross = ParetoLevelsCrossover(['PBI_penalty'])
+    pl_cross = PopulationLevelCrossover(['PBI_penalty'])
     add_kwarg_to_operator(operator = pl_cross, labeled_base_val = {'PBI_penalty' : 1.})
 
     equation_crossover.set_suboperators(operators = {'term_param_crossover' : term_param_crossover, 
