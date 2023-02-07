@@ -49,7 +49,7 @@ class SystemMutation(CompoundOperator):
         return altered_objective
 
     def use_default_tags(self):
-        self._tags = {'mutation', 'chromosome level', 'contains suboperators'}
+        self._tags = {'mutation', 'chromosome level', 'contains suboperators', 'standard'}
     
 
 class EquationMutation(CompoundOperator):
@@ -65,7 +65,7 @@ class EquationMutation(CompoundOperator):
         return objective
 
     def use_default_tags(self):
-        self._tags = {'mutation', 'gene level', 'contains suboperators'}
+        self._tags = {'mutation', 'gene level', 'contains suboperators', 'standard'}
 
 
 class MetaparameterMutation(CompoundOperator):
@@ -81,7 +81,7 @@ class MetaparameterMutation(CompoundOperator):
         return altered_objective
 
     def use_default_tags(self):
-        self._tags = {'mutation', 'gene level', 'no suboperators'}
+        self._tags = {'mutation', 'gene level', 'no suboperators', 'standard'}
 
     
 class TermMutation(CompoundOperator):
@@ -122,7 +122,7 @@ class TermMutation(CompoundOperator):
         return new_term
 
     def use_default_tags(self):
-        self._tags = {'mutation', 'term level', 'exploration', 'no suboperators'}
+        self._tags = {'mutation', 'term level', 'exploration', 'no suboperators', 'standard'}
 
 
 class TermParameterMutation(CompoundOperator):
@@ -195,7 +195,7 @@ class TermParameterMutation(CompoundOperator):
         return term
     
     def use_default_tags(self):
-        self._tags = {'mutation', 'term level', 'exploitation', 'no suboperators'}
+        self._tags = {'mutation', 'term level', 'exploitation', 'no suboperators', 'standard'}
 
 # TODO: reorganize mutation and similar operators into the blocks of "common" operators.
 

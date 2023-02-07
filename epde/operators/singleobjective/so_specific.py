@@ -20,7 +20,6 @@ class FractionElitism(CompoundOperator):
 #        if isinstance(self.params['elite_fraction'], float):
 #            assert self.params['elite_fraction'] <= 1 and self.params['elite_fraction'] >= 0
 #            fraction = int(np.ceil(self.params['elite_fraction'] * len(objective.population)))
-            
         for idx, elem in enumerate(objective.population):
             if idx == 0:
                 setattr(elem, 'elite', 'immutable')
@@ -33,4 +32,4 @@ class FractionElitism(CompoundOperator):
     
     @property
     def operator_tags(self):
-        return {'elitism', 'population level', 'auxilary', 'no suboperators'}        
+        return {'elitism', 'population level', 'auxilary', 'no suboperators', 'standard'}        

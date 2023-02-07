@@ -227,7 +227,7 @@ class RouletteWheelSelection(CompoundOperator):
         fitnesses = np.array([1/candidate.obj_fun for candidate in objective]) # Inspect for cases, when the solutions have relatively good fitness
         probas = (fitnesses/np.sum(fitnesses)).squeeze()
 
-        print(probas.shape)
+        # print(probas.shape)
         candidate_idxs = np.random.choice(range(len(objective.population)), size = parents_number, 
                                           replace = True, p = probas) # Experiment with roulette with replace = False
         for idx in candidate_idxs:

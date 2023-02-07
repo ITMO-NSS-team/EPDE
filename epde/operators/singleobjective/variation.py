@@ -91,7 +91,7 @@ class PopulationLevelCrossover(CompoundOperator):
         if isinstance(objective, ParetoLevels):
             objective.unplaced_candidates = offsprings
         elif isinstance(objective, Population):
-            objective.population.append(offsprings)
+            objective.population.extend(offsprings)
         return objective
 
     def use_default_tags(self):

@@ -73,8 +73,12 @@ class InputDataEntry(object):
                                      'dimensionality' : self.data_tensor.ndim}
             
     def use_global_cache(self):
+        # print(f'self.data_tensor: {self.data_tensor.shape}')
+        # print(f'self.derivatives: {self.derivatives.shape}')
         derivs_stacked = prepare_var_tensor(self.data_tensor, self.derivatives, time_axis = global_var.time_axis)
+        # print(f'derivs_stacked: {derivs_stacked.shape}')
         
+        # raise Exception('ZUL LUL')
         try:       
             upload_simple_tokens(self.names, global_var.tensor_cache, derivs_stacked)
             upload_simple_tokens([self.var_name,], global_var.initial_data_cache, [self.data_tensor,])            
@@ -317,10 +321,7 @@ class epde_search(object):
                               'nds_method' : nds_method, 
                               'ndl_update' : ndl_update_method}
         
-        self.optimizer_exec_params = {'neighborhood_selector' : neighborhood_selector,
-                                           'neighborhood_selector_params' : neighborhood_selector_params,
-                                           'delta' : subregion_mating_limitation, 
-                                           'epochs' : training_epochs}
+        self.optimizer_exec_params = {'epochs' : training_epochs}
  
     def set_singleobjective_params(self, population_size: int = 4, solution_params: dict = {}, 
                                    sorting_method: Callable = simple_sorting, training_epochs: int = 50):
@@ -617,21 +618,23 @@ class epde_search(object):
             return self.optimizer.population.population
             
     
-    def equation_search_results(self, only_print : bool = True, level_num = 1):
+    def equation_search_results(self, only_print : bool = True, num = 1):
         if self.multiobjective_mode:
             if only_print:
-                for idx in range(min(level_num, len(self.resulting_population))):
+                for idx in range(min(num, len(self.resulting_population))):
                     print('\n')
                     print(f'{idx}-th non-dominated level')    
                     print('\n')                
                     [print(f'{solution.text_form} , with objective function values of {solution.obj_fun} \n')  
                     for solution in self.resulting_population[idx]]
             else:
-                return self.optimizer.pareto_levels.levels[:level_num]
+                return self.resulting_population[:num]
         else:
             if only_print:
                 [print(f'{solution.text_form} , with objective function values of {solution.obj_fun} \n')  
-                 for solution in self.resulting_population[idx]]
+                 for solution in self.resulting_population[:num]]
+            else:
+                return self.resulting_population[:num]
         
     def solver_forms(self):
         '''

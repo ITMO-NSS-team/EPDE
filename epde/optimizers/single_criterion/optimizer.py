@@ -102,6 +102,12 @@ class Population(object):
         
     def delete_point(self, point):
         self.population = [solution for solution in self.population if solution != point]
+
+    def __setitem__(self, key, value):
+        self.population[key] = value
+
+    def __getitem__(self, key):
+        return self.population[key]
         
     def __iter__(self):
         return PopulationIterator(self)

@@ -20,11 +20,12 @@ class BaselineDirector(OptimizationPatternDirector):
         elitism = FractionElitism()
 
         mutation = get_singleobjective_mutation(mutation_params = mutation_params)
-        elitism_cond_for_mutation = lambda x: all([elem_eq.elite == 'non-elite' for elem_eq in x.vals])
-        mutation = map_operator_between_levels(mutation, 'chromosome level', 'population level', elitism_cond_for_mutation)
+        elitism_cond_for_mutation = lambda candidate: candidate.elite
+        mutation = map_operator_between_levels(mutation, 'chromosome level', 'population level', 
+                                               element_condition = elitism_cond_for_mutation)
 
         variation = get_singleobjective_variation(variation_params = variation_params)
-        variation = map_operator_between_levels(variation, 'chromosome level', 'population level')
+        # variation = map_operator_between_levels(variation, 'chromosome level', 'population level')
 
         selection = RouletteWheelSelection(['parents_fraction'])
         add_kwarg_to_operator(operator = selection, labeled_base_val = {'parents_fraction' : 0.4})
@@ -36,13 +37,15 @@ class BaselineDirector(OptimizationPatternDirector):
         eq_fitness.set_suboperators({'sparsity' : sparsity, 'coeff_calc' : coeff_calc})
 
         fitness_cond = lambda x: not getattr(x, 'fitness_calculated')
-        sys_fitness = map_operator_between_levels(eq_fitness, 'gene level', 'chromosome level', fitness_cond)
+        sys_fitness = map_operator_between_levels(eq_fitness, 'gene level', 'chromosome level', 
+                                                  objective_condition = fitness_cond)
         pop_fitness = map_operator_between_levels(sys_fitness, 'chromosome level', 'population level') # TODO: edit in operator_mappers.py 
         
         # Check for optimality of operator application
         rps_cond = lambda x: any([not elem_eq.right_part_selected for elem_eq in x.vals])
         right_part_selector = RandomRHPSelector()
-        sys_rps = map_operator_between_levels(right_part_selector, 'gene level', 'chromosome level', rps_cond)
+        sys_rps = map_operator_between_levels(right_part_selector, 'gene level', 'chromosome level',
+                                              objective_condition = rps_cond)
         pop_rps = map_operator_between_levels(sys_rps, 'chromosome level', 'population level') # TODO: edit in operator_mappers.py 
 
         population_pruner = SizeRestriction()

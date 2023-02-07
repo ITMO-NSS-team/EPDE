@@ -54,6 +54,6 @@ class MOEADDSectorProcesser(Strategy):
     processing of a population in respect to a weight vector.
     '''
     def run(self, population_subset, EA_kwargs : dict):
-        self.check_integrity()
+        # self.check_integrity()
         self.linked_blocks.traversal(population_subset, EA_kwargs)
         return self.linked_blocks.output
