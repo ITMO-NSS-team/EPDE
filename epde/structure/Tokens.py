@@ -53,6 +53,7 @@ class TerminalToken(Token):
     requaires only numeric parameters.
 
     """
+
     def __init__(self, number_params: int = 0, params_description: dict = None, params: np.ndarray = None,
                  cache_val: bool = True, fix_val: bool = False, fix: bool = False,
                  val: np.ndarray = None, type_: str = 'TerminalToken', optimizer: str = None, name_: str = None,
@@ -151,11 +152,12 @@ class TerminalToken(Token):
         """
         recomendations = "\nUse methods 'params_description.setter' or 'set_descriptor' to change params_descriptions"
         assert isinstance(self._params_description, dict), "Invalid params_description structure," \
-                                                        " must be a dictionary of dictionaries" + recomendations
+            " must be a dictionary of dictionaries" + recomendations
         assert len(self._params_description) == self._number_params, "The number of parameters does not" \
                                                                      " match the number of descriptors" + recomendations
         for key, value in self._params_description.items():
-            assert isinstance(value, dict), "Invalid params_description structure, must be a dictionary of dictionaries"
+            assert isinstance(
+                value, dict), "Invalid params_description structure, must be a dictionary of dictionaries"
             assert 'name' in value.keys(), "Key 'name' must be in the nested" \
                                            " dictionary for each parameter" + recomendations
             assert 'bounds' in value.keys(), "Key 'bounds' must be in the nested " \
@@ -163,9 +165,9 @@ class TerminalToken(Token):
             assert key < self._number_params, "The parameter index must not exceed" \
                                               " the number of parameters" + recomendations
             assert (len(value['bounds']) == 2 and
-                   value['bounds'][0] <= value['bounds'][1]), "Bounds of each parameter must have" \
-                                                            " length = 2 and contain value" \
-                                                            " boundaries MIN <= MAX." + recomendations
+                    value['bounds'][0] <= value['bounds'][1]), "Bounds of each parameter must have" \
+                " length = 2 and contain value" \
+                " boundaries MIN <= MAX." + recomendations
 
     def set_descriptor(self, key: int, descriptor_name: str, descriptor_value):
         try:
@@ -191,7 +193,8 @@ class TerminalToken(Token):
 
     @params.setter
     def params(self, params):
-        assert len(params) == self._number_params, "Input array has incorrect size"
+        assert len(
+            params) == self._number_params, "Input array has incorrect size"
         self._params = np.array(params, dtype=float)
         self._fix_val = False
 
@@ -207,7 +210,8 @@ class TerminalToken(Token):
 
     def param(self, name=None, idx=None):
         try:
-            idx = idx if name == None else self.get_key_use_params_description('name', name)
+            idx = idx if name == None else self.get_key_use_params_description(
+                'name', name)
         except KeyError:
             print('There is no parameter with this name')
         try:
@@ -217,22 +221,27 @@ class TerminalToken(Token):
 
     def set_param(self, param, name=None, idx=None):
         try:
-            idx = idx if name is None else self.get_key_use_params_description('name', name)
+            idx = idx if name is None else self.get_key_use_params_description(
+                'name', name)
         except KeyError:
-            raise KeyError('"{}" have no parameter with name "{}"'.format(self, name))
+            raise KeyError(
+                '"{}" have no parameter with name "{}"'.format(self, name))
         try:
             self._params[idx] = param
             self._fix_val = False
         except IndexError:
-            raise IndexError('"{}" have no parameter with index "{}"'.format(self, idx))
+            raise IndexError(
+                '"{}" have no parameter with index "{}"'.format(self, idx))
 
     def init_params(self):
         try:
             for key, value in self._params_description.items():
-                self.set_param(np.random.uniform(value['bounds'][0], value['bounds'][1]), idx=key)
+                self.set_param(np.random.uniform(
+                    value['bounds'][0], value['bounds'][1]), idx=key)
         except OverflowError:
             # tb = sys.exc_info()[2]
-            raise OverflowError('Bounds have incorrect/infinite values')  # .with_traceback(tb)
+            # .with_traceback(tb)
+            raise OverflowError('Bounds have incorrect/infinite values')
 
     def set_val(self, val):
         self.val = val
@@ -287,6 +296,7 @@ class ComplexToken(TerminalToken):
     in addition to the numeric parameters.
     Example: Product of TerminalTokens.
     """
+
     def __init__(self, number_params: int = 0, params_description: dict = None, params: np.ndarray = None,
                  cache_val: bool = True, fix_val: bool = False, fix: bool = False,
                  val: np.ndarray = None, type_: str = 'TerminalToken', optimizer: str = None, name_: str = None,
@@ -349,4 +359,3 @@ class ComplexToken(TerminalToken):
                 self.mandatory = np.random.uniform()
                 return
         self.mandatory = 0
-
