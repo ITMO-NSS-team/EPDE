@@ -157,22 +157,22 @@ def download_variable(var_filename, deriv_filename, time_axis):
 
 
 class Cache(object):
-    """
-    Class for keeping values of terms/factors of equations
+    """Class for keeping values of terms/factors of equations.
 
     Args:
-        max_allowed_tensors: int, limitation on the number of allowed tensors to load into rhe cache
-        memory_default: dict, key - name of tensor (tuple - (name_of_term, params)), value - derivative. Objects without changes after evolutional step
-        memory_normalized: dict, key - name of tensor (tuple - (name_of_term, params)), value - derivative. Objects with normalize
-        memory_structural: dict, key - name of tensor (tuple - (name_of_term, params)), value - derivative. NOT USED ДОПИСАТЬ ПРОСМОТРЯ КОД
+        max_allowed_tensors (`int`): limitation on the number of allowed tensors to load into rhe cache.
+        memory_default (`dict`): key - name of tensor (tuple - (name_of_term, params)), value - derivative. Objects without changes after evolutional step
+        memory_normalized (`dict`): key - name of tensor (tuple - (name_of_term, params)), value - derivative. Objects with normalize
+        memory_structural (`dict`): key - name of tensor (tuple - (name_of_term, params)), value - derivative. NOT USED ДОПИСАТЬ ПРОСМОТРЯ КОД
     """
     def __init__(self):
         self.max_allowed_tensors = None
         self.memory_default = dict()
         self.memory_normalized = dict()
         self.memory_structural = dict()
-        self.mem_prop_set = False
+        self.mem_prop_set = False 
         self.base_tensors = []  # storage of non-normalized tensors, that will not be affected by change of variables
+        self.structural_and_base_merged = dict()
 
     def use_structural(self, use_base_data=True, label=None, replacing_data=None):
         # print(f'Setting structural data for {label}, for it: {use_base_data} - use_base_data')
@@ -182,17 +182,10 @@ class Cache(object):
             if use_base_data:
                 self.memory_structural = {key: val for key, val in self.memory_default.items()}
                 try:
-                    if not all([key in list(self.structural_and_base_merged.keys())
-                                for key in self.memory_structural.keys()]):
-                        for key in self.memory_structural.keys():
-                            self.structural_and_base_merged[key] = True
-                    else:
-                        for key in self.structural_and_base_merged.keys():
-                            self.structural_and_base_merged[key] = True
-                except AttributeError:
-                    self.structural_and_base_merged = {}
                     for key in self.memory_structural.keys():
-                        self.structural_and_base_merged[key] = True  # if not key in except_labels else True
+                        self.structural_and_base_merged[key] = True
+                except AttributeError as e:
+                    print(f"Error in class Cache {e}")
             else:
                 if type(replacing_data) != dict:
                     raise TypeError('Replacing data shall be set with dict of format: tuple - memory key: np.ndarray ')

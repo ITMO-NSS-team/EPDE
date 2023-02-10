@@ -80,23 +80,56 @@ class ConcretePrepBuilder(GeneralizedPrepBuilder):
 
 
 class PreprocessingPipe(object):
+    """
+    Class with intruments for preprocessing input data and calculate derivatives.
+
+    Attributes:
+        smoother (`method`): method for smoothing input data before calculate derivatives  
+        smoother_args (`list`): args for `self.smoother`
+        smoother_kwargs (`dict`): kwargs fot `self.smoother`
+
+        deriv_calculator (`method`): method for calculating derivatives from data
+        deriv_calculator_args (`list`): args for `self.deriv_calculator`
+        deriv_calculator_kwargs (`dict`): kwargs for `self.deriv_calculator`
+    """
     def __init__(self):
         self.smoother = None
         self.deriv_calculator = None
 
         self.smoother_args = None
-        self.smoother_kwargs = None
+        self.smoother_kwargs = dict()
 
-        self.deriv_calculator_kwargs = None
+        self.deriv_calculator_kwargs = dict()
         self.deriv_calculator_args = None
 
     def use_grid(self, grid):
+        """
+        Method for set parameter 'grid' to kwargs of methods for smoothing and derivative's calculating.
+
+        Args:
+            grid (`np.ndarray`): value of grid
+
+        Returns:
+            None
+        """
         if 'grid' in self.smoother_kwargs.keys():
             self.smoother_kwargs['grid'] = grid
         if 'grid' in self.deriv_calculator_kwargs.keys():
             self.deriv_calculator_kwargs['grid'] = grid
 
     def run(self, data, grid=None, max_order: Union[list, int] = 1):
+        """
+        Method that run process of calculation derivatives. 
+
+        Args:
+            data (`np.ndarray`): values from which derivatives are calculated
+            grid (`np.ndarray`, optional): the grid on which the data is viewed
+            max_order (`list`|`int`, optional): max order of derivatives
+
+        Returns:
+            np.ndarray: smoothing data if `self.smoother` is not None, else - original data
+            np.ndarray: calculated derivatives
+        """
         self.deriv_calculator_kwargs['max_order'] = max_order
         if grid is not None:
             self.use_grid(grid)

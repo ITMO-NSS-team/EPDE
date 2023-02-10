@@ -47,6 +47,18 @@ from epde.interface.prepared_tokens import PreparedTokens, CustomTokens
 from epde.interface.solver_integration import BoundaryConditions, SolverAdapter
 
 class InputDataEntry(object):
+    """
+    Class for keeping input data
+
+    Attributes:
+        var_name (`str`): name of input data dependent variable
+        data_tensor (`np.ndarray`): value of the input data
+
+        names (`list`): keys for derivatides
+        d_orders (`list`): keys for derivatides on `int` format for `solver`
+        derivatives (`np.ndarray`): values of derivatives
+        deriv_properties (`dict`): settings of derivatives
+    """
     def __init__(self, var_name: str, data_tensor: np.ndarray):
         self.var_name = var_name
         check_nparray(data_tensor)
@@ -54,7 +66,9 @@ class InputDataEntry(object):
 
     def set_derivatives(self, preprocesser: PreprocessingPipe, deriv_tensors=None,
                         max_order: Union[list, tuple, int] = 1, grid: list = []):
-
+        """
+        Method for setting derivatives ot calculate derivatives from data 
+        """
         deriv_names, deriv_orders = define_derivatives(self.var_name, dimensionality=self.data_tensor.ndim,
                                                        max_order=max_order)
 

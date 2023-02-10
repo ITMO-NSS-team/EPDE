@@ -215,10 +215,22 @@ def Slice_Data_3D(matrix, part=4, part_tuple=None):
 
 
 def define_derivatives(var_name='u', dimensionality=1, max_order=2):
+    """
+    Method for generating derivative keys
+
+    Args:
+        var_name (`str`): name of input data dependent variable
+        dimensionality (`int`): dimensionallity of data
+        max_order (`int`|`list`): max order of delivative
+    
+    Returns:
+        deriv_names (`list` with `str` values): keys for epde
+        var_deriv_orders (`list` with `int` values): keys for enter to solver
+    """
     deriv_names = [var_name,]
     var_deriv_orders = [[None,],]
     if isinstance(max_order, int):
-        max_order = [max_order for dim in range(dimensionality)]
+        max_order = [max_order for dim in dimensionality]
     for var_idx in range(dimensionality):
         for order in range(max_order[var_idx]):
             var_deriv_orders.append([var_idx,] * (order+1))
