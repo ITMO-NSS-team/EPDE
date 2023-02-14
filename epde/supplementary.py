@@ -230,7 +230,7 @@ def define_derivatives(var_name='u', dimensionality=1, max_order=2):
     deriv_names = [var_name,]
     var_deriv_orders = [[None,],]
     if isinstance(max_order, int):
-        max_order = [max_order for dim in dimensionality]
+        max_order = [max_order for dim in range(dimensionality)]
     for var_idx in range(dimensionality):
         for order in range(max_order[var_idx]):
             var_deriv_orders.append([var_idx,] * (order+1))
