@@ -28,6 +28,9 @@ class FractionElitism(CompoundOperator):
             else:
                 setattr(elem, 'elite', 'non-elite')
                 
+        # print('in elitism')
+        # print([[(eq.fitness_calculated, eq.text_form) for eq in candidate.vals] 
+               # for candidate in objective])
         return objective
     
     @property

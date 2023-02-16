@@ -37,6 +37,10 @@ class BaselineDirector(OptimizationPatternDirector):
         eq_fitness.set_suboperators({'sparsity' : sparsity, 'coeff_calc' : coeff_calc})
 
         fitness_cond = lambda x: not getattr(x, 'fitness_calculated')
+        # def fitness_cond(x):
+        #     print('getattr(x, "fitness_calculated")', getattr(x, 'fitness_calculated'))
+        #     return not getattr(x, 'fitness_calculated')
+        
         sys_fitness = map_operator_between_levels(eq_fitness, 'gene level', 'chromosome level', 
                                                   objective_condition = fitness_cond)
         pop_fitness = map_operator_between_levels(sys_fitness, 'chromosome level', 'population level') # TODO: edit in operator_mappers.py 

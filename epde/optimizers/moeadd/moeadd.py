@@ -176,8 +176,12 @@ class ParetoLevels(object):
         points = np.concatenate((points, np.max(points, axis = 0).reshape((1, -1))))
         points_unique = np.unique(points, axis = 0)
         
-        hull = ConvexHull(points = points_unique, qhull_options='Qt')
-        
+        self.hull = ConvexHull(points = points_unique, qhull_options='Qt')
+
+    def get_by_complexity(self, complexity):
+        matching_solutions = [solution for solution in self.levels[0] 
+                              if solution.matches_complexitiy(complexity)]
+        return matching_solutions        
 
 class ParetoLevelsIterator(object):
     def __init__(self, pareto_levels):

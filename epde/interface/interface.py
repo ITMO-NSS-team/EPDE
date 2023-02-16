@@ -65,12 +65,15 @@ class InputDataEntry(object):
         if deriv_tensors is None:
             self.data_tensor, self.derivatives = preprocesser.run(self.data_tensor, grid = grid, 
                                                                   max_order = max_order) 
+            # print(f'self.derivatives has shape of {self.derivatives.shape}')
+            # raise Exception()
             self.deriv_properties = {'max order' : max_order,
                                      'dimensionality' : self.data_tensor.ndim}
         else:
             self.derivatives = deriv_tensors
             self.deriv_properties = {'max order' : max_order,
                                      'dimensionality' : self.data_tensor.ndim}
+            print('! Using pre-calculated derivatives !')
             
     def use_global_cache(self):
         # print(f'self.data_tensor: {self.data_tensor.shape}')
@@ -653,6 +656,9 @@ class epde_search(object):
             return global_var.grid_cache, global_var.tensor_cache
         else:
             return None, global_var.tensor_cache
+
+    def get_equations_by_complexity(self, complexity : Union[int, list]):
+        return self.optimizer.pareto_levels.get_by_complexity(complexity)
 
     def predict(self, system : SoEq, boundary_conditions : BoundaryConditions, grid : list = None, 
                 system_file : str = None, solver_kwargs : dict = {'model' : None, 'use_cache' : True}):

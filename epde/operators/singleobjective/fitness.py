@@ -59,12 +59,12 @@ class L2Fitness(CompoundOperator):
         
         None
         """        
-        # print(f'CALCULATING FITNESS FOR {objective.text_form}')
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
         self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
         self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
         
+        # print(f'CALCULATING FITNESS FOR {objective.text_form}')        
         _, target, features = objective.evaluate(normalize = False, return_val = False)
         try:
             discr = (np.dot(features, objective.weights_final[:-1]) + 

@@ -787,6 +787,15 @@ class SoEq(moeadd.MOEADDSolution):
         assert callable(obj_funs) or all([callable(fun) for fun in obj_funs])
         self.obj_funs = obj_funs
 
+    def matches_complexitiy(self, complexity : Union[int, list]):
+        if isinstance(complexity, (int, float)):    
+            complexity = [complexity,]
+        
+        if not isinstance(complexity, list) or len(self.vars_to_describe) != len(complexity):
+            raise ValueError('Incorrect list of complexities passed.')
+        
+        return list(self.obj_fun[-len(complexity):]) == complexity        
+
     def create_equations(self):
         structure = {}
 
@@ -928,6 +937,7 @@ class SoEq(moeadd.MOEADDSolution):
         with open(file_name, 'wb') as file:
             to_save = ([equation.text_form for equation in self.vals], self.tokens_for_eq + self.tokens_supp)
             pickle.dump(obj = to_save, file = file) 
+        
         
 class SoEqIterator(object):
     def __init__(self, system : SoEq):

@@ -92,6 +92,7 @@ class PopulationLevelCrossover(CompoundOperator):
             objective.unplaced_candidates = offsprings
         elif isinstance(objective, Population):
             objective.population.extend(offsprings)
+        # print(f'added {len(offsprings)} into the population of {len(objective.population)}')
         return objective
 
     def use_default_tags(self):
