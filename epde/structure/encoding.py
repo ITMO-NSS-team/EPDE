@@ -44,8 +44,7 @@ class Gene(object):
         try:
             return self.key == other.key and self.value == other.value
         except AttributeError:
-            warnings.warn(
-                f'The equality method is not implemented for object of type {type(self)} or {type(other)}')
+            warnings.warn(f'The equality method is not implemented for object of type {type(self)} or {type(other)}')
 
     def set_metaparam(self, key: str, value: Union[float, int]):
         assert key in self._value.metaparameters, f'Incorrect parameter key {key} passed into the gene, containing {self.key}'

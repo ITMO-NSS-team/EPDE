@@ -51,8 +51,7 @@ class ANNSmoother(AbstractSmoother):
 
     def __call__(self, data, grid, epochs_max=1e3, loss_mean=1000, batch_frac=0.5,
                  learining_rate=1e-4):
-        dim = 1 if np.any([s == 1 for s in data.shape]
-                          ) and data.ndim == 2 else data.ndim
+        dim = 1 if np.any([s == 1 for s in data.shape]) and data.ndim == 2 else data.ndim
         model = baseline_ann(dim)
         grid_flattened = torch.from_numpy(
             np.array([subgrid.reshape(-1) for subgrid in grid])).float().T
@@ -93,8 +92,7 @@ class ANNSmoother(AbstractSmoother):
             print('Surface training t={}, loss={}'.format(t, loss_mean))
             t += 1
 
-        data_approx = best_model(
-            grid_flattened).detach().numpy().reshape(original_shape)
+        data_approx = best_model(grid_flattened).detach().numpy().reshape(original_shape)
         return data_approx
 
 

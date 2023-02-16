@@ -14,9 +14,9 @@ from functools import reduce
 
 import epde.globals as global_var
 
-from epde.moeadd.moeadd_strategy_elems import MOEADDSectorProcesser
-from epde.moeadd.moeadd_supplementary import fast_non_dominated_sorting, ndl_update, Equality, Inequality        
-    
+from epde.optimizers.moeadd.strategy_elems import MOEADDSectorProcesser
+from epde.optimizers.moeadd.supplementary import fast_non_dominated_sorting, ndl_update, Equality, Inequality
+from scipy.spatial import ConvexHull    
 
 def clear_list_of_lists(inp_list) -> list:
     '''
@@ -169,6 +169,19 @@ class ParetoLevels(object):
         self.levels = new_levels
         self.population = population_cleared
 
+    def fit_convex_hull(self):
+        if len(self.levels) > 1:
+            warnings.warn('Algorithm has not converged to a single Pareto level yet!')
+        points = np.vstack([sol.obj_fun for sol in self.population])
+        points = np.concatenate((points, np.max(points, axis = 0).reshape((1, -1))))
+        points_unique = np.unique(points, axis = 0)
+        
+        self.hull = ConvexHull(points = points_unique, qhull_options='Qt')
+
+    def get_by_complexity(self, complexity):
+        matching_solutions = [solution for solution in self.levels[0] 
+                              if solution.matches_complexitiy(complexity)]
+        return matching_solutions        
 
 class ParetoLevelsIterator(object):
     def __init__(self, pareto_levels):
@@ -364,7 +377,7 @@ class MOEADDOptimizer(object):
         assert 1./delta == round(1./delta) # check, if 1/delta is integer number
         m = np.zeros(weights_num)
         for weight_idx in np.arange(weights_num):
-            weights[weight_idx] = np.random.choice([div_idx * delta for div_idx in np.arange(1./delta + 1 - np.sum(m[:weight_idx + 1]))])
+            weights[weight_idx] = np.random.choice([div_idx * delta for div_idx in np.arange(1./delta + 1e-8 - np.sum(m[:weight_idx + 1]))])
             m[weight_idx] = weights[weight_idx]/delta
         weights[-1] = 1 - np.sum(weights[:-1])
         
@@ -414,7 +427,7 @@ class MOEADDOptimizer(object):
         self.sector_processer = processer
     
         
-    def optimize(self, neighborhood_selector, delta, neighborhood_selector_params, epochs):
+    def optimize(self, epochs):
         '''
         
         Method for the main unconstrained evolutionary optimization. Can be applied repeatedly to 

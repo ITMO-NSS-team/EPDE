@@ -33,8 +33,7 @@ class PreprocessorSetup:
         deriv_calculator_args = ()
         deriv_calculator_kwargs = {'grid': None}
 
-        self.builder.set_smoother(
-            ANNSmoother, *smoother_args, **smoother_kwargs)
+        self.builder.set_smoother(ANNSmoother, *smoother_args, **smoother_kwargs)
         self.builder.set_deriv_calculator(AdaptiveFiniteDeriv, *deriv_calculator_args,
                                           **deriv_calculator_kwargs)
 
@@ -43,11 +42,9 @@ class PreprocessorSetup:
         smoother_kwargs = {}
 
         deriv_calculator_args = ()
-        deriv_calculator_kwargs = {
-            'grid': None, 'n': n, 'steepness': steepness}
+        deriv_calculator_kwargs = {'grid': None, 'n': n, 'steepness': steepness}
 
-        self.builder.set_smoother(
-            PlaceholderSmoother, *smoother_args, **smoother_kwargs)
+        self.builder.set_smoother(PlaceholderSmoother, *smoother_args, **smoother_kwargs)
         self.builder.set_deriv_calculator(SpectralDeriv, *deriv_calculator_args,
                                           **deriv_calculator_kwargs)
 

@@ -71,12 +71,11 @@ def get_subdomains_mask(tensor, division_fractions: Union[int, list, tuple], dom
         sd_shape = tuple([div_frac for idx, div_frac in enumerate(
             division_fractions) if idx != time_axis])
     # [division_fraction for i in self.]
-    accepted_spatial_domains = np.full(
-        shape=(sd_shape), fill_value=True, dtype=bool)
+    accepted_spatial_domains = np.full(shape=(sd_shape), fill_value=True, dtype=bool)
     tensor = scale_values(tensor)
     split_idxs, time_deriv_fragments = split_tensor(tensor, division_fractions)
-    time_deriv_fragments = np.moveaxis(
-        a=time_deriv_fragments, source=time_axis, destination=-1)  # for
+    time_deriv_fragments = np.moveaxis(a=time_deriv_fragments, source=time_axis, 
+					 destination=-1)  # for
 
     temp = []
     counter = 0
@@ -86,8 +85,7 @@ def get_subdomains_mask(tensor, division_fractions: Union[int, list, tuple], dom
             counter += 1
         else:
             temp.append(partial_tensor)
-            accepted_spatial_domains[idx[:-1]
-                                     ] = domain_selector(temp, **domain_selector_kwargs)
+            accepted_spatial_domains[idx[:-1]] = domain_selector(temp, **domain_selector_kwargs)
             temp = []
             counter = 0
     return split_idxs, accepted_spatial_domains
@@ -146,8 +144,6 @@ class DomainPruner(object):
                 tensor_new = np.moveaxis(
                     tensor_new, source=axis_idx, destination=0)
                 bd_idx = axis_idx if axis_idx < self.time_axis else axis_idx - 1
-                tensor_new = tensor_new[self.bds[bd_idx]
-                                        [0]: self.bds[bd_idx][1], ...]
-                tensor_new = np.moveaxis(
-                    tensor_new, source=0, destination=axis_idx)
+                tensor_new = tensor_new[self.bds[bd_idx][0] : self.bds[bd_idx][1], ...]
+                tensor_new = np.moveaxis(tensor_new, source=0, destination=axis_idx)
         return tensor_new

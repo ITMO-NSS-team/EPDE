@@ -1,0 +1,33 @@
+Single Criterion
+
+0.04005348929324611 * d^2u/dx2^2{power: 1.0} + 0.0 * u{power: 1.0} + 0.0 * u{power: 1.0} * du/dx2{power: 1.0} + -0.012597553598492208 = d^2u/dx1^2{power: 1.0}
+{'terms_number': {'optimizable': False, 'value': 4}, 'max_factors_in_term': {'optimizable': False, 'value': {'factors_num': [1, 2], 'probas': [0.8, 0.2]}}, ('sparsity', 'u'): {'optimizable': True, 'value': 0.14553368599025387}} 
+
+0.0 * du/dx2{power: 1.0} + 0.0 * d^2u/dx2^2{power: 1.0} * du/dx2{power: 1.0} + 0.04005348929324611 * d^2u/dx2^2{power: 1.0} + -0.012597553598492208 = d^2u/dx1^2{power: 1.0}
+{'terms_number': {'optimizable': False, 'value': 4}, 'max_factors_in_term': {'optimizable': False, 'value': {'factors_num': [1, 2], 'probas': [0.8, 0.2]}}, ('sparsity', 'u'): {'optimizable': True, 'value': 0.26833824577090865}} 
+
+0.0 * du/dx1{power: 1.0} + 0.04005348929324611 * d^2u/dx2^2{power: 1.0} + 0.0 * du/dx2{power: 1.0} + -0.012597553598492208 = d^2u/dx1^2{power: 1.0}
+{'terms_number': {'optimizable': False, 'value': 4}, 'max_factors_in_term': {'optimizable': False, 'value': {'factors_num': [1, 2], 'probas': [0.8, 0.2]}}, ('sparsity', 'u'): {'optimizable': True, 'value': 0.2629305460667142}} 
+
+0.0 * du/dx2{power: 1.0} + 0.04005348929324611 * d^2u/dx2^2{power: 1.0} + 0.0 * u{power: 1.0} + -0.012597553598492208 = d^2u/dx1^2{power: 1.0}
+{'terms_number': {'optimizable': False, 'value': 4}, 'max_factors_in_term': {'optimizable': False, 'value': {'factors_num': [1, 2], 'probas': [0.8, 0.2]}}, ('sparsity', 'u'): {'optimizable': True, 'value': 0.04938714873569119}} 
+
+0.0 * d^2u/dx1^2{power: 1.0} * u{power: 1.0} + 0.0 * du/dx2{power: 1.0} + 0.040191220562718025 * du/dx1{power: 1.0} * d^2u/dx2^2{power: 1.0} + 0.0022302384416791263 = du/dx1{power: 1.0} * d^2u/dx1^2{power: 1.0}
+{'terms_number': {'optimizable': False, 'value': 4}, 'max_factors_in_term': {'optimizable': False, 'value': {'factors_num': [1, 2], 'probas': [0.8, 0.2]}}, ('sparsity', 'u'): {'optimizable': True, 'value': 0.37048157251431635}} 
+
+0.04005348929324611 * d^2u/dx2^2{power: 1.0} + 0.0 * u{power: 1.0} + 0.0 * du/dx2{power: 1.0} + -0.012597553598492208 = d^2u/dx1^2{power: 1.0}
+{'terms_number': {'optimizable': False, 'value': 4}, 'max_factors_in_term': {'optimizable': False, 'value': {'factors_num': [1, 2], 'probas': [0.8, 0.2]}}, ('sparsity', 'u'): {'optimizable': True, 'value': 0.2733616559950976}} 
+
+0.0 * du/dx1{power: 1.0} + 0.0 * u{power: 1.0} + 0.04005348929324611 * d^2u/dx2^2{power: 1.0} + -0.012597553598492208 = d^2u/dx1^2{power: 1.0}
+{'terms_number': {'optimizable': False, 'value': 4}, 'max_factors_in_term': {'optimizable': False, 'value': {'factors_num': [1, 2], 'probas': [0.8, 0.2]}}, ('sparsity', 'u'): {'optimizable': True, 'value': 0.2808403320703333}} 
+
+0.0 * du/dx2{power: 1.0} + 0.04005348929324611 * d^2u/dx2^2{power: 1.0} + 0.0 * u{power: 1.0} + -0.012597553598492208 = d^2u/dx1^2{power: 1.0}
+{'terms_number': {'optimizable': False, 'value': 4}, 'max_factors_in_term': {'optimizable': False, 'value': {'factors_num': [1, 2], 'probas': [0.8, 0.2]}}, ('sparsity', 'u'): {'optimizable': True, 'value': 0.20321299870600915}} 
+
+0.04005348929324611 * d^2u/dx2^2{power: 1.0} + 0.0 * du/dx2{power: 1.0} + 0.0 * du/dx1{power: 1.0} + -0.012597553598492208 = d^2u/dx1^2{power: 1.0}
+{'terms_number': {'optimizable': False, 'value': 4}, 'max_factors_in_term': {'optimizable': False, 'value': {'factors_num': [1, 2], 'probas': [0.8, 0.2]}}, ('sparsity', 'u'): {'optimizable': True, 'value': 0.21125750317996891}} 
+
+0.0 * u{power: 1.0} * du/dx2{power: 1.0} + 0.0 * u{power: 1.0} + 0.04005348929324611 * d^2u/dx2^2{power: 1.0} + -0.012597553598492208 = d^2u/dx1^2{power: 1.0}
+{'terms_number': {'optimizable': False, 'value': 4}, 'max_factors_in_term': {'optimizable': False, 'value': {'factors_num': [1, 2], 'probas': [0.8, 0.2]}}, ('sparsity', 'u'): {'optimizable': True, 'value': 0.2639337572843398}}
+
+Multi-objective

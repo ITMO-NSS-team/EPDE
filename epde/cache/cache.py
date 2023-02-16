@@ -176,8 +176,8 @@ class Cache(object):
 
     def use_structural(self, use_base_data=True, label=None, replacing_data=None):
         # print(f'Setting structural data for {label}, for it: {use_base_data} - use_base_data')
-        assert use_base_data or not isinstance(replacing_data, None), 'Structural data must be declared with base data or by additional tensors.'
-        if isinstance(label, None):
+        assert use_base_data or replacing_data is not None, 'Structural data must be declared with base data or by additional tensors.'
+        if label is None:
             # self.structural_used = True
             if use_base_data:
                 self.memory_structural = {key: val for key, val in self.memory_default.items()}
@@ -238,9 +238,9 @@ class Cache(object):
         ...
 
         '''
-        assert not (isinstance(mem_for_cache_frac, None) and isinstance(mem_for_cache_abs, None)), 'Avalable memory space not defined'
+        assert not (mem_for_cache_frac is None and mem_for_cache_abs is None), 'Avalable memory space not defined'
         assert type(obj_test_case) is not None or len(self.memory_default) > 0, 'Method needs sample of stored matrix to evaluate memory allocation'
-        if isinstance(mem_for_cache_abs, None):
+        if mem_for_cache_abs is None:
             self.available_mem = mem_for_cache_frac / 100. * psutil.virtual_memory().total  # Allocated memory for tensor storage, bytes
         else:
             self.available_mem = mem_for_cache_abs

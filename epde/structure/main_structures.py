@@ -53,11 +53,9 @@ class Term(ComplexStructure):
     @property
     def cache_label(self):
         if len(self.structure) > 1:
-            structure_sorted = sorted(
-                self.structure, key=lambda x: x.cache_label)
+            structure_sorted = sorted(self.structure, key=lambda x: x.cache_label)
             # reduce(form_label, structure_sorted, '')
-            cache_label = tuple(
-                [elem.cache_label for elem in structure_sorted])
+            cache_label = tuple([elem.cache_label for elem in structure_sorted])
         else:
             cache_label = self.structure[0].cache_label
         return cache_label
@@ -122,8 +120,7 @@ class Term(ComplexStructure):
                 # print('family is ', family)
                 for token_label in family[0]:
                     if isinstance(self.max_factors_in_term, int):
-                        forbidden_factors[token_label] = [
-                            0, min(self.max_factors_in_term, family[1]), False]
+                        forbidden_factors[token_label] = [0, min(self.max_factors_in_term, family[1]), False]
                     elif isinstance(self.max_factors_in_term, dict) and 'probas' in self.max_factors_in_term.keys():
                         forbidden_factors[token_label] = [0, min(self.max_factors_in_term['factors_num'][-1], family[1]),
                                                           False]
@@ -159,8 +156,7 @@ class Term(ComplexStructure):
                                                           token_status=self.occupied_tokens_labels,
                                                           **kwargs)
 
-            update_token_status(
-                self.occupied_tokens_labels, occupied_by_factor)
+            update_token_status(self.occupied_tokens_labels, occupied_by_factor)
             self.structure.append(factor)
         self.structure = filter_powers(self.structure)
 
@@ -205,8 +201,8 @@ class Term(ComplexStructure):
     def filter_tokens_by_right_part(self, reference_target, equation, equation_position):
         warnings.warn(message='Tokens can no longer be set as right-part-unique',
                       category=DeprecationWarning)
-        taken_tokens = [
-            factor.label for factor in reference_target.structure if factor.status['unique_for_right_part']]
+        taken_tokens = [factor.label for factor in reference_target.structure 
+			 if factor.status['unique_for_right_part']]
         meaningful_taken = any([factor.status['meaningful'] for factor in reference_target.structure
                                 if factor.status['unique_for_right_part']])
 
@@ -229,8 +225,7 @@ class Term(ComplexStructure):
                 warnings.warn(
                     'Can not create unique term, while filtering equation tokens in regards to the right part.')
             if accept_term_try >= 10:
-                self.randomize(
-                    forbidden_factors=new_term.occupied_tokens_labels + taken_tokens)
+                self.randomize(forbidden_factors=new_term.occupied_tokens_labels + taken_tokens)
             if accept_term_try == 100:
                 print(
                     'Something wrong with the random generation of term while running "filter_tokens_by_right_part"')
@@ -843,6 +838,15 @@ class SoEq(moeadd.MOEADDSolution):
         '''
         assert callable(obj_funs) or all([callable(fun) for fun in obj_funs])
         self.obj_funs = obj_funs
+
+    def matches_complexitiy(self, complexity : Union[int, list]):
+        if isinstance(complexity, (int, float)):    
+            complexity = [complexity,]
+        
+        if not isinstance(complexity, list) or len(self.vars_to_describe) != len(complexity):
+            raise ValueError('Incorrect list of complexities passed.')
+        
+        return list(self.obj_fun[-len(complexity):]) == complexity        
 
     def create_equations(self):
         structure = {}

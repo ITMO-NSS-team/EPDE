@@ -5,11 +5,6 @@
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import TEDEouS.solver as solver
-from TEDEouS.input_preprocessing import Equation as SolverEquation
-import epde.globals as global_var
-from epde.structure.main_structures import Equation, SoEq
-from functools import singledispatchmethod, singledispatch
 import numpy as np
 import torch
 
@@ -188,8 +183,7 @@ class PregenBOperator(object):
                     bc_values = np.expand_dims(bc_values, axis=0).T
                     coords = torch.from_numpy(coords).type(torch.FloatTensor)
 
-                    bc_values = torch.from_numpy(
-                        bc_values).type(torch.FloatTensor)
+                    bc_values = torch.from_numpy(bc_values).type(torch.FloatTensor)
                     operator = BOPElement(axis=ax_idx, key=variable, coeff=1, term=[None],
                                           power=1, var=var_idx, rel_location=loc)
                     operator.set_grid(grid=coords)
