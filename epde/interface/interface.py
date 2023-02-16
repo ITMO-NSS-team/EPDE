@@ -67,7 +67,16 @@ class InputDataEntry(object):
     def set_derivatives(self, preprocesser: PreprocessingPipe, deriv_tensors=None,
                         max_order: Union[list, tuple, int] = 1, grid: list = []):
         """
-        Method for setting derivatives ot calculate derivatives from data 
+        Method for setting derivatives ot calculate derivatives from data
+
+        Args:
+            preprocesser (`PreprocessingPipe`): operator for preprocessing data (smooting and calculating derivatives)
+            deriv_tensor (`np.ndarray`): values of derivatives
+            max_order (`list`|`tuple`|`int`): order for derivatives
+            grid: value of grid
+
+        Returns:
+            None
         """
         deriv_names, deriv_orders = define_derivatives(self.var_name, dimensionality=self.data_tensor.ndim,
                                                        max_order=max_order)
@@ -86,6 +95,9 @@ class InputDataEntry(object):
                                      'dimensionality': self.data_tensor.ndim}
 
     def use_global_cache(self):
+        """
+        Method for add calculated derivatives in the cache
+        """
         # print(f'self.data_tensor: {self.data_tensor.shape}')
         # print(f'self.derivatives: {self.derivatives.shape}')
         derivs_stacked = prepare_var_tensor(self.data_tensor, self.derivatives, time_axis=global_var.time_axis)
@@ -107,27 +119,23 @@ def simple_selector(sorted_neighbors, number_of_neighbors=4):
 
 
 class EpdeSearch(object):
-    '''
-    
+    """
     Intialization of the epde search object. Here, the user can declare the properties of the 
     search mechainsm by defining evolutionary search strategy.
     
-    Parameters:
-    --------------
-    
-    use_default_strategy : bool, optional
-        True (base and recommended value), if the default evolutionary strategy will be used, 
-        False if the user-defined strategy will be passed further. Otherwise, the search will 
-        not be conducted.
+    Attributes:    
+        use_default_strategy (`bool`): optional
+            True (base and recommended value), if the default evolutionary strategy will be used, 
+            False if the user-defined strategy will be passed further. Otherwise, the search will 
+            not be conducted.  
+        director (`OptimizationPatternDirector`): optional
+            User-defined director, responsible for construction of multi-objective evolutionary optimization
+            strategy; shall not be interfered with unless for very specific tasks.
         
-    director : OptimizationPatternDirector, optional
-        User-defined director, responsible for construction of multi-objective evolutionary optimization
-        strategy; shall not be interfered with unless for very specific tasks.
-        
-    director_params : dict, optional
-        Contains parameters for evolutionary operator builder / construction director, that
-        can be passed to individual operators. Keys shall be 'variation_params', 'mutation_params',
-        'pareto_combiner_params', 'pareto_updater_params'.
+        director_params (`dict`): optionals
+            Contains parameters for evolutionary operator builder / construction director, that
+            can be passed to individual operators. Keys shall be 'variation_params', 'mutation_params',
+            'pareto_combiner_params', 'pareto_updater_params'.
         
     time_axis : int, optional
         Indicator of time axis in data and grids. Used in normalization for regressions.
@@ -183,7 +191,7 @@ class EpdeSearch(object):
     rectangular: bool, optional
         A line of subdomains along an axis can be removed if all values inside them are identical to zero.        
     
-    '''    
+    """
     def __init__(self, multiobjective_mode: bool = True, use_default_strategy: bool = True, director=None, 
                  director_params : dict = {'variation_params' : {}, 'mutation_params' : {},
                                            'pareto_combiner_params' : {}, 'pareto_updater_params' : {}}, 
@@ -329,7 +337,7 @@ class EpdeSearch(object):
             calculation, defalut value is 1.
 
         '''
-        self.optimizer_init_params = {'weights_num': population_size, 'pop_size': population_size,
+        self.moeadd_params = {'weights_num': population_size, 'pop_size': population_size,
                               'delta': delta, 'neighbors_number': neighbors_number,
                               'solution_params': solution_params,
                               'nds_method' : nds_method, 
@@ -676,29 +684,3 @@ class EpdeSearch(object):
             return global_var.grid_cache, global_var.tensor_cache
         else:
             return None, global_var.tensor_cache
-
-    def get_equations_by_complexity(self, complexity : Union[int, list]):
-        return self.optimizer.pareto_levels.get_by_complexity(complexity)
-
-    def predict(self, system: SoEq, boundary_conditions: BoundaryConditions, grid: list = None, 
-                system_file: str = None, solver_kwargs: dict={'model' : None, 'use_cache' : True}):
-        solver_kwargs['dim'] = len(global_var.grid_cache.get_all()[1])
-        # solver_kwargs['dim']
-        
-        if system is not None:
-            print('Using explicitly sent system of equations.')
-        elif system_file is not None:
-            assert '.pickle' in system_file
-            print('Loading equation from pickled file.')
-
-            system = pickle.load(file=system_file)
-        else:
-            raise ValueError('Missing system, that was not passed in any form.')
-        
-        if grid is None:
-            grid = global_var.grid_cache.get_all()[1]
-        
-        adapter = SolverAdapter(var_number = len(system.vars_to_describe))
-        solution_model = adapter.solve_epde_system(system = system, grids = grid, 
-                                                   boundary_conditions = boundary_conditions)
-        return solution_model(adapter.convert_grid(grid)).detach().numpy()
