@@ -47,9 +47,9 @@ def upload_simple_tokens(labels, cache, tensors, grid_setting=False):
     Uploads the basic factor into the cache with its value in ndimensional numpy.array
 
     Args:
-        labels:  list or 1-d array with string name of coefficients
-        cache: 
-        tensors:  n-d numpy.array with values for coefficients, shape of array: (n, m, ...), where n is number of coefficients
+        labels: list or 1-d array with string name of coefficients
+        cache (`Cache`): keeping values of terms/factors of equations.
+        tensors (`numpy.ndarray`): values for coefficients, shape of array: (n, m, ...), where n is number of coefficients
         grid_settings:  optional, boolean argument, default - False
 
     Returns:
@@ -114,12 +114,14 @@ def np_ndarray_section(matrix, boundary=None, except_idx: list = []):
 
 def prepare_var_tensor(var_tensor, derivs_tensor, time_axis):
     """
+    Method for transformation of the input data, the time axis is placed first
 
     Args:
         var_tensor: numpy.array, 
         derivs_tensor: numpy.ndarray, 
         time_axis:
     Returns:
+        result (`numpy.ndarray`): formed data for the algorithm
 
     """
     initial_shape = var_tensor.shape
@@ -176,8 +178,8 @@ class Cache(object):
 
     def use_structural(self, use_base_data=True, label=None, replacing_data=None):
         # print(f'Setting structural data for {label}, for it: {use_base_data} - use_base_data')
-        assert use_base_data or not isinstance(replacing_data, None), 'Structural data must be declared with base data or by additional tensors.'
-        if isinstance(label, None):
+        assert use_base_data or replacing_data is not None, 'Structural data must be declared with base data or by additional tensors.'
+        if label is None:
             # self.structural_used = True
             if use_base_data:
                 self.memory_structural = {key: val for key, val in self.memory_default.items()}
@@ -238,9 +240,9 @@ class Cache(object):
         ...
 
         '''
-        assert not (isinstance(mem_for_cache_frac, None) and isinstance(mem_for_cache_abs, None)), 'Avalable memory space not defined'
+        assert not (mem_for_cache_frac is None and mem_for_cache_abs is None), 'Avalable memory space not defined'
         assert type(obj_test_case) is not None or len(self.memory_default) > 0, 'Method needs sample of stored matrix to evaluate memory allocation'
-        if isinstance(mem_for_cache_abs, None):
+        if mem_for_cache_abs is None:
             self.available_mem = mem_for_cache_frac / 100. * psutil.virtual_memory().total  # Allocated memory for tensor storage, bytes
         else:
             self.available_mem = mem_for_cache_abs

@@ -136,7 +136,7 @@ class SpectralDeriv(AbstractDeriv):
         #     func = self.func
         #     grid = self.grid
         func_projection = np.fft.rfft(func)
-        if isinstance(n, type(None)):
+        if n is None:
             n = func_projection.size
         func_projection_copy = np.copy(func_projection)
         spacing_vector = np.reshape(grid, (1, grid.size))
@@ -153,7 +153,7 @@ class SpectralDeriv(AbstractDeriv):
     
         if isinstance(n, int):
             n = np.full(shape=len(grid), fill_value=n)
-        if isinstance(n, type(None)):
+        if n is None:
             n = np.min(func.shape)
         all_dim_derivative = []
         func_projection = np.fft.fftn(func, axes=[0,1])
@@ -224,7 +224,7 @@ class SpectralDeriv(AbstractDeriv):
 
         if len(grid) > 1 and grid[0].shape == grid[1].shape:
             grid = make_unsparse_sparse(*grid)
-        if isinstance(n, int) or isinstance(n, type(None)):
+        if isinstance(n, int) or n is None:
             n = np.full(shape=len(grid), fill_value=n)
 
         derivatives = self.differentiate(
