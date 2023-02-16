@@ -263,8 +263,7 @@ class TokenFamily(object):
         if isinstance(eval_function, EvaluatorContained):
             self._evaluator = eval_function
         else:
-            self._evaluator = EvaluatorContained(
-                eval_function, eval_kwargs_keys)
+            self._evaluator = EvaluatorContained(eval_function, eval_kwargs_keys)
 #        self._evaluator.set_params(**eval_params)
         self.evaluator_set = True
         if self.params_set and not suppress_eval_test:

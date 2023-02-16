@@ -36,7 +36,7 @@ def translate_eq():
 
     lp_terms = [['d^2u/dx3^2{power: 1}'], ['d^2u/dx2^2{power: 1}']]
     rp_term = ['d^2u/dx1^2{power: 1}',]
-    epde_search_obj = epde_alg.epde_search(use_solver = False, dimensionality = dimensionality, boundary = boundary,
+    epde_search_obj = epde_alg.EpdeSearch(use_solver = False, dimensionality = dimensionality, boundary = boundary,
                                            coordinate_tensors = grids, verbose_params = {'show_moeadd_epochs' : True})    
 
     epde_search_obj.create_pool(data = u, max_deriv_order=(2, 2, 2), additional_tokens = [], 
@@ -53,7 +53,7 @@ def translate_eq():
     print(map_to_equation(test1.equation, np.mean))
     
 def run_wave_eq_search(mode):
-    epde_search_obj = epde_alg.epde_search(multiobjective_mode=multiobjective_mode, use_solver=False, 
+    epde_search_obj = epde_alg.EpdeSearch(multiobjective_mode=multiobjective_mode, use_solver=False, 
                                            dimensionality=dimensionality, boundary=boundary, 
                                            coordinate_tensors = grids, 
                                            verbose_params = {'show_moeadd_epochs' : True})    

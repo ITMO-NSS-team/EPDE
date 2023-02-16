@@ -30,8 +30,7 @@ def FDderivatives(matrix, axis, idx, grid, max_order, poly_bound):
     derivatives = np.empty(3)
     derivatives[0] = (F[1] - F[0]) / (x[1] - x[0])
     derivatives[1] = (2*F[0] - 5*F[1] + 4*F[2] - F[3]) / (x[1] - x[0]) ** 2
-    derivatives[2] = (-2.5*F[0] + 9*F[1] - 12*F[2] + 7 *
-                      F[3] - 1.5*F[4]) / (x[1] - x[0]) ** 3
+    derivatives[2] = (-2.5*F[0] + 9*F[1] - 12*F[2] + 7*F[3] - 1.5*F[4]) / (x[1] - x[0]) ** 3
     if max_order > 3:
         raise ValueError(
             'Attempting to calculate derivatives up to order higher, than 3. Option not implemented yet.')

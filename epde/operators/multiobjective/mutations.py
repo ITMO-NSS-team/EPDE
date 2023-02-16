@@ -19,7 +19,7 @@ from epde.supplementary import filter_powers, try_iterable
 from epde.operators.utils.template import CompoundOperator, add_param_to_operator
 
 
-from epde.decorators import History_Extender, ResetEquationStatus
+from epde.decorators import HistoryExtender, ResetEquationStatus
 
 
 class SystemMutation(CompoundOperator):
@@ -55,7 +55,7 @@ class SystemMutation(CompoundOperator):
 class EquationMutation(CompoundOperator):
     key = ["gene mutation", "structural mutation"]
 
-    @History_Extender(f'\n -> mutating equation', 'ba')
+    @HistoryExtender(f'\n -> mutating equation', 'ba')
     def apply(self, objective : Equation, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)  
 

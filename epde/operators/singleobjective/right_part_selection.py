@@ -13,7 +13,7 @@ import warnings
 
 import epde.globals as global_var
 from epde.operators.utils.template import CompoundOperator
-from epde.decorators import History_Extender
+from epde.decorators import HistoryExtender
 from epde.structure.main_structures import Term, Equation
     
 class EqRightPartSelector(CompoundOperator):
@@ -40,7 +40,7 @@ class EqRightPartSelector(CompoundOperator):
 
     
     '''    
-    @History_Extender('\n -> The equation structure was detected: ', 'a')        
+    @HistoryExtender('\n -> The equation structure was detected: ', 'a')        
     def apply(self, objective : Equation, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
@@ -101,7 +101,7 @@ class RandomRHPSelector(CompoundOperator):
 
     
     '''
-    @History_Extender('\n -> The equation structure was detected: ', 'a')
+    @HistoryExtender('\n -> The equation structure was detected: ', 'a')
     def apply(self, objective : Equation, arguments : dict):
         # print(f'CALLING RIGHT PART SELECTOR FOR {objective.text_form}')
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)

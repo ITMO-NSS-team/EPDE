@@ -66,8 +66,7 @@ class ConcretePrepBuilder(GeneralizedPrepBuilder):
         try:
             test_call = self._prep_pipeline.run()
             if len(self.output_tests) > 0:
-                test_call = reduce(lambda x, y: y(
-                    x), self.output_tests, test_call)
+                test_call = reduce(lambda x, y: y(x), self.output_tests, test_call)
             _ = test_call(np.ones((100, 100)))
         except:
             print("Incorrect selection of preprocessing tools.")

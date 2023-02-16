@@ -119,7 +119,7 @@ class PopulationIterator(object):
         self._idx = 0
 
     def __next__(self):
-        if self._idx < self._population.length:
+        if self._idx < len(self._population.population):
             res = self._population.population[self._idx]
             self._idx += 1
             return res

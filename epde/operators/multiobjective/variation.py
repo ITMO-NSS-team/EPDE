@@ -17,7 +17,7 @@ from epde.structure.structure_template import check_uniqueness
 from epde.optimizers.moeadd.moeadd import ParetoLevels
 
 from epde.supplementary import detect_similar_terms, flatten
-from epde.decorators import History_Extender, ResetEquationStatus
+from epde.decorators import HistoryExtender, ResetEquationStatus
 
 from epde.operators.utils.template import CompoundOperator, add_param_to_operator
 from epde.operators.multiobjective.moeadd_specific import get_basic_populator_updater
@@ -144,7 +144,7 @@ class MetaparamerCrossover(CompoundOperator):
 class EquationCrossover(CompoundOperator):
     key = ["gene level", "structural crossover"]
     
-    @History_Extender(f'\n -> performing equation crossover', 'ba')
+    @HistoryExtender(f'\n -> performing equation crossover', 'ba')
     def apply(self, objective : tuple, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
@@ -175,7 +175,7 @@ class EquationCrossover(CompoundOperator):
 class EquationExchangeCrossover(CompoundOperator):
     key = ["gene level", "structural crossover"]
     
-    @History_Extender(f'\n -> performing equation exchange crossover', 'ba')
+    @HistoryExtender(f'\n -> performing equation exchange crossover', 'ba')
     def apply(self, objective : tuple, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         

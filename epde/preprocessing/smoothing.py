@@ -19,8 +19,8 @@ def Smoothing(data, kernel_fun, **params):
                     smoothed[time_idx, :, :] = gaussian_filter(
                         data[time_idx, :, :], sigma=params['sigma'])
                 elif np.ndim(data) == 2:
-                    smoothed[time_idx, :] = gaussian_filter(
-                        data[time_idx, :], sigma=params['sigma'])
+                    smoothed[time_idx, :] = gaussian_filter(data[time_idx, :], 
+							      sigma=params['sigma'])
         else:  # if np.ndim(data) == 1:
             smoothed = gaussian_filter(data, sigma=params['sigma'])
     else:

@@ -329,7 +329,7 @@ class EpdeSearch(object):
             calculation, defalut value is 1.
 
         '''
-        self.moeadd_params = {'weights_num': population_size, 'pop_size': population_size,
+        self.optimizer_init_params = {'weights_num': population_size, 'pop_size': population_size,
                               'delta': delta, 'neighbors_number': neighbors_number,
                               'solution_params': solution_params,
                               'nds_method' : nds_method, 
@@ -676,3 +676,29 @@ class EpdeSearch(object):
             return global_var.grid_cache, global_var.tensor_cache
         else:
             return None, global_var.tensor_cache
+
+    def get_equations_by_complexity(self, complexity : Union[int, list]):
+        return self.optimizer.pareto_levels.get_by_complexity(complexity)
+
+    def predict(self, system: SoEq, boundary_conditions: BoundaryConditions, grid: list = None, 
+                system_file: str = None, solver_kwargs: dict={'model' : None, 'use_cache' : True}):
+        solver_kwargs['dim'] = len(global_var.grid_cache.get_all()[1])
+        # solver_kwargs['dim']
+        
+        if system is not None:
+            print('Using explicitly sent system of equations.')
+        elif system_file is not None:
+            assert '.pickle' in system_file
+            print('Loading equation from pickled file.')
+
+            system = pickle.load(file=system_file)
+        else:
+            raise ValueError('Missing system, that was not passed in any form.')
+        
+        if grid is None:
+            grid = global_var.grid_cache.get_all()[1]
+        
+        adapter = SolverAdapter(var_number = len(system.vars_to_describe))
+        solution_model = adapter.solve_epde_system(system = system, grids = grid, 
+                                                   boundary_conditions = boundary_conditions)
+        return solution_model(adapter.convert_grid(grid)).detach().numpy()

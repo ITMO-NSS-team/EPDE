@@ -57,15 +57,13 @@ class LASSOSparsity(CompoundOperator):
         None
         """
         # print(f'Metaparameter: {objective.metaparameters}, objective.metaparameters[("sparsity", objective.main_var_to_explain)]')
-        self_args, subop_args = self.parse_suboperator_args(
-            arguments=arguments)
+        self_args, subop_args = self.parse_suboperator_args(arguments=arguments)
 
         estimator = Lasso(alpha=objective.metaparameters[('sparsity', objective.main_var_to_explain)]['value'],
                           copy_X=True, fit_intercept=True, max_iter=1000, normalize=False,
                           positive=False, precompute=False, random_state=None,
                           selection='cyclic', tol=0.0001, warm_start=False)
-        _, target, features = objective.evaluate(
-            normalize=True, return_val=False)
+        _, target, features = objective.evaluate(normalize=True, return_val=False)
         self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)
 
         # target = np.multiply(target, self.g_fun_vals)
