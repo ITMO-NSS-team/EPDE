@@ -26,10 +26,7 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
         equation.weights_final attribute
             
     
-    '''
-    
-    key = ['chromosome level', 'coeff_calculator']
-    
+    '''    
     def apply(self, objective : Equation, arguments : dict):
         """
         Calculate the coefficients of the equation, using the linear regression.The result is stored in the 

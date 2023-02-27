@@ -14,11 +14,11 @@ from epde.operators.utils.template import add_param_to_operator
 
 from epde.operators.multiobjective.selections import MOEADDSelection
 from epde.operators.multiobjective.variation import get_basic_variation
-from epde.operators.multiobjective.fitness import L2Fitness
-from epde.operators.multiobjective.right_part_selection import RandomRHPSelector
+from epde.operators.common.fitness import L2Fitness
+from epde.operators.common.right_part_selection import RandomRHPSelector
 from epde.operators.multiobjective.moeadd_specific import get_pareto_levels_updater, SimpleNeighborSelector, get_initial_sorter
-from epde.operators.multiobjective.sparsity import LASSOSparsity
-from epde.operators.multiobjective.coeff_calculation import LinRegBasedCoeffsEquation
+from epde.operators.common.sparsity import LASSOSparsity
+from epde.operators.common.coeff_calculation import LinRegBasedCoeffsEquation
 
 from epde.optimizers.builder import add_sequential_operators, OptimizationPatternDirector
 

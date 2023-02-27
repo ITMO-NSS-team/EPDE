@@ -56,7 +56,7 @@ def run_wave_eq_search(multiobjective_mode, derivs = None):
         metric = epde_search_obj.equation_search_results(only_print = False, num = 1)[0].obj_fun[0]
     print(f'Obtained metric is {metric}')
     
-    return epde_search_obj.equation_search_results(only_print = False, num = 1), metric 
+    return epde_search_obj.equation_search_results(only_print = False, num = 1), metric, epde_search_obj.saved_derivaties 
     
 
 if __name__ == '__main__':
@@ -66,7 +66,6 @@ if __name__ == '__main__':
     Подгружаем данные, содержащие временные ряды динамики "вида-охотника" и "вида-жертвы"
     '''
     shape = 80
-        # shape = 50
         
     try:
         print(os.path.dirname( __file__ ))
@@ -86,7 +85,13 @@ if __name__ == '__main__':
     paretos = []
     exp_num = 20
     for exp_run in range(exp_num):
-        paretos.append(run_wave_eq_search(multiobjective_mode = exp_run >= exp_num/2))
+        if exp_num == 0:
+            derivs = None
+        res = run_wave_eq_search(multiobjective_mode = exp_run >= exp_num/2, derivs = derivs)
+        if exp_num == 0:
+            derivs = res[2]
+
+        paretos.append(res[:2])
         
     obj_funs_so = [2.030488112155742,
                    2.0304881121557465,

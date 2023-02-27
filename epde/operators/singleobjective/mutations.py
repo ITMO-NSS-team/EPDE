@@ -27,7 +27,6 @@ class SystemMutation(CompoundOperator):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)    
     
         altered_objective = deepcopy(objective)
-        # objective.copy_properties_to(altered_objective)
         
         eqs_keys = altered_objective.vals.equation_keys; params_keys = altered_objective.vals.params_keys
         affected_by_mutation = True
@@ -53,7 +52,6 @@ class SystemMutation(CompoundOperator):
     
 
 class EquationMutation(CompoundOperator):
-    # @ResetEquationStatus(reset_output = True)
     @History_Extender(f'\n -> mutating equation', 'ba')
     def apply(self, objective : Equation, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)  

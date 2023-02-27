@@ -22,8 +22,7 @@ from epde.operators.utils.template import CompoundOperator, add_param_to_operato
 from epde.decorators import History_Extender, ResetEquationStatus
 
 
-class SystemMutation(CompoundOperator):
-    key = ["chromosome level", "mutation"]    
+class SystemMutation(CompoundOperator):   
     def apply(self, objective : SoEq, arguments : dict): # TODO: add setter for best_individuals & worst individuals 
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)    
     
@@ -53,8 +52,6 @@ class SystemMutation(CompoundOperator):
     
 
 class EquationMutation(CompoundOperator):
-    key = ["gene mutation", "structural mutation"]
-
     @History_Extender(f'\n -> mutating equation', 'ba')
     def apply(self, objective : Equation, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)  

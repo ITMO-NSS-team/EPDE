@@ -38,7 +38,6 @@ class LASSOSparsity(CompoundOperator):
         calculate the coefficients of the equation, that will be stored in the equation.weights np.ndarray.    
         
     """
-    key = ["gene level", "sparsity"]    
     
     def apply(self, objective : Equation, arguments : dict):
         """

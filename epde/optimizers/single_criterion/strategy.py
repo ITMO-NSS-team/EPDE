@@ -4,10 +4,10 @@ from functools import partial
 from epde.operators.utils.operator_mappers import map_operator_between_levels
 from epde.operators.utils.template import add_param_to_operator
 
-from epde.operators.singleobjective.right_part_selection import RandomRHPSelector
-from epde.operators.singleobjective.fitness import L2Fitness
-from epde.operators.singleobjective.sparsity import LASSOSparsity
-from epde.operators.singleobjective.coeff_calculation import LinRegBasedCoeffsEquation
+from epde.operators.common.right_part_selection import RandomRHPSelector
+from epde.operators.common.fitness import L2Fitness
+from epde.operators.common.sparsity import LASSOSparsity
+from epde.operators.common.coeff_calculation import LinRegBasedCoeffsEquation
 from epde.operators.singleobjective.mutations import get_singleobjective_mutation
 from epde.operators.singleobjective.variation import get_singleobjective_variation
 from epde.operators.singleobjective.selections import RouletteWheelSelection
