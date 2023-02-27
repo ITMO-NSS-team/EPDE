@@ -13,6 +13,15 @@ from epde.cache.cache import Cache
 
 
 def init_caches(set_grids: bool = False):
+    """
+    Initialization global variables for keeping input data, values of grid and useful tensors such as evaluated terms
+
+    Args:
+        set_grids (`bool`): flag about using grid data
+
+    Returns:
+        None
+    """
     global tensor_cache, grid_cache, initial_data_cache
     tensor_cache = Cache()
     initial_data_cache = Cache()
@@ -23,6 +32,9 @@ def init_caches(set_grids: bool = False):
 
 
 def set_time_axis(axis: int):
+    """
+    Setting global of time axis
+    """
     global time_axis
     time_axis = axis
 
@@ -51,6 +63,9 @@ def delete_cache():
 
 @dataclass
 class Verbose_Manager:
+    """
+    Manager for output in text form
+    """
     plot_DE_solutions : bool
     iter_idx : bool
     iter_fitness : bool
@@ -58,9 +73,24 @@ class Verbose_Manager:
     show_warnings : bool
     show_moeadd_epochs : bool
     
-def init_verbose(plot_DE_solutions : bool = False, show_iter_idx : bool = False, 
-                 show_iter_fitness : bool = False, show_iter_stats : bool = False, 
-                 show_warnings : bool = False, show_moeadd_epochs : bool = False):
+def init_verbose(plot_DE_solutions: bool = False, show_iter_idx: bool = False, 
+                 show_iter_fitness: bool = False, show_iter_stats: bool = False, 
+                 show_warnings: bool = False, show_moeadd_epochs: bool = False):
+    """
+    Method for initialized of manager for output in text form
+
+    Args:
+        plot_DE_solutions (`bool`): optional 
+            display solutions of a differential equation, default - False
+        show_iter_idx (`bool`): optional
+            display the index of each iteration EA, default - False
+        show_iter_fitness (`bool`): optional
+            display the fitness of each iteration EA, default - False
+        show_iter_stats (`bool`): optional
+            display statistical properties of the population in each iteration EA, default - False
+        show_warnings (`bool`): optional
+            display warnings arising during the operation of the algorithm, default - False
+    """
     global verbose
     if not show_warnings:
         warnings.filterwarnings("ignore")

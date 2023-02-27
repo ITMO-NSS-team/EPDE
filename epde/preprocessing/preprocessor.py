@@ -80,14 +80,14 @@ class ConcretePrepBuilder(GeneralizedPrepBuilder):
 
 class PreprocessingPipe(object):
     """
-    Class with intruments for preprocessing input data and calculate derivatives.
+    Class with instruments for preprocessing input data and calculate derivatives.
 
     Attributes:
-        smoother (`method`): method for smoothing input data before calculate derivatives  
+        smoother (`callable`): method for smoothing input data before calculate derivatives  
         smoother_args (`list`): args for `self.smoother`
         smoother_kwargs (`dict`): kwargs fot `self.smoother`
 
-        deriv_calculator (`method`): method for calculating derivatives from data
+        deriv_calculator (`callable`): method for calculating derivatives from data
         deriv_calculator_args (`list`): args for `self.deriv_calculator`
         deriv_calculator_kwargs (`dict`): kwargs for `self.deriv_calculator`
     """
@@ -103,7 +103,7 @@ class PreprocessingPipe(object):
 
     def use_grid(self, grid):
         """
-        Method for set parameter 'grid' to kwargs of methods for smoothing and derivative's calculating.
+        Method to set parameter 'grid' to kwargs of methods for smoothing and derivative's calculating.
 
         Args:
             grid (`np.ndarray`): value of grid
@@ -118,7 +118,7 @@ class PreprocessingPipe(object):
 
     def run(self, data, grid=None, max_order: Union[list, int] = 1):
         """
-        Method that run process of calculation derivatives. 
+        Method that runs process of calculation derivatives. 
 
         Args:
             data (`np.ndarray`): values from which derivatives are calculated

@@ -66,11 +66,11 @@ def upload_simple_tokens(labels, cache, tensors, grid_setting=False):
 
 def upload_grids(grids, cache):
     """
-    Grids are saved into the base matrices of the cache/
+    Grids are saved into the base matrices of the cache
 
     Args:
-        grids: type argument can be list|tuple|numpy.ndarray, value of grids
-        cache:
+        grids (`list|tuple|numpy.ndarray`): value of grids
+        cache (`Cache`): object where grids wiil be stored
     
     Returns:
         None
@@ -231,17 +231,26 @@ class Cache(object):
         self.base_tensors.append(label)
 
     def set_boundaries(self, boundary_width: Union[int, list]):
+        """
+        Setting the number of unaccounted elements at the edges
+        """
         assert '0' in self.memory_default.keys(), 'Boundaries should be specified for grid cache.'
         self.boundary_width = boundary_width
 
     def memory_usage_properties(self, obj_test_case=None, mem_for_cache_frac=None, mem_for_cache_abs=None):
-        '''
-        Properties:
-        ...
+        """
+        Method for setting of memory using in algorithm's process
 
-        '''
+        Args:
+            obj_test_case (`ndarray`): referntial tensor to evaluate memory consuption by tensors equation search
+            mem_for_cache_frac (`int`): memory available for cache (in fraction of RAM). The default - None.
+            mem_for_cache_abs (`int`): memory available for cache (in byte). The default - None.
+        
+        Returns:
+            None
+        """
         assert not (mem_for_cache_frac is None and mem_for_cache_abs is None), 'Avalable memory space not defined'
-        assert type(obj_test_case) is not None or len(self.memory_default) > 0, 'Method needs sample of stored matrix to evaluate memory allocation'
+        assert obj_test_case is not None or len(self.memory_default) > 0, 'Method needs sample of stored matrix to evaluate memory allocation'
         if mem_for_cache_abs is None:
             self.available_mem = mem_for_cache_frac / 100. * psutil.virtual_memory().total  # Allocated memory for tensor storage, bytes
         else:

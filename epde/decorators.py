@@ -104,6 +104,12 @@ class HistoryExtender():
 
 
 class BoundaryExclusion():
+    """
+    Class for modifing test function to ignore (i.e. considered zeros) values at the bounderies
+
+    Attributes:
+        boundary_width (`int|list|tuple`): the number of unaccounted elements at the edges
+    """
     def __init__(self, boundary_width=0):
         self.boundary_width = boundary_width
 
