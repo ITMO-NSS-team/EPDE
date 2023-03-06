@@ -23,6 +23,12 @@ from epde.cache.cache import upload_simple_tokens, prepare_var_tensor  # np_ndar
 
 
 class PreparedTokens(ABC):
+    """
+    Parent class for all prepared tokens, that have corresponding class, defined here 
+
+    Attributes:
+        _token_family  (`TokenFamily`): the family of functions to which the token belongs
+    """
     def __init__(self, *args, **kwargs):
         self._token_family = TokenFamily(token_type='Placeholder')
 
@@ -34,7 +40,19 @@ class PreparedTokens(ABC):
 
 
 class TrigonometricTokens(PreparedTokens):
+    """
+    Class for prepared tokens, that belongs to the trigonometric family
+    """
     def __init__(self, freq: tuple = (np.pi/2., 2*np.pi), dimensionality=1):
+        """
+        Initialization of class
+
+        Args:
+            freq (`tuple`): optional, default - (pi/2., 2*pi)
+                interval for parameter frequency in trigonometric token
+            dimensionally (`int`): optional, default - 1
+                data dimension 
+        """
         assert freq[1] > freq[0] and len(freq) == 2, 'The tuple, defining frequncy interval, shall contain 2 elements with first - the left boundary of interval and the second - the right one. '
 
         self._token_family = TokenFamily(token_type='trigonometric')
@@ -58,10 +76,31 @@ class LogfunTokens(PreparedTokens):
 
 
 class CustomTokens(PreparedTokens):
+    """
+    Class for customer tokens
+    """
     def __init__(self, token_type: str, token_labels: list,
                  evaluator: Union[CustomEvaluator, EvaluatorTemplate, Callable],
-                 params_ranges: dict, params_equality_ranges: Union[None, dict], dimensionality: int = 1,
+                 params_ranges: dict, params_equality_ranges: dict = None, dimensionality: int = 1,
                  unique_specific_token=True, unique_token_type=True, meaningful=False):
+        
+        """
+        Initialization of class
+
+        Args:
+            token_type (`str`): type of token for class `TokenFamily`
+            token_labels (`list`): name of parameters of customer token
+            evaluator (`CustomEvaluator|EvaluatorTemplate|Callable`): method for evaluating customer token
+            params_range (`dict`): intervals for each parameter for customer token
+            params_equality_ranges (`dict`): optional, default - None
+                acceptable deviations of parameters for equivalence tokens
+            unique_specific_token (`boolean`): optional, default - True 
+                if True, a specific token can be present only once per term
+            unique_token_type (`boolean`): optional, default - True 
+                if True, only one token of the family can be present in the term
+            meaningful (`boolean`): optional, default - True
+                token significance flag
+        """
         self._token_family = TokenFamily(token_type=token_type)
         self._token_family.set_status(unique_specific_token=unique_specific_token,
                                       unique_token_type=unique_token_type, meaningful=meaningful)

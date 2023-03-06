@@ -19,7 +19,7 @@ from epde.optimizers.moeadd.supplementary import *
 from epde.optimizers.single_criterion.supplementary import simple_sorting
 # from epde.optimizers.moeadd.strategy_elems import SectorProcesserBuilder
 
-from epde.preprocessing.DomainPruning import DomainPruner
+from epde.preprocessing.domain_pruning import DomainPruner
 from epde.operators.utils.default_parameter_loader import EvolutionaryParams
 
 from epde.optimizers.builder import StrategyBuilder
@@ -628,7 +628,18 @@ class EpdeSearch(object):
             derivs = None, max_deriv_order = 1, additional_tokens = [], memory_for_cache = 5,
             prune_domain : bool = False, pivotal_tensor_label = None, pruner = None, 
             threshold : float = 1e-2, division_fractions = 3, rectangular : bool = True, 
-            data_fun_pow : int = 1):    
+            data_fun_pow : int = 1):
+        """
+        Fitting functional for multiojective optimization 
+
+        Args:
+            equation_terms_max_number (`int`): maximum count of terms in differential equation, default - 6
+            equation_factors_max_number (`int`): maximum count of factors in term of differential equation, default - 1
+            eq_sparsity_interval (`tuple`): interval of allowed values of sparsity constant for lasso regression, default - (1e-4, 2.5)
+
+        Returns:
+            None
+        """
         pop_constructor = MOEADDSystemPopConstr(pool = self.pool, terms_number = equation_terms_max_number, 
                                                 max_factors_in_term = equation_factors_max_number,
                                                 sparsity_interval = eq_sparsity_interval)
@@ -656,6 +667,17 @@ class EpdeSearch(object):
                             prune_domain : bool = False, pivotal_tensor_label = None, pruner = None, 
                             threshold : float = 1e-2, division_fractions = 3, rectangular : bool = True, 
                             data_fun_pow : int = 1):
+        """
+        Fitting functional for singleobjective optimization 
+
+        Args:
+            equation_terms_max_number (`int`): maximum count of terms in differential equation, default - 6
+            equation_factors_max_number (`int`): maximum count of factors in term of differential equation, default - 1
+            eq_sparsity_interval (`tuple`): interval of allowed values of sparsity constant for lasso regression, default - (1e-4, 2.5)
+
+        Returns:
+            None
+        """
         pop_constructor = SOSystemPopConstr(pool = self.pool, terms_number = equation_terms_max_number, 
                                             max_factors_in_term = equation_factors_max_number,
                                             sparsity_interval = eq_sparsity_interval)
@@ -685,6 +707,17 @@ class EpdeSearch(object):
             
     
     def equation_search_results(self, only_print : bool = True, num = 1):
+        """
+        Method for print or getting results of searching differential equation
+
+        Args:
+            only_print (`bool`): flag about action (print ot get) for results, default - True
+            num (`int`): count of results for getting or print, default - 1
+
+        Returns:
+            None, when `only_print` == True
+            resulting equations from population, when `only_print` == False  
+        """
         if self.multiobjective_mode:
             if only_print:
                 for idx in range(min(num, len(self.resulting_population))):
@@ -705,6 +738,9 @@ class EpdeSearch(object):
     def solver_forms(self):
         '''
         Method returns solver forms of the equations on 1-st non-dominated levels in a form of Python list.
+
+        Returns:
+            form system for solver
         '''
         sf = []
         for system in self.resulting_population[0]:

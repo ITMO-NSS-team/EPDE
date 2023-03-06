@@ -149,16 +149,10 @@ class TokenFamily(object):
         """
         Set the status of the elements of the token family; 
 
-        Parameters:
-        -----------            
-        mandatory : Bool
-            if True, a token from the family must be present in every term; 
-
-        unique_token_type : Bool
-            if True, only one token of the family can be present in the term; 
-
-        unique_specific_token : Bool
-            if True, a specific token can be present only once per term;
+        Args:           
+            mandatory (`boolean`):if True, a token from the family must be present in every term;
+            unique_token_type (`boolean`): if True, only one token of the family can be present in the term;
+            unique_specific_token (`boolean`): if True, a specific token can be present only once per term;
         """
         self.status = {}
         self.status['demands_equation'] = demands_equation
