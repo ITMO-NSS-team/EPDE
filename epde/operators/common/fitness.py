@@ -42,8 +42,8 @@ class L2Fitness(CompoundOperator):
         
     """
     
-    key = ['gene level', 'fitness']
-    
+    key = 'DiscrepancyBasedFitness'
+
     def apply(self, objective: Equation, arguments: dict):
         """
         Calculate the fitness function values. The result is not returned, but stored in the equation.fitness_value attribute.
@@ -88,6 +88,8 @@ class L2Fitness(CompoundOperator):
 
 
 class SolverBasedFitness(CompoundOperator):
+    key = 'SolverBasedFitness'
+    
     def __init__(self, param_keys: list, solver_kwargs: dict = {'model' : None, 'use_cache' : True}):
         super().__init__(param_keys)
         solver_kwargs['dim'] = len(global_var.grid_cache.get_all()[1])

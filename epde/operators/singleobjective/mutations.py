@@ -23,6 +23,8 @@ from epde.decorators import History_Extender, ResetEquationStatus
 
 
 class SystemMutation(CompoundOperator):
+    key = 'SystemMutation'
+
     def apply(self, objective : SoEq, arguments : dict): # TODO: add setter for best_individuals & worst individuals 
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)    
     
@@ -52,6 +54,8 @@ class SystemMutation(CompoundOperator):
     
 
 class EquationMutation(CompoundOperator):
+    key = 'EquationMutation'
+
     @History_Extender(f'\n -> mutating equation', 'ba')
     def apply(self, objective : Equation, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)  
@@ -67,6 +71,8 @@ class EquationMutation(CompoundOperator):
 
 
 class MetaparameterMutation(CompoundOperator):
+    key = 'MetaparameterMutation'
+
     def apply(self, objective : Union[int, float], arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
@@ -86,6 +92,8 @@ class TermMutation(CompoundOperator):
     """
     Specific operator of the term mutation, where the term is replaced with a randomly created new one.
     """
+    key = 'TermMutation'
+
     def apply(self, objective : tuple, arguments : dict): #term_idx, equation):
         """
         Return a new term, randomly created to be unique from other terms of this particular equation.
@@ -127,6 +135,8 @@ class TermParameterMutation(CompoundOperator):
     """
     Specific operator of the term mutation, where the term parameters are changed with a random increment.
     """
+    key = 'TermParameterMutation'
+
     def apply(self, objective : tuple, arguments : dict): # term_idx, objective
         """ 
         Specific operator of the term mutation, where the term parameters are changed with a random increment.

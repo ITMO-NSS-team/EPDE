@@ -4,6 +4,8 @@ from epde.operators.utils.template import CompoundOperator
 from epde.optimizers.single_criterion.optimizer import Population
 
 class SizeRestriction(CompoundOperator):
+    key = 'SizeRestriction'
+
     def apply(self, objective: Population, arguments: dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)    
         objective.population = objective.sort()[:objective.length]
@@ -13,6 +15,8 @@ class SizeRestriction(CompoundOperator):
         self._tags = {'size restriction', 'population level', 'no suboperators', 'standard'}    
 
 class FractionElitism(CompoundOperator):
+    key = 'FractionElitism'
+
     def apply(self, objective: Population, arguments: dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)    
 
@@ -28,9 +32,6 @@ class FractionElitism(CompoundOperator):
             else:
                 setattr(elem, 'elite', 'non-elite')
                 
-        # print('in elitism')
-        # print([[(eq.fitness_calculated, eq.text_form) for eq in candidate.vals] 
-               # for candidate in objective])
         return objective
     
     @property

@@ -22,7 +22,8 @@ from epde.operators.utils.template import CompoundOperator, add_param_to_operato
 from epde.decorators import History_Extender, ResetEquationStatus
 
 
-class SystemMutation(CompoundOperator):   
+class SystemMutation(CompoundOperator):
+    key = 'SystemMutation'
     def apply(self, objective : SoEq, arguments : dict): # TODO: add setter for best_individuals & worst individuals 
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)    
     
@@ -52,6 +53,7 @@ class SystemMutation(CompoundOperator):
     
 
 class EquationMutation(CompoundOperator):
+    key = 'EquationMutation'
     @History_Extender(f'\n -> mutating equation', 'ba')
     def apply(self, objective : Equation, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)  
@@ -67,7 +69,7 @@ class EquationMutation(CompoundOperator):
 
 
 class MetaparameterMutation(CompoundOperator):
-    key = ["gene mutation", "metaparameter mutation"]
+    key = 'MetaparameterMutation'
 
     def apply(self, objective : Union[int, float], arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
@@ -86,7 +88,7 @@ class TermMutation(CompoundOperator):
     """
     Specific operator of the term mutation, where the term is replaced with a randomly created new one.
     """
-    key = ["term mutation", "metaparameter mutation"]
+    key = 'TermMutation'
     
     def apply(self, objective : tuple, arguments : dict): #term_idx, equation):
         """
@@ -129,7 +131,7 @@ class TermParameterMutation(CompoundOperator):
     """
     Specific operator of the term mutation, where the term parameters are changed with a random increment.
     """
-    key = ["term mutation", "structural mutation"]    
+    key = 'TermParameterMutation'    
     
     def apply(self, objective : tuple, arguments : dict): # term_idx, objective
         """ 
@@ -216,7 +218,7 @@ def get_basic_mutation(mutation_params):
     metaparameter_mutation = MetaparameterMutation(['std', 'mean'])
     add_kwarg_to_operator(operator = metaparameter_mutation, labeled_base_val = {'std' : 1e-4, 'mean' : 0.0})
 
-    chromosome_mutation = SystemMutation(['indiv_mutation_prob'])
+    chromosome_mutation = SystemMutation([])
     # add_kwarg_to_operator(operator = chromosome_mutation, labeled_base_val = {'indiv_mutation_prob' : 0.5})
     # chromosome_mutation.params = {'indiv_mutation_prob' : 0.5} if not 'mutation_params' in kwargs.keys() else kwargs['mutation_params']
 

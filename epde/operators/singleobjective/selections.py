@@ -16,6 +16,7 @@ from epde.operators.utils.template import CompoundOperator
 
 
 class RouletteWheelSelection(CompoundOperator):
+    key = 'RouletteWheelSelection'
     def apply(self, objective : Population, arguments: dict):
         # TODO: add docstring
         if isinstance(objective, ParetoLevels):

@@ -16,7 +16,7 @@ from epde.operators.utils.template import CompoundOperator
 
 
 class MOEADDSelection(CompoundOperator):
-    key = ["population level", "selection"]
+    key = 'MOEADDSelection'
     
     def apply(self, objective : ParetoLevels, arguments : dict): # pareto_levels
         '''
@@ -105,7 +105,7 @@ class MOEADDSelection(CompoundOperator):
 
 
 class MOEADDSelectionConstrained(CompoundOperator):
-    key = ["population level", "constrained selection"]
+    key = 'MOEADDSelectionConstrained'
     
     def apply(self, objective : ParetoLevels, arguments : dict):
         '''
@@ -191,7 +191,7 @@ class MOEADDSelectionConstrained(CompoundOperator):
 
 
 class SelectionConstraintProcesser(object):
-    key = ["custom level", "constrained processor"]
+    key = 'SelectionConstraintProcesser'
     
     def __init__(self, constraints = None, param_keys = []):
         assert all(isinstance(constraints, Constraint) for constr in constraints)

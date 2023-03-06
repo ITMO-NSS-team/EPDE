@@ -19,6 +19,9 @@ class ParamContainerMeta(type):
             cls._container_instances[cls] = instance
             
         return cls._container_instances[cls]
+    
+    def reset(self):
+        self._container_instances = {}
 
 class EvolutionaryParams(metaclass = ParamContainerMeta):
     '''

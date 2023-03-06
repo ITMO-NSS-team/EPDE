@@ -46,6 +46,8 @@ class PopulationLevelCrossover(CompoundOperator):
         return the new population, created with the noted operators and containing both parent individuals and their offsprings.    
     copy_properties_to
     """
+    key = 'PopulationLevelCrossover'
+
     def apply(self, objective : Union[ParetoLevels, Population], arguments : dict):
         """
         Method to obtain a new population by selection of parent individuals (equations) and performing a crossover between them to get the offsprings.
@@ -100,6 +102,8 @@ class PopulationLevelCrossover(CompoundOperator):
 
 
 class ChromosomeCrossover(CompoundOperator):
+    key = 'ChromosomeCrossover'
+
     def apply(self, objective : tuple, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
    
@@ -137,6 +141,8 @@ class ChromosomeCrossover(CompoundOperator):
 
 
 class MetaparamerCrossover(CompoundOperator):
+    key = 'MetaparamerCrossover'
+
     def apply(self, objective : tuple, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
