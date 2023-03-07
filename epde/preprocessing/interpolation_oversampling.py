@@ -12,7 +12,7 @@ from sklearn.linear_model import LinearRegression
 
 
 class BesselInterpolator(object):
-    def __init__(self, x, data, max_order = 5):
+    def __init__(self, x, data, max_order=5):
         assert x.ndim == 1, 'Prototype for 1D - data'
         assert data.shape == x.shape
 
@@ -25,8 +25,8 @@ class BesselInterpolator(object):
 
     def bf_vals(self, arg):
         ones = [1.,] if isinstance(arg, (int, float)) else [np.ones(arg.size),]
-        res = ([jv(order, arg) for order in range(self.max_order)] +  #[yv(order, arg) for order in range(self.max_order)] + 
-               ones) # Конкат. листов - неоптимальная операция
+        res = ([jv(order, arg) for order in range(self.max_order)] +  # [yv(order, arg) for order in range(self.max_order)] +
+               ones)  # Конкат. листов - неоптимальная операция
         # print('res', len(res))
         return res
 

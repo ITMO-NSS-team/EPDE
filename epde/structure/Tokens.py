@@ -53,6 +53,7 @@ class TerminalToken(Token):
     requaires only numeric parameters.
 
     """
+
     def __init__(self, number_params: int = 0, params_description: dict = None, params: np.ndarray = None,
                  cache_val: bool = True, fix_val: bool = False, fix: bool = False,
                  val: np.ndarray = None, type_: str = 'TerminalToken', optimizer: str = None, name_: str = None,
@@ -151,7 +152,7 @@ class TerminalToken(Token):
         """
         recomendations = "\nUse methods 'params_description.setter' or 'set_descriptor' to change params_descriptions"
         assert isinstance(self._params_description, dict), "Invalid params_description structure," \
-                                                        " must be a dictionary of dictionaries" + recomendations
+            " must be a dictionary of dictionaries" + recomendations
         assert len(self._params_description) == self._number_params, "The number of parameters does not" \
                                                                      " match the number of descriptors" + recomendations
         for key, value in self._params_description.items():
@@ -163,9 +164,9 @@ class TerminalToken(Token):
             assert key < self._number_params, "The parameter index must not exceed" \
                                               " the number of parameters" + recomendations
             assert (len(value['bounds']) == 2 and
-                   value['bounds'][0] <= value['bounds'][1]), "Bounds of each parameter must have" \
-                                                            " length = 2 and contain value" \
-                                                            " boundaries MIN <= MAX." + recomendations
+                    value['bounds'][0] <= value['bounds'][1]), "Bounds of each parameter must have" \
+                " length = 2 and contain value" \
+                " boundaries MIN <= MAX." + recomendations
 
     def set_descriptor(self, key: int, descriptor_name: str, descriptor_value):
         try:
@@ -231,8 +232,8 @@ class TerminalToken(Token):
             for key, value in self._params_description.items():
                 self.set_param(np.random.uniform(value['bounds'][0], value['bounds'][1]), idx=key)
         except OverflowError:
-            # tb = sys.exc_info()[2]
-            raise OverflowError('Bounds have incorrect/infinite values')  # .with_traceback(tb)
+
+            raise OverflowError('Bounds have incorrect/infinite values')
 
     def set_val(self, val):
         self.val = val
@@ -287,6 +288,7 @@ class ComplexToken(TerminalToken):
     in addition to the numeric parameters.
     Example: Product of TerminalTokens.
     """
+
     def __init__(self, number_params: int = 0, params_description: dict = None, params: np.ndarray = None,
                  cache_val: bool = True, fix_val: bool = False, fix: bool = False,
                  val: np.ndarray = None, type_: str = 'TerminalToken', optimizer: str = None, name_: str = None,
@@ -349,4 +351,3 @@ class ComplexToken(TerminalToken):
                 self.mandatory = np.random.uniform()
                 return
         self.mandatory = 0
-

@@ -12,13 +12,16 @@ from copy import deepcopy
 
 from typing import Union
 
+
 class Gene(object):
-    def __init__(self, key, value = None, value_type = None):
+    def __init__(self, key, value=None, value_type=None):
         if value is None and value_type is None:
-            raise ValueError('Both value and value type can not be None during gene initialization')
+            raise ValueError(
+                'Both value and value type can not be None during gene initialization')
         elif type(value) != value_type and value_type is not None:
-            raise ValueError('Both value and value type can not be None during gene initialization')
-            
+            raise ValueError(
+                'Both value and value type can not be None during gene initialization')
+
         self.key = key
         self.val_type = value_type if value is None else type(value)
         self.value = value
@@ -34,7 +37,8 @@ class Gene(object):
         if isinstance(val, self.val_type):
             self._value = val
         else:
-            TypeError(f'Value of the incorrect type {type(val)} was passed into a gene of {self.val_type}')
+            TypeError(
+                f'Value of the incorrect type {type(val)} was passed into a gene of {self.val_type}')
 
     def __eq__(self, other):
         try:
@@ -42,11 +46,11 @@ class Gene(object):
         except AttributeError:
             warnings.warn(f'The equality method is not implemented for object of type {type(self)} or {type(other)}')
 
-    def set_metaparam(self, key : str, value : Union[float, int]):
+    def set_metaparam(self, key: str, value: Union[float, int]):
         assert key in self._value.metaparameters, f'Incorrect parameter key {key} passed into the gene, containing {self.key}'
         self._value.metaparameters[key]['value'] = value
 
-    def __deepcopy__(self, memo): # TODO: overload
+    def __deepcopy__(self, memo):
         cls = self.__class__
         result = cls.__new__(cls)
         memo[id(self)] = result
@@ -59,7 +63,7 @@ class Chromosome(object):
 
     def __init__(self, equations, params):
         '''
-        
+
         Parameters
         ----------
         equations : dict of epde.strucutre.main_structures.Equation objects
@@ -73,20 +77,21 @@ class Chromosome(object):
 
         '''
         # print('equations', equations)
-        
+
         self.equation_type = type(next(iter(equations)))
-        
-        self.chromosome = {key : Gene(key = key, value = eq) for key, eq in equations.items()}  # eq.main_var_to_explain
+
+        # eq.main_var_to_explain
+        self.chromosome = {key: Gene(key=key, value=eq)
+                           for key, eq in equations.items()}
         self.equation_keys = list(self.chromosome.keys())
         self.params_keys = list(params.keys())
         for key, arg in params.items():
-            self.chromosome[key] = Gene(key = key, value = arg['value'])
-            
-            
+            self.chromosome[key] = Gene(key=key, value=arg['value'])
+
     def replace_gene(self, gene_key, value):
         self.chromosome[gene_key].value = value
-        
-    def pass_parametric_gene(self, key, value): # TODO: Merge with replace_gene when ready.
+
+    def pass_parametric_gene(self, key, value):
         '''
 
         Parameters
@@ -104,27 +109,28 @@ class Chromosome(object):
         '''
         if isinstance(key, str) and (key in self.chromosome[np.random.choice(self.equation_keys)]):
             for eq_name in self.equation_keys:
-                self.chromosome[eq_name].set_metaparam(key = key, value = value)
+                self.chromosome[eq_name].set_metaparam(key=key, value=value)
         elif isinstance(key, (list, tuple)):
-            self.chromosome[key[1]].set_metaparam(key = key, value = value)
+            self.chromosome[key[1]].set_metaparam(key=key, value=value)
         else:
-            raise ValueError('Incorrect value passed into genes parameters setting.')
-        
+            raise ValueError(
+                'Incorrect value passed into genes parameters setting.')
+
     def __eq__(self, other):
         if set(self.chromosome.keys()) != set(self.chromosome.keys()):
             return False
         return all([self.chromosome[key] == other.chromosome[key] for key in self.chromosome.keys()])
-    
+
     def __getitem__(self, key):
         return self.chromosome[key].value
-    
+
     def __len__(self):
         return len(self.equation_keys)
-    
+
     @property
     def text_form(self):
         return [(key, gene.value) for key, gene in self.chromosome.items()]
-    
+
     @property
     def hash_descr(self):
         def get_gene_hash(gene):
@@ -142,24 +148,27 @@ class Chromosome(object):
         return ChromosomeEqIterator(self)
 
     def same_encoding(self, other):
-        cond_1 = all([key in other.chromosome.keys() for key in self.chromosome.keys()])
-        cond_2 = all([key in self.chromosome.keys() for key in other.chromosome.keys()])
+        cond_1 = all([key in other.chromosome.keys()
+                     for key in self.chromosome.keys()])
+        cond_2 = all([key in self.chromosome.keys()
+                     for key in other.chromosome.keys()])
         return cond_1 and cond_2
-    
-    def __deepcopy__(self, memo): # TODO: overload
+
+    def __deepcopy__(self, memo):  # TODO: overload
         cls = self.__class__
         result = cls.__new__(cls)
         memo[id(self)] = result
         for k, v in self.__dict__.items():
             setattr(result, k, deepcopy(v, memo))
-        return result    
+        return result
+
 
 class ChromosomeEqIterator(object):
     def __init__(self, chromosome):
         self._chromosome = chromosome
         self._idx = 0
         self._chromosome_equation_labels = list(self._chromosome.equation_keys)
-        
+
     def __next__(self):
         if self._idx < len(self._chromosome_equation_labels):
             res = self._chromosome[self._chromosome_equation_labels[self._idx]]
