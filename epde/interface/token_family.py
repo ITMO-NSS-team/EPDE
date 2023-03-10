@@ -25,23 +25,15 @@ class EvaluatorContained(object):
     """
     Class for evaluator of token (factor of the term in the sought equation) values with arbitrary function
 
-    Attributes
-    ----------
+    Attributes:
+        _evaluator (`callable`): a function, which returns the vector of token values, evaluated on the studied area;
+        params (`dict`): dictionary, containing parameters of the evaluator (like grid, on which the function is evaluated or matrices of pre-calculated function)
 
-    _evaluator : function
-        a function, which returns the vector of token values, evaluated on the studied area;
-    params : dict
-        dictionary, containing parameters of the evaluator (like grid, on which the function is evaluated or matrices of pre-calculated function)
-
-
-    Methods
-    ----------
-
-    set_params(**params)
-        set the parameters of the evaluator, using keyword arguments
-
-    apply(token, token_params)
-        apply the defined evaluator to evaluate the token with specific parameters
+    Methods:
+        set_params(**params)
+            set the parameters of the evaluator, using keyword arguments
+        apply(token, token_params)
+            apply the defined evaluator to evaluate the token with specific parameters
     """
 
     def __init__(self, eval_function, eval_kwargs_keys={}):  # , deriv_eval_function = None
@@ -53,20 +45,14 @@ class EvaluatorContained(object):
         """
         Apply the defined evaluator to evaluate the token with specific parameters.
 
-        Parameters:
-        ----------
-        token : epde.main_structures.factor.Factor
-            symbolic label of the specific token, e.g. 'cos';
-
-        token_params : dict
-            dictionary with keys, naming the token parameters (such as frequency, axis and power for trigonometric function) 
+        Ags:
+            token (`epde.main_structures.factor.Factor`): symbolic label of the specific token, e.g. 'cos';
+        token_params (`dict`): dictionary with keys, naming the token parameters (such as frequency, axis and power for trigonometric function) 
             and values - specific values of corresponding parameters.
 
         Raises:
-        ----------
-        TypeError
-            If the evaluator could not be applied to the token.
-
+            `TypeError`
+                If the evaluator could not be applied to the token.
         """
         assert list(kwargs.keys()) == self.eval_kwargs_keys
         return self._evaluator(token, structural, grids, **kwargs)
@@ -77,59 +63,50 @@ class TokenFamily(object):
     Class for the type (family) of tokens, from which the tokens are taken as factors in the terms of the equation
 
     Attributes:
-    -----------
-    type : string
-        the symbolic name of the token family (e.g. 'logarithmic', 'trigonometric', etc.)
-
-    status : dict
-        dictionary, containing markers, describing the token properties. Key - property, value - bool variable:
-
-        'mandatory' - if True, a token from the family must be present in every term; 
-
-        'unique_token_type' - if True, only one token of the family can be present in the term; 
-
-        'unique_specific_token' - if True, a specific token can be present only once per term;
-
-    _evaluator : EvaluatorContained object
-        Evaluator, which is used to get values of the tokens from that family;
-
-    tokens : list of strings
-        List of function names, describing all of the functions, belonging to the family. E.g. for 'trigonometric' token type, this list will be ['sin', 'cos']
-
-    token_params : OrderedDict
-        Available range for token parameters. Ordered dictionary with key - token parameter name, and value - tuple with 2 elements:
-        (lower boundary, higher boundary), while type of boundaries describes the avalable token params: 
-        if int - the parameters will be integer, if float - float.
+        ftype (`string`): the symbolic name of the token family (e.g. 'logarithmic', 'trigonometric', etc.)
+        status (`dict`): dictionary, containing markers, describing the token properties. Key - property, value - bool variable:
+            'mandatory' - if True, a token from the family must be present in every term;
+            'unique_token_type' - if True, only one token of the family can be present in the term;
+            'unique_specific_token' - if True, a specific token can be present only once per term;
+        family_of_derivs (`bool`): flag about the presence of derivatives in the token family
+        evaluator_set (`bool`): flag about the existence of a method for evaluation
+        params_set (`bool`): flag, that exist params in that token fami;y
+        cache_set (`bool`): flag, that exist cache for the token family
+        deriv_exaluator_set (`bool`): flag about the existing a evaluator for derivatives
+        _evaluator (`EvaluatorContained object`): Evaluator, which is used to get values of the tokens from that family;
+        tokens (`list of strings`): List of function names, describing all of the functions, belonging to the family. E.g. for 'trigonometric' token type, this list will be ['sin', 'cos']
+        token_params (`OrderedDict`): Available range for token parameters. Ordered dictionary with key - token parameter name, and value - tuple with 2 elements:
+            (lower boundary, higher boundary), while type of boundaries describes the avalable token params: 
+            if int - the parameters will be integer, if float - float.
+        equality_ranges (`dict`): error for equality of token parameters, key is name of parameter
+        derivs_ords (`dict`):  keys for derivatides for `solver` for each token in family
 
     Methods:
-    -----------
-    set_status(demands_equation = False, meaningful = False, 
-               s_and_d_merged = True, unique_specific_token = False, 
-               unique_token_type = False, requires_grid = False))
-        Method to set the markers of the token status;
+        set_status(demands_equation = False, meaningful = False, 
+                s_and_d_merged = True, unique_specific_token = False, 
+                unique_token_type = False, requires_grid = False))
+            Method to set the markers of the token status;
 
-    set_params(tokens, token_params)
-        Method to set the list of tokens, present in the family, and their parameters;
+        set_params(tokens, token_params)
+            Method to set the list of tokens, present in the family, and their parameters;
 
-    set_evaluator(eval_function, **eval_params)
-        Method to set the evaluator for the token family & its parameters;
+        set_evaluator(eval_function, **eval_params)
+            Method to set the evaluator for the token family & its parameters;
 
-    test_evaluator()
-        Method to test, if the evaluator and tokens are set properly
+        test_evaluator()
+            Method to test, if the evaluator and tokens are set properly
 
-    evaluate(token, token_params)
-        Method, which uses the specific token evaluator to evaluate the passed token with its parameters
-
+        evaluate(token, token_params)
+            Method, which uses the specific token evaluator to evaluate the passed token with its parameters
     """
 
     def __init__(self, token_type: str, family_of_derivs: bool = False):
         """
         Initialize the token family;
 
-        Parameters:
-        -----------
-        token_type : string
-            The name of the token family; must be unique among other families.
+        Args:
+            token_type (`string`): The name of the token family; must be unique among other families.
+            family_of_derivs (`bool`): tha flag about the existence of a derivative in the fanily of token
         """
 
         self.ftype = token_type
@@ -149,10 +126,16 @@ class TokenFamily(object):
         """
         Set the status of the elements of the token family; 
 
-        Args:           
-            mandatory (`boolean`):if True, a token from the family must be present in every term;
-            unique_token_type (`boolean`): if True, only one token of the family can be present in the term;
-            unique_specific_token (`boolean`): if True, a specific token can be present only once per term;
+        Args:
+            demands_equation (`boolean`): default - False
+                flag about the existence of restrictions for equation
+            meaningful (`boolean`):if True, a token from the family must be present in every term
+            unique_token_type (`boolean`): if True, only one token of the family can be present in the term
+            unique_specific_token (`boolean`): if True, a specific token can be present only once per term
+            s_and_d_merged (`boolean`): default - True,
+                flag, that the base values of the token are used as the structural values (generally, in other cases the normalized values are used as structural)
+            requires_grid (`boolean`): default - False, 
+                flag, that a grid is required to evaluate the token
         """
         self.status = {}
         self.status['demands_equation'] = demands_equation
@@ -166,24 +149,22 @@ class TokenFamily(object):
         """
         Define the token family with list of tokens and their parameters
 
-        Parameters:
-        -----------
-        tokens : list of strings
-            List of function names, describing all of the functions, belonging to the family. E.g. for 'trigonometric' token type, 
-            this list will be ['sin', 'cos']
-
-        token_params : OrderedDict
-            Available range for token parameters. Ordered dictionary with key - token parameter name, and value - tuple with 2 elements:
-            (lower boundary, higher boundary), while type of boundaries describes the avalable token params: 
-            if int - the parameters will be integer, if float - float.
+        Args:
+            tokens (`list of strings`): List of function names, describing all of the functions, belonging to the family. E.g. for 'trigonometric' token type, 
+                this list will be ['sin', 'cos']
+            token_params (`OrderedDict`): Available range for token parameters. Ordered dictionary with key - token parameter name, and value - tuple with 2 elements:
+                (lower boundary, higher boundary), while type of boundaries describes the avalable token params: 
+                if int - the parameters will be integer, if float - float.
+            equality_ranges (`dict`): error for equality of token parameters, key is name of parameter
+            derivs_solver_orders (`list`): keys for derivatides on `int` format for `solver`
 
         Example:
         ----------
-        >>> token_names_trig = ['sin', 'cos']        
-        >>> trig_token_params = OrderedDict([('power', (1, 1)), ('freq', (0.9, 1.1)), ('dim', (0, u_initial.ndim))])
-        >>> trigonometric_tokens.set_params(token_names_trig, trig_token_params)
-
+            >>> token_names_trig = ['sin', 'cos']        
+            >>> trig_token_params = OrderedDict([('power', (1, 1)), ('freq', (0.9, 1.1)), ('dim', (0, u_initial.ndim))])
+            >>> trigonometric_tokens.set_params(token_names_trig, trig_token_params)
         """
+
         assert bool(derivs_solver_orders is not None) == bool(
             self.family_of_derivs), 'Solver form must be set for derivatives, and only for them.'
 
@@ -206,52 +187,47 @@ class TokenFamily(object):
         """
         Define the evaluator for the token family and its parameters
 
-        Parameters:
-        ------------
-        eval_function : function or EvaluatorContained object
-            Function, used in the evaluator, or the evaluator
-
-        **eval_params : keyword arguments
-            The parameters for evaluator; must contain params_names (names of the token parameters) &
-            param_equality (for each of the token parameters, range in which it considered as the same), 
+        Args:
+            eval_function (`function or EvaluatorContained object`): Function, used in the evaluator, or the evaluator
+            eval_params (`keyword arguments`): The parameters for evaluator; must contain params_names (names of the token parameters) &
+                param_equality (for each of the token parameters, range in which it considered as the same), 
 
 
         Example:
-        -----------
-        >>> def trigonometric_evaluator(token, token_params, eval_params):
-        >>>     
-        >>>     '''
-        >>>     
-        >>>     Example of the evaluator of token values, appropriate for case of trigonometric functions to be calculated on grid, with results in forms of tensors
-        >>>     
-        >>>     Parameters
-        >>>     ----------
-        >>>     token: {'sin', 'cos'}
-        >>>         symbolic form of the function to be evaluated: 
-        >>>     token_params: dictionary: key - symbolic form of the parameter, value - parameter value
-        >>>         names and values of the parameters for trigonometric functions: amplitude, frequency & dimension
-        >>>     eval_params : dict
-        >>>         Dictionary, containing parameters of the evaluator: in this example, it contains coordinates np.meshgrid with coordinates for points, 
-        >>>         names of the token parameters (frequency, axis and power). Additionally, the names of the token parameters must be included with specific key 'params_names', 
-        >>>         and parameters range, for which each of the tokens if consedered as "equal" to another, like sin(1.0001 x) can be assumed as equal to (0.9999 x)
-        >>>     
-        >>>     Returns
-        >>>     ----------
-        >>>     value : numpy.ndarray
-        >>>         Vector of the evaluation of the token values, that shall be used as target, or feature during the LASSO regression.
-        >>>         
-        >>>     '''
-        >>>     
-        >>>     assert 'grid' in eval_params
-        >>>     trig_functions = {'sin' : np.sin, 'cos' : np.cos}
-        >>>     function = trig_functions[token]
-        >>>     grid_function = np.vectorize(lambda *args: function(token_params['freq']*args[token_params['dim']])**token_params['power'])
-        >>>     value = grid_function(*eval_params['grid'])
-        >>>     return value
-        >>> 
-        >>> der_eval_params = {'token_matrices':simple_functions, 'params_names':['power'], 'params_equality':{'power' : 0}}
-        >>> trig_eval_params = {'grid':grid, 'params_names':['power',  'freq', 'dim'], 'params_equality':{'power': 0, 'freq':0.05, 'dim':0}}
-        >>> trigonometric_tokens.set_evaluator(trigonometric_evaluator, **trig_eval_params)
+            >>> def trigonometric_evaluator(token, token_params, eval_params):
+            >>>     
+            >>>     '''
+            >>>     
+            >>>     Example of the evaluator of token values, appropriate for case of trigonometric functions to be calculated on grid, with results in forms of tensors
+            >>>     
+            >>>     Parameters
+            >>>     ----------
+            >>>     token: {'sin', 'cos'}
+            >>>         symbolic form of the function to be evaluated: 
+            >>>     token_params: dictionary: key - symbolic form of the parameter, value - parameter value
+            >>>         names and values of the parameters for trigonometric functions: amplitude, frequency & dimension
+            >>>     eval_params : dict
+            >>>         Dictionary, containing parameters of the evaluator: in this example, it contains coordinates np.meshgrid with coordinates for points, 
+            >>>         names of the token parameters (frequency, axis and power). Additionally, the names of the token parameters must be included with specific key 'params_names', 
+            >>>         and parameters range, for which each of the tokens if consedered as "equal" to another, like sin(1.0001 x) can be assumed as equal to (0.9999 x)
+            >>>     
+            >>>     Returns
+            >>>     ----------
+            >>>     value : numpy.ndarray
+            >>>         Vector of the evaluation of the token values, that shall be used as target, or feature during the LASSO regression.
+            >>>         
+            >>>     '''
+            >>>     
+            >>>     assert 'grid' in eval_params
+            >>>     trig_functions = {'sin' : np.sin, 'cos' : np.cos}
+            >>>     function = trig_functions[token]
+            >>>     grid_function = np.vectorize(lambda *args: function(token_params['freq']*args[token_params['dim']])**token_params['power'])
+            >>>     value = grid_function(*eval_params['grid'])
+            >>>     return value
+            >>> 
+            >>> der_eval_params = {'token_matrices':simple_functions, 'params_names':['power'], 'params_equality':{'power' : 0}}
+            >>> trig_eval_params = {'grid':grid, 'params_names':['power',  'freq', 'dim'], 'params_equality':{'power': 0, 'freq':0.05, 'dim':0}}
+            >>> trigonometric_tokens.set_evaluator(trigonometric_evaluator, **trig_eval_params)
 
         """
         if isinstance(eval_function, EvaluatorContained):
@@ -267,15 +243,12 @@ class TokenFamily(object):
         """
         Define the evaluator for the derivatives of the token family and its parameters
 
-        Parameters:
-        ------------
-        eval_functions : dict of function or EvaluatorContained object
-            Dict containing the derivatives by each of the token parameter, where elements are the functions, used in the evaluator, or the evaluators.
-            Keys represent the parameter name, and values are the corresponding functions.
-
-        **eval_params : keyword arguments
-            The parameters for evaluator; must contain params_names (names of the token parameters) &
-            param_equality (for each of the token parameters, range in which it considered as the same),         
+        Args:
+            eval_functions (`dict|EvaluatorContained`): Dict containing the derivatives by each of the token parameter, where elements are the functions, used in the evaluator, or the evaluators.
+                Keys represent the parameter name, and values are the corresponding functions.
+            eval_kwargs_keys (`list`): The parameters for evaluator; must contain params_names (names of the token parameters) &
+                param_equality (for each of the token parameters, range in which it considered as the same)
+            suppress_eval_test (`boolean`): if True, run `test_evaluator` for testing of method for evaluating token
         """
         self._deriv_evaluators = {}
         for param_key, eval_function in eval_functions.items():
@@ -331,6 +304,9 @@ class TokenFamily(object):
             global_var.tensor_cache.delete_entry(label + ' power 1')
 
     def evaluate(self, token):    # Return tensor of values of applied evaluator
+        """
+        Applying evaluator in token
+        """
         raise NotImplementedError('Method has been moved to the Factor class')
         if self.evaluator_set:
             return self._evaluator.apply(token)
@@ -338,8 +314,22 @@ class TokenFamily(object):
             raise TypeError(
                 'Evaluator function or its parameters not set brfore evaluator application.')
 
-    def create(self, label=None, token_status: Union[dict, None] = None,
+    def create(self, label=None, token_status: dict = None,
                create_derivs: bool = False, **factor_params):
+        """
+        Create factor from the tokens family
+
+        Args:
+            label (`string`): name of token, that wante create.
+                if label == None, that will be create random token
+            token_status (`dict`): 
+            create_derivs (`boolean`): default - False. Flag, that token must be with a derivative
+            **factor_params (`dict`): parameters for token-factor, key - name of parameter
+
+        Returns:
+             occupied_by_factor (`dict`): dict with unique tokens, where key - name of token and value - the maximum possible amount of presence ерфе ещлут in the equation
+             new_factor (`Factor`): resulting factor from the tokens family
+        """
         if token_status is None or token_status == {}:
             token_status = {label: (0, self.token_params['power'][1], False)
                             for label in self.tokens}
