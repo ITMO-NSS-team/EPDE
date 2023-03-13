@@ -72,7 +72,7 @@ class VerboseManager:
     iter_stats : bool
     show_warnings : bool
     
-def init_verbose(plot_DE_solutions : bool = False, show_iter_idx : bool = False, 
+def init_verbose(plot_DE_solutions : bool = False, show_iter_idx : bool = True, 
                  show_iter_fitness : bool = False, show_iter_stats : bool = False, 
                  show_warnings : bool = False):
     """

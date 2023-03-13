@@ -143,7 +143,7 @@ class EpdeSearch(object):
                  use_solver: bool = False, dimensionality: int = 1, verbose_params: dict = {'show_iter_idx' : True}, 
                  coordinate_tensors=None, memory_for_cache=5, prune_domain: bool = False, 
                  pivotal_tensor_label=None, pruner=None, threshold: float = 1e-2, 
-                 division_fractions=3, rectangular: bool = True):
+                 division_fractions=3, rectangular: bool = True, params_filename: str = None):
         """
         Args:
             use_default_strategy (`bool`): optional
@@ -202,6 +202,14 @@ class EpdeSearch(object):
                                        prune_domain=prune_domain, pruner=pruner, pivotal_tensor_label=pivotal_tensor_label,
                                        threshold=threshold, division_fractions=division_fractions,
                                        rectangular=rectangular)
+
+        if multiobjective_mode:
+            mode_key = 'multi objective'
+        else:
+            mode_key = 'single objective'
+        
+        EvolutionaryParams.reset()
+        evo_param = EvolutionaryParams(parameter_file = params_filename, mode = mode_key)
 
         if use_solver:
             global_var.dimensionality = dimensionality

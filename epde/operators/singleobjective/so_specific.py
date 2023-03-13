@@ -20,15 +20,10 @@ class FractionElitism(CompoundOperator):
     def apply(self, objective: Population, arguments: dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)    
 
-#
-#        if isinstance(self.params['elite_fraction'], float):
-#            assert self.params['elite_fraction'] <= 1 and self.params['elite_fraction'] >= 0
-#            fraction = int(np.ceil(self.params['elite_fraction'] * len(objective.population)))
+
         for idx, elem in enumerate(objective.population):
             if idx == 0:
                 setattr(elem, 'elite', 'immutable')
-#            if idx < fraction:
-#                setattr(elem, 'elite', 'elite')
             else:
                 setattr(elem, 'elite', 'non-elite')
                 

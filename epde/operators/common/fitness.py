@@ -116,7 +116,6 @@ class SolverBasedFitness(CompoundOperator):
         self.g_fun_vals = global_var.grid_cache.g_func #.reshape(-1)
         
         solution = solution_model(self.adapter.convert_grid(grid)).detach().numpy()
-        fitness_value = rl_error
         for eq_idx, eq in enumerate(objective.structure):
             referential_data = global_var.tensor_cache.get((eq.main_var_to_explain, (1.0,)))
 
@@ -124,7 +123,8 @@ class SolverBasedFitness(CompoundOperator):
 
             discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape))
             rl_error = np.linalg.norm(discr, ord = 2)
-
+            
+            fitness_value = rl_error
             if np.sum(eq.weights_final) == 0: 
                 fitness_value /= self.params['penalty_coeff']
 

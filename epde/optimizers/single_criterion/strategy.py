@@ -2,7 +2,7 @@ from epde.optimizers.builder import add_sequential_operators, OptimizationPatter
 from functools import partial
 
 from epde.operators.utils.operator_mappers import map_operator_between_levels
-from epde.operators.utils.template import add_param_to_operator
+from epde.operators.utils.template import add_base_param_to_operator
 
 from epde.operators.common.right_part_selection import RandomRHPSelector
 from epde.operators.common.fitness import L2Fitness
@@ -15,7 +15,7 @@ from epde.operators.singleobjective.so_specific import SizeRestriction, Fraction
 
 class BaselineDirector(OptimizationPatternDirector):
     def use_baseline(self, variation_params: dict = {}, mutation_params: dict = {}, **kwargs):
-        add_kwarg_to_operator = partial(add_param_to_operator, target_dict = kwargs)
+        add_kwarg_to_operator = partial(add_base_param_to_operator, target_dict = kwargs)
 
         elitism = FractionElitism()
 
@@ -28,12 +28,12 @@ class BaselineDirector(OptimizationPatternDirector):
         # variation = map_operator_between_levels(variation, 'chromosome level', 'population level')
 
         selection = RouletteWheelSelection(['parents_fraction'])
-        add_kwarg_to_operator(operator = selection, labeled_base_val = {'parents_fraction' : 0.4})
+        add_kwarg_to_operator(operator = selection)
 
         sparsity = LASSOSparsity()
         coeff_calc = LinRegBasedCoeffsEquation()
         eq_fitness = L2Fitness(['penalty_coeff'])
-        add_kwarg_to_operator(operator = eq_fitness, labeled_base_val = {'penalty_coeff' : 0.2})
+        add_kwarg_to_operator(operator = eq_fitness)
         eq_fitness.set_suboperators({'sparsity' : sparsity, 'coeff_calc' : coeff_calc})
 
         fitness_cond = lambda x: not getattr(x, 'fitness_calculated')

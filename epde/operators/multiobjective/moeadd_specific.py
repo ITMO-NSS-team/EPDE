@@ -12,7 +12,7 @@ from typing import Union
 from functools import reduce, partial
 
 from epde.optimizers.moeadd.moeadd import ParetoLevels
-from epde.operators.utils.template import CompoundOperator, add_param_to_operator
+from epde.operators.utils.template import CompoundOperator, add_base_param_to_operator
 from epde.operators.multiobjective.mutations import get_basic_mutation
 
 
@@ -289,19 +289,19 @@ def use_item_if_no_default(key, arg : dict, replacement_arg : dict):
 
 
 def get_basic_populator_updater(params : dict = {}):
-    add_kwarg_to_operator = partial(add_param_to_operator, target_dict = params)    
+    add_kwarg_to_operator = partial(add_base_param_to_operator, target_dict = params)    
     
     pop_updater = PopulationUpdater()
-    add_kwarg_to_operator(operator = pop_updater, labeled_base_val = {'PBI_penalty' : 1})    
+    add_kwarg_to_operator(operator = pop_updater)    
     # pop_updater.params = params
     return pop_updater
 
 
 def get_constrained_populator_updater(params : dict = {}, constraints : list = []):
-    add_kwarg_to_operator = partial(add_param_to_operator, target_dict = params)
+    add_kwarg_to_operator = partial(add_base_param_to_operator, target_dict = params)
     
     pop_updater = PopulationUpdaterConstrained(constraints = constraints)
-    add_kwarg_to_operator(operator = pop_updater, labeled_base_val = {'PBI_penalty' : 1})        
+    add_kwarg_to_operator(operator = pop_updater)        
     # pop_updater.params = params
     return pop_updater
 
@@ -378,9 +378,9 @@ def get_pareto_levels_updater(right_part_selector : CompoundOperator, chromosome
                               mutation : CompoundOperator = None, constrained : bool = False, 
                               mutation_params : dict = {}, pl_updater_params : dict = {}, 
                               combiner_params : dict = {}):
-    add_kwarg_to_updater = partial(add_param_to_operator, target_dict = combiner_params)
+    add_kwarg_to_updater = partial(add_base_param_to_operator, target_dict = combiner_params)
     updater = OffspringUpdater()
-    add_kwarg_to_updater(operator = updater, labeled_base_val = {'attempt_limit' : 5})
+    add_kwarg_to_updater(operator = updater)
     
     if mutation is None:
         mutation = get_basic_mutation(mutation_params)
@@ -431,9 +431,9 @@ class InitialParetoLevelSorting(CompoundOperator):
 def get_initial_sorter(right_part_selector : CompoundOperator, 
                        chromosome_fitness : CompoundOperator, 
                        sorter_params : dict = {}):
-    add_kwarg_to_updater = partial(add_param_to_operator, target_dict = sorter_params)
+    add_kwarg_to_updater = partial(add_base_param_to_operator, target_dict = sorter_params)
     sorter = InitialParetoLevelSorting()
-    add_kwarg_to_updater(operator = sorter, labeled_base_val = {})
+    add_kwarg_to_updater(operator = sorter)
     sorter.set_suboperators(operators = {'right_part_selector' : right_part_selector,
                                           'chromosome_fitness' : chromosome_fitness})
     return sorter

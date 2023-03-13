@@ -10,7 +10,7 @@ import numpy as np
 from functools import partial
 
 from epde.operators.utils.operator_mappers import map_operator_between_levels
-from epde.operators.utils.template import add_param_to_operator
+from epde.operators.utils.template import add_base_param_to_operator
 
 from epde.operators.multiobjective.selections import MOEADDSelection
 from epde.operators.multiobjective.variation import get_basic_variation
@@ -26,13 +26,13 @@ from epde.optimizers.builder import add_sequential_operators, OptimizationPatter
 class MOEADDDirector(OptimizationPatternDirector):
     def use_baseline(self, variation_params : dict = {}, mutation_params : dict = {}, sorter_params : dict = {},
                     pareto_combiner_params : dict = {}, pareto_updater_params : dict = {}, **kwargs):
-        add_kwarg_to_operator = partial(add_param_to_operator, target_dict = kwargs)
+        add_kwarg_to_operator = partial(add_base_param_to_operator, target_dict = kwargs)
 
         neighborhood_selector = SimpleNeighborSelector(['number_of_neighbors'])
-        add_kwarg_to_operator(operator = neighborhood_selector, labeled_base_val = {'number_of_neighbors' : 4})
+        add_kwarg_to_operator(operator = neighborhood_selector)
 
         selection = MOEADDSelection(['delta', 'parents_fraction'])
-        add_kwarg_to_operator(operator = selection, labeled_base_val = {'delta' : 0.9, 'parents_fraction' : 0.4})
+        add_kwarg_to_operator(operator = selection)
         selection.set_suboperators({'neighborhood_selector' : neighborhood_selector})
 
         variation = get_basic_variation(variation_params)
@@ -40,7 +40,7 @@ class MOEADDDirector(OptimizationPatternDirector):
         right_part_selector = RandomRHPSelector()
         
         eq_fitness = L2Fitness(['penalty_coeff'])
-        add_kwarg_to_operator(operator = eq_fitness, labeled_base_val = {'penalty_coeff' : 0.2})
+        add_kwarg_to_operator(operator = eq_fitness)
         
         sparsity = LASSOSparsity()
         coeff_calc = LinRegBasedCoeffsEquation()

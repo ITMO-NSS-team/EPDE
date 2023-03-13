@@ -48,7 +48,7 @@ class PreprocessorSetup:
         self.builder.set_deriv_calculator(SpectralDeriv, *deriv_calculator_args,
                                           **deriv_calculator_kwargs)
 
-    def build_poly_diff_preprocessing(self, use_smoothing=True, sigma=1, mp_poolsize=4,
+    def build_poly_diff_preprocessing(self, use_smoothing=False, sigma=1, mp_poolsize=4,
                                       polynomial_window=9, poly_order=None):
         smoother_args = ()
         smoother_kwargs = {'sigma': sigma}

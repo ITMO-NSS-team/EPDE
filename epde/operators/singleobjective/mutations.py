@@ -16,7 +16,7 @@ from epde.optimizers.moeadd.moeadd import ParetoLevels
 from epde.structure.main_structures import Equation, SoEq, Term
 from epde.structure.structure_template import check_uniqueness
 from epde.supplementary import filter_powers, try_iterable
-from epde.operators.utils.template import CompoundOperator, add_param_to_operator
+from epde.operators.utils.template import CompoundOperator, add_base_param_to_operator
 
 
 from epde.decorators import HistoryExtender, ResetEquationStatus
@@ -209,26 +209,19 @@ class TermParameterMutation(CompoundOperator):
 
 def get_multiobjective_mutation(mutation_params): # TODO: rename function calls where necessary
     # TODO: generalize initiation with test runs and simultaneous parameter and object initiation.
-    add_kwarg_to_operator = partial(add_param_to_operator, target_dict = mutation_params)    
+    add_kwarg_to_operator = partial(add_base_param_to_operator, target_dict = mutation_params)    
 
     term_mutation = TermMutation([])
-    # term_param_mutation = TermParameterMutation(['r_param_mutation', 'multiplier'])
-    # add_kwarg_to_operator(operator = term_param_mutation, labeled_base_val = {'r_param_mutation' : 0.2, 
-    #                                                                           'strict_restrictions' : True,
-    #                                                                           'multiplier' : 0.1})
 
     equation_mutation = EquationMutation(['r_mutation', 'type_probabilities'])
-    add_kwarg_to_operator(operator = equation_mutation, labeled_base_val = {'r_mutation' : 0.6, 'type_probabilities' : []})
+    add_kwarg_to_operator(operator = equation_mutation)
     
     metaparameter_mutation = MetaparameterMutation(['std', 'mean'])
-    add_kwarg_to_operator(operator = metaparameter_mutation, labeled_base_val = {'std' : 1e-4, 'mean' : 0.0})
+    add_kwarg_to_operator(operator = metaparameter_mutation)
 
     chromosome_mutation = SystemMutation(['indiv_mutation_prob'])
-    # add_kwarg_to_operator(operator = chromosome_mutation, labeled_base_val = {'indiv_mutation_prob' : 0.5})
-    # chromosome_mutation.params = {'indiv_mutation_prob' : 0.5} if not 'mutation_params' in kwargs.keys() else kwargs['mutation_params']
 
-    equation_mutation.set_suboperators(operators = {'mutation' : term_mutation})#, [term_param_mutation, ]
-                                       # probas = {'equation_crossover' : [0.0, 1.0]})
+    equation_mutation.set_suboperators(operators = {'mutation' : term_mutation})
 
     chromosome_mutation.set_suboperators(operators = {'equation_mutation' : equation_mutation, 
                                                       'param_mutation' : metaparameter_mutation})
@@ -237,21 +230,16 @@ def get_multiobjective_mutation(mutation_params): # TODO: rename function calls 
 
 def get_singleobjective_mutation(mutation_params):
     # TODO: generalize initiation with test runs and simultaneous parameter and object initiation.
-    add_kwarg_to_operator = partial(add_param_to_operator, target_dict = mutation_params)    
+    add_kwarg_to_operator = partial(add_base_param_to_operator, target_dict = mutation_params)    
 
     term_mutation = TermMutation([])
-    # term_param_mutation = TermParameterMutation(['r_param_mutation', 'multiplier'])
-    # add_kwarg_to_operator(operator = term_param_mutation, labeled_base_val = {'r_param_mutation' : 0.2, 
-    #                                                                           'strict_restrictions' : True,
-    #                                                                           'multiplier' : 0.1})
 
     equation_mutation = EquationMutation(['r_mutation', 'type_probabilities'])
-    add_kwarg_to_operator(operator = equation_mutation, labeled_base_val = {'r_mutation' : 0.6, 'type_probabilities' : []})
+    add_kwarg_to_operator(operator = equation_mutation)
     
     chromosome_mutation = SystemMutation(['indiv_mutation_prob'])
     
-    equation_mutation.set_suboperators(operators = {'mutation' : term_mutation})#, [term_param_mutation, ]
-                                       # probas = {'equation_crossover' : [0.0, 1.0]})
+    equation_mutation.set_suboperators(operators = {'mutation' : term_mutation})
 
     chromosome_mutation.set_suboperators(operators = {'equation_mutation' : equation_mutation})
     return chromosome_mutation    

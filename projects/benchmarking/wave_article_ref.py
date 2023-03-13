@@ -20,9 +20,9 @@ sys.path.pop()
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')))
 
 def run_wave_eq_search(multiobjective_mode, derivs = None):
-    epde_search_obj = epde_alg.epde_search(multiobjective_mode=multiobjective_mode, use_solver = False, 
-                                           dimensionality = dimensionality, boundary = 10,
-                                           coordinate_tensors = grids)    
+    epde_search_obj = epde_alg.EpdeSearch(multiobjective_mode=multiobjective_mode, use_solver = False, 
+                                          dimensionality = dimensionality, boundary = 10,
+                                          coordinate_tensors = grids)    
     # epde_search_obj.set_preprocessor(default_preprocessor_type='spectral', # use_smoothing = True
     #                                  preprocessor_kwargs={})
     popsize = 7
@@ -51,7 +51,7 @@ def run_wave_eq_search(multiobjective_mode, derivs = None):
                         eq_sparsity_interval=bounds)
 
     if multiobjective_mode:    
-        metric = epde_search_obj.get_equations_by_complexity(complexity = 3)[0].obj_fun[0]
+        metric = epde_search_obj.get_equations_by_complexity(complexity = 2)[0].obj_fun[0]
     else:
         metric = epde_search_obj.equation_search_results(only_print = False, num = 1)[0].obj_fun[0]
     print(f'Obtained metric is {metric}')
@@ -83,9 +83,9 @@ if __name__ == '__main__':
     dimensionality = data.ndim - 1
     
     paretos = []
-    exp_num = 20
+    exp_num = 10
     for exp_run in range(exp_num):
-        if exp_num == 0:
+        if exp_run == 0:
             derivs = None
         res = run_wave_eq_search(multiobjective_mode = exp_run >= exp_num/2, derivs = derivs)
         if exp_num == 0:
@@ -114,4 +114,3 @@ if __name__ == '__main__':
                    2.030488112155742,
                    2.030488112155742,
                    2.030488112155742]
-    

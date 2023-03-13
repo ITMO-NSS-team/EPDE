@@ -1,74 +1,66 @@
 {
-	"selection" : {
-	 	"key" : "MOEADDSelection",
-	 	"parameters" : {"delta" : 0.9, "parents_fraction" : 0.4}
+	"MOEADDSelection" : {
+    	"delta" : 0.9, 
+    	"parents_fraction" : 0.4
  	},
-	"population_updater" : {
-		"key" : "PopulationUpdater",
-		"parameters" : {"PBI_penalty" : 1.0}
+	"PopulationUpdater" : {
+    	"PBI_penalty" : 1.0
 	},
-	"neighborhood_selector" : {
-		"key" : "SortingBasedNeighborSelector",
-   		"parameters" : {"number_of_neighbors" : 4}
+	"SortingBasedNeighborSelector" : {
+        "number_of_neighbors" : 4
  	},
-	"offspring_placement" : {
-		"key" : "ParetoLevelUpdater",
-		"parameters" : {"attempt_limit" : 5}
+	"ParetoLevelUpdater" : {
+    	"attempt_limit" : 5
 	},
-	"initial_placement" : {
-		"key" : "InitialParetoLevelSorting",
-		"parameters" : {}
+	"InitialParetoLevelSorting" : {
+	
 	},
- 	"fitness" : {
- 		"key" : "",
-   		"parameters" : {"penalty_coeff" : 0.2} 		
+ 	"DiscrepancyBasedFitness" : {
+        "penalty_coeff" : 0.2
  	},
- 	"pareto_level_crossover" : {
- 		"key" : "ParetoLevelsCrossover",
-   		"parameters" : {}
+ 	"ParetoLevelsCrossover" : {
+
  	},
- 	"chromosome_crossover" : {
-		"key" : "ChromosomeCrossover",
-		  "parameters" : {}
+ 	"ChromosomeCrossover" : {
+
 	},	
- 	"metaparameter_crossover" : {
- 		"key" : "MetaparamerCrossover",
-   		"parameters" : {"metaparam_proportion" : 0.4}
+ 	"MetaparamerCrossover" : {
+        "metaparam_proportion" : 0.4
 	},
- 	"equation_crossover" : {
- 		"key" : "EquationCrossover",
-   		"parameters" : {}
+ 	"EquationCrossover" : {
+
 	},	
-	"equation_exchange_crossover" : {
-		"key" : "EquationCrossover",
-		  "parameters" : {}
-   },		
- 	"term_crossover" : {
- 		"key" : "",
-   		"parameters" : {"crossover_probability" : 0.3}
+	"EquationExchangeCrossover" : {
+
+    },		
+ 	"TermCrossover" : {
+        "crossover_probability" : 0.3
 	},
- 	"term_param_crossover" : {
- 		"key" : "",
-   		"parameters" : {"term_param_proportion" : 0.4}
+ 	"TermParamCrossover" : {
+        "term_param_proportion" : 0.4
 	},
-	"system_mutation" : {
-		"key" : "SystemMutation",
-		"parameters" : {}
+	"SystemMutation" : {
+
     },
-	"equation_mutation" : {
-		"key" : "EquationMutation",
-		"parameters" : {"r_mutation" : 0.6}
+	"EquationMutation" : {
+        "r_mutation" : 0.6
 	},
-	"metaparam_mutation" : {
-		"key" : "MetaparameterMutation",
-		"parameters" : {"mean" : 0.0, "std" : 1e-4}
+	"MetaparameterMutation" : {
+        "mean" : 0.0,
+        "std" : 1e-4
 	},
-	"term_mutation" : {
-		"key" : "TermMutation",
-		"parameters" : {}
+	"TermMutation" : {
+
 	},
-	"term_param_mutation" : {
-		"key" : "TermParameterMutation",
-		"parameters" : {"r_param_mutation" : 0.2, "multiplier" : 0.1, "strict_restrictions" : 1}
-	}	
+	"TermParameterMutation" : {
+        "r_param_mutation" : 0.2,
+        "multiplier" : 0.1,
+        "strict_restrictions" : 1
+	}, 
+	"LinRegCoeffCalc" : {
+
+	},
+	"LASSOBasedSparsity" : {
+	
+	}
 }

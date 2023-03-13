@@ -19,7 +19,7 @@ from epde.optimizers.moeadd.moeadd import ParetoLevels
 from epde.supplementary import detect_similar_terms, flatten
 from epde.decorators import HistoryExtender, ResetEquationStatus
 
-from epde.operators.utils.template import CompoundOperator, add_param_to_operator
+from epde.operators.utils.template import CompoundOperator, add_base_param_to_operator
 from epde.operators.multiobjective.moeadd_specific import get_basic_populator_updater
 from epde.operators.multiobjective.mutations import get_basic_mutation
 
@@ -299,16 +299,16 @@ class TermCrossover(CompoundOperator):
 
 def get_basic_variation(variation_params : dict = {}):
     # TODO: generalize initiation with test runs and simultaneous parameter and object initiation.
-    add_kwarg_to_operator = partial(add_param_to_operator, target_dict = variation_params)    
+    add_kwarg_to_operator = partial(add_base_param_to_operator, target_dict = variation_params)    
 
     term_param_crossover = TermParamCrossover(['term_param_proportion'])
-    add_kwarg_to_operator(operator = term_param_crossover, labeled_base_val = {'term_param_proportion' : 0.4})
+    add_kwarg_to_operator(operator = term_param_crossover)
     term_crossover = TermCrossover(['crossover_probability'])
-    add_kwarg_to_operator(operator = term_crossover, labeled_base_val = {'crossover_probability' : 0.3})
+    add_kwarg_to_operator(operator = term_crossover)
 
     equation_crossover = EquationCrossover()
     metaparameter_crossover = MetaparamerCrossover(['metaparam_proportion'])
-    add_kwarg_to_operator(operator = metaparameter_crossover, labeled_base_val = {'metaparam_proportion' : 0.4})
+    add_kwarg_to_operator(operator = metaparameter_crossover)
     equation_exchange_crossover = EquationExchangeCrossover()
 
     chromosome_crossover = ChromosomeCrossover()

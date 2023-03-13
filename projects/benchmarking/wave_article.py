@@ -106,6 +106,6 @@ if __name__ == "__main__":
     dimensionality = u.ndim - 1; boundary = 20
 
     paretos = []
-    exp_num = 20
+    exp_num = 2
     for exp_run in range(exp_num):
-        paretos.append(run_wave_eq_search(multiobjective_mode = exp_run > 9))
+        paretos.append(run_wave_eq_search(multiobjective_mode = False))
