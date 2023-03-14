@@ -6,6 +6,8 @@ Created on Wed May 26 13:36:47 2021
 @author: mike_ubuntu
 """
 
+import glob
+
 from setuptools import setup, find_packages
 from os.path import dirname, join
 from pathlib import Path
@@ -35,7 +37,7 @@ def get_requirements():
 
 setup(
       name = 'epde',
-      version = '1.2.5',
+      version = '1.2.6',
       description = 'EPDE package',
       author = 'Mikhail Maslyaev',
       author_email = 'miklemas@list.ru',
@@ -53,6 +55,7 @@ setup(
                                           'epde.operators.multiobjective', 
                                           'epde.operators.singleobjective', 'epde.preprocessing', 
                                           'epde.parametric', 'epde.structure', 'epde.solver']),
-      include_package_data = True,                                          
+      include_package_data = True,
+      data_files = glob.glob('epde/operators/utils/parameters/**')                                   
       python_requires =' >=3.8'
       )
