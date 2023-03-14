@@ -6,8 +6,6 @@ Created on Wed May 26 13:36:47 2021
 @author: mike_ubuntu
 """
 
-import glob
-
 from setuptools import setup, find_packages
 from os.path import dirname, join
 from pathlib import Path
@@ -55,7 +53,6 @@ setup(
                                           'epde.operators.multiobjective', 
                                           'epde.operators.singleobjective', 'epde.preprocessing', 
                                           'epde.parametric', 'epde.structure', 'epde.solver']),
-      include_package_data = True,
-      data_files = glob.glob('epde/operators/utils/parameters/**')                                   
+      include_package_data = True,                               
       python_requires =' >=3.8'
       )
