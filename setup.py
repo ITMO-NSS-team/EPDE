@@ -48,7 +48,8 @@ setup(
       packages = find_packages(include = ['epde', 'epde.cache', 'epde.interface', 'epde.moeadd', 
                                           'epde.optimizers', 'epde.optimizers.moeadd', 
                                           'epde.optimizers.single_criterion', 'epde.operators.common',
-                                          'epde.operators', 'epde.operators.utils', 
+                                          'epde.operators', 'epde.operators.utils',
+                                          'epde.operators.utils.parameters' 
                                           'epde.operators.multiobjective', 
                                           'epde.operators.singleobjective', 'epde.preprocessing', 
                                           'epde.parametric', 'epde.structure', 'epde.solver']), 
