@@ -162,7 +162,20 @@ class ExternalDerivativesTokens(CustomTokens):
 
 
 class ConstantToken(PreparedTokens):
+    """
+    Variety of tokens for keeping constanting variables
+    """
     def __init__(self, values_range=(-np.inf, np.inf)):
+        """
+        Initialization of constant token
+
+        Args:
+            values_range (`tuple`): optional, default - (-inf, +inf)
+                interval in which the value of token exist
+
+        Returns:
+            None
+        """
         assert len(values_range) == 2 and values_range[0] < values_range[1], 'Range of the values has not been stated correctly.'
         self._token_family = TokenFamily(token_type='constants')
         self._token_family.set_status(unique_specific_token=True, unique_token_type=True,
@@ -184,6 +197,9 @@ class ConstantToken(PreparedTokens):
 
 
 class VelocityHEQTokens(PreparedTokens):
+    """
+    Сustom type of tokens for the equation of thermal conductivity
+    """
     def __init__(self, param_ranges):
         assert len(param_ranges) == 15
         self._token_family = TokenFamily(token_type='velocity_assuption')

@@ -579,50 +579,7 @@ class EpdeSearch(object):
             equation_factors_max_number=1, variable_names=['u',], eq_sparsity_interval=(1e-4, 2.5), 
             derivs=None, max_deriv_order=1, additional_tokens=[], data_fun_pow: int = 1):
         """
-
         Fit epde search algorithm to obtain differential equations, describing passed data.
-        
-        Parameters:
-        -------------
-        
-        data : np.ndarray, list or tuple,
-            Values of modeled variables. If the variable is single (i.e. deriving a single equation),
-            it can be passed as the numpy.ndarray or as the list/tuple with a single element;
-            multiple variables are not supported yet, use older interfaces.
-            
-        equation_terms_max_number : int, optional,
-            The maximum number of terms, present in the derived equations. Default value: 6.
-            
-        equation_factors_max_number : int, optional,
-            The maximum number of factors (token functions; real-valued coefficients are not counted here), 
-            present in terms of the equaton. Default value: 1.
-            
-        variable_names : list of str, optional,
-            Names of the independent variables, passed into search mechanism. Length of the list must correspond
-            to the number of np.ndarrays, sent with in ``data`` parameter. In case of system of differential equation discovery, 
-            all variables shall be named here. Defalut value: ``['u',]``, representing a single variable *u*.
-            
-        eq_sparsity_interval : tuple of two float values, optional,
-            The left and right boundaries of interval with sparse regression values. Influence the number of 
-            terms in the equation. Default value: ``(1e-4, 2.5)``.
-            
-        derivs : list of lists of np.ndarrays or None, optional,
-            Pre-computed values of derivatives. If ``None`` is passed, the derivatives are calculated in the 
-            method. Recommended to use, if the computations of derivatives take too long. For further information 
-            about using data, prepared in advance, check ``epde.preprocessing.derivatives.Preprocess_derivatives`` function.
-            Default value: None.
-            
-        max_deriv_order : int or tuple/list, optional,
-            Highest order of calculated derivatives. Default value: 1.
-            
-        additional_tokens : None or list of ``TokenFamily`` or ``Prepared_tokens`` objects, optional
-            Additional tokens, that would be used to construct the equations among the main variables and their 
-            derivatives. Objects of this list must be of type ``epde.interface.token_family.TokenFamily`` or 
-            of ``epde.interface.prepared_tokens.Prepared_tokens`` subclasses types. Default value: None.
-            
-        field_smooth : bool, optional
-            Parameter, if the input variable fields shall be smoothed to avoid the errors. If the data is 
-            assumed to be noiseless, shall be set to False, otherwise - True. Default value: False.
 
         Args:
             data (`np.ndarray|list|tuple`): Values of modeled variables. If the variable is single (i.e. deriving a single equation),
@@ -693,7 +650,7 @@ class EpdeSearch(object):
 
         Returns:
             None
-        """    
+        """
         pop_constructor = MOEADDSystemPopConstr(pool = self.pool, terms_number = equation_terms_max_number, 
                                                 max_factors_in_term = equation_factors_max_number,
                                                 sparsity_interval = eq_sparsity_interval)
@@ -715,7 +672,12 @@ class EpdeSearch(object):
         print('The optimization has been conducted.')
         self.search_conducted = True
         
-    def fit_singleobjective(self, equation_terms_max_number=6, equation_factors_max_number=1, eq_sparsity_interval=(1e-4, 2.5)):
+    def fit_singleobjective(self, data : Union[np.ndarray, list, tuple], equation_terms_max_number = 6,
+                            equation_factors_max_number = 1, variable_names = ['u',], eq_sparsity_interval = (1e-4, 2.5), 
+                            derivs = None, max_deriv_order = 1, additional_tokens = [], memory_for_cache = 5,
+                            prune_domain : bool = False, pivotal_tensor_label = None, pruner = None, 
+                            threshold : float = 1e-2, division_fractions = 3, rectangular : bool = True, 
+                            data_fun_pow : int = 1):
         """
         Fitting functional for singleobjective optimization 
 
@@ -789,7 +751,7 @@ class EpdeSearch(object):
         Method returns solver forms of the equations on 1-st non-dominated levels in a form of Python list.
 
         Returns:
-            system form, suitable for solver
+            form system for solver
         '''
         sf = []
         for system in self.resulting_population[0]:
