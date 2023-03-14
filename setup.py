@@ -35,7 +35,7 @@ def get_requirements():
 
 setup(
       name = 'epde',
-      version = '1.2.6',
+      version = '1.2.7',
       description = 'EPDE package',
       author = 'Mikhail Maslyaev',
       author_email = 'miklemas@list.ru',
@@ -49,7 +49,7 @@ setup(
                                           'epde.optimizers', 'epde.optimizers.moeadd', 
                                           'epde.optimizers.single_criterion', 'epde.operators.common',
                                           'epde.operators', 'epde.operators.utils',
-                                          'epde.operators.utils.parameters' 
+                                          'epde.operators.utils.parameters',
                                           'epde.operators.multiobjective', 
                                           'epde.operators.singleobjective', 'epde.preprocessing', 
                                           'epde.parametric', 'epde.structure', 'epde.solver']),
