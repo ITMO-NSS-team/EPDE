@@ -15,6 +15,7 @@ import epde.globals as global_var
 from epde.supplementary import factor_params_to_str, train_ann, use_ann_to_predict
 
 
+
 class Factor(TerminalToken):
     __slots__ = ['_params', '_params_description', '_hash_val',
                  'label', 'ftype', 'grid_set', 'grid_idx', 'is_deriv', 'deriv_code',
@@ -93,18 +94,14 @@ class Factor(TerminalToken):
         '''
         _params_description = {}
         if not random:
-            #            assert set(self.token._evaluator.params['params_names']) != set(kwargs.keys()), 'Incorrect/partial set of parameters used to define factor'
-            #                raise Exception()
             _params = np.empty(len(kwargs))
-            assert len(kwargs) == len(
-                params_description), 'Not all parameters have been declared. Partial randomization TBD'
-            # param_name, param_val
+            assert len(kwargs) == len(params_description), 'Not all parameters have been declared. Partial randomization TBD'
             for param_idx, param_info in enumerate(kwargs.items()):
                 _params[param_idx] = param_info[1]
                 _params_description[param_idx] = {'name': param_info[0],
                                                   'bounds': params_description[param_info[0]]}
         else:
-            _params = np.empty(len(params_description))  # OrderedDict()
+            _params = np.empty(len(params_description))
             for param_idx, param_info in enumerate(params_description.items()):
                 if param_info[0] != 'power':
                     _params[param_idx] = (np.random.randint(param_info[1][0], param_info[1][1] + 1) if isinstance(param_info[1][0], int)
@@ -152,8 +149,7 @@ class Factor(TerminalToken):
             return global_var.tensor_cache.get(self.cache_label,
                                                structural=structural)
         else:
-            value = self._evaluator.apply(
-                self, structural=structural, grids=grids)
+            value = self._evaluator.apply(self, structural=structural, grids=grids)
             if grids is None:
                 if key == 'structural' and self.status['structural_and_defalut_merged']:
                     global_var.tensor_cache.use_structural(use_base_data=True)

@@ -107,7 +107,6 @@ def ndl_update(new_solution, levels) -> list:   # efficient_ndl_update
                 moving_set_new.add(moving_set_elem)
             elif (not np.any([check_dominance(solution, moving_set_elem) for solution in new_levels[level_idx]]) and
                   not np.any([check_dominance(moving_set_elem, solution) for solution in new_levels[level_idx]])):
-                # ; completed_levels = True
                 new_levels[level_idx].append(moving_set_elem)
             elif np.all([check_dominance(moving_set_elem, solution) for solution in levels[level_idx]]):
                 temp_levels = new_levels[level_idx:]

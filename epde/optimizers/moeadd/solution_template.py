@@ -62,6 +62,7 @@ class CrossoverSelectionCounter(object):
         return self._counter
 
 
+
 class MOEADDSolution(ABC):
     '''
 
@@ -107,6 +108,7 @@ class MOEADDSolution(ABC):
 
     '''
 
+
     def __init__(self, x, obj_funs):
         self.vals = x
         self.obj_funs = obj_funs
@@ -119,8 +121,7 @@ class MOEADDSolution(ABC):
         if self.precomputed_value:
             return self._obj_fun
         else:
-            self._obj_fun = np.fromiter(
-                map(lambda obj_fun: obj_fun(self.vals), self.obj_funs), dtype=float)
+            self._obj_fun = np.fromiter(map(lambda obj_fun: obj_fun(self.vals), self.obj_funs), dtype=float)
             self.precomputed_value = True
             return self._obj_fun
 
@@ -149,6 +150,7 @@ class MOEADDSolution(ABC):
     @abstractmethod
     def __hash__(self):
         raise NotImplementedError(
+            
             'The hash needs to be defined in the subclass')
 
     def incr_counter(self, incr_val: int = 1):
@@ -169,3 +171,4 @@ class MOEADDSolution(ABC):
 
     def reset_counter(self):
         self.crossover_selected_times.reset()
+

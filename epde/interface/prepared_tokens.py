@@ -163,11 +163,11 @@ class ExternalDerivativesTokens(CustomTokens):
 
 class ConstantToken(PreparedTokens):
     """
-    Variety of token for keeping constanting variables
+    Variety of tokens for keeping constanting variables
     """
     def __init__(self, values_range=(-np.inf, np.inf)):
         """
-        Initialization of constant tokren
+        Initialization of constant token
 
         Args:
             values_range (`tuple`): optional, default - (-inf, +inf)
@@ -198,7 +198,7 @@ class ConstantToken(PreparedTokens):
 
 class VelocityHEQTokens(PreparedTokens):
     """
-    Сustomer type of tokens for the equation of thermal conductivity
+    Сustom type of tokens for the equation of thermal conductivity
     """
     def __init__(self, param_ranges):
         assert len(param_ranges) == 15

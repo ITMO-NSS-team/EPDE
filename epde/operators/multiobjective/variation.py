@@ -14,14 +14,14 @@ from copy import deepcopy
 from functools import partial
 
 from epde.structure.structure_template import check_uniqueness
-from epde.optimizers.moeadd.moeadd import ParetoLevels
+from epde.optimizers.optimizers.moeadd.moeadd import ParetoLevels
 
 from epde.supplementary import detect_similar_terms, flatten
 from epde.decorators import HistoryExtender, ResetEquationStatus
 
-from epde.operators.utils.template import CompoundOperator, add_param_to_operator
-from epde.operators.multiobjective.moeadd_specific import get_basic_populator_updater
-from epde.operators.multiobjective.mutations import get_basic_mutation
+from epde.operators.utils.utils.template import CompoundOperator, add_base_param_to_operator
+from epde.operators.multiobjective.multiobjective.moeadd_specific import get_basic_populator_updater
+from epde.operators.multiobjective.multiobjective.mutations import get_basic_mutation
 
 
 class ParetoLevelsCrossover(CompoundOperator):
@@ -44,7 +44,7 @@ class ParetoLevelsCrossover(CompoundOperator):
         return the new population, created with the noted operators and containing both parent individuals and their offsprings.    
     copy_properties_to
     """
-    key = ["population level", "crossover"]
+    key = 'ParetoLevelsCrossover'
     
     def apply(self, objective : ParetoLevels, arguments : dict):
         """
@@ -95,7 +95,7 @@ class ParetoLevelsCrossover(CompoundOperator):
 
 
 class ChromosomeCrossover(CompoundOperator):
-    key = ["chromosome level", "crossover"]
+    key = 'ChromosomeCrossover'
     
     def apply(self, objective : tuple, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
@@ -128,7 +128,7 @@ class ChromosomeCrossover(CompoundOperator):
 
 
 class MetaparamerCrossover(CompoundOperator):
-    key = ["gene level", "metaparameter crossover"]
+    key = 'MetaparamerCrossover'
     
     def apply(self, objective : tuple, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
@@ -142,7 +142,7 @@ class MetaparamerCrossover(CompoundOperator):
 
 
 class EquationCrossover(CompoundOperator):
-    key = ["gene level", "structural crossover"]
+    key = 'EquationCrossover'
     
     @HistoryExtender(f'\n -> performing equation crossover', 'ba')
     def apply(self, objective : tuple, arguments : dict):
@@ -173,7 +173,7 @@ class EquationCrossover(CompoundOperator):
         self._tags = {'crossover', 'gene level', 'contains suboperators', 'standard'}
 
 class EquationExchangeCrossover(CompoundOperator):
-    key = ["gene level", "structural crossover"]
+    key = 'EquationExchangeCrossover'
     
     @HistoryExtender(f'\n -> performing equation exchange crossover', 'ba')
     def apply(self, objective : tuple, arguments : dict):
@@ -201,7 +201,7 @@ class TermParamCrossover(CompoundOperator):
     apply(population)
         return the offspring terms, constructed as the parents' factors with parameter values, selected between the parents' ones.        
     """
-    key = ["term level", "parameter crossover"]
+    key = 'TermParamCrossover'
         
     def apply(self, objective : tuple, arguments : dict):
         """
@@ -268,7 +268,7 @@ class TermCrossover(CompoundOperator):
         return the offspring terms, which are the same parents' ones, but in different order, if the crossover occured.
         .        
     """    
-    key = ["term level", "structural crossover"]
+    key = 'TermCrossover'
 
     def apply(self, objective : tuple, arguments : dict):
         """
@@ -299,23 +299,22 @@ class TermCrossover(CompoundOperator):
 
 def get_basic_variation(variation_params : dict = {}):
     # TODO: generalize initiation with test runs and simultaneous parameter and object initiation.
-    add_kwarg_to_operator = partial(add_param_to_operator, target_dict = variation_params)    
+    add_kwarg_to_operator = partial(add_base_param_to_operator, target_dict = variation_params)    
 
     term_param_crossover = TermParamCrossover(['term_param_proportion'])
-    add_kwarg_to_operator(operator = term_param_crossover, labeled_base_val = {'term_param_proportion' : 0.4})
+    add_kwarg_to_operator(operator = term_param_crossover)
     term_crossover = TermCrossover(['crossover_probability'])
-    add_kwarg_to_operator(operator = term_crossover, labeled_base_val = {'crossover_probability' : 0.3})
+    add_kwarg_to_operator(operator = term_crossover)
 
     equation_crossover = EquationCrossover()
     metaparameter_crossover = MetaparamerCrossover(['metaparam_proportion'])
-    add_kwarg_to_operator(operator = metaparameter_crossover, labeled_base_val = {'metaparam_proportion' : 0.4})
+    add_kwarg_to_operator(operator = metaparameter_crossover)
     equation_exchange_crossover = EquationExchangeCrossover()
 
     chromosome_crossover = ChromosomeCrossover()
 
-    pl_cross = ParetoLevelsCrossover(['PBI_penalty'])
-    add_kwarg_to_operator(operator = pl_cross, labeled_base_val = {'PBI_penalty' : 1.})
-
+    pl_cross = ParetoLevelsCrossover([])
+    
     equation_crossover.set_suboperators(operators = {'term_param_crossover' : term_param_crossover, 
                                                      'term_crossover' : term_crossover})
     chromosome_crossover.set_suboperators(operators = {'equation_crossover' : [equation_crossover, equation_exchange_crossover],

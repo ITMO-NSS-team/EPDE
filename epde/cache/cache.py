@@ -259,7 +259,7 @@ class Cache(object):
         assert self.available_mem < psutil.virtual_memory().available
 
         if len(self.memory_default) == 0:
-            assert type(obj_test_case) is not None
+            assert obj_test_case is not None
             self.max_allowed_tensors = np.int(np.floor(self.available_mem/obj_test_case.nbytes)/2)
         else:
             self.max_allowed_tensors = np.int(np.floor(self.available_mem/self.memory_default[np.random.choice(list(self.memory_default.keys()))].nbytes))

@@ -6,10 +6,11 @@ import inspect
 
 from functools import wraps
 from epde.operators.utils.default_parameter_loader import EvolutionaryParams
+from epde.operators.utils.default_parameter_loader import EvolutionaryParams
 
 from epde.structure.main_structures import Term, Equation, SoEq
 from epde.structure.encoding import Gene, Chromosome
-from epde.optimizers.moeadd.moeadd import ParetoLevels
+from epde.optimizers.optimizers.moeadd.moeadd import ParetoLevels
 
 OPERATOR_LEVELS = ('custom level', 'term level', 'gene level', 'chromosome level',
                    'population level')
@@ -23,12 +24,16 @@ def add_base_param_to_operator(operator):
     for param_key, param_value in params_container[operator.key].items():
         operator.params[param_key] = param_value
 
-def add_param_to_operator(operator, target_dict, labeled_base_val):
-    for key, base_val in labeled_base_val.items():
-        if base_val is None and key not in target_dict.keys():
-            raise ValueError('Mandatory parameter for evolutionary operator')
-        operator.params[key] = target_dict[key] if key in target_dict.keys(
-        ) else base_val
+def add_base_param_to_operator(operator, target_dict):
+    params_container = EvolutionaryParams()
+    for param_key, param_value in params_container.get_default_params_for_operator(operator.key).items():
+        operator.params[param_key] = target_dict[param_key] if param_key in target_dict.keys(
+        ) else param_value
+# def add_param_to_operator(operator, target_dict, labeled_base_val):
+#     for key, base_val in labeled_base_val.items():
+#         if base_val is None and key not in target_dict.keys():
+#             raise ValueError('Mandatory parameter for evolutionary operator')
+#         operator.params[key] = target_dict[key] if key in target_dict.keys() else base_val
 
 class CompoundOperator():
     '''
@@ -62,10 +67,12 @@ class CompoundOperator():
         if not all([isinstance(key, str) and (isinstance(value, (list, tuple, dict)) or
                                               issubclass(type(value), CompoundOperator))
                     for key, value in operators.items()]):
-            raise TypeError(
-                'The suboperators of an evolutionary operator must be declared in format key : value, where key is str and value - CompoundOperator, list, tuple or dict')
-        self._suboperators = SuboperatorContainer(
-            suboperators=operators, probas=probas)
+            print([(key, isinstance(key, str),  
+                    value, (isinstance(value, (list, tuple, dict)) or 
+                            issubclass(type(value), CompoundOperator)))
+                    for key, value in operators.items()])
+            raise TypeError('The suboperators of an evolutionary operator must be declared in format key : value, where key is str and value - CompoundOperator, list, tuple or dict')
+        self._suboperators = SuboperatorContainer(suboperators = operators, probas = probas) 
 
     def get_suboperator_args(self, personal=False):
         '''

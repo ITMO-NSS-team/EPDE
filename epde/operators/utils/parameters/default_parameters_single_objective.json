@@ -1,0 +1,59 @@
+{
+	"RouletteWheelSelection" : {
+    	"parents_fraction" : 0.4
+ 	},
+	"SizeRestriction" : {
+
+	},
+	"FractionElitism" : {
+        "number_of_neighbors" : 4
+ 	},
+	"ParetoLevelUpdater" : {
+    	"attempt_limit" : 5
+	},
+	"InitialParetoLevelSorting" : {
+	
+	},
+ 	"DiscrepancyBasedFitness" : {
+        "penalty_coeff" : 0.2
+ 	},
+ 	"PopulationLevelCrossover" : {
+
+ 	},
+ 	"ChromosomeCrossover" : {
+
+	},	
+ 	"EquationCrossover" : {
+
+	},
+ 	"TermCrossover" : {
+        "crossover_probability" : 0.3
+	},
+ 	"TermParamCrossover" : {
+        "term_param_proportion" : 0.4
+	},
+    "SystemMutation" : {
+
+    },
+	"EquationMutation" : {
+        "r_mutation" : 0.6
+	},
+	"MetaparameterMutation" : {
+        "mean" : 0.0,
+        "std" : 1e-4
+	},
+	"TermMutation" : {
+
+	},
+	"TermParameterMutation" : {
+        "r_param_mutation" : 0.2,
+        "multiplier" : 0.1,
+        "strict_restrictions" : 1
+	}, 
+	"LinRegCoeffCalc" : {
+
+	},
+	"LASSOBasedSparsity" : {
+	
+	}
+}

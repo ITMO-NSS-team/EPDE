@@ -19,6 +19,9 @@ class ParamContainerMeta(type):
             cls._container_instances[cls] = instance
             
         return cls._container_instances[cls]
+    
+    def reset(self):
+        self._container_instances = {}
 
 class EvolutionaryParams(metaclass = ParamContainerMeta):
     '''
@@ -27,11 +30,12 @@ class EvolutionaryParams(metaclass = ParamContainerMeta):
     '''
     
     def __init__(self, parameter_file : str = None, mode : str = 'multi objective') -> None:
-        if mode == 'single criterion':
-            parameter_file = 'default_parameters_single_objective.json'
-        else:
-            parameter_file = 'default_parameters_multi_objective.json'
-                        
+        if parameter_file is None:
+            if mode == 'single objective':
+                parameter_file = 'default_parameters_single_objective.json'
+            elif mode == 'multi objective':
+                parameter_file = 'default_parameters_multi_objective.json'
+        
         self.mode = mode
         repo_folder = str(os.path.dirname(__file__))
         file = os.path.join('parameters', parameter_file)
@@ -53,7 +57,9 @@ class EvolutionaryParams(metaclass = ParamContainerMeta):
     def get_default_params_for_operator(self, operator_name : str) -> dict:
         if operator_name in self._repo:
             return self._repo[operator_name]
-        return {}
+        else:
+            raise Exception(f'Operator with key {operator_name} is missing from the repo with params')
+        # return {}
     
     def change_operator_param(self, operator_name : str, parameter_name : str, new_value):
         if type(new_value) != type(self._repo[operator_name][parameter_name]):

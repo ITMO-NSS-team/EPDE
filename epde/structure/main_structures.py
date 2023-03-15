@@ -54,7 +54,6 @@ class Term(ComplexStructure):
     def cache_label(self):
         if len(self.structure) > 1:
             structure_sorted = sorted(self.structure, key=lambda x: x.cache_label)
-            # reduce(form_label, structure_sorted, '')
             cache_label = tuple([elem.cache_label for elem in structure_sorted])
         else:
             cache_label = self.structure[0].cache_label
@@ -68,9 +67,11 @@ class Term(ComplexStructure):
 
     # TODO: make self.descr_variable_marker setting for defined parameter
 
+
     @singledispatchmethod
     def defined(self, passed_term):
         raise NotImplementedError(
+            
             f'passed term should have string or list/dict types, not {type(passed_term)}')
 
     @defined.register
@@ -84,6 +85,7 @@ class Term(ComplexStructure):
                 self.structure.append(factor)
             else:
                 raise ValueError(
+                    
                     'The structure of a term should be declared with str or factor.Factor obj, instead got', type(factor))
         self.structure = filter_powers(self.structure)
 
@@ -97,6 +99,7 @@ class Term(ComplexStructure):
             self.structure.append(passed_term)
         else:
             raise ValueError(
+                
                 'The structure of a term should be declared with str or factor.Factor obj, instead got', type(passed_term))
 
     def randomize(self, mandatory_family=None, forbidden_factors=None,
@@ -191,8 +194,7 @@ class Term(ComplexStructure):
                 value = (value - np.mean(value))
             if np.all([len(factor.params) == 1 for factor in self.structure]) and grids is None:
                 # Место возможных проблем: сохранение/загрузка нормализованных данных
-                self.saved[normalize] = global_var.tensor_cache.add(
-                    self.cache_label, value, normalized=normalize)
+                self.saved[normalize] = global_var.tensor_cache.add(self.cache_label, value, normalized=normalize)
                 if self.saved[normalize]:
                     self.saved_as[normalize] = self.cache_label
             value = value.reshape(-1)
@@ -202,6 +204,7 @@ class Term(ComplexStructure):
         warnings.warn(message='Tokens can no longer be set as right-part-unique',
                       category=DeprecationWarning)
         taken_tokens = [factor.label for factor in reference_target.structure 
+			 
 			 if factor.status['unique_for_right_part']]
         meaningful_taken = any([factor.status['meaningful'] for factor in reference_target.structure
                                 if factor.status['unique_for_right_part']])
@@ -223,13 +226,16 @@ class Term(ComplexStructure):
                 break
             if accept_term_try == 10 and global_var.verbose.show_warnings:
                 warnings.warn(
+                    
                     'Can not create unique term, while filtering equation tokens in regards to the right part.')
             if accept_term_try >= 10:
                 self.randomize(forbidden_factors=new_term.occupied_tokens_labels + taken_tokens)
             if accept_term_try == 100:
                 print(
+                    
                     'Something wrong with the random generation of term while running "filter_tokens_by_right_part"')
                 print('proposed', new_term.name, 'for ', equation.text_form,
+                     
                       'with respect to', reference_target.name)
 
     def reset_occupied_tokens(self):
@@ -244,7 +250,6 @@ class Term(ComplexStructure):
         self.occupied_tokens_labels = occupied_tokens_new
 
     @property
-    # Переделать, т.к. меняется пул токенов: старая имплементация через лист
     def available_tokens(self):
         available_tokens = []
         for token in self.pool.families:
@@ -288,7 +293,7 @@ class Term(ComplexStructure):
         new_struct = clss.__new__(clss)
         memo[id(self)] = new_struct
 
-        attrs_to_avoid_copy = []  # Add attributes to avoid copying during deepcopy, if needed
+        attrs_to_avoid_copy = []
         for k in self.__slots__:
             try:
                 if k not in attrs_to_avoid_copy:
@@ -378,7 +383,7 @@ class Equation(ComplexStructure):
 
         self.main_var_to_explain = var_to_explain
 
-        force_var_to_explain = True  # False
+        force_var_to_explain = True   # False
         for i in range(len(basic_structure), self.metaparameters['terms_number']['value']):
             check_test = 0
             while True:
@@ -442,8 +447,7 @@ class Equation(ComplexStructure):
         while True:
             print(
                 f'Restoring containment of {mandatory_family} in {self.text_form}.')
-            replacement_idx = np.random.randint(
-                low=0, high=len(self.structure))
+            replacement_idx = np.random.randint(low=0, high=len(self.structure))
             mf_marker = mandatory_family if mandatory_family else None
             temp = Term(self.pool, mandatory_family=mf_marker,
                         max_factors_in_term=self.metaparameters['max_factors_in_term']['value'])
@@ -473,24 +477,20 @@ class Equation(ComplexStructure):
         return new_eq
 
     def evaluate(self, normalize=True, return_val=False, grids=None):
-        self._target = self.structure[self.target_idx].evaluate(
-            normalize, grids=grids)
+        self._target = self.structure[self.target_idx].evaluate(normalize, grids=grids)
         feature_indexes = list(range(len(self.structure)))
         feature_indexes.remove(self.target_idx)
         for feat_idx in range(len(feature_indexes)):
             if feat_idx == 0:
-                self._features = self.structure[feature_indexes[feat_idx]].evaluate(
-                    normalize, grids=grids)
+                self._features = self.structure[feature_indexes[feat_idx]].evaluate(normalize, grids=grids)
             elif feat_idx != 0:
-                temp = self.structure[feature_indexes[feat_idx]].evaluate(
-                    normalize, grids=grids)
+                temp = self.structure[feature_indexes[feat_idx]].evaluate(normalize, grids=grids)
                 self._features = np.vstack([self._features, temp])
             else:
                 continue
         if self._features.ndim == 1:
             self._features = np.expand_dims(self._features, 1).T
-        temp_feats = np.vstack(
-            [self._features, np.ones(self._features.shape[1])])
+        temp_feats = np.vstack([self._features, np.ones(self._features.shape[1])])
         self._features = np.transpose(self._features)
         temp_feats = np.transpose(temp_feats)
         if return_val:
@@ -515,9 +515,6 @@ class Equation(ComplexStructure):
         self.weights_final_evald = False
         self.fitness_calculated = False
         self.solver_form_defined = False
-        # print('Resetting!')
-        # if self.structure is not None:
-        # print(f'RESETTING {self.text_form}')
 
     # @ResetEquationStatus(reset_input = False, reset_output = True)
     @HistoryExtender('\n -> was copied by deepcopy(self)', 'n')
@@ -531,10 +528,8 @@ class Equation(ComplexStructure):
         for k in self.__slots__:
             try:
                 if k not in attrs_to_avoid_copy:
-                    # , tuple, np.ndarray Проблема в недоучёте типов?
                     if not isinstance(k, list):
-                        setattr(new_struct, k, copy.deepcopy(
-                            getattr(self, k), memo))
+                        setattr(new_struct, k, copy.deepcopy(getattr(self, k), memo))
                     else:
                         temp = []
                         for elem in getattr(self, k):
@@ -651,14 +646,12 @@ class Equation(ComplexStructure):
 
             free_coeff_weight = torch.from_numpy(np.full_like(a=global_var.grid_cache.get('0'),
                                                               fill_value=self.weights_final[-1]))
-            free_coeff_weight = torch.flatten(
-                free_coeff_weight).unsqueeze(1).type(torch.FloatTensor)
+            free_coeff_weight = torch.flatten(free_coeff_weight).unsqueeze(1).type(torch.FloatTensor)
             target_weight = torch.from_numpy(np.full_like(a=global_var.grid_cache.get('0'),
                                                           fill_value=-1.))
             target_form = self.structure[self.target_idx].solver_form
             target_form[0] = target_form[0] * target_weight
-            target_form[0] = torch.flatten(
-                target_form[0]).unsqueeze(1).type(torch.FloatTensor)
+            target_form[0] = torch.flatten(target_form[0]).unsqueeze(1).type(torch.FloatTensor)
 
             self._solver_form.append([free_coeff_weight, [None], 0])
             self._solver_form.append(target_form)
@@ -707,51 +700,48 @@ class Equation(ComplexStructure):
                 max_orders = np.maximum(max_orders, orders)
         if np.max(max_orders) > 4:
             raise NotImplementedError(
+                
                 'The current implementation allows does not allow higher orders of equation, than 2.')
         return max_orders
-
-    def boundary_conditions(self, main_var_key=('u', (1.0,)), full_domain: bool = False,
-                            grids: list = None):
-        # We assume, that the maximum order of the equation here is 2
-        required_bc_ord = self.max_deriv_orders()
-        if global_var.grid_cache is None:
-            raise NameError('Grid cache has not been initialized yet.')
-
-        bconds = []
-        hardcoded_bc_relative_locations = {0: (), 1: (0,), 2: (0, 1),
-                                           3: (0., 0.5, 1.), 4: (0., 1/3., 2/3., 1.)}
-
-        if full_domain:
-            grid_cache = global_var.initial_data_cache
-            tensor_cache = global_var.initial_data_cache
-        else:
-            grid_cache = global_var.grid_cache
-            tensor_cache = global_var.tensor_cache
-
-        tensor_shape = grid_cache.get('0').shape
-
-        def get_boundary_ind(tensor_shape, axis, rel_loc):
-            return tuple(np.meshgrid(*[np.arange(shape) if dim_idx != axis else min(int(rel_loc * shape), shape-1)
-                                       for dim_idx, shape in enumerate(tensor_shape)], indexing='ij'))
-        for ax_idx, ax_ord in enumerate(required_bc_ord):
-            for loc_fraction in hardcoded_bc_relative_locations[ax_ord]:
-                indexes = get_boundary_ind(
-                    tensor_shape, axis=ax_idx, rel_loc=loc_fraction)
-                coords_raw = np.array([grid_cache.get(str(idx))[indexes] for idx
-                                       in np.arange(len(tensor_shape))])
-                coords = coords_raw.T
-                if coords.ndim > 2:
-                    coords = coords.squeeze()
-                # np.squeeze(tensor_cache.get(main_var_key)[indexes]).T
-                vals = np.expand_dims(tensor_cache.get(
-                    main_var_key)[indexes], axis=0).T
-
-                coords = torch.from_numpy(coords).type(torch.FloatTensor)
-
-                vals = torch.from_numpy(vals).type(torch.FloatTensor)
-                bconds.append([coords, vals])
-
-        return bconds
+    
+    def boundary_conditions(self, max_deriv_orders=(1,), main_var_key=('u', (1.0,)), full_domain: bool = False,
+                                grids : list = None):
+            required_bc_ord = max_deriv_orders   # We assume, that the maximum order of the equation here is 2
+            if global_var.grid_cache is None:
+                raise NameError('Grid cache has not been initialized yet.')
+    
+            bconds = []
+            hardcoded_bc_relative_locations = {0: (), 1: (0,), 2: (0, 1),
+                                               3: (0., 0.5, 1.), 4: (0., 1/3., 2/3., 1.)}
+    
+            if full_domain:
+                grid_cache = global_var.initial_data_cache
+                tensor_cache = global_var.initial_data_cache
+            else:
+                grid_cache = global_var.grid_cache
+                tensor_cache = global_var.tensor_cache
+    
+            tensor_shape = grid_cache.get('0').shape
+    
+            def get_boundary_ind(tensor_shape, axis, rel_loc):
+                return tuple(np.meshgrid(*[np.arange(shape) if dim_idx != axis else min(int(rel_loc * shape), shape-1)
+                                           for dim_idx, shape in enumerate(tensor_shape)], indexing='ij'))
+            for ax_idx, ax_ord in enumerate(required_bc_ord):
+                for loc_fraction in hardcoded_bc_relative_locations[ax_ord]:
+                    indexes = get_boundary_ind(tensor_shape, axis=ax_idx, rel_loc=loc_fraction)
+                    coords_raw = np.array([grid_cache.get(str(idx))[indexes] for idx
+                                           in np.arange(len(tensor_shape))])
+                    coords = coords_raw.T
+                    if coords.ndim > 2:
+                        coords = coords.squeeze()
+                    vals = np.expand_dims(tensor_cache.get(main_var_key)[indexes], axis=0).T
+    
+                    coords = torch.from_numpy(coords).type(torch.FloatTensor)
+    
+                    vals = torch.from_numpy(vals).type(torch.FloatTensor)
+                    bconds.append([coords, vals, 'dirichlet'])    
+    
+            return bconds
 
     def clear_after_solver(self):
         del self.model
@@ -805,10 +795,9 @@ class SoEq(moeadd.MOEADDSolution):
         self.tokens_supp = TFPool(pool.families_equationless)
         self.moeadd_set = False
 
-        self.vars_to_describe = {
-            token_family.ftype for token_family in self.tokens_for_eq.families}
+        self.vars_to_describe = {token_family.ftype for token_family in self.tokens_for_eq.families}
 
-    def use_default_multiobjective_function(self):
+    def use_default_multimultiobjective_function(self):
         from epde.eq_mo_objectives import generate_partial, equation_fitness, equation_complexity_by_factors
         complexity_objectives = [generate_partial(equation_complexity_by_factors, eq_key)
                                  for eq_key in self.vars_to_describe]  # range(len(self.tokens_for_eq))]
@@ -838,6 +827,15 @@ class SoEq(moeadd.MOEADDSolution):
         '''
         assert callable(obj_funs) or all([callable(fun) for fun in obj_funs])
         self.obj_funs = obj_funs
+
+    def matches_complexitiy(self, complexity : Union[int, list]):
+        if isinstance(complexity, (int, float)):    
+            complexity = [complexity,]
+        
+        if not isinstance(complexity, list) or len(self.vars_to_describe) != len(complexity):
+            raise ValueError('Incorrect list of complexities passed.')
+        
+        return list(self.obj_fun[-len(complexity):]) == complexity        
 
     def matches_complexitiy(self, complexity : Union[int, list]):
         if isinstance(complexity, (int, float)):    
@@ -878,12 +876,10 @@ class SoEq(moeadd.MOEADDSolution):
     def evaluate(self, normalize=True, grids: list = None):
         raise DeprecationWarning('Evaluation of system is not necessary')
         if len(self.vals) == 1:
-            value = [equation.evaluate(normalize, return_val=True)[
-                0] for equation in self.vals][0]
+            value = [equation.evaluate(normalize, return_val=True)[0] for equation in self.vals][0]
             # self.vals[0].evaluate(normalize = normalize, return_val = True)[0]
         else:
-            value = np.sum([equation.evaluate(normalize, return_val=True)[
-                           0] for equation in self.vals])
+            value = np.sum([equation.evaluate(normalize, return_val=True)[0] for equation in self.vals])
         value = np.sum(np.abs(value))
         return value
 
@@ -915,7 +911,7 @@ class SoEq(moeadd.MOEADDSolution):
         assert self.moeadd_set, 'The structure of the equation is not defined, therefore no moeadd operations can be called'
         return (all([any([other_elem == self_elem for other_elem in other.vals]) for self_elem in self.vals]) and
                 all([any([other_elem == self_elem for self_elem in self.vals]) for other_elem in other.vals]) and
-                len(other.vals) == len(self.vals))  # or all(np.isclose(self.obj_fun, other.obj_fun)
+                len(other.vals) == len(self.vals))   # or all(np.isclose(self.obj_fun, other.obj_fun)
 
     @property
     def latex_form(self):
@@ -939,8 +935,7 @@ class SoEq(moeadd.MOEADDSolution):
         for k in self.__slots__:
             try:
                 if not isinstance(k, list):
-                    setattr(new_struct, k, copy.deepcopy(
-                        getattr(self, k), memo))
+                    setattr(new_struct, k, copy.deepcopy(getattr(self, k), memo))
                 else:
                     temp = []
                     for elem in getattr(self, k):
@@ -955,7 +950,7 @@ class SoEq(moeadd.MOEADDSolution):
             equation.reset_state(reset_right_part)
 
     def copy_properties_to(self, objective):
-        for eq_label in self.vals.equation_keys:  # Not the best code possible here
+        for eq_label in self.vals.equation_keys:   # Not the best code possible here
             self.vals[eq_label].copy_properties_to(objective.vals[eq_label])
 
     def solver_params(self, full_domain, grids=None):

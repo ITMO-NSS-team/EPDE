@@ -20,7 +20,7 @@ sys.path.pop()
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')))
 
 def run_wave_eq_search(multiobjective_mode, derivs = None):
-    epde_search_obj = epde_alg.EpdeSearch(multiobjective_mode=multiobjective_mode, use_solver = False, 
+    epde_search_obj = epde_alg.epde_search(multiobjective_mode=multiobjective_mode, use_solver = False, 
                                            dimensionality = dimensionality, boundary = 10,
                                            coordinate_tensors = grids, verbose_params = {'show_moeadd_epochs' : True})    
     # epde_search_obj.set_preprocessor(default_preprocessor_type='spectral', # use_smoothing = True

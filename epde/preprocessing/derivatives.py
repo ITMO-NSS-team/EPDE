@@ -18,6 +18,11 @@ from typing import Union
 import torch
 device = torch.device('cpu')
 
+import epde.globals as global_var
+from epde.preprocessing.cheb import process_point_cheb
+from epde.preprocessing.smoothing import Smoothing
+from epde.supplementary import define_derivatives, train_ann, use_ann_to_predict
+    
 
 def preprocess_derivatives_poly(field, grid=None, steps=None, data_name=None, output_file_name=None, smooth=True, sigma=9,
                                 mp_poolsize=4, max_order=2, polynomial_window=9, poly_order=None, scaling=False):
@@ -102,6 +107,7 @@ def preprocess_derivatives_poly(field, grid=None, steps=None, data_name=None, ou
     return field, np.array(derivatives)
 
 
+
 def init_ann(dim):
     model = torch.nn.Sequential(
         torch.nn.Linear(dim, 256),
@@ -123,6 +129,7 @@ def differentiate(data, order: Union[int, list], mixed: bool = False, axis=None,
         order = [order,] * data.ndim
     if any([ord_ax != order[0] for ord_ax in order]) and mixed:
         raise Exception(
+            
             'Mixed derivatives can be taken only if the orders are same along all axes.')
     if data.ndim != len(grids) and (len(grids) != 1 or data.ndim != 2):
         print(data.ndim, len(grids))
@@ -139,6 +146,7 @@ def differentiate(data, order: Union[int, list], mixed: bool = False, axis=None,
             higher_ord_der_axis = None if mixed else dim_idx
             ord_reduced = [ord_ax - 1 for ord_ax in order]
             derivs.extend(differentiate(grad, ord_reduced,
+                         
                           mixed, higher_ord_der_axis, *grids))
     else:
         derivs = []
@@ -152,14 +160,14 @@ def differentiate(data, order: Union[int, list], mixed: bool = False, axis=None,
                     higher_ord_der_axis = None if mixed else dim_idx
                     ord_reduced = [ord_ax - 1 for ord_ax in order]
                     derivs.extend(differentiate(grad, ord_reduced,
+                                 
                                   mixed, higher_ord_der_axis, *grids))
         else:
             grad = np.gradient(data, grids[axis], axis=axis)
             derivs.append(grad)
             if order[axis] > 1:
                 ord_reduced = [ord_ax - 1 for ord_ax in order]
-                derivs.extend(differentiate(
-                    grad, ord_reduced, False, axis, *grids))
+                derivs.extend(differentiate(grad, ord_reduced, False, axis, *grids))
     return derivs
 
 
@@ -167,6 +175,7 @@ def preprocess_derivatives_ANN(field, grid, max_order, test_output=False,
                                epochs_max=1e3, loss_mean=1000, batch_frac=0.5):
     assert grid is not None, 'Grid needed for derivatives preprocessing with ANN'
     if isinstance(grid, np.ndarray):
+       
         grid = [grid,]
     grid_unique = [np.unique(ax_grid) for ax_grid in grid]
     original_shape = field.shape
@@ -191,5 +200,6 @@ implemented_methods = {'ANN': preprocess_derivatives_ANN,
 def preprocess_derivatives(field, method, method_kwargs):
     if method not in implemented_methods.keys():
         raise NotImplementedError(
+            
             'Called preprocessing method has not been implemented yet. Use one of {implemented_methods}')
     return implemented_methods[method](field, **method_kwargs)

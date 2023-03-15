@@ -11,12 +11,12 @@ from copy import deepcopy
 from functools import partial
 from typing import Union
 
-from epde.optimizers.moeadd.moeadd import ParetoLevels
+from epde.optimizers.optimizers.moeadd.moeadd import ParetoLevels
 
 from epde.structure.main_structures import Equation, SoEq, Term
 from epde.structure.structure_template import check_uniqueness
 from epde.supplementary import filter_powers, try_iterable
-from epde.operators.utils.template import CompoundOperator, add_param_to_operator
+from epde.operators.utils.utils.template import CompoundOperator, add_base_param_to_operator
 
 
 from epde.decorators import HistoryExtender, ResetEquationStatus
@@ -24,6 +24,7 @@ from epde.decorators import HistoryExtender, ResetEquationStatus
 
 class SystemMutation(CompoundOperator):
     key = ["chromosome level", "mutation"]    
+    key = 'SystemMutation'
     def apply(self, objective : SoEq, arguments : dict): # TODO: add setter for best_individuals & worst individuals 
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)    
     
@@ -53,8 +54,7 @@ class SystemMutation(CompoundOperator):
     
 
 class EquationMutation(CompoundOperator):
-    key = ["gene mutation", "structural mutation"]
-
+    key = 'EquationMutation'
     @HistoryExtender(f'\n -> mutating equation', 'ba')
     def apply(self, objective : Equation, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)  
@@ -70,7 +70,7 @@ class EquationMutation(CompoundOperator):
 
 
 class MetaparameterMutation(CompoundOperator):
-    key = ["gene mutation", "metaparameter mutation"]
+    key = 'MetaparameterMutation'
 
     def apply(self, objective : Union[int, float], arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
@@ -89,7 +89,7 @@ class TermMutation(CompoundOperator):
     """
     Specific operator of the term mutation, where the term is replaced with a randomly created new one.
     """
-    key = ["term mutation", "metaparameter mutation"]
+    key = 'TermMutation'
     
     def apply(self, objective : tuple, arguments : dict): #term_idx, equation):
         """
@@ -132,7 +132,7 @@ class TermParameterMutation(CompoundOperator):
     """
     Specific operator of the term mutation, where the term parameters are changed with a random increment.
     """
-    key = ["term mutation", "structural mutation"]    
+    key = 'TermParameterMutation'    
     
     def apply(self, objective : tuple, arguments : dict): # term_idx, objective
         """ 
@@ -204,24 +204,17 @@ class TermParameterMutation(CompoundOperator):
 
 
 def get_basic_mutation(mutation_params):
-    # TODO: generalize initiation with test runs and simultaneous parameter and object initiation.
-    add_kwarg_to_operator = partial(add_param_to_operator, target_dict = mutation_params)    
+    add_kwarg_to_operator = partial(add_base_param_to_operator, target_dict = mutation_params)
 
     term_mutation = TermMutation([])
-    # term_param_mutation = TermParameterMutation(['r_param_mutation', 'multiplier'])
-    # add_kwarg_to_operator(operator = term_param_mutation, labeled_base_val = {'r_param_mutation' : 0.2, 
-    #                                                                           'strict_restrictions' : True,
-    #                                                                           'multiplier' : 0.1})
 
     equation_mutation = EquationMutation(['r_mutation', 'type_probabilities'])
-    add_kwarg_to_operator(operator = equation_mutation, labeled_base_val = {'r_mutation' : 0.6, 'type_probabilities' : []})
+    add_kwarg_to_operator(operator = equation_mutation)
     
     metaparameter_mutation = MetaparameterMutation(['std', 'mean'])
-    add_kwarg_to_operator(operator = metaparameter_mutation, labeled_base_val = {'std' : 1e-4, 'mean' : 0.0})
+    add_kwarg_to_operator(operator = metaparameter_mutation)
 
-    chromosome_mutation = SystemMutation(['indiv_mutation_prob'])
-    # add_kwarg_to_operator(operator = chromosome_mutation, labeled_base_val = {'indiv_mutation_prob' : 0.5})
-    # chromosome_mutation.params = {'indiv_mutation_prob' : 0.5} if not 'mutation_params' in kwargs.keys() else kwargs['mutation_params']
+    chromosome_mutation = SystemMutation([])
 
     equation_mutation.set_suboperators(operators = {'mutation' : term_mutation})#, [term_param_mutation, ]
                                        # probas = {'equation_crossover' : [0.0, 1.0]})

@@ -7,6 +7,7 @@ Created on Wed Jul 20 16:15:12 2022
 """
 
 from abc import ABC
+from abc import ABC
 from scipy.ndimage import gaussian_filter
 import numpy as np
 
@@ -45,6 +46,7 @@ def baseline_ann(dim):
     return model
 
 
+
 class ANNSmoother(AbstractSmoother):
     def __init__(self):
         pass
@@ -53,8 +55,7 @@ class ANNSmoother(AbstractSmoother):
                  learining_rate=1e-4):
         dim = 1 if np.any([s == 1 for s in data.shape]) and data.ndim == 2 else data.ndim
         model = baseline_ann(dim)
-        grid_flattened = torch.from_numpy(
-            np.array([subgrid.reshape(-1) for subgrid in grid])).float().T
+        grid_flattened = torch.from_numpy(np.array([subgrid.reshape(-1) for subgrid in grid])).float().T
 
         original_shape = data.shape
 
@@ -115,3 +116,4 @@ class GaussianSmoother(AbstractSmoother):
                 'Wrong kernel passed into function. Current version supports only Gaussian smoothing.')
 
         return smoothed_data
+

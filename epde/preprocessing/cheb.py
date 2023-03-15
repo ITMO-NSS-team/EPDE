@@ -51,17 +51,16 @@ def process_point_cheb(args):
             n_der) == matrix.ndim, 'Given derivative orders do not match the data tensor dimensionality'
     else:
         raise TypeError(
+            
             'Derivatives were given in the incorrect format. A single integer or list/tuple of integers required')
 
-    poly_mask = [idx[dim] >= poly_bound and idx[dim] <=
-                 matrix.shape[dim] - poly_bound for dim in np.arange(matrix.ndim)]
-    polynomials = np.empty(
-        matrix.ndim, dtype=np.polynomial.chebyshev.Chebyshev)
+    poly_mask = [idx[dim] >= poly_bound and idx[dim] <= matrix.shape[dim] - poly_bound for dim in np.arange(matrix.ndim)]
+    polynomials = np.empty(matrix.ndim, dtype=np.polynomial.chebyshev.Chebyshev)
     x = np.empty(idx.shape)
     for i in range(matrix.ndim):
         if poly_mask[i]:
-            x_temp, poly_temp = get_cheb_for_point(
-                matrix, i, idx, grid, max_der_order=n_der[i], points=points, poly_order=poly_order)
+            x_temp, poly_temp = get_cheb_for_point(matrix, i, idx, grid, max_der_order=n_der[i], 
+                                                   points=points, poly_order=poly_order)
             x[i] = x_temp
             polynomials[i] = poly_temp
 
@@ -70,17 +69,13 @@ def process_point_cheb(args):
     deriv_idx = 0
     for var_idx in np.arange(matrix.ndim):
         if poly_mask[var_idx]:
-            # var_idx*(n_der[var_idx]) + (der_idx-1)
             for der_idx in np.arange(1, n_der[var_idx]+1):
-                derivatives[deriv_idx] = polynomials[var_idx].deriv(
-                    m=der_idx)(x[var_idx])
+                derivatives[deriv_idx] = polynomials[var_idx].deriv(m=der_idx)(x[var_idx])
                 deriv_idx += 1
         else:
-            #            print(derivatives[var_idx*(n_der) : (var_idx+1)*(n_der)].shape, FDderivatives(matrix,
-            #                        axis = var_idx, idx = idx, grid = grid, max_order = n_der, poly_bound = poly_bound).shape)
-            derivatives[deriv_idx: deriv_idx + n_der[var_idx]] = FDderivatives(matrix,
-                                                                                axis=var_idx, idx=idx, grid=grid, max_order=n_der[var_idx], poly_bound=poly_bound)
+            derivatives[deriv_idx: deriv_idx + n_der[var_idx]] = FDderivatives(matrix, axis=var_idx, idx=idx, grid=grid, 
+                                                                               max_order=n_der[var_idx], poly_bound=poly_bound)
             deriv_idx += n_der[var_idx]
 #    print(derivatives.shape)
 #    print('derivatives length', len(derivatives), 'type', type(derivatives))
-    return (derivatives)
+    return  (derivatives)

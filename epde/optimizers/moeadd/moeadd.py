@@ -410,7 +410,7 @@ class MOEADDOptimizer(object):
             self.best_obj[arg_idx] = arg if isinstance(arg, int) or isinstance(arg, float) else arg() # Переделать под больше elif'ов
     
 
-    def set_sector_processer(self, processer : MOEADDSectorProcesser) -> None:
+    def set_sector_processer(self, processer: MOEADDSectorProcesser) -> None:
         '''
         
         Setter of the `moeadd_optimizer.sector_processer` attribute.
@@ -423,7 +423,6 @@ class MOEADDOptimizer(object):
         
         '''
         
-        # добавить возможность теста оператора
         self.sector_processer = processer
     
         
@@ -437,21 +436,7 @@ class MOEADDOptimizer(object):
         
         Parameters:
         -----------
-        
-        neighborhood_selector : function,
-            Method of finding "close neighbors" of the vector with proximity list.
-            The baseline example of the selector, presented in 
-            ``moeadd.moeadd_stc.simple_selector``, selects n-adjacent ones.
-            
-        delta : float
-            The probability of mating selection to be limited only to the selected
-            subregions (adjacent to the weight vector domain). :math:`\delta \in [0., 1.)
-        
-        neighborhood_selector_params : tuple/list or None
-            Iterable, which will be passed into neighborhood_selector, as 
-            an arugument. *None*, is no additional arguments are required inside
-            the selector.
-            
+                    
         epochs : int
             Maximum number of iterations, during that the optimization will be held.
             Note, that if the algorithm converges to a single Pareto frontier, 
@@ -461,18 +446,15 @@ class MOEADDOptimizer(object):
         if not self.abbreviated_search_executed:
             assert not type(self.best_obj) == type(None)
             for epoch_idx in np.arange(epochs):
-                if global_var.verbose.show_moeadd_epochs:
+                if global_var.verbose.show_iter_idx:
                     print(f'Multiobjective optimization : {epoch_idx}-th epoch.')
                 for weight_idx in np.arange(len(self.weights)):
-                    if global_var.verbose.show_moeadd_epochs:
+                    if global_var.verbose.show_iter_idx:
                         print(f'During MO : processing {weight_idx}-th weight.')                    
                     sp_kwargs = self.form_processer_args(weight_idx)
                     self.sector_processer.run(population_subset = self.pareto_levels, 
                                               EA_kwargs = sp_kwargs)
                         
-                # if len(self.pareto_levels.levels) == 1:
-                #     break
-                    
     def form_processer_args(self, cur_weight : int): # TODO: inspect the most convenient input format
         return {'weight_idx' : cur_weight, 'weights' : self.weights, 'best_obj' : self.best_obj, 
                 'neighborhood_vectors' : self.neighborhood_lists}

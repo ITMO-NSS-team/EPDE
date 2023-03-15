@@ -25,7 +25,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
 # TODO^ caching of the pre-calculated derivatives
     
 def run_KdV_eq_search(multiobjective_mode, derivs):
-    epde_search_obj = epde_alg.EpdeSearch(multiobjective_mode=multiobjective_mode, use_solver=False, 
+    epde_search_obj = epde_alg.epde_search(multiobjective_mode=multiobjective_mode, use_solver=False, 
                                            dimensionality=dimensionality, boundary=boundary, 
                                            coordinate_tensors = grids, 
                                            verbose_params = {'show_moeadd_epochs' : True})    
@@ -67,7 +67,7 @@ def run_KdV_eq_search(multiobjective_mode, derivs):
     opt_val = 1e-7
     bounds = (1e-8, 1e-2) if multiobjective_mode else (opt_val, opt_val)
     epde_search_obj.fit(data=[u, ], variable_names=['u',], max_deriv_order=(1, 3), derivs = [derivs,],
-                        equation_terms_max_number=5, data_fun_pow = 2, 
+                        equation_terms_max_number=4, data_fun_pow = 2, 
                         additional_tokens=[trig_tokens, custom_grid_tokens, custom_trig_tokens], #custom_grid_tokens 
                         equation_factors_max_number = factors_max_number, 
                         eq_sparsity_interval = bounds)
@@ -120,8 +120,8 @@ if __name__ == "__main__":
     dimensionality = u.ndim - 1; boundary = 20
 
     paretos = []
-    exp_num = 20
+    exp_num = 10
     for exp_run in range(exp_num):
         # paretos.append(run_KdV_eq_search(multiobjective_mode = exp_run >= exp_num/2, derivs=derivs))
-        paretos.append(run_KdV_eq_search(multiobjective_mode = True, derivs=derivs))
+        paretos.append(run_KdV_eq_search(multiobjective_mode = False, derivs=derivs))
         

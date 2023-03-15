@@ -11,6 +11,7 @@ from functools import reduce, singledispatchmethod
 from epde.structure.main_structures import Equation
 
 
+
 class ParametricEquation(object):
     def __init__(self, pool, terms: Union[list, tuple], right_part_index: int = -1):
         self.pool = pool
@@ -71,13 +72,12 @@ class ParametricEquation(object):
         def opt_grd(params): return opt_fun_grad(params, optimizational_copy)
 
         if method == 'L-BFGS-B':
-            optimal_params = optimize.minimize(
-                opt_lbd, x0=initial_params)  # (, fprime = opt_grd)
+            optimal_params = optimize.minimize(opt_lbd, x0=initial_params)
         elif method == 'GD':
-            optimal_params = optimize.fmin_cg(
-                opt_lbd, x0=initial_params, fprime=opt_grd)
+            optimal_params = optimize.fmin_cg(opt_lbd, x0=initial_params, fprime=opt_grd)
         else:
             raise NotImplementedError(
+                
                 'Implemented methods of parameter optimization are limited to "L-BFGS-B" and gradient descent as "GD"')
         print(type(optimal_params))
 
@@ -105,8 +105,7 @@ class ParametricEquation(object):
         cur_idx = 0
         for term in self.terms:
             # print('params', params)
-            params_parsed[term.term_id] = term.parse_opt_params(
-                params[cur_idx: cur_idx + term.opt_params_num()])
+            params_parsed[term.term_id] = term.parse_opt_params(params[cur_idx: cur_idx + term.opt_params_num()])
             cur_idx += term.opt_params_num()
         return params_parsed
 
@@ -118,11 +117,11 @@ class ParametricEquation(object):
     def evaluate_with_params(self, params):
         self.set_term_params(params)
         if self.rpi < 0:
-            val1 = np.add.reduce([term.evaluate() for term_idx, term in enumerate(
-                self.terms) if term_idx != len(self.terms) + self.rpi])
-        else:  # if self.rpi > 0:
-            val1 = np.add.reduce([term.evaluate() for term_idx, term in enumerate(
-                self.terms) if term_idx != self.rpi])
+            val1 = np.add.reduce([term.evaluate() for term_idx, term in enumerate(self.terms) 
+                                 if term_idx != len(self.terms) + self.rpi])
+        else:
+            val1 = np.add.reduce([term.evaluate() for term_idx, term in enumerate(self.terms)
+                                 if term_idx != self.rpi])
         val2 = self.terms[self.rpi].evaluate()
         return val1 - val2
 
@@ -130,8 +129,7 @@ class ParametricEquation(object):
         param_label = self.terms[param_in_term_props[0]
                                  ].all_params[param_in_term_props[1]]
         param_grad_vals = 2 * self.evaluate_with_params(params) * \
-            self.terms[param_in_term_props[0]].evaluate_grad(
-                param_label).reshape(-1)
+            self.terms[param_in_term_props[0]].evaluate_grad(param_label).reshape(-1)
         print('------------------------------------------------------------------')
         print(
             f'grad for param {param_label} is {np.linalg.norm(param_grad_vals)}')
@@ -154,8 +152,7 @@ class ParametricEquation(object):
         weights, terms = self.parse_eq_terms()
         self._equation = Equation(pool=self.pool, basic_structure=terms, terms_number=len(terms),
                                   max_factors_in_term=max([len(term.structure) for term in terms]))
-        self._equation.target_idx = rpi if rpi >= 0 else len(
-            self._equation.structure) - 1
+        self._equation.target_idx = rpi if rpi >= 0 else len(self._equation.structure) - 1
         self._equation.weights_internal = weights
         self._equation.weights_final = weights
         self.equation_set = True
@@ -163,14 +160,15 @@ class ParametricEquation(object):
     @singledispatchmethod
     def get_term_for_param(self, param):
         raise NotImplementedError(
+            
             'The term must be called by parameter index or label')
 
     @get_term_for_param.register
     def _(self, param: str):
-        term_index = [idx for idx, term in enumerate(
-            self.terms) if param in term][0]
+        term_index = [idx for idx, term in enumerate(self.terms) if param in term][0]
         return self.terms[term_index]
 
     @get_term_for_param.register
     def _(self, param: int):
         return self.terms[self.param_term_beloning[param]]
+

@@ -75,10 +75,7 @@ class HistoryExtender():
         @wraps(method)
         def wrapper(obj, *args, **kwargs):
             def historized(h_obj):
-                res = hasattr(h_obj, '_history') and hasattr(
-                    h_obj, 'add_history')
-#                print(f'called object of the type {type(h_obj)} is historized {res}')
-                # hasattr(h_obj, '_history') and hasattr(h_obj, 'add_history')
+                res = hasattr(h_obj, '_history') and hasattr(h_obj, 'add_history')
                 return res
 
             for element in [obj,] + list(args):
@@ -118,6 +115,7 @@ class BoundaryExclusion():
         def wrapper(grids, boundary_width: Union[int, list] = 0):
             assert len(grids) == grids[0].ndim
             if isinstance(self.boundary_width, int):
+               
                 self.boundary_width = len(grids)*[self.boundary_width,]
             indexes_shape = grids[0].shape
             indexes = np.indices(indexes_shape)
@@ -134,3 +132,4 @@ class BoundaryExclusion():
             return func(grids) * mask
 
         return wrapper
+

@@ -13,10 +13,12 @@ from copy import deepcopy
 from typing import Union
 
 
+
 class Gene(object):
     def __init__(self, key, value=None, value_type=None):
         if value is None and value_type is None:
             raise ValueError(
+                
                 'Both value and value type can not be None during gene initialization')
         elif type(value) != value_type and value_type is not None:
             raise ValueError(
@@ -38,6 +40,7 @@ class Gene(object):
             self._value = val
         else:
             TypeError(
+                
                 f'Value of the incorrect type {type(val)} was passed into a gene of {self.val_type}')
 
     def __eq__(self, other):
@@ -50,7 +53,7 @@ class Gene(object):
         assert key in self._value.metaparameters, f'Incorrect parameter key {key} passed into the gene, containing {self.key}'
         self._value.metaparameters[key]['value'] = value
 
-    def __deepcopy__(self, memo):  # TODO: overload
+    def __deepcopy__(self, memo): 
         cls = self.__class__
         result = cls.__new__(cls)
         memo[id(self)] = result
@@ -91,7 +94,6 @@ class Chromosome(object):
     def replace_gene(self, gene_key, value):
         self.chromosome[gene_key].value = value
 
-    # TODO: Merge with replace_gene when ready.
     def pass_parametric_gene(self, key, value):
         '''
 
@@ -150,8 +152,10 @@ class Chromosome(object):
 
     def same_encoding(self, other):
         cond_1 = all([key in other.chromosome.keys()
+                    
                      for key in self.chromosome.keys()])
         cond_2 = all([key in self.chromosome.keys()
+                    
                      for key in other.chromosome.keys()])
         return cond_1 and cond_2
 
@@ -162,6 +166,7 @@ class Chromosome(object):
         for k, v in self.__dict__.items():
             setattr(result, k, deepcopy(v, memo))
         return result
+
 
 
 class ChromosomeEqIterator(object):
@@ -177,3 +182,4 @@ class ChromosomeEqIterator(object):
             return res
         else:
             raise StopIteration
+

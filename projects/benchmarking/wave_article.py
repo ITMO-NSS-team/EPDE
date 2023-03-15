@@ -9,7 +9,7 @@ Created on Mon Dec 19 15:51:40 2022
 import numpy as np
 import epde.interface.interface as epde_alg
 
-from epde.interface.equation_translator import CoefflessEquation
+from epde.interface.equation_translator import CoeffLessEquation
 from epde.interface.prepared_tokens import TrigonometricTokens, CacheStoredTokens
 
 import os
@@ -36,13 +36,13 @@ def translate_eq():
 
     lp_terms = [['d^2u/dx3^2{power: 1}'], ['d^2u/dx2^2{power: 1}']]
     rp_term = ['d^2u/dx1^2{power: 1}',]
-    epde_search_obj = epde_alg.EpdeSearch(use_solver = False, dimensionality = dimensionality, boundary = boundary,
-                                           coordinate_tensors = grids, verbose_params = {'show_moeadd_epochs' : True})    
+    epde_search_obj = epde_alg.epde_search(use_solver = False, dimensionality = dimensionality, boundary = boundary,
+                                           coordinate_tensors = grids)    
 
     epde_search_obj.create_pool(data = u, max_deriv_order=(2, 2, 2), additional_tokens = [], 
                                 method = 'poly', method_kwargs={'smooth': False, 'grid': grids})
 
-    test1 = CoefflessEquation(lp_terms, rp_term, epde_search_obj.pool)
+    test1 = CoeffLessEquation(lp_terms, rp_term, epde_search_obj.pool)
     def map_to_equation(equation, function, function_kwargs = dict()):
         _, target, features = equation.evaluate(normalize = False, return_val = False)
         return function(np.abs(np.dot(features, equation.weights_final[:-1]) + 
@@ -53,10 +53,10 @@ def translate_eq():
     print(map_to_equation(test1.equation, np.mean))
     
 def run_wave_eq_search(multiobjective_mode):
-    epde_search_obj = epde_alg.epde_search(multiobjective_mode=multiobjective_mode, use_solver=False, 
+    epde_search_obj = epde_alg.EpdeSearch(multiobjective_mode=multiobjective_mode, use_solver=False, 
                                            dimensionality=dimensionality, boundary=boundary, 
                                            coordinate_tensors = grids, 
-                                           verbose_params = {'show_moeadd_epochs' : True})    
+                                           verbose_params = {})    
     epde_search_obj.set_preprocessor(default_preprocessor_type='poly', # use_smoothing = True
                                      preprocessor_kwargs={'use_smoothing' : False})
     popsize = 7
@@ -106,6 +106,6 @@ if __name__ == "__main__":
     dimensionality = u.ndim - 1; boundary = 20
 
     paretos = []
-    exp_num = 20
+    exp_num = 2
     for exp_run in range(exp_num):
-        paretos.append(run_wave_eq_search(multiobjective_mode = exp_run > 9))
+        paretos.append(run_wave_eq_search(multiobjective_mode = False))

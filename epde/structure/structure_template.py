@@ -14,6 +14,7 @@ def check_uniqueness(obj, background):
     return not any([elem == obj for elem in background])
 
 
+
 class ComplexStructure(object):
     def __init__(self, interelement_operator=np.add, *params):
         self._history = ''
@@ -38,8 +39,7 @@ class ComplexStructure(object):
             'Functionality of this method has been moved to the evolutionary operator declaration')
 
     def evaluate(self, structural=False):
-        assert len(
-            self.structure) > 0, 'Attempt to evaluate an empty complex structure'
+        assert len(self.structure) > 0, 'Attempt to evaluate an empty complex structure'
         if len(self.structure) == 1:
             return self.structure[0].evaluate(structural)
         else:
@@ -47,8 +47,8 @@ class ComplexStructure(object):
                           self.structure[1:], self.structure[0].evaluate(structural))
 
     def reset_saved_state(self):
-        self.saved = {True: False, False: False}
-        self.saved_as = {True: None, False: None}
+        self.saved = {True:  False, False:  False}
+        self.saved_as = {True:  None, False:  None}
         for elem in self.structure:
             elem.reset_saved_state()
 
@@ -69,3 +69,4 @@ class CSIterator(object):
             return res
         else:
             raise StopIteration
+

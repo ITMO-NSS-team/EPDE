@@ -11,6 +11,7 @@ from pprint import pprint
 import epde.globals as global_var
 
 
+
 class ParametricFactor(Factor):
     __slot__ = ['_params', '_params_description', '_hash_val',
                 'label', 'type', 'grid_set', 'grid_idx', 'is_deriv', 'deriv_code',
@@ -76,8 +77,7 @@ class ParametricFactor(Factor):
 
     def use_params(self, params):
         self.reset_saved_state()
-        assert len(params) == len(
-            self.params_to_optimize), 'The number of the passed parameters does not match declared problem'
+        assert len(params) == len(self.params_to_optimize), 'The number of the passed parameters does not match declared problem'
         _params = np.ones(shape=len(self.params_description))
         for param_idx, param_info in self.params_description.items():
             if param_info['name'] not in self.params_to_optimize and param_info['name'] != 'power':
@@ -91,8 +91,7 @@ class ParametricFactor(Factor):
                 opt_param_idx = self.params_to_optimize.index(
                     param_info['name'])
                 _params[param_idx] = params[opt_param_idx][1]
-        _kw_params = {param_info['name']: _params[idx] for idx, param_info in enumerate(
-            list(self.params_description.values()))}
+        _kw_params = {param_info['name']: _params[idx] for idx, param_info in enumerate(list(self.params_description.values()))}
 
         super().set_parameters(self.params_description_odict,
                                self.equality_ranges, random=False, **_kw_params)
@@ -117,6 +116,7 @@ class ParametricFactor(Factor):
         value = self._grad_evaluator[param_label].apply(self)
         # self.saved['deriv'][param_label] = global_var.tensor_cache.add(self.grad_cache_label, value, structural = False)
         return value
+
 
 
 class ParametricTerm(Term):
@@ -180,8 +180,7 @@ class ParametricTerm(Term):
         init_idx = 0
         for factor in self.parametric_factors.values():
             hash_descr, factor_params = factor.required_params
-            params_dict[hash_descr] = list(
-                zip(factor_params, params[init_idx: init_idx + len(factor_params)]))
+            params_dict[hash_descr] = list(zip(factor_params, params[init_idx: init_idx + len(factor_params)]))
             init_idx += len(factor_params)
         return params_dict
 
@@ -232,6 +231,7 @@ class ParametricTerm(Term):
     @singledispatchmethod
     def __contains__(self, element):
         raise NotImplementedError(
+            
             'Incorrect type of the requested item for the __contains__ method')
 
     @__contains__.register
@@ -245,3 +245,4 @@ class ParametricTerm(Term):
     @__contains__.register
     def _(self, element: Factor):
         return element in self.defined_factors.values()
+

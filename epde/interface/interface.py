@@ -1,4 +1,4 @@
-# !/usr/bin/env python3
+#  !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Tue Jul  6 15:55:12 2021
@@ -140,10 +140,10 @@ class EpdeSearch(object):
                  director_params: dict = {'variation_params': {}, 'mutation_params': {},
                                            'pareto_combiner_params': {}, 'pareto_updater_params': {}}, 
                  time_axis: int = 0, define_domain: bool = True, function_form=None, boundary: int = 0, 
-                 use_solver: bool = False, dimensionality: int = 1, verbose_params: dict = {}, 
+                 use_solver: bool = False, dimensionality: int = 1, verbose_params: dict = {'show_iter_idx' : True}, 
                  coordinate_tensors=None, memory_for_cache=5, prune_domain: bool = False, 
                  pivotal_tensor_label=None, pruner=None, threshold: float = 1e-2, 
-                 division_fractions=3, rectangular: bool = True):
+                 division_fractions=3, rectangular: bool = True, params_filename: str = None):
         """
         Args:
             use_default_strategy (`bool`): optional
@@ -203,6 +203,14 @@ class EpdeSearch(object):
                                        threshold=threshold, division_fractions=division_fractions,
                                        rectangular=rectangular)
 
+        if multiobjective_mode:
+            mode_key = 'multi objective'
+        else:
+            mode_key = 'single objective'
+        
+        EvolutionaryParams.reset()
+        evo_param = EvolutionaryParams(parameter_file = params_filename, mode = mode_key)
+
         if use_solver:
             global_var.dimensionality = dimensionality
 
@@ -230,6 +238,8 @@ class EpdeSearch(object):
             self.set_moeadd_params()
         else:
             self.set_singleobjective_params()
+
+        self.pool = None
         self.search_conducted = False
 
     def set_memory_properties(self, example_tensor, mem_for_cache_frac=None, mem_for_cache_abs=None):
@@ -498,7 +508,8 @@ class EpdeSearch(object):
     def create_pool(self, data: Union[np.ndarray, list, tuple], variable_names=['u',],
                     derivs=None, max_deriv_order=1, additional_tokens=[],
                     data_fun_pow: int = 1):
-        # method = 'ANN', method_kwargs: dict = {},
+        self.pool_params = {'variable_names' : variable_names, 'max_deriv_order' : max_deriv_order,
+                            'additional_tokens' : [family.token_family.ftype for family in additional_tokens]}
         assert (isinstance(derivs, list) and isinstance(derivs[0], np.ndarray)) or derivs is None
         if isinstance(data, np.ndarray):
             data = [data,]
@@ -524,8 +535,8 @@ class EpdeSearch(object):
                                   grid=global_var.grid_cache.get_all()[1], max_order=max_deriv_order)
             entry.use_global_cache()
 
-            print(f'creating TokenFamily entry {entry.var_name}')
-            time.sleep(10)
+            self.set_derivatives(variable=variable_names[data_elem_idx], deriv=entry.derivatives)
+            
             entry_token_family = TokenFamily(entry.var_name, family_of_derivs=True)
             entry_token_family.set_status(demands_equation=True, unique_specific_token=False,
                                           unique_token_type=False, s_and_d_merged=False,
@@ -533,7 +544,7 @@ class EpdeSearch(object):
             entry_token_family.set_params(entry.names, OrderedDict([('power', (1, data_fun_pow))]),
                                           {'power': 0}, entry.d_orders)
             entry_token_family.set_evaluator(simple_function_evaluator, [])
-
+                
             print(entry_token_family.tokens)
             data_tokens.append(entry_token_family)
 
@@ -549,14 +560,25 @@ class EpdeSearch(object):
                                       for tf in additional_tokens])
         print(f'The cardinality of defined token pool is {self.pool.families_cardinality()}')
         print(f'Among them, the pool contains {self.pool.families_cardinality(meaningful_only=True)}')
+        
+    def set_derivatives(self, variable, deriv):
+        try:
+            self._derivatives
+        except AttributeError:
+            self._derivatives = {}
+        self._derivatives[variable] = deriv
+
+    @property
+    def saved_derivaties(self):
+        try:
+            return self._derivatives
+        except AttributeError:
+            print('Trying to get derivatives before their calculation. Call EPDESearch.create_pool() to calculate derivatives')
+            return None
 
     def fit(self, data: Union[np.ndarray, list, tuple], equation_terms_max_number=6,
-            equation_factors_max_number=1, variable_names=['u',], eq_sparsity_interval=(1e-4, 2.5),
-            derivs=None, max_deriv_order=1,
-            additional_tokens=[], coordinate_tensors=None, memory_for_cache=5,
-            prune_domain: bool = False, pivotal_tensor_label=None, pruner=None,
-            threshold: float = 1e-2, division_fractions=3, rectangular: bool = True,
-            data_fun_pow: int = 1):
+            equation_factors_max_number=1, variable_names=['u',], eq_sparsity_interval=(1e-4, 2.5), 
+            derivs=None, max_deriv_order=1, additional_tokens=[], data_fun_pow: int = 1):
         """
         Fit epde search algorithm to obtain differential equations, describing passed data.
 
@@ -604,31 +626,21 @@ class EpdeSearch(object):
                 Maximum power of token
 
         """
-        self.create_pool(data = data, variable_names=variable_names, 
-                         derivs=derivs, max_deriv_order=max_deriv_order, 
-                         additional_tokens=additional_tokens, 
-                         data_fun_pow=data_fun_pow)        
+
+        cur_params = {'variable_names' : variable_names, 'max_deriv_order' : max_deriv_order,
+                      'additional_tokens' : [family.token_family.ftype for family in additional_tokens]}
+
+        if self.pool == None or self.pool_params != cur_params:
+                self.create_pool(data = data, variable_names=variable_names, 
+                                 derivs=derivs, max_deriv_order=max_deriv_order, 
+                                 additional_tokens=additional_tokens, 
+                                 data_fun_pow=data_fun_pow)        
         if self.multiobjective_mode:
-            self.fit_multiobjective(data, equation_terms_max_number,
-                                    equation_factors_max_number, variable_names,
-                                    eq_sparsity_interval, derivs, max_deriv_order,
-                                    additional_tokens, memory_for_cache, prune_domain, 
-                                    pivotal_tensor_label, pruner, threshold, division_fractions,
-                                    rectangular, data_fun_pow)
+            self.fit_multiobjective(equation_terms_max_number, equation_factors_max_number,eq_sparsity_interval)
         else:
-            self.fit_singleobjective(data, equation_terms_max_number,
-                                     equation_factors_max_number, variable_names,
-                                     eq_sparsity_interval, derivs, max_deriv_order,
-                                     additional_tokens, memory_for_cache, prune_domain, 
-                                     pivotal_tensor_label, pruner, threshold, division_fractions,
-                                     rectangular, data_fun_pow)
+            self.fit_singleobjective(equation_terms_max_number, equation_factors_max_number, eq_sparsity_interval)
             
-    def fit_multiobjective(self, data : Union[np.ndarray, list, tuple], equation_terms_max_number = 6,
-            equation_factors_max_number = 1, variable_names = ['u',], eq_sparsity_interval = (1e-4, 2.5), 
-            derivs = None, max_deriv_order = 1, additional_tokens = [], memory_for_cache = 5,
-            prune_domain : bool = False, pivotal_tensor_label = None, pruner = None, 
-            threshold : float = 1e-2, division_fractions = 3, rectangular : bool = True, 
-            data_fun_pow : int = 1):
+    def fit_multiobjective(self, equation_terms_max_number=6, equation_factors_max_number=1, eq_sparsity_interval=(1e-4, 2.5)):
         """
         Fitting functional for multiojective optimization 
 
@@ -755,3 +767,29 @@ class EpdeSearch(object):
             return global_var.grid_cache, global_var.tensor_cache
         else:
             return None, global_var.tensor_cache
+
+    def get_equations_by_complexity(self, complexity : Union[int, list]):
+        return self.optimizer.pareto_levels.get_by_complexity(complexity)
+
+    def predict(self, system : SoEq, boundary_conditions : BoundaryConditions, grid : list = None, 
+                system_file : str = None, solver_kwargs : dict = {'model' : None, 'use_cache' : True}):
+        solver_kwargs['dim'] = len(global_var.grid_cache.get_all()[1])
+        # solver_kwargs['dim']
+        
+        if system is not None:
+            print('Using explicitly sent system of equations.')
+        elif system_file is not None:
+            assert '.pickle' in system_file
+            print('Loading equation from pickled file.')
+
+            system = pickle.load(file=system_file)
+        else:
+            raise ValueError('Missing system, that was not passed in any form.')
+        
+        if grid is None:
+            grid = global_var.grid_cache.get_all()[1]
+        
+        adapter = SolverAdapter(var_number = len(system.vars_to_describe))
+        solution_model = adapter.solve_epde_system(system = system, grids = grid, 
+                                                   boundary_conditions = boundary_conditions)
+        return solution_model(adapter.convert_grid(grid)).detach().numpy()

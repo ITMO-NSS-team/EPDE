@@ -6,24 +6,41 @@ Created on Tue Jul 13 14:45:14 2021
 @author: mike_ubuntu
 """
 
+import os
+import sys
+
+sys.path.append('../')
+
+sys.path.pop()
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')))
+
 import numpy as np
 import epde.interface.interface as epde_alg
 
-from epde.interface.prepared_tokens import Custom_tokens, Trigonometric_tokens, Cache_stored_tokens
+from epde.interface.prepared_tokens import CustomTokens, TrigonometricTokens, CacheStoredTokens
 from epde.evaluators import CustomEvaluator
 
 if __name__ == '__main__':
 
     t = np.linspace(0, 4*np.pi, 1000)
-    u = np.load('/home/maslyaev/epde/EPDE/tests/system/Test_data/fill366.npy') # loading data with the solution of ODE
+    try:
+        print(os.path.dirname( __file__ ))
+        data_file = os.path.join(os.path.dirname( __file__ ), f'data/fill366.npy')
+        u = np.load(data_file)
+    except FileNotFoundError:
+        data_file = '/home/maslyaev/epde/EPDE/tests/system/data/fill366.npy'
+        u = np.loadtxt(data_file)
+        
+    # u = np.load('/home/maslyaev/epde/EPDE/tests/system/Test_data/fill366.npy') # loading data with the solution of ODE
     # Trying to create population for mulit-objective optimization with only 
     # derivatives as allowed tokens. Here only one equation structure will be 
     # discovered, thus MOO algorithm will not be launched.
     
     dimensionality = t.ndim - 1
+    multiobjective_mode = False
     
-    epde_search_obj = epde_alg.epde_search(use_solver=False, eq_search_iter = 100, dimensionality=dimensionality,
-                                       verbose_params={'show_moeadd_epochs' : True})
+    epde_search_obj = epde_alg.EpdeSearch(multiobjective_mode=multiobjective_mode, use_solver = False, 
+                                          dimensionality = dimensionality, coordinate_tensors = [t,])    
     '''
     --------------------------------------------------------------------------------------------------------------------------------
     Так как в этом примере мы будем использовать собственноручно-заданные семейства токенов, то для начала нужно ввести 
@@ -38,7 +55,7 @@ if __name__ == '__main__':
     параметры функций, а в *args - значения аргументов (координаты на сетке).
     '''
     custom_trigonometric_eval_fun =  {'cos' : lambda *grids, **kwargs: np.cos(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power'], 
-                   'sin' : lambda *grids, **kwargs: np.sin(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power']}
+                                      'sin' : lambda *grids, **kwargs: np.sin(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power']}
     
     '''
     --------------------------------------------------------------------------------------------------------------------------------
@@ -78,12 +95,12 @@ if __name__ == '__main__':
     '''
     trig_params_equal_ranges = {'freq' : 0.05}
 
-    custom_trig_tokens = Custom_tokens(token_type = 'trigonometric', # Выбираем название для семейства токенов.
-                                       token_labels = ['sin', 'cos'], # Задаём названия токенов семейства в формате python-list'a.
-                                                                      # Названия должны соответствовать тем, что были заданы в словаре с лямбда-ф-циями.
-                                       evaluator = custom_trig_evaluator, # Используем заранее заданный инициализированный объект для функции оценки токенов.
-                                       params_ranges = trig_params_ranges, # Используем заявленные диапазоны параметров
-                                       params_equality_ranges = trig_params_equal_ranges) # Используем заявленные диапазоны "равенства" параметров
+    custom_trig_tokens = CustomTokens(token_type = 'trigonometric', # Выбираем название для семейства токенов.
+                                      token_labels = ['sin', 'cos'], # Задаём названия токенов семейства в формате python-list'a.
+                                      # Названия должны соответствовать тем, что были заданы в словаре с лямбда-ф-циями.
+                                      evaluator = custom_trig_evaluator, # Используем заранее заданный инициализированный объект для функции оценки токенов.
+                                      params_ranges = trig_params_ranges, # Используем заявленные диапазоны параметров
+                                      params_equality_ranges = trig_params_equal_ranges) # Используем заявленные диапазоны "равенства" параметров
 
     '''
     Расширим допустимый пулл токенов, добавив функции, обратные значениям координат (вида 1/x, 1/t, и т.д.). Для получения их
@@ -95,31 +112,37 @@ if __name__ == '__main__':
 
     inv_fun_params_ranges = {'power' : (1, 2), 'dim' : (0, dimensionality)}
     
-    custom_inv_fun_tokens = Custom_tokens(token_type = 'inverse', # Выбираем название для семейства токенов - обратных функций.
-                                       token_labels = ['1/x_{dim}',], # Задаём названия токенов семейства в формате python-list'a.
-                                                                     # Т.к. у нас всего один токен такого типа, задаём лист из 1 элемента
-                                       evaluator = custom_inv_fun_evaluator, # Используем заранее заданный инициализированный объект для функции оценки токенов.
-                                       params_ranges = inv_fun_params_ranges, # Используем заявленные диапазоны параметров
-                                       params_equality_ranges = None) # Используем None, т.к. значения по умолчанию 
-                                                                      # (равенство при лишь полном совпадении дискретных параметров)
+    custom_inv_fun_tokens = CustomTokens(token_type = 'inverse', # Выбираем название для семейства токенов - обратных функций.
+                                         token_labels = ['1/x_{dim}',], # Задаём названия токенов семейства в формате python-list'a.
+                                         # Т.к. у нас всего один токен такого типа, задаём лист из 1 элемента
+                                         evaluator = custom_inv_fun_evaluator, # Используем заранее заданный инициализированный объект для функции оценки токенов.
+                                         params_ranges = inv_fun_params_ranges, # Используем заявленные диапазоны параметров
+                                         params_equality_ranges = None) # Используем None, т.к. значения по умолчанию 
+                                                                          # (равенство при лишь полном совпадении дискретных параметров)
                                                                       # нас устраивает.
 
     boundary = 10
-    custom_grid_tokens = Cache_stored_tokens(token_type = 'grid', 
-                                       boundary = boundary,
-                                       token_labels = ['t'], 
-                                       token_tensors={'t' : t},
-                                       params_ranges = {'power' : (1, 1)},
-                                       params_equality_ranges = None)
+    custom_grid_tokens = CacheStoredTokens(token_type = 'grid', 
+                                           token_labels = ['t'], 
+                                           token_tensors={'t' : t},
+                                           params_ranges = {'power' : (1, 1)},
+                                           params_equality_ranges = None)
 
-    epde_search_obj.set_moeadd_params(population_size=4)
+    opt_val = 1e-1
+    bounds = (1e-8, 1e0) if multiobjective_mode else (opt_val, opt_val)   
+    factors_max_number = {'factors_num' : [1, 2], 'probas' : [0.8, 0.2]}
+    
+    popsize = 7
+    if multiobjective_mode:
+        epde_search_obj.set_moeadd_params(population_size = popsize, 
+                                          training_epochs=40)
+    else:
+        epde_search_obj.set_singleobjective_params(population_size = popsize, 
+                                                   training_epochs=40)
 
     print('u.shape', u.shape, u.ndim)
-    epde_search_obj.fit(data = u, max_deriv_order=(1,), boundary=(10,), equation_terms_max_number = 4,
-                        equation_factors_max_number = 2, deriv_method='poly', eq_sparsity_interval = (1e-4, 0.4), #'smooth' : True, 'sigma' : 5
-                        deriv_method_kwargs = {'smooth' : False, 'grid' : [t,]}, coordinate_tensors = [t,], 
-                        additional_tokens = [custom_grid_tokens, custom_trig_tokens], 
-                        memory_for_cache=25, prune_domain = False,
-                        division_fractions = None)
+    epde_search_obj.fit(data = u, max_deriv_order=(1,), variable_names=['u',], equation_terms_max_number = 4,
+                        equation_factors_max_number = factors_max_number, eq_sparsity_interval = bounds, 
+                        additional_tokens = [custom_grid_tokens, custom_trig_tokens])
     
-    epde_search_obj.equation_search_results(only_print = True, level_num = 1) # showing the Pareto-optimal set of discovered equations 
+    epde_search_obj.equation_search_results(only_print = True, num = 1) # showing the Pareto-optimal set of discovered equations 

@@ -33,6 +33,7 @@ class AdaptiveFiniteDeriv(AbstractDeriv):
             max_order = [max_order,] * data.ndim
         if any([ord_ax != max_order[0] for ord_ax in max_order]) and mixed:
             raise Exception(
+                
                 'Mixed derivatives can be taken only if the orders are same along all axes.')
         if data.ndim != len(grids) and (len(grids) != 1 or data.ndim != 2):
             print(data.ndim, len(grids))
@@ -90,8 +91,8 @@ class PolynomialDeriv(AbstractDeriv):
         index_array = []
 
         for idx, _ in np.ndenumerate(data):
-            index_array.append(
-                (idx, data, grid, polynomial_window, max_order, polynomial_boundary, poly_order))
+            index_array.append((idx, data, grid, polynomial_window, max_order, 
+                                polynomial_boundary, poly_order))
         print(len(index_array))
 
         if mp_poolsize > 1:
@@ -213,6 +214,7 @@ class SpectralDeriv(AbstractDeriv):
         print(f'derivatives orders are {[deriv[0] for deriv in derivatives]}')
         if len(derivatives) != expeced_num_of_derivs:
             raise Exception(
+                
                 f'Expected number of derivatives {expeced_num_of_derivs} does not match obtained {len(derivatives)}')
         return derivatives
 
@@ -227,8 +229,7 @@ class SpectralDeriv(AbstractDeriv):
         if isinstance(n, int) or n is None:
             n = np.full(shape=len(grid), fill_value=n)
 
-        derivatives = self.differentiate(
-            data, grid, max_order, mixed, n, steepness).values()
+        derivatives = self.differentiate(data, grid, max_order, mixed, n, steepness).values()
         derivatives = np.vstack([der.reshape(-1) for der in derivatives]).T
 
         return derivatives
@@ -240,9 +241,10 @@ class SpectralDeriv(AbstractDeriv):
         # inverter = lambda x: 1 if x == 0 else (x if x != 1 else 0)
 
         for deriv_idx in range(max_order):
-            deriv_descr = tuple([axis,] * (deriv_idx + 1))  # inverter(axis) V
+            deriv_descr = tuple([axis,] * (deriv_idx + 1))
             cur_deriv = np.apply_along_axis(self.spectral_derivative_1d, axis, cur_deriv, grid[axis],
                                             n[axis], steepness)
             derivs.append((deriv_descr, cur_deriv))
 
         return derivs
+

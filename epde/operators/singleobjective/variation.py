@@ -21,7 +21,7 @@ from epde.optimizers.single_criterion.optimizer import Population
 from epde.supplementary import detect_similar_terms, flatten
 from epde.decorators import HistoryExtender, ResetEquationStatus
 
-from epde.operators.utils.template import CompoundOperator, add_param_to_operator
+from epde.operators.utils.template import CompoundOperator, add_base_param_to_operator
 from epde.operators.multiobjective.moeadd_specific import get_basic_populator_updater
 from epde.operators.multiobjective.mutations import get_basic_mutation
 
@@ -46,6 +46,8 @@ class PopulationLevelCrossover(CompoundOperator):
         return the new population, created with the noted operators and containing both parent individuals and their offsprings.    
     copy_properties_to
     """
+    key = 'PopulationLevelCrossover'
+
     def apply(self, objective : Union[ParetoLevels, Population], arguments : dict):
         """
         Method to obtain a new population by selection of parent individuals (equations) and performing a crossover between them to get the offsprings.
@@ -99,6 +101,8 @@ class PopulationLevelCrossover(CompoundOperator):
 
 
 class ChromosomeCrossover(CompoundOperator):
+    key = 'ChromosomeCrossover'
+
     def apply(self, objective : tuple, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
    
@@ -136,6 +140,8 @@ class ChromosomeCrossover(CompoundOperator):
 
 
 class MetaparamerCrossover(CompoundOperator):
+    key = 'MetaparamerCrossover'
+
     def apply(self, objective : tuple, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
@@ -148,7 +154,8 @@ class MetaparamerCrossover(CompoundOperator):
 
 
 class EquationCrossover(CompoundOperator):
-    # @ResetEquationStatus(reset_output = True)
+    key = 'EquationCrossover'
+    
     @HistoryExtender(f'\n -> performing equation crossover', 'ba')
     def apply(self, objective : tuple, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
@@ -178,7 +185,8 @@ class EquationCrossover(CompoundOperator):
         self._tags = {'crossover', 'gene level', 'contains suboperators', 'standard'}
 
 class EquationExchangeCrossover(CompoundOperator):
-    # @ResetEquationStatus(reset_output = True)
+    key = 'EquationExchangeCrossover'
+    
     @HistoryExtender(f'\n -> performing equation exchange crossover', 'ba')
     def apply(self, objective : tuple, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
@@ -205,6 +213,8 @@ class TermParamCrossover(CompoundOperator):
     apply(population)
         return the offspring terms, constructed as the parents' factors with parameter values, selected between the parents' ones.        
     """
+    key = 'TermParamCrossover'
+    
     def apply(self, objective : tuple, arguments : dict):
         """
         Get the offspring terms, constructed as the parents' factors with parameter values, selected between the parents' ones.
@@ -270,7 +280,9 @@ class TermCrossover(CompoundOperator):
     apply(population)
         return the offspring terms, which are the same parents' ones, but in different order, if the crossover occured.
         .        
-    """    
+    """
+    key = 'TermCrossover'
+    
     def apply(self, objective : tuple, arguments : dict):
         """
         Get the offspring terms, which are the same parents' ones, but in different order, if the crossover occured.
@@ -300,19 +312,19 @@ class TermCrossover(CompoundOperator):
 
 def get_singleobjective_variation(variation_params : dict = {}):
     # TODO: generalize initiation with test runs and simultaneous parameter and object initiation.
-    add_kwarg_to_operator = partial(add_param_to_operator, target_dict = variation_params)    
+    add_kwarg_to_operator = partial(add_base_param_to_operator, target_dict = variation_params)    
 
     term_param_crossover = TermParamCrossover(['term_param_proportion'])
-    add_kwarg_to_operator(operator = term_param_crossover, labeled_base_val = {'term_param_proportion' : 0.4})
+    add_kwarg_to_operator(operator = term_param_crossover)
     term_crossover = TermCrossover(['crossover_probability'])
-    add_kwarg_to_operator(operator = term_crossover, labeled_base_val = {'crossover_probability' : 0.3})
+    add_kwarg_to_operator(operator = term_crossover)
 
     equation_crossover = EquationCrossover()
 
     chromosome_crossover = ChromosomeCrossover()
 
     pl_cross = PopulationLevelCrossover(['PBI_penalty'])
-    add_kwarg_to_operator(operator = pl_cross, labeled_base_val = {'PBI_penalty' : 1.})
+    add_kwarg_to_operator(operator = pl_cross)
 
     equation_crossover.set_suboperators(operators = {'term_param_crossover' : term_param_crossover, 
                                                      'term_crossover' : term_crossover})
@@ -324,22 +336,22 @@ def get_singleobjective_variation(variation_params : dict = {}):
 
 def get_multiobjective_variation(variation_params : dict = {}): # Rename function calls where necessary
     # TODO: generalize initiation with test runs and simultaneous parameter and object initiation.
-    add_kwarg_to_operator = partial(add_param_to_operator, target_dict = variation_params)    
+    add_kwarg_to_operator = partial(add_base_param_to_operator, target_dict = variation_params)    
 
     term_param_crossover = TermParamCrossover(['term_param_proportion'])
-    add_kwarg_to_operator(operator = term_param_crossover, labeled_base_val = {'term_param_proportion' : 0.4})
+    add_kwarg_to_operator(operator = term_param_crossover)
     term_crossover = TermCrossover(['crossover_probability'])
-    add_kwarg_to_operator(operator = term_crossover, labeled_base_val = {'crossover_probability' : 0.3})
+    add_kwarg_to_operator(operator = term_crossover)
 
     equation_crossover = EquationCrossover()
     metaparameter_crossover = MetaparamerCrossover(['metaparam_proportion'])
-    add_kwarg_to_operator(operator = metaparameter_crossover, labeled_base_val = {'metaparam_proportion' : 0.4})
+    add_kwarg_to_operator(operator = metaparameter_crossover)
     equation_exchange_crossover = EquationExchangeCrossover()
 
     chromosome_crossover = ChromosomeCrossover()
 
     pl_cross = PopulationLevelCrossover(['PBI_penalty'])
-    add_kwarg_to_operator(operator = pl_cross, labeled_base_val = {'PBI_penalty' : 1.})
+    add_kwarg_to_operator(operator = pl_cross)
 
     equation_crossover.set_suboperators(operators = {'term_param_crossover' : term_param_crossover, 
                                                      'term_crossover' : term_crossover})

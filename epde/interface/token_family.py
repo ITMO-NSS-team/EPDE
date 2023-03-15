@@ -45,7 +45,7 @@ class EvaluatorContained(object):
         """
         Apply the defined evaluator to evaluate the token with specific parameters.
 
-        Ags:
+        Args:
             token (`epde.main_structures.factor.Factor`): symbolic label of the specific token, e.g. 'cos';
         token_params (`dict`): dictionary with keys, naming the token parameters (such as frequency, axis and power for trigonometric function) 
             and values - specific values of corresponding parameters.
@@ -100,6 +100,7 @@ class TokenFamily(object):
             Method, which uses the specific token evaluator to evaluate the passed token with its parameters
     """
 
+    def __init__(self, token_type: str, family_of_derivs: bool = False):
     def __init__(self, token_type: str, family_of_derivs: bool = False):
         """
         Initialize the token family;
@@ -171,8 +172,7 @@ class TokenFamily(object):
         self.tokens = tokens
         self.token_params = token_params
         if self.family_of_derivs:
-            self.derivs_ords = {
-                token: derivs_solver_orders[idx] for idx, token in enumerate(tokens)}
+            self.derivs_ords = {token: derivs_solver_orders[idx] for idx, token in enumerate(tokens)}
         self.params_set = True
         self.equality_ranges = equality_ranges
 
@@ -307,6 +307,9 @@ class TokenFamily(object):
         """
         Applying evaluator in token
         """
+        """
+        Applying evaluator in token
+        """
         raise NotImplementedError('Method has been moved to the Factor class')
         if self.evaluator_set:
             return self._evaluator.apply(token)
@@ -316,20 +319,6 @@ class TokenFamily(object):
 
     def create(self, label=None, token_status: dict = None,
                create_derivs: bool = False, **factor_params):
-        """
-        Create factor from the tokens family
-
-        Args:
-            label (`string`): name of token, that wante create.
-                if label == None, that will be create random token
-            token_status (`dict`): 
-            create_derivs (`boolean`): default - False. Flag, that token must be with a derivative
-            **factor_params (`dict`): parameters for token-factor, key - name of parameter
-
-        Returns:
-             occupied_by_factor (`dict`): dict with unique tokens, where key - name of token and value - the maximum possible amount of presence ерфе ещлут in the equation
-             new_factor (`Factor`): resulting factor from the tokens family
-        """
         if token_status is None or token_status == {}:
             token_status = {label: (0, self.token_params['power'][1], False)
                             for label in self.tokens}
@@ -344,9 +333,11 @@ class TokenFamily(object):
                                               if not token_status[token][0] + 1 > token_status[token][1]])
             except ValueError:
                 print(
+                    
                     f'An error while creating factor of {self.ftype} token family')
                 print('Status description:', token_status, ' all:', self.tokens)
                 raise ValueError(
+                    
                     "'a' cannot be empty unless no samples are taken")
 
         if self.family_of_derivs:
@@ -357,8 +348,7 @@ class TokenFamily(object):
                             status=self.status, family_type=self.ftype)
 
         if self.status['unique_token_type']:
-            occupied_by_factor = {
-                token: self.token_params['power'][1] for token in self.tokens}
+            occupied_by_factor = {token: self.token_params['power'][1] for token in self.tokens}
         elif self.status['unique_specific_token']:
             occupied_by_factor = {label: self.token_params['power'][1]}
         else:
@@ -409,6 +399,7 @@ class TokenFamily(object):
                 print(generated_token.cache_label)
                 if generated_token.cache_label not in global_var.tensor_cache.memory_default.keys():
                     raise KeyError(
+                        
                         'Generated token somehow was not stored in cache.')
 
 
@@ -482,9 +473,11 @@ class TFPool(object):
             if len(token_families) > 1:
                 print([family.tokens for family in token_families])
                 raise Exception(
+                    
                     'More than one family contains token with desired label.')
             elif len(token_families) == 0:
                 raise Exception(
+                    
                     'Desired label does not match tokens in any family.')
             else:
                 return token_families[0].create(label=label,
