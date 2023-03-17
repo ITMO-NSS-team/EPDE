@@ -29,6 +29,20 @@ from epde.structure.structure_template import ComplexStructure, check_uniqueness
 
 
 class Term(ComplexStructure):
+    """
+    Class for describing the term of differential equation
+
+    Attributes:
+        _descr_variable_marker
+
+        pool
+        max_factors_in_term:
+        cache_linked:
+        structure:
+        occupied_tokens_labels:
+        descr_variable_marker:
+        prev_normalized
+    """
     __slots__ = ['_history', 'structure', 'interelement_operator', 'saved', 'saved_as',
                  'pool', 'max_factors_in_term', 'cache_linked', 'occupied_tokens_labels',
                  '_descr_variable_marker']
@@ -84,9 +98,7 @@ class Term(ComplexStructure):
             elif isinstance(factor, Factor):
                 self.structure.append(factor)
             else:
-                raise ValueError(
-                    
-                    'The structure of a term should be declared with str or factor.Factor obj, instead got', type(factor))
+                raise ValueError('The structure of a term should be declared with str or factor.Factor obj, instead got', type(factor))
         self.structure = filter_powers(self.structure)
 
     @defined.register
@@ -98,15 +110,12 @@ class Term(ComplexStructure):
         elif isinstance(passed_term, Factor):
             self.structure.append(passed_term)
         else:
-            raise ValueError(
-                
-                'The structure of a term should be declared with str or factor.Factor obj, instead got', type(passed_term))
+            raise ValueError('The structure of a term should be declared with str or factor.Factor obj, instead got', type(passed_term))
 
     def randomize(self, mandatory_family=None, forbidden_factors=None,
                   create_derivs=False, **kwargs):
         if np.sum(self.pool.families_cardinality(meaningful_only=True)) == 0:
-            raise ValueError(
-                'No token families are declared as meaningful for the process of the system search')
+            raise ValueError('No token families are declared as meaningful for the process of the system search')
 
         def update_token_status(token_status, changes):
             for key, value in changes.items():
@@ -134,8 +143,7 @@ class Term(ComplexStructure):
             factors_num = np.random.choice(a=self.max_factors_in_term['factors_num'],
                                            p=self.max_factors_in_term['probas'])
         else:
-            raise ValueError(
-                'Incorrect value of max_factors_in_term metaparameters')
+            raise ValueError('Incorrect value of max_factors_in_term metaparameters')
 
         self.occupied_tokens_labels = copy.copy(forbidden_factors)
 
@@ -172,8 +180,7 @@ class Term(ComplexStructure):
         if not marker or isinstance(marker, str):
             self._descr_variable_marker = marker
         else:
-            raise ValueError(
-                'Described variable marker shall be a family label (i.e. "u") of "False"')
+            raise ValueError('Described variable marker shall be a family label (i.e. "u") of "False"')
 
     def evaluate(self, structural, grids=None):
         assert global_var.tensor_cache is not None, 'Currently working only with connected cache'
@@ -225,18 +232,12 @@ class Term(ComplexStructure):
                 self.reset_saved_state()
                 break
             if accept_term_try == 10 and global_var.verbose.show_warnings:
-                warnings.warn(
-                    
-                    'Can not create unique term, while filtering equation tokens in regards to the right part.')
+                warnings.warn('Can not create unique term, while filtering equation tokens in regards to the right part.')
             if accept_term_try >= 10:
                 self.randomize(forbidden_factors=new_term.occupied_tokens_labels + taken_tokens)
             if accept_term_try == 100:
-                print(
-                    
-                    'Something wrong with the random generation of term while running "filter_tokens_by_right_part"')
-                print('proposed', new_term.name, 'for ', equation.text_form,
-                     
-                      'with respect to', reference_target.name)
+                print('Something wrong with the random generation of term while running "filter_tokens_by_right_part"')
+                print('proposed', new_term.name, 'for ', equation.text_form, 'with respect to', reference_target.name)
 
     def reset_occupied_tokens(self):
         occupied_tokens_new = []
@@ -699,9 +700,7 @@ class Equation(ComplexStructure):
                                    in np.arange(max_orders.size)])
                 max_orders = np.maximum(max_orders, orders)
         if np.max(max_orders) > 4:
-            raise NotImplementedError(
-                
-                'The current implementation allows does not allow higher orders of equation, than 2.')
+            raise NotImplementedError('The current implementation allows does not allow higher orders of equation, than 2.')
         return max_orders
     
     def boundary_conditions(self, max_deriv_orders=(1,), main_var_key=('u', (1.0,)), full_domain: bool = False,

@@ -38,6 +38,13 @@ def add_base_param_to_operator(operator, target_dict):
 class CompoundOperator():
     '''
     Universal class for operator of an arbitrary purpose
+
+    Attributes:
+        suboperators (`dict`): dictionary with name of suboperators and its argumetns
+        params (`dict`): dictionary with names and values of parameters for the operator
+        param_keys (`list`): names of parameters of the operator
+        level_index (`tuple`): abstraction level, to indicate which classes of objects the operator is applied to
+        operator_tags (`set`): log about operator
     '''
 
     def __init__(self, param_keys: list = []):
@@ -64,6 +71,16 @@ class CompoundOperator():
         return self._suboperators
 
     def set_suboperators(self, operators: dict, probas: dict = {}):
+        """
+        Setting suboperators
+
+        Args:
+            operators (`dict`): dictionary with names and methods for evoluation of operators
+            probas (`dict`): dictionary with names of operators and them probability of execution
+
+        Returns:
+            None
+        """
         if not all([isinstance(key, str) and (isinstance(value, (list, tuple, dict)) or
                                               issubclass(type(value), CompoundOperator))
                     for key, value in operators.items()]):
@@ -75,15 +92,15 @@ class CompoundOperator():
         self._suboperators = SuboperatorContainer(suboperators = operators, probas = probas) 
 
     def get_suboperator_args(self, personal=False):
-        '''
+        """
+        Get arguments of the operator and its suboperators
 
+        Args:
+            personal (`boolean`): if True - gives unique arguments, default - True
 
-        Returns
-        -------
-        args : list
-            Arguments of the operator and its suboperators.
-
-        '''
+        Returns:
+            args (`list`): arguments of the operator and its suboperators.
+        """
         args = self.arguments
         if not personal:
             for operator in self.suboperators:
@@ -119,6 +136,16 @@ class CompoundOperator():
         return wrapper
 
     def parse_suboperator_args(self, arguments: dict):
+        """
+        Getting args of suboperators in the from of a dictionary
+
+        Args:
+            arguments (`dict`): dictionary with names of operator's arguments and its values 
+
+        Returns:
+            `dict` with all parameters in one pile
+            `dict` with parameters separated by each operator
+        """
         def parse_args(keys, args):
             return {key: args[key] for key in keys}
 
@@ -133,8 +160,7 @@ class CompoundOperator():
     def apply(self, objective, arguments: dict):
         self_args, subop_args = self.parse_suboperator_args(
             arguments=arguments)
-        raise NotImplementedError(
-            'Trying to apply abstract superclass of the operator.')
+        raise NotImplementedError('Trying to apply abstract superclass of the operator.')
 
     @property
     def level_index(self):
