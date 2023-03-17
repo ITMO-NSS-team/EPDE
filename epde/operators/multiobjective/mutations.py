@@ -11,18 +11,19 @@ from copy import deepcopy
 from functools import partial
 from typing import Union
 
-from epde.optimizers.moeadd.moeadd import ParetoLevels
+from epde.optimizers.optimizers.moeadd.moeadd import ParetoLevels
 
 from epde.structure.main_structures import Equation, SoEq, Term
 from epde.structure.structure_template import check_uniqueness
 from epde.supplementary import filter_powers, try_iterable
-from epde.operators.utils.template import CompoundOperator, add_base_param_to_operator
+from epde.operators.utils.utils.template import CompoundOperator, add_base_param_to_operator
 
 
 from epde.decorators import HistoryExtender, ResetEquationStatus
 
 
 class SystemMutation(CompoundOperator):
+    key = ["chromosome level", "mutation"]    
     key = 'SystemMutation'
     def apply(self, objective : SoEq, arguments : dict): # TODO: add setter for best_individuals & worst individuals 
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)    

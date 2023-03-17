@@ -47,9 +47,11 @@ def process_point_cheb(args):
     if isinstance(n_der, int):
         n_der = tuple([n_der for i in range(matrix.ndim)])
     elif isinstance(n_der, (list, tuple)):
-        assert len(n_der) == matrix.ndim, 'Given derivative orders do not match the data tensor dimensionality'
+        assert len(
+            n_der) == matrix.ndim, 'Given derivative orders do not match the data tensor dimensionality'
     else:
         raise TypeError(
+            
             'Derivatives were given in the incorrect format. A single integer or list/tuple of integers required')
 
     poly_mask = [idx[dim] >= poly_bound and idx[dim] <= matrix.shape[dim] - poly_bound for dim in np.arange(matrix.ndim)]
@@ -76,4 +78,4 @@ def process_point_cheb(args):
             deriv_idx += n_der[var_idx]
 #    print(derivatives.shape)
 #    print('derivatives length', len(derivatives), 'type', type(derivatives))
-    return (derivatives)
+    return  (derivatives)

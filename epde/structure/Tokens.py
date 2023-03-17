@@ -54,6 +54,7 @@ class TerminalToken(Token):
 
     """
 
+
     def __init__(self, number_params: int = 0, params_description: dict = None, params: np.ndarray = None,
                  cache_val: bool = True, fix_val: bool = False, fix: bool = False,
                  val: np.ndarray = None, type_: str = 'TerminalToken', optimizer: str = None, name_: str = None,
@@ -288,6 +289,7 @@ class ComplexToken(TerminalToken):
     in addition to the numeric parameters.
     Example: Product of TerminalTokens.
     """
+
 
     def __init__(self, number_params: int = 0, params_description: dict = None, params: np.ndarray = None,
                  cache_val: bool = True, fix_val: bool = False, fix: bool = False,

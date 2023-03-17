@@ -31,7 +31,7 @@ from epde.prep.derivatives import Preprocess_derivatives
 from epde.interface.token_family import TF_Pool, Token_family
 
 from epde.eq_search_strategy import Strategy_director, Strategy_director_solver
-from epde.operators.ea_stop_criteria import Iteration_limit
+from epde.operators.ea_stop_conds import Iteration_limit
 
 #if __name__ == '__main__':
 def test_ode_auto():

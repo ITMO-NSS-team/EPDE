@@ -16,7 +16,7 @@ from epde.interface.prepared_tokens import TrigonometricTokens, CacheStoredToken
 
 import matplotlib.pyplot as plt
 import torch
-import TEDEouS
+import epde.solver
 
 # from TEDEouS import solver
 

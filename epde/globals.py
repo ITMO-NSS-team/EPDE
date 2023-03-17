@@ -44,6 +44,7 @@ def init_eq_search_operator(operator):
     eq_search_operator = operator
 
 
+
 def init_sys_search_operator(operator):
     global sys_search_operator
     sys_search_operator = operator
@@ -95,4 +96,3 @@ def init_verbose(plot_DE_solutions : bool = False, show_iter_idx : bool = True,
         warnings.filterwarnings("ignore")
     verbose = VerboseManager(plot_DE_solutions, show_iter_idx, show_iter_fitness, 
                              show_iter_stats, show_warnings)
-    

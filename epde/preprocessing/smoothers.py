@@ -7,6 +7,7 @@ Created on Wed Jul 20 16:15:12 2022
 """
 
 from abc import ABC
+from abc import ABC
 from scipy.ndimage import gaussian_filter
 import numpy as np
 
@@ -43,6 +44,7 @@ def baseline_ann(dim):
         torch.nn.Linear(1024, 1)
     )
     return model
+
 
 
 class ANNSmoother(AbstractSmoother):
@@ -114,3 +116,4 @@ class GaussianSmoother(AbstractSmoother):
                 'Wrong kernel passed into function. Current version supports only Gaussian smoothing.')
 
         return smoothed_data
+

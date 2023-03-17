@@ -7,11 +7,11 @@ Created on Thu Feb 13 16:33:34 2020
 """
 
 import numpy as np
+from functools import reduce
 import copy
 import torch
 device = torch.device('cpu')
 
-from functools import reduce
 
 def train_ann(grids: list, data: np.ndarray, epochs_max: int = 10000):
     dim = 1 if np.any([s == 1 for s in data.shape]) and data.ndim == 2 else data.ndim
@@ -80,14 +80,16 @@ def use_ann_to_predict(model, recalc_grids: list):
     return model(recalc_grid_tensor).detach().numpy().reshape(recalc_grids[0].shape)
 
 
+
 def np_cartesian_product(*arrays):
     print(arrays)
     la = len(arrays)
     dtype = np.result_type(*arrays)
     arr = np.empty([len(a) for a in arrays] + [la], dtype=dtype)
     for i, a in enumerate(np.ix_(*arrays)):
-        arr[..., i] = a
+        arr[...,  i] = a
     return arr.reshape(-1, la)
+
 
 
 def flatten(obj):
@@ -99,7 +101,8 @@ def flatten(obj):
     for idx, elem in enumerate(obj):
         if not isinstance(elem, (list, tuple)):
             obj[idx] = [elem,]
-    return reduce(lambda x, y: x+y, obj)
+    return reduce(lambda x,  y: x+y, obj)
+
 
 
 def try_iterable(arg):
@@ -108,6 +111,7 @@ def try_iterable(arg):
     except TypeError:
         return False
     return True
+
 
 
 def memory_assesment():
@@ -127,12 +131,13 @@ def factor_params_to_str(factor, set_default_power=False, power_idx=0):
     return (factor.label, tuple(param_label))
 
 
+
 def form_label(x, y):
     print(type(x), type(y.cache_label))
     return x + ' * ' + y.cache_label if len(x) > 0 else x + y.cache_label
 
 
-def detect_similar_terms(base_equation_1, base_equation_2):  # Переделать!
+def detect_similar_terms(base_equation_1, base_equation_2):   # Переделать!
     same_terms_from_eq1 = []
     same_terms_from_eq2 = []
     eq2_processed = np.full(
@@ -240,14 +245,17 @@ def define_derivatives(var_name='u', dimensionality=1, max_order=2):
                 deriv_names.append('d' + var_name + '/dx' + str(var_idx+1))
             else:
                 deriv_names.append(
+                    
                     'd^'+str(order+1) + var_name + '/dx'+str(var_idx+1)+'^'+str(order+1))
     print('Deriv orders after definition', var_deriv_orders)
     return deriv_names, var_deriv_orders
 
 
 def population_sort(input_population):
-    individ_fitvals = [individual.fitness_value if individual.fitness_calculated else 0 for individual in input_population ]
-    pop_sorted = [x for x, _ in sorted(zip(input_population, individ_fitvals), key=lambda pair: pair[1])]
+    individ_fitvals = [
+        individual.fitness_value if individual.fitness_calculated else 0 for individual in input_population]
+    pop_sorted = [x for x, _ in sorted(
+        zip(input_population, individ_fitvals), key=lambda pair: pair[1])]
     return list(reversed(pop_sorted))
 
 
@@ -255,6 +263,7 @@ def normalize_ts(Input):
     matrix = np.copy(Input)
     if np.ndim(matrix) == 0:
         raise ValueError(
+            
             'Incorrect input to the normalizaton: the data has 0 dimensions')
     elif np.ndim(matrix) == 1:
         return matrix
@@ -266,3 +275,4 @@ def normalize_ts(Input):
             else:
                 matrix[i] = 1
         return matrix
+

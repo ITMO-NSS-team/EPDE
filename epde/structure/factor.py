@@ -15,6 +15,7 @@ import epde.globals as global_var
 from epde.supplementary import factor_params_to_str, train_ann, use_ann_to_predict
 
 
+
 class Factor(TerminalToken):
     __slots__ = ['_params', '_params_description', '_hash_val',
                  'label', 'ftype', 'grid_set', 'grid_idx', 'is_deriv', 'deriv_code',
@@ -207,7 +208,8 @@ class Factor(TerminalToken):
             try:
                 if k not in attrs_to_avoid_copy:
                     if not isinstance(k, list):
-                        setattr(new_struct, k, copy.deepcopy(getattr(self, k), memo))
+                        setattr(new_struct, k, copy.deepcopy(
+                            getattr(self, k), memo))
                     else:
                         temp = []
                         for elem in getattr(self, k):

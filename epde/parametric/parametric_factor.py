@@ -11,6 +11,7 @@ from pprint import pprint
 import epde.globals as global_var
 
 
+
 class ParametricFactor(Factor):
     __slot__ = ['_params', '_params_description', '_hash_val',
                 'label', 'type', 'grid_set', 'grid_idx', 'is_deriv', 'deriv_code',
@@ -87,7 +88,8 @@ class ParametricFactor(Factor):
                     _params[param_idx] = self.params_predefined[param_info['name']]
 
             elif param_info['name'] in self.params_to_optimize:
-                opt_param_idx = self.params_to_optimize.index(param_info['name'])
+                opt_param_idx = self.params_to_optimize.index(
+                    param_info['name'])
                 _params[param_idx] = params[opt_param_idx][1]
         _kw_params = {param_info['name']: _params[idx] for idx, param_info in enumerate(list(self.params_description.values()))}
 
@@ -116,6 +118,7 @@ class ParametricFactor(Factor):
         return value
 
 
+
 class ParametricTerm(Term):
     __slots__ = ['_history', 'structure', 'interelement_operator', 'saved', 'saved_as',
                  'pool', 'max_factors_in_term', 'cache_linked', 'occupied_tokens_labels',
@@ -125,7 +128,8 @@ class ParametricTerm(Term):
         self.parametric_factors = parametric_factors
         self.defined_factors = defined_factors
         # print('parametric factors:', self.parametric_factors)
-        self.all_params = reduce(lambda x, y: x+y, [factor.params_to_optimize for factor in self.parametric_factors.values()], [])
+        self.all_params = reduce(
+            lambda x, y: x+y, [factor.params_to_optimize for factor in self.parametric_factors.values()], [])
         # print('Params in term:', self.all_params, len(self.all_params))
         self.pool = pool
         self.operator = interelement_operator
@@ -166,7 +170,8 @@ class ParametricTerm(Term):
 
     @property
     def term_id(self) -> int:
-        _term_id = sum([factor.hash_descr for factor in self.parametric_factors.values()])
+        _term_id = sum(
+            [factor.hash_descr for factor in self.parametric_factors.values()])
         # print('_term_id', _term_id)
         return _term_id
 
@@ -195,9 +200,11 @@ class ParametricTerm(Term):
 
     def evaluate_grad(self, parameter):
         # print(self.parametric_factors, parameter)
-        param_factor_idxs = [idx for idx, factor in enumerate(self.parametric_factors.values()) if parameter in factor]
+        param_factor_idxs = [idx for idx, factor in enumerate(
+            self.parametric_factors.values()) if parameter in factor]
         # print(param_factor_idxs)
-        assert len(param_factor_idxs) == 1, 'More than one factor in a term contains the same parameter'
+        assert len(
+            param_factor_idxs) == 1, 'More than one factor in a term contains the same parameter'
 
         return np.multiply.reduce([factor.evaluate() for idx, factor in enumerate(self.parametric_factors.values()) if idx != param_factor_idxs[0]] +
                                   [factor.evaluate() for factor in self.defined_factors.values()]) * list(self.parametric_factors.values())[param_factor_idxs[0]].eval_grad(parameter)
@@ -224,6 +231,7 @@ class ParametricTerm(Term):
     @singledispatchmethod
     def __contains__(self, element):
         raise NotImplementedError(
+            
             'Incorrect type of the requested item for the __contains__ method')
 
     @__contains__.register
@@ -237,3 +245,4 @@ class ParametricTerm(Term):
     @__contains__.register
     def _(self, element: Factor):
         return element in self.defined_factors.values()
+

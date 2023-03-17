@@ -14,14 +14,14 @@ from copy import deepcopy
 from functools import partial
 
 from epde.structure.structure_template import check_uniqueness
-from epde.optimizers.moeadd.moeadd import ParetoLevels
+from epde.optimizers.optimizers.moeadd.moeadd import ParetoLevels
 
 from epde.supplementary import detect_similar_terms, flatten
 from epde.decorators import HistoryExtender, ResetEquationStatus
 
-from epde.operators.utils.template import CompoundOperator, add_base_param_to_operator
-from epde.operators.multiobjective.moeadd_specific import get_basic_populator_updater
-from epde.operators.multiobjective.mutations import get_basic_mutation
+from epde.operators.utils.utils.template import CompoundOperator, add_base_param_to_operator
+from epde.operators.multiobjective.multiobjective.moeadd_specific import get_basic_populator_updater
+from epde.operators.multiobjective.multiobjective.mutations import get_basic_mutation
 
 
 class ParetoLevelsCrossover(CompoundOperator):

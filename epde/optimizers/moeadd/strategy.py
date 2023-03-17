@@ -10,15 +10,15 @@ import numpy as np
 from functools import partial
 
 from epde.operators.utils.operator_mappers import map_operator_between_levels
-from epde.operators.utils.template import add_base_param_to_operator
+from epde.operators.utils.template import add_param_to_operator
 
 from epde.operators.multiobjective.selections import MOEADDSelection
 from epde.operators.multiobjective.variation import get_basic_variation
-from epde.operators.common.fitness import L2Fitness
-from epde.operators.common.right_part_selection import RandomRHPSelector
+from epde.operators.multiobjective.fitness import L2Fitness
+from epde.operators.multiobjective.right_part_selection import RandomRHPSelector
 from epde.operators.multiobjective.moeadd_specific import get_pareto_levels_updater, SimpleNeighborSelector, get_initial_sorter
-from epde.operators.common.sparsity import LASSOSparsity
-from epde.operators.common.coeff_calculation import LinRegBasedCoeffsEquation
+from epde.operators.multiobjective.sparsity import LASSOSparsity
+from epde.operators.multiobjective.coeff_calculation import LinRegBasedCoeffsEquation
 
 from epde.optimizers.builder import add_sequential_operators, OptimizationPatternDirector
 
@@ -26,13 +26,13 @@ from epde.optimizers.builder import add_sequential_operators, OptimizationPatter
 class MOEADDDirector(OptimizationPatternDirector):
     def use_baseline(self, variation_params : dict = {}, mutation_params : dict = {}, sorter_params : dict = {},
                     pareto_combiner_params : dict = {}, pareto_updater_params : dict = {}, **kwargs):
-        add_kwarg_to_operator = partial(add_base_param_to_operator, target_dict = kwargs)
+        add_kwarg_to_operator = partial(add_param_to_operator, target_dict = kwargs)
 
         neighborhood_selector = SimpleNeighborSelector(['number_of_neighbors'])
-        add_kwarg_to_operator(operator = neighborhood_selector)
+        add_kwarg_to_operator(operator = neighborhood_selector, labeled_base_val = {'number_of_neighbors' : 4})
 
         selection = MOEADDSelection(['delta', 'parents_fraction'])
-        add_kwarg_to_operator(operator = selection)
+        add_kwarg_to_operator(operator = selection, labeled_base_val = {'delta' : 0.9, 'parents_fraction' : 0.4})
         selection.set_suboperators({'neighborhood_selector' : neighborhood_selector})
 
         variation = get_basic_variation(variation_params)
@@ -40,7 +40,7 @@ class MOEADDDirector(OptimizationPatternDirector):
         right_part_selector = RandomRHPSelector()
         
         eq_fitness = L2Fitness(['penalty_coeff'])
-        add_kwarg_to_operator(operator = eq_fitness)
+        add_kwarg_to_operator(operator = eq_fitness, labeled_base_val = {'penalty_coeff' : 0.2})
         
         sparsity = LASSOSparsity()
         coeff_calc = LinRegBasedCoeffsEquation()

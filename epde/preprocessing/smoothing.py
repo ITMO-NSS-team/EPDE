@@ -10,6 +10,7 @@ import numpy as np
 from scipy.ndimage import gaussian_filter
 
 
+
 def Smoothing(data, kernel_fun, **params):
     smoothed = np.empty(data.shape)
     if kernel_fun == 'gaussian':
@@ -26,3 +27,4 @@ def Smoothing(data, kernel_fun, **params):
         raise Exception('Wrong kernel passed into function')
 
     return smoothed
+

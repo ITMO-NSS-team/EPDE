@@ -11,9 +11,9 @@ import time
 from typing import Union
 from functools import reduce, partial
 
-from epde.optimizers.moeadd.moeadd import ParetoLevels
-from epde.operators.utils.template import CompoundOperator, add_base_param_to_operator
-from epde.operators.multiobjective.mutations import get_basic_mutation
+from epde.optimizers.optimizers.moeadd.moeadd import ParetoLevels
+from epde.operators.utils.utils.template import CompoundOperator, add_base_param_to_operator
+from epde.operators.multiobjective.multiobjective.mutations import get_basic_mutation
 
 
 def penalty_based_intersection(sol_obj, weight, ideal_obj, penalty_factor = 1.) -> float:

@@ -114,8 +114,10 @@ def ndl_update(new_solution, levels) -> list:   # efficient_ndl_update
                 new_levels.append([moving_set_elem,])
                 new_levels.extend(temp_levels)  # ; completed_levels = True
             else:
-                dominated_level_elems = [level_elem for level_elem in new_levels[level_idx] if check_dominance(moving_set_elem, level_elem)]
-                non_dominated_level_elems = [level_elem for level_elem in new_levels[level_idx] if not check_dominance(moving_set_elem, level_elem)]
+                dominated_level_elems = [level_elem for level_elem in new_levels[level_idx] if check_dominance(
+                    moving_set_elem, level_elem)]
+                non_dominated_level_elems = [
+                    level_elem for level_elem in new_levels[level_idx] if not check_dominance(moving_set_elem, level_elem)]
                 non_dominated_level_elems.append(moving_set_elem)
                 new_levels[level_idx] = non_dominated_level_elems
 

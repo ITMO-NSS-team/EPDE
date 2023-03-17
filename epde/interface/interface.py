@@ -1,4 +1,4 @@
-# !/usr/bin/env python3
+#  !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Tue Jul  6 15:55:12 2021
@@ -135,6 +135,7 @@ class EpdeSearch(object):
         search_conducted (`bool`): flag that the equation was searched 
         optimizer_init_params (`dict`): parameters for optimization algorithm initialization
         optimizer_exec_params (`dict`): parameters for execution algorithm of optimization
+        optimizer ()
     """
     def __init__(self, multiobjective_mode: bool = True, use_default_strategy: bool = True, director=None, 
                  director_params: dict = {'variation_params': {}, 'mutation_params': {},
@@ -544,7 +545,8 @@ class EpdeSearch(object):
             entry_token_family.set_params(entry.names, OrderedDict([('power', (1, data_fun_pow))]),
                                           {'power': 0}, entry.d_orders)
             entry_token_family.set_evaluator(simple_function_evaluator, [])
-            
+                
+            print(entry_token_family.tokens)
             data_tokens.append(entry_token_family)
 
         if isinstance(additional_tokens, list):

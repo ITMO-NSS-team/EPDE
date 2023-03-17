@@ -11,6 +11,7 @@ from functools import reduce, singledispatchmethod
 from epde.structure.main_structures import Equation
 
 
+
 class ParametricEquation(object):
     def __init__(self, pool, terms: Union[list, tuple], right_part_index: int = -1):
         self.pool = pool
@@ -27,7 +28,8 @@ class ParametricEquation(object):
                 total_count += 1
                 local_count += 1
 
-        self.rpi = right_part_index if right_part_index >= 0 else len(terms) + right_part_index
+        self.rpi = right_part_index if right_part_index >= 0 else len(
+            terms) + right_part_index
         self._optimization_held = False
 
     def optimize_equations(self, initial_params=None, method='L-BFGS-B'):
@@ -47,7 +49,8 @@ class ParametricEquation(object):
             # print('evaluating gradient')
             grad = np.zeros_like(params)
             for param_idx, param_in_term_props in variables[0].param_term_beloning.items():
-                grad[param_idx] = np.sum(variables[0].evaluate_grad(params, param_in_term_props))
+                grad[param_idx] = np.sum(
+                    variables[0].evaluate_grad(params, param_in_term_props))
             print('gradient:', grad)
             return grad
 
@@ -74,6 +77,7 @@ class ParametricEquation(object):
             optimal_params = optimize.fmin_cg(opt_lbd, x0=initial_params, fprime=opt_grd)
         else:
             raise NotImplementedError(
+                
                 'Implemented methods of parameter optimization are limited to "L-BFGS-B" and gradient descent as "GD"')
         print(type(optimal_params))
 
@@ -122,7 +126,8 @@ class ParametricEquation(object):
         return val1 - val2
 
     def evaluate_grad(self, params, param_in_term_props):
-        param_label = self.terms[param_in_term_props[0]].all_params[param_in_term_props[1]]
+        param_label = self.terms[param_in_term_props[0]
+                                 ].all_params[param_in_term_props[1]]
         param_grad_vals = 2 * self.evaluate_with_params(params) * \
             self.terms[param_in_term_props[0]].evaluate_grad(param_label).reshape(-1)
         print('------------------------------------------------------------------')
@@ -155,6 +160,7 @@ class ParametricEquation(object):
     @singledispatchmethod
     def get_term_for_param(self, param):
         raise NotImplementedError(
+            
             'The term must be called by parameter index or label')
 
     @get_term_for_param.register
@@ -165,3 +171,4 @@ class ParametricEquation(object):
     @get_term_for_param.register
     def _(self, param: int):
         return self.terms[self.param_term_beloning[param]]
+

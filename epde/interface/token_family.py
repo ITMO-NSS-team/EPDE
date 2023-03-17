@@ -63,6 +63,7 @@ class TokenFamily(object):
     Class for the type (family) of tokens, from which the tokens are taken as factors in the terms of the equation
 
     Attributes:
+        _deriv_evaluators (`dict`): 
         ftype (`string`): the symbolic name of the token family (e.g. 'logarithmic', 'trigonometric', etc.)
         status (`dict`): dictionary, containing markers, describing the token properties. Key - property, value - bool variable:
             'mandatory' - if True, a token from the family must be present in every term;
@@ -80,6 +81,9 @@ class TokenFamily(object):
             if int - the parameters will be integer, if float - float.
         equality_ranges (`dict`): error for equality of token parameters, key is name of parameter
         derivs_ords (`dict`):  keys for derivatides for `solver` for each token in family
+        opt_param_labels (`list`): 
+        test_token ():
+        test_evaluation ():
 
     Methods:
         set_status(demands_equation = False, meaningful = False, 
@@ -189,8 +193,8 @@ class TokenFamily(object):
         Args:
             eval_function (`function or EvaluatorContained object`): Function, used in the evaluator, or the evaluator
             eval_params (`keyword arguments`): The parameters for evaluator; must contain params_names (names of the token parameters) &
-                param_equality (for each of the token parameters, range in which it considered as the same), 
-
+                param_equality (for each of the token parameters, range in which it considered as the same),
+            suppress_eval_test (`boolean`): if True, run `test_evaluator` for testing of method for evaluating token
 
         Example:
             >>> def trigonometric_evaluator(token, token_params, eval_params):
@@ -255,7 +259,8 @@ class TokenFamily(object):
                 _deriv_evaluator = eval_function
             else:
                 print('Setting evaluator kwargs:', eval_kwargs_keys)
-                _deriv_evaluator = EvaluatorContained(eval_function, eval_kwargs_keys)
+                _deriv_evaluator = EvaluatorContained(
+                    eval_function, eval_kwargs_keys)
             self._deriv_evaluators[param_key] = _deriv_evaluator
         self.opt_param_labels = list(eval_functions.keys())
         self.deriv_evaluator_set = True
@@ -285,12 +290,19 @@ class TokenFamily(object):
     def chech_constancy(self, test_function, **tfkwargs):
         '''
         Method to check, if any single simple token in the studied domain is constant, or close to it. The constant token is to be displayed and deleted from tokens and cache.
+
+        Args:
+            test_function (`callable`): the method used to evaluate
+
+        Returns:
+            None
         '''
         assert self.params_set
         constant_tokens_labels = []
         for label in self.tokens:
             print(type(global_var.tensor_cache.memory[label + ' power 1']))
-            constancy = test_function(global_var.tensor_cache.memory[label + ' power 1'], **tfkwargs)
+            constancy = test_function(
+                global_var.tensor_cache.memory[label + ' power 1'], **tfkwargs)
             if constancy:
                 constant_tokens_labels.append(label)
 
@@ -313,6 +325,20 @@ class TokenFamily(object):
 
     def create(self, label=None, token_status: dict = None,
                create_derivs: bool = False, **factor_params):
+        """
+        Method for creating element of the token family
+
+        Args:
+            label (`str`): one name of them, if label is None - random selection occurs from possible tokns for that family
+            token_status (`dict`): information about usage of all tokens that belong to this family, 
+                if `label` is not None, this argument will not be considered. Example: (number of used, max number for using, flag about permission to use)
+            create_derivs (`boolean`): default - False
+                flag about the presence of derivatives in the token structure
+
+        Returns:
+            occupied_by_factor (`dict`): information about blocked elements after cteated the factor
+            new_factor (`Factor`): resulting factor for that token family
+        """
         if token_status is None or token_status == {}:
             token_status = {label: (0, self.token_params['power'][1], False)
                             for label in self.tokens}
@@ -327,10 +353,10 @@ class TokenFamily(object):
                                               if not token_status[token][0] + 1 > token_status[token][1]])
             except ValueError:
                 print(
+                    
                     f'An error while creating factor of {self.ftype} token family')
                 print('Status description:', token_status, ' all:', self.tokens)
-                raise ValueError(
-                    "'a' cannot be empty unless no samples are taken")
+                raise ValueError("'a' cannot be empty unless no samples are taken")
 
         if self.family_of_derivs:
             factor_deriv_code = self.derivs_ords[label]
@@ -358,26 +384,43 @@ class TokenFamily(object):
         return occupied_by_factor, new_factor
 
     def cardinality(self, token_status: Union[dict, None] = None):
+        """
+        Method for getting number of free place for creating new factors for that token family
+
+        Args:
+           token_status (`dict`):  information about usage of all tokens that belong to this family, 
+                Example: (number of used, max number for using, flag about permission to use)
+
+        Returns:
+            number of place (`int`)
+        """
         if token_status is None or token_status == {}:
             token_status = {label: (0, self.token_params['power'][1], False)
                             for label in self.tokens}
         return len([token for token in self.tokens if token_status[token][0] < token_status[token][1]])
 
     def evaluate_all(self):
+        """
+        Apply method of evaluation for all tokens in token family
+        """
         for token_label in self.tokens:
             params_vals = []
             for param_label, param_range in self.token_params.items():
                 if param_label != 'power' and isinstance(param_range[0], int):
-                    params_vals.append(np.arange(param_range[0], param_range[1] + 1))
+                    params_vals.append(
+                        np.arange(param_range[0], param_range[1] + 1))
                 elif param_label == 'power':
                     params_vals.append([1,])
                 else:
-                    params_vals.append(np.random.uniform(param_range[0], param_range[1]))
+                    params_vals.append(np.random.uniform(
+                        param_range[0], param_range[1]))
             params_sets = list(itertools.product(*params_vals))
             for params_selection in params_sets:
-                params_sets_labeled = dict(zip(list(self.token_params.keys()), params_selection))
+                params_sets_labeled = dict(
+                    zip(list(self.token_params.keys()), params_selection))
 
-                _, generated_token = self.create(token_label, **params_sets_labeled)
+                _, generated_token = self.create(
+                    token_label, **params_sets_labeled)
                 generated_token.use_cache()
                 if self.status['requires_grid']:
                     generated_token.use_grids_cache()
@@ -386,15 +429,16 @@ class TokenFamily(object):
                 _ = generated_token.evaluate()
                 print(generated_token.cache_label)
                 if generated_token.cache_label not in global_var.tensor_cache.memory_default.keys():
-                    raise KeyError(
-                        'Generated token somehow was not stored in cache.')
+                    raise KeyError('Generated token somehow was not stored in cache.')
 
 
 class TFPool(object):
-    '''
+    """
+     Class stored pool for token families
 
-    '''
-
+     Args:
+        families (`list`): toen families that using in that run
+    """
     def __init__(self, families: list, stored_pool=None):
         if stored_pool is not None:
             self = pickle.load(stored_pool)
@@ -402,22 +446,37 @@ class TFPool(object):
 
     @property
     def families_meaningful(self):
+        """
+        Getting token families, that is meaningful
+        """
         return [family for family in self.families if family.status['meaningful']]
 
     @property
     def families_demand_equation(self):
+        """
+        Getting token families, that be sure to use in equation
+        """
         return [family for family in self.families if family.status['demands_equation']]
 
     @property
     def families_supplementary(self):
+        """
+        Getting token families, that is not meaningful
+        """
         return [family for family in self.families if not family.status['meaningful']]
 
     @property
     def families_equationless(self):
+        """
+        Getting token families, whose presence in the equation is optional
+        """
         return [family for family in self.families if not family.status['demands_equation']]
 
     @property
     def labels_overview(self):
+        """
+        Getting pairs from each token familly by next form: (name of token for this family, max number of token for using) 
+        """
         overview = []
         for family in self.families:
             overview.append((family.tokens, family.token_params['power'][1]))
@@ -425,6 +484,16 @@ class TFPool(object):
 
     def families_cardinality(self, meaningful_only: bool = False,
                              token_status: Union[dict, None] = None):
+        """
+        Getting number of free place for creating new factors for each token family
+
+        Args:
+            meaningful_only (`boolean`): using only meaningful families
+            token_status (`dict`): information about usage of all tokens that belong to all families of the class
+
+        Returns:
+            numpy.array with integer values (number of free place in each `self.families`)
+        """
         if meaningful_only:
             return np.array([family.cardinality(token_status) for family in self.families_meaningful])
         else:
@@ -432,6 +501,18 @@ class TFPool(object):
 
     def create(self, label=None, create_meaningful: bool = False, token_status=None,
                create_derivs: bool = False, **kwargs) -> Union[str, Factor]:
+        """
+        Create token from family for current running
+
+        Args:
+            label (`str`): if noe None, that create token with name == label
+            create_meaningful (`boolean`): the choice of the token to create is selected from meaningful family
+            token_status (`dict`): information about status of all families
+            create_derivs (`boolean`): flag about the presence of derivatives in the token structure
+        
+        Returns:
+            created `Factor` 
+        """
         if label is None:
             if create_meaningful:
                 if np.sum(self.families_cardinality(True, token_status)) == 0:
@@ -455,13 +536,16 @@ class TFPool(object):
                                                                 create_derivs=create_derivs,
                                                                 **kwargs)
         else:
-            token_families = [family for family in self.families if label in family.tokens]
+            token_families = [
+                family for family in self.families if label in family.tokens]
             if len(token_families) > 1:
                 print([family.tokens for family in token_families])
                 raise Exception(
+                    
                     'More than one family contains token with desired label.')
             elif len(token_families) == 0:
                 raise Exception(
+                    
                     'Desired label does not match tokens in any family.')
             else:
                 return token_families[0].create(label=label,
@@ -469,6 +553,16 @@ class TFPool(object):
                                                 **kwargs)
 
     def create_from_family(self, family_label: str, token_status=None, **kwargs):
+        """
+        Create token from choosing family
+
+        Args:
+            family_label (`str`): the name of the family from which the token will be created
+            token_status (`dict`): information about status of all families
+        
+        Returns:
+            created `Factor`
+        """
         # print('family_label', family_label, 'self.families', self.families)
         family = [f for f in self.families if family_label == f.ftype][0]
         return family.create(label=None, token_status=token_status, **kwargs)
@@ -480,6 +574,15 @@ class TFPool(object):
         return len(self.families)
 
     def get_families_by_label(self, label):
+        """
+        Getting family by input name of token
+
+        Args:
+            label (`str`): the name of the token that will be used to search for his family
+
+        Returns:
+            `TokenFamily` for token by input name
+        """
         containing_families = [family for family in self.families
                                if label in family.tokens]
         if len(containing_families) > 1:
@@ -491,6 +594,12 @@ class TFPool(object):
             raise IndexError('No family for token.')
 
     def save(self, filename: str):
+        """
+        Saving information about all families
+
+        Args:
+            filename (`str`): path to file, which will be save data
+        """
         file_to_store = open(filename, "wb")
         pickle.dump(self, file_to_store)
         file_to_store.close()
