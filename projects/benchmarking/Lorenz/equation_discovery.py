@@ -33,22 +33,22 @@ if __name__ == '__main__':
     Подгружаем данные, содержащие временные ряды динамики "вида-охотника" и "вида-жертвы"
     '''
     try:
-        t_file = os.path.join(os.path.dirname( __file__ ), 'projects/hunter-prey/t.npy')
+        t_file = os.path.join(os.path.dirname( __file__ ), 'data/t.npy')
         t = np.load(t_file)
     except FileNotFoundError:
-        t_file = '/home/maslyaev/epde/EPDE_rework/projects/hunter-prey/t.npy'
+        t_file = '/home/maslyaev/epde/EPDE_main/projects/benchmarking/data/t.npy'
         t = np.load(t_file)
     
     try:
-        data_file =  os.path.join(os.path.dirname( __file__ ), 'projects/hunter-prey/data.npy')
+        data_file =  os.path.join(os.path.dirname( __file__ ), 'data/lorenz.npy')
         data = np.load(data_file)
     except FileNotFoundError:
-        data_file = '/home/maslyaev/epde/EPDE_rework/projects/hunter-prey/data.npy'
+        data_file = '/home/maslyaev/epde/EPDE_main/projects/benchmarking/data/lorenz.npy'
         data = np.load(data_file)
         
-    t_max = 600
-    t = t[:t_max]
-    x = data[:t_max, 0]; y = data[:t_max, 1]
+    end = 10000
+    t = t[:end]
+    x = data[:end, 0]; y = data[:end, 1]; z = data[:end, 2]
         
     dimensionality = x.ndim - 1
     
@@ -59,13 +59,13 @@ if __name__ == '__main__':
                                            coordinate_tensors = [t,])    
     epde_search_obj.set_preprocessor(default_preprocessor_type='poly', # use_smoothing = True
                                      preprocessor_kwargs={})
-    popsize = 12
-    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=120)
+    popsize = 20
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=40)
     trig_tokens = TrigonometricTokens(dimensionality = dimensionality)
     factors_max_number = {'factors_num' : [1, 2], 'probas' : [0.8, 0.2]}
     
-    epde_search_obj.fit(data=[x, y], variable_names=['u', 'v'], max_deriv_order=(1,),
-                        equation_terms_max_number=3, data_fun_pow = 1, additional_tokens=[trig_tokens,], 
+    epde_search_obj.fit(data=[x, y, z], variable_names=['u', 'v', 'w'], max_deriv_order=(1,),
+                        equation_terms_max_number=5, data_fun_pow = 1, additional_tokens=[trig_tokens,], 
                         equation_factors_max_number=factors_max_number,
                         eq_sparsity_interval=(1e-10, 1e-4))
     '''

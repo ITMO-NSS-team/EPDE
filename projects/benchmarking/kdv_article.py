@@ -25,19 +25,18 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
 # TODO^ caching of the pre-calculated derivatives
     
 def run_KdV_eq_search(multiobjective_mode, derivs):
-    epde_search_obj = epde_alg.epde_search(multiobjective_mode=multiobjective_mode, use_solver=False, 
+    epde_search_obj = epde_alg.EpdeSearch(multiobjective_mode=multiobjective_mode, use_solver=False, 
                                            dimensionality=dimensionality, boundary=boundary, 
-                                           coordinate_tensors = grids, 
-                                           verbose_params = {'show_moeadd_epochs' : True})    
+                                           coordinate_tensors = grids)    
     epde_search_obj.set_preprocessor(default_preprocessor_type='poly', # use_smoothing = True
                                      preprocessor_kwargs={'use_smoothing' : False})
     popsize = 7
     if multiobjective_mode:
         epde_search_obj.set_moeadd_params(population_size = popsize, 
-                                          training_epochs=40)
+                                          training_epochs=80)
     else:
         epde_search_obj.set_singleobjective_params(population_size = popsize, 
-                                                   training_epochs=40)
+                                                   training_epochs=80)
 
 
     custom_grid_tokens = CacheStoredTokens(token_type = 'grid',
@@ -67,7 +66,7 @@ def run_KdV_eq_search(multiobjective_mode, derivs):
     opt_val = 1e-7
     bounds = (1e-8, 1e-2) if multiobjective_mode else (opt_val, opt_val)
     epde_search_obj.fit(data=[u, ], variable_names=['u',], max_deriv_order=(1, 3), derivs = [derivs,],
-                        equation_terms_max_number=4, data_fun_pow = 2, 
+                        equation_terms_max_number=5, data_fun_pow = 2, 
                         additional_tokens=[trig_tokens, custom_grid_tokens, custom_trig_tokens], #custom_grid_tokens 
                         equation_factors_max_number = factors_max_number, 
                         eq_sparsity_interval = bounds)

@@ -672,12 +672,7 @@ class EpdeSearch(object):
         print('The optimization has been conducted.')
         self.search_conducted = True
         
-    def fit_singleobjective(self, data : Union[np.ndarray, list, tuple], equation_terms_max_number = 6,
-                            equation_factors_max_number = 1, variable_names = ['u',], eq_sparsity_interval = (1e-4, 2.5), 
-                            derivs = None, max_deriv_order = 1, additional_tokens = [], memory_for_cache = 5,
-                            prune_domain : bool = False, pivotal_tensor_label = None, pruner = None, 
-                            threshold : float = 1e-2, division_fractions = 3, rectangular : bool = True, 
-                            data_fun_pow : int = 1):
+    def fit_singleobjective(self, equation_terms_max_number=6, equation_factors_max_number=1, eq_sparsity_interval=(1e-4, 2.5)):
         """
         Fitting functional for singleobjective optimization 
 

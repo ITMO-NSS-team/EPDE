@@ -103,12 +103,16 @@ class GaussianSmoother(AbstractSmoother):
         # print('kwargs', kwargs)
         smoothed_data = np.empty_like(data)
         if kernel_fun == 'gaussian':
-            if np.ndim(data) > 1:
+            if kwargs['include_time']:
+                print('full smoothing')
+                smoothed_data = gaussian_filter(data, sigma=kwargs['sigma'])
+            elif np.ndim(data) > 1:
                 for time_idx in np.arange(data.shape[0]):
                     smoothed_data[time_idx, ...] = gaussian_filter(data[time_idx, ...],
                                                                    sigma=kwargs['sigma'])
             else:
                 smoothed_data = gaussian_filter(data, sigma=kwargs['sigma'])
+
         else:
             raise NotImplementedError(
                 'Wrong kernel passed into function. Current version supports only Gaussian smoothing.')

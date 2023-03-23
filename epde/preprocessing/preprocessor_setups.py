@@ -49,9 +49,9 @@ class PreprocessorSetup:
                                           **deriv_calculator_kwargs)
 
     def build_poly_diff_preprocessing(self, use_smoothing=False, sigma=1, mp_poolsize=4,
-                                      polynomial_window=9, poly_order=None):
+                                      polynomial_window=9, poly_order=None, include_time=False):
         smoother_args = ()
-        smoother_kwargs = {'sigma': sigma}
+        smoother_kwargs = {'sigma': sigma, 'include_time' : include_time}
 
         deriv_calculator_args = ()
         deriv_calculator_kwargs = {'grid': None, 'mp_poolsize': mp_poolsize, 'polynomial_window': polynomial_window,
