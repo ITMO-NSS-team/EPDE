@@ -135,7 +135,7 @@ class EpdeSearch(object):
         search_conducted (`bool`): flag that the equation was searched 
         optimizer_init_params (`dict`): parameters for optimization algorithm initialization
         optimizer_exec_params (`dict`): parameters for execution algorithm of optimization
-        optimizer ()
+        optimizer (`OptimizationPatternDirector`): the strategy of the evolutionary algorithm
     """
     def __init__(self, multiobjective_mode: bool = True, use_default_strategy: bool = True, director=None, 
                  director_params: dict = {'variation_params': {}, 'mutation_params': {},

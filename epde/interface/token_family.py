@@ -63,7 +63,7 @@ class TokenFamily(object):
     Class for the type (family) of tokens, from which the tokens are taken as factors in the terms of the equation
 
     Attributes:
-        _deriv_evaluators (`dict`): 
+        _deriv_evaluators (`dict`): dict containing the derivatives by each of the token parameter, where elements are the functions, used in the evaluator, or the evaluators.
         ftype (`string`): the symbolic name of the token family (e.g. 'logarithmic', 'trigonometric', etc.)
         status (`dict`): dictionary, containing markers, describing the token properties. Key - property, value - bool variable:
             'mandatory' - if True, a token from the family must be present in every term;
@@ -81,7 +81,7 @@ class TokenFamily(object):
             if int - the parameters will be integer, if float - float.
         equality_ranges (`dict`): error for equality of token parameters, key is name of parameter
         derivs_ords (`dict`):  keys for derivatides for `solver` for each token in family
-        opt_param_labels (`list`): 
+        opt_param_labels (`list`): name of parameters of tokens, that used in elements functions 
         test_token ():
         test_evaluation ():
 
