@@ -112,7 +112,9 @@ def init_ann(dim):
         torch.nn.Tanh(),
         torch.nn.Linear(64, 1024),
         torch.nn.Tanh(),
-        torch.nn.Linear(1024, 1)
+        torch.nn.Linear(1024, 512),
+        torch.nn.Tanh(),        
+        torch.nn.Linear(512, 1)
     )
     return model
 

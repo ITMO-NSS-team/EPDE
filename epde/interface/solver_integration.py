@@ -516,7 +516,8 @@ class SolverAdapter(object):
     def solve(self, system_form=None, grid=None, boundary_conditions=None):
         if isinstance(grid, (list, tuple)):
             grid = self.convert_grid(grid)
+        print('Grid is ', type(grid), grid.shape)            
         self.equation = SolverEquation(grid, system_form, boundary_conditions).set_strategy('NN')
 
-        self.prev_solution = solver.Solver(grid, self.equation, self.model, 'autograd').solve(**self._solver_params)
+        self.prev_solution = solver.Solver(grid, self.equation, self.model, 'NN').solve(**self._solver_params)
         return self.prev_solution

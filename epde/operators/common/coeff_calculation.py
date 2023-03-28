@@ -17,34 +17,32 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
     '''
     
     The operatror, dedicated to the calculation of the weights of the equation (for the free coefficient and 
-    each of its terms except the target one). 
+    each of its terms except the target one).
+
+    Attributes:
+        _tags (`set`): 
+        g_fun_vals (`numpy.ndarray`): 
     
     Methods:
-    -----------
-    apply(equation)
-        Calculate the coefficients of the equation, using the linear regression. The result is stored in the 
-        equation.weights_final attribute
-            
-    
+        apply(equation)
+            Calculate the coefficients of the equation, using the linear regression. The result is stored in the 
+            equation.weights_final attribute
     '''
     key = 'LinRegCoeffCalc'
     
-    def apply(self, objective : Equation, arguments : dict):
+    def apply(self, objective : Equation, arguments : dict = None):
         """
         Calculate the coefficients of the equation, using the linear regression.The result is stored in the 
         objective.weights_final attribute
 
-        Parameters:
-        ------------
-        objective : Equation object
-            the equation object, to that the fitness function is obtained.
+        Args:
+            objective (`Equation`): the equation object, to that the fitness function is obtained.
+            arguments (`dict`): 
             
         Returns:
-        ------------
-        
-        None
+            None
         """        
-        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
+        # self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
         assert objective.weights_internal_evald, 'Trying to calculate final weights before evaluating intermeidate ones (no sparsity).'
         target = objective.structure[objective.target_idx]

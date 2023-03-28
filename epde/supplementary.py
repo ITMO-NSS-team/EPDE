@@ -11,6 +11,7 @@ import copy
 import torch
 device = torch.device('cpu')
 
+import matplotlib.pyplot as plt
 from functools import reduce
 
 def train_ann(grids: list, data: np.ndarray, epochs_max: int = 10000):
@@ -47,7 +48,8 @@ def train_ann(grids: list, data: np.ndarray, epochs_max: int = 10000):
 
     loss_mean = 1000
     min_loss = np.inf
-    while loss_mean > 1e-2:  # and t<epochs_max:
+    losses = []
+    while loss_mean > 2e-3 and t < epochs_max:  # and t<epochs_max:
 
         permutation = torch.randperm(grid_tensor.size()[0])
 
@@ -67,8 +69,14 @@ def train_ann(grids: list, data: np.ndarray, epochs_max: int = 10000):
         if loss_mean < min_loss:
             best_model = model
             min_loss = loss_mean
+        losses.append(loss_mean)
         print('Surface training t={}, loss={}'.format(t, loss_mean))
         t += 1
+    print_loss = True
+    if print_loss:
+        plt.plot(losses)
+        plt.grid()
+        plt.show()
     return best_model
 
 

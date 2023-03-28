@@ -650,7 +650,7 @@ class EpdeSearch(object):
 
         Returns:
             None
-        """
+        """    
         pop_constructor = MOEADDSystemPopConstr(pool = self.pool, terms_number = equation_terms_max_number, 
                                                 max_factors_in_term = equation_factors_max_number,
                                                 sparsity_interval = eq_sparsity_interval)
@@ -746,7 +746,7 @@ class EpdeSearch(object):
         Method returns solver forms of the equations on 1-st non-dominated levels in a form of Python list.
 
         Returns:
-            form system for solver
+            system form, suitable for solver
         '''
         sf = []
         for system in self.resulting_population[0]:
@@ -784,6 +784,7 @@ class EpdeSearch(object):
             grid = global_var.grid_cache.get_all()[1]
         
         adapter = SolverAdapter(var_number = len(system.vars_to_describe))
+        print(f'Shape of the grid for solver {adapter.convert_grid(grid).shape}')        
         solution_model = adapter.solve_epde_system(system = system, grids = grid, 
                                                    boundary_conditions = boundary_conditions)
         return solution_model(adapter.convert_grid(grid)).detach().numpy()

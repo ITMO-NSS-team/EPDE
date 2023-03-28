@@ -29,6 +29,20 @@ from epde.structure.structure_template import ComplexStructure, check_uniqueness
 
 
 class Term(ComplexStructure):
+    """
+    Class for describing the term of differential equation
+
+    Attributes:
+        _descr_variable_marker
+
+        pool
+        max_factors_in_term:
+        cache_linked:
+        structure:
+        occupied_tokens_labels:
+        descr_variable_marker:
+        prev_normalized
+    """
     __slots__ = ['_history', 'structure', 'interelement_operator', 'saved', 'saved_as',
                  'pool', 'max_factors_in_term', 'cache_linked', 'occupied_tokens_labels',
                  '_descr_variable_marker']
@@ -82,8 +96,7 @@ class Term(ComplexStructure):
             elif isinstance(factor, Factor):
                 self.structure.append(factor)
             else:
-                raise ValueError(
-                    'The structure of a term should be declared with str or factor.Factor obj, instead got', type(factor))
+                raise ValueError('The structure of a term should be declared with str or factor.Factor obj, instead got', type(factor))
         self.structure = filter_powers(self.structure)
 
     @defined.register
@@ -95,14 +108,12 @@ class Term(ComplexStructure):
         elif isinstance(passed_term, Factor):
             self.structure.append(passed_term)
         else:
-            raise ValueError(
-                'The structure of a term should be declared with str or factor.Factor obj, instead got', type(passed_term))
+            raise ValueError('The structure of a term should be declared with str or factor.Factor obj, instead got', type(passed_term))
 
     def randomize(self, mandatory_family=None, forbidden_factors=None,
                   create_derivs=False, **kwargs):
         if np.sum(self.pool.families_cardinality(meaningful_only=True)) == 0:
-            raise ValueError(
-                'No token families are declared as meaningful for the process of the system search')
+            raise ValueError('No token families are declared as meaningful for the process of the system search')
 
         def update_token_status(token_status, changes):
             for key, value in changes.items():
