@@ -89,16 +89,22 @@ if __name__ == '__main__':
     def get_ode_bop(key, var, grid_loc, value):
         bop = BOPElement(axis = 0, key = key, term = [None], power = 1, var = var)
         bop_grd_np = np.array([[grid_loc,]])
+        bop.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor))
+        bop.values = torch.from_numpy(np.array([[value,]])).float()
         
-    bop_x = BOPElement(axis = 0, key = 'u', term = [None], power = 1, var = 0)
-    bop_y = BOPElement(axis = 0, key = 'v', term = [None], power = 1, var = 1)
+    # bop_x = BOPElement(axis = 0, key = 'u', term = [None], power = 1, var = 0)
+    # bop_y = BOPElement(axis = 0, key = 'v', term = [None], power = 1, var = 1)
     
-    bop_grd_np = np.array([[t_test[0],]])
-    bop_x.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor))    
-    bop_y.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor))
+    # bop_grd_np = np.array([[t_test[0],]])
+    # bop_x.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor))    
+    # bop_y.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor))
     
-    bop_x.values = torch.from_numpy(np.array([[x_test[0],]])).float()
-    bop_y.values = torch.from_numpy(np.array([[y_test[0],]])).float()
+    # bop_x.values = torch.from_numpy(np.array([[x_test[0],]])).float()
+    # bop_y.values = torch.from_numpy(np.array([[y_test[0],]])).float()
+    
+    bop_x = get_ode_bop('u', 0, t_test[0], x_test[0])
+    bop_y = get_ode_bop('v', 1, t_test[0], y_test[0])
+    
     
     pred_u_v = epde_search_obj.predict(system=sys[0], boundary_conditions=[bop_x(), bop_y()], 
                                         grid = [t_test,])
