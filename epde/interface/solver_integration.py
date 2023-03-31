@@ -12,11 +12,11 @@ from typing import Callable, Union
 from types import FunctionType
 
 VAL_TYPES = Union[FunctionType, int, float, torch.Tensor, np.ndarray]
-BASE_SOLVER_PARAMS = {'lambda_bound' : 10, 'verbose' : False,
-                      'learning_rate' : 1e-3, 'eps' : 1e-5, 'tmin' : 1000,
-                      'tmax' : 1e5, 'use_cache' : True, 'cache_verbose' : True, 
-                      'save_always' : False, 'print_every' : None, 
-                      'model_randomize_parameter' : 1e-6, 'step_plot_print' : False, 
+BASE_SOLVER_PARAMS = {'lambda_bound' : 100, 'verbose' : False,
+                      'learning_rate' : 1e-4, 'eps' : 1e-6, 'tmin' : 1000,
+                      'tmax' : 5e6, 'use_cache' : True, 'cache_verbose' : True, 
+                      'save_always' : False, 'print_every' : None, 'optimizer_mode' : 'Adam', 
+                      'model_randomize_parameter' : 1e-5, 'step_plot_print' : False, 
                       'step_plot_save' : False, 'image_save_dir' : None}
 
 from functools import singledispatchmethod, singledispatch
@@ -88,7 +88,7 @@ class PregenBOperator(object):
                 print('processing a single variable')
                 var_max_orders = np.zeros(dim)
                 for term in equation_sf.values():
-                    if isinstance(term['power'], list):
+                    if isinstance(term['pow'], list):
                         for deriv_factor in term['term']:
                             orders = np.array([count_factor_order(deriv_factor, ax) for ax
                                                in np.arange(dim)])
@@ -173,9 +173,9 @@ class PregenBOperator(object):
                         bc_values = vals[indexes]
 
                     bc_values = np.expand_dims(bc_values, axis=0).T
-                    coords = torch.from_numpy(coords).type(torch.FloatTensor)
+                    coords = torch.from_numpy(coords).float() # torch.FloatTensor
 
-                    bc_values = torch.from_numpy(bc_values).type(torch.FloatTensor)
+                    bc_values = torch.from_numpy(bc_values).float() # torch.FloatTensor
                     operator = BOPElement(axis=ax_idx, key=variable, coeff=1, term=[None],
                                           power=1, var=var_idx, rel_location=loc)
                     operator.set_grid(grid=coords)
@@ -194,7 +194,8 @@ class BOPElement(object):
         self.power = power
         self.variables = var
         self.location = rel_location
-
+        self.grid = None
+        
         self.status = {'boundary_location_set': False,
                        'boundary_values_set': False}
 
@@ -205,7 +206,7 @@ class BOPElement(object):
     @property
     def operator_form(self):
         form = {
-            'coeffs': self.coefficient,
+            'coeff': self.coefficient,
             self.key: self.term,
             'pow': self.power,
             'var': self.variables
@@ -234,13 +235,15 @@ class BOPElement(object):
             raise TypeError(
                 f'Incorrect type of coefficients. Must be a type from list {VAL_TYPES}.')
 
-    def __call__(self, values: VAL_TYPES = None, boundary: list = None):
+    def __call__(self, values: VAL_TYPES = None): # , boundary: list = None , self.grid
         if not self.vals_set and values is not None:
             self.values = values
             self.status['boundary_values_set'] = True
         elif not self.vals_set and values is None:
             raise ValueError('No location passed into the BOP.')
-        if boundary is None and self.location is not None:
+        if self.grid is not None:
+            boundary = self.grid
+        elif self.grid is None and self.location is not None:
             _, all_grids = global_var.grid_cache.get_all()  # str(self.axis)
 
             abs_loc = self.location * all_grids[0].shape[self.axis]
@@ -254,7 +257,7 @@ class BOPElement(object):
                                                 torch.from_numpy(np.array([abs_loc,], dtype=np.float64))).float()
                 boundary = torch.moveaxis(boundary, source=0, destination=self.axis).resize()
             else:
-                boundary = torch.from_numpy(np.array([[abs_loc,],]))  # TODO: work from here
+                boundary = torch.from_numpy(np.array([[abs_loc,],])).float()  # TODO: work from here
                 # boundary = torch.expand_dims(boundary, axis=0)
             print('boundary.shape', boundary.shape, boundary.ndim)
 
@@ -270,8 +273,8 @@ class BOPElement(object):
         boundary_value = self.values
 
         print('Output of bc:')
-        print(boundary, boundary_value)
-        return boundary, boundary_operator, boundary_value
+        print(boundary, boundary_operator, boundary_value, self.variables, 'operator')
+        return [boundary, boundary_operator, boundary_value, self.variables, 'operator']
 
 
 class BoundaryConditions(object):
@@ -300,6 +303,7 @@ def solver_formed_grid(training_grid=None):
 class SystemSolverInterface(object):
     def __init__(self, system_to_adapt: SoEq):
         self.variables = list(system_to_adapt.vars_to_describe)
+        # print(f'self.variables in SystemSolverInterface: {self.variables}')
         self.adaptee = system_to_adapt
         # assert self.adaptee.weights_final_evald
 
@@ -370,9 +374,9 @@ class SystemSolverInterface(object):
 
         coeff_tensor = torch.from_numpy(coeff_tensor)
 
-        res = {'const': coeff_tensor,
+        res = {'coeff': coeff_tensor,
                'term': deriv_orders,
-               'power': deriv_powers,
+               'pow': deriv_powers,
                'var': deriv_vars}
 
         return res
@@ -393,25 +397,26 @@ class SystemSolverInterface(object):
                     weight = equation.weights_final[term_idx]
                 else:
                     weight = equation.weights_final[term_idx-1]
-                _solver_form[term.name]['const'] = _solver_form[term.name]['const'] * weight
-                _solver_form[term.name]['const'] = torch.flatten(_solver_form[term.name]['const']).unsqueeze(1).type(torch.FloatTensor)
+                _solver_form[term.name]['coeff'] = _solver_form[term.name]['coeff'] * weight
+                _solver_form[term.name]['coeff'] = torch.flatten(_solver_form[term.name]['coeff']).unsqueeze(1).type(torch.FloatTensor)
 
         free_coeff_weight = torch.from_numpy(np.full_like(a=grids[0],  # global_var.grid_cache.get('0'),
                                                           fill_value=equation.weights_final[-1]))
         free_coeff_weight = torch.flatten(free_coeff_weight).unsqueeze(1).type(torch.FloatTensor)
-        free_coeff_term = {'const': free_coeff_weight,
+        free_coeff_term = {'coeff': free_coeff_weight,
                            'term': [None],
-                           'power': 0,
+                           'pow': 0,
                            'var': [0,]}
         _solver_form['C'] = free_coeff_term
 
         target_weight = torch.from_numpy(np.full_like(a=grids[0],  # global_var.grid_cache.get('0'),
                                                       fill_value=-1.))
         target_form = self._term_solver_form(equation.structure[equation.target_idx], grids, variables)
-        target_form['const'] = target_form['const'] * target_weight
-        target_form['const'] = torch.flatten(target_form['const']).unsqueeze(1).type(torch.FloatTensor)
+        target_form['coeff'] = target_form['coeff'] * target_weight
+        target_form['coeff'] = torch.flatten(target_form['coeff']).unsqueeze(1).type(torch.FloatTensor)
 
         _solver_form[equation.structure[equation.target_idx].name] = target_form
+
         return _solver_form
 
     def use_grids(self, grids=None):
@@ -461,18 +466,18 @@ class SolverAdapter(object):
     def set_solver_params(self, lambda_bound=None, verbose: bool = None, learning_rate: float = None,
                           eps: float = None, tmin: int = None, tmax: int = None,
                           use_cache: bool = None, cache_verbose: bool = None,
-                          save_always: bool = None, print_every: bool = None,
+                          save_always: bool = None, print_every: bool = None, optimizer_mode = None, 
                           model_randomize_parameter: bool = None, step_plot_print: bool = None,
                           step_plot_save: bool = None, image_save_dir: str = None):
         # TODO: refactor
         params = {'lambda_bound': lambda_bound, 'verbose': verbose,
                   'learning_rate': learning_rate, 'eps': eps, 'tmin': tmin,
                   'tmax': tmax, 'use_cache': use_cache, 'cache_verbose': cache_verbose,
-                  'save_always': save_always, 'print_every': print_every,
+                  'save_always': save_always, 'print_every': print_every, 'optimizer_mode': optimizer_mode,
                   'model_randomize_parameter': model_randomize_parameter, 'step_plot_print': step_plot_print,
                   'step_plot_save': step_plot_save, 'image_save_dir': image_save_dir}
 
-        print('params: ', params)
+        # print('params: ', params)
         for param_key, param_vals in params.items():
             if params is not None:
                 try:
@@ -483,7 +488,7 @@ class SolverAdapter(object):
     def set_param(self, param_key: str, value):
         self._solver_params[param_key] = value
 
-    def solve_epde_system(self, system: SoEq, grids: list = None, boundary_conditions=None):
+    def solve_epde_system(self, system: SoEq, grids: list = None, boundary_conditions=None, strategy = 'NN'):
         system_interface = SystemSolverInterface(system_to_adapt=system)
 
         system_solver_forms = system_interface.form(grids)
@@ -498,7 +503,7 @@ class SolverAdapter(object):
             _, grids = global_var.grid_cache.get_all()
 
         return self.solve(system_form=[form[1] for form in system_solver_forms], grid=grids,
-                          boundary_conditions=boundary_conditions)
+                          boundary_conditions=boundary_conditions, strategy = strategy)
 
     @staticmethod
     def convert_grid(grid):
@@ -513,11 +518,11 @@ class SolverAdapter(object):
             conv_grid = torch.cartesian_prod(*conv_grid).float()
         return conv_grid
 
-    def solve(self, system_form=None, grid=None, boundary_conditions=None):
+    def solve(self, system_form=None, grid=None, boundary_conditions=None, strategy = 'NN'):
         if isinstance(grid, (list, tuple)):
             grid = self.convert_grid(grid)
         print('Grid is ', type(grid), grid.shape)            
-        self.equation = SolverEquation(grid, system_form, boundary_conditions).set_strategy('NN')
+        self.equation = SolverEquation(grid, system_form, boundary_conditions).set_strategy(strategy)
 
-        self.prev_solution = solver.Solver(grid, self.equation, self.model, 'NN').solve(**self._solver_params)
+        self.prev_solution = solver.Solver(grid, self.equation, self.model, strategy).solve(**self._solver_params)
         return self.prev_solution

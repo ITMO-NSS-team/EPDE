@@ -766,7 +766,7 @@ class EpdeSearch(object):
         return self.optimizer.pareto_levels.get_by_complexity(complexity)
 
     def predict(self, system : SoEq, boundary_conditions : BoundaryConditions, grid : list = None, 
-                system_file : str = None, solver_kwargs : dict = {'model' : None, 'use_cache' : True}):
+                system_file : str = None, solver_kwargs : dict = {'model' : None, 'use_cache' : True}, strategy = 'NN'):
         solver_kwargs['dim'] = len(global_var.grid_cache.get_all()[1])
         # solver_kwargs['dim']
         
@@ -786,5 +786,5 @@ class EpdeSearch(object):
         adapter = SolverAdapter(var_number = len(system.vars_to_describe))
         print(f'Shape of the grid for solver {adapter.convert_grid(grid).shape}')        
         solution_model = adapter.solve_epde_system(system = system, grids = grid, 
-                                                   boundary_conditions = boundary_conditions)
+                                                   boundary_conditions = boundary_conditions, strategy = strategy)
         return solution_model(adapter.convert_grid(grid)).detach().numpy()

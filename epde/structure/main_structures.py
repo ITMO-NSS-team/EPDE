@@ -788,7 +788,7 @@ class SoEq(moeadd.MOEADDSolution):
         self.tokens_supp = TFPool(pool.families_equationless)
         self.moeadd_set = False
 
-        self.vars_to_describe = {token_family.ftype for token_family in self.tokens_for_eq.families}
+        self.vars_to_describe = [token_family.ftype for token_family in self.tokens_for_eq.families] # Made list from set
 
     def use_default_multiobjective_function(self):
         from epde.eq_mo_objectives import generate_partial, equation_fitness, equation_complexity_by_factors

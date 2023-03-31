@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Jun 15 15:47:47 2022
+Created on Fri Mar 31 12:53:27 2023
 
 @author: maslyaev
 """
@@ -12,6 +12,7 @@ import epde.interface.interface as epde_alg
 from epde.interface.prepared_tokens import TrigonometricTokens
 from epde.interface.solver_integration import BoundaryConditions, BOPElement
 
+import torch
 import os
 import sys
 
@@ -84,15 +85,20 @@ if __name__ == '__main__':
     # res = epde_search_obj.equation_search_results(only_print = False, num = 1)
     
     sys = epde_search_obj.get_equations_by_complexity([4, 4])
-    # bop_x = BOPElement(axis = 0, key = 'u', term = [None],
-    #                    power = 1, var = 1, rel_location = 1.)
     
-    # pred_u_v = epde_search_obj.predict(system=sys[0], boundary_conditions=None)
-
-    # sys = res[0][1]
-    # sys.text_form
-    # pareto_frontiers[(err_factor, sigma)].append(res)
-'''
-Решаем уравнение (систему уравнений) при помощи метода .predict(...)
-'''
-# predictions = epde_search_obj.predict(system = sys, boundary_conditions=None)
+    def get_ode_bop(key, var, grid_loc, value):
+        bop = BOPElement(axis = 0, key = key, term = [None], power = 1, var = var)
+        bop_grd_np = np.array([[grid_loc,]])
+        
+    bop_x = BOPElement(axis = 0, key = 'u', term = [None], power = 1, var = 0)
+    bop_y = BOPElement(axis = 0, key = 'v', term = [None], power = 1, var = 1)
+    
+    bop_grd_np = np.array([[t_test[0],]])
+    bop_x.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor))    
+    bop_y.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor))
+    
+    bop_x.values = torch.from_numpy(np.array([[x_test[0],]])).float()
+    bop_y.values = torch.from_numpy(np.array([[y_test[0],]])).float()
+    
+    pred_u_v = epde_search_obj.predict(system=sys[0], boundary_conditions=[bop_x(), bop_y()], 
+                                        grid = [t_test,])

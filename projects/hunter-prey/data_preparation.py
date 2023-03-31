@@ -33,10 +33,17 @@ def Lotka_Volterra_by_RK(initial : tuple, timestep : float, steps : int, alpha :
     return res
         
 if __name__ == '__main__':
-    step = 0.1; steps_num = 1000
-    t = np.arange(start = 0, stop = step * steps_num, step = step)
-    solution = Lotka_Volterra_by_RK(initial=(1, 1), timestep=step, steps=steps_num, 
-                                    alpha=2/5., beta=4./3., delta=1., gamma=1.)
+    default_exp = True
+    if default_exp:
+        step = 0.1; steps_num = 1000
+        t = np.arange(start = 0, stop = step * steps_num, step = step)
+        solution = Lotka_Volterra_by_RK(initial=(1, 1), timestep=step, steps=steps_num, 
+                                        alpha=2/5., beta=4./3., delta=1., gamma=1.)
+    else:
+        steps_num = 301; step = 1./steps_num
+        t = np.arange(start = 0, stop = step * steps_num, step = step)
+        solution = Lotka_Volterra_by_RK(initial=(4., 2.), timestep=step, steps=steps_num, 
+                                        alpha=20., beta=20., delta=20., gamma=20.)        
     # plt.plot(solution[:, 0], solution[:, 1])
     
     fig, ax = plt.subplots()    

@@ -7,6 +7,7 @@ Created on Thu Feb 13 19:16:50 2020
 """
 
 import numpy as np
+from warnings import warn
 from epde.preprocessing.fin_der import FDderivatives
 
 
@@ -15,6 +16,11 @@ def get_cheb_for_point(matrix, axis, idx, grid, max_der_order=3, points=9, poly_
         max_power = max_der_order + 1
     else:
         max_power = poly_order
+        
+    if points == max_power:
+        warn('Overfitting of the Chebyshev polynomial, that tries to represent the data, reducing order by one.')
+        max_power -= 1
+        
     I = np.array([np.int(-(points-1)/2 + i)
                  for i in np.arange(points)]) + idx[axis]
     F = matrix.take(I, axis=axis)

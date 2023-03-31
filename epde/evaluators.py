@@ -55,9 +55,13 @@ class CustomEvaluator(EvaluatorTemplate):
         grid_function = np.vectorize(lambda args: evaluation_function(*args, **eval_fun_kwargs))
 
         if grids is None:
+            new_grid = False
             grids = factor.grids
-
+        else:
+            new_grid = True
         try:
+            if new_grid:
+                raise AttributeError
             self.indexes_vect
         except AttributeError:
             self.indexes_vect = np.empty_like(grids[0], dtype=object)
