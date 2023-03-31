@@ -142,7 +142,8 @@ class InputBlock(Block):
     Blocks with fucntionality running before each evolutionary step
     """
     def __init__(self, to_pass):
-        self.set_output(to_pass); self.applied = True
+        self.set_output(to_pass)
+        self.applied = True
         super().__init__(initial = True)
 
     def add_incoming(self, incoming):
@@ -165,7 +166,7 @@ class LinkedBlocks(object):
         blocks_labeled (`dict`): dictionary with names and arguments of operators 
         supress_structure_check (`boolean`): checking of structure
         initial (`list`): keeping initialized evolution operators
-        output (): 
+        output (`ndarray`): result from applying operator with evoluyion algorithm's arguments
     """
     def __init__(self, blocks_labeled : dict, suppress_structure_check : bool = False):
         self.blocks_labeled = blocks_labeled
@@ -184,13 +185,14 @@ class LinkedBlocks(object):
         Sequential execution of the evolutionary algorithm's blocks.
 
         Args:
-            input_obj ():
-            EA_kwargs (`dict`): 
+            input_obj (`ndarray`): source data
+            EA_kwargs (`dict`): dictionary with names and values for parameters in the evolution algorithm
         '''
         self.reset_traversal_cond()
         
         self.initial[0][1].set_output(input_obj)
-        delayed = []; processed = [self.initial[0][1],]
+        delayed = []
+        processed = [self.initial[0][1],]
         self.terminated = False
         while not self.terminated:
             processed_new = []
