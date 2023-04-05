@@ -20,12 +20,21 @@ from epde.operators.multiobjective.moeadd_specific import get_pareto_levels_upda
 from epde.operators.multiobjective.sparsity import LASSOSparsity
 from epde.operators.multiobjective.coeff_calculation import LinRegBasedCoeffsEquation
 
-from epde.optimizers.builder import add_sequential_operators, OptimizationPatternDirector
-
+from epde.optimizers.builder import add_sequential_operators, OptimizationPatternDirector, StrategyBuilder
+from epde.optimizers.moeadd.strategy_elems import MOEADDSectorProcesser
 
 class MOEADDDirector(OptimizationPatternDirector):
-    def use_baseline(self, variation_params : dict = {}, mutation_params : dict = {}, sorter_params : dict = {},
-                    pareto_combiner_params : dict = {}, pareto_updater_params : dict = {}, **kwargs):
+    def __init__(self) -> None:
+        super().__init__()
+        self.builder = StrategyBuilder(MOEADDSectorProcesser)
+
+    def use_baseline(self, params: dict, **kwargs):
+        variation_params = params.get('variation_params', {})
+        mutation_params = params.get('mutation_params', {})
+        sorter_params = params.get("sorter_params", {})
+        pareto_combiner_params = params.get("pareto_combiner_params", {})
+        pareto_updater_params = params.get("pareto_updater_params", {})
+
         add_kwarg_to_operator = partial(add_param_to_operator, target_dict = kwargs)
 
         neighborhood_selector = SimpleNeighborSelector(['number_of_neighbors'])

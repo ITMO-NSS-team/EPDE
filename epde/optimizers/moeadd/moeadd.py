@@ -13,6 +13,7 @@ from copy import deepcopy
 from functools import reduce
 
 import epde.globals as global_var
+from epde.optimizers.moeadd.population_constr import SystemsPopulationConstructor
 
 from epde.optimizers.moeadd.strategy_elems import MOEADDSectorProcesser
 from epde.optimizers.moeadd.supplementary import fast_non_dominated_sorting, ndl_update, Equality, Inequality
@@ -49,7 +50,7 @@ class ParetoLevels(object):
                  update_method = ndl_update, initial_sort : bool = False):
         """
         Args:
-            population (`list`):List with the elements - canidate solutions of the case-specific subclass of 
+            population (`list`): List with the elements - canidate solutions of the case-specific subclass of 
                 ``src.moeadd.moeadd_solution_template.MOEADDSolution``.
             sorting_method (`callable`): optional, default - ``src.moeadd.moeadd_supplementary.fast_non_dominated_sorting``
                 The method of population separation into non-dominated levels
@@ -200,55 +201,7 @@ class MOEADDOptimizer(object):
     Solving multiobjective optimization problem (minimizing set of functions) with an 
     evolutionary approach. In this class, the unconstrained variation of the problem is 
     considered.
-    
-    Initialization of the evolutionary optimizer is done with the introduction of 
-    initial population of candidate solutions, divided into Pareto non-dominated 
-    levels (sets of solutions, such, as none of the solution of a level dominates 
-    another on the same level), and creation of set of weights with a proximity list 
-    defined for each of them.
-    
-    
-    Parameters:
-    
-    pop_constructor : obj of moeadd_stc.moe_population_constructor class
-        The problem-specific population constructor object with the ``create`` method, 
-        that returns a new (often randomly) generated solution. The template for the 
-        class is presented in the moeadd_stc.moe_population_constructor abstract class.
-        
-    weights_num : int
-        Number of the weight vectors, dividing the objective function values space. Often, shall
-        be same, as the population size.
-        
-    pop_size : int
-        The size of the candidate solution population.
-        
-    solution_params : dict or None
-        The dicitionary with the solution parameters, passed into each new created solution during the 
-        initialization. 
-        
-    delta : float
-        parameter of uniform spacing between the weight vectors; *H = 1 / delta*        
-        should be integer - a number of divisions along an objective coordinate axis.
-        
-    neighbors_number : int, *> 0*
-        number of neighboring weight vectors to be considered during the operation 
-        of evolutionary operators as the "neighbors" of the processed sectors.
-        
-    nds_method : function, optional, default ``moeadd.moeadd_supplementary.fast_non_dominated_sorting``
-        Method of non-dominated sorting of the candidate solutions. The default method is implemented according to the article 
-        *K. Deb, A. Pratap, S. Agarwal, and T. Meyarivan, “A fast and elitist
-        multiobjective genetic algorithm: NSGA-II,” IEEE Trans. Evol. Comput.,
-        vol. 6, no. 2, pp. 182–197, Apr. 2002.*
-        
-    ndl_update : function, optional, defalut ``moeadd.moeadd_supplementary.ndl_update``
-        Method of adding a new solution point into the objective functions space, introduced 
-        to minimize the recalculation of the non-dominated levels for the entire population. 
-        The default method was taken from the *K. Li, K. Deb, Q. Zhang, and S. Kwong, “Efficient non-domination level
-        update approach for steady-state evolutionary multiobjective optimization,” 
-        Dept. Electr. Comput. Eng., Michigan State Univ., East Lansing,
-        MI, USA, Tech. Rep. COIN No. 2014014, 2014.*
-    
-    
+
     Attributes:
         abbreviated_search_executed (`boolean`): flag about executing abbreviated search
         weights (`np.ndarray`): Weight vectors, introduced to decompose the optimization problem into 
@@ -258,6 +211,7 @@ class MOEADDOptimizer(object):
         neighborhood_lists (`list`): keeping neighbours for each solution. stored as lists with all solutions, which are sorted by the owner of the `list` (first element) 
         best_obj (`np.array`): The best achievable values of objective functions. Should be introduced with 
             ``self.pass_best_objectives`` method.
+        sector_processer (`MOEADDSectorProcesser`): keeping evolutionary process
     
     Example:
     --------
@@ -277,13 +231,40 @@ class MOEADDOptimizer(object):
     and evolutionary operator contains mutation and crossover suboperators.
     
     """
-    def __init__(self, pop_constructor, weights_num, pop_size, solution_params, delta, neighbors_number, 
+    def __init__(self, population_instruct, weights_num, pop_size, solution_params, delta, neighbors_number, 
                  nds_method = fast_non_dominated_sorting, ndl_update = ndl_update):
-
+        """
+        Initialization of the evolutionary optimizer is done with the introduction of 
+        initial population of candidate solutions, divided into Pareto non-dominated 
+        levels (sets of solutions, such, as none of the solution of a level dominates 
+        another on the same level), and creation of set of weights with a proximity list 
+        defined for each of them.
+        
+        Args:
+            pop_constructor (``):
+            weights_num (`int`): Number of the weight vectors, dividing the objective function values space. Often, shall be same, as the population size.
+            pop_size (`int`): The size of the candidate solution population.
+            solution_params (`dict`): The dicitionary with the solution parameters, passed into each new created solution during the initialization.
+            delta (`float`): parameter of uniform spacing between the weight vectors; *H = 1 / delta* should be integer - a number of divisions along an objective coordinate axis.
+            neighbors_number (`int`): number of neighboring weight vectors to be considered during the operation of evolutionary operators as the "neighbors" of the processed sectors.
+            nds_method (`callable`): default - ``moeadd.moeadd_supplementary.fast_non_dominated_sorting``
+                Method of non-dominated sorting of the candidate solutions. The default method is implemented according to the article 
+                *K. Deb, A. Pratap, S. Agarwal, and T. Meyarivan, “A fast and elitist multiobjective genetic algorithm: NSGA-II,” IEEE Trans. Evol. Comput.,
+                vol. 6, no. 2, pp. 182–197, Apr. 2002.*
+            ndl_update (`callable`): default - ``moeadd.moeadd_supplementary.ndl_update``
+                Method of adding a new solution point into the objective functions space, introduced 
+                to minimize the recalculation of the non-dominated levels for the entire population. 
+                The default method was taken from the *K. Li, K. Deb, Q. Zhang, and S. Kwong, “Efficient non-domination level
+                update approach for steady-state evolutionary multiobjective optimization,” 
+                Dept. Electr. Comput. Eng., Michigan State Univ., East Lansing,
+                MI, USA, Tech. Rep. COIN No. 2014014, 2014.*
+        """
         assert weights_num == pop_size, 'Each individual in population has to correspond to a sector'
         self.abbreviated_search_executed = False
         soluton_creation_attempts_softmax = 10
         soluton_creation_attempts_hardmax = 100
+
+        pop_constructor = SystemsPopulationConstructor(**population_instruct)
         
         assert type(solution_params) == type(None) or type(solution_params) == dict, 'The solution parameters, passed into population constructor must be in dictionary'
         population = []
@@ -328,6 +309,18 @@ class MOEADDOptimizer(object):
         self.best_obj = None
 
     def abbreviated_search(self, population, sorting_method, update_method):
+        """
+        Searching data by pareto levels with enterned sorting and updating methods.
+
+        Args:
+            population (`list`): List with the elements - canidate solutions of the case-specific subclass of 
+                ``src.moeadd.moeadd_solution_template.MOEADDSolution``.
+            sorting_method (`callable`): The method of population separation into non-dominated levels
+            update_method (`callable`): The method of point addition into the population and onto the non-dominated levels.
+
+        Returns:
+            None
+        """
         self.pareto_levels = ParetoLevels(population, sorting_method=sorting_method, update_method=update_method)
         if global_var.verbose.show_warnings:
             if len(population) == 1:
@@ -338,30 +331,20 @@ class MOEADDOptimizer(object):
             
     @staticmethod
     def weights_generation(weights_num, delta) -> list:
-        '''
-        
+        """
         Method to calculate the set of vectors to divide the problem of Pareto frontier
         discovery into several subproblems of Pareto frontier sector discovery, where
         each sector is defined by a weight vector.
         
-        Arguments:
-        ----------
-        
-        weights_num : int
-            Number of the weight vectors, dividing the objective function values space.
-            
-        delta : float
-            Parameter of uniform spacing between the weight vectors; *H = 1 / delta*        
-            should be integer - a number of divisions along an objective coordinate axis.
+        Args:
+            weights_num (`int`): Number of the weight vectors, dividing the objective function values space.
+            delta (`float`): Parameter of uniform spacing between the weight vectors; *H = 1 / delta*        
+                should be integer - a number of divisions along an objective coordinate axis.
         
         Returns:
-        ---------
-        
-        Weights : np.ndarray
-            Weight vectors, introduced to decompose the optimization problem into 
-            several subproblems by dividing Pareto frontier into a number of sectors.
-        
-        '''
+            weights (`list`): weight vectors (`np.ndarrays`), introduced to decompose the optimization problem into 
+                several subproblems by dividing Pareto frontier into a number of sectors.
+        """
         weights = np.empty(weights_num)
         assert 1./delta == round(1./delta) # check, if 1/delta is integer number
         m = np.zeros(weights_num)
@@ -375,18 +358,15 @@ class MOEADDOptimizer(object):
 
     
     def pass_best_objectives(self, *args) -> None:
-        '''
-        
+        """
         Setter of the `moeadd_optimizer.best_obj` attribute. 
         
-        Arguments:
-        ----------
+        Args:
+            args (`np.ndarray|list`): The values of the objective functions for the many-objective optimization problem.
         
-        *args : np.array/list of float values
-            The values of the objective functions for the many-objective optimization 
-            problem.
-        
-        '''
+        Returns:
+            None
+        """
         if len(self.pareto_levels.population) != 0:
             print('comparing lengths', len(args), len(self.pareto_levels.population[0].obj_funs))
             assert len(args) == len(self.pareto_levels.population[0].obj_funs)
@@ -400,38 +380,34 @@ class MOEADDOptimizer(object):
     
 
     def set_sector_processer(self, processer: MOEADDSectorProcesser) -> None:
-        '''
-        
+        """
         Setter of the `moeadd_optimizer.sector_processer` attribute.
         
-        Arguments:
-        ----------
-        
-        operator : object of subclass of ``MOEADDSectorProcesser``
-            The operator, which defines the evolutionary process
-        
-        '''
-        
+        Args:
+            processer (`MOEADDSectorProcesser`): The operator, which defines the evolutionary process
+        """
         self.sector_processer = processer
+
+    def set_strategy(self, strategy_director):
+        builder = strategy_director.builder
+        builder.assemble(True)
+        self.set_sector_processer(builder.processer)
     
         
     def optimize(self, epochs):
-        '''
-        
+        """
         Method for the main unconstrained evolutionary optimization. Can be applied repeatedly to 
         the population, if the previous results are insufficient. The output of the 
         optimization shall be accessed with the ``optimizer.pareto_level`` object and 
         its attributes ``.levels`` or ``.population``.
         
-        Parameters:
-        -----------
-                    
-        epochs : int
-            Maximum number of iterations, during that the optimization will be held.
-            Note, that if the algorithm converges to a single Pareto frontier, 
-            the optimization is stopped.
+        Args:        
+            epochs (`int`): Maximum number of iterations, during that the optimization will be held.
         
-        '''
+        Note:
+            that if the algorithm converges to a single Pareto frontier, the optimization is stopped.
+        
+        """
         if not self.abbreviated_search_executed:
             assert not type(self.best_obj) == type(None)
             for epoch_idx in np.arange(epochs):
@@ -445,6 +421,9 @@ class MOEADDOptimizer(object):
                                               EA_kwargs = sp_kwargs)
                         
     def form_processer_args(self, cur_weight : int): # TODO: inspect the most convenient input format
+        """
+        Forming arguments of the processer 
+        """
         return {'weight_idx' : cur_weight, 'weights' : self.weights, 'best_obj' : self.best_obj, 
                 'neighborhood_vectors' : self.neighborhood_lists}
 

@@ -217,24 +217,15 @@ class EpdeSearch(object):
 
         if director is not None and not use_default_strategy:
             self.director = director
-        elif director is None and self.multiobjective_mode and use_default_strategy:
-            self.director = MOEADDDirector()
-            self.director.builder = StrategyBuilder(MOEADDSectorProcesser)
-            
-            self.director.use_baseline(variation_params=director_params['variation_params'],
-                                       mutation_params=director_params['mutation_params'],
-                                       pareto_combiner_params=director_params['pareto_combiner_params'],
-                                       pareto_updater_params=director_params['pareto_updater_params'])
-        elif director is None and not self.multiobjective_mode and use_default_strategy:
-            self.director = BaselineDirector()
-            # print('ZUL')
-            self.director.builder = StrategyBuilder(EvolutionaryStrategy)
-            
-            self.director.use_baseline(variation_params       = director_params['variation_params'], 
-                                       mutation_params        = director_params['mutation_params'])
-
+        elif director is None and use_default_strategy:
+            if self.multiobjective_mode:
+                self.director = MOEADDDirector()
+            else:
+                self.director = BaselineDirector()
+            self.director.use_baseline(params=director_params)
         else:
             raise NotImplementedError('Wrong arguments passed during the epde search initialization')
+
         if self.multiobjective_mode:    
             self.set_moeadd_params()
         else:
@@ -635,11 +626,30 @@ class EpdeSearch(object):
                 self.create_pool(data = data, variable_names=variable_names, 
                                  derivs=derivs, max_deriv_order=max_deriv_order, 
                                  additional_tokens=additional_tokens, 
-                                 data_fun_pow=data_fun_pow)        
+                                 data_fun_pow=data_fun_pow)
+
+        self.optimizer_init_params['population_instruct'] = {"pool": self.pool, "terms_number": equation_terms_max_number,
+                                                             "max_factors_in_terms": equation_factors_max_number, "sparsity_interval": eq_sparsity_interval}
+        
         if self.multiobjective_mode:
-            self.fit_multiobjective(equation_terms_max_number, equation_factors_max_number,eq_sparsity_interval)
+            self.optimizer = MOEADDOptimizer(**self.optimizer_init_params)
+            best_obj = np.concatenate((np.zeros(shape=len([1 for token_family in self.pool.families if token_family.status['demands_equation']])),
+                                   np.ones(shape=len([1 for token_family in self.pool.families if token_family.status['demands_equation']]))))
+            print('best_obj', len(best_obj))
+            self.optimizer.pass_best_objectives(*best_obj)
         else:
-            self.fit_singleobjective(equation_terms_max_number, equation_factors_max_number, eq_sparsity_interval)
+            self.optimizer = SimpleOptimizer(**self.optimizer_init_params)
+        
+        self.optimizer.set_strategy(self.director)
+        self.optimizer.optimize(**self.optimizer_exec_params)
+
+        print('The optimization has been conducted.')
+        self.search_conducted = True
+
+        # if self.multiobjective_mode:
+        #     self.fit_multiobjective(equation_terms_max_number, equation_factors_max_number,eq_sparsity_interval)
+        # else:
+        #     self.fit_singleobjective(equation_terms_max_number, equation_factors_max_number, eq_sparsity_interval)
             
     def fit_multiobjective(self, equation_terms_max_number=6, equation_factors_max_number=1, eq_sparsity_interval=(1e-4, 2.5)):
         """
@@ -653,18 +663,22 @@ class EpdeSearch(object):
         Returns:
             None
         """
-        pop_constructor = MOEADDSystemPopConstr(pool = self.pool, terms_number = equation_terms_max_number, 
-                                                max_factors_in_term = equation_factors_max_number,
-                                                sparsity_interval = eq_sparsity_interval)
+        # pop_constructor = MOEADDSystemPopConstr(pool = self.pool, terms_number = equation_terms_max_number, 
+        #                                         max_factors_in_term = equation_factors_max_number,
+        #                                         sparsity_interval = eq_sparsity_interval)
 
-        self.optimizer_init_params['pop_constructor'] = pop_constructor
+        self.optimizer_init_params['population_instruct'] = {"pool": self.pool, "terms_number": equation_terms_max_number,
+                                                             "max_factors_in_terms": equation_factors_max_number, "sparsity_interval": eq_sparsity_interval}
+
+        # self.optimizer_init_params['pop_constructor'] = pop_constructor
         self.optimizer = MOEADDOptimizer(**self.optimizer_init_params)
         
-        evo_operator_builder = self.director.builder
-        evo_operator_builder.assemble(True)
-        evo_operator = evo_operator_builder.processer
+        # evo_operator_builder = self.director.builder
+        # evo_operator_builder.assemble(True)
+        # evo_operator = evo_operator_builder.processer
 
-        self.optimizer.set_sector_processer(processer=evo_operator)
+        # self.optimizer.set_sector_processer(processer=evo_operator)
+        self.optimizer.set_strategy(self.director)
         best_obj = np.concatenate((np.zeros(shape=len([1 for token_family in self.pool.families if token_family.status['demands_equation']])),
                                    np.ones(shape=len([1 for token_family in self.pool.families if token_family.status['demands_equation']]))))
         print('best_obj', len(best_obj))
@@ -691,18 +705,22 @@ class EpdeSearch(object):
         Returns:
             None
         """
-        pop_constructor = SOSystemPopConstr(pool = self.pool, terms_number = equation_terms_max_number, 
-                                            max_factors_in_term = equation_factors_max_number,
-                                            sparsity_interval = eq_sparsity_interval)
+        # pop_constructor = SOSystemPopConstr(pool = self.pool, terms_number = equation_terms_max_number, 
+        #                                     max_factors_in_term = equation_factors_max_number,
+        #                                     sparsity_interval = eq_sparsity_interval)
+        
+        self.optimizer_init_params['population_instruct'] = {"pool": self.pool, "terms_number": equation_terms_max_number,
+                                                             "max_factors_in_terms": equation_factors_max_number, "sparsity_interval": eq_sparsity_interval}
         # self.optimizer_params['pop_constructor']
-        self.optimizer_init_params['pop_constructor'] = pop_constructor
+        # self.optimizer_init_params['pop_constructor'] = pop_constructor
         self.optimizer = SimpleOptimizer(**self.optimizer_init_params)        
 
         # TODO: Somehow generalize
-        evo_operator_builder = self.director.builder
-        evo_operator_builder.assemble(True)
-        evo_operator = evo_operator_builder.processer
-        self.optimizer.set_strategy(strategy = evo_operator)
+        # evo_operator_builder = self.director.builder
+        # evo_operator_builder.assemble(True)
+        # evo_operator = evo_operator_builder.processer
+        # self.optimizer.set_strategy(strategy = evo_operator)
+        self.optimizer.set_strategy(self.director)
 
         self.optimizer.optimize(**self.optimizer_exec_params)
 

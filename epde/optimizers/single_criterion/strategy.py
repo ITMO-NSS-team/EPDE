@@ -1,4 +1,5 @@
-from epde.optimizers.builder import add_sequential_operators, OptimizationPatternDirector
+from epde.optimizers.builder import add_sequential_operators, OptimizationPatternDirector, StrategyBuilder
+from epde.optimizers.single_criterion.optimizer import EvolutionaryStrategy
 from functools import partial
 
 from epde.operators.utils.operator_mappers import map_operator_between_levels
@@ -14,7 +15,14 @@ from epde.operators.singleobjective.selections import RouletteWheelSelection
 from epde.operators.singleobjective.so_specific import SizeRestriction, FractionElitism
 
 class BaselineDirector(OptimizationPatternDirector):
-    def use_baseline(self, variation_params: dict = {}, mutation_params: dict = {}, **kwargs):
+    def __init__(self) -> None:
+        super().__init__()
+        self.builder = StrategyBuilder(EvolutionaryStrategy)
+
+    def use_baseline(self, params: dict, **kwargs):
+        variation_params = params.get('variation_params', {})
+        mutation_params = params.get('mutation_params', {})
+
         add_kwarg_to_operator = partial(add_base_param_to_operator, target_dict = kwargs)
 
         elitism = FractionElitism()

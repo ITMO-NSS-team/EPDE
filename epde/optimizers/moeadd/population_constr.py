@@ -12,6 +12,16 @@ from typing import Callable
 from epde.structure.main_structures import SoEq
 
 class SystemsPopulationConstructor(object):
+    """
+    Class for creating population according to the current optimization method/
+
+    Attributes:
+        pool (``):
+        terms_number (`int`):
+        max_factors_in_term (`int`):
+        vars_demand_equation (``):
+        sparsity_internal (`tuple`): 
+    """
     def __init__(self, pool, terms_number : int = 8, max_factors_in_term : int = 2, 
                  obj_functions : Callable = None, sparsity_interval : tuple = (0, 1)):
         self.pool = pool; self.terms_number = terms_number

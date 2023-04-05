@@ -15,6 +15,8 @@ import epde.globals as global_var
 from epde.optimizers.strategy import Strategy
 from epde.optimizers.single_criterion.ea_stop_conds import IterationLimit
 from epde.optimizers.single_criterion.supplementary import simple_sorting
+from epde.optimizers.single_criterion.population_constr import SystemsPopulationConstructor
+from epde.optimizers.builder import OptimizationPatternDirector
 
 # class PopulationProcesserBuilder(StrategyBuilder):
 #     """
@@ -128,9 +130,11 @@ class PopulationIterator(object):
 
 
 class SimpleOptimizer(object):
-    def __init__(self, pop_constructor, pop_size, solution_params, sorting_method = simple_sorting): 
+    def __init__(self, population_instruct, pop_size, solution_params, sorting_method = simple_sorting): 
         soluton_creation_attempts_softmax = 10
         soluton_creation_attempts_hardmax = 100
+
+        pop_constructor = SystemsPopulationConstructor(**population_instruct)
         
         assert type(solution_params) == type(None) or type(solution_params) == dict, 'The solution parameters, passed into population constructor must be in dictionary'
         initial_population = []
@@ -152,8 +156,12 @@ class SimpleOptimizer(object):
                 
         self.population = Population(elements = initial_population, sorting_method = sorting_method)
 
-    def set_strategy(self, strategy: EvolutionaryStrategy):
-        self.strategy = strategy
+    # def set_strategy(self, strategy: EvolutionaryStrategy):
+    def set_strategy(self, strategy_director):
+        builder = strategy_director.builder
+        builder.assemble(True)
+        self.strategy = builder.processer
+        # self.strategy = strategy
         
     def optimize(self, EA_kwargs: dict = {},  epochs: int = None):
         scp = {} if epochs is None else {'limit' : 50}
