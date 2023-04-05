@@ -56,9 +56,22 @@ def check_dominance(target, compared_with) -> bool:
     '''
     flag = False
 
+    def rts(value, sign_num: int = 5):
+        """
+        Round to a ``sign_num`` of significant digits.
+        """
+        if value == 0:
+            return 0
+        magn_top = np.log10(value)
+        idx = -(np.sign(magn_top)*np.ceil(np.abs(magn_top)) - sign_num)
+        if idx - sign_num > 1:
+            idx -= 1
+        return np.around(value, np.int(idx))
+
+    sdn = 5 # Number of significant digits
     for obj_fun_idx in range(len(target.obj_fun)):
-        if target.obj_fun[obj_fun_idx] <= compared_with.obj_fun[obj_fun_idx]:
-            if target.obj_fun[obj_fun_idx] < compared_with.obj_fun[obj_fun_idx]:
+        if rts(target.obj_fun[obj_fun_idx], sdn) <= rts(compared_with.obj_fun[obj_fun_idx], sdn):
+            if rts(target.obj_fun[obj_fun_idx], sdn) < rts(compared_with.obj_fun[obj_fun_idx], sdn):
                 flag = True
         else:
             return False
