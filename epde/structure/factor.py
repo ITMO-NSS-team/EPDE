@@ -51,8 +51,8 @@ class Factor(TerminalToken):
         try:
             return self._ann_repr
         except AttributeError:
-            self._ann_repr = train_ann(grids=global_var.grid_cache.get_all(), 
-					data=self.evaluate())
+            _, grids = global_var.grid_cache.get_all()
+            self._ann_repr = train_ann(grids = grids, data=self.evaluate())
             return self._ann_repr
 
     def predict_with_ann(self, grids: list):

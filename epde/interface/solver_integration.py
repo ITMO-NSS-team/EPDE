@@ -12,10 +12,10 @@ from typing import Callable, Union
 from types import FunctionType
 
 VAL_TYPES = Union[FunctionType, int, float, torch.Tensor, np.ndarray]
-BASE_SOLVER_PARAMS = {'lambda_bound' : 100, 'verbose' : False,
-                      'learning_rate' : 1e-4, 'eps' : 1e-6, 'tmin' : 1000,
-                      'tmax' : 5e6, 'use_cache' : True, 'cache_verbose' : True, 
-                      'save_always' : False, 'print_every' : None, 'optimizer_mode' : 'Adam', 
+BASE_SOLVER_PARAMS = {'lambda_bound' : 1000, 'verbose' : True,
+                      'learning_rate' : 1e-5, 'eps' : 1e-6, 'tmin' : 1000,
+                      'tmax' : 5e6, 'use_cache' : False, 'cache_verbose' : True, 
+                      'save_always' : False, 'print_every' : 1000, 'optimizer_mode' : 'Adam', 
                       'model_randomize_parameter' : 1e-5, 'step_plot_print' : False, 
                       'step_plot_save' : False, 'image_save_dir' : None}
 
@@ -138,7 +138,7 @@ class PregenBOperator(object):
         # Implement allow_high_ords - selection of derivatives from
         required_bc_ord = self.max_deriv_orders
         assert set(self.variables) == set(required_bc_ord.keys()), 'Some conditions miss required orders.'
-        assert (len(self.variables) == 1) == isinstance(vals, dict), ''
+        # assert (len(self.variables) == 1) == isinstance(vals, dict), f'{isinstance(vals, dict), vals} '
 
         grid_cache = global_var.initial_data_cache
         tensor_cache = global_var.initial_data_cache
@@ -272,8 +272,8 @@ class BOPElement(object):
         # TODO: inspect boundary value setter with an arbitrary function in symb form
         boundary_value = self.values
 
-        print('Output of bc:')
-        print(boundary, boundary_operator, boundary_value, self.variables, 'operator')
+        # print('Output of bc:')
+        # print(boundary, boundary_operator, boundary_value, self.variables, 'operator')
         return [boundary, boundary_operator, boundary_value, self.variables, 'operator']
 
 
@@ -374,6 +374,12 @@ class SystemSolverInterface(object):
 
         coeff_tensor = torch.from_numpy(coeff_tensor)
 
+        if deriv_vars == []:
+            if deriv_powers != 0:
+                # print()
+                raise Exception('Something went wrong with parsing an equation for solver')
+            else:
+                deriv_vars = [0]
         res = {'coeff': coeff_tensor,
                'term': deriv_orders,
                'pow': deriv_powers,
@@ -440,8 +446,9 @@ class SystemSolverInterface(object):
 
 
 class SolverAdapter(object):
-    def __init__(self, model=None, use_cache: bool = True, var_number: int = 1,
-                 dim_number: int = 1):
+    def __init__(self, model=None, use_cache: bool = True, var_number: int = 1):
+        dim_number = global_var.grid_cache.get('0').ndim
+        print(f'dimensionality is {dim_number}')
         if model is None:
             model = torch.nn.Sequential(
                 torch.nn.Linear(dim_number, 100),
@@ -522,7 +529,7 @@ class SolverAdapter(object):
         if isinstance(grid, (list, tuple)):
             grid = self.convert_grid(grid)
         print('Grid is ', type(grid), grid.shape)            
-        self.equation = SolverEquation(grid, system_form, boundary_conditions).set_strategy(strategy)
+        self.equation = SolverEquation(grid, system_form, boundary_conditions).set_strategy(strategy) # set h < 0.001
 
         self.prev_solution = solver.Solver(grid, self.equation, self.model, strategy).solve(**self._solver_params)
         return self.prev_solution
