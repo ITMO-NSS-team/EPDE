@@ -59,17 +59,40 @@ class Model_prepare():
     def grid_model_mat(self, cache_model):
         NN_grid = torch.vstack([self.grid[i].reshape(-1) for i in \
                                 range(self.grid.shape[0])]).T.float()
-
+        # print(f'Input shape {self.grid.shape}')
         if cache_model == None:
             cache_model = torch.nn.Sequential(
-                torch.nn.Linear(self.grid.shape[0], 100),
+                torch.nn.Linear(self.grid.shape[0], 256),
                 torch.nn.Tanh(),
-                torch.nn.Linear(100, 100),
+                # torch.nn.Dropout(0.1),
+                # torch.nn.ReLU(),
+                torch.nn.Linear(256, 256),
                 torch.nn.Tanh(),
-                torch.nn.Linear(100, 100),
+                # torch.nn.Dropout(0.1),
+                # torch.nn.ReLU(),
+                torch.nn.Linear(256, 64),
+                # # torch.nn.Dropout(0.1),
                 torch.nn.Tanh(),
-                torch.nn.Linear(100, 1)
+                torch.nn.Linear(64, 1024),
+                # torch.nn.Dropout(0.1),
+                torch.nn.Tanh(),
+                torch.nn.Linear(1024, 1)
+                # torch.nn.Tanh()
             )
+                
+                
+            #     torch.nn.Linear(self.grid.shape[0], 100),
+            #     torch.nn.Tanh(),
+            #     torch.nn.Linear(100, 100),
+            #     torch.nn.Tanh(),
+            #     torch.nn.Linear(100, 100),
+            #     # torch.nn.Tanh(),
+            #     # torch.nn.Linear(100, 100),
+            #     # torch.nn.Tanh(),
+            #     # torch.nn.Linear(100, 100),
+            #     torch.nn.Tanh(),
+            #     torch.nn.Linear(100, 1)
+            # )
         return NN_grid, cache_model
 
     def cache_lookup(self, lambda_bound: float = 0.001, weak_form: None = None, cache_dir: str = '../cache/',

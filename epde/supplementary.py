@@ -20,16 +20,23 @@ def train_ann(grids: list, data: np.ndarray, epochs_max: int = 10000):
     data_size = data.size
 
     model = torch.nn.Sequential(
-        torch.nn.Linear(dim, 256),
-        torch.nn.Tanh(),
-        torch.nn.Linear(256, 64),
-        torch.nn.Tanh(),
-        torch.nn.Linear(64, 64),
-        torch.nn.Tanh(),
-        torch.nn.Linear(64, 1024),
-        torch.nn.Tanh(),
-        torch.nn.Linear(1024, 1)
-    )
+                torch.nn.Linear(dim, 256),
+                torch.nn.Tanh(),
+                # torch.nn.Dropout(0.1),
+                # torch.nn.ReLU(),
+                torch.nn.Linear(256, 256),
+                torch.nn.Tanh(),
+                # torch.nn.Dropout(0.1),
+                # torch.nn.ReLU(),
+                torch.nn.Linear(256, 64),
+                # # torch.nn.Dropout(0.1),
+                torch.nn.Tanh(),
+                torch.nn.Linear(64, 1024),
+                # torch.nn.Dropout(0.1),
+                torch.nn.Tanh(),
+                torch.nn.Linear(1024, 1)
+                # torch.nn.Tanh()
+            )
 
     data_grid = np.stack([grid.reshape(-1) for grid in grids])
     grid_tensor = torch.from_numpy(data_grid).float().T

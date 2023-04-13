@@ -17,7 +17,7 @@ from epde.preprocessing.derivatives import preprocess_derivatives
 import epde.globals as global_var
 from epde.interface.token_family import TokenFamily
 from epde.evaluators import CustomEvaluator, EvaluatorTemplate, trigonometric_evaluator, simple_function_evaluator
-from epde.evaluators import const_evaluator, const_grad_evaluator
+from epde.evaluators import const_evaluator, const_grad_evaluator, grid_evaluator
 from epde.evaluators import velocity_evaluator, velocity_grad_evaluators
 from epde.cache.cache import upload_simple_tokens, prepare_var_tensor  # np_ndarray_section,
 
@@ -68,6 +68,33 @@ class TrigonometricTokens(PreparedTokens):
                              'dim': 0}
         self._token_family.set_params(['sin', 'cos'], trig_token_params, trig_equal_params)
         self._token_family.set_evaluator(trigonometric_evaluator, [])
+
+
+class GridTokens(PreparedTokens):
+    """
+    Class for prepared tokens, that describe family of grids as values
+    """
+    def __init__(self, labels = ['t',], dimensionality=1):
+        """
+        Initialization of class
+
+        Args:
+            dimensionally (`int`): optional, default - 1
+                data dimension 
+        """
+        assert len(labels) == dimensionality + 1, 'Incorrect labels for grids.'
+        
+        self._token_family = TokenFamily(token_type='grids')
+        self._token_family.set_status(unique_specific_token=True, unique_token_type=True,
+                                      meaningful=True)
+
+        grid_token_params = OrderedDict([('power', (1, 1)), ('dim', (0, dimensionality))])
+
+        grid_equal_params = {'power': 0, 'dim': 0}
+        self._token_family.set_params(labels, grid_token_params, grid_equal_params)
+        print(self._token_family.token_params)
+        time.sleep(10)
+        self._token_family.set_evaluator(grid_evaluator, [])
 
 
 class LogfunTokens(PreparedTokens):

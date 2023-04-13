@@ -123,7 +123,10 @@ def simple_function_evaluator(factor, structural: bool = False, grids=None, **kw
 trig_eval_fun = {'cos': lambda *grids, **kwargs: np.cos(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power'],
                  'sin': lambda *grids, **kwargs: np.sin(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power']}
 inverse_eval_fun = lambda *grids, **kwargs: np.power(grids[int(kwargs['dim'])], - kwargs['power'])
+grid_eval_fun = lambda *grids, **kwargs: np.power(grids[int(kwargs['dim'])], kwargs['power'])
 
+# def grid_eval_fun(*grids, **kwargs):
+#     return np.power(grids[int(kwargs['dim'])], kwargs['power'])
 
 def const_eval_fun(*grids, **kwargs):
     return np.full_like(a=grids[0], fill_value=kwargs['value'])
@@ -261,7 +264,8 @@ vhef_grad = [vhef_grad_1, vhef_grad_2, vhef_grad_3,
              vhef_grad_10, vhef_grad_11, vhef_grad_12,
              vhef_grad_13, vhef_grad_14, vhef_grad_15]
 
-trigonometric_evaluator = CustomEvaluator(trig_eval_fun, eval_fun_params_labels=['freq', 'dim', 'power'])
+trigonometric_evaluator = CustomEvaluator(trig_eval_fun, eval_fun_params_labels=['freq', 'dim', 'power'], use_factors_grids=True)
+grid_evaluator = CustomEvaluator(grid_eval_fun, eval_fun_params_labels=['dim', 'power'], use_factors_grids=True)
 
 inverse_function_evaluator = CustomEvaluator(inverse_eval_fun, eval_fun_params_labels=['dim', 'power'], use_factors_grids=True)
 

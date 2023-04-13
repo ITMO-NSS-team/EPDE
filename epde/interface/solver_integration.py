@@ -12,10 +12,12 @@ from typing import Callable, Union
 from types import FunctionType
 
 VAL_TYPES = Union[FunctionType, int, float, torch.Tensor, np.ndarray]
-BASE_SOLVER_PARAMS = {'lambda_bound' : 1000, 'verbose' : True,
-                      'learning_rate' : 1e-5, 'eps' : 1e-6, 'tmin' : 1000,
-                      'tmax' : 5e6, 'use_cache' : False, 'cache_verbose' : True, 
-                      'save_always' : False, 'print_every' : 1000, 'optimizer_mode' : 'Adam', 
+BASE_SOLVER_PARAMS = {'lambda_bound' : 100, 'verbose' : True,
+                      'learning_rate' : 1e-3, 'eps' : 1e-6, 'tmin' : 1000,
+                      'tmax' : 1e7, 'use_cache' : False, 'cache_verbose' : True, 
+                      'patience' : 5, 'loss_oscillation_window' : 100,
+                      'no_improvement_patience' : 500, 'save_always' : False, 
+                      'print_every' : 1000, 'optimizer_mode' : 'Adam', 
                       'model_randomize_parameter' : 1e-5, 'step_plot_print' : False, 
                       'step_plot_save' : False, 'image_save_dir' : None}
 
@@ -473,6 +475,8 @@ class SolverAdapter(object):
     def set_solver_params(self, lambda_bound=None, verbose: bool = None, learning_rate: float = None,
                           eps: float = None, tmin: int = None, tmax: int = None,
                           use_cache: bool = None, cache_verbose: bool = None,
+                          patience: int = None, loss_oscillation_window : int = None,
+                          no_improvement_patience: int = None,
                           save_always: bool = None, print_every: bool = None, optimizer_mode = None, 
                           model_randomize_parameter: bool = None, step_plot_print: bool = None,
                           step_plot_save: bool = None, image_save_dir: str = None):
@@ -480,7 +484,9 @@ class SolverAdapter(object):
         params = {'lambda_bound': lambda_bound, 'verbose': verbose,
                   'learning_rate': learning_rate, 'eps': eps, 'tmin': tmin,
                   'tmax': tmax, 'use_cache': use_cache, 'cache_verbose': cache_verbose,
-                  'save_always': save_always, 'print_every': print_every, 'optimizer_mode': optimizer_mode,
+                  'patience' : patience, 'loss_oscillation_window' : loss_oscillation_window,
+                  'no_improvement_patience' : no_improvement_patience, 'save_always': save_always,
+                  'print_every': print_every, 'optimizer_mode': optimizer_mode,
                   'model_randomize_parameter': model_randomize_parameter, 'step_plot_print': step_plot_print,
                   'step_plot_save': step_plot_save, 'image_save_dir': image_save_dir}
 
