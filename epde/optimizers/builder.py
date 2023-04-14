@@ -166,6 +166,12 @@ def add_sequential_operators(builder : StrategyBuilder, operators : list):
 
     
 class OptimizationPatternDirector(object):
+    """
+    Base class of director for optimization's strategy
+
+    Attributes:
+        builder (`StrategyBuilder`)
+    """
     def __init__(self):
         self._builder = None
 

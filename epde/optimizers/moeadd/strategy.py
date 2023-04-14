@@ -24,11 +24,20 @@ from epde.optimizers.builder import add_sequential_operators, OptimizationPatter
 from epde.optimizers.moeadd.strategy_elems import MOEADDSectorProcesser
 
 class MOEADDDirector(OptimizationPatternDirector):
+    """
+    Class for creating strategy builder of multicriterian optimization
+
+    Attributes:
+        builder (`StrategyBuilder`): builder of strategy for optimization
+    """
     def __init__(self) -> None:
         super().__init__()
         self.builder = StrategyBuilder(MOEADDSectorProcesser)
 
     def use_baseline(self, params: dict, **kwargs):
+        """
+        
+        """
         variation_params = params.get('variation_params', {})
         mutation_params = params.get('mutation_params', {})
         sorter_params = params.get("sorter_params", {})
