@@ -36,7 +36,13 @@ class MOEADDDirector(OptimizationPatternDirector):
 
     def use_baseline(self, params: dict, **kwargs):
         """
-        
+        Method for applying optimizer's strategy for multicriterial optimization.
+
+        Args:
+            params (`dict`): parameters required for multicriterial optimization
+
+        Returns:
+            None
         """
         variation_params = params.get('variation_params', {})
         mutation_params = params.get('mutation_params', {})

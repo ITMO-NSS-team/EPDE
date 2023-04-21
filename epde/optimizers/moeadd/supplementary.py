@@ -32,28 +32,22 @@ from abc import ABC, abstractproperty, abstractmethod
 
 
 def check_dominance(target, compared_with) -> bool:
-    '''
+    """
 
     Function to check, if one solution is dominated by another.
 
-    Arguments:
-    ----------
-
-    target : ``src.moeadd.moeadd_solution_template.MOEADDSolution`` case-specific subclass object
-        The individual solution on the pareto levels, compared with the other element.
-
-    compared_with : ``src.moeadd.moeadd_solution_template.MOEADDSolution`` case-specific subclass object
-        The individual solution on the pareto levels, with with the target is compared.
+    Args:
+        target (`src.moeadd.moeadd_solution_template.MOEADDSolution`):  case-specific subclass object
+            The individual solution on the pareto levels, compared with the other element.
+        compared_with (`src.moeadd.moeadd_solution_template.MOEADDSolution`):  case-specific subclass object
+            The individual solution on the pareto levels, with with the target is compared.
 
     Returns:
-    --------
+        domiated (`bool`): Function returns True, if the **compared_with** dominates (has at least one objective
+            functions with less values, while the others are the same) the **target**; 
+            False in all other cases.
 
-    domiated : bool
-        Function returns True, if the **compared_with** dominates (has at least one objective
-        functions with less values, while the others are the same) the **target**; 
-        False in all other cases.
-
-    '''
+    """
     flag = False
 
     for obj_fun_idx in range(len(target.obj_fun)):
@@ -66,37 +60,26 @@ def check_dominance(target, compared_with) -> bool:
 
 
 def ndl_update(new_solution, levels) -> list:   # efficient_ndl_update
-    '''
-
+    """
     Computationally-cheap method of adding new solution into the existing Pareto levels.
 
-    Parameters:
-    -----------
-
-    new_solution : ``src.moeadd.moeadd_solution_template.MOEADDSolution`` case-specific subclass object
-        The solution, that is to be added onto the non-dominated levels.
-
-    levels : list
-        List of lists of ``src.moeadd.moeadd_solution_template.MOEADDSolution`` case-specific subclass 
-        object, representing the input non-dominated levels.
+    Args:
+        new_solution (`src.moeadd.moeadd_solution_template.MOEADDSolution`):  case-specific subclass object
+            The solution, that is to be added onto the non-dominated levels.
+        levels (`list`): List of lists of ``src.moeadd.moeadd_solution_template.MOEADDSolution`` case-specific subclass 
+            object, representing the input non-dominated levels.
 
     Returns:
-    --------
-
-    new_levels : list
-        List of lists of ``src.moeadd.moeadd_solution_template.MOEADDSolution`` case-specific subclass 
-        object, containing the solution from input parameter *level* with *new_solution*, 
-        added to it.
+        new_levels (`list`): List of lists of ``src.moeadd.moeadd_solution_template.MOEADDSolution`` case-specific subclass 
+            object, containing the solution from input parameter *level* with *new_solution*, added to it.
 
     Notes:
-    ------
+        The idea for this method was introduced in *K. Li, K. Deb, Q. Zhang, and S. Kwong, 
+        “Efficient non-domination level update approach for steady-state evolutionary 
+        multiobjective optimization,” Dept. Electr. Comput. Eng., Michigan State Univ., 
+        East Lansing, MI, USA, Tech. Rep. COIN No. 2014014, 2014.*
 
-    The idea for this method was introduced in *K. Li, K. Deb, Q. Zhang, and S. Kwong, 
-    “Efficient non-domination level update approach for steady-state evolutionary 
-    multiobjective optimization,” Dept. Electr. Comput. Eng., Michigan State Univ., 
-    East Lansing, MI, USA, Tech. Rep. COIN No. 2014014, 2014.*
-
-    '''
+    """
     moving_set = {new_solution}
     new_levels = deepcopy(levels)  # levels# CAUSES ERRORS DUE TO DEEPCOPY
     # print(f'type(levels) is {type(levels)}')
@@ -134,8 +117,7 @@ def ndl_update(new_solution, levels) -> list:   # efficient_ndl_update
 
 
 def fast_non_dominated_sorting(population) -> list:
-    '''
-
+    """
     Procedure of separating points from the general population into non-dominated levels.
     This function is a faster alternative to the ``slow_non_dominated_sorting``, but requires 
     a little more memory to store indexes of elements, dominated by every solution. This 
@@ -146,20 +128,14 @@ def fast_non_dominated_sorting(population) -> list:
     functions in comparisson with :math:`O(MN^3)` of the straightforward way.
 
 
-    Parameters:
-    -----------
+    Args:
+        population (`list`): The input population, represented as a list of individuals.
 
-    population : list
-        The input population, represented as a list of individuals.
+    Returns:
+        levels (`list`): List of lists of population elements. The outer index is the number of a layer 
+            (e.g. 0-th is the current Pareto frontier), while the inner is the index of an element on a level.
 
-    Returns: 
-    ----------
-
-    levels : list
-        List of lists of population elements. The outer index is the number of a layer 
-        (e.g. 0-th is the current Pareto frontier), while the inner is the index of an element on a level.
-
-    '''
+    """
 
     levels = []
     ranks = np.empty(len(population))
@@ -200,28 +176,21 @@ def fast_non_dominated_sorting(population) -> list:
 
 
 def slow_non_dominated_sorting(population) -> list:
-    '''
-
+    """
     Procedure of separating points from the general population into non-dominated levels.
     Operates in the straightforward way: each layer is comprised of elements, that are 
     not dominated by any other element in the population, except the ones, already put into
     the output levels. Computational complexity of this variant of sorting in worst scenario is
     :math:`O(MN^3)`, where *N* is the population size, and *M* is the number of objective functions.
 
-    Parameters:
-    -----------
+    Args:
+        population (`list`): The input population, represented as a list of individuals.
 
-    population : list
-        The input population, represented as a list of individuals.
+    Returns:
+        levels (`list`): List of lists of population elements. The outer index is the number of a layer 
+            (e.g. 0-th is the current Pareto frontier), while the inner is the index of an element on a level.
 
-    Returns: 
-    ----------
-
-    levels : list
-        List of lists of population elements. The outer index is the number of a layer 
-        (e.g. 0-th is the current Pareto frontier), while the inner is the index of an element on a level.
-
-    '''
+    """
     locked_idxs = []
     levels = []
     levels_elems = 0
@@ -248,11 +217,11 @@ def acute_angle(vector_a, vector_b) -> float:
 
 
 class Constraint(ABC):
-    '''
+    """
 
     The abstract class for the constraint. Noteable subclasses: Inequality & Equality.
 
-    '''
+    """
     @abstractmethod
     def __init__(self, *args):
         pass
@@ -263,91 +232,66 @@ class Constraint(ABC):
 
 
 class Inequality(Constraint):
-    '''
-
+    """
     The class of the constrain (subclass of Constraint), representing the inequality. 
     The format of inequality is assumed in format :math:`g(x) >= 0`.
 
-    Parameters:
-    ----------
-
-    g : function (lambda function)
-        The constraint function, which shall penalize the candidate solution, if the value of
-        :math:`g(x) >= 0` is not fulfilled (is less, than 0). The penalty is equal to 
-        the absolute value of constraint violation.
+    Args:
+        g (`function (lambda function)`): The constraint function, which shall penalize the candidate solution, if the value of
+            :math:`g(x) >= 0` is not fulfilled (is less, than 0). The penalty is equal to 
+            the absolute value of constraint violation.
 
     Methods:
-    ---------
+        __call__(self, x) : returns float
+            Overloaded call operator returns the value of constaint violation.
 
-    __call__(self, x) : returns float
-        Overloaded call operator returns the value of constaint violation.
-
-    '''
+    """
 
     def __init__(self, g):
         self._g = g
 
     def __call__(self, x) -> float:
-        '''
+        """
         Method to evaluate the constraint violation of the candidate solution.
 
-        Parameters:
-        ---------
-
-        x : np.ndarray
-            Values (.vals attribute) of the candidate solution, that represent its gene.
+        Args:
+            x (`np.ndarray`): Values (.vals attribute) of the candidate solution, that represent its gene.
 
         Returns:
-        --------
-
-        cv : float
-            Constraint violation value. If the value of :math:`g(x) >= 0` is not 
-            fulfilled (is less, than 0), than returns :math:`|g(x)|`, else 0.
-
-        '''
+            cv (`float`): Constraint violation value. If the value of :math:`g(x) >= 0` is not 
+                fulfilled (is less, than 0), than returns :math:`|g(x)|`, else 0.
+        """
         return - self._g(x) if self._g(x) < 0 else 0
 
 
 class Equality(Constraint):
-    '''
-
+    """
     The class of the constrain (subclass of Constraint), representing the inequality. 
     The format of inequality is assumed in format :math:`h(x) = 0`.
 
-    Parameters:
-    ----------
-
-    h : function (lambda function)
-        The constraint function, which shall be penalized, if the value does not match with
-        the const
+    Args:
+        h (`function (lambda function)`): The constraint function, which shall be penalized, if the value does not match with
+            the const
 
     Methods:
-    ---------
+        __call__(self, x) : returns float
+            Overloaded call operator returns the value of constaint violation.
 
-    __call__(self, x) : returns float
-        Overloaded call operator returns the value of constaint violation.
-
-    '''
+    """
 
     def __init__(self, h):
         self._h = h
 
     def __call__(self, x) -> float:
-        '''
+        """
         Method to evaluate the constraint violation of the candidate solution.
 
-        Parameters:
-        ---------
-
-        x : np.ndarray
-            Values (.vals attribute) of the candidate solution, that represent its gene.
+        Args:
+            x (`np.ndarray`): Values (.vals attribute) of the candidate solution, that represent its gene.
 
         Returns:
-        --------
+            cv (`float`): Constraint violation value. If the value of :math:`h(x) = 0` is not 
+                fulfilled, than returns :math:`|g(x)|`, else 0.
 
-        cv : float
-            Constraint violation value. If the value of :math:`h(x) = 0` is not 
-            fulfilled, than returns :math:`|g(x)|`, else 0.
-
-        '''
+        """
         return np.abs(self._h(x))

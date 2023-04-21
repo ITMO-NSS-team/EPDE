@@ -10,16 +10,12 @@ from abc import ABC, abstractproperty
 
 class StopCondition(ABC):
     '''
-    
     Abstract class for generalized stop condition for the evolutionary algorithm.
     
-    Methods:
-    ----------
-    
-    reset():
-        Reset the object. Mainly useful, if some sort of counter is implemented inside the instance. Returns None.
-        
-    check()
+    Methods:    
+        reset():
+            Reset the object. Mainly useful, if some sort of counter is implemented inside the instance. Returns None.
+        check()
     
     '''
     def __init__(self, estrategy):
