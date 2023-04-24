@@ -507,6 +507,8 @@ class epde_search(object):
                 [print(f'{solution.text_form} , with objective function values of {solution.obj_fun} \n')  
                 for solution in self.equations_pareto_frontier[idx]]
         else:
+            # self.pool.show_distrib()
+            # TF_Pool.distribution_ls = []
             return self.optimizer.pareto_levels.levels[:level_num]
         
     def solver_forms(self):

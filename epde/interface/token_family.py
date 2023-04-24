@@ -476,27 +476,12 @@ class TF_Pool(object):
             total_term += total_token * total_token
         return total_term
 
+    def show_distrib(self, plot_distrib=False):
+        for item in range(len(self.prob_info.term_set_hashed)):
+            indexes = np.where(np.array(self.distribution_ls) == item)[0]
+            print(f'{self.prob_info.distribution_dict_idx[item]}: {len(indexes)}')
 
-    def update_distribution(self, term):
-
-        label = []
-        for factor in term:
-            label.append(factor.label)
-        hashed_label = self.hash_term(label)
-        self.distribution_ls.append(self.prob_info.distribution_dict[hashed_label])
-
-
-        if len(self.distribution_ls) % 50 == 0:
-            print('Length of list for drawing:', len(self.distribution_ls))
-        if len(self.distribution_ls) == 1100:
-
-            for item in range(len(self.prob_info.term_set_hashed)):
-                indexes = np.where(np.array(self.distribution_ls) == item)[0]
-                print(self.prob_info.distribution_dict_idx[item], ":", len(indexes))
-                # print(self.prob_info.distribution_dict_idx[item], ": N#:", len(indexes), ": p:",
-                      # len(indexes)/len(self.distribution_ls))
-
-            # sublist = self.distribution_ls[41:]
+        if plot_distrib:
             sublist = self.distribution_ls
             fig, ax1 = plt.subplots()
             sns.kdeplot(sublist, ax=ax1)
@@ -505,6 +490,14 @@ class TF_Pool(object):
             sns.histplot(sublist, ax=ax2, bins=len(self.prob_info.term_set_hashed))  # discrete=True)
             plt.grid()
             plt.show()
+
+    def update_distribution(self, term):
+
+        label = []
+        for factor in term:
+            label.append(factor.label)
+        hashed_label = self.hash_term(label)
+        self.distribution_ls.append(self.prob_info.distribution_dict[hashed_label])
         
     @property
     def families_meaningful(self):
