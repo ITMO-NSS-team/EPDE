@@ -121,7 +121,11 @@ class PopulationIterator(object):
 
 class SimpleOptimizer(object):
     """
-    
+    Optimizer for single criterion strategy of evolution
+
+    Attributes:
+        population (`Population`): population of individs
+        strategy (`Strategy`): evolutionary strategy
     """
     def __init__(self, population_instruct, pop_size, solution_params, sorting_method = simple_sorting): 
         soluton_creation_attempts_softmax = 10
@@ -151,13 +155,29 @@ class SimpleOptimizer(object):
 
     # def set_strategy(self, strategy: EvolutionaryStrategy):
     def set_strategy(self, strategy_director):
+        """
+        Setting evolutionary strategy
+
+        Args:
+            strategy_directory (`OptimizationPatternDirector`):  new evolutionary strategy
+        
+        Returns:
+            None
+        """
         builder = strategy_director.builder
         builder.assemble(True)
         self.strategy = builder.processer
         # self.strategy = strategy
         
     def optimize(self, EA_kwargs: dict = {},  epochs: int = None):
-        scp = {} if epochs is None else {'limit' : 50}
+        """
+        Running evolutionary strategy for optimization
+
+        Args:
+            EA_kwargs (`dict`): parameters for evolutionary algorithm
+            epochs (`int`): number of iterations in evolutionary, 
+        """
+        scp = {'limit' : 50} if epochs is None else {'limit' : epochs}
 
         self.strategy.run(initial_population = self.population, EA_kwargs = EA_kwargs, 
                           stop_criterion_params = scp)

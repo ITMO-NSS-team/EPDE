@@ -15,6 +15,14 @@ from typing import Union
 
 
 class Gene(object):
+    """
+    Evolutionary object, a structural unit of chromosome
+
+    Attributes:
+        key (`str`): name of the type gene
+        val_type (`type`): type of value, that will be considered a gene
+        value (`type as val_type`): value in gene
+    """
     def __init__(self, key, value=None, value_type=None):
         if value is None and value_type is None:
             raise ValueError(
@@ -50,6 +58,13 @@ class Gene(object):
             warnings.warn(f'The equality method is not implemented for object of type {type(self)} or {type(other)}')
 
     def set_metaparam(self, key: str, value: Union[float, int]):
+        """
+        Setting metaparameters in objec of `Gene`, when gene have type the `Equation`
+
+        Args:
+            key (`str`): name of metaparameter
+            value (`int|float`): new value for that metaparameter 
+        """
         assert key in self._value.metaparameters, f'Incorrect parameter key {key} passed into the gene, containing {self.key}'
         self._value.metaparameters[key]['value'] = value
 
@@ -63,22 +78,27 @@ class Gene(object):
 
 
 class Chromosome(object):
+    """
+
+    Attributes:
+        equation_type (`type`): type of equations, that will be in chromosome as gene
+        chromosome (`dict`): dictionary with genes
+        equation_keys (`list`): type names of equations, that are genes
+        params_keys (`list`): names of parameters, that used in eqautions
+
+    """
 
     def __init__(self, equations, params):
-        '''
+        """
 
-        Parameters
-        ----------
-        equations : dict of epde.strucutre.main_structures.Equation objects
-            List of equation, that form the chromosome.
-        **kwargs : TYPE
-            DESCRIPTION.
+        Args:
+            equations (`dict`): dictionary with epde.strucutre.main_structures.Equation objects. List of equation, that form the chromosome.
+            params (`dict`): dictionary with names and values parameters for each equation
 
-        Returns
-        -------
-        None.
+        Returns:
+            None
 
-        '''
+        """
         # print('equations', equations)
 
         self.equation_type = type(next(iter(equations)))
@@ -95,21 +115,18 @@ class Chromosome(object):
         self.chromosome[gene_key].value = value
 
     def pass_parametric_gene(self, key, value):
-        '''
+        """
 
-        Parameters
-        ----------
-        key : tuple of format (parameter_name, variable_name) of 'str', or 'str' for parameter_name,
-            The key, encoding with a tuple, dedicated to the altered metaparametric gene of the chromosome.
-            First element of the key is the label of the parameter, while the second is the name of the parameter
-        value : float or integer,
-            The value, which is replacing the previous gene value.
+        Args:
+            key (`tuple`): format (parameter_name, variable_name) of 'str', or 'str' for parameter_name,
+                The key, encoding with a tuple, dedicated to the altered metaparametric gene of the chromosome.
+                First element of the key is the label of the parameter, while the second is the name of the parameter
+            value (`float|int`): The value, which is replacing the previous gene value.
 
-        Returns
-        -------
-        None.
+        Returns:
+            None
 
-        '''
+        """
         if isinstance(key, str) and (key in self.chromosome[np.random.choice(self.equation_keys)]):
             for eq_name in self.equation_keys:
                 self.chromosome[eq_name].set_metaparam(key=key, value=value)
@@ -151,6 +168,16 @@ class Chromosome(object):
         return ChromosomeEqIterator(self)
 
     def same_encoding(self, other):
+        """
+        Compaison of two chromosomes by the keys of equations and metaparameters
+
+        Args:
+            other (`Chromosome`): the chromosome with which we will compare
+        
+        Returns:
+            `bool`: if all keys from first chromosome exist in second chromosome and all keys from second eist in first - `True`, 
+                    else - `False`
+        """
         cond_1 = all([key in other.chromosome.keys()
                     
                      for key in self.chromosome.keys()])
@@ -170,6 +197,9 @@ class Chromosome(object):
 
 
 class ChromosomeEqIterator(object):
+    """
+    Iterator only by the equations from the chromosome.
+    """
     def __init__(self, chromosome):
         self._chromosome = chromosome
         self._idx = 0

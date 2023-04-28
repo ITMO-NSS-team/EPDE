@@ -461,7 +461,7 @@ class TFPool(object):
     @property
     def families_supplementary(self):
         """
-        Getting token families, that is not meaningful
+        Tokens families, that require an individual equation to be represented in the system
         """
         return [family for family in self.families if not family.status['meaningful']]
 

@@ -15,11 +15,26 @@ from epde.operators.singleobjective.selections import RouletteWheelSelection
 from epde.operators.singleobjective.so_specific import SizeRestriction, FractionElitism
 
 class BaselineDirector(OptimizationPatternDirector):
+    """
+    Class for creating and configuring strategy builder
+
+    Attributes:
+        builder (`StratgyBuilder`): builder of evolutional strategy
+    """
     def __init__(self) -> None:
         super().__init__()
         self.builder = StrategyBuilder(EvolutionaryStrategy)
 
     def use_baseline(self, params: dict, **kwargs):
+        """
+        Launching strategy settings
+
+        Args:
+            params (`dict`): dictionary with parameters for evolutionary
+
+        Returns:
+            None
+        """
         variation_params = params.get('variation_params', {})
         mutation_params = params.get('mutation_params', {})
 

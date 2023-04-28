@@ -181,13 +181,13 @@ class LinkedBlocks(object):
             if not isinstance(block, InputBlock): block.applied = False 
             
     def traversal(self, input_obj, EA_kwargs):
-        '''
+        """
         Sequential execution of the evolutionary algorithm's blocks.
 
         Args:
             input_obj (`ndarray`): source data
             EA_kwargs (`dict`): dictionary with names and values for parameters in the evolution algorithm
-        '''
+        """
         self.reset_traversal_cond()
         
         self.initial[0][1].set_output(input_obj)
