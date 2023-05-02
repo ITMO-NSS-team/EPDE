@@ -20,10 +20,14 @@ from epde.operators.multiobjective.moeadd_specific import get_pareto_levels_upda
 from epde.operators.common.sparsity import LASSOSparsity
 from epde.operators.common.coeff_calculation import LinRegBasedCoeffsEquation
 
-from epde.optimizers.builder import add_sequential_operators, OptimizationPatternDirector
-
+from epde.optimizers.builder import add_sequential_operators, OptimizationPatternDirector, StrategyBuilder
+from epde.optimizers.moeadd.strategy_elems import MOEADDSectorProcesser
 
 class MOEADDDirector(OptimizationPatternDirector):
+    """
+    Class for creating strategy builder of multicriterian optimization
+    """
+# class MOEADDDirector(OptimizationPatternDirector):
     def use_baseline(self, variation_params : dict = {}, mutation_params : dict = {}, sorter_params : dict = {},
                     pareto_combiner_params : dict = {}, pareto_updater_params : dict = {}, **kwargs):
         add_kwarg_to_operator = partial(add_base_param_to_operator, target_dict = kwargs)

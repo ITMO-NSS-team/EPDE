@@ -35,6 +35,8 @@ import epde.interface.interface as epde_alg
 from epde.interface.prepared_tokens import TrigonometricTokens
 from epde.interface.solver_integration import BoundaryConditions, BOPElement
 
+SOLVER_STRATEGY = 'autograd'
+
 def write_pareto(dict_of_exp):
     for key, item in dict_of_exp.items():
         test_key = str(key[0]).replace('.', '_') + '__' + str(key[1]).replace('.', '_')
@@ -57,17 +59,17 @@ def epde_discovery(t, x, y, use_ann = False):
                                          preprocessor_kwargs={'epochs_max' : 50000})# 
     else:
         epde_search_obj.set_preprocessor(default_preprocessor_type='poly', # use_smoothing = True poly
-                                         preprocessor_kwargs={'use_smoothing' : True, 'sigma' : 1, 'polynomial_window' : 3, 'poly_order' : 3}) # 'epochs_max' : 10000})# 
+                                         preprocessor_kwargs={'use_smoothing' : False, 'sigma' : 1, 'polynomial_window' : 3, 'poly_order' : 3}) # 'epochs_max' : 10000})# 
                                      # preprocessor_kwargs={'use_smoothing' : True, 'polynomial_window' : 3, 'poly_order' : 2, 'sigma' : 3})#'epochs_max' : 10000}) 'polynomial_window' : 3, 'poly_order' : 3
     popsize = 12
-    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=85)
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=25)
     # trig_tokens = TrigonometricTokens(dimensionality = dimensionality)
     factors_max_number = {'factors_num' : [1, 2], 'probas' : [0.8, 0.2]}
     
     epde_search_obj.fit(data=[x, y], variable_names=['u', 'v'], max_deriv_order=(1,),
                         equation_terms_max_number=3, data_fun_pow = 1, #additional_tokens=[trig_tokens,], 
                         equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-10, 1e-4))
+                        eq_sparsity_interval=(1e-12, 1e-4))
     '''
     Смотрим на найденное Парето-множество, 
     
@@ -84,15 +86,6 @@ def epde_discovery(t, x, y, use_ann = False):
     
 
 def sindy_discovery(t, x, y):
-    # dt = 0.001
-    # t_train = np.arange(0, 100, dt)
-    # t_train_span = (t_train[0], t_train[-1])
-    # x0_train = [4, 2]
-    # x_train = solve_ivp(lorenz, t_train_span, 
-    #                     x0_train, t_eval=t_train, **integrator_keywords).y.T
-    # x_dot_train_measured = np.array(
-    #     [lorenz(0, x_train[i]) for i in range(t_train.size)]
-    # )    
     poly_order = 5
     threshold = 0.05
     
@@ -117,21 +110,30 @@ if __name__ == '__main__':
     Подгружаем данные, содержащие временные ряды динамики "вида-охотника" и "вида-жертвы"
     '''
     try:
-        t_file = os.path.join(os.path.dirname( __file__ ), 'projects/hunter-prey/t.npy')
+        t_file = os.path.join(os.path.dirname( __file__ ), 'projects/hunter-prey/t_20.npy')
         t = np.load(t_file)
     except FileNotFoundError:
-        t_file = '/home/maslyaev/epde/EPDE_main/projects/hunter-prey/t.npy'
+        t_file = '/home/maslyaev/epde/EPDE_main/projects/hunter-prey/t_20.npy'
         t = np.load(t_file)
     
     try:
-        data_file =  os.path.join(os.path.dirname( __file__ ), 'projects/hunter-prey/data.npy')
+        data_file =  os.path.join(os.path.dirname( __file__ ), 'projects/hunter-prey/data_20.npy')
         data = np.load(data_file)
     except FileNotFoundError:
-        data_file = '/home/maslyaev/epde/EPDE_main/projects/hunter-prey/data.npy'
+        data_file = '/home/maslyaev/epde/EPDE_main/projects/hunter-prey/data_20.npy'
         data = np.load(data_file)
+    
+    large_data = False
+    if large_data:
+        t_max = 400; t_size_raw = 100; t_size_dense = 1000
+        t_train = t[:t_max]; t_test_interval = t[t_max:t_max+t_size_raw] 
+        t_test_interval_pred = np.linspace(t_test_interval[0], t_test_interval[-1], 
+                                           num = t_size_dense)
+    else:
+        t_max = 150
+        t_train = t[:t_max]; t_test = t[t_max:] 
+        t_test_interval_pred = t_test
         
-    t_max = 680
-    t_train = t[:t_max]; t_test = t[t_max:] 
     x = data[:t_max, 0]; x_test = data[t_max:, 0]
     y = data[:t_max, 1]; y_test = data[t_max:, 1]
 
@@ -144,21 +146,55 @@ if __name__ == '__main__':
     epde = True
     
     if epde:
-        epde_search_obj, sys = epde_discovery(t_train, x_n, y_n, False)
-        
-        def get_ode_bop(key, var, grid_loc, value):
-            bop = BOPElement(axis = 0, key = key, term = [None], power = 1, var = var)
-            bop_grd_np = np.array([[grid_loc,]])
-            bop.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor))
-            bop.values = torch.from_numpy(np.array([[value,]])).float()
-            return bop
+        test_launches = 1
+        errs = []
+        for idx in range(test_launches):
+            epde_search_obj, sys = epde_discovery(t_train, x_n, y_n, False)
             
-        
-        bop_x = get_ode_bop('u', 0, t_test[0], x_test[0])
-        bop_y = get_ode_bop('v', 1, t_test[0], y_test[0])
-        
-        
-        pred_u_v = epde_search_obj.predict(system=sys, boundary_conditions=[bop_x(), bop_y()], 
-                                            grid = [t_test,], strategy='autograd')
+            def get_ode_bop(key, var, grid_loc, value):
+                bop = BOPElement(axis = 0, key = key, term = [None], power = 1, var = var)
+                bop_grd_np = np.array([[grid_loc,]])
+                bop.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor))
+                bop.values = torch.from_numpy(np.array([[value,]])).float()
+                return bop
+                
+            
+            bop_x = get_ode_bop('u', 0, t_test_interval_pred[0], x_test[0])
+            bop_y = get_ode_bop('v', 1, t_test_interval_pred[0], y_test[0])
+            
+            
+            pred_u_v = epde_search_obj.predict(system=sys, boundary_conditions=[bop_x(), bop_y()], 
+                                                grid = [t_test_interval_pred,], strategy=SOLVER_STRATEGY)
+            plt.plot(t_test_interval_pred, x_test, '+', label = 'preys_odeint')
+            plt.plot(t_test_interval_pred, y_test, '*', label = "predators_odeint")
+            plt.plot(t_test_interval_pred, pred_u_v[..., 0], color = 'b', label='preys_NN')
+            plt.plot(t_test_interval_pred, pred_u_v[..., 1], color = 'r', label='predators_NN')
+            plt.xlabel('Time t, [days]')
+            plt.ylabel('Population')
+            plt.grid()
+            plt.legend(loc='upper right')       
+            plt.show()
+            errs.append((np.mean(np.abs(x_test - pred_u_v[:, 0])), 
+                         np.mean(np.abs(y_test - pred_u_v[:, 1]))))
     else:
-        model = sindy_discovery(t_train, x_n, y_n)
+        errs = []
+        models = []
+        test_launches = 10
+        for idx in range(test_launches):
+            model = sindy_discovery(t_train, x_n, y_n)
+            print('Initial conditions', np.array([x_test[0], y_test[0]]))
+            pred_u_v = model.simulate(np.array([x_test[0], y_test[0]]), t_test)
+            models.append(model)
+            
+            plt.plot(t_test, x_test, '+', label = 'preys_odeint')
+            plt.plot(t_test, y_test, '*', label = "predators_odeint")
+            plt.plot(t_test, pred_u_v[:, 0], color = 'b', label='preys_NN')
+            plt.plot(t_test, pred_u_v[:, 1], color = 'r', label='predators_NN')
+            plt.xlabel('Time t, [days]')
+            plt.ylabel('Population')
+            plt.grid()
+            plt.legend(loc='upper right')       
+            plt.show()
+            errs.append((np.mean(np.abs(x_test - pred_u_v[:, 0])),
+                         np.mean(np.abs(y_test - pred_u_v[:, 1]))))
+        

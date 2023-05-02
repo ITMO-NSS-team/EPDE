@@ -32,6 +32,7 @@ Raises:
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from warnings import warn
 import numpy as np
 import psutil
 from functools import partial
@@ -83,33 +84,6 @@ def upload_grids(grids, cache):
         tensors = [grids,]
     upload_simple_tokens(labels=labels, cache=cache, tensors=tensors, grid_setting=True)
     cache.use_structural()
-
-
-def np_ndarray_section(matrix, boundary=None, except_idx: list = []):
-    # Добавить проверку на случай, когда boundary = 0, чтобы тогда возвращало матрицу без изменения
-    raise DeprecationWarning('No data section shall be used during equation discovery!')
-    # if isinstance(boundary, int):
-    #     if boundary != 0:
-    #         for idx in except_idx:
-    #             if idx < 0:
-    #                 except_idx.append(matrix.ndim - 1)
-    #         for dim_idx in np.arange(matrix.ndim):
-    #             if not dim_idx in except_idx:
-    #                 matrix = np.moveaxis(matrix, source = dim_idx, destination=0)
-    #                 matrix = matrix[boundary:-boundary, ...]
-    #                 matrix = np.moveaxis(matrix, source = 0, destination=dim_idx)
-    # elif isinstance(boundary, (list, tuple)):
-    #     if len(boundary) != matrix.ndim:
-    #         raise IndexError('Sizes of boundary do not match the dimensionality of data')
-    #     for idx in except_idx:
-    #         if idx < 0:
-    #             except_idx.append(matrix.ndim - 1)
-    #     for dim_idx in np.arange(matrix.ndim):
-    #         if not dim_idx in except_idx and boundary[dim_idx] > 0:
-    #             matrix = np.moveaxis(matrix, source = dim_idx, destination=0)
-    #             matrix = matrix[boundary[dim_idx]:-boundary[dim_idx], ...]
-    #             matrix = np.moveaxis(matrix, source = 0, destination=dim_idx)
-    # return matrix
 
 
 def prepare_var_tensor(var_tensor, derivs_tensor, time_axis):
@@ -230,11 +204,21 @@ class Cache(object):
         assert label in self.memory_default.keys()
         self.base_tensors.append(label)
 
-    def set_boundaries(self, boundary_width: Union[int, list]):
+    def set_boundaries(self, boundary_width: Union[int, list, tuple]):
         """
         Setting the number of unaccounted elements at the edges
         """
         assert '0' in self.memory_default.keys(), 'Boundaries should be specified for grid cache.'
+        shape = self.get('0')[1].shape
+        if isinstance(boundary_width, int):
+            if any([elem <= 2*boundary_width for elem in shape]):
+                raise IndexError(f'Mismatching shapes: boundary of {boundary_width} does not fit data of shape {shape}')
+        elif isinstance(boundary_width, (list, tuple)):
+            if any([elem <= 2*boundary_width[idx] for idx, elem in enumerate(shape)]):
+                raise IndexError(f'Mismatching shapes: boundary of {boundary_width} does not fit data of shape {shape}')                
+        else:
+            raise TypeError(f'Incorrect type of boundaries: {type(boundary_width)}, instead of expected int or list/tuple')
+
         self.boundary_width = boundary_width
 
     def memory_usage_properties(self, obj_test_case=None, mem_for_cache_frac=None, mem_for_cache_abs=None):
@@ -260,9 +244,9 @@ class Cache(object):
 
         if len(self.memory_default) == 0:
             assert obj_test_case is not None
-            self.max_allowed_tensors = np.int(np.floor(self.available_mem/obj_test_case.nbytes)/2)
+            self.max_allowed_tensors = int(np.floor(self.available_mem/obj_test_case.nbytes)/2)
         else:
-            self.max_allowed_tensors = np.int(np.floor(self.available_mem/self.memory_default[np.random.choice(list(self.memory_default.keys()))].nbytes))
+            self.max_allowed_tensors = int(np.floor(self.available_mem/self.memory_default[np.random.choice(list(self.memory_default.keys()))].nbytes))
 
         eps = 1e-7
         if np.abs(self.available_mem) < eps:

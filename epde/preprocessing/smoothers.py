@@ -112,7 +112,6 @@ class GaussianSmoother(AbstractSmoother):
                                                                    sigma=kwargs['sigma'])
             else:
                 smoothed_data = gaussian_filter(data, sigma=kwargs['sigma'])
-
         else:
             raise NotImplementedError(
                 'Wrong kernel passed into function. Current version supports only Gaussian smoothing.')

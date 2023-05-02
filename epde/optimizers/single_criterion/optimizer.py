@@ -15,62 +15,36 @@ import epde.globals as global_var
 from epde.optimizers.strategy import Strategy
 from epde.optimizers.single_criterion.ea_stop_conds import IterationLimit
 from epde.optimizers.single_criterion.supplementary import simple_sorting
-
-# class PopulationProcesserBuilder(StrategyBuilder):
-#     """
-#     Class of sector process builder for moeadd. 
-    
-#     Attributes:
-#     ------------
-    
-#     operator : Evolutionary_operator object
-#         the evolutionary operator, which is being constructed for the evolutionary algorithm, which is applied to a population;
-        
-#     Methods:
-#     ------------
-    
-#     reset()
-#         Reset the evolutionary operator, deleting all of the declared suboperators.
-        
-#     set_evolution(crossover_op, mutation_op)
-#         Set crossover and mutation operators with corresponding evolutionary operators, each of the Specific_Operator type object, to improve the 
-#         quality of the population.
-    
-#     set_param_optimization(param_optimizer)
-#         Set parameter optimizer with pre-defined Specific_Operator type object to optimize the parameters of the factors, present in the equation.
-        
-#     set_coeff_calculator(coef_calculator)
-#         Set coefficient calculator with Specific_Operator type object, which determines the weights of the terms in the equations.
-        
-#     set_fitness(fitness_estim)
-#         Set fitness function value estimator with the Specific_Operator type object. 
-    
-#     """
-#     def reset(self): # stop_criterion, stop_criterion_kwargs
-#         self._processer = EvolutionaryStrategy() # stop_criterion, stop_criterion_kwargs
-#         super().__init__()
-    
-#     @property
-#     def processer(self):
-#         return self._processer
+from epde.optimizers.single_criterion.population_constr import SystemsPopulationConstructor
+from epde.optimizers.builder import OptimizationPatternDirector
 
 class EvolutionaryStrategy(Strategy):
-    '''
+    """
     Evolutionary strategy for the single criterion optimization. Includes method ``iteration`` for a single 
     iteration of the algotirhm & ``run`` for executing a full optimization.
-    '''
+
+    Attributes:
+        _stop_criterion (`IteratorLimit`): object for stored the condition for stopping the evolutionary algorithm
+        run_performed (`bool`): flag about ranning evolutionary strategy
+        linked_blocks (`LinkedBlocks`): the sequence (not necessarily chain: divergencies can be present) of blocks with evolutionary operators
+    """
     def __init__(self, stop_criterion = IterationLimit, sc_init_kwargs: dict = {'limit' : 50}):
         super().__init__()
         self._stop_criterion = stop_criterion(**sc_init_kwargs)
         self.run_performed = False
-            
-    def iteration(self, population_subset, EA_kwargs = None):
-        self.check_integrity()
-        self.linked_blocks.blocks_labeled['initial'].set_output(population_subset)
-        self.linked_blocks.traversal(EA_kwargs)
-        return self.linked_blocks.output
     
     def run(self, initial_population: Iterable, EA_kwargs: dict, stop_criterion_params: dict = {}):
+        """
+        Running evolutionary strategy for input population
+
+        Args:
+            intial_population (`Iterable`): population only after initialized
+            EA_kwargs (`dict`): arguments for evolutionary algoritm
+            stop_criterion_params (`dict`): parameters for stoping evolutionary
+
+        Returns:
+            None
+        """
         self._stop_criterion.reset(**stop_criterion_params)
         population = initial_population
         while not self._stop_criterion.check():
@@ -79,7 +53,19 @@ class EvolutionaryStrategy(Strategy):
         self.run_performed = True
 
 class Population(object):
+    """
+    Class for keeping population
+
+    Attributes:
+        population (`list`): list of individs
+        length (`int`): number of individs in population
+    """
     def __init__(self, elements: list, sorting_method: Callable):
+        """
+        Args:
+            elements (`list`): list of individs
+            sorting_method (`Callable`): method for sortiing of individs in population
+        """
         self.population = elements
         self.length = len(elements)
         self._sorting_method = sorting_method
@@ -98,9 +84,15 @@ class Population(object):
         self.population = self.sort() 
 
     def update(self, point):
+        """
+        Adding new_individ to population
+        """
         self.population.append(point)
         
     def delete_point(self, point):
+        """
+        Deleting entering individ
+        """
         self.population = [solution for solution in self.population if solution != point]
 
     def __setitem__(self, key, value):
@@ -128,9 +120,14 @@ class PopulationIterator(object):
 
 
 class SimpleOptimizer(object):
-    def __init__(self, pop_constructor, pop_size, solution_params, sorting_method = simple_sorting): 
+    """
+    
+    """
+    def __init__(self, population_instruct, pop_size, solution_params, sorting_method = simple_sorting): 
         soluton_creation_attempts_softmax = 10
         soluton_creation_attempts_hardmax = 100
+
+        pop_constructor = SystemsPopulationConstructor(**population_instruct)
         
         assert type(solution_params) == type(None) or type(solution_params) == dict, 'The solution parameters, passed into population constructor must be in dictionary'
         initial_population = []
@@ -152,11 +149,14 @@ class SimpleOptimizer(object):
                 
         self.population = Population(elements = initial_population, sorting_method = sorting_method)
 
-    def set_strategy(self, strategy: EvolutionaryStrategy):
-        self.strategy = strategy
+    def set_strategy(self, strategy_director):
+        builder = strategy_director.builder
+        builder.assemble(True)
+        self.strategy = builder.processer
+        # self.strategy = strategy
         
     def optimize(self, EA_kwargs: dict = {},  epochs: int = None):
-        scp = {} if epochs is None else {'limit' : 50}
+        scp = {'limit' : epochs} if epochs is not None else {'limit' : 50}
 
         self.strategy.run(initial_population = self.population, EA_kwargs = EA_kwargs, 
                           stop_criterion_params = scp)

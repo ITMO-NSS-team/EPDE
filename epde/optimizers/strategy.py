@@ -13,11 +13,30 @@ from epde.optimizers.blocks import LinkedBlocks
 
 
 class Strategy():
+    """
+    Class instance of base for create evolution strategy
+
+    Attributes:
+        suppress_structure_check (`boolean`): flag about checking of structure
+        blocks (`dict`): ductuonary with operators for the strategy
+        linked_blocks (`LinkedBlocks`): the sequence (not necessarily chain: divergencies can be present) of blocks with evolutionary operators
+        run_performed (`boolean`): flag, that strategy was running (exclude the possibility of taking a result from a strategy that has not been applied)        
+    """
     def __init__(self):
         self._blocks = dict()
         self._linked_blocks = None
         
     def create_linked_blocks(self, blocks = None, suppress_structure_check = False):
+        """
+        Creating sequence of `blocks` with evolution operators
+
+        Args:
+            blocks (`dict`): dictionary with names and values of the evolution operator
+            suppress_structure_check (`boolean`): flag about checking of structure
+        
+        Returns:
+            None
+        """
         self.suppress_structure_check = suppress_structure_check
         if self.suppress_structure_check and global_var.verbose.show_warnings:
             warn('The tests of the strategy integrity are suppressed: valuable blocks of EA may go missing and that will not be noticed')
@@ -31,37 +50,26 @@ class Strategy():
             self.linked_blocks = LinkedBlocks(blocks, suppress_structure_check)
             
     def check_integrity(self):
+        """
+        Method for checking type on blocks of evolutional operators
+        """
         if not isinstance(self.blocks, dict):
             raise TypeError('Blocks object must be of type dict with key - symbolic name of the block (e.g. "crossover", or "mutation", and value of type block')
         if not isinstance(self.linked_blocks, LinkedBlocks):
             raise TypeError('self.linked_blocks object is not of type LinkedBlocks')
             
     def apply_block(self, label, operator_kwargs):
-        self.linked_blocks.blocks_labeled[label]._operator.apply(**operator_kwargs)
-        
-    def modify_block_params(self, block_label, param_label, value, suboperator_sequence = None):
-        '''
-        example call: ``evo_strat.modify_block_params(block_label = 'rps', param_label = 'sparsity', value = some_value, suboperator_sequence = ['fitness_calculation', 'sparsity'])``
-        '''
-        if suboperator_sequence is None:
-            self.linked_blocks.blocks_labeled[block_label]._operator.params[param_label] = value
-        else:
-            if isinstance(suboperator_sequence, str):
-                if suboperator_sequence not in self.linked_blocks.blocks_labeled[block_label]._operator.suboperators.keys():
-                    err_message = f'Suboperator for the control sequence {suboperator_sequence} is missing'
-                    raise KeyError(err_message)
-                temp = self.linked_blocks.blocks_labeled[block_label]._operator.suboperators[suboperator_sequence]
-            elif isinstance(suboperator_sequence, (tuple, list)):
-                temp = self.linked_blocks.blocks_labeled[block_label]._operator
-                for suboperator in suboperator_sequence:
-                    if suboperator not in temp.suboperators.keys():
-                        err_message = f'Suboperator for the control sequence {suboperator} is missing'
-                        raise KeyError(err_message)
-                    temp = temp.suboperators[suboperator]
+        """
+        Running process of choosing block evolutionary operator
 
-            else:
-                raise TypeError('Incorrect type of suboperator sequence. Need str or list/tuple of str')
-            temp.params[param_label] = value
+        Args:
+            label (`str`): name of evolutional operator
+            operator_kwargs (`dict`): dictionary with argumenta of EA, where keys are names and items are values of the arguments
+
+        Returns:
+            None
+        """
+        self.linked_blocks.blocks_labeled[label]._operator.apply(**operator_kwargs)
             
     @property
     def result(self):

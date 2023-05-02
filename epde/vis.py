@@ -17,11 +17,13 @@ class ParetoVisualizer(object):
 
     def plot_pareto(self, dimensions: tuple = (0, 1), annotate_best=True, plot_level = 1, 
                     filename = None, save_format = 'eps'):
-        assert len(dimensions) == 2, 'The pareto levels are projected on the 2D plane, therefore only 2 coordinates are processible'
+        assert len(
+            dimensions) == 2, 'The pareto levels are projected on the 2D plane, therefore only 2 coordinates are processible'
         coords = [[(solution.obj_fun[dimensions[0]], solution.obj_fun[dimensions[1]]) for solution in self.pareto_frontier.levels[front_idx]]
                   for front_idx in np.arange(len(self.pareto_frontier.levels))]
         if annotate_best:
-            annotations = [[solution.latex_form for solution in self.pareto_frontier.levels[front_idx]] for front_idx in np.arange(len(self.pareto_frontier.levels))]
+            annotations = [[solution.latex_form for solution in self.pareto_frontier.levels[front_idx]]
+                       for front_idx in np.arange(len(self.pareto_frontier.levels))]
         coords_arrays = []
         for coord_set in coords:
             coords_arrays.append(np.array(coord_set))

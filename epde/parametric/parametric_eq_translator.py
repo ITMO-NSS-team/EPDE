@@ -13,7 +13,8 @@ def float_convertable(obj):
 
 
 def parse_params_str(param_str):
-    assert isinstance(param_str, str), 'Passed parameters are not in string format'
+    assert isinstance(
+        param_str, str), 'Passed parameters are not in string format'
     params_split = param_str.split(',')
     params_parsed = dict()
     params_to_optimize = []
@@ -26,7 +27,8 @@ def parse_params_str(param_str):
             params_parsed[temp[0]] = None
             params_to_optimize.append(temp[0])
         else:
-            params_parsed[temp[0]] = float(temp[1]) if '.' in temp[1] else int(temp[1])
+            params_parsed[temp[0]] = float(
+                temp[1]) if '.' in temp[1] else int(temp[1])
     return params_parsed, params_to_optimize
 
 
@@ -97,7 +99,8 @@ def optimize_parametric_form(terms: list, pool, method='L-BFGS-B', **kwargs):
         temp_factors_param = {}
         temp_factors_defined = {}
         for factor in term_list:
-            factor_is_parametric, label, params_vals, params = parse_parametric_factor(factor, pool)
+            factor_is_parametric, label, params_vals, params = parse_parametric_factor(
+                factor, pool)
             cur_family = pool.get_families_by_label(label)
             assert cur_family.params_set and cur_family.evaluator_set, 'Family has not been completed before the call.'
             if factor_is_parametric:

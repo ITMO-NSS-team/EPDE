@@ -8,6 +8,13 @@ Created on Wed Jun 15 15:47:47 2022
 
 import numpy as np
 
+'''
+
+You can install EPDE directly from our github repo:
+    pip install git+https://github.com/ITMO-NSS-team/EPDE@main    
+
+'''
+
 import epde.interface.interface as epde_alg
 from epde.interface.prepared_tokens import TrigonometricTokens, CacheStoredTokens
 
@@ -60,39 +67,43 @@ def run_wave_eq_search(multiobjective_mode, derivs = None):
     
 
 if __name__ == '__main__':
+    '''
+    Ensure the correctness of the paths!
+    '''    
+    
     results = []
-    shapes = [30, 40, 50, 60, 70, 80, 90, 100]
-    '''
-    Подгружаем данные, содержащие временные ряды динамики "вида-охотника" и "вида-жертвы"
-    '''
-    shape = 80
         
     try:
         print(os.path.dirname( __file__ ))
-        data_file = os.path.join(os.path.dirname( __file__ ), f'wave/wave_sln_{shape}.csv')
+        data_file = os.path.join(os.path.dirname( __file__ ), 'data/wave_sln_80.csv')
         data = np.loadtxt(data_file, delimiter = ',').T
     except FileNotFoundError:
-        data_file = '/home/maslyaev/epde/EPDE_rework/projects/benchmarking/wave/wave_sln_{shape}.csv'
+        data_file = '/home/maslyaev/epde/EPDE_rework/projects/benchmarking/wave/wave_sln_80.csv'
         data = np.loadtxt(data_file, delimiter = ',').T
         
-    t = np.linspace(0, 1, shape+1); x = np.linspace(0, 1, shape+1)
-    # x += np.random.normal(0, err_factor*np.min(x), size = x.size)
-    # y += np.random.normal(0, err_factor*np.min(y), size = y.size)
+    t = np.linspace(0, 1, 81); x = np.linspace(0, 1, 81)
 
     grids = np.meshgrid(t, x, indexing = 'ij')
     dimensionality = data.ndim - 1
     
-    paretos = []
+    res = run_wave_eq_search(multiobjective_mode = False, derivs = None)
+    derivs = res[2]
+    
+    paretos_mo = []
+    paretos_so = []
+    
     exp_num = 10
     for exp_run in range(exp_num):
-        if exp_run == 0:
-            derivs = None
-        res = run_wave_eq_search(multiobjective_mode = exp_run >= exp_num/2, derivs = derivs)
-        if exp_num == 0:
-            derivs = res[2]
-
-        paretos.append(res[:2])
+        paretos_mo.append(run_wave_eq_search(multiobjective_mode = True, derivs=derivs)[:2])
+        paretos_so.append(run_wave_eq_search(multiobjective_mode = False, derivs=derivs)[:2])
+            
+    obj_funs_mo = [elem[1] for elem in paretos_mo]
+    obj_funs_so = [elem[1] for elem in paretos_so]    
         
+    obj_funs_mo = [elem[1] for elem in paretos_mo]
+    obj_funs_so = [elem[1] for elem in paretos_so]        
+        
+    '''    
     obj_funs_so = [2.030488112155742,
                    2.0304881121557465,
                    2.0304881121557465,
@@ -114,3 +125,4 @@ if __name__ == '__main__':
                    2.030488112155742,
                    2.030488112155742,
                    2.030488112155742]
+    '''

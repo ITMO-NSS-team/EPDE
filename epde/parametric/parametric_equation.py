@@ -11,6 +11,7 @@ from functools import reduce, singledispatchmethod
 from epde.structure.main_structures import Equation
 
 
+
 class ParametricEquation(object):
     def __init__(self, pool, terms: Union[list, tuple], right_part_index: int = -1):
         self.pool = pool
@@ -27,7 +28,8 @@ class ParametricEquation(object):
                 total_count += 1
                 local_count += 1
 
-        self.rpi = right_part_index if right_part_index >= 0 else len(terms) + right_part_index
+        self.rpi = right_part_index if right_part_index >= 0 else len(
+            terms) + right_part_index
         self._optimization_held = False
 
     def optimize_equations(self, initial_params=None, method='L-BFGS-B'):
@@ -47,7 +49,8 @@ class ParametricEquation(object):
             # print('evaluating gradient')
             grad = np.zeros_like(params)
             for param_idx, param_in_term_props in variables[0].param_term_beloning.items():
-                grad[param_idx] = np.sum(variables[0].evaluate_grad(params, param_in_term_props))
+                grad[param_idx] = np.sum(
+                    variables[0].evaluate_grad(params, param_in_term_props))
             print('gradient:', grad)
             return grad
 

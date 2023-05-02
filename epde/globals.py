@@ -95,4 +95,3 @@ def init_verbose(plot_DE_solutions : bool = False, show_iter_idx : bool = True,
         warnings.filterwarnings("ignore")
     verbose = VerboseManager(plot_DE_solutions, show_iter_idx, show_iter_fitness, 
                              show_iter_stats, show_warnings)
-    

@@ -9,7 +9,8 @@ from typing import Union
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
-from epde.structure.main_structures import Term, Equation
+from epde.structure.encoding import Chromosome
+from epde.structure.main_structures import Term, Equation, SoEq
 
 
 def float_convertable(obj):
@@ -28,7 +29,6 @@ def translate_equation(text_form, pool):
     for idx, term in enumerate(parsed_text_form):
         if (any([not float_convertable(elem) for elem in term]) and
             any([float_convertable(elem) for elem in term])):
-
             factors = [parse_factor(factor, pool) for factor in term[1:]]
             if len(factors) > max_factors:
                 max_factors = len(factors)
@@ -49,7 +49,15 @@ def translate_equation(text_form, pool):
     equation.target_idx = len(term_list) - 1
     equation.weights_internal = weights
     equation.weights_final = weights
-    return equation
+    system = SoEq(pool = pool, metaparameters={'sparsity': {'optimizable': True, 'value': 1.},
+                                               'terms_number': {'optimizable': False, 'value': len(term_list)},
+                                               'max_factors_in_term': {'optimizable': False, 'value': max_factors}})
+    
+    structure = {'u' : equation}
+    system.vals = Chromosome(structure, params={key: val for key, val in system.metaparameters.items()
+                                                if val['optimizable']})
+    
+    return system
 
 
 def parse_equation_str(text_form):

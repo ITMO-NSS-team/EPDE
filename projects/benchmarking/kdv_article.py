@@ -9,8 +9,14 @@ Created on Fri Feb 10 20:55:49 2023
 import numpy as np
 import pandas as pd
 
-import epde.interface.interface as epde_alg
+'''
 
+You can install EPDE directly from our github repo:
+    pip install git+https://github.com/ITMO-NSS-team/EPDE@main    
+
+'''
+
+import epde.interface.interface as epde_alg
 from epde.interface.prepared_tokens import TrigonometricTokens, CacheStoredTokens, CustomEvaluator, CustomTokens
 
 import os
@@ -21,9 +27,6 @@ sys.path.append('../')
 sys.path.pop()
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')))
 
-# from epde.evaluators import CustomEvaluator, simple_function_evaluator, inverse_function_evaluator
-# TODO^ caching of the pre-calculated derivatives
-    
 def run_KdV_eq_search(multiobjective_mode, derivs):
     epde_search_obj = epde_alg.EpdeSearch(multiobjective_mode=multiobjective_mode, use_solver=False, 
                                            dimensionality=dimensionality, boundary=boundary, 
@@ -83,10 +86,11 @@ def run_KdV_eq_search(multiobjective_mode, derivs):
     return epde_search_obj.equation_search_results(only_print = False, num = 1), metric 
     
 if __name__ == "__main__":
+    '''
+    Ensure the correctness of the paths!
+    '''
     
-    # multiobjective_mode = True
-    
-    path = '/home/maslyaev/epde/EPDE_main/projects/benchmarking/KdV/Data/'
+    path = '/home/maslyaev/epde/EPDE_main/projects/benchmarking/KdV/data/'
     df = pd.read_csv(f'{path}KdV_sln_100.csv', header=None)
     dddx = pd.read_csv(f'{path}ddd_x_100.csv', header=None)
     ddx = pd.read_csv(f'{path}dd_x_100.csv', header=None)
@@ -118,9 +122,60 @@ if __name__ == "__main__":
     
     dimensionality = u.ndim - 1; boundary = 20
 
-    paretos = []
+    paretos_mo = []
+    paretos_so = []
+    
     exp_num = 10
     for exp_run in range(exp_num):
-        # paretos.append(run_KdV_eq_search(multiobjective_mode = exp_run >= exp_num/2, derivs=derivs))
-        paretos.append(run_KdV_eq_search(multiobjective_mode = False, derivs=derivs))
+        paretos_mo.append(run_KdV_eq_search(multiobjective_mode = True, derivs=derivs))
+        paretos_so.append(run_KdV_eq_search(multiobjective_mode = False, derivs=derivs))
+            
+    obj_funs_mo = [elem[1] for elem in paretos_mo]
+    obj_funs_so = [elem[1] for elem in paretos_so]
+    
         
+    '''
+    In the experiment with multi-objective optimization: 
+    [elem[1] for elem in paretos] yields:
+        
+    obj_funs_mo = [0.19872577110025424,
+                   0.010044168726883887,
+                   0.010044168726881037,
+                   0.010044168726882132,
+                   0.010044168726883887,
+                   0.010053873940359866,
+                   0.024887542837425773,
+                   0.03168872586194803,
+                   0.037691446421954516,
+                   0.029037133966699005]
+ 
+    -- || -- with single-objective optimization: 
+    [elem[1] for elem in paretos] yields:
+        
+    obj_funs_so = [0.02612207554109057,
+                   0.2617447823390866,
+                   0.02287012183806553,
+                   0.0419274773296572,
+                   0.018129337042157977,
+                   0.22147963853403785,
+                   0.15777454100663743,
+                   0.05992896372668442,
+                   0.09788517017857494,
+                   0.09524688508509466]
+    
+    '''
+    
+    import matplotlib.pyplot as plt
+    import matplotlib
+    matplotlib.rcParams['pdf.fonttype'] = 42
+    matplotlib.rcParams['ps.fonttype'] = 42    
+    
+    plt.rcParams["figure.figsize"] = (3.0, 3.5)
+    my_dict = {'Single Objective': obj_funs_so, 'Multi-Objective': obj_funs_mo}
+    
+    fig, ax = plt.subplots()
+    ax.set_yscale('log')
+    ax.grid(alpha = 0.5)
+    ax.boxplot(my_dict.values(), whis=[5, 95])
+    ax.set_xticklabels(my_dict.keys())
+    plt.savefig('boxplot_KdV.png', dpi = 300, format = 'png', bbox_inches = 'tight')       

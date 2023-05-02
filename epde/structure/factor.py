@@ -207,7 +207,8 @@ class Factor(TerminalToken):
             try:
                 if k not in attrs_to_avoid_copy:
                     if not isinstance(k, list):
-                        setattr(new_struct, k, copy.deepcopy(getattr(self, k), memo))
+                        setattr(new_struct, k, copy.deepcopy(
+                            getattr(self, k), memo))
                     else:
                         temp = []
                         for elem in getattr(self, k):

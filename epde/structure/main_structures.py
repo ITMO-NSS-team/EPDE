@@ -141,8 +141,7 @@ class Term(ComplexStructure):
             factors_num = np.random.choice(a=self.max_factors_in_term['factors_num'],
                                            p=self.max_factors_in_term['probas'])
         else:
-            raise ValueError(
-                'Incorrect value of max_factors_in_term metaparameters')
+            raise ValueError('Incorrect value of max_factors_in_term metaparameters')
 
         self.occupied_tokens_labels = copy.copy(forbidden_factors)
 
@@ -179,8 +178,7 @@ class Term(ComplexStructure):
         if not marker or isinstance(marker, str):
             self._descr_variable_marker = marker
         else:
-            raise ValueError(
-                'Described variable marker shall be a family label (i.e. "u") of "False"')
+            raise ValueError('Described variable marker shall be a family label (i.e. "u") of "False"')
 
     def evaluate(self, structural, grids=None):
         assert global_var.tensor_cache is not None, 'Currently working only with connected cache'
@@ -231,22 +229,20 @@ class Term(ComplexStructure):
                 self.reset_saved_state()
                 break
             if accept_term_try == 10 and global_var.verbose.show_warnings:
-                warnings.warn(
-                    'Can not create unique term, while filtering equation tokens in regards to the right part.')
+                warnings.warn('Can not create unique term, while filtering equation tokens in regards to the right part.')
             if accept_term_try >= 10:
                 self.randomize(forbidden_factors=new_term.occupied_tokens_labels + taken_tokens)
             if accept_term_try == 100:
-                print(
-                    'Something wrong with the random generation of term while running "filter_tokens_by_right_part"')
-                print('proposed', new_term.name, 'for ', equation.text_form,
-                      'with respect to', reference_target.name)
+                print('Something wrong with the random generation of term while running "filter_tokens_by_right_part"')
+                print('proposed', new_term.name, 'for ', equation.text_form, 'with respect to', reference_target.name)
 
     def reset_occupied_tokens(self):
         occupied_tokens_new = []
         for factor in self.structure:
             for token_family in self.pool.families:
                 if factor in token_family.tokens and factor.status['unique_token_type']:
-                    occupied_tokens_new.extend([token for token in token_family.tokens])
+                    occupied_tokens_new.extend(
+                        [token for token in token_family.tokens])
                 elif factor.status['unique_specific_token']:
                     occupied_tokens_new.append(factor.label)
         self.occupied_tokens_labels = occupied_tokens_new
@@ -257,7 +253,8 @@ class Term(ComplexStructure):
         for token in self.pool.families:
             if not all([label in self.occupied_tokens_labels for label in token.tokens]):
                 token_new = copy.deepcopy(token)
-                token_new.tokens = [label for label in token.tokens if label not in self.occupied_tokens_labels]
+                token_new.tokens = [
+                    label for label in token.tokens if label not in self.occupied_tokens_labels]
                 available_tokens.append(token_new)
         return available_tokens
 
@@ -299,7 +296,8 @@ class Term(ComplexStructure):
             try:
                 if k not in attrs_to_avoid_copy:
                     if not isinstance(k, list):
-                        setattr(new_struct, k, copy.deepcopy(getattr(self, k), memo))
+                        setattr(new_struct, k, copy.deepcopy(
+                            getattr(self, k), memo))
                     else:
                         temp = []
                         for elem in getattr(self, k):
@@ -383,7 +381,7 @@ class Equation(ComplexStructure):
 
         self.main_var_to_explain = var_to_explain
 
-        force_var_to_explain = True  # False
+        force_var_to_explain = True   # False
         for i in range(len(basic_structure), self.metaparameters['terms_number']['value']):
             check_test = 0
             while True:
@@ -403,7 +401,8 @@ class Equation(ComplexStructure):
         for idx, term in enumerate(self.structure):
             if idx == term_idx:
                 # print(f'Checking if {self.main_var_to_explain} is in {term.name}')
-                assert term.contains_family(self.main_var_to_explain), 'Trying explain a variable with term without right family.'
+                assert term.contains_family(
+                    self.main_var_to_explain), 'Trying explain a variable with term without right family.'
                 term.descr_variable_marker = self.main_var_to_explain
             else:
                 term.descr_variable_marker = False
@@ -429,7 +428,8 @@ class Equation(ComplexStructure):
     def forbidden_token_labels(self):
         warnings.warn(message='Tokens can no longer be set as right-part-unique',
                       category=DeprecationWarning)
-        target_symbolic = [factor.label for factor in self.structure[self.target_idx].structure]
+        target_symbolic = [
+            factor.label for factor in self.structure[self.target_idx].structure]
         forbidden_tokens = set()
 
         for token_family in self.pool.families:
@@ -468,7 +468,8 @@ class Equation(ComplexStructure):
         if any([factor.status['unique_for_right_part'] for factor in new_eq.structure[right_part_idx].structure]):
             for term_idx, term in enumerate(new_eq.structure):
                 if term_idx != right_part_idx:
-                    term.filter_tokens_by_right_part(new_eq.structure[right_part_idx], self, term_idx)
+                    term.filter_tokens_by_right_part(
+                        new_eq.structure[right_part_idx], self, term_idx)
 
         new_eq.reset_saved_state()
         return new_eq
@@ -601,7 +602,8 @@ class Equation(ComplexStructure):
         form = r""
         for term_idx in range(len(self.structure)):
             if term_idx != self.target_idx:
-                form += str(self.weights_final[term_idx]) if term_idx < self.target_idx else str(self.weights_final[term_idx-1])
+                form += str(self.weights_final[term_idx]) if term_idx < self.target_idx else str(
+                    self.weights_final[term_idx-1])
                 form += ' * ' + self.structure[term_idx].latex_form + ' + '
         form += str(self.weights_final[-1]) + ' = ' + \
             self.structure[self.target_idx].text_form
@@ -613,7 +615,8 @@ class Equation(ComplexStructure):
         if self.weights_final_evald:
             for term_idx in range(len(self.structure)):
                 if term_idx != self.target_idx:
-                    form += str(self.weights_final[term_idx]) if term_idx < self.target_idx else str(self.weights_final[term_idx-1])
+                    form += str(self.weights_final[term_idx]) if term_idx < self.target_idx else str(
+                        self.weights_final[term_idx-1])
                     form += ' * ' + self.structure[term_idx].name + ' + '
             form += str(self.weights_final[-1]) + ' = ' + \
                 self.structure[self.target_idx].name
@@ -635,7 +638,8 @@ class Equation(ComplexStructure):
                     term_form = self.structure[term_idx].solver_form
                     weight = self.weights_final[term_idx] if term_idx < self.target_idx else self.weights_final[term_idx-1]
                     term_form[0] = term_form[0] * weight
-                    term_form[0] = torch.flatten(term_form[0]).unsqueeze(1).type(torch.FloatTensor)
+                    term_form[0] = torch.flatten(term_form[0]).unsqueeze(
+                        1).type(torch.FloatTensor)
                     self._solver_form.append(term_form)
 
             free_coeff_weight = torch.from_numpy(np.full_like(a=global_var.grid_cache.get('0'),
@@ -693,8 +697,7 @@ class Equation(ComplexStructure):
                                    in np.arange(max_orders.size)])
                 max_orders = np.maximum(max_orders, orders)
         if np.max(max_orders) > 4:
-            raise NotImplementedError(
-                'The current implementation allows does not allow higher orders of equation, than 2.')
+            raise NotImplementedError('The current implementation allows does not allow higher orders of equation, than 2.')
         return max_orders
     
     def boundary_conditions(self, max_deriv_orders=(1,), main_var_key=('u', (1.0,)), full_domain: bool = False,

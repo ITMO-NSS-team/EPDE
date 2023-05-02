@@ -86,14 +86,16 @@ class HistoryExtender():
                 ender = ' ' if 'a' in self.state_writing_points else ' || \n'
                 for element in [obj,] + list(args):
                     if historized(element):
-                        element.add_history(' || before operation: ' + element.state + ender)
-                        
+                        element.add_history(
+                            ' || before operation: ' + element.state + ender)
+
             result = method(obj, *args, **kwargs)
             if 'a' in self.state_writing_points:
                 beginner = ' | ' if 'b' in self.state_writing_points else ' || '
                 for element in [obj,] + list(args):
                     if historized(element):
-                        element.add_history(beginner + 'after operation: ' + element.state + ' || \n')
+                        element.add_history(
+                            beginner + 'after operation: ' + element.state + ' || \n')
             return result
         return wrapper
 
@@ -113,12 +115,14 @@ class BoundaryExclusion():
         def wrapper(grids, boundary_width: Union[int, list] = 0):
             assert len(grids) == grids[0].ndim
             if isinstance(self.boundary_width, int):
+               
                 self.boundary_width = len(grids)*[self.boundary_width,]
             indexes_shape = grids[0].shape
             indexes = np.indices(indexes_shape)
 
             mask_partial = np.array([np.where((indexes[idx, ...] >= self.boundary_width[idx]) &
-                                              (indexes[idx, ...] < indexes_shape[idx] - self.boundary_width[idx]),
+                                              (indexes[idx, ...] < indexes_shape[idx] -
+                                               self.boundary_width[idx]),
                                               1, 0)
                                      for idx in np.arange(indexes.shape[0])])
 
@@ -128,3 +132,4 @@ class BoundaryExclusion():
             return func(grids) * mask
 
         return wrapper
+

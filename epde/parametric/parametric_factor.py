@@ -11,6 +11,7 @@ from pprint import pprint
 import epde.globals as global_var
 
 
+
 class ParametricFactor(Factor):
     __slot__ = ['_params', '_params_description', '_hash_val',
                 'label', 'type', 'grid_set', 'grid_idx', 'is_deriv', 'deriv_code',

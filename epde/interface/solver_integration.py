@@ -501,7 +501,8 @@ class SolverAdapter(object):
     def set_param(self, param_key: str, value):
         self._solver_params[param_key] = value
 
-    def solve_epde_system(self, system: SoEq, grids: list = None, boundary_conditions=None, strategy = 'NN'):
+    def solve_epde_system(self, system: SoEq, grids: list=None, boundary_conditions=None, 
+                          strategy='NN', data=None):
         system_interface = SystemSolverInterface(system_to_adapt=system)
 
         system_solver_forms = system_interface.form(grids)
@@ -509,7 +510,7 @@ class SolverAdapter(object):
             op_gen = PregenBOperator(system=system,
                                      system_of_equation_solver_form=[sf_labeled[1] for sf_labeled
                                                                      in system_solver_forms])
-            op_gen.generate_default_bc()
+            op_gen.generate_default_bc(vals = data, grids = grids)
             boundary_conditions = op_gen.conditions
 
         if grids is None:
@@ -531,11 +532,12 @@ class SolverAdapter(object):
             conv_grid = torch.cartesian_prod(*conv_grid).float()
         return conv_grid
 
-    def solve(self, system_form=None, grid=None, boundary_conditions=None, strategy = 'NN'):
+    def solve(self, system_form=None, grid=None, boundary_conditions=None, strategy = 'NN'): #data=None, 
         if isinstance(grid, (list, tuple)):
             grid = self.convert_grid(grid)
         print('Grid is ', type(grid), grid.shape)            
         self.equation = SolverEquation(grid, system_form, boundary_conditions).set_strategy(strategy) # set h < 0.001
 
+        print(grid[0].shape)
         self.prev_solution = solver.Solver(grid, self.equation, self.model, strategy).solve(**self._solver_params)
         return self.prev_solution

@@ -62,7 +62,7 @@ if __name__ == '__main__':
     epde_search_obj.set_preprocessor(default_preprocessor_type='poly', # use_smoothing = True
                                      preprocessor_kwargs={'use_smoothing' : False, 'polynomial_window' : 3, 'poly_order' : 2})#'epochs_max' : 10000}) 'polynomial_window' : 3, 'poly_order' : 3
     popsize = 12
-    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=25)
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=35)
     trig_tokens = TrigonometricTokens(dimensionality = dimensionality)
     factors_max_number = {'factors_num' : [1, 2], 'probas' : [0.8, 0.2]}
     

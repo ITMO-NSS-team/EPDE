@@ -18,11 +18,16 @@ OPERATOR_LEVELS_SUPPORTED_TYPES = {'custom level': None, 'term level': Term, 'ge
                                    'chromosome level': Chromosome, 'population level': ParetoLevels}
 
 
+def add_base_param_to_operator(operator):
+    params_container = EvolutionaryParams()
+    for param_key, param_value in params_container[operator.key].items():
+        operator.params[param_key] = param_value
+
 def add_base_param_to_operator(operator, target_dict):
     params_container = EvolutionaryParams()
     for param_key, param_value in params_container.get_default_params_for_operator(operator.key).items():
-        operator.params[param_key] = target_dict[param_key] if param_key in target_dict.keys() else param_value
-
+        operator.params[param_key] = target_dict[param_key] if param_key in target_dict.keys(
+        ) else param_value
 # def add_param_to_operator(operator, target_dict, labeled_base_val):
 #     for key, base_val in labeled_base_val.items():
 #         if base_val is None and key not in target_dict.keys():
@@ -112,7 +117,8 @@ class CompoundOperator():
         def wrapper(self, *args, **kwargs):
             objective = args[0]
             try:
-                level_descr = [tag for tag in self.operator_tags if 'level' in tag][0]
+                level_descr = [
+                    tag for tag in self.operator_tags if 'level' in tag][0]
             except IndexError:
                 level_descr = 'custom level'
             if level_descr == 'custom level':
@@ -188,10 +194,12 @@ class SuboperatorContainer():
             if isinstance(oper, CompoundOperator):
                 operator_probability = 1
             elif isinstance(oper, (list, tuple, np.ndarray)) and label not in probas.keys():
-                operator_probability = np.full(fill_value=1./len(oper), shape=len(oper))
+                operator_probability = np.full(
+                    fill_value=1./len(oper), shape=len(oper))
             elif isinstance(oper, (list, tuple, np.ndarray)) and label in probas.keys():
                 if len(oper) != len(probas[label]):
-                    raise ValueError(f'Number of passed suboperators for {label} does not match defined probabilities.')
+                    raise ValueError(
+                        f'Number of passed suboperators for {label} does not match defined probabilities.')
                 operator_probability = probas[label]
             self.probas[label] = operator_probability
 
