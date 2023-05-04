@@ -25,14 +25,14 @@
 
 	},	
  	"MetaparamerCrossover" : {
-        "metaparam_proportion" : 0.4
+        "metaparam_proportion" : 0.05
 	},
  	"EquationCrossover" : {
 
 	},	
 	"EquationExchangeCrossover" : {
 
-    },		
+    	},		
  	"TermCrossover" : {
         "crossover_probability" : 0.3
 	},
@@ -41,13 +41,13 @@
 	},
 	"SystemMutation" : {
 
-    },
+    	},
 	"EquationMutation" : {
         "r_mutation" : 0.6
 	},
 	"MetaparameterMutation" : {
         "mean" : 0.0,
-        "std" : 1e-4
+        "std" : 1e-3
 	},
 	"TermMutation" : {
 
