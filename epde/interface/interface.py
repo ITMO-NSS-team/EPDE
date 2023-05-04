@@ -735,7 +735,7 @@ class EpdeSearch(object):
             return self.optimizer.population.population
             
     
-    def equation_search_results(self, only_print : bool = True, num = 1):
+    def equation_search_results(self, only_print : bool = True, only_str = False, num = 1):
         """
         Method for print or getting results of searching differential equation
 
@@ -756,13 +756,22 @@ class EpdeSearch(object):
                     [print(f'{solution.text_form} , with objective function values of {solution.obj_fun} \n')  
                     for solution in self.resulting_population[idx]]
             else:
-                return self.resulting_population[:num]
+                if only_str:
+                    eqs = []
+                    for idx in range(min(num, len(self.resulting_population))):
+                        eqs.append([solution.text_form for solution in self.resulting_population[idx]])
+                    return eqs
+                else:
+                    return self.resulting_population[:num]
         else:
             if only_print:
                 [print(f'{solution.text_form} , with objective function values of {solution.obj_fun} \n')  
                  for solution in self.resulting_population[:num]]
             else:
-                return self.resulting_population[:num]
+                if only_str:
+                    return [solution.text_form for solution in self.resulting_population[:num]]
+                else:
+                    return self.resulting_population[:num]
 
     def solver_forms(self, grids: list = None, num: int = 1):
         '''
