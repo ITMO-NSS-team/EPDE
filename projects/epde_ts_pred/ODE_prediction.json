@@ -1,0 +1,36 @@
+{
+"Optimizer": {
+"learning_rate":1e-5,
+"lambda_bound":100,
+"optimizer":"Adam"
+},
+"Cache":{
+"use_cache":false,
+"cache_dir":"../cache/",
+"cache_verbose":false,
+"save_always":false,
+"model_randomize_parameter":1e-5
+},
+"NN":{
+"batch_size":null,
+"lp_par":null,
+"grid_point_subset":["central"],
+"h":0.001
+},
+"Verbose":{
+	"verbose":true,
+	"print_every":null
+},
+"StopCriterion":{
+"eps":1e-7,
+"tmin":1000,
+"tmax":5e6,
+"patience":5,
+"loss_oscillation_window":100,
+"no_improvement_patience":1000   	
+},
+"Matrix":{
+"lp_par":null,
+"cache_model":null
+}
+}
