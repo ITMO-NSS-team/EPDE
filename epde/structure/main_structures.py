@@ -33,15 +33,16 @@ class Term(ComplexStructure):
     Class for describing the term of differential equation
 
     Attributes:
-        _descr_variable_marker
-
-        pool
-        max_factors_in_term:
+        pool (`TFPool`): all free families with elementary functions
+        max_factors_in_term (`int`): maximum number of elements in term of equation 
         cache_linked:
-        structure:
+        structure: 
         occupied_tokens_labels:
         descr_variable_marker:
-        prev_normalized
+        prev_normalized:
+        available_tokens (`list`): all tokens from `self.pool.families`, which have free components left. They have only free components in the available tokens
+        total_params (`int`): number of parameters in all structure of Term
+        name (`str`): string output of term structture
     """
     __slots__ = ['_history', 'structure', 'interelement_operator', 'saved', 'saved_as',
                  'pool', 'max_factors_in_term', 'cache_linked', 'occupied_tokens_labels',

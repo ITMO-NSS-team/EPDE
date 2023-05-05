@@ -17,6 +17,25 @@ from epde.supplementary import factor_params_to_str, train_ann, use_ann_to_predi
 
 
 class Factor(TerminalToken):
+    """
+
+    Attributes:
+        label (`str`): name of token
+        ftype (`str`): type of token family the Factor belongs to
+        status (`dict`): description of token behaviour during the equation construction and processsing.
+            Keys:
+                'mandatory' - if True, a token from the family must be present in every term; 
+                'unique_token_type' - if True, only one token of the family can be present in the term; 
+                'unique_specific_token' - if True, a specific token can be present only once per term;            
+                'requires_grid' - if True, the token requires grid for evaluation, if False, the tokens will be loaded from cache.
+        grid_set (`bool`): the need to use a grid
+        is_deriv (`bool`): the presence if a derivative in the token structure
+        deriv_code (``)
+        cache_linked ()
+        cache_label (`tuple`): structure of tuple = (name of token, (parameters of token))
+        name (`str`): formating output for token
+        
+    """
     __slots__ = ['_params', '_params_description', '_hash_val',
                  'label', 'ftype', 'grid_set', 'grid_idx', 'is_deriv', 'deriv_code',
                  'cache_linked', '_status', 'equality_ranges', '_evaluator', 'saved']
@@ -68,30 +87,25 @@ class Factor(TerminalToken):
 
     @status.setter
     def status(self, status_dict):
-        '''
-        Parameters
-        ----------
-        status_dict : dict
-            Description of token behaviour during the equation construction and processsing.
-            Keys:
-                'mandatory' - if True, a token from the family must be present in every term; 
-
-                'unique_token_type' - if True, only one token of the family can be present in the term; 
-
-                'unique_specific_token' - if True, a specific token can be present only once per term;            
-
-                'requires_grid' - if True, the token requires grid for evaluation, if False, the tokens will be
-                loaded from cache.
-        '''
         self._status = status_dict
 
     def set_parameters(self, params_description: dict, equality_ranges: dict,
                        random=True, **kwargs):
-        '''
+        """
+        Setting new value to parameters
 
-        Avoid periodic parameters (e.g. phase shift) 
+        Args:
+            params_description (`dict`): indormation about parameters (name, bounds)
+            equality_ranges (`dict`): acceptable difference in parameter values when comparing tokens
+            random (`bool`): default - True (select a random value within the given bounds), 
+                else - False (the value specified for the parameter is taken)
+        
+        Note:
+            Avoid periodic parameters (e.g. phase shift)
 
-        '''
+        Returns:
+            None
+        """
         _params_description = {}
         if not random:
             _params = np.empty(len(kwargs))
@@ -128,9 +142,9 @@ class Factor(TerminalToken):
             return True
 
     def __call__(self):
-        '''
+        """
         Return vector of evaluated values
-        '''
+        """
         raise NotImplementedError('Delete me')
         return self.evaluate(self)
 
@@ -139,6 +153,9 @@ class Factor(TerminalToken):
 
     # Переработать/удалить __call__, т.к. его функции уже тут
     def evaluate(self, structural=False, grids=None):
+        """
+        Getting result of the factor on the grid
+        """
         assert self.cache_linked
         if self.is_deriv and grids is not None:
             raise Exception(

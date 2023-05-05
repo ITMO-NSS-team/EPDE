@@ -25,14 +25,15 @@ class Token(ABC):
         """
         Return value of the token in the context of the task.
 
-        Parameters
-        ----------
-        grid:
-            The grid on which the value is calculated.
+        Args:
+            grid (`numpy.ndarray`): The grid on which the value is calculated.
         """
         pass
 
     def name(self, with_params=False):
+        """
+        Token output in a beautiful and understandable way
+        """
         try:
             return str(self.params[0]) + self.name_
         except:
@@ -52,9 +53,18 @@ class TerminalToken(Token):
     TerminalToken is the token that returns a value as a vector whose evaluating
     requaires only numeric parameters.
 
+    Attributes:
+        params_description (`dict`): The dictionary of dictionaries for describing numeric parameters of the token.
+        params (`numpy.ndarray`): Numeric parameters of the token for calculating its value.
+        cache_val (`bool`): If true, token value will be calculated only when its params are changed. Calculated value
+            is written to the token property 'self.val'.
+        val (`np.ndarray`): Value of the token.
+        name_ (`str`): The name of the token that will be used for visualisation results and  some comparison operations.
+        mandatory (`float`): Unique id for the token. If not zero, the token must be present in the result construct.
+        optimize_id (`int`): Used for identifications by optimizers which token to optimize.
+        
+
     """
-
-
     def __init__(self, number_params: int = 0, params_description: dict = None, params: np.ndarray = None,
                  cache_val: bool = True, fix_val: bool = False, fix: bool = False,
                  val: np.ndarray = None, type_: str = 'TerminalToken', optimizer: str = None, name_: str = None,
@@ -63,36 +73,24 @@ class TerminalToken(Token):
 
         Parameters
         ----------
-        number_params: int
-            Number of numeric parameters describing the behavior of the token.
-        params_description: dict
-            The dictionary of dictionaries for describing numeric parameters of the token.
+        number_params (`int`): Number of numeric parameters describing the behavior of the token.
+        params_description (`dict`): The dictionary of dictionaries for describing numeric parameters of the token.
             Must have the form like:
             {
                 parameter_index: dict(name='name', bounds=(min_value, max_value)[, ...]),
                 ...
             }
-        params: numpy.ndarray
-            Numeric parameters of the token for calculating its value.
-        cache_val: bool
-            If true, token value will be calculated only when its params are changed. Calculated value
+        params (`numpy.ndarray`): Numeric parameters of the token for calculating its value.
+        cache_val (`bool`): If true, token value will be calculated only when its params are changed. Calculated value
             is written to the token property 'self.val'.
-        fix_val: bool
-            Defined by parameter 'cache_val'. If true, token value returns 'self.val'.
-        fix: bool
-            If true, numeric parameters will not be changed by optimization procedures.
-        val: np.ndarray
-            Value of the token.
-        type_: str
-            Type of the token.
-        optimizer: str
-            Optimizer 
-        name_: str
-            The name of the token that will be used for visualisation results and  some comparison operations.
-        mandatory: float
-            Unique id for the token. If not zero, the token must be present in the result construct.
-        optimize_id: int
-            Used for identifications by optimizers which token to optimize.
+        fix_val (`bool`): Defined by parameter 'cache_val'. If true, token value returns 'self.val'.
+        fix (`bool`): If true, numeric parameters will not be changed by optimization procedures.
+        val (`np.ndarray`): Value of the token.
+        type_ (`str`): Type of the token.
+        optimizer (`str`): Optimizer 
+        name_ (`str`): The name of the token that will be used for visualisation results and  some comparison operations.
+        mandatory (`float`): Unique id for the token. If not zero, the token must be present in the result construct.
+        optimize_id (`int`): Used for identifications by optimizers which token to optimize.
         """
         self._number_params = number_params
         if params_description is None:
@@ -139,10 +137,8 @@ class TerminalToken(Token):
         Params_description must contain all fields for work in current tokens that will be checked by
         method 'self.check_params_description()'.
 
-        Parameters
-        ----------
-        params_description: dict
-            Dictionary with description for each parameter
+        Args:
+            params_description (`dict`): dictionary with description for each parameter
         """
         assert isinstance(params_description, dict)
         self._params_description = params_description
@@ -170,6 +166,13 @@ class TerminalToken(Token):
                 " boundaries MIN <= MAX." + recomendations
 
     def set_descriptor(self, key: int, descriptor_name: str, descriptor_value):
+        """
+        Setting new dscription for parameter of token
+
+        Args:
+            key (`str`): parameter name
+            descriptor_name (d)
+        """
         try:
             self._params_description[key][descriptor_name] = descriptor_value
         except KeyError:
