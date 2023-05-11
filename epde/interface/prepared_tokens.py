@@ -18,7 +18,7 @@ import epde.globals as global_var
 from epde.interface.token_family import TokenFamily
 from epde.evaluators import CustomEvaluator, EvaluatorTemplate, trigonometric_evaluator, simple_function_evaluator
 from epde.evaluators import const_evaluator, const_grad_evaluator, grid_evaluator
-from epde.evaluators import velocity_evaluator, velocity_grad_evaluators
+from epde.evaluators import velocity_evaluator, velocity_grad_evaluators, phased_sine_evaluator
 from epde.cache.cache import upload_simple_tokens, prepare_var_tensor  # np_ndarray_section,
 
 
@@ -50,7 +50,7 @@ class TrigonometricTokens(PreparedTokens):
         Args:
             freq (`tuple`): optional, default - (pi/2., 2*pi)
                 interval for parameter frequency in trigonometric token
-            dimensionally (`int`): optional, default - 1
+            dimensionality (`int`): optional, default - 1
                 data dimension 
         """
         assert freq[1] > freq[0] and len(freq) == 2, 'The tuple, defining frequncy interval, shall contain 2 elements with first - the left boundary of interval and the second - the right one. '
@@ -70,6 +70,51 @@ class TrigonometricTokens(PreparedTokens):
         self._token_family.set_evaluator(trigonometric_evaluator, [])
 
 
+# class PhasedSineTokens(PreparedTokens):
+#     def __init__(self, freq: tuple = ((np.pi/2., 2*np.pi),), dimensionality = 1):
+#         assert len(freq) == dimensionality or len(freq) == 1, 'Incorrect params'
+#         self._token_family = TokenFamily(token_type='phased_sine')
+#         self._token_family.set_status(unique_specific_token=True, unique_token_type=True,
+#                                       meaningful=False)
+
+#         if len(freq) == 1: # dimensionality > 1 and 
+#             freqs_matched = tuple([freq[0] for idx in range(dimensionality)])
+        
+#         sine_token_params = OrderedDict([('power', (1, 1)),#tuple([(1, 1) for idx in range(dimensionality)])),
+#                                          ('freq', freqs_matched),
+#                                          ('phase', tuple([(0, 1) for idx in range(dimensionality)]))])
+
+#         freq_equality_fraction = 0.05  # fraction of allowed frequency interval, that is considered as the same
+
+#         freqs_equality = [(freq[idx][1] - freq[idx][0]) / freq_equality_fraction for idx in range(dimensionality)]
+#         sine_equal_params = {'power': 0, 'freq': freqs_equality,
+#                              'phase': 0.05}
+#         self._token_family.set_params(['sine',], sine_token_params, sine_equal_params)
+#         self._token_family.set_evaluator(phased_sine_evaluator, [])        
+
+class PhasedSine1DTokens(PreparedTokens):
+    def __init__(self, freq: tuple = (np.pi/2., 2*np.pi)):
+        # assert len(freq) == dimensionality or len(freq) == 1, 'Incorrect params'
+        self._token_family = TokenFamily(token_type='phased_sine_1d')
+        self._token_family.set_status(unique_specific_token=True, unique_token_type=True,
+                                      meaningful=False)
+
+        # if len(freq) == 1: # dimensionality > 1 and 
+        #     freqs_matched = tuple([freq[0] for idx in range(dimensionality)])
+        
+        sine_token_params = OrderedDict([('power', (1, 1)),#tuple([(1, 1) for idx in range(dimensionality)])),
+                                         ('freq', freq),
+                                         ('phase', (0., 1.))])
+
+        freq_equality_fraction = 0.05  # fraction of allowed frequency interval, that is considered as the same
+
+        # freqs_equality = [(freq[idx][1] - freq[idx][0]) / freq_equality_fraction for idx in range(dimensionality)]
+        sine_equal_params = {'power': 0, 'freq': (freq[1] - freq[0]) / freq_equality_fraction,
+                             'phase': 0.05}
+        self._token_family.set_params(['sine',], sine_token_params, sine_equal_params)
+        self._token_family.set_evaluator(phased_sine_evaluator, [])        
+
+
 class GridTokens(PreparedTokens):
     """
     Class for prepared tokens, that describe family of grids as values
@@ -79,7 +124,7 @@ class GridTokens(PreparedTokens):
         Initialization of class
 
         Args:
-            dimensionally (`int`): optional, default - 1
+            dimensionality (`int`): optional, default - 1
                 data dimension 
         """
         assert len(labels) == dimensionality + 1, 'Incorrect labels for grids.'

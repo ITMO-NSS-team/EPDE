@@ -122,8 +122,20 @@ def simple_function_evaluator(factor, structural: bool = False, grids=None, **kw
 
 trig_eval_fun = {'cos': lambda *grids, **kwargs: np.cos(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power'],
                  'sin': lambda *grids, **kwargs: np.sin(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power']}
+
 inverse_eval_fun = lambda *grids, **kwargs: np.power(grids[int(kwargs['dim'])], - kwargs['power'])
+
 grid_eval_fun = lambda *grids, **kwargs: np.power(grids[int(kwargs['dim'])], kwargs['power'])
+
+def phased_sine(*grids, **kwargs):
+    coordwise_elems = [kwargs['freq'][dim] * 2*np.pi*(grids[dim] + kwargs['phase'][dim]) 
+                       for dim in range(len(grids))]
+    return np.power(np.sin(np.sum(coordwise_elems, axis = 0)), kwargs['power'])
+
+def phased_sine_1d(*grids, **kwargs):
+    coordwise_elems = kwargs['freq'] * 2*np.pi*(grids[0] + kwargs['phase']/kwargs['freq']) 
+                       # for dim in range(len(grids))]
+    return np.power(np.sin(coordwise_elems), kwargs['power'])
 
 # def grid_eval_fun(*grids, **kwargs):
 #     return np.power(grids[int(kwargs['dim'])], kwargs['power'])
@@ -264,6 +276,7 @@ vhef_grad = [vhef_grad_1, vhef_grad_2, vhef_grad_3,
              vhef_grad_10, vhef_grad_11, vhef_grad_12,
              vhef_grad_13, vhef_grad_14, vhef_grad_15]
 
+phased_sine_evaluator = CustomEvaluator(phased_sine_1d, eval_fun_params_labels=['power', 'freq', 'phase'], use_factors_grids=True)
 trigonometric_evaluator = CustomEvaluator(trig_eval_fun, eval_fun_params_labels=['freq', 'dim', 'power'], use_factors_grids=True)
 grid_evaluator = CustomEvaluator(grid_eval_fun, eval_fun_params_labels=['dim', 'power'], use_factors_grids=True)
 

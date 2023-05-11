@@ -60,7 +60,7 @@ def check_dominance(target, compared_with) -> bool:
         idx = -(np.sign(magn_top)*np.ceil(np.abs(magn_top)) - sign_num)
         if idx - sign_num > 1:
             idx -= 1
-        return np.around(value, np.int(idx))
+        return np.around(value, int(idx))
 
     sdn = 5 # Number of significant digits
     for obj_fun_idx in range(len(target.obj_fun)):

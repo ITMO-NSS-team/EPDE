@@ -21,7 +21,7 @@ def get_cheb_for_point(matrix, axis, idx, grid, max_der_order=3, points=9, poly_
         warn('Overfitting of the Chebyshev polynomial, that tries to represent the data, reducing order by one.')
         max_power -= 1
         
-    I = np.array([np.int(-(points-1)/2 + i)
+    I = np.array([int(-(points-1)/2 + i)
                  for i in np.arange(points)]) + idx[axis]
     F = matrix.take(I, axis=axis)
     x_raw = grid[axis].take(I, axis=axis)
