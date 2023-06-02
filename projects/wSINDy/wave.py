@@ -159,7 +159,7 @@ if __name__ == '__main__':
         data_file = os.path.join(os.path.dirname( __file__ ), f'data/wave/wave_sln_{shape}.csv')
         data = np.loadtxt(data_file, delimiter = ',').T
     except FileNotFoundError:
-        data_file = '/home/maslyaev/epde/EPDE_main/projects/wSINDy/data/wave/wave_sln_{shape}.csv'
+        data_file = f'/home/maslyaev/epde/EPDE_main/projects/wSINDy/data/wave/wave_sln_{shape}.csv'
         data = np.loadtxt(data_file, delimiter = ',').T
 
     t = np.linspace(0, 1, shape+1); x = np.linspace(0, 1, shape+1)

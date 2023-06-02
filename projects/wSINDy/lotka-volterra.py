@@ -116,8 +116,37 @@ def sindy_discovery(t, x, y):
     )
     return model
 
-# def save_launch_res(filename):
-#     if filename[0] == '\':
+def weak_sindy_discovery(t, x, y):
+    # poly_order = 5
+    # threshold = 0.05
+    dt = t[1] - t[0]
+    x_train = np.array([x, y]).T
+    print(x_train.shape)
+
+    x_dot = ps.FiniteDifference()._differentiate(x_train, t=dt)
+    model = ps.SINDy()
+    model.fit(x_train, x_dot=x_dot, t=dt)
+    model.print()    
+    
+    library_functions = [lambda x: x, lambda x: x * x, lambda x, y: x * y]
+    library_function_names = [lambda x: x, lambda x: x + x, lambda x, y: x + y]
+    ode_lib = ps.WeakPDELibrary(
+        library_functions=library_functions,
+        function_names=library_function_names,
+        spatiotemporal_grid=t_train,
+        is_uniform=True,
+        K=10,
+    )
+    
+    # Instantiate and fit the SINDy model with the integral of u_dot
+    optimizer = ps.SR3(
+        threshold=0.05, thresholder="l1", max_iter=1000, normalize_columns=True, tol=1e-1
+    )
+    model = ps.SINDy(feature_library=ode_lib, optimizer=optimizer)
+    model.fit(x_train)
+    model.print()
+    return model
+
 
 if __name__ == '__main__':
     '''
@@ -151,18 +180,21 @@ if __name__ == '__main__':
     x = data[:t_max, 0]; x_test = data[t_max:, 0]
     y = data[:t_max, 1]; y_test = data[t_max:, 1]
 
-    magnitude = 5.*1e-2
-    x_n = x + np.random.normal(scale = magnitude*x, size = x.shape)
-    y_n = y + np.random.normal(scale = magnitude*y, size = y.shape)
-    plt.plot(t_train, x_n)
-    plt.plot(t_train, y_n)
-    plt.show()
-    epde = True
-    
-    if epde:
-        test_launches = 1
-        errs = []
-        models = []
+    exps = {}
+    magnitudes = [0, 1.*1e-2, 2.5*1e-2, 5.*1e-2, 1.*1e-1]
+    for magnitude in magnitudes:
+        x_n = x + np.random.normal(scale = magnitude*x, size = x.shape)
+        y_n = y + np.random.normal(scale = magnitude*y, size = y.shape)
+        plt.plot(t_train, x_n)
+        plt.plot(t_train, y_n)
+        plt.show()
+        # epde = True
+        
+        test_launches = 20
+        errs_epde = []
+        models_epde = []
+        calc_epde = []
+        
         for idx in range(test_launches):
             epde_search_obj, sys = epde_discovery(t_train, x_n, y_n, True)
             
@@ -190,28 +222,69 @@ if __name__ == '__main__':
             plt.legend(loc='upper right')
             plt.show()
             
-            models.append(epde_search_obj)
-            errs.append((np.mean(np.abs(x_test - pred_u_v[:, 0])), 
+            models_epde.append(epde_search_obj)
+            errs_epde.append((np.mean(np.abs(x_test - pred_u_v[:, 0])), 
                          np.mean(np.abs(y_test - pred_u_v[:, 1]))))
-    else:
-        errs = []
-        models = []
-        test_launches = 10
+            calc_epde.append(pred_u_v)
+        # else:
+        errs_SINDy = []
+        models_SINDy = []
+        calc_SINDy = []
+        test_launches = 1
         for idx in range(test_launches):
-            model = sindy_discovery(t_train, x_n, y_n)
+            '''
+            Basic SINDy
+            '''
+            model_base = sindy_discovery(t_train, x_n, y_n)
             print('Initial conditions', np.array([x_test[0], y_test[0]]))
-            pred_u_v = model.simulate(np.array([x_test[0], y_test[0]]), t_test)
-            models.append(model)
-            
-            plt.plot(t_test, x_test, '+', label = 'preys_odeint')
-            plt.plot(t_test, y_test, '*', label = "predators_odeint")
-            plt.plot(t_test, pred_u_v[:, 0], color = 'b', label='preys_NN')
-            plt.plot(t_test, pred_u_v[:, 1], color = 'r', label='predators_NN')
-            plt.xlabel('Time t, [days]')
-            plt.ylabel('Population')
-            plt.grid()
-            plt.legend(loc='upper right')       
-            plt.show()
-            errs.append((np.mean(np.abs(x_test - pred_u_v[:, 0])),
-                         np.mean(np.abs(y_test - pred_u_v[:, 1]))))
-        
+            models_SINDy.append(model_base)
+
+            try:
+                pred_u_v = model_base.simulate(np.array([x_test[0], y_test[0]]), t_test)
+                
+                plt.plot(t_test, x_test, '+', label = 'preys_odeint')
+                plt.plot(t_test, y_test, '*', label = "predators_odeint")
+                plt.plot(t_test, pred_u_v[:, 0], color = 'b', label='preys_NN')
+                plt.plot(t_test, pred_u_v[:, 1], color = 'r', label='predators_NN')
+                plt.xlabel('Time t, [days]')
+                plt.ylabel('Population')
+                plt.grid()
+                plt.legend(loc='upper right')
+                plt.title('Basic SINDy')
+                plt.show()
+                errs_SINDy.append((np.mean(np.abs(x_test - pred_u_v[:, 0])),
+                             np.mean(np.abs(y_test - pred_u_v[:, 1]))))
+                calc_SINDy.append(pred_u_v)
+            except:
+                errs_SINDy.append((np.inf, np.inf))
+                calc_SINDy.append(np.zeros((x_test.size, 2)))
+
+            '''
+            weak SINDy
+            '''
+            model_weak = weak_sindy_discovery(t_train, x_n, y_n)
+            print('Initial conditions', np.array([x_test[0], y_test[0]]))
+            models_SINDy.append(model_weak)
+
+            try:
+                pred_u_v = model_weak.simulate(np.array([x_test[0], y_test[0]]), t_test)
+                
+                plt.plot(t_test, x_test, '+', label = 'preys_odeint')
+                plt.plot(t_test, y_test, '*', label = "predators_odeint")
+                plt.plot(t_test, pred_u_v[:, 0], color = 'b', label='preys_NN')
+                plt.plot(t_test, pred_u_v[:, 1], color = 'r', label='predators_NN')
+                plt.xlabel('Time t, [days]')
+                plt.ylabel('Population')
+                plt.grid()
+                plt.legend(loc='upper right')
+                plt.title('weakform SINDy')
+                plt.show()
+                errs_SINDy.append((np.mean(np.abs(x_test - pred_u_v[:, 0])),
+                             np.mean(np.abs(y_test - pred_u_v[:, 1]))))
+                calc_SINDy.append(pred_u_v)
+            except:
+                errs_SINDy.append((np.inf, np.inf))
+                calc_SINDy.append(np.zeros((x_test.size, 2)))      
+                
+        exps[magnitude] = {'epde': (models_epde, errs_epde, calc_epde), 
+                           'SINDy' : (models_SINDy, errs_SINDy, calc_SINDy)}

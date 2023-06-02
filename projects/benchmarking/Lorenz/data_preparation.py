@@ -34,7 +34,7 @@ def Lotka_Volterra_by_RK(initial : tuple, timestep : float, steps : int, alpha :
     return res
         
 def dxdt(x, t):
-    sigma = 10.; rho = 28.; beta = 8./3.
+    sigma = 100.; rho = 280.; beta = 80./3. # Added extra zeros
     res = np.empty(3)
     res[0] = sigma * (x[1] - x[0])
     res[1] = x[0] * (rho - x[2]) - x[1]
@@ -78,14 +78,22 @@ def classical_plot(solution, time, time_max = -1, step = 1):
     plt.show()
     
 if __name__ == "__main__":
-    step = 0.001; steps_num = 100000
+    step = 0.0001; steps_num = 10000
     t = np.arange(start = 0, stop = step * steps_num, step = step)
     solution = solve(initial=(0, 1, 20), timestep=step, steps=steps_num)    
     
+    # for var_idx in range(solution.shape[1]):
+    #     plt.scatter(time[:time_max:step], solution[:time_max:step, var_idx], color = colors[var_idx], 
+    #                 label = f'x{var_idx}')
+    # plt.grid()
+    # plt.legend(prop={'size': 13})
+    # plt.xlabel('Time')
+    # plt.ylabel('Value')
+    
 
-    plt.savefig('/home/maslyaev/epde/EPDE_main/projects/benchmarking/Lorenz/fig.png', dpi=150, 
-                bbox_inches='tight')
-    data = np.save(file = '/home/maslyaev/epde/EPDE_main/projects/benchmarking/Lorenz/data/lorenz.npy', 
-                   arr = solution)
-    t = np.save(file = '/home/maslyaev/epde/EPDE_main/projects/benchmarking/Lorenz/data/t.npy', 
+    # plt.savefig('/home/maslyaev/epde/EPDE_main/projects/benchmarking/Lorenz/fig.png', dpi=150, 
+    #             bbox_inches='tight')
+    data = np.save(file = '/home/maslyaev/epde/EPDE_main/projects/benchmarking/Lorenz/data/lorenz_1.npy', 
+                    arr = solution)
+    t = np.save(file = '/home/maslyaev/epde/EPDE_main/projects/benchmarking/Lorenz/data/t_1.npy', 
                 arr = t)

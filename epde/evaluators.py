@@ -133,7 +133,7 @@ def phased_sine(*grids, **kwargs):
     return np.power(np.sin(np.sum(coordwise_elems, axis = 0)), kwargs['power'])
 
 def phased_sine_1d(*grids, **kwargs):
-    coordwise_elems = kwargs['freq'] * 2*np.pi*(grids[0] + kwargs['phase']) 
+    coordwise_elems = kwargs['freq'] * 2*np.pi*(grids[0] + kwargs['phase']/kwargs['freq']) 
                        # for dim in range(len(grids))]
     return np.power(np.sin(coordwise_elems), kwargs['power'])
 

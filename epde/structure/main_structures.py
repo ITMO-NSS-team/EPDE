@@ -628,6 +628,7 @@ class Equation(ComplexStructure):
         return form
 
     def solver_form(self, grids: list = None):
+        raise DeprecationWarning('To be removed from the framework!')
         if self.solver_form_defined:
             # print(self.text_form)
             return self._solver_form

@@ -400,13 +400,14 @@ class SystemSolverInterface(object):
         _solver_form = {}
         for term_idx, term in enumerate(equation.structure):
             if term_idx != equation.target_idx:
-                _solver_form[term.name] = self._term_solver_form(term, grids, variables)
                 if term_idx < equation.target_idx:
                     weight = equation.weights_final[term_idx]
                 else:
                     weight = equation.weights_final[term_idx-1]
-                _solver_form[term.name]['coeff'] = _solver_form[term.name]['coeff'] * weight
-                _solver_form[term.name]['coeff'] = torch.flatten(_solver_form[term.name]['coeff']).unsqueeze(1).type(torch.FloatTensor)
+                if not np.isclose(weight, 0, rtol = 1.e-9):
+                    _solver_form[term.name] = self._term_solver_form(term, grids, variables)
+                    _solver_form[term.name]['coeff'] = _solver_form[term.name]['coeff'] * weight
+                    _solver_form[term.name]['coeff'] = torch.flatten(_solver_form[term.name]['coeff']).unsqueeze(1).type(torch.FloatTensor)
 
         free_coeff_weight = torch.from_numpy(np.full_like(a=grids[0],  # global_var.grid_cache.get('0'),
                                                           fill_value=equation.weights_final[-1]))
