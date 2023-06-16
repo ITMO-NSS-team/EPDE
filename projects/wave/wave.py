@@ -85,7 +85,7 @@ if __name__ == "__main__":
                                 equation_terms_max_number=5, data_fun_pow = 1, additional_tokens=[trig_tokens,], #custom_grid_tokens 
                                 equation_factors_max_number = factors_max_number, 
                                 eq_sparsity_interval=(1e-10, 1e-4), coordinate_tensors=grids)
-            paretos.append(epde_search_obj.equation_search_results(only_print = False, level_num = 1))
+            paretos.append(epde_search_obj.equations(only_print = False, level_num = 1))
     #     return paretos
     
     # translate_eq()

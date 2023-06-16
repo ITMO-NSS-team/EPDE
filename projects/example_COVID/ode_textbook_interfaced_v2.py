@@ -74,4 +74,4 @@ if __name__ == '__main__':
                         equation_factors_max_number=2, deriv_method='poly', eq_sparsity_interval=(1e-7, 10),
                         deriv_method_kwargs={'smooth': False, 'grid': [t, ]}, coordinate_tensors=[t, ])
 
-    epde_search_obj.equation_search_results(only_print = True, level_num = 1) # showing the Pareto-optimal set of discovered equations 
+    epde_search_obj.equations(only_print = True, level_num = 1) # showing the Pareto-optimal set of discovered equations 

@@ -85,10 +85,10 @@ if __name__ == '__main__':
     {'terms_number': {'optimizable': False, 'value': 3}, 'max_factors_in_term': {'optimizable': False, 'value': {'factors_num': [1, 2], 'probas': [0.8, 0.2]}}, 
      ('sparsity', 'u'): {'optimizable': True, 'value': 0.00027172388370453704}, ('sparsity', 'v'): {'optimizable': True, 'value': 0.00019292375116125682}} , with objective function values of [0.2800438  0.18041074 4.         4.        ]         
     '''
-    epde_search_obj.equation_search_results(only_print = True, num = 1)
+    epde_search_obj.equations(only_print = True, num = 1)
     
-    res = epde_search_obj.equation_search_results(only_print = False, num = 1)
-    eq = epde_search_obj.get_equations_by_complexity(complexity=[3., 5., 4.])[0]
+    res = epde_search_obj.equations(only_print = False, num = 1)
+    eq = epde_search_obj.get_equations_by_complexity(complexity=[4., 5., 4.])[0]
     
     def get_ode_bop(key, var, grid_loc, value):
         bop = BOPElement(axis = 0, key = key, term = [None], power = 1, var = var)

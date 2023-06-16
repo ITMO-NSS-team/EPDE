@@ -73,17 +73,17 @@ def run_KdV_eq_search(multiobjective_mode, derivs):
                         additional_tokens=[trig_tokens, custom_grid_tokens, custom_trig_tokens], #custom_grid_tokens 
                         equation_factors_max_number = factors_max_number, 
                         eq_sparsity_interval = bounds)
-    epde_search_obj.equation_search_results(only_print = True, num = 1)        
+    epde_search_obj.equations(only_print = True, num = 1)        
     if multiobjective_mode:    
         try:
             metric = epde_search_obj.get_equations_by_complexity(complexity = 5)[0].obj_fun[0]
         except IndexError:
             metric = 999.
     else:
-        metric = epde_search_obj.equation_search_results(only_print = False, num = 1)[0].obj_fun[0]
+        metric = epde_search_obj.equations(only_print = False, num = 1)[0].obj_fun[0]
     print(f'Obtained metric is {metric}')
     
-    return epde_search_obj.equation_search_results(only_print = False, num = 1), metric 
+    return epde_search_obj.equations(only_print = False, num = 1), metric 
     
 if __name__ == "__main__":
     '''

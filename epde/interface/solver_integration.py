@@ -303,40 +303,11 @@ def solver_formed_grid(training_grid=None):
 
 
 class SystemSolverInterface(object):
-    def __init__(self, system_to_adapt: SoEq):
+    def __init__(self, system_to_adapt: SoEq, coeff_tol: float = 1.e-9):
         self.variables = list(system_to_adapt.vars_to_describe)
-        # print(f'self.variables in SystemSolverInterface: {self.variables}')
         self.adaptee = system_to_adapt
-        # assert self.adaptee.weights_final_evald
-
         self.grids = None
-
-    # @staticmethod
-    # def old_term_solver_form(term, grids):
-    #     deriv_orders = []
-    #     deriv_powers = []
-    #     derivs_detected = False
-
-    #     try:
-    #         coeff_tensor = np.ones_like(global_var.grid_cache.get('0'))
-    #     except KeyError:
-    #         raise NotImplementedError('No cache implemented')
-    #     for factor in term.structure:
-    #         if factor.is_deriv:
-    #             for param_idx, param_descr in factor.params_description.items():
-    #                 if param_descr['name'] == 'power': power_param_idx = param_idx
-    #             deriv_orders.append(factor.deriv_code); deriv_powers.append(factor.params[power_param_idx])
-    #             derivs_detected = True
-    #         else:
-    #             coeff_tensor=coeff_tensor * factor.evaluate(grids=grids)
-    #     if not derivs_detected:
-    #        deriv_powers = [0]; deriv_orders = [[None,],]
-    #     if len(deriv_powers) == 1:
-    #         deriv_powers = deriv_powers[0]
-    #         deriv_orders = deriv_orders[0]
-
-    #     coeff_tensor = torch.from_numpy(coeff_tensor)
-    #     return [coeff_tensor, deriv_orders, deriv_powers]
+        self.coeff_tol = coeff_tol
 
     @staticmethod
     def _term_solver_form(term, grids, variables: list = ['u',]):
@@ -346,7 +317,6 @@ class SystemSolverInterface(object):
         derivs_detected = False
 
         try:
-            # global_var.grid_cache.get('0'))
             coeff_tensor = np.ones_like(grids[0])
         except KeyError:
             raise NotImplementedError('No cache implemented')
@@ -404,7 +374,7 @@ class SystemSolverInterface(object):
                     weight = equation.weights_final[term_idx]
                 else:
                     weight = equation.weights_final[term_idx-1]
-                if not np.isclose(weight, 0, rtol = 1.e-9):
+                if not np.isclose(weight, 0, rtol = self.coeff_tol):
                     _solver_form[term.name] = self._term_solver_form(term, grids, variables)
                     _solver_form[term.name]['coeff'] = _solver_form[term.name]['coeff'] * weight
                     _solver_form[term.name]['coeff'] = torch.flatten(_solver_form[term.name]['coeff']).unsqueeze(1).type(torch.FloatTensor)

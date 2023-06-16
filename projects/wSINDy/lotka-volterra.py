@@ -28,12 +28,14 @@ matplotlib.rc('axes', titlesize=SMALL_SIZE)
 from scipy.integrate import solve_ivp
 from scipy.io import loadmat
 from pysindy.utils import lotka
+from functools import reduce
 
 import pysindy as ps
 
 import epde.interface.interface as epde_alg
 from epde.interface.prepared_tokens import TrigonometricTokens
 from epde.interface.solver_integration import BoundaryConditions, BOPElement
+from epde.interface.logger import Logger
 
 SOLVER_STRATEGY = 'autograd'
 
@@ -45,6 +47,29 @@ def write_pareto(dict_of_exp):
                 f.write(f'Iteration {iteration}\n\n')
                 for ind in [pareto.text_form for pareto in item[iteration][0]]:
                     f.write(ind + '\n\n')
+
+def translate_sindy_eq(equation: str):
+    correspondence = {"0" : "u{power: 1.0}",
+                      "0_1" : "du/dx2{power: 1.0}",
+                      "0_11" : "d^2u/dx2^2{power: 1.0}",
+                      "0_111" : "d^3u/dx3^2{power: 1.0}"}
+                        
+    terms = [] # Check EPDE translator input format
+    
+    def replace(term):
+        term = term.replace(' ', '').split('x')
+        for idx, factor in enumerate(term[1:]):
+            try:
+                term[idx+1] = correspondence[factor]
+            except KeyError:
+                print(f'Key of term {factor} is missing')
+                raise KeyError()
+        return term
+                
+    for term in equation.split('+'):
+        terms.append(reduce(lambda x, y: x + ' * ' + y, replace(term)))
+    terms_comb = reduce(lambda x, y: x + ' + ' + y, terms) + ' = du/dx1{power: 1.0}'
+    return terms_comb
 
 def epde_discovery(t, x, y, use_ann = False):
     dimensionality = x.ndim - 1
@@ -80,7 +105,7 @@ def epde_discovery(t, x, y, use_ann = False):
     {'terms_number': {'optimizable': False, 'value': 3}, 'max_factors_in_term': {'optimizable': False, 'value': {'factors_num': [1, 2], 'probas': [0.8, 0.2]}}, 
      ('sparsity', 'u'): {'optimizable': True, 'value': 0.00027172388370453704}, ('sparsity', 'v'): {'optimizable': True, 'value': 0.00019292375116125682}} , with objective function values of [0.2800438  0.18041074 4.         4.        ]         
     '''
-    epde_search_obj.equation_search_results(only_print = True, num = 1)
+    epde_search_obj.equations(only_print = True, num = 1)
     equation_obtained = False; compl = [4, 4]; attempt = 0
     
     
@@ -96,15 +121,15 @@ def epde_discovery(t, x, y, use_ann = False):
     return epde_search_obj, res
     
 
-def sindy_discovery(t, x, y):
+def sindy_discovery(t, x, y, sparsity = 0.05):
     poly_order = 5
-    threshold = 0.05
+    # threshold = 0.05
     
     x_train = np.array([x, y]).T
     print(x_train.shape)
     
     model = ps.SINDy(
-        optimizer=ps.STLSQ(threshold=threshold),
+        optimizer=ps.STLSQ(threshold=sparsity),
         feature_library=ps.PolynomialLibrary(degree=poly_order),
     )
     model.fit(
@@ -140,7 +165,7 @@ def weak_sindy_discovery(t, x, y):
     
     # Instantiate and fit the SINDy model with the integral of u_dot
     optimizer = ps.SR3(
-        threshold=0.05, thresholder="l1", max_iter=1000, normalize_columns=True, tol=1e-1
+        threshold=1.5, thresholder="l1", max_iter=1000, normalize_columns=True, tol=1e-1
     )
     model = ps.SINDy(feature_library=ode_lib, optimizer=optimizer)
     model.fit(x_train)
@@ -179,6 +204,9 @@ if __name__ == '__main__':
         
     x = data[:t_max, 0]; x_test = data[t_max:, 0]
     y = data[:t_max, 1]; y_test = data[t_max:, 1]
+    
+    run_epde = False
+    run_sindy = True
 
     exps = {}
     magnitudes = [0, 1.*1e-2, 2.5*1e-2, 5.*1e-2, 1.*1e-1]
@@ -188,7 +216,6 @@ if __name__ == '__main__':
         plt.plot(t_train, x_n)
         plt.plot(t_train, y_n)
         plt.show()
-        # epde = True
         
         test_launches = 20
         errs_epde = []
@@ -196,95 +223,119 @@ if __name__ == '__main__':
         calc_epde = []
         
         for idx in range(test_launches):
-            epde_search_obj, sys = epde_discovery(t_train, x_n, y_n, True)
-            
-            def get_ode_bop(key, var, grid_loc, value):
-                bop = BOPElement(axis = 0, key = key, term = [None], power = 1, var = var)
-                bop_grd_np = np.array([[grid_loc,]])
-                bop.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor))
-                bop.values = torch.from_numpy(np.array([[value,]])).float()
-                return bop
+            if run_epde:
+                epde_search_obj, sys = epde_discovery(t_train, x_n, y_n, True)
                 
-            
-            bop_x = get_ode_bop('u', 0, t_test_interval_pred[0], x_test[0])
-            bop_y = get_ode_bop('v', 1, t_test_interval_pred[0], y_test[0])
-            
-            
-            pred_u_v = epde_search_obj.predict(system=sys, boundary_conditions=[bop_x(), bop_y()], 
-                                                grid = [t_test_interval_pred,], strategy=SOLVER_STRATEGY)
-            plt.plot(t_test_interval_pred, x_test, '+', label = 'preys_odeint')
-            plt.plot(t_test_interval_pred, y_test, '*', label = "predators_odeint")
-            plt.plot(t_test_interval_pred, pred_u_v[..., 0], color = 'b', label='preys_NN')
-            plt.plot(t_test_interval_pred, pred_u_v[..., 1], color = 'r', label='predators_NN')
-            plt.xlabel('Time t, [days]')
-            plt.ylabel('Population')
-            plt.grid()
-            plt.legend(loc='upper right')
-            plt.show()
-            
-            models_epde.append(epde_search_obj)
-            errs_epde.append((np.mean(np.abs(x_test - pred_u_v[:, 0])), 
-                         np.mean(np.abs(y_test - pred_u_v[:, 1]))))
-            calc_epde.append(pred_u_v)
+                def get_ode_bop(key, var, grid_loc, value):
+                    bop = BOPElement(axis = 0, key = key, term = [None], power = 1, var = var)
+                    bop_grd_np = np.array([[grid_loc,]])
+                    bop.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor))
+                    bop.values = torch.from_numpy(np.array([[value,]])).float()
+                    return bop
+                    
+                
+                bop_x = get_ode_bop('u', 0, t_test_interval_pred[0], x_test[0])
+                bop_y = get_ode_bop('v', 1, t_test_interval_pred[0], y_test[0])
+                
+                
+                pred_u_v = epde_search_obj.predict(system=sys, boundary_conditions=[bop_x(), bop_y()], 
+                                                    grid = [t_test_interval_pred,], strategy=SOLVER_STRATEGY)
+                plt.plot(t_test_interval_pred, x_test, '+', label = 'preys_odeint')
+                plt.plot(t_test_interval_pred, y_test, '*', label = "predators_odeint")
+                plt.plot(t_test_interval_pred, pred_u_v[..., 0], color = 'b', label='preys_NN')
+                plt.plot(t_test_interval_pred, pred_u_v[..., 1], color = 'r', label='predators_NN')
+                plt.xlabel('Время')
+                plt.ylabel('Размер популяции')
+                plt.grid()
+                plt.legend(loc='upper right')
+                plt.show()
+                
+                models_epde.append(epde_search_obj)
+                err_u, err_v = np.mean(np.abs(x_test - pred_u_v[:, 0])), np.mean(np.abs(y_test - pred_u_v[:, 1]))
+                errs_epde.append((err_u, err_v))
+                calc_epde.append(pred_u_v)
+                
+                try:
+                    logger.add_log(key = f'Lotka_Volterra_noise_{magnitude}_attempt_{idx}', entry = sys, error_pred = (err_u, err_v))
+                except NameError:
+                    logger = Logger(name = 'logs/lotka_volterra.json', referential_equation = {'u' : '20.0 * u{power: 1.0} + -20.0 * u{power: 1.0} * v{power: 1.0} + 0.0 = du/dx1{power: 1.0}',
+                                                                                               'v' : '-20.0 * v{power: 1.0} + 20.0 * u{power: 1.0} * v{power: 1.0} + 0.0 = dv/dx1{power: 1.0}'}, 
+                                    pool = epde_search_obj.pool)
+                    logger.add_log(key = f'Lotka_Volterra_noise_{magnitude}_attempt_{idx}', entry = sys, error_pred = (err_u, err_v))
+                            
         # else:
+
         errs_SINDy = []
         models_SINDy = []
         calc_SINDy = []
-        test_launches = 1
-        for idx in range(test_launches):
-            '''
-            Basic SINDy
-            '''
-            model_base = sindy_discovery(t_train, x_n, y_n)
-            print('Initial conditions', np.array([x_test[0], y_test[0]]))
-            models_SINDy.append(model_base)
-
-            try:
-                pred_u_v = model_base.simulate(np.array([x_test[0], y_test[0]]), t_test)
+        if run_sindy:        
+            test_launches = 1
+            for idx in range(test_launches):
+                '''
+                Basic SINDy
+                '''
+                model_quality = np.inf; model_container = (None, None, None)
+                for sparsity_thr in [0.05, 0.1, 0.2, 0.5, 1., 1.5]:
+                                        
+                    model_base = sindy_discovery(t_train, x_n, y_n, sparsity=sparsity_thr)
+                    print('Initial conditions', np.array([x_test[0], y_test[0]]))
+                    
+        
+                    try:
+                        pred_u_v = model_base.simulate(np.array([x_test[0], y_test[0]]), t_test)
+                        
+                        plt.plot(t_test, x_test, '+', label = 'preys_odeint')
+                        plt.plot(t_test, y_test, '*', label = "predators_odeint")
+                        plt.plot(t_test, pred_u_v[:, 0], color = 'b', label='preys_NN')
+                        plt.plot(t_test, pred_u_v[:, 1], color = 'r', label='predators_NN')
+                        plt.xlabel('Time t, [days]')
+                        plt.ylabel('Population')
+                        plt.grid()
+                        plt.legend(loc='upper right')
+                        plt.title(f'Basic SINDy {magnitude}')
+                        plt.show()
+                        err_u, err_v = np.mean(np.abs(x_test - pred_u_v[:, 0])), np.mean(np.abs(y_test - pred_u_v[:, 1]))
+                    except:
+                        # errs_SINDy.append((np.inf, np.inf))
+                        # calc_SINDy.append(np.zeros((x_test.size, 2)))
+                        err_u, err_v = np.inf, np.inf
+                        pred_u_v = np.zeros((t_test.size, 2))
+                    if err_u + err_v < model_quality:
+                        model_quality = err_u + err_v
+                        model_container = (model_base, (err_u, err_v), pred_u_v)
+    
+                models_SINDy.append(model_container[0])
+                errs_SINDy.append((err_u, err_v))
+                calc_SINDy.append(pred_u_v)                
                 
-                plt.plot(t_test, x_test, '+', label = 'preys_odeint')
-                plt.plot(t_test, y_test, '*', label = "predators_odeint")
-                plt.plot(t_test, pred_u_v[:, 0], color = 'b', label='preys_NN')
-                plt.plot(t_test, pred_u_v[:, 1], color = 'r', label='predators_NN')
-                plt.xlabel('Time t, [days]')
-                plt.ylabel('Population')
-                plt.grid()
-                plt.legend(loc='upper right')
-                plt.title('Basic SINDy')
-                plt.show()
-                errs_SINDy.append((np.mean(np.abs(x_test - pred_u_v[:, 0])),
-                             np.mean(np.abs(y_test - pred_u_v[:, 1]))))
-                calc_SINDy.append(pred_u_v)
-            except:
-                errs_SINDy.append((np.inf, np.inf))
-                calc_SINDy.append(np.zeros((x_test.size, 2)))
-
-            '''
-            weak SINDy
-            '''
-            model_weak = weak_sindy_discovery(t_train, x_n, y_n)
-            print('Initial conditions', np.array([x_test[0], y_test[0]]))
-            models_SINDy.append(model_weak)
-
-            try:
-                pred_u_v = model_weak.simulate(np.array([x_test[0], y_test[0]]), t_test)
-                
-                plt.plot(t_test, x_test, '+', label = 'preys_odeint')
-                plt.plot(t_test, y_test, '*', label = "predators_odeint")
-                plt.plot(t_test, pred_u_v[:, 0], color = 'b', label='preys_NN')
-                plt.plot(t_test, pred_u_v[:, 1], color = 'r', label='predators_NN')
-                plt.xlabel('Time t, [days]')
-                plt.ylabel('Population')
-                plt.grid()
-                plt.legend(loc='upper right')
-                plt.title('weakform SINDy')
-                plt.show()
-                errs_SINDy.append((np.mean(np.abs(x_test - pred_u_v[:, 0])),
-                             np.mean(np.abs(y_test - pred_u_v[:, 1]))))
-                calc_SINDy.append(pred_u_v)
-            except:
-                errs_SINDy.append((np.inf, np.inf))
-                calc_SINDy.append(np.zeros((x_test.size, 2)))      
+    
+                '''
+                weak SINDy
+                '''
+                model_weak = weak_sindy_discovery(t_train, x_n, y_n)
+                print('Initial conditions', np.array([x_test[0], y_test[0]]))
+                models_SINDy.append(model_weak)
+    
+                try:
+                    pred_u_v = model_weak.simulate(np.array([x_test[0], y_test[0]]), t_test)
+                    
+                    plt.plot(t_test, x_test, '+', label = 'preys_odeint')
+                    plt.plot(t_test, y_test, '*', label = "predators_odeint")
+                    plt.plot(t_test, pred_u_v[:, 0], color = 'b', label='preys_NN')
+                    plt.plot(t_test, pred_u_v[:, 1], color = 'r', label='predators_NN')
+                    plt.xlabel('Time t, [days]')
+                    plt.ylabel('Population')
+                    plt.grid()
+                    plt.legend(loc='upper right')
+                    plt.title('weakform SINDy')
+                    plt.show()
+                    errs_SINDy.append((np.mean(np.abs(x_test - pred_u_v[:, 0])),
+                                 np.mean(np.abs(y_test - pred_u_v[:, 1]))))
+                    calc_SINDy.append(pred_u_v)
+                except:
+                    errs_SINDy.append((np.inf, np.inf))
+                    calc_SINDy.append(np.zeros((x_test.size, 2)))      
                 
         exps[magnitude] = {'epde': (models_epde, errs_epde, calc_epde), 
                            'SINDy' : (models_SINDy, errs_SINDy, calc_SINDy)}
+    logger.dump()

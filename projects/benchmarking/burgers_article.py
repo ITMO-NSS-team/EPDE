@@ -65,7 +65,7 @@ def run_burg_eq_search(multiobjective_mode, derivs):
                         additional_tokens=[trig_tokens, custom_grid_tokens], #custom_grid_tokens 
                         equation_factors_max_number = factors_max_number, 
                         eq_sparsity_interval = bounds)
-    epde_search_obj.equation_search_results(only_print = True, num = 1)        
+    epde_search_obj.equations(only_print = True, num = 1)        
     if multiobjective_mode:    
         metric = epde_search_obj.get_equations_by_complexity(complexity = 3)[0].obj_fun[0]
         print(f'Obtained metric is {metric}')
@@ -73,9 +73,9 @@ def run_burg_eq_search(multiobjective_mode, derivs):
         print(f'Equation without d2u/dx2: {epde_search_obj.get_equations_by_complexity(complexity = 3)[0].text_form}')
         time.sleep(10)
     else:
-        metric = epde_search_obj.equation_search_results(only_print = False, num = 1)[0].obj_fun[0]
+        metric = epde_search_obj.equations(only_print = False, num = 1)[0].obj_fun[0]
     return epde_search_obj, metric 
-    # .equation_search_results(only_print = False, num = 1)    
+    # .equations(only_print = False, num = 1)    
 
 if __name__ == "__main__":
     '''

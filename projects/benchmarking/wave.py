@@ -53,10 +53,10 @@ def run_wave_eq_search(multiobjective_mode, derivs = None):
     if multiobjective_mode:    
         metric = epde_search_obj.get_equations_by_complexity(complexity = 3)[0].obj_fun[0]
     else:
-        metric = epde_search_obj.equation_search_results(only_print = False, num = 1)[0].obj_fun[0]
+        metric = epde_search_obj.equations(only_print = False, num = 1)[0].obj_fun[0]
     print(f'Obtained metric is {metric}')
     
-    return epde_search_obj.equation_search_results(only_print = False, num = 1), metric 
+    return epde_search_obj.equations(only_print = False, num = 1), metric 
     
 
 if __name__ == '__main__':

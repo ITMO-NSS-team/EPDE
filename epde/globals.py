@@ -61,6 +61,22 @@ def delete_cache():
         print('Failed to delete grid cache due to its inexistance')
 
 
+class TrainHistory(object):
+    def __init__(self):
+        self.reset()
+        
+    def reset(self):
+        self.history = []
+        self._idx = 0
+
+    def add(self, element):
+        self.history.append((self._idx, element))
+        self._idx += 1
+
+def reset_hist():
+    global history
+    history = TrainHistory()
+
 @dataclass
 class VerboseManager:
     """

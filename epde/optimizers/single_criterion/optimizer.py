@@ -157,6 +157,7 @@ class SimpleOptimizer(object):
         
     def optimize(self, EA_kwargs: dict = {},  epochs: int = None):
         scp = {'limit' : epochs} if epochs is not None else {'limit' : 50}
-
+        global_var.reset_hist()
+        
         self.strategy.run(initial_population = self.population, EA_kwargs = EA_kwargs, 
                           stop_criterion_params = scp)

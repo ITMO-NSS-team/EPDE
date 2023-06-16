@@ -35,4 +35,4 @@ if __name__ == '__main__':
     epde_search_obj.fit(data = u, equation_factors_max_number = 2, coordinate_tensors = [t,], 
                         additional_tokens = trig_tokens, field_smooth = False)
     
-    epde_search_obj.equation_search_results(only_print = True, level_num = 1) # showing the Pareto-optimal set of discovered equations 
+    epde_search_obj.equations(only_print = True, level_num = 1) # showing the Pareto-optimal set of discovered equations 

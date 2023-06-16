@@ -122,7 +122,7 @@ if __name__ == '__main__':
 
     '''
     The results of the equation search have the following format: if we call method 
-    .equation_search_results() with "only_print = True", the Pareto frontiers 
+    .equations() with "only_print = True", the Pareto frontiers 
     of equations of varying complexities will be shown, as in the following example:
         
       0-th non-dominated level
@@ -162,4 +162,4 @@ if __name__ == '__main__':
 
     '''
     
-    epde_search_obj.equation_search_results(only_print=True, num = 1)
+    epde_search_obj.equations(only_print=True, num = 1)

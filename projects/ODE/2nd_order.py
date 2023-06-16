@@ -70,13 +70,13 @@ def epde_discovery(t, x, use_ann = False):
                         equation_factors_max_number=factors_max_number,
                         eq_sparsity_interval=(1e-12, 1e-4))
 
-    epde_search_obj.equation_search_results(only_print = True, num = 1)
+    epde_search_obj.equations(only_print = True, num = 1)
     
-    # syss = epde_search_obj.equation_search_results(only_print = False, num = 1) 
+    # syss = epde_search_obj.equations(only_print = False, num = 1) 
     '''
     Having insight about the initial ODE structure, we are extracting the equation with complexity of 5
     
-    In other cases, you should call sys.equation_search_results(only_print = True),
+    In other cases, you should call sys.equations(only_print = True),
     where the algorithm presents Pareto frontier of optimal equations.
     '''
     sys = epde_search_obj.get_equations_by_complexity(5)[0]

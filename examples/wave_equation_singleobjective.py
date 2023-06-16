@@ -136,4 +136,4 @@ if __name__ == '__main__':
     
     '''
     
-    epde_search_obj.equation_search_results(only_print=True, num = 1)
+    epde_search_obj.equations(only_print=True, num = 1)

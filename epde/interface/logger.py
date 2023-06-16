@@ -7,15 +7,25 @@ Created on Fri Jun  2 16:21:21 2023
 """
 
 import numpy as np
-
 import json
+
 from epde.structure.main_structures import SoEq, Equation
+from epde.interface.equation_translator import translate_equation
 
 def equations_match(eq_checked: Equation, eq_ref: Equation):
-    def parse_equation(equation: Equation):
+    def parse_equation(equation: Equation, eps = 1e-9):
+        term_weights = []
+        for idx, term in enumerate(equation.structure):
+            if idx < equation.target_idx:
+                term_weights.append(equation.weights_final[idx])
+            elif idx == equation.target_idx:
+                term_weights.append(1)
+            else:
+                term_weights.append(equation.weights_final[idx-1])
+        print(term_weights)
         return {frozenset({(factor.label, factor.param(name = 'power')) 
                            for factor in term.structure}) 
-                for term in equation.structure}
+                for idx, term in enumerate(equation.structure) if np.abs(term_weights[idx]) > eps}
     
     checked_parsed = parse_equation(eq_checked)
     ref_parsed = parse_equation(eq_ref)
@@ -26,12 +36,16 @@ def equations_match(eq_checked: Equation, eq_ref: Equation):
     return (matching, missing, extra)
 
 def systems_match(checked_system: SoEq, reference_system: SoEq):
-    return [equations_match(checked_system.vars[var], reference_system.vars[var]) 
+    return [equations_match(checked_system.vals[var], reference_system.vals[var]) 
             for var in checked_system.vars_to_describe]
         
 class Logger():
-    def __init__(self, name, referential_equation = None):
+    def __init__(self, name, referential_equation = None, pool = None):
         self.reset(name = name)
+        if isinstance(referential_equation, str) or isinstance(referential_equation, dict):
+            if pool is None:
+                raise ValueError('Can not translate equations: the pool of tokens is missing')
+            referential_equation = translate_equation(referential_equation, pool)
         self._referential_equation = referential_equation
         
     def reset(self, name = None):
@@ -41,17 +55,25 @@ class Logger():
             pass
         
         self._log = {}
-        self.name = name
+        if name is not None:
+            self.name = name
         
     def dump(self):
-        # json_str = json.dumps(self.log)
         with open(self.name, 'w') as outfile:
-            outfile.dump(self._log, outfile)
+            json.dump(self._log, outfile)
+        self.reset()
         
     def add_log(self, key, entry, **kwargs):
-        log_entry = {'equation_form' : entry.text_form,
-                     'term_match' : systems_match(entry, self._referential_equation),
-                     'mae_train' : np.mean(np.abs(entry.evaluate(False, True)[0]))}
+        match = systems_match(entry, self._referential_equation) if self._referential_equation is not None else (0, 0, 0)
+        try:
+            mae = [np.mean(np.abs(eq.evaluate(False, True)[0])) for eq in entry]
+        except KeyError:
+            mae = 0
+        
+        log_entry = {'equation_form': entry.text_form,
+                     'term_match': match,
+                     'mae_train': mae
+                     }
 
         log_entry = {**log_entry, **kwargs}
         self._log[key] = log_entry

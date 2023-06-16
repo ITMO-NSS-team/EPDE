@@ -80,7 +80,7 @@ if __name__ == '__main__':
                         equation_factors_max_number=2, deriv_method='poly', eq_sparsity_interval=(1e-7, 10),
                         deriv_method_kwargs={'smooth': False, 'grid': [t, ]}, coordinate_tensors=[t, ])
 
-    res = epde_search_obj.equation_search_results(only_print = False, level_num = 1) # showing the Pareto-optimal set of discovered equations 
+    res = epde_search_obj.equations(only_print = False, level_num = 1) # showing the Pareto-optimal set of discovered equations 
 
     solver_forms = []    
     grids = []
@@ -92,4 +92,4 @@ if __name__ == '__main__':
             solver_forms.append(solver_form)
             grids.append(grid)
             bconds.append(bcond)            
-    epde_search_obj.equation_search_results(only_print = True, level_num = 1)            
+    epde_search_obj.equations(only_print = True, level_num = 1)            

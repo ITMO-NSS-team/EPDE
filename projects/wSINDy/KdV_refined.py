@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Mar 31 12:53:27 2023
-
-@author: maslyaev
-"""
-
 import numpy as np
 import pandas as pd
 
@@ -31,8 +23,9 @@ from pysindy.utils import lotka
 
 import pysindy as ps
 
+from epde.interface.logger import Logger
 import epde.interface.interface as epde_alg
-from epde.interface.prepared_tokens import TrigonometricTokens, CacheStoredTokens
+from epde.interface.prepared_tokens import TrigonometricTokens, CacheStoredTokens, CustomEvaluator, CustomTokens
 from epde.interface.solver_integration import BoundaryConditions, BOPElement
 
 def Heatmap(Matrix, interval = None, area = ((0, 1), (0, 1)), xlabel = '', ylabel = '', figsize=(8,6), filename = None, title = ''):
@@ -53,7 +46,7 @@ def Heatmap(Matrix, interval = None, area = ((0, 1), (0, 1)), xlabel = '', ylabe
     plt.show()
     if type(filename) != type(None): plt.savefig(filename + '.eps', format='eps')
 
-def epde_discovery(x, t, u, use_ann = False): #(grids, data, use_ann = False):
+def epde_discovery(x, t, u, derivs, use_ann = False): #(grids, data, use_ann = False):
     grids = np.meshgrid(t, x, indexing = 'ij')
     print(u.shape, grids[0].shape, grids[1].shape)
     multiobjective_mode = True
@@ -71,7 +64,7 @@ def epde_discovery(x, t, u, use_ann = False): #(grids, data, use_ann = False):
         epde_search_obj.set_moeadd_params(population_size = popsize, 
                                           training_epochs=65)
     else:
-        epde_search_obj.set_singleobjective_params(population_size = popsize, 
+        epde_search_obj.set_singleobjective_params(population_size = popsize,
                                                    training_epochs=65)
     # epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=50)
     
@@ -79,20 +72,33 @@ def epde_discovery(x, t, u, use_ann = False): #(grids, data, use_ann = False):
                                            token_labels = ['t', 'x'],
                                            token_tensors={'t' : grids[0], 'x' : grids[1]},
                                            params_ranges = {'power' : (1, 1)},
-                                           params_equality_ranges = None)        
-    trig_tokens = TrigonometricTokens(dimensionality = dimensionality)
+                                           params_equality_ranges = None)   
+
+    custom_trigonometric_eval_fun = {
+        'cos(t)sin(x)': lambda *grids, **kwargs: (np.cos(grids[0]) * np.sin(grids[1])) ** kwargs['power']}
     
-    factors_max_number = {'factors_num' : [1, 2], 'probas' : [0.8, 0.2]}
+    custom_trig_evaluator = CustomEvaluator(custom_trigonometric_eval_fun,
+                                            eval_fun_params_labels=['power'])
+    trig_params_ranges = {'power': (1, 1)}
+    trig_params_equal_ranges = {}
+
+    custom_trig_tokens = CustomTokens(token_type='trigonometric',
+                                      token_labels=['cos(t)sin(x)'],
+                                      evaluator=custom_trig_evaluator,
+                                      params_ranges=trig_params_ranges,
+                                      params_equality_ranges=trig_params_equal_ranges,
+                                      meaningful=True, unique_token_type=False)    
+    factors_max_number = {'factors_num' : [1, 2], 'probas' : [0.6, 0.4]}
     
     opt_val = 1e-1
     bounds = (1e-9, 1e0) if multiobjective_mode else (opt_val, opt_val)    
     print(u.shape, grids[0].shape)
-    epde_search_obj.fit(data=u, variable_names=['u',], max_deriv_order=(2, 2),
-                        equation_terms_max_number=5, data_fun_pow = 1, additional_tokens=[trig_tokens, custom_grid_tokens], 
+    epde_search_obj.fit(data=u, variable_names=['u',], max_deriv_order=(1, 3), derivs = [derivs,],
+                        equation_terms_max_number=5, data_fun_pow = 1, additional_tokens=[custom_trig_tokens, custom_grid_tokens], 
                         equation_factors_max_number=factors_max_number,
                         eq_sparsity_interval=bounds)
     
-    equation_obtained = False; compl = [4,]; attempt = 0
+    equation_obtained = False; compl = [5,]; attempt = 0
     
     iterations = 4
     while not equation_obtained:
@@ -106,39 +112,9 @@ def epde_discovery(x, t, u, use_ann = False): #(grids, data, use_ann = False):
                 continue
         else:
             res = epde_search_obj.equations(only_print = False)[0][0]
-             # = sys
         equation_obtained = True
-    # return epde_search_obj, res    
     
     return epde_search_obj, res
-
-
-# def sindy_examplar_search(x, t, u):
-#     u = u.T
-#     dt = t[1] - t[0]
-#     dx = x[1] - x[0]
-    
-#     u_dot = ps.FiniteDifference(axis=1)._differentiate(u, t=dt)
-    
-#     u = u.reshape(len(x), len(t), 1)
-#     u_dot = u_dot.reshape(len(x), len(t), 1)
-    
-#     print(u.shape, u_dot.shape)
-#     library_functions = [lambda x: x, lambda x: x * x]
-#     library_function_names = [lambda x: x, lambda x: x + x]
-#     pde_lib = ps.PDELibrary(
-#         library_functions=library_functions,
-#         function_names=library_function_names,
-#         derivative_order=3,
-#         spatial_grid=x,
-#         is_uniform=True,
-#     )
-    
-#     print('STLSQ model: ')
-#     optimizer = ps.STLSQ(threshold=2, alpha=1e-5, normalize_columns=True)
-#     model = ps.SINDy(feature_library=pde_lib, optimizer=optimizer)
-#     model.fit(u, t=dt)
-#     model.print()
 
 def sindy_discovery(grids, u):
     t = np.unique(grids[0])
@@ -223,37 +199,74 @@ def sindy_provided_l0(grids, u):
     return model
 
 if __name__ == '__main__':
-    path = '/home/maslyaev/epde/EPDE_main/projects/wSINDy/data/burgers/'
+    path = '/home/maslyaev/epde/EPDE_main/projects/wSINDy/data/KdV/'
 
     try:
-        u_file = os.path.join(os.path.dirname( __file__ ), 'data/burgers/burgers.mat')
-        # data = loadmat(u_file)
+        df = pd.read_csv(f'{path}KdV_sln_100.csv', header=None)
+        dddx = pd.read_csv(f'{path}ddd_x_100.csv', header=None)
+        ddx = pd.read_csv(f'{path}dd_x_100.csv', header=None)
+        dx = pd.read_csv(f'{path}d_x_100.csv', header=None)
+        dt = pd.read_csv(f'{path}d_t_100.csv', header=None)
     except (FileNotFoundError, OSError):
-        u_file = '/home/maslyaev/epde/EPDE_main/projects/wSINDy/data/burgers/burgers.mat'
-    print(u_file)
-    data = loadmat(u_file)
+        df = pd.read_csv('/home/maslyaev/epde/EPDE_main/projects/benchmarking/KdV/data/KdV_sln_100.csv', header=None)
+        dddx = pd.read_csv('/home/maslyaev/epde/EPDE_main/projects/benchmarking/KdV/data/ddd_x_100.csv', header=None)
+        ddx = pd.read_csv('/home/maslyaev/epde/EPDE_main/projects/benchmarking/KdV/data/dd_x_100.csv', header=None)
+        dx = pd.read_csv('/home/maslyaev/epde/EPDE_main/projects/benchmarking/KdV/data/d_x_100.csv', header=None)
+        dt = pd.read_csv('/home/maslyaev/epde/EPDE_main/projects/benchmarking/KdV/data/d_t_100.csv', header=None)
 
-    # data = loadmat('burgers.mat')
-    t = np.ravel(data['t'])
-    x = np.ravel(data['x'])
-    u = np.real(data['usol']).T
-    dt = t[1] - t[0]
-    dx = x[1] - x[0]
+    def train_test_split(tensor, time_index):
+        return tensor[:time_index, ...], tensor[time_index:, ...]
 
-    train_max = 51    
+    train_max = 50
+
+    u = df.values
+    u = np.transpose(u)
+    u_train, u_test = train_test_split(u, train_max)
+
+    t = np.linspace(0, 1, u.shape[0])
+    x = np.linspace(0, 1, u.shape[1])
     grids = np.meshgrid(t, x, indexing = 'ij')
-    grids_training = (grids[0][:train_max, ...], grids[1][:train_max, ...])
-    grids_test = (grids[0][train_max:, ...], grids[1][train_max:, ...])    
 
-    t_train, t_test = t[:train_max], t[train_max:]
-    data_train, data_test = u[:train_max, ...], u[train_max:, ...]
+    
+    grid_t_train, grid_t_test = train_test_split(grids[0], train_max)
+    grid_x_train, grid_x_test = train_test_split(grids[1], train_max)
+    
+    grids_training = (grid_t_train, grid_x_train)
+    grids_test = (grid_t_test, grid_x_test)    
+
+    t_train, t_test = train_test_split(t, train_max)
+    data_train, data_test = train_test_split(u, train_max)
+    
+    ddd_x = dddx.values
+    ddd_x = np.transpose(ddd_x)
+    ddd_x_train, ddd_x_test = train_test_split(ddd_x, train_max)
+    
+    dd_x = ddx.values
+    dd_x = np.transpose(dd_x)
+    dd_x_train, dd_x_test = train_test_split(dd_x, train_max)
+    
+    d_x = dx.values
+    d_x = np.transpose(d_x)
+    d_x_train, d_x_test = train_test_split(d_x, train_max)    
+    
+    d_t = dt.values
+    d_t = np.transpose(d_t)
+    d_t_train, d_t_test = train_test_split(d_t, train_max)
+
+    derivs = np.zeros(shape=(u_train.shape[0], u_train.shape[1], 4))
+    derivs[:, :, 0] = d_t_train
+    derivs[:, :, 1] = d_x_train
+    derivs[:, :, 2] = dd_x_train
+    derivs[:, :, 3] = ddd_x_train
+    derivs = derivs.reshape((-1, 4))   
+    print(derivs.shape)
     '''
     EPDE side
     '''
 
     exps = {}
     test_launches = 10
-    magnitudes = [2.5*1e-2, 5.*1e-2, 1.*1e-1] # [0, 1.*1e-2, 
+    magnitudes = [0,]# 1.*1e-2, 2.5*1e-2, 5.*1e-2, 1.*1e-1] # 
     for magnitude in magnitudes:
         data_train_n = data_train + np.random.normal(scale = magnitude * np.abs(data_train), size = data_train.shape)
         
@@ -261,48 +274,50 @@ if __name__ == '__main__':
         
         errs_epde = []
         models_epde = []
-        calc_epde = []        
+        calc_epde = []
         for idx in range(test_launches):
-            epde_search_obj, sys = epde_discovery(x, t_train, data_train_n)
+            epde_search_obj, sys = epde_discovery(x, t_train, data_train_n, derivs)
+            print(sys.text_form)
+            models_epde.append(sys)
+        exps['kek'] = models_epde
+        #     bnd_t = torch.cartesian_prod(torch.from_numpy(np.array([t[train_max + 1]], dtype=np.float64)),
+        #                                   torch.from_numpy(x)).float()
+            
+        #     bop_1 = BOPElement(axis = 0, key = 'u_t', term = [None], power = 1, var = 0)
+        #     bop_1.set_grid(bnd_t)
+        #     bop_1.values = torch.from_numpy(data_test[0, ...]).float()
+            
+        #     t_der = epde_search_obj.saved_derivaties['u'][..., 0].reshape(grids_training[0].shape)
+        #     bop_2 = BOPElement(axis = 0, key = 'dudt', term = [0], power = 1, var = 0)
+        #     bop_2.set_grid(bnd_t)
+        #     bop_2.values = torch.from_numpy(t_der[-1, ...]).float()
+            
+        #     bnd_x1 = torch.cartesian_prod(torch.from_numpy(t[train_max:]),
+        #                                   torch.from_numpy(np.array([x[0]], dtype=np.float64))).float()
+        #     bnd_x2 = torch.cartesian_prod(torch.from_numpy(t[train_max:]),
+        #                                   torch.from_numpy(np.array([x[-1]], dtype=np.float64))).float()            
+            
+        #     bop_3 = BOPElement(axis = 1, key = 'u_x1', term = [None], power = 1, var = 0)
+        #     bop_3.set_grid(bnd_x1)
+        #     bop_3.values = torch.from_numpy(data_test[..., 0]).float()            
     
-            bnd_t = torch.cartesian_prod(torch.from_numpy(np.array([t[train_max + 1]], dtype=np.float64)),
-                                          torch.from_numpy(x)).float()
+        #     bop_4 = BOPElement(axis = 1, key = 'u_x2', term = [None], power = 1, var = 0)
+        #     bop_4.set_grid(bnd_x2)
+        #     bop_4.values = torch.from_numpy(data_test[..., -1]).float()            
             
-            bop_1 = BOPElement(axis = 0, key = 'u_t', term = [None], power = 1, var = 0)
-            bop_1.set_grid(bnd_t)
-            bop_1.values = torch.from_numpy(data_test[0, ...]).float()
+        #     # bop_grd_np = np.array([[,]])
             
-            t_der = epde_search_obj.saved_derivaties['u'][..., 0].reshape(grids_training[0].shape)
-            bop_2 = BOPElement(axis = 0, key = 'dudt', term = [0], power = 1, var = 0)
-            bop_2.set_grid(bnd_t)
-            bop_2.values = torch.from_numpy(t_der[-1, ...]).float()
-            
-            bnd_x1 = torch.cartesian_prod(torch.from_numpy(t[train_max:]),
-                                          torch.from_numpy(np.array([x[0]], dtype=np.float64))).float()
-            bnd_x2 = torch.cartesian_prod(torch.from_numpy(t[train_max:]),
-                                          torch.from_numpy(np.array([x[-1]], dtype=np.float64))).float()            
-            
-            bop_3 = BOPElement(axis = 1, key = 'u_x1', term = [None], power = 1, var = 0)
-            bop_3.set_grid(bnd_x1)
-            bop_3.values = torch.from_numpy(data_test[..., 0]).float()            
-    
-            bop_4 = BOPElement(axis = 1, key = 'u_x2', term = [None], power = 1, var = 0)
-            bop_4.set_grid(bnd_x2)
-            bop_4.values = torch.from_numpy(data_test[..., -1]).float()            
-            
-            # bop_grd_np = np.array([[,]])
-            
-            # bop = get_ode_bop('u', 0, t_test[0], x_test[0])
-            # bop_y = get_ode_bop('v', 1, t_test[0], y_test[0])
+        #     # bop = get_ode_bop('u', 0, t_test[0], x_test[0])
+        #     # bop_y = get_ode_bop('v', 1, t_test[0], y_test[0])
             
             
-            pred_u_v = epde_search_obj.predict(system=sys, boundary_conditions=[bop_1(), bop_2(), bop_3(), bop_4()], 
-                                                grid = grids_test, strategy='NN')
-            pred_u_v = pred_u_v.reshape(data_test.shape)
-            models_epde.append(epde_search_obj)
-            errs_epde.append(np.mean(np.abs(data_test - pred_u_v)))
-            calc_epde.append(pred_u_v)
+        #     pred_u_v = epde_search_obj.predict(system=sys, boundary_conditions=[bop_1(), bop_2(), bop_3(), bop_4()], 
+        #                                         grid = grids_test, strategy='NN')
+        #     pred_u_v = pred_u_v.reshape(data_test.shape)
+        #     models_epde.append(epde_search_obj)
+        #     errs_epde.append(np.mean(np.abs(data_test - pred_u_v)))
+        #     calc_epde.append(pred_u_v)
             
-        model_base = sindy_provided_l0(grids_training, data_train_n)    
-        exps[magnitude] = {'epde': (models_epde, errs_epde, calc_epde),
-                           'SINDy': (model_base,)}
+        # model_base = sindy_provided_l0(grids_training, data_train_n)    
+        # exps[magnitude] = {'epde': (models_epde, errs_epde, calc_epde),
+        #                    'SINDy': (model_base,)}

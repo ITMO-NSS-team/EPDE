@@ -100,13 +100,13 @@ def equation_fit(grid,data):
                     equation_factors_max_number=2, deriv_method='poly', eq_sparsity_interval=(1e-7, 1000),
                     deriv_method_kwargs={'smooth': False, 'grid': [grid, ]}, coordinate_tensors=[grid, ])
     
-        res = epde_search_obj.equation_search_results(only_print = False, level_num = 1) # showing the Pareto-optimal set of discovered equations 
+        res = epde_search_obj.equations(only_print = False, level_num = 1) # showing the Pareto-optimal set of discovered equations 
         solver_inp = []
     
         for eq in res[0]:
             solver_inp.append((eq.structure[0].solver_form(), eq.structure[0].boundary_conditions()))
     
-        epde_search_obj.equation_search_results(only_print = True, level_num = 1)
+        epde_search_obj.equations(only_print = True, level_num = 1)
         return solver_inp
 
 

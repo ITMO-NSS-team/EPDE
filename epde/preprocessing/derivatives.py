@@ -165,14 +165,15 @@ def differentiate(data, order: Union[int, list], mixed: bool = False, axis=None,
 
 
 def preprocess_derivatives_ANN(field, grid, max_order, test_output=False,
-                               epochs_max=1e3, loss_mean=1000, batch_frac=0.5):
+                               epochs_max=1e3, loss_mean=1000, batch_frac=0.5,
+                               return_ann: bool = False):
     assert grid is not None, 'Grid needed for derivatives preprocessing with ANN'
     if isinstance(grid, np.ndarray):
         grid = [grid,]
     grid_unique = [np.unique(ax_grid) for ax_grid in grid]
     original_shape = field.shape
 
-    best_model = train_ann(grids=grid, data=field)
+    best_model = train_ann(grids=grid, data=field, epochs_max=epochs_max)
     approximation = use_ann_to_predict(model=best_model, recalc_grids=grid)
 
     derivs = differentiate(approximation, max_order, False, None, *grid_unique)
@@ -181,9 +182,10 @@ def preprocess_derivatives_ANN(field, grid, max_order, test_output=False,
     print(np.linalg.norm(approximation - field))
     print('shapes after & before', approximation.shape, original_shape)
     time.sleep(3)
-
-    return approximation, derivs
-
+    if return_ann:
+        return approximation, derivs, best_model
+    else:
+        return approximation, derivs
 
 implemented_methods = {'ANN': preprocess_derivatives_ANN,
                        'poly': preprocess_derivatives_poly}

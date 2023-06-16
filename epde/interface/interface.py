@@ -726,7 +726,7 @@ class EpdeSearch(object):
         self.search_conducted = True
 
     @property
-    def resulting_population(self):
+    def _resulting_population(self):
         if not self.search_conducted:
             raise AttributeError('Pareto set of the best equations has not been discovered. Use ``self.fit`` method.')
         if self.multiobjective_mode:
@@ -735,7 +735,7 @@ class EpdeSearch(object):
             return self.optimizer.population.population
             
     
-    def equation_search_results(self, only_print : bool = True, only_str = False, num = 1):
+    def equations(self, only_print : bool = True, only_str = False, num = 1):
         """
         Method for print or getting results of searching differential equation
 
@@ -749,29 +749,29 @@ class EpdeSearch(object):
         """
         if self.multiobjective_mode:
             if only_print:
-                for idx in range(min(num, len(self.resulting_population))):
+                for idx in range(min(num, len(self._resulting_population))):
                     print('\n')
                     print(f'{idx}-th non-dominated level')    
                     print('\n')                
                     [print(f'{solution.text_form} , with objective function values of {solution.obj_fun} \n')  
-                    for solution in self.resulting_population[idx]]
+                    for solution in self._resulting_population[idx]]
             else:
                 if only_str:
                     eqs = []
-                    for idx in range(min(num, len(self.resulting_population))):
-                        eqs.append([solution.text_form for solution in self.resulting_population[idx]])
+                    for idx in range(min(num, len(self._resulting_population))):
+                        eqs.append([solution.text_form for solution in self._resulting_population[idx]])
                     return eqs
                 else:
-                    return self.resulting_population[:num]
+                    return self._resulting_population[:num]
         else:
             if only_print:
                 [print(f'{solution.text_form} , with objective function values of {solution.obj_fun} \n')  
-                 for solution in self.resulting_population[:num]]
+                 for solution in self._resulting_population[:num]]
             else:
                 if only_str:
-                    return [solution.text_form for solution in self.resulting_population[:num]]
+                    return [solution.text_form for solution in self._resulting_population[:num]]
                 else:
-                    return self.resulting_population[:num]
+                    return self._resulting_population[:num]
 
     def solver_forms(self, grids: list = None, num: int = 1):
         '''
@@ -782,13 +782,13 @@ class EpdeSearch(object):
         '''
         forms = []
         if self.multiobjective_mode:
-            for level in self.resulting_population[:min(num, len(self.resulting_population))]:
+            for level in self._resulting_population[:min(num, len(self._resulting_population))]:
                 temp = []
                 for sys in level: #self.resulting_population[idx]:
                     temp.append(SystemSolverInterface(sys).form(grids=grids))
                 forms.append(temp)
         else:
-            for sys in self.resulting_population[:min(num, len(self.resulting_population))]:
+            for sys in self._resulting_population[:min(num, len(self._resulting_population))]:
                 forms.append(SystemSolverInterface(sys).form(grids=grids))
         return forms
 

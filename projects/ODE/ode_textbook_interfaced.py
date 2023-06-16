@@ -122,7 +122,7 @@ def old_main():
                         memory_for_cache=25, prune_domain = False,
                         division_fractions = None)
     
-    epde_search_obj.equation_search_results(only_print = True, level_num = 1) # showing the Pareto-optimal set of discovered equations 
+    epde_search_obj.equations(only_print = True, level_num = 1) # showing the Pareto-optimal set of discovered equations 
 
 def new_main():
     t = np.linspace(0, 4*np.pi, 1000)
@@ -142,7 +142,7 @@ def new_main():
                         equation_factors_max_number=factors_max_number, deriv_method='poly', 
                         eq_sparsity_interval=(1e-10, 1e-1),
                         deriv_method_kwargs={'smooth': False}, coordinate_tensors=[t, ])   # , 'grid': [t, ] 
-    epde_search_obj.equation_search_results(only_print = True, level_num = 1)
+    epde_search_obj.equations(only_print = True, level_num = 1)
     
 def new_main_with_custom_tokens():
     t = np.linspace(0, 4*np.pi, 1000)
@@ -177,7 +177,7 @@ def new_main_with_custom_tokens():
                         equation_factors_max_number=factors_max_number, deriv_method='poly', 
                         eq_sparsity_interval=(1e-10, 1e-1),
                         deriv_method_kwargs={'smooth': False}, coordinate_tensors=[t, ])   # , 'grid': [t, ] 
-    epde_search_obj.equation_search_results(only_print = True, level_num = 1)
+    epde_search_obj.equations(only_print = True, level_num = 1)
     
     
 if __name__ == "__main__":

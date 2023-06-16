@@ -12,6 +12,7 @@ from sklearn.linear_model import LinearRegression
 from epde.structure.encoding import Chromosome
 from epde.structure.main_structures import Term, Equation, SoEq
 
+from functools import singledispatch
 
 def float_convertable(obj):
     try:
@@ -20,8 +21,12 @@ def float_convertable(obj):
     except (ValueError, TypeError) as e:
         return False
 
-
+@singledispatch
 def translate_equation(text_form, pool):
+    raise NotImplementedError(f'Equation shall be translated from {type(text_form)}')
+
+@translate_equation.register
+def _(text_form : str, pool):
     parsed_text_form = parse_equation_str(text_form)
     term_list = []
     weights = np.empty(len(parsed_text_form) - 1)
@@ -54,6 +59,49 @@ def translate_equation(text_form, pool):
                                                'max_factors_in_term': {'optimizable': False, 'value': max_factors}})
     
     structure = {'u' : equation}
+    system.vals = Chromosome(structure, params={key: val for key, val in system.metaparameters.items()
+                                                if val['optimizable']})
+    
+    return system
+
+@translate_equation.register
+def _(text_form : dict, pool):
+    structure = {}
+    for var_key, eq_text_form in text_form.items(): 
+        parsed_text_form = parse_equation_str(eq_text_form)
+        term_list = []
+        weights = np.empty(len(parsed_text_form) - 1)
+        max_factors = 0
+        for idx, term in enumerate(parsed_text_form):
+            if (any([not float_convertable(elem) for elem in term]) and
+                any([float_convertable(elem) for elem in term])):
+                factors = [parse_factor(factor, pool) for factor in term[1:]]
+                if len(factors) > max_factors:
+                    max_factors = len(factors)
+                term_list.append(Term(pool, passed_term=factors))
+                weights[idx] = float(term[0])
+            elif float_convertable(term[0]) and len(term) == 1:
+                weights[idx] = float(term[0])
+            elif all([not float_convertable(elem) for elem in term]):
+                factors = [parse_factor(factor, pool) for factor in term]
+                if len(factors) > max_factors:
+                    max_factors = len(factors)
+                term_list.append(Term(pool, passed_term=factors))
+    
+        equation = Equation(pool=pool, basic_structure=term_list,
+                            metaparameters={'sparsity': {'optimizable': True, 'value': 1.},
+                                              'terms_number': {'optimizable': False, 'value': len(term_list)},
+                                              'max_factors_in_term': {'optimizable': False, 'value': max_factors}})
+        equation.target_idx = len(term_list) - 1
+        equation.weights_internal = weights
+        equation.weights_final = weights
+        structure[var_key] = equation
+    
+    # structure = {'u' : equation}
+
+    system = SoEq(pool = pool, metaparameters={'sparsity': {'optimizable': True, 'value': 1.},
+                                               'terms_number': {'optimizable': False, 'value': len(term_list)},
+                                               'max_factors_in_term': {'optimizable': False, 'value': max_factors}})
     system.vals = Chromosome(structure, params={key: val for key, val in system.metaparameters.items()
                                                 if val['optimizable']})
     

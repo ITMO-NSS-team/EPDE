@@ -79,9 +79,9 @@ if __name__ == '__main__':
     {'terms_number': {'optimizable': False, 'value': 3}, 'max_factors_in_term': {'optimizable': False, 'value': {'factors_num': [1, 2], 'probas': [0.8, 0.2]}}, 
      ('sparsity', 'u'): {'optimizable': True, 'value': 0.00027172388370453704}, ('sparsity', 'v'): {'optimizable': True, 'value': 0.00019292375116125682}} , with objective function values of [0.2800438  0.18041074 4.         4.        ]         
     '''
-    epde_search_obj.equation_search_results(only_print = True, num = 1)
+    epde_search_obj.equations(only_print = True, num = 1)
     
-    # res = epde_search_obj.equation_search_results(only_print = False, num = 1)
+    # res = epde_search_obj.equations(only_print = False, num = 1)
     
     sys = epde_search_obj.get_equations_by_complexity([4, 4])
     # bop_x = BOPElement(axis = 0, key = 'u', term = [None],

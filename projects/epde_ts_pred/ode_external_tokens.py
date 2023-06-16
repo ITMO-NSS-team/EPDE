@@ -48,4 +48,4 @@ if __name__ == "__main__":
                         deriv_method='poly', eq_sparsity_interval=(1e-7, 1000), 
                         additional_tokens=[T1_derivs, power_tokens],
                         deriv_method_kwargs={'smooth': False, 'grid': [t, ]}, coordinate_tensors=[t, ])    
-    res = epde_search_obj.equation_search_results(level_num = 1)    
+    res = epde_search_obj.equations(level_num = 1)    

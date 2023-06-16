@@ -120,4 +120,4 @@ if __name__ == '__main__':
                         memory_for_cache=25, prune_domain = False,
                         division_fractions = None)
     
-    epde_search_obj.equation_search_results(only_print = True, level_num = 1) # showing the Pareto-optimal set of discovered equations 
+    epde_search_obj.equations(only_print = True, level_num = 1) # showing the Pareto-optimal set of discovered equations 

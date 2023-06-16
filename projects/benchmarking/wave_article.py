@@ -84,7 +84,7 @@ def run_wave_eq_search(multiobjective_mode):
                         equation_terms_max_number=4, data_fun_pow = 2, additional_tokens=[trig_tokens,], #custom_grid_tokens 
                         equation_factors_max_number = factors_max_number, 
                         eq_sparsity_interval = bounds)
-    return epde_search_obj.equation_search_results(only_print = False, num = 1)        
+    return epde_search_obj.equations(only_print = False, num = 1)        
     
 if __name__ == "__main__":
     

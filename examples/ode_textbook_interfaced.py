@@ -145,4 +145,4 @@ if __name__ == '__main__':
                         equation_factors_max_number = factors_max_number, eq_sparsity_interval = bounds, 
                         additional_tokens = [custom_grid_tokens, custom_trig_tokens])
     
-    epde_search_obj.equation_search_results(only_print = True, num = 1) # showing the Pareto-optimal set of discovered equations 
+    epde_search_obj.equations(only_print = True, num = 1) # showing the Pareto-optimal set of discovered equations 

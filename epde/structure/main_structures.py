@@ -476,32 +476,56 @@ class Equation(ComplexStructure):
 
     def evaluate(self, normalize=True, return_val=False, grids=None):
         self._target = self.structure[self.target_idx].evaluate(normalize, grids=grids)
-        feature_indexes = list(range(len(self.structure)))
-        feature_indexes.remove(self.target_idx)
-        for feat_idx in range(len(feature_indexes)):
-            if feat_idx == 0:
-                self._features = self.structure[feature_indexes[feat_idx]].evaluate(normalize, grids=grids)
-            elif feat_idx != 0:
-                temp = self.structure[feature_indexes[feat_idx]].evaluate(normalize, grids=grids)
-                self._features = np.vstack([self._features, temp])
+        
+        # Place for improvent: introduce shifted_idx where necessary
+        
+        def shifted_idx(idx):
+            if idx < self.target_idx:
+                return idx  
+            elif idx > self.target_idx:
+                return idx - 1
             else:
-                continue
-        if self._features.ndim == 1:
-            self._features = np.expand_dims(self._features, 1).T
-        temp_feats = np.vstack([self._features, np.ones(self._features.shape[1])])
-        self._features = np.transpose(self._features)
-        temp_feats = np.transpose(temp_feats)
+                return -1
+        
+        if normalize:
+            feature_indexes = list(range(len(self.structure)))
+            feature_indexes.remove(self.target_idx)
+        else:
+            feature_indexes = [idx for idx in range(len(self.structure)) 
+                               if self.weights_internal[shifted_idx(idx)] != 0 and idx != self.target_idx]
+        if len(feature_indexes) > 0:
+            for feat_idx in range(len(feature_indexes)):
+                if feat_idx == 0:
+                    self._features = self.structure[feature_indexes[feat_idx]].evaluate(normalize, grids=grids)
+                else: #if feat_idx != 0:
+                    temp = self.structure[feature_indexes[feat_idx]].evaluate(normalize, grids=grids)
+                    self._features = np.vstack([self._features, temp])
+                # else:
+                    # continue
+            if self._features.ndim == 1:
+                self._features = np.expand_dims(self._features, 1).T
+            temp_feats = np.vstack([self._features, np.ones(self._features.shape[1])])
+            self._features = np.transpose(self._features)
+            temp_feats = np.transpose(temp_feats)
+        else:
+            self._features = None
+            
         if return_val:
             self.prev_normalized = normalize
             if normalize:
                 elem1 = np.expand_dims(self._target, axis=1)
-                value = np.add(elem1, - reduce(lambda x, y: np.add(x, y), [np.multiply(weight, temp_feats[:, feature_idx])
-                                                                           for feature_idx, weight in np.ndenumerate(self.weights_internal)]))
+                value = np.add(elem1, - reduce(lambda x, y: np.add(x, y), [np.multiply(self.weights_internal[idx_full], temp_feats[:, idx_sparse])
+                                                                           for idx_sparse, idx_full in enumerate(feature_indexes)]))
+                                                                           # for feature_idx, weight in np.ndenumerate(self.weights_internal)]))
             else:
                 elem1 = np.expand_dims(self._target, axis=1)
-
-                value = np.add(elem1, - reduce(lambda x, y: np.add(x, y), [np.multiply(weight, temp_feats[:, feature_idx])
-                                                                           for feature_idx, weight in np.ndenumerate(self.weights_final)]))
+                if self._features is None:
+                    feature_list = [np.multiply(self.weights_final[idx_full], temp_feats[:, idx_sparse])
+                                    for idx_sparse, idx_full in enumerate(feature_indexes)]
+                else:
+                    feature_list = 0               
+                value = np.add(elem1, feature_list)
+                                               
             return value, self._target, self._features
         else:
             return None, self._target, self._features
@@ -626,36 +650,36 @@ class Equation(ComplexStructure):
                     self.structure[term_idx].name + ' + '
             form += 'k_' + str(len(self.structure)) + ' = 0'
         return form
+    
+    # def solver_form(self, grids: list = None):
+    #     raise DeprecationWarning('To be removed from the framework!')
+    #     if self.solver_form_defined:
+    #         # print(self.text_form)
+    #         return self._solver_form
+    #     else:
+    #         self._solver_form = []
+    #         for term_idx in range(len(self.structure)):
+    #             if term_idx != self.target_idx:
+    #                 term_form = self.structure[term_idx].solver_form
+    #                 weight = self.weights_final[term_idx] if term_idx < self.target_idx else self.weights_final[term_idx-1]
+    #                 term_form[0] = term_form[0] * weight
+    #                 term_form[0] = torch.flatten(term_form[0]).unsqueeze(
+    #                     1).type(torch.FloatTensor)
+    #                 self._solver_form.append(term_form)
 
-    def solver_form(self, grids: list = None):
-        raise DeprecationWarning('To be removed from the framework!')
-        if self.solver_form_defined:
-            # print(self.text_form)
-            return self._solver_form
-        else:
-            self._solver_form = []
-            for term_idx in range(len(self.structure)):
-                if term_idx != self.target_idx:
-                    term_form = self.structure[term_idx].solver_form
-                    weight = self.weights_final[term_idx] if term_idx < self.target_idx else self.weights_final[term_idx-1]
-                    term_form[0] = term_form[0] * weight
-                    term_form[0] = torch.flatten(term_form[0]).unsqueeze(
-                        1).type(torch.FloatTensor)
-                    self._solver_form.append(term_form)
+    #         free_coeff_weight = torch.from_numpy(np.full_like(a=global_var.grid_cache.get('0'),
+    #                                                           fill_value=self.weights_final[-1]))
+    #         free_coeff_weight = torch.flatten(free_coeff_weight).unsqueeze(1).type(torch.FloatTensor)
+    #         target_weight = torch.from_numpy(np.full_like(a=global_var.grid_cache.get('0'),
+    #                                                       fill_value=-1.))
+    #         target_form = self.structure[self.target_idx].solver_form
+    #         target_form[0] = target_form[0] * target_weight
+    #         target_form[0] = torch.flatten(target_form[0]).unsqueeze(1).type(torch.FloatTensor)
 
-            free_coeff_weight = torch.from_numpy(np.full_like(a=global_var.grid_cache.get('0'),
-                                                              fill_value=self.weights_final[-1]))
-            free_coeff_weight = torch.flatten(free_coeff_weight).unsqueeze(1).type(torch.FloatTensor)
-            target_weight = torch.from_numpy(np.full_like(a=global_var.grid_cache.get('0'),
-                                                          fill_value=-1.))
-            target_form = self.structure[self.target_idx].solver_form
-            target_form[0] = target_form[0] * target_weight
-            target_form[0] = torch.flatten(target_form[0]).unsqueeze(1).type(torch.FloatTensor)
-
-            self._solver_form.append([free_coeff_weight, [None], 0])
-            self._solver_form.append(target_form)
-            self.solver_form_defined = True
-            return self._solver_form
+    #         self._solver_form.append([free_coeff_weight, [None], 0])
+    #         self._solver_form.append(target_form)
+    #         self.solver_form_defined = True
+    #         return self._solver_form
 
     @property
     def state(self):
