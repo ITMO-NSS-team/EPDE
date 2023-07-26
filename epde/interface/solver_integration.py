@@ -10,13 +10,14 @@ import torch
 
 from typing import Callable, Union
 from types import FunctionType
+from epde.solver.models import Modified_MLP
 
 VAL_TYPES = Union[FunctionType, int, float, torch.Tensor, np.ndarray]
 BASE_SOLVER_PARAMS = {'lambda_bound' : 100, 'verbose' : True,
-                      'learning_rate' : 1e-3, 'eps' : 1e-6, 'tmin' : 1000,
-                      'tmax' : 1e7, 'use_cache' : False, 'cache_verbose' : True, 
-                      'patience' : 5, 'loss_oscillation_window' : 100,
-                      'no_improvement_patience' : 500, 'save_always' : False, 
+                      'learning_rate' : 1e-3, 'eps' : 1e-6, 'tmin' : 5000,
+                      'tmax' : 2*1e4, 'use_cache' : False, 'cache_verbose' : True, 
+                      'patience' : 10, 'loss_oscillation_window' : 100,
+                      'no_improvement_patience' : 100, 'save_always' : False, 
                       'print_every' : 1000, 'optimizer_mode' : 'Adam', 
                       'model_randomize_parameter' : 1e-5, 'step_plot_print' : False, 
                       'step_plot_save' : False, 'image_save_dir' : None}
@@ -167,7 +168,7 @@ class PregenBOperator(object):
                     indexes = get_boundary_ind(tensor_shape, ax_idx, rel_loc=loc)
                     coords = np.array([grids[idx][indexes] for idx in np.arange(len(tensor_shape))]).T
                     if coords.ndim > 2:
-                        coords.squeeze()
+                        coords = coords.squeeze()
 
                     if vals is None:
                         bc_values = tensor_cache.get(val_keys[variable])[indexes]
@@ -303,40 +304,11 @@ def solver_formed_grid(training_grid=None):
 
 
 class SystemSolverInterface(object):
-    def __init__(self, system_to_adapt: SoEq):
+    def __init__(self, system_to_adapt: SoEq, coeff_tol: float = 1.e-9):
         self.variables = list(system_to_adapt.vars_to_describe)
-        # print(f'self.variables in SystemSolverInterface: {self.variables}')
         self.adaptee = system_to_adapt
-        # assert self.adaptee.weights_final_evald
-
         self.grids = None
-
-    # @staticmethod
-    # def old_term_solver_form(term, grids):
-    #     deriv_orders = []
-    #     deriv_powers = []
-    #     derivs_detected = False
-
-    #     try:
-    #         coeff_tensor = np.ones_like(global_var.grid_cache.get('0'))
-    #     except KeyError:
-    #         raise NotImplementedError('No cache implemented')
-    #     for factor in term.structure:
-    #         if factor.is_deriv:
-    #             for param_idx, param_descr in factor.params_description.items():
-    #                 if param_descr['name'] == 'power': power_param_idx = param_idx
-    #             deriv_orders.append(factor.deriv_code); deriv_powers.append(factor.params[power_param_idx])
-    #             derivs_detected = True
-    #         else:
-    #             coeff_tensor=coeff_tensor * factor.evaluate(grids=grids)
-    #     if not derivs_detected:
-    #        deriv_powers = [0]; deriv_orders = [[None,],]
-    #     if len(deriv_powers) == 1:
-    #         deriv_powers = deriv_powers[0]
-    #         deriv_orders = deriv_orders[0]
-
-    #     coeff_tensor = torch.from_numpy(coeff_tensor)
-    #     return [coeff_tensor, deriv_orders, deriv_powers]
+        self.coeff_tol = coeff_tol
 
     @staticmethod
     def _term_solver_form(term, grids, variables: list = ['u',]):
@@ -346,7 +318,6 @@ class SystemSolverInterface(object):
         derivs_detected = False
 
         try:
-            # global_var.grid_cache.get('0'))
             coeff_tensor = np.ones_like(grids[0])
         except KeyError:
             raise NotImplementedError('No cache implemented')
@@ -400,13 +371,14 @@ class SystemSolverInterface(object):
         _solver_form = {}
         for term_idx, term in enumerate(equation.structure):
             if term_idx != equation.target_idx:
-                _solver_form[term.name] = self._term_solver_form(term, grids, variables)
                 if term_idx < equation.target_idx:
                     weight = equation.weights_final[term_idx]
                 else:
                     weight = equation.weights_final[term_idx-1]
-                _solver_form[term.name]['coeff'] = _solver_form[term.name]['coeff'] * weight
-                _solver_form[term.name]['coeff'] = torch.flatten(_solver_form[term.name]['coeff']).unsqueeze(1).type(torch.FloatTensor)
+                if not np.isclose(weight, 0, rtol = self.coeff_tol):
+                    _solver_form[term.name] = self._term_solver_form(term, grids, variables)
+                    _solver_form[term.name]['coeff'] = _solver_form[term.name]['coeff'] * weight
+                    _solver_form[term.name]['coeff'] = torch.flatten(_solver_form[term.name]['coeff']).unsqueeze(1).type(torch.FloatTensor)
 
         free_coeff_weight = torch.from_numpy(np.full_like(a=grids[0],  # global_var.grid_cache.get('0'),
                                                           fill_value=equation.weights_final[-1]))
@@ -452,17 +424,23 @@ class SolverAdapter(object):
         dim_number = global_var.grid_cache.get('0').ndim
         print(f'dimensionality is {dim_number}')
         if model is None:
-            model = torch.nn.Sequential(
-                torch.nn.Linear(dim_number, 100),
-                torch.nn.Tanh(),
-                torch.nn.Linear(100, 100),
-                torch.nn.Tanh(),
-                torch.nn.Linear(100, 100),
-                torch.nn.Tanh(),
-                torch.nn.Linear(100, 100),
-                torch.nn.Tanh(),
-                torch.nn.Linear(100, var_number),
-            )
+            # model = torch.nn.Sequential(
+            #     torch.nn.Linear(dim_number, 100),
+            #     torch.nn.Tanh(),
+            #     torch.nn.Linear(100, 100),
+            #     torch.nn.Tanh(),
+            #     torch.nn.Linear(100, 100),
+            #     torch.nn.Tanh(),
+            #     torch.nn.Linear(100, 100),
+            #     torch.nn.Tanh(),
+            #     torch.nn.Linear(100, var_number),
+            # )
+            if dim_number == 1:
+                model = Modified_MLP([400, 400, 400, 400, var_number], [15], [7])
+            else:
+                model = Modified_MLP([112, 112, 112, 112, var_number], [None,] + [15]*(dim_number - 1), 
+                                     [None,] + [3]*(dim_number - 1))
+               
         self.model = model
 
         self._solver_params = dict()
@@ -477,9 +455,9 @@ class SolverAdapter(object):
                           use_cache: bool = None, cache_verbose: bool = None,
                           patience: int = None, loss_oscillation_window : int = None,
                           no_improvement_patience: int = None,
-                          save_always: bool = None, print_every: bool = None, optimizer_mode = None, 
+                          save_always: bool = None, print_every: bool = 5000, optimizer_mode = None, 
                           model_randomize_parameter: bool = None, step_plot_print: bool = None,
-                          step_plot_save: bool = None, image_save_dir: str = None):
+                          step_plot_save: bool = True, image_save_dir: str = None, tol: float = None):
         # TODO: refactor
         params = {'lambda_bound': lambda_bound, 'verbose': verbose,
                   'learning_rate': learning_rate, 'eps': eps, 'tmin': tmin,
@@ -488,7 +466,7 @@ class SolverAdapter(object):
                   'no_improvement_patience' : no_improvement_patience, 'save_always': save_always,
                   'print_every': print_every, 'optimizer_mode': optimizer_mode,
                   'model_randomize_parameter': model_randomize_parameter, 'step_plot_print': step_plot_print,
-                  'step_plot_save': step_plot_save, 'image_save_dir': image_save_dir}
+                  'step_plot_save': step_plot_save, 'image_save_dir': image_save_dir, 'tol': tol}
 
         # print('params: ', params)
         for param_key, param_vals in params.items():

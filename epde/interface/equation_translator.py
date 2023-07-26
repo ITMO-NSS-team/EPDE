@@ -12,6 +12,7 @@ from sklearn.linear_model import LinearRegression
 from epde.structure.encoding import Chromosome
 from epde.structure.main_structures import Term, Equation, SoEq
 
+from functools import singledispatch
 
 def float_convertable(obj):
     try:
@@ -20,8 +21,12 @@ def float_convertable(obj):
     except (ValueError, TypeError) as e:
         return False
 
-
+@singledispatch
 def translate_equation(text_form, pool):
+    raise NotImplementedError(f'Equation shall be translated from {type(text_form)}')
+
+@translate_equation.register
+def _(text_form : str, pool):
     parsed_text_form = parse_equation_str(text_form)
     term_list = []
     weights = np.empty(len(parsed_text_form) - 1)
@@ -32,7 +37,7 @@ def translate_equation(text_form, pool):
             factors = [parse_factor(factor, pool) for factor in term[1:]]
             if len(factors) > max_factors:
                 max_factors = len(factors)
-            term_list.append(Term(pool, passed_term=factors))
+            term_list.append(Term(pool, passed_term=factors, collapse_powers=False))
             weights[idx] = float(term[0])
         elif float_convertable(term[0]) and len(term) == 1:
             weights[idx] = float(term[0])
@@ -40,7 +45,7 @@ def translate_equation(text_form, pool):
             factors = [parse_factor(factor, pool) for factor in term]
             if len(factors) > max_factors:
                 max_factors = len(factors)
-            term_list.append(Term(pool, passed_term=factors))
+            term_list.append(Term(pool, passed_term=factors, collapse_powers=False))
 
     equation = Equation(pool=pool, basic_structure=term_list,
                         metaparameters={'sparsity': {'optimizable': True, 'value': 1.},
@@ -54,6 +59,49 @@ def translate_equation(text_form, pool):
                                                'max_factors_in_term': {'optimizable': False, 'value': max_factors}})
     
     structure = {'u' : equation}
+    system.vals = Chromosome(structure, params={key: val for key, val in system.metaparameters.items()
+                                                if val['optimizable']})
+    
+    return system
+
+@translate_equation.register
+def _(text_form : dict, pool):
+    structure = {}
+    for var_key, eq_text_form in text_form.items(): 
+        parsed_text_form = parse_equation_str(eq_text_form)
+        term_list = []
+        weights = np.empty(len(parsed_text_form) - 1)
+        max_factors = 0
+        for idx, term in enumerate(parsed_text_form):
+            if (any([not float_convertable(elem) for elem in term]) and
+                any([float_convertable(elem) for elem in term])):
+                factors = [parse_factor(factor, pool) for factor in term[1:]]
+                if len(factors) > max_factors:
+                    max_factors = len(factors)
+                term_list.append(Term(pool, passed_term=factors, collapse_powers=False))
+                weights[idx] = float(term[0])
+            elif float_convertable(term[0]) and len(term) == 1:
+                weights[idx] = float(term[0])
+            elif all([not float_convertable(elem) for elem in term]):
+                factors = [parse_factor(factor, pool) for factor in term]
+                if len(factors) > max_factors:
+                    max_factors = len(factors)
+                term_list.append(Term(pool, passed_term=factors, collapse_powers=False))
+    
+        equation = Equation(pool=pool, basic_structure=term_list,
+                            metaparameters={'sparsity': {'optimizable': True, 'value': 1.},
+                                              'terms_number': {'optimizable': False, 'value': len(term_list)},
+                                              'max_factors_in_term': {'optimizable': False, 'value': max_factors}})
+        equation.target_idx = len(term_list) - 1
+        equation.weights_internal = weights
+        equation.weights_final = weights
+        structure[var_key] = equation
+    
+    # structure = {'u' : equation}
+
+    system = SoEq(pool = pool, metaparameters={'sparsity': {'optimizable': True, 'value': 1.},
+                                               'terms_number': {'optimizable': False, 'value': len(term_list)},
+                                               'max_factors_in_term': {'optimizable': False, 'value': max_factors}})
     system.vals = Chromosome(structure, params={key: val for key, val in system.metaparameters.items()
                                                 if val['optimizable']})
     
@@ -89,6 +137,7 @@ def parse_factor(factor_form, pool):   # В проект: работы по об
     print(label_str, params_str)
     factor_family = [family for family in pool.families if label_str in family.tokens][0]
     _, factor = factor_family.create(label=label_str, **params_str)
+    factor.set_param(param = params_str['power'], name = 'power')
     return factor
 
 
@@ -104,8 +153,9 @@ def parse_params_str(param_str):
 
 class CoeffLessEquation():
     def __init__(self, lp_terms : Union[list, tuple], rp_term : Union[list, tuple], pool):
-        self.lp_terms_translated = [Term(pool, passed_term = [parse_factor(factor, pool) for factor in term]) for term in lp_terms]
-        self.rp_translated = Term(pool, passed_term = [parse_factor(factor, pool) for factor in rp_term])
+        self.lp_terms_translated = [Term(pool, passed_term = [parse_factor(factor, pool) for factor in term],
+                                         collapse_powers=False) for term in lp_terms]
+        self.rp_translated = Term(pool, passed_term = [parse_factor(factor, pool) for factor in rp_term], collapse_powers=False)
         
         self.lp_values = np.vstack(list(map(lambda x: x.evaluate(False).reshape(-1), self.lp_terms_translated)))
         self.rp_value = self.rp_translated.evaluate(False).reshape(-1)

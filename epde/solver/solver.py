@@ -5,6 +5,7 @@ from matplotlib import cm
 import os
 import datetime
 from typing import Union
+from torch.optim.lr_scheduler import ExponentialLR
 
 from epde.solver.cache import *
 from epde.solver.device import check_device, device_type
@@ -45,56 +46,11 @@ def grid_format_prepare(coord_list, mode='NN') -> torch.Tensor:
     return grid
 
 
-class Solver():
-    """
-    High-level interface for solving equations.
-    """
-    def __init__(self, grid: torch.Tensor, equal_cls: Union[epde.solver.input_preprocessing.Equation_NN,
-                                                            epde.solver.input_preprocessing.Equation_mat, 
-                                                            epde.solver.input_preprocessing.Equation_autograd],
-                 model: Any, mode: str, weak_form: Union[None, list] = None):
-        """
-        High-level interface for solving equations.
-        Args:
-            grid: array of a n-D points.
-            equal_cls: object from input_preprocessing (see input_preprocessing.Equation).
-            model: neural network.
-            mode: calculation method. (i.e., "NN", "autograd", "mat").
-            weak_form: list of basis functions.
-        """
-        self.grid = check_device(grid)
-        self.equal_cls = equal_cls
+class Plots():
+    def __init__(self, model, grid, mode):
         self.model = model
+        self.grid = grid
         self.mode = mode
-        self.weak_form = weak_form
-
-    def optimizer_choice(self, optimizer: str, learning_rate: float)-> \
-            Union[torch.optim.Adam, torch.optim.SGD, torch.optim.LBFGS]:
-        """
-        Setting optimizer.
-
-        Args:
-           optimizer: optimizer choice (Adam, SGD, LBFGS).
-           learning_rate: determines the step size at each iteration while moving toward a minimum of a loss function.
-        Returns:
-           torch.optimizer object as is.
-        """
-        if optimizer=='Adam':
-            torch_optim = torch.optim.Adam
-        elif optimizer=='SGD':
-            torch_optim = torch.optim.SGD
-        elif optimizer=='LBFGS':
-            torch_optim = torch.optim.LBFGS
-        else:
-            print('Wrong optimizer chosen, optimization was not performed')
-            return self.model
-
-        if self.mode =='NN' or self.mode == 'autograd':
-            optimizer = torch_optim(self.model.parameters(), lr=learning_rate)
-        elif self.mode =='mat':
-            optimizer = torch_optim([self.model.requires_grad_()], lr=learning_rate)
-       
-        return optimizer
 
     def print_nn(self, title: str):
         """
@@ -103,9 +59,13 @@ class Solver():
         Args:
             title: title
         """
-        nvars_model = self.model[-1].out_features
+        try:
+            nvars_model = self.model[-1].out_features
+        except:
+            nvars_model = self.model.model[-1].out_features
+
         nparams = self.grid.shape[1]
-        fig = plt.figure()
+        fig = plt.figure(figsize=(15,8))
         for i in range(nvars_model):
             if nparams == 1:
                 ax1 = fig.add_subplot(1,nvars_model,i+1)
@@ -113,6 +73,7 @@ class Solver():
                     ax1.set_title(title+' variable {}'.format(i))
                 ax1.scatter(self.grid.detach().cpu().numpy().reshape(-1),
                             self.model(self.grid)[:,i].detach().cpu().numpy())
+                
             else:
                 ax1 = fig.add_subplot(1, nvars_model, i+1, projection='3d')
                 if title != None:
@@ -188,15 +149,69 @@ class Solver():
             plt.show()
         plt.close()
 
-    def solve(self, lambda_bound: Union[int, float] = 10, verbose: bool = False, learning_rate: float = 1e-4,
-              eps: float = 1e-5, tmin: int = 1000, tmax: float = 1e5, nmodels: Union[int, None] = None,
-              name: Union[str, None] = None, abs_loss: Union[None, float] = None, use_cache: bool = True,
-              cache_dir: str = '../cache/', cache_verbose: bool = False, save_always: bool = False,
-              print_every: Union[int, None] = 100, cache_model: Union[torch.nn.Sequential, None] = None,
-              patience: int = 5, loss_oscillation_window: int = 100, no_improvement_patience: int = 1000,
-              model_randomize_parameter: Union[int, float] = 0, optimizer_mode: str = 'Adam',
-              step_plot_print: Union[bool, int] = False, step_plot_save: Union[bool, int] = False,
-              image_save_dir: Union[str, None] = None) -> Any:
+
+class Solver():
+    """
+    High-level interface for solving equations.
+    """
+    def __init__(self, grid: torch.Tensor, equal_cls,
+                 model: Any, mode: str, weak_form: Union[None, list] = None):
+        """
+        High-level interface for solving equations.
+        Args:
+            grid: array of a n-D points.
+            equal_cls: object from input_preprocessing (see input_preprocessing.Equation).
+            model: neural network.
+            mode: calculation method. (i.e., "NN", "autograd", "mat").
+            weak_form: list of basis functions.
+        """
+        self.grid = check_device(grid)
+        self.equal_cls = equal_cls
+        self.model = model
+        self.mode = mode
+        self.weak_form = weak_form
+
+    def optimizer_choice(self, optimizer: str, learning_rate: float)-> \
+            Union[torch.optim.Adam, torch.optim.SGD, torch.optim.LBFGS]:
+        """
+        Setting optimizer.
+
+        Args:
+           optimizer: optimizer choice (Adam, SGD, LBFGS).
+           learning_rate: determines the step size at each iteration while moving toward a minimum of a loss function.
+        Returns:
+           torch.optimizer object as is.
+        """
+        if optimizer=='Adam':
+            torch_optim = torch.optim.Adam
+        elif optimizer=='SGD':
+            torch_optim = torch.optim.SGD
+        elif optimizer=='LBFGS':
+            torch_optim = torch.optim.LBFGS
+        else:
+            print('Wrong optimizer chosen, optimization was not performed')
+            return self.model
+
+        if self.mode =='NN' or self.mode == 'autograd':
+            optimizer = torch_optim(self.model.parameters(), lr=learning_rate)
+        elif self.mode =='mat':
+            optimizer = torch_optim([self.model.requires_grad_()], lr=learning_rate)
+       
+        return optimizer
+
+
+    def solve(self, lambda_bound: Union[int, float] = 10,
+              verbose: bool = False, learning_rate: float = 1e-4, gamma=None, lr_change=1000,
+              eps: float = 1e-5, tmin: int = 1000, tmax: float = 1e5,
+              nmodels: Union[int, None] = None, name: Union[str, None] = None,
+              abs_loss: Union[None, float] = None, use_cache: bool = True,
+              cache_dir: str = '../cache/', cache_verbose: bool = False,
+              save_always: bool = False, print_every: Union[int, None] = 100,
+              cache_model: Union[torch.nn.Sequential, None] = None,
+              patience: int = 5, loss_oscillation_window: int = 100,
+              no_improvement_patience: int = 1000,  model_randomize_parameter: Union[int, float] = 0,
+              optimizer_mode: str = 'Adam', step_plot_print: Union[bool, int] = False,
+              step_plot_save: Union[bool, int] = False, image_save_dir: Union[str, None] = None, tol:float=0) -> Any:
         """
         High-level interface for solving equations.
 
@@ -204,6 +219,8 @@ class Solver():
             lambda_bound: an arbitrary chosen constant, influence only convergence speed.
             verbose: detailed info about training process.
             learning_rate: determines the step size at each iteration while moving toward a minimum of a loss function.
+            gamma: multiplicative factor of learning rate decay.
+            lr_change: the number of epochs after which the learning_rate change occurs
             eps: arbitrarily small number that uses for loss comparison criterion.
             tmax: maximum execution time.
             nmodels: smth
@@ -223,6 +240,7 @@ class Solver():
             step_plot_print: draws a figure through each given step.
             step_plot_save: saves a figure through each given step.
             image_save_dir: a directory where saved figure in.
+            tol: float constant, influences on error penalty in casual_loss algorithm. 
 
         Returns:
             model.
@@ -234,6 +252,8 @@ class Solver():
 
         # prepare input data to uniform format 
         r = create_random_fn(model_randomize_parameter)
+
+
         #  use cache if needed
         if use_cache:
             self.model, min_loss = Cache_class.cache(cache_dir, nmodels,
@@ -241,7 +261,7 @@ class Solver():
                                                      cache_verbose,
                                                      model_randomize_parameter,
                                                      cache_model,
-                                                     weak_form=self.weak_form,)
+                                                     weak_form=self.weak_form)
             
             Solution_class = Solution(self.grid, self.equal_cls,
                                       self.model, self.mode)
@@ -249,10 +269,15 @@ class Solver():
             Solution_class = Solution(self.grid, self.equal_cls,
                                       self.model, self.mode)
             min_loss = Solution_class.loss_evaluation(lambda_bound=lambda_bound,
-                                                      weak_form=self.weak_form)
+                                                      weak_form=self.weak_form,
+                                                      tol=tol)
         
+        self.plot = Plots(self.model, self.grid, self.mode)
+
         optimizer = self.optimizer_choice(optimizer_mode, learning_rate)
-    
+        if gamma != None:
+            scheduler = ExponentialLR(optimizer, gamma=gamma)
+
         # standard NN stuff
         if verbose:
             print('[{}] initial (min) loss is {}'.format(
@@ -267,7 +292,8 @@ class Solver():
             nonlocal cur_loss
             optimizer.zero_grad()
             loss = Solution_class.loss_evaluation(
-                lambda_bound = lambda_bound, weak_form=self.weak_form)
+                lambda_bound = lambda_bound, weak_form=self.weak_form,
+                                                            tol=tol)
             loss.backward()
             cur_loss = loss.item()
             return loss
@@ -275,7 +301,7 @@ class Solver():
         stop_dings = 0
         t_imp_start = 0
         # to stop train proceduce we fit the line in the loss data
-        # if line is flat enough 5 times, we stop the procedure
+        # if line is flat enough "patience" times, we stop the procedure
         cur_loss = min_loss
         while stop_dings <= patience:
             optimizer.step(closure)
@@ -296,6 +322,10 @@ class Solver():
                 info_string='Step = {} loss = {:.6f} normalized loss line= {:.6f}x+{:.6f}. There was {} stop dings already.'.format(
                                                                         t, cur_loss, line[0]/cur_loss, line[1]/cur_loss, stop_dings+1)
 
+            if gamma != None and t % lr_change == 0:
+                 scheduler.step()
+
+
             if t%loss_oscillation_window == 0:
                 line = np.polyfit(range(loss_oscillation_window), last_loss, 1)
                 if abs(line[0]/cur_loss) < eps and t > 0:
@@ -307,7 +337,7 @@ class Solver():
                             datetime.datetime.now()))
                         print(info_string)
                         if step_plot_print or step_plot_save:
-                            self.solution_print(title='Iteration = ' + str(t),
+                            self.plot.solution_print(title='Iteration = ' + str(t),
                                                 solution_print=step_plot_print,
                                                 solution_save=step_plot_save,
                                                 save_dir=image_save_dir)
@@ -318,7 +348,7 @@ class Solver():
                         datetime.datetime.now(),no_improvement_patience))
                     print(info_string)
                     if step_plot_print or step_plot_save:
-                        self.solution_print(title='Iteration = ' + str(t),
+                        self.plot.solution_print(title='Iteration = ' + str(t),
                                                 solution_print=step_plot_print,
                                                 solution_save=step_plot_save,
                                                 save_dir=image_save_dir)
@@ -333,7 +363,7 @@ class Solver():
                     print('[{}] Absolute value of loss is lower than threshold'.format(datetime.datetime.now()))
                     print(info_string)
                     if step_plot_print or step_plot_save:
-                        self.solution_print(title='Iteration = ' + str(t),
+                        self.plot.solution_print(title='Iteration = ' + str(t),
                                                 solution_print=step_plot_print,
                                                 solution_save=step_plot_save,
                                                 save_dir=image_save_dir)
@@ -345,7 +375,7 @@ class Solver():
                     datetime.datetime.now(),print_every))
                 print(info_string)
                 if step_plot_print or step_plot_save:
-                    self.solution_print(title='Iteration = ' + str(t),
+                    self.plot.solution_print(title='Iteration = ' + str(t),
                                                 solution_print=step_plot_print,
                                                 solution_save=step_plot_save,
                                                 save_dir=image_save_dir)

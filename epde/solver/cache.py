@@ -59,41 +59,45 @@ class Model_prepare():
     def grid_model_mat(self, cache_model):
         NN_grid = torch.vstack([self.grid[i].reshape(-1) for i in \
                                 range(self.grid.shape[0])]).T.float()
-        # print(f'Input shape {self.grid.shape}')
+
         if cache_model == None:
             cache_model = torch.nn.Sequential(
-                torch.nn.Linear(self.grid.shape[0], 256),
+                torch.nn.Linear(self.grid.shape[0], 100),
                 torch.nn.Tanh(),
-                # torch.nn.Dropout(0.1),
-                # torch.nn.ReLU(),
-                torch.nn.Linear(256, 256),
+                torch.nn.Linear(100, 100),
                 torch.nn.Tanh(),
-                # torch.nn.Dropout(0.1),
-                # torch.nn.ReLU(),
-                torch.nn.Linear(256, 64),
-                # # torch.nn.Dropout(0.1),
+                torch.nn.Linear(100, 100),
                 torch.nn.Tanh(),
-                torch.nn.Linear(64, 1024),
-                # torch.nn.Dropout(0.1),
-                torch.nn.Tanh(),
-                torch.nn.Linear(1024, 1)
-                # torch.nn.Tanh()
+                torch.nn.Linear(100, 1)
             )
-                
-                
-            #     torch.nn.Linear(self.grid.shape[0], 100),
-            #     torch.nn.Tanh(),
-            #     torch.nn.Linear(100, 100),
-            #     torch.nn.Tanh(),
-            #     torch.nn.Linear(100, 100),
-            #     # torch.nn.Tanh(),
-            #     # torch.nn.Linear(100, 100),
-            #     # torch.nn.Tanh(),
-            #     # torch.nn.Linear(100, 100),
-            #     torch.nn.Tanh(),
-            #     torch.nn.Linear(100, 1)
-            # )
         return NN_grid, cache_model
+
+    @staticmethod
+    def model_reform(init_model, model):
+        """
+        As some models are nn.Sequential class objects,
+        but another models are nn.Module class objects.
+        This method does checking the solver model (init_model)
+        and the cache model (model).
+        Args:
+            init_model: [nn.Sequential or class(nn.Module)].
+            model: [nn.Sequential or class(nn.Module)].
+        Returns:
+            * **init_model** -- [nn.Sequential or nn.ModuleList] \n
+            * **model** -- [nn.Sequential or nn.ModuleList].
+        """
+        try:
+            model[0]
+        except:
+            model = model.model
+        
+        try:
+            init_model[0]
+        except:
+            init_model = init_model.model
+        
+        return init_model, model
+        
 
     def cache_lookup(self, lambda_bound: float = 0.001, weak_form: None = None, cache_dir: str = '../cache/',
                 nmodels: Union[int, None] = None, cache_verbose: bool = False) -> Tuple[dict, torch.Tensor]:
@@ -102,10 +106,10 @@ class Model_prepare():
         Args:
             lambda_bound: an arbitrary chosen constant, influence only convergence speed.
             cache_dir: directory where saved cache in.
-            nmodels: smth
+            nmodels: maximal number of models that are looked before optimization
             cache_verbose: more detailed info about models in cache.
         Returns:
-            * **best_checkpoint** -- smth.\n
+            * **best_checkpoint** -- best model with optimizator state.\n
             * **min_loss** -- minimum error in pre-trained error.
         """
         files = glob.glob(cache_dir + '*.tar')
@@ -127,10 +131,13 @@ class Model_prepare():
             model = checkpoint['model']
             model.load_state_dict(checkpoint['model_state_dict'])
             # this one for the input shape fix if needed
-            if model[0].in_features != self.model[0].in_features:
+            
+            solver_model, cache_model = self.model_reform(self.model, model)
+
+            if cache_model[0].in_features != solver_model[0].in_features:
                 continue
             try:
-                if model[-1].out_features != self.model[-1].out_features:
+                if cache_model[-1].out_features != solver_model[-1].out_features:
                     continue
             except Exception:
                 continue
@@ -251,8 +258,11 @@ class Model_prepare():
         if cache_checkpoint == None:
             optimizer_state = None
             return self.model, optimizer_state
-        # if models have the same structure use the cache model state
-        if str(cache_checkpoint['model']) == str(self.model):
+        # if models have the same structure use the cache model state,
+        # and the cache model has ordinary structure
+        if str(cache_checkpoint['model']) == str(self.model) and \
+                 isinstance(self.model, torch.nn.Sequential) and \
+                 isinstance(self.model[0], torch.nn.Linear):
             self.model = cache_checkpoint['model']
             self.model.load_state_dict(cache_checkpoint['model_state_dict'])
             self.model.train()
@@ -294,6 +304,7 @@ class Model_prepare():
                                                        cache_verbose=cache_verbose,
                                                        lambda_bound=lambda_bound,
                                                        weak_form=weak_form)
+        
         self.model, optimizer_state = self.cache_retrain(cache_checkpoint,
                                                          cache_verbose=cache_verbose)
 

@@ -52,15 +52,14 @@ def integration(func: torch.tensor, grid, pow: Union[int, float] = 2) -> Union[T
         return result, grid
 
 
-class Solution():
-    def __init__(self, grid: torch.Tensor, equal_cls: Union[epde.solver.input_preprocessing.Equation_NN,
-                                                            epde.solver.input_preprocessing.Equation_mat, 
-                                                            epde.solver.input_preprocessing.Equation_autograd],
+class DE_operator():
+    """
+    Class for differential equation calculation.
+    """
+    def __init__(self, grid: torch.Tensor, prepared_operator: dict,
                  model: Union[torch.nn.Sequential, torch.Tensor], mode: str):
         self.grid = check_device(grid)
-        equal_copy = deepcopy(equal_cls)
-        self.prepared_operator = equal_copy.operator_prepare()
-        self.prepared_bconds = equal_copy.bnd_prepare()
+        self.prepared_operator = prepared_operator
         self.model = model.to(device_type())
         self.mode = mode
         if self.mode == 'NN':
@@ -89,6 +88,71 @@ class Solution():
             except NameError:
                 total = dif
         return total
+
+    def pde_compute(self) -> torch.Tensor:
+        """
+        Computes PDE residual.
+
+        Returns:
+            PDE residual.
+        """
+
+        num_of_eq = len(self.prepared_operator)
+        if num_of_eq == 1:
+            op = self.apply_operator(
+                self.prepared_operator[0], self.sorted_grid)
+        else:
+            op_list = []
+            for i in range(num_of_eq):
+                op_list.append(self.apply_operator(
+                    self.prepared_operator[i], self.sorted_grid))
+            op = torch.cat(op_list, 1)
+        return op
+
+    def weak_pde_compute(self, weak_form) -> torch.Tensor:
+        """
+        Computes PDE residual in weak form.
+
+        Args:
+            weak_form: list of basis functions
+        Returns:
+            weak PDE residual.
+        """
+        device = device_type()
+        if self.mode == 'NN':
+            grid_central = self.grid_dict['central']
+        elif self.mode == 'autograd':
+            grid_central = self.grid
+
+        op = self.pde_compute()
+        sol_list = []
+        for i in range(op.shape[-1]):
+            sol = op[:, i]
+            for func in weak_form:
+                sol = sol * func(grid_central).to(device).reshape(-1)
+            grid_central1 = torch.clone(grid_central)
+            for k in range(grid_central.shape[-1]):
+                sol, grid_central1 = integration(sol, grid_central1)
+            sol_list.append(sol.reshape(-1, 1))
+        if len(sol_list) == 1:
+            return sol_list[0]
+        else:
+            return torch.cat(sol_list)
+
+
+class Bounds():
+    """
+    class for boundary and initial conditions calculation.
+    """
+    def __init__(self, grid: torch.Tensor, prepared_bconds: dict,
+                 model: Union[torch.nn.Sequential, torch.Tensor], mode: str):
+        self.grid = check_device(grid)
+        self.prepared_bconds = prepared_bconds
+        self.model = model.to(device_type())
+        self.mode = mode
+        self.apply_operator = DE_operator(self.grid, self.prepared_bconds,
+                                          self.model, self.mode).apply_operator
+
 
     def apply_bconds_set(self, operator_set: list) -> torch.Tensor:
         """
@@ -217,57 +281,32 @@ class Solution():
 
         return b_val, true_b_val
 
-    def pde_compute(self) -> torch.Tensor:
-        """
-        Computes PDE residual.
 
-        Returns:
-            PDE residual.
-        """
+class Solution():
+    """
+    class for different loss functions calculation.
+    """
+    def __init__(self, grid: torch.Tensor, equal_cls: Union[epde.solver.input_preprocessing.Equation_NN,
+                                                            epde.solver.input_preprocessing.Equation_mat,
+                                                            epde.solver.input_preprocessing.Equation_autograd],
+                 model: Union[torch.nn.Sequential, torch.Tensor], mode: str):
+        self.grid = check_device(grid)
+        if mode == 'NN':
+            sorted_grid = Points_type(self.grid).grid_sort()
+            self.n_t = len(sorted_grid['central'][:, 0].unique())
+        elif mode == 'autograd':
+            self.n_t = len(self.grid[:, 0].unique())
+        equal_copy = deepcopy(equal_cls)
+        self.prepared_operator = equal_copy.operator_prepare()
+        self.prepared_bconds = equal_copy.bnd_prepare()
+        self.model = model.to(device_type())
+        self.mode = mode
+        self.operator = DE_operator(self.grid, self.prepared_operator, self.model,
+                                   self.mode)
+        self.bconds = Bounds(self.grid, self.prepared_bconds, self.model,
+                                   self.mode)
 
-        num_of_eq = len(self.prepared_operator)
-        if num_of_eq == 1:
-            op = self.apply_operator(
-                self.prepared_operator[0], self.sorted_grid)
-        else:
-            op_list = []
-            for i in range(num_of_eq):
-                op_list.append(self.apply_operator(
-                    self.prepared_operator[i], self.sorted_grid))
-            op = torch.cat(op_list, 1)
-        return op
-
-    def weak_pde_compute(self, weak_form) -> torch.Tensor:
-        """
-        Computes PDE residual in weak form.
-
-        Args:
-            weak_form: list of basis functions
-        Returns:
-            weak PDE residual.
-        """
-        device = device_type()
-        if self.mode == 'NN':
-            grid_central = self.grid_dict['central']
-        elif self.mode == 'autograd':
-            grid_central = self.grid
-
-        op = self.pde_compute()
-        sol_list = []
-        for i in range(op.shape[-1]):
-            sol = op[:, i]
-            for func in weak_form:
-                sol = sol * func(grid_central).to(device).reshape(-1)
-            grid_central1 = torch.clone(grid_central)
-            for k in range(grid_central.shape[-1]):
-                sol, grid_central1 = integration(sol, grid_central1)
-            sol_list.append(sol.reshape(-1, 1))
-        if len(sol_list) == 1:
-            return sol_list[0]
-        else:
-            return torch.cat(sol_list)
-
-    def l2_loss(self, lambda_bound:  Union[int, float] = 10) -> torch.Tensor:
+    def default_loss(self, lambda_bound:  Union[int, float] = 10):
         """
         Computes l2 loss.
         Args:
@@ -275,12 +314,12 @@ class Solution():
         Returns:
             model loss.
         """
-        op = self.pde_compute()
+        op = self.operator.pde_compute()
+
         if self.prepared_bconds == None:
             return torch.sum(torch.mean((op) ** 2, 0))
 
-        b_val, true_b_val = self.apply_bconds_operator()
-
+        b_val, true_b_val = self.bconds.apply_bconds_operator()
 
         if self.mode == 'mat':
             loss = torch.mean((op) ** 2) + \
@@ -288,6 +327,39 @@ class Solution():
         else:
             loss = torch.sum(torch.mean((op) ** 2, 0)) + \
                    lambda_bound * torch.sum(torch.mean((b_val - true_b_val) ** 2, 0))
+        return loss
+
+    def casual_loss(self, lambda_bound:  Union[int, float] = 10, tol: float = 0) -> torch.Tensor:
+        """
+        Computes casual loss, which is caclulated with weights matrix:
+        W = exp(-tol*(Loss_i)) where Loss_i is sum of the L2 loss from 0
+        to t_i moment of time. This loss function should be used when one
+        of the DE independent parameter is time.
+
+        Args:
+            lambda_bound: an arbitrary chosen constant, influence only convergence speed.
+            tol: float constant, influences on error penalty. 
+        Returns:
+            model loss.
+        """
+        
+        op = self.operator.pde_compute()**2
+
+        if self.prepared_bconds == None:
+            return torch.sum(torch.mean((op) ** 2, 0))
+
+        b_val, true_b_val = self.bconds.apply_bconds_operator()
+
+        res = torch.sum(op, dim=1).reshape(self.n_t, -1)
+        res = torch.mean(res, axis=1).reshape(self.n_t, 1)
+        M = torch.triu(torch.ones((self.n_t, self.n_t)), diagonal=1).T
+        with torch.no_grad():
+            W = torch.exp(- tol * (M @ res))
+        #plt.plot(W.detach().cpu().numpy())
+        #plt.show()
+        loss = torch.mean(W*res) + \
+                lambda_bound * torch.sum(torch.mean((b_val - true_b_val) ** 2, 0))
+
         return loss
 
     def weak_loss(self, weak_form: Union[None, list], lambda_bound: Union[int, float] = 10) -> torch.Tensor:
@@ -299,25 +371,26 @@ class Solution():
         Returns:
             model loss.
         """
-        op = self.weak_pde_compute(weak_form)
+        op = self.operator.weak_pde_compute(weak_form)
         if self.prepared_bconds == None:
             return torch.sum(op)
 
         # we apply no  boundary conditions operators if they are all None
 
-        b_val, true_b_val = self.apply_bconds_operator()
+        b_val, true_b_val = self.bconds.apply_bconds_operator()
 
         loss = torch.sum(op) + \
                lambda_bound * torch.sum(torch.mean((b_val - true_b_val) ** 2, 0))
 
         return loss
 
-    def loss_evaluation(self, lambda_bound: Union[int, float] = 10, weak_form: Union[None, list] = None) -> Union[l2_loss, weak_loss]:
+    def loss_evaluation(self, lambda_bound: Union[int, float] = 10, weak_form: Union[None, list] = None, tol=0) -> Union[default_loss, weak_loss, casual_loss]:
         """
         Setting the required loss calculation method.
         Args:
             lambda_bound: an arbitrary chosen constant, influence only convergence speed.
             weak_form: list of basis functions.
+            tol: float constant, influences on error penalty. 
         Returns:
             A given calculation method.
         """
@@ -326,7 +399,9 @@ class Solution():
                 print('No bconds is not possible, returning infinite loss')
                 return np.inf
 
-        if weak_form == None or weak_form == []:
-            return self.l2_loss(lambda_bound=lambda_bound)
-        else:
+        if weak_form != None and weak_form != []:
             return self.weak_loss(weak_form, lambda_bound=lambda_bound)
+        elif tol != 0:
+            return self.casual_loss(lambda_bound=lambda_bound, tol=tol)
+        else:
+            return self.default_loss(lambda_bound=lambda_bound)

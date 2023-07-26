@@ -14,7 +14,7 @@ device = torch.device('cpu')
 
 import matplotlib.pyplot as plt
 
-def train_ann(grids: list, data: np.ndarray, epochs_max: int = 10000):
+def train_ann(grids: list, data: np.ndarray, epochs_max: int = 500):
     dim = 1 if np.any([s == 1 for s in data.shape]) and data.ndim == 2 else data.ndim
     assert len(grids) == dim, 'Dimensionality of data does not match with passed grids.'
     data_size = data.size
