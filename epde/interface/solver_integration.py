@@ -311,7 +311,7 @@ class SystemSolverInterface(object):
         self.coeff_tol = coeff_tol
 
     @staticmethod
-    def _term_solver_form(term, grids, variables: list = ['u',]):
+    def _term_solver_form(term, grids, default_domain, variables: list = ['u',]):
         deriv_orders = []
         deriv_powers = []
         deriv_vars = []
@@ -319,6 +319,7 @@ class SystemSolverInterface(object):
 
         try:
             coeff_tensor = np.ones_like(grids[0])
+            
         except KeyError:
             raise NotImplementedError('No cache implemented')
         for factor in term.structure:
@@ -337,7 +338,8 @@ class SystemSolverInterface(object):
 
                 deriv_vars.append(cur_deriv_var)
             else:
-                coeff_tensor = coeff_tensor * factor.evaluate(grids=grids)
+                grid_arg = None if default_domain else grids
+                coeff_tensor = coeff_tensor * factor.evaluate(grids=grid_arg)
         if not derivs_detected:
             deriv_powers = [0]
             deriv_orders = [[None,],]
@@ -366,9 +368,12 @@ class SystemSolverInterface(object):
 
     def _equation_solver_form(self, equation, variables, grids=None):
         # TODO: fix performance on other, than default grids.
+        _solver_form = {}
         if grids is None:
             grids = self.grids
-        _solver_form = {}
+            default_domain = True
+        else:
+            default_domain = False
         for term_idx, term in enumerate(equation.structure):
             if term_idx != equation.target_idx:
                 if term_idx < equation.target_idx:
@@ -376,7 +381,7 @@ class SystemSolverInterface(object):
                 else:
                     weight = equation.weights_final[term_idx-1]
                 if not np.isclose(weight, 0, rtol = self.coeff_tol):
-                    _solver_form[term.name] = self._term_solver_form(term, grids, variables)
+                    _solver_form[term.name] = self._term_solver_form(term, grids, default_domain, variables)
                     _solver_form[term.name]['coeff'] = _solver_form[term.name]['coeff'] * weight
                     _solver_form[term.name]['coeff'] = torch.flatten(_solver_form[term.name]['coeff']).unsqueeze(1).type(torch.FloatTensor)
 
@@ -391,7 +396,7 @@ class SystemSolverInterface(object):
 
         target_weight = torch.from_numpy(np.full_like(a=grids[0],  # global_var.grid_cache.get('0'),
                                                       fill_value=-1.))
-        target_form = self._term_solver_form(equation.structure[equation.target_idx], grids, variables)
+        target_form = self._term_solver_form(equation.structure[equation.target_idx], grids, default_domain, variables)
         target_form['coeff'] = target_form['coeff'] * target_weight
         target_form['coeff'] = torch.flatten(target_form['coeff']).unsqueeze(1).type(torch.FloatTensor)
 
