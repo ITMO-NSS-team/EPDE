@@ -318,6 +318,6 @@ if __name__ == '__main__':
         #     errs_epde.append(np.mean(np.abs(data_test - pred_u_v)))
         #     calc_epde.append(pred_u_v)
             
-        # model_base = sindy_provided_l0(grids_training, data_train_n)    
-        # exps[magnitude] = {'epde': (models_epde, errs_epde, calc_epde),
-        #                    'SINDy': (model_base,)}
+        model_base = sindy_provided_l0(grids_training, data_train_n)    
+        exps[magnitude] = {'epde': (models_epde, errs_epde, calc_epde),
+                            'SINDy': (model_base,)}

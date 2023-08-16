@@ -71,12 +71,21 @@ if __name__ == "__main__":
                                              preprocessor_kwargs={'use_smoothing' : False,
                                                                   })
         
-            # custom_grid_tokens = CacheStoredTokens(token_type = 'grid',
-            #                                        # boundary = boundary,
-            #                                        token_labels = ['t', 'x', 'y'],
-            #                                        token_tensors={'t' : grids[0], 'x' : grids[1], 'y' : grids[2]},
-            #                                        params_ranges = {'power' : (1, 1)},
-            #                                        params_equality_ranges = None)
+            order = 5
+            
+            def get_polynomial_family(tensor, order, token_type = 'polynomials'):
+                '''
+                Get family of tokens for polynomials of orders from second up to order argument.
+                '''
+                assert order > 1
+                labels = [f'p^{idx+1}' for idx in range(1, order)]
+                tensors = {label : tensor ** (idx + 2) for idx, label in enumerate(labels)}
+                return CacheStoredTokens(token_type = token_type,
+                                         token_labels = labels,
+                                         token_tensors = tensors,
+                                         params_ranges = {'power' : (1, 1)},
+                                         params_equality_ranges = None, 
+                                         meaningful = True)
         
             trig_tokens = TrigonometricTokens(dimensionality = dimensionality)
             factors_max_number = {'factors_num' : [1, 2], 'probas' : [0.95, 0.05]}

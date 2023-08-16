@@ -71,15 +71,38 @@ def equation_complexity_by_factors(system, equation_key):
         discrepancy : list of integers.
         The values of the error metric: list entry for each of the equations.
     '''
+    # eq_compl = 0
+
+    # for idx, term in enumerate(system.vals[equation_key].structure):
+    #     if idx < system.vals[equation_key].target_idx:
+    #         if not system.vals[equation_key].weights_final[idx] == 0:
+    #             eq_compl += len(term.structure)
+    #     elif idx > system.vals[equation_key].target_idx:
+    #         if not system.vals[equation_key].weights_final[idx-1] == 0:
+    #             eq_compl += len(term.structure)
+    #     else:
+    #         eq_compl += len(term.structure)
+    # return eq_compl
     eq_compl = 0
 
     for idx, term in enumerate(system.vals[equation_key].structure):
         if idx < system.vals[equation_key].target_idx:
             if not system.vals[equation_key].weights_final[idx] == 0:
-                eq_compl += len(term.structure)
+                eq_compl += complexity_deriv(term.structure)
         elif idx > system.vals[equation_key].target_idx:
             if not system.vals[equation_key].weights_final[idx-1] == 0:
-                eq_compl += len(term.structure)
+                eq_compl += complexity_deriv(term.structure)
         else:
-            eq_compl += len(term.structure)
+            eq_compl += complexity_deriv(term.structure)
     return eq_compl
+
+def complexity_deriv(term_list: list):
+    total = 0
+    for factor in term_list:
+        if factor.deriv_code == [None]:
+            total += 0.5
+        elif factor.deriv_code is None:
+            total += 0.5
+        else:
+            total += len(factor.deriv_code)
+    return total*factor.param('power')

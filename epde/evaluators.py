@@ -99,7 +99,7 @@ def simple_function_evaluator(factor, structural: bool = False, grids=None, **kw
     for param_idx, param_descr in factor.params_description.items():
         if param_descr['name'] == 'power':
             power_param_idx = param_idx
-
+            
     if grids is not None:
         base_val = global_var.tensor_cache.get(factor.cache_label, structural=structural)
         # original_grids = factor.grids

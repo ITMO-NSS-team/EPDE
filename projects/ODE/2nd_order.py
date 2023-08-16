@@ -124,8 +124,12 @@ if __name__ == "__main__":
         pred_u = epde_search_obj.predict(system=sys, boundary_conditions=[bop_u(), bop_du()], 
                                           grid = [t_test,], strategy='autograd')
         
-        plt.plot(t_test, x_test, '+', label = 'test data')
-        plt.plot(t_test, pred_u, color = 'r', label='solution of the discovered ODE')
+        plt.plot(t_train, x_train, color = 'b', label='Обучающая выборка')
+        plt.plot(t_test, x_test, '+', label = 'Валидационная выборка')
+        plt.plot(t_test, pred_u, color = 'r', label='Решение полученного ОДУ')
+        plt.xlabel('t')
+        plt.ylabel('x')
         plt.grid()
-        plt.legend(loc='upper right')       
+        plt.legend(loc='upper left')     
+        plt.savefig(fname = 'projects/ODE/ODE_sol_1.png', dpi = 300)
         plt.show()

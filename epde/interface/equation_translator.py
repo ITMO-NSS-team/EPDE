@@ -37,7 +37,7 @@ def _(text_form : str, pool):
             factors = [parse_factor(factor, pool) for factor in term[1:]]
             if len(factors) > max_factors:
                 max_factors = len(factors)
-            term_list.append(Term(pool, passed_term=factors))
+            term_list.append(Term(pool, passed_term=factors, collapse_powers=False))
             weights[idx] = float(term[0])
         elif float_convertable(term[0]) and len(term) == 1:
             weights[idx] = float(term[0])
@@ -45,7 +45,7 @@ def _(text_form : str, pool):
             factors = [parse_factor(factor, pool) for factor in term]
             if len(factors) > max_factors:
                 max_factors = len(factors)
-            term_list.append(Term(pool, passed_term=factors))
+            term_list.append(Term(pool, passed_term=factors, collapse_powers=False))
 
     equation = Equation(pool=pool, basic_structure=term_list,
                         metaparameters={'sparsity': {'optimizable': True, 'value': 1.},
@@ -78,7 +78,7 @@ def _(text_form : dict, pool):
                 factors = [parse_factor(factor, pool) for factor in term[1:]]
                 if len(factors) > max_factors:
                     max_factors = len(factors)
-                term_list.append(Term(pool, passed_term=factors))
+                term_list.append(Term(pool, passed_term=factors, collapse_powers=False))
                 weights[idx] = float(term[0])
             elif float_convertable(term[0]) and len(term) == 1:
                 weights[idx] = float(term[0])
@@ -86,7 +86,7 @@ def _(text_form : dict, pool):
                 factors = [parse_factor(factor, pool) for factor in term]
                 if len(factors) > max_factors:
                     max_factors = len(factors)
-                term_list.append(Term(pool, passed_term=factors))
+                term_list.append(Term(pool, passed_term=factors, collapse_powers=False))
     
         equation = Equation(pool=pool, basic_structure=term_list,
                             metaparameters={'sparsity': {'optimizable': True, 'value': 1.},
@@ -137,6 +137,7 @@ def parse_factor(factor_form, pool):   # В проект: работы по об
     print(label_str, params_str)
     factor_family = [family for family in pool.families if label_str in family.tokens][0]
     _, factor = factor_family.create(label=label_str, **params_str)
+    factor.set_param(param = params_str['power'], name = 'power')
     return factor
 
 
@@ -152,8 +153,9 @@ def parse_params_str(param_str):
 
 class CoeffLessEquation():
     def __init__(self, lp_terms : Union[list, tuple], rp_term : Union[list, tuple], pool):
-        self.lp_terms_translated = [Term(pool, passed_term = [parse_factor(factor, pool) for factor in term]) for term in lp_terms]
-        self.rp_translated = Term(pool, passed_term = [parse_factor(factor, pool) for factor in rp_term])
+        self.lp_terms_translated = [Term(pool, passed_term = [parse_factor(factor, pool) for factor in term],
+                                         collapse_powers=False) for term in lp_terms]
+        self.rp_translated = Term(pool, passed_term = [parse_factor(factor, pool) for factor in rp_term], collapse_powers=False)
         
         self.lp_values = np.vstack(list(map(lambda x: x.evaluate(False).reshape(-1), self.lp_terms_translated)))
         self.rp_value = self.rp_translated.evaluate(False).reshape(-1)

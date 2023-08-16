@@ -73,7 +73,7 @@ if __name__ == "__main__":
         epde_search_obj.equations(only_print = True, num = 1)
         histories.append((global_var.history.history, epde_search_obj.equations(only_print = False, num = 1)[0]))
 
-    ranges = np.arange(0, 120, 10)
+    ranges = np.arange(0, 120, 12)
     
     data = {}
     for r in ranges:
@@ -85,4 +85,4 @@ if __name__ == "__main__":
     ax.grid(alpha = 0.5)
     ax.boxplot(data.values(), whis=[5, 95])
     ax.set_xticklabels(data.keys())
-    plt.savefig('boxplot_ode_conv.png', dpi = 300, format = 'png', bbox_inches = 'tight')        
+    plt.savefig('boxplot_ode_conv_log.png', dpi = 300, format = 'png', bbox_inches = 'tight')        

@@ -48,7 +48,7 @@ class Term(ComplexStructure):
                  '_descr_variable_marker']
 
     def __init__(self, pool, passed_term=None, mandatory_family=None, max_factors_in_term=1,
-                 create_derivs: bool = False, interelement_operator=np.multiply):
+                 create_derivs: bool = False, interelement_operator=np.multiply, collapse_powers = True):
         super().__init__(interelement_operator)
         self.pool = pool
         self.max_factors_in_term = max_factors_in_term
@@ -57,7 +57,7 @@ class Term(ComplexStructure):
             self.randomize(mandatory_family=mandatory_family,
                            create_derivs=create_derivs)
         else:
-            self.defined(passed_term)
+            self.defined(passed_term, collapse_powers = collapse_powers)
 
         if global_var.tensor_cache is not None:
             self.use_cache()
@@ -87,7 +87,7 @@ class Term(ComplexStructure):
             f'passed term should have string or list/dict types, not {type(passed_term)}')
 
     @defined.register
-    def _(self, passed_term: list):
+    def _(self, passed_term: list, collapse_powers = True):
         self.structure = []
         for _, factor in enumerate(passed_term):
             if isinstance(factor, str):
@@ -97,10 +97,11 @@ class Term(ComplexStructure):
                 self.structure.append(factor)
             else:
                 raise ValueError('The structure of a term should be declared with str or factor.Factor obj, instead got', type(factor))
-        self.structure = filter_powers(self.structure)
+        if collapse_powers:
+            self.structure = filter_powers(self.structure)
 
     @defined.register
-    def _(self, passed_term: str):
+    def _(self, passed_term: str, collapse_powers = True):
         self.structure = []
         if isinstance(passed_term, str):
             _, temp_f = self.pool.create(label=passed_term)

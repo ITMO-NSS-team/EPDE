@@ -79,6 +79,13 @@ class AdaptiveFiniteDeriv(AbstractDeriv):
         return derivs
 
 
+# class ANNBasedFiniteDifferences(AbstractDeriv):
+#     def __init__(self):
+#         self._internal_ann = None
+
+#     def differentiate(self, data: np.ndarray, max_order: Union[int, list],
+#                       mixed: bool = False, axis=None, *grids) -> list:
+
 class PolynomialDeriv(AbstractDeriv):
     def __init__(self):
         pass
