@@ -26,7 +26,6 @@ class OperatorMapper(CompoundOperator):
         self._tags = copy.copy(operator_to_map.operator_tags)
         self._tags.remove(source_tag)
         self._tags.add(objective_tag)
-        # print(f'Initializing operator mapper from {source_tag} to {objective_tag}')
 
     def apply(self, objective : CompoundOperator, arguments : dict):
         if self.objective_condition is None or self.objective_condition(objective):
@@ -44,18 +43,13 @@ class OperatorMapper(CompoundOperator):
 
             if 'population level' in self._tags:
                 return objective
-                # return objective # Why are we here? Just to suffer?
-    # TODO: check, if the population-level operators after mapping have appropriate "return" 
-    # Do we need return here of some sort?                    
 
 
 def map_operator_between_levels(operator: CompoundOperator, original_level: Union[str, int], target_level: Union[str, int],
                                 objective_condition: Callable = None, element_condition: Callable = None):
-    # TODO: make objective conditon be passed with a tag, pointing, where it shall be used.
     if isinstance(original_level, str): original_level = OPERATOR_LEVELS.index(original_level)
     if isinstance(target_level, str): target_level = OPERATOR_LEVELS.index(target_level)
     
-    # print(f'mapping between {original_level} and {target_level}, that is {np.arange(original_level, target_level + 1)}')
     resulting_operator = reduce(lambda x, y: OperatorMapper(operator_to_map     = x, 
                                                             objective_tag       = OPERATOR_LEVELS[y], 
                                                             source_tag          = OPERATOR_LEVELS[y-1],

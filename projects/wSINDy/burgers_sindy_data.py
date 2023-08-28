@@ -18,6 +18,7 @@ sys.path.append('../')
 
 sys.path.pop()
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')))
+sys.path.append('C:/Users/Mike/Documents/Work/EPDE')
 
 import matplotlib.pyplot as plt
 import matplotlib
@@ -302,13 +303,13 @@ def sindy_provided_l0(grids, u):
     return model
 
 if __name__ == '__main__':
-    path = '/home/maslyaev/epde/EPDE_main/projects/wSINDy/data/burgers/'
+    path = 'C:\\Users\\Mike\\Documents\\Work\\EPDE\\projects\\wSINDy\\data\\data\\burgers\\'
 
     try:
         u_file = os.path.join(os.path.dirname( __file__ ), 'data/burgers/burgers.mat')
         # data = loadmat(u_file)
     except (FileNotFoundError, OSError):
-        u_file = '/home/maslyaev/epde/EPDE_main/projects/wSINDy/data/burgers/burgers.mat'
+        u_file = 'C:\\Users\\Mike\\Documents\\Work\\EPDE\\projects\\wSINDy\\data\\burgers\\burgers.mat'
     print(u_file)
     data = loadmat(u_file)
 
@@ -318,6 +319,10 @@ if __name__ == '__main__':
     u = np.real(data['usol']).T
     dt = t[1] - t[0]
     dx = x[1] - x[0]
+
+    print(u.shape, t.shape)
+    print(dt, dx)
+    raise NotImplementedError()
 
     train_max = 51    
     grids = np.meshgrid(t, x, indexing = 'ij')
@@ -348,7 +353,7 @@ if __name__ == '__main__':
         
         if run_epde:
             for idx in range(test_launches):
-                epde_search_obj, sys = epde_discovery(x, t_train, data_train_n, True)
+                epde_search_obj, sys = epde_discovery(x, t_train, data_train_n, False)
                 if pool is None:
                     pool = epde_search_obj.pool
         
@@ -431,27 +436,3 @@ if __name__ == '__main__':
         exps[magnitude] = {'epde': (models_epde, errs_epde, calc_epde),
                            'SINDy': (model_base, errs_sindy, calc_sindy)}
     logger.dump()
-    
-for noise_level in exps.keys():
-    for exp_idx, exp in enumerate(exps[noise_level]['epde'][0]):
-        
-        equation_obtained = False; compl = [4.5,]; attempt = 0
-        
-        iterations = 4
-        while not equation_obtained:
-            if attempt < iterations:
-                try:
-                    sys = exp.get_equations_by_complexity(compl)
-                    res = sys[0]
-                except IndexError:
-                    compl[0] += 0.5
-                    attempt += 1
-                    continue
-            else:
-                res = exp.equations(only_print = False)[0][0]
-                 # = sys
-            equation_obtained = True        
-        
-        logger.add_log(key = f'Burgers_{noise_level}_attempt_{exp_idx}', entry = res, 
-                       error_pred = exps[noise_level]['epde'][1][exp_idx])        
-            

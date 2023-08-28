@@ -139,8 +139,6 @@ class LogLoader(object):
         term_presence_log = {key : {} for key in range(len(variables))} # replaced self._term_presence_log
         for log_entry in self._log:
             for exp_key, exp_log in log_entry.items():
-                # if 'key' in exp_log.keys() and not exp_log['key']['aggregate']:
-                    # continue
                 if exp_key == 'meta':
                     continue
                 
@@ -163,25 +161,36 @@ class LogLoader(object):
     def get_stats(terms: Union[list, tuple], parsed_log: dict, metrics: list = [np.mean, np.var, np.size], 
                   metric_names: list = ['mean', 'var', 'disc_num'], variable_eq: str = 'u', variables = ['u',]):
         assert all([isinstance(term, frozenset) for term in terms])
-        stats = np.array([[metric(np.array(parsed_log[variables.index(variable_eq)][term])) for metric in metrics] 
-                          for term in terms]).reshape(-1)
-        
+        stats = []
+        for term in terms:
+            if term in parsed_log[variables.index(variable_eq)].keys():
+                term_coeff_vals = np.array(parsed_log[variables.index(variable_eq)][term])
+                stats.append([metric(np.abs(term_coeff_vals[term_coeff_vals != 0])) 
+                              for metric in metrics])
+            else:
+                stats.append([np.nan for metric in metrics])
+
+        stats = np.array(stats).reshape(-1)
+
         label_sep = '_'; term_sep = '*'
         term_names = [term_sep.join(term) for term in terms]
         labels = [label_sep.join(map(str, x)) for x in product(*[term_names, metric_names])]
+        print(metric_names)
+        print(labels)
         
         return labels, stats
     
-    def to_pandas(self, terms: Union[list, tuple], metrics: list = [np.mean, np.var, np.size], variable: str = 'u',
-                  variables: list = ['u',]):
+    def to_pandas(self, terms: Union[list, tuple], metrics: list = [np.mean, np.var, np.size], metric_names: list = ['mean', 'var', 'disc_num'], 
+                  variable: str = 'u', variables: list = ['u',]):
         metric_frames = []
         for log_entry in self._log:
             aggregation_keys = log_entry['meta']['aggregation_key']
             data = []
-            row_labels = ['_'.join(key) for key in aggregation_keys]
+            row_labels = ['_'.join(map(str, key)) for key in aggregation_keys]
             for aggr_key in aggregation_keys:
                 parsed_log = self.obtain_parsed_log(variables=variables, aggregation_key=aggr_key)
-                keys, stats = self.get_stats(terms, parsed_log, metrics, variables)
+                keys, stats = self.get_stats(terms = terms, parsed_log = parsed_log, metrics = metrics, metric_names = metric_names, 
+                                             variable_eq = variable, variables = variables)
                 data.append({keys[idx] : stats[idx] for idx in range(len(keys))})
                 
             

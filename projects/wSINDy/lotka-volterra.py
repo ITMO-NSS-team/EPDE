@@ -7,6 +7,7 @@ Created on Fri Mar 31 12:53:27 2023
 """
 
 import numpy as np
+import time
 
 import torch
 import os
@@ -16,6 +17,7 @@ sys.path.append('../')
 
 sys.path.pop()
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')))
+sys.path.append('C:/Users/Mike/Documents/Work/EPDE')
 
 import matplotlib.pyplot as plt
 import matplotlib
@@ -57,7 +59,7 @@ def translate_sindy_eq(equation):
                       "1" : "v{power: 1.0}",
                       "1_1" : "dv/dx1{power: 1.0}",}
                         
-    terms = [] # Check EPDE translator input format
+     # Check EPDE translator input format
     
     def replace(term):
         term = term.replace(' ', '').split('x')
@@ -74,20 +76,27 @@ def translate_sindy_eq(equation):
         return term
                 
     if isinstance(equation, str):
-        for term in equation.split('+'):
+        terms = []        
+        split_eq = equation.split('+')
+        const = split_eq[0][:-2]
+        for term in split_eq[1:]:
             print('To replace:', term, replace(term))
             terms.append(reduce(lambda x, y: x + ' * ' + y, replace(term)))
-        terms_comb = reduce(lambda x, y: x + ' + ' + y, terms) + ' + 0.0 = du/dx1{power: 1.0}'
+        terms_comb = reduce(lambda x, y: x + ' + ' + y, terms) + ' + ' + const + ' = du/dx1{power: 1.0}'
         return terms_comb        
     elif isinstance(equation, list):
         assert len(equation) == 2
-        rp_term_list = [' + 0.0 = du/dx1{power: 1.0}', ' + 0.0 = dv/dx1{power: 1.0}']
+        var_list = ['u', 'v', 'w']
+        #rp_term_list = [' + 0.0 = du/dx1{power: 1.0}', ' + 0.0 = dv/dx1{power: 1.0}']
         eqs_tr = []
         for idx, eq in enumerate(equation):
-            for term in eq.split('+'):
+            terms = []            
+            split_eq = eq.split('+')
+            const = split_eq[0][:-2]
+            for term in split_eq[1:]:
                 print('To replace:', term, replace(term))                
                 terms.append(reduce(lambda x, y: x + ' * ' + y, replace(term)))
-            terms_comb = reduce(lambda x, y: x + ' + ' + y, terms) + rp_term_list[idx]
+            terms_comb = reduce(lambda x, y: x + ' + ' + y, terms) + ' + ' + const + ' = d' + var_list[idx] + '/dx1{power: 1.0}'
             eqs_tr.append(terms_comb)
         print('Translated system:', eqs_tr)
         return eqs_tr
@@ -233,17 +242,17 @@ if __name__ == '__main__':
     Подгружаем данные, содержащие временные ряды динамики "вида-охотника" и "вида-жертвы"
     '''
     try:
-        t_file = os.path.join(os.path.dirname( __file__ ), 'projects/hunter-prey/t_20.npy')
+        t_file = os.path.join(os.path.dirname( __file__ ), 'projects//hunter-prey//t_20.npy')
         t = np.load(t_file)
     except FileNotFoundError:
-        t_file = '/home/maslyaev/epde/EPDE_main/projects/hunter-prey/t_20.npy'
+        t_file = 'C:\\Users\\Mike\\Documents\\Work\\EPDE\\projects\\hunter-prey\\t_20.npy'
         t = np.load(t_file)
     
     try:
-        data_file =  os.path.join(os.path.dirname( __file__ ), 'projects/hunter-prey/data_20.npy')
+        data_file =  os.path.join(os.path.dirname( __file__ ), 'projects//hunter-prey//data_20.npy')
         data = np.load(data_file)
     except FileNotFoundError:
-        data_file = '/home/maslyaev/epde/EPDE_main/projects/hunter-prey/data_20.npy'
+        data_file = 'C:\\Users\\Mike\\Documents\\Work\\EPDE\\projects\\hunter-prey\\data_20.npy'
         data = np.load(data_file)
     
     large_data = False
@@ -265,7 +274,7 @@ if __name__ == '__main__':
     pool = None
     
     exps = {}
-    magnitudes = [0, 0.5*1e-2, 1.*1e-2, 2.5*1e-2, 5.*1e-2, 1.*1e-1, 1.5*1e-1]
+    magnitudes = [0, ]#0.5*1e-2, 1.*1e-2, 2.5*1e-2, ]#5.*1e-2, 1.*1e-1, 1.5*1e-1]
     for magnitude in magnitudes:
         x_n = x + np.random.normal(scale = magnitude*x, size = x.shape)
         y_n = y + np.random.normal(scale = magnitude*y, size = y.shape)
@@ -273,15 +282,18 @@ if __name__ == '__main__':
         plt.plot(t_train, y_n)
         plt.show()
         
-        test_launches = 10
+        test_launches = 1
         errs_epde = []
         models_epde = []
         calc_epde = []
         
         for idx in range(test_launches):
             if run_epde:
+                t1 = time.time()
                 epde_search_obj, sys = epde_discovery(t_train, x_n, y_n, False)
-                
+                t2 = time.time()
+
+                print('time_epde', t2-t1)
                 def get_ode_bop(key, var, grid_loc, value):
                     bop = BOPElement(axis = 0, key = key, term = [None], power = 1, var = var)
                     bop_grd_np = np.array([[grid_loc,]])
@@ -336,13 +348,17 @@ if __name__ == '__main__':
                 for sparsity_thr in [50.,]: # 7., 12., ]: # 1.2, 1.5,, 1.5, 2., 2.5]: # 0.05, 0.1,  0.2, 0.5, 1.*1e-2
                     if pool is None:
                         pool = get_epde_pool(t_train, x_n, y_n)
-                    print(pool)                                           
+                    print(pool)
+                    t1 = time.time()                                           
                     model_base = sindy_discovery(t_train, x_n, y_n, sparsity=sparsity_thr)
+                    t2 = time.time()
+                    print('SINDy time', t2-t1)
+
                     print('Initial conditions', np.array([x_test[0], y_test[0]]))
                     eq_translated = translate_sindy_eq(model_base.equations())
                     sys = translate_equation({'u': eq_translated[0],
                                               'v': eq_translated[1]}, pool)                    
-        
+                    print(sys.text_form)
                     # try:
                     pred_u_v = model_base.simulate(np.array([x_test[0], y_test[0]]), t_test)
                     

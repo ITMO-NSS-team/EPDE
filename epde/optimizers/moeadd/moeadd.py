@@ -14,6 +14,7 @@ from functools import reduce
 
 import epde.globals as global_var
 from epde.optimizers.moeadd.population_constr import SystemsPopulationConstructor
+from epde.interface.logger import Logger
 
 from epde.optimizers.moeadd.strategy_elems import MOEADDSectorProcesser
 from epde.optimizers.moeadd.supplementary import fast_non_dominated_sorting, ndl_update, Equality, Inequality
@@ -153,6 +154,9 @@ class ParetoLevels(object):
         self.levels = new_levels
         self.population = population_cleared
 
+    def get_stats(self):
+        return np.array([[element.obj_fun for element in level] for level in self.levels])
+
     def fit_convex_hull(self):
         """
 
@@ -232,7 +236,7 @@ class MOEADDOptimizer(object):
     
     """
     def __init__(self, population_instruct, weights_num, pop_size, solution_params, delta, neighbors_number, 
-                 nds_method = fast_non_dominated_sorting, ndl_update = ndl_update):
+                 nds_method = fast_non_dominated_sorting, ndl_update = ndl_update): # logger: Logger = None, 
         """
         Initialization of the evolutionary optimizer is done with the introduction of 
         initial population of candidate solutions, divided into Pareto non-dominated 
@@ -307,6 +311,7 @@ class MOEADDOptimizer(object):
                     key = lambda pair: pair[1])][:neighbors_number+1]) # срез листа - задаёт регион "близости"
 
         self.best_obj = None
+        self._hist = []
 
     def abbreviated_search(self, population, sorting_method, update_method):
         """
@@ -409,6 +414,7 @@ class MOEADDOptimizer(object):
         
         """
         if not self.abbreviated_search_executed:
+            self.hist = []
             assert not type(self.best_obj) == type(None)
             for epoch_idx in np.arange(epochs):
                 if global_var.verbose.show_iter_idx:
@@ -419,7 +425,12 @@ class MOEADDOptimizer(object):
                     sp_kwargs = self.form_processer_args(weight_idx)
                     self.sector_processer.run(population_subset = self.pareto_levels, 
                                               EA_kwargs = sp_kwargs)
-                        
+                stats = self.pareto_levels.get_stats()
+                self._hist.append(stats)
+                if global_var.verbose.iter_fitness:
+                    print(f'after epoch {epoch_idx} obtained OF: mean = {np.mean(stats[0], axis = 0)}, \
+                           var = {np.mean(stats[0], axis = 0)}')    
+
     def form_processer_args(self, cur_weight : int): # TODO: inspect the most convenient input format
         """
         Forming arguments of the processer 
@@ -428,3 +439,8 @@ class MOEADDOptimizer(object):
                 'neighborhood_vectors' : self.neighborhood_lists}
 
 
+    def get_hist(self, best_only: bool = True):
+        if best_only:
+            return [elem[0] for elem in self._hist]
+        else:
+            return self._hist

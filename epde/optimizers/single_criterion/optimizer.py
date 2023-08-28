@@ -85,15 +85,18 @@ class Population(object):
 
     def update(self, point):
         """
-        Adding new_individ to population
+        Adding new candidate to population
         """
         self.population.append(point)
         
     def delete_point(self, point):
         """
-        Deleting entering individ
+        Deleting specified candidate solution
         """
         self.population = [solution for solution in self.population if solution != point]
+
+    def get_stats(self):
+        return np.array([element.obj_fun for element in self.population])
 
     def __setitem__(self, key, value):
         self.population[key] = value

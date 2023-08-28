@@ -132,4 +132,3 @@ class BoundaryExclusion():
             return func(grids) * mask
 
         return wrapper
-
