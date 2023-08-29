@@ -137,14 +137,14 @@ def epde_discovery(t, x, y, use_ann = False):
                                            coordinate_tensors = [t,])
     if use_ann:
         epde_search_obj.set_preprocessor(default_preprocessor_type='ANN', # use_smoothing = True poly
-                                         preprocessor_kwargs={'epochs_max' : 35000})# 
+                                         preprocessor_kwargs={'epochs_max' : 25000})# 
     else:
         epde_search_obj.set_preprocessor(default_preprocessor_type='poly', # use_smoothing = True poly
                                          preprocessor_kwargs={'use_smoothing' : True, 'sigma' : 1, 
                                                               'polynomial_window' : 3, 'poly_order' : 3}) # 'epochs_max' : 10000})# 
                                      # preprocessor_kwargs={'use_smoothing' : True, 'polynomial_window' : 3, 'poly_order' : 2, 'sigma' : 3})#'epochs_max' : 10000}) 'polynomial_window' : 3, 'poly_order' : 3
-    popsize = 12
-    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=95)
+    popsize = 30
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=15)
     # trig_tokens = TrigonometricTokens(dimensionality = dimensionality)
     factors_max_number = {'factors_num' : [1, 2], 'probas' : [0.5, 0.5]}
     
@@ -242,17 +242,17 @@ if __name__ == '__main__':
     Подгружаем данные, содержащие временные ряды динамики "вида-охотника" и "вида-жертвы"
     '''
     try:
-        t_file = os.path.join(os.path.dirname( __file__ ), 'projects//hunter-prey//t_20.npy')
+        t_file = os.path.join(os.path.dirname( __file__ ), 'projects/hunter-prey/t_20.npy')
         t = np.load(t_file)
     except FileNotFoundError:
-        t_file = 'C:\\Users\\Mike\\Documents\\Work\\EPDE\\projects\\hunter-prey\\t_20.npy'
+        t_file = '/home/maslyaev/epde/EPDE_main/projects/hunter-prey/t_20.npy'
         t = np.load(t_file)
     
     try:
-        data_file =  os.path.join(os.path.dirname( __file__ ), 'projects//hunter-prey//data_20.npy')
+        data_file =  os.path.join(os.path.dirname( __file__ ), 'projects/hunter-prey/data_20.npy')
         data = np.load(data_file)
     except FileNotFoundError:
-        data_file = 'C:\\Users\\Mike\\Documents\\Work\\EPDE\\projects\\hunter-prey\\data_20.npy'
+        data_file = '/home/maslyaev/epde/EPDE_main/projects/hunter-prey/data_20.npy'
         data = np.load(data_file)
     
     large_data = False
@@ -290,7 +290,7 @@ if __name__ == '__main__':
         for idx in range(test_launches):
             if run_epde:
                 t1 = time.time()
-                epde_search_obj, sys = epde_discovery(t_train, x_n, y_n, False)
+                epde_search_obj, sys = epde_discovery(t_train, x_n, y_n, True)
                 t2 = time.time()
 
                 print('time_epde', t2-t1)

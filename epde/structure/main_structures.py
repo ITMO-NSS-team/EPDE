@@ -441,7 +441,7 @@ class Equation(ComplexStructure):
 
     def restore_property(self, deriv: bool = False, mandatory_family: bool = False):
         # TODO: rewrite for an arbitrary equation property check
-        if not (bool or mandatory_family):
+        if not (deriv or mandatory_family):
             raise ValueError('No property passed for restoration.')
         while True:
             print(

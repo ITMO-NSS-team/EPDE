@@ -358,7 +358,7 @@ class MOEADDOptimizer(object):
             m[weight_idx] = weights[weight_idx]/delta
         weights[-1] = 1 - np.sum(weights[:-1])
         
-        weights = np.abs(weights)  
+        weights = np.abs(weights)
         return list(weights)
 
     

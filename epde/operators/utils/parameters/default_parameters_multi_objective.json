@@ -4,7 +4,7 @@
     	"parents_fraction" : 0.4
  	},
 	"PopulationUpdater" : {
-    	"PBI_penalty" : 1.0
+    	"PBI_penalty" : 10.0
 	},
 	"SortingBasedNeighborSelector" : {
         "number_of_neighbors" : 4
