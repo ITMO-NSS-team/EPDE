@@ -38,8 +38,8 @@ setup(
       name = 'epde',
       version = '1.2.11',
       description = SHORT_DESCRIPTION,
-      long_description=README,
-      long_description_content_type='text/x-rst',
+      long_description="PLACEHOLDER",
+#      long_description_content_type='text/x-rst',
       author = 'Mikhail Maslyaev',
       author_email = 'miklemas@list.ru',
       classifiers = [      
