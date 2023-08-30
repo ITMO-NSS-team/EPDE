@@ -7,20 +7,19 @@ Created on Wed May 26 13:36:47 2021
 """
 
 from setuptools import setup, find_packages
-import os
+from os.path import dirname, join
 from pathlib import Path
 import pathlib
 
-HERE = os.path.abspath(os.path.dirname(__file__))
+here = pathlib.Path(__file__).parent.resolve()
 
 # Get the long description from the README file
-SHORT_DESCRIPTION = 'Framework for automated ordinary/partial differential equation discovery'
-LONG_DESCRIPTION = (Path(os.path.join(HERE, "README.rst"))).read_text()
+long_description = (here / 'README.rst').read_text(encoding='utf-8')
 
 
 def read(*names, **kwargs):
     with open(
-            os.path.join(os.path.dirname(__file__), *names),
+            join(dirname(__file__), *names),
             encoding=kwargs.get('encoding', 'utf8')
     ) as fh:
         return fh.read()
@@ -36,19 +35,24 @@ def get_requirements():
 
 setup(
       name = 'epde',
-      version = '1.1.20',
+      version = '1.2.10',
+      description = 'EPDE package',
       author = 'Mikhail Maslyaev',
       author_email = 'miklemas@list.ru',
-      description=SHORT_DESCRIPTION,
-      long_description=LONG_DESCRIPTION,
-      long_description_content_type="text/x-rst",
       classifiers = [      
               'Development Status :: 3 - Alpha',
               'Programming Language :: Python :: 3',
               'License :: OSI Approved :: MIT License',
               'Operating System :: OS Independent',
       ],
-      packages = find_packages(include = ['epde', 'epde.cache', 'epde.interface', 'epde.moeadd', 
-                                          'epde.operators', 'epde.prep']), 
-      python_requires =' >=3.6'
+      packages = find_packages(include = ['epde', 'epde.cache', 'epde.interface', 
+                                          'epde.optimizers', 'epde.optimizers.moeadd', 
+                                          'epde.optimizers.single_criterion', 'epde.operators.common',
+                                          'epde.operators', 'epde.operators.utils',
+                                          'epde.operators.utils.parameters',
+                                          'epde.operators.multiobjective', 
+                                          'epde.operators.singleobjective', 'epde.preprocessing', 
+                                          'epde.parametric', 'epde.structure', 'epde.solver']),
+      include_package_data = True,                               
+      python_requires =' >=3.8'
       )
