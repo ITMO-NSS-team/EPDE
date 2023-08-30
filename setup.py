@@ -57,5 +57,5 @@ setup(
                                           'epde.operators.singleobjective', 'epde.preprocessing', 
                                           'epde.parametric', 'epde.structure', 'epde.solver']),
       include_package_data = True,                               
-      python_requires =' >=3.8'
+      python_requires =' >=3.8',
       )
