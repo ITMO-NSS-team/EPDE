@@ -11,10 +11,11 @@ from os.path import dirname, join
 from pathlib import Path
 import pathlib
 
-here = pathlib.Path(__file__).parent.resolve()
+HERE = pathlib.Path(__file__).parent.resolve()
+README = Path(HERE, 'README.rst').read_text(encoding='utf-8')
+SHORT_DESCRIPTION = 'Data-driven dynamical system and differential equations discovery framework'
 
 # Get the long description from the README file
-#long_description = (here / 'README.rst').read_text(encoding='utf-8')
 
 
 def read(*names, **kwargs):
@@ -36,7 +37,9 @@ def get_requirements():
 setup(
       name = 'epde',
       version = '1.2.11',
-      description = 'EPDE package',
+      description = SHORT_DESCRIPTION,
+      long_description=README,
+      long_description_content_type='text/x-rst',
       author = 'Mikhail Maslyaev',
       author_email = 'miklemas@list.ru',
       classifiers = [      
