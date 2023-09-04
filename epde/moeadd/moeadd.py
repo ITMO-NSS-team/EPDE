@@ -266,7 +266,8 @@ class MOEADDOptimizer(object):
         
     evolutionary_operator : object of subclass of ``moe_evolutionary_operator``
         The operator, which defines the evolutionary process.
-    
+    history : list
+            History of populations
     Example:
     --------
     
@@ -334,6 +335,7 @@ class MOEADDOptimizer(object):
                     key = lambda pair: pair[1])][:neighbors_number+1]) # срез листа - задаёт регион "близости"
 
         self.best_obj = None
+        self.history = []#надстройка#
 
     def abbreviated_search(self, population, sorting_method, update_method):
         self.pareto_levels = ParetoLevels(population, sorting_method=sorting_method, update_method=update_method)
@@ -453,7 +455,6 @@ class MOEADDOptimizer(object):
             Maximum number of iterations, during that the optimization will be held.
             Note, that if the algorithm converges to a single Pareto frontier, 
             the optimization is stopped.
-        
         '''
         if not self.abbreviated_search_executed:
             assert not type(self.best_obj) == type(None)
@@ -466,10 +467,11 @@ class MOEADDOptimizer(object):
                     sp_kwargs = self.form_processer_args(weight_idx)
                     self.sector_processer.run(population_subset = self.pareto_levels, 
                                               EA_kwargs = sp_kwargs)
-                        
+                self.history.append(self.pareto_levels.get_by_complexity(3))#надстройка#
+            #self.history = self.history.reshape((epochs, len(self.weights)))    
                 # if len(self.pareto_levels.levels) == 1:
                 #     break
-                    
+            
     def form_processer_args(self, cur_weight : int): # TODO: inspect the most convenient input format
         return {'weight_idx' : cur_weight, 'weights' : self.weights, 'best_obj' : self.best_obj, 
                 'neighborhood_vectors' : self.neighborhood_lists}
