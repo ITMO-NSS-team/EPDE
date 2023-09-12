@@ -290,7 +290,7 @@ if __name__ == '__main__':
         for idx in range(test_launches):
             if run_epde:
                 t1 = time.time()
-                epde_search_obj, sys = epde_discovery(t_train, x_n, y_n, True)
+                epde_search_obj, sys = epde_discovery(t_train, x_n, y_n, False)
                 t2 = time.time()
 
                 print('time_epde', t2-t1)

@@ -7,6 +7,7 @@ Created on Thu Jul 21 12:11:05 2022
 """
 
 import numpy as np
+from numba import njit
 
 import multiprocessing as mp
 from typing import Union
@@ -222,7 +223,7 @@ class SpectralDeriv(AbstractDeriv):
 
     def __call__(self, data: np.ndarray, grid: list, max_order: Union[int, list],
                  mixed: bool = False, n=None, steepness=1) -> np.ndarray:
-        def make_unsparse_sparse(*grids):  # TODO^ find more e;egant solution
+        def make_unsparse_sparse(*grids):  # TODO^ find more elegant solution
             unique_vals = [np.unique(grid) for grid in grids]
             return np.meshgrid(*unique_vals, sparse=True, indexing='ij')
 
@@ -249,3 +250,46 @@ class SpectralDeriv(AbstractDeriv):
             derivs.append((deriv_descr, cur_deriv))
 
         return derivs
+
+class TotalVariation(AbstractDeriv):
+    @staticmethod
+    def initial_guess(dimensionality: tuple):
+        grad = np.array([np.zeros(dimensionality) for dim in dimensionality], dtype = np.ndarray)
+        w = np.array([np.zeros(dimensionality) for idx in np.arange(len(dimensionality)**2)], 
+                     dtype = np.ndarray).reshape((dimensionality.size, dimensionality.size))
+        lap_mul = np.array([np.zeros(dimensionality) for idx in np.arange(len(dimensionality)**2)], 
+                     dtype = np.ndarray).reshape((dimensionality.size, dimensionality.size))
+        return grad, w, lap_mul
+    
+    @staticmethod
+    @njit
+    def admm_step(initial_u: np.ndarray, initial_w: np.ndarray, initial_lap: np.ndarray, 
+                  lbd: float, reg_strng: float):
+        '''
+        All inputs initial_u, initial_w & initial_lap have to be transformed by DFT.
+        '''
+        @njit
+        def diff_factor(size):
+            return np.exp(-2*np.pi*np.arange(size)/size) - 1
+        
+        diff_factors = np.array([np.tile(diff_factor(dim_size), [sh if ax_idx != comp_idx else 1 
+                                                                 for ax_idx, sh in enumerate(initial_u[0].shape)]) 
+                                 for comp_idx, dim_size in enumerate(initial_u[0].shape)],
+                                dtype = np.ndarray)
+        
+        lbd_inv = lbd**(-1)
+        denum = lbd_inv * np.sum([np.linalg.norm(factor)**2 for factor in diff_factors])
+        
+        for grad_idx in range(initial_u.size):
+            u_nonzero_freq = np.zeros_like(initial_u[grad_idx])
+            u_nonzero_freq = initial_u[grad_idx].take(indices = range(1, initial_u[grad_idx].shape[grad_idx]), axis = grad_idx)            
+            u_nonzero_freq
+    
+    def differentiate(self, data: np.ndarray, max_order: Union[int, list],
+                      mixed: bool = False, axis=None, *grids) -> list:
+        if isinstance(max_order, int):
+            max_order = [max_order,] * data.ndim
+        else:
+            max_order = np.full_like(max_order, np.max(max_order))
+        
+        if len(grids) == 1 and data.ndim == 2:

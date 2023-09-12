@@ -137,7 +137,7 @@ def epde_discovery(x, t, u, use_ann = False, smooth = False): #(grids, data, use
     popsize = 9
     if multiobjective_mode:
         epde_search_obj.set_moeadd_params(population_size = popsize, 
-                                          training_epochs=55)
+                                          training_epochs=10)
     else:
         epde_search_obj.set_singleobjective_params(population_size = popsize,
                                                    training_epochs=85)
@@ -210,8 +210,8 @@ def get_epde_pool(x, t, u, use_ann = False):
                                          preprocessor_kwargs={'epochs_max' : 35000})# 
     else:
         epde_search_obj.set_preprocessor(default_preprocessor_type='poly', # use_smoothing = True poly
-                                         preprocessor_kwargs={'use_smoothing' : True, 'sigma' : 1, 
-                                                              'polynomial_window' : 3, 'poly_order' : 3}) # 'epochs_max' : 10000})# 
+                                         preprocessor_kwargs={'use_smoothing' : False, 'sigma' : 1, 
+                                                              'polynomial_window' : 6, 'poly_order' : 5}) # 'epochs_max' : 10000})# 
 
     # epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=50)
     
@@ -353,13 +353,11 @@ def sindy_provided_l0(grids, u):
     return model
 
 if __name__ == "__main__":
-    kdV = loadmat('C:\\Users\\Mike\\Documents\\Work\\EPDE\\projects\\wSINDy\\data\\KdV\\kdv.mat')
+    kdV = loadmat('/home/maslyaev/epde/EPDE_SINDY_exp/datasets/kdv/kdv.mat')
     t = np.ravel(kdV['t'])
     x = np.ravel(kdV['x'])
     u = np.real(kdV['usol']).T
 
-    print(u.shape, t.shape, t[1]-t[0], x[1]- x[0])
-    raise NotImplementedError()
     dt = t[1] - t[0]
     dx = x[1] - x[0]
 
@@ -378,8 +376,8 @@ if __name__ == "__main__":
     run_sindy = False
 
     exps = {}
-    test_launches = 5
-    magnitudes = [0, 1.*1e-2, 2.5*1e-2, 5.*1e-2, 1.*1e-1]# 1.5 * 1e-1, 2. * 1e-1, 2.5 * 1e-1]
+    test_launches = 1
+    magnitudes = [0, ]#1.*1e-2, 2.5*1e-2, 5.*1e-2, 1.*1e-1]# 1.5 * 1e-1, 2. * 1e-1, 2.5 * 1e-1]
     for magnitude in magnitudes:
         data_train_n = data_train + np.random.normal(scale = magnitude * np.abs(data_train), size = data_train.shape)
         
@@ -393,7 +391,7 @@ if __name__ == "__main__":
         if run_epde:
             for idx in range(test_launches):
                 t1 = time.time()
-                epde_search_obj, sys = epde_discovery(x, t_train, data_train_n, False)
+                epde_search_obj, sys = epde_discovery(x, t_train, data_train_n, False, False)
                 t2 = time.time()
                 if pool is None:
                     pool = epde_search_obj.pool                
