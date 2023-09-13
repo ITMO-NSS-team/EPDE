@@ -261,35 +261,78 @@ class TotalVariation(AbstractDeriv):
                      dtype = np.ndarray).reshape((dimensionality.size, dimensionality.size))
         return grad, w, lap_mul
     
+#    @njit
     @staticmethod
-    @njit
-    def admm_step(initial_u: np.ndarray, initial_w: np.ndarray, initial_lap: np.ndarray, 
-                  lbd: float, reg_strng: float):
+    def admm_step(data: np.ndarray, steps: Union[list, float], initial_u: np.ndarray, initial_w: np.ndarray, 
+                  initial_lap: np.ndarray, lbd: float, reg_strng: float, c_const: float) -> tuple:
         '''
         All inputs initial_u, initial_w & initial_lap have to be transformed by DFT.
         '''
-        @njit
-        def diff_factor(size):
+        def soft_thresholding(arg: np.ndarray, lbd: float) -> np.ndarray:
+            norm = np.linalg.norm(arg)
+            return max(norm - lbd, 0) * arg / norm
+        
+#        @njit
+        def diff_factor(size) -> np.ndarray:
             return np.exp(-2*np.pi*np.arange(size)/size) - 1
         
-        diff_factors = np.array([np.tile(diff_factor(dim_size), [sh if ax_idx != comp_idx else 1 
-                                                                 for ax_idx, sh in enumerate(initial_u[0].shape)]) 
+        diff_factors = np.array([np.moveaxis(np.broadcast_to(diff_factor(dim_size),
+                                                             shape = initial_u[0].shape),
+                                             source = -1, destination = comp_idx)
                                  for comp_idx, dim_size in enumerate(initial_u[0].shape)],
                                 dtype = np.ndarray)
         
         lbd_inv = lbd**(-1)
-        denum = lbd_inv * np.sum([np.linalg.norm(factor)**2 for factor in diff_factors])
         
-        for grad_idx in range(initial_u.size):
+        
+        
+        for grad_idx in range(initial_u.shape[0]):
             u_nonzero_freq = np.zeros_like(initial_u[grad_idx])
-            u_nonzero_freq = initial_u[grad_idx].take(indices = range(1, initial_u[grad_idx].shape[grad_idx]), axis = grad_idx)            
-            u_nonzero_freq
+            
+            section_len = initial_u[grad_idx].shape[grad_idx]
+            putting_shape = np.ones(initial_u[grad_idx].ndim)
+            putting_shape[grad_idx] = section_len
+            
+            putting_args = {'indices' : np.arange(1, initial_u[grad_idx].shape[grad_idx]).reshape(putting_shape),
+                            'axis' : grad_idx}
+            taking_args = {'indices' : range(1, initial_u[grad_idx].shape[grad_idx]),
+                           'axis' : grad_idx}
+            
+            def take(arr: np.ndarray, taking_args: dict = taking_args):
+                return np.take(arr, **taking_args)
+
+            denum_part = lbd_inv * np.sum([np.linalg.norm(take(factor))**2 for factor in diff_factors])            
+            partial_sum = [take(diff_factors[arg_idx]) * (take(initial_w[grad_idx, arg_idx]) - take(initial_lap[grad_idx, arg_idx])) 
+                           for arg_idx in initial_u.shape[0]]
+            
+            grad_nonzero_upd = (lbd_inv * np.sum(partial_sum, axis = 0) + reg_strng * take(diff_factors[grad_idx]) * take(data) /
+                                (denum_part + reg_strng/np.linalg.norm(take(diff_factors[grad_idx]))))
+            np.put_along_axis(u_nonzero_freq, values = grad_nonzero_upd, **putting_args)
+            initial_u[grad_idx] = u_nonzero_freq
     
-    def differentiate(self, data: np.ndarray, max_order: Union[int, list],
-                      mixed: bool = False, axis=None, *grids) -> list:
-        if isinstance(max_order, int):
-            max_order = [max_order,] * data.ndim
-        else:
-            max_order = np.full_like(max_order, np.max(max_order))
+        for i in range(initial_w.shape[0]):
+            for j in range(initial_w.shape[1]):
+                initial_w[i, j] = soft_thresholding(np.grad(initial_u[j], axis = i) + initial_lap[i, j], lbd)
+                
+        for i in range(initial_w.shape[0]):
+            for j in range(initial_w.shape[1]):
+                initial_lap[i, j] = c_const*(initial_lap[i, j] + np.grad(initial_u[j], axis = i) - initial_w[i, j])
+    
+        return initial_u, initial_w, initial_lap
+
+    def optimize_with_admm(self, data, lbd: float, reg_strng: float, c_const: float, nsteps: int = 1e3):
+        u, w, lap_mul = self.initial_guess(dimensionality=data.shape)
+        for epoch in range(nsteps):
+            u, w, lap_mul = self.admm_step(data = data, steps = None, initial_u = u, initial_w = w, 
+                                           initial_lap=lap_mul, lbd = lbd, reg_strng = reg_strng, 
+                                           c_const = c_const)
+        return u
         
-        if len(grids) == 1 and data.ndim == 2:
+    # def differentiate(self, data: np.ndarray, max_order: Union[int, list],
+    #                   mixed: bool = False, axis=None, *grids) -> list:
+    #     if isinstance(max_order, int):
+    #         max_order = [max_order,] * data.ndim
+    #     else:
+    #         max_order = np.full_like(max_order, np.max(max_order))
+        
+    #     if len(grids) == 1 and data.ndim == 2:
