@@ -9,12 +9,31 @@ Created on Thu Jul 21 12:11:05 2022
 import numpy as np
 from numba import njit
 
+import matplotlib.pyplot as plt
+
 import multiprocessing as mp
 from typing import Union
 
 from abc import ABC
 from epde.preprocessing.cheb import process_point_cheb
 
+def Heatmap(Matrix, interval = None, area = ((0, 1), (0, 1)), xlabel = '', ylabel = '', figsize=(8,6), filename = None, title = ''):
+    y, x = np.meshgrid(np.linspace(area[0][0], area[0][1], Matrix.shape[0]), np.linspace(area[1][0], area[1][1], Matrix.shape[1]))
+    fig, ax = plt.subplots(figsize = figsize)
+    plt.xlabel(xlabel)
+    ax.set(ylabel=ylabel)
+    ax.xaxis.labelpad = -10
+    if interval:
+        c = ax.pcolormesh(x, y, np.transpose(Matrix), cmap='RdBu', vmin=interval[0], vmax=interval[1])    
+    else:
+        c = ax.pcolormesh(x, y, np.transpose(Matrix), cmap='RdBu', vmin=min(-abs(np.max(Matrix)), -abs(np.min(Matrix))),
+                          vmax=max(abs(np.max(Matrix)), abs(np.min(Matrix)))) 
+    # set the limits of the plot to the limits of the data
+    ax.axis([x.min(), x.max(), y.min(), y.max()])
+    fig.colorbar(c, ax=ax)
+    plt.title(title)
+    plt.show()
+    if type(filename) != type(None): plt.savefig(filename + '.eps', format='eps')
 
 class AbstractDeriv(ABC):
     def __init__(self, *args, **kwargs):
@@ -253,36 +272,38 @@ class SpectralDeriv(AbstractDeriv):
 
 class TotalVariation(AbstractDeriv):
     @staticmethod
-    def initial_guess(dimensionality: tuple):
-        grad = np.array([np.zeros(dimensionality) for dim in dimensionality], dtype = np.ndarray)
-        w = np.array([np.zeros(dimensionality) for idx in np.arange(len(dimensionality)**2)], 
-                     dtype = np.ndarray).reshape((dimensionality.size, dimensionality.size))
-        lap_mul = np.array([np.zeros(dimensionality) for idx in np.arange(len(dimensionality)**2)], 
-                     dtype = np.ndarray).reshape((dimensionality.size, dimensionality.size))
+    def initial_guess(data: np.ndarray, dimensionality: tuple):
+        grad = np.array([np.gradient(data, axis=dim_idx) for dim_idx, dim in enumerate(dimensionality)], 
+                        dtype = np.ndarray)
+        print(grad.shape)
+        # w = np.array([np.zeros(dimensionality) for idx in np.arange(len(dimensionality)**2)], 
+        #              dtype = np.ndarray).reshape([len(dimensionality), len(dimensionality),] + list(dimensionality))
+        w = np.array([np.gradient(grad[int(idx/2.)], axis = idx % 2) for idx in np.arange(len(dimensionality)**2)], 
+                      dtype = np.ndarray).reshape([len(dimensionality), len(dimensionality),] + list(dimensionality))
+        
+        lap_mul = np.array([np.ones(dimensionality) for idx in np.arange(len(dimensionality)**2)], 
+                     dtype = np.ndarray).reshape([len(dimensionality), len(dimensionality),] + list(dimensionality))
         return grad, w, lap_mul
-    
-#    @njit
+
     @staticmethod
     def admm_step(data: np.ndarray, steps: list, initial_u: np.ndarray, initial_w: np.ndarray, 
                   initial_lap: np.ndarray, lbd: float, reg_strng: float, c_const: float) -> tuple:
         '''
+        *data* has to be already Fourier-transformed
         All inputs initial_u, initial_w & initial_lap have to be transformed by DFT.
         '''
         def soft_thresholding(arg: np.ndarray, lbd: float) -> np.ndarray:
             norm = np.linalg.norm(arg)
             return max(norm - lbd, 0) * arg / norm
         
-#        @njit
         def diff_factor(N: int, d: float = 1.) -> np.ndarray:
             freqs = np.fft.fftfreq(N, d = d) 
             return np.exp(-2*np.pi*freqs/N) - 1
         
-#        initial_u = np.fft.fftn(initial_u, s = initial_u.shape[1:])
+        initial_u = np.fft.fftn(initial_u, s = initial_u.shape[1:])
         initial_w_fft = np.fft.fftn(initial_w, s = initial_w.shape[2:])
-        initial_lap_fft = np.fft.fftn(initial_lap, s = initial_lap.shape[2:])        
-        data_fft = np.fft.fftn(data)
-
-
+        initial_lap_fft = np.fft.fftn(initial_lap, s = initial_lap.shape[2:])
+        
         diff_factors = np.array([np.moveaxis(np.broadcast_to(diff_factor(dim_size, d = steps[comp_idx]),
                                                              shape = initial_u[0].shape),
                                              source = -1, destination = comp_idx)
@@ -297,8 +318,8 @@ class TotalVariation(AbstractDeriv):
             u_nonzero_freq = np.zeros_like(u_freq[grad_idx])
             
             section_len = u_freq[grad_idx].shape[grad_idx]
-            putting_shape = np.ones(u_freq[grad_idx].ndim)
-            putting_shape[grad_idx] = section_len
+            putting_shape = np.ones(u_freq[grad_idx].ndim, dtype = np.int8)
+            putting_shape[grad_idx] = section_len-1
             
             putting_args = {'indices' : np.arange(1, u_freq[grad_idx].shape[grad_idx]).reshape(putting_shape),
                             'axis' : grad_idx}
@@ -310,28 +331,34 @@ class TotalVariation(AbstractDeriv):
 
             denum_part = lbd_inv * np.sum([np.linalg.norm(take(factor))**2 for factor in diff_factors])            
             partial_sum = [take(diff_factors[arg_idx]) * (take(initial_w_fft[grad_idx, arg_idx]) - take(initial_lap_fft[grad_idx, arg_idx])) 
-                           for arg_idx in u_freq.shape[0]]
+                           for arg_idx in range(u_freq.shape[0])]
             
-            grad_nonzero_upd = (lbd_inv * np.sum(partial_sum, axis = 0) + reg_strng * take(diff_factors[grad_idx]) * take(data_fft) /
+            grad_nonzero_upd = (lbd_inv * np.sum(partial_sum, axis = 0) + reg_strng * take(diff_factors[grad_idx]) * take(data) /
                                 (denum_part + reg_strng/np.linalg.norm(take(diff_factors[grad_idx]))))
             np.put_along_axis(u_nonzero_freq, values = grad_nonzero_upd, **putting_args)
             u_freq[grad_idx] = u_nonzero_freq
     
-        initial_u = np.fft.ifft(u_freq, u_freq.shape[1:])
+        initial_u = np.real(np.fft.ifftn(u_freq, u_freq.shape[1:]))
+
         for i in range(initial_w.shape[0]):
             for j in range(initial_w.shape[1]):
-                initial_w[i, j] = soft_thresholding(np.grad(initial_u[j], axis = i) + initial_lap[i, j], lbd)
+                initial_w[i, j] = soft_thresholding(np.gradient(initial_u[j], axis = i) + initial_lap[i, j], lbd)
                 
         for i in range(initial_w.shape[0]):
             for j in range(initial_w.shape[1]):
-                initial_lap[i, j] = c_const*(initial_lap[i, j] + np.grad(initial_u[j], axis = i) - initial_w[i, j])
+                initial_lap[i, j] = c_const*(initial_lap[i, j] + np.gradient(initial_u[j], axis = i)
+                                             - initial_w[i, j])
     
         return initial_u, initial_w, initial_lap
 
-    def optimize_with_admm(self, data, lbd: float, reg_strng: float, c_const: float, nsteps: int = 1e3):
-        u, w, lap_mul = self.initial_guess(dimensionality=data.shape)
-        for epoch in range(nsteps):
-            u, w, lap_mul = self.admm_step(data = data, steps = None, initial_u = u, initial_w = w, 
+    def optimize_with_admm(self, data, lbd: float, reg_strng: float, c_const: float, nsteps: int = 1e5):
+        u, w, lap_mul = self.initial_guess(data=data, dimensionality=data.shape)
+        data_fft = np.fft.fftn(data)
+        for epoch in range(int(nsteps)):
+            print(epoch)
+            if epoch % 100 == 0:
+                Heatmap(u[1], title=str(epoch))            
+            u, w, lap_mul = self.admm_step(data = data_fft, steps = np.ones(data.ndim), initial_u = u, initial_w = w, 
                                            initial_lap=lap_mul, lbd = lbd, reg_strng = reg_strng, 
                                            c_const = c_const)
         return u
