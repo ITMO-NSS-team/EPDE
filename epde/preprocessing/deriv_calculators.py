@@ -263,7 +263,7 @@ class TotalVariation(AbstractDeriv):
     
 #    @njit
     @staticmethod
-    def admm_step(data: np.ndarray, steps: Union[list, float], initial_u: np.ndarray, initial_w: np.ndarray, 
+    def admm_step(data: np.ndarray, steps: list, initial_u: np.ndarray, initial_w: np.ndarray, 
                   initial_lap: np.ndarray, lbd: float, reg_strng: float, c_const: float) -> tuple:
         '''
         All inputs initial_u, initial_w & initial_lap have to be transformed by DFT.
@@ -273,10 +273,17 @@ class TotalVariation(AbstractDeriv):
             return max(norm - lbd, 0) * arg / norm
         
 #        @njit
-        def diff_factor(size) -> np.ndarray:
-            return np.exp(-2*np.pi*np.arange(size)/size) - 1
+        def diff_factor(N: int, d: float = 1.) -> np.ndarray:
+            freqs = np.fft.fftfreq(N, d = d) 
+            return np.exp(-2*np.pi*freqs/N) - 1
         
-        diff_factors = np.array([np.moveaxis(np.broadcast_to(diff_factor(dim_size),
+#        initial_u = np.fft.fftn(initial_u, s = initial_u.shape[1:])
+        initial_w_fft = np.fft.fftn(initial_w, s = initial_w.shape[2:])
+        initial_lap_fft = np.fft.fftn(initial_lap, s = initial_lap.shape[2:])        
+        data_fft = np.fft.fftn(data)
+
+
+        diff_factors = np.array([np.moveaxis(np.broadcast_to(diff_factor(dim_size, d = steps[comp_idx]),
                                                              shape = initial_u[0].shape),
                                              source = -1, destination = comp_idx)
                                  for comp_idx, dim_size in enumerate(initial_u[0].shape)],
@@ -284,32 +291,33 @@ class TotalVariation(AbstractDeriv):
         
         lbd_inv = lbd**(-1)
         
-        
+        u_freq = np.copy(initial_u)
         
         for grad_idx in range(initial_u.shape[0]):
-            u_nonzero_freq = np.zeros_like(initial_u[grad_idx])
+            u_nonzero_freq = np.zeros_like(u_freq[grad_idx])
             
-            section_len = initial_u[grad_idx].shape[grad_idx]
-            putting_shape = np.ones(initial_u[grad_idx].ndim)
+            section_len = u_freq[grad_idx].shape[grad_idx]
+            putting_shape = np.ones(u_freq[grad_idx].ndim)
             putting_shape[grad_idx] = section_len
             
-            putting_args = {'indices' : np.arange(1, initial_u[grad_idx].shape[grad_idx]).reshape(putting_shape),
+            putting_args = {'indices' : np.arange(1, u_freq[grad_idx].shape[grad_idx]).reshape(putting_shape),
                             'axis' : grad_idx}
-            taking_args = {'indices' : range(1, initial_u[grad_idx].shape[grad_idx]),
+            taking_args = {'indices' : range(1, u_freq[grad_idx].shape[grad_idx]),
                            'axis' : grad_idx}
             
             def take(arr: np.ndarray, taking_args: dict = taking_args):
                 return np.take(arr, **taking_args)
 
             denum_part = lbd_inv * np.sum([np.linalg.norm(take(factor))**2 for factor in diff_factors])            
-            partial_sum = [take(diff_factors[arg_idx]) * (take(initial_w[grad_idx, arg_idx]) - take(initial_lap[grad_idx, arg_idx])) 
-                           for arg_idx in initial_u.shape[0]]
+            partial_sum = [take(diff_factors[arg_idx]) * (take(initial_w_fft[grad_idx, arg_idx]) - take(initial_lap_fft[grad_idx, arg_idx])) 
+                           for arg_idx in u_freq.shape[0]]
             
-            grad_nonzero_upd = (lbd_inv * np.sum(partial_sum, axis = 0) + reg_strng * take(diff_factors[grad_idx]) * take(data) /
+            grad_nonzero_upd = (lbd_inv * np.sum(partial_sum, axis = 0) + reg_strng * take(diff_factors[grad_idx]) * take(data_fft) /
                                 (denum_part + reg_strng/np.linalg.norm(take(diff_factors[grad_idx]))))
             np.put_along_axis(u_nonzero_freq, values = grad_nonzero_upd, **putting_args)
-            initial_u[grad_idx] = u_nonzero_freq
+            u_freq[grad_idx] = u_nonzero_freq
     
+        initial_u = np.fft.ifft(u_freq, u_freq.shape[1:])
         for i in range(initial_w.shape[0]):
             for j in range(initial_w.shape[1]):
                 initial_w[i, j] = soft_thresholding(np.grad(initial_u[j], axis = i) + initial_lap[i, j], lbd)
