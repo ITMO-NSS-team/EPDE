@@ -150,9 +150,13 @@ class SpectralDeriv(AbstractDeriv):
         freqs_copy = np.copy(freqs)
         freqs_copy = np.abs(freqs_copy)
         freqs_copy.sort()
+        print('freqs', freqs)
+        print('freqs_copy', freqs_copy[number_of_freqs - 1])
+        
         butterworth_filter_multiplier = 1 / \
             (1 + (freqs / freqs_copy[number_of_freqs - 1]) ** (2 * steepness))
-        return freqs * butterworth_filter_multiplier
+        print(butterworth_filter_multiplier)
+        return freqs #* butterworth_filter_multiplier
 
     def spectral_derivative_1d(self, func: np.ndarray, grid: np.ndarray, n=None, steepness=1):
         '''Одномерная спектральная производная,принимает на вход количество частот и крутизну для фильтра Баттерворта, если они не указаны - фильтрация не производится'''
