@@ -277,16 +277,17 @@ class SpectralDeriv(AbstractDeriv):
 class TotalVariation(AbstractDeriv):
     @staticmethod
     def initial_guess(data: np.ndarray, dimensionality: tuple):
-        grad = np.array([np.gradient(data, axis=dim_idx) for dim_idx, dim in enumerate(dimensionality)], 
-                        dtype = np.ndarray)
+        grad = np.array([np.gradient(data, axis=dim_idx) for dim_idx, dim in enumerate(dimensionality)])
         print(grad.shape)
         # w = np.array([np.zeros(dimensionality) for idx in np.arange(len(dimensionality)**2)], 
         #              dtype = np.ndarray).reshape([len(dimensionality), len(dimensionality),] + list(dimensionality))
-        w = np.array([np.gradient(grad[int(idx/2.)], axis = idx % 2) for idx in np.arange(len(dimensionality)**2)], 
-                      dtype = np.ndarray).reshape([len(dimensionality), len(dimensionality),] + list(dimensionality))
+        w = np.array([np.gradient(grad[int(idx/2.)], axis = idx % 2) 
+                      for idx in np.arange(len(dimensionality)**2)]).reshape([len(dimensionality), 
+                                                                              len(dimensionality),] + list(dimensionality))
         
-        lap_mul = np.array([np.ones(dimensionality) for idx in np.arange(len(dimensionality)**2)], 
-                     dtype = np.ndarray).reshape([len(dimensionality), len(dimensionality),] + list(dimensionality))
+        lap_mul = np.array([np.ones(dimensionality) 
+                            for idx in np.arange(len(dimensionality)**2)]).reshape([len(dimensionality), 
+                                                                                    len(dimensionality),] + list(dimensionality))
         return grad, w, lap_mul
 
     @staticmethod
@@ -301,7 +302,8 @@ class TotalVariation(AbstractDeriv):
             return max(norm - lbd, 0) * arg / norm
         
         def diff_factor(N: int, d: float = 1.) -> np.ndarray:
-            freqs = np.fft.fftfreq(N, d = d) 
+            #freqs = np.fft.fftfreq(N, d = d)
+            freqs = np.arange(N)
             return np.exp(-2*np.pi*freqs/N) - 1
         
         initial_u = np.fft.fftn(initial_u, s = initial_u.shape[1:])
@@ -311,8 +313,7 @@ class TotalVariation(AbstractDeriv):
         diff_factors = np.array([np.moveaxis(np.broadcast_to(diff_factor(dim_size, d = steps[comp_idx]),
                                                              shape = initial_u[0].shape),
                                              source = -1, destination = comp_idx)
-                                 for comp_idx, dim_size in enumerate(initial_u[0].shape)],
-                                dtype = np.ndarray)
+                                 for comp_idx, dim_size in enumerate(initial_u[0].shape)])
         
         lbd_inv = lbd**(-1)
         
@@ -361,7 +362,9 @@ class TotalVariation(AbstractDeriv):
         for epoch in range(int(nsteps)):
             print(epoch)
             if epoch % 100 == 0:
-                Heatmap(u[1], title=str(epoch))            
+                Heatmap(u[1], title=str(epoch))
+                plt.plot(u[1, :, int(u.shape[2]/2.)])
+                plt.show()
             u, w, lap_mul = self.admm_step(data = data_fft, steps = np.ones(data.ndim), initial_u = u, initial_w = w, 
                                            initial_lap=lap_mul, lbd = lbd, reg_strng = reg_strng, 
                                            c_const = c_const)
