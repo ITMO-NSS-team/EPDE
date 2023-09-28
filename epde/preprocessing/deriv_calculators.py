@@ -8,6 +8,7 @@ Created on Thu Jul 21 12:11:05 2022
 
 import numpy as np
 from numba import njit
+import time
 
 import matplotlib.pyplot as plt
 
@@ -278,14 +279,14 @@ class TotalVariation(AbstractDeriv):
     @staticmethod
     def initial_guess(data: np.ndarray, dimensionality: tuple):
         grad = np.array([np.gradient(data, axis=dim_idx) for dim_idx, dim in enumerate(dimensionality)])
-        print(grad.shape)
+        # print(grad.shape)
         # w = np.array([np.zeros(dimensionality) for idx in np.arange(len(dimensionality)**2)], 
         #              dtype = np.ndarray).reshape([len(dimensionality), len(dimensionality),] + list(dimensionality))
         w = np.array([np.gradient(grad[int(idx/2.)], axis = idx % 2) 
                       for idx in np.arange(len(dimensionality)**2)]).reshape([len(dimensionality), 
                                                                               len(dimensionality),] + list(dimensionality))
         
-        lap_mul = np.array([np.ones(dimensionality) 
+        lap_mul = np.array([np.zeros(dimensionality) 
                             for idx in np.arange(len(dimensionality)**2)]).reshape([len(dimensionality), 
                                                                                     len(dimensionality),] + list(dimensionality))
         return grad, w, lap_mul
@@ -307,6 +308,9 @@ class TotalVariation(AbstractDeriv):
             return np.exp(-2*np.pi*freqs/N) - 1
         
         initial_u = np.fft.fftn(initial_u, s = initial_u.shape[1:])
+        # print(initial_u[0].shape)
+        # print(np.max(np.abs(initial_u[0])), np.min(np.abs(initial_u[0])))
+        Heatmap(np.abs(initial_u[0]), title = 'FFT')
         initial_w_fft = np.fft.fftn(initial_w, s = initial_w.shape[2:])
         initial_lap_fft = np.fft.fftn(initial_lap, s = initial_lap.shape[2:])
         
@@ -328,23 +332,34 @@ class TotalVariation(AbstractDeriv):
             
             putting_args = {'indices' : np.arange(1, u_freq[grad_idx].shape[grad_idx]).reshape(putting_shape),
                             'axis' : grad_idx}
+            # print(f'putting_args {putting_args}')
             taking_args = {'indices' : range(1, u_freq[grad_idx].shape[grad_idx]),
                            'axis' : grad_idx}
+            # print(f'taking_args {taking_args}')
             
             def take(arr: np.ndarray, taking_args: dict = taking_args):
                 return np.take(arr, **taking_args)
 
-            denum_part = lbd_inv * np.sum([np.linalg.norm(take(factor))**2 for factor in diff_factors])            
-            partial_sum = [take(diff_factors[arg_idx]) * (take(initial_w_fft[grad_idx, arg_idx]) - take(initial_lap_fft[grad_idx, arg_idx])) 
+            denum_part = lbd_inv * np.sum([np.abs(take(factor))**2 for factor in diff_factors])            
+            partial_sum = [take(diff_factors[arg_idx]) * (take(initial_w_fft[grad_idx, arg_idx]) - 
+                                                          take(initial_lap_fft[grad_idx, arg_idx])) 
                            for arg_idx in range(u_freq.shape[0])]
+            print([(np.min(elem), np.max(elem)) for elem in partial_sum]) # * take(data) * take(data)
+            print(np.min(take(data)), np.max(take(data)))
+            print('3rd term:', np.min(reg_strng * take(diff_factors[grad_idx]) ), np.max(reg_strng * take(diff_factors[grad_idx]) ))
             
             grad_nonzero_upd = (lbd_inv * np.sum(partial_sum, axis = 0) + reg_strng * take(diff_factors[grad_idx]) * take(data) /
-                                (denum_part + reg_strng/np.linalg.norm(take(diff_factors[grad_idx]))))
+                                (denum_part + reg_strng/np.abs(take(diff_factors[grad_idx]))))
+            print('shit shape', (lbd_inv * np.sum(partial_sum, axis = 0) + reg_strng * take(diff_factors[grad_idx]) * take(data)).shape)
+            print(np.max(lbd_inv * np.sum(partial_sum, axis = 0) + reg_strng * take(diff_factors[grad_idx]) * take(data)),
+                  np.min(lbd_inv * np.sum(partial_sum, axis = 0) + reg_strng * take(diff_factors[grad_idx]) * take(data)))
+            Heatmap(np.real(lbd_inv * np.sum(partial_sum, axis = 0) + reg_strng * take(diff_factors[grad_idx]) * take(data)), title = 'partial')
+            
             np.put_along_axis(u_nonzero_freq, values = grad_nonzero_upd, **putting_args)
             u_freq[grad_idx] = u_nonzero_freq
+        Heatmap(np.real(u_freq[0]), title = 'inside the optimization')            
     
         initial_u = np.real(np.fft.ifftn(u_freq, u_freq.shape[1:]))
-
         for i in range(initial_w.shape[0]):
             for j in range(initial_w.shape[1]):
                 initial_w[i, j] = soft_thresholding(np.gradient(initial_u[j], axis = i) + initial_lap[i, j], lbd)
@@ -354,11 +369,13 @@ class TotalVariation(AbstractDeriv):
                 initial_lap[i, j] = c_const*(initial_lap[i, j] + np.gradient(initial_u[j], axis = i)
                                              - initial_w[i, j])
     
+        time.sleep(15)
         return initial_u, initial_w, initial_lap
 
     def optimize_with_admm(self, data, lbd: float, reg_strng: float, c_const: float, nsteps: int = 1e5):
         u, w, lap_mul = self.initial_guess(data=data, dimensionality=data.shape)
         data_fft = np.fft.fftn(data)
+        print(f'For some reason has to be abysmal: {np.min(np.real(data_fft)), np.max(np.real(data_fft))}')
         for epoch in range(int(nsteps)):
             print(epoch)
             if epoch % 100 == 0:
