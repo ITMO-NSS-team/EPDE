@@ -151,18 +151,18 @@ class SpectralDeriv(AbstractDeriv):
         freqs_copy = np.copy(freqs)
         freqs_copy = np.abs(freqs_copy)
         freqs_copy.sort()
-        print('freqs', freqs)
-        print('freqs_copy', freqs_copy[number_of_freqs - 1])
+        # print('freqs', freqs)
+        # print('freqs_copy', freqs_copy[number_of_freqs - 1])
         
         butterworth_filter_multiplier = 1 / \
             (1 + (freqs / freqs_copy[number_of_freqs - 1]) ** (2 * steepness))
-        print(butterworth_filter_multiplier)
-        return freqs #* butterworth_filter_multiplier
+        # print(butterworth_filter_multiplier)
+        return freqs * butterworth_filter_multiplier
 
     def spectral_derivative_1d(self, func: np.ndarray, grid: np.ndarray, n=None, steepness=1):
         '''Одномерная спектральная производная,принимает на вход количество частот и крутизну для фильтра Баттерворта, если они не указаны - фильтрация не производится'''
 
-        print(func.shape, grid.shape)
+        # print(func.shape, grid.shape)
         # if isinstance(func, type(None)) and isinstance(grid, type(None)):
         #     func = self.func
         #     grid = self.grid
@@ -239,7 +239,7 @@ class SpectralDeriv(AbstractDeriv):
                 for key, deriv in axis_derivs:
                     derivatives[key] = deriv
 
-        print(f'derivatives orders are {[deriv[0] for deriv in derivatives]}')
+        # print(f'derivatives orders are {[deriv[0] for deriv in derivatives]}')
         if len(derivatives) != expeced_num_of_derivs:
             raise Exception(
                 f'Expected number of derivatives {expeced_num_of_derivs} does not match obtained {len(derivatives)}')
