@@ -1,0 +1,7 @@
+epde.globals
+epde.structure.main_structures
+epde.operators.multiobjective.mutations
+epde.interface.interface
+epde.interface.token_family
+
+symnet.*

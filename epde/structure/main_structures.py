@@ -27,6 +27,10 @@ from epde.supplementary import filter_powers, normalize_ts, population_sort, fla
 from epde.structure.factor import Factor
 from epde.structure.structure_template import ComplexStructure, check_uniqueness
 
+import seaborn as sns
+import matplotlib.pyplot as plt
+from symnet.pool_terms import to_symbolic
+
 
 class Term(ComplexStructure):
     """
@@ -316,39 +320,49 @@ class StructureStatus:
     def __init__(self, equation):
         self.equation = equation
 
-    def hash_forbid_terms(self):
-        forbidden_terms_hashed = set()
+    def tforbid_to_sym(self):
+        forbidden_terms = set()
         for term in self.equation.structure:
-            label = self.equation.pool.compile_term(term)
-            forbidden_terms_hashed.add(self.equation.pool.hash_term(label))
-        return forbidden_terms_hashed
+            forbidden_terms.add(to_symbolic(term))
+        return forbidden_terms
 
-    def define_mutation_prob(self):
-        # custom_prob_dict: dict(keys=all_custom_prob_hashes, values=initial_weight)
-        forbidden_terms_hashed = self.hash_forbid_terms()
+    def set_mutation_probability(self):
 
-        available_hashes = self.equation.pool.prob_info.term_set_hashed.difference(forbidden_terms_hashed)
-        available_custom_hashes = self.equation.pool.prob_info.custom_prob_set_hashed.difference(forbidden_terms_hashed)
+        pool_tsym_set = set(global_var.sympool.pool_sym_ls)
+        allow_tsym = list(pool_tsym_set.difference(self.tforbid_to_sym()))
+        allow_csym = []
+        for tsym in allow_tsym:
+            allow_csym.append(global_var.sympool.pool_dict.get(tsym))
 
-        units_quantity = len(available_hashes) - len(available_custom_hashes)
-        correction_units = 0.
+        eq_prob_ls = self._set_probabilities(allow_csym, draw_prob=False)
+        return allow_tsym, eq_prob_ls
 
-        for hash_key in available_custom_hashes:
-            correction_units += self.equation.pool.prob_info.custom_prob_dict.get(hash_key)
-        units_quantity += correction_units
+    @staticmethod
+    def _set_probabilities(csym_pool_ls, mmf=2.4, draw_prob=False):
+        def draw_probabilities(final_probabilities, mmf, smoothing_factor):
+            fig, ax = plt.subplots(figsize=(16, 8))
+            ax.set_ylim(0, max(final_probabilities) + 0.01)
+            sns.barplot(x=np.arange(len(final_probabilities)), y=final_probabilities, orient="v", ax=ax)
+            plt.title(f"Smoothing factor: {smoothing_factor:.3f}, mmf: {mmf:.1f}")
+            plt.grid()
+            plt.show()
 
-        '''формируем список вероятностей'''
-        prob_ls, term_ls = [], []
-        for available_hash in available_hashes:
-            term_ls.append(available_hash)
-            if available_hash in available_custom_hashes:
-                prob_ls.append(self.equation.pool.prob_info.custom_prob_dict.get(available_hash) / units_quantity)
-            else:
-                prob_ls.append(1. / units_quantity)
+        csym_arr = np.fabs(np.array(csym_pool_ls))
+        smoothing_factor = 0
 
-        # for hashed in term_ls:
-        #     print(self.equation.pool.prob_info.term_ls_dict[hashed])
-        return term_ls, prob_ls
+        if np.max(csym_arr) / np.min(csym_arr) > 2.6:
+            min_max_coeff = mmf * np.min(csym_arr) - np.max(csym_arr)
+            smoothing_factor = min_max_coeff / (min_max_coeff - (mmf - 1) * np.average(csym_arr))
+            uniform_csym = np.array([np.sum(csym_arr) / len(csym_arr)] * len(csym_arr))
+
+            smoothed_array = (1 - smoothing_factor) * csym_arr + smoothing_factor * uniform_csym
+            final_probabilities = smoothed_array / np.sum(smoothed_array)
+        else:
+            final_probabilities = csym_arr / np.sum(csym_arr)
+
+        if draw_prob:
+            draw_probabilities(final_probabilities, mmf, smoothing_factor)
+        return final_probabilities.tolist()
 
 
 class Equation(ComplexStructure):
@@ -829,10 +843,8 @@ class SoEq(moeadd.MOEADDSolution):
         check_metaparameters(metaparameters)
 
         self.metaparameters = metaparameters
-        self.tokens_for_eq = TFPool(pool.families_demand_equation, custom_prob_terms=pool.custom_prob_terms,
-                            custom_cross_prob=pool.custom_cross_prob, max_factors_in_term=pool.max_factors_in_term)
-        self.tokens_supp = TFPool(pool.families_equationless, custom_prob_terms=pool.custom_prob_terms,
-                            custom_cross_prob=pool.custom_cross_prob, max_factors_in_term=pool.max_factors_in_term)
+        self.tokens_for_eq = TFPool(pool.families_demand_equation)
+        self.tokens_supp = TFPool(pool.families_equationless)
         self.moeadd_set = False
 
         self.vars_to_describe = [token_family.ftype for token_family in self.tokens_for_eq.families] # Made list from set

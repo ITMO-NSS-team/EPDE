@@ -7,6 +7,4 @@ numpy==1.19.5
 seaborn==0.11.1
 scipy==1.7.1
 auto_mix_prep==0.2.0
-dataclasses==0.8
-guppy==0.1.11
 scikit_learn==1.1.3
