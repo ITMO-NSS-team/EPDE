@@ -6,6 +6,9 @@ from epde.evaluators import CustomEvaluator
 from epde.interface.prepared_tokens import CustomTokens
 from kdv_init_distrib import coefficients1, coefficients2
 
+import traceback
+import logging
+
 
 def find_coeff_diff(res):
     differences = []
@@ -121,14 +124,15 @@ if __name__ == '__main__':
     ''' Parameters of the experiment '''
     write_csv = False
     print_results = True
-    max_iter_number = 1
+    max_iter_number = 10
     title = 'df0'
-
 
     time_ls = []
     differences_ls = []
     num_found_eq = []
-    for i in range(max_iter_number):
+    mean_diff_ls = []
+    i = 0
+    while i < max_iter_number:
         epde_search_obj = epde_alg.EpdeSearch(use_solver=False, boundary=boundary,
                                                dimensionality=dimensionality, coordinate_tensors=grids)
 
@@ -150,11 +154,15 @@ if __name__ == '__main__':
 
         epde_search_obj.set_moeadd_params(population_size=8, training_epochs=90)
         start = time.time()
-
-        epde_search_obj.fit(data=u, max_deriv_order=(1, 3),
-                            equation_terms_max_number=4, equation_factors_max_number=2,
-                            eq_sparsity_interval=(1e-08, 1e-06), derivs=[derivs],
-                            additional_tokens=[custom_trig_tokens, ])
+        try:
+            epde_search_obj.fit(data=u, max_deriv_order=(1, 3),
+                                equation_terms_max_number=4, equation_factors_max_number=2,
+                                eq_sparsity_interval=(1e-08, 1e-06), derivs=[derivs],
+                                additional_tokens=[custom_trig_tokens, ])
+        except Exception as e:
+            logging.error(traceback.format_exc())
+            i -= 1
+            continue
         end = time.time()
         epde_search_obj.equation_search_results(only_print=True, num=2)
         time1 = end-start
@@ -164,11 +172,13 @@ if __name__ == '__main__':
         difference_ls = find_coeff_diff(res)
         if len(difference_ls) != 0:
             differences_ls.append(min(difference_ls))
-        else:
-            differences_ls.append(None)
+            mean_diff_ls += difference_ls
+        # else:
+        #     differences_ls.append(None)
         num_found_eq.append(len(difference_ls))
 
         print('Overall time is:', time1)
+        print(f'Iteration processed: {i+1}/{max_iter_number}\n')
         time_ls.append(time1)
 
     if write_csv:
@@ -178,10 +188,15 @@ if __name__ == '__main__':
         df.to_csv(f'data_kdv/{title}.csv')
 
     if print_results:
-        print('\nAverage time, s:', sum(time_ls) / len(time_ls))
         print('\nTime for every run:')
         for item in time_ls:
             print(item)
-        print('\nMAE and # of found equations in every run:')
-        for item1, item2 in zip(differences_ls, num_found_eq):
-            print("diff:", item1, "num eq:", item2)
+        # print('\nMAE and # of found equations in every run:')
+        # for item1, item2 in zip(differences_ls, num_found_eq):
+        #     print("diff:", item1, "num eq:", item2)
+
+        print()
+        print(f'\nAverage time, s: {sum(time_ls) / len(time_ls):.2f}')
+        print(f'Average MAE per eq: {sum(mean_diff_ls) / len(mean_diff_ls):.4f}')
+        print(f'Average minimum MAE per run: {sum(differences_ls) / len(differences_ls):.4f}')
+        print(f'Average # of found eq per run: {sum(num_found_eq) / len(num_found_eq):.2f}')

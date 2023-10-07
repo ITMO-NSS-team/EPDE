@@ -45,9 +45,9 @@ def get_csym_tsym(u, derivs, shape, input_names, pool_names, sparsity=0.001, add
     # TODO: SymNet имеет 3 todo (+, pool_terms, preproc_input)
 
     # TODO: что делать с left_side_name? (случ. генер.?)
-    left_side_name = ('du/dx1', )
+    # left_side_name = ('du/dx1', )
     # TODO: если в левой части e.g. d^2u/dx2^2, то как получить в правой слагаемое d^2u/dx2^2 * u?
-    # left_side_name = ('d^2u/dx2^2',)
+    left_side_name = ('d^2u/dx2^2',)
 
     input_names, idx = clean_names(left_side_name, input_names)
     x_train, y_train = prepare_batches(u, derivs, shape, idx, additional_tokens=additional_tokens)

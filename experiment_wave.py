@@ -137,29 +137,6 @@ def hash_term(term):
 
 
 if __name__ == '__main__':
-    distrib1 = {('u',): 17,
-                ('du/dx1',): 34,
-                ('d^2u/dx1^2',): 38,
-                ('du/dx2',): 41,
-                ('d^2u/dx2^2',): 30}
-    distrib2 = {('u',): 17,
-                ('du/dx1',): 34,
-                ('d^2u/dx1^2',): 48,
-                ('du/dx2',): 41,
-                ('d^2u/dx2^2',): 42}
-
-    distrib3 = {('u',): 17,
-                ('du/dx1',): 34,
-                ('d^2u/dx1^2',): 93,
-                ('du/dx2',): 41,
-                ('d^2u/dx2^2',): 94}
-
-    distrib4 = {('u',): 1,
-                ('du/dx1',): 1,
-                ('d^2u/dx1^2',): 1,
-                ('du/dx2',): 1,
-                ('d^2u/dx2^2',): 1}
-    # draw_all_distributions(distrib1, distrib2, distrib3, "t")
 
     path = "data_wave/"
     df = pd.read_csv(f'{path}wave_sln_100.csv', header=None)
@@ -175,8 +152,7 @@ if __name__ == '__main__':
     ''' Parameters of the experiment '''
     write_csv = False
     print_results = True
-    max_iter_number = 1
-    distrib = {}  # {} or distrib1 or distrib2 or distrib3 or distrib4
+    max_iter_number = 50
     title = 'df0'
     ''''''
 
@@ -187,6 +163,7 @@ if __name__ == '__main__':
 
     time_ls = []
     differences_ls = []
+    mean_diff_ls = []
     num_found_eq = []
     for i in range(max_iter_number):
         epde_search_obj = epde_alg.EpdeSearch(use_solver=False, boundary=boundary,
@@ -199,7 +176,7 @@ if __name__ == '__main__':
         # equation_factors_max_number = 1!!!!!!!!!!!
         epde_search_obj.fit(data=u, max_deriv_order=(2, 2),
                             equation_terms_max_number=3, equation_factors_max_number=1,
-                            eq_sparsity_interval=(1e-08, 5), custom_prob_terms=distrib)
+                            eq_sparsity_interval=(1e-08, 5))
         end = time.time()
         epde_search_obj.equation_search_results(only_print=True, num=2)
         time1 = end-start
@@ -209,10 +186,12 @@ if __name__ == '__main__':
 
         if len(difference_ls) != 0:
             differences_ls.append(min(difference_ls))
-        else:
-            differences_ls.append(None)
+            mean_diff_ls += difference_ls
+        # else:
+        #     differences_ls.append(None)
         num_found_eq.append(len(difference_ls))
         print('Overall time is:', time1)
+        print(f'Iteration processed: {i+1}/{max_iter_number}\n')
         time_ls.append(time1)
 
     if write_csv:
@@ -222,10 +201,15 @@ if __name__ == '__main__':
         df.to_csv(f'data_wave/{title}.csv')
 
     if print_results:
-        print('\nAverage time, s:', sum(time_ls) / len(time_ls))
         print('\nTime for every run, s:')
         for item in time_ls:
             print(f'{item: .4f}')
-        print('\nMAE and # of found equations in every run:')
-        for item1, item2 in zip(differences_ls, num_found_eq):
-            print(f"diff: {item1:.5f}", "num eq:", item2)
+        # print('\nMAE and # of found equations in every run:')
+        # for item1, item2 in zip(differences_ls, num_found_eq):
+        #     print(f"diff: {item1:.5f}", "num eq:", item2)
+
+        print()
+        print(f'\nAverage time, s: {sum(time_ls) / len(time_ls):.2f}')
+        print(f'Average MAE per eq: {sum(mean_diff_ls) / len(mean_diff_ls):.4f}')
+        print(f'Average minimum MAE per run: {sum(differences_ls) / len(differences_ls):.4f}')
+        print(f'Average # of found eq: {sum(num_found_eq) / len(num_found_eq):.2f}')
