@@ -42,7 +42,7 @@ def get_csym_tsym(u, derivs, shape, input_names, pool_names, sparsity=0.001, add
     """
     Can process only one variable! (u)
     """
-    # TODO: SymNet имеет 3 todo (+, pool_terms, preproc_input)
+    # TODO: SymNet имеет 4 todo (+, pool_terms, preproc_input)
 
     # TODO: что делать с left_side_name? (случ. генер.?)
     # left_side_name = ('du/dx1', )

@@ -4,6 +4,7 @@ import pandas as pd
 import epde.interface.interface as epde_alg
 import seaborn as sns
 import matplotlib.pyplot as plt
+from scipy.io import loadmat
 from matplotlib import rcParams
 rcParams.update({'figure.autolayout': True})
 import traceback
@@ -15,7 +16,7 @@ def find_coeff_diff(res, coefficients: dict):
 
     for pareto_front in res:
         for soeq in pareto_front:
-            if soeq.obj_fun[0] < 10.:
+            if soeq.obj_fun[0] < 10:
                 eq_text = soeq.vals.chromosome['u'].value.text_form
                 terms_dict = out_formatting(eq_text)
                 diff = coefficients_difference(terms_dict, coefficients)
@@ -30,11 +31,11 @@ def coefficients_difference(terms_dict, coefficients):
     eq_found = 0
     for term_hash in terms_dict.keys():
         mae += abs(terms_dict.get(term_hash) - coefficients.get(term_hash))
-        if coefficients.get(term_hash) != 0.0 and abs(terms_dict.get(term_hash) - coefficients.get(term_hash)) < 0.2:
+        if coefficients.get(term_hash) != 0.0 and abs(terms_dict.get(term_hash) - coefficients.get(term_hash)) < 0.1:
             eq_found += 1
 
     mae /= len(terms_dict)
-    if eq_found == 2:
+    if eq_found == 3:
         return mae
     else:
         return -1
@@ -82,12 +83,11 @@ def hash_term(term):
 
 if __name__ == '__main__':
 
-    path = "data_wave/"
-    df = pd.read_csv(f'{path}wave_sln_100.csv', header=None)
-    u = df.values
+    burg = loadmat('data_burg/burgers.mat')
+    t = np.ravel(burg['t'])
+    x = np.ravel(burg['x'])
+    u = np.real(burg['usol'])
     u = np.transpose(u)
-    x = np.linspace(0, 1, 101)
-    t = np.linspace(0, 1, 101)
 
     boundary = 10
     dimensionality = u.ndim
@@ -96,13 +96,13 @@ if __name__ == '__main__':
     ''' Parameters of the experiment '''
     write_csv = False
     print_results = True
-    max_iter_number = 50
-    title = 'df0'
-    ''''''
+    max_iter_number = 1
+    title = 'df0_sindy'
 
-    terms = [('u',), ('du/dx1',), ('d^2u/dx1^2',), ('du/dx2',), ('d^2u/dx2^2',)]
+    terms = [('u',), ('du/dx1',), ('du/dx2',), ('d^2u/dx2^2',), ('u', 'du/dx1'), ('u', 'du/dx2'), ('u', 'd^2u/dx2^2'),
+             ('du/dx1', 'du/dx2'), ('du/dx1', 'd^2u/dx2^2'), ('du/dx2', 'd^2u/dx2^2')]
     hashed_ls = [hash_term(term) for term in terms]
-    coefficients = dict(zip(hashed_ls, [0., 0., -1., 0., 0.04]))
+    coefficients = dict(zip(hashed_ls, [0., -1., 0., 0.1, 0., -1., 0., 0., 0., 0.]))
     coefficients[1] = 0.
 
     time_ls = []
@@ -112,26 +112,23 @@ if __name__ == '__main__':
     i = 0
     while i < max_iter_number:
         epde_search_obj = epde_alg.EpdeSearch(use_solver=False, boundary=boundary,
-                                              dimensionality=dimensionality, coordinate_tensors=grids,
-                                              prune_domain=False)
+                                              dimensionality=dimensionality, coordinate_tensors=grids)
 
-        epde_search_obj.set_moeadd_params(population_size=5, training_epochs=5)
+        epde_search_obj.set_moeadd_params(population_size=8, training_epochs=7)
         start = time.time()
-
-        # equation_factors_max_number = 1!!!!!!!!!!!
         try:
-            epde_search_obj.fit(data=u, max_deriv_order=(2, 2),
-                                equation_terms_max_number=3, equation_factors_max_number=1,
-                                eq_sparsity_interval=(1e-08, 5))
+            epde_search_obj.fit(data=u, max_deriv_order=(1, 2),
+                                equation_terms_max_number=3, equation_factors_max_number=2,
+                                eq_sparsity_interval=(1e-08, 1e-1))
         except Exception as e:
             logging.error(traceback.format_exc())
             i -= 1
             continue
         end = time.time()
-        epde_search_obj.equation_search_results(only_print=True, num=2)
+        epde_search_obj.equation_search_results(only_print=True, num=4)
         time1 = end-start
 
-        res = epde_search_obj.equation_search_results(only_print=False, num=2)
+        res = epde_search_obj.equation_search_results(only_print=False, num=4)
         difference_ls = find_coeff_diff(res, coefficients)
 
         if len(difference_ls) != 0:
@@ -147,8 +144,7 @@ if __name__ == '__main__':
         arr = np.array([differences_ls, time_ls, num_found_eq])
         arr = arr.T
         df = pd.DataFrame(data=arr, columns=['MAE', 'time', 'number_found_eq'])
-        df.to_csv(f'data_wave/{title}.csv')
-
+        df.to_csv(f'data_burg/{title}.csv')
     if print_results:
         print('\nTime for every run, s:')
         for item in time_ls:
