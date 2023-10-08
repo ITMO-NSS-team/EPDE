@@ -173,13 +173,13 @@ if __name__ == '__main__':
         if len(difference_ls) != 0:
             differences_ls.append(min(difference_ls))
             mean_diff_ls += difference_ls
-        # else:
-        #     differences_ls.append(None)
+
         num_found_eq.append(len(difference_ls))
 
         print('Overall time is:', time1)
         print(f'Iteration processed: {i+1}/{max_iter_number}\n')
         time_ls.append(time1)
+        i += 1
 
     if write_csv:
         arr = np.array([differences_ls, time_ls, num_found_eq])

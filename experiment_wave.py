@@ -141,6 +141,7 @@ if __name__ == '__main__':
         num_found_eq.append(len(difference_ls))
         print('Overall time is:', time1)
         print(f'Iteration processed: {i+1}/{max_iter_number}\n')
+        i += 1
         time_ls.append(time1)
 
     if write_csv:
