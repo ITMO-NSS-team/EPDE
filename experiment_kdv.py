@@ -132,6 +132,7 @@ if __name__ == '__main__':
     num_found_eq = []
     mean_diff_ls = []
     i = 0
+    population_error = 0
     while i < max_iter_number:
         epde_search_obj = epde_alg.EpdeSearch(use_solver=False, boundary=boundary,
                                                dimensionality=dimensionality, coordinate_tensors=grids)
@@ -162,6 +163,7 @@ if __name__ == '__main__':
         except Exception as e:
             logging.error(traceback.format_exc())
             i -= 1
+            population_error += 1
             continue
         end = time.time()
         epde_search_obj.equation_search_results(only_print=True, num=2)
@@ -201,3 +203,4 @@ if __name__ == '__main__':
         print(f'Average minimum MAE per run: {sum(differences_ls) / len(differences_ls):.6f}')
         print(f'Average # of found eq per run: {sum(num_found_eq) / len(num_found_eq):.2f}')
         print(f"Runs where eq was not found: {max_iter_number - len(differences_ls)}")
+        print(f"Num of population error occurrence: {population_error}")
