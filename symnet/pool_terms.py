@@ -22,12 +22,13 @@ class PoolTerms:
     def set_initial_distr(self, u, derivs, shape, names, families, grids):
         if len(families) == 1:
             self.pool_dict, self.pool_sym_ls = \
-                        get_csym_tsym(u, derivs, shape, names, pool_names=self.term_ls)
+                        get_csym_tsym(u, derivs, shape, names, pool_names=self.term_ls, families=families)
         else:
             additional_tokens = _prepare_additional_tokens(families, grids)
             names = _prepare_names(names, families)
             self.pool_dict, self.pool_sym_ls = \
-                get_csym_tsym(u, derivs, shape, names, pool_names=self.term_ls, additional_tokens=additional_tokens)
+                get_csym_tsym(u, derivs, shape, names,
+                              families=families, pool_names=self.term_ls, additional_tokens=additional_tokens)
         self.pool_sym_dict = dict(zip(self.pool_sym_ls, self.term_ls))
 
 

@@ -1,5 +1,5 @@
 import symnet.expr as expr
-from symnet.preproc_input import prepare_batches
+from symnet.preproc_input import prepare_batches, init_left_term
 from symnet.initparams import initexpr
 import torch
 from symnet.loss import loss
@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 def clean_names(left_name, names: list):
     new_names = names.copy()
     idx = None
+
     if len(left_name) == 1:
         lname = left_name[0]
         if lname in new_names:
@@ -38,16 +39,16 @@ def train_model(input_names, x_train, y_train, sparsity):
     return model
 
 
-def get_csym_tsym(u, derivs, shape, input_names, pool_names, sparsity=0.001, additional_tokens=None):
+def get_csym_tsym(u, derivs, shape, input_names, pool_names, families, sparsity=0.001, additional_tokens=None):
     """
     Can process only one variable! (u)
     """
     # TODO: SymNet имеет 4 todo (+, pool_terms, preproc_input)
 
     # TODO: что делать с left_side_name? (случ. генер.?)
-    # left_side_name = ('du/dx1', )
     # TODO: если в левой части e.g. d^2u/dx2^2, то как получить в правой слагаемое d^2u/dx2^2 * u?
-    left_side_name = ('d^2u/dx2^2',)
+    # left_side_name = ('d^2u/dx2^2',) # ('du/dx1', )
+    left_side_name = init_left_term(families)
 
     input_names, idx = clean_names(left_side_name, input_names)
     x_train, y_train = prepare_batches(u, derivs, shape, idx, additional_tokens=additional_tokens)
