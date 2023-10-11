@@ -162,7 +162,6 @@ if __name__ == '__main__':
                                 additional_tokens=[custom_trig_tokens, ])
         except Exception as e:
             logging.error(traceback.format_exc())
-            i -= 1
             population_error += 1
             continue
         end = time.time()
@@ -200,7 +199,7 @@ if __name__ == '__main__':
         print()
         print(f'\nAverage time, s: {sum(time_ls) / len(time_ls):.2f}')
         print(f'Average MAE per eq: {sum(mean_diff_ls) / len(mean_diff_ls):.6f}')
-        print(f'Average minimum MAE per run: {sum(differences_ls) / len(differences_ls):.6f}')
-        print(f'Average # of found eq per run: {sum(num_found_eq) / len(num_found_eq):.2f}')
-        print(f"Runs where eq was not found: {max_iter_number - len(differences_ls)}")
+        print(f'Average minimum MAE per run: {sum(differences_ls) / max_iter_number:.6f}')
+        print(f'Average # of found eq per run: {sum(num_found_eq) / max_iter_number:.2f}')
+        print(f"Runs where eq was not found: {num_found_eq.count(0)}")
         print(f"Num of population error occurrence: {population_error}")
