@@ -124,7 +124,7 @@ if __name__ == '__main__':
     ''' Parameters of the experiment '''
     write_csv = False
     print_results = True
-    max_iter_number = 10
+    max_iter_number = 50
     title = 'df0'
 
     time_ls = []
@@ -197,6 +197,7 @@ if __name__ == '__main__':
 
         print()
         print(f'\nAverage time, s: {sum(time_ls) / len(time_ls):.2f}')
-        print(f'Average MAE per eq: {sum(mean_diff_ls) / len(mean_diff_ls):.4f}')
-        print(f'Average minimum MAE per run: {sum(differences_ls) / len(differences_ls):.4f}')
+        print(f'Average MAE per eq: {sum(mean_diff_ls) / len(mean_diff_ls):.6f}')
+        print(f'Average minimum MAE per run: {sum(differences_ls) / len(differences_ls):.6f}')
         print(f'Average # of found eq per run: {sum(num_found_eq) / len(num_found_eq):.2f}')
+        print(f"Runs where eq was not found: {max_iter_number - len(differences_ls)}")

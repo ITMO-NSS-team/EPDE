@@ -160,3 +160,4 @@ if __name__ == '__main__':
         print(f'Average MAE per eq: {sum(mean_diff_ls) / len(mean_diff_ls):.4f}')
         print(f'Average minimum MAE per run: {sum(differences_ls) / len(differences_ls):.4f}')
         print(f'Average # of found eq: {sum(num_found_eq) / len(num_found_eq):.2f}')
+        print(f"Runs where eq was not found: {max_iter_number - len(differences_ls)}")
