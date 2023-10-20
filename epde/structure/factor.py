@@ -9,25 +9,27 @@ Created on Thu Mar  5 13:16:43 2020
 import numpy as np
 import copy
 import torch
+from typing import Callable
 
 from epde.structure.Tokens import TerminalToken
 import epde.globals as global_var
-from epde.supplementary import factor_params_to_str, train_ann, use_ann_to_predict
+from epde.supplementary import factor_params_to_str, train_ann, use_ann_to_predict, exp_form
 
 
 class Factor(TerminalToken):
-    __slots__ = ['_params', '_params_description', '_hash_val',
+    __slots__ = ['_params', '_params_description', '_hash_val', '_latex_constructor'
                  'label', 'ftype', 'grid_set', 'grid_idx', 'is_deriv', 'deriv_code',
                  'cache_linked', '_status', 'equality_ranges', '_evaluator', 'saved']
 
-    def __init__(self, token_name: str, status: dict, family_type: str,
-                 randomize: bool = False, params_description=None,
-                 deriv_code=None, equality_ranges=None):
+    def __init__(self, token_name: str, status: dict, family_type: str, latex_constructor: Callable,
+                 randomize: bool = False, params_description=None, deriv_code=None, 
+                 equality_ranges=None):
         self.label = token_name
         self.ftype = family_type
         self.status = status
         self.grid_set = False
         self._hash_val = np.random.randint(0, 1e9)
+        self._latex_constructor = latex_constructor
 
         self.is_deriv = not (deriv_code is None)
         self.deriv_code = deriv_code
@@ -176,6 +178,19 @@ class Factor(TerminalToken):
         form += '}'
         return form
 
+    @property
+    def latex_name(self):
+        if self._latex_constructor is not None:
+            params_dict = {}
+            for param_idx, param_info in self.params_description.items():
+                mnt, exp = exp_form(self.params[param_idx], 4)
+                exp_str = r'\cdot 10^{{{0}}} '.format(str(exp)) if exp != 0 else ''
+
+                params_dict[param_info['name']] = (self.params[param_idx], str(mnt) + exp_str)
+            return self._latex_constructor(self.label, **params_dict)
+        else:
+            return self.name # other implementations are possible
+    
     @property
     def hash_descr(self) -> int:
         return self._hash_val

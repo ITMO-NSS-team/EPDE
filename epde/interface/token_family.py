@@ -8,7 +8,7 @@ Created on Mon Jul  6 15:39:18 2020
 
 import numpy as np
 import itertools
-from typing import Union
+from typing import Union, Callable
 
 import pickle
 
@@ -119,6 +119,7 @@ class TokenFamily(object):
         self.params_set = False
         self.cache_set = False
         self.deriv_evaluator_set = True
+        self.set_latex_form_constructor()
 
     def __len__(self):
         assert self.params_set, 'Familiy is not fully initialized.'
@@ -237,7 +238,6 @@ class TokenFamily(object):
             self._evaluator = eval_function
         else:
             self._evaluator = EvaluatorContained(eval_function, eval_kwargs_keys)
-#        self._evaluator.set_params(**eval_params)
         self.evaluator_set = True
         if self.params_set and not suppress_eval_test:
             self.test_evaluator()
@@ -265,6 +265,9 @@ class TokenFamily(object):
         self.deriv_evaluator_set = True
         if self.params_set and not suppress_eval_test:
             self.test_evaluator(deriv=True)
+
+    def set_latex_form_constructor(self, latex_constructor: Callable = None):
+        self.latex_constructor = latex_constructor
 
     def test_evaluator(self, deriv=False):
         """
@@ -360,7 +363,8 @@ class TokenFamily(object):
         else:
             factor_deriv_code = None
         new_factor = Factor(token_name=label, deriv_code=factor_deriv_code,
-                            status=self.status, family_type=self.ftype)
+                            status=self.status, family_type=self.ftype, 
+                            latex_constructor = self.latex_constructor)
 
         if self.status['unique_token_type']:
             occupied_by_factor = {token: self.token_params['power'][1] for token in self.tokens}

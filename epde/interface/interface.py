@@ -5,32 +5,31 @@ Created on Tue Jul  6 15:55:12 2021
 
 @author: mike_ubuntu
 """
-import time
 import pickle
 import numpy as np
 from typing import Union, Callable
 from collections import OrderedDict
-import warnings
 
 import epde.globals as global_var
 
+from epde.optimizers.builder import StrategyBuilder
+
 from epde.optimizers.moeadd.moeadd import *
 from epde.optimizers.moeadd.supplementary import *
+from epde.optimizers.moeadd.strategy import MOEADDDirector
+from epde.optimizers.moeadd.strategy_elems import MOEADDSectorProcesser
+#from epde.optimizers.moeadd.population_constr import SystemsPopulationConstructor as MOEADDSystemPopConstr
+
+from epde.optimizers.single_criterion.optimizer import EvolutionaryStrategy, SimpleOptimizer
+# from epde.optimizers.single_criterion.population_constr import SystemsPopulationConstructor as SOSystemPopConstr
+from epde.optimizers.single_criterion.strategy import BaselineDirector
 from epde.optimizers.single_criterion.supplementary import simple_sorting
 # from epde.optimizers.moeadd.strategy_elems import SectorProcesserBuilder
 
 from epde.preprocessing.domain_pruning import DomainPruner
 from epde.operators.utils.default_parameter_loader import EvolutionaryParams
 
-from epde.optimizers.builder import StrategyBuilder
-from epde.optimizers.single_criterion.optimizer import EvolutionaryStrategy, SimpleOptimizer
-from epde.optimizers.moeadd.strategy_elems import MOEADDSectorProcesser
 from epde.decorators import BoundaryExclusion
-
-from epde.optimizers.single_criterion.population_constr import SystemsPopulationConstructor as SOSystemPopConstr
-from epde.optimizers.moeadd.population_constr import SystemsPopulationConstructor as MOEADDSystemPopConstr
-from epde.optimizers.single_criterion.strategy import BaselineDirector
-from epde.optimizers.moeadd.strategy import MOEADDDirector
 
 from epde.evaluators import simple_function_evaluator, trigonometric_evaluator
 from epde.supplementary import define_derivatives
@@ -97,12 +96,8 @@ class InputDataEntry(object):
         """
         Method for add calculated derivatives in the cache
         """
-        # print(f'self.data_tensor: {self.data_tensor.shape}')
-        # print(f'self.derivatives: {self.derivatives.shape}')
         derivs_stacked = prepare_var_tensor(self.data_tensor, self.derivatives, time_axis=global_var.time_axis)
-        # print(f'derivs_stacked: {derivs_stacked.shape}')
 
-        # raise Exception('ZUL LUL')
         try:
             upload_simple_tokens(self.names, global_var.tensor_cache, derivs_stacked)
             upload_simple_tokens([self.var_name,], global_var.initial_data_cache, [self.data_tensor,])
@@ -521,6 +516,30 @@ class EpdeSearch(object):
             self.set_preprocessor()
 
         data_tokens = []
+            
+        def latex_form(label, **params):
+            '''
+            Parameters
+            ----------
+            label : str
+                label of the token, for which we construct the latex form.
+            **params : dict
+                dictionary with parameter labels as keys and tuple of parameter values 
+                and their output text forms as values.
+
+            Returns
+            -------
+            form : str
+                LaTeX-styled text form of token.
+            '''            
+            if '/' in label:
+                label = label.replace('d', r'\partial ').replace('/', r'}{')
+                label = r'\frac{' + label + r'}'
+                                
+            if params['power'][0] > 1:
+                label = r'\left(' + label + r'\right)^{{{0}}}'.format(params["power"][1])
+            return label
+        
         for data_elem_idx, data_tensor in enumerate(data):
             assert isinstance(data_tensor, np.ndarray), 'Input data must be in format of numpy ndarrays or iterable (list or tuple) of numpy arrays'
             entry = InputDataEntry(var_name=variable_names[data_elem_idx],
@@ -530,9 +549,11 @@ class EpdeSearch(object):
                                   grid=global_var.grid_cache.get_all()[1], max_order=max_deriv_order)
             entry.use_global_cache()
 
-            self.set_derivatives(variable=variable_names[data_elem_idx], deriv=entry.derivatives)
-            
+            self.set_derivatives(variable=variable_names[data_elem_idx], deriv=entry.derivatives)  
+
+
             entry_token_family = TokenFamily(entry.var_name, family_of_derivs=True)
+            entry_token_family.set_latex_form_constructor(latex_form)
             entry_token_family.set_status(demands_equation=True, unique_specific_token=False,
                                           unique_token_type=False, s_and_d_merged=False,
                                           meaningful=True)
@@ -826,3 +847,9 @@ class EpdeSearch(object):
         solution_model = adapter.solve_epde_system(system = system, grids = grid, data = data, 
                                                    boundary_conditions = boundary_conditions, strategy = strategy)
         return solution_model(adapter.convert_grid(grid)).detach().numpy()
+
+    def visualize_solutions(self, dimensions:list, **visulaizer_kwargs):
+        if self.multiobjective_mode:
+            self.optimizer.plot_pareto(dimensions=dimensions, **visulaizer_kwargs)
+        else:
+            raise NotImplementedError('Solution visualization is implemented only for multiobjective mode.')

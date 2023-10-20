@@ -14,6 +14,24 @@ device = torch.device('cpu')
 
 import matplotlib.pyplot as plt
 
+def exp_form(a, sign_num: int = 4):
+    if np.isclose(a, 0):
+        return 0.0, 1
+    exp = np.floor(np.log10(np.abs(a)))
+    return np.sign(a) * np.around(a / 10**exp, sign_num), int(exp)
+
+def rts(value, sign_num: int = 5):
+    """
+    Round to a ``sign_num`` of significant digits.
+    """
+    if value == 0:
+        return 0
+    magn_top = np.log10(value)
+    idx = -(np.sign(magn_top)*np.ceil(np.abs(magn_top)) - sign_num)
+    if idx - sign_num > 1:
+        idx -= 1
+    return np.around(value, int(idx))
+
 def train_ann(grids: list, data: np.ndarray, epochs_max: int = 500):
     dim = 1 if np.any([s == 1 for s in data.shape]) and data.ndim == 2 else data.ndim
     assert len(grids) == dim, 'Dimensionality of data does not match with passed grids.'

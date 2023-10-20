@@ -5,16 +5,15 @@ Main classes and functions of the moeadd optimizer.
 """
 
 import numpy as np
-import time
 import warnings
 
 from typing import Union
-from copy import deepcopy
-from functools import reduce
+# from copy import deepcopy
+# from functools import reduce
 
 import epde.globals as global_var
 from epde.optimizers.moeadd.population_constr import SystemsPopulationConstructor
-from epde.interface.logger import Logger
+from epde.optimizers.moeadd.vis import ParetoVisualizer
 
 from epde.optimizers.moeadd.strategy_elems import MOEADDSectorProcesser
 from epde.optimizers.moeadd.supplementary import fast_non_dominated_sorting, ndl_update, Equality, Inequality
@@ -444,3 +443,9 @@ class MOEADDOptimizer(object):
             return [elem[0] for elem in self._hist]
         else:
             return self._hist
+        
+    def plot_pareto(self, dimensions:list, **visualizer_kwargs):
+        assert len(dimensions) == 2, 'Current approach supports only two dimensional plots'
+        visualizer = ParetoVisualizer(self.pareto_levels)
+        visualizer.plot_pareto(dimensions = dimensions, **visualizer_kwargs)
+        

@@ -23,9 +23,8 @@ if __name__ == "__main__":
     t = data[:, 0]
     T0 = data[:, 1]; T1 = data[:, 2]; phi = data[:, 3]
     
-    dimensionality = t.ndim # - 1
+    dimensionality = t.ndim
     boundary = 10
-    
     
     epde_search_obj = epde_alg.epde_search(use_solver=False, eq_search_iter = 200, dimensionality=dimensionality) #verbose_params={'show_moeadd_epochs' : True}
     epde_search_obj.set_moeadd_params(population_size=20)
