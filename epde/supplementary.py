@@ -16,9 +16,9 @@ import matplotlib.pyplot as plt
 
 def exp_form(a, sign_num: int = 4):
     if np.isclose(a, 0):
-        return 0.0, 1
+        return 0.0, 0
     exp = np.floor(np.log10(np.abs(a)))
-    return np.sign(a) * np.around(a / 10**exp, sign_num), int(exp)
+    return np.around(a / 10**exp, sign_num), int(exp) # np.sign(a) * 
 
 def rts(value, sign_num: int = 5):
     """
@@ -273,11 +273,11 @@ def define_derivatives(var_name='u', dimensionality=1, max_order=2):
         for order in range(max_order[var_idx]):
             var_deriv_orders.append([var_idx,] * (order+1))
             if order == 0:
-                deriv_names.append('d' + var_name + '/dx' + str(var_idx+1))
+                deriv_names.append('d' + var_name + '/dx' + str(var_idx))
             else:
                 deriv_names.append(
                     
-                    'd^'+str(order+1) + var_name + '/dx'+str(var_idx+1)+'^'+str(order+1))
+                    'd^'+str(order+1) + var_name + '/dx'+str(var_idx)+'^'+str(order+1))
     print('Deriv orders after definition', var_deriv_orders)
     return deriv_names, var_deriv_orders
 

@@ -183,7 +183,7 @@ class Factor(TerminalToken):
         if self._latex_constructor is not None:
             params_dict = {}
             for param_idx, param_info in self.params_description.items():
-                mnt, exp = exp_form(self.params[param_idx], 4)
+                mnt, exp = exp_form(self.params[param_idx], 3)
                 exp_str = r'\cdot 10^{{{0}}} '.format(str(exp)) if exp != 0 else ''
 
                 params_dict[param_info['name']] = (self.params[param_idx], str(mnt) + exp_str)

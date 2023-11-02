@@ -533,6 +533,7 @@ class EpdeSearch(object):
                 LaTeX-styled text form of token.
             '''            
             if '/' in label:
+                label = label[:label.find('x')+1] + '_' + label[label.find('x')+1:]
                 label = label.replace('d', r'\partial ').replace('/', r'}{')
                 label = r'\frac{' + label + r'}'
                                 
@@ -848,7 +849,7 @@ class EpdeSearch(object):
                                                    boundary_conditions = boundary_conditions, strategy = strategy)
         return solution_model(adapter.convert_grid(grid)).detach().numpy()
 
-    def visualize_solutions(self, dimensions:list, **visulaizer_kwargs):
+    def visualize_solutions(self, dimensions:list = [0, 1], **visulaizer_kwargs):
         if self.multiobjective_mode:
             self.optimizer.plot_pareto(dimensions=dimensions, **visulaizer_kwargs)
         else:

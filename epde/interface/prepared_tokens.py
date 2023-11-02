@@ -75,7 +75,7 @@ class TrigonometricTokens(PreparedTokens):
                 LaTeX-styled text form of token.
             '''
             form = label + r'^{{{0}}}'.format(params["power"][1]) + \
-                r'(' + params["freq"][1] + r' x_{' + params["dim"][1] + r'})'
+                    r'(' + params["freq"][1] + r' x_{' + params["dim"][1] + r'})'
             return form
         
         self._token_family.set_latex_form_constructor(latex_form)

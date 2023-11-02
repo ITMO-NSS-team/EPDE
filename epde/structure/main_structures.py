@@ -654,10 +654,10 @@ class Equation(ComplexStructure):
             if idx == self.target_idx or self.weights_final[idx_corrected] == 0:
                 continue
             
-            digits_rounding_max = 4
+            digits_rounding_max = 3
             mnt, exp = exp_form(self.weights_final[idx_corrected], digits_rounding_max)
             exp_str = r'\cdot 10^{{{0}}} '.format(str(exp)) if exp != 0 else ''
-            form += str(mnt) + exp_str + term.latex_form + r' '
+            form += str(mnt) + exp_str + term.latex_form + r' + '
         
         mnt, exp = exp_form(self.weights_final[-1], digits_rounding_max)
         exp_str = r'\cdot 10^{{{0}}} '.format(str(exp)) if exp != 0 else ''
@@ -901,14 +901,14 @@ class SoEq(moeadd.MOEADDSolution):
 
     @property
     def latex_form(self):
-        form = r"\begin{eqnarray*}"
+        form = r"\begin{eqnarray*} "
         for idx, equation in enumerate(self.vals):
             postfix = '' if idx == len(self.vals) - 1 else r", \\ "
             form += equation.latex_form + postfix
-        form += r"\end{eqnarray*}"
+        form += r" \end{eqnarray*}"
+        return form
 
     def __hash__(self):
-        # print(f'GETTING HASH VALUE OF SoEq: {self.vals.hash_descr}')
         return hash(self.vals.hash_descr)
 
     def __deepcopy__(self, memo=None):
@@ -944,14 +944,6 @@ class SoEq(moeadd.MOEADDSolution):
         '''
         Returns solver form, grid and boundary conditions
         '''
-        # if len(self.vals) > 1:
-        #     raise Exception('Solver form is defined only for a "system", that contains a single equation.')
-        # else:
-        #     form = self.vals[0].solver_form()
-        #     grid = solver_formed_grid()
-        #     bconds = self.vals[0].boundary_conditions(full_domain = full_domain)
-        #     return form, grid, bconds
-
         equation_forms = []
         bconds = []
 
@@ -970,7 +962,7 @@ class SoEq(moeadd.MOEADDSolution):
         return all([equation.fitness_calculated for equation in self.vals])
 
     def save(self, file_name='epde_systems.pickle'):
-        dir = os.getcwd()
+        directory = os.getcwd()
         with open(file_name, 'wb') as file:
             to_save = ([equation.text_form for equation in self.vals],
                        self.tokens_for_eq + self.tokens_supp)
