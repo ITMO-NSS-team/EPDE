@@ -23,7 +23,7 @@ import epde.optimizers.moeadd.solution_template as moeadd
 from epde.structure.encoding import Chromosome
 from epde.interface.token_family import TFPool
 from epde.decorators import HistoryExtender, ResetEquationStatus
-from epde.supplementary import filter_powers, normalize_ts, population_sort, flatten
+from epde.supplementary import filter_powers, normalize_ts, population_sort, flatten, rts, exp_form
 from epde.structure.factor import Factor
 from epde.structure.structure_template import ComplexStructure, check_uniqueness
 
@@ -48,7 +48,7 @@ class Term(ComplexStructure):
                  '_descr_variable_marker']
 
     def __init__(self, pool, passed_term=None, mandatory_family=None, max_factors_in_term=1,
-                 create_derivs: bool = False, interelement_operator=np.multiply):
+                 create_derivs: bool = False, interelement_operator=np.multiply, collapse_powers = True):
         super().__init__(interelement_operator)
         self.pool = pool
         self.max_factors_in_term = max_factors_in_term
@@ -57,7 +57,7 @@ class Term(ComplexStructure):
             self.randomize(mandatory_family=mandatory_family,
                            create_derivs=create_derivs)
         else:
-            self.defined(passed_term)
+            self.defined(passed_term, collapse_powers = collapse_powers)
 
         if global_var.tensor_cache is not None:
             self.use_cache()
@@ -79,7 +79,7 @@ class Term(ComplexStructure):
             if not self.structure[idx].cache_linked:
                 self.structure[idx].use_cache()
 
-    # TODO: make self.descr_variable_marker setting for defined parameter
+    # TODO: non-urgent, make self.descr_variable_marker setting for defined parameter
 
     @singledispatchmethod
     def defined(self, passed_term):
@@ -87,7 +87,7 @@ class Term(ComplexStructure):
             f'passed term should have string or list/dict types, not {type(passed_term)}')
 
     @defined.register
-    def _(self, passed_term: list):
+    def _(self, passed_term: list, collapse_powers = True):
         self.structure = []
         for _, factor in enumerate(passed_term):
             if isinstance(factor, str):
@@ -97,10 +97,11 @@ class Term(ComplexStructure):
                 self.structure.append(factor)
             else:
                 raise ValueError('The structure of a term should be declared with str or factor.Factor obj, instead got', type(factor))
-        self.structure = filter_powers(self.structure)
+        if collapse_powers:
+            self.structure = filter_powers(self.structure)
 
     @defined.register
-    def _(self, passed_term: str):
+    def _(self, passed_term: str, collapse_powers = True):
         self.structure = []
         if isinstance(passed_term, str):
             _, temp_f = self.pool.create(label=passed_term)
@@ -271,6 +272,12 @@ class Term(ComplexStructure):
                 form += ' * '
         return form
 
+    @property
+    def latex_form(self):
+        form = reduce(lambda x, y: x + r' \cdot ' + y, [factor.latex_name for
+                                                        factor in self.structure])
+        return form
+
     def contains_deriv(self, family=None):
         if family is None:
             return any([factor.is_deriv and factor.deriv_code != [None,] for factor in self.structure])
@@ -439,8 +446,8 @@ class Equation(ComplexStructure):
         return forbidden_tokens
 
     def restore_property(self, deriv: bool = False, mandatory_family: bool = False):
-        # TODO: rewrite for an arbitrary equation property check
-        if not (bool or mandatory_family):
+        # TODO: non-urgent, rewrite for an arbitrary equation property check
+        if not (deriv or mandatory_family):
             raise ValueError('No property passed for restoration.')
         while True:
             print(
@@ -476,32 +483,56 @@ class Equation(ComplexStructure):
 
     def evaluate(self, normalize=True, return_val=False, grids=None):
         self._target = self.structure[self.target_idx].evaluate(normalize, grids=grids)
-        feature_indexes = list(range(len(self.structure)))
-        feature_indexes.remove(self.target_idx)
-        for feat_idx in range(len(feature_indexes)):
-            if feat_idx == 0:
-                self._features = self.structure[feature_indexes[feat_idx]].evaluate(normalize, grids=grids)
-            elif feat_idx != 0:
-                temp = self.structure[feature_indexes[feat_idx]].evaluate(normalize, grids=grids)
-                self._features = np.vstack([self._features, temp])
+        
+        # Place for improvent: introduce shifted_idx where necessary
+        
+        def shifted_idx(idx):
+            if idx < self.target_idx:
+                return idx  
+            elif idx > self.target_idx:
+                return idx - 1
             else:
-                continue
-        if self._features.ndim == 1:
-            self._features = np.expand_dims(self._features, 1).T
-        temp_feats = np.vstack([self._features, np.ones(self._features.shape[1])])
-        self._features = np.transpose(self._features)
-        temp_feats = np.transpose(temp_feats)
+                return -1
+        
+        if normalize:
+            feature_indexes = list(range(len(self.structure)))
+            feature_indexes.remove(self.target_idx)
+        else:
+            feature_indexes = [idx for idx in range(len(self.structure)) 
+                               if self.weights_internal[shifted_idx(idx)] != 0 and idx != self.target_idx]
+        if len(feature_indexes) > 0:
+            for feat_idx in range(len(feature_indexes)):
+                if feat_idx == 0:
+                    self._features = self.structure[feature_indexes[feat_idx]].evaluate(normalize, grids=grids)
+                else: #if feat_idx != 0:
+                    temp = self.structure[feature_indexes[feat_idx]].evaluate(normalize, grids=grids)
+                    self._features = np.vstack([self._features, temp])
+                # else:
+                    # continue
+            if self._features.ndim == 1:
+                self._features = np.expand_dims(self._features, 1).T
+            temp_feats = np.vstack([self._features, np.ones(self._features.shape[1])])
+            self._features = np.transpose(self._features)
+            temp_feats = np.transpose(temp_feats)
+        else:
+            self._features = None
+            
         if return_val:
             self.prev_normalized = normalize
             if normalize:
                 elem1 = np.expand_dims(self._target, axis=1)
-                value = np.add(elem1, - reduce(lambda x, y: np.add(x, y), [np.multiply(weight, temp_feats[:, feature_idx])
-                                                                           for feature_idx, weight in np.ndenumerate(self.weights_internal)]))
+                value = np.add(elem1, - reduce(lambda x, y: np.add(x, y), [np.multiply(self.weights_internal[idx_full], temp_feats[:, idx_sparse])
+                                                                           for idx_sparse, idx_full in enumerate(feature_indexes)]))
+                                                                           # for feature_idx, weight in np.ndenumerate(self.weights_internal)]))
             else:
                 elem1 = np.expand_dims(self._target, axis=1)
-
-                value = np.add(elem1, - reduce(lambda x, y: np.add(x, y), [np.multiply(weight, temp_feats[:, feature_idx])
-                                                                           for feature_idx, weight in np.ndenumerate(self.weights_final)]))
+                if self._features is None:
+                    feature_list = [np.multiply(self.weights_final[idx_full], temp_feats[:, idx_sparse])
+                                    for idx_sparse, idx_full in enumerate(feature_indexes)]
+                else:
+                    feature_list = 0               
+                value = np.add(elem1, feature_list)
+                                               
             return value, self._target, self._features
         else:
             return None, self._target, self._features
@@ -598,18 +629,6 @@ class Equation(ComplexStructure):
         self.weights_final_evald = True
 
     @property
-    def latex_form(self):
-        form = r""
-        for term_idx in range(len(self.structure)):
-            if term_idx != self.target_idx:
-                form += str(self.weights_final[term_idx]) if term_idx < self.target_idx else str(
-                    self.weights_final[term_idx-1])
-                form += ' * ' + self.structure[term_idx].latex_form + ' + '
-        form += str(self.weights_final[-1]) + ' = ' + \
-            self.structure[self.target_idx].text_form
-        return form
-
-    @property
     def text_form(self):
         form = ''
         if self.weights_final_evald:
@@ -626,36 +645,26 @@ class Equation(ComplexStructure):
                     self.structure[term_idx].name + ' + '
             form += 'k_' + str(len(self.structure)) + ' = 0'
         return form
-
-    def solver_form(self, grids: list = None):
-        if self.solver_form_defined:
-            # print(self.text_form)
-            return self._solver_form
-        else:
-            self._solver_form = []
-            for term_idx in range(len(self.structure)):
-                if term_idx != self.target_idx:
-                    term_form = self.structure[term_idx].solver_form
-                    weight = self.weights_final[term_idx] if term_idx < self.target_idx else self.weights_final[term_idx-1]
-                    term_form[0] = term_form[0] * weight
-                    term_form[0] = torch.flatten(term_form[0]).unsqueeze(
-                        1).type(torch.FloatTensor)
-                    self._solver_form.append(term_form)
-
-            free_coeff_weight = torch.from_numpy(np.full_like(a=global_var.grid_cache.get('0'),
-                                                              fill_value=self.weights_final[-1]))
-            free_coeff_weight = torch.flatten(free_coeff_weight).unsqueeze(1).type(torch.FloatTensor)
-            target_weight = torch.from_numpy(np.full_like(a=global_var.grid_cache.get('0'),
-                                                          fill_value=-1.))
-            target_form = self.structure[self.target_idx].solver_form
-            target_form[0] = target_form[0] * target_weight
-            target_form[0] = torch.flatten(target_form[0]).unsqueeze(1).type(torch.FloatTensor)
-
-            self._solver_form.append([free_coeff_weight, [None], 0])
-            self._solver_form.append(target_form)
-            self.solver_form_defined = True
-            return self._solver_form
-
+    
+    @property
+    def latex_form(self):
+        form = self.structure[self.target_idx].latex_form + r' = '
+        for idx, term in enumerate(self.structure):
+            idx_corrected = idx if idx <= self.target_idx else idx - 1
+            if idx == self.target_idx or self.weights_final[idx_corrected] == 0:
+                continue
+            
+            digits_rounding_max = 3
+            mnt, exp = exp_form(self.weights_final[idx_corrected], digits_rounding_max)
+            exp_str = r'\cdot 10^{{{0}}} '.format(str(exp)) if exp != 0 else ''
+            form += str(mnt) + exp_str + term.latex_form + r' + '
+        
+        mnt, exp = exp_form(self.weights_final[-1], digits_rounding_max)
+        exp_str = r'\cdot 10^{{{0}}} '.format(str(exp)) if exp != 0 else ''
+        
+        form += str(mnt) + exp_str
+        return form
+    
     @property
     def state(self):
         return self.text_form
@@ -761,7 +770,7 @@ def solver_formed_grid(training_grid=None):
 def check_metaparameters(metaparameters: dict):
     metaparam_labels = ['terms_number', 'max_factors_in_term', 'sparsity']
     return True
-    # TODO: fix this check
+    # TODO: maybe fix this check, non-urgent
     # if any([((label not in metaparameters.keys()) and ) for label in metaparam_labels]):
     #     print('required metaparameters:', metaparam_labels, 'metaparameters:', metaparameters)
     #     raise ValueError('Only partial metaparameter vector has been passed.')
@@ -859,17 +868,7 @@ class SoEq(moeadd.MOEADDSolution):
         gc.collect()
         population = evol_operator.apply(population, unexplained_vars)
         return population
-
-    def evaluate(self, normalize=True, grids: list = None):
-        raise DeprecationWarning('Evaluation of system is not necessary')
-        if len(self.vals) == 1:
-            value = [equation.evaluate(normalize, return_val=True)[0] for equation in self.vals][0]
-            # self.vals[0].evaluate(normalize = normalize, return_val = True)[0]
-        else:
-            value = np.sum([equation.evaluate(normalize, return_val=True)[0] for equation in self.vals])
-        value = np.sum(np.abs(value))
-        return value
-
+    
     @property
     def obj_fun(self):
         return np.array(flatten([func(self) for func in self.obj_funs]))
@@ -902,13 +901,14 @@ class SoEq(moeadd.MOEADDSolution):
 
     @property
     def latex_form(self):
-        form = r"\begin{eqnarray*}"
-        for equation in self.vals:
-            form += equation.latex_form + r", \\ "
-        form += r"\end{eqnarray*}"
+        form = r"\begin{eqnarray*} "
+        for idx, equation in enumerate(self.vals):
+            postfix = '' if idx == len(self.vals) - 1 else r", \\ "
+            form += equation.latex_form + postfix
+        form += r" \end{eqnarray*}"
+        return form
 
     def __hash__(self):
-        # print(f'GETTING HASH VALUE OF SoEq: {self.vals.hash_descr}')
         return hash(self.vals.hash_descr)
 
     def __deepcopy__(self, memo=None):
@@ -944,14 +944,6 @@ class SoEq(moeadd.MOEADDSolution):
         '''
         Returns solver form, grid and boundary conditions
         '''
-        # if len(self.vals) > 1:
-        #     raise Exception('Solver form is defined only for a "system", that contains a single equation.')
-        # else:
-        #     form = self.vals[0].solver_form()
-        #     grid = solver_formed_grid()
-        #     bconds = self.vals[0].boundary_conditions(full_domain = full_domain)
-        #     return form, grid, bconds
-
         equation_forms = []
         bconds = []
 
@@ -970,7 +962,7 @@ class SoEq(moeadd.MOEADDSolution):
         return all([equation.fitness_calculated for equation in self.vals])
 
     def save(self, file_name='epde_systems.pickle'):
-        dir = os.getcwd()
+        directory = os.getcwd()
         with open(file_name, 'wb') as file:
             to_save = ([equation.text_form for equation in self.vals],
                        self.tokens_for_eq + self.tokens_supp)

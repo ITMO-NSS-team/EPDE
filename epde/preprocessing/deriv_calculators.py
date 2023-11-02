@@ -7,6 +7,10 @@ Created on Thu Jul 21 12:11:05 2022
 """
 
 import numpy as np
+from numba import njit
+import time
+
+import matplotlib.pyplot as plt
 
 import multiprocessing as mp
 from typing import Union
@@ -14,6 +18,23 @@ from typing import Union
 from abc import ABC
 from epde.preprocessing.cheb import process_point_cheb
 
+def Heatmap(Matrix, interval = None, area = ((0, 1), (0, 1)), xlabel = '', ylabel = '', figsize=(8,6), filename = None, title = ''):
+    y, x = np.meshgrid(np.linspace(area[0][0], area[0][1], Matrix.shape[0]), np.linspace(area[1][0], area[1][1], Matrix.shape[1]))
+    fig, ax = plt.subplots(figsize = figsize)
+    plt.xlabel(xlabel)
+    ax.set(ylabel=ylabel)
+    ax.xaxis.labelpad = -10
+    if interval:
+        c = ax.pcolormesh(x, y, np.transpose(Matrix), cmap='RdBu', vmin=interval[0], vmax=interval[1])    
+    else:
+        c = ax.pcolormesh(x, y, np.transpose(Matrix), cmap='RdBu', vmin=min(-abs(np.max(Matrix)), -abs(np.min(Matrix))),
+                          vmax=max(abs(np.max(Matrix)), abs(np.min(Matrix)))) 
+    # set the limits of the plot to the limits of the data
+    ax.axis([x.min(), x.max(), y.min(), y.max()])
+    fig.colorbar(c, ax=ax)
+    plt.title(title)
+    plt.show()
+    if type(filename) != type(None): plt.savefig(filename + '.eps', format='eps')
 
 class AbstractDeriv(ABC):
     def __init__(self, *args, **kwargs):
@@ -79,6 +100,13 @@ class AdaptiveFiniteDeriv(AbstractDeriv):
         return derivs
 
 
+# class ANNBasedFiniteDifferences(AbstractDeriv):
+#     def __init__(self):
+#         self._internal_ann = None
+
+#     def differentiate(self, data: np.ndarray, max_order: Union[int, list],
+#                       mixed: bool = False, axis=None, *grids) -> list:
+
 class PolynomialDeriv(AbstractDeriv):
     def __init__(self):
         pass
@@ -123,14 +151,18 @@ class SpectralDeriv(AbstractDeriv):
         freqs_copy = np.copy(freqs)
         freqs_copy = np.abs(freqs_copy)
         freqs_copy.sort()
+        # print('freqs', freqs)
+        # print('freqs_copy', freqs_copy[number_of_freqs - 1])
+        
         butterworth_filter_multiplier = 1 / \
             (1 + (freqs / freqs_copy[number_of_freqs - 1]) ** (2 * steepness))
+        # print(butterworth_filter_multiplier)
         return freqs * butterworth_filter_multiplier
 
     def spectral_derivative_1d(self, func: np.ndarray, grid: np.ndarray, n=None, steepness=1):
         '''Одномерная спектральная производная,принимает на вход количество частот и крутизну для фильтра Баттерворта, если они не указаны - фильтрация не производится'''
 
-        print(func.shape, grid.shape)
+        # print(func.shape, grid.shape)
         # if isinstance(func, type(None)) and isinstance(grid, type(None)):
         #     func = self.func
         #     grid = self.grid
@@ -207,7 +239,7 @@ class SpectralDeriv(AbstractDeriv):
                 for key, deriv in axis_derivs:
                     derivatives[key] = deriv
 
-        print(f'derivatives orders are {[deriv[0] for deriv in derivatives]}')
+        # print(f'derivatives orders are {[deriv[0] for deriv in derivatives]}')
         if len(derivatives) != expeced_num_of_derivs:
             raise Exception(
                 f'Expected number of derivatives {expeced_num_of_derivs} does not match obtained {len(derivatives)}')
@@ -215,7 +247,7 @@ class SpectralDeriv(AbstractDeriv):
 
     def __call__(self, data: np.ndarray, grid: list, max_order: Union[int, list],
                  mixed: bool = False, n=None, steepness=1) -> np.ndarray:
-        def make_unsparse_sparse(*grids):  # TODO^ find more e;egant solution
+        def make_unsparse_sparse(*grids):  # TODO^ find more elegant solution
             unique_vals = [np.unique(grid) for grid in grids]
             return np.meshgrid(*unique_vals, sparse=True, indexing='ij')
 
@@ -242,3 +274,124 @@ class SpectralDeriv(AbstractDeriv):
             derivs.append((deriv_descr, cur_deriv))
 
         return derivs
+
+class TotalVariation(AbstractDeriv):
+    @staticmethod
+    def initial_guess(data: np.ndarray, dimensionality: tuple):
+        grad = np.array([np.gradient(data, axis=dim_idx) for dim_idx, dim in enumerate(dimensionality)])
+        # print(grad.shape)
+        # w = np.array([np.zeros(dimensionality) for idx in np.arange(len(dimensionality)**2)], 
+        #              dtype = np.ndarray).reshape([len(dimensionality), len(dimensionality),] + list(dimensionality))
+        w = np.array([np.gradient(grad[int(idx/2.)], axis = idx % 2) 
+                      for idx in np.arange(len(dimensionality)**2)]).reshape([len(dimensionality), 
+                                                                              len(dimensionality),] + list(dimensionality))
+        
+        lap_mul = np.array([np.zeros(dimensionality) 
+                            for idx in np.arange(len(dimensionality)**2)]).reshape([len(dimensionality), 
+                                                                                    len(dimensionality),] + list(dimensionality))
+        return grad, w, lap_mul
+
+    @staticmethod
+    def admm_step(data: np.ndarray, steps: list, initial_u: np.ndarray, initial_w: np.ndarray, 
+                  initial_lap: np.ndarray, lbd: float, reg_strng: float, c_const: float) -> tuple:
+        '''
+        *data* has to be already Fourier-transformed
+        All inputs initial_u, initial_w & initial_lap have to be transformed by DFT.
+        '''
+        def soft_thresholding(arg: np.ndarray, lbd: float) -> np.ndarray:
+            norm = np.linalg.norm(arg)
+            return max(norm - lbd, 0) * arg / norm
+        
+        def diff_factor(N: int, d: float = 1.) -> np.ndarray:
+            #freqs = np.fft.fftfreq(N, d = d)
+            freqs = np.arange(N)
+            return np.exp(-2*np.pi*freqs/N) - 1
+        
+        initial_u = np.fft.fftn(initial_u, s = initial_u.shape[1:])
+        # print(initial_u[0].shape)
+        # print(np.max(np.abs(initial_u[0])), np.min(np.abs(initial_u[0])))
+        Heatmap(np.abs(initial_u[0]), title = 'FFT')
+        initial_w_fft = np.fft.fftn(initial_w, s = initial_w.shape[2:])
+        initial_lap_fft = np.fft.fftn(initial_lap, s = initial_lap.shape[2:])
+        
+        diff_factors = np.array([np.moveaxis(np.broadcast_to(diff_factor(dim_size, d = steps[comp_idx]),
+                                                             shape = initial_u[0].shape),
+                                             source = -1, destination = comp_idx)
+                                 for comp_idx, dim_size in enumerate(initial_u[0].shape)])
+        
+        lbd_inv = lbd**(-1)
+        
+        u_freq = np.copy(initial_u)
+        
+        for grad_idx in range(initial_u.shape[0]):
+            u_nonzero_freq = np.zeros_like(u_freq[grad_idx])
+            
+            section_len = u_freq[grad_idx].shape[grad_idx]
+            putting_shape = np.ones(u_freq[grad_idx].ndim, dtype = np.int8)
+            putting_shape[grad_idx] = section_len-1
+            
+            putting_args = {'indices' : np.arange(1, u_freq[grad_idx].shape[grad_idx]).reshape(putting_shape),
+                            'axis' : grad_idx}
+            # print(f'putting_args {putting_args}')
+            taking_args = {'indices' : range(1, u_freq[grad_idx].shape[grad_idx]),
+                           'axis' : grad_idx}
+            # print(f'taking_args {taking_args}')
+            
+            def take(arr: np.ndarray, taking_args: dict = taking_args):
+                return np.take(arr, **taking_args)
+
+            denum_part = lbd_inv * np.sum([np.abs(take(factor))**2 for factor in diff_factors])            
+            partial_sum = [take(diff_factors[arg_idx]) * (take(initial_w_fft[grad_idx, arg_idx]) - 
+                                                          take(initial_lap_fft[grad_idx, arg_idx])) 
+                           for arg_idx in range(u_freq.shape[0])]
+            print([(np.min(elem), np.max(elem)) for elem in partial_sum]) # * take(data) * take(data)
+            print(np.min(take(data)), np.max(take(data)))
+            print('3rd term:', np.min(reg_strng * take(diff_factors[grad_idx]) ), np.max(reg_strng * take(diff_factors[grad_idx]) ))
+            
+            grad_nonzero_upd = (lbd_inv * np.sum(partial_sum, axis = 0) + reg_strng * take(diff_factors[grad_idx]) * take(data) /
+                                (denum_part + reg_strng/np.abs(take(diff_factors[grad_idx]))))
+            print('shit shape', (lbd_inv * np.sum(partial_sum, axis = 0) + reg_strng * take(diff_factors[grad_idx]) * take(data)).shape)
+            print(np.max(lbd_inv * np.sum(partial_sum, axis = 0) + reg_strng * take(diff_factors[grad_idx]) * take(data)),
+                  np.min(lbd_inv * np.sum(partial_sum, axis = 0) + reg_strng * take(diff_factors[grad_idx]) * take(data)))
+            Heatmap(np.real(lbd_inv * np.sum(partial_sum, axis = 0) + reg_strng * take(diff_factors[grad_idx]) * take(data)), title = 'partial')
+            
+            np.put_along_axis(u_nonzero_freq, values = grad_nonzero_upd, **putting_args)
+            u_freq[grad_idx] = u_nonzero_freq
+        Heatmap(np.real(u_freq[0]), title = 'inside the optimization')            
+    
+        initial_u = np.real(np.fft.ifftn(u_freq, u_freq.shape[1:]))
+        for i in range(initial_w.shape[0]):
+            for j in range(initial_w.shape[1]):
+                initial_w[i, j] = soft_thresholding(np.gradient(initial_u[j], axis = i) + initial_lap[i, j], lbd)
+                
+        for i in range(initial_w.shape[0]):
+            for j in range(initial_w.shape[1]):
+                initial_lap[i, j] = c_const*(initial_lap[i, j] + np.gradient(initial_u[j], axis = i)
+                                             - initial_w[i, j])
+    
+        time.sleep(15)
+        return initial_u, initial_w, initial_lap
+
+    def optimize_with_admm(self, data, lbd: float, reg_strng: float, c_const: float, nsteps: int = 1e5):
+        u, w, lap_mul = self.initial_guess(data=data, dimensionality=data.shape)
+        data_fft = np.fft.fftn(data)
+        print(f'For some reason has to be abysmal: {np.min(np.real(data_fft)), np.max(np.real(data_fft))}')
+        for epoch in range(int(nsteps)):
+            print(epoch)
+            if epoch % 100 == 0:
+                Heatmap(u[1], title=str(epoch))
+                plt.plot(u[1, :, int(u.shape[2]/2.)])
+                plt.show()
+            u, w, lap_mul = self.admm_step(data = data_fft, steps = np.ones(data.ndim), initial_u = u, initial_w = w, 
+                                           initial_lap=lap_mul, lbd = lbd, reg_strng = reg_strng, 
+                                           c_const = c_const)
+        return u
+        
+    # def differentiate(self, data: np.ndarray, max_order: Union[int, list],
+    #                   mixed: bool = False, axis=None, *grids) -> list:
+    #     if isinstance(max_order, int):
+    #         max_order = [max_order,] * data.ndim
+    #     else:
+    #         max_order = np.full_like(max_order, np.max(max_order))
+        
+    #     if len(grids) == 1 and data.ndim == 2:

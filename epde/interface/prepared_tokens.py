@@ -18,7 +18,7 @@ import epde.globals as global_var
 from epde.interface.token_family import TokenFamily
 from epde.evaluators import CustomEvaluator, EvaluatorTemplate, trigonometric_evaluator, simple_function_evaluator
 from epde.evaluators import const_evaluator, const_grad_evaluator, grid_evaluator
-from epde.evaluators import velocity_evaluator, velocity_grad_evaluators
+from epde.evaluators import velocity_evaluator, velocity_grad_evaluators, phased_sine_evaluator
 from epde.cache.cache import upload_simple_tokens, prepare_var_tensor  # np_ndarray_section,
 
 
@@ -50,7 +50,7 @@ class TrigonometricTokens(PreparedTokens):
         Args:
             freq (`tuple`): optional, default - (pi/2., 2*pi)
                 interval for parameter frequency in trigonometric token
-            dimensionally (`int`): optional, default - 1
+            dimensionality (`int`): optional, default - 1
                 data dimension 
         """
         assert freq[1] > freq[0] and len(freq) == 2, 'The tuple, defining frequncy interval, shall contain 2 elements with first - the left boundary of interval and the second - the right one. '
@@ -58,7 +58,27 @@ class TrigonometricTokens(PreparedTokens):
         self._token_family = TokenFamily(token_type='trigonometric')
         self._token_family.set_status(unique_specific_token=True, unique_token_type=True,
                                       meaningful=False)
+            
+        def latex_form(label, **params):
+            '''
+            Parameters
+            ----------
+            label : str
+                label of the token, for which we construct the latex form.
+            **params : dict
+                dictionary with parameter labels as keys and tuple of parameter values 
+                and their output text forms as values.
 
+            Returns
+            -------
+            form : str
+                LaTeX-styled text form of token.
+            '''
+            form = label + r'^{{{0}}}'.format(params["power"][1]) + \
+                    r'(' + params["freq"][1] + r' x_{' + params["dim"][1] + r'})'
+            return form
+        
+        self._token_family.set_latex_form_constructor(latex_form)
         trig_token_params = OrderedDict([('power', (1, 1)),
                                          ('freq', freq),
                                          ('dim', (0, dimensionality))])
@@ -70,6 +90,44 @@ class TrigonometricTokens(PreparedTokens):
         self._token_family.set_evaluator(trigonometric_evaluator, [])
 
 
+class PhasedSine1DTokens(PreparedTokens):
+    def __init__(self, freq: tuple = (np.pi/2., 2*np.pi)):
+        self._token_family = TokenFamily(token_type='phased_sine_1d')
+        self._token_family.set_status(unique_specific_token=True, unique_token_type=True,
+                                      meaningful=False)
+        
+        sine_token_params = OrderedDict([('power', (1, 1)),#tuple([(1, 1) for idx in range(dimensionality)])),
+                                         ('freq', freq),
+                                         ('phase', (0., 1.))])
+
+        freq_equality_fraction = 0.05  # fraction of allowed frequency interval, that is considered as the same
+
+        def latex_form(label, **params):
+            '''
+            Parameters
+            ----------
+            label : str
+                label of the token, for which we construct the latex form.
+            **params : dict
+                dictionary with parameter labels as keys and tuple of parameter values 
+                and their output text forms as values.
+
+            Returns
+            -------
+            form : str
+                LaTeX-styled text form of token.
+            '''            
+            pwr_sign = r'^{{{0}}}'.format(params["power"][1]) if params["power"][0] != 1 else ''
+            return label + pwr_sign + r'(' + params["freq"][1] + r' x_{1} + ' \
+                   + params["phase"][1] + r')'
+        
+        self._token_family.set_latex_form_constructor(latex_form)
+        sine_equal_params = {'power': 0, 'freq': (freq[1] - freq[0]) / freq_equality_fraction,
+                             'phase': 0.05}
+        self._token_family.set_params(['sine',], sine_token_params, sine_equal_params)
+        self._token_family.set_evaluator(phased_sine_evaluator, [])        
+
+
 class GridTokens(PreparedTokens):
     """
     Class for prepared tokens, that describe family of grids as values
@@ -79,7 +137,7 @@ class GridTokens(PreparedTokens):
         Initialization of class
 
         Args:
-            dimensionally (`int`): optional, default - 1
+            dimensionality (`int`): optional, default - 1
                 data dimension 
         """
         assert len(labels) == dimensionality + 1, 'Incorrect labels for grids.'
@@ -88,6 +146,28 @@ class GridTokens(PreparedTokens):
         self._token_family.set_status(unique_specific_token=True, unique_token_type=True,
                                       meaningful=True)
 
+        def latex_form(label, **params):
+            '''
+            Parameters
+            ----------
+            label : str
+                label of the token, for which we construct the latex form.
+            **params : dict
+                dictionary with parameter labels as keys and tuple of parameter values 
+                and their output text forms as values.
+
+            Returns
+            -------
+            form : str
+                LaTeX-styled text form of token.
+            '''
+            form = label            
+            if params['power'][0] > 1:
+                form = r'(' + form + r')^{{{0}}}'.format(params["power"][0])
+            return form
+        
+
+        self._token_family.set_latex_form_constructor(latex_form)
         grid_token_params = OrderedDict([('power', (1, 1)), ('dim', (0, dimensionality))])
 
         grid_equal_params = {'power': 0, 'dim': 0}

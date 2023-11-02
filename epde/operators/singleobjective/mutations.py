@@ -27,8 +27,10 @@ class SystemMutation(CompoundOperator):
 
     def apply(self, objective : SoEq, arguments : dict): # TODO: add setter for best_individuals & worst individuals 
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)    
-    
+
         altered_objective = deepcopy(objective)
+        if objective.elite == 'immutable':
+            return altered_objective
         
         eqs_keys = altered_objective.vals.equation_keys; params_keys = altered_objective.vals.params_keys
         affected_by_mutation = True
@@ -59,7 +61,6 @@ class EquationMutation(CompoundOperator):
     @HistoryExtender(f'\n -> mutating equation', 'ba')
     def apply(self, objective : Equation, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)  
-
         for term_idx in range(objective.n_immutable, len(objective.structure)):
             if np.random.uniform(0, 1) <= self.params['r_mutation']:
                 objective.structure[term_idx] = self.suboperators['mutation'].apply(objective = (term_idx, objective),

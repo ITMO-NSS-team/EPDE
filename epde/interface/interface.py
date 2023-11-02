@@ -5,32 +5,31 @@ Created on Tue Jul  6 15:55:12 2021
 
 @author: mike_ubuntu
 """
-import time
 import pickle
 import numpy as np
 from typing import Union, Callable
 from collections import OrderedDict
-import warnings
 
 import epde.globals as global_var
 
+from epde.optimizers.builder import StrategyBuilder
+
 from epde.optimizers.moeadd.moeadd import *
 from epde.optimizers.moeadd.supplementary import *
+from epde.optimizers.moeadd.strategy import MOEADDDirector
+from epde.optimizers.moeadd.strategy_elems import MOEADDSectorProcesser
+#from epde.optimizers.moeadd.population_constr import SystemsPopulationConstructor as MOEADDSystemPopConstr
+
+from epde.optimizers.single_criterion.optimizer import EvolutionaryStrategy, SimpleOptimizer
+# from epde.optimizers.single_criterion.population_constr import SystemsPopulationConstructor as SOSystemPopConstr
+from epde.optimizers.single_criterion.strategy import BaselineDirector
 from epde.optimizers.single_criterion.supplementary import simple_sorting
 # from epde.optimizers.moeadd.strategy_elems import SectorProcesserBuilder
 
 from epde.preprocessing.domain_pruning import DomainPruner
 from epde.operators.utils.default_parameter_loader import EvolutionaryParams
 
-from epde.optimizers.builder import StrategyBuilder
-from epde.optimizers.single_criterion.optimizer import EvolutionaryStrategy, SimpleOptimizer
-from epde.optimizers.moeadd.strategy_elems import MOEADDSectorProcesser
 from epde.decorators import BoundaryExclusion
-
-from epde.optimizers.single_criterion.population_constr import SystemsPopulationConstructor as SOSystemPopConstr
-from epde.optimizers.moeadd.population_constr import SystemsPopulationConstructor as MOEADDSystemPopConstr
-from epde.optimizers.single_criterion.strategy import BaselineDirector
-from epde.optimizers.moeadd.strategy import MOEADDDirector
 
 from epde.evaluators import simple_function_evaluator, trigonometric_evaluator
 from epde.supplementary import define_derivatives
@@ -97,12 +96,8 @@ class InputDataEntry(object):
         """
         Method for add calculated derivatives in the cache
         """
-        # print(f'self.data_tensor: {self.data_tensor.shape}')
-        # print(f'self.derivatives: {self.derivatives.shape}')
         derivs_stacked = prepare_var_tensor(self.data_tensor, self.derivatives, time_axis=global_var.time_axis)
-        # print(f'derivs_stacked: {derivs_stacked.shape}')
 
-        # raise Exception('ZUL LUL')
         try:
             upload_simple_tokens(self.names, global_var.tensor_cache, derivs_stacked)
             upload_simple_tokens([self.var_name,], global_var.initial_data_cache, [self.data_tensor,])
@@ -521,6 +516,31 @@ class EpdeSearch(object):
             self.set_preprocessor()
 
         data_tokens = []
+            
+        def latex_form(label, **params):
+            '''
+            Parameters
+            ----------
+            label : str
+                label of the token, for which we construct the latex form.
+            **params : dict
+                dictionary with parameter labels as keys and tuple of parameter values 
+                and their output text forms as values.
+
+            Returns
+            -------
+            form : str
+                LaTeX-styled text form of token.
+            '''            
+            if '/' in label:
+                label = label[:label.find('x')+1] + '_' + label[label.find('x')+1:]
+                label = label.replace('d', r'\partial ').replace('/', r'}{')
+                label = r'\frac{' + label + r'}'
+                                
+            if params['power'][0] > 1:
+                label = r'\left(' + label + r'\right)^{{{0}}}'.format(params["power"][1])
+            return label
+        
         for data_elem_idx, data_tensor in enumerate(data):
             assert isinstance(data_tensor, np.ndarray), 'Input data must be in format of numpy ndarrays or iterable (list or tuple) of numpy arrays'
             entry = InputDataEntry(var_name=variable_names[data_elem_idx],
@@ -530,9 +550,11 @@ class EpdeSearch(object):
                                   grid=global_var.grid_cache.get_all()[1], max_order=max_deriv_order)
             entry.use_global_cache()
 
-            self.set_derivatives(variable=variable_names[data_elem_idx], deriv=entry.derivatives)
-            
+            self.set_derivatives(variable=variable_names[data_elem_idx], deriv=entry.derivatives)  
+
+
             entry_token_family = TokenFamily(entry.var_name, family_of_derivs=True)
+            entry_token_family.set_latex_form_constructor(latex_form)
             entry_token_family.set_status(demands_equation=True, unique_specific_token=False,
                                           unique_token_type=False, s_and_d_merged=False,
                                           meaningful=True)
@@ -726,7 +748,7 @@ class EpdeSearch(object):
         self.search_conducted = True
 
     @property
-    def resulting_population(self):
+    def _resulting_population(self):
         if not self.search_conducted:
             raise AttributeError('Pareto set of the best equations has not been discovered. Use ``self.fit`` method.')
         if self.multiobjective_mode:
@@ -735,7 +757,7 @@ class EpdeSearch(object):
             return self.optimizer.population.population
             
     
-    def equation_search_results(self, only_print : bool = True, only_str = False, num = 1):
+    def equations(self, only_print : bool = True, only_str = False, num = 1):
         """
         Method for print or getting results of searching differential equation
 
@@ -749,29 +771,29 @@ class EpdeSearch(object):
         """
         if self.multiobjective_mode:
             if only_print:
-                for idx in range(min(num, len(self.resulting_population))):
+                for idx in range(min(num, len(self._resulting_population))):
                     print('\n')
                     print(f'{idx}-th non-dominated level')    
                     print('\n')                
                     [print(f'{solution.text_form} , with objective function values of {solution.obj_fun} \n')  
-                    for solution in self.resulting_population[idx]]
+                    for solution in self._resulting_population[idx]]
             else:
                 if only_str:
                     eqs = []
-                    for idx in range(min(num, len(self.resulting_population))):
-                        eqs.append([solution.text_form for solution in self.resulting_population[idx]])
+                    for idx in range(min(num, len(self._resulting_population))):
+                        eqs.append([solution.text_form for solution in self._resulting_population[idx]])
                     return eqs
                 else:
-                    return self.resulting_population[:num]
+                    return self._resulting_population[:num]
         else:
             if only_print:
                 [print(f'{solution.text_form} , with objective function values of {solution.obj_fun} \n')  
-                 for solution in self.resulting_population[:num]]
+                 for solution in self._resulting_population[:num]]
             else:
                 if only_str:
-                    return [solution.text_form for solution in self.resulting_population[:num]]
+                    return [solution.text_form for solution in self._resulting_population[:num]]
                 else:
-                    return self.resulting_population[:num]
+                    return self._resulting_population[:num]
 
     def solver_forms(self, grids: list = None, num: int = 1):
         '''
@@ -782,13 +804,13 @@ class EpdeSearch(object):
         '''
         forms = []
         if self.multiobjective_mode:
-            for level in self.resulting_population[:min(num, len(self.resulting_population))]:
+            for level in self._resulting_population[:min(num, len(self._resulting_population))]:
                 temp = []
                 for sys in level: #self.resulting_population[idx]:
                     temp.append(SystemSolverInterface(sys).form(grids=grids))
                 forms.append(temp)
         else:
-            for sys in self.resulting_population[:min(num, len(self.resulting_population))]:
+            for sys in self._resulting_population[:min(num, len(self._resulting_population))]:
                 forms.append(SystemSolverInterface(sys).form(grids=grids))
         return forms
 
@@ -826,3 +848,9 @@ class EpdeSearch(object):
         solution_model = adapter.solve_epde_system(system = system, grids = grid, data = data, 
                                                    boundary_conditions = boundary_conditions, strategy = strategy)
         return solution_model(adapter.convert_grid(grid)).detach().numpy()
+
+    def visualize_solutions(self, dimensions:list = [0, 1], **visulaizer_kwargs):
+        if self.multiobjective_mode:
+            self.optimizer.plot_pareto(dimensions=dimensions, **visulaizer_kwargs)
+        else:
+            raise NotImplementedError('Solution visualization is implemented only for multiobjective mode.')
