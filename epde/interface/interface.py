@@ -556,7 +556,7 @@ class EpdeSearch(object):
         grids = [self.cache[0].memory_default.get('0'), self.cache[0].memory_default.get('1')]
         global_var.init_symnet_pool(max_factors_in_term, self.pool.families,
                                     entry.data_tensor, entry.derivatives, entry.data_tensor.shape, entry.names,
-                                    grids=grids)
+                                    grids=grids, max_deriv_order=max_deriv_order)
         print(f'The cardinality of defined token pool is {self.pool.families_cardinality()}')
         print(f'Among them, the pool contains {self.pool.families_cardinality(meaningful_only=True)}')
         

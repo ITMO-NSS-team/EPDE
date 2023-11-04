@@ -19,16 +19,18 @@ class PoolTerms:
         for i in range(1, max_factors_in_term + 1):
             self.term_ls += list(itertools.combinations(token_ls, i))
 
-    def set_initial_distr(self, u, derivs, shape, names, families, grids):
+    def set_initial_distr(self, u, derivs, shape, names, families, grids, max_deriv_order):
         if len(families) == 1:
             self.pool_dict, self.pool_sym_ls = \
-                        get_csym_tsym(u, derivs, shape, names, pool_names=self.term_ls, families=families)
+                        get_csym_tsym(u, derivs, shape, names, pool_names=self.term_ls,
+                                      max_deriv_order=max_deriv_order)
         else:
             additional_tokens = _prepare_additional_tokens(families, grids)
             names = _prepare_names(names, families)
             self.pool_dict, self.pool_sym_ls = \
                 get_csym_tsym(u, derivs, shape, names,
-                              families=families, pool_names=self.term_ls, additional_tokens=additional_tokens)
+                              pool_names=self.term_ls, additional_tokens=additional_tokens,
+                              max_deriv_order=max_deriv_order)
         self.pool_sym_dict = dict(zip(self.pool_sym_ls, self.term_ls))
 
 

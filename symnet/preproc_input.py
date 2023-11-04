@@ -2,12 +2,6 @@ import torch
 import numpy as np
 
 
-def init_left_term(families):
-    labels = families[0].tokens.copy()
-    labels.remove('u')
-    return (np.random.choice(labels), )
-
-
 # TODO: случай когда idx == None
 def prepare_batches(u, derivs, shape, idx, additional_tokens=None):
     u = np.reshape(u, (shape[0], shape[1], 1))
