@@ -13,6 +13,7 @@ import torch
 device = torch.device('cpu')
 
 import matplotlib.pyplot as plt
+import epde.globals as global_var
 
 def exp_form(a, sign_num: int = 4):
     if np.isclose(a, 0):
@@ -95,7 +96,8 @@ def train_ann(grids: list, data: np.ndarray, epochs_max: int = 500):
             best_model = model
             min_loss = loss_mean
         losses.append(loss_mean)
-        print('Surface training t={}, loss={}'.format(t, loss_mean))
+        if global_var.verbose.show_ann_loss:
+            print('Surface training t={}, loss={}'.format(t, loss_mean))
         t += 1
     print_loss = True
     if print_loss:

@@ -36,7 +36,7 @@ def get_requirements():
 
 setup(
       name = 'epde',
-      version = '1.2.13',
+      version = '1.2.14',
       description = SHORT_DESCRIPTION,
       long_description="PLACEHOLDER",
 #      long_description_content_type='text/x-rst',
