@@ -14,6 +14,7 @@ import numpy as np
 import torch
 device = torch.device('cpu')
 
+import epde.globals as global_var
 
 class AbstractSmoother(ABC):
     def __init__(self, *args, **kwargs):
@@ -89,7 +90,8 @@ class ANNSmoother(AbstractSmoother):
             if loss_mean < min_loss:
                 best_model = model
                 min_loss = loss_mean
-            print('Surface training t={}, loss={}'.format(t, loss_mean))
+            if global_var.verbose.show_ann_loss:
+                print('Surface training t={}, loss={}'.format(t, loss_mean))
             t += 1
 
         data_approx = best_model(grid_flattened).detach().numpy().reshape(original_shape)

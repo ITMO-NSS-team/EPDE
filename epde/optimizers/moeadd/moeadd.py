@@ -6,8 +6,13 @@ Main classes and functions of the moeadd optimizer.
 
 import numpy as np
 import warnings
+from itertools import chain
 
 from typing import Union
+
+def flatten_chain(matrix):
+    return list(chain.from_iterable(matrix))
+
 # from copy import deepcopy
 # from functools import reduce
 
@@ -154,7 +159,8 @@ class ParetoLevels(object):
         self.population = population_cleared
 
     def get_stats(self):
-        return np.array([[element.obj_fun for element in level] for level in self.levels])
+        return np.array(flatten_chain([[element.obj_fun for element in level] 
+                                       for level in self.levels]))
 
     def fit_convex_hull(self):
         """

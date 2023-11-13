@@ -11,10 +11,11 @@ from os.path import dirname, join
 from pathlib import Path
 import pathlib
 
-here = pathlib.Path(__file__).parent.resolve()
+HERE = pathlib.Path(__file__).parent.resolve()
+README = Path(HERE, 'README.rst').read_text(encoding='utf-8')
+SHORT_DESCRIPTION = 'Data-driven dynamical system and differential equations discovery framework'
 
 # Get the long description from the README file
-long_description = (here / 'README.rst').read_text(encoding='utf-8')
 
 
 def read(*names, **kwargs):
@@ -35,8 +36,10 @@ def get_requirements():
 
 setup(
       name = 'epde',
-      version = '1.2.9',
-      description = 'EPDE package',
+      version = '1.2.14',
+      description = SHORT_DESCRIPTION,
+      long_description="PLACEHOLDER",
+#      long_description_content_type='text/x-rst',
       author = 'Mikhail Maslyaev',
       author_email = 'miklemas@list.ru',
       classifiers = [      
@@ -45,7 +48,7 @@ setup(
               'License :: OSI Approved :: MIT License',
               'Operating System :: OS Independent',
       ],
-      packages = find_packages(include = ['epde', 'epde.cache', 'epde.interface', 'epde.moeadd', 
+      packages = find_packages(include = ['epde', 'epde.cache', 'epde.interface', 
                                           'epde.optimizers', 'epde.optimizers.moeadd', 
                                           'epde.optimizers.single_criterion', 'epde.operators.common',
                                           'epde.operators', 'epde.operators.utils',
@@ -54,5 +57,5 @@ setup(
                                           'epde.operators.singleobjective', 'epde.preprocessing', 
                                           'epde.parametric', 'epde.structure', 'epde.solver']),
       include_package_data = True,                               
-      python_requires =' >=3.8'
+      python_requires =' >=3.8',
       )

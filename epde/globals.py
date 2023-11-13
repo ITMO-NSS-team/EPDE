@@ -86,11 +86,12 @@ class VerboseManager:
     show_iter_idx : bool
     iter_fitness : bool
     iter_stats : bool
+    show_ann_loss : bool    
     show_warnings : bool
     
 def init_verbose(plot_DE_solutions : bool = False, show_iter_idx : bool = True, 
                  show_iter_fitness : bool = False, show_iter_stats : bool = False, 
-                 show_warnings : bool = False):
+                 show_ann_loss : bool = False, show_warnings : bool = False):
     """
     Method for initialized of manager for output in text form
 
@@ -110,4 +111,4 @@ def init_verbose(plot_DE_solutions : bool = False, show_iter_idx : bool = True,
     if not show_warnings:
         warnings.filterwarnings("ignore")
     verbose = VerboseManager(plot_DE_solutions, show_iter_idx, show_iter_fitness, 
-                             show_iter_stats, show_warnings)
+                             show_iter_stats, show_ann_loss, show_warnings)
