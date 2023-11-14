@@ -363,13 +363,17 @@ class OffspringUpdater(CompoundOperator):
                                                                     arguments = subop_args['pareto_level_updater'])
                     break
                 elif attempt >= attempt_limit:
-                    print(temp_offspring.text_form)
-                    print('-----------------------')
-                    for idx, individual in enumerate(objective.population):
-                        print(f'Individual {idx}')
-                        print(individual.text_form)
-                        print('-----------------------')
-                    raise Exception('Can not place individual into the population. Try decreasing population size or increasing token variety. ')
+                    # print(temp_offspring.text_form)
+                    # print('-----------------------')
+                    # for idx, individual in enumerate(objective.population):
+                    #     print(f'Individual {idx}')
+                    #     print(individual.text_form)
+                    #     print('-----------------------')
+                    # raise Exception('Can not place individual into the population. Try decreasing population size or increasing token variety. ')
+                    print('The algorithm had issues with generating unique offsprings, allowed replication.')
+                    self.suboperators['pareto_level_updater'].apply(objective = (temp_offspring, objective),
+                                                                    arguments = subop_args['pareto_level_updater'])
+
                     break
                 attempt += 1
         return objective
