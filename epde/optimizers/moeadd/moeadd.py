@@ -290,10 +290,15 @@ class MOEADDOptimizer(object):
                     break
                 if solution_gen_idx == soluton_creation_attempts_softmax and global_var.verbose.show_warnings:
                     print('solutions tried:', solution_gen_idx)
-                    warnings.warn('Too many failed attempts to create unique solutions for multiobjective optimization. Change solution parameters to allow more diversity.')
+                    warnings.warn('Too many failed attempts to create unique solutions for multiobjective optimization.\
+                                  Change solution parameters to allow more diversity.')
                 if solution_gen_idx == soluton_creation_attempts_hardmax:
-                    self.abbreviated_search(population, sorting_method = nds_method, update_method = ndl_update)
-                    return None
+                    # self.abbreviated_search(population, sorting_method = nds_method, update_method = ndl_update)
+                    # return None
+                    population.append(temp_solution)
+                    print(f'New solution accepted, despite being a dublicate of another solution.\
+                          Confirmed {len(population)}/{pop_size} solutions.')
+                    break                    
                 solution_gen_idx += 1
         self.pareto_levels = ParetoLevels(population, sorting_method = nds_method, update_method = ndl_update,
                                           initial_sort = False)
