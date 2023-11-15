@@ -518,7 +518,6 @@ class TFPool(object):
 
                 probabilities = (self.families_cardinality(True, token_status) /
                                  np.sum(self.families_cardinality(True, token_status)))
-
                 return np.random.choice(a=self.families_meaningful,
                                         p=probabilities).create(label=None,
                                                                 token_status=token_status,
