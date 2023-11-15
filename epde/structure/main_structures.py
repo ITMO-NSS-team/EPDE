@@ -147,9 +147,8 @@ class Term(ComplexStructure):
         self.occupied_tokens_labels = copy.copy(forbidden_factors)
 
         self.descr_variable_marker = mandatory_family if mandatory_family is not None else False
-        # print(f'self.descr_variable_marker is set as {self.descr_variable_marker}')
 
-        if not mandatory_family:
+        if not mandatory_family:      
             occupied_by_factor, factor = self.pool.create(label=None, create_meaningful=True,
                                                           token_status=self.occupied_tokens_labels,
                                                           create_derivs=create_derivs, **kwargs)
@@ -396,9 +395,11 @@ class Equation(ComplexStructure):
                 mf = var_to_explain if force_var_to_explain else None
                 new_term = Term(self.pool, max_factors_in_term=self.metaparameters['max_factors_in_term']['value'],
                                 mandatory_family=mf, passed_term=None)
+
                 if check_uniqueness(new_term, self.structure):
                     force_var_to_explain = False
                     break
+            
             self.structure.append(new_term)
 
         for idx, _ in enumerate(self.structure):
@@ -649,12 +650,12 @@ class Equation(ComplexStructure):
     @property
     def latex_form(self):
         form = self.structure[self.target_idx].latex_form + r' = '
+        digits_rounding_max = 3
         for idx, term in enumerate(self.structure):
             idx_corrected = idx if idx <= self.target_idx else idx - 1
             if idx == self.target_idx or self.weights_final[idx_corrected] == 0:
                 continue
-            
-            digits_rounding_max = 3
+
             mnt, exp = exp_form(self.weights_final[idx_corrected], digits_rounding_max)
             exp_str = r'\cdot 10^{{{0}}} '.format(str(exp)) if exp != 0 else ''
             form += str(mnt) + exp_str + term.latex_form + r' + '

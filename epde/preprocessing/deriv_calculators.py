@@ -7,7 +7,6 @@ Created on Thu Jul 21 12:11:05 2022
 """
 
 import numpy as np
-from numba import njit
 import time
 
 import matplotlib.pyplot as plt
