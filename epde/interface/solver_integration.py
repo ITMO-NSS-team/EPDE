@@ -398,7 +398,7 @@ class SystemSolverInterface(object):
                            'var': [0,]}
         _solver_form['C'] = free_coeff_term
 
-        target_weight = torch.from_numpy(np.full_like(a=grids[0],  # global_var.grid_cache.get('0'),
+        target_weight = torch.from_numpy(np.full_like(a=grids[0],
                                                       fill_value=-1.))
         target_form = self._term_solver_form(equation.structure[equation.target_idx], grids, default_domain, variables)
         target_form['coeff'] = target_form['coeff'] * target_weight
@@ -421,7 +421,7 @@ class SystemSolverInterface(object):
         self.use_grids(grids=grids)
         equation_forms = []
 
-        for equation in self.adaptee.vals:  # Deleted enumeration
+        for equation in self.adaptee.vals:
             equation_forms.append((equation.main_var_to_explain,
                                    self._equation_solver_form(equation, variables=self.variables,
                                                               grids=grids)))
@@ -433,17 +433,6 @@ class SolverAdapter(object):
         dim_number = global_var.grid_cache.get('0').ndim
         print(f'dimensionality is {dim_number}')
         if model is None:
-            # model = torch.nn.Sequential(
-            #     torch.nn.Linear(dim_number, 100),
-            #     torch.nn.Tanh(),
-            #     torch.nn.Linear(100, 100),
-            #     torch.nn.Tanh(),
-            #     torch.nn.Linear(100, 100),
-            #     torch.nn.Tanh(),
-            #     torch.nn.Linear(100, 100),
-            #     torch.nn.Tanh(),
-            #     torch.nn.Linear(100, var_number),
-            # )
             if dim_number == 1:
                 model = Modified_MLP([400, 400, 400, 400, var_number], [15], [7])
             else:
@@ -467,7 +456,7 @@ class SolverAdapter(object):
                           save_always: bool = None, print_every: bool = 5000, optimizer_mode = None, 
                           model_randomize_parameter: bool = None, step_plot_print: bool = None,
                           step_plot_save: bool = True, image_save_dir: str = None, tol: float = None):
-        # TODO: refactor
+        
         params = {'lambda_bound': lambda_bound, 'verbose': verbose,
                   'learning_rate': learning_rate, 'eps': eps, 'tmin': tmin,
                   'tmax': tmax, 'use_cache': use_cache, 'cache_verbose': cache_verbose,
@@ -477,9 +466,8 @@ class SolverAdapter(object):
                   'model_randomize_parameter': model_randomize_parameter, 'step_plot_print': step_plot_print,
                   'step_plot_save': step_plot_save, 'image_save_dir': image_save_dir, 'tol': tol}
 
-        # print('params: ', params)
         for param_key, param_vals in params.items():
-            if params is not None:
+            if param_vals is not None:
                 try:
                     self._solver_params[param_key] = param_vals
                 except KeyError:

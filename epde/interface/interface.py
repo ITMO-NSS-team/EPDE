@@ -776,7 +776,7 @@ class EpdeSearch(object):
                     print(f'{idx}-th non-dominated level')    
                     print('\n')                
                     [print(f'{solution.text_form} , with objective function values of {solution.obj_fun} \n')  
-                    for solution in self._resulting_population[idx]]
+                     for solution in self._resulting_population[idx]]
             else:
                 if only_str:
                     eqs = []
@@ -825,9 +825,9 @@ class EpdeSearch(object):
         return self.optimizer.pareto_levels.get_by_complexity(complexity)
 
     def predict(self, system : SoEq, boundary_conditions : BoundaryConditions, grid : list = None, data = None,
-                system_file : str = None, solver_kwargs : dict = {'model' : None, 'use_cache' : True}, strategy = 'NN'):
-        solver_kwargs['dim'] = len(global_var.grid_cache.get_all()[1])
-        # solver_kwargs['dim']
+                system_file : str = None, solver_kwargs : dict = {'use_cache' : True}, strategy = 'NN'):
+        # solver_kwargs['dim'] = len(global_var.grid_cache.get_all()[1])
+        
         
         if system is not None:
             print('Using explicitly sent system of equations.')
@@ -843,6 +843,7 @@ class EpdeSearch(object):
             grid = global_var.grid_cache.get_all()[1]
         
         adapter = SolverAdapter(var_number = len(system.vars_to_describe))
+        adapter.set_solver_params(**solver_kwargs)
         print(f'grid.shape is {grid[0].shape}')
         print(f'Shape of the grid for solver {adapter.convert_grid(grid).shape}')        
         solution_model = adapter.solve_epde_system(system = system, grids = grid, data = data, 
