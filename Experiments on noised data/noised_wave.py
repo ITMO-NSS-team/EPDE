@@ -8,6 +8,8 @@ from matplotlib import rcParams
 rcParams.update({'figure.autolayout': True})
 import traceback
 import logging
+import os
+from pathlib import Path
 
 
 def find_coeff_diff(res, coefficients: dict):
@@ -82,8 +84,8 @@ def hash_term(term):
 
 if __name__ == '__main__':
 
-    path = "data_wave/"
-    df = pd.read_csv(f'{path}wave_sln_100.csv', header=None)
+    path_full = os.path.join(Path().absolute().parent, "data_wave", "wave_sln_100.csv")
+    df = pd.read_csv(path_full, header=None)
     u = df.values
     u = np.transpose(u)
     x = np.linspace(0, 1, 101)
@@ -97,9 +99,12 @@ if __name__ == '__main__':
     write_csv = True
     print_results = True
     max_iter_number = 50
-    title = 'dfs'
+    magnitudes = [1. * 1e-2, 5. * 1e-2, 1. * 1e-1, 2. * 1e-1, 5 * 1e-1]
+    magnitude = magnitudes[0]
+    title = f'dfs{magnitude}'
     ''''''
 
+    u = u + np.random.normal(scale=magnitude * np.abs(u), size=u.shape)
     terms = [('u',), ('du/dx1',), ('d^2u/dx1^2',), ('du/dx2',), ('d^2u/dx2^2',)]
     hashed_ls = [hash_term(term) for term in terms]
     coefficients = dict(zip(hashed_ls, [0., 0., -1., 0., 0.04]))
@@ -153,7 +158,7 @@ if __name__ == '__main__':
         arr = np.array([differences_ls_none, time_ls, num_found_eq])
         arr = arr.T
         df = pd.DataFrame(data=arr, columns=['MAE', 'time', 'number_found_eq'])
-        df.to_csv(f'data_wave/{title}.csv')
+        df.to_csv(os.path.join(Path().absolute().parent, "data_wave", f"{title}.csv"))
 
     if print_results:
         print('\nTime for every run, s:')

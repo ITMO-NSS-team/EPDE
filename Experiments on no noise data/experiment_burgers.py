@@ -2,13 +2,12 @@ import time
 import numpy as np
 import pandas as pd
 import epde.interface.interface as epde_alg
-import seaborn as sns
-import matplotlib.pyplot as plt
-from scipy.io import loadmat
 from matplotlib import rcParams
 rcParams.update({'figure.autolayout': True})
 import traceback
 import logging
+import os
+from pathlib import Path
 
 
 def find_coeff_diff(res, coefficients: dict):
@@ -16,7 +15,7 @@ def find_coeff_diff(res, coefficients: dict):
 
     for pareto_front in res:
         for soeq in pareto_front:
-            if soeq.obj_fun[0] < 10:
+            if soeq.obj_fun[0] < 10.:
                 eq_text = soeq.vals.chromosome['u'].value.text_form
                 terms_dict = out_formatting(eq_text)
                 diff = coefficients_difference(terms_dict, coefficients)
@@ -31,11 +30,11 @@ def coefficients_difference(terms_dict, coefficients):
     eq_found = 0
     for term_hash in terms_dict.keys():
         mae += abs(terms_dict.get(term_hash) - coefficients.get(term_hash))
-        if coefficients.get(term_hash) != 0.0 and abs(terms_dict.get(term_hash) - coefficients.get(term_hash)) < 0.1:
+        if coefficients.get(term_hash) == -1.0 and abs(terms_dict.get(term_hash) - coefficients.get(term_hash)) < 0.2:
             eq_found += 1
 
     mae /= len(terms_dict)
-    if eq_found == 3:
+    if eq_found == 2:
         return mae
     else:
         return -1
@@ -83,11 +82,14 @@ def hash_term(term):
 
 if __name__ == '__main__':
 
-    burg = loadmat('data_burg/burgers.mat')
-    t = np.ravel(burg['t'])
-    x = np.ravel(burg['x'])
-    u = np.real(burg['usol'])
+    path = "data_burg"
+    path_full = os.path.join(Path().absolute().parent, path, "burgers_sln_100.csv")
+    df = pd.read_csv(path_full, header=None)
+
+    u = df.values
     u = np.transpose(u)
+    x = np.linspace(-1000, 0, 101)
+    t = np.linspace(0, 1, 101)
 
     boundary = 10
     dimensionality = u.ndim
@@ -97,12 +99,11 @@ if __name__ == '__main__':
     write_csv = True
     print_results = True
     max_iter_number = 50
-    title = 'dfs_sindy'
+    title = 'dfs'
 
-    terms = [('u',), ('du/dx1',), ('du/dx2',), ('d^2u/dx2^2',), ('u', 'du/dx1'), ('u', 'du/dx2'), ('u', 'd^2u/dx2^2'),
-             ('du/dx1', 'du/dx2'), ('du/dx1', 'd^2u/dx2^2'), ('du/dx2', 'd^2u/dx2^2')]
+    terms = [('du/dx1', ), ('du/dx2', 'u'), ('u',), ('du/dx2',), ('u', 'du/dx1'), ('du/dx1', 'du/dx2'),]
     hashed_ls = [hash_term(term) for term in terms]
-    coefficients = dict(zip(hashed_ls, [0., -1., 0., 0.1, 0., -1., 0., 0., 0., 0.]))
+    coefficients = dict(zip(hashed_ls, [-1., -1., 0., 0., 0., 0.]))
     coefficients[1] = 0.
 
     time_ls = []
@@ -116,21 +117,21 @@ if __name__ == '__main__':
         epde_search_obj = epde_alg.EpdeSearch(use_solver=False, boundary=boundary,
                                               dimensionality=dimensionality, coordinate_tensors=grids)
 
-        epde_search_obj.set_moeadd_params(population_size=8, training_epochs=7)
+        epde_search_obj.set_moeadd_params(population_size=5, training_epochs=5)
         start = time.time()
         try:
-            epde_search_obj.fit(data=u, max_deriv_order=(1, 2),
+            epde_search_obj.fit(data=u, max_deriv_order=(1, 1),
                                 equation_terms_max_number=3, equation_factors_max_number=2,
-                                eq_sparsity_interval=(1e-08, 1e-1))
+                                eq_sparsity_interval=(1e-08, 1e-4))
         except Exception as e:
             logging.error(traceback.format_exc())
             population_error += 1
             continue
         end = time.time()
-        epde_search_obj.equation_search_results(only_print=True, num=4)
+        epde_search_obj.equation_search_results(only_print=True, num=2)
         time1 = end-start
 
-        res = epde_search_obj.equation_search_results(only_print=False, num=4)
+        res = epde_search_obj.equation_search_results(only_print=False, num=2)
         difference_ls = find_coeff_diff(res, coefficients)
 
         if len(difference_ls) != 0:
@@ -150,11 +151,12 @@ if __name__ == '__main__':
         arr = np.array([differences_ls_none, time_ls, num_found_eq])
         arr = arr.T
         df = pd.DataFrame(data=arr, columns=['MAE', 'time', 'number_found_eq'])
-        df.to_csv(f'data_burg/{title}.csv')
+        df.to_csv(os.path.join(Path().absolute().parent, "data_burg", f"{title}.csv"))
+
     if print_results:
-        print('\nTime for every run, s:')
+        print('\nTime for every run:')
         for item in time_ls:
-            print(f'{item: .4f}')
+            print(item)
 
         print()
         print(f'\nAverage time, s: {sum(time_ls) / len(time_ls):.2f}')
