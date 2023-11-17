@@ -101,15 +101,16 @@ if __name__ == '__main__':
     grids = np.meshgrid(t, x, indexing='ij')
 
     ''' Parameters of the experiment '''
-    write_csv = False
+    write_csv = True
     print_results = True
     max_iter_number = 50
-    title = 'df0_sindy'
+    title = 'dfs_sindy'
 
     time_ls = []
     differences_ls = []
     mean_diff_ls = []
     num_found_eq = []
+    differences_ls_none =[]
     i = 0
     population_error = 0
     while i < max_iter_number:
@@ -136,7 +137,10 @@ if __name__ == '__main__':
         difference_ls = find_coeff_diff(res)
         if len(difference_ls) != 0:
             differences_ls.append(min(difference_ls))
+            differences_ls_none.append(min(difference_ls))
             mean_diff_ls += difference_ls
+        else:
+            differences_ls_none.append(None)
 
         num_found_eq.append(len(difference_ls))
         print('Overall time is:', time1)
@@ -145,7 +149,7 @@ if __name__ == '__main__':
         time_ls.append(time1)
 
     if write_csv:
-        arr = np.array([differences_ls, time_ls, num_found_eq])
+        arr = np.array([differences_ls_none, time_ls, num_found_eq])
         arr = arr.T
         df = pd.DataFrame(data=arr, columns=['MAE', 'time', 'number_found_eq'])
         df.to_csv(f'data_kdv/{title}.csv')
