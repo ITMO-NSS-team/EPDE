@@ -94,11 +94,12 @@ if __name__ == '__main__':
     grids = np.meshgrid(t, x, indexing='ij')
 
     ''' Parameters of the experiment '''
-    write_csv = False
+    write_csv = True
     print_results = True
-    max_iter_number = 10
+    max_iter_number = 50
     # magnitudes = [0, 1. * 1e-2, 5. * 1e-2, 1. * 1e-1, 2. * 1e-1, 5 * 1e-1]
-    magnitudes = [1. * 1e-5, 1. * 1e-4] # 1, 10 num of not found eqs
+    # magnitudes = [1. * 1e-5, 1.5 * 1e-5, 2 * 1e-5, 2.5 * 1e-5, 3. * 1e-5, 3.67 * 1e-5] # 1, 10 num of not found eqs
+    magnitudes = [3.67 * 1e-5, ]
 
     terms = [('du/dx1',), ('du/dx2', 'u'), ('u',), ('du/dx2',), ('u', 'du/dx1'), ('du/dx1', 'du/dx2'), ]
     hashed_ls = [hash_term(term) for term in terms]
@@ -110,7 +111,7 @@ if __name__ == '__main__':
     draw_avgmae = []
     for magnitude in magnitudes:
         title = f'dfs{magnitude}'
-
+        df = pd.read_csv(path_full, header=None)
         u = df.values
         u = np.transpose(u)
         u = u + np.random.normal(scale=magnitude * np.abs(u), size=u.shape)
@@ -124,9 +125,10 @@ if __name__ == '__main__':
         i = 0
         population_error = 0
         while i < max_iter_number:
-            epde_search_obj = epde_alg.EpdeSearch(use_solver=False, boundary=boundary,
-                                                  dimensionality=dimensionality, coordinate_tensors=grids)
 
+            epde_search_obj = epde_alg.EpdeSearch(use_solver=False, boundary=boundary,
+                                                  dimensionality=dimensionality, coordinate_tensors=grids,)
+            # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN', preprocessor_kwargs={'epochs_max': 800})
             epde_search_obj.set_moeadd_params(population_size=5, training_epochs=5)
             start = time.time()
             try:
@@ -179,25 +181,28 @@ if __name__ == '__main__':
             print(f"Num of population error occurrence: {population_error}")
 
         if len(mean_diff_ls) != 0:
-            draw_avgmae.append(sum(differences_ls) / max_iter_number)
+            draw_avgmae.append(sum(differences_ls) / (max_iter_number - num_found_eq.count(0)))
         else:
-            draw_avgmae.append(0.1)
+            draw_avgmae.append(0.01)
         draw_not_found.append(num_found_eq.count(0))
         draw_time.append(sum(time_ls) / len(time_ls))
 
-    plt.plot(magnitudes, draw_not_found)
+    plt.plot(magnitudes, draw_not_found, linewidth=2, markersize=9, marker='o')
+    plt.title("SymNet")
     plt.ylabel("No. runs with not found eq.")
     plt.xlabel("Magnitude value")
     plt.grid()
     plt.show()
 
-    plt.plot(magnitudes, draw_time)
+    plt.plot(magnitudes, draw_time, linewidth=2, markersize=9, marker='o')
+    plt.title("SymNet")
     plt.ylabel("Time, s.")
     plt.xlabel("Magnitude value")
     plt.grid()
     plt.show()
 
-    plt.plot(magnitudes, draw_avgmae)
+    plt.plot(magnitudes, draw_avgmae, linewidth=2, markersize=9, marker='o')
+    plt.title("SymNet")
     plt.ylabel("Average MAE")
     plt.xlabel("Magnitude value")
     plt.grid()

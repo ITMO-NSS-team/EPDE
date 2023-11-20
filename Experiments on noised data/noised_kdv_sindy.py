@@ -8,6 +8,7 @@ import traceback
 import logging
 import os
 from pathlib import Path
+import matplotlib.pyplot as plt
 
 
 def find_coeff_diff(res):
@@ -95,79 +96,113 @@ if __name__ == '__main__':
     kdV = loadmat(path_full)
     t = np.ravel(kdV['t'])
     x = np.ravel(kdV['x'])
-    u = np.real(kdV['usol'])
-    u = np.transpose(u)
+    u_init = np.real(kdV['usol'])
+    u_init = np.transpose(u_init)
 
     boundary = 0
-    dimensionality = u.ndim
+    dimensionality = u_init.ndim
     grids = np.meshgrid(t, x, indexing='ij')
 
     ''' Parameters of the experiment '''
     write_csv = True
     print_results = True
     max_iter_number = 50
+
+    draw_not_found = []
+    draw_time = []
+    draw_avgmae = []
+    start_gl = time.time()
     magnitudes = [1. * 1e-2, 5. * 1e-2, 1. * 1e-1, 2. * 1e-1, 5 * 1e-1]
-    magnitude = magnitudes[0]
-    title = f'dfs_sindy{magnitude}'
+    for magnitude in magnitudes:
+        title = f'dfs_sindy{magnitude}'
 
-    u = u + np.random.normal(scale=magnitude * np.abs(u), size=u.shape)
-    time_ls = []
-    differences_ls = []
-    mean_diff_ls = []
-    num_found_eq = []
-    differences_ls_none =[]
-    i = 0
-    population_error = 0
-    while i < max_iter_number:
-        epde_search_obj = epde_alg.EpdeSearch(use_solver=False, boundary=boundary,
-                                               dimensionality=dimensionality, coordinate_tensors=grids)
+        time_ls = []
+        differences_ls = []
+        mean_diff_ls = []
+        num_found_eq = []
+        differences_ls_none = []
+        i = 0
+        population_error = 0
+        while i < max_iter_number:
+            u = u_init + np.random.normal(scale=magnitude * np.abs(u_init), size=u_init.shape)
+            epde_search_obj = epde_alg.EpdeSearch(use_solver=False, boundary=boundary,
+                                                   dimensionality=dimensionality, coordinate_tensors=grids)
 
-        epde_search_obj.set_moeadd_params(population_size=8, training_epochs=90)
-        start = time.time()
+            epde_search_obj.set_moeadd_params(population_size=8, training_epochs=90)
+            start = time.time()
 
-        try:
-            epde_search_obj.fit(data=u, max_deriv_order=(1, 3),
-                                equation_terms_max_number=4, equation_factors_max_number=2,
-                                eq_sparsity_interval=(1e-08, 1e-06))
-        except Exception as e:
-            logging.error(traceback.format_exc())
-            population_error += 1
-            continue
-        end = time.time()
-        epde_search_obj.equation_search_results(only_print=True, num=4)
-        time1 = end-start
+            try:
+                epde_search_obj.fit(data=u, max_deriv_order=(1, 3),
+                                    equation_terms_max_number=4, equation_factors_max_number=2,
+                                    eq_sparsity_interval=(1e-08, 1e-06))
+            except Exception as e:
+                logging.error(traceback.format_exc())
+                population_error += 1
+                continue
+            end = time.time()
+            epde_search_obj.equation_search_results(only_print=True, num=4)
+            time1 = end-start
 
-        res = epde_search_obj.equation_search_results(only_print=False, num=4)
+            res = epde_search_obj.equation_search_results(only_print=False, num=4)
+            difference_ls = find_coeff_diff(res)
+            if len(difference_ls) != 0:
+                differences_ls.append(min(difference_ls))
+                differences_ls_none.append(min(difference_ls))
+                mean_diff_ls += difference_ls
+            else:
+                differences_ls_none.append(None)
 
-        difference_ls = find_coeff_diff(res)
-        if len(difference_ls) != 0:
-            differences_ls.append(min(difference_ls))
-            differences_ls_none.append(min(difference_ls))
-            mean_diff_ls += difference_ls
-        else:
-            differences_ls_none.append(None)
+            num_found_eq.append(len(difference_ls))
+            print('Overall time is:', time1)
+            print(f'Iteration processed: {i+1}/{max_iter_number}\n')
+            i += 1
+            time_ls.append(time1)
 
-        num_found_eq.append(len(difference_ls))
-        print('Overall time is:', time1)
-        print(f'Iteration processed: {i+1}/{max_iter_number}\n')
-        i += 1
-        time_ls.append(time1)
+        if write_csv:
+            arr = np.array([differences_ls_none, time_ls, num_found_eq])
+            arr = arr.T
+            df = pd.DataFrame(data=arr, columns=['MAE', 'time', 'number_found_eq'])
+            df.to_csv(os.path.join(Path().absolute().parent, "data_kdv", f"{title}.csv"))
 
-    if write_csv:
-        arr = np.array([differences_ls_none, time_ls, num_found_eq])
-        arr = arr.T
-        df = pd.DataFrame(data=arr, columns=['MAE', 'time', 'number_found_eq'])
-        df.to_csv(os.path.join(Path().absolute().parent, "data_kdv", f"{title}.csv"))
+            if print_results:
+                print()
+                print(f'\nAverage time, s: {sum(time_ls) / len(time_ls):.2f}')
+                if len(mean_diff_ls) != 0:
+                    print(f'Average MAE per eq: {sum(mean_diff_ls) / len(mean_diff_ls):.6f}')
+                    print(
+                        f'Average minimum MAE per run: {sum(differences_ls) / (max_iter_number - num_found_eq.count(0)):.6f}')
+                else:
+                    print("Equation was not found in any run")
+                print(f'Average # of found eq per run: {sum(num_found_eq) / max_iter_number:.2f}')
+                print(f"Runs where eq was not found: {num_found_eq.count(0)}")
+                print(f"Num of population error occurrence: {population_error}")
 
-    if print_results:
-        print('\nTime for every run, s:')
-        for item in time_ls:
-            print(f'{item: .4f}')
+            if len(mean_diff_ls) != 0:
+                draw_avgmae.append(sum(differences_ls) / (max_iter_number - num_found_eq.count(0)))
+            else:
+                draw_avgmae.append(0.08)
+            draw_not_found.append(num_found_eq.count(0))
+            draw_time.append(sum(time_ls) / len(time_ls))
 
-        print()
-        print(f'\nAverage time, s: {sum(time_ls) / len(time_ls):.2f}')
-        print(f'Average MAE per eq: {sum(mean_diff_ls) / len(mean_diff_ls):.6f}')
-        print(f'Average minimum MAE per run: {sum(differences_ls) / max_iter_number:.6f}')
-        print(f'Average # of found eq per run: {sum(num_found_eq) / max_iter_number:.2f}')
-        print(f"Runs where eq was not found: {num_found_eq.count(0)}")
-        print(f"Num of population error occurrence: {population_error}")
+    end_gl = time.time()
+    print(f"Overall time: {end_gl - start_gl:.2f}, s.")
+    plt.title("SymNet")
+    plt.plot(magnitudes, draw_not_found, linewidth=2, markersize=9, marker='o')
+    plt.ylabel("No. runs with not found eq.")
+    plt.xlabel("Magnitude value")
+    plt.grid()
+    plt.show()
+
+    plt.plot(magnitudes, draw_time, linewidth=2, markersize=9, marker='o')
+    plt.title("SymNet")
+    plt.ylabel("Time, s.")
+    plt.xlabel("Magnitude value")
+    plt.grid()
+    plt.show()
+
+    plt.plot(magnitudes, draw_avgmae, linewidth=2, markersize=9, marker='o')
+    plt.title("SymNet")
+    plt.ylabel("Average MAE")
+    plt.xlabel("Magnitude value")
+    plt.grid()
+    plt.show()

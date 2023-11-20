@@ -5,7 +5,7 @@ import epde.interface.interface as epde_alg
 from epde.evaluators import CustomEvaluator
 from epde.interface.prepared_tokens import CustomTokens
 from kdv_init_distrib import coefficients1, coefficients2
-
+import matplotlib.pyplot as plt
 import traceback
 import logging
 import os
@@ -100,8 +100,8 @@ if __name__ == '__main__':
     dx = pd.read_csv(os.path.join(Path().absolute().parent, "data_kdv", "d_x_100.csv"), header=None)
     dt = pd.read_csv(os.path.join(Path().absolute().parent, "data_kdv", "d_t_100.csv"), header=None)
 
-    u = df.values
-    u = np.transpose(u)
+    u_init = df.values
+    u_init = np.transpose(u_init)
 
     ddd_x = dddx.values
     ddd_x = np.transpose(ddd_x)
@@ -112,105 +112,134 @@ if __name__ == '__main__':
     d_t = dt.values
     d_t = np.transpose(d_t)
 
-    derivs = np.zeros(shape=(u.shape[0],u.shape[1],4))
+    derivs = np.zeros(shape=(u_init.shape[0],u_init.shape[1],4))
     derivs[:, :, 0] = d_t
     derivs[:, :, 1] = d_x
     derivs[:, :, 2] = dd_x
     derivs[:, :, 3] = ddd_x
 
-    t = np.linspace(0, 1, u.shape[0])
-    x = np.linspace(0, 1, u.shape[1])
+    t = np.linspace(0, 1, u_init.shape[0])
+    x = np.linspace(0, 1, u_init.shape[1])
 
     boundary = 0
-    dimensionality = u.ndim
+    dimensionality = u_init.ndim
     grids = np.meshgrid(t, x, indexing='ij')
 
     ''' Parameters of the experiment '''
     write_csv = True
     print_results = True
     max_iter_number = 50
+
+    draw_not_found = []
+    draw_time = []
+    draw_avgmae = []
+    start_gl = time.time()
     magnitudes = [1. * 1e-2, 5. * 1e-2, 1. * 1e-1, 2. * 1e-1, 5 * 1e-1]
-    magnitude = magnitudes[0]
-    title = f'dfs{magnitude}'
+    for magnitude in magnitudes:
+        title = f'dfs{magnitude}'
 
-    u = u + np.random.normal(scale=magnitude * np.abs(u), size=u.shape)
-    time_ls = []
-    differences_ls = []
-    differences_ls_none = []
-    num_found_eq = []
-    mean_diff_ls = []
-    i = 0
-    population_error = 0
-    while i < max_iter_number:
-        epde_search_obj = epde_alg.EpdeSearch(use_solver=False, boundary=boundary,
-                                               dimensionality=dimensionality, coordinate_tensors=grids)
+        time_ls = []
+        differences_ls = []
+        differences_ls_none = []
+        num_found_eq = []
+        mean_diff_ls = []
+        i = 0
+        population_error = 0
+        while i < max_iter_number:
+            u = u_init + np.random.normal(scale=magnitude * np.abs(u_init), size=u_init.shape)
+            epde_search_obj = epde_alg.EpdeSearch(use_solver=False, boundary=boundary,
+                                                   dimensionality=dimensionality, coordinate_tensors=grids)
 
-        custom_trigonometric_eval_fun = {
-            'cos(t)sin(x)': lambda *grids, **kwargs: (np.cos(grids[0]) * np.sin(grids[1])) ** kwargs['power']}
-        custom_trig_evaluator = CustomEvaluator(custom_trigonometric_eval_fun,
-                                                eval_fun_params_labels=['power'])
-        trig_params_ranges = {'power': (1, 1)}
-        # something = custom_trigonometric_eval_fun.get('cos(t)sin(x)')(*grids,
-        #                                                               **{'power': trig_params_ranges.get('power')[0]})
-        trig_params_equal_ranges = {}
+            custom_trigonometric_eval_fun = {
+                'cos(t)sin(x)': lambda *grids, **kwargs: (np.cos(grids[0]) * np.sin(grids[1])) ** kwargs['power']}
+            custom_trig_evaluator = CustomEvaluator(custom_trigonometric_eval_fun,
+                                                    eval_fun_params_labels=['power'])
+            trig_params_ranges = {'power': (1, 1)}
+            trig_params_equal_ranges = {}
 
-        custom_trig_tokens = CustomTokens(token_type='trigonometric',
-                                          token_labels=['cos(t)sin(x)'],
-                                          evaluator=custom_trig_evaluator,
-                                          params_ranges=trig_params_ranges,
-                                          params_equality_ranges=trig_params_equal_ranges,
-                                          meaningful=True, unique_token_type=False)
+            custom_trig_tokens = CustomTokens(token_type='trigonometric',
+                                              token_labels=['cos(t)sin(x)'],
+                                              evaluator=custom_trig_evaluator,
+                                              params_ranges=trig_params_ranges,
+                                              params_equality_ranges=trig_params_equal_ranges,
+                                              meaningful=True, unique_token_type=False)
 
-        epde_search_obj.set_moeadd_params(population_size=8, training_epochs=90)
-        start = time.time()
-        try:
-            epde_search_obj.fit(data=u, max_deriv_order=(1, 3),
-                                equation_terms_max_number=4, equation_factors_max_number=2,
-                                eq_sparsity_interval=(1e-08, 1e-06), derivs=[derivs],
-                                additional_tokens=[custom_trig_tokens, ])
-        except Exception as e:
-            logging.error(traceback.format_exc())
-            population_error += 1
-            continue
-        end = time.time()
-        epde_search_obj.equation_search_results(only_print=True, num=2)
-        time1 = end-start
+            epde_search_obj.set_moeadd_params(population_size=8, training_epochs=90)
+            start = time.time()
+            try:
+                epde_search_obj.fit(data=u, max_deriv_order=(1, 3),
+                                    equation_terms_max_number=4, equation_factors_max_number=2,
+                                    eq_sparsity_interval=(1e-08, 1e-06), derivs=[derivs],
+                                    additional_tokens=[custom_trig_tokens, ])
+            except Exception as e:
+                logging.error(traceback.format_exc())
+                population_error += 1
+                continue
+            end = time.time()
+            epde_search_obj.equation_search_results(only_print=True, num=2)
+            time1 = end-start
 
-        res = epde_search_obj.equation_search_results(only_print=False, num=2)
+            res = epde_search_obj.equation_search_results(only_print=False, num=2)
+            difference_ls = find_coeff_diff(res)
 
-        difference_ls = find_coeff_diff(res)
-        if len(difference_ls) != 0:
-            differences_ls.append(min(difference_ls))
-            differences_ls_none.append(min(difference_ls))
-            mean_diff_ls += difference_ls
+            if len(difference_ls) != 0:
+                differences_ls.append(min(difference_ls))
+                differences_ls_none.append(min(difference_ls))
+                mean_diff_ls += difference_ls
+            else:
+                differences_ls_none.append(None)
+
+            num_found_eq.append(len(difference_ls))
+            print('Overall time is:', time1)
+            print(f'Iteration processed: {i+1}/{max_iter_number}\n')
+            time_ls.append(time1)
+            i += 1
+
+        if write_csv:
+            arr = np.array([differences_ls_none, time_ls, num_found_eq])
+            arr = arr.T
+            df = pd.DataFrame(data=arr, columns=['MAE', 'time', 'number_found_eq'])
+            df.to_csv(os.path.join(Path().absolute().parent, "data_kdv", f"{title}.csv"))
+
+        if print_results:
+            print()
+            print(f'\nAverage time, s: {sum(time_ls) / len(time_ls):.2f}')
+            if len(mean_diff_ls) != 0:
+                print(f'Average MAE per eq: {sum(mean_diff_ls) / len(mean_diff_ls):.6f}')
+                print(
+                    f'Average minimum MAE per run: {sum(differences_ls) / (max_iter_number - num_found_eq.count(0)):.6f}')
+            else:
+                print("Equation was not found in any run")
+            print(f'Average # of found eq per run: {sum(num_found_eq) / max_iter_number:.2f}')
+            print(f"Runs where eq was not found: {num_found_eq.count(0)}")
+            print(f"Num of population error occurrence: {population_error}")
+
+        if len(mean_diff_ls) != 0:
+            draw_avgmae.append(sum(differences_ls) / (max_iter_number - num_found_eq.count(0)))
         else:
-            differences_ls_none.append(None)
+            draw_avgmae.append(0.08)
+        draw_not_found.append(num_found_eq.count(0))
+        draw_time.append(sum(time_ls) / len(time_ls))
 
-        num_found_eq.append(len(difference_ls))
+    end_gl = time.time()
+    print(f"Overall time: {(end_gl - start_gl) / 60:.2f}, min.")
+    plt.title("SymNet")
+    plt.plot(magnitudes, draw_not_found, linewidth=2, markersize=9, marker='o')
+    plt.ylabel("No. runs with not found eq.")
+    plt.xlabel("Magnitude value")
+    plt.grid()
+    plt.show()
 
-        print('Overall time is:', time1)
-        print(f'Iteration processed: {i+1}/{max_iter_number}\n')
-        time_ls.append(time1)
-        i += 1
+    plt.plot(magnitudes, draw_time, linewidth=2, markersize=9, marker='o')
+    plt.title("SymNet")
+    plt.ylabel("Time, s.")
+    plt.xlabel("Magnitude value")
+    plt.grid()
+    plt.show()
 
-    if write_csv:
-        arr = np.array([differences_ls_none, time_ls, num_found_eq])
-        arr = arr.T
-        df = pd.DataFrame(data=arr, columns=['MAE', 'time', 'number_found_eq'])
-        df.to_csv(os.path.join(Path().absolute().parent, "data_kdv", f"{title}.csv"))
-
-    if print_results:
-        print('\nTime for every run:')
-        for item in time_ls:
-            print(item)
-        # print('\nMAE and # of found equations in every run:')
-        # for item1, item2 in zip(differences_ls, num_found_eq):
-        #     print("diff:", item1, "num eq:", item2)
-
-        print()
-        print(f'\nAverage time, s: {sum(time_ls) / len(time_ls):.2f}')
-        print(f'Average MAE per eq: {sum(mean_diff_ls) / len(mean_diff_ls):.6f}')
-        print(f'Average minimum MAE per run: {sum(differences_ls) / max_iter_number:.6f}')
-        print(f'Average # of found eq per run: {sum(num_found_eq) / max_iter_number:.2f}')
-        print(f"Runs where eq was not found: {num_found_eq.count(0)}")
-        print(f"Num of population error occurrence: {population_error}")
+    plt.plot(magnitudes, draw_avgmae, linewidth=2, markersize=9, marker='o')
+    plt.title("SymNet")
+    plt.ylabel("Average MAE")
+    plt.xlabel("Magnitude value")
+    plt.grid()
+    plt.show()
