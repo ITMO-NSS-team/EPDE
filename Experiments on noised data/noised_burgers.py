@@ -86,6 +86,9 @@ if __name__ == '__main__':
     path = "data_burg"
     path_full = os.path.join(Path().absolute().parent, path, "burgers_sln_100.csv")
     df = pd.read_csv(path_full, header=None)
+    u_init= df.values
+    u_init = np.transpose(u_init)
+    dimensionality = u_init.ndim
 
     x = np.linspace(-1000, 0, 101)
     t = np.linspace(0, 1, 101)
@@ -111,12 +114,6 @@ if __name__ == '__main__':
     draw_avgmae = []
     for magnitude in magnitudes:
         title = f'dfs{magnitude}'
-        df = pd.read_csv(path_full, header=None)
-        u = df.values
-        u = np.transpose(u)
-        u = u + np.random.normal(scale=magnitude * np.abs(u), size=u.shape)
-        dimensionality = u.ndim
-
         time_ls = []
         differences_ls = []
         mean_diff_ls = []
@@ -125,7 +122,7 @@ if __name__ == '__main__':
         i = 0
         population_error = 0
         while i < max_iter_number:
-
+            u = u_init + np.random.normal(scale=magnitude * np.abs(u_init), size=u_init.shape)
             epde_search_obj = epde_alg.EpdeSearch(use_solver=False, boundary=boundary,
                                                   dimensionality=dimensionality, coordinate_tensors=grids,)
             # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN', preprocessor_kwargs={'epochs_max': 800})
