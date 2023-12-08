@@ -96,10 +96,10 @@ if __name__ == '__main__':
     grids = np.meshgrid(t, x, indexing='ij')
 
     ''' Parameters of the experiment '''
-    write_csv = True
-    print_results = True
-    max_iter_number = 50
-    title = 'dfs'
+    write_csv = False
+    print_results = False
+    max_iter_number = 1
+    title = 'dfs0'
     ''''''
 
     terms = [('u',), ('du/dx1',), ('d^2u/dx1^2',), ('du/dx2',), ('d^2u/dx2^2',)]

@@ -99,7 +99,7 @@ if __name__ == '__main__':
     write_csv = True
     print_results = True
     max_iter_number = 50
-    title = 'dfs_sindy'
+    title = 'dfs0'
 
     terms = [('u',), ('du/dx1',), ('du/dx2',), ('d^2u/dx2^2',), ('u', 'du/dx1'), ('u', 'du/dx2'), ('u', 'd^2u/dx2^2'),
              ('du/dx1', 'du/dx2'), ('du/dx1', 'd^2u/dx2^2'), ('du/dx2', 'd^2u/dx2^2')]
@@ -152,7 +152,7 @@ if __name__ == '__main__':
         arr = np.array([differences_ls_none, time_ls, num_found_eq])
         arr = arr.T
         df = pd.DataFrame(data=arr, columns=['MAE', 'time', 'number_found_eq'])
-        df.to_csv(os.path.join(Path().absolute().parent, "data_burg", f"{title}.csv"))
+        df.to_csv(os.path.join(Path().absolute().parent, "data_burg_sindy", f"{title}.csv"))
 
     if print_results:
         print('\nTime for every run, s:')

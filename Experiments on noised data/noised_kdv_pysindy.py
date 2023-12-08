@@ -37,9 +37,9 @@ write_csv = False
 draw_time = []
 draw_mae = []
 draw_not_found = []
-magnitudes = [0., 2.26 * 1e-4, ]
+magnitudes = [0., 1. * 1e-5, 3.5 * 1e-5, 5.5 * 1e-5, 8. * 1e-5, 2.26 * 1e-4]
 for magnitude in magnitudes:
-    title = f"kdv{magnitude}"
+    title = f"dfp{magnitude}"
     time_ls = []
     mae_ls = []
     found_ls = []
@@ -80,7 +80,7 @@ for magnitude in magnitudes:
         arr = np.array([mae_ls, time_ls, found_ls])
         arr = arr.T
         df = pd.DataFrame(data=arr, columns=["MAE", 'time', "found"])
-        df.to_csv(os.path.join(Path().absolute().parent, "data_pysindy_kdv", f"{title}.csv"))
+        df.to_csv(os.path.join(Path().absolute().parent, "data_kdv_sindy", f"{title}.csv"))
     if print_results:
         print(f"Average time, s: {sum(time_ls) / iter_number:.2f}")
         print(f"Average min MAE: {df.MAE.mean():.2f}")

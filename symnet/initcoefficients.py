@@ -13,8 +13,6 @@ import matplotlib.pyplot as plt
 def clean_names(left_name, names: list):
     new_names = names.copy()
     idx = None
-    # if len(left_name) == 1:
-    #     lname = left_name[0]
     if left_name in new_names:
         idx = new_names.index(left_name)
         new_names.remove(left_name)
@@ -54,19 +52,33 @@ def select_model(input_names, left_pool, u, derivs, shape, sparsity, additional_
     return models[idx], left_pool[idx]
 
 
+def save_fig(csym, add_left=True):
+    distr = np.fabs(csym.copy())
+    if add_left:
+        distr = np.append(distr, (distr[0] + distr[1]) / 2)
+    distr.sort()
+    distr = distr[::-1]
+
+    fig, ax = plt.subplots(figsize=(16, 8))
+    ax.set_ylim(0, np.max(distr) + 0.01)
+    sns.barplot(x=np.arange(len(distr)), y=distr, orient="v", ax=ax)
+    plt.grid()
+    # plt.show()
+    plt.yticks(fontsize=50)
+    plt.savefig(f'symnet_distr{len(distr)}.png', transparent=True)
+
+
 def get_csym_tsym(u, derivs, shape, input_names, pool_names, sparsity=0.001, additional_tokens=None,
                   max_deriv_order=None):
     """
     Can process only one variable! (u)
     """
-    # TODO: SymNet имеет 4 todo (+, pool_terms, preproc_input)
-
-    # TODO: если в левой части e.g. d^2u/dx2^2, то как получить в правой слагаемое d^2u/dx2^2 * u?
 
     left_pool = get_left_pool(max_deriv_order)
     model, left_side_name = select_model(input_names, left_pool, u, derivs, shape, sparsity, additional_tokens)
     tsym, csym = model.coeffs(calprec=16)
+    # save_fig(csym)
     pool_sym_ls = cast_to_symbols(pool_names)
-
     csym_pool_ls = get_csym_pool(tsym, csym, pool_sym_ls, left_side_name)
+    # save_fig(np.array(csym_pool_ls), add_left=False)
     return dict(zip(pool_sym_ls, csym_pool_ls)), pool_sym_ls

@@ -134,7 +134,7 @@ if __name__ == '__main__':
     draw_time = []
     draw_avgmae = []
     start_gl = time.time()
-    magnitudes = [1. * 1e-2, 5. * 1e-2, 1. * 1e-1, 2. * 1e-1, 5 * 1e-1]
+    magnitudes = [1. * 1e-3, 1. * 1e-2, 7. * 1e-2, 8. * 1e-2, 9. * 1e-2, 9.2 * 1e-2]
     for magnitude in magnitudes:
         title = f'dfs{magnitude}'
 

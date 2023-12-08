@@ -103,10 +103,10 @@ if __name__ == '__main__':
     grids = np.meshgrid(t, x, indexing='ij')
 
     ''' Parameters of the experiment '''
-    write_csv = True
+    write_csv = False
     print_results = True
-    max_iter_number = 50
-    title = 'dfs_sindy'
+    max_iter_number = 1
+    title = 'dfs0'
 
     time_ls = []
     differences_ls = []
@@ -154,7 +154,7 @@ if __name__ == '__main__':
         arr = np.array([differences_ls_none, time_ls, num_found_eq])
         arr = arr.T
         df = pd.DataFrame(data=arr, columns=['MAE', 'time', 'number_found_eq'])
-        df.to_csv(os.path.join(Path().absolute().parent, "data_kdv", f"{title}.csv"))
+        df.to_csv(os.path.join(Path().absolute().parent, "data_kdv_sindy", f"{title}.csv"))
 
     if print_results:
         print('\nTime for every run, s:')

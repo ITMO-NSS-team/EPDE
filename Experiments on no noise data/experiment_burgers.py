@@ -99,7 +99,7 @@ if __name__ == '__main__':
     write_csv = True
     print_results = True
     max_iter_number = 50
-    title = 'dfs'
+    title = 'dfs0'
 
     terms = [('du/dx1', ), ('du/dx2', 'u'), ('u',), ('du/dx2',), ('u', 'du/dx1'), ('du/dx1', 'du/dx2'),]
     hashed_ls = [hash_term(term) for term in terms]
