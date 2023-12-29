@@ -1,7 +1,7 @@
 import torch
-from typing import Any, Union
+from typing import Any, Union, List
 import numpy as np
-
+from scipy import linalg
 
 
 class DerivativeInt():
@@ -115,15 +115,47 @@ class Derivative_mat(DerivativeInt):
     """
     Taking numerical derivative for 'mat' method.
     """
-    def __init__(self, model):
+    def __init__(self, model, derivative_points):
         """
         Args:
             model: random matrix.
         """
         self.model = model
+        self.backward, self.farward = Derivative_mat.labels(derivative_points)
+
+        self.alpha_backward = Derivative_mat.linear_system(self.backward)
+        self.alpha_farward = Derivative_mat.linear_system(self.farward)
+
+        num_points = int(len(self.backward)-1)
+
+        self.back = [int(0-i) for i in range(1,num_points+1)]
+
+        self.farw = [int(i) for i in range(num_points)]
+
 
     @staticmethod
-    def derivative_1d(model: torch.Tensor, grid: torch.Tensor) -> torch.Tensor:
+    def labels(num_points):
+        labels_backward = [i for i in range(-num_points+1,1)]
+        labels_farward = [i for i in range(num_points)]
+        return labels_backward, labels_farward
+
+    @staticmethod
+    def linear_system(labels):
+        points_num = len(labels) # num_points=number of equations
+        labels = np.array(labels)
+        A = []
+        for i in range(points_num):
+            A.append(labels**i)
+        A = np.array(A)
+
+        b = np.zeros_like(labels)
+        b[1] = 1
+
+        alpha = linalg.solve(A, b)
+
+        return alpha
+
+    def derivative_1d(self, u_tensor: torch.Tensor, h: torch.Tensor) -> torch.Tensor:
         """
         Computes derivative in one dimension for matrix method.
         Args:
@@ -132,25 +164,38 @@ class Derivative_mat(DerivativeInt):
         Returns:
             computed derivative along one dimension.
         """
-        # print('1d>2d')
-        u = model.reshape(-1)
-        x = grid.reshape(-1)
+        shape = u_tensor.shape
+        u_tensor = u_tensor.reshape(-1)
 
-        # du_forward = (u-torch.roll(u, -1)) / (x-torch.roll(x, -1))
-        # du_backward = (torch.roll(u, 1) - u) / (torch.roll(x, 1) - x)
+        du_back = 0
+        du_farw = 0
+        i=0
+        for shift_b, shift_f in zip(self.backward, self.farward):
+            du_back += torch.roll(u_tensor, -shift_b)*self.alpha_backward[i]
+            du_farw += torch.roll(u_tensor, -shift_f)*self.alpha_farward[i]
+            i += 1
+        du = (du_back+du_farw)/(2*h)
+        du[self.back] = du_back[self.back]/h
+        du[self.farw] = du_farw[self.farw]/h
 
-        du = (torch.roll(u, 1) - torch.roll(u, -1))/\
-                                        (torch.roll(x, 1) - torch.roll(x, -1))
-        du[0] = (u[0] - u[1]) / (x[0] - x[1])
-        du[-1] = (u[-1] - u[-2]) / (x[-1] - x[-2])
 
-        du=du.reshape(model.shape)
+        du = du.reshape(shape)
 
         return du
 
-    @staticmethod
-    def derivative(u_tensor: torch.Tensor, h_tensor: torch.Tensor, axis: int,
-                   scheme_order: int = 1, boundary_order: int = 1) -> torch.Tensor:
+
+    def step_h(self, h_tensor: torch.Tensor) -> List[torch.Tensor]:
+        h = []
+
+        NN_grid = torch.vstack([h_tensor[i].reshape(-1) for i in \
+                                range(h_tensor.shape[0])]).T.float()
+        
+        for i in range(NN_grid.shape[-1]):
+            axis_points = torch.unique(NN_grid[:,i])
+            h.append(abs(axis_points[1]-axis_points[0]))
+        return h
+
+    def derivative(self, u_tensor: torch.Tensor, h, axis: int) -> torch.Tensor:
         """
         Computing derivative for 'matrix' method.
         Args:
@@ -162,107 +207,31 @@ class Derivative_mat(DerivativeInt):
         Returns:
             computed derivative.
         """
-        if (u_tensor.shape[0]==1):
-            du = Derivative_mat.derivative_1d(u_tensor,h_tensor)
+        if len(u_tensor.shape)==1 or u_tensor.shape[0]==1:
+            du = self.derivative_1d(u_tensor, h)
             return du
 
-        u_tensor = torch.transpose(u_tensor, 0, axis)
-        h_tensor = torch.transpose(h_tensor, 0, axis)
+        pos = len(u_tensor.shape) - 1
+
+        u_tensor = torch.transpose(u_tensor, pos, axis)
+
+        du_back = 0
+        du_farw = 0
+        i=0
+        for shift_b, shift_f in zip(self.backward, self.farward):
+            du_back += torch.roll(u_tensor, -shift_b)*self.alpha_backward[i]
+            du_farw += torch.roll(u_tensor, -shift_f)*self.alpha_farward[i]
+            i += 1
+        du = (du_back+du_farw)/(2*h)
         
-        
-        if scheme_order==1:
-            du_forward = (-torch.roll(u_tensor, -1) + u_tensor) / \
-                        (-torch.roll(h_tensor, -1) + h_tensor)
-        
-            du_backward = (torch.roll(u_tensor, 1) - u_tensor) / \
-                        (torch.roll(h_tensor, 1) - h_tensor)
-            du = (1 / 2) * (du_forward + du_backward)
-        
-        # dh=h_tensor[0,1]-h_tensor[0,0]
-        
-        if scheme_order==2:
-            u_shift_down_1 = torch.roll(u_tensor, 1)
-            u_shift_down_2 = torch.roll(u_tensor, 2)
-            u_shift_up_1 = torch.roll(u_tensor, -1)
-            u_shift_up_2 = torch.roll(u_tensor, -2)
-            
-            h_shift_down_1 = torch.roll(h_tensor, 1)
-            h_shift_down_2 = torch.roll(h_tensor, 2)
-            h_shift_up_1 = torch.roll(h_tensor, -1)
-            h_shift_up_2 = torch.roll(h_tensor, -2)
-            
-            h1_up=h_shift_up_1-h_tensor
-            h2_up=h_shift_up_2-h_shift_up_1
-            
-            h1_down=h_tensor-h_shift_down_1
-            h2_down=h_shift_down_1-h_shift_down_2
-        
-            a_up=-(2*h1_up+h2_up)/(h1_up*(h1_up+h2_up))
-            b_up=(h2_up+h1_up)/(h1_up*h2_up)
-            c_up=-h1_up/(h2_up*(h1_up+h2_up))
-            
-            a_down=(2*h1_down+h2_down)/(h1_down*(h1_down+h2_down))
-            b_down=-(h2_down+h1_down)/(h1_down*h2_down)
-            c_down=h1_down/(h2_down*(h1_down+h2_down))
-            
-            du_forward=a_up*u_tensor+b_up*u_shift_up_1+c_up*u_shift_up_2
-            du_backward=a_down*u_tensor+b_down*u_shift_down_1+c_down*u_shift_down_2
-            du = (1 / 2) * (du_forward + du_backward)
-            
-            
-        if boundary_order==1:
-            if scheme_order==1:
-                du[:, 0] = du_forward[:, 0]
-                du[:, -1] = du_backward[:, -1]
-            elif scheme_order==2:
-                du_forward = (-torch.roll(u_tensor, -1) + u_tensor) / \
-                            (-torch.roll(h_tensor, -1) + h_tensor)
-            
-                du_backward = (torch.roll(u_tensor, 1) - u_tensor) / \
-                            (torch.roll(h_tensor, 1) - h_tensor)
-                du[:, 0] = du_forward[:, 0]
-                du[:, 1] = du_forward[:, 1]
-                du[:, -1] = du_backward[:, -1]
-                du[:, -2] = du_backward[:, -2]
-        elif boundary_order==2:
-            if scheme_order==2:
-                du[:, 0] = du_forward[:, 0]
-                du[:, 1] = du_forward[:, 1]
-                du[:, -1] = du_backward[:, -1]
-                du[:, -2] = du_backward[:, -2]
-            elif scheme_order==1:
-                u_shift_down_1 = torch.roll(u_tensor, 1)
-                u_shift_down_2 = torch.roll(u_tensor, 2)
-                u_shift_up_1 = torch.roll(u_tensor, -1)
-                u_shift_up_2 = torch.roll(u_tensor, -2)
-                
-                h_shift_down_1 = torch.roll(h_tensor, 1)
-                h_shift_down_2 = torch.roll(h_tensor, 2)
-                h_shift_up_1 = torch.roll(h_tensor, -1)
-                h_shift_up_2 = torch.roll(h_tensor, -2)
-                
-                h1_up=h_shift_up_1-h_tensor
-                h2_up=h_shift_up_2-h_shift_up_1
-                
-                h1_down=h_tensor-h_shift_down_1
-                h2_down=h_shift_down_1-h_shift_down_2
-            
-        
-                a_up=-(2*h1_up+h2_up)/(h1_up*(h1_up+h2_up))
-                b_up=(h2_up+h1_up)/(h1_up*h2_up)
-                c_up=-h1_up/(h2_up*(h1_up+h2_up))
-                
-                a_down=(2*h1_up+h2_up)/(h1_down*(h1_down+h2_down))
-                b_down=-(h2_down+h1_down)/(h1_down*h2_down)
-                c_down=h1_down/(h2_down*(h1_down+h2_down))
-            
-                
-                du_forward=a_up*u_tensor+b_up*u_shift_up_1+c_up*u_shift_up_2
-                du_backward=a_down*u_tensor+b_down*u_shift_down_1+c_down*u_shift_down_2
-                du[:, 0] = du_forward[:, 0]
-                du[:, -1] = du_backward[:, -1]
-                
-        du = torch.transpose(du, 0, axis)
+        if pos == 1:
+            du[:,self.back] = du_back[:,self.back]/h
+            du[:, self.farw] = du_farw[:, self.farw]/h
+        elif pos == 2:
+            du[:,:, self.back] = du_back[:,:, self.back] / h
+            du[:,:, self.farw] = du_farw[:,:, self.farw] / h
+
+        du = torch.transpose(du, pos, axis)
 
         return du
 
@@ -280,13 +249,13 @@ class Derivative_mat(DerivativeInt):
         dif_dir = list(term.keys())[1]
         der_term = torch.zeros_like(self.model) + 1
         for j, scheme in enumerate(term[dif_dir]):
-            prod=self.model
+            prod=self.model[term['var'][j]]
             if scheme!=[None]:
                 for axis in scheme:
                     if axis is None:
                         continue
-                    h = grid_points[axis]
-                    prod=self.derivative(prod, h, axis, scheme_order=1, boundary_order=1)
+                    h = self.step_h(grid_points)[axis]
+                    prod = self.derivative(prod, h, axis)
             der_term = der_term * prod ** term['pow'][j]
         if callable(term['coeff']) is True:
             der_term = term['coeff'](grid_points) * der_term
@@ -300,13 +269,14 @@ class Derivative():
    Interface for taking numerical derivative due to chosen calculation method.
 
    """
-    def __init__(self, model):
+    def __init__(self, model, derivative_points):
         """
         Args:
             model: neural network or matrix depending on the selected mode.
 
         """
         self.model = model
+        self.derivative_points = derivative_points
 
     def set_strategy(self, strategy: str) -> Union[Derivative_NN, Derivative_autograd, Derivative_mat]:
         """
@@ -323,4 +293,4 @@ class Derivative():
             return  Derivative_autograd(self.model)
 
         elif strategy == 'mat':
-            return Derivative_mat(self.model)
+            return Derivative_mat(self.model, self.derivative_points)

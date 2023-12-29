@@ -17,7 +17,6 @@ from epde.structure.factor import Factor
 
 
 def constancy_hard_equality(tensor, epsilon=1e-7):
-    # print(np.abs(np.max(tensor) - np.min(tensor)), epsilon, type(np.abs(np.max(tensor) - np.min(tensor))),  type(epsilon))
     return np.abs(np.max(tensor) - np.min(tensor)) < epsilon
 
 
@@ -36,9 +35,8 @@ class EvaluatorContained(object):
             apply the defined evaluator to evaluate the token with specific parameters
     """
 
-    def __init__(self, eval_function, eval_kwargs_keys={}):  # , deriv_eval_function = None
+    def __init__(self, eval_function, eval_kwargs_keys={}):
         self._evaluator = eval_function
-        # if deriv_eval_function is not None: self._deriv_evaluator = deriv_eval_function
         self.eval_kwargs_keys = eval_kwargs_keys
 
     def apply(self, token, structural=False, grids=None, **kwargs):
@@ -186,7 +184,6 @@ class TokenFamily(object):
         if self.evaluator_set:
             self.test_evaluator()
 
-    # , ): , **eval_params   #Test, if the evaluator works properly
     def set_evaluator(self, eval_function, eval_kwargs_keys=[], suppress_eval_test=True):
         """
         Define the evaluator for the token family and its parameters
@@ -313,7 +310,7 @@ class TokenFamily(object):
             self.tokens.remove(label)
             global_var.tensor_cache.delete_entry(label + ' power 1')
 
-    def evaluate(self, token):    # Return tensor of values of applied evaluator
+    def evaluate(self, token):
         """
         Applying evaluator in token
         """
@@ -422,7 +419,6 @@ class TokenFamily(object):
                 if self.status['requires_grid']:
                     generated_token.use_grids_cache()
                 generated_token.scaled = False
-                # _ = self._evaluator.apply(generated_token)
                 _ = generated_token.evaluate()
                 print(generated_token.cache_label)
                 if generated_token.cache_label not in global_var.tensor_cache.memory_default.keys():
@@ -435,11 +431,15 @@ class TFPool(object):
 
      Args:
         families (`list`): toen families that using in that run
-    """
+    """    
     def __init__(self, families: list, stored_pool=None):
         if stored_pool is not None:
             self = pickle.load(stored_pool)
         self.families = families
+
+    def attrs_from_dict(self, attributes, except_keys = ['obj_type']):
+        self.__dict__ = {key : item for key, item in attributes.items() 
+                         if key not in except_keys}
 
     @property
     def families_meaningful(self):
@@ -518,7 +518,6 @@ class TFPool(object):
 
                 probabilities = (self.families_cardinality(True, token_status) /
                                  np.sum(self.families_cardinality(True, token_status)))
-
                 return np.random.choice(a=self.families_meaningful,
                                         p=probabilities).create(label=None,
                                                                 token_status=token_status,

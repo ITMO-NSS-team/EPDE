@@ -18,13 +18,10 @@ from epde.optimizers.moeadd.moeadd import *
 from epde.optimizers.moeadd.supplementary import *
 from epde.optimizers.moeadd.strategy import MOEADDDirector
 from epde.optimizers.moeadd.strategy_elems import MOEADDSectorProcesser
-#from epde.optimizers.moeadd.population_constr import SystemsPopulationConstructor as MOEADDSystemPopConstr
 
 from epde.optimizers.single_criterion.optimizer import EvolutionaryStrategy, SimpleOptimizer
-# from epde.optimizers.single_criterion.population_constr import SystemsPopulationConstructor as SOSystemPopConstr
 from epde.optimizers.single_criterion.strategy import BaselineDirector
 from epde.optimizers.single_criterion.supplementary import simple_sorting
-# from epde.optimizers.moeadd.strategy_elems import SectorProcesserBuilder
 
 from epde.preprocessing.domain_pruning import DomainPruner
 from epde.operators.utils.default_parameter_loader import EvolutionaryParams
@@ -33,7 +30,7 @@ from epde.decorators import BoundaryExclusion
 
 from epde.evaluators import simple_function_evaluator, trigonometric_evaluator
 from epde.supplementary import define_derivatives
-from epde.cache.cache import upload_simple_tokens, upload_grids, prepare_var_tensor #, np_ndarray_section
+from epde.cache.cache import upload_simple_tokens, upload_grids, prepare_var_tensor
 
 from epde.preprocessing.preprocessor_setups import PreprocessorSetup
 from epde.preprocessing.preprocessor import ConcretePrepBuilder, PreprocessingPipe
@@ -671,11 +668,6 @@ class EpdeSearch(object):
         print('The optimization has been conducted.')
         self.search_conducted = True
 
-        # if self.multiobjective_mode:
-        #     self.fit_multiobjective(equation_terms_max_number, equation_factors_max_number,eq_sparsity_interval)
-        # else:
-        #     self.fit_singleobjective(equation_terms_max_number, equation_factors_max_number, eq_sparsity_interval)
-            
     def fit_multiobjective(self, equation_terms_max_number=6, equation_factors_max_number=1, eq_sparsity_interval=(1e-4, 2.5)):
         """
         Fitting functional for multiojective optimization 
@@ -688,21 +680,11 @@ class EpdeSearch(object):
         Returns:
             None
         """
-        # pop_constructor = MOEADDSystemPopConstr(pool = self.pool, terms_number = equation_terms_max_number, 
-        #                                         max_factors_in_term = equation_factors_max_number,
-        #                                         sparsity_interval = eq_sparsity_interval)
-
         self.optimizer_init_params['population_instruct'] = {"pool": self.pool, "terms_number": equation_terms_max_number,
                                                              "max_factors_in_terms": equation_factors_max_number, "sparsity_interval": eq_sparsity_interval}
 
-        # self.optimizer_init_params['pop_constructor'] = pop_constructor
         self.optimizer = MOEADDOptimizer(**self.optimizer_init_params)
         
-        # evo_operator_builder = self.director.builder
-        # evo_operator_builder.assemble(True)
-        # evo_operator = evo_operator_builder.processer
-
-        # self.optimizer.set_sector_processer(processer=evo_operator)
         self.optimizer.set_strategy(self.director)
         best_obj = np.concatenate((np.zeros(shape=len([1 for token_family in self.pool.families if token_family.status['demands_equation']])),
                                    np.ones(shape=len([1 for token_family in self.pool.families if token_family.status['demands_equation']]))))
@@ -725,21 +707,10 @@ class EpdeSearch(object):
         Returns:
             None
         """
-        # pop_constructor = SOSystemPopConstr(pool = self.pool, terms_number = equation_terms_max_number, 
-        #                                     max_factors_in_term = equation_factors_max_number,
-        #                                     sparsity_interval = eq_sparsity_interval)
-        
         self.optimizer_init_params['population_instruct'] = {"pool": self.pool, "terms_number": equation_terms_max_number,
                                                              "max_factors_in_terms": equation_factors_max_number, "sparsity_interval": eq_sparsity_interval}
-        # self.optimizer_params['pop_constructor']
-        # self.optimizer_init_params['pop_constructor'] = pop_constructor
         self.optimizer = SimpleOptimizer(**self.optimizer_init_params)        
 
-        # TODO: Somehow generalize
-        # evo_operator_builder = self.director.builder
-        # evo_operator_builder.assemble(True)
-        # evo_operator = evo_operator_builder.processer
-        # self.optimizer.set_strategy(strategy = evo_operator)
         self.optimizer.set_strategy(self.director)
 
         self.optimizer.optimize(**self.optimizer_exec_params)
@@ -825,9 +796,7 @@ class EpdeSearch(object):
         return self.optimizer.pareto_levels.get_by_complexity(complexity)
 
     def predict(self, system : SoEq, boundary_conditions : BoundaryConditions, grid : list = None, data = None,
-                system_file : str = None, solver_kwargs : dict = {'model' : None, 'use_cache' : True}, strategy = 'NN'):
-        solver_kwargs['dim'] = len(global_var.grid_cache.get_all()[1])
-        # solver_kwargs['dim']
+                system_file : str = None, solver_kwargs : dict = {'use_cache' : True}, mode = 'NN'):
         
         if system is not None:
             print('Using explicitly sent system of equations.')
@@ -843,11 +812,15 @@ class EpdeSearch(object):
             grid = global_var.grid_cache.get_all()[1]
         
         adapter = SolverAdapter(var_number = len(system.vars_to_describe))
+        adapter.set_solver_params(**solver_kwargs)        
         print(f'grid.shape is {grid[0].shape}')
-        print(f'Shape of the grid for solver {adapter.convert_grid(grid).shape}')        
+        print(f'Shape of the grid for solver {adapter.convert_grid(grid, mode = mode).shape}')        
         solution_model = adapter.solve_epde_system(system = system, grids = grid, data = data, 
-                                                   boundary_conditions = boundary_conditions, strategy = strategy)
-        return solution_model(adapter.convert_grid(grid)).detach().numpy()
+                                                   boundary_conditions = boundary_conditions, mode = mode)
+        if mode == 'mat':
+            return solution_model
+        else:
+            return solution_model(adapter.convert_grid(grid, mode = mode)).detach().numpy()
 
     def visualize_solutions(self, dimensions:list = [0, 1], **visulaizer_kwargs):
         if self.multiobjective_mode:

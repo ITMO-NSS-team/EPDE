@@ -132,10 +132,8 @@ class Points_type():
         def bnd_to_dict(grid_dict, b_coord):
             bnd_dict = {}
             for k, v in grid_dict.items():
-                # print('In the loop:', k, '&', v.shape)
                 bnd_dict[k] = []
                 for bnd in b_coord:
-                    # print('With the bnd:', bnd.shape)                    
                     if ((bnd == v).all(axis=1)).any():
                         bnd_dict[k].append(bnd)
                 if bnd_dict[k] == []:

@@ -13,6 +13,8 @@ import os
 import pickle
 from typing import Union, Callable
 from functools import singledispatchmethod, reduce
+from collections import Iterable
+
 
 import numpy as np
 import torch
@@ -63,7 +65,63 @@ class Term(ComplexStructure):
             self.use_cache()
         # key - state of normalization, value - if the variable is saved in cache
         self.reset_saved_state()
+        
+    def attrs_from_dict(self, attributes, except_keys = ['obj_type']):
+        self.__dict__ = {key : item for key, item in attributes.items()
+                         if key not in except_keys}
 
+    def to_pickle(self, except_attrs:list):
+        '''
+
+        Template method for adapting pickling of an object. Shall be copied to objects, that are 
+        to be pickable with local rules.
+
+        Parameters
+        ----------
+        except_attrs : list of strings
+            Attributes to keep from saving to the resulting dict.
+
+        Returns
+        -------
+        dict_to_pickle : dict
+            Dictionary representation of the object attributes.
+
+        '''
+        not_to_pickle = except_attrs + ['pool'] 
+        manual_pickle = ['structure']
+        dict_to_pickle = {}
+        
+        for key, elem in self.__dict__.items():
+            if key in not_to_pickle:
+                continue
+            elif key in manual_pickle:
+                if isinstance(elem, dict):
+                    dict_to_pickle[key] = {'type' : dict, 'keys' : [ekey for ekey in elem.keys()],
+                                           'elements' : [val.to_pickle() for val in elem.values()]}
+                elif isinstance(elem, Iterable):
+                    dict_to_pickle[key] = {'type' : type(elem), 'elements' : [list_elem.to_pickle() for list_elem in elem]}
+                else:
+                    dict_to_pickle[key] = {'type' : type(elem), 'elements' : elem.to_pickle()}
+            else:
+                dict_to_pickle[key] = elem
+        
+        for slot in self.__slots__():
+            elem = getattr(self, slot)
+            if slot in not_to_pickle:
+                continue
+            elif key in manual_pickle:
+                if isinstance(elem, dict):
+                    dict_to_pickle[slot] = {'type' : dict, 'keys' : [key for key in elem.keys()],
+                                           'elements' : [val.to_pickle() for val in elem.values()]}
+                elif isinstance(elem, Iterable):
+                    dict_to_pickle[slot] = {'type' : type(elem), 'elements' : [list_elem.to_pickle() for list_elem in elem]}
+                else:
+                    dict_to_pickle[slot] = {'type' : type(elem), 'elements' : elem.to_pickle()}
+            else:
+                dict_to_pickle[key] = elem
+        
+        return dict_to_pickle
+    
     @property
     def cache_label(self):
         if len(self.structure) > 1:
@@ -147,9 +205,8 @@ class Term(ComplexStructure):
         self.occupied_tokens_labels = copy.copy(forbidden_factors)
 
         self.descr_variable_marker = mandatory_family if mandatory_family is not None else False
-        # print(f'self.descr_variable_marker is set as {self.descr_variable_marker}')
 
-        if not mandatory_family:
+        if not mandatory_family:      
             occupied_by_factor, factor = self.pool.create(label=None, create_meaningful=True,
                                                           token_status=self.occupied_tokens_labels,
                                                           create_derivs=create_derivs, **kwargs)
@@ -396,14 +453,72 @@ class Equation(ComplexStructure):
                 mf = var_to_explain if force_var_to_explain else None
                 new_term = Term(self.pool, max_factors_in_term=self.metaparameters['max_factors_in_term']['value'],
                                 mandatory_family=mf, passed_term=None)
+
                 if check_uniqueness(new_term, self.structure):
                     force_var_to_explain = False
                     break
+            
             self.structure.append(new_term)
 
         for idx, _ in enumerate(self.structure):
             self.structure[idx].use_cache()
 
+    def attrs_from_dict(self, attributes, except_keys = ['obj_type']):
+        self.__dict__ = {key : item for key, item in attributes.items()
+                         if key not in except_keys}
+
+    def to_pickle(self, except_attrs:list):
+        '''
+
+        Template method for adapting pickling of an object. Shall be copied to objects, that are 
+        to be pickable with local rules.
+
+        Parameters
+        ----------
+        except_attrs : list of strings
+            Attributes to keep from saving to the resulting dict.
+
+        Returns
+        -------
+        dict_to_pickle : dict
+            Dictionary representation of the object attributes.
+
+        '''
+        not_to_pickle = except_attrs + ['pool'] 
+        manual_pickle = ['structure']
+        dict_to_pickle = {}
+        
+        for key, elem in self.__dict__.items():
+            if key in not_to_pickle:
+                continue
+            elif key in manual_pickle:
+                if isinstance(elem, dict):
+                    dict_to_pickle[key] = {'type' : dict, 'keys' : [ekey for ekey in elem.keys()],
+                                           'elements' : [val.to_pickle() for val in elem.values()]}
+                elif isinstance(elem, Iterable):
+                    dict_to_pickle[key] = {'type' : type(elem), 'elements' : [list_elem.to_pickle() for list_elem in elem]}
+                else:
+                    dict_to_pickle[key] = {'type' : type(elem), 'elements' : elem.to_pickle()}
+            else:
+                dict_to_pickle[key] = elem
+        
+        for slot in self.__slots__():
+            elem = getattr(self, slot)
+            if slot in not_to_pickle:
+                continue
+            elif key in manual_pickle:
+                if isinstance(elem, dict):
+                    dict_to_pickle[slot] = {'type' : dict, 'keys' : [key for key in elem.keys()],
+                                           'elements' : [val.to_pickle() for val in elem.values()]}
+                elif isinstance(elem, Iterable):
+                    dict_to_pickle[slot] = {'type' : type(elem), 'elements' : [list_elem.to_pickle() for list_elem in elem]}
+                else:
+                    dict_to_pickle[slot] = {'type' : type(elem), 'elements' : elem.to_pickle()}
+            else:
+                dict_to_pickle[key] = elem
+        
+        return dict_to_pickle
+    
     def reset_explaining_term(self, term_idx=0):
         for idx, term in enumerate(self.structure):
             if idx == term_idx:
@@ -485,7 +600,6 @@ class Equation(ComplexStructure):
         self._target = self.structure[self.target_idx].evaluate(normalize, grids=grids)
         
         # Place for improvent: introduce shifted_idx where necessary
-        
         def shifted_idx(idx):
             if idx < self.target_idx:
                 return idx  
@@ -504,11 +618,10 @@ class Equation(ComplexStructure):
             for feat_idx in range(len(feature_indexes)):
                 if feat_idx == 0:
                     self._features = self.structure[feature_indexes[feat_idx]].evaluate(normalize, grids=grids)
-                else: #if feat_idx != 0:
+                else:
                     temp = self.structure[feature_indexes[feat_idx]].evaluate(normalize, grids=grids)
                     self._features = np.vstack([self._features, temp])
-                # else:
-                    # continue
+
             if self._features.ndim == 1:
                 self._features = np.expand_dims(self._features, 1).T
             temp_feats = np.vstack([self._features, np.ones(self._features.shape[1])])
@@ -545,10 +658,8 @@ class Equation(ComplexStructure):
         self.fitness_calculated = False
         self.solver_form_defined = False
 
-    # @ResetEquationStatus(reset_input = False, reset_output = True)
     @HistoryExtender('\n -> was copied by deepcopy(self)', 'n')
     def __deepcopy__(self, memo=None):
-        # print(f'Deepcopying equation {self}')
         clss = self.__class__
         new_struct = clss.__new__(clss)
         memo[id(self)] = new_struct
@@ -584,6 +695,7 @@ class Equation(ComplexStructure):
             pass
 
     def add_history(self, add):
+        # print(add)
         self._history += add
 
     @property
@@ -649,12 +761,12 @@ class Equation(ComplexStructure):
     @property
     def latex_form(self):
         form = self.structure[self.target_idx].latex_form + r' = '
+        digits_rounding_max = 3
         for idx, term in enumerate(self.structure):
             idx_corrected = idx if idx <= self.target_idx else idx - 1
             if idx == self.target_idx or self.weights_final[idx_corrected] == 0:
                 continue
-            
-            digits_rounding_max = 3
+
             mnt, exp = exp_form(self.weights_final[idx_corrected], digits_rounding_max)
             exp_str = r'\cdot 10^{{{0}}} '.format(str(exp)) if exp != 0 else ''
             form += str(mnt) + exp_str + term.latex_form + r' + '
@@ -770,10 +882,6 @@ def solver_formed_grid(training_grid=None):
 def check_metaparameters(metaparameters: dict):
     metaparam_labels = ['terms_number', 'max_factors_in_term', 'sparsity']
     return True
-    # TODO: maybe fix this check, non-urgent
-    # if any([((label not in metaparameters.keys()) and ) for label in metaparam_labels]):
-    #     print('required metaparameters:', metaparam_labels, 'metaparameters:', metaparameters)
-    #     raise ValueError('Only partial metaparameter vector has been passed.')
 
 
 class SoEq(moeadd.MOEADDSolution):
@@ -800,13 +908,68 @@ class SoEq(moeadd.MOEADDSolution):
         self.tokens_supp = TFPool(pool.families_equationless)
         self.moeadd_set = False
 
-        self.vars_to_describe = [token_family.ftype for token_family in self.tokens_for_eq.families] # Made list from set
+        self.vars_to_describe = [token_family.ftype for token_family in self.tokens_for_eq.families]
+
+    def attrs_from_dict(self, attributes, except_keys = ['obj_type']):
+        self.__dict__ = {key : item for key, item in attributes.items()
+                         if key not in except_keys}
+
+    def to_pickle(self, except_attrs:list):
+        '''
+
+        Template method for adapting pickling of an object. Shall be copied to objects, that are 
+        to be pickable with local rules.
+
+        Parameters
+        ----------
+        except_attrs : list of strings
+            Attributes to keep from saving to the resulting dict.
+
+        Returns
+        -------
+        dict_to_pickle : dict
+            Dictionary representation of the object attributes.
+
+        '''
+        not_to_pickle = except_attrs + ['tokens_for_eq', 'tokens_supp'] 
+        manual_pickle = ['vals']
+        dict_to_pickle = {}
+        
+        for key, elem in self.__dict__.items():
+            if key in not_to_pickle:
+                continue
+            elif key in manual_pickle:
+                if isinstance(elem, dict):
+                    dict_to_pickle[key] = {'type' : dict, 'keys' : [ekey for ekey in elem.keys()],
+                                           'elements' : [val.to_pickle() for val in elem.values()]}
+                elif isinstance(elem, Iterable):
+                    dict_to_pickle[key] = {'type' : type(elem), 'elements' : [list_elem.to_pickle() for list_elem in elem]}
+                else:
+                    dict_to_pickle[key] = {'type' : type(elem), 'elements' : elem.to_pickle()}
+            else:
+                dict_to_pickle[key] = elem
+        
+        for slot in self.__slots__():
+            elem = getattr(self, slot)
+            if slot in not_to_pickle:
+                continue
+            elif key in manual_pickle:
+                if isinstance(elem, dict):
+                    dict_to_pickle[slot] = {'type' : dict, 'keys' : [key for key in elem.keys()],
+                                           'elements' : [val.to_pickle() for val in elem.values()]}
+                elif isinstance(elem, Iterable):
+                    dict_to_pickle[slot] = {'type' : type(elem), 'elements' : [list_elem.to_pickle() for list_elem in elem]}
+                else:
+                    dict_to_pickle[slot] = {'type' : type(elem), 'elements' : elem.to_pickle()}
+            else:
+                dict_to_pickle[key] = elem
+        
+        return dict_to_pickle
 
     def use_default_multiobjective_function(self):
         from epde.eq_mo_objectives import generate_partial, equation_fitness, equation_complexity_by_factors
         complexity_objectives = [generate_partial(equation_complexity_by_factors, eq_key)
-                                 for eq_key in self.vars_to_describe]  # range(len(self.tokens_for_eq))]
-        # range(len(self.tokens_for_eq))]
+                                 for eq_key in self.vars_to_describe]
         quality_objectives = [generate_partial(
             equation_fitness, eq_key) for eq_key in self.vars_to_describe]
         self.set_objective_functions(
@@ -961,12 +1124,12 @@ class SoEq(moeadd.MOEADDSolution):
     def fitness_calculated(self):
         return all([equation.fitness_calculated for equation in self.vals])
 
-    def save(self, file_name='epde_systems.pickle'):
-        directory = os.getcwd()
-        with open(file_name, 'wb') as file:
-            to_save = ([equation.text_form for equation in self.vals],
-                       self.tokens_for_eq + self.tokens_supp)
-            pickle.dump(obj=to_save, file=file)
+    # def save(self, file_name='epde_systems.pickle'):
+    #     directory = os.getcwd()
+    #     with open(file_name, 'wb') as file:
+    #         to_save = ([equation.text_form for equation in self.vals],
+    #                    self.tokens_for_eq + self.tokens_supp)
+    #         pickle.dump(obj=to_save, file=file)
 
 
 class SoEqIterator(object):

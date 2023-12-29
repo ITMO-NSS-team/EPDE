@@ -40,7 +40,7 @@ from functools import partial
 from typing import Union, Callable
 
 from copy import deepcopy
-from collections import OrderedDict
+from collections import OrderedDict, Iterable
 
 
 def upload_simple_tokens(labels, cache, tensors, grid_setting=False):
@@ -149,6 +149,63 @@ class Cache(object):
         self.mem_prop_set = False 
         self.base_tensors = []  # storage of non-normalized tensors, that will not be affected by change of variables
         self.structural_and_base_merged = dict()
+
+    def attrs_from_dict(self, attributes, except_keys = ['obj_type']):
+        self.__dict__ = {key : item for key, item in attributes.items()
+                         if key not in except_keys}
+
+    def to_pickle(self, except_attrs:list):
+        '''
+
+        Template method for adapting pickling of an object. Shall be copied to objects, that are 
+        to be pickable with local rules.
+
+        Parameters
+        ----------
+        except_attrs : list of strings
+            Attributes to keep from saving to the resulting dict.
+
+        Returns
+        -------
+        dict_to_pickle : dict
+            Dictionary representation of the object attributes.
+
+        '''
+        not_to_pickle = except_attrs
+        manual_pickle = []
+        dict_to_pickle = {}
+        
+        for key, elem in self.__dict__.items():
+            if key in not_to_pickle:
+                continue
+            elif key in manual_pickle:
+                if isinstance(elem, dict):
+                    dict_to_pickle[key] = {'type' : dict, 'keys' : [ekey for ekey in elem.keys()],
+                                           'elements' : [val.to_pickle() for val in elem.values()]}
+                elif isinstance(elem, Iterable):
+                    dict_to_pickle[key] = {'type' : type(elem), 'elements' : [list_elem.to_pickle() for list_elem in elem]}
+                else:
+                    dict_to_pickle[key] = {'type' : type(elem), 'elements' : elem.to_pickle()}
+            else:
+                dict_to_pickle[key] = elem
+        
+        for slot in self.__slots__():
+            elem = getattr(self, slot)
+            if slot in not_to_pickle:
+                continue
+            elif key in manual_pickle:
+                if isinstance(elem, dict):
+                    dict_to_pickle[slot] = {'type' : dict, 'keys' : [key for key in elem.keys()],
+                                           'elements' : [val.to_pickle() for val in elem.values()]}
+                elif isinstance(elem, Iterable):
+                    dict_to_pickle[slot] = {'type' : type(elem), 'elements' : [list_elem.to_pickle() for list_elem in elem]}
+                else:
+                    dict_to_pickle[slot] = {'type' : type(elem), 'elements' : elem.to_pickle()}
+            else:
+                dict_to_pickle[key] = elem
+        
+        return dict_to_pickle
+
 
     def use_structural(self, use_base_data=True, label=None, replacing_data=None):
         # print(f'Setting structural data for {label}, for it: {use_base_data} - use_base_data')

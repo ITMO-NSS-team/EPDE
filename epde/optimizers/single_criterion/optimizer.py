@@ -69,13 +69,17 @@ class Population(object):
         self.population = elements
         self.length = len(elements)
         self._sorting_method = sorting_method
-        
+    
+    def attrs_from_dict(self, attributes, except_keys = ['obj_type']):
+        self.__dict__ = {key : item for key, item in attributes.items()
+                         if key not in except_keys}
+    
     def sort(self):
         '''
         Method, that returns sorted population of the candidates. 
         Does not change anything inside the population.
         '''
-        return self._sorting_method(self.population) # TODO: finish that piece of code.
+        return self._sorting_method(self.population)
     
     def sorted(self):
         '''

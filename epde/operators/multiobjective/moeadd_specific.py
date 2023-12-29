@@ -363,13 +363,17 @@ class OffspringUpdater(CompoundOperator):
                                                                     arguments = subop_args['pareto_level_updater'])
                     break
                 elif attempt >= attempt_limit:
-                    print(temp_offspring.text_form)
-                    print('-----------------------')
-                    for idx, individual in enumerate(objective.population):
-                        print(f'Individual {idx}')
-                        print(individual.text_form)
-                        print('-----------------------')
-                    raise Exception('Can not place individual into the population. Try decreasing population size or increasing token variety. ')
+                    # print(temp_offspring.text_form)
+                    # print('-----------------------')
+                    # for idx, individual in enumerate(objective.population):
+                    #     print(f'Individual {idx}')
+                    #     print(individual.text_form)
+                    #     print('-----------------------')
+                    # raise Exception('Can not place individual into the population. Try decreasing population size or increasing token variety. ')
+                    print('The algorithm had issues with generating unique offsprings, allowed replication.')
+                    self.suboperators['pareto_level_updater'].apply(objective = (temp_offspring, objective),
+                                                                    arguments = subop_args['pareto_level_updater'])
+
                     break
                 attempt += 1
         return objective
@@ -414,14 +418,15 @@ class InitialParetoLevelSorting(CompoundOperator):
         
         if len(objective.population) == 0:
             for idx, candidate in enumerate(objective.unplaced_candidates):
-                while True:
-                    temp_candidate = copy.deepcopy(candidate)
-                    self.suboperators['right_part_selector'].apply(objective = temp_candidate,
-                                                                   arguments = subop_args['right_part_selector'])                
-                    if all([temp_candidate != solution for solution in objective.unplaced_candidates[:idx] + 
-                            objective.unplaced_candidates[idx+1:]]):
-                        objective.unplaced_candidates[idx] = temp_candidate
-                        break
+                # while True:
+                    # temp_candidate = copy.deepcopy(candidate)
+                self.suboperators['right_part_selector'].apply(objective = candidate,
+                                                                arguments = subop_args['right_part_selector'])                
+                    # print('Hah, got ya!')
+                    # if all([temp_candidate != solution for solution in objective.unplaced_candidates[:idx] + 
+                    #         objective.unplaced_candidates[idx+1:]]):
+                    #     objective.unplaced_candidates[idx] = temp_candidate
+                    #     break
                         
                 self.suboperators['chromosome_fitness'].apply(objective = objective.unplaced_candidates[idx],
                                                               arguments = subop_args['chromosome_fitness'])

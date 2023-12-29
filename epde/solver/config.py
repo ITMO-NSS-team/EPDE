@@ -1,4 +1,3 @@
-from email.policy import default
 from typing import Union, Optional
 import json
 

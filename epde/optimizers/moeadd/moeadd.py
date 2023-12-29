@@ -6,8 +6,13 @@ Main classes and functions of the moeadd optimizer.
 
 import numpy as np
 import warnings
+from itertools import chain
 
 from typing import Union
+
+def flatten_chain(matrix):
+    return list(chain.from_iterable(matrix))
+
 # from copy import deepcopy
 # from functools import reduce
 
@@ -58,13 +63,17 @@ class ParetoLevels(object):
                 The method of point addition into the population and onto the non-dominated levels.
         """
         self._sorting_method = sorting_method
-        self.population = [] #population
+        self.population = []
         self._update_method = update_method
-        self.unplaced_candidates = population # tabulation deleted
-        
+        self.unplaced_candidates = population
+    
+    def attrs_from_dict(self, attributes, except_keys = ['obj_type']):
+        self.__dict__ = {key : item for key, item in attributes.items()
+                         if key not in except_keys}
+    
     @property
     def levels(self):
-        return self._levels     #sort(self.population)
+        return self._levels
     
     @levels.setter
     def levels(self, value : list):
@@ -82,10 +91,10 @@ class ParetoLevels(object):
         """
         while self._unplaced_candidates:
             self.population.append(self._unplaced_candidates.pop())
-        if any([any([candidate == other_candidate for other_candidate in self.population[:idx] + self.population[idx+1:]])
-                for idx, candidate in enumerate(self.population)]):
-            print([candidate.text_form for candidate in self.population])
-            raise Exception('Duplicating initial candidates')
+        # if any([any([candidate == other_candidate for other_candidate in self.population[:idx] + self.population[idx+1:]])
+                # for idx, candidate in enumerate(self.population)]):
+            # print([candidate.text_form for candidate in self.population])
+            # raise Exception('Duplicating initial candidates')
         self.levels = self.sort()
 
     def sort(self):
@@ -154,7 +163,8 @@ class ParetoLevels(object):
         self.population = population_cleared
 
     def get_stats(self):
-        return np.array([[element.obj_fun for element in level] for level in self.levels])
+        return np.array(flatten_chain([[element.obj_fun for element in level] 
+                                       for level in self.levels]))
 
     def fit_convex_hull(self):
         """
@@ -276,7 +286,6 @@ class MOEADDOptimizer(object):
             while True:
                 if type(solution_params) == type(None): solution_params = {}
                 temp_solution = pop_constructor.create(**solution_params)
-                #TODO: check domain belonging
                 temp_solution.set_domain(solution_idx)
                 if not np.any([temp_solution == solution for solution in population]):
                     population.append(temp_solution)
@@ -284,10 +293,13 @@ class MOEADDOptimizer(object):
                     break
                 if solution_gen_idx == soluton_creation_attempts_softmax and global_var.verbose.show_warnings:
                     print('solutions tried:', solution_gen_idx)
-                    warnings.warn('Too many failed attempts to create unique solutions for multiobjective optimization. Change solution parameters to allow more diversity.')
+                    warnings.warn('Too many failed attempts to create unique solutions for multiobjective optimization.\
+                                  Change solution parameters to allow more diversity.')
                 if solution_gen_idx == soluton_creation_attempts_hardmax:
-                    self.abbreviated_search(population, sorting_method = nds_method, update_method = ndl_update)
-                    return None
+                    population.append(temp_solution)
+                    print(f'New solution accepted, despite being a dublicate of another solution.\
+                          Confirmed {len(population)}/{pop_size} solutions.')
+                    break                    
                 solution_gen_idx += 1
         self.pareto_levels = ParetoLevels(population, sorting_method = nds_method, update_method = ndl_update,
                                           initial_sort = False)
