@@ -39,24 +39,24 @@ class EPDELoader(object):
             self._directory = os.path.normpath((os.path.join(os.path.dirname(os.getcwd()), 
                                                             '..','epde_cache')))
         
-    def save(self, obj, filename:str = None, except_attrs:list = []):
+    def save(self, obj, filename:str = None, not_to_pickle:list = [], manual_pickle:list = []):
         with open(filename, mode = 'wb') as file:
-            pickle.dump(obj.to_pickle(), file)
+            pickle.dump(obj.to_pickle(not_to_pickle, manual_pickle), file)
     
-    def saves(self, obj):
-        pickling_form = obj.to_pickle()
+    def saves(self, obj, not_to_pickle:list = [], manual_pickle:list = []):
+        pickling_form = obj.to_pickle(not_to_pickle, manual_pickle)
         pickle.dumps(pickling_form)        
 
-    def use_pickles(self, obj_pickled):
+    def use_pickles(self, obj_pickled, **kwargs):
         obj = self._types[obj_pickled['obj_type']].__new__(self._types[obj_pickled['obj_type']])
-        obj.attrs_from_dict(obj_pickled)
+        obj.attrs_from_dict(obj_pickled, except_attrs = kwargs)
         return obj
 
     def load(self, filename:str, **kwargs):
         with open(filename, mode = 'rb') as file:
             obj_pickled = pickle.load(file)
-        return self.use_pickles(obj_pickled)
+        return self.use_pickles(obj_pickled, **kwargs)
 
-    def loads(self, byteobj):
+    def loads(self, byteobj, **kwargs):
         obj_pickled = pickle.loads(byteobj)
-        return self.use_pickles(obj_pickled)
+        return self.use_pickles(obj_pickled, **kwargs)

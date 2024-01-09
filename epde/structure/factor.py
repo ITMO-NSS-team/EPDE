@@ -49,11 +49,15 @@ class Factor(TerminalToken):
             if self.status['requires_grid']:
                 self.use_grids_cache()
 
-    def attrs_from_dict(self, attributes, except_keys = ['obj_type']):
+    def attrs_from_dict(self, attributes, except_attrs: dict = {}):
+        except_attrs['obj_type'] = None
         self.__dict__ = {key : item for key, item in attributes.items()
-                         if key not in except_keys}
+                         if key not in except_attrs.keys}
+        for key, elem in except_attrs.items():
+            if elem is not None:
+                self.__dict__[key] = elem
 
-    def to_pickle(self, except_attrs:list):
+    def to_pickle(self, not_to_pickle:list, manual_pickle: list = []):
         '''
 
         Template method for adapting pickling of an object. Shall be copied to objects, that are 
@@ -64,14 +68,15 @@ class Factor(TerminalToken):
         except_attrs : list of strings
             Attributes to keep from saving to the resulting dict.
 
+        manual_pickle : list of strings
+            Attributes, that require manual call for their pickle forms.
+        
         Returns
         -------
         dict_to_pickle : dict
             Dictionary representation of the object attributes.
 
         '''
-        not_to_pickle = except_attrs + ['pool'] 
-        manual_pickle = []
         dict_to_pickle = {}
         
         for key, elem in self.__dict__.items():

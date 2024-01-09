@@ -66,11 +66,7 @@ class Term(ComplexStructure):
         # key - state of normalization, value - if the variable is saved in cache
         self.reset_saved_state()
         
-    def attrs_from_dict(self, attributes, except_keys = ['obj_type']):
-        self.__dict__ = {key : item for key, item in attributes.items()
-                         if key not in except_keys}
-
-    def to_pickle(self, except_attrs:list):
+    def to_pickle(self, not_to_pickle:list, manual_pickle: list = []):
         '''
 
         Template method for adapting pickling of an object. Shall be copied to objects, that are 
@@ -81,46 +77,19 @@ class Term(ComplexStructure):
         except_attrs : list of strings
             Attributes to keep from saving to the resulting dict.
 
+        manual_pickle : list of strings
+            Attributes, that require manual call for their pickle forms.
+        
         Returns
         -------
         dict_to_pickle : dict
             Dictionary representation of the object attributes.
 
         '''
-        not_to_pickle = except_attrs + ['pool'] 
-        manual_pickle = ['structure']
-        dict_to_pickle = {}
-        
-        for key, elem in self.__dict__.items():
-            if key in not_to_pickle:
-                continue
-            elif key in manual_pickle:
-                if isinstance(elem, dict):
-                    dict_to_pickle[key] = {'type' : dict, 'keys' : [ekey for ekey in elem.keys()],
-                                           'elements' : [val.to_pickle() for val in elem.values()]}
-                elif isinstance(elem, Iterable):
-                    dict_to_pickle[key] = {'type' : type(elem), 'elements' : [list_elem.to_pickle() for list_elem in elem]}
-                else:
-                    dict_to_pickle[key] = {'type' : type(elem), 'elements' : elem.to_pickle()}
-            else:
-                dict_to_pickle[key] = elem
-        
-        for slot in self.__slots__():
-            elem = getattr(self, slot)
-            if slot in not_to_pickle:
-                continue
-            elif key in manual_pickle:
-                if isinstance(elem, dict):
-                    dict_to_pickle[slot] = {'type' : dict, 'keys' : [key for key in elem.keys()],
-                                           'elements' : [val.to_pickle() for val in elem.values()]}
-                elif isinstance(elem, Iterable):
-                    dict_to_pickle[slot] = {'type' : type(elem), 'elements' : [list_elem.to_pickle() for list_elem in elem]}
-                else:
-                    dict_to_pickle[slot] = {'type' : type(elem), 'elements' : elem.to_pickle()}
-            else:
-                dict_to_pickle[key] = elem
-        
-        return dict_to_pickle
+        not_to_pickle = not_to_pickle + ['pool'] 
+        manual_pickle = manual_pickle + ['structure']
+
+        return super.to_pickle(not_to_pickle, manual_pickle)
     
     @property
     def cache_label(self):
@@ -463,11 +432,7 @@ class Equation(ComplexStructure):
         for idx, _ in enumerate(self.structure):
             self.structure[idx].use_cache()
 
-    def attrs_from_dict(self, attributes, except_keys = ['obj_type']):
-        self.__dict__ = {key : item for key, item in attributes.items()
-                         if key not in except_keys}
-
-    def to_pickle(self, except_attrs:list):
+    def to_pickle(self, not_to_pickle:list, manual_pickle: list = []):
         '''
 
         Template method for adapting pickling of an object. Shall be copied to objects, that are 
@@ -478,46 +443,19 @@ class Equation(ComplexStructure):
         except_attrs : list of strings
             Attributes to keep from saving to the resulting dict.
 
+        manual_pickle : list of strings
+            Attributes, that require manual call for their pickle forms.
+        
         Returns
         -------
         dict_to_pickle : dict
             Dictionary representation of the object attributes.
 
         '''
-        not_to_pickle = except_attrs + ['pool'] 
-        manual_pickle = ['structure']
-        dict_to_pickle = {}
-        
-        for key, elem in self.__dict__.items():
-            if key in not_to_pickle:
-                continue
-            elif key in manual_pickle:
-                if isinstance(elem, dict):
-                    dict_to_pickle[key] = {'type' : dict, 'keys' : [ekey for ekey in elem.keys()],
-                                           'elements' : [val.to_pickle() for val in elem.values()]}
-                elif isinstance(elem, Iterable):
-                    dict_to_pickle[key] = {'type' : type(elem), 'elements' : [list_elem.to_pickle() for list_elem in elem]}
-                else:
-                    dict_to_pickle[key] = {'type' : type(elem), 'elements' : elem.to_pickle()}
-            else:
-                dict_to_pickle[key] = elem
-        
-        for slot in self.__slots__():
-            elem = getattr(self, slot)
-            if slot in not_to_pickle:
-                continue
-            elif key in manual_pickle:
-                if isinstance(elem, dict):
-                    dict_to_pickle[slot] = {'type' : dict, 'keys' : [key for key in elem.keys()],
-                                           'elements' : [val.to_pickle() for val in elem.values()]}
-                elif isinstance(elem, Iterable):
-                    dict_to_pickle[slot] = {'type' : type(elem), 'elements' : [list_elem.to_pickle() for list_elem in elem]}
-                else:
-                    dict_to_pickle[slot] = {'type' : type(elem), 'elements' : elem.to_pickle()}
-            else:
-                dict_to_pickle[key] = elem
-        
-        return dict_to_pickle
+        not_to_pickle = not_to_pickle + ['pool'] 
+        manual_pickle = manual_pickle + ['structure']
+
+        return super.to_pickle(not_to_pickle, manual_pickle)
     
     def reset_explaining_term(self, term_idx=0):
         for idx, term in enumerate(self.structure):
@@ -910,11 +848,7 @@ class SoEq(moeadd.MOEADDSolution):
 
         self.vars_to_describe = [token_family.ftype for token_family in self.tokens_for_eq.families]
 
-    def attrs_from_dict(self, attributes, except_keys = ['obj_type']):
-        self.__dict__ = {key : item for key, item in attributes.items()
-                         if key not in except_keys}
-
-    def to_pickle(self, except_attrs:list):
+    def to_pickle(self, not_to_pickle:list, manual_pickle: list = []):
         '''
 
         Template method for adapting pickling of an object. Shall be copied to objects, that are 
@@ -925,46 +859,19 @@ class SoEq(moeadd.MOEADDSolution):
         except_attrs : list of strings
             Attributes to keep from saving to the resulting dict.
 
+        manual_pickle : list of strings
+            Attributes, that require manual call for their pickle forms.
+        
         Returns
         -------
         dict_to_pickle : dict
             Dictionary representation of the object attributes.
 
         '''
-        not_to_pickle = except_attrs + ['tokens_for_eq', 'tokens_supp'] 
-        manual_pickle = ['vals']
-        dict_to_pickle = {}
-        
-        for key, elem in self.__dict__.items():
-            if key in not_to_pickle:
-                continue
-            elif key in manual_pickle:
-                if isinstance(elem, dict):
-                    dict_to_pickle[key] = {'type' : dict, 'keys' : [ekey for ekey in elem.keys()],
-                                           'elements' : [val.to_pickle() for val in elem.values()]}
-                elif isinstance(elem, Iterable):
-                    dict_to_pickle[key] = {'type' : type(elem), 'elements' : [list_elem.to_pickle() for list_elem in elem]}
-                else:
-                    dict_to_pickle[key] = {'type' : type(elem), 'elements' : elem.to_pickle()}
-            else:
-                dict_to_pickle[key] = elem
-        
-        for slot in self.__slots__():
-            elem = getattr(self, slot)
-            if slot in not_to_pickle:
-                continue
-            elif key in manual_pickle:
-                if isinstance(elem, dict):
-                    dict_to_pickle[slot] = {'type' : dict, 'keys' : [key for key in elem.keys()],
-                                           'elements' : [val.to_pickle() for val in elem.values()]}
-                elif isinstance(elem, Iterable):
-                    dict_to_pickle[slot] = {'type' : type(elem), 'elements' : [list_elem.to_pickle() for list_elem in elem]}
-                else:
-                    dict_to_pickle[slot] = {'type' : type(elem), 'elements' : elem.to_pickle()}
-            else:
-                dict_to_pickle[key] = elem
-        
-        return dict_to_pickle
+        not_to_pickle = not_to_pickle + ['tokens_for_eq', 'tokens_supp'] 
+        manual_pickle = manual_pickle + ['vals']
+
+        return super.to_pickle(not_to_pickle, manual_pickle)
 
     def use_default_multiobjective_function(self):
         from epde.eq_mo_objectives import generate_partial, equation_fitness, equation_complexity_by_factors

@@ -9,8 +9,7 @@ Created on Mon Jul  6 15:39:18 2020
 import numpy as np
 import itertools
 from typing import Union, Callable
-
-import pickle
+from collections import Iterable
 
 import epde.globals as global_var
 from epde.structure.factor import Factor
@@ -432,14 +431,69 @@ class TFPool(object):
      Args:
         families (`list`): toen families that using in that run
     """    
-    def __init__(self, families: list, stored_pool=None):
-        if stored_pool is not None:
-            self = pickle.load(stored_pool)
+    def __init__(self, families: list):
         self.families = families
 
-    def attrs_from_dict(self, attributes, except_keys = ['obj_type']):
-        self.__dict__ = {key : item for key, item in attributes.items() 
-                         if key not in except_keys}
+    def attrs_from_dict(self, attributes, except_attrs: dict = {}):
+        except_attrs['obj_type'] = None
+        self.__dict__ = {key : item for key, item in attributes.items()
+                         if key not in except_attrs.keys}
+        for key, elem in except_attrs.items():
+            if elem is not None:
+                self.__dict__[key] = elem
+
+    def to_pickle(self, not_to_pickle:list, manual_pickle: list = []):
+        '''
+
+        Template method for adapting pickling of an object. Shall be copied to objects, that are 
+        to be pickable with local rules.
+
+        Parameters
+        ----------
+        except_attrs : list of strings
+            Attributes to keep from saving to the resulting dict.
+
+        manual_pickle : list of strings
+            Attributes, that require manual call for their pickle forms.
+        
+        Returns
+        -------
+        dict_to_pickle : dict
+            Dictionary representation of the object attributes.
+
+        '''
+        dict_to_pickle = {}
+        
+        for key, elem in self.__dict__.items():
+            if key in not_to_pickle:
+                continue
+            elif key in manual_pickle:
+                if isinstance(elem, dict):
+                    dict_to_pickle[key] = {'type' : dict, 'keys' : [ekey for ekey in elem.keys()],
+                                           'elements' : [val.to_pickle() for val in elem.values()]}
+                elif isinstance(elem, Iterable):
+                    dict_to_pickle[key] = {'type' : type(elem), 'elements' : [list_elem.to_pickle() for list_elem in elem]}
+                else:
+                    dict_to_pickle[key] = {'type' : type(elem), 'elements' : elem.to_pickle()}
+            else:
+                dict_to_pickle[key] = elem
+        
+        for slot in self.__slots__():
+            elem = getattr(self, slot)
+            if slot in not_to_pickle:
+                continue
+            elif key in manual_pickle:
+                if isinstance(elem, dict):
+                    dict_to_pickle[slot] = {'type' : dict, 'keys' : [key for key in elem.keys()],
+                                           'elements' : [val.to_pickle() for val in elem.values()]}
+                elif isinstance(elem, Iterable):
+                    dict_to_pickle[slot] = {'type' : type(elem), 'elements' : [list_elem.to_pickle() for list_elem in elem]}
+                else:
+                    dict_to_pickle[slot] = {'type' : type(elem), 'elements' : elem.to_pickle()}
+            else:
+                dict_to_pickle[key] = elem
+        
+        return dict_to_pickle
 
     @property
     def families_meaningful(self):
@@ -585,14 +639,3 @@ class TFPool(object):
         except IndexError:
             print(label, [family.tokens for family in self.families])
             raise IndexError('No family for token.')
-
-    def save(self, filename: str):
-        """
-        Saving information about all families
-
-        Args:
-            filename (`str`): path to file, which will be save data
-        """
-        file_to_store = open(filename, "wb")
-        pickle.dump(self, file_to_store)
-        file_to_store.close()
