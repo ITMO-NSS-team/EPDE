@@ -17,6 +17,7 @@ def flatten_chain(matrix):
 # from functools import reduce
 
 import epde.globals as global_var
+from epde.structure.main_structures import SoEq
 from epde.optimizers.moeadd.population_constr import SystemsPopulationConstructor
 from epde.optimizers.moeadd.vis import ParetoVisualizer
 
@@ -66,6 +67,20 @@ class ParetoLevels(object):
         self.population = []
         self._update_method = update_method
         self.unplaced_candidates = population
+    
+    def manual_reconst(self, attribute:str, value, except_attrs:dict):
+        from epde.loader import attrs_from_dict, get_typespec_attrs
+        supported_attrs = ['population']
+        if attribute not in supported_attrs:
+            raise ValueError(f'Attribute {attribute} is not supported by manual_reconst method.')
+            
+        if attribute == 'population':
+            self.population = []
+            for system_elem in value:
+                system = SoEq.__new__(SoEq)
+                attrs_from_dict(system, system_elem, except_attrs)
+                self.population.append(system)
+        self.levels = self.sort()
     
     def attrs_from_dict(self, attributes, except_keys = ['obj_type']):
         self.__dict__ = {key : item for key, item in attributes.items()

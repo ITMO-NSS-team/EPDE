@@ -70,9 +70,11 @@ class Population(object):
         self.length = len(elements)
         self._sorting_method = sorting_method
     
-    def attrs_from_dict(self, attributes, except_keys = ['obj_type']):
-        self.__dict__ = {key : item for key, item in attributes.items()
-                         if key not in except_keys}
+    def manual_reconst(self, attribute:str, value, except_attrs:dict):
+        from epde.loader import attrs_from_dict, get_typespec_attrs      
+        supported_attrs = ['vals']
+        if attribute not in supported_attrs:
+            raise ValueError(f'Attribute {attribute} is not supported by manual_reconst method.')
     
     def sort(self):
         '''

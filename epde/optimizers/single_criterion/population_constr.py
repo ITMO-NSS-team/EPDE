@@ -45,5 +45,5 @@ class SystemsPopulationConstructor(object):
         except KeyError:
             created_solution.use_default_singleobjective_function()
 
-        created_solution.create_equations()
+        created_solution.create()
         return created_solution

@@ -158,7 +158,7 @@ class Cache(object):
             if elem is not None:
                 self.__dict__[key] = elem
 
-    def to_pickle(self, not_to_pickle:list, manual_pickle: list = []):
+    def to_pickle(self, not_to_pickle: list = [], manual_pickle: list = []):
         '''
 
         Template method for adapting pickling of an object. Shall be copied to objects, that are 
@@ -194,11 +194,11 @@ class Cache(object):
             else:
                 dict_to_pickle[key] = elem
         
-        for slot in self.__slots__():
+        for slot in self.__slots__:
             elem = getattr(self, slot)
             if slot in not_to_pickle:
                 continue
-            elif key in manual_pickle:
+            elif slot in manual_pickle:
                 if isinstance(elem, dict):
                     dict_to_pickle[slot] = {'type' : dict, 'keys' : [key for key in elem.keys()],
                                            'elements' : [val.to_pickle() for val in elem.values()]}
@@ -207,7 +207,7 @@ class Cache(object):
                 else:
                     dict_to_pickle[slot] = {'type' : type(elem), 'elements' : elem.to_pickle()}
             else:
-                dict_to_pickle[key] = elem
+                dict_to_pickle[slot] = elem
         
         return dict_to_pickle
 

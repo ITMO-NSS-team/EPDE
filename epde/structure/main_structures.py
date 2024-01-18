@@ -48,6 +48,7 @@ class Term(ComplexStructure):
     __slots__ = ['_history', 'structure', 'interelement_operator', 'saved', 'saved_as',
                  'pool', 'max_factors_in_term', 'cache_linked', 'occupied_tokens_labels',
                  '_descr_variable_marker']
+    # manual_reconst_attrs = ['structure']
 
     def __init__(self, pool, passed_term=None, mandatory_family=None, max_factors_in_term=1,
                  create_derivs: bool = False, interelement_operator=np.multiply, collapse_powers = True):
@@ -65,31 +66,22 @@ class Term(ComplexStructure):
             self.use_cache()
         # key - state of normalization, value - if the variable is saved in cache
         self.reset_saved_state()
-        
-    def to_pickle(self, not_to_pickle:list, manual_pickle: list = []):
-        '''
-
-        Template method for adapting pickling of an object. Shall be copied to objects, that are 
-        to be pickable with local rules.
-
-        Parameters
-        ----------
-        except_attrs : list of strings
-            Attributes to keep from saving to the resulting dict.
-
-        manual_pickle : list of strings
-            Attributes, that require manual call for their pickle forms.
-        
-        Returns
-        -------
-        dict_to_pickle : dict
-            Dictionary representation of the object attributes.
-
-        '''
-        not_to_pickle = not_to_pickle + ['pool'] 
-        manual_pickle = manual_pickle + ['structure']
-
-        return super.to_pickle(not_to_pickle, manual_pickle)
+    
+    def manual_reconst(self, attribute:str, value, except_attrs:dict):
+        from epde.loader import attrs_from_dict, get_typespec_attrs      
+        supported_attrs = ['structure']
+        if attribute not in supported_attrs:
+            raise ValueError(f'Attribute {attribute} is not supported by manual_reconst method.')
+    
+        if attribute == supported_attrs[0]:
+            # Validate correctness of a term definition
+            self.structure = []
+            for factor_elem in value:
+                factor = Factor.__new__(Factor)
+                # except_attr, _ = get_typespec_attrs(factor)
+                
+                attrs_from_dict(factor, factor_elem, except_attrs)
+                self.structure.append(factor)
     
     @property
     def cache_label(self):
@@ -155,7 +147,6 @@ class Term(ComplexStructure):
         if forbidden_factors is None:
             forbidden_factors = {}
             for family in self.pool.labels_overview:
-                # print('family is ', family)
                 for token_label in family[0]:
                     if isinstance(self.max_factors_in_term, int):
                         forbidden_factors[token_label] = [0, min(self.max_factors_in_term, family[1]), False]
@@ -345,12 +336,12 @@ class Term(ComplexStructure):
 
 
 class Equation(ComplexStructure):
-    __slots__ = ['_history', 'structure', 'interelement_operator', 'saved', 'saved_as',
-                 'n_immutable', 'pool', 'terms_number', 'max_factors_in_term', 'operator',
+    __slots__ = ['_history', 'structure', 'interelement_operator', 'n_immutable', 'pool',
+                  # 'saved', 'saved_as','max_factors_in_term', 'operator',
                  '_target', 'target_idx', '_features', 'right_part_selected',
                  '_weights_final', 'weights_final_evald', '_weights_internal', 'weights_internal_evald',
-                 'fitness_calculated', 'solver_form_defined', '_solver_form', '_fitness_value',
-                 'crossover_selected_times', 'metaparameters', 'main_var_to_explain']
+                 'fitness_calculated', 'solver_form_defined', '_fitness_value', # , '_solver_form'
+                 'metaparameters', 'main_var_to_explain']
 
     def __init__(self, pool: TFPool, basic_structure: Union[list, tuple, set], var_to_explain: str = None,
                  metaparameters: dict = {'sparsity': {'optimizable': True, 'value': 1.},
@@ -386,9 +377,6 @@ class Equation(ComplexStructure):
 
             tokens : list of strings \r\n
             Symbolic forms of functions, including derivatives;
-
-            terms_number : int, base value of 6 \r\n
-            Maximum number of terms in the discovered equation; 
 
             max_factors_in_term : int, base value of 2\r\n
             Maximum number of factors, that can form a term (e.g. with 2: df/dx_1 * df/dx_2)
@@ -431,36 +419,26 @@ class Equation(ComplexStructure):
 
         for idx, _ in enumerate(self.structure):
             self.structure[idx].use_cache()
-
-    def to_pickle(self, not_to_pickle:list, manual_pickle: list = []):
-        '''
-
-        Template method for adapting pickling of an object. Shall be copied to objects, that are 
-        to be pickable with local rules.
-
-        Parameters
-        ----------
-        except_attrs : list of strings
-            Attributes to keep from saving to the resulting dict.
-
-        manual_pickle : list of strings
-            Attributes, that require manual call for their pickle forms.
-        
-        Returns
-        -------
-        dict_to_pickle : dict
-            Dictionary representation of the object attributes.
-
-        '''
-        not_to_pickle = not_to_pickle + ['pool'] 
-        manual_pickle = manual_pickle + ['structure']
-
-        return super.to_pickle(not_to_pickle, manual_pickle)
+    
+    def manual_reconst(self, attribute:str, value, except_attrs:dict):
+        from epde.loader import attrs_from_dict, get_typespec_attrs      
+        supported_attrs = ['structure']
+        if attribute not in supported_attrs:
+            raise ValueError(f'Attribute {attribute} is not supported by manual_reconst method.')
+    
+        if attribute == supported_attrs[0]:
+            # Validate correctness of a term definition
+            self.structure = []
+            for term_elem in value:
+                term = Term.__new__(Term)
+                # except_attr, _ = get_typespec_attrs(term)
+                
+                attrs_from_dict(term, term_elem, except_attrs)
+                self.structure.append(term)
     
     def reset_explaining_term(self, term_idx=0):
         for idx, term in enumerate(self.structure):
             if idx == term_idx:
-                # print(f'Checking if {self.main_var_to_explain} is in {term.name}')
                 assert term.contains_family(
                     self.main_var_to_explain), 'Trying explain a variable with term without right family.'
                 term.descr_variable_marker = self.main_var_to_explain
@@ -847,32 +825,23 @@ class SoEq(moeadd.MOEADDSolution):
         self.moeadd_set = False
 
         self.vars_to_describe = [token_family.ftype for token_family in self.tokens_for_eq.families]
-
-    def to_pickle(self, not_to_pickle:list, manual_pickle: list = []):
-        '''
-
-        Template method for adapting pickling of an object. Shall be copied to objects, that are 
-        to be pickable with local rules.
-
-        Parameters
-        ----------
-        except_attrs : list of strings
-            Attributes to keep from saving to the resulting dict.
-
-        manual_pickle : list of strings
-            Attributes, that require manual call for their pickle forms.
         
-        Returns
-        -------
-        dict_to_pickle : dict
-            Dictionary representation of the object attributes.
-
-        '''
-        not_to_pickle = not_to_pickle + ['tokens_for_eq', 'tokens_supp'] 
-        manual_pickle = manual_pickle + ['vals']
-
-        return super.to_pickle(not_to_pickle, manual_pickle)
-
+    def manual_reconst(self, attribute:str, value, except_attrs:dict):
+        from epde.loader import attrs_from_dict, get_typespec_attrs
+        supported_attrs = ['vals']
+        if attribute not in supported_attrs:
+            raise ValueError(f'Attribute {attribute} is not supported by manual_reconst method.')
+    
+        if attribute == supported_attrs[0]:
+            # Validate correctness of a term definition
+            equations = {}
+            for idx, eq_elem in enumerate(value):
+                eq = Equation.__new__(Equation)
+                attrs_from_dict(eq, eq_elem, except_attrs)
+                equations[self.vars_to_describe[idx]] = eq
+            self.vals = Chromosome(equations, {key: val for key, val in self.metaparameters.items()
+                                               if val['optimizable']})
+                
     def use_default_multiobjective_function(self):
         from epde.eq_mo_objectives import generate_partial, equation_fitness, equation_complexity_by_factors
         complexity_objectives = [generate_partial(equation_complexity_by_factors, eq_key)
@@ -912,16 +881,21 @@ class SoEq(moeadd.MOEADDSolution):
         
         return list(self.obj_fun[-len(complexity):]) == complexity        
 
-    def create_equations(self):
-        structure = {}
-
-        token_selection = self.tokens_supp
-        current_tokens_pool = token_selection + self.tokens_for_eq
-
-        for eq_idx, variable in enumerate(self.vars_to_describe):
-            structure[variable] = Equation(current_tokens_pool, basic_structure=[],
-                                           var_to_explain=variable,
-                                           metaparameters=self.metaparameters)
+    def create(self, passed_equations: list = None):
+        if passed_equations is None:
+            structure = {}
+    
+            token_selection = self.tokens_supp
+            current_tokens_pool = token_selection + self.tokens_for_eq
+    
+            for eq_idx, variable in enumerate(self.vars_to_describe):
+                structure[variable] = Equation(current_tokens_pool, basic_structure=[],
+                                               var_to_explain=variable,
+                                               metaparameters=self.metaparameters)
+        else:
+            if len(passed_equations) != len(self.vars_to_describe):
+                raise ValueError('Length of passed equations list does not match')
+            structure = {self.vars_to_describe[idx] : eq for idx, eq in enumerate(passed_equations)}
 
         self.vals = Chromosome(structure, params={key: val for key, val in self.metaparameters.items()
                                                   if val['optimizable']})

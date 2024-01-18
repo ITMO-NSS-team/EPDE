@@ -12,13 +12,13 @@ import torch
 from typing import Callable
 from collections import Iterable
 
-from epde.structure.Tokens import TerminalToken
 import epde.globals as global_var
+from epde.structure.Tokens import TerminalToken
 from epde.supplementary import factor_params_to_str, train_ann, use_ann_to_predict, exp_form
 
 
 class Factor(TerminalToken):
-    __slots__ = ['_params', '_params_description', '_hash_val', '_latex_constructor'
+    __slots__ = ['_params', '_params_description', '_hash_val', '_latex_constructor',
                  'label', 'ftype', 'grid_set', 'grid_idx', 'is_deriv', 'deriv_code',
                  'cache_linked', '_status', 'equality_ranges', '_evaluator', 'saved']
 
@@ -48,16 +48,14 @@ class Factor(TerminalToken):
 
             if self.status['requires_grid']:
                 self.use_grids_cache()
+    
+    def manual_reconst(self, attribute:str, value, except_attrs:dict):
+        from epde.loader import obj_to_pickle, attrs_from_dict        
+        supported_attrs = []
+        if attribute not in supported_attrs:
+            raise ValueError(f'Attribute {attribute} is not supported by manual_reconst method.')
 
-    def attrs_from_dict(self, attributes, except_attrs: dict = {}):
-        except_attrs['obj_type'] = None
-        self.__dict__ = {key : item for key, item in attributes.items()
-                         if key not in except_attrs.keys}
-        for key, elem in except_attrs.items():
-            if elem is not None:
-                self.__dict__[key] = elem
-
-    def to_pickle(self, not_to_pickle:list, manual_pickle: list = []):
+    def to_pickle(self, not_to_pickle: list = [], manual_pickle: list = []):
         '''
 
         Template method for adapting pickling of an object. Shall be copied to objects, that are 
@@ -93,11 +91,13 @@ class Factor(TerminalToken):
             else:
                 dict_to_pickle[key] = elem
         
-        for slot in self.__slots__():
+        
+        
+        for slot in self.__slots__:
             elem = getattr(self, slot)
             if slot in not_to_pickle:
                 continue
-            elif key in manual_pickle:
+            elif slot in manual_pickle:
                 if isinstance(elem, dict):
                     dict_to_pickle[slot] = {'type' : dict, 'keys' : [key for key in elem.keys()],
                                            'elements' : [val.to_pickle() for val in elem.values()]}
@@ -106,7 +106,7 @@ class Factor(TerminalToken):
                 else:
                     dict_to_pickle[slot] = {'type' : type(elem), 'elements' : elem.to_pickle()}
             else:
-                dict_to_pickle[key] = elem
+                dict_to_pickle[slot] = elem
         
         return dict_to_pickle
 
