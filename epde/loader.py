@@ -6,6 +6,7 @@ Created on Fri Dec 22 13:27:53 2023
 @author: maslyaev
 """
 
+import sys
 import os
 import dill as pickle
 
@@ -31,6 +32,23 @@ TYPESPEC_ATTRS = {'SoEq' : (['tokens_for_eq', 'tokens_supp', 'latex_form'], ['va
                   
 
 LOADING_PRESETS = {'SoEq' : {'SoEq' : []}}
+
+def get_size(obj, seen=None):
+    size = sys.getsizeof(obj)
+    if seen is None:
+        seen = set()
+    obj_id = id(obj)
+    if obj_id in seen:
+        return 0
+    seen.add(obj_id)
+    if isinstance(obj, dict):
+        size += sum([get_size(v, seen) for v in obj.values()])
+        size += sum([get_size(k, seen) for k in obj.keys()])
+    elif hasattr(obj, '__dict__'):
+        size += get_size(obj.__dict__, seen)
+    elif hasattr(obj, '__iter__') and not isinstance(obj, (str, bytes, bytearray)):
+        size += sum([get_size(i, seen) for i in obj])
+    return size
 
 def parse_obj_type(obj):
     return str(type(obj)).split('.')[-1][:-2]
@@ -71,6 +89,7 @@ def obj_to_pickle(obj, not_to_pickle: list = [], manual_pickle: list = []):
     dict_to_pickle = {'obj_type' : parse_obj_type(obj)}
     
     for key, elem in obj.__dict__.items():
+        print(f'in __dict__, attr {key}')
         if key in not_to_pickle:
             continue
         elif key in manual_pickle:
@@ -97,6 +116,7 @@ def obj_to_pickle(obj, not_to_pickle: list = [], manual_pickle: list = []):
         slots = []
 
     for slot in slots:
+        print(f'in __slots__, attr {slot}')        
         elem = getattr(obj, slot)
         if slot in not_to_pickle:
             continue
@@ -115,7 +135,7 @@ def obj_to_pickle(obj, not_to_pickle: list = [], manual_pickle: list = []):
                                                                                             get_typespec_attrs(elem)[1])}
         else:
             dict_to_pickle[slot] = elem
-    
+    print(f'Dict size is {get_size(dict_to_pickle)} bytes')
     return dict_to_pickle
 
 def attrs_from_dict(obj, attributes, except_attrs: dict = {}):
