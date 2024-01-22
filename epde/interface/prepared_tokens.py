@@ -39,6 +39,49 @@ class PreparedTokens(ABC):
         return self._token_family
 
 
+class DataPolynomials(PreparedTokens):
+    def __init__(self, var_name: str, max_power: int):
+        """
+        Class for tokens, representing higher order power products of the modelled variable. 
+        Argument `max_power` represents the maximum power, in which the tokens will exponentiated.
+        
+        """
+        self._token_family = TokenFamily(token_type=f'poly of {var_name}')
+        
+        def latex_form(label, **params):
+            '''
+            Parameters
+            ----------
+            label : str
+                label of the token, for which we construct the latex form.
+            **params : dict
+                dictionary with parameter labels as keys and tuple of parameter values 
+                and their output text forms as values.
+
+            Returns
+            -------
+            form : str
+                LaTeX-styled text form of token.
+            '''            
+            if '/' in label:
+                label = label[:label.find('x')+1] + '_' + label[label.find('x')+1:]
+                label = label.replace('d', r'\partial ').replace('/', r'}{')
+                label = r'\frac{' + label + r'}'
+                                
+            if params['power'][0] > 1:
+                label = r'\left(' + label + r'\right)^{{{0}}}'.format(params["power"][1])
+            return label
+        
+        self._token_family.set_latex_form_constructor(latex_form)
+        self._token_family.set_status(demands_equation=False, meaningful=True,
+                                      unique_specific_token=True, unique_token_type=True,
+                                      s_and_d_merged=False, family_of_derivs=True)
+        self._token_family.set_params([var_name,], OrderedDict([('power', (2, max_power))]), 
+                                      {'power': 0}, [None,])
+        self._token_family.set_evaluator(simple_function_evaluator, [])
+        
+
+
 class TrigonometricTokens(PreparedTokens):
     """
     Class for prepared tokens, that belongs to the trigonometric family
@@ -172,8 +215,6 @@ class GridTokens(PreparedTokens):
 
         grid_equal_params = {'power': 0, 'dim': 0}
         self._token_family.set_params(labels, grid_token_params, grid_equal_params)
-        print(self._token_family.token_params)
-        time.sleep(10)
         self._token_family.set_evaluator(grid_evaluator, [])
 
 
@@ -237,8 +278,6 @@ class CacheStoredTokens(CustomTokens):
                  unique_specific_token=True, unique_token_type=True, meaningful=False):
         if set(token_labels) != set(list(token_tensors.keys())):
             raise KeyError('The labels of tokens do not match the labels of passed tensors')
-        # for key, val in token_tensors.items():
-        #     token_tensors[key] = np_ndarray_section(val, boundary = boundary)
         upload_simple_tokens(list(token_tensors.keys()), global_var.tensor_cache, list(token_tensors.values()))
         super().__init__(token_type=token_type, token_labels=token_labels, evaluator=simple_function_evaluator,
                          params_ranges=params_ranges, params_equality_ranges=params_equality_ranges,
@@ -252,7 +291,7 @@ class ExternalDerivativesTokens(CustomTokens):
                  params_equality_ranges: Union[None, dict], dimensionality: int = 1,
                  unique_specific_token=True, unique_token_type=True, meaningful=False):
         deriv_method_kwargs['max_order'] = max_orders
-        # TODO: rewrite preprocessing of external derivatives
+        # TODO: rewrite preprocessing of external derivatives to match selected preprocessing pipelines
         data_tensor, derivs_tensor = preprocess_derivatives(token_tensor, method=deriv_method,
                                                           method_kwargs=deriv_method_kwargs)
         deriv_names, deriv_orders = define_derivatives(base_token_label, dimensionality=token_tensor.ndim,

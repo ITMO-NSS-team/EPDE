@@ -9,6 +9,7 @@ Created on Fri Dec 22 13:27:53 2023
 import sys
 import os
 import dill as pickle
+import time
 
 from collections import Iterable
 
@@ -87,15 +88,13 @@ def obj_to_pickle(obj, not_to_pickle: list = [], manual_pickle: list = []):
         Dictionary representation of the object attributes.
 
     '''
-    print(f'Working with {type(obj)}')
     ntp_add, mp_add = get_typespec_attrs(obj)
-    not_to_pickle += ntp_add
-    manual_pickle += mp_add
+    not_to_pickle = ntp_add
+    manual_pickle = mp_add
     
     dict_to_pickle = {'obj_type' : parse_obj_type(obj)}
     
     for key, elem in obj.__dict__.items():
-        print(f'in __dict__, attr {key}')
         if key in not_to_pickle:
             continue
         elif key in manual_pickle:
@@ -122,7 +121,6 @@ def obj_to_pickle(obj, not_to_pickle: list = [], manual_pickle: list = []):
         slots = []
 
     for slot in slots:
-        print(f'in __slots__, attr {slot}')        
         elem = getattr(obj, slot)
         if slot in not_to_pickle:
             continue
@@ -141,7 +139,7 @@ def obj_to_pickle(obj, not_to_pickle: list = [], manual_pickle: list = []):
                                                                                             get_typespec_attrs(elem)[1])}
         else:
             dict_to_pickle[slot] = elem
-    print(f'Dict size is {get_size(dict_to_pickle)} bytes')
+    
     return dict_to_pickle
 
 def attrs_from_dict(obj, attributes, except_attrs: dict = {}):

@@ -541,7 +541,7 @@ class EpdeSearch(object):
         for data_elem_idx, data_tensor in enumerate(data):
             assert isinstance(data_tensor, np.ndarray), 'Input data must be in format of numpy ndarrays or iterable (list or tuple) of numpy arrays'
             entry = InputDataEntry(var_name=variable_names[data_elem_idx],
-                                     data_tensor=data_tensor)
+                                   data_tensor=data_tensor)
             derivs_tensor = derivs[data_elem_idx] if derivs is not None else None
             entry.set_derivatives(preprocesser=self.preprocessor_pipeline, deriv_tensors=derivs_tensor,
                                   grid=global_var.grid_cache.get_all()[1], max_order=max_deriv_order)
@@ -570,7 +570,7 @@ class EpdeSearch(object):
             print(isinstance(additional_tokens, PreparedTokens))
             raise TypeError(f'Incorrect type of additional tokens: expected list or TokenFamily/Prepared_tokens - obj, instead got {type(additional_tokens)}')
         self.pool = TFPool(data_tokens + [tf if isinstance(tf, TokenFamily) else tf.token_family
-                                      for tf in additional_tokens])
+                                          for tf in additional_tokens])
         print(f'The cardinality of defined token pool is {self.pool.families_cardinality()}')
         print(f'Among them, the pool contains {self.pool.families_cardinality(meaningful_only=True)}')
         
