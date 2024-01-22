@@ -48,6 +48,12 @@ def get_size(obj, seen=None):
         size += get_size(obj.__dict__, seen)
     elif hasattr(obj, '__iter__') and not isinstance(obj, (str, bytes, bytearray)):
         size += sum([get_size(i, seen) for i in obj])
+    try:
+        slots = obj.__slots__
+    except AttributeError:
+        slots = []
+    for slot in slots:
+        size += get_size(getattr(obj, slot), seen)
     return size
 
 def parse_obj_type(obj):
