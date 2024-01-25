@@ -268,13 +268,10 @@ class BOPElement(object):
                 boundary = torch.moveaxis(boundary, source=0, destination=self.axis).resize()
             else:
                 boundary = torch.from_numpy(np.array([[abs_loc,],])).float()  # TODO: work from here
-                # boundary = torch.expand_dims(boundary, axis=0)
             print('boundary.shape', boundary.shape, boundary.ndim)
 
         elif boundary is None and self.location is None:
             raise ValueError('No location passed into the BOP.')
-
-        # boundary = torch.reshape(boundary, ())
 
         form = self.operator_form
         boundary_operator = {form[0]: form[1]}
@@ -335,7 +332,7 @@ class SystemSolverInterface(object):
                 deriv_orders.append(factor.deriv_code)
                 deriv_powers.append(factor.params[power_param_idx])
                 try:
-                    cur_deriv_var = variables.index(factor.ftype)
+                    cur_deriv_var = variables.index(factor.variable)
                 except ValueError:
                     raise ValueError(
                         f'Variable family of passed derivative {variables}, other than {cur_deriv_var}')
@@ -502,7 +499,7 @@ class SolverAdapter(object):
         conv_grid = grid_format_prepare([np.unique(var_grid) for var_grid in grid], mode)
         return conv_grid
 
-    def solve(self, system_form=None, grid=None, boundary_conditions=None, mode = 'NN'): #data=None, 
+    def solve(self, system_form=None, grid=None, boundary_conditions=None, mode = 'NN'):
         if isinstance(grid, (list, tuple)):
             grid = self.convert_grid(grid, mode)
         print('Grid is ', type(grid), grid.shape)            

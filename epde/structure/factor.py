@@ -19,14 +19,16 @@ from epde.supplementary import factor_params_to_str, train_ann, use_ann_to_predi
 
 class Factor(TerminalToken):
     __slots__ = ['_params', '_params_description', '_hash_val', '_latex_constructor',
-                 'label', 'ftype', 'grid_set', 'grid_idx', 'is_deriv', 'deriv_code',
+                 'label', 'ftype', '_variable', 'grid_set', 'grid_idx', 'is_deriv', 'deriv_code',
                  'cache_linked', '_status', 'equality_ranges', '_evaluator', 'saved']
 
     def __init__(self, token_name: str, status: dict, family_type: str, latex_constructor: Callable,
-                 randomize: bool = False, params_description=None, deriv_code=None, 
-                 equality_ranges=None):
+                 variable: str = None, randomize: bool = False, params_description=None, deriv_code=None, 
+                 equality_ranges = None):
         self.label = token_name
         self.ftype = family_type
+        self._variable = variable
+        
         self.status = status
         self.grid_set = False
         self._hash_val = np.random.randint(0, 1e9)
@@ -49,6 +51,13 @@ class Factor(TerminalToken):
             if self.status['requires_grid']:
                 self.use_grids_cache()
     
+    @property
+    def variable(self):
+        if self._variable is None:
+            return self.ftype
+        else:
+            return self._variable
+        
     def manual_reconst(self, attribute:str, value, except_attrs:dict):
         from epde.loader import obj_to_pickle, attrs_from_dict        
         supported_attrs = []

@@ -39,7 +39,7 @@ from epde.structure.main_structures import Equation, SoEq
 
 from epde.interface.token_family import TFPool, TokenFamily
 from epde.interface.type_checks import *
-from epde.interface.prepared_tokens import PreparedTokens, CustomTokens
+from epde.interface.prepared_tokens import PreparedTokens, CustomTokens, DataPolynomials
 from epde.interface.solver_integration import BoundaryConditions, SolverAdapter, SystemSolverInterface
 
 class InputDataEntry(object):
@@ -97,6 +97,7 @@ class InputDataEntry(object):
 
         try:
             upload_simple_tokens(self.names, global_var.tensor_cache, derivs_stacked)
+            upload_simple_tokens([self.var_name,], global_var.tensor_cache, [self.data_tensor,])            
             upload_simple_tokens([self.var_name,], global_var.initial_data_cache, [self.data_tensor,])
 
         except AttributeError:
@@ -104,6 +105,50 @@ class InputDataEntry(object):
 
         global_var.tensor_cache.use_structural()
 
+    @staticmethod
+    def latex_form(label, **params):
+        '''
+        Parameters
+        ----------
+        label : str
+            label of the token, for which we construct the latex form.
+        **params : dict
+            dictionary with parameter labels as keys and tuple of parameter values 
+            and their output text forms as values.
+
+        Returns
+        -------
+        form : str
+            LaTeX-styled text form of token.
+        '''            
+        if '/' in label:
+            label = label[:label.find('x')+1] + '_' + label[label.find('x')+1:]
+            label = label.replace('d', r'\partial ').replace('/', r'}{')
+            label = r'\frac{' + label + r'}'
+                            
+        if params['power'][0] > 1:
+            label = r'\left(' + label + r'\right)^{{{0}}}'.format(params["power"][1])
+        return label
+
+    def create_derivs_family(self, max_deriv_power: int = 1):
+        self._derivs_family = TokenFamily(token_type=f'deriv of {self.var_name}', variable = self.var_name, 
+                                          family_of_derivs=True)
+        
+        
+        self._derivs_family.set_latex_form_constructor(self.latex_form)
+        self._derivs_family.set_status(demands_equation=True, unique_specific_token=False,
+                                      unique_token_type=False, s_and_d_merged=False,
+                                      meaningful=True)
+        self._derivs_family.set_params(self.names, OrderedDict([('power', (1, max_deriv_power))]),
+                                      {'power': 0}, self.d_orders)
+        self._derivs_family.set_evaluator(simple_function_evaluator, [])        
+
+    def create_polynomial_family(self, max_power):
+        polynomials = DataPolynomials(self.var_name, max_power = max_power)
+        self._polynomial_family = polynomials.token_family
+
+    def get_families(self):
+        return [self._polynomial_family, self._derivs_family]
 
 def simple_selector(sorted_neighbors, number_of_neighbors=4):
     return sorted_neighbors[:number_of_neighbors]
@@ -494,7 +539,7 @@ class EpdeSearch(object):
 
     def create_pool(self, data: Union[np.ndarray, list, tuple], variable_names=['u',],
                     derivs=None, max_deriv_order=1, additional_tokens=[],
-                    data_fun_pow: int = 1):
+                    data_fun_pow: int = 1, deriv_fun_pow: int = 1):
         self.pool_params = {'variable_names' : variable_names, 'max_deriv_order' : max_deriv_order,
                             'additional_tokens' : [family.token_family.ftype for family in additional_tokens]}
         assert (isinstance(derivs, list) and isinstance(derivs[0], np.ndarray)) or derivs is None
@@ -513,30 +558,6 @@ class EpdeSearch(object):
             self.set_preprocessor()
 
         data_tokens = []
-            
-        def latex_form(label, **params):
-            '''
-            Parameters
-            ----------
-            label : str
-                label of the token, for which we construct the latex form.
-            **params : dict
-                dictionary with parameter labels as keys and tuple of parameter values 
-                and their output text forms as values.
-
-            Returns
-            -------
-            form : str
-                LaTeX-styled text form of token.
-            '''            
-            if '/' in label:
-                label = label[:label.find('x')+1] + '_' + label[label.find('x')+1:]
-                label = label.replace('d', r'\partial ').replace('/', r'}{')
-                label = r'\frac{' + label + r'}'
-                                
-            if params['power'][0] > 1:
-                label = r'\left(' + label + r'\right)^{{{0}}}'.format(params["power"][1])
-            return label
         
         for data_elem_idx, data_tensor in enumerate(data):
             assert isinstance(data_tensor, np.ndarray), 'Input data must be in format of numpy ndarrays or iterable (list or tuple) of numpy arrays'
@@ -547,19 +568,10 @@ class EpdeSearch(object):
                                   grid=global_var.grid_cache.get_all()[1], max_order=max_deriv_order)
             entry.use_global_cache()
 
-            self.set_derivatives(variable=variable_names[data_elem_idx], deriv=entry.derivatives)  
-
-
-            entry_token_family = TokenFamily(entry.var_name, family_of_derivs=True)
-            entry_token_family.set_latex_form_constructor(latex_form)
-            entry_token_family.set_status(demands_equation=True, unique_specific_token=False,
-                                          unique_token_type=False, s_and_d_merged=False,
-                                          meaningful=True)
-            entry_token_family.set_params(entry.names, OrderedDict([('power', (1, data_fun_pow))]),
-                                          {'power': 0}, entry.d_orders)
-            entry_token_family.set_evaluator(simple_function_evaluator, [])
+            entry.create_derivs_family(max_deriv_power=deriv_fun_pow)
+            entry.create_polynomial_family(max_power=data_fun_pow)
             
-            data_tokens.append(entry_token_family)
+            data_tokens.extend(entry.get_families())
 
         if isinstance(additional_tokens, list):
             if not all([isinstance(tf, (TokenFamily, PreparedTokens)) for tf in additional_tokens]):

@@ -101,7 +101,7 @@ class TokenFamily(object):
             Method, which uses the specific token evaluator to evaluate the passed token with its parameters
     """
 
-    def __init__(self, token_type: str, family_of_derivs: bool = False):
+    def __init__(self, token_type: str, variable:str = None, family_of_derivs: bool = False):
         """
         Initialize the token family;
 
@@ -111,6 +111,8 @@ class TokenFamily(object):
         """
 
         self.ftype = token_type
+        self.variable = variable
+        
         self.family_of_derivs = family_of_derivs
         self.evaluator_set = False
         self.params_set = False
@@ -339,8 +341,10 @@ class TokenFamily(object):
         if token_status is None or token_status == {}:
             token_status = {label: (0, self.token_params['power'][1], False)
                             for label in self.tokens}
+        # print('self.tokens:', self.tokens)
         if label is None:
             try:
+                # print()
                 if create_derivs:
                     label = np.random.choice([token for token in self.tokens
                                               if (not token_status[token][0] + 1 > token_status[token][1]
@@ -358,8 +362,8 @@ class TokenFamily(object):
             factor_deriv_code = self.derivs_ords[label]
         else:
             factor_deriv_code = None
-        new_factor = Factor(token_name=label, deriv_code=factor_deriv_code,
-                            status=self.status, family_type=self.ftype, 
+        new_factor = Factor(token_name=label, deriv_code=factor_deriv_code, status=self.status,
+                            family_type=self.ftype, variable = self.variable,
                             latex_constructor = self.latex_constructor)
 
         if self.status['unique_token_type']:
@@ -555,10 +559,33 @@ class TFPool(object):
         Returns:
             created `Factor`
         """
-        # print('family_label', family_label, 'self.families', self.families)
+        # print([f.ftype for f in self.families], family_label)
         family = [f for f in self.families if family_label == f.ftype][0]
         return family.create(label=None, token_status=token_status, **kwargs)
 
+    def create_with_var(self, variable: str, token_status=None, **kwargs):
+        """
+        Create token from choosing family
+
+        Args:
+            family_label (`str`): the name of the family from which the token will be created
+            token_status (`dict`): information about status of all families
+        
+        Returns:
+            created `Factor`
+        """
+        # print([f.ftype for f in self.families], family_label)
+        assert variable is not None, 'Can not create token with a specific variable for '
+        families = [f for f in self.families if variable == f.variable]
+
+        while True:
+            try:
+                probabilities = np.array([len(f.tokens) for f in families])
+                family = np.random.choice(families, p = probabilities/probabilities.sum())                
+                return family.create(label=None, token_status=token_status, **kwargs)
+            except ValueError:
+                families.remove(family)
+                
     def __add__(self, other):
         return TFPool(families=self.families + other.families)
 

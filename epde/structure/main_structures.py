@@ -78,7 +78,6 @@ class Term(ComplexStructure):
             self.structure = []
             for factor_elem in value:
                 factor = Factor.__new__(Factor)
-                # except_attr, _ = get_typespec_attrs(factor)
                 
                 attrs_from_dict(factor, factor_elem, except_attrs)
                 self.structure.append(factor)
@@ -171,10 +170,10 @@ class Term(ComplexStructure):
                                                           token_status=self.occupied_tokens_labels,
                                                           create_derivs=create_derivs, **kwargs)
         else:
-            occupied_by_factor, factor = self.pool.create_from_family(family_label=mandatory_family,
-                                                                      token_status=self.occupied_tokens_labels,
-                                                                      create_derivs=create_derivs,
-                                                                      **kwargs)
+            occupied_by_factor, factor = self.pool.create_with_var(variable=mandatory_family,
+                                                                   token_status=self.occupied_tokens_labels,
+                                                                   create_derivs=create_derivs,
+                                                                   **kwargs)
         self.structure = [factor,]
         update_token_status(self.occupied_tokens_labels, occupied_by_factor)
 
@@ -295,14 +294,14 @@ class Term(ComplexStructure):
                                                         factor in self.structure])
         return form
 
-    def contains_deriv(self, family=None):
-        if family is None:
+    def contains_deriv(self, variable=None):
+        if variable is None:
             return any([factor.is_deriv and factor.deriv_code != [None,] for factor in self.structure])
         else:
-            return any([factor.ftype == family and factor.deriv_code != [None,] for factor in self.structure])
+            return any([factor.variable == variable and factor.deriv_code != [None,] for factor in self.structure])
 
-    def contains_family(self, family):
-        return any([factor.ftype == family for factor in self.structure])
+    def contains_variable(self, variable):
+        return any([factor.variable == variable for factor in self.structure])
 
     def __eq__(self, other):
         return (all([any([other_elem == self_elem for other_elem in other.structure]) for self_elem in self.structure])
@@ -439,8 +438,9 @@ class Equation(ComplexStructure):
     def reset_explaining_term(self, term_idx=0):
         for idx, term in enumerate(self.structure):
             if idx == term_idx:
-                assert term.contains_family(
-                    self.main_var_to_explain), 'Trying explain a variable with term without right family.'
+                assert term.contains_variable(
+                    self.main_var_to_explain), f'Trying explain a variable {self.main_var_to_explain} \
+                                                 with term without right family.'
                 term.descr_variable_marker = self.main_var_to_explain
             else:
                 term.descr_variable_marker = False
@@ -456,11 +456,11 @@ class Equation(ComplexStructure):
                     and all([any([other_elem == self_elem for self_elem in self.structure]) for other_elem in other.structure])
                     and len(other.structure) == len(self.structure))
 
-    def contains_deriv(self, family=None):
-        return any([term.contains_deriv(family) for term in self.structure])
+    def contains_deriv(self, variable=None):
+        return any([term.contains_deriv(variable) for term in self.structure])
 
-    def contains_family(self, family):
-        return any([term.contains_family(family) for term in self.structure])
+    def contains_variable(self, variable):
+        return any([term.contains_variable(variable) for term in self.structure])
 
     @property
     def forbidden_token_labels(self):
@@ -490,7 +490,7 @@ class Equation(ComplexStructure):
             if deriv and temp.contains_deriv():
                 self.structure[replacement_idx] = temp
                 break
-            elif mandatory_family and temp.contains_family(self.main_var_to_explain):
+            elif mandatory_family and temp.contains_variable(self.main_var_to_explain):
                 self.structure[replacement_idx] = temp
                 break
             else:
@@ -824,7 +824,7 @@ class SoEq(moeadd.MOEADDSolution):
         self.tokens_supp = TFPool(pool.families_equationless)
         self.moeadd_set = False
 
-        self.vars_to_describe = [token_family.ftype for token_family in self.tokens_for_eq.families]
+        self.vars_to_describe = [token_family.variable for token_family in self.tokens_for_eq.families]
         
     def manual_reconst(self, attribute:str, value, except_attrs:dict):
         from epde.loader import attrs_from_dict, get_typespec_attrs

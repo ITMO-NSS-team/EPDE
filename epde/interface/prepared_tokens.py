@@ -40,13 +40,14 @@ class PreparedTokens(ABC):
 
 
 class DataPolynomials(PreparedTokens):
-    def __init__(self, var_name: str, max_power: int):
+    def __init__(self, var_name: str, max_power: int = 1):
         """
-        Class for tokens, representing higher order power products of the modelled variable. 
+        Class for tokens, representing power products of the modelled variable. 
         Argument `max_power` represents the maximum power, in which the tokens will exponentiated.
-        
+        Should be included into the pool by default, replacing the default 1-st power of the data.
         """
-        self._token_family = TokenFamily(token_type=f'poly of {var_name}')
+        self._token_family = TokenFamily(token_type=f'poly of {var_name}', variable = var_name,
+                                         family_of_derivs=True)
         
         def latex_form(label, **params):
             '''
@@ -75,10 +76,11 @@ class DataPolynomials(PreparedTokens):
         self._token_family.set_latex_form_constructor(latex_form)
         self._token_family.set_status(demands_equation=False, meaningful=True,
                                       unique_specific_token=True, unique_token_type=True,
-                                      s_and_d_merged=False, family_of_derivs=True)
-        self._token_family.set_params([var_name,], OrderedDict([('power', (2, max_power))]), 
-                                      {'power': 0}, [None,])
+                                      s_and_d_merged=False)
+        self._token_family.set_params([var_name,], OrderedDict([('power', (1, max_power))]), 
+                                      {'power': 0}, [[None,],])
         self._token_family.set_evaluator(simple_function_evaluator, [])
+        
         
 
 

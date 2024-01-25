@@ -101,10 +101,10 @@ def prepare_var_tensor(var_tensor, derivs_tensor, time_axis):
     initial_shape = var_tensor.shape
     print('initial_shape', initial_shape, 'derivs_tensor.shape', derivs_tensor.shape)
     var_tensor = np.moveaxis(var_tensor, time_axis, 0)
-    result = np.ones((1 + derivs_tensor.shape[-1], ) + tuple([shape for shape in var_tensor.shape]))  # - 2*boundary
+    result = np.ones((derivs_tensor.shape[-1], ) + tuple([shape for shape in var_tensor.shape]))  # - 2*boundary
 
-    increment = 1
-    result[increment - 1, :] = var_tensor#, boundary, cut_except)
+    increment = 0
+    #result[increment - 1, :] = var_tensor#, boundary, cut_except)
     if derivs_tensor.ndim == 2:
         for i_outer in range(0, derivs_tensor.shape[1]):
             result[i_outer+increment, ...] = np.moveaxis(derivs_tensor[:, i_outer].reshape(initial_shape), # np_ndarray_section( , boundary, cut_except)
