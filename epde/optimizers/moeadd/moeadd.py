@@ -17,6 +17,7 @@ def flatten_chain(matrix):
 # from functools import reduce
 
 import epde.globals as global_var
+from epde.structure.main_structures import SoEq
 from epde.optimizers.moeadd.population_constr import SystemsPopulationConstructor
 from epde.optimizers.moeadd.vis import ParetoVisualizer
 
@@ -63,13 +64,31 @@ class ParetoLevels(object):
                 The method of point addition into the population and onto the non-dominated levels.
         """
         self._sorting_method = sorting_method
-        self.population = [] #population
+        self.population = []
         self._update_method = update_method
-        self.unplaced_candidates = population # tabulation deleted
-        
+        self.unplaced_candidates = population
+    
+    def manual_reconst(self, attribute:str, value, except_attrs:dict):
+        from epde.loader import attrs_from_dict, get_typespec_attrs
+        supported_attrs = ['population']
+        if attribute not in supported_attrs:
+            raise ValueError(f'Attribute {attribute} is not supported by manual_reconst method.')
+            
+        if attribute == 'population':
+            self.population = []
+            for system_elem in value:
+                system = SoEq.__new__(SoEq)
+                attrs_from_dict(system, system_elem, except_attrs)
+                self.population.append(system)
+        self.levels = self.sort()
+    
+    def attrs_from_dict(self, attributes, except_keys = ['obj_type']):
+        self.__dict__ = {key : item for key, item in attributes.items()
+                         if key not in except_keys}
+    
     @property
     def levels(self):
-        return self._levels     #sort(self.population)
+        return self._levels
     
     @levels.setter
     def levels(self, value : list):
@@ -87,10 +106,10 @@ class ParetoLevels(object):
         """
         while self._unplaced_candidates:
             self.population.append(self._unplaced_candidates.pop())
-        if any([any([candidate == other_candidate for other_candidate in self.population[:idx] + self.population[idx+1:]])
-                for idx, candidate in enumerate(self.population)]):
-            print([candidate.text_form for candidate in self.population])
-            raise Exception('Duplicating initial candidates')
+        # if any([any([candidate == other_candidate for other_candidate in self.population[:idx] + self.population[idx+1:]])
+                # for idx, candidate in enumerate(self.population)]):
+            # print([candidate.text_form for candidate in self.population])
+            # raise Exception('Duplicating initial candidates')
         self.levels = self.sort()
 
     def sort(self):
@@ -282,7 +301,6 @@ class MOEADDOptimizer(object):
             while True:
                 if type(solution_params) == type(None): solution_params = {}
                 temp_solution = pop_constructor.create(**solution_params)
-                #TODO: check domain belonging
                 temp_solution.set_domain(solution_idx)
                 if not np.any([temp_solution == solution for solution in population]):
                     population.append(temp_solution)
@@ -293,8 +311,6 @@ class MOEADDOptimizer(object):
                     warnings.warn('Too many failed attempts to create unique solutions for multiobjective optimization.\
                                   Change solution parameters to allow more diversity.')
                 if solution_gen_idx == soluton_creation_attempts_hardmax:
-                    # self.abbreviated_search(population, sorting_method = nds_method, update_method = ndl_update)
-                    # return None
                     population.append(temp_solution)
                     print(f'New solution accepted, despite being a dublicate of another solution.\
                           Confirmed {len(population)}/{pop_size} solutions.')

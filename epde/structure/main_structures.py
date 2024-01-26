@@ -13,6 +13,8 @@ import os
 import pickle
 from typing import Union, Callable
 from functools import singledispatchmethod, reduce
+from collections import Iterable
+
 
 import numpy as np
 import torch
@@ -46,6 +48,7 @@ class Term(ComplexStructure):
     __slots__ = ['_history', 'structure', 'interelement_operator', 'saved', 'saved_as',
                  'pool', 'max_factors_in_term', 'cache_linked', 'occupied_tokens_labels',
                  '_descr_variable_marker']
+    # manual_reconst_attrs = ['structure']
 
     def __init__(self, pool, passed_term=None, mandatory_family=None, max_factors_in_term=1,
                  create_derivs: bool = False, interelement_operator=np.multiply, collapse_powers = True):
@@ -63,7 +66,22 @@ class Term(ComplexStructure):
             self.use_cache()
         # key - state of normalization, value - if the variable is saved in cache
         self.reset_saved_state()
-
+    
+    def manual_reconst(self, attribute:str, value, except_attrs:dict):
+        from epde.loader import attrs_from_dict, get_typespec_attrs      
+        supported_attrs = ['structure']
+        if attribute not in supported_attrs:
+            raise ValueError(f'Attribute {attribute} is not supported by manual_reconst method.')
+    
+        if attribute == supported_attrs[0]:
+            # Validate correctness of a term definition
+            self.structure = []
+            for factor_elem in value:
+                factor = Factor.__new__(Factor)
+                
+                attrs_from_dict(factor, factor_elem, except_attrs)
+                self.structure.append(factor)
+    
     @property
     def cache_label(self):
         if len(self.structure) > 1:
@@ -128,7 +146,6 @@ class Term(ComplexStructure):
         if forbidden_factors is None:
             forbidden_factors = {}
             for family in self.pool.labels_overview:
-                # print('family is ', family)
                 for token_label in family[0]:
                     if isinstance(self.max_factors_in_term, int):
                         forbidden_factors[token_label] = [0, min(self.max_factors_in_term, family[1]), False]
@@ -153,10 +170,10 @@ class Term(ComplexStructure):
                                                           token_status=self.occupied_tokens_labels,
                                                           create_derivs=create_derivs, **kwargs)
         else:
-            occupied_by_factor, factor = self.pool.create_from_family(family_label=mandatory_family,
-                                                                      token_status=self.occupied_tokens_labels,
-                                                                      create_derivs=create_derivs,
-                                                                      **kwargs)
+            occupied_by_factor, factor = self.pool.create_with_var(variable=mandatory_family,
+                                                                   token_status=self.occupied_tokens_labels,
+                                                                   create_derivs=create_derivs,
+                                                                   **kwargs)
         self.structure = [factor,]
         update_token_status(self.occupied_tokens_labels, occupied_by_factor)
 
@@ -277,14 +294,14 @@ class Term(ComplexStructure):
                                                         factor in self.structure])
         return form
 
-    def contains_deriv(self, family=None):
-        if family is None:
+    def contains_deriv(self, variable=None):
+        if variable is None:
             return any([factor.is_deriv and factor.deriv_code != [None,] for factor in self.structure])
         else:
-            return any([factor.ftype == family and factor.deriv_code != [None,] for factor in self.structure])
+            return any([factor.variable == variable and factor.deriv_code != [None,] for factor in self.structure])
 
-    def contains_family(self, family):
-        return any([factor.ftype == family for factor in self.structure])
+    def contains_variable(self, variable):
+        return any([factor.variable == variable for factor in self.structure])
 
     def __eq__(self, other):
         return (all([any([other_elem == self_elem for other_elem in other.structure]) for self_elem in self.structure])
@@ -318,12 +335,12 @@ class Term(ComplexStructure):
 
 
 class Equation(ComplexStructure):
-    __slots__ = ['_history', 'structure', 'interelement_operator', 'saved', 'saved_as',
-                 'n_immutable', 'pool', 'terms_number', 'max_factors_in_term', 'operator',
+    __slots__ = ['_history', 'structure', 'interelement_operator', 'n_immutable', 'pool',
+                  # 'saved', 'saved_as','max_factors_in_term', 'operator',
                  '_target', 'target_idx', '_features', 'right_part_selected',
                  '_weights_final', 'weights_final_evald', '_weights_internal', 'weights_internal_evald',
-                 'fitness_calculated', 'solver_form_defined', '_solver_form', '_fitness_value',
-                 'crossover_selected_times', 'metaparameters', 'main_var_to_explain']
+                 'fitness_calculated', 'solver_form_defined', '_fitness_value', # , '_solver_form'
+                 'metaparameters', 'main_var_to_explain']
 
     def __init__(self, pool: TFPool, basic_structure: Union[list, tuple, set], var_to_explain: str = None,
                  metaparameters: dict = {'sparsity': {'optimizable': True, 'value': 1.},
@@ -359,9 +376,6 @@ class Equation(ComplexStructure):
 
             tokens : list of strings \r\n
             Symbolic forms of functions, including derivatives;
-
-            terms_number : int, base value of 6 \r\n
-            Maximum number of terms in the discovered equation; 
 
             max_factors_in_term : int, base value of 2\r\n
             Maximum number of factors, that can form a term (e.g. with 2: df/dx_1 * df/dx_2)
@@ -404,13 +418,29 @@ class Equation(ComplexStructure):
 
         for idx, _ in enumerate(self.structure):
             self.structure[idx].use_cache()
-
+    
+    def manual_reconst(self, attribute:str, value, except_attrs:dict):
+        from epde.loader import attrs_from_dict, get_typespec_attrs      
+        supported_attrs = ['structure']
+        if attribute not in supported_attrs:
+            raise ValueError(f'Attribute {attribute} is not supported by manual_reconst method.')
+    
+        if attribute == supported_attrs[0]:
+            # Validate correctness of a term definition
+            self.structure = []
+            for term_elem in value:
+                term = Term.__new__(Term)
+                # except_attr, _ = get_typespec_attrs(term)
+                
+                attrs_from_dict(term, term_elem, except_attrs)
+                self.structure.append(term)
+    
     def reset_explaining_term(self, term_idx=0):
         for idx, term in enumerate(self.structure):
             if idx == term_idx:
-                # print(f'Checking if {self.main_var_to_explain} is in {term.name}')
-                assert term.contains_family(
-                    self.main_var_to_explain), 'Trying explain a variable with term without right family.'
+                assert term.contains_variable(
+                    self.main_var_to_explain), f'Trying explain a variable {self.main_var_to_explain} \
+                                                 with term without right family.'
                 term.descr_variable_marker = self.main_var_to_explain
             else:
                 term.descr_variable_marker = False
@@ -426,11 +456,11 @@ class Equation(ComplexStructure):
                     and all([any([other_elem == self_elem for self_elem in self.structure]) for other_elem in other.structure])
                     and len(other.structure) == len(self.structure))
 
-    def contains_deriv(self, family=None):
-        return any([term.contains_deriv(family) for term in self.structure])
+    def contains_deriv(self, variable=None):
+        return any([term.contains_deriv(variable) for term in self.structure])
 
-    def contains_family(self, family):
-        return any([term.contains_family(family) for term in self.structure])
+    def contains_variable(self, variable):
+        return any([term.contains_variable(variable) for term in self.structure])
 
     @property
     def forbidden_token_labels(self):
@@ -460,7 +490,7 @@ class Equation(ComplexStructure):
             if deriv and temp.contains_deriv():
                 self.structure[replacement_idx] = temp
                 break
-            elif mandatory_family and temp.contains_family(self.main_var_to_explain):
+            elif mandatory_family and temp.contains_variable(self.main_var_to_explain):
                 self.structure[replacement_idx] = temp
                 break
             else:
@@ -486,7 +516,6 @@ class Equation(ComplexStructure):
         self._target = self.structure[self.target_idx].evaluate(normalize, grids=grids)
         
         # Place for improvent: introduce shifted_idx where necessary
-        
         def shifted_idx(idx):
             if idx < self.target_idx:
                 return idx  
@@ -505,11 +534,10 @@ class Equation(ComplexStructure):
             for feat_idx in range(len(feature_indexes)):
                 if feat_idx == 0:
                     self._features = self.structure[feature_indexes[feat_idx]].evaluate(normalize, grids=grids)
-                else: #if feat_idx != 0:
+                else:
                     temp = self.structure[feature_indexes[feat_idx]].evaluate(normalize, grids=grids)
                     self._features = np.vstack([self._features, temp])
-                # else:
-                    # continue
+
             if self._features.ndim == 1:
                 self._features = np.expand_dims(self._features, 1).T
             temp_feats = np.vstack([self._features, np.ones(self._features.shape[1])])
@@ -546,10 +574,8 @@ class Equation(ComplexStructure):
         self.fitness_calculated = False
         self.solver_form_defined = False
 
-    # @ResetEquationStatus(reset_input = False, reset_output = True)
     @HistoryExtender('\n -> was copied by deepcopy(self)', 'n')
     def __deepcopy__(self, memo=None):
-        # print(f'Deepcopying equation {self}')
         clss = self.__class__
         new_struct = clss.__new__(clss)
         memo[id(self)] = new_struct
@@ -585,6 +611,7 @@ class Equation(ComplexStructure):
             pass
 
     def add_history(self, add):
+        # print(add)
         self._history += add
 
     @property
@@ -771,10 +798,6 @@ def solver_formed_grid(training_grid=None):
 def check_metaparameters(metaparameters: dict):
     metaparam_labels = ['terms_number', 'max_factors_in_term', 'sparsity']
     return True
-    # TODO: maybe fix this check, non-urgent
-    # if any([((label not in metaparameters.keys()) and ) for label in metaparam_labels]):
-    #     print('required metaparameters:', metaparam_labels, 'metaparameters:', metaparameters)
-    #     raise ValueError('Only partial metaparameter vector has been passed.')
 
 
 class SoEq(moeadd.MOEADDSolution):
@@ -801,13 +824,28 @@ class SoEq(moeadd.MOEADDSolution):
         self.tokens_supp = TFPool(pool.families_equationless)
         self.moeadd_set = False
 
-        self.vars_to_describe = [token_family.ftype for token_family in self.tokens_for_eq.families] # Made list from set
-
+        self.vars_to_describe = [token_family.variable for token_family in self.tokens_for_eq.families]
+        
+    def manual_reconst(self, attribute:str, value, except_attrs:dict):
+        from epde.loader import attrs_from_dict, get_typespec_attrs
+        supported_attrs = ['vals']
+        if attribute not in supported_attrs:
+            raise ValueError(f'Attribute {attribute} is not supported by manual_reconst method.')
+    
+        if attribute == supported_attrs[0]:
+            # Validate correctness of a term definition
+            equations = {}
+            for idx, eq_elem in enumerate(value):
+                eq = Equation.__new__(Equation)
+                attrs_from_dict(eq, eq_elem, except_attrs)
+                equations[self.vars_to_describe[idx]] = eq
+            self.vals = Chromosome(equations, {key: val for key, val in self.metaparameters.items()
+                                               if val['optimizable']})
+                
     def use_default_multiobjective_function(self):
         from epde.eq_mo_objectives import generate_partial, equation_fitness, equation_complexity_by_factors
         complexity_objectives = [generate_partial(equation_complexity_by_factors, eq_key)
-                                 for eq_key in self.vars_to_describe]  # range(len(self.tokens_for_eq))]
-        # range(len(self.tokens_for_eq))]
+                                 for eq_key in self.vars_to_describe]
         quality_objectives = [generate_partial(
             equation_fitness, eq_key) for eq_key in self.vars_to_describe]
         self.set_objective_functions(
@@ -843,16 +881,21 @@ class SoEq(moeadd.MOEADDSolution):
         
         return list(self.obj_fun[-len(complexity):]) == complexity        
 
-    def create_equations(self):
-        structure = {}
-
-        token_selection = self.tokens_supp
-        current_tokens_pool = token_selection + self.tokens_for_eq
-
-        for eq_idx, variable in enumerate(self.vars_to_describe):
-            structure[variable] = Equation(current_tokens_pool, basic_structure=[],
-                                           var_to_explain=variable,
-                                           metaparameters=self.metaparameters)
+    def create(self, passed_equations: list = None):
+        if passed_equations is None:
+            structure = {}
+    
+            token_selection = self.tokens_supp
+            current_tokens_pool = token_selection + self.tokens_for_eq
+    
+            for eq_idx, variable in enumerate(self.vars_to_describe):
+                structure[variable] = Equation(current_tokens_pool, basic_structure=[],
+                                               var_to_explain=variable,
+                                               metaparameters=self.metaparameters)
+        else:
+            if len(passed_equations) != len(self.vars_to_describe):
+                raise ValueError('Length of passed equations list does not match')
+            structure = {self.vars_to_describe[idx] : eq for idx, eq in enumerate(passed_equations)}
 
         self.vals = Chromosome(structure, params={key: val for key, val in self.metaparameters.items()
                                                   if val['optimizable']})
@@ -962,12 +1005,12 @@ class SoEq(moeadd.MOEADDSolution):
     def fitness_calculated(self):
         return all([equation.fitness_calculated for equation in self.vals])
 
-    def save(self, file_name='epde_systems.pickle'):
-        directory = os.getcwd()
-        with open(file_name, 'wb') as file:
-            to_save = ([equation.text_form for equation in self.vals],
-                       self.tokens_for_eq + self.tokens_supp)
-            pickle.dump(obj=to_save, file=file)
+    # def save(self, file_name='epde_systems.pickle'):
+    #     directory = os.getcwd()
+    #     with open(file_name, 'wb') as file:
+    #         to_save = ([equation.text_form for equation in self.vals],
+    #                    self.tokens_for_eq + self.tokens_supp)
+    #         pickle.dump(obj=to_save, file=file)
 
 
 class SoEqIterator(object):

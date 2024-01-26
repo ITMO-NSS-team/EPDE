@@ -18,13 +18,10 @@ from epde.optimizers.moeadd.moeadd import *
 from epde.optimizers.moeadd.supplementary import *
 from epde.optimizers.moeadd.strategy import MOEADDDirector
 from epde.optimizers.moeadd.strategy_elems import MOEADDSectorProcesser
-#from epde.optimizers.moeadd.population_constr import SystemsPopulationConstructor as MOEADDSystemPopConstr
 
 from epde.optimizers.single_criterion.optimizer import EvolutionaryStrategy, SimpleOptimizer
-# from epde.optimizers.single_criterion.population_constr import SystemsPopulationConstructor as SOSystemPopConstr
 from epde.optimizers.single_criterion.strategy import BaselineDirector
 from epde.optimizers.single_criterion.supplementary import simple_sorting
-# from epde.optimizers.moeadd.strategy_elems import SectorProcesserBuilder
 
 from epde.preprocessing.domain_pruning import DomainPruner
 from epde.operators.utils.default_parameter_loader import EvolutionaryParams
@@ -33,7 +30,7 @@ from epde.decorators import BoundaryExclusion
 
 from epde.evaluators import simple_function_evaluator, trigonometric_evaluator
 from epde.supplementary import define_derivatives
-from epde.cache.cache import upload_simple_tokens, upload_grids, prepare_var_tensor #, np_ndarray_section
+from epde.cache.cache import upload_simple_tokens, upload_grids, prepare_var_tensor
 
 from epde.preprocessing.preprocessor_setups import PreprocessorSetup
 from epde.preprocessing.preprocessor import ConcretePrepBuilder, PreprocessingPipe
@@ -42,7 +39,7 @@ from epde.structure.main_structures import Equation, SoEq
 
 from epde.interface.token_family import TFPool, TokenFamily
 from epde.interface.type_checks import *
-from epde.interface.prepared_tokens import PreparedTokens, CustomTokens
+from epde.interface.prepared_tokens import PreparedTokens, CustomTokens, DataPolynomials
 from epde.interface.solver_integration import BoundaryConditions, SolverAdapter, SystemSolverInterface
 
 class InputDataEntry(object):
@@ -100,6 +97,7 @@ class InputDataEntry(object):
 
         try:
             upload_simple_tokens(self.names, global_var.tensor_cache, derivs_stacked)
+            upload_simple_tokens([self.var_name,], global_var.tensor_cache, [self.data_tensor,])            
             upload_simple_tokens([self.var_name,], global_var.initial_data_cache, [self.data_tensor,])
 
         except AttributeError:
@@ -107,6 +105,50 @@ class InputDataEntry(object):
 
         global_var.tensor_cache.use_structural()
 
+    @staticmethod
+    def latex_form(label, **params):
+        '''
+        Parameters
+        ----------
+        label : str
+            label of the token, for which we construct the latex form.
+        **params : dict
+            dictionary with parameter labels as keys and tuple of parameter values 
+            and their output text forms as values.
+
+        Returns
+        -------
+        form : str
+            LaTeX-styled text form of token.
+        '''            
+        if '/' in label:
+            label = label[:label.find('x')+1] + '_' + label[label.find('x')+1:]
+            label = label.replace('d', r'\partial ').replace('/', r'}{')
+            label = r'\frac{' + label + r'}'
+                            
+        if params['power'][0] > 1:
+            label = r'\left(' + label + r'\right)^{{{0}}}'.format(params["power"][1])
+        return label
+
+    def create_derivs_family(self, max_deriv_power: int = 1):
+        self._derivs_family = TokenFamily(token_type=f'deriv of {self.var_name}', variable = self.var_name, 
+                                          family_of_derivs=True)
+        
+        
+        self._derivs_family.set_latex_form_constructor(self.latex_form)
+        self._derivs_family.set_status(demands_equation=True, unique_specific_token=False,
+                                      unique_token_type=False, s_and_d_merged=False,
+                                      meaningful=True)
+        self._derivs_family.set_params(self.names, OrderedDict([('power', (1, max_deriv_power))]),
+                                      {'power': 0}, self.d_orders)
+        self._derivs_family.set_evaluator(simple_function_evaluator, [])        
+
+    def create_polynomial_family(self, max_power):
+        polynomials = DataPolynomials(self.var_name, max_power = max_power)
+        self._polynomial_family = polynomials.token_family
+
+    def get_families(self):
+        return [self._polynomial_family, self._derivs_family]
 
 def simple_selector(sorted_neighbors, number_of_neighbors=4):
     return sorted_neighbors[:number_of_neighbors]
@@ -497,7 +539,7 @@ class EpdeSearch(object):
 
     def create_pool(self, data: Union[np.ndarray, list, tuple], variable_names=['u',],
                     derivs=None, max_deriv_order=1, additional_tokens=[],
-                    data_fun_pow: int = 1):
+                    data_fun_pow: int = 1, deriv_fun_pow: int = 1):
         self.pool_params = {'variable_names' : variable_names, 'max_deriv_order' : max_deriv_order,
                             'additional_tokens' : [family.token_family.ftype for family in additional_tokens]}
         assert (isinstance(derivs, list) and isinstance(derivs[0], np.ndarray)) or derivs is None
@@ -516,53 +558,20 @@ class EpdeSearch(object):
             self.set_preprocessor()
 
         data_tokens = []
-            
-        def latex_form(label, **params):
-            '''
-            Parameters
-            ----------
-            label : str
-                label of the token, for which we construct the latex form.
-            **params : dict
-                dictionary with parameter labels as keys and tuple of parameter values 
-                and their output text forms as values.
-
-            Returns
-            -------
-            form : str
-                LaTeX-styled text form of token.
-            '''            
-            if '/' in label:
-                label = label[:label.find('x')+1] + '_' + label[label.find('x')+1:]
-                label = label.replace('d', r'\partial ').replace('/', r'}{')
-                label = r'\frac{' + label + r'}'
-                                
-            if params['power'][0] > 1:
-                label = r'\left(' + label + r'\right)^{{{0}}}'.format(params["power"][1])
-            return label
         
         for data_elem_idx, data_tensor in enumerate(data):
             assert isinstance(data_tensor, np.ndarray), 'Input data must be in format of numpy ndarrays or iterable (list or tuple) of numpy arrays'
             entry = InputDataEntry(var_name=variable_names[data_elem_idx],
-                                     data_tensor=data_tensor)
+                                   data_tensor=data_tensor)
             derivs_tensor = derivs[data_elem_idx] if derivs is not None else None
             entry.set_derivatives(preprocesser=self.preprocessor_pipeline, deriv_tensors=derivs_tensor,
                                   grid=global_var.grid_cache.get_all()[1], max_order=max_deriv_order)
             entry.use_global_cache()
 
-            self.set_derivatives(variable=variable_names[data_elem_idx], deriv=entry.derivatives)  
-
-
-            entry_token_family = TokenFamily(entry.var_name, family_of_derivs=True)
-            entry_token_family.set_latex_form_constructor(latex_form)
-            entry_token_family.set_status(demands_equation=True, unique_specific_token=False,
-                                          unique_token_type=False, s_and_d_merged=False,
-                                          meaningful=True)
-            entry_token_family.set_params(entry.names, OrderedDict([('power', (1, data_fun_pow))]),
-                                          {'power': 0}, entry.d_orders)
-            entry_token_family.set_evaluator(simple_function_evaluator, [])
+            entry.create_derivs_family(max_deriv_power=deriv_fun_pow)
+            entry.create_polynomial_family(max_power=data_fun_pow)
             
-            data_tokens.append(entry_token_family)
+            data_tokens.extend(entry.get_families())
 
         if isinstance(additional_tokens, list):
             if not all([isinstance(tf, (TokenFamily, PreparedTokens)) for tf in additional_tokens]):
@@ -573,7 +582,7 @@ class EpdeSearch(object):
             print(isinstance(additional_tokens, PreparedTokens))
             raise TypeError(f'Incorrect type of additional tokens: expected list or TokenFamily/Prepared_tokens - obj, instead got {type(additional_tokens)}')
         self.pool = TFPool(data_tokens + [tf if isinstance(tf, TokenFamily) else tf.token_family
-                                      for tf in additional_tokens])
+                                          for tf in additional_tokens])
         print(f'The cardinality of defined token pool is {self.pool.families_cardinality()}')
         print(f'Among them, the pool contains {self.pool.families_cardinality(meaningful_only=True)}')
         
@@ -671,11 +680,6 @@ class EpdeSearch(object):
         print('The optimization has been conducted.')
         self.search_conducted = True
 
-        # if self.multiobjective_mode:
-        #     self.fit_multiobjective(equation_terms_max_number, equation_factors_max_number,eq_sparsity_interval)
-        # else:
-        #     self.fit_singleobjective(equation_terms_max_number, equation_factors_max_number, eq_sparsity_interval)
-            
     def fit_multiobjective(self, equation_terms_max_number=6, equation_factors_max_number=1, eq_sparsity_interval=(1e-4, 2.5)):
         """
         Fitting functional for multiojective optimization 
@@ -688,21 +692,11 @@ class EpdeSearch(object):
         Returns:
             None
         """
-        # pop_constructor = MOEADDSystemPopConstr(pool = self.pool, terms_number = equation_terms_max_number, 
-        #                                         max_factors_in_term = equation_factors_max_number,
-        #                                         sparsity_interval = eq_sparsity_interval)
-
         self.optimizer_init_params['population_instruct'] = {"pool": self.pool, "terms_number": equation_terms_max_number,
                                                              "max_factors_in_terms": equation_factors_max_number, "sparsity_interval": eq_sparsity_interval}
 
-        # self.optimizer_init_params['pop_constructor'] = pop_constructor
         self.optimizer = MOEADDOptimizer(**self.optimizer_init_params)
         
-        # evo_operator_builder = self.director.builder
-        # evo_operator_builder.assemble(True)
-        # evo_operator = evo_operator_builder.processer
-
-        # self.optimizer.set_sector_processer(processer=evo_operator)
         self.optimizer.set_strategy(self.director)
         best_obj = np.concatenate((np.zeros(shape=len([1 for token_family in self.pool.families if token_family.status['demands_equation']])),
                                    np.ones(shape=len([1 for token_family in self.pool.families if token_family.status['demands_equation']]))))
@@ -725,21 +719,10 @@ class EpdeSearch(object):
         Returns:
             None
         """
-        # pop_constructor = SOSystemPopConstr(pool = self.pool, terms_number = equation_terms_max_number, 
-        #                                     max_factors_in_term = equation_factors_max_number,
-        #                                     sparsity_interval = eq_sparsity_interval)
-        
         self.optimizer_init_params['population_instruct'] = {"pool": self.pool, "terms_number": equation_terms_max_number,
                                                              "max_factors_in_terms": equation_factors_max_number, "sparsity_interval": eq_sparsity_interval}
-        # self.optimizer_params['pop_constructor']
-        # self.optimizer_init_params['pop_constructor'] = pop_constructor
         self.optimizer = SimpleOptimizer(**self.optimizer_init_params)        
 
-        # TODO: Somehow generalize
-        # evo_operator_builder = self.director.builder
-        # evo_operator_builder.assemble(True)
-        # evo_operator = evo_operator_builder.processer
-        # self.optimizer.set_strategy(strategy = evo_operator)
         self.optimizer.set_strategy(self.director)
 
         self.optimizer.optimize(**self.optimizer_exec_params)
@@ -776,7 +759,7 @@ class EpdeSearch(object):
                     print(f'{idx}-th non-dominated level')    
                     print('\n')                
                     [print(f'{solution.text_form} , with objective function values of {solution.obj_fun} \n')  
-                     for solution in self._resulting_population[idx]]
+                    for solution in self._resulting_population[idx]]
             else:
                 if only_str:
                     eqs = []
@@ -825,9 +808,7 @@ class EpdeSearch(object):
         return self.optimizer.pareto_levels.get_by_complexity(complexity)
 
     def predict(self, system : SoEq, boundary_conditions : BoundaryConditions, grid : list = None, data = None,
-                system_file : str = None, solver_kwargs : dict = {'use_cache' : True}, strategy = 'NN'):
-        # solver_kwargs['dim'] = len(global_var.grid_cache.get_all()[1])
-        
+                system_file : str = None, solver_kwargs : dict = {'use_cache' : True}, mode = 'NN'):
         
         if system is not None:
             print('Using explicitly sent system of equations.')
@@ -843,12 +824,15 @@ class EpdeSearch(object):
             grid = global_var.grid_cache.get_all()[1]
         
         adapter = SolverAdapter(var_number = len(system.vars_to_describe))
-        adapter.set_solver_params(**solver_kwargs)
+        adapter.set_solver_params(**solver_kwargs)        
         print(f'grid.shape is {grid[0].shape}')
-        print(f'Shape of the grid for solver {adapter.convert_grid(grid).shape}')        
+        print(f'Shape of the grid for solver {adapter.convert_grid(grid, mode = mode).shape}')        
         solution_model = adapter.solve_epde_system(system = system, grids = grid, data = data, 
-                                                   boundary_conditions = boundary_conditions, strategy = strategy)
-        return solution_model(adapter.convert_grid(grid)).detach().numpy()
+                                                   boundary_conditions = boundary_conditions, mode = mode)
+        if mode == 'mat':
+            return solution_model
+        else:
+            return solution_model(adapter.convert_grid(grid, mode = mode)).detach().numpy()
 
     def visualize_solutions(self, dimensions:list = [0, 1], **visulaizer_kwargs):
         if self.multiobjective_mode:

@@ -10,22 +10,25 @@ import numpy as np
 import copy
 import torch
 from typing import Callable
+from collections import Iterable
 
-from epde.structure.Tokens import TerminalToken
 import epde.globals as global_var
+from epde.structure.Tokens import TerminalToken
 from epde.supplementary import factor_params_to_str, train_ann, use_ann_to_predict, exp_form
 
 
 class Factor(TerminalToken):
-    __slots__ = ['_params', '_params_description', '_hash_val', '_latex_constructor'
-                 'label', 'ftype', 'grid_set', 'grid_idx', 'is_deriv', 'deriv_code',
+    __slots__ = ['_params', '_params_description', '_hash_val', '_latex_constructor',
+                 'label', 'ftype', '_variable', 'grid_set', 'grid_idx', 'is_deriv', 'deriv_code',
                  'cache_linked', '_status', 'equality_ranges', '_evaluator', 'saved']
 
     def __init__(self, token_name: str, status: dict, family_type: str, latex_constructor: Callable,
-                 randomize: bool = False, params_description=None, deriv_code=None, 
-                 equality_ranges=None):
+                 variable: str = None, randomize: bool = False, params_description=None, deriv_code=None, 
+                 equality_ranges = None):
         self.label = token_name
         self.ftype = family_type
+        self._variable = variable
+        
         self.status = status
         self.grid_set = False
         self._hash_val = np.random.randint(0, 1e9)
@@ -47,6 +50,19 @@ class Factor(TerminalToken):
 
             if self.status['requires_grid']:
                 self.use_grids_cache()
+    
+    @property
+    def variable(self):
+        if self._variable is None:
+            return self.ftype
+        else:
+            return self._variable
+        
+    def manual_reconst(self, attribute:str, value, except_attrs:dict):
+        from epde.loader import obj_to_pickle, attrs_from_dict        
+        supported_attrs = []
+        if attribute not in supported_attrs:
+            raise ValueError(f'Attribute {attribute} is not supported by manual_reconst method.')
 
     @property
     def ann_representation(self) -> torch.nn.modules.container.Sequential:
@@ -104,7 +120,7 @@ class Factor(TerminalToken):
         else:
             _params = np.empty(len(params_description))
             for param_idx, param_info in enumerate(params_description.items()):
-                if param_info[0] != 'power':
+                if param_info[0] != 'power' or self.status['non_default_power']:
                     _params[param_idx] = (np.random.randint(param_info[1][0], param_info[1][1] + 1) if isinstance(param_info[1][0], int)
                                           else np.random.uniform(param_info[1][0], param_info[1][1])) if param_info[1][1] > param_info[1][0] else param_info[1][0]
                 else:

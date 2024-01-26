@@ -26,8 +26,9 @@ class SystemsPopulationConstructor(object):
                  obj_functions : Callable = None, sparsity_interval : tuple = (0, 1)):
         self.pool = pool; self.terms_number = terms_number
         self.max_factors_in_term = max_factors_in_term 
-        self.vars_demand_equation = [family.ftype for family in self.pool.families_demand_equation]
+        self.vars_demand_equation = set([family.variable for family in self.pool.families_demand_equation])
         self.sparsity_interval = sparsity_interval
+        print('self.vars_demand_equation', self.vars_demand_equation)        
 
     def create(self, **kwargs):
         sparsity = kwargs.get('sparsity', np.exp(np.random.uniform(low = np.log(self.sparsity_interval[0]),
@@ -49,6 +50,6 @@ class SystemsPopulationConstructor(object):
         except KeyError:
             created_solution.use_default_multiobjective_function()
 
-        created_solution.create_equations()
+        created_solution.create()
 
         return created_solution

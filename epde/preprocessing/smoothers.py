@@ -107,13 +107,9 @@ class GaussianSmoother(AbstractSmoother):
         pass
 
     def __call__(self, data, kernel_fun='gaussian', **kwargs):
-        # print('kwargs', kwargs)
         smoothed_data = np.empty_like(data)
         if kernel_fun == 'gaussian':
-            if kwargs['include_time']:
-                print('full smoothing')
-                smoothed_data = gaussian_filter(data, sigma=kwargs['sigma'])
-            elif np.ndim(data) > 1:
+            if not kwargs['include_time'] and np.ndim(data) > 1:
                 for time_idx in np.arange(data.shape[0]):
                     smoothed_data[time_idx, ...] = gaussian_filter(data[time_idx, ...],
                                                                    sigma=kwargs['sigma'])

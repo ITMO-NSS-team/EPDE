@@ -267,8 +267,8 @@ def define_derivatives(var_name='u', dimensionality=1, max_order=2):
         deriv_names (`list` with `str` values): keys for epde
         var_deriv_orders (`list` with `int` values): keys for enter to solver
     """
-    deriv_names = [var_name,]
-    var_deriv_orders = [[None,],]
+    deriv_names = []#[var_name,]
+    var_deriv_orders = []#[[None,],]
     if isinstance(max_order, int):
         max_order = [max_order for dim in range(dimensionality)]
     for var_idx in range(dimensionality):

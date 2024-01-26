@@ -9,15 +9,13 @@ Created on Mon Jul  6 15:39:18 2020
 import numpy as np
 import itertools
 from typing import Union, Callable
-
-import pickle
+from collections import Iterable
 
 import epde.globals as global_var
 from epde.structure.factor import Factor
 
 
 def constancy_hard_equality(tensor, epsilon=1e-7):
-    # print(np.abs(np.max(tensor) - np.min(tensor)), epsilon, type(np.abs(np.max(tensor) - np.min(tensor))),  type(epsilon))
     return np.abs(np.max(tensor) - np.min(tensor)) < epsilon
 
 
@@ -36,9 +34,8 @@ class EvaluatorContained(object):
             apply the defined evaluator to evaluate the token with specific parameters
     """
 
-    def __init__(self, eval_function, eval_kwargs_keys={}):  # , deriv_eval_function = None
+    def __init__(self, eval_function, eval_kwargs_keys={}):
         self._evaluator = eval_function
-        # if deriv_eval_function is not None: self._deriv_evaluator = deriv_eval_function
         self.eval_kwargs_keys = eval_kwargs_keys
 
     def apply(self, token, structural=False, grids=None, **kwargs):
@@ -104,7 +101,7 @@ class TokenFamily(object):
             Method, which uses the specific token evaluator to evaluate the passed token with its parameters
     """
 
-    def __init__(self, token_type: str, family_of_derivs: bool = False):
+    def __init__(self, token_type: str, variable:str = None, family_of_derivs: bool = False):
         """
         Initialize the token family;
 
@@ -114,6 +111,8 @@ class TokenFamily(object):
         """
 
         self.ftype = token_type
+        self.variable = variable
+        
         self.family_of_derivs = family_of_derivs
         self.evaluator_set = False
         self.params_set = False
@@ -127,7 +126,7 @@ class TokenFamily(object):
 
     def set_status(self, demands_equation=False, meaningful=False,
                    s_and_d_merged=True, unique_specific_token=False,
-                   unique_token_type=False, requires_grid=False):
+                   unique_token_type=False, requires_grid=False, non_default_power=False):
         """
         Set the status of the elements of the token family; 
 
@@ -141,6 +140,8 @@ class TokenFamily(object):
                 flag, that the base values of the token are used as the structural values (generally, in other cases the normalized values are used as structural)
             requires_grid (`boolean`): default - False, 
                 flag, that a grid is required to evaluate the token
+            non_default_power (`boolean`): default - False,
+                flag, that the behavior of power parameter is different. If `True`, values, other than 1 can be created during init as separate tokens.
         """
         self.status = {}
         self.status['demands_equation'] = demands_equation
@@ -149,6 +150,7 @@ class TokenFamily(object):
         self.status['unique_specific_token'] = unique_specific_token
         self.status['unique_token_type'] = unique_token_type
         self.status['requires_grid'] = requires_grid
+        self.status['non_default_power'] = non_default_power
 
     def set_params(self, tokens, token_params, equality_ranges, derivs_solver_orders=None):
         """
@@ -186,7 +188,6 @@ class TokenFamily(object):
         if self.evaluator_set:
             self.test_evaluator()
 
-    # , ): , **eval_params   #Test, if the evaluator works properly
     def set_evaluator(self, eval_function, eval_kwargs_keys=[], suppress_eval_test=True):
         """
         Define the evaluator for the token family and its parameters
@@ -313,7 +314,7 @@ class TokenFamily(object):
             self.tokens.remove(label)
             global_var.tensor_cache.delete_entry(label + ' power 1')
 
-    def evaluate(self, token):    # Return tensor of values of applied evaluator
+    def evaluate(self, token):
         """
         Applying evaluator in token
         """
@@ -343,8 +344,10 @@ class TokenFamily(object):
         if token_status is None or token_status == {}:
             token_status = {label: (0, self.token_params['power'][1], False)
                             for label in self.tokens}
+        # print('self.tokens:', self.tokens)
         if label is None:
             try:
+                # print()
                 if create_derivs:
                     label = np.random.choice([token for token in self.tokens
                                               if (not token_status[token][0] + 1 > token_status[token][1]
@@ -353,17 +356,17 @@ class TokenFamily(object):
                     label = np.random.choice([token for token in self.tokens
                                               if not token_status[token][0] + 1 > token_status[token][1]])
             except ValueError:
-                print(
-                    f'An error while creating factor of {self.ftype} token family')
-                print('Status description:', token_status, ' all:', self.tokens)
+                # print(
+                    # f'An error while creating factor of {self.ftype} token family')
+                # print('Status description:', token_status, ' all:', self.tokens)
                 raise ValueError("'a' cannot be empty unless no samples are taken")
 
         if self.family_of_derivs:
             factor_deriv_code = self.derivs_ords[label]
         else:
             factor_deriv_code = None
-        new_factor = Factor(token_name=label, deriv_code=factor_deriv_code,
-                            status=self.status, family_type=self.ftype, 
+        new_factor = Factor(token_name=label, deriv_code=factor_deriv_code, status=self.status,
+                            family_type=self.ftype, variable = self.variable,
                             latex_constructor = self.latex_constructor)
 
         if self.status['unique_token_type']:
@@ -422,7 +425,6 @@ class TokenFamily(object):
                 if self.status['requires_grid']:
                     generated_token.use_grids_cache()
                 generated_token.scaled = False
-                # _ = self._evaluator.apply(generated_token)
                 _ = generated_token.evaluate()
                 print(generated_token.cache_label)
                 if generated_token.cache_label not in global_var.tensor_cache.memory_default.keys():
@@ -435,12 +437,16 @@ class TFPool(object):
 
      Args:
         families (`list`): toen families that using in that run
-    """
-    def __init__(self, families: list, stored_pool=None):
-        if stored_pool is not None:
-            self = pickle.load(stored_pool)
+    """    
+    def __init__(self, families: list):
         self.families = families
-
+    
+    def manual_reconst(self, attribute:str, value, except_attrs:dict):
+        from epde.loader import obj_to_pickle, attrs_from_dict        
+        supported_attrs = []
+        if attribute not in supported_attrs:
+            raise ValueError(f'Attribute {attribute} is not supported by manual_reconst method.')
+    
     @property
     def families_meaningful(self):
         """
@@ -556,10 +562,33 @@ class TFPool(object):
         Returns:
             created `Factor`
         """
-        # print('family_label', family_label, 'self.families', self.families)
+        # print([f.ftype for f in self.families], family_label)
         family = [f for f in self.families if family_label == f.ftype][0]
         return family.create(label=None, token_status=token_status, **kwargs)
 
+    def create_with_var(self, variable: str, token_status=None, **kwargs):
+        """
+        Create token from choosing family
+
+        Args:
+            family_label (`str`): the name of the family from which the token will be created
+            token_status (`dict`): information about status of all families
+        
+        Returns:
+            created `Factor`
+        """
+        # print([f.ftype for f in self.families], family_label)
+        assert variable is not None, 'Can not create token with a specific variable for '
+        families = [f for f in self.families if variable == f.variable]
+
+        while True:
+            try:
+                probabilities = np.array([len(f.tokens) for f in families])
+                family = np.random.choice(families, p = probabilities/probabilities.sum())                
+                return family.create(label=None, token_status=token_status, **kwargs)
+            except ValueError:
+                families.remove(family)
+                
     def __add__(self, other):
         return TFPool(families=self.families + other.families)
 
@@ -585,14 +614,3 @@ class TFPool(object):
         except IndexError:
             print(label, [family.tokens for family in self.families])
             raise IndexError('No family for token.')
-
-    def save(self, filename: str):
-        """
-        Saving information about all families
-
-        Args:
-            filename (`str`): path to file, which will be save data
-        """
-        file_to_store = open(filename, "wb")
-        pickle.dump(self, file_to_store)
-        file_to_store.close()

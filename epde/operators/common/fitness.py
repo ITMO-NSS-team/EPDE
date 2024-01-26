@@ -67,10 +67,8 @@ class L2Fitness(CompoundOperator):
         try:
             if features is None:
                 discr_feats = 0
-                # print('having equation with no features')
             else:
-                discr_feats = np.dot(features, objective.weights_final[:-1][objective.weights_final[:-1] != 0])
-                # print(features.shape, objective.weights_final[:-1][objective.weights_final[:-1] != 0].shape)
+                discr_feats = np.dot(features, objective.weights_final[:-1][objective.weights_internal != 0]) # weights_final -> weights_internal
 
             discr = (discr_feats + np.full(target.shape, objective.weights_final[-1]) - target)
             self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)

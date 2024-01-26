@@ -10,10 +10,12 @@ import torch
 
 from typing import Callable, Union
 from types import FunctionType
-from epde.solver.models import Modified_MLP
+from epde.solver.models import FourierNN
+from epde.solver.solver import grid_format_prepare
 
 VAL_TYPES = Union[FunctionType, int, float, torch.Tensor, np.ndarray]
-BASE_SOLVER_PARAMS = {'lambda_bound' : 100, 'verbose' : True,
+BASE_SOLVER_PARAMS = {'lambda_bound' : 100, 'verbose' : True, 
+                      'gamma' : 0.9, 'lr_decay' : 400, 'derivative_points' : 3, 
                       'learning_rate' : 1e-3, 'eps' : 1e-6, 'tmin' : 5000,
                       'tmax' : 2*1e4, 'use_cache' : False, 'cache_verbose' : True, 
                       'patience' : 10, 'loss_oscillation_window' : 100,
@@ -29,6 +31,7 @@ import epde.globals as global_var
 
 from epde.solver.input_preprocessing import Equation as SolverEquation
 import epde.solver.solver as solver
+from epde.solver.models import mat_model
 
 class PregenBOperator(object):
     def __init__(self, system: SoEq, system_of_equation_solver_form: list):
@@ -186,8 +189,8 @@ class PregenBOperator(object):
                     operator.values = bc_values
                     bconds.append(operator)  # )(rel_location=loc)
         self.conditions = bconds
-        print([cond[0].shape for cond in self.conditions])
-        print([cond[2].shape for cond in self.conditions])
+        print('cond[0]', [cond[0].shape for cond in self.conditions])
+        print('cond[2]', [cond[2].shape for cond in self.conditions])
         
 
 
@@ -265,22 +268,16 @@ class BOPElement(object):
                 boundary = torch.moveaxis(boundary, source=0, destination=self.axis).resize()
             else:
                 boundary = torch.from_numpy(np.array([[abs_loc,],])).float()  # TODO: work from here
-                # boundary = torch.expand_dims(boundary, axis=0)
             print('boundary.shape', boundary.shape, boundary.ndim)
 
         elif boundary is None and self.location is None:
             raise ValueError('No location passed into the BOP.')
 
-        # boundary = torch.reshape(boundary, ())
-
         form = self.operator_form
         boundary_operator = {form[0]: form[1]}
 
-        # TODO: inspect boundary value setter with an arbitrary function in symb form
         boundary_value = self.values
 
-        # print('Output of bc:')
-        # print(boundary, boundary_operator, boundary_value, self.variables, 'operator')
         return [boundary, boundary_operator, boundary_value, self.variables, 'operator']
 
 
@@ -304,7 +301,8 @@ def solver_formed_grid(training_grid=None):
     assert len(keys) == training_grid[0].ndim, 'Mismatching dimensionalities'
 
     training_grid = np.array(training_grid).reshape((len(training_grid), -1))
-    return torch.from_numpy(training_grid).T.type(torch.FloatTensor)
+    #return torch.from_numpy(training_grid).T.type(torch.FloatTensor)
+    return torch.from_numpy(training_grid).T.float()
 
 
 class SystemSolverInterface(object):
@@ -334,7 +332,7 @@ class SystemSolverInterface(object):
                 deriv_orders.append(factor.deriv_code)
                 deriv_powers.append(factor.params[power_param_idx])
                 try:
-                    cur_deriv_var = variables.index(factor.ftype)
+                    cur_deriv_var = variables.index(factor.variable)
                 except ValueError:
                     raise ValueError(
                         f'Variable family of passed derivative {variables}, other than {cur_deriv_var}')
@@ -371,7 +369,6 @@ class SystemSolverInterface(object):
         raise NotImplementedError()
 
     def _equation_solver_form(self, equation, variables, grids=None):
-        # TODO: fix performance on other, than default grids.
         _solver_form = {}
         if grids is None:
             grids = self.grids
@@ -389,7 +386,7 @@ class SystemSolverInterface(object):
                     _solver_form[term.name]['coeff'] = _solver_form[term.name]['coeff'] * weight
                     _solver_form[term.name]['coeff'] = torch.flatten(_solver_form[term.name]['coeff']).unsqueeze(1).type(torch.FloatTensor)
 
-        free_coeff_weight = torch.from_numpy(np.full_like(a=grids[0],  # global_var.grid_cache.get('0'),
+        free_coeff_weight = torch.from_numpy(np.full_like(a=grids[0],
                                                           fill_value=equation.weights_final[-1]))
         free_coeff_weight = torch.flatten(free_coeff_weight).unsqueeze(1).type(torch.FloatTensor)
         free_coeff_term = {'coeff': free_coeff_weight,
@@ -398,8 +395,7 @@ class SystemSolverInterface(object):
                            'var': [0,]}
         _solver_form['C'] = free_coeff_term
 
-        target_weight = torch.from_numpy(np.full_like(a=grids[0],
-                                                      fill_value=-1.))
+        target_weight = torch.from_numpy(np.full_like(a=grids[0], fill_value=-1.))
         target_form = self._term_solver_form(equation.structure[equation.target_idx], grids, default_domain, variables)
         target_form['coeff'] = target_form['coeff'] * target_weight
         target_form['coeff'] = torch.flatten(target_form['coeff']).unsqueeze(1).type(torch.FloatTensor)
@@ -411,7 +407,7 @@ class SystemSolverInterface(object):
     def use_grids(self, grids=None):
         if grids is None and self.grids is None:
             _, self.grids = global_var.grid_cache.get_all()
-        elif grids is None:
+        elif self.grids is None:
             if len(grids) != len(global_var.grid_cache.get_all()[1]):
                 raise ValueError(
                     'Number of passed grids does not match the problem')
@@ -434,10 +430,10 @@ class SolverAdapter(object):
         print(f'dimensionality is {dim_number}')
         if model is None:
             if dim_number == 1:
-                model = Modified_MLP([400, 400, 400, 400, var_number], [15], [7])
+                model = FourierNN([400, 400, 400, 400, var_number], [15], [7])
             else:
-                model = Modified_MLP([112, 112, 112, 112, var_number], [None,] + [15]*(dim_number - 1), 
-                                     [None,] + [3]*(dim_number - 1))
+                model = FourierNN([112, 112, 112, 112, var_number], [None,] + [None,]*(dim_number - 1), 
+                                     [None,] + [None,]*(dim_number - 1)) # 15, 3
                
         self.model = model
 
@@ -448,7 +444,8 @@ class SolverAdapter(object):
         self.use_cache = use_cache
         self.prev_solution = None
 
-    def set_solver_params(self, lambda_bound=None, verbose: bool = None, learning_rate: float = None,
+    def set_solver_params(self, lambda_bound=None, verbose: bool = None, gamma: float = None,
+                          lr_decay: int = 400, derivative_points: int = None, learning_rate: float = None,
                           eps: float = None, tmin: int = None, tmax: int = None,
                           use_cache: bool = None, cache_verbose: bool = None,
                           patience: int = None, loss_oscillation_window : int = None,
@@ -456,8 +453,9 @@ class SolverAdapter(object):
                           save_always: bool = None, print_every: bool = 5000, optimizer_mode = None, 
                           model_randomize_parameter: bool = None, step_plot_print: bool = None,
                           step_plot_save: bool = True, image_save_dir: str = None, tol: float = None):
-        
-        params = {'lambda_bound': lambda_bound, 'verbose': verbose,
+
+        params = {'lambda_bound': lambda_bound, 'verbose': verbose, 'gamma': gamma, 
+                  'lr_decay': lr_decay, 'derivative_points': derivative_points,
                   'learning_rate': learning_rate, 'eps': eps, 'tmin': tmin,
                   'tmax': tmax, 'use_cache': use_cache, 'cache_verbose': cache_verbose,
                   'patience' : patience, 'loss_oscillation_window' : loss_oscillation_window,
@@ -477,7 +475,7 @@ class SolverAdapter(object):
         self._solver_params[param_key] = value
 
     def solve_epde_system(self, system: SoEq, grids: list=None, boundary_conditions=None, 
-                          strategy='NN', data=None):
+                          mode='NN', data=None):
         system_interface = SystemSolverInterface(system_to_adapt=system)
 
         system_solver_forms = system_interface.form(grids)
@@ -492,27 +490,23 @@ class SolverAdapter(object):
             _, grids = global_var.grid_cache.get_all()
 
         return self.solve(system_form=[form[1] for form in system_solver_forms], grid=grids,
-                          boundary_conditions=boundary_conditions, strategy = strategy)
+                          boundary_conditions=boundary_conditions, mode = mode)
 
     @staticmethod
-    def convert_grid(grid):
+    def convert_grid(grid, mode):
         assert isinstance(grid, (list, tuple)), 'Convertion of the tensor can be only held from tuple or list.'
-        dimensionality = len(grid)
 
-        if grid[0].ndim == dimensionality:
-            conv_grid = np.stack([subgrid.reshape(-1) for subgrid in grid])
-            conv_grid = torch.from_numpy(conv_grid).float().T
-        else:
-            conv_grid = [torch.from_numpy(subgrid) for subgrid in grid]
-            conv_grid = torch.cartesian_prod(*conv_grid).float()
+        conv_grid = grid_format_prepare([np.unique(var_grid) for var_grid in grid], mode)
         return conv_grid
 
-    def solve(self, system_form=None, grid=None, boundary_conditions=None, strategy = 'NN'): #data=None, 
+    def solve(self, system_form=None, grid=None, boundary_conditions=None, mode = 'NN'):
         if isinstance(grid, (list, tuple)):
-            grid = self.convert_grid(grid)
+            grid = self.convert_grid(grid, mode)
         print('Grid is ', type(grid), grid.shape)            
-        self.equation = SolverEquation(grid, system_form, boundary_conditions).set_strategy(strategy) # set h < 0.001
+        self.equation = SolverEquation(grid, system_form, boundary_conditions).set_mode(mode) # set h < 0.001
 
         print(grid[0].shape)
-        self.prev_solution = solver.Solver(grid, self.equation, self.model, strategy).solve(**self._solver_params)
+        if mode == 'mat':
+            self.model = mat_model(grid, self.equation)
+        self.prev_solution = solver.Solver(grid, self.equation, self.model, mode).solve(**self._solver_params)
         return self.prev_solution

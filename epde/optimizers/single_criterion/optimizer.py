@@ -69,13 +69,19 @@ class Population(object):
         self.population = elements
         self.length = len(elements)
         self._sorting_method = sorting_method
-        
+    
+    def manual_reconst(self, attribute:str, value, except_attrs:dict):
+        from epde.loader import attrs_from_dict, get_typespec_attrs      
+        supported_attrs = ['vals']
+        if attribute not in supported_attrs:
+            raise ValueError(f'Attribute {attribute} is not supported by manual_reconst method.')
+    
     def sort(self):
         '''
         Method, that returns sorted population of the candidates. 
         Does not change anything inside the population.
         '''
-        return self._sorting_method(self.population) # TODO: finish that piece of code.
+        return self._sorting_method(self.population)
     
     def sorted(self):
         '''

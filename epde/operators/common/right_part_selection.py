@@ -51,13 +51,13 @@ class EqRightPartSelector(CompoundOperator):
             max_idx = 0
             if not objective.contains_deriv():
                 objective.restore_property(deriv = True)
-            if not objective.contains_family(objective.main_var_to_explain):
+            if not objective.contains_variable(objective.main_var_to_explain):
                 objective.restore_property(mandatory_family = True)
                 
             
                 
             for target_idx, target_term in enumerate(objective.structure):
-                if target_term.contains_family(objective.main_var_to_explain): #target_term.descr_variable_marker:
+                if target_term.contains_variable(objective.main_var_to_explain): #target_term.descr_variable_marker:
                     # target_term.contains_family(equation.main_var_to_explain)
                     if not objective.structure[target_idx].contains_deriv:
                         continue
@@ -112,7 +112,7 @@ class RandomRHPSelector(CompoundOperator):
 
         if not objective.right_part_selected:
             term_selection = [term_idx for term_idx, term in enumerate(objective.structure)
-                              if term.contains_deriv(family = objective.main_var_to_explain)]
+                              if term.contains_deriv(variable = objective.main_var_to_explain)]
             
             if len(term_selection) == 0:
                 idx = np.random.choice([term_idx for term_idx, _ in enumerate(objective.structure)])
@@ -121,7 +121,7 @@ class RandomRHPSelector(CompoundOperator):
                     candidate_term = Term(pool = prev_term.pool, mandatory_family = objective.main_var_to_explain,
                                           max_factors_in_term = len(prev_term.structure), 
                                           create_derivs = True)
-                    if candidate_term.contains_deriv(family = objective.main_var_to_explain):
+                    if candidate_term.contains_deriv(variable = objective.main_var_to_explain):
                         break
                 
                 objective.structure[idx] = candidate_term

@@ -16,12 +16,12 @@ device = torch.device('cpu')
 
 import epde.globals as global_var
 from epde.preprocessing.cheb import process_point_cheb
-from epde.preprocessing.smoothing import Smoothing
+from epde.preprocessing.smoothing import smoothing
 from epde.supplementary import define_derivatives, train_ann, use_ann_to_predict
     
 
 def preprocess_derivatives_poly(field, grid=None, steps=None, data_name=None, output_file_name=None, smooth=True, sigma=9,
-                                mp_poolsize=4, max_order=2, polynomial_window=9, poly_order=None, scaling=False):
+                                mp_poolsize=4, max_order=2, polynomial_window=9, poly_order=None, scaling=False, include_time = False):
     '''
 
     Main preprocessing function for the calculation of derivatives on uniform grid
@@ -63,7 +63,7 @@ def preprocess_derivatives_poly(field, grid=None, steps=None, data_name=None, ou
         steps = np.ones(np.ndim(field))
 
     if smooth:
-        field = Smoothing(field, 'gaussian', sigma=sigma)
+        field = smoothing(field, 'gaussian', sigma=sigma, include_time = include_time)
     index_array = []
 
     if grid is None:

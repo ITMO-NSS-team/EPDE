@@ -1,17 +1,44 @@
 import torch
 import numpy as np
 from copy import deepcopy
-from typing import Union
+from typing import Union, Tuple
 
 from epde.solver.points_type import Points_type
 from epde.solver.finite_diffs import Finite_diffs
 from epde.solver.device import check_device
+
+def lambda_prepare(val, lambda_: Union[int, list, torch.Tensor]) -> torch.Tensor :
+    """
+    Prepares lambdas for corresponding equation or bcond type.
+
+    Args:
+        val: operator tensor or bval tensor
+        lambda_: regularization parameters values
+
+    Returns:
+        lambdas: torch.Tensor with lambda_ values,
+        len(lambdas) = number of columns in val
+
+    """
+    if type(lambda_) is torch.Tensor:
+        return lambda_
+
+    if type(lambda_) is int:
+        try:
+            lambdas = torch.ones(val.shape[-1], dtype=val.dtype)*lambda_
+        except:
+            lambdas = torch.tensor(lambda_, dtype=val.dtype)
+    elif type(lambda_) is list:
+        lambdas = torch.tensor(lambda_, dtype=val.dtype)
+
+    return lambdas.reshape(1,-1)
 
 
 class Boundary():
     """
     Сlass for bringing all boundary conditions to a similar form.
     """
+
     def __init__(self, bconds: list):
         """
         Args:
@@ -62,11 +89,10 @@ class Boundary():
         """
         bcond[0] = check_device(bcond[0])
         bcond[2] = check_device(bcond[2])
+        bcond[1] = EquationMixin.equation_unify(bcond[1])
         if len(bcond) == 4:
-            bcond[1] = EquationMixin.equation_unify(bcond[1])
             boundary = [bcond[0], bcond[1], bcond[2], None, bcond[3]]
         elif len(bcond) == 5:
-            bcond[1] = EquationMixin.equation_unify(bcond[1])
             boundary = [bcond[0], bcond[1], bcond[2], None, bcond[4]]
         else:
             raise NameError('Incorrect operator condition')
@@ -103,6 +129,22 @@ class Boundary():
             raise NameError('Incorrect periodic condition')
         return boundary
 
+    def data(self, bcond:list) -> list:
+        '''determine type of data condition and call neumann or dirichlet methods'''
+
+        bop_exist = False
+        for bcond_part in bcond:
+            if type(bcond_part) == dict:
+                bop_exist = True
+                break
+        
+        if bop_exist:
+            boundary = self.neumann(bcond)
+        else:
+            boundary = self.dirichlet(bcond)
+        
+        return boundary
+
     def bnd_choose(self, bcond: list) -> list:
         """
         Method that choose type of boundary condition.
@@ -120,6 +162,8 @@ class Boundary():
             bnd = self.dirichlet(bcond)
         elif bcond[-1] == 'operator':
             bnd = self.neumann(bcond)
+        elif bcond[-1] == 'data':
+            bnd = self.data(bcond)
         else:
             raise NameError('TEDEouS can not use ' + bcond[-1] + ' condition type')
         return bnd
@@ -141,7 +185,7 @@ class Boundary():
         return unified_bnd
 
 
-class EquationMixin():
+class EquationMixin:
     """
     Auxiliary class. This one contains some methods that uses in other classes.
     """
@@ -203,7 +247,7 @@ class EquationMixin():
     @staticmethod
     def convert_to_double(bnd: Union[list, np.array]) -> float:
         """
-        Coverts points to double type.
+        Converts points to double type.
 
         Args:
             bnd: array or list of arrays
@@ -250,6 +294,7 @@ class EquationMixin():
     def bndpos(grid: torch.Tensor, bnd: torch.Tensor) -> Union[list, int]:
         """
         Returns the position of the boundary points on the grid.
+
         Args:
             grid:  grid for coefficient in form of torch.Tensor mapping.
             bnd: boundary conditions.
@@ -275,6 +320,7 @@ class Equation_NN(EquationMixin, Points_type):
                  inner_order: str = '1', boundary_order: str = '2'):
         """
         Prepares equation, boundary conditions for NN method.
+
         Args:
             grid:  array of a n-D points.
             operator:  equation.
@@ -365,6 +411,8 @@ class Equation_NN(EquationMixin, Points_type):
             coeff = check_device(coeff)
             pos = self.bndpos(self.grid, grid_points)
             coeff1 = coeff[pos].reshape(-1, 1)
+        elif type(coeff) is torch.nn.parameter.Parameter:
+            coeff1 = coeff
         else:
             raise NameError('"coeff" should be: torch.Tensor or callable or int or float!')
         return coeff1
@@ -521,6 +569,8 @@ class Equation_autograd(EquationMixin):
         elif type(coeff) == torch.Tensor:
             coeff = check_device(coeff)
             coeff1 = coeff.reshape(-1, 1)
+        elif type(coeff) is torch.nn.parameter.Parameter:
+            coeff1 = coeff
         else:
             raise NameError('"coeff" should be: torch.Tensor or callable or int or float!')
         return coeff1
@@ -611,8 +661,17 @@ class Equation_mat(EquationMixin):
             final form of differential operator used in the algorithm.
         """
 
-        unified_operator = [self.equation_unify(self.operator)]
-        return unified_operator
+        if type(self.operator) is list and type(self.operator[0]) is dict:
+            num_of_eq = len(self.operator)
+            prepared_operator = []
+            for i in range(num_of_eq):
+                equation = self.equation_unify(self.operator[i])
+                prepared_operator.append(equation)
+        else:
+            equation = self.equation_unify(self.operator)
+            prepared_operator = [equation]
+
+        return prepared_operator
 
     def point_position(self, bnd) -> list:
         """
@@ -681,7 +740,7 @@ class Equation():
         self.inner_order = inner_order
         self.boundary_order = boundary_order
 
-    def set_strategy(self, strategy: str) -> Union[Equation_NN, Equation_mat, Equation_autograd]:
+    def set_mode(self, mode: str) -> Union[Equation_NN, Equation_mat, Equation_autograd]:
         """
         Setting the calculation method.
         Args:
@@ -690,11 +749,11 @@ class Equation():
             A given calculation method.
         """
 
-        if strategy == 'NN':
+        if mode == 'NN':
             return Equation_NN(self.grid, self.operator, self.bconds, h=self.h,
                                inner_order=self.inner_order,
                                boundary_order=self.boundary_order)
-        if strategy == 'mat':
+        if mode == 'mat':
             return Equation_mat(self.grid, self.operator, self.bconds)
-        if strategy == 'autograd':
+        if mode == 'autograd':
             return Equation_autograd(self.grid, self.operator, self.bconds)

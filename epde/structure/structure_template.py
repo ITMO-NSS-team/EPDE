@@ -8,7 +8,7 @@ Created on Tue Jul 26 13:38:20 2022
 
 import numpy as np
 from functools import reduce
-
+from collections import Iterable
 
 def check_uniqueness(obj, background):
     return not any([elem == obj for elem in background])
@@ -19,7 +19,13 @@ class ComplexStructure(object):
         self._history = ''
         self.structure = None
         self.interelement_operator = interelement_operator
-
+    
+    def manual_reconst(self, attribute:str, value, except_attrs:dict):
+        from epde.loader import obj_to_pickle, attrs_from_dict        
+        supported_attrs = []
+        if attribute not in supported_attrs:
+            raise ValueError(f'Attribute {attribute} is not supported by manual_reconst method.')
+    
     def __eq__(self, other):
         if type(other) != type(self):
             raise ValueError('Type of self and other are different')
