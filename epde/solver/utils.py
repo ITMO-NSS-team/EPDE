@@ -5,7 +5,10 @@ import numpy as np
 from typing import Tuple
 from torch.nn import Module
 from torch import Tensor
-from SALib import ProblemSpec
+try:
+    from SALib import ProblemSpec
+except ImportError:
+    pass
 
 def samples_count(second_order_interactions: bool,
                   sampling_N: int,
