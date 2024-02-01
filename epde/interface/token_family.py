@@ -126,7 +126,7 @@ class TokenFamily(object):
 
     def set_status(self, demands_equation=False, meaningful=False,
                    s_and_d_merged=True, unique_specific_token=False,
-                   unique_token_type=False, requires_grid=False):
+                   unique_token_type=False, requires_grid=False, non_default_power=False):
         """
         Set the status of the elements of the token family; 
 
@@ -140,6 +140,8 @@ class TokenFamily(object):
                 flag, that the base values of the token are used as the structural values (generally, in other cases the normalized values are used as structural)
             requires_grid (`boolean`): default - False, 
                 flag, that a grid is required to evaluate the token
+            non_default_power (`boolean`): default - False,
+                flag, that the behavior of power parameter is different. If `True`, values, other than 1 can be created during init as separate tokens.
         """
         self.status = {}
         self.status['demands_equation'] = demands_equation
@@ -148,6 +150,7 @@ class TokenFamily(object):
         self.status['unique_specific_token'] = unique_specific_token
         self.status['unique_token_type'] = unique_token_type
         self.status['requires_grid'] = requires_grid
+        self.status['non_default_power'] = non_default_power
 
     def set_params(self, tokens, token_params, equality_ranges, derivs_solver_orders=None):
         """
@@ -353,9 +356,9 @@ class TokenFamily(object):
                     label = np.random.choice([token for token in self.tokens
                                               if not token_status[token][0] + 1 > token_status[token][1]])
             except ValueError:
-                print(
-                    f'An error while creating factor of {self.ftype} token family')
-                print('Status description:', token_status, ' all:', self.tokens)
+                # print(
+                    # f'An error while creating factor of {self.ftype} token family')
+                # print('Status description:', token_status, ' all:', self.tokens)
                 raise ValueError("'a' cannot be empty unless no samples are taken")
 
         if self.family_of_derivs:

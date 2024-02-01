@@ -568,6 +568,7 @@ class EpdeSearch(object):
                                   grid=global_var.grid_cache.get_all()[1], max_order=max_deriv_order)
             entry.use_global_cache()
 
+            self.set_derivatives(variable=variable_names[data_elem_idx], deriv=entry.derivatives)  
             entry.create_derivs_family(max_deriv_power=deriv_fun_pow)
             entry.create_polynomial_family(max_power=data_fun_pow)
             

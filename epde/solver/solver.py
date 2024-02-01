@@ -44,6 +44,7 @@ def grid_format_prepare(coord_list, mode='NN') -> torch.Tensor:
     elif mode == 'mat':
         grid = np.meshgrid(*coord_list, indexing='ij')
         grid = torch.tensor(np.array(grid)).to(device)
+    print(f'In grid format prepare: grid shape is {grid.shape}')
     return grid
 
 

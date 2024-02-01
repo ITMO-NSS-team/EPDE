@@ -76,7 +76,7 @@ class DataPolynomials(PreparedTokens):
         self._token_family.set_latex_form_constructor(latex_form)
         self._token_family.set_status(demands_equation=False, meaningful=True,
                                       unique_specific_token=True, unique_token_type=True,
-                                      s_and_d_merged=False)
+                                      s_and_d_merged=False, non_default_power = True)
         self._token_family.set_params([var_name,], OrderedDict([('power', (1, max_power))]), 
                                       {'power': 0}, [[None,],])
         self._token_family.set_evaluator(simple_function_evaluator, [])
@@ -177,7 +177,7 @@ class GridTokens(PreparedTokens):
     """
     Class for prepared tokens, that describe family of grids as values
     """
-    def __init__(self, labels = ['t',], dimensionality=1):
+    def __init__(self, labels = ['t',], max_power: int = 1, dimensionality=1):
         """
         Initialization of class
 
@@ -189,7 +189,7 @@ class GridTokens(PreparedTokens):
         
         self._token_family = TokenFamily(token_type='grids')
         self._token_family.set_status(unique_specific_token=True, unique_token_type=True,
-                                      meaningful=True)
+                                      meaningful=True, non_default_power = True)
 
         def latex_form(label, **params):
             '''
@@ -213,7 +213,7 @@ class GridTokens(PreparedTokens):
         
 
         self._token_family.set_latex_form_constructor(latex_form)
-        grid_token_params = OrderedDict([('power', (1, 1)), ('dim', (0, dimensionality))])
+        grid_token_params = OrderedDict([('power', (1, max_power)), ('dim', (0, dimensionality))])
 
         grid_equal_params = {'power': 0, 'dim': 0}
         self._token_family.set_params(labels, grid_token_params, grid_equal_params)
@@ -232,7 +232,7 @@ class CustomTokens(PreparedTokens):
     def __init__(self, token_type: str, token_labels: list,
                  evaluator: Union[CustomEvaluator, EvaluatorTemplate, Callable],
                  params_ranges: dict, params_equality_ranges: dict = None, dimensionality: int = 1,
-                 unique_specific_token=True, unique_token_type=True, meaningful=False):
+                 unique_specific_token=True, unique_token_type=True, meaningful=False, non_default_power = False):
         
         """
         Initialization of class

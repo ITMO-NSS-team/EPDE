@@ -104,7 +104,6 @@ def prepare_var_tensor(var_tensor, derivs_tensor, time_axis):
     result = np.ones((derivs_tensor.shape[-1], ) + tuple([shape for shape in var_tensor.shape]))  # - 2*boundary
 
     increment = 0
-    #result[increment - 1, :] = var_tensor#, boundary, cut_except)
     if derivs_tensor.ndim == 2:
         for i_outer in range(0, derivs_tensor.shape[1]):
             result[i_outer+increment, ...] = np.moveaxis(derivs_tensor[:, i_outer].reshape(initial_shape), # np_ndarray_section( , boundary, cut_except)
@@ -157,59 +156,6 @@ class Cache(object):
         for key, elem in except_attrs.items():
             if elem is not None:
                 self.__dict__[key] = elem
-
-    def to_pickle(self, not_to_pickle: list = [], manual_pickle: list = []):
-        '''
-
-        Template method for adapting pickling of an object. Shall be copied to objects, that are 
-        to be pickable with local rules.
-
-        Parameters
-        ----------
-        except_attrs : list of strings
-            Attributes to keep from saving to the resulting dict.
-
-        manual_pickle : list of strings
-            Attributes, that require manual call for their pickle forms.
-        
-        Returns
-        -------
-        dict_to_pickle : dict
-            Dictionary representation of the object attributes.
-
-        '''
-        dict_to_pickle = {}
-        
-        for key, elem in self.__dict__.items():
-            if key in not_to_pickle:
-                continue
-            elif key in manual_pickle:
-                if isinstance(elem, dict):
-                    dict_to_pickle[key] = {'type' : dict, 'keys' : [ekey for ekey in elem.keys()],
-                                           'elements' : [val.to_pickle() for val in elem.values()]}
-                elif isinstance(elem, Iterable):
-                    dict_to_pickle[key] = {'type' : type(elem), 'elements' : [list_elem.to_pickle() for list_elem in elem]}
-                else:
-                    dict_to_pickle[key] = {'type' : type(elem), 'elements' : elem.to_pickle()}
-            else:
-                dict_to_pickle[key] = elem
-        
-        for slot in self.__slots__:
-            elem = getattr(self, slot)
-            if slot in not_to_pickle:
-                continue
-            elif slot in manual_pickle:
-                if isinstance(elem, dict):
-                    dict_to_pickle[slot] = {'type' : dict, 'keys' : [key for key in elem.keys()],
-                                           'elements' : [val.to_pickle() for val in elem.values()]}
-                elif isinstance(elem, Iterable):
-                    dict_to_pickle[slot] = {'type' : type(elem), 'elements' : [list_elem.to_pickle() for list_elem in elem]}
-                else:
-                    dict_to_pickle[slot] = {'type' : type(elem), 'elements' : elem.to_pickle()}
-            else:
-                dict_to_pickle[slot] = elem
-        
-        return dict_to_pickle
 
     def use_structural(self, use_base_data=True, label=None, replacing_data=None):
         # print(f'Setting structural data for {label}, for it: {use_base_data} - use_base_data')

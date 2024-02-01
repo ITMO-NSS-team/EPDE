@@ -61,10 +61,7 @@ class Solution():
             eq = operator[i]
             for key in eq.keys():
                 if isinstance(eq[key]['coeff'], torch.Tensor):
-                    try:
-                        eq[key]['coeff'] = equal_cls.operator[i][key]['coeff'].to(device_type())
-                    except:
-                        eq[key]['coeff'] = equal_cls.operator[key]['coeff'].to(device_type())
+                    eq[key]['coeff'] = eq[key]['coeff'].to(device_type())
 
 
     def evaluate(self,
