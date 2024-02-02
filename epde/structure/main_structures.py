@@ -336,11 +336,11 @@ class Term(ComplexStructure):
 
 class Equation(ComplexStructure):
     __slots__ = ['_history', 'structure', 'interelement_operator', 'n_immutable', 'pool',
-                  # 'saved', 'saved_as','max_factors_in_term', 'operator',
-                 '_target', 'target_idx', '_features', 'right_part_selected',
-                 '_weights_final', 'weights_final_evald', '_weights_internal', 'weights_internal_evald',
-                 'fitness_calculated', 'solver_form_defined', '_fitness_value', # , '_solver_form'
-                 'metaparameters', 'main_var_to_explain']
+                  # '_target', '_features', 'saved', 'saved_as','max_factors_in_term', 'operator',
+                 'target_idx', 'right_part_selected', '_weights_final', 'weights_final_evald', 
+                 '_weights_internal', 'weights_internal_evald', 'fitness_calculated', 'solver_form_defined', 
+                 '_fitness_value', 'metaparameters', 'main_var_to_explain'] # , '_solver_form'
+                 
 
     def __init__(self, pool: TFPool, basic_structure: Union[list, tuple, set], var_to_explain: str = None,
                  metaparameters: dict = {'sparsity': {'optimizable': True, 'value': 1.},

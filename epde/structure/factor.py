@@ -16,6 +16,7 @@ import epde.globals as global_var
 from epde.structure.Tokens import TerminalToken
 from epde.supplementary import factor_params_to_str, train_ann, use_ann_to_predict, exp_form
 
+from epde.interace.token_family import EvaluatorContained, TFPool # Possible circular dependency
 
 class Factor(TerminalToken):
     __slots__ = ['_params', '_params_description', '_hash_val', '_latex_constructor',
@@ -151,8 +152,16 @@ class Factor(TerminalToken):
         raise NotImplementedError('Delete me')
         return self.evaluate(self)
 
-    def set_evaluator(self, evaluator):
-        self._evaluator = evaluator
+    @property
+    def evaluator(self):
+        return self._evaluator
+
+    @evaluator.setter
+    def evaluator(self, evaluator):
+        if isinstance(evaluator, EvaluatorContained):
+            self._evaluator = evaluator
+        elif isinstance(evaluator, TFPool):
+            # TODO: INSERT LOGIC OF FACTOR CREATION ACCORDING TO THE POOL
 
     # Переработать/удалить __call__, т.к. его функции уже тут
     def evaluate(self, structural=False, grids=None):

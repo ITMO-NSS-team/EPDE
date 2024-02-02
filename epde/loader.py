@@ -27,7 +27,7 @@ TYPES = {'SoEq' : SoEq, 'TFPool' : TFPool, 'cache' : Cache,
 # while the second represents attributes for manual reconstruction.
 TYPESPEC_ATTRS = {'SoEq' : (['tokens_for_eq', 'tokens_supp', 'latex_form'], ['vals']), 
                   'Factor' : (['latex_form', '_ann_repr', '_latex_constructor', '_evaluator'], []), 
-                  'Equation' : (['pool', 'latex_form', '_history', '_features', '_target'], ['structure']), 
+                  'Equation' : (['pool', 'latex_form', '_history'], ['structure']), # , '_features', '_target'
                   'Term' : (['pool', 'latex_form'], ['structure']), 'TFPool' : ([], []), 'cache' : ([], []), 
                   'ParetoLevels' : (['levels'], ['population']), 'Population' : ([], [])}
                   
@@ -179,12 +179,11 @@ class LoaderAssistant(object):
                               'latex_form' : None}, # TBD, make better loading procedure
                 'Equation' : {'pool' : pool, 
                               'latex_form' : None,
-                              '_history' : None,
-                              '_features' : None,
-                              '_target' : None},
+                              '_history' : None},
                 'Term'     : {'pool' : pool, 
                               'latex_form' : None},
-                'Factor'   : {'latex_form' : None}}
+                'Factor'   : {'_latex_constructor' : None}} # 'latex_form' : None, 
+
     
     @staticmethod
     def pool_preset():
@@ -208,7 +207,7 @@ class LoaderAssistant(object):
                               'latex_form' : None},
                 'Term'     : {'pool' : pool, 
                               'latex_form' : None},
-                'Factor'   : {'latex_form' : None}}
+                'Factor'   : {'_latex_constructor' : None}}
         
 
 class EPDELoader(object):
