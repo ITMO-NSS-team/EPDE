@@ -173,19 +173,22 @@ class LoaderAssistant(object):
         pass
     
     @staticmethod
-    def system_preset(pool: TFPool):
-        return {'SoEq' :     {'tokens_for_eq' : TFPool(pool.families_demand_equation), 
+    def system_preset(pool: TFPool): # Validate correctness of attribute definitions
+        return {'SoEq' :     {'tokens_for_eq' : TFPool(pool.families_demand_equation),
                               'tokens_supp' : TFPool(pool.families_equationless), 
                               'latex_form' : None}, # TBD, make better loading procedure
                 'Equation' : {'pool' : pool, 
-                              'latex_form' : None},
+                              'latex_form' : None,
+                              '_history' : None,
+                              '_features' : None,
+                              '_target' : None},
                 'Term'     : {'pool' : pool, 
                               'latex_form' : None},
                 'Factor'   : {'latex_form' : None}}
     
     @staticmethod
     def pool_preset():
-        return {}
+        return {'TFPool' : {}}
     
     @staticmethod
     def cache_preset():
@@ -236,7 +239,7 @@ class EPDELoader(object):
     
     def saves(self, obj, not_to_pickle:list = [], manual_pickle:list = []):
         pickling_form = obj_to_pickle(obj, not_to_pickle, manual_pickle)
-        pickle.dumps(pickling_form)        
+        return pickle.dumps(pickling_form)        
 
     def use_pickles(self, obj_pickled, **kwargs):
         obj = TYPES[obj_pickled['obj_type']].__new__(TYPES[obj_pickled['obj_type']])
