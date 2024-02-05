@@ -22,6 +22,7 @@ from epde.decorators import HistoryExtender, ResetEquationStatus
 from epde.operators.utils.template import CompoundOperator, add_base_param_to_operator
 from epde.operators.multiobjective.moeadd_specific import get_basic_populator_updater
 from epde.operators.multiobjective.mutations import get_basic_mutation
+from sympy import Mul, Symbol
 
 
 class ParetoLevelsCrossover(CompoundOperator):
@@ -286,9 +287,17 @@ class TermCrossover(CompoundOperator):
         
         """
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
-        
-        if (np.random.uniform(0, 1) <= self.params['crossover_probability'] and 
-            objective[1].descr_variable_marker == objective[0].descr_variable_marker):
+
+        cross_tokens = []
+        if type(objective[0].cache_label[0]) == tuple:
+            for lbl_tuple in objective[0].cache_label:
+                    cross_tokens.append(Symbol(lbl_tuple[0]))
+        else:
+            cross_tokens.append(Symbol(objective[0].cache_label[0]))
+        cross_prob = objective[0].pool.cross_prob_distr.get(Mul(*cross_tokens))
+
+        if (np.random.uniform(0, 1) <= cross_prob and
+                objective[1].descr_variable_marker == objective[0].descr_variable_marker):
                 return objective[1], objective[0]
         else:
                 return objective[0], objective[1]
