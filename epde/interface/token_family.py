@@ -431,6 +431,54 @@ class TokenFamily(object):
                     raise KeyError('Generated token somehow was not stored in cache.')
 
 
+class CustomProbInfo:
+    def __init__(self, pool):
+        self.pool = pool
+
+        token_ls = []
+        for family in self.pool.families:
+            token_ls += family.tokens
+        term_ls = []
+        for i in range(1, self.pool.max_factors_in_term + 1):
+            term_ls += list(itertools.combinations(token_ls, i))
+        self.pool_terms = self.cast_to_symbols(term_ls)
+        self.cross_distr = self.get_cross_distr(self.pool.custom_cross_prob)
+
+    @staticmethod
+    def get_cross_distr(custom_cross_prob, min_pr=0.15, max_pr=0.75):
+        mmf = 2.4
+        values = list(custom_cross_prob.values())
+
+        csym_arr = np.fabs(np.array(values))
+
+        min_max_coeff = np.max(csym_arr) - mmf * np.min(csym_arr)
+        smoothing_factor = min_max_coeff / (min_max_coeff + (mmf - 1) * np.average(csym_arr))
+
+        uniform_csym = np.array([np.sum(csym_arr) / len(csym_arr)] * len(csym_arr))
+        smoothed_array = (1 - smoothing_factor) * csym_arr + smoothing_factor * uniform_csym
+
+        # Dominator's distribution
+        # final_probabilities = (np.max(smoothed_array) - smoothed_array) / \
+        #                       (np.max(smoothed_array) - np.min(smoothed_array)) * \
+        #                       (max_pr-min_pr) + min_pr
+
+        final_probabilities = (smoothed_array - np.min(smoothed_array)) / \
+                              (np.max(smoothed_array) - np.min(smoothed_array)) * \
+                              (max_pr-min_pr) + min_pr
+        cross_dict = dict(zip(custom_cross_prob.keys(), final_probabilities))
+        return cross_dict
+
+
+    @staticmethod
+    def cast_to_symbols(pool_names: list[tuple[str]]):
+
+        pool_ls = []
+        for name in pool_names:
+            term_symbolic = list(map(lambda u: Symbol(u), name))
+            pool_ls.append(Mul(*term_symbolic))
+        return pool_ls
+
+
 class TFPool(object):
     """
      Class stored pool for token families
@@ -440,25 +488,20 @@ class TFPool(object):
     """
     distribution_ls = []
 
-    def __init__(self, families: list, stored_pool=None):
+    def __init__(self, families: list, stored_pool=None, custom_cross_prob : dict = {}, max_factors_in_term: int = 1):
         if stored_pool is not None:
             self = pickle.load(stored_pool)
         self.families = families
+        self.custom_cross_prob = custom_cross_prob
+        self.max_factors_in_term = max_factors_in_term
+        self.cross_prob_distr = CustomProbInfo(self).cross_distr
 
-    # def show_distrib(self, plot_distrib=False):
-    #     for item in range(len(self.prob_info.term_set_hashed)):
-    #         indexes = np.where(np.array(self.distribution_ls) == item)[0]
-    #         print(f'{self.prob_info.distribution_dict_idx[item]}: {len(indexes)}')
-    #
-    #     if plot_distrib:
-    #         sublist = self.distribution_ls
-    #         fig, ax1 = plt.subplots()
-    #         sns.kdeplot(sublist, ax=ax1)
-    #         ax1.set_xlim(min(sublist), max(sublist))
-    #         ax2 = ax1.twinx()
-    #         sns.histplot(sublist, ax=ax2, bins=len(self.prob_info.term_set_hashed))  # discrete=True)
-    #         plt.grid()
-    #         plt.show()
+    @staticmethod
+    def compile_term(term):
+        complete_term = []
+        for factor in term.structure:
+            complete_term.append(factor.label)
+        return tuple(complete_term)
 
     # def update_distribution(self, term):
     #
@@ -589,7 +632,7 @@ class TFPool(object):
         return family.create(label=None, token_status=token_status, **kwargs)
 
     def __add__(self, other):
-        return TFPool(families=self.families + other.families)
+        return TFPool(families=self.families + other.families, custom_cross_prob=self.custom_cross_prob, max_factors_in_term=self.max_factors_in_term)
 
     def __len__(self):
         return len(self.families)

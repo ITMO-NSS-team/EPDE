@@ -503,7 +503,9 @@ class EpdeSearch(object):
 
     def create_pool(self, data: Union[np.ndarray, list, tuple], variable_names=['u',],
                     derivs=None, max_deriv_order=1, additional_tokens=[],
-                    data_fun_pow: int = 1, max_factors_in_term=1):
+                    data_fun_pow: int = 1, deriv_fun_pow: int = 1, max_factors_in_term=1,
+                    custom_cross_prob: dict = {}):
+
         self.pool_params = {'variable_names' : variable_names, 'max_deriv_order' : max_deriv_order,
                             'additional_tokens' : [family.token_family.ftype for family in additional_tokens]}
         assert (isinstance(derivs, list) and isinstance(derivs[0], np.ndarray)) or derivs is None
@@ -551,12 +553,13 @@ class EpdeSearch(object):
             print(isinstance(additional_tokens, PreparedTokens))
             raise TypeError(f'Incorrect type of additional tokens: expected list or TokenFamily/Prepared_tokens - obj, instead got {type(additional_tokens)}')
         self.pool = TFPool(data_tokens + [tf if isinstance(tf, TokenFamily) else tf.token_family
-                                      for tf in additional_tokens])
+                                          for tf in additional_tokens],custom_cross_prob=custom_cross_prob,
+                                                                    max_factors_in_term=max_factors_in_term)
 
-        grids = [self.cache[0].memory_default.get('0'), self.cache[0].memory_default.get('1')]
-        global_var.init_symnet_pool(max_factors_in_term, self.pool.families,
-                                    entry.data_tensor, entry.derivatives, entry.data_tensor.shape, entry.names,
-                                    grids=grids, max_deriv_order=max_deriv_order)
+        # grids = [self.cache[0].memory_default.get('0'), self.cache[0].memory_default.get('1')]
+        # global_var.init_symnet_pool(max_factors_in_term, self.pool.families,
+        #                             entry.data_tensor, entry.derivatives, entry.data_tensor.shape, entry.names,
+        #                             grids=grids, max_deriv_order=max_deriv_order)
         print(f'The cardinality of defined token pool is {self.pool.families_cardinality()}')
         print(f'Among them, the pool contains {self.pool.families_cardinality(meaningful_only=True)}')
         
@@ -577,7 +580,7 @@ class EpdeSearch(object):
 
     def fit(self, data: Union[np.ndarray, list, tuple], equation_terms_max_number=6,
             equation_factors_max_number=1, variable_names=['u',], eq_sparsity_interval=(1e-4, 2.5),
-            derivs=None, max_deriv_order=1, additional_tokens=[], data_fun_pow: int = 1):
+            derivs=None, max_deriv_order=1, additional_tokens=[], data_fun_pow: int = 1, custom_cross_prob : dict = {}):
         """
         Fit epde search algorithm to obtain differential equations, describing passed data.
 
@@ -634,6 +637,7 @@ class EpdeSearch(object):
                                  derivs=derivs, max_deriv_order=max_deriv_order,
                                  additional_tokens=additional_tokens,
                                  data_fun_pow=data_fun_pow,
+                                 custom_cross_prob=custom_cross_prob,
                                  max_factors_in_term=equation_factors_max_number)
 
         self.optimizer_init_params['population_instruct'] = {"pool": self.pool, "terms_number": equation_terms_max_number,

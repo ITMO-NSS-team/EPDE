@@ -22,6 +22,7 @@ from epde.decorators import HistoryExtender, ResetEquationStatus
 from epde.operators.utils.template import CompoundOperator, add_base_param_to_operator
 from epde.operators.multiobjective.moeadd_specific import get_basic_populator_updater
 from epde.operators.multiobjective.mutations import get_basic_mutation
+from sympy import Mul, Symbol
 
 
 class ParetoLevelsCrossover(CompoundOperator):
@@ -103,11 +104,20 @@ class ChromosomeCrossover(CompoundOperator):
         assert objective[0].vals.same_encoding(objective[1].vals)
         offspring_1 = objective[0]; offspring_2 = objective[1]
                 
+        if objective[0].crossover_dominator_count >= objective[1].crossover_dominator_count:
+            objective[0].incr_dominator_count()
+        else:
+            objective[1].incr_dominator_count()
+
         eqs_keys = objective[0].vals.equation_keys; params_keys = objective[1].vals.params_keys
         for eq_key in eqs_keys:
             temp_eq_1, temp_eq_2 = self.suboperators['equation_crossover'].apply(objective = (objective[0].vals[eq_key],
                                                                                               objective[1].vals[eq_key]),
-                                                                                 arguments = subop_args['equation_crossover'])
+                                                                                 arguments = subop_args['equation_crossover'],
+                                                                                 dominator_count=(objective[0].crossover_dominator_count,
+                                                                                                  objective[1].crossover_dominator_count))
+            # except TypeError:
+            #     pass
             objective[0].vals.replace_gene(gene_key = eq_key, value = temp_eq_1)
             offspring_2.vals.replace_gene(gene_key = eq_key, value = temp_eq_2)
             
@@ -145,7 +155,7 @@ class EquationCrossover(CompoundOperator):
     key = 'EquationCrossover'
     
     @HistoryExtender(f'\n -> performing equation crossover', 'ba')
-    def apply(self, objective : tuple, arguments : dict):
+    def apply(self, objective : tuple, arguments : dict, dominator_count : tuple):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
         equation1_terms, equation2_terms = detect_similar_terms(objective[0], objective[1])
@@ -176,7 +186,7 @@ class EquationExchangeCrossover(CompoundOperator):
     key = 'EquationExchangeCrossover'
     
     @HistoryExtender(f'\n -> performing equation exchange crossover', 'ba')
-    def apply(self, objective : tuple, arguments : dict):
+    def apply(self, objective : tuple, arguments : dict, dominator_count : tuple):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
         objective[0].structure, objective[1].structure = objective[1].structure, objective[0].structure
@@ -270,7 +280,7 @@ class TermCrossover(CompoundOperator):
     """    
     key = 'TermCrossover'
 
-    def apply(self, objective : tuple, arguments : dict):
+    def apply(self, objective : tuple, arguments : dict, dominator_count : tuple):
         """
         Get the offspring terms, which are the same parents' ones, but in different order, if the crossover occured.
         
@@ -287,7 +297,16 @@ class TermCrossover(CompoundOperator):
         """
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
-        if (np.random.uniform(0, 1) <= self.params['crossover_probability'] and 
+        idx = int(np.argmin(dominator_count))
+        cross_tokens = []
+        if type(objective[idx].cache_label[0]) == tuple:
+            for lbl_tuple in objective[idx].cache_label:
+                cross_tokens.append(Symbol(lbl_tuple[0]))
+        else:
+            cross_tokens.append(Symbol(objective[idx].cache_label[0]))
+        cross_prob = objective[0].pool.cross_prob_distr.get(Mul(*cross_tokens))
+
+        if (np.random.uniform(0, 1) <= cross_prob and
             objective[1].descr_variable_marker == objective[0].descr_variable_marker):
                 return objective[1], objective[0]
         else:

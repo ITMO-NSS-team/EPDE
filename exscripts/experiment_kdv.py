@@ -2,8 +2,10 @@ import time
 import numpy as np
 import pandas as pd
 import epde.interface.interface as epde_alg
-from kdv_init_distrib_sindy import coefficients1, coefficients2
-from scipy.io import loadmat
+from epde.evaluators import CustomEvaluator
+from epde.interface.prepared_tokens import CustomTokens
+from kdv_init_distrib import coefficients1, coefficients2
+
 import traceback
 import logging
 import os
@@ -15,7 +17,7 @@ def find_coeff_diff(res):
 
     for pareto_front in res:
         for soeq in pareto_front:
-            if soeq.obj_fun[0] < 10:
+            if soeq.obj_fun[0] < 0.02:
                 eq_text = soeq.vals.chromosome['u'].value.text_form
                 terms_dict = out_formatting(eq_text)
                 diff = coefficients_difference(terms_dict)
@@ -32,17 +34,15 @@ def coefficients_difference(terms_dict):
     for term_hash in terms_dict.keys():
         mae1 += abs(terms_dict.get(term_hash) - coefficients1.get(term_hash))
         mae2 += abs(terms_dict.get(term_hash) - coefficients2.get(term_hash))
-        if coefficients1.get(term_hash) != 0.0 and (abs(terms_dict.get(term_hash) - coefficients1.get(term_hash)) < 0.3\
-                or abs(terms_dict.get(term_hash) - coefficients2.get(term_hash)) < 0.3):
+        if coefficients1.get(term_hash) != 0.0 and (abs(terms_dict.get(term_hash) - coefficients1.get(term_hash)) < 0.1\
+                or abs(terms_dict.get(term_hash) - coefficients2.get(term_hash)) < 0.1):
             eq_found += 1
 
-    values = list(terms_dict.values())
-    not_zero_ls = [value for value in values if value != 0.0]
-    mae1 /= len(not_zero_ls)
-    mae2 /= len(not_zero_ls)
+    mae1 /= len(terms_dict)
+    mae2 /= len(terms_dict)
     mae = min(mae1, mae2)
 
-    if eq_found == 3:
+    if eq_found == 4:
         return mae
     else:
         return -1
@@ -50,12 +50,12 @@ def coefficients_difference(terms_dict):
 
 def out_formatting(string):
     string = string.replace("u{power: 1.0}", "u")
-    string = string.replace("d^2u/dx2^2{power: 1.0}", "d^2u/dx2^2")
     string = string.replace("d^2u/dx1^2{power: 1.0}", "d^2u/dx1^2")
+    string = string.replace("d^2u/dx0^2{power: 1.0}", "d^2u/dx0^2")
+    string = string.replace("du/dx0{power: 1.0}", "du/dx0")
     string = string.replace("du/dx1{power: 1.0}", "du/dx1")
-    string = string.replace("du/dx2{power: 1.0}", "du/dx2")
     string = string.replace("cos(t)sin(x){power: 1.0}", "cos(t)sin(x)")
-    string = string.replace("d^3u/dx2^3{power: 1.0}", "d^3u/dx2^3")
+    string = string.replace("d^3u/dx1^3{power: 1.0}", "d^3u/dx1^3")
     string = string.replace(" ", "")
 
     ls_equal = string.split('=')
@@ -91,50 +91,88 @@ def hash_term(term):
 
 
 if __name__ == '__main__':
-    path_full = os.path.join(Path().absolute().parent, "data_kdv", "kdv.mat")
-    kdV = loadmat(path_full)
-    t = np.ravel(kdV['t'])
-    x = np.ravel(kdV['x'])
-    u = np.real(kdV['usol'])
+    path_full = os.path.join(Path().absolute().parent, "data_kdv", "KdV_sln_100.csv")
+    df = pd.read_csv(path_full, header=None)
+
+    os.path.join(Path().absolute().parent, "data_kdv", "d_x_100.csv")
+    dddx = pd.read_csv(os.path.join(Path().absolute().parent, "data_kdv", "ddd_x_100.csv"), header=None)
+    ddx = pd.read_csv(os.path.join(Path().absolute().parent, "data_kdv", "dd_x_100.csv"), header=None)
+    dx = pd.read_csv(os.path.join(Path().absolute().parent, "data_kdv", "d_x_100.csv"), header=None)
+    dt = pd.read_csv(os.path.join(Path().absolute().parent, "data_kdv", "d_t_100.csv"), header=None)
+
+    u = df.values
     u = np.transpose(u)
+
+    ddd_x = dddx.values
+    ddd_x = np.transpose(ddd_x)
+    dd_x = ddx.values
+    dd_x = np.transpose(dd_x)
+    d_x = dx.values
+    d_x = np.transpose(d_x)
+    d_t = dt.values
+    d_t = np.transpose(d_t)
+
+    derivs = np.zeros(shape=(u.shape[0] * u.shape[1], 4))
+
+    derivs[:, 0] = d_t.flatten()
+    derivs[:, 1] = d_x.flatten()
+    derivs[:, 2] = dd_x.flatten()
+    derivs[:, 3] = ddd_x.flatten()
+
+    t = np.linspace(0, 1, u.shape[0])
+    x = np.linspace(0, 1, u.shape[1])
 
     boundary = 0
     dimensionality = u.ndim
     grids = np.meshgrid(t, x, indexing='ij')
 
     ''' Parameters of the experiment '''
-    write_csv = False
+    write_csv = True
     print_results = True
-    max_iter_number = 1
-    title = 'dfs0'
+    max_iter_number = 50
+    title = 'dfo0'
 
     time_ls = []
     differences_ls = []
-    mean_diff_ls = []
+    differences_ls_none = []
     num_found_eq = []
-    differences_ls_none =[]
+    mean_diff_ls = []
     i = 0
     population_error = 0
     while i < max_iter_number:
         epde_search_obj = epde_alg.EpdeSearch(use_solver=False, boundary=boundary,
                                                dimensionality=dimensionality, coordinate_tensors=grids)
 
+        custom_trigonometric_eval_fun = {
+            'cos(t)sin(x)': lambda *grids, **kwargs: (np.cos(grids[0]) * np.sin(grids[1])) ** kwargs['power']}
+        custom_trig_evaluator = CustomEvaluator(custom_trigonometric_eval_fun,
+                                                eval_fun_params_labels=['power'])
+        trig_params_ranges = {'power': (1, 1)}
+        trig_params_equal_ranges = {}
+
+        custom_trig_tokens = CustomTokens(token_type='trigonometric',
+                                          token_labels=['cos(t)sin(x)'],
+                                          evaluator=custom_trig_evaluator,
+                                          params_ranges=trig_params_ranges,
+                                          params_equality_ranges=trig_params_equal_ranges,
+                                          meaningful=True, unique_token_type=False)
+
         epde_search_obj.set_moeadd_params(population_size=8, training_epochs=90)
         start = time.time()
-
         try:
             epde_search_obj.fit(data=u, max_deriv_order=(1, 3),
                                 equation_terms_max_number=4, equation_factors_max_number=2,
-                                eq_sparsity_interval=(1e-08, 1e-06))
+                                eq_sparsity_interval=(1e-08, 1e-06), derivs=[derivs],
+                                additional_tokens=[custom_trig_tokens, ])
         except Exception as e:
             logging.error(traceback.format_exc())
             population_error += 1
             continue
         end = time.time()
-        epde_search_obj.equation_search_results(only_print=True, num=4)
+        epde_search_obj.equations(only_print=True, num=2)
         time1 = end-start
 
-        res = epde_search_obj.equation_search_results(only_print=False, num=4)
+        res = epde_search_obj.equations(only_print=False, num=2)
 
         difference_ls = find_coeff_diff(res)
         if len(difference_ls) != 0:
@@ -145,22 +183,19 @@ if __name__ == '__main__':
             differences_ls_none.append(None)
 
         num_found_eq.append(len(difference_ls))
+
         print('Overall time is:', time1)
         print(f'Iteration processed: {i+1}/{max_iter_number}\n')
-        i += 1
         time_ls.append(time1)
+        i += 1
 
     if write_csv:
         arr = np.array([differences_ls_none, time_ls, num_found_eq])
         arr = arr.T
         df = pd.DataFrame(data=arr, columns=['MAE', 'time', 'number_found_eq'])
-        df.to_csv(os.path.join(Path().absolute().parent, "data_kdv_sindy", f"{title}.csv"))
+        df.to_csv(os.path.join(Path().absolute().parent, "data_kdv", f"{title}.csv"))
 
     if print_results:
-        print('\nTime for every run, s:')
-        for item in time_ls:
-            print(f'{item: .4f}')
-
         print()
         print(f'\nAverage time, s: {sum(time_ls) / len(time_ls):.2f}')
         print(f'Average MAE per eq: {sum(mean_diff_ls) / len(mean_diff_ls):.6f}')
