@@ -213,10 +213,12 @@ def detect_similar_terms(base_equation_1, base_equation_2):   # Передела
 
 def filter_powers(gene):    # Разобраться и переделать
     gene_filtered = []
-    for token_idx in range(len(gene)):
-        total_power = gene.count(gene[token_idx])
-        powered_token = copy.deepcopy(gene[token_idx])
 
+    for token_idx in range(len(gene)):
+        total_power = sum([factor.param(name = 'power') for factor in gene 
+                           if gene[token_idx].partial_equlaity(factor)])#gene.count(gene[token_idx])
+        powered_token = copy.deepcopy(gene[token_idx])
+        
         power_idx = np.inf
         for param_idx, param_info in powered_token.params_description.items():
             if param_info['name'] == 'power':
@@ -227,7 +229,6 @@ def filter_powers(gene):    # Разобраться и переделать
         if powered_token not in gene_filtered:
             gene_filtered.append(powered_token)
     return gene_filtered
-
 
 def Bind_Params(zipped_params):
     param_dict = {}

@@ -368,7 +368,16 @@ class SystemSolverInterface(object):
     def set_boundary_operator(self, operator_info):
         raise NotImplementedError()
 
-    def _equation_solver_form(self, equation, variables, grids=None):
+    def _equation_solver_form(self, equation, variables, grids=None, mode = 'NN'):
+        assert mode in ['NN', 'autograd', 'mat'], 'Incorrect mode passed. Form available only \
+                                                   for "NN", "autograd "and "mat" methods'
+        
+        def adjust_shape(tensor, mode = 'NN'):
+            if mode in ['NN', 'autograd']:
+                return torch.flatten(tensor).unsqueeze(1).type(torch.FloatTensor)
+            elif mode == 'mat':
+                return tensor.type(torch.FloatTensor)
+            
         _solver_form = {}
         if grids is None:
             grids = self.grids
@@ -384,11 +393,13 @@ class SystemSolverInterface(object):
                 if not np.isclose(weight, 0, rtol = self.coeff_tol):
                     _solver_form[term.name] = self._term_solver_form(term, grids, default_domain, variables)
                     _solver_form[term.name]['coeff'] = _solver_form[term.name]['coeff'] * weight
-                    _solver_form[term.name]['coeff'] = torch.flatten(_solver_form[term.name]['coeff']).unsqueeze(1).type(torch.FloatTensor)
+                    _solver_form[term.name]['coeff'] = adjust_shape(_solver_form[term.name]['coeff'], mode = mode)
+                    #torch.flatten(_solver_form[term.name]['coeff']).unsqueeze(1).type(torch.FloatTensor)
 
         free_coeff_weight = torch.from_numpy(np.full_like(a=grids[0],
                                                           fill_value=equation.weights_final[-1]))
-        free_coeff_weight = torch.flatten(free_coeff_weight).unsqueeze(1).type(torch.FloatTensor)
+        free_coeff_weight = adjust_shape(free_coeff_weight, mode = mode)
+        #torch.flatten(free_coeff_weight).unsqueeze(1).type(torch.FloatTensor)
         free_coeff_term = {'coeff': free_coeff_weight,
                            'term': [None],
                            'pow': 0,
@@ -398,7 +409,12 @@ class SystemSolverInterface(object):
         target_weight = torch.from_numpy(np.full_like(a=grids[0], fill_value=-1.))
         target_form = self._term_solver_form(equation.structure[equation.target_idx], grids, default_domain, variables)
         target_form['coeff'] = target_form['coeff'] * target_weight
-        target_form['coeff'] = torch.flatten(target_form['coeff']).unsqueeze(1).type(torch.FloatTensor)
+        # if mode in ['NN', 'autograd']:
+        #     target_form['coeff'] = torch.flatten(target_form['coeff']).unsqueeze(1).type(torch.FloatTensor)
+        # elif mode == 'mat':
+        #     target_form['coeff'] = target_form['coeff'].type(torch.FloatTensor)
+        target_form['coeff'] = adjust_shape(target_form['coeff'], mode = mode)
+        print(f'target_form shape is {target_form["coeff"].shape}')
 
         _solver_form[equation.structure[equation.target_idx].name] = target_form
 
@@ -407,20 +423,21 @@ class SystemSolverInterface(object):
     def use_grids(self, grids=None):
         if grids is None and self.grids is None:
             _, self.grids = global_var.grid_cache.get_all()
-        elif self.grids is None:
+        elif grids is not None:   # elif self.grids is None:
             if len(grids) != len(global_var.grid_cache.get_all()[1]):
                 raise ValueError(
                     'Number of passed grids does not match the problem')
             self.grids = grids
+            
 
-    def form(self, grids=None):
+    def form(self, grids=None, mode = 'NN'):
         self.use_grids(grids=grids)
         equation_forms = []
 
         for equation in self.adaptee.vals:
             equation_forms.append((equation.main_var_to_explain,
                                    self._equation_solver_form(equation, variables=self.variables,
-                                                              grids=grids)))
+                                                              grids=grids, mode = mode)))
         return equation_forms
 
 
@@ -478,7 +495,7 @@ class SolverAdapter(object):
                           mode='NN', data=None):
         system_interface = SystemSolverInterface(system_to_adapt=system)
 
-        system_solver_forms = system_interface.form(grids)
+        system_solver_forms = system_interface.form(grids = grids, mode = mode)
         if boundary_conditions is None:
             op_gen = PregenBOperator(system=system,
                                      system_of_equation_solver_form=[sf_labeled[1] for sf_labeled

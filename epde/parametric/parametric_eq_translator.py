@@ -108,7 +108,7 @@ def optimize_parametric_form(terms: list, pool, method='L-BFGS-B', **kwargs):
                                                      status=cur_family.status, family_type=cur_family.ftype,
                                                      params_description=cur_family.token_params, params_to_opt=params)
                 factor.set_defined_params({key: value for key, value in params_vals.items() if value is not None})
-                factor.set_evaluator(cur_family._evaluator)
+                factor.evaluator = cur_family._evaluator
                 factor.set_grad_evaluator(cur_family._deriv_evaluators)
                 temp_factors_param[factor.hash_descr] = factor
             else:
@@ -121,7 +121,7 @@ def optimize_parametric_form(terms: list, pool, method='L-BFGS-B', **kwargs):
                                       equality_ranges=cur_family.equality_ranges,
                                       random=False,
                                       **params_vals)
-                factor.set_evaluator(cur_family._evaluator)
+                factor.evaluator = cur_family._evaluator
                 temp_factors_defined[factor.hash_descr] = factor
 
         terms_parsed.append(ParametricTerm(pool, parametric_factors=temp_factors_param,

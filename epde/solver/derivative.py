@@ -43,6 +43,7 @@ class Derivative_NN(DerivativeInt):
             for k, grid in enumerate(scheme):
                 grid_sum += self.model(grid)[:, term['var'][j]].reshape(-1, 1)\
                     * term[dif_dir][1][j][k]
+            print(f'grid_sum in take_derivatives is {grid_sum.shape} with the grid of {grid.shape}')
             der_term = der_term * grid_sum ** term['pow'][j]
         der_term = coeff * der_term
 

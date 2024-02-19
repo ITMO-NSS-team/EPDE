@@ -336,11 +336,11 @@ class Term(ComplexStructure):
 
 class Equation(ComplexStructure):
     __slots__ = ['_history', 'structure', 'interelement_operator', 'n_immutable', 'pool',
-                  # 'saved', 'saved_as','max_factors_in_term', 'operator',
-                 '_target', 'target_idx', '_features', 'right_part_selected',
-                 '_weights_final', 'weights_final_evald', '_weights_internal', 'weights_internal_evald',
-                 'fitness_calculated', 'solver_form_defined', '_fitness_value', # , '_solver_form'
-                 'metaparameters', 'main_var_to_explain']
+                  # '_target', '_features', 'saved', 'saved_as','max_factors_in_term', 'operator',
+                 'target_idx', 'right_part_selected', '_weights_final', 'weights_final_evald', 
+                 '_weights_internal', 'weights_internal_evald', 'fitness_calculated', 'solver_form_defined', 
+                 '_fitness_value', 'metaparameters', 'main_var_to_explain'] # , '_solver_form'
+                 
 
     def __init__(self, pool: TFPool, basic_structure: Union[list, tuple, set], var_to_explain: str = None,
                  metaparameters: dict = {'sparsity': {'optimizable': True, 'value': 1.},
@@ -513,7 +513,7 @@ class Equation(ComplexStructure):
         return new_eq
 
     def evaluate(self, normalize=True, return_val=False, grids=None):
-        self._target = self.structure[self.target_idx].evaluate(normalize, grids=grids)
+        target = self.structure[self.target_idx].evaluate(normalize, grids=grids)
         
         # Place for improvent: introduce shifted_idx where necessary
         def shifted_idx(idx):
@@ -533,38 +533,38 @@ class Equation(ComplexStructure):
         if len(feature_indexes) > 0:
             for feat_idx in range(len(feature_indexes)):
                 if feat_idx == 0:
-                    self._features = self.structure[feature_indexes[feat_idx]].evaluate(normalize, grids=grids)
+                    features = self.structure[feature_indexes[feat_idx]].evaluate(normalize, grids=grids)
                 else:
                     temp = self.structure[feature_indexes[feat_idx]].evaluate(normalize, grids=grids)
-                    self._features = np.vstack([self._features, temp])
+                    features = np.vstack([features, temp])
 
-            if self._features.ndim == 1:
-                self._features = np.expand_dims(self._features, 1).T
-            temp_feats = np.vstack([self._features, np.ones(self._features.shape[1])])
-            self._features = np.transpose(self._features)
+            if features.ndim == 1:
+                features = np.expand_dims(features, 1).T
+            temp_feats = np.vstack([features, np.ones(features.shape[1])])
+            features = np.transpose(features)
             temp_feats = np.transpose(temp_feats)
         else:
-            self._features = None
+            features = None
             
         if return_val:
             self.prev_normalized = normalize
             if normalize:
-                elem1 = np.expand_dims(self._target, axis=1)
+                elem1 = np.expand_dims(target, axis=1)
                 value = np.add(elem1, - reduce(lambda x, y: np.add(x, y), [np.multiply(self.weights_internal[idx_full], temp_feats[:, idx_sparse])
                                                                            for idx_sparse, idx_full in enumerate(feature_indexes)]))
                                                                            # for feature_idx, weight in np.ndenumerate(self.weights_internal)]))
             else:
-                elem1 = np.expand_dims(self._target, axis=1)
-                if self._features is None:
+                elem1 = np.expand_dims(target, axis=1)
+                if features is None:
                     feature_list = [np.multiply(self.weights_final[idx_full], temp_feats[:, idx_sparse])
                                     for idx_sparse, idx_full in enumerate(feature_indexes)]
                 else:
                     feature_list = 0               
                 value = np.add(elem1, feature_list)
                                                
-            return value, self._target, self._features
+            return value, target, features
         else:
-            return None, self._target, self._features
+            return None, target, features
 
     def reset_state(self, reset_right_part: bool = True):
         if reset_right_part:
@@ -580,7 +580,7 @@ class Equation(ComplexStructure):
         new_struct = clss.__new__(clss)
         memo[id(self)] = new_struct
 
-        attrs_to_avoid_copy = ['_features', '_target']
+        attrs_to_avoid_copy = []
         for k in self.__slots__:
             try:
                 if k not in attrs_to_avoid_copy:

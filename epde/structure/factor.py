@@ -143,17 +143,35 @@ class Factor(TerminalToken):
             return False
         else:
             return True
+        
+    def partial_equlaity(self, other):
+        for param_idx, param_info in self.params_description.items():
+            if param_info['name'] == 'power':
+                power_idx = param_idx
+                break
+            
+        if type(self) != type(other):
+            return False
+        elif self.label != other.label:
+            return False
+        elif any([abs(self.params[idx] - other.params[idx]) > self.equality_ranges[self.params_description[idx]['name']]
+                  for idx in np.arange(self.params.size) if idx != power_idx]):
+            return False
+        else:
+            return True
 
-    def __call__(self):
-        '''
-        Return vector of evaluated values
-        '''
-        raise NotImplementedError('Delete me')
-        return self.evaluate(self)
+    @property
+    def evaluator(self):
+        return self._evaluator
 
-    def set_evaluator(self, evaluator):
-        self._evaluator = evaluator
-
+    @evaluator.setter
+    def evaluator(self, evaluator):
+        try:
+            factor_family = [family for family in evaluator if family.ftype == self.ftype][0]
+            self._evaluator = factor_family.evaluator
+        except TypeError:
+            self._evaluator = evaluator
+            
     # Переработать/удалить __call__, т.к. его функции уже тут
     def evaluate(self, structural=False, grids=None):
         assert self.cache_linked

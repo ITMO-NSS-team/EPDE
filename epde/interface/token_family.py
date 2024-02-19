@@ -309,8 +309,8 @@ class TokenFamily(object):
                 constant_tokens_labels.append(label)
 
         for label in constant_tokens_labels:
-            print('Function ', label,
-                  'is assumed to be constant in the studied domain. Removed from the equaton search')
+            print(f'Function {label} is assumed to be constant in the studied domain. \
+                  Removed from the equaton search.')
             self.tokens.remove(label)
             global_var.tensor_cache.delete_entry(label + ' power 1')
 
@@ -318,12 +318,12 @@ class TokenFamily(object):
         """
         Applying evaluator in token
         """
-        raise NotImplementedError('Method has been moved to the Factor class')
+        raise NotImplementedError('Method has been moved to the Factor class.')
         if self.evaluator_set:
             return self._evaluator.apply(token)
         else:
             raise TypeError(
-                'Evaluator function or its parameters not set brfore evaluator application.')
+                'Evaluator function or its parameters not set before evaluator application.')
 
     def create(self, label=None, token_status: dict = None,
                create_derivs: bool = False, **factor_params):
@@ -344,10 +344,8 @@ class TokenFamily(object):
         if token_status is None or token_status == {}:
             token_status = {label: (0, self.token_params['power'][1], False)
                             for label in self.tokens}
-        # print('self.tokens:', self.tokens)
         if label is None:
             try:
-                # print()
                 if create_derivs:
                     label = np.random.choice([token for token in self.tokens
                                               if (not token_status[token][0] + 1 > token_status[token][1]
@@ -356,9 +354,6 @@ class TokenFamily(object):
                     label = np.random.choice([token for token in self.tokens
                                               if not token_status[token][0] + 1 > token_status[token][1]])
             except ValueError:
-                # print(
-                    # f'An error while creating factor of {self.ftype} token family')
-                # print('Status description:', token_status, ' all:', self.tokens)
                 raise ValueError("'a' cannot be empty unless no samples are taken")
 
         if self.family_of_derivs:
@@ -384,7 +379,8 @@ class TokenFamily(object):
                                       equality_ranges=self.equality_ranges,
                                       random=False,
                                       **factor_params)
-        new_factor.set_evaluator(self._evaluator)
+        new_factor.evaluator = self._evaluator
+
         return occupied_by_factor, new_factor
 
     def cardinality(self, token_status: Union[dict, None] = None):
