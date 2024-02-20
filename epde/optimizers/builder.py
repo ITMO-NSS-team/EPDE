@@ -22,7 +22,7 @@ def link(op1, op2):
     op2.add_incoming(op1)
 
 
-class StrategyBuilder():     # OperatorBuilder  ABC
+class StrategyBuilder():
     """
     Class instance for building a strategy
 
@@ -57,7 +57,6 @@ class StrategyBuilder():     # OperatorBuilder  ABC
     
     @abstractproperty
     def processer(self):
-        # raise NotImplementedError('Tring to return a property of an abstract class.')
         return self._processer
 
     def add_init_operator(self, operator_label : str = 'initial'):

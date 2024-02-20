@@ -16,7 +16,6 @@ import epde.globals as global_var
 from epde.structure.Tokens import TerminalToken
 from epde.supplementary import factor_params_to_str, train_ann, use_ann_to_predict, exp_form
 
-from epde.interace.token_family import EvaluatorContained, TFPool # Possible circular dependency
 
 class Factor(TerminalToken):
     __slots__ = ['_params', '_params_description', '_hash_val', '_latex_constructor',
@@ -144,13 +143,22 @@ class Factor(TerminalToken):
             return False
         else:
             return True
-
-    def __call__(self):
-        '''
-        Return vector of evaluated values
-        '''
-        raise NotImplementedError('Delete me')
-        return self.evaluate(self)
+        
+    def partial_equlaity(self, other):
+        for param_idx, param_info in self.params_description.items():
+            if param_info['name'] == 'power':
+                power_idx = param_idx
+                break
+            
+        if type(self) != type(other):
+            return False
+        elif self.label != other.label:
+            return False
+        elif any([abs(self.params[idx] - other.params[idx]) > self.equality_ranges[self.params_description[idx]['name']]
+                  for idx in np.arange(self.params.size) if idx != power_idx]):
+            return False
+        else:
+            return True
 
     @property
     def evaluator(self):
@@ -158,11 +166,12 @@ class Factor(TerminalToken):
 
     @evaluator.setter
     def evaluator(self, evaluator):
-        if isinstance(evaluator, EvaluatorContained):
+        try:
+            factor_family = [family for family in evaluator if family.ftype == self.ftype][0]
+            self._evaluator = factor_family.evaluator
+        except TypeError:
             self._evaluator = evaluator
-        elif isinstance(evaluator, TFPool):
-            # TODO: INSERT LOGIC OF FACTOR CREATION ACCORDING TO THE POOL
-
+            
     # Переработать/удалить __call__, т.к. его функции уже тут
     def evaluate(self, structural=False, grids=None):
         assert self.cache_linked

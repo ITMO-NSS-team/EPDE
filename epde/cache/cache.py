@@ -112,7 +112,7 @@ def prepare_var_tensor(var_tensor, derivs_tensor, time_axis):
         for i_outer in range(0, derivs_tensor.shape[-1]):
             assert derivs_tensor.ndim == var_tensor.ndim, 'The shape of tensor of derivatives does not correspond '
             result[i_outer+increment, ...] = np.moveaxis(derivs_tensor[..., i_outer], # np_ndarray_section( -1, , boundary, [])
-                                                         source=time_axis, destination=0)    
+                                                         source=time_axis, destination=0)
     return result
 
 

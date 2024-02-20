@@ -19,7 +19,8 @@ def exp_form(a, sign_num: int = 4):
     if np.isclose(a, 0):
         return 0.0, 0
     exp = np.floor(np.log10(np.abs(a)))
-    return np.around(a / 10**exp, sign_num), int(exp) # np.sign(a) * 
+    return np.around(a / 10**exp, sign_num), int(exp)
+
 
 def rts(value, sign_num: int = 5):
     """
@@ -33,6 +34,7 @@ def rts(value, sign_num: int = 5):
         idx -= 1
     return np.around(value, int(idx))
 
+
 def train_ann(grids: list, data: np.ndarray, epochs_max: int = 500):
     dim = 1 if np.any([s == 1 for s in data.shape]) and data.ndim == 2 else data.ndim
     assert len(grids) == dim, 'Dimensionality of data does not match with passed grids.'
@@ -41,20 +43,13 @@ def train_ann(grids: list, data: np.ndarray, epochs_max: int = 500):
     model = torch.nn.Sequential(
                 torch.nn.Linear(dim, 256),
                 torch.nn.Tanh(),
-                # torch.nn.Dropout(0.1),
-                # torch.nn.ReLU(),
                 torch.nn.Linear(256, 256),
                 torch.nn.Tanh(),
-                # torch.nn.Dropout(0.1),
-                # torch.nn.ReLU(),
                 torch.nn.Linear(256, 64),
-                # # torch.nn.Dropout(0.1),
                 torch.nn.Tanh(),
                 torch.nn.Linear(64, 1024),
-                # torch.nn.Dropout(0.1),
                 torch.nn.Tanh(),
                 torch.nn.Linear(1024, 1)
-                # torch.nn.Tanh()
             )
 
     data_grid = np.stack([grid.reshape(-1) for grid in grids])
@@ -66,7 +61,7 @@ def train_ann(grids: list, data: np.ndarray, epochs_max: int = 500):
     optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 
     batch_frac = 0.5
-    batch_size = int(data_size * batch_frac)  # or whatever
+    batch_size = int(data_size * batch_frac)
 
     t = 0
 
@@ -75,7 +70,7 @@ def train_ann(grids: list, data: np.ndarray, epochs_max: int = 500):
     loss_mean = 1000
     min_loss = np.inf
     losses = []
-    while loss_mean > 2e-3 and t < epochs_max:  # and t<epochs_max:
+    while loss_mean > 2e-3 and t < epochs_max:
 
         permutation = torch.randperm(grid_tensor.size()[0])
 
@@ -138,14 +133,12 @@ def flatten(obj):
     return reduce(lambda x, y: x+y, obj)
 
 
-
 def try_iterable(arg):
     try:
         _ = [elem for elem in arg]
     except TypeError:
         return False
     return True
-
 
 
 def memory_assesment():
@@ -211,12 +204,14 @@ def detect_similar_terms(base_equation_1, base_equation_2):   # Передела
     return [same_terms_from_eq1, similar_terms_from_eq1, different_terms_from_eq1], [same_terms_from_eq2, similar_terms_from_eq2, different_terms_from_eq2]
 
 
-def filter_powers(gene):    # Разобраться и переделать
+def filter_powers(gene):
     gene_filtered = []
-    for token_idx in range(len(gene)):
-        total_power = gene.count(gene[token_idx])
-        powered_token = copy.deepcopy(gene[token_idx])
 
+    for token_idx in range(len(gene)):
+        total_power = sum([factor.param(name = 'power') for factor in gene 
+                           if gene[token_idx].partial_equlaity(factor)])#gene.count(gene[token_idx])
+        powered_token = copy.deepcopy(gene[token_idx])
+        
         power_idx = np.inf
         for param_idx, param_info in powered_token.params_description.items():
             if param_info['name'] == 'power':
@@ -227,31 +222,6 @@ def filter_powers(gene):    # Разобраться и переделать
         if powered_token not in gene_filtered:
             gene_filtered.append(powered_token)
     return gene_filtered
-
-
-def Bind_Params(zipped_params):
-    param_dict = {}
-    for token_props in zipped_params:
-        param_dict[token_props[0]] = token_props[1]
-    return param_dict
-
-
-
-def Slice_Data_3D(matrix, part=4, part_tuple=None):
-    """
-    Input matrix slicing for separate domain calculation
-    """
-
-    if part_tuple:
-        for i in range(part_tuple[0]):
-            for j in range(part_tuple[1]):
-                yield matrix[:, i*int(matrix.shape[1]/float(part_tuple[0])):(i+1)*int(matrix.shape[1]/float(part_tuple[0])),
-                             j*int(matrix.shape[2]/float(part_tuple[1])):(j+1)*int(matrix.shape[2]/float(part_tuple[1]))], i, j
-    part_dim = int(np.sqrt(part))
-    for i in range(part_dim):
-        for j in range(part_dim):
-            yield matrix[:, i*int(matrix.shape[1]/float(part_dim)):(i+1)*int(matrix.shape[1]/float(part_dim)),
-                         j*int(matrix.shape[2]/float(part_dim)):(j+1)*int(matrix.shape[2]/float(part_dim))], i, j
 
 
 def define_derivatives(var_name='u', dimensionality=1, max_order=2):
@@ -267,8 +237,8 @@ def define_derivatives(var_name='u', dimensionality=1, max_order=2):
         deriv_names (`list` with `str` values): keys for epde
         var_deriv_orders (`list` with `int` values): keys for enter to solver
     """
-    deriv_names = []#[var_name,]
-    var_deriv_orders = []#[[None,],]
+    deriv_names = []
+    var_deriv_orders = []
     if isinstance(max_order, int):
         max_order = [max_order for dim in range(dimensionality)]
     for var_idx in range(dimensionality):
@@ -308,4 +278,3 @@ def normalize_ts(Input):
             else:
                 matrix[i] = 1
         return matrix
-

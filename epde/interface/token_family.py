@@ -379,7 +379,8 @@ class TokenFamily(object):
                                       equality_ranges=self.equality_ranges,
                                       random=False,
                                       **factor_params)
-        new_factor.set_evaluator(self._evaluator)
+        new_factor.evaluator = self._evaluator
+
         return occupied_by_factor, new_factor
 
     def cardinality(self, token_status: Union[dict, None] = None):

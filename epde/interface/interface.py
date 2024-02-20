@@ -1,9 +1,15 @@
-#  !/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
-Created on Tue Jul  6 15:55:12 2021
 
-@author: mike_ubuntu
+Inteface objects for EPDE framework
+
+Contains:
+---------
+
+**InputDataEntry** class, containing logic for preparing the input data for the equation search,
+such as initialization of neccessary token families and derivatives calculation.
+
+**EpdeSearch** class for main interactions between the user and the framework.
+
 """
 import pickle
 import numpy as np
@@ -152,7 +158,6 @@ class InputDataEntry(object):
 
 def simple_selector(sorted_neighbors, number_of_neighbors=4):
     return sorted_neighbors[:number_of_neighbors]
-
 
 class EpdeSearch(object):
     """
