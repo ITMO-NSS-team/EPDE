@@ -16,6 +16,41 @@ import epde.globals as global_var
 from epde.structure.Tokens import TerminalToken
 from epde.supplementary import factor_params_to_str, train_ann, use_ann_to_predict, exp_form
 
+class EvaluatorContained(object):
+    """
+    Class for evaluator of token (factor of the term in the sought equation) values with arbitrary function
+
+    Attributes:
+        _evaluator (`callable`): a function, which returns the vector of token values, evaluated on the studied area;
+        params (`dict`): dictionary, containing parameters of the evaluator (like grid, on which the function is evaluated or matrices of pre-calculated function)
+
+    Methods:
+        set_params(**params)
+            set the parameters of the evaluator, using keyword arguments
+        apply(token, token_params)
+            apply the defined evaluator to evaluate the token with specific parameters
+    """
+
+    def __init__(self, eval_function, eval_kwargs_keys={}):
+        self._evaluator = eval_function
+        self.eval_kwargs_keys = eval_kwargs_keys
+
+    def apply(self, token, structural=False, grids=None, **kwargs):
+        """
+        Apply the defined evaluator to evaluate the token with specific parameters.
+
+        Args:
+            token (`epde.main_structures.factor.Factor`): symbolic label of the specific token, e.g. 'cos';
+        token_params (`dict`): dictionary with keys, naming the token parameters (such as frequency, axis and power for trigonometric function) 
+            and values - specific values of corresponding parameters.
+
+        Raises:
+            `TypeError`
+                If the evaluator could not be applied to the token.
+        """
+        assert list(kwargs.keys()) == self.eval_kwargs_keys
+        return self._evaluator(token, structural, grids, **kwargs)
+
 
 class Factor(TerminalToken):
     __slots__ = ['_params', '_params_description', '_hash_val', '_latex_constructor',
@@ -166,11 +201,11 @@ class Factor(TerminalToken):
 
     @evaluator.setter
     def evaluator(self, evaluator):
-        try:
-            factor_family = [family for family in evaluator if family.ftype == self.ftype][0]
-            self._evaluator = factor_family.evaluator
-        except TypeError:
+        if isinstance(evaluator, EvaluatorContained):
             self._evaluator = evaluator
+        else:
+            factor_family = [family for family in evaluator.families if family.ftype == self.ftype][0]
+            self._evaluator = factor_family._evaluator # TODO: fix calling private attribute
             
     # Переработать/удалить __call__, т.к. его функции уже тут
     def evaluate(self, structural=False, grids=None):

@@ -176,14 +176,14 @@ class LoaderAssistant(object):
     def system_preset(pool: TFPool): # Validate correctness of attribute definitions
         return {'SoEq' :     {'tokens_for_eq' : TFPool(pool.families_demand_equation),
                               'tokens_supp' : TFPool(pool.families_equationless), 
-                              'latex_form' : None}, # TBD, make better loading procedure
+                              'latex_form' : None},
                 'Equation' : {'pool' : pool, 
                               'latex_form' : None,
                               '_history' : None},
                 'Term'     : {'pool' : pool, 
                               'latex_form' : None},
-                'Factor'   : {'_latex_constructor' : None}} # 'latex_form' : None, 
-
+                'Factor'   : {'_latex_constructor' : None, 
+                              '_evaluator' : None}} 
     
     @staticmethod
     def pool_preset():

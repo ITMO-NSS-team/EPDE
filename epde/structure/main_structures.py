@@ -80,6 +80,7 @@ class Term(ComplexStructure):
                 factor = Factor.__new__(Factor)
                 
                 attrs_from_dict(factor, factor_elem, except_attrs)
+                factor.evaluator = self.pool
                 self.structure.append(factor)
     
     @property
