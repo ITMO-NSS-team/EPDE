@@ -10,7 +10,6 @@ import traceback
 import logging
 import os
 from pathlib import Path
-from sympy import Symbol, Mul
 
 
 def find_coeff_diff(res, coefficients: dict):
@@ -45,10 +44,10 @@ def coefficients_difference(terms_dict, coefficients):
 
 def out_formatting(string):
     string = string.replace("u{power: 1.0}", "u")
+    string = string.replace("d^2u/dx2^2{power: 1.0}", "d^2u/dx2^2")
     string = string.replace("d^2u/dx1^2{power: 1.0}", "d^2u/dx1^2")
-    string = string.replace("d^2u/dx0^2{power: 1.0}", "d^2u/dx0^2")
-    string = string.replace("du/dx0{power: 1.0}", "du/dx0")
     string = string.replace("du/dx1{power: 1.0}", "du/dx1")
+    string = string.replace("du/dx2{power: 1.0}", "du/dx2")
     string = string.replace(" ", "")
 
     ls_equal = string.split('=')
@@ -97,18 +96,13 @@ if __name__ == '__main__':
     grids = np.meshgrid(t, x, indexing='ij')
 
     ''' Parameters of the experiment '''
-    write_csv = True
-    print_results = True
-    max_iter_number = 50
+    write_csv = False
+    print_results = False
+    max_iter_number = 1
     title = 'dfs0'
     ''''''
 
-    terms = [('u',), ('du/dx0',), ('d^2u/dx0^2',), ('du/dx1',), ('d^2u/dx1^2',)]
-    cross_distr = {Symbol('u'): 2,
-                   Symbol('du/dx0'): 2,
-                   Symbol('d^2u/dx0^2'): 9,
-                   Symbol('du/dx1'): 3,
-                   Symbol('d^2u/dx1^2'): 10}
+    terms = [('u',), ('du/dx1',), ('d^2u/dx1^2',), ('du/dx2',), ('d^2u/dx2^2',)]
     hashed_ls = [hash_term(term) for term in terms]
     coefficients = dict(zip(hashed_ls, [0., 0., -1., 0., 0.04]))
     coefficients[1] = 0.
@@ -138,10 +132,10 @@ if __name__ == '__main__':
             population_error += 1
             continue
         end = time.time()
-        epde_search_obj.equations(only_print=True, num=2)
+        epde_search_obj.equation_search_results(only_print=True, num=2)
         time1 = end-start
 
-        res = epde_search_obj.equations(only_print=False, num=2)
+        res = epde_search_obj.equation_search_results(only_print=False, num=2)
         difference_ls = find_coeff_diff(res, coefficients)
 
         if len(difference_ls) != 0:

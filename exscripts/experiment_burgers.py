@@ -8,7 +8,6 @@ import traceback
 import logging
 import os
 from pathlib import Path
-from sympy import Mul, Symbol
 
 
 def find_coeff_diff(res, coefficients: dict):
@@ -43,10 +42,10 @@ def coefficients_difference(terms_dict, coefficients):
 
 def out_formatting(string):
     string = string.replace("u{power: 1.0}", "u")
+    string = string.replace("d^2u/dx2^2{power: 1.0}", "d^2u/dx2^2")
     string = string.replace("d^2u/dx1^2{power: 1.0}", "d^2u/dx1^2")
-    string = string.replace("d^2u/dx0^2{power: 1.0}", "d^2u/dx0^2")
-    string = string.replace("du/dx0{power: 1.0}", "du/dx0")
     string = string.replace("du/dx1{power: 1.0}", "du/dx1")
+    string = string.replace("du/dx2{power: 1.0}", "du/dx2")
     string = string.replace(" ", "")
 
     ls_equal = string.split('=')
@@ -92,13 +91,6 @@ if __name__ == '__main__':
     x = np.linspace(-1000, 0, 101)
     t = np.linspace(0, 1, 101)
 
-    distr = {Symbol('u') : 1,
-                Symbol('du/dx0') : 7,
-                Symbol('du/dx1') : 2,
-                Mul(Symbol('u'), Symbol('du/dx0')) : 1,
-                Mul(Symbol('u'), Symbol('du/dx1')) : 8,
-                Mul(Symbol('du/dx1'), Symbol('du/dx0')) : 3}
-
     boundary = 10
     dimensionality = u.ndim
     grids = np.meshgrid(t, x, indexing='ij')
@@ -107,9 +99,9 @@ if __name__ == '__main__':
     write_csv = True
     print_results = True
     max_iter_number = 50
-    title = 'dfo0'
+    title = 'dfs0'
 
-    terms = [('du/dx0', ), ('du/dx1', 'u'), ('u',), ('du/dx1',), ('u', 'du/dx0'), ('du/dx0', 'du/dx1'),]
+    terms = [('du/dx1', ), ('du/dx2', 'u'), ('u',), ('du/dx2',), ('u', 'du/dx1'), ('du/dx1', 'du/dx2'),]
     hashed_ls = [hash_term(term) for term in terms]
     coefficients = dict(zip(hashed_ls, [-1., -1., 0., 0., 0., 0.]))
     coefficients[1] = 0.
@@ -136,10 +128,10 @@ if __name__ == '__main__':
             population_error += 1
             continue
         end = time.time()
-        epde_search_obj.equations(only_print=True, num=2)
+        epde_search_obj.equation_search_results(only_print=True, num=2)
         time1 = end-start
 
-        res = epde_search_obj.equations(only_print=False, num=2)
+        res = epde_search_obj.equation_search_results(only_print=False, num=2)
         difference_ls = find_coeff_diff(res, coefficients)
 
         if len(difference_ls) != 0:

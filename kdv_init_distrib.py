@@ -1,8 +1,4 @@
-import seaborn as sns
-import matplotlib.pyplot as plt
-import numpy as np
-from matplotlib import rcParams
-rcParams.update({'figure.autolayout': True})
+from sympy import Symbol, Mul
 
 
 def hash_term(term):
@@ -62,6 +58,28 @@ coefficients_direct1 = {('u',): 0.,
                 ('d^2u/dx2^2', 'cos(t)sin(x)'): 0.,
                 ('d^3u/dx2^3', 'cos(t)sin(x)'): 0.,
                 }
+coefficients_prob = {Symbol('u'): 2.,
+                     Symbol('du/dx1'): 9,
+                     Symbol('du/dx2'): 2.,
+                     Symbol('d^2u/dx2^2'): 2.,
+                     Symbol('d^3u/dx2^3'): 8,
+                     Symbol('cos(t)sin(x)'): 8,
+                     Mul(Symbol('u'), Symbol('du/dx1')): 2.,
+                     Mul(Symbol('u'), Symbol('du/dx2')): 10.,
+                     Mul(Symbol('u'), Symbol('d^2u/dx2^2')): 2.,
+                     Mul(Symbol('u'), Symbol('d^3u/dx2^3')): 2.,
+                     Mul(Symbol('u'), Symbol('cos(t)sin(x)')): 3.,
+                     Mul(Symbol('du/dx1'), Symbol('du/dx2')): 2.,
+                     Mul(Symbol('du/dx1'), Symbol('d^2u/dx2^2')): 3.,
+                     Mul(Symbol('du/dx1'), Symbol('d^3u/dx2^3')): 2.,
+                     Mul(Symbol('du/dx1'), Symbol('cos(t)sin(x)')): 3.,
+                     Mul(Symbol('du/dx2'), Symbol('d^2u/dx2^2')): 2.,
+                     Mul(Symbol('du/dx2'), Symbol('d^3u/dx2^3')): 3,
+                     Mul(Symbol('du/dx2'), Symbol('cos(t)sin(x)')): 2.,
+                     Mul(Symbol('d^2u/dx2^2'), Symbol('d^3u/dx2^3')): 2.,
+                     Mul(Symbol('d^2u/dx2^2'), Symbol('cos(t)sin(x)')): 4.,
+                     Mul(Symbol('d^3u/dx2^3'), Symbol('cos(t)sin(x)')): 3.,
+                     }
 term_ls = list(coefficients_direct1.keys())
 values = list(coefficients_direct1.values())
 hashed_ls = [hash_term(term) for term in term_ls]

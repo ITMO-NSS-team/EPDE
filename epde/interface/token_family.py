@@ -19,7 +19,6 @@ from epde.structure.factor import Factor
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-from symnet.initcoefficients import get_csym_tsym
 from sympy import Symbol, Mul
 
 def constancy_hard_equality(tensor, epsilon=1e-7):
@@ -445,7 +444,7 @@ class CustomProbInfo:
         self.cross_distr = self.get_cross_distr(self.pool.custom_cross_prob)
 
     @staticmethod
-    def get_cross_distr(custom_cross_prob, min_pr=0.15, max_pr=0.75):
+    def get_cross_distr(custom_cross_prob, min_pr=0.2, max_pr=0.7): # 0.15 0.75 for burg sindy 9 0.2-0.8 bo
         mmf = 2.4
         values = list(custom_cross_prob.values())
 

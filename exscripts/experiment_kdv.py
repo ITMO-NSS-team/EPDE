@@ -4,7 +4,7 @@ import pandas as pd
 import epde.interface.interface as epde_alg
 from epde.evaluators import CustomEvaluator
 from epde.interface.prepared_tokens import CustomTokens
-from kdv_init_distrib import coefficients1, coefficients2
+from kdv_init_distrib import coefficients1, coefficients2, coefficients_prob
 
 import traceback
 import logging
@@ -50,12 +50,12 @@ def coefficients_difference(terms_dict):
 
 def out_formatting(string):
     string = string.replace("u{power: 1.0}", "u")
+    string = string.replace("d^2u/dx2^2{power: 1.0}", "d^2u/dx2^2")
     string = string.replace("d^2u/dx1^2{power: 1.0}", "d^2u/dx1^2")
-    string = string.replace("d^2u/dx0^2{power: 1.0}", "d^2u/dx0^2")
-    string = string.replace("du/dx0{power: 1.0}", "du/dx0")
     string = string.replace("du/dx1{power: 1.0}", "du/dx1")
+    string = string.replace("du/dx2{power: 1.0}", "du/dx2")
     string = string.replace("cos(t)sin(x){power: 1.0}", "cos(t)sin(x)")
-    string = string.replace("d^3u/dx1^3{power: 1.0}", "d^3u/dx1^3")
+    string = string.replace("d^3u/dx2^3{power: 1.0}", "d^3u/dx2^3")
     string = string.replace(" ", "")
 
     ls_equal = string.split('=')
@@ -112,12 +112,11 @@ if __name__ == '__main__':
     d_t = dt.values
     d_t = np.transpose(d_t)
 
-    derivs = np.zeros(shape=(u.shape[0] * u.shape[1], 4))
-
-    derivs[:, 0] = d_t.flatten()
-    derivs[:, 1] = d_x.flatten()
-    derivs[:, 2] = dd_x.flatten()
-    derivs[:, 3] = ddd_x.flatten()
+    derivs = np.zeros(shape=(u.shape[0],u.shape[1],4))
+    derivs[:, :, 0] = d_t
+    derivs[:, :, 1] = d_x
+    derivs[:, :, 2] = dd_x
+    derivs[:, :, 3] = ddd_x
 
     t = np.linspace(0, 1, u.shape[0])
     x = np.linspace(0, 1, u.shape[1])
@@ -127,18 +126,21 @@ if __name__ == '__main__':
     grids = np.meshgrid(t, x, indexing='ij')
 
     ''' Parameters of the experiment '''
-    write_csv = True
+    write_csv = False
     print_results = True
-    max_iter_number = 50
-    title = 'dfo0'
+    max_iter_number = 1
+    print_id_of_good_runs = True
+    title = 'dfs0'
 
     time_ls = []
     differences_ls = []
     differences_ls_none = []
     num_found_eq = []
     mean_diff_ls = []
+    idxs = []
     i = 0
     population_error = 0
+    alg_time_start = time.time()
     while i < max_iter_number:
         epde_search_obj = epde_alg.EpdeSearch(use_solver=False, boundary=boundary,
                                                dimensionality=dimensionality, coordinate_tensors=grids)
@@ -148,6 +150,8 @@ if __name__ == '__main__':
         custom_trig_evaluator = CustomEvaluator(custom_trigonometric_eval_fun,
                                                 eval_fun_params_labels=['power'])
         trig_params_ranges = {'power': (1, 1)}
+        # something = custom_trigonometric_eval_fun.get('cos(t)sin(x)')(*grids,
+        #                                                               **{'power': trig_params_ranges.get('power')[0]})
         trig_params_equal_ranges = {}
 
         custom_trig_tokens = CustomTokens(token_type='trigonometric',
@@ -163,16 +167,16 @@ if __name__ == '__main__':
             epde_search_obj.fit(data=u, max_deriv_order=(1, 3),
                                 equation_terms_max_number=4, equation_factors_max_number=2,
                                 eq_sparsity_interval=(1e-08, 1e-06), derivs=[derivs],
-                                additional_tokens=[custom_trig_tokens, ])
+                                additional_tokens=[custom_trig_tokens, ], custom_cross_prob=coefficients_prob)
         except Exception as e:
             logging.error(traceback.format_exc())
             population_error += 1
             continue
         end = time.time()
-        epde_search_obj.equations(only_print=True, num=2)
+        epde_search_obj.equation_search_results(only_print=True, num=2)
         time1 = end-start
 
-        res = epde_search_obj.equations(only_print=False, num=2)
+        res = epde_search_obj.equation_search_results(only_print=False, num=2)
 
         difference_ls = find_coeff_diff(res)
         if len(difference_ls) != 0:
@@ -185,10 +189,14 @@ if __name__ == '__main__':
         num_found_eq.append(len(difference_ls))
 
         print('Overall time is:', time1)
-        print(f'Iteration processed: {i+1}/{max_iter_number}\n')
+        print(f'Iteration processed: {i+1}/{max_iter_number}')
+        print(f"Equations found: {len(difference_ls)}\n")
         time_ls.append(time1)
         i += 1
+        if len(difference_ls) > 0:
+            idxs.append(i)
 
+    alg_time_end = time.time()
     if write_csv:
         arr = np.array([differences_ls_none, time_ls, num_found_eq])
         arr = arr.T
@@ -198,8 +206,14 @@ if __name__ == '__main__':
     if print_results:
         print()
         print(f'\nAverage time, s: {sum(time_ls) / len(time_ls):.2f}')
+        print(f"Time for all runs, min: {(alg_time_end - alg_time_start) / 60: .2f}")
+        print(f"Time for all runs, hours: {(alg_time_end - alg_time_start) / 3600: .2f}")
         print(f'Average MAE per eq: {sum(mean_diff_ls) / len(mean_diff_ls):.6f}')
         print(f'Average minimum MAE per run: {sum(differences_ls) / max_iter_number:.6f}')
         print(f'Average # of found eq per run: {sum(num_found_eq) / max_iter_number:.2f}')
         print(f"Runs where eq was not found: {num_found_eq.count(0)}")
         print(f"Num of population error occurrence: {population_error}")
+
+    if print_id_of_good_runs:
+        print("\nIndexes of runs where eq was found:")
+        print(idxs)

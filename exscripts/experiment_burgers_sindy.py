@@ -34,7 +34,7 @@ def coefficients_difference(terms_dict, coefficients):
     eq_found = 0
     for term_hash in terms_dict.keys():
         mae += abs(terms_dict.get(term_hash) - coefficients.get(term_hash))
-        if coefficients.get(term_hash) != 0.0 and abs(terms_dict.get(term_hash) - coefficients.get(term_hash)) < 0.15:
+        if coefficients.get(term_hash) != 0.0 and abs(terms_dict.get(term_hash) - coefficients.get(term_hash)) < 0.1:
             eq_found += 1
 
     mae /= len(terms_dict)
@@ -47,9 +47,9 @@ def coefficients_difference(terms_dict, coefficients):
 def out_formatting(string):
     string = string.replace("u{power: 1.0}", "u")
     string = string.replace("d^2u/dx1^2{power: 1.0}", "d^2u/dx1^2")
-    string = string.replace("d^2u/dx0^2{power: 1.0}", "d^2u/dx0^2")
-    string = string.replace("du/dx0{power: 1.0}", "du/dx0")
+    string = string.replace("d^2u/dx2^2{power: 1.0}", "d^2u/dx2^2")
     string = string.replace("du/dx1{power: 1.0}", "du/dx1")
+    string = string.replace("du/dx2{power: 1.0}", "du/dx2")
     string = string.replace(" ", "")
 
     ls_equal = string.split('=')
@@ -97,24 +97,23 @@ if __name__ == '__main__':
     grids = np.meshgrid(t, x, indexing='ij')
 
     ''' Parameters of the experiment '''
-    write_csv = False
+    write_csv = True
     print_results = True
-    max_iter_number = 50
-    title = 'dfo0'
+    max_iter_number = 2000
+    title = f'dfs0_{max_iter_number}_simstart2'
 
-    terms = [('u',), ('du/dx0',), ('du/dx1',), ('d^2u/dx1^2',), ('u', 'du/dx0'), ('u', 'du/dx1'), ('u', 'd^2u/dx1^2'),
-             ('du/dx0', 'du/dx1'), ('du/dx0', 'd^2u/dx1^2'), ('du/dx1', 'd^2u/dx1^2')]
+    terms = [('u',), ('du/dx1',), ('du/dx2',), ('d^2u/dx2^2',), ('u', 'du/dx1'), ('u', 'du/dx2'), ('u', 'd^2u/dx2^2'),
+             ('du/dx1', 'du/dx2'), ('du/dx1', 'd^2u/dx2^2'), ('du/dx2', 'd^2u/dx2^2')]
     cross_distr = {Symbol('u'): 2,
-                   Symbol('du/dx0'): 10,
-                   Symbol('du/dx1'): 2,
-                   Symbol('d^2u/dx1^2'): 9,
-                   Mul(Symbol('u'), Symbol('du/dx0')): 4,
-                   Mul(Symbol('u'), Symbol('du/dx1')): 8,
-                   Mul(Symbol('u'), Symbol('d^2u/dx1^2')): 2,
-                   Mul(Symbol('du/dx0'), Symbol('du/dx1')): 3,
-                   Mul(Symbol('du/dx0'), Symbol('d^2u/dx1^2')): 2,
-                   Mul(Symbol('du/dx1'), Symbol('d^2u/dx1^2')): 3}
-    
+                   Symbol('du/dx1'): 10,
+                   Symbol('du/dx2'): 2,
+                   Symbol('d^2u/dx2^2'): 9,
+                   Mul(Symbol('u'), Symbol('du/dx1')): 4,
+                   Mul(Symbol('u'), Symbol('du/dx2')): 8,
+                   Mul(Symbol('u'), Symbol('d^2u/dx2^2')): 2,
+                   Mul(Symbol('du/dx1'), Symbol('du/dx2')): 3,
+                   Mul(Symbol('du/dx1'), Symbol('d^2u/dx2^2')): 2,
+                   Mul(Symbol('du/dx2'), Symbol('d^2u/dx2^2')): 3}
     hashed_ls = [hash_term(term) for term in terms]
     coefficients = dict(zip(hashed_ls, [0., -1., 0., 0.1, 0., -1., 0., 0., 0., 0.]))
     coefficients[1] = 0.
@@ -126,6 +125,7 @@ if __name__ == '__main__':
     differences_ls_none = []
     i = 0
     population_error = 0
+    alg_time_start = time.time()
     while i < max_iter_number:
         epde_search_obj = epde_alg.EpdeSearch(use_solver=False, boundary=boundary,
                                               dimensionality=dimensionality, coordinate_tensors=grids)
@@ -135,15 +135,16 @@ if __name__ == '__main__':
         try:
             epde_search_obj.fit(data=u, max_deriv_order=(1, 2),
                                 equation_terms_max_number=3, equation_factors_max_number=2,
-                                eq_sparsity_interval=(1e-08, 1e-1))
+                                eq_sparsity_interval=(1e-08, 1e-1), custom_cross_prob=cross_distr)
         except Exception as e:
             logging.error(traceback.format_exc())
             population_error += 1
             continue
         end = time.time()
-        epde_search_obj.equations(only_print=True, num=4)
+        epde_search_obj.equation_search_results(only_print=True, num=4)
         time1 = end-start
-        res = epde_search_obj.equations(only_print=False, num=4)
+
+        res = epde_search_obj.equation_search_results(only_print=False, num=4)
         difference_ls = find_coeff_diff(res, coefficients)
 
         if len(difference_ls) != 0:
@@ -155,10 +156,11 @@ if __name__ == '__main__':
 
         num_found_eq.append(len(difference_ls))
         print('Overall time is:', time1)
-        print(f'Iteration processed: {i+1}/{max_iter_number}\n')
+        print(f'Iteration processed: {i+1}/{max_iter_number}')
+        print(f"Equations found: {len(difference_ls)}\n")
         i += 1
         time_ls.append(time1)
-
+    alg_time_end = time.time()
     if write_csv:
         arr = np.array([differences_ls_none, time_ls, num_found_eq])
         arr = arr.T
@@ -166,12 +168,10 @@ if __name__ == '__main__':
         df.to_csv(os.path.join(Path().absolute().parent, "data_burg_sindy", f"{title}.csv"))
 
     if print_results:
-        print('\nTime for every run, s:')
-        for item in time_ls:
-            print(f'{item: .4f}')
-
         print()
         print(f'\nAverage time, s: {sum(time_ls) / len(time_ls):.2f}')
+        print(f"Time for all runs, min: {(alg_time_end - alg_time_start) / 60: .2f}")
+        print(f"Time for all runs, hours: {(alg_time_end - alg_time_start) / 3600: .2f}")
         print(f'Average MAE per eq: {sum(mean_diff_ls) / len(mean_diff_ls):.6f}')
         print(f'Average minimum MAE per run: {sum(differences_ls) / max_iter_number:.6f}')
         print(f'Average # of found eq per run: {sum(num_found_eq) / max_iter_number:.2f}')

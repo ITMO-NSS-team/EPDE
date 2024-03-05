@@ -50,12 +50,12 @@ def coefficients_difference(terms_dict):
 
 def out_formatting(string):
     string = string.replace("u{power: 1.0}", "u")
+    string = string.replace("d^2u/dx2^2{power: 1.0}", "d^2u/dx2^2")
     string = string.replace("d^2u/dx1^2{power: 1.0}", "d^2u/dx1^2")
-    string = string.replace("d^2u/dx0^2{power: 1.0}", "d^2u/dx0^2")
-    string = string.replace("du/dx0{power: 1.0}", "du/dx0")
     string = string.replace("du/dx1{power: 1.0}", "du/dx1")
+    string = string.replace("du/dx2{power: 1.0}", "du/dx2")
     string = string.replace("cos(t)sin(x){power: 1.0}", "cos(t)sin(x)")
-    string = string.replace("d^3u/dx1^3{power: 1.0}", "d^3u/dx1^3")
+    string = string.replace("d^3u/dx2^3{power: 1.0}", "d^3u/dx2^3")
     string = string.replace(" ", "")
 
     ls_equal = string.split('=')
@@ -106,7 +106,7 @@ if __name__ == '__main__':
     write_csv = True
     print_results = True
     max_iter_number = 50
-    title = 'dfo0'
+    title = 'dfs0'
 
     time_ls = []
     differences_ls = []
@@ -125,16 +125,16 @@ if __name__ == '__main__':
         try:
             epde_search_obj.fit(data=u, max_deriv_order=(1, 3),
                                 equation_terms_max_number=4, equation_factors_max_number=2,
-                                eq_sparsity_interval=(1e-08, 1e-06))
+                                eq_sparsity_interval=(1e-08, 1e-06), custom_cross_prob=coefficients_prob)
         except Exception as e:
             logging.error(traceback.format_exc())
             population_error += 1
             continue
         end = time.time()
-        epde_search_obj.equations(only_print=True, num=4)
+        epde_search_obj.equation_search_results(only_print=True, num=4)
         time1 = end-start
 
-        res = epde_search_obj.equations(only_print=False, num=4)
+        res = epde_search_obj.equation_search_results(only_print=False, num=4)
 
         difference_ls = find_coeff_diff(res)
         if len(difference_ls) != 0:
@@ -146,7 +146,8 @@ if __name__ == '__main__':
 
         num_found_eq.append(len(difference_ls))
         print('Overall time is:', time1)
-        print(f'Iteration processed: {i+1}/{max_iter_number}\n')
+        print(f'Iteration processed: {i+1}/{max_iter_number}')
+        print(f"Equations found: {len(difference_ls)}\n")
         i += 1
         time_ls.append(time1)
 

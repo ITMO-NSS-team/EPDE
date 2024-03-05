@@ -1,3 +1,4 @@
+from sympy import Symbol, Mul
 
 
 def hash_term(term):
@@ -45,6 +46,22 @@ coefficients_direct1 = {('u',): 0.,
                 ('du/dx2', 'd^3u/dx2^3'): 0.,
                 ('d^2u/dx2^2', 'd^3u/dx2^3'): 0.,
                 }
+coefficients_prob = {Symbol('u'): 3.,
+                     Symbol('du/dx1'): 10,
+                     Symbol('du/dx2'): 2.,
+                     Symbol('d^2u/dx2^2'): 3.,
+                     Symbol('d^3u/dx2^3'): 9,
+                     Mul(Symbol('u'), Symbol('du/dx1')): 2.,
+                     Mul(Symbol('u'), Symbol('du/dx2')): 9,
+                     Mul(Symbol('u'), Symbol('d^2u/dx2^2')): 2.,
+                     Mul(Symbol('u'), Symbol('d^3u/dx2^3')): 2.,
+                     Mul(Symbol('du/dx1'), Symbol('du/dx2')): 3.,
+                     Mul(Symbol('du/dx1'), Symbol('d^2u/dx2^2')): 4.,
+                     Mul(Symbol('du/dx1'), Symbol('d^3u/dx2^3')): 2.,
+                     Mul(Symbol('du/dx2'), Symbol('d^2u/dx2^2')): 2.,
+                     Mul(Symbol('du/dx2'), Symbol('d^3u/dx2^3')): 3.,
+                     Mul(Symbol('d^2u/dx2^2'), Symbol('d^3u/dx2^3')): 2.,
+                     }
 term_ls = list(coefficients_direct1.keys())
 values = list(coefficients_direct1.values())
 hashed_ls = [hash_term(term) for term in term_ls]

@@ -795,7 +795,6 @@ class SoEq(moeadd.MOEADDSolution):
         self.tokens_for_eq = TFPool(pool.families_demand_equation, custom_cross_prob=pool.custom_cross_prob, max_factors_in_term=pool.max_factors_in_term)
         self.tokens_supp = TFPool(pool.families_equationless, custom_cross_prob=pool.custom_cross_prob, max_factors_in_term=pool.max_factors_in_term)
         self.moeadd_set = False
-
         self.vars_to_describe = [token_family.ftype for token_family in self.tokens_for_eq.families] # Made list from set
 
     def use_default_multiobjective_function(self):
