@@ -707,7 +707,6 @@ class EpdeSearch(object):
             return self.optimizer.pareto_levels.levels
         else:
             return self.optimizer.population.population
-            
     
     def equations(self, only_print : bool = True, only_str = False, num = 1):
         """
