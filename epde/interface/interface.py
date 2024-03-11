@@ -19,6 +19,7 @@ from collections import OrderedDict
 import epde.globals as global_var
 
 from epde.optimizers.builder import StrategyBuilder
+from epde.optimizers.builder import OptimizationPatternDirector
 
 from epde.optimizers.moeadd.moeadd import *
 from epde.optimizers.moeadd.supplementary import *
@@ -609,7 +610,7 @@ class EpdeSearch(object):
 
     def fit(self, data: Union[np.ndarray, list, tuple], equation_terms_max_number=6,
             equation_factors_max_number=1, variable_names=['u',], eq_sparsity_interval=(1e-4, 2.5), 
-            derivs=None, max_deriv_order=1, additional_tokens=[], data_fun_pow: int = 1):
+            derivs=None, max_deriv_order=1, additional_tokens=[], data_fun_pow: int = 1, optimizer = None):
         """
         Fit epde search algorithm to obtain differential equations, describing passed data.
 
@@ -671,70 +672,32 @@ class EpdeSearch(object):
                                                              "max_factors_in_term": equation_factors_max_number,
                                                              "sparsity_interval": eq_sparsity_interval}
         
-        if self.multiobjective_mode:
-            self.optimizer = MOEADDOptimizer(**self.optimizer_init_params)
-            best_obj = np.concatenate((np.zeros(shape=len([1 for token_family in self.pool.families if token_family.status['demands_equation']])),
-                                   np.ones(shape=len([1 for token_family in self.pool.families if token_family.status['demands_equation']]))))
-            print('best_obj', len(best_obj))
-            self.optimizer.pass_best_objectives(*best_obj)
+        if optimizer is None:
+            self.optimizer = self._set_optimizer(self.multiobjective_mode, self.optimizer_init_params, self.director)
         else:
-            self.optimizer = SimpleOptimizer(**self.optimizer_init_params)
-        
-        self.optimizer.set_strategy(self.director)
+            self.optimizer = optimizer
+            
         self.optimizer.optimize(**self.optimizer_exec_params)
-
+        
         print('The optimization has been conducted.')
         self.search_conducted = True
 
-    def fit_multiobjective(self, equation_terms_max_number=6, equation_factors_max_number=1, eq_sparsity_interval=(1e-4, 2.5)):
-        """
-        Fitting functional for multiojective optimization 
-
-        Args:
-            equation_terms_max_number (`int`): maximum count of terms in differential equation, default - 6
-            equation_factors_max_number (`int`): maximum count of factors in term of differential equation, default - 1
-            eq_sparsity_interval (`tuple`): interval of allowed values of sparsity constant for lasso regression, default - (1e-4, 2.5)
-
-        Returns:
-            None
-        """
-        self.optimizer_init_params['population_instruct'] = {"pool": self.pool, "terms_number": equation_terms_max_number,
-                                                             "max_factors_in_terms": equation_factors_max_number, "sparsity_interval": eq_sparsity_interval}
-
-        self.optimizer = MOEADDOptimizer(**self.optimizer_init_params)
+    @staticmethod
+    def _set_optimizer(multiobjective_mode:bool, optimizer_init_params:dict, opt_strategy_director:OptimizationPatternDirector):
+        if multiobjective_mode:
+            optimizer = MOEADDOptimizer(**optimizer_init_params)
+                            
+            best_obj = np.concatenate((np.zeros(shape=len([1 for token_family in optimizer_init_params['population_instruct']['pool'].families 
+                                                           if token_family.status['demands_equation']])),
+                                       np.ones(shape=len([1 for token_family in optimizer_init_params['population_instruct']['pool'].families 
+                                                          if token_family.status['demands_equation']]))))
+            print('best_obj', len(best_obj))
+            optimizer.pass_best_objectives(*best_obj)            
+        else:
+            optimizer = SimpleOptimizer(**optimizer_init_params)
         
-        self.optimizer.set_strategy(self.director)
-        best_obj = np.concatenate((np.zeros(shape=len([1 for token_family in self.pool.families if token_family.status['demands_equation']])),
-                                   np.ones(shape=len([1 for token_family in self.pool.families if token_family.status['demands_equation']]))))
-        print('best_obj', len(best_obj))
-        self.optimizer.pass_best_objectives(*best_obj)
-        self.optimizer.optimize(**self.optimizer_exec_params)
-
-        print('The optimization has been conducted.')
-        self.search_conducted = True
-        
-    def fit_singleobjective(self, equation_terms_max_number=6, equation_factors_max_number=1, eq_sparsity_interval=(1e-4, 2.5)):
-        """
-        Fitting functional for singleobjective optimization 
-
-        Args:
-            equation_terms_max_number (`int`): maximum count of terms in differential equation, default - 6
-            equation_factors_max_number (`int`): maximum count of factors in term of differential equation, default - 1
-            eq_sparsity_interval (`tuple`): interval of allowed values of sparsity constant for lasso regression, default - (1e-4, 2.5)
-
-        Returns:
-            None
-        """
-        self.optimizer_init_params['population_instruct'] = {"pool": self.pool, "terms_number": equation_terms_max_number,
-                                                             "max_factors_in_terms": equation_factors_max_number, "sparsity_interval": eq_sparsity_interval}
-        self.optimizer = SimpleOptimizer(**self.optimizer_init_params)        
-
-        self.optimizer.set_strategy(self.director)
-
-        self.optimizer.optimize(**self.optimizer_exec_params)
-
-        print('The optimization has been conducted.')
-        self.search_conducted = True
+        optimizer.set_strategy(opt_strategy_director)        
+        return optimizer
 
     @property
     def _resulting_population(self):

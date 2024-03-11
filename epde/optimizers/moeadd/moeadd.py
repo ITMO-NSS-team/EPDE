@@ -69,7 +69,7 @@ class ParetoLevels(object):
         self.unplaced_candidates = population
     
     def manual_reconst(self, attribute:str, value, except_attrs:dict):
-        from epde.loader import attrs_from_dict, get_typespec_attrs
+        from epde.loader import attrs_from_dict
         supported_attrs = ['population']
         if attribute not in supported_attrs:
             raise ValueError(f'Attribute {attribute} is not supported by manual_reconst method.')

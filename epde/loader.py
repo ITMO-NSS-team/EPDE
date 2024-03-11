@@ -32,7 +32,7 @@ TYPESPEC_ATTRS = {'SoEq' : (['tokens_for_eq', 'tokens_supp', 'latex_form'], ['va
                   'ParetoLevels' : (['levels'], ['population']), 'Population' : ([], [])}
                   
 
-LOADING_PRESETS = {'SoEq' : {'SoEq' : []}}
+# LOADING_PRESETS = {'SoEq' : {'SoEq' : []}}
 
 def get_size(obj, seen=None):
     size = sys.getsizeof(obj)
@@ -194,20 +194,32 @@ class LoaderAssistant(object):
         return {}
     
     @staticmethod
-    def population_preset():
-        return {}
+    def population_preset(pool: TFPool):
+        return {'Population' : {}, 
+                'SoEq' :     {'tokens_for_eq' : TFPool(pool.families_demand_equation),
+                              'tokens_supp' : TFPool(pool.families_equationless), 
+                              'latex_form' : None},
+                'Equation' : {'pool' : pool, 
+                              'latex_form' : None,
+                              '_history' : None},
+                'Term'     : {'pool' : pool, 
+                              'latex_form' : None},
+                'Factor'   : {'_latex_constructor' : None, 
+                              '_evaluator' : None}}
     
     @staticmethod
     def pareto_levels_preset(pool: TFPool):
-        return {
-                'SoEq'     : {'tokens_for_eq' : TFPool(pool.families_demand_equation), 
+        return {'ParetoLevels' : {}, 
+                'SoEq' :     {'tokens_for_eq' : TFPool(pool.families_demand_equation),
                               'tokens_supp' : TFPool(pool.families_equationless), 
-                              'latex_form' : None}, # TBD, make better loading procedure
-                'Equation' : {'pool' : pool, 
                               'latex_form' : None},
+                'Equation' : {'pool' : pool, 
+                              'latex_form' : None,
+                              '_history' : None},
                 'Term'     : {'pool' : pool, 
                               'latex_form' : None},
-                'Factor'   : {'_latex_constructor' : None}}
+                'Factor'   : {'_latex_constructor' : None, 
+                              '_evaluator' : None}}
         
 
 class EPDELoader(object):

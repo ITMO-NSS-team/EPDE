@@ -40,13 +40,11 @@ class ParametricEquation(object):
             the variables: variables[0] - the object, containing parametric equation.  
 
             '''
-            # print('params in opt_func', params)
             err = np.linalg.norm(variables[0].evaluate_with_params(params))
             print('error:', err)
             return err
 
         def opt_fun_grad(params, *variables):
-            # print('evaluating gradient')
             grad = np.zeros_like(params)
             for param_idx, param_in_term_props in variables[0].param_term_beloning.items():
                 grad[param_idx] = np.sum(
