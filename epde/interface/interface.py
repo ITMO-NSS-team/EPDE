@@ -392,18 +392,21 @@ class EpdeSearch(object):
                              threshold : float = 1e-5, division_fractions = 3, 
                              rectangular : bool = True):
         """
-        Method for select only subdomains with variable dinamice
+        Method for select only subdomains with variable dynamics.
 
         Args:
-            pivotal_tensor_label (`np.ndarray`): pattern that guides the domain pruning
-                will be cutting areas, where values of the `pivotal_tensor` are closed to zero
-            pruner (`DomainPruner`): object for selecting domain region
+            pivotal_tensor_label (`np.ndarray`): 
+                Pattern that guides the domain pruning will be cutting areas, where values of the 
+                `pivotal_tensor` are closed to zero.
+            pruner (`DomainPruner`): 
+                Custom object for selecting domain region by pruning out areas with no dynamics.
             threshold (`float`): optional, default - 1e-5
-                the boundary at which values are considered zero
+                The boundary at which values are considered zero.
             division_fractions (`int`): optional, default - 3
-                number of fraction for each axis (if this is integer than all axis are dividing by same fractions)
+                Number of fraction for each axis (if this is integer than all axis are dividing by same fractions).
             rectangular (`bool`): default - True
-                flag indecating that area is rectangle    
+                Flag indecating that area is rectangle.
+                
         Returns:
             None
         """
@@ -428,14 +431,16 @@ class EpdeSearch(object):
         if global_var.grid_cache is not None:
             global_var.grid_cache.prune_tensors(self.pruner)
 
-    def create_caches(self, coordinate_tensors, memory_for_cache):
+    def _create_caches(self, coordinate_tensors, memory_for_cache):
         """
-        Creating caches for tensor keeping
-
+        Creating caches for keeping tensors during EPDE search.
+        
         Args:
-            coordinate_tensors (`np.ndarray|list`): grid values
-            memory_for_cache (`int`): allowed amount of memory for data storage
-
+            coordinate_tensors (`np.ndarray|list`):
+                Grid values, passed as a single `np.ndarray` or a list of `np.ndarray`'s.
+            memory_for_cache (`int`): 
+                allowed amount of memory for data storage
+        
         Returns:
             None
         """
@@ -447,16 +452,17 @@ class EpdeSearch(object):
 
     def set_boundaries(self, boundary_width: Union[int, list]):
         """
-        Setting the number of unaccountable elements at the edges into cache with saved grid
+        Setting the number of unaccountable elements at the edges into cache with saved grid.
         """
         global_var.grid_cache.set_boundaries(boundary_width=boundary_width)
 
-    def upload_g_func(self, function_form: Callable = None):
+    def _upload_g_func(self, function_form: Callable = None):
         """
-        Loading testing function connected to the weak derivative notion
+        Loading testing function connected to the weak derivative notion.
 
         Args:
-            function_form (`callable`): test function, default using inverse polynomial with max in the domain center
+            function_form (`callable`)
+                Test function, default using inverse polynomial with max in the domain center.
 
         Returns:
             None 
@@ -488,40 +494,71 @@ class EpdeSearch(object):
                               pivotal_tensor_label=None, pruner=None, threshold: float = 1e-5,
                               division_fractions: int = 3, rectangular: bool = True):
         """
-        Setting properties for processing considered domain, such as removing areas with no dynamics, setting bounderes and uploading test function
+        Setting properties for processing considered domain, such as removing areas with no dynamics,
+        and setting bounderes. Can be used for uploading test function.
 
-        Args:
-            coordinate_tensor (`np.ndarray|list`): tensor with grid values
-            memory_for_cache (`int`): allowed amount of memory for data storage
-            boundary_width (`int|list`): the number of unaccountable elements at the edges
-            function_form (`callable`): optional, default - None
-                testing function connected to the weak derivative notion
-            prune_domain (`bool`): flag about using areas cropping, default - False
-            pivotal_tensor_label (`np.ndarray`): pattern that guides the domain pruning, default - None
-            pruner (`DomainPruner`): object for selecting domain region, default - None
-            threshold (`float`): optional, default - 1e-5
-                the boundary at which values are considered zero
-            division_fractions (`int`): optional, default - 3
-                number of fraction for each axis (if this is integer than all axis are dividing by same fractions)
-            rectangular (`bool`): default - True
-                flag indecating that area is rectangle
+        Parameters
+        ----------
+        coordinate_tensors : list|np.ndarrays, optional
+            Values of the coordinates on the grid nodes with studied functions values. In case of 1D-problem,
+            that will be ``numpy.array``, while the parameter for higher dimensionality problems can be set from
+            ``numpy.meshgrid`` function.
+        memory_for_cache : int
+            Allowed amount of memory (in percentage) for data storage.
+        boundary_width : int|list
+            The number of unaccountable elements at the edges of the domain.
+        function_form : callable, optional
+            Testing function connected to the weak derivative notion, the default value is None, that 
+            corresponds with the product of normalized inverse square functions of the coordinates, 
+            centered at the middle of the domain.
+        prune_domain : bool
+            Flag, enabling area cropping by removing subdomains with constant values, default - False.
+        pivotal_tensor_label : np.ndarray
+            Pattern that guides the domain pruning, the default is None.
+        pruner : DomainPruner
+            Object for selecting domain region, the default is None.
+        threshold : float, optional
+            The boundary at which values are considered zero, the default is 1e-5.
+        division_fractions : int, optional
+            Number of fraction for each axis (if this is integer than all axis are dividing by 
+            same fractions), the default is 3.
+        rectangular : bool, optional
+            Flag indecating that crop subdomains are rectangle, default - True.
 
-        Returns:
-            None
+        Returns
+        -------
+        None.
 
         """
-        self.create_caches(coordinate_tensors=coordinate_tensors, memory_for_cache=memory_for_cache)
+        self._create_caches(coordinate_tensors=coordinate_tensors, memory_for_cache=memory_for_cache)
         if prune_domain:
             self.domain_pruning(pivotal_tensor_label, pruner, threshold, division_fractions, rectangular)
         self.set_boundaries(boundary_width)
-        self.upload_g_func(function_form)
+        self._upload_g_func(function_form)
 
     def set_preprocessor(self, preprocessor_pipeline: PreprocessingPipe = None,
-                         default_preprocessor_type: str = 'poly',
-                         preprocessor_kwargs: dict = {}):
-        """
-
-        """
+                         default_preprocessor_type: str = 'poly', preprocessor_kwargs: dict = {}):
+        '''
+        Specification of preprocessor, devoted to smoothing the raw input data and 
+        calculating the derivatives.
+    
+        Parameters
+        ----------
+        preprocessor_pipeline : PreprocessingPipe, optional
+            Pipeline of operators, aimed on preparing all necessary data for equation discovery.
+        default_preprocessor_type : str, optional
+            Key for selection of pre-defined preprocessors: **'poly'** matches Savitsky-Golay filtering, 'ANN' if for 
+            neural network data approximation and further finite-difference differentiation, 'spectral' for 
+            spectral differentiation. The default is 'poly'.
+        preprocessor_kwargs : dict, optional
+            Keyword arguments for preprocessor setup and operation. The default is an empty dictionary, corresponding to 
+            all default parameters of the preprocessors.
+    
+        Returns
+        -------
+        None.
+    
+        '''
         if preprocessor_pipeline is None:
             setup = PreprocessorSetup()
             builder = ConcretePrepBuilder()
@@ -546,6 +583,13 @@ class EpdeSearch(object):
     def create_pool(self, data: Union[np.ndarray, list, tuple], variable_names=['u',],
                     derivs=None, max_deriv_order=1, additional_tokens=[],
                     data_fun_pow: int = 1, deriv_fun_pow: int = 1):
+        '''
+        Create pool of tokens to represent elementary functions, that can be included in equations.
+        
+        Args:
+            data : np.ndarray | list of np.ndarrays | tuple of np.ndarrays
+            
+        '''
         self.pool_params = {'variable_names' : variable_names, 'max_deriv_order' : max_deriv_order,
                             'additional_tokens' : [family.token_family.ftype for family in additional_tokens]}
         assert (isinstance(derivs, list) and isinstance(derivs[0], np.ndarray)) or derivs is None
@@ -593,7 +637,23 @@ class EpdeSearch(object):
         print(f'The cardinality of defined token pool is {self.pool.families_cardinality()}')
         print(f'Among them, the pool contains {self.pool.families_cardinality(meaningful_only=True)}')
         
-    def set_derivatives(self, variable, deriv):
+    def set_derivatives(self, variable:str, deriv:np.ndarray):
+        '''
+        Pass the derivatives of a variable as a np.ndarray.
+    
+        Parameters
+        ----------
+        variable : str
+            Key for the variable to have the derivatives set.
+        deriv : np.ndarray
+            Arrays of derivatives. Have to be shaped as (n, m), where n is the number of passed derivatives 
+            (for example, when you differentiate the dataset once for the first axis, and up to the second order for 
+             the second, and you have no mixed derivatives, *n = 3*), and m is the number of data points in the domain.
+
+        Returns
+        -------
+        None.
+        '''
         try:
             self._derivatives
         except AttributeError:
@@ -614,49 +674,48 @@ class EpdeSearch(object):
         """
         Fit epde search algorithm to obtain differential equations, describing passed data.
 
-        Args:
-            data (`np.ndarray|list|tuple`): Values of modeled variables. If the variable is single (i.e. deriving a single equation),
-                it can be passed as the numpy.ndarray or as the list/tuple with a single element;
-                multiple variables are not supported yet, use older interfaces.
-            time_axis (`int`): optional, default - 0
-                Index of the axis in the data, representing time.
-            equation_terms_max_number (`int`):optional, default - 6
-                The maximum number of terms, present in the derived equations.
-            equation_factors_max_number (`int`): optional, default - 1
-                The maximum number of factors (token functions; real-valued coefficients are not counted here),
-                present in terms of the equaton.
-            variable_names (`list|str`): optional, default - ``['u',]``, representinga single variable *u*.
-                Names of the independent variables, passed into search mechanism. Length of the list must correspond
-                to the number of np.ndarrays, sent with in ``data`` parameter. In case of system of differential equation discovery, 
-                all variables shall be named here.
-            eq_sparsity_interval (`tuple`): optional, default - ``(1e-4, 2.5)``.
-                The left and right boundaries of interval with sparse regression values. Influence the number of
-                terms in the equation.
-            derivs (`list`): list of lists of np.ndarrays, optional, default - None
-                Pre-computed values of derivatives. If ``None`` is passed, the derivatives are calculated in the
-                method. Recommended to use, if the computations of derivatives take too long. For further information
-                about using data, prepared in advance, check ``epde.preprocessing.derivatives.preprocess_derivatives`` function
-            max_deriv_order (`int|list|tuple`): optional, default - 1
-                Highest order of calculated derivatives.
-            additional_tokens (`list of TokenFamily or Prepared_tokens`): optional, defult - None
-                Additional tokens, that would be used to construct the equations among the main variables and their
-                derivatives. Objects of this list must be of type ``epde.interface.token_family.TokenFamily`` or
-                of ``epde.interface.prepared_tokens.Prepared_tokens`` subclasses types.
-            coordinate_tensors (`list|np.ndarrays`): optional, default - None
-                Values of the coordinates on the grid nodes with studied functions values. In case of 1D-problem,
-                that will be ``numpy.array``, while the parameter for higher dimensionality problems can be set from
-                ``numpy.meshgrid`` function. With None, the tensors will be created as ranges with step of 1 between
-                nodes.
-            field_smooth (`bool`): optional, default - False
-                Parameter, if the input variable fields shall be smoothed to avoid the errors. If the data is
-                assumed to be noiseless, shall be set to False, otherwise - True.
-            memory_for_cache (`int|float`): optional, default - 5
-                Limit for the cache (in fraction of the memory) for precomputed tensor values to be stored:
-                if int, will be considered as the percentage of the entire memory, and if float,
-                then as a fraction of memory.
-            data_fun_pow (`int`): optional, default - 1
-                Maximum power of token
+        Parameters
+        ----------
+        data  : np.ndarray | list | tuple
+            Values of modeled variables. If the variable is single (i.e. deriving a single equation),
+            it can be passed as the numpy.ndarray or as the list/tuple with a single element;
+            multiple variables are not supported yet, use older interfaces.
+        equation_terms_max_number  : int, optional
+            The maximum number of terms, present in the derived equations, the default is 6.
+        equation_factors_max_number : int, optional
+            The maximum number of factors (token functions; real-valued coefficients are not counted here),
+            present in terms of the equaton, the default is 1.
+        variable_names : list | str, optional
+            Names of the independent variables, passed into search mechanism. Length of the list must correspond
+            to the number of np.ndarrays, sent with in ``data`` parameter. In case of system of differential equation discovery, 
+            all variables shall be named here, default - ``['u',]``, representing a single variable *u*.
+        eq_sparsity_interval : tuple, optional
+            The left and right boundaries of interval with sparse regression values. Undirectly influences the 
+            number of active terms in the equation, the default is ``(1e-4, 2.5)``.
+        derivs : list or list of lists of np.ndarrays, optional
+            Pre-computed values of derivatives. If ``None`` is passed, the derivatives are calculated in the
+            method. Recommended to use, if the computations of derivatives take too long. For further information
+            about using data, prepared in advance, check ``epde.preprocessing.derivatives.preprocess_derivatives`` 
+            function, default - None.
+        max_deriv_order : int | list | tuple, optional
+            Highest order of calculated derivatives, the default is 1.
+        additional_tokens : list of TokenFamily or Prepared_tokens, optional
+            Additional tokens, that would be used to construct the equations among the main variables and their
+            derivatives. Objects of this list must be of type ``epde.interface.token_family.TokenFamily`` or
+            of ``epde.interface.prepared_tokens.Prepared_tokens`` subclasses types. The default is None.
+        field_smooth : bool, optional
+            Parameter, if the input variable fields shall be smoothed to avoid the errors. If the data is
+            assumed to be noiseless, shall be set to False, otherwise - True, the default - False.
+        memory_for_cache : int | float, optional
+            Limit for the cache (in fraction of the memory) for precomputed tensor values to be stored:
+            if int, will be considered as the percentage of the entire memory, and if float,
+            then as a fraction of memory, the default is 5.
+        data_fun_pow : int, optional
+            Maximum power of token, the default is 1.
 
+        Returns
+        -------
+        None.
         """
 
         cur_params = {'variable_names' : variable_names, 'max_deriv_order' : max_deriv_order,
@@ -673,7 +732,8 @@ class EpdeSearch(object):
                                                              "sparsity_interval": eq_sparsity_interval}
         
         if optimizer is None:
-            self.optimizer = self._set_optimizer(self.multiobjective_mode, self.optimizer_init_params, self.director)
+            self.optimizer = self._create_optimizer(self.multiobjective_mode, self.optimizer_init_params, 
+                                                    self.director)
         else:
             self.optimizer = optimizer
             
@@ -682,8 +742,11 @@ class EpdeSearch(object):
         print('The optimization has been conducted.')
         self.search_conducted = True
 
+
+
     @staticmethod
-    def _set_optimizer(multiobjective_mode:bool, optimizer_init_params:dict, opt_strategy_director:OptimizationPatternDirector):
+    def _create_optimizer(multiobjective_mode:bool, optimizer_init_params:dict, 
+                          opt_strategy_director:OptimizationPatternDirector):
         if multiobjective_mode:
             optimizer = MOEADDOptimizer(**optimizer_init_params)
                             
@@ -712,9 +775,12 @@ class EpdeSearch(object):
         """
         Method for print or getting results of searching differential equation
 
-        Args:
-            only_print (`bool`): flag about action (print ot get) for results, default - True
-            num (`int`): count of results for getting or print, default - 1
+        Parameters
+        ----------
+        only_print : `bool`, optional
+            Flag about action (print ot get) for results, the default is True.
+        Num : `int`, optional
+            Number of results for return or printing, the default is 1.
 
         Returns:
             None, when `only_print` == True
@@ -777,6 +843,36 @@ class EpdeSearch(object):
 
     def predict(self, system : SoEq, boundary_conditions : BoundaryConditions, grid : list = None, data = None,
                 system_file : str = None, solver_kwargs : dict = {'use_cache' : True}, mode = 'NN'):
+        '''
+
+        Parameters
+        ----------
+        system : SoEq
+            DESCRIPTION.
+        boundary_conditions : BoundaryConditions
+            DESCRIPTION.
+        grid : list, optional
+            DESCRIPTION. The default is None.
+        data : TYPE, optional
+            DESCRIPTION. The default is None.
+        system_file : str, optional
+            DESCRIPTION. The default is None.
+        solver_kwargs : dict, optional
+            DESCRIPTION. The default is {'use_cache' : True}.
+        mode : TYPE, optional
+            DESCRIPTION. The default is 'NN'.
+
+        Raises
+        ------
+        ValueError
+            DESCRIPTION.
+
+        Returns
+        -------
+        TYPE
+            DESCRIPTION.
+
+        '''
         
         if system is not None:
             print('Using explicitly sent system of equations.')
