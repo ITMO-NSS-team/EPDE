@@ -26,7 +26,7 @@ from epde.optimizers.moeadd.supplementary import *
 from epde.optimizers.moeadd.strategy import MOEADDDirector
 from epde.optimizers.moeadd.strategy_elems import MOEADDSectorProcesser
 
-from epde.optimizers.single_criterion.optimizer import EvolutionaryStrategy, SimpleOptimizer
+from epde.optimizers.single_criterion.optimizer import EvolutionaryStrategy, SimpleOptimizer, Population
 from epde.optimizers.single_criterion.strategy import BaselineDirector
 from epde.optimizers.single_criterion.supplementary import simple_sorting
 
@@ -668,18 +668,21 @@ class EpdeSearch(object):
             print('Trying to get derivatives before their calculation. Call EPDESearch.create_pool() to calculate derivatives')
             return None
 
-    def fit(self, data: Union[np.ndarray, list, tuple], equation_terms_max_number=6,
+    def fit(self, data: Union[np.ndarray, list, tuple] = None, equation_terms_max_number=6,
             equation_factors_max_number=1, variable_names=['u',], eq_sparsity_interval=(1e-4, 2.5), 
-            derivs=None, max_deriv_order=1, additional_tokens=[], data_fun_pow: int = 1, optimizer = None):
+            derivs=None, max_deriv_order=1, additional_tokens=[], data_fun_pow: int = 1, 
+            optimizer: Union[SimpleOptimizer, MOEADDOptimizer] = None, pool: TFPool = None,
+            population: Union[ParetoLevels, Population] = None):
         """
         Fit epde search algorithm to obtain differential equations, describing passed data.
 
         Parameters
         ----------
-        data  : np.ndarray | list | tuple
+        data  : np.ndarray | list | tuple, optional
             Values of modeled variables. If the variable is single (i.e. deriving a single equation),
             it can be passed as the numpy.ndarray or as the list/tuple with a single element;
-            multiple variables are not supported yet, use older interfaces.
+            multiple variables are not supported yet, use older interfaces. Default value is None, but it 
+            shall be used only for retraining, when the pool argument is passed.
         equation_terms_max_number  : int, optional
             The maximum number of terms, present in the derived equations, the default is 6.
         equation_factors_max_number : int, optional
@@ -712,7 +715,17 @@ class EpdeSearch(object):
             then as a fraction of memory, the default is 5.
         data_fun_pow : int, optional
             Maximum power of token, the default is 1.
-
+        optimizer : SimpleOptimizer | MOEADDOptimizer, optional
+            Pre-defined optimizer, that will be used during evolution. Shall correspond with the mode 
+            (single- and multiobjective). The default is None, matching no use of pre-defined optimizer.
+        pool : TFPool, optional
+            Pool of tokens, that can be explicitly passed. The default is None, matching no use of passed pool.
+        population : Population | ParetoLevels, optional
+            Population of candidate equatons, that can be optionally passed in explicit form. The type of objects
+            must match the optimization algorithm: epde.optimizers.single_criterion.optimizer.Population for 
+            single-objective mode and epde.optimizers.moeadd.moeadd.ParetoLevels for multiobjective optimization.
+            The default is None, specifing no passed population.
+    
         Returns
         -------
         None.
@@ -721,11 +734,16 @@ class EpdeSearch(object):
         cur_params = {'variable_names' : variable_names, 'max_deriv_order' : max_deriv_order,
                       'additional_tokens' : [family.token_family.ftype for family in additional_tokens]}
 
-        if self.pool == None or self.pool_params != cur_params:
+        if pool is None:
+            if self.pool == None or self.pool_params != cur_params:
+                if data is None:
+                    raise ValueError('Data has to ')
                 self.create_pool(data = data, variable_names=variable_names, 
                                  derivs=derivs, max_deriv_order=max_deriv_order, 
                                  additional_tokens=additional_tokens, 
                                  data_fun_pow=data_fun_pow)
+        else:
+            self.pool = pool; self.pool_params = cur_params
 
         self.optimizer_init_params['population_instruct'] = {"pool": self.pool, "terms_number": equation_terms_max_number,
                                                              "max_factors_in_term": equation_factors_max_number,
