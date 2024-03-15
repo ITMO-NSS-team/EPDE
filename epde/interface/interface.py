@@ -571,7 +571,7 @@ class EpdeSearch(object):
             elif default_preprocessor_type == 'spectral':
                 setup.build_spectral_preprocessing(**preprocessor_kwargs)
             else:
-                raise NotImplementedError('Incorrect default preprocessor type. Only ANN or poly are allowed.')
+                raise NotImplementedError('Incorrect default preprocessor type. Only ANN, spectral or poly are allowed.')
             preprocessor_pipeline = setup.builder.prep_pipeline
 
         if 'max_order' not in preprocessor_pipeline.deriv_calculator_kwargs.keys():
@@ -856,29 +856,47 @@ class EpdeSearch(object):
         else:
             return None, global_var.tensor_cache
 
-    def get_equations_by_complexity(self, complexity : Union[int, list]):
+    def get_equations_by_complexity(self, complexity : Union[float, list]):
+        '''
+        Get equations with desired complexity. Works best with ``EpdeSearch.visualize_solutions(...)``
+
+        Parameters
+        ----------
+        complexity : float | list of floats
+            The complexity metric of the desited equation. For systems of equations shall be passed as the list of complexities.
+
+        Returns
+        -------
+        list of ``epde.structure.main_structures.SoEq objects``.
+        '''
         return self.optimizer.pareto_levels.get_by_complexity(complexity)
 
-    def predict(self, system : SoEq, boundary_conditions : BoundaryConditions, grid : list = None, data = None,
+    def predict(self, system : SoEq, boundary_conditions : BoundaryConditions = None, grid : list = None, data = None,
                 system_file : str = None, solver_kwargs : dict = {'use_cache' : True}, mode = 'NN'):
         '''
+        Predict state by automatically solving discovered equation or system. Employs solver implementation, adapted from 
+        https://github.com/ITMO-NSS-team/torch_DE_solver.  
 
         Parameters
         ----------
         system : SoEq
-            DESCRIPTION.
-        boundary_conditions : BoundaryConditions
-            DESCRIPTION.
-        grid : list, optional
-            DESCRIPTION. The default is None.
+            Object, containing the system (or a single equation as a system of one equation) to solve. 
+        boundary_conditions : BoundaryConditions, optional
+            Boundary condition objects, should match the order of differential equations due to no internal checks. 
+            Over/underdefined solution can happen, if the number of conditions is incorrect. The default value is None, 
+            matching automatic construction of the required Dirichlet BC from data. 
+        grid : list of np.ndarrays, optional
+            Grids, defining Cartesian coordinates, on which the equations will be solved. The default is None, specifing 
+            the use of grids, stored in cache during equation learning.
         data : TYPE, optional
-            DESCRIPTION. The default is None.
+            Dataset, from which the boundary conditions can be automatically created. The default is None, making use of
+            the training datasets, stored in cache during equation training.
         system_file : str, optional
-            DESCRIPTION. The default is None.
+            Filename for the pickled equation/system of equations. If passed, **system** can be None. The default is None, meaning no equation.
         solver_kwargs : dict, optional
-            DESCRIPTION. The default is {'use_cache' : True}.
+            Parameters of the solver. The default is {'use_cache' : True}, with that no  
         mode : TYPE, optional
-            DESCRIPTION. The default is 'NN'.
+            Key, defining used method of the automatic DE solution. Supported methods: 'NN', 'mat' and 'autodiff'. The default is 'NN'.
 
         Raises
         ------
