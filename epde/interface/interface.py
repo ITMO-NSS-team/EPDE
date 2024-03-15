@@ -939,3 +939,7 @@ class EpdeSearch(object):
             self.optimizer.plot_pareto(dimensions=dimensions, **visulaizer_kwargs)
         else:
             raise NotImplementedError('Solution visualization is implemented only for multiobjective mode.')
+            
+            
+# class ExperimentCombiner(object):
+#     def 

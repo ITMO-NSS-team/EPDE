@@ -271,23 +271,29 @@ class MOEADDOptimizer(object):
         
         Parameters
         ----------
-        population_instruct (``):
-        weights_num (`int`): Number of the weight vectors, dividing the objective function values space. Often, shall be same, as the population size.
-        pop_size (`int`): The size of the candidate solution population.
-        solution_params (`dict`): The dicitionary with the solution parameters, passed into each new created solution during the initialization.
-        delta (`float`): parameter of uniform spacing between the weight vectors; *H = 1 / delta* should be integer - a number of divisions along an objective coordinate axis.
-        neighbors_number (`int`): number of neighboring weight vectors to be considered during the operation of evolutionary operators as the "neighbors" of the processed sectors.
-        nds_method (`callable`): default - ``moeadd.moeadd_supplementary.fast_non_dominated_sorting``
+        population_instruct : dict
+            Parameters of the individual creation.
+        weights_num : int
+            Number of the weight vectors, dividing the objective function values space. Often, shall be same, as the population size.
+        pop_size : int 
+            The size of the candidate solution population.
+        solution_params : dict
+            The dicitionary with the solution parameters, passed into each new created solution during the initialization.
+        delta : float
+            The parameter of uniform spacing between the weight vectors; *H = 1 / delta* should be integer - a number of divisions along an objective coordinate axis.
+        neighbors_number : int 
+            The number of neighboring weight vectors to be considered during the operation of evolutionary operators as the "neighbors" of the processed sectors.
+        nds_method : callable, optional
             Method of non-dominated sorting of the candidate solutions. The default method is implemented according to the article 
             *K. Deb, A. Pratap, S. Agarwal, and T. Meyarivan, “A fast and elitist multiobjective genetic algorithm: NSGA-II,” IEEE Trans. Evol. Comput.,
-            vol. 6, no. 2, pp. 182–197, Apr. 2002.*
-            ndl_update (`callable`): default - ``moeadd.moeadd_supplementary.ndl_update``
+            vol. 6, no. 2, pp. 182–197, Apr. 2002.* The default is ``moeadd.moeadd_supplementary.fast_non_dominated_sorting``
+        ndl_update : callable, optional
                 Method of adding a new solution point into the objective functions space, introduced 
                 to minimize the recalculation of the non-dominated levels for the entire population. 
                 The default method was taken from the *K. Li, K. Deb, Q. Zhang, and S. Kwong, “Efficient non-domination level
                 update approach for steady-state evolutionary multiobjective optimization,” 
                 Dept. Electr. Comput. Eng., Michigan State Univ., East Lansing,
-                MI, USA, Tech. Rep. COIN No. 2014014, 2014.*
+                MI, USA, Tech. Rep. COIN No. 2014014, 2014.* The default - ``moeadd.moeadd_supplementary.ndl_update``
         """
         assert weights_num == pop_size, 'Each individual in population has to correspond to a sector'
         self.abbreviated_search_executed = False
