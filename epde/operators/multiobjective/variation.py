@@ -23,6 +23,8 @@ from epde.operators.utils.template import CompoundOperator, add_base_param_to_op
 from epde.operators.multiobjective.moeadd_specific import get_basic_populator_updater
 from epde.operators.multiobjective.mutations import get_basic_mutation
 from sympy import Mul, Symbol
+import epde.globals as global_var
+from symnet.preproc_output import get_cross_distr, to_symbolic
 
 
 class ParetoLevelsCrossover(CompoundOperator):
@@ -109,8 +111,6 @@ class ChromosomeCrossover(CompoundOperator):
             temp_eq_1, temp_eq_2 = self.suboperators['equation_crossover'].apply(objective = (objective[0].vals[eq_key],
                                                                                               objective[1].vals[eq_key]),
                                                                                  arguments = subop_args['equation_crossover'])
-            # except TypeError:
-            #     pass
             objective[0].vals.replace_gene(gene_key = eq_key, value = temp_eq_1)
             offspring_2.vals.replace_gene(gene_key = eq_key, value = temp_eq_2)
             
@@ -184,54 +184,36 @@ class EquationCrossover(CompoundOperator):
                         eq2_distr = self.get_equation_cross_distr(objective[1], start_idx)
 
 
-        # for i in range(same_num + similar_num, len(objective[0].structure)):
-        #     if check_uniqueness(objective[0].structure[i], objective[1].structure) and check_uniqueness(objective[1].structure[i], objective[0].structure):
-        #         objective[0].structure[i], objective[1].structure[i] = self.suboperators['term_crossover'].apply(objective = (objective[0].structure[i],
-        #                                                                                                                       objective[1].structure[i]),
-        #                                                                                                          arguments = subop_args['term_crossover'])
+        for i in range(same_num + similar_num, len(objective[0].structure)):
+            if check_uniqueness(objective[0].structure[i], objective[1].structure) and check_uniqueness(objective[1].structure[i], objective[0].structure):
+                objective[0].structure[i], objective[1].structure[i] = self.suboperators['term_crossover'].apply(objective = (objective[0].structure[i],
+                                                                                                                              objective[1].structure[i]),
+                                                                                                                 arguments = subop_args['term_crossover'])
+                # term1 = objective[1].structure[0]
+                # term2 = objective[0].structure[i]
+            # else:
+            #     print("Uniqueness in equation 0:")
+            #     print(check_uniqueness(objective[0].structure[i], objective[1].structure))
+            #
+            #     print("Term is not unique in equation:")
+
 
         return objective[0], objective[1]
 
     def use_default_tags(self):
         self._tags = {'crossover', 'gene level', 'contains suboperators', 'standard'}
 
-    @staticmethod
-    def to_symbolic(term):
-        if type(term.cache_label[0]) == tuple:
-            labels = []
-            for label in term.cache_label:
-                labels.append(str(label[0]))
-            symlabels = list(map(lambda token: Symbol(token), labels))
-            return Mul(*symlabels)
-        else:
-            return Symbol(str(term.cache_label[0]))
 
     def get_equation_cross_distr(self, equation, start_idx):
         importance_coeffs = {}
         for i in range(start_idx, len(equation.structure)):
-            sym_term = self.to_symbolic(equation.structure[i])
-            importance_coeffs[sym_term] = equation.pool.custom_cross_prob.get(sym_term)
-        cross_distr = self.get_cross_distr(importance_coeffs, start_idx, len(equation.structure))
+            sym_term = to_symbolic(equation.structure[i])
+            importance_coeffs[sym_term] = global_var.sympool.pool_dict.get(sym_term)
+            # importance_coeffs[sym_term] = global_var.sympool.pool_sym_dict.get(sym_term)
+        cross_distr = get_cross_distr(importance_coeffs, start_idx, len(equation.structure))
         return cross_distr
 
-    @staticmethod
-    def get_cross_distr(custom_cross_prob, start_idx, end_idx_exclude):
-        mmf = 2.4
-        values = list(custom_cross_prob.values())
-        csym_arr = np.fabs(np.array(values))
 
-        if np.max(csym_arr) / np.min(csym_arr) > 2.6:
-            min_max_coeff = mmf * np.min(csym_arr) - np.max(csym_arr)
-            smoothing_factor = min_max_coeff / (min_max_coeff - (mmf - 1) * np.average(csym_arr))
-            uniform_csym = np.array([np.sum(csym_arr) / len(csym_arr)] * len(csym_arr))
-
-            smoothed_array = (1 - smoothing_factor) * csym_arr + smoothing_factor * uniform_csym
-            inv = 1 / smoothed_array
-        else:
-            inv = 1 / csym_arr
-        inv_norm = inv / np.sum(inv)
-
-        return dict(zip([i for i in range(start_idx, end_idx_exclude)], inv_norm.tolist()))
 
 class EquationExchangeCrossover(CompoundOperator):
     key = 'EquationExchangeCrossover'

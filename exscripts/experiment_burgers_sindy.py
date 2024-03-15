@@ -97,9 +97,9 @@ if __name__ == '__main__':
     grids = np.meshgrid(t, x, indexing='ij')
 
     ''' Parameters of the experiment '''
-    write_csv = True
+    write_csv = False
     print_results = True
-    max_iter_number = 2000
+    max_iter_number = 10
     title = f'dfs0_{max_iter_number}_simstart2'
 
     terms = [('u',), ('du/dx1',), ('du/dx2',), ('d^2u/dx2^2',), ('u', 'du/dx1'), ('u', 'du/dx2'), ('u', 'd^2u/dx2^2'),
@@ -135,7 +135,7 @@ if __name__ == '__main__':
         try:
             epde_search_obj.fit(data=u, max_deriv_order=(1, 2),
                                 equation_terms_max_number=3, equation_factors_max_number=2,
-                                eq_sparsity_interval=(1e-08, 1e-1), custom_cross_prob=cross_distr)
+                                eq_sparsity_interval=(1e-08, 1e-1))
         except Exception as e:
             logging.error(traceback.format_exc())
             population_error += 1

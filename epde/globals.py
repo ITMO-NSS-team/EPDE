@@ -10,7 +10,7 @@ from dataclasses import dataclass
 import warnings
 
 from epde.cache.cache import Cache
-# from symnet import pool_terms
+from symnet import pool_terms
 
 
 def init_caches(set_grids: bool = False):
@@ -98,7 +98,7 @@ def init_verbose(plot_DE_solutions : bool = False, show_iter_idx : bool = True,
                              show_iter_stats, show_warnings)
 
 
-# def init_symnet_pool(max_factors_in_term, families, u, derivs, shape, names, grids, max_deriv_order):
-#     global sympool
-#     sympool = pool_terms.PoolTerms(max_factors_in_term, families)
-#     sympool.set_initial_distr(u, derivs, shape, names, families=families, grids=grids, max_deriv_order=max_deriv_order)
+def init_symnet_pool(max_factors_in_term, families, u, derivs, shape, names, grids, max_deriv_order):
+    global sympool
+    sympool = pool_terms.PoolTerms(max_factors_in_term, families)
+    sympool.set_initial_distr(u, derivs, shape, names, families=families, grids=grids, max_deriv_order=max_deriv_order)
