@@ -8,9 +8,12 @@ Created on Fri Dec 22 13:27:53 2023
 
 import sys
 import os
+
+import tempfile
 import dill as pickle
 import time
 
+from typing import Union
 from collections import Iterable
 
 from epde.structure.factor import Factor
@@ -167,6 +170,16 @@ def attrs_from_dict(obj, attributes, except_attrs: dict = {}):
             raise AttributeError(f'Object {man_attr} for reconstruction is missing from attributes dictionary.')
 
         obj.manual_reconst(man_attr, attributes[man_attr]['elements'], except_attrs)
+
+
+def temp_pickle_save(obj : Un, not_to_pickle = [], manual_pickle = []):
+    loader = EPDELoader()
+    pickled_obj = loader.saves(obj, not_to_pickle = [], manual_pickle = [])
+    
+    temp_file = tempfile.NamedTemporaryFile()
+    temp_file.write(pickled_obj)
+    return temp_file
+
 
 class LoaderAssistant(object):
     def __init__(self):
