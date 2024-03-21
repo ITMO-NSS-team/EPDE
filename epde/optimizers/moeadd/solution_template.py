@@ -108,7 +108,6 @@ class MOEADDSolution(ABC):
             domains (`int`): Index of the domain, to that the solution belongs.
         """
         if self.precomputed_domain:
-            # print(self, 'DOMAIN IS:', self._domain)
             return self._domain
         else:
             self._domain = get_domain_idx(self, weights)

@@ -215,7 +215,10 @@ def slow_non_dominated_sorting(population) -> list:
 
 
 def acute_angle(vector_a, vector_b) -> float:
-    return np.arccos(np.dot(vector_a, vector_b)/(np.sqrt(np.dot(vector_a, vector_a))*np.sqrt(np.dot(vector_b, vector_b))))
+    cos_val = np.dot(vector_a, vector_b)/(np.sqrt(np.dot(vector_a, vector_a))*np.sqrt(np.dot(vector_b, vector_b)))
+    if np.abs(cos_val) > 1.:
+        cos_val = np.sign(cos_val)
+    return np.arccos(cos_val)
 
 
 class Constraint(ABC):

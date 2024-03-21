@@ -18,16 +18,17 @@ OPERATOR_LEVELS_SUPPORTED_TYPES = {'custom level': None, 'term level': Term, 'ge
                                    'chromosome level': Chromosome, 'population level': ParetoLevels}
 
 
-def add_base_param_to_operator(operator):
-    params_container = EvolutionaryParams()
-    for param_key, param_value in params_container[operator.key].items():
-        operator.params[param_key] = param_value
+# def add_base_param_to_operator(operator):
+#     params_container = EvolutionaryParams()
+#     for param_key, param_value in params_container[operator.key].items():
+#         operator.params[param_key] = param_value
 
 def add_base_param_to_operator(operator, target_dict):
     params_container = EvolutionaryParams()
     for param_key, param_value in params_container.get_default_params_for_operator(operator.key).items():
         operator.params[param_key] = target_dict[param_key] if param_key in target_dict.keys(
         ) else param_value
+        
 # def add_param_to_operator(operator, target_dict, labeled_base_val):
 #     for key, base_val in labeled_base_val.items():
 #         if base_val is None and key not in target_dict.keys():
@@ -83,7 +84,7 @@ class CompoundOperator():
         if not all([isinstance(key, str) and (isinstance(value, (list, tuple, dict)) or
                                               issubclass(type(value), CompoundOperator))
                     for key, value in operators.items()]):
-            print([(key, isinstance(key, str),  
+            print([(key, isinstance(key, str),
                     value, (isinstance(value, (list, tuple, dict)) or 
                             issubclass(type(value), CompoundOperator)))
                     for key, value in operators.items()])
@@ -155,7 +156,6 @@ class CompoundOperator():
 
         return parse_args(self.get_suboperator_args(True), arguments), operators_args
 
-    @_check_objective_type
     def apply(self, objective, arguments: dict):
         self_args, subop_args = self.parse_suboperator_args(
             arguments=arguments)

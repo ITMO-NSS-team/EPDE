@@ -47,6 +47,7 @@ class EvolutionaryParams(metaclass = ParamContainerMeta):
 
     def __exit__(self, type, value, traceback):
         self._repo_path = None
+        # self._repo = None        
 
     def _initialise_repo(self) -> dict:
         with open(self._repo_path) as repository_json_file:
@@ -59,7 +60,6 @@ class EvolutionaryParams(metaclass = ParamContainerMeta):
             return self._repo[operator_name]
         else:
             raise Exception(f'Operator with key {operator_name} is missing from the repo with params')
-        # return {}
     
     def change_operator_param(self, operator_name : str, parameter_name : str, new_value):
         if type(new_value) != type(self._repo[operator_name][parameter_name]):
