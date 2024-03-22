@@ -36,7 +36,6 @@ class OperatorMapper(CompoundOperator):
             elif 'standard' in self.operator_tags:
                 for idx, elem in enumerate(objective):
                     if self.element_condition is None or self.element_condition(elem):
-                        # print(objective[idx])
                         objective[idx] = self.suboperators['to_map'].apply(elem, arguments)
             else:
                 raise TypeError('Incorrect type of mapping operator: not inplace nor returns similar object, as input.')
@@ -46,7 +45,7 @@ class OperatorMapper(CompoundOperator):
 
 
 def map_operator_between_levels(operator: CompoundOperator, original_level: Union[str, int], target_level: Union[str, int],
-                                objective_condition: Callable = None, element_condition: Callable = None):
+                                objective_condition: Callable = None, element_condition: Callable = None) -> CompoundOperator:
     if isinstance(original_level, str): original_level = OPERATOR_LEVELS.index(original_level)
     if isinstance(target_level, str): target_level = OPERATOR_LEVELS.index(target_level)
     

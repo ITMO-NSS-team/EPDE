@@ -131,7 +131,7 @@ def test_ode_auto():
     
 #    test_system = SoEq(pool = pool, terms_number = 4, max_factors_in_term=2, sparcity = (0.1,))
 #    test_system.set_eq_search_evolutionary(director.constructor.operator)
-#    test_system.create_equations(population_size=16, eq_search_iters=300)    
+#    test_system.create(population_size=16, eq_search_iters=300)    
     
 #    tokens=[h_tokens, trig_tokens]
     '''
