@@ -54,7 +54,7 @@ class Domain():
         dtype = tensor_dtype(dtype)
 
         if isinstance(variable_set, torch.Tensor):
-            variable_tensor = check_device(variable_tensor)
+            variable_tensor = check_device(variable_set)
             variable_tensor = variable_set.to(dtype)
             self.variable_dict[variable_name] = variable_tensor
         else:

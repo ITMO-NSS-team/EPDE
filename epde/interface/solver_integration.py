@@ -5,41 +5,105 @@
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
 import numpy as np
 import torch
 
-from typing import Callable, Union
+from typing import Callable, Union, Dict, List
 from types import FunctionType
-from epde.solver.models import FourierNN
-from epde.solver.solver import grid_format_prepare
-
-VAL_TYPES = Union[FunctionType, int, float, torch.Tensor, np.ndarray]
-BASE_SOLVER_PARAMS = {'lambda_bound' : 100, 'verbose' : True, 
-                      'gamma' : 0.9, 'lr_decay' : 400, 'derivative_points' : 3, 
-                      'learning_rate' : 1e-3, 'eps' : 1e-6, 'tmin' : 5000,
-                      'tmax' : 2*1e4, 'use_cache' : False, 'cache_verbose' : True, 
-                      'patience' : 10, 'loss_oscillation_window' : 100,
-                      'no_improvement_patience' : 100, 'save_always' : False, 
-                      'print_every' : 1000, 'optimizer_mode' : 'Adam', 
-                      'model_randomize_parameter' : 1e-5, 'step_plot_print' : False, 
-                      'step_plot_save' : True, 'image_save_dir' : '/home/maslyaev/epde/EPDE_main/ann_imgs/', 'tol' : 0.01 }
-
 from functools import singledispatchmethod, singledispatch
 
 from epde.structure.main_structures import Equation, SoEq
 import epde.globals as global_var
 
-from epde.solver.input_preprocessing import Equation as SolverEquation
-import epde.solver.solver as solver
-from epde.solver.models import mat_model
+from epde.solver.data import Domain, Conditions, Equation
+from epde.solver.model import Model
+from epde.solver.callbacks import cache, early_stopping, plot
+from epde.solver.optimizers.optimizer import Optimizer
+from epde.solver.device import solver_device, check_device, device_type
+from epde.solver.models import Fourier_embedding
+
+# from epde.solver.models import FourierNN
+# from epde.solver.solver import grid_format_prepare
+# from epde.solver.model import Model
+
+# from epde.solver.input_preprocessing import Equation as SolverEquation
+# import epde.solver.solver as solver
+# from epde.solver.models import mat_model
+
+VAL_TYPES = Union[FunctionType, int, float, torch.Tensor, np.ndarray]
+# BASE_SOLVER_PARAMS = {'lambda_bound' : 100, 'verbose' : True, 
+#                       'gamma' : 0.9, 'lr_decay' : 400, 'derivative_points' : 3, 
+#                       'learning_rate' : 1e-3, 'eps' : 1e-6, 'tmin' : 5000,
+#                       'tmax' : 2*1e4, 'use_cache' : False, 'cache_verbose' : True, 
+#                       'patience' : 10, 'loss_oscillation_window' : 100,
+#                       'no_improvement_patience' : 100, 'save_always' : False, 
+#                       'print_every' : 1000, 'optimizer_mode' : 'Adam', 
+#                       'model_randomize_parameter' : 1e-5, 'step_plot_print' : False, 
+#                       'step_plot_save' : True, 'image_save_dir' : '/home/maslyaev/epde/EPDE_main/ann_imgs/', 'tol' : 0.01 }
+
+'''
+Specification of baseline equation solver parameters. Can be separated into its own json file for 
+better handling, i.e. manual setup.
+'''
+
+BASE_COMPILING_PARAMS = {
+                         'mode'                 : 'NN',
+                         'lambda_operator'      : 1,
+                         'lambda_bound'         : 1e2,
+                         'normalized_loss_stop' : False,
+                         'h'                    : 0.001,
+                         'inner_order'          : '1',
+                         'boundary_order'       : '2',
+                         'weak_form'            : None,
+                         'tol'                  : 0
+                         }
+
+BASE_OPTIMIZER_PARAMS = {
+                         'optimizer'   : 'Adam', # Alternatively, switch to PSO, if it proves to be effective.
+                         'params'      : {'lr'  : 1e-3,
+                                          'eps' : 1e-6},
+                         'gamma'       : None,
+                         'decay_every' : None
+                         }
+
+BASE_CACHE_PARAMS = {
+                     'use_cache'                 : False,
+                     'cache_verbose'             : True,
+                     'cache_mode'                : None,
+                     'model_randomize_parameter' : 0,
+                     'clear_cache'               : False
+                     }
+
+BASE_EARLY_STOPPING_PARAMS = {
+                              'eps'                     : 1e-7,
+                              'loss_window'             : 100,
+                              'no_improvement_patience' : 1000,
+                              'patience'                : 5,
+                              'abs_loss'                : 1e-5,
+                              'normalized_loss'         : False,
+                              'randomize_parameter'     : 1e-5,
+                              'info_string_every'       : None,
+                              'verbose'                 : True
+                              }
+
+try:
+    plot_saving_directory = os.path.realpath(__file__)
+except NameError:
+    plot_saving_directory = None
+    
+BASE_PLOTTER_PARAMS = {
+                       'save_every'  : 1000, 
+                       'print_every' : 500,
+                       'title'       : None,
+                       'img_dir'     : plot_saving_directory
+                       }
 
 class PregenBOperator(object):
     def __init__(self, system: SoEq, system_of_equation_solver_form: list):
         self.system = system
         self.equation_sf = [eq for eq in system_of_equation_solver_form]
         self.variables = list(system.vars_to_describe)
-        # print('Varibales:', self.variables)
-        # self.max_ord = self.max_deriv_orders
 
     def demonstrate_required_ords(self):
         linked_ords = list(zip([eq.main_var_to_explain for eq in self.system],
@@ -52,7 +116,7 @@ class PregenBOperator(object):
         return self._bconds
 
     @conditions.setter
-    def conditions(self, conds: list):
+    def conditions(self, conds: List[BOPElement]):
         self._bconds = []
         if len(conds) != int(sum([value.sum() for value in self.max_deriv_orders.values()])):
             raise ValueError(
@@ -70,7 +134,7 @@ class PregenBOperator(object):
         return self.get_max_deriv_orders(self.equation_sf, self.variables)
 
     @staticmethod
-    def get_max_deriv_orders(system_sf: list, variables: list = ['u',]) -> np.ndarray:
+    def get_max_deriv_orders(system_sf: List[Dict[str, Dict]], variables: List[str] = ['u',]) -> np.ndarray:
         def count_factor_order(factor_code, deriv_ax):
             if factor_code is None:
                 return 0
@@ -139,12 +203,11 @@ class PregenBOperator(object):
                       for var in variables}  # TODO
         return max_orders
 
-    def generate_default_bc(self, vals: Union[np.ndarray, dict] = None, grids: list = None,
+    def generate_default_bc(self, vals: Union[np.ndarray, dict] = None, grids: List[np.ndarray] = None,
                             allow_high_ords: bool = False):
         # Implement allow_high_ords - selection of derivatives from
         required_bc_ord = self.max_deriv_orders
         assert set(self.variables) == set(required_bc_ord.keys()), 'Some conditions miss required orders.'
-        # assert (len(self.variables) == 1) == isinstance(vals, dict), f'{isinstance(vals, dict), vals} '
 
         grid_cache = global_var.initial_data_cache
         tensor_cache = global_var.initial_data_cache
@@ -169,7 +232,7 @@ class PregenBOperator(object):
             for ax_idx, ax_ord in enumerate(required_bc_ord[variable]):
                 for loc in relative_bc_location[ax_ord]:
                     indexes = get_boundary_ind(tensor_shape, ax_idx, rel_loc=loc)
-                    # print(indexes)
+
                     coords = np.array([grids[idx][indexes] for idx in np.arange(len(tensor_shape))]).T
                     if coords.ndim > 2:
                         coords = coords.squeeze()
@@ -180,23 +243,22 @@ class PregenBOperator(object):
                         bc_values = vals[indexes]
 
                     bc_values = np.expand_dims(bc_values, axis=0).T
-                    coords = torch.from_numpy(coords).float() # torch.FloatTensor
+                    coords = torch.from_numpy(coords).float()
 
-                    bc_values = torch.from_numpy(bc_values).float() # torch.FloatTensor
+                    bc_values = torch.from_numpy(bc_values).float()
                     operator = BOPElement(axis=ax_idx, key=variable, coeff=1, term=[None],
                                           power=1, var=var_idx, rel_location=loc)
                     operator.set_grid(grid=coords)
                     operator.values = bc_values
-                    bconds.append(operator)  # )(rel_location=loc)
+                    bconds.append(operator)
         self.conditions = bconds
         print('cond[0]', [cond[0].shape for cond in self.conditions])
         print('cond[2]', [cond[2].shape for cond in self.conditions])
-        
 
 
 class BOPElement(object):
     def __init__(self, axis: int, key: str, coeff: float = 1., term: list = [None],
-                 power: Union[list, int] = 1, var: Union[list, int] = 1, rel_location: float = 0.):
+                 power: Union[List[int], int] = 1, var: Union[List[int], int] = 1, rel_location: float = 0.):
         self.axis = axis
         self.key = key
         self.coefficient = coeff
@@ -269,15 +331,15 @@ class BOPElement(object):
             else:
                 boundary = torch.from_numpy(np.array([[abs_loc,],])).float()  # TODO: work from here
             print('boundary.shape', boundary.shape, boundary.ndim)
-
+            
         elif boundary is None and self.location is None:
             raise ValueError('No location passed into the BOP.')
-
+            
         form = self.operator_form
         boundary_operator = {form[0]: form[1]}
-
+        
         boundary_value = self.values
-
+        
         return [boundary, boundary_operator, boundary_value, self.variables, 'operator']
 
 
@@ -313,7 +375,7 @@ class SystemSolverInterface(object):
         self.coeff_tol = coeff_tol
 
     @staticmethod
-    def _term_solver_form(term, grids, default_domain, variables: list = ['u',]):
+    def _term_solver_form(term, grids, default_domain, variables: List[str] = ['u',]):
         deriv_orders = []
         deriv_powers = []
         deriv_vars = []
@@ -353,7 +415,6 @@ class SystemSolverInterface(object):
 
         if deriv_vars == []:
             if deriv_powers != 0:
-                # print()
                 raise Exception('Something went wrong with parsing an equation for solver')
             else:
                 deriv_vars = [0]
@@ -399,7 +460,6 @@ class SystemSolverInterface(object):
         free_coeff_weight = torch.from_numpy(np.full_like(a=grids[0],
                                                           fill_value=equation.weights_final[-1]))
         free_coeff_weight = adjust_shape(free_coeff_weight, mode = mode)
-        #torch.flatten(free_coeff_weight).unsqueeze(1).type(torch.FloatTensor)
         free_coeff_term = {'coeff': free_coeff_weight,
                            'term': [None],
                            'pow': 0,
@@ -409,10 +469,6 @@ class SystemSolverInterface(object):
         target_weight = torch.from_numpy(np.full_like(a=grids[0], fill_value=-1.))
         target_form = self._term_solver_form(equation.structure[equation.target_idx], grids, default_domain, variables)
         target_form['coeff'] = target_form['coeff'] * target_weight
-        # if mode in ['NN', 'autograd']:
-        #     target_form['coeff'] = torch.flatten(target_form['coeff']).unsqueeze(1).type(torch.FloatTensor)
-        # elif mode == 'mat':
-        #     target_form['coeff'] = target_form['coeff'].type(torch.FloatTensor)
         target_form['coeff'] = adjust_shape(target_form['coeff'], mode = mode)
         print(f'target_form shape is {target_form["coeff"].shape}')
 
@@ -423,7 +479,7 @@ class SystemSolverInterface(object):
     def use_grids(self, grids=None):
         if grids is None and self.grids is None:
             _, self.grids = global_var.grid_cache.get_all()
-        elif grids is not None:   # elif self.grids is None:
+        elif grids is not None:
             if len(grids) != len(global_var.grid_cache.get_all()[1]):
                 raise ValueError(
                     'Number of passed grids does not match the problem')
@@ -442,22 +498,50 @@ class SystemSolverInterface(object):
 
 
 class SolverAdapter(object):
-    def __init__(self, model=None, use_cache: bool = True, var_number: int = 1):
+    def __init__(self, net=None, fft_params: dict = None,
+                 use_cache: bool = True, var_number: int = 1, use_fourier: bool = None):
         dim_number = global_var.grid_cache.get('0').ndim
+        
+        self.domain = Domain()
         print(f'dimensionality is {dim_number}')
-        if model is None:
+        
+        if net is None:
             if dim_number == 1:
-                model = FourierNN([400, 400, 400, 400, var_number], [15], [7])
+                FFL = Fourier_embedding(**fft_params)
+                linear_inputs = FFL.out_features                
+                
+                hidden_neurons = 128
             else:
-                model = FourierNN([112, 112, 112, 112, var_number], [None,] + [None,]*(dim_number - 1), 
-                                     [None,] + [None,]*(dim_number - 1)) # 15, 3
+                hidden_neurons = 112
+
+        L_default, M_default = 4, 10
+        if use_fourier:
+            if fft_params is None:
+                if dim_number == 1:
+                   fft_params = {'L' : [L_default], 
+                                 'M' : [M_default]}
+                else:
+                   fft_params = {'L' : [L_default] + [None,] * (dim_number - 1), 
+                                 'M' : [M_default] + [None,] * (dim_number - 1)}
+            net_default = [Fourier_embedding(**fft_params),]
+        else:
+            net_default = []            
                
-        self.model = model
-
-        self._solver_params = dict()
-        _solver_params = BASE_SOLVER_PARAMS
-
-        self.set_solver_params(**_solver_params)
+        self.net = torch.nn.Sequential(net_default + [torch.nn.Linear(linear_inputs, hidden_neurons),
+                                                      torch.nn.Tanh(),
+                                                      torch.nn.Linear(hidden_neurons, hidden_neurons),
+                                                      torch.nn.Tanh(),
+                                                      torch.nn.Linear(hidden_neurons, hidden_neurons),
+                                                      torch.nn.Tanh(),
+                                                      torch.nn.Linear(hidden_neurons, var_number)
+                                                      ])
+        
+        self._compiling_params = dict()
+        self._optimizer_params = dict()
+        self._cache_params = dict()
+        self._early_stopping_params = dict()
+        self._ploter_params = dict()
+        
         self.use_cache = use_cache
         self.prev_solution = None
 
@@ -488,6 +572,20 @@ class SolverAdapter(object):
                 except KeyError:
                     print(f'Parameter {param_key} can not be passed into the solver.')
 
+    def set_optimizer_params(self, optimizer: str = None, params: Dict[str, float] = None,
+                             gamma: float = None, decay_every: int = None):
+        optim_params = {'optimizer' : optimizer, 'params' : params, 'gamma' : gamma, 
+                        'decay_every' : decay_every}
+        
+        for param_key, param_vals in optim_params.items():
+            if param_vals is not None:
+                try:
+                    self._optimizer_params[param_key] = param_vals
+                except KeyError:
+                    print(f'Parameter {param_key} can not be passed into the solver.')
+                    
+    def set_compiling_params(self, mode: str = None, )
+                    
     def set_param(self, param_key: str, value):
         self._solver_params[param_key] = value
 
