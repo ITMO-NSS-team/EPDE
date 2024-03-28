@@ -13,10 +13,13 @@ from typing import Callable, Union, Dict, List
 from types import FunctionType
 from functools import singledispatchmethod, singledispatch
 
+from torch.nn import Sequential
+
 from epde.structure.main_structures import Equation, SoEq
 import epde.globals as global_var
 
-from epde.solver.data import Domain, Conditions, Equation
+from epde.solver.data import Domain, Conditions
+from epde.solver.data import Equation as SolverEquation
 from epde.solver.model import Model
 from epde.solver.callbacks import cache, early_stopping, plot
 from epde.solver.optimizers.optimizer import Optimizer
@@ -55,7 +58,7 @@ BASE_COMPILING_PARAMS = {
                          'h'                    : 0.001,
                          'inner_order'          : '1',
                          'boundary_order'       : '2',
-                         'weak_form'            : None,
+                         'weak_form'            : 'None',
                          'tol'                  : 0
                          }
 
@@ -63,14 +66,14 @@ BASE_OPTIMIZER_PARAMS = {
                          'optimizer'   : 'Adam', # Alternatively, switch to PSO, if it proves to be effective.
                          'params'      : {'lr'  : 1e-3,
                                           'eps' : 1e-6},
-                         'gamma'       : None,
-                         'decay_every' : None
+                         'gamma'       : 'None',
+                         'decay_every' : 'None'
                          }
 
 BASE_CACHE_PARAMS = {
                      'use_cache'                 : False,
                      'cache_verbose'             : True,
-                     'cache_mode'                : None,
+                     'cache_model'               : 'None',
                      'model_randomize_parameter' : 0,
                      'clear_cache'               : False
                      }
@@ -83,21 +86,111 @@ BASE_EARLY_STOPPING_PARAMS = {
                               'abs_loss'                : 1e-5,
                               'normalized_loss'         : False,
                               'randomize_parameter'     : 1e-5,
-                              'info_string_every'       : None,
+                              'info_string_every'       : 'None',
                               'verbose'                 : True
                               }
 
 try:
     plot_saving_directory = os.path.realpath(__file__)
 except NameError:
-    plot_saving_directory = None
+    plot_saving_directory = 'None'
     
 BASE_PLOTTER_PARAMS = {
                        'save_every'  : 1000, 
                        'print_every' : 500,
-                       'title'       : None,
+                       'title'       : 'None',
                        'img_dir'     : plot_saving_directory
                        }
+
+
+
+
+class BOPElement(object):
+    def __init__(self, axis: int, key: str, coeff: float = 1., term: list = [None],
+                 power: Union[List[int], int] = 1, var: Union[List[int], int] = 1, rel_location: float = 0.):
+        self.axis = axis
+        self.key = key
+        self.coefficient = coeff
+        self.term = term
+        self.power = power
+        self.variables = var
+        self.location = rel_location
+        self.grid = None
+        
+        self.status = {'boundary_location_set': False,
+                       'boundary_values_set': False}
+
+    def set_grid(self, grid: torch.Tensor):
+        self.grid = grid
+        self.status['boundary_location_set'] = True
+
+    @property
+    def operator_form(self):
+        form = {
+            'coeff': self.coefficient,
+            self.key: self.term,
+            'pow': self.power,
+            'var': self.variables
+        }
+        return self.key, form
+
+    @property
+    def values(self):
+        if isinstance(self._values, FunctionType):
+            assert self.grid_set, 'Tring to evaluate variable coefficent without a proper grid.'
+            res = self._values(self.grids)
+            assert res.shape == self.grids[0].shape
+            return torch.from_numpy(res)
+        else:
+            return self._values
+
+    @values.setter
+    def values(self, vals):
+        if isinstance(vals, (FunctionType, int, float, torch.Tensor)):
+            self._values = vals
+            self.vals_set = True
+        elif isinstance(vals, np.ndarray):
+            self._values = torch.from_numpy(vals)
+            self.vals_set = True
+        else:
+            raise TypeError(
+                f'Incorrect type of coefficients. Must be a type from list {VAL_TYPES}.')
+
+    def __call__(self, values: VAL_TYPES = None):
+        if not self.vals_set and values is not None:
+            self.values = values
+            self.status['boundary_values_set'] = True
+        elif not self.vals_set and values is None:
+            raise ValueError('No location passed into the BOP.')
+        if self.grid is not None:
+            boundary = self.grid
+        elif self.grid is None and self.location is not None:
+            _, all_grids = global_var.grid_cache.get_all()
+
+            abs_loc = self.location * all_grids[0].shape[self.axis]
+            if all_grids[0].ndim > 1:
+                boundary = np.array(all_grids[:self.axis] + all_grids[self.axis+1:])
+                if isinstance(values, FunctionType):
+                    raise NotImplementedError  # TODO: evaluation of BCs passed as functions or lambdas
+                boundary = torch.from_numpy(np.expand_dims(boundary, axis=self.axis)).float()  # .reshape(bnd_shape))
+
+                boundary = torch.cartesian_prod(boundary,
+                                                torch.from_numpy(np.array([abs_loc,], dtype=np.float64))).float()
+                boundary = torch.moveaxis(boundary, source=0, destination=self.axis).resize()
+            else:
+                boundary = torch.from_numpy(np.array([[abs_loc,],])).float() # TODO: work from here
+            print('boundary.shape', boundary.shape, boundary.ndim)
+            
+        elif boundary is None and self.location is None:
+            raise ValueError('No location passed into the BOP.')
+            
+        form = self.operator_form
+        boundary_operator = {form[0]: form[1]}
+        
+        boundary_value = self.values
+        
+        return {'bnd_loc' : boundary, 'bnd_op' : boundary_operator, 'bnd_val' : boundary_value, 
+                'variables' : self.variables, 'type' : 'operator'}
 
 class PregenBOperator(object):
     def __init__(self, system: SoEq, system_of_equation_solver_form: list):
@@ -256,102 +349,15 @@ class PregenBOperator(object):
         print('cond[2]', [cond[2].shape for cond in self.conditions])
 
 
-class BOPElement(object):
-    def __init__(self, axis: int, key: str, coeff: float = 1., term: list = [None],
-                 power: Union[List[int], int] = 1, var: Union[List[int], int] = 1, rel_location: float = 0.):
-        self.axis = axis
-        self.key = key
-        self.coefficient = coeff
-        self.term = term
-        self.power = power
-        self.variables = var
-        self.location = rel_location
-        self.grid = None
-        
-        self.status = {'boundary_location_set': False,
-                       'boundary_values_set': False}
+# class BoundaryConditions(object):
+#     def __init__(self, grids=None, partial_operators: dict = []):
+#         self.grids_set = (grids is not None)
+#         if grids is not None:
+#             self.grids = grids
+#         self.operators = partial_operators
 
-    def set_grid(self, grid: torch.Tensor):
-        self.grid = grid
-        self.status['boundary_location_set'] = True
-
-    @property
-    def operator_form(self):
-        form = {
-            'coeff': self.coefficient,
-            self.key: self.term,
-            'pow': self.power,
-            'var': self.variables
-        }
-        return self.key, form
-
-    @property
-    def values(self):
-        if isinstance(self._values, FunctionType):
-            assert self.grid_set, 'Tring to evaluate variable coefficent without a proper grid.'
-            res = self._values(self.grids)
-            assert res.shape == self.grids[0].shape
-            return torch.from_numpy(res)
-        else:
-            return self._values
-
-    @values.setter
-    def values(self, vals):
-        if isinstance(vals, (FunctionType, int, float, torch.Tensor)):
-            self._values = vals
-            self.vals_set = True
-        elif isinstance(vals, np.ndarray):
-            self._values = torch.from_numpy(vals)
-            self.vals_set = True
-        else:
-            raise TypeError(
-                f'Incorrect type of coefficients. Must be a type from list {VAL_TYPES}.')
-
-    def __call__(self, values: VAL_TYPES = None): # , boundary: list = None , self.grid
-        if not self.vals_set and values is not None:
-            self.values = values
-            self.status['boundary_values_set'] = True
-        elif not self.vals_set and values is None:
-            raise ValueError('No location passed into the BOP.')
-        if self.grid is not None:
-            boundary = self.grid
-        elif self.grid is None and self.location is not None:
-            _, all_grids = global_var.grid_cache.get_all()  # str(self.axis)
-
-            abs_loc = self.location * all_grids[0].shape[self.axis]
-            if all_grids[0].ndim > 1:
-                boundary = np.array(all_grids[:self.axis] + all_grids[self.axis+1:])
-                if isinstance(values, FunctionType):
-                    raise NotImplementedError  # TODO: evaluation of BCs passed as functions or lambdas
-                boundary = torch.from_numpy(np.expand_dims(boundary, axis=self.axis)).float()  # .reshape(bnd_shape))
-
-                boundary = torch.cartesian_prod(boundary,
-                                                torch.from_numpy(np.array([abs_loc,], dtype=np.float64))).float()
-                boundary = torch.moveaxis(boundary, source=0, destination=self.axis).resize()
-            else:
-                boundary = torch.from_numpy(np.array([[abs_loc,],])).float()  # TODO: work from here
-            print('boundary.shape', boundary.shape, boundary.ndim)
-            
-        elif boundary is None and self.location is None:
-            raise ValueError('No location passed into the BOP.')
-            
-        form = self.operator_form
-        boundary_operator = {form[0]: form[1]}
-        
-        boundary_value = self.values
-        
-        return [boundary, boundary_operator, boundary_value, self.variables, 'operator']
-
-
-class BoundaryConditions(object):
-    def __init__(self, grids=None, partial_operators: dict = []):
-        self.grids_set = (grids is not None)
-        if grids is not None:
-            self.grids = grids
-        self.operators = partial_operators
-
-    def form_operator(self):
-        return [list(bcond()) for bcond in self.operators.values()]
+#     def form_operator(self):
+#         return [list(bcond()) for bcond in self.operators.values()]
 
 
 def solver_formed_grid(training_grid=None):
@@ -537,10 +543,19 @@ class SolverAdapter(object):
                                                       ])
         
         self._compiling_params = dict()
+        self.set_compiling_params(**BASE_COMPILING_PARAMS)
+        
         self._optimizer_params = dict()
+        self.set_optimizer_params(**BASE_OPTIMIZER_PARAMS)
+        
         self._cache_params = dict()
+        self.set_cache_params(**BASE_CACHE_PARAMS)
+        
         self._early_stopping_params = dict()
+        self.set_early_stopping_params(**BASE_EARLY_STOPPING_PARAMS)
+        
         self._ploter_params = dict()
+        self.set_plotting_params(**BASE_PLOTTER_PARAMS)
         
         self.use_cache = use_cache
         self.prev_solution = None
@@ -568,7 +583,28 @@ class SolverAdapter(object):
         for param_key, param_vals in params.items():
             if param_vals is not None:
                 try:
-                    self._solver_params[param_key] = param_vals
+                    if param_vals is 'None':
+                        self._solver_params[param_key] = None
+                    else:
+                        self._solver_params[param_key] = param_vals
+                except KeyError:
+                    print(f'Parameter {param_key} can not be passed into the solver.')
+    
+    def set_compiling_params(self, mode: str = None, lambda_operator: float = None, 
+                             lambda_bound : float = None, normalized_loss_stop: bool = None,
+                             h: float = None, inner_order: str = None, bounary_order: str = None,
+                             weak_form: List[Callable] = None, tol: float = None):
+        compiling_params = {'mode' : mode, 'lambda_operator' : lambda_operator, 'lambda_bound' : lambda_bound,
+                            'normalized_loss_stop' : normalized_loss_stop, 'h' : h, 'inner_order' : inner_order,
+                            'bounary_order' : bounary_order, 'weak_form' : weak_form, 'tol' : tol}
+        
+        for param_key, param_vals in compiling_params.items():
+            if param_vals is not None:
+                try:
+                    if param_vals == 'None':
+                        self._solver_params[param_key] = None
+                    else:
+                        self._solver_params[param_key] = param_vals
                 except KeyError:
                     print(f'Parameter {param_key} can not be passed into the solver.')
 
@@ -580,48 +616,115 @@ class SolverAdapter(object):
         for param_key, param_vals in optim_params.items():
             if param_vals is not None:
                 try:
-                    self._optimizer_params[param_key] = param_vals
+                    if param_vals == 'None':
+                        self._solver_params[param_key] = None
+                    else:
+                        self._solver_params[param_key] = param_vals
+                except KeyError:
+                    print(f'Parameter {param_key} can not be passed into the solver.')
+    
+    def set_cache_params(self, use_cache: bool = None, cache_verbose: bool = None, 
+                         cache_model: Sequential = None, model_randomize_parameter: Union[int, float] = None,
+                         clear_cache: bool = None):
+        cache_params = {'use_cache' : use_cache, 'cache_verbose' : cache_verbose, 'cache_model' : cache_model,
+                        'model_randomize_parameter' : model_randomize_parameter, 'clear_cache' : clear_cache}
+
+        for param_key, param_vals in cache_params.items():
+            if param_vals is not None:
+                try:
+                    if param_vals == 'None':
+                        self._solver_params[param_key] = None
+                    else:
+                        self._solver_params[param_key] = param_vals
                 except KeyError:
                     print(f'Parameter {param_key} can not be passed into the solver.')
                     
-    def set_compiling_params(self, mode: str = None, )
+    def set_early_stopping_params(self, eps: float = None, loss_window: int = None, no_improvement_patience: int = None,
+                                  patience: int = None, abs_loss: float = None, normalized_loss: bool = None,
+                                  randomize_parameter: float = None, info_string_every: int = None, verbose: bool = None):
+        early_stopping_params = {'eps' : eps, 'loss_window' : loss_window, 'no_improvement_patience' : no_improvement_patience,
+                                 'patience' : patience, 'abs_loss' : abs_loss, 'normalized_loss' : normalized_loss, 
+                                 'randomize_parameter' : randomize_parameter, 'info_string_every' : info_string_every,
+                                 'verbose' : verbose}
+    
+        for param_key, param_vals in early_stopping_params.items():
+            if param_vals is not None:
+                try:
+                    if param_vals == 'None':
+                        self._solver_params[param_key] = None
+                    else:
+                        self._solver_params[param_key] = param_vals
+                except KeyError:
+                    print(f'Parameter {param_key} can not be passed into the solver.')
                     
-    def set_param(self, param_key: str, value):
-        self._solver_params[param_key] = value
+    def set_plotting_params(self, save_every: int = None, print_every: int = None, title: str = None,
+                            img_dir: str = None):
+        plotting_params = {'save_every' : save_every, 'print_every' : print_every, 'print_every' : print_every,
+                           'img_dir' : img_dir}
+        for param_key, param_vals in plotting_params.items():
+            if param_vals is not None:
+                try:
+                    if param_vals == 'None':
+                        self._solver_params[param_key] = None
+                    else:
+                        self._solver_params[param_key] = param_vals
+                except KeyError:
+                    print(f'Parameter {param_key} can not be passed into the solver.')
+    
+    # def set_param(self, param_key: str, value):
+        # self._solver_params[param_key] = value
+
+    @staticmethod
+    def create_domain(self, variables: List[str], grids : List[np.ndarray]) -> Domain:
+        assert len(variables) == len(grids), f'Number of passed variables {len(variables)} does not \
+                                               match number of grids {len(grids)}.'
+        domain = Domain('uniform')
+        for idx, var_name in enumerate(variables):
+            domain.variable(var_name, torch.tensor(), n_points)
+        
 
     def solve_epde_system(self, system: SoEq, grids: list=None, boundary_conditions=None, 
                           mode='NN', data=None):
         system_interface = SystemSolverInterface(system_to_adapt=system)
 
         system_solver_forms = system_interface.form(grids = grids, mode = mode)
+        
         if boundary_conditions is None:
             op_gen = PregenBOperator(system=system,
                                      system_of_equation_solver_form=[sf_labeled[1] for sf_labeled
                                                                      in system_solver_forms])
             op_gen.generate_default_bc(vals = data, grids = grids)
             boundary_conditions = op_gen.conditions
+            if not (isinstance(boundary_conditions, list) and isinstance(boundary_conditions[0], BOPElement)):
+                raise ValueError('Incorrect boundary conditions generated in the solver interface.')
+            
+        bconds_combined = Conditions()
+        for cond in boundary_conditions:
+            bconds_combined.operator(bnd = cond['bnd_loc'], operator = cond['bnd_op'], 
+                                     value = cond['bnd_val'])
 
         if grids is None:
             _, grids = global_var.grid_cache.get_all()
 
-        return self.solve(system_form=[form[1] for form in system_solver_forms], grid=grids,
+        return self.solve(equations=[form[1] for form in system_solver_forms], grid=grids,
                           boundary_conditions=boundary_conditions, mode = mode)
 
-    @staticmethod
-    def convert_grid(grid, mode):
-        assert isinstance(grid, (list, tuple)), 'Convertion of the tensor can be only held from tuple or list.'
+    def solve(self, equations, grid=None, boundary_conditions=None, mode = 'NN'): #: List[] =None
+        print('Grid is ', type(grid), grid.shape)
+        if isinstance(equations, SolverEquation):
+            self.equations = equations
+        else:
+            self.equations = SolverEquation()
+            for form in equations:
+                self.equations.add(form)
 
-        conv_grid = grid_format_prepare([np.unique(var_grid) for var_grid in grid], mode)
-        return conv_grid
-
-    def solve(self, system_form=None, grid=None, boundary_conditions=None, mode = 'NN'):
-        if isinstance(grid, (list, tuple)):
-            grid = self.convert_grid(grid, mode)
-        print('Grid is ', type(grid), grid.shape)            
-        self.equation = SolverEquation(grid, system_form, boundary_conditions).set_mode(mode) # set h < 0.001
-
-        print(grid[0].shape)
-        if mode == 'mat':
-            self.model = mat_model(grid, self.equation)
-        self.prev_solution = solver.Solver(grid, self.equation, self.model, mode).solve(**self._solver_params)
+        cb_cache = cache.Cache(**self._cache_params)
+        cb_early_stops = early_stopping.EarlyStopping(**self._early_stopping_params)
+        cb_plots = plot.Plots(**self._ploter_params)
+        
+        optimizer = Optimizer(**self._optimizer_params)
+        
+        model = Model(net = self.net, domain, equation, conditions)
+        
+        self.prev_solution = solver.Solver(grid, self.equations, self.model, mode).solve(**self._solver_params)
         return self.prev_solution
