@@ -26,24 +26,7 @@ from epde.solver.optimizers.optimizer import Optimizer
 from epde.solver.device import solver_device, check_device, device_type
 from epde.solver.models import Fourier_embedding
 
-# from epde.solver.models import FourierNN
-# from epde.solver.solver import grid_format_prepare
-# from epde.solver.model import Model
-
-# from epde.solver.input_preprocessing import Equation as SolverEquation
-# import epde.solver.solver as solver
-# from epde.solver.models import mat_model
-
 VAL_TYPES = Union[FunctionType, int, float, torch.Tensor, np.ndarray]
-# BASE_SOLVER_PARAMS = {'lambda_bound' : 100, 'verbose' : True, 
-#                       'gamma' : 0.9, 'lr_decay' : 400, 'derivative_points' : 3, 
-#                       'learning_rate' : 1e-3, 'eps' : 1e-6, 'tmin' : 5000,
-#                       'tmax' : 2*1e4, 'use_cache' : False, 'cache_verbose' : True, 
-#                       'patience' : 10, 'loss_oscillation_window' : 100,
-#                       'no_improvement_patience' : 100, 'save_always' : False, 
-#                       'print_every' : 1000, 'optimizer_mode' : 'Adam', 
-#                       'model_randomize_parameter' : 1e-5, 'step_plot_print' : False, 
-#                       'step_plot_save' : True, 'image_save_dir' : '/home/maslyaev/epde/EPDE_main/ann_imgs/', 'tol' : 0.01 }
 
 '''
 Specification of baseline equation solver parameters. Can be separated into its own json file for 
@@ -103,7 +86,13 @@ BASE_PLOTTER_PARAMS = {
                        }
 
 
-
+BASE_TRAINING_PARAMS = {
+                        'epochs'            : 1e5, 
+                        'info_string_every' : 1e4,
+                        'mixed_precision'   : False,
+                        'save_model'        : False,
+                        'model_name'        : 'None'
+                        }
 
 class BOPElement(object):
     def __init__(self, axis: int, key: str, coeff: float = 1., term: list = [None],
@@ -349,15 +338,15 @@ class PregenBOperator(object):
         print('cond[2]', [cond[2].shape for cond in self.conditions])
 
 
-# class BoundaryConditions(object):
-#     def __init__(self, grids=None, partial_operators: dict = []):
-#         self.grids_set = (grids is not None)
-#         if grids is not None:
-#             self.grids = grids
-#         self.operators = partial_operators
+class BoundaryConditions(object):
+    def __init__(self, grids=None, partial_operators: dict = []):
+        self.grids_set = (grids is not None)
+        if grids is not None:
+            self.grids = grids
+        self.operators = partial_operators
 
-#     def form_operator(self):
-#         return [list(bcond()) for bcond in self.operators.values()]
+    def form_operator(self):
+        return [list(bcond()) for bcond in self.operators.values()]
 
 
 def solver_formed_grid(training_grid=None):
@@ -369,7 +358,6 @@ def solver_formed_grid(training_grid=None):
     assert len(keys) == training_grid[0].ndim, 'Mismatching dimensionalities'
 
     training_grid = np.array(training_grid).reshape((len(training_grid), -1))
-    #return torch.from_numpy(training_grid).T.type(torch.FloatTensor)
     return torch.from_numpy(training_grid).T.float()
 
 
@@ -505,42 +493,40 @@ class SystemSolverInterface(object):
 
 class SolverAdapter(object):
     def __init__(self, net=None, fft_params: dict = None,
-                 use_cache: bool = True, var_number: int = 1, use_fourier: bool = None):
-        dim_number = global_var.grid_cache.get('0').ndim
-        
-        self.domain = Domain()
+                 use_cache: bool = True, var_number: int = 1, use_fourier: bool = False):
+        dim_number = global_var.grid_cache.get('0').ndim # AM I NEEDED?
         print(f'dimensionality is {dim_number}')
         
-        if net is None:
-            if dim_number == 1:
-                FFL = Fourier_embedding(**fft_params)
-                linear_inputs = FFL.out_features                
-                
-                hidden_neurons = 128
-            else:
-                hidden_neurons = 112
-
         L_default, M_default = 4, 10
         if use_fourier:
             if fft_params is None:
                 if dim_number == 1:
-                   fft_params = {'L' : [L_default], 
+                   fft_params = {'L' : [L_default],
                                  'M' : [M_default]}
                 else:
                    fft_params = {'L' : [L_default] + [None,] * (dim_number - 1), 
                                  'M' : [M_default] + [None,] * (dim_number - 1)}
             net_default = [Fourier_embedding(**fft_params),]
         else:
-            net_default = []            
-               
-        self.net = torch.nn.Sequential(net_default + [torch.nn.Linear(linear_inputs, hidden_neurons),
-                                                      torch.nn.Tanh(),
-                                                      torch.nn.Linear(hidden_neurons, hidden_neurons),
-                                                      torch.nn.Tanh(),
-                                                      torch.nn.Linear(hidden_neurons, hidden_neurons),
-                                                      torch.nn.Tanh(),
-                                                      torch.nn.Linear(hidden_neurons, var_number)
-                                                      ])
+            net_default = []        
+        
+        if net is None:
+            if dim_number == 1:
+                FFL = Fourier_embedding(**fft_params)
+                linear_inputs = FFL.out_features
+                
+                hidden_neurons = 128
+            else:
+                hidden_neurons = 112
+   
+        operators = net_default + [torch.nn.Linear(linear_inputs, hidden_neurons),
+                                   torch.nn.Tanh(),
+                                   torch.nn.Linear(hidden_neurons, hidden_neurons),
+                                   torch.nn.Tanh(),
+                                   torch.nn.Linear(hidden_neurons, hidden_neurons),
+                                   torch.nn.Tanh(),
+                                   torch.nn.Linear(hidden_neurons, var_number)]
+        self.net = torch.nn.Sequential(*operators)
         
         self._compiling_params = dict()
         self.set_compiling_params(**BASE_COMPILING_PARAMS)
@@ -557,54 +543,26 @@ class SolverAdapter(object):
         self._ploter_params = dict()
         self.set_plotting_params(**BASE_PLOTTER_PARAMS)
         
+        self._training_params = dict()
+        self.set_training_params(**BASE_TRAINING_PARAMS)
+        
         self.use_cache = use_cache
-        self.prev_solution = None
-
-    def set_solver_params(self, lambda_bound=None, verbose: bool = None, gamma: float = None,
-                          lr_decay: int = 400, derivative_points: int = None, learning_rate: float = None,
-                          eps: float = None, tmin: int = None, tmax: int = None,
-                          use_cache: bool = None, cache_verbose: bool = None,
-                          patience: int = None, loss_oscillation_window : int = None,
-                          no_improvement_patience: int = None,
-                          save_always: bool = None, print_every: bool = 5000, optimizer_mode = None, 
-                          model_randomize_parameter: bool = None, step_plot_print: bool = None,
-                          step_plot_save: bool = True, image_save_dir: str = None, tol: float = None):
-
-        params = {'lambda_bound': lambda_bound, 'verbose': verbose, 'gamma': gamma, 
-                  'lr_decay': lr_decay, 'derivative_points': derivative_points,
-                  'learning_rate': learning_rate, 'eps': eps, 'tmin': tmin,
-                  'tmax': tmax, 'use_cache': use_cache, 'cache_verbose': cache_verbose,
-                  'patience' : patience, 'loss_oscillation_window' : loss_oscillation_window,
-                  'no_improvement_patience' : no_improvement_patience, 'save_always': save_always,
-                  'print_every': print_every, 'optimizer_mode': optimizer_mode,
-                  'model_randomize_parameter': model_randomize_parameter, 'step_plot_print': step_plot_print,
-                  'step_plot_save': step_plot_save, 'image_save_dir': image_save_dir, 'tol': tol}
-
-        for param_key, param_vals in params.items():
-            if param_vals is not None:
-                try:
-                    if param_vals is 'None':
-                        self._solver_params[param_key] = None
-                    else:
-                        self._solver_params[param_key] = param_vals
-                except KeyError:
-                    print(f'Parameter {param_key} can not be passed into the solver.')
     
     def set_compiling_params(self, mode: str = None, lambda_operator: float = None, 
                              lambda_bound : float = None, normalized_loss_stop: bool = None,
-                             h: float = None, inner_order: str = None, bounary_order: str = None,
+                             h: float = None, inner_order: str = None, boundary_order: str = None,
                              weak_form: List[Callable] = None, tol: float = None):
         compiling_params = {'mode' : mode, 'lambda_operator' : lambda_operator, 'lambda_bound' : lambda_bound,
                             'normalized_loss_stop' : normalized_loss_stop, 'h' : h, 'inner_order' : inner_order,
-                            'bounary_order' : bounary_order, 'weak_form' : weak_form, 'tol' : tol}
+                            'boundary_order' : boundary_order, 'weak_form' : weak_form, 'tol' : tol}
         
         for param_key, param_vals in compiling_params.items():
             if param_vals is not None:
                 try:
                     if param_vals == 'None':
-                        self._solver_params[param_key] = None
+                        self._compiling_params[param_key] = None
                     else:
-                        self._solver_params[param_key] = param_vals
+                        self._compiling_params[param_key] = param_vals
                 except KeyError:
                     print(f'Parameter {param_key} can not be passed into the solver.')
 
@@ -617,9 +575,9 @@ class SolverAdapter(object):
             if param_vals is not None:
                 try:
                     if param_vals == 'None':
-                        self._solver_params[param_key] = None
+                        self._optimizer_params[param_key] = None
                     else:
-                        self._solver_params[param_key] = param_vals
+                        self._optimizer_params[param_key] = param_vals
                 except KeyError:
                     print(f'Parameter {param_key} can not be passed into the solver.')
     
@@ -633,9 +591,9 @@ class SolverAdapter(object):
             if param_vals is not None:
                 try:
                     if param_vals == 'None':
-                        self._solver_params[param_key] = None
+                        self._cache_params[param_key] = None
                     else:
-                        self._solver_params[param_key] = param_vals
+                        self._cache_params[param_key] = param_vals
                 except KeyError:
                     print(f'Parameter {param_key} can not be passed into the solver.')
                     
@@ -651,37 +609,53 @@ class SolverAdapter(object):
             if param_vals is not None:
                 try:
                     if param_vals == 'None':
-                        self._solver_params[param_key] = None
+                        self._early_stopping_params[param_key] = None
                     else:
-                        self._solver_params[param_key] = param_vals
+                        self._early_stopping_params[param_key] = param_vals
                 except KeyError:
                     print(f'Parameter {param_key} can not be passed into the solver.')
                     
     def set_plotting_params(self, save_every: int = None, print_every: int = None, title: str = None,
                             img_dir: str = None):
-        plotting_params = {'save_every' : save_every, 'print_every' : print_every, 'print_every' : print_every,
-                           'img_dir' : img_dir}
+        plotting_params = {'save_every' : save_every, 'print_every' : print_every, 
+                           'print_every' : print_every, 'img_dir' : img_dir}
         for param_key, param_vals in plotting_params.items():
             if param_vals is not None:
                 try:
                     if param_vals == 'None':
-                        self._solver_params[param_key] = None
+                        self._ploter_params[param_key] = None
                     else:
-                        self._solver_params[param_key] = param_vals
+                        self._ploter_params[param_key] = param_vals
                 except KeyError:
                     print(f'Parameter {param_key} can not be passed into the solver.')
     
-    # def set_param(self, param_key: str, value):
-        # self._solver_params[param_key] = value
+    def set_training_params(self, epochs: int = None, info_string_every: int = None, mixed_precision: bool = None,
+                            save_model: bool = None, model_name: str = None):
+        training_params = {'epochs' : epochs, 'info_string_every' : info_string_every, 
+                           'mixed_precision' : mixed_precision, 'save_model' : save_model, 'model_name' : model_name}
 
+        for param_key, param_vals in training_params.items():
+            if param_vals is not None:
+                try:
+                    if param_vals == 'None':
+                        self._ploter_params[param_key] = None
+                    else:
+                        self._ploter_params[param_key] = param_vals
+                except KeyError:
+                    print(f'Parameter {param_key} can not be passed into the solver.')
+    
     @staticmethod
     def create_domain(self, variables: List[str], grids : List[np.ndarray]) -> Domain:
         assert len(variables) == len(grids), f'Number of passed variables {len(variables)} does not \
                                                match number of grids {len(grids)}.'
+        assert len(variables) == grids.dim, 'Grids have to be set as a N-dimensional np.ndarrays with dim \
+                                             matching the domain dimensionality'
         domain = Domain('uniform')
         for idx, var_name in enumerate(variables):
-            domain.variable(var_name, torch.tensor(), n_points)
-        
+            domain.variable(variable_name = var_name, variable_set = torch.tensor(grids), 
+                            n_points = None)
+            
+        return domain
 
     def solve_epde_system(self, system: SoEq, grids: list=None, boundary_conditions=None, 
                           mode='NN', data=None):
@@ -706,11 +680,12 @@ class SolverAdapter(object):
         if grids is None:
             _, grids = global_var.grid_cache.get_all()
 
-        return self.solve(equations=[form[1] for form in system_solver_forms], grid=grids,
+        domain = self.create_domain(list(system.vars_to_describe), grids)
+
+        return self.solve(equations=[form[1] for form in system_solver_forms], domain=domain,
                           boundary_conditions=boundary_conditions, mode = mode)
 
-    def solve(self, equations, grid=None, boundary_conditions=None, mode = 'NN'): #: List[] =None
-        print('Grid is ', type(grid), grid.shape)
+    def solve(self, equations, domain:Domain, boundary_conditions = None, mode = 'NN', epochs = 1e3): #: List[] =None
         if isinstance(equations, SolverEquation):
             self.equations = equations
         else:
@@ -724,7 +699,14 @@ class SolverAdapter(object):
         
         optimizer = Optimizer(**self._optimizer_params)
         
-        model = Model(net = self.net, domain, equation, conditions)
+        model = Model(net = self.net, domain = self.domain, equation = self.equations, 
+                      conditions = self.boundary_conditions)
+        model.compile(**self._compiling_params)
+        model.train(optimizer, callbacks=[cb_cache, cb_early_stops, cb_plots], **self._training_params)
         
-        self.prev_solution = solver.Solver(grid, self.equations, self.model, mode).solve(**self._solver_params)
-        return self.prev_solution
+        grid = domain.build(mode = self._compiling_params['mode'])
+        self.net  = self.net.to(device = device_type())
+        grid = check_device(grid)
+        
+        solution = self.net(grid).detach().cpu().numpy()
+        return solution

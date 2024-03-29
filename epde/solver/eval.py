@@ -3,10 +3,10 @@
 from typing import Tuple, Union, List
 import torch
 
-from epde.interface.points_type import Points_type
-from epde.interface.derivative import Derivative
-from epde.interface.device import device_type, check_device
-from epde.interface.utils import PadTransform
+from epde.solver.points_type import Points_type
+from epde.solver.derivative import Derivative
+from epde.solver.device import device_type, check_device
+from epde.solver.utils import PadTransform
 
 
 def integration(func: torch.Tensor,
@@ -95,7 +95,7 @@ class Operator():
                  prepared_operator: Union[list,dict],
                  model: Union[torch.nn.Sequential, torch.Tensor],
                  mode: str,
-                 weak_form: list[callable],
+                 weak_form: List[callable],
                  derivative_points: int):
         """
         Args:
@@ -103,7 +103,7 @@ class Operator():
             prepared_operator (Union[list,dict]): prepared (after Equation class) operator.
             model (Union[torch.nn.Sequential, torch.Tensor]): *mat or NN or autograd* model.
             mode (str): *mat or NN or autograd*
-            weak_form (list[callable]): list with basis functions (if the form is *weak*).
+            weak_form (List[callable]): list with basis functions (if the form is *weak*).
             derivative_points (int): points number for derivative calculation.
                                      For details to Derivative_mat class.
         """
@@ -214,7 +214,7 @@ class Bounds():
                  prepared_bconds: Union[list, dict],
                  model: Union[torch.nn.Sequential, torch.Tensor],
                  mode: str,
-                 weak_form: list[callable],
+                 weak_form: List[callable],
                  derivative_points: int):
         """_summary_
 
@@ -223,7 +223,7 @@ class Bounds():
             prepared_bconds (Union[list,dict]): prepared (after Equation class) baund-y con-s.
             model (Union[torch.nn.Sequential, torch.Tensor]): *mat or NN or autograd* model.
             mode (str): *mat or NN or autograd*
-            weak_form (list[callable]): list with basis functions (if the form is *weak*).
+            weak_form (List[callable]): list with basis functions (if the form is *weak*).
             derivative_points (int): points number for derivative calculation.
                                      For details to Derivative_mat class.
         """

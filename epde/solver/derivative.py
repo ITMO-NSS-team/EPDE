@@ -222,14 +222,14 @@ class Derivative_mat(DerivativeInt):
         return du
 
 
-    def _step_h(self, h_tensor: torch.Tensor) -> list[torch.Tensor]:
+    def _step_h(self, h_tensor: torch.Tensor) -> List[torch.Tensor]:
         """ Calculate increment along each axis of the grid.
 
         Args:
             h_tensor (torch.Tensor): grid of *mat* mode.
 
         Returns:
-            h (list[torch.Tensor]): lsit with increment
+            h (List[torch.Tensor]): lsit with increment
                                     along each axis of the grid.
         """
         h = []

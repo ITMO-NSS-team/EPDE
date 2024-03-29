@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import Tuple, Union, Any
+from typing import Tuple, Union, Any, List
 import torch
 
 from epde.solver.derivative import Derivative
@@ -26,7 +26,7 @@ class Solution():
         equal_cls: Union[Equation_NN, Equation_mat, Equation_autograd],
         model: Union[torch.nn.Sequential, torch.Tensor],
         mode: str,
-        weak_form: Union[None, list[callable]],
+        weak_form: Union[None, List[callable]],
         lambda_operator,
         lambda_bound,
         tol: float = 0,
@@ -37,7 +37,7 @@ class Solution():
             equal_cls (Union[Equation_NN, Equation_mat, Equation_autograd]): Equation_{NN, mat, autograd} object.
             model (Union[torch.nn.Sequential, torch.Tensor]): model of *mat or NN or autograd* mode.
             mode (str): *mat or NN or autograd*
-            weak_form (Union[None, list[callable]]): list with basis functions, if the form is *weak*.
+            weak_form (Union[None, List[callable]]): list with basis functions, if the form is *weak*.
             lambda_operator (_type_): regularization parameter for operator term in loss.
             lambda_bound (_type_): regularization parameter for boundary term in loss.
             tol (float, optional): penalty in *casual loss*. Defaults to 0.
