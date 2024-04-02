@@ -872,7 +872,10 @@ class EpdeSearch(object):
         return self.optimizer.pareto_levels.get_by_complexity(complexity)
 
     def predict(self, system : SoEq, boundary_conditions: BoundaryConditions = None, grid : list = None, data = None,
-                system_file: str = None, solver_kwargs: dict = {'use_cache' : True}, mode = 'NN'):
+                system_file: str = None, mode: str = 'NN', compiling_params: dict = {}, optimizer_params: dict = {},
+                cache_params: dict = {}, early_stopping_params: dict = {}, plotting_params: dict = {}, 
+                training_params: dict = {}, use_cache: bool = False, use_fourier: bool = False, 
+                fft_params: dict = None, net = None):
         '''
         Predict state by automatically solving discovered equation or system. Employs solver implementation, adapted from 
         https://github.com/ITMO-NSS-team/torch_DE_solver.  
@@ -923,16 +926,33 @@ class EpdeSearch(object):
         if grid is None:
             grid = global_var.grid_cache.get_all()[1]
         
-        adapter = SolverAdapter(var_number = len(system.vars_to_describe), use_fourier = True)
-        adapter.set_solver_params(**solver_kwargs)        
+        adapter = SolverAdapter(net = net, fft_params = fft_params, use_cache = use_cache,
+                                var_number = len(system.vars_to_describe), use_fourier = use_fourier)
+        
+        # Setting various adapater parameters
+        adapter.set_compiling_params(**compiling_params)
+        
+        adapter.set_optimizer_params(**optimizer_params)
+        
+        adapter.set_cache_params(**cache_params)
+        
+        adapter.set_early_stopping_params(**early_stopping_params)
+        
+        adapter.set_plotting_params(**plotting_params)
+        
+        adapter.set_training_params(**training_params)
+        
+        adapter.change_parameter('mode', mode, param_dict_key = 'compiling_params')
         print(f'grid.shape is {grid[0].shape}')
-        print(f'Shape of the grid for solver {adapter.convert_grid(grid, mode = mode).shape}')        
+        # print(f'Shape of the grid for solver {adapter.convert_grid(grid, mode = mode).shape}')        
         solution_model = adapter.solve_epde_system(system = system, grids = grid, data = data, 
-                                                   boundary_conditions = boundary_conditions, mode = mode)
-        if mode == 'mat':
-            return solution_model
-        else:
-            return solution_model(adapter.convert_grid(grid, mode = mode)).detach().numpy()
+                                                   boundary_conditions = boundary_conditions, 
+                                                   mode = mode, use_cache = use_cache)
+        return solution_model
+        # if adapter.mode == 'mat':
+            # return solution_model
+        # else:
+            # return solution_model(adapter.convert_grid(grid, mode = mode)).detach().numpy()
 
     def visualize_solutions(self, dimensions:list = [0, 1], **visulaizer_kwargs):
         if self.multiobjective_mode:

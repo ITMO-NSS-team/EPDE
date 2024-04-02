@@ -35,26 +35,53 @@ better handling, i.e. manual setup.
 
 BASE_COMPILING_PARAMS = {
                          'mode'                 : 'NN',
-                         'lambda_operator'      : 1,
+                         'lambda_operator'      : 1e1,
                          'lambda_bound'         : 1e2,
                          'normalized_loss_stop' : False,
                          'h'                    : 0.001,
                          'inner_order'          : '1',
                          'boundary_order'       : '2',
                          'weak_form'            : 'None',
-                         'tol'                  : 0
+                         'tol'                  : 0.1
                          }
+
+ADAM_OPTIMIZER_PARAMS = {
+                         'lr'  : 1e-3,
+                         'eps' : 1e-6
+                         }
+
+
+
+LBFGS_OPTIMIZER_PARAMS = {
+                          'lr'       : 1e-2,
+                          'max_iter' : 10
+                          }
+
+PSO_OPTIMIZER_PARAMS = {
+                        'pop_size'   : 30,
+                        'b'          : 0.9,
+                        'c1'         : 8e-2,
+                        'c2'         : 5e-1,
+                        'lr'         : 1e-3,
+                        'betas'      : (0.99, 0.999),
+                        'c_decrease' : False,
+                        'variance'   : 1,
+                        'epsilon'    : 1e-8,
+                        'n_iter'     : 2000
+                        }
+
+
 
 BASE_OPTIMIZER_PARAMS = {
                          'optimizer'   : 'Adam', # Alternatively, switch to PSO, if it proves to be effective.
-                         'params'      : {'lr'  : 1e-3,
-                                          'eps' : 1e-6},
-                         'gamma'       : 'None',
+                         # 'params'      : {'lr'  : 1e-3,
+                         #                  'eps' : 1e-6},
+                         'gamma'       : 'None', # 0.9, # 
                          'decay_every' : 'None'
                          }
 
 BASE_CACHE_PARAMS = {
-                     'use_cache'                 : False,
+                     # 'use_cache'                 : False,
                      'cache_verbose'             : True,
                      'cache_model'               : 'None',
                      'model_randomize_parameter' : 0,
@@ -497,26 +524,26 @@ class SolverAdapter(object):
         dim_number = global_var.grid_cache.get('0').ndim # AM I NEEDED?
         print(f'dimensionality is {dim_number}')
         
-        L_default, M_default = 4, 10
-        if use_fourier:
-            if fft_params is None:
-                if dim_number == 1:
-                   fft_params = {'L' : [L_default],
-                                 'M' : [M_default]}
-                else:
-                   fft_params = {'L' : [L_default] + [None,] * (dim_number - 1), 
-                                 'M' : [M_default] + [None,] * (dim_number - 1)}
-            net_default = [Fourier_embedding(**fft_params),]
-        else:
-            net_default = []        
-        
-        if net is None:
+        if net is None:        
+            L_default, M_default = 4, 10
+            if use_fourier:
+                if fft_params is None:
+                    if dim_number == 1:
+                       fft_params = {'L' : [L_default],
+                                     'M' : [M_default]}
+                    else:
+                       fft_params = {'L' : [L_default] + [None,] * (dim_number - 1), 
+                                     'M' : [M_default] + [None,] * (dim_number - 1)}
+                net_default = [Fourier_embedding(**fft_params),]
+            else:
+                net_default = []        
+            linear_inputs = net_default[0].out_features if use_fourier else dim_number
+            
             if dim_number == 1:
-                FFL = Fourier_embedding(**fft_params)
-                linear_inputs = FFL.out_features
-                
+                # FFL = Fourier_embedding(**fft_params)                
                 hidden_neurons = 128
             else:
+                
                 hidden_neurons = 112
    
         operators = net_default + [torch.nn.Linear(linear_inputs, hidden_neurons),
@@ -547,6 +574,10 @@ class SolverAdapter(object):
         self.set_training_params(**BASE_TRAINING_PARAMS)
         
         self.use_cache = use_cache
+    
+    @property
+    def mode(self):
+        return self._compiling_params['mode']
     
     def set_compiling_params(self, mode: str = None, lambda_operator: float = None, 
                              lambda_bound : float = None, normalized_loss_stop: bool = None,
@@ -581,10 +612,10 @@ class SolverAdapter(object):
                 except KeyError:
                     print(f'Parameter {param_key} can not be passed into the solver.')
     
-    def set_cache_params(self, use_cache: bool = None, cache_verbose: bool = None, 
-                         cache_model: Sequential = None, model_randomize_parameter: Union[int, float] = None,
-                         clear_cache: bool = None):
-        cache_params = {'use_cache' : use_cache, 'cache_verbose' : cache_verbose, 'cache_model' : cache_model,
+    def set_cache_params(self, cache_verbose: bool = None, cache_model: Sequential = None, 
+                         model_randomize_parameter: Union[int, float] = None, clear_cache: bool = None): # use_cache: bool = None, 
+
+        cache_params = { 'cache_verbose' : cache_verbose, 'cache_model' : cache_model, # 'use_cache' : use_cache,
                         'model_randomize_parameter' : model_randomize_parameter, 'clear_cache' : clear_cache}
 
         for param_key, param_vals in cache_params.items():
@@ -638,17 +669,37 @@ class SolverAdapter(object):
             if param_vals is not None:
                 try:
                     if param_vals == 'None':
-                        self._ploter_params[param_key] = None
+                        self._training_params[param_key] = None
                     else:
-                        self._ploter_params[param_key] = param_vals
+                        self._training_params[param_key] = param_vals
                 except KeyError:
                     print(f'Parameter {param_key} can not be passed into the solver.')
-    
+                    
+    def change_parameter(self, parameter: str, value, param_dict_key: str = None):
+        setters = {'compiling_params'      : (BASE_COMPILING_PARAMS, self.set_compiling_params), 
+                   'optimizer_params'      : (BASE_OPTIMIZER_PARAMS, self.set_optimizer_params),
+                   'cache_params'          : (BASE_CACHE_PARAMS, self.set_cache_params),
+                   'early_stopping_params' : (BASE_EARLY_STOPPING_PARAMS, self.set_early_stopping_params),
+                   'plotting_params'       : (BASE_PLOTTER_PARAMS, self.set_plotting_params),
+                   'training_params'       : (BASE_TRAINING_PARAMS, self.set_training_params)}
+
+        if value is None:
+            value = 'None'
+            
+        if param_dict_key is not None: # TODO: Add regular expressions
+            param_labeled = {parameter : value}
+            setters[param_dict_key][1](**param_labeled)
+        else:
+            for key, param_elem in setters.items():
+                if parameter in param_elem[0].keys():
+                    param_labeled = {parameter : value}
+                    param_elem[1](**param_labeled)
+                
     @staticmethod
-    def create_domain(self, variables: List[str], grids : List[np.ndarray]) -> Domain:
+    def create_domain(variables: List[str], grids : List[np.ndarray]) -> Domain:
         assert len(variables) == len(grids), f'Number of passed variables {len(variables)} does not \
                                                match number of grids {len(grids)}.'
-        assert len(variables) == grids.dim, 'Grids have to be set as a N-dimensional np.ndarrays with dim \
+        assert len(variables) == grids[0].ndim, 'Grids have to be set as a N-dimensional np.ndarrays with dim \
                                              matching the domain dimensionality'
         domain = Domain('uniform')
         for idx, var_name in enumerate(variables):
@@ -658,7 +709,7 @@ class SolverAdapter(object):
         return domain
 
     def solve_epde_system(self, system: SoEq, grids: list=None, boundary_conditions=None, 
-                          mode='NN', data=None):
+                          mode='NN', data=None, use_cache: bool = False):
         system_interface = SystemSolverInterface(system_to_adapt=system)
 
         system_solver_forms = system_interface.form(grids = grids, mode = mode)
@@ -682,29 +733,34 @@ class SolverAdapter(object):
 
         domain = self.create_domain(list(system.vars_to_describe), grids)
 
-        return self.solve(equations=[form[1] for form in system_solver_forms], domain=domain,
-                          boundary_conditions=boundary_conditions, mode = mode)
+        return self.solve(equations=[form[1] for form in system_solver_forms], domain = domain,
+                          boundary_conditions = bconds_combined, mode = mode, use_cache = use_cache)
 
-    def solve(self, equations, domain:Domain, boundary_conditions = None, mode = 'NN', epochs = 1e3): #: List[] =None
+    def solve(self, equations, domain:Domain, boundary_conditions = None, mode = 'NN', 
+              epochs = 1e3, use_cache: bool = False): #: List[] =None
         if isinstance(equations, SolverEquation):
-            self.equations = equations
+            equations_prepared = equations
         else:
-            self.equations = SolverEquation()
+            equations_prepared = SolverEquation()
             for form in equations:
-                self.equations.add(form)
+                equations_prepared.add(form)
 
-        cb_cache = cache.Cache(**self._cache_params)
+        
         cb_early_stops = early_stopping.EarlyStopping(**self._early_stopping_params)
-        cb_plots = plot.Plots(**self._ploter_params)
+        # cb_plots = plot.Plots(**self._ploter_params)
+        callbacks = [cb_early_stops,] #, cb_plots]
+        if use_cache:
+            cb_cache = cache.Cache(**self._cache_params)
+            callbacks.append(cb_cache)
         
         optimizer = Optimizer(**self._optimizer_params)
         
-        model = Model(net = self.net, domain = self.domain, equation = self.equations, 
-                      conditions = self.boundary_conditions)
+        model = Model(net = self.net, domain = domain, equation = equations_prepared, 
+                      conditions = boundary_conditions)
         model.compile(**self._compiling_params)
-        model.train(optimizer, callbacks=[cb_cache, cb_early_stops, cb_plots], **self._training_params)
+        model.train(optimizer, callbacks=callbacks, **self._training_params)
         
-        grid = domain.build(mode = self._compiling_params['mode'])
+        grid = domain.build(mode = self.mode)
         self.net  = self.net.to(device = device_type())
         grid = check_device(grid)
         

@@ -23,15 +23,15 @@ def lambda_prepare(val: torch.Tensor,
         torch.Tensor: torch.Tensor with lambda_ values,
         len(lambdas) = number of columns in val
     """
-
+    # print('Lambda:', type(lambda_), lambda_)
     if isinstance(lambda_, torch.Tensor):
         return lambda_
 
-    if isinstance(lambda_, int):
+    if isinstance(lambda_, (int, float)):
         try:
-            lambdas = torch.ones(val.shape[-1]) * lambda_
+            lambdas = torch.ones(val.shape[-1]) * int(lambda_)
         except:
-            lambdas = torch.tensor(lambda_)
+            lambdas = torch.tensor(int(lambda_))
     elif isinstance(lambda_, list):
         lambdas = torch.tensor(lambda_)
 

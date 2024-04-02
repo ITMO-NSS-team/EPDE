@@ -111,7 +111,10 @@ class Plots(Callback):
                                         str(datetime.datetime.now().timestamp()) + '.png'))
         else:
             if not os.path.isdir(save_dir):
-                os.mkdir(save_dir)
+                try:
+                    os.mkdir(save_dir)
+                except:
+                    pass
             directory = os.path.join(save_dir,
                                      str(datetime.datetime.now().timestamp()) + '.png')
         return directory
