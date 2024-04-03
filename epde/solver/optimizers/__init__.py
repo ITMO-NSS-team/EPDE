@@ -1,1 +1,1 @@
-from tedeous.optimizers.optimizer import Optimizer
+from epde.solver.optimizers.optimizer import Optimizer

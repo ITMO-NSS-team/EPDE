@@ -1,2 +1,2 @@
-from tedeous.callbacks.adaptive_lambda import AdaptiveLambda
-from tedeous.callbacks.early_stopping import EarlyStopping
+from epde.solver.callbacks.adaptive_lambda import AdaptiveLambda
+from epde.solver.callbacks.early_stopping import EarlyStopping

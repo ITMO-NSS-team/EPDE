@@ -50,7 +50,8 @@ ADAM_OPTIMIZER_PARAMS = {
                          'eps' : 1e-6
                          }
 
-
+SGD_OPTIMIZER_PARAMS = {
+                        }
 
 LBFGS_OPTIMIZER_PARAMS = {
                           'lr'       : 1e-2,
@@ -70,8 +71,6 @@ PSO_OPTIMIZER_PARAMS = {
                         'n_iter'     : 2000
                         }
 
-
-
 BASE_OPTIMIZER_PARAMS = {
                          'optimizer'   : 'Adam', # Alternatively, switch to PSO, if it proves to be effective.
                          # 'params'      : {'lr'  : 1e-3,
@@ -79,6 +78,13 @@ BASE_OPTIMIZER_PARAMS = {
                          'gamma'       : 'None', # 0.9, # 
                          'decay_every' : 'None'
                          }
+
+OPTIMIZERS_MATCHED = {
+                      'Adam'  : ADAM_OPTIMIZER_PARAMS,
+                      'LBFGS' : LBFGS_OPTIMIZER_PARAMS,
+                      'PSO'   : PSO_OPTIMIZER_PARAMS,
+                      'SGD'   : SGD_OPTIMIZER_PARAMS
+                      }
 
 BASE_CACHE_PARAMS = {
                      # 'use_cache'                 : False,
@@ -609,6 +615,10 @@ class SolverAdapter(object):
                         self._optimizer_params[param_key] = None
                     else:
                         self._optimizer_params[param_key] = param_vals
+                        if param_key == 'optimizer':
+                            if param_vals not in ['Adam', 'SGD', 'PSO', 'LBFGS']:
+                                raise ValueError(f'Unimplemented optimizer has been selected. Please, use {OPTIMIZERS_MATCHED.keys()}')
+                            self._optimizer_params['params'] = OPTIMIZERS_MATCHED[param_vals]
                 except KeyError:
                     print(f'Parameter {param_key} can not be passed into the solver.')
     
