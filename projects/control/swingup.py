@@ -1,0 +1,221 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Apr  3 17:43:03 2024
+
+@author: maslyaev
+"""
+
+import numpy as np
+from tqdm import tqdm
+from collections import OrderedDict
+
+import gymnasium
+from gymnasium.spaces.box import Box
+from gymnasium.envs.mujoco.swimmer_v4 import SwimmerEnv
+from ray.rllib.env.wrappers.dm_control_wrapper import DMCEnv
+
+import matplotlib.pyplot as plt
+
+import epde
+
+def safe_reset(res):
+    '''A ''safe'' wrapper for dealing with OpenAI gym's refactor.'''
+    if isinstance(res[-1], dict):
+        return res[0]
+    else:
+        return res
+    
+def safe_step(res):
+    '''A ''safe'' wrapper for dealing with OpenAI gym's refactor.'''
+    if len(res)==5:
+        return res[0], res[1], res[2] or res[3], res[4]
+    else:
+        return res
+    
+def replace_with_inf(arr, neg):
+    '''helper function to replace an array with inf. Used for Box bounds'''
+    replace_with = np.inf
+    if neg:
+        replace_with *= -1
+    return np.nan_to_num(arr, nan=replace_with)
+
+def rollout_env(env, policy, n_steps, n_steps_reset=np.inf, seed=None, verbose = False, env_callback = None):
+    '''
+    Step through an environment and produce rollouts.
+    Arguments:
+        env: gymnasium environment
+        policy: sindy_rl.BasePolicy subclass
+            The policy to rollout experience
+        n_steps: int
+            number of steps of experience to rollout
+        n_steps_reset: int
+            number of steps of experience to rollout before reset
+        seed: int
+            environment reset seed 
+        verbose: bool
+            whether to provide tqdm progress bar
+        env_callback: fn(idx, env)
+            optional function that is called after every step
+    Returns:
+        lists of obs, acts, rews trajectories
+    '''
+    if seed is not None:    
+        obs_list = [safe_reset(env.reset(seed=seed))]
+    else:
+        obs_list = [safe_reset(env.reset())]
+
+    act_list = []
+    rew_list = []
+    
+    trajs_obs = []
+    trajs_acts = []
+    trajs_rews = []
+
+    for i in tqdm(range(n_steps), disable=not verbose):
+        
+        # collect experience
+        action = policy.compute_action(obs_list[-1])
+        step_val = env.step(action)
+        # print(f'step_val {step_val} for action {action}')
+        obs, rew, done, info = safe_step(step_val)
+        act_list.append(action)
+        obs_list.append(obs)
+        rew_list.append(rew)
+        
+        # handle resets
+        if done or len(obs_list) > n_steps_reset:
+            obs_list.pop(-1)
+            trajs_obs.append(np.array(obs_list))
+            trajs_acts.append(np.array(act_list))
+            trajs_rews.append(np.array(rew_list))
+
+            obs_list = [safe_reset(env.reset())]
+            act_list = []
+            rew_list = []
+        
+        # env callback
+        if env_callback:
+            env_callback(i, env)
+    
+    # edge case if never hit reset
+    if len(act_list) != 0:
+        obs_list.pop(-1)
+        trajs_obs.append(np.array(obs_list))
+        trajs_acts.append(np.array(act_list))
+        trajs_rews.append(np.array(rew_list))
+    return trajs_obs, trajs_acts, trajs_rews
+
+class DMCEnvWrapper(DMCEnv):
+    '''
+    A wrapper for all dm-control environments using RLlib's 
+    DMCEnv wrapper. 
+    '''
+    # need to wrap with config dict instead of just passing kwargs
+    def __init__(self, config=None):
+        env_config = config or {}
+        super().__init__(**env_config)
+        
+class BasePolicy:
+    '''Parent class for policies'''
+    def __init__(self):
+        raise NotImplementedError
+    def compute_action(self, obs):
+        '''given observation, output action'''
+        raise NotImplementedError        
+        
+class RandomPolicy(BasePolicy):
+    '''
+    A random policy
+    '''
+    def __init__(self, action_space = None, low = None, high = None, seed = 0):
+        '''
+        Inputs: 
+            action_space: (gym.spaces) space used for sampling
+            seed: (int) random seed
+        '''
+        if action_space: 
+            self.action_space = action_space
+        else:
+            self.action_space = Box(low=low, high=high) #action_space
+        self.action_space.seed(seed)
+        self.magnitude = 1.0
+        
+    def compute_action(self, obs):
+        '''
+        Return random sample from action space
+        
+        Inputs:
+            obs: ndarray (unused)
+        Returns: 
+            Random action
+        '''
+        return self.magnitude * self.action_space.sample()
+    
+    def set_magnitude_(self, mag):
+        self.magnitude = mag        
+        
+def epde_discovery(t, x, angle, u, use_ann):
+    dimensionality = x.ndim - 1
+    
+    epde_search_obj = epde.EpdeSearch(use_solver = False, dimensionality = dimensionality, boundary = 30,
+                                      coordinate_tensors = [t,], verbose_params = {'show_iter_idx' : False})    
+    
+    if use_ann:
+        epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
+                                         preprocessor_kwargs={'epochs_max' : 50000})
+    else:
+        epde_search_obj.set_preprocessor(default_preprocessor_type='poly',
+                                         preprocessor_kwargs={'use_smoothing' : False, 'sigma' : 1, 
+                                                              'polynomial_window' : 3, 'poly_order' : 3}) 
+    
+    angle_cos = np.cos(angle)
+    angle_sin = np.sin(angle)
+    
+    angle_trig_tokens = epde.CacheStoredTokens('angle_trig', ['sin(phi)', 'cos(phi)'], 
+                                               {'sin(phi)' : angle_sin, 'cos(phi)' : angle_cos}, 
+                                               OrderedDict([('power', (1, 3))]), {'power': 0})
+    control_var_tokens = epde.CacheStoredTokens('w')
+    
+if __name__ == '__main__':
+    env_config = {'domain_name': "cartpole",
+                'task_name': "swingup",
+                'frame_skip': 1,
+                'from_pixels': False}
+    cart_env = DMCEnvWrapper(env_config)
+    random_policy = RandomPolicy(cart_env.action_space)
+    traj_obs, traj_acts, traj_rews = rollout_env(cart_env, random_policy, n_steps = 8000, 
+                                                 n_steps_reset=1000)    
+    
+    # def get_angle(cosine, sine):
+    #     if sine >= 0 and cosine >= 0:
+    #         return np.arccos(cosine)
+    #     elif sine >= 0 and cosine < 0:
+    #         return np.arccos(cosine)
+    #     elif sine < 0 and cosine >= 0:
+    #         return np.arcsin(sine)
+    #     else:
+    #         return - np.arccos(cosine)
+
+    def get_angle_rot(cosine, sine):
+        if sine >= 0 and cosine >= 0:
+            return np.arccos(cosine)
+        elif sine >= 0 and cosine < 0:
+            return np.arccos(cosine)
+        elif sine < 0 and cosine >= 0:
+            return 2*np.pi + np.arcsin(sine)
+        else:
+            return 2*np.pi - np.arccos(cosine)
+    
+    t = np.arange(traj_acts[0].size)
+    angles_calc = np.vectorize(get_angle_rot)
+    angle, angle_dot = angles_calc(traj_obs[0][:, 1], traj_obs[0][:, 2]), traj_obs[0][:, 4]
+    
+    x, x_dot = traj_obs[0][:, 0], traj_obs[0][:, 3]
+    u = traj_acts[0]
+
+    
+    # plt.plot(angle, color = 'k')
+    # plt.plot(traj_obs[0][:, 4], color = 'b')
+    
+    
