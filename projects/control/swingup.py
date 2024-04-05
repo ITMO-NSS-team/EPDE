@@ -5,6 +5,13 @@ Created on Wed Apr  3 17:43:03 2024
 
 @author: maslyaev
 """
+import os
+import sys
+
+sys.path.append('../')
+
+sys.path.pop()
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../..')))
 
 import numpy as np
 from tqdm import tqdm
@@ -167,7 +174,7 @@ def epde_discovery(t, x, angle, u, use_ann):
     else:
         epde_search_obj.set_preprocessor(default_preprocessor_type='poly',
                                          preprocessor_kwargs={'use_smoothing' : False, 'sigma' : 1, 
-                                                              'polynomial_window' : 3, 'poly_order' : 3}) 
+                                                              'polynomial_window' : 3, 'poly_order' : 4}) 
     
     angle_cos = np.cos(angle)
     angle_sin = np.sin(angle)
@@ -175,8 +182,24 @@ def epde_discovery(t, x, angle, u, use_ann):
     angle_trig_tokens = epde.CacheStoredTokens('angle_trig', ['sin(phi)', 'cos(phi)'], 
                                                {'sin(phi)' : angle_sin, 'cos(phi)' : angle_cos}, 
                                                OrderedDict([('power', (1, 3))]), {'power': 0})
-    control_var_tokens = epde.CacheStoredTokens('w')
+    control_var_tokens = epde.CacheStoredTokens('control', 'u', {'u' : u}, OrderedDict([('power', (1, 1))]),
+                                                {'power': 0})
     
+    eps = 5e-7
+    popsize = 10
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=55)
+
+    factors_max_number = {'factors_num' : [1, 2], 'probas' : [0.65, 0.35]}
+
+    custom_grid_tokens = epde.GridTokens(dimensionality = dimensionality, max_power=1)
+    
+    epde_search_obj.fit(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,),
+                        equation_terms_max_number=7, data_fun_pow = 2, 
+                        additional_tokens=[custom_grid_tokens, control_var_tokens], # angle_trig_tokens, control_var_tokens, 
+                        equation_factors_max_number=factors_max_number,
+                        eq_sparsity_interval=(1e-6, 1e-1))    
+    epde_search_obj.equations()
+
 if __name__ == '__main__':
     env_config = {'domain_name': "cartpole",
                 'task_name': "swingup",
@@ -212,10 +235,11 @@ if __name__ == '__main__':
     angle, angle_dot = angles_calc(traj_obs[0][:, 1], traj_obs[0][:, 2]), traj_obs[0][:, 4]
     
     x, x_dot = traj_obs[0][:, 0], traj_obs[0][:, 3]
-    u = traj_acts[0]
+    u = traj_acts[0].reshape(x.shape)
 
+    print(u.shape, x.shape, t.shape, angle.shape)
     
     # plt.plot(angle, color = 'k')
     # plt.plot(traj_obs[0][:, 4], color = 'b')
     
-    
+    epde_discovery(t, x, angle, u, False)
