@@ -162,19 +162,24 @@ class RandomPolicy(BasePolicy):
     def set_magnitude_(self, mag):
         self.magnitude = mag        
         
-def epde_discovery(t, x, angle, u, use_ann):
+def epde_discovery(t, x, angle, u, diff_method = 'FD'):
     dimensionality = x.ndim - 1
     
     epde_search_obj = epde.EpdeSearch(use_solver = False, dimensionality = dimensionality, boundary = 30,
                                       coordinate_tensors = [t,], verbose_params = {'show_iter_idx' : False})    
     
-    if use_ann:
+    if diff_method == 'ANN':
         epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
                                          preprocessor_kwargs={'epochs_max' : 50000})
-    else:
+    elif diff_method == 'poly':
         epde_search_obj.set_preprocessor(default_preprocessor_type='poly',
                                          preprocessor_kwargs={'use_smoothing' : False, 'sigma' : 1, 
                                                               'polynomial_window' : 3, 'poly_order' : 4}) 
+    elif diff_method == 'FD':
+        epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+                                         preprocessor_kwargs={}) 
+    else:
+        raise ValueError('Incorrect preprocessing tool selected.')
     
     angle_cos = np.cos(angle)
     angle_sin = np.sin(angle)
@@ -182,23 +187,24 @@ def epde_discovery(t, x, angle, u, use_ann):
     angle_trig_tokens = epde.CacheStoredTokens('angle_trig', ['sin(phi)', 'cos(phi)'], 
                                                {'sin(phi)' : angle_sin, 'cos(phi)' : angle_cos}, 
                                                OrderedDict([('power', (1, 3))]), {'power': 0})
-    control_var_tokens = epde.CacheStoredTokens('control', 'u', {'u' : u}, OrderedDict([('power', (1, 1))]),
+    control_var_tokens = epde.CacheStoredTokens('control', ['ctrl',], {'ctrl' : u}, OrderedDict([('power', (1, 1))]),
                                                 {'power': 0})
     
     eps = 5e-7
-    popsize = 10
-    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=55)
+    popsize = 16
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=200)
 
-    factors_max_number = {'factors_num' : [1, 2], 'probas' : [0.65, 0.35]}
+    factors_max_number = {'factors_num' : [1, 2, 3], 'probas' : [0.6, 0.3, 0.1]}
 
     custom_grid_tokens = epde.GridTokens(dimensionality = dimensionality, max_power=1)
     
     epde_search_obj.fit(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,),
-                        equation_terms_max_number=7, data_fun_pow = 2, 
-                        additional_tokens=[custom_grid_tokens, control_var_tokens], # angle_trig_tokens, control_var_tokens, 
+                        equation_terms_max_number=11, data_fun_pow = 2, 
+                        additional_tokens=[custom_grid_tokens, control_var_tokens, angle_trig_tokens], # , control_var_tokens, 
                         equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-6, 1e-1))    
+                        eq_sparsity_interval=(1e-10, 1e-1))
     epde_search_obj.equations()
+    return epde_search_obj
 
 if __name__ == '__main__':
     env_config = {'domain_name': "cartpole",
@@ -208,17 +214,8 @@ if __name__ == '__main__':
     cart_env = DMCEnvWrapper(env_config)
     random_policy = RandomPolicy(cart_env.action_space)
     traj_obs, traj_acts, traj_rews = rollout_env(cart_env, random_policy, n_steps = 8000, 
-                                                 n_steps_reset=1000)    
-    
-    # def get_angle(cosine, sine):
-    #     if sine >= 0 and cosine >= 0:
-    #         return np.arccos(cosine)
-    #     elif sine >= 0 and cosine < 0:
-    #         return np.arccos(cosine)
-    #     elif sine < 0 and cosine >= 0:
-    #         return np.arcsin(sine)
-    #     else:
-    #         return - np.arccos(cosine)
+                                                 n_steps_reset=1000)
+
 
     def get_angle_rot(cosine, sine):
         if sine >= 0 and cosine >= 0:
@@ -229,17 +226,26 @@ if __name__ == '__main__':
             return 2*np.pi + np.arcsin(sine)
         else:
             return 2*np.pi - np.arccos(cosine)
-    
-    t = np.arange(traj_acts[0].size)
-    angles_calc = np.vectorize(get_angle_rot)
-    angle, angle_dot = angles_calc(traj_obs[0][:, 1], traj_obs[0][:, 2]), traj_obs[0][:, 4]
-    
-    x, x_dot = traj_obs[0][:, 0], traj_obs[0][:, 3]
-    u = traj_acts[0].reshape(x.shape)
 
-    print(u.shape, x.shape, t.shape, angle.shape)
+    xs, x_dots = [], []
+    angles, angle_dots = [], []
+    us = []
     
-    # plt.plot(angle, color = 'k')
-    # plt.plot(traj_obs[0][:, 4], color = 'b')
+    for idx, _ in enumerate(traj_acts[:1]):
+        t = np.arange(traj_acts[0].size)
+        angles_calc = np.vectorize(get_angle_rot)
+        angle, angle_dot = angles_calc(traj_obs[idx][:, 1], traj_obs[idx][:, 2]), traj_obs[idx][:, 4]
+        
+        x, x_dot = traj_obs[idx][:, 0], traj_obs[idx][:, 3]
+        
+        u = traj_acts[idx].reshape(x.shape)
     
-    epde_discovery(t, x, angle, u, False)
+        xs.append(x)
+        x_dots.append(x_dot)
+        angles.append(angle)
+        angle_dots.append(angle_dot)
+        us.append(u)
+    
+        print(u.shape, x.shape, t.shape, angle.shape)
+        
+        res = epde_discovery(t, x, angle, u, 'FD')

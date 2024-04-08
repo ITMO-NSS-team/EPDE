@@ -570,6 +570,8 @@ class EpdeSearch(object):
                 setup.build_poly_diff_preprocessing(**preprocessor_kwargs)
             elif default_preprocessor_type == 'spectral':
                 setup.build_spectral_preprocessing(**preprocessor_kwargs)
+            elif default_preprocessor_type == 'FD':
+                setup.build_FD_preprocessing(**preprocessor_kwargs)
             else:
                 raise NotImplementedError('Incorrect default preprocessor type. Only ANN, spectral or poly are allowed.')
             preprocessor_pipeline = setup.builder.prep_pipeline
@@ -927,7 +929,7 @@ class EpdeSearch(object):
             grid = global_var.grid_cache.get_all()[1]
         
         adapter = SolverAdapter(net = net, fft_params = fft_params, use_cache = use_cache,
-                                var_number = len(system.vars_to_describe), use_fourier = use_fourier)
+                                use_fourier = use_fourier) # var_number = len(system.vars_to_describe), 
         
         # Setting various adapater parameters
         adapter.set_compiling_params(**compiling_params)

@@ -36,6 +36,10 @@ class Domain():
         self.type = type
         self.variable_dict = {}
     
+    @property
+    def dim(self):
+        return len(self.variable_dict)
+    
     def variable(
             self,
             variable_name: str,
@@ -277,6 +281,10 @@ class Equation():
     """
     def __init__(self):
         self.equation_lst = []
+    
+    @property
+    def num(self):
+        return len(self.equation_lst)
     
     def add(self, eq: dict):
         """ add equation

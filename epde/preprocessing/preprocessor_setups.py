@@ -38,6 +38,17 @@ class PreprocessorSetup:
         self.builder.set_deriv_calculator(AdaptiveFiniteDeriv, *deriv_calculator_args,
                                           **deriv_calculator_kwargs)
 
+    def build_FD_preprocessing(self):
+        smoother_args = ()
+        smoother_kwargs = {}
+
+        deriv_calculator_args = ()
+        deriv_calculator_kwargs = {'grid': None}
+
+        self.builder.set_smoother(PlaceholderSmoother, *smoother_args, **smoother_kwargs)        
+        self.builder.set_deriv_calculator(AdaptiveFiniteDeriv, *deriv_calculator_args,
+                                          **deriv_calculator_kwargs)
+
     def build_spectral_preprocessing(self, n=None, steepness=1):
         smoother_args = ()
         smoother_kwargs = {}
