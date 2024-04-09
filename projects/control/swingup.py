@@ -194,7 +194,7 @@ def epde_discovery(t, x, angle, u, diff_method = 'FD'):
     popsize = 16
     epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=200)
 
-    factors_max_number = {'factors_num' : [1, 2, 3], 'probas' : [0.6, 0.3, 0.1]}
+    factors_max_number = {'factors_num' : [1, 2, 3, 4], 'probas' : [0.3, 0.3, 0.3, 0.1]}
 
     custom_grid_tokens = epde.GridTokens(dimensionality = dimensionality, max_power=1)
     

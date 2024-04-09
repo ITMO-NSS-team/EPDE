@@ -42,7 +42,8 @@ BASE_COMPILING_PARAMS = {
                          'inner_order'          : '1',
                          'boundary_order'       : '2',
                          'weak_form'            : 'None',
-                         'tol'                  : 0.1
+                         'tol'                  : 0.1,
+                         'derivative_points'    : 3
                          }
 
 ADAM_OPTIMIZER_PARAMS = {
@@ -634,10 +635,11 @@ class SolverAdapter(object):
     def set_compiling_params(self, mode: str = None, lambda_operator: float = None, 
                              lambda_bound : float = None, normalized_loss_stop: bool = None,
                              h: float = None, inner_order: str = None, boundary_order: str = None,
-                             weak_form: List[Callable] = None, tol: float = None):
+                             weak_form: List[Callable] = None, tol: float = None, derivative_points: int = None):
         compiling_params = {'mode' : mode, 'lambda_operator' : lambda_operator, 'lambda_bound' : lambda_bound,
                             'normalized_loss_stop' : normalized_loss_stop, 'h' : h, 'inner_order' : inner_order,
-                            'boundary_order' : boundary_order, 'weak_form' : weak_form, 'tol' : tol}
+                            'boundary_order' : boundary_order, 'weak_form' : weak_form, 'tol' : tol,
+                            'derivative_points' : derivative_points}
         
         for param_key, param_vals in compiling_params.items():
             if param_vals is not None:
@@ -820,5 +822,8 @@ class SolverAdapter(object):
         self.net  = self.net.to(device = device_type())
         grid = check_device(grid)
         
-        solution = self.net(grid).detach().cpu().numpy()
+        if mode in ['NN', 'autograd']:
+            solution = self.net(grid).detach().cpu().numpy()
+        else:
+            solution = self.net
         return solution
