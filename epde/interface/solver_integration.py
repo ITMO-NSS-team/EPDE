@@ -42,7 +42,7 @@ BASE_COMPILING_PARAMS = {
                          'inner_order'          : '1',
                          'boundary_order'       : '2',
                          'weak_form'            : 'None',
-                         'tol'                  : 0.1,
+                         'tol'                  : 0.005,
                          'derivative_points'    : 3
                          }
 
