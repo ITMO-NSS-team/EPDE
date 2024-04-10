@@ -3,9 +3,14 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# C extensions
-*.so
+# Folders
+classic_alg_exp/
 
+# Extensions
+*.so
+*.png
+*.csv
+*.docx
 # Distribution / packaging
 .Python
 pyvenv.cfg

@@ -8,6 +8,7 @@ from symnet.preproc_output import *
 
 import seaborn as sns
 import matplotlib.pyplot as plt
+from symnet.print_selection_info import ModelsInfo
 
 
 def clean_names(left_name, names: list):
@@ -33,23 +34,83 @@ def train_model(input_names, x_train, y_train, sparsity):
     lbfgs = torch.optim.LBFGS(params=model.parameters(), max_iter=2000, line_search_fn='strong_wolfe')
     model.train()
     lbfgs.step(closure)
-    last_step_loss = loss(model, y_train, x_train, block=1, sparsity=sparsity)
+    last_step_loss = loss(model, y_train, x_train, block=1, sparsity=0.0)
 
     return model, last_step_loss.item()
 
 
-def select_model(input_names, left_pool, u, derivs, shape, sparsity, additional_tokens):
-    models = []
-    losses = []
-    for left_side_name in left_pool:
-        m_input_names, idx = clean_names(left_side_name, input_names)
-        x_train, y_train = prepare_batches(u, derivs, shape, idx, additional_tokens=additional_tokens)
-        model, last_loss = train_model(m_input_names, x_train, y_train, sparsity)
-        losses.append(last_loss)
-        models.append(model)
 
+
+
+
+
+# def right_matrices_coef(matrices, names: list[str], csym, tsym):
+#     token_matrix = {}
+#     for i in range(len(names)):
+#         token_matrix[Symbol(names[i])] = matrices[i]
+#
+#     right_side = []
+#     for i in range(len(csym)):
+#         total_mx = 1
+#         if type(tsym[i]) == Mul:
+#             if tsym[i] == Mul(Symbol("u"), Symbol("du/dx2")):
+#                 u_ux_ind = i
+#             lbls = tsym[i].args
+#             for lbl in lbls:
+#                 if type(lbl) == Symbol:
+#                     total_mx *= token_matrix.get(lbl)
+#                 else:
+#                     for j in range(lbl.args[1]):
+#                         total_mx *= token_matrix.get(lbl.args[0])
+#         elif type(tsym[i]) == Symbol:
+#             total_mx *= token_matrix.get(tsym[i])
+#         elif type(tsym[i]) == Pow:
+#             for j in range(tsym[i].args[1]):
+#                 total_mx *= token_matrix.get(tsym[i].args[0])
+#         total_mx *= csym[i]
+#         right_side.append(total_mx)
+#
+#     u_ux = 1
+#     for lbl in (Symbol("u"), Symbol("du/dx2")):
+#         u_ux *= token_matrix.get(lbl)
+#     right_u_ux = csym[u_ux_ind] * u_ux
+#     diff1 = np.fabs((np.abs(csym[u_ux_ind]) - 1) * u_ux)
+#     return right_side, right_u_ux, u_ux
+
+
+# def select_model1(input_names, left_pool, u, derivs, shape, sparsity, additional_tokens):
+#     models = []
+#     losses = []
+#     for left_side_name in left_pool:
+#         m_input_names, idx = clean_names(left_side_name, input_names)
+#         x_train, y_train = prepare_batches(u, derivs, shape, idx, additional_tokens=additional_tokens)
+#         model, last_loss = train_model(m_input_names, x_train, y_train, sparsity)
+#
+#         tsym, csym = model.coeffs(calprec=16)
+#         losses.append(last_loss)
+#         models.append(model)
+#
+#     idx = losses.index(min(losses))
+#     return models[idx], left_pool[idx]
+
+def select_model(input_names, left_pool, u, derivs, shape, additional_tokens):
+    models, losses, left_sides = [], [], []
+    info = ModelsInfo()
+    for left_side_name in left_pool:
+        for sparsity in [0.001, 0.0000001]:
+            m_input_names, idx = clean_names(left_side_name, input_names)
+            x_train, y_train = prepare_batches(u, derivs, shape, idx, additional_tokens=additional_tokens)
+            model, last_loss = train_model(m_input_names, x_train, y_train, sparsity)
+
+            losses.append(last_loss)
+            models.append(model)
+            left_sides.append(left_side_name)
+
+            info.selection_info(model, last_loss, sparsity, left_side_name)
+
+    info.print_best()
     idx = losses.index(min(losses))
-    return models[idx], left_pool[idx]
+    return models[idx], left_sides[idx]
 
 
 def save_fig(csym, add_left=True):
@@ -68,7 +129,7 @@ def save_fig(csym, add_left=True):
     plt.savefig(f'symnet_distr{len(distr)}.png', transparent=True)
 
 
-def get_csym_tsym(u, derivs, shape, input_names, pool_names, sparsity=0.001, additional_tokens=None,
+def get_csym_tsym(u, derivs, shape, input_names, pool_names, additional_tokens=None,
                   max_deriv_order=None):
     """
     Can process only one variable! (u)
