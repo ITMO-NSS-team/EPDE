@@ -280,26 +280,6 @@ class Cache(object):
             self.memory_normalized = memory_new_norm
             self.memory_structural = memory_new_structural
 
-    def change_variables(self, increment, increment_structral=None):
-        '''
-            Additional regression in the search process, run on the structural data, is required to set the
-            increment_structral tensor. ToDo!
-        '''
-        raise DeprecationWarning('No need to change variables in current version of EPDE.')
-        assert not (increment_structral is None and not all(self.structural_and_base_merged)), 'Not all structural data taken from the default, and the increment for structural was not sent'
-
-        random_key = list(self.memory_default.keys())[0]
-        increment = np.reshape(increment, newshape=self.memory_default[random_key].shape)
-        del self.memory_normalized
-        self.memory_default = {key: self.memory_default[key] for key in self.base_tensors}  # deepcopy(self.base_tensors)
-        self.memory_structural = {key: self.memory_structural[key] for key in self.base_tensors}  # deepcopy(self.base_tensors_structural)
-        self.memory_normalized = dict()
-        for key in self.memory_default.keys():
-            assert np.all(self.memory_default[key].shape == increment.shape)
-            self.memory_default[key] = self.memory_default[key] - increment
-            if not self.structural_and_base_merged[key]:
-                self.memory_structural[key] = self.memory_structural[key] - increment_structral
-
     def add(self, label, tensor, normalized: bool = False, structural: bool = False,
             indication: bool = False):
         '''
@@ -462,9 +442,6 @@ class Cache(object):
 
 
 def upload_complex_token(label: str, params_values: OrderedDict, evaluator, tensor_cache: Cache, grid_cache: Cache):
-    # label_completed = (label, (1.0,))
-    # value = evaluator.apply(self)
-    # global_var.tensor_cache.add(self.cache_label, value, structural = False)
     try:
         evaluation_function = evaluator.evaluation_functions[label]
     except TypeError:
@@ -477,3 +454,16 @@ def upload_complex_token(label: str, params_values: OrderedDict, evaluator, tens
 
     label_completed = (label, tuple(params_values.values()))
     tensor_cache.add(label_completed, grid_function(indexes_vect))
+
+class EquationsCache(object):
+    '''
+    Cache to keep the information about already discovered equations. Getting equation objectives values will reduce the unnecessary
+    computations, that may occur if the EPDE repeatedly generates the same equation.
+    '''
+    def __init__(self):
+        self._saved_equations = set()
+
+    def parse_input(self, item):
+        return 
+
+    

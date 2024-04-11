@@ -202,7 +202,7 @@ def epde_discovery(t, x, angle, u, diff_method = 'FD'):
                         equation_terms_max_number=11, data_fun_pow = 2, 
                         additional_tokens=[custom_grid_tokens, control_var_tokens, angle_trig_tokens], # , control_var_tokens, 
                         equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-10, 1e-1))
+                        eq_sparsity_interval=(1e-10, 1e-4))
     epde_search_obj.equations()
     return epde_search_obj
 
