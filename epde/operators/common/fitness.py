@@ -70,7 +70,10 @@ class L2Fitness(CompoundOperator):
             else:
                 discr_feats = np.dot(features, objective.weights_final[:-1][objective.weights_internal != 0]) # weights_final -> weights_internal
 
-            discr = (discr_feats + np.full(target.shape, objective.weights_final[-1]) - target)
+            discr = (discr_feats + np.full(target.shape, objective.weights_final[-1]) - target)  # Normalization on target values
+            # t_mean = np.mean(target)
+            # if t_mean != 0:
+                # discr = discr / t_mean
             self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)
             discr = np.multiply(discr, self.g_fun_vals)
             rl_error = np.linalg.norm(discr, ord = 2)

@@ -877,7 +877,7 @@ class EpdeSearch(object):
                 system_file: str = None, mode: str = 'NN', compiling_params: dict = {}, optimizer_params: dict = {},
                 cache_params: dict = {}, early_stopping_params: dict = {}, plotting_params: dict = {}, 
                 training_params: dict = {}, use_cache: bool = False, use_fourier: bool = False, 
-                fft_params: dict = None, net = None):
+                fft_params: dict = None, net = None, use_adaptive_lambdas: bool = False):
         '''
         Predict state by automatically solving discovered equation or system. Employs solver implementation, adapted from 
         https://github.com/ITMO-NSS-team/torch_DE_solver.  
@@ -949,7 +949,8 @@ class EpdeSearch(object):
         # print(f'Shape of the grid for solver {adapter.convert_grid(grid, mode = mode).shape}')        
         solution_model = adapter.solve_epde_system(system = system, grids = grid, data = data, 
                                                    boundary_conditions = boundary_conditions, 
-                                                   mode = mode, use_cache = use_cache)
+                                                   mode = mode, use_cache = use_cache, 
+                                                   use_adaptive_lambdas = use_adaptive_lambdas)
         return solution_model
         # if adapter.mode == 'mat':
             # return solution_model

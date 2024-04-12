@@ -1006,13 +1006,6 @@ class SoEq(moeadd.MOEADDSolution):
     def fitness_calculated(self):
         return all([equation.fitness_calculated for equation in self.vals])
 
-    # def save(self, file_name='epde_systems.pickle'):
-    #     directory = os.getcwd()
-    #     with open(file_name, 'wb') as file:
-    #         to_save = ([equation.text_form for equation in self.vals],
-    #                    self.tokens_for_eq + self.tokens_supp)
-    #         pickle.dump(obj=to_save, file=file)
-
 
 class SoEqIterator(object):
     def __init__(self, system: SoEq):

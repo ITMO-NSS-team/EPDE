@@ -463,7 +463,8 @@ class EquationsCache(object):
     def __init__(self):
         self._saved_equations = set()
 
-    def parse_input(self, item):
+    @staticmethod
+    def parse_input(self, equation):
         return 
 
     

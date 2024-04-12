@@ -21,7 +21,7 @@ import epde.globals as global_var
 from epde.solver.data import Domain, Conditions
 from epde.solver.data import Equation as SolverEquation
 from epde.solver.model import Model
-from epde.solver.callbacks import cache, early_stopping, plot
+from epde.solver.callbacks import cache, early_stopping, plot, adaptive_lambda
 from epde.solver.optimizers.optimizer import Optimizer
 from epde.solver.device import solver_device, check_device, device_type
 from epde.solver.models import Fourier_embedding, mat_model
@@ -74,9 +74,7 @@ PSO_OPTIMIZER_PARAMS = {
 
 BASE_OPTIMIZER_PARAMS = {
                          'optimizer'   : 'Adam', # Alternatively, switch to PSO, if it proves to be effective.
-                         # 'params'      : {'lr'  : 1e-3,
-                         #                  'eps' : 1e-6},
-                         'gamma'       : 'None', # 0.9, # 
+                         'gamma'       : 'None',
                          'decay_every' : 'None'
                          }
 
@@ -88,7 +86,6 @@ OPTIMIZERS_MATCHED = {
                       }
 
 BASE_CACHE_PARAMS = {
-                     # 'use_cache'                 : False,
                      'cache_verbose'             : True,
                      'cache_model'               : 'None',
                      'model_randomize_parameter' : 0,
@@ -367,9 +364,10 @@ class PregenBOperator(object):
                     operator.set_grid(grid=coords)
                     operator.values = bc_values
                     bconds.append(operator)
+        print('obtained bconds:', bconds)
         self.conditions = bconds
-        print('cond[0]', [cond[0].shape for cond in self.conditions])
-        print('cond[2]', [cond[2].shape for cond in self.conditions])
+        #print('cond[0]', [cond[0].shape for cond in self.conditions])
+        #print('cond[2]', [cond[2].shape for cond in self.conditions])
 
 
 class BoundaryConditions(object):
@@ -756,9 +754,9 @@ class SolverAdapter(object):
     @staticmethod
     def create_domain(variables: List[str], grids : List[np.ndarray]) -> Domain:
         assert len(variables) == len(grids), f'Number of passed variables {len(variables)} does not \
-                                               match number of grids {len(grids)}.'
+            match number of grids {len(grids)}.'
         assert len(variables) == grids[0].ndim, 'Grids have to be set as a N-dimensional np.ndarrays with dim \
-                                             matching the domain dimensionality'
+            matching the domain dimensionality'
         domain = Domain('uniform')
         for idx, var_name in enumerate(variables):
             domain.variable(variable_name = var_name, variable_set = torch.tensor(grids), 
@@ -767,7 +765,8 @@ class SolverAdapter(object):
         return domain
 
     def solve_epde_system(self, system: SoEq, grids: list=None, boundary_conditions=None, 
-                          mode='NN', data=None, use_cache: bool = False):
+                          mode='NN', data=None, use_cache: bool = False, 
+                          use_adaptive_lambdas: bool = False):
         system_interface = SystemSolverInterface(system_to_adapt=system)
 
         system_solver_forms = system_interface.form(grids = grids, mode = mode)
@@ -778,8 +777,9 @@ class SolverAdapter(object):
                                                                      in system_solver_forms])
             op_gen.generate_default_bc(vals = data, grids = grids)
             boundary_conditions = op_gen.conditions
-            if not (isinstance(boundary_conditions, list) and isinstance(boundary_conditions[0], BOPElement)):
-                raise ValueError('Incorrect boundary conditions generated in the solver interface.')
+            # if not (isinstance(boundary_conditions, list) and isinstance(boundary_conditions[0], BOPElement)):
+                # print(f'boundary_conditions {type(boundary_conditions)}, type({boundary_conditions[0]})')
+                # raise ValueError('Incorrect boundary conditions generated in the solver interface.')
             
         bconds_combined = Conditions()
         for cond in boundary_conditions:
@@ -787,15 +787,19 @@ class SolverAdapter(object):
                                      value = cond['bnd_val'])
 
         if grids is None:
-            _, grids = global_var.grid_cache.get_all()
+            grid_var_keys, grids = global_var.grid_cache.get_all()
+        else:
+            grid_var_keys, _ = global_var.grid_cache.get_all()
 
-        domain = self.create_domain(list(system.vars_to_describe), grids)
+        domain = self.create_domain(grid_var_keys, grids)
 
         return self.solve(equations=[form[1] for form in system_solver_forms], domain = domain,
-                          boundary_conditions = bconds_combined, mode = mode, use_cache = use_cache)
+                          boundary_conditions = bconds_combined, mode = mode, use_cache = use_cache,
+                          use_adaptive_lambdas = use_adaptive_lambdas)
 
     def solve(self, equations, domain:Domain, boundary_conditions = None, mode = 'NN', 
-              epochs = 1e3, use_cache: bool = False, use_fourier: bool = False, fourier_params: dict = None):
+              epochs = 1e3, use_cache: bool = False, use_fourier: bool = False, fourier_params: dict = None,
+              use_adaptive_lambdas: bool = False):
     
         if isinstance(equations, SolverEquation):
             equations_prepared = equations
@@ -805,11 +809,14 @@ class SolverAdapter(object):
                 equations_prepared.add(form)
         self.net = self.get_net(equations_prepared, mode, domain, use_fourier, fourier_params)
         
+        
         cb_early_stops = early_stopping.EarlyStopping(**self._early_stopping_params)
         callbacks = [cb_early_stops,]
         if use_cache:
-            cb_cache = cache.Cache(**self._cache_params)
-            callbacks.append(cb_cache)
+            callbacks.append(cache.Cache(**self._cache_params))
+
+        if use_adaptive_lambdas:
+            callbacks.append(adaptive_lambda.AdaptiveLambda())
         
         optimizer = Optimizer(**self._optimizer_params)
         
