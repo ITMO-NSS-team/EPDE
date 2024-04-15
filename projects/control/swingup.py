@@ -135,7 +135,7 @@ class RandomPolicy(BasePolicy):
     '''
     A random policy
     '''
-    def __init__(self, action_space = None, low = None, high = None, seed = 0):
+    def __init__(self, action_space = None, low = -1, high = 1, seed = 0):
         '''
         Inputs: 
             action_space: (gym.spaces) space used for sampling
@@ -146,7 +146,9 @@ class RandomPolicy(BasePolicy):
         else:
             self.action_space = Box(low=low, high=high) #action_space
         self.action_space.seed(seed)
-        self.magnitude = 1.0
+        self.magnitude = 1.1
+#        self.inertia = 0.9
+#        self._prev_action = 0.
         
     def compute_action(self, obs):
         '''
@@ -157,11 +159,46 @@ class RandomPolicy(BasePolicy):
         Returns: 
             Random action
         '''
-        return self.magnitude * self.action_space.sample()
+        action = self.action_space.sample()
+        # print(f'action is {action}, type {type(action)}')
+        return self.magnitude * action # + self.inertia * self._prev_action
     
     def set_magnitude_(self, mag):
         self.magnitude = mag        
+
+class CosinePolicy(BasePolicy):
+    '''
+    A random policy
+    '''
+    def __init__(self, period = 300., amplitude = 1., seed = 0):
+        '''
+        Inputs: 
+            action_space: (gym.spaces) space used for sampling
+            seed: (int) random seed
+        '''
+        self.action_space = Box(low=-amplitude, high=amplitude)
+        self.time_counter = 0
+        self.period = period
+        self.amplitude = amplitude
         
+    def compute_action(self, obs):
+        '''
+        Return random sample from action space
+        
+        Inputs:
+            obs: ndarray (unused)
+        Returns: 
+            Random action
+        '''
+        action = np.array([self.amplitude * np.sin(self.time_counter/self.period),], dtype=np.float32)
+        self.time_counter += 1
+        # print(f'action is {action}')
+        return action
+    
+    def set_magnitude_(self, mag):
+        self.magnitude = mag        
+
+
 def epde_discovery(t, x, angle, u, diff_method = 'FD'):
     dimensionality = x.ndim - 1
     
@@ -212,10 +249,13 @@ if __name__ == '__main__':
                 'frame_skip': 1,
                 'from_pixels': False}
     cart_env = DMCEnvWrapper(env_config)
-    random_policy = RandomPolicy(cart_env.action_space)
-    traj_obs, traj_acts, traj_rews = rollout_env(cart_env, random_policy, n_steps = 8000, 
+    random_policy = RandomPolicy() #cart_env.action_space)
+    cosine_policy = CosinePolicy(period=100, amplitude=0.2)
+    print('action space ', cosine_policy.action_space.shape, cosine_policy.action_space.low, cosine_policy.action_space.high, cosine_policy.action_space.contains([0.]))
+#    
+# random_policy.set_magnitude_(10.)
+    traj_obs, traj_acts, traj_rews = rollout_env(cart_env, cosine_policy, n_steps = 8000, 
                                                  n_steps_reset=1000)
-
 
     def get_angle_rot(cosine, sine):
         if sine >= 0 and cosine >= 0:
@@ -239,7 +279,19 @@ if __name__ == '__main__':
         x, x_dot = traj_obs[idx][:, 0], traj_obs[idx][:, 3]
         
         u = traj_acts[idx].reshape(x.shape)
-    
+
+        plt.plot(u)
+        plt.grid()
+        plt.title('Actions, taken as control.')
+        plt.show()
+
+        plt.plot(angle, color = 'k', label = 'Pole angle, rad.')
+        plt.plot(x, color = 'r', label = 'Cart position.')
+        plt.legend()
+        plt.grid()
+        plt.title('Inputs')
+        plt.show()
+
         xs.append(x)
         x_dots.append(x_dot)
         angles.append(angle)
