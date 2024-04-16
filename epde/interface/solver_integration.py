@@ -777,9 +777,6 @@ class SolverAdapter(object):
                                                                      in system_solver_forms])
             op_gen.generate_default_bc(vals = data, grids = grids)
             boundary_conditions = op_gen.conditions
-            # if not (isinstance(boundary_conditions, list) and isinstance(boundary_conditions[0], BOPElement)):
-                # print(f'boundary_conditions {type(boundary_conditions)}, type({boundary_conditions[0]})')
-                # raise ValueError('Incorrect boundary conditions generated in the solver interface.')
             
         bconds_combined = Conditions()
         for cond in boundary_conditions:
@@ -832,5 +829,5 @@ class SolverAdapter(object):
         if mode in ['NN', 'autograd']:
             solution = self.net(grid).detach().cpu().numpy()
         else:
-            solution = self.net
+            solution = self.net.detach().cpu().numpy()
         return solution

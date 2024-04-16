@@ -82,6 +82,48 @@ class DataPolynomials(PreparedTokens):
         self._token_family.set_evaluator(simple_function_evaluator, [])
         
         
+class DataSign(PreparedTokens):
+    def __init__(self, var_name: str, max_power: int = 1):
+        """
+        Class for tokens, representing power products of the modelled variable. 
+        Argument `max_power` represents the maximum power, in which the tokens will exponentiated.
+        Should be included into the pool by default, replacing the default 1-st power of the data.
+        """
+        raise NotImplementedError('Sign is still not implemented.')
+        self._token_family = TokenFamily(token_type=f'poly of {var_name}', variable = var_name,
+                                         family_of_derivs=True)
+        
+        def latex_form(label, **params):
+            '''
+            Parameters
+            ----------
+            label : str
+                label of the token, for which we construct the latex form.
+            **params : dict
+                dictionary with parameter labels as keys and tuple of parameter values 
+                and their output text forms as values.
+
+            Returns
+            -------
+            form : str
+                LaTeX-styled text form of token.
+            '''            
+            if '/' in label:
+                label = label[:label.find('x')+1] + '_' + label[label.find('x')+1:]
+                label = label.replace('d', r'\partial ').replace('/', r'}{')
+                label = r'\frac{' + label + r'}'
+                                
+            if params['power'][0] > 1:
+                label = r'\left(' + label + r'\right)^{{{0}}}'.format(params["power"][1])
+            return label
+        
+        self._token_family.set_latex_form_constructor(latex_form)
+        self._token_family.set_status(demands_equation=False, meaningful=True,
+                                      unique_specific_token=True, unique_token_type=True,
+                                      s_and_d_merged=False, non_default_power = True)
+        self._token_family.set_params([var_name,], OrderedDict([('power', (1, max_power))]), 
+                                      {'power': 0}, [[None,],])
+        self._token_family.set_evaluator(simple_function_evaluator, [])    
 
 
 class TrigonometricTokens(PreparedTokens):

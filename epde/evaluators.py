@@ -101,9 +101,7 @@ def simple_function_evaluator(factor, structural: bool = False, grids=None, **kw
             power_param_idx = param_idx
             
     if grids is not None:
-        base_val = global_var.tensor_cache.get(factor.cache_label, structural=structural)
-        # original_grids = factor.grids
-        # factor_model = train_ann(grids = original_grids, data = base_val)
+        # base_val = global_var.tensor_cache.get(factor.cache_label, structural=structural)
 
         value = factor.predict_with_ann(grids)
         value = value**(factor.params[power_param_idx])
@@ -118,6 +116,45 @@ def simple_function_evaluator(factor, structural: bool = False, grids=None, **kw
                                                 structural=structural)
             value = value**(factor.params[power_param_idx])
             return value
+
+def sign_function_evaluator(factor, structural: bool = False, grids=None, **kwargs):
+    '''
+
+    Example of the evaluator of token values, that can be used for uploading values of stored functions from cache. Cases, when
+    this approach can be used, include evaluating derivatives, coordinates, etc.
+
+
+    Parameters
+    ----------
+
+    factor : epde.factor.Factor object,
+        Object, that represents a factor from the equation terms, for that we want to calculate the values.
+
+    structural : bool,
+        Mark, if the evaluated value will be used for discovering equation structure (True), or calculating coefficients (False)
+
+    Returns
+    ----------
+    value : numpy.ndarray
+        Vector of the evaluation of the token values, that can be used as target, or feature during the LASSO regression.
+
+    '''
+
+    for param_idx, param_descr in factor.params_description.items():
+        if param_descr['name'] == 'power':
+            power_param_idx = param_idx
+            
+    assert factor.params[power_param_idx] == 1, 'Power of sgn function token must be "1".'
+    if grids is not None:
+        # base_val = global_var.tensor_cache.get(factor.cache_label, structural=structural)
+
+        value = factor.predict_with_ann(grids)
+        return np.sign(value)
+
+    else:
+        value = global_var.tensor_cache.get(factor.cache_label, structural=structural)
+        return np.sign(value)
+
 
 
 trig_eval_fun = {'cos': lambda *grids, **kwargs: np.cos(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power'],

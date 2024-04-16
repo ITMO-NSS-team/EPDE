@@ -190,7 +190,8 @@ class CosinePolicy(BasePolicy):
         Returns: 
             Random action
         '''
-        action = np.array([self.amplitude * np.sin(self.time_counter/self.period),], dtype=np.float32)
+        # print(1.*self.time_counter/self.period)
+        action = np.array([self.amplitude * np.sin(1.*self.time_counter/self.period),], dtype=np.float32)
         self.time_counter += 1
         # print(f'action is {action}')
         return action
@@ -243,17 +244,65 @@ def epde_discovery(t, x, angle, u, diff_method = 'FD'):
     epde_search_obj.equations()
     return epde_search_obj
 
+def translate_equation(t, x, angle, u, derivs: dict, diff_method = 'FD'):
+    dimensionality = x.ndim - 1    
+    
+    lp_terms = [['ctrl{power: 1}',], 
+                ['d^2phi/dx0^2{power: 1}', 'cos(phi){power: 1}'],
+                ['dphi/dx0{power: 2}', 'sin(phi){power: 1}'],
+                ['sgn(dy){power: 1}']]
+    rp_term  = ['d^2y/dx0^2{power: 1}',]
+    
+
+    epde_search_obj = epde.EpdeSearch(use_solver = False, dimensionality = dimensionality, boundary = 30,
+                                      coordinate_tensors = [t,], verbose_params = {'show_iter_idx' : False})    
+
+    if diff_method == 'ANN':
+        epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
+                                         preprocessor_kwargs={'epochs_max' : 50000})
+    elif diff_method == 'poly':
+        epde_search_obj.set_preprocessor(default_preprocessor_type='poly',
+                                         preprocessor_kwargs={'use_smoothing' : False, 'sigma' : 1, 
+                                                              'polynomial_window' : 3, 'poly_order' : 4}) 
+    elif diff_method == 'FD':
+        epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+                                         preprocessor_kwargs={}) 
+    else:
+        raise ValueError('Incorrect preprocessing tool selected.')
+    
+    angle_cos = np.cos(angle)
+    angle_sin = np.sin(angle)
+    
+    angle_trig_tokens = epde.CacheStoredTokens('angle_trig', ['sin(phi)', 'cos(phi)'], 
+                                               {'sin(phi)' : angle_sin, 'cos(phi)' : angle_cos}, 
+                                               OrderedDict([('power', (1, 3))]), {'power': 0})
+    control_var_tokens = epde.CacheStoredTokens('control', ['ctrl',], {'ctrl' : u}, OrderedDict([('power', (1, 1))]),
+                                                {'power': 0})
+    sgn_tokens = epde.CacheStoredTokens('signum of y', ['sgn(y)', 'sgn(dy)', 'sgn(ddy)'], 
+                                        {'sgn(y)' : np.sign(angle), 
+                                         'sgn(dy)' : np.sign(derivs['y'][:, 0]),
+                                         'sgn(ddy)' : np.sign(derivs['y'][:, 1]),}, 
+                                        OrderedDict([('power', (1, 1))]), {'power': 0})
+    
+
+    epde_search_obj.create_pool(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,),
+                                additional_tokens = [angle_trig_tokens, control_var_tokens, sgn_tokens])
+
+    test = epde.interface.equation_translator.CoeffLessEquation(lp_terms, rp_term, 
+                                                                 epde_search_obj.pool)
+    return test
+
 if __name__ == '__main__':
     env_config = {'domain_name': "cartpole",
                 'task_name': "swingup",
                 'frame_skip': 1,
                 'from_pixels': False}
     cart_env = DMCEnvWrapper(env_config)
-    random_policy = RandomPolicy() #cart_env.action_space)
-    cosine_policy = CosinePolicy(period=100, amplitude=0.2)
+    random_policy = RandomPolicy()
+    cosine_policy = CosinePolicy(period=100, amplitude=0.4)
     print('action space ', cosine_policy.action_space.shape, cosine_policy.action_space.low, cosine_policy.action_space.high, cosine_policy.action_space.contains([0.]))
-#    
-# random_policy.set_magnitude_(10.)
+
+
     traj_obs, traj_acts, traj_rews = rollout_env(cart_env, cosine_policy, n_steps = 8000, 
                                                  n_steps_reset=1000)
 
@@ -267,18 +316,28 @@ if __name__ == '__main__':
         else:
             return 2*np.pi - np.arccos(cosine)
 
-    xs, x_dots = [], []
-    angles, angle_dots = [], []
+    xs, x_ds = [], []
+    angles, angles_d = [], []
     us = []
     
-    for idx, _ in enumerate(traj_acts[:1]):
-        t = np.arange(traj_acts[0].size)
+    for idx, _ in enumerate(traj_acts[:
+                                      1]):
+        step = 0.01
+        t = np.linspace(0, step*traj_acts[0].size, num = traj_acts[0].size, endpoint=False)[1:-1]
+        
         angles_calc = np.vectorize(get_angle_rot)
-        angle, angle_dot = angles_calc(traj_obs[idx][:, 1], traj_obs[idx][:, 2]), traj_obs[idx][:, 4]
+        angle, angle_d = angles_calc(traj_obs[idx][:, 1], traj_obs[idx][:, 2]), traj_obs[idx][:, 4]
+        angle_dd = (angle_d[2:] - angle_d[:-2])/(2*step)
+        angle = angle[1:-1] ; angle_d = angle_d[1:-1]
         
-        x, x_dot = traj_obs[idx][:, 0], traj_obs[idx][:, 3]
+        x, x_d = traj_obs[idx][:, 0], traj_obs[idx][:, 3]
+        x_dd = (x_d[2:] - x_d[:-2])/(2*step)
+        u = traj_acts[idx].reshape(x.shape)        
         
-        u = traj_acts[idx].reshape(x.shape)
+        x = x[1:-1] ; x_d = x_d[1:-1]; u = u[1:-1]
+        derivs = {'y': np.vstack((x_d, x_dd)).T, 'phi': np.vstack((angle_d, angle_dd)).T}
+        
+
 
         plt.plot(u)
         plt.grid()
@@ -292,12 +351,25 @@ if __name__ == '__main__':
         plt.title('Inputs')
         plt.show()
 
+        plt.plot(np.cos(angle), color = 'k', label = 'Sine')
+        plt.plot(np.sin(angle), color = 'r', label = 'Cosine')
+
+        # plt.plot(x, color = 'r', label = 'Cart position.')
+        plt.legend()
+        plt.grid()
+        plt.title('Angle cosine')
+        plt.show()
+
+
         xs.append(x)
-        x_dots.append(x_dot)
+        x_ds.append(x_d)
         angles.append(angle)
-        angle_dots.append(angle_dot)
+        angles_d.append(angle_d)
         us.append(u)
-    
-        print(u.shape, x.shape, t.shape, angle.shape)
-        
-        res = epde_discovery(t, x, angle, u, 'FD')
+        # derivs = {'y':}
+        # print(u.shape, x.shape, t.shape, angle.shape)
+        discover = False
+        if discover:
+            res = epde_discovery(t, x, angle, u, derivs, 'FD')
+        else:
+            res = translate_equation(t, x, angle, u, derivs, 'FD')

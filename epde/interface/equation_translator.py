@@ -165,7 +165,10 @@ class CoeffLessEquation():
         terms_aggregated = self.lp_terms_translated + [self.rp_translated,]
         max_factors = max([len(term.structure) for term in terms_aggregated])
         self.equation = Equation(pool=pool, basic_structure=terms_aggregated,
-                            terms_number=len(lp_terms) + 1, max_factors_in_term=max_factors)
+                                 metaparameters={'sparsity'           : {'optimizable': True, 'value': 1.},
+                                                 'terms_number'       : {'optimizable': False, 'value': len(lp_terms) + 1},
+                                                 'max_factors_in_term': {'optimizable': False, 'value': max_factors}})
+                                 # terms_number=len(lp_terms) + 1, max_factors_in_term=max_factors)
         self.equation.target_idx = len(terms_aggregated) - 1
         self.equation.weights_internal = np.append(lr.coef_, lr.intercept_)
         self.equation.weights_final = np.append(lr.coef_, lr.intercept_)
