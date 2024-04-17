@@ -146,7 +146,7 @@ class RandomPolicy(BasePolicy):
         else:
             self.action_space = Box(low=low, high=high) #action_space
         self.action_space.seed(seed)
-        self.magnitude = 1.1
+        self.magnitude = 0.08
 #        self.inertia = 0.9
 #        self._prev_action = 0.
         
@@ -191,7 +191,7 @@ class CosinePolicy(BasePolicy):
             Random action
         '''
         # print(1.*self.time_counter/self.period)
-        action = np.array([self.amplitude * np.sin(1.*self.time_counter/self.period),], dtype=np.float32)
+        action = np.array([self.amplitude * np.sin(2*np.pi*self.time_counter/self.period),], dtype=np.float32)
         self.time_counter += 1
         # print(f'action is {action}')
         return action
@@ -290,6 +290,19 @@ def translate_equation(t, x, angle, u, derivs: dict, diff_method = 'FD'):
 
     test = epde.interface.equation_translator.CoeffLessEquation(lp_terms, rp_term, 
                                                                  epde_search_obj.pool)
+    val, target, features = test.equation.evaluate(return_val = True)
+    print(np.mean(val), np.mean(np.abs(val)), features.shape)
+    plt.plot(target, color = 'r', label = 'Equation target')
+    plt.plot((test.equation.weights_final.reshape((1, -1))[:, :-1] @ features.T + test.equation.weights_final[-1]).reshape(-1), color = 'b', label = 'Equation features')
+    plt.grid()
+    plt.legend()
+    plt.show()
+
+    plt.plot(target, color = 'b', label = 'Equation target')
+    plt.grid()
+    plt.legend()
+    plt.show()
+
     return test
 
 if __name__ == '__main__':
@@ -298,8 +311,8 @@ if __name__ == '__main__':
                 'frame_skip': 1,
                 'from_pixels': False}
     cart_env = DMCEnvWrapper(env_config)
-    random_policy = RandomPolicy()
-    cosine_policy = CosinePolicy(period=100, amplitude=0.4)
+    random_policy = RandomPolicy(cart_env.action_space)
+    cosine_policy = CosinePolicy(period=800, amplitude=0.04)
     print('action space ', cosine_policy.action_space.shape, cosine_policy.action_space.low, cosine_policy.action_space.high, cosine_policy.action_space.contains([0.]))
 
 
@@ -320,8 +333,7 @@ if __name__ == '__main__':
     angles, angles_d = [], []
     us = []
     
-    for idx, _ in enumerate(traj_acts[:
-                                      1]):
+    for idx, _ in enumerate(traj_acts[:1]):
         step = 0.01
         t = np.linspace(0, step*traj_acts[0].size, num = traj_acts[0].size, endpoint=False)[1:-1]
         
@@ -345,10 +357,21 @@ if __name__ == '__main__':
         plt.show()
 
         plt.plot(angle, color = 'k', label = 'Pole angle, rad.')
-        plt.plot(x, color = 'r', label = 'Cart position.')
+        plt.plot(derivs['phi'][:, 0], color = 'r', label = 'Angle deriv, rad./s')
+        plt.plot(derivs['phi'][:, 1], color = 'b', label = 'Angle deriv, rad./s')
         plt.legend()
         plt.grid()
-        plt.title('Inputs')
+        plt.title('Inputs, angle')
+        plt.show()
+
+
+
+        plt.plot(x, color = 'k', label = 'Cart position.')
+        plt.plot(derivs['y'][:, 0], color = 'r', label = 'Cart pos deriv, rad./s')
+        plt.plot(derivs['y'][:, 1], color = 'b', label = 'Cart pos deriv, rad./s')
+        plt.legend()
+        plt.grid()
+        plt.title('Inputs, cart position')
         plt.show()
 
         plt.plot(np.cos(angle), color = 'k', label = 'Sine')
