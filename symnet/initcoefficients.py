@@ -95,7 +95,7 @@ def train_model(input_names, x_train, y_train, sparsity):
 
 def select_model(input_names, left_pool, u, derivs, shape, additional_tokens):
     models, losses, left_sides = [], [], []
-    info = ModelsInfo()
+    # info = ModelsInfo()
     for left_side_name in left_pool:
         for sparsity in [0.001, 0.0000001]:
             m_input_names, idx = clean_names(left_side_name, input_names)
@@ -106,9 +106,9 @@ def select_model(input_names, left_pool, u, derivs, shape, additional_tokens):
             models.append(model)
             left_sides.append(left_side_name)
 
-            info.selection_info(model, last_loss, sparsity, left_side_name)
+            # info.selection_info(model, last_loss, sparsity, left_side_name)
 
-    info.print_best()
+    # info.print_best()
     idx = losses.index(min(losses))
     return models[idx], left_sides[idx]
 
@@ -134,12 +134,15 @@ def get_csym_tsym(u, derivs, shape, input_names, pool_names, additional_tokens=N
     """
     Can process only one variable! (u)
     """
+    # TODO: SymNet имеет 4 todo (+, pool_terms, preproc_input)
+
+    # TODO: если в левой части e.g. d^2u/dx2^2, то как получить в правой слагаемое d^2u/dx2^2 * u?
 
     left_pool = get_left_pool(max_deriv_order)
-    model, left_side_name = select_model(input_names, left_pool, u, derivs, shape, sparsity, additional_tokens)
+    model, left_side_name = select_model(input_names, left_pool, u, derivs, shape, additional_tokens)
     tsym, csym = model.coeffs(calprec=16)
     # save_fig(csym)
     pool_sym_ls = cast_to_symbols(pool_names)
+
     csym_pool_ls = get_csym_pool(tsym, csym, pool_sym_ls, left_side_name)
-    # save_fig(np.array(csym_pool_ls), add_left=False)
     return dict(zip(pool_sym_ls, csym_pool_ls)), pool_sym_ls

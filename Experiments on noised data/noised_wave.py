@@ -100,15 +100,20 @@ if __name__ == '__main__':
     coefficients[1] = 0.
 
     ''' Parameters of the experiment '''
-    write_csv = False
+    write_csv = True
     print_results = True
     max_iter_number = 50
-    magnitudes = [1. * 1e-2]
+    magnitudes = [2. * 1e-5, 2.5 * 1e-5, 3. * 1e-5, 3.2 * 1e-5, 3.47 * 1e-5]
+    # magnitudes = [3.47 * 1e-5]
 
     draw_not_found = []
     draw_time = []
     draw_avgmae = []
     start_gl = time.time()
+    not_found_ls = []
+    # string = "0.04073797307153838 * d^2u/dx2^2{power: 1.0} + 0.0014821321520873156 * du/dx1{power: 1.0} + 0.034797130718506576 = d^2u/dx1^2{power: 1.0}"
+    # difference_ls = find_diff_str(string, coefficients)
+
     for magnitude in magnitudes:
         title = f'dfs{magnitude}'
 
@@ -146,8 +151,10 @@ if __name__ == '__main__':
                 differences_ls.append(min(difference_ls))
                 differences_ls_none.append(min(difference_ls))
                 mean_diff_ls += difference_ls
+                print(f"Num. eq. found: {len(difference_ls)}")
             else:
                 differences_ls_none.append(None)
+                print(f"Num. eq. found: 0")
 
             num_found_eq.append(len(difference_ls))
             print('Overall time is:', time1)
@@ -155,6 +162,7 @@ if __name__ == '__main__':
             i += 1
             time_ls.append(time1)
 
+        not_found_ls.append(num_found_eq.count(0))
         if write_csv:
             arr = np.array([differences_ls_none, time_ls, num_found_eq])
             arr = arr.T
@@ -182,24 +190,26 @@ if __name__ == '__main__':
         draw_time.append(sum(time_ls) / len(time_ls))
 
     end_gl = time.time()
-    print(f"Overall time: {end_gl - start_gl:.2f}, s.")
-    plt.title("SymNet")
-    plt.plot(magnitudes, draw_not_found, linewidth=2, markersize=9, marker='o')
-    plt.ylabel("No. runs with not found eq.")
-    plt.xlabel("Magnitude value")
-    plt.grid()
-    plt.show()
-
-    plt.plot(magnitudes, draw_time, linewidth=2, markersize=9, marker='o')
-    plt.title("SymNet")
-    plt.ylabel("Time, s.")
-    plt.xlabel("Magnitude value")
-    plt.grid()
-    plt.show()
-
-    plt.plot(magnitudes, draw_avgmae, linewidth=2, markersize=9, marker='o')
-    plt.title("SymNet")
-    plt.ylabel("Average MAE")
-    plt.xlabel("Magnitude value")
-    plt.grid()
-    plt.show()
+    print(f"Overall time: {(end_gl - start_gl) / 3600:.2f}, h.")
+    print(f"Runs where eq was not found for each magn: {not_found_ls}")
+    # print(f"Overall time: {end_gl - start_gl:.2f}, s.")
+    # plt.title("Original")
+    # plt.plot(magnitudes, draw_not_found, linewidth=2, markersize=9, marker='o')
+    # plt.ylabel("No. runs with not found eq.")
+    # plt.xlabel("Magnitude value")
+    # plt.grid()
+    # plt.show()
+    #
+    # plt.plot(magnitudes, draw_time, linewidth=2, markersize=9, marker='o')
+    # plt.title("Original")
+    # plt.ylabel("Time, s.")
+    # plt.xlabel("Magnitude value")
+    # plt.grid()
+    # plt.show()
+    #
+    # plt.plot(magnitudes, draw_avgmae, linewidth=2, markersize=9, marker='o')
+    # plt.title("Original")
+    # plt.ylabel("Average MAE")
+    # plt.xlabel("Magnitude value")
+    # plt.grid()
+    # plt.show()

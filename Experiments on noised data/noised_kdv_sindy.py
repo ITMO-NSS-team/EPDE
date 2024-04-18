@@ -112,7 +112,8 @@ if __name__ == '__main__':
     draw_time = []
     draw_avgmae = []
     start_gl = time.time()
-    magnitudes = [1. * 1e-5, 3.5 * 1e-5, 5.5 * 1e-5, 8. * 1e-5, 2.26 * 1e-4]
+    # magnitudes = [1. * 1e-5, 1. * 1e-4, 3.5 * 1e-5, 5.5 * 1e-5, 8. * 1e-5, 2.26 * 1e-4]
+    magnitudes = [1. * 1e-4]
     for magnitude in magnitudes:
         title = f'dfs{magnitude}'
 
@@ -162,7 +163,7 @@ if __name__ == '__main__':
             arr = np.array([differences_ls_none, time_ls, num_found_eq])
             arr = arr.T
             df = pd.DataFrame(data=arr, columns=['MAE', 'time', 'number_found_eq'])
-            df.to_csv(os.path.join(Path().absolute().parent, "data_kdv_sindy", f"{title}.csv"))
+            df.to_csv(os.path.join(Path().absolute().parent, "data_pysindy_kdv", f"{title}.csv"))
 
             if print_results:
                 print()

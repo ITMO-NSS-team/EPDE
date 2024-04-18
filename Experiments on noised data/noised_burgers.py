@@ -97,10 +97,11 @@ if __name__ == '__main__':
     grids = np.meshgrid(t, x, indexing='ij')
 
     ''' Parameters of the experiment '''
-    write_csv = False
+    write_csv = True
     print_results = True
-    max_iter_number = 50
-    magnitudes = [1. * 1e-5, 1.5 * 1e-5, 2 * 1e-5, 2.5 * 1e-5, 3. * 1e-5, 3.67 * 1e-5] #
+    max_iter_number = 5
+    # magnitudes = [1. * 1e-5, 1.5 * 1e-5, 2 * 1e-5, 2.5 * 1e-5, 3. * 1e-5, 3.67 * 1e-5] #
+    magnitudes = [3. * 1e-5]
 
     terms = [('du/dx1',), ('du/dx2', 'u'), ('u',), ('du/dx2',), ('u', 'du/dx1'), ('du/dx1', 'du/dx2'), ]
     hashed_ls = [hash_term(term) for term in terms]

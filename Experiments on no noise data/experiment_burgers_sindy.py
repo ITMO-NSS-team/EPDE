@@ -152,7 +152,7 @@ if __name__ == '__main__':
         arr = np.array([differences_ls_none, time_ls, num_found_eq])
         arr = arr.T
         df = pd.DataFrame(data=arr, columns=['MAE', 'time', 'number_found_eq'])
-        df.to_csv(os.path.join(Path().absolute().parent, "data_burg_sindy", f"{title}.csv"))
+        df.to_csv(os.path.join(Path().absolute().parent, "data_pysindy_burg", f"{title}.csv"))
 
     if print_results:
         print('\nTime for every run, s:')

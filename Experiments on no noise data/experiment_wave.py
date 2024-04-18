@@ -96,9 +96,9 @@ if __name__ == '__main__':
     grids = np.meshgrid(t, x, indexing='ij')
 
     ''' Parameters of the experiment '''
-    write_csv = False
-    print_results = False
-    max_iter_number = 1
+    write_csv = True
+    print_results = True
+    max_iter_number = 50
     title = 'dfs0'
     ''''''
 
