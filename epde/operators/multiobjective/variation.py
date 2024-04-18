@@ -22,6 +22,9 @@ from epde.decorators import HistoryExtender, ResetEquationStatus
 from epde.operators.utils.template import CompoundOperator, add_base_param_to_operator
 from epde.operators.multiobjective.moeadd_specific import get_basic_populator_updater
 from epde.operators.multiobjective.mutations import get_basic_mutation
+from sympy import Mul, Symbol
+import epde.globals as global_var
+from symnet.preproc_output import get_cross_distr, to_symbolic
 
 
 class ParetoLevelsCrossover(CompoundOperator):
@@ -161,16 +164,48 @@ class EquationCrossover(CompoundOperator):
                 check_uniqueness(temp_term_2, objective[1].structure[:i] + objective[1].structure[i+1:])):                     
                 objective[0].structure[i] = temp_term_1; objective[1].structure[i] = temp_term_2
 
-        for i in range(same_num + similar_num, len(objective[0].structure)):
-            if check_uniqueness(objective[0].structure[i], objective[1].structure) and check_uniqueness(objective[1].structure[i], objective[0].structure):
-                objective[0].structure[i], objective[1].structure[i] = self.suboperators['term_crossover'].apply(objective = (objective[0].structure[i], 
-                                                                                                                              objective[1].structure[i]),
-                                                                                                                 arguments = subop_args['term_crossover'])
+        # CHECK OUT HERE!!!
+        if same_num + similar_num < len(objective[0].structure):
+            start_idx = same_num + similar_num
+            eq1_distr = self.get_equation_cross_distr(objective[0], start_idx)
+            eq2_distr = self.get_equation_cross_distr(objective[1], start_idx)
+            for _ in range(len(eq1_distr)):
+                idx0 = np.random.choice(list(eq1_distr.keys()), p=list(eq1_distr.values()))
+                idx1 = np.random.choice(list(eq2_distr.keys()), p=list(eq2_distr.values()))
+
+                if check_uniqueness(objective[0].structure[idx0], objective[1].structure) and check_uniqueness(
+                    objective[1].structure[idx1], objective[0].structure):
+
+                    objective[0].structure[idx0], objective[1].structure[idx1], recalc_distr = self.suboperators['term_crossover'].apply(
+                        objective=(objective[0].structure[idx0],objective[1].structure[idx1]),
+                        arguments=subop_args['term_crossover'])
+
+                    if recalc_distr:
+                        eq1_distr = self.get_equation_cross_distr(objective[0], start_idx)
+                        eq2_distr = self.get_equation_cross_distr(objective[1], start_idx)
+
+
+        # for i in range(same_num + similar_num, len(objective[0].structure)):
+        #     if check_uniqueness(objective[0].structure[i], objective[1].structure) and check_uniqueness(objective[1].structure[i], objective[0].structure):
+        #         objective[0].structure[i], objective[1].structure[i] = self.suboperators['term_crossover'].apply(objective = (objective[0].structure[i],
+        #                                                                                                                       objective[1].structure[i]),
+        #                                                                                                          arguments = subop_args['term_crossover'])
                 
         return objective[0], objective[1]
 
     def use_default_tags(self):
         self._tags = {'crossover', 'gene level', 'contains suboperators', 'standard'}
+
+
+    def get_equation_cross_distr(self, equation, start_idx):
+        importance_coeffs = {}
+        for i in range(start_idx, len(equation.structure)):
+            sym_term = to_symbolic(equation.structure[i])
+            importance_coeffs[sym_term] = global_var.sympool.pool_dict.get(sym_term)
+        cross_distr = get_cross_distr(importance_coeffs, start_idx, len(equation.structure))
+        return cross_distr
+
+
 
 class EquationExchangeCrossover(CompoundOperator):
     key = 'EquationExchangeCrossover'
@@ -286,12 +321,11 @@ class TermCrossover(CompoundOperator):
         
         """
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
-        
         if (np.random.uniform(0, 1) <= self.params['crossover_probability'] and 
             objective[1].descr_variable_marker == objective[0].descr_variable_marker):
-                return objective[1], objective[0]
+                return objective[1], objective[0], True
         else:
-                return objective[0], objective[1]
+                return objective[0], objective[1], False
         
     def use_default_tags(self):
         self._tags = {'crossover', 'term level', 'exploration', 'no suboperators', 'standard'}

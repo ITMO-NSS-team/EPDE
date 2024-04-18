@@ -96,9 +96,9 @@ if __name__ == '__main__':
     grids = np.meshgrid(t, x, indexing='ij')
 
     ''' Parameters of the experiment '''
-    write_csv = True
+    write_csv = False
     print_results = True
-    max_iter_number = 50
+    max_iter_number = 1
     title = 'dfs0'
 
     terms = [('u',), ('du/dx1',), ('du/dx2',), ('d^2u/dx2^2',), ('u', 'du/dx1'), ('u', 'du/dx2'), ('u', 'd^2u/dx2^2'),
@@ -131,6 +131,14 @@ if __name__ == '__main__':
         end = time.time()
         epde_search_obj.equation_search_results(only_print=True, num=4)
         time1 = end-start
+
+        # keys = list(epde_search_obj.cache[1].memory_default.keys())
+        # for i in range(4):
+        #     val = epde_search_obj.cache[1].memory_default.get(keys[i])
+        #     name = keys[i][0].replace("/", '_')
+        #     path = os.path.join(Path().absolute().parent, "data_burg", name)
+        #     np.save(path, val)
+        #     print()
 
         res = epde_search_obj.equation_search_results(only_print=False, num=4)
         difference_ls = find_coeff_diff(res, coefficients)

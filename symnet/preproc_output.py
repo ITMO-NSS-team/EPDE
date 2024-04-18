@@ -44,3 +44,33 @@ def cast_to_symbols(pool_names: list[tuple[str]]):
         term_symbolic = list(map(lambda u: Symbol(u), name))
         pool_ls.append(Mul(*term_symbolic))
     return pool_ls
+
+
+def to_symbolic(term):
+    if type(term.cache_label[0]) == tuple:
+        labels = []
+        for label in term.cache_label:
+            labels.append(str(label[0]))
+        symlabels = list(map(lambda token: Symbol(token), labels))
+        return Mul(*symlabels)
+    else:
+        return Symbol(str(term.cache_label[0]))
+
+
+def get_cross_distr(custom_cross_prob, start_idx, end_idx_exclude):
+    mmf = 2.4
+    values = list(custom_cross_prob.values())
+    csym_arr = np.fabs(np.array(values))
+
+    if np.max(csym_arr) / np.min(csym_arr) > 2.6:
+        min_max_coeff = mmf * np.min(csym_arr) - np.max(csym_arr)
+        smoothing_factor = min_max_coeff / (min_max_coeff - (mmf - 1) * np.average(csym_arr))
+        uniform_csym = np.array([np.sum(csym_arr) / len(csym_arr)] * len(csym_arr))
+
+        smoothed_array = (1 - smoothing_factor) * csym_arr + smoothing_factor * uniform_csym
+        inv = 1 / smoothed_array
+    else:
+        inv = 1 / csym_arr
+    inv_norm = inv / np.sum(inv)
+
+    return dict(zip([i for i in range(start_idx, end_idx_exclude)], inv_norm.tolist()))
