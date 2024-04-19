@@ -873,14 +873,18 @@ class SoEq(moeadd.MOEADDSolution):
         assert callable(obj_funs) or all([callable(fun) for fun in obj_funs])
         self.obj_funs = obj_funs
 
-    def matches_complexitiy(self, complexity : Union[int, list]):
+    def matches_complexitiy(self, complexity : Union[int, list, type(None)]):
         if isinstance(complexity, (int, float)):    
             complexity = [complexity,]
         
         if not isinstance(complexity, list) or len(self.vars_to_describe) != len(complexity):
             raise ValueError('Incorrect list of complexities passed.')
+        adj_complexity = copy.copy(complexity)
+        for idx, compl in enumerate(adj_complexity):
+            if compl is None:
+                adj_complexity[idx] = self.obj_fun[-len(complexity) + idx]
         
-        return list(self.obj_fun[-len(complexity):]) == complexity        
+        return list(self.obj_fun[-len(adj_complexity):]) == adj_complexity
 
     def create(self, passed_equations: list = None):
         if passed_equations is None:

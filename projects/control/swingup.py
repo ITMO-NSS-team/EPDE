@@ -233,7 +233,7 @@ def epde_discovery(t, x, angle, u, derivs, diff_method = 'FD'):
                                         OrderedDict([('power', (1, 1))]), {'power': 0}, meaningful=True)    
 
     eps = 5e-7
-    popsize = 16
+    popsize = 24
     epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=175)
 
     factors_max_number = {'factors_num' : [1, 2, 3, 4], 'probas' : [0.3, 0.3, 0.3, 0.1]}
@@ -244,7 +244,7 @@ def epde_discovery(t, x, angle, u, derivs, diff_method = 'FD'):
                         equation_terms_max_number=11, data_fun_pow = 2, derivs = [derivs['y'], derivs['phi']],
                         additional_tokens=[custom_grid_tokens, control_var_tokens, angle_trig_tokens, sgn_tokens], # , control_var_tokens, 
                         equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-8, 1e-5)) # TODO: narrow sparsity interval, reduce the population size
+                        eq_sparsity_interval=(1e-7, 1e-5)) # TODO: narrow sparsity interval, reduce the population size
     epde_search_obj.equations()
     return epde_search_obj
 

@@ -87,7 +87,7 @@ class Domain():
         else:
             grid = np.meshgrid(*var_lst, indexing='ij')
             grid = check_device(torch.tensor(np.array(grid)))
-
+        print(f'grid.shape inside Domain is {grid.shape}')
         return grid
 
 

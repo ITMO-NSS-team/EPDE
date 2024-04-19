@@ -13,8 +13,10 @@ such as initialization of neccessary token families and derivatives calculation.
 """
 import pickle
 import numpy as np
-from typing import Union, Callable
+
+from typing import Union, Callable, List
 from collections import OrderedDict
+from functools import reduce, singledispatchmethod
 
 import epde.globals as global_var
 
@@ -964,5 +966,31 @@ class EpdeSearch(object):
             raise NotImplementedError('Solution visualization is implemented only for multiobjective mode.')
             
             
-# class ExperimentCombiner(object):
-#     def 
+class ExperimentCombiner(object):
+    def __init__(self, equations: Union[ParetoLevels, List[SoEq], List[ParetoLevels]]):
+        pass
+    
+    @singledispatchmethod
+    def get_complexities(self, equations):
+        raise NotImplementedError('Incorrect type of equations to parse')
+
+    @get_complexities.register
+    def _(self, equations: List[ParetoLevels]):
+        eqs = reduce(lambda x, y: x.append(y), [self.get_complexities(pareto_level) for 
+                                                pareto_level in equations], [])
+        return eqs
+        
+    @get_complexities.register
+    def _(self, equations: ParetoLevels):
+        eqs = reduce(lambda x, y: x.append(y), [self.get_complexities(level) for 
+                                                level in equations.levels], [])
+        return eqs
+        
+    @get_complexities.register
+    def _(self, equations: List[SoEq]):
+        # Here we assume, that the number of objectives is even, having quality 
+        # and complexity for each equation
+        compl_objs_num = equations[0].obj_fun.size/2
+        return [equation.obj_fun[]]
+        # eqs = reduce(lambda x, y: x.append(y), [self.get_complexities() for 
+        #                                         level in equations.levels], [])
