@@ -176,7 +176,7 @@ class CosinePolicy(BasePolicy):
             action_space: (gym.spaces) space used for sampling
             seed: (int) random seed
         '''
-        self.action_space = Box(low=-amplitude, high=amplitude)
+        self.action_space = Box(low=-1, high=1)
         self.time_counter = 0
         self.period = period
         self.amplitude = amplitude
@@ -191,7 +191,7 @@ class CosinePolicy(BasePolicy):
             Random action
         '''
         # print(1.*self.time_counter/self.period)
-        action = np.array([self.amplitude * np.sin(2*np.pi*self.time_counter/self.period),], dtype=np.float32)
+        action = np.array([self.amplitude * self.time_counter * np.sin(2*np.pi*self.time_counter/self.period),], dtype=np.float32)
         self.time_counter += 1
         # print(f'action is {action}')
         return action
@@ -200,11 +200,11 @@ class CosinePolicy(BasePolicy):
         self.magnitude = mag        
 
 
-def epde_discovery(t, x, angle, u, diff_method = 'FD'):
+def epde_discovery(t, x, angle, u, derivs, diff_method = 'FD'):
     dimensionality = x.ndim - 1
     
     epde_search_obj = epde.EpdeSearch(use_solver = False, dimensionality = dimensionality, boundary = 30,
-                                      coordinate_tensors = [t,], verbose_params = {'show_iter_idx' : False})    
+                                      coordinate_tensors = [t,], verbose_params = {'show_iter_idx' : True})    
     
     if diff_method == 'ANN':
         epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
@@ -224,23 +224,27 @@ def epde_discovery(t, x, angle, u, diff_method = 'FD'):
     
     angle_trig_tokens = epde.CacheStoredTokens('angle_trig', ['sin(phi)', 'cos(phi)'], 
                                                {'sin(phi)' : angle_sin, 'cos(phi)' : angle_cos}, 
-                                               OrderedDict([('power', (1, 3))]), {'power': 0})
+                                               OrderedDict([('power', (1, 3))]), {'power': 0}, meaningful=True)
     control_var_tokens = epde.CacheStoredTokens('control', ['ctrl',], {'ctrl' : u}, OrderedDict([('power', (1, 1))]),
-                                                {'power': 0})
-    
+                                                {'power': 0}, meaningful=True)
+    sgn_tokens = epde.CacheStoredTokens('signum of y', ['sgn(dy)', 'sgn(ddy)'], 
+                                        {'sgn(dy)' : np.sign(derivs['y'][:, 0]),
+                                         'sgn(ddy)' : np.sign(derivs['y'][:, 1]),}, 
+                                        OrderedDict([('power', (1, 1))]), {'power': 0}, meaningful=True)    
+
     eps = 5e-7
     popsize = 16
-    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=200)
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=175)
 
     factors_max_number = {'factors_num' : [1, 2, 3, 4], 'probas' : [0.3, 0.3, 0.3, 0.1]}
 
     custom_grid_tokens = epde.GridTokens(dimensionality = dimensionality, max_power=1)
     
     epde_search_obj.fit(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,),
-                        equation_terms_max_number=11, data_fun_pow = 2, 
-                        additional_tokens=[custom_grid_tokens, control_var_tokens, angle_trig_tokens], # , control_var_tokens, 
+                        equation_terms_max_number=11, data_fun_pow = 2, derivs = [derivs['y'], derivs['phi']],
+                        additional_tokens=[custom_grid_tokens, control_var_tokens, angle_trig_tokens, sgn_tokens], # , control_var_tokens, 
                         equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-10, 1e-4))
+                        eq_sparsity_interval=(1e-8, 1e-5)) # TODO: narrow sparsity interval, reduce the population size
     epde_search_obj.equations()
     return epde_search_obj
 
@@ -278,27 +282,22 @@ def translate_equation(t, x, angle, u, derivs: dict, diff_method = 'FD'):
                                                OrderedDict([('power', (1, 3))]), {'power': 0})
     control_var_tokens = epde.CacheStoredTokens('control', ['ctrl',], {'ctrl' : u}, OrderedDict([('power', (1, 1))]),
                                                 {'power': 0})
-    sgn_tokens = epde.CacheStoredTokens('signum of y', ['sgn(y)', 'sgn(dy)', 'sgn(ddy)'], 
-                                        {'sgn(y)' : np.sign(angle), 
-                                         'sgn(dy)' : np.sign(derivs['y'][:, 0]),
+    sgn_tokens = epde.CacheStoredTokens('signum of y', ['sgn(dy)', 'sgn(ddy)'], 
+                                        {'sgn(dy)' : np.sign(derivs['y'][:, 0]),
                                          'sgn(ddy)' : np.sign(derivs['y'][:, 1]),}, 
                                         OrderedDict([('power', (1, 1))]), {'power': 0})
     
 
-    epde_search_obj.create_pool(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,),
+    epde_search_obj.create_pool(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,), derivs = [derivs['y'], derivs['phi']],
                                 additional_tokens = [angle_trig_tokens, control_var_tokens, sgn_tokens])
 
     test = epde.interface.equation_translator.CoeffLessEquation(lp_terms, rp_term, 
                                                                  epde_search_obj.pool)
-    val, target, features = test.equation.evaluate(return_val = True)
+    val, target, features = test.equation.evaluate(normalize = False, return_val = True)
     print(np.mean(val), np.mean(np.abs(val)), features.shape)
     plt.plot(target, color = 'r', label = 'Equation target')
+    plt.plot(val, '-', color = 'k', label = 'Equation discrepancy')
     plt.plot((test.equation.weights_final.reshape((1, -1))[:, :-1] @ features.T + test.equation.weights_final[-1]).reshape(-1), color = 'b', label = 'Equation features')
-    plt.grid()
-    plt.legend()
-    plt.show()
-
-    plt.plot(target, color = 'b', label = 'Equation target')
     plt.grid()
     plt.legend()
     plt.show()
@@ -312,11 +311,11 @@ if __name__ == '__main__':
                 'from_pixels': False}
     cart_env = DMCEnvWrapper(env_config)
     random_policy = RandomPolicy(cart_env.action_space)
-    cosine_policy = CosinePolicy(period=800, amplitude=0.04)
+    cosine_policy = CosinePolicy(period=200, amplitude=0.0005)
     print('action space ', cosine_policy.action_space.shape, cosine_policy.action_space.low, cosine_policy.action_space.high, cosine_policy.action_space.contains([0.]))
 
 
-    traj_obs, traj_acts, traj_rews = rollout_env(cart_env, cosine_policy, n_steps = 8000, 
+    traj_obs, traj_acts, traj_rews = rollout_env(cart_env, cosine_policy, n_steps = 1000, 
                                                  n_steps_reset=1000)
 
     def get_angle_rot(cosine, sine):
@@ -348,7 +347,6 @@ if __name__ == '__main__':
         
         x = x[1:-1] ; x_d = x_d[1:-1]; u = u[1:-1]
         derivs = {'y': np.vstack((x_d, x_dd)).T, 'phi': np.vstack((angle_d, angle_dd)).T}
-        
 
 
         plt.plot(u)
@@ -364,8 +362,6 @@ if __name__ == '__main__':
         plt.title('Inputs, angle')
         plt.show()
 
-
-
         plt.plot(x, color = 'k', label = 'Cart position.')
         plt.plot(derivs['y'][:, 0], color = 'r', label = 'Cart pos deriv, rad./s')
         plt.plot(derivs['y'][:, 1], color = 'b', label = 'Cart pos deriv, rad./s')
@@ -377,7 +373,6 @@ if __name__ == '__main__':
         plt.plot(np.cos(angle), color = 'k', label = 'Sine')
         plt.plot(np.sin(angle), color = 'r', label = 'Cosine')
 
-        # plt.plot(x, color = 'r', label = 'Cart position.')
         plt.legend()
         plt.grid()
         plt.title('Angle cosine')
@@ -389,9 +384,8 @@ if __name__ == '__main__':
         angles.append(angle)
         angles_d.append(angle_d)
         us.append(u)
-        # derivs = {'y':}
-        # print(u.shape, x.shape, t.shape, angle.shape)
-        discover = False
+
+        discover = True
         if discover:
             res = epde_discovery(t, x, angle, u, derivs, 'FD')
         else:

@@ -81,7 +81,7 @@ class Domain():
         var_lst = [i.cpu() for i in var_lst]
         if mode in ('autograd', 'NN'):
             if len(self.variable_dict) == 1:
-                grid = check_device(var_lst[0].reshape(-1, 1))
+                grid = check_device(var_lst[0].reshape(-1, 1)) # TODO: verify the correctness of mat method grids generation
             else:
                 grid = check_device(torch.cartesian_prod(*var_lst))
         else:

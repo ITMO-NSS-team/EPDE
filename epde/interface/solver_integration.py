@@ -524,41 +524,8 @@ class SystemSolverInterface(object):
 
 
 class SolverAdapter(object):
-    def __init__(self, net=None, fft_params: dict = None,
-                 use_cache: bool = True, use_fourier: bool = False): # var_number: int = 1, 
-        # dim_number = global_var.grid_cache.get('0').ndim # AM I NEEDED?
-        # print(f'dimensionality is {dim_number}')
-        
-        # if net is None:        
-        #     L_default, M_default = 4, 10
-        #     if use_fourier:
-        #         if fft_params is None:
-        #             if dim_number == 1:
-        #                fft_params = {'L' : [L_default],
-        #                              'M' : [M_default]}
-        #             else:
-        #                fft_params = {'L' : [L_default] + [None,] * (dim_number - 1), 
-        #                              'M' : [M_default] + [None,] * (dim_number - 1)}
-        #         net_default = [Fourier_embedding(**fft_params),]
-        #     else:
-        #         net_default = []        
-        #     linear_inputs = net_default[0].out_features if use_fourier else dim_number
-            
-        #     if dim_number == 1:
-        #         # FFL = Fourier_embedding(**fft_params)                
-        #         hidden_neurons = 128
-        #     else:
-                
-        #         hidden_neurons = 112
-   
-        # operators = net_default + [torch.nn.Linear(linear_inputs, hidden_neurons),
-        #                            torch.nn.Tanh(),
-        #                            torch.nn.Linear(hidden_neurons, hidden_neurons),
-        #                            torch.nn.Tanh(),
-        #                            torch.nn.Linear(hidden_neurons, hidden_neurons),
-        #                            torch.nn.Tanh(),
-        #                            torch.nn.Linear(hidden_neurons, var_number)]
-        self.net = None #torch.nn.Sequential(*operators)
+    def __init__(self, net=None, use_cache: bool = True):
+        self.net = net
         
         self._compiling_params = dict()
         self.set_compiling_params(**BASE_COMPILING_PARAMS)
@@ -584,13 +551,6 @@ class SolverAdapter(object):
     def mode(self):
         return self._compiling_params['mode']
     
-    # @property
-    # def net(self):
-    #     if self._net_specified:
-    #         return self._net
-    #     else:
-    #         raise AttributeError('Calling model before its initialization.')
-    
     @staticmethod
     def get_net(equations: SolverEquation, mode: str, domain: Domain, use_fourier = True, 
                 fft_params: dict = {'L' : [4,], 'M' : [3,]}):
@@ -611,11 +571,9 @@ class SolverAdapter(object):
                 net_default = []        
             linear_inputs = net_default[0].out_features if use_fourier else domain.dim
             
-            if domain.dim == 1:
-                # FFL = Fourier_embedding(**fft_params)                
+            if domain.dim == 1:            
                 hidden_neurons = 128
             else:
-                
                 hidden_neurons = 112
    
             operators = net_default + [torch.nn.Linear(linear_inputs, hidden_neurons),

@@ -24,7 +24,7 @@ import epde.optimizers.moeadd.solution_template as moeadd
 
 from epde.structure.encoding import Chromosome
 from epde.interface.token_family import TFPool
-from epde.decorators import HistoryExtender, ResetEquationStatus
+from epde.decorators import HistoryExtender
 from epde.supplementary import filter_powers, normalize_ts, population_sort, flatten, rts, exp_form
 from epde.structure.factor import Factor
 from epde.structure.structure_template import ComplexStructure, check_uniqueness
@@ -48,7 +48,6 @@ class Term(ComplexStructure):
     __slots__ = ['_history', 'structure', 'interelement_operator', 'saved', 'saved_as',
                  'pool', 'max_factors_in_term', 'cache_linked', 'occupied_tokens_labels',
                  '_descr_variable_marker']
-    # manual_reconst_attrs = ['structure']
 
     def __init__(self, pool, passed_term=None, mandatory_family=None, max_factors_in_term=1,
                  create_derivs: bool = False, interelement_operator=np.multiply, collapse_powers = True):
@@ -554,15 +553,16 @@ class Equation(ComplexStructure):
                 value = np.add(elem1, - reduce(lambda x, y: np.add(x, y), [np.multiply(self.weights_internal[idx_full], temp_feats[:, idx_sparse])
                                                                            for idx_sparse, idx_full in enumerate(feature_indexes)]))
                                                                            # for feature_idx, weight in np.ndenumerate(self.weights_internal)]))
-            else:
+            else:           
                 elem1 = np.expand_dims(target, axis=1)
-                if features is None:
-                    feature_list = [np.multiply(self.weights_final[idx_full], temp_feats[:, idx_sparse])
-                                    for idx_sparse, idx_full in enumerate(feature_indexes)]
+                if features is not None:
+                    features_val = reduce(lambda x, y: np.add(x, y), [np.multiply(self.weights_final[idx_full], temp_feats[:, idx_sparse])
+                                                                      for idx_sparse, idx_full in enumerate(feature_indexes)]) # Possible mistake here
+                    features_val = np.expand_dims(features_val, axis=1)
                 else:
-                    feature_list = 0               
-                value = np.add(elem1, feature_list)
-                                               
+                    features_val = np.zeros_like(target)
+                value = np.add(elem1, -  features_val)
+                print(value.shape)
             return value, target, features
         else:
             return None, target, features
