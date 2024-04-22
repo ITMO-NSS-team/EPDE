@@ -176,7 +176,7 @@ class CosinePolicy(BasePolicy):
             action_space: (gym.spaces) space used for sampling
             seed: (int) random seed
         '''
-        self.action_space = Box(low=-1, high=1)
+        self.action_space = Box(low=-10, high=10)
         self.time_counter = 0
         self.period = period
         self.amplitude = amplitude
@@ -311,11 +311,11 @@ if __name__ == '__main__':
                 'from_pixels': False}
     cart_env = DMCEnvWrapper(env_config)
     random_policy = RandomPolicy(cart_env.action_space)
-    cosine_policy = CosinePolicy(period=200, amplitude=0.0005)
+    cosine_policy = CosinePolicy(period=180, amplitude=0.007)
     print('action space ', cosine_policy.action_space.shape, cosine_policy.action_space.low, cosine_policy.action_space.high, cosine_policy.action_space.contains([0.]))
 
 
-    traj_obs, traj_acts, traj_rews = rollout_env(cart_env, cosine_policy, n_steps = 1000, 
+    traj_obs, traj_acts, traj_rews = rollout_env(cart_env, cosine_policy, n_steps = 200, 
                                                  n_steps_reset=1000)
 
     def get_angle_rot(cosine, sine):
