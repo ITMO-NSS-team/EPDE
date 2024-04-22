@@ -234,14 +234,14 @@ def epde_discovery(t, x, angle, u, derivs, diff_method = 'FD'):
 
     eps = 5e-7
     popsize = 24
-    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=175)
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=200)
 
-    factors_max_number = {'factors_num' : [1, 2, 3, 4], 'probas' : [0.3, 0.3, 0.3, 0.1]}
+    factors_max_number = {'factors_num' : [1, 2, 3,], 'probas' : [0.4, 0.45, 0.15]}
 
     custom_grid_tokens = epde.GridTokens(dimensionality = dimensionality, max_power=1)
     
     epde_search_obj.fit(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,),
-                        equation_terms_max_number=11, data_fun_pow = 2, derivs = [derivs['y'], derivs['phi']],
+                        equation_terms_max_number=10, data_fun_pow = 2, derivs = [derivs['y'], derivs['phi']],
                         additional_tokens=[custom_grid_tokens, control_var_tokens, angle_trig_tokens, sgn_tokens], # , control_var_tokens, 
                         equation_factors_max_number=factors_max_number,
                         eq_sparsity_interval=(1e-7, 1e-5)) # TODO: narrow sparsity interval, reduce the population size
@@ -311,11 +311,11 @@ if __name__ == '__main__':
                 'from_pixels': False}
     cart_env = DMCEnvWrapper(env_config)
     random_policy = RandomPolicy(cart_env.action_space)
-    cosine_policy = CosinePolicy(period=200, amplitude=0.0005)
+    cosine_policy = CosinePolicy(period=180, amplitude=0.003)
     print('action space ', cosine_policy.action_space.shape, cosine_policy.action_space.low, cosine_policy.action_space.high, cosine_policy.action_space.contains([0.]))
 
 
-    traj_obs, traj_acts, traj_rews = rollout_env(cart_env, cosine_policy, n_steps = 1000, 
+    traj_obs, traj_acts, traj_rews = rollout_env(cart_env, cosine_policy, n_steps = 250, 
                                                  n_steps_reset=1000)
 
     def get_angle_rot(cosine, sine):
