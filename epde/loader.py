@@ -172,7 +172,8 @@ def attrs_from_dict(obj, attributes, except_attrs: dict = {}):
         obj.manual_reconst(man_attr, attributes[man_attr]['elements'], except_attrs)
 
 
-def temp_pickle_save(obj : Un, not_to_pickle = [], manual_pickle = []):
+def temp_pickle_save(obj : Union[SoEq, Cache, TFPool, ParetoLevels, Population], 
+                     not_to_pickle = [], manual_pickle = []):
     loader = EPDELoader()
     pickled_obj = loader.saves(obj, not_to_pickle = [], manual_pickle = [])
     

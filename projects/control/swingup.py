@@ -233,18 +233,18 @@ def epde_discovery(t, x, angle, u, derivs, diff_method = 'FD'):
                                         OrderedDict([('power', (1, 1))]), {'power': 0}, meaningful=True)    
 
     eps = 5e-7
-    popsize = 16
-    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=175)
+    popsize = 24
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=200)
 
-    factors_max_number = {'factors_num' : [1, 2, 3, 4], 'probas' : [0.3, 0.3, 0.3, 0.1]}
+    factors_max_number = {'factors_num' : [1, 2, 3,], 'probas' : [0.2, 0.65, 0.15]}
 
     custom_grid_tokens = epde.GridTokens(dimensionality = dimensionality, max_power=1)
     
     epde_search_obj.fit(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,),
-                        equation_terms_max_number=11, data_fun_pow = 2, derivs = [derivs['y'], derivs['phi']],
+                        equation_terms_max_number=10, data_fun_pow = 2, derivs = [derivs['y'], derivs['phi']],
                         additional_tokens=[custom_grid_tokens, control_var_tokens, angle_trig_tokens, sgn_tokens], # , control_var_tokens, 
                         equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-8, 1e-5)) # TODO: narrow sparsity interval, reduce the population size
+                        eq_sparsity_interval=(1e-7, 1e-5)) # TODO: narrow sparsity interval, reduce the population size
     epde_search_obj.equations()
     return epde_search_obj
 
@@ -306,16 +306,17 @@ def translate_equation(t, x, angle, u, derivs: dict, diff_method = 'FD'):
 
 if __name__ == '__main__':
     env_config = {'domain_name': "cartpole",
-                'task_name': "swingup",
-                'frame_skip': 1,
-                'from_pixels': False}
+                  'task_name': "swingup",
+                  'frame_skip': 1,
+                  'from_pixels': False}
     cart_env = DMCEnvWrapper(env_config)
     random_policy = RandomPolicy(cart_env.action_space)
-    cosine_policy = CosinePolicy(period=180, amplitude=0.007)
-    print('action space ', cosine_policy.action_space.shape, cosine_policy.action_space.low, cosine_policy.action_space.high, cosine_policy.action_space.contains([0.]))
+    cosine_policy = CosinePolicy(period=180, amplitude=0.003)
+    print('action space ', cosine_policy.action_space.shape, cosine_policy.action_space.low,
+          cosine_policy.action_space.high, cosine_policy.action_space.contains([0.]))
 
 
-    traj_obs, traj_acts, traj_rews = rollout_env(cart_env, cosine_policy, n_steps = 200, 
+    traj_obs, traj_acts, traj_rews = rollout_env(cart_env, cosine_policy, n_steps = 250, 
                                                  n_steps_reset=1000)
 
     def get_angle_rot(cosine, sine):
@@ -372,6 +373,7 @@ if __name__ == '__main__':
 
         plt.plot(np.cos(angle), color = 'k', label = 'Sine')
         plt.plot(np.sin(angle), color = 'r', label = 'Cosine')
+        plt.plot(1 - (np.sin(angle)**2 + np.cos(angle)**2), '-', color = 'b', label = 'Trig identity check')
 
         plt.legend()
         plt.grid()

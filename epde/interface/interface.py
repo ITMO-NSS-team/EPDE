@@ -13,8 +13,11 @@ such as initialization of neccessary token families and derivatives calculation.
 """
 import pickle
 import numpy as np
-from typing import Union, Callable
+
+from copy import deepcopy
+from typing import Union, Callable, List
 from collections import OrderedDict
+from functools import reduce, singledispatchmethod
 
 import epde.globals as global_var
 
@@ -877,7 +880,7 @@ class EpdeSearch(object):
                 system_file: str = None, mode: str = 'NN', compiling_params: dict = {}, optimizer_params: dict = {},
                 cache_params: dict = {}, early_stopping_params: dict = {}, plotting_params: dict = {}, 
                 training_params: dict = {}, use_cache: bool = False, use_fourier: bool = False, 
-                fft_params: dict = None, net = None, use_adaptive_lambdas: bool = False):
+                fourier_params: dict = None, net = None, use_adaptive_lambdas: bool = False):
         '''
         Predict state by automatically solving discovered equation or system. Employs solver implementation, adapted from 
         https://github.com/ITMO-NSS-team/torch_DE_solver.  
@@ -928,8 +931,7 @@ class EpdeSearch(object):
         if grid is None:
             grid = global_var.grid_cache.get_all()[1]
         
-        adapter = SolverAdapter(net = net, fft_params = fft_params, use_cache = use_cache,
-                                use_fourier = use_fourier) # var_number = len(system.vars_to_describe), 
+        adapter = SolverAdapter(net = net, use_cache = use_cache) # var_number = len(system.vars_to_describe), 
         
         # Setting various adapater parameters
         adapter.set_compiling_params(**compiling_params)
@@ -946,16 +948,12 @@ class EpdeSearch(object):
         
         adapter.change_parameter('mode', mode, param_dict_key = 'compiling_params')
         print(f'grid.shape is {grid[0].shape}')
-        # print(f'Shape of the grid for solver {adapter.convert_grid(grid, mode = mode).shape}')        
         solution_model = adapter.solve_epde_system(system = system, grids = grid, data = data, 
                                                    boundary_conditions = boundary_conditions, 
                                                    mode = mode, use_cache = use_cache, 
+                                                   use_fourier = use_fourier, fourier_params = fourier_params,
                                                    use_adaptive_lambdas = use_adaptive_lambdas)
         return solution_model
-        # if adapter.mode == 'mat':
-            # return solution_model
-        # else:
-            # return solution_model(adapter.convert_grid(grid, mode = mode)).detach().numpy()
 
     def visualize_solutions(self, dimensions:list = [0, 1], **visulaizer_kwargs):
         if self.multiobjective_mode:
@@ -964,5 +962,58 @@ class EpdeSearch(object):
             raise NotImplementedError('Solution visualization is implemented only for multiobjective mode.')
             
             
-# class ExperimentCombiner(object):
-#     def 
+class ExperimentCombiner(object):
+    def __init__(self, candidates: Union[ParetoLevels, List[SoEq], List[ParetoLevels]]):
+        self.complexity_matched = self.get_complexities(candidates)
+        complexity_sets = [set() for i in self.complexity_matched[0][1]]
+        for eq, complexity in self.complexity_matched:
+            for idx, compl in enumerate(complexity):
+                complexity_sets[idx].add(compl)
+        self.ordered_complexities = [sorted(compl_set) for compl_set in complexity_sets]
+        
+    @singledispatchmethod
+    def get_complexities(self, candidates) -> list:
+        raise NotImplementedError('Incorrect type of equations to parse')
+
+    @get_complexities.register
+    def _(self, candidates: list) -> list:
+        if isinstance(candidates[0], ParetoLevels):
+            return reduce(lambda x, y: x.append(y), [self.get_complexities(pareto_level) for 
+                                                    pareto_level in candidates], [])
+        elif isinstance(candidates[0], SoEq):
+            # Here we assume, that the number of objectives is even, having quality 
+            # and complexity for each equation
+            compl_objs_num = candidates[0].obj_fun.size/2
+            return [(candidate, candidate.obj_fun[-compl_objs_num:]) for candidate in candidates]
+        else:
+            raise ValueError('Incorrect type of the equation')
+        
+    @get_complexities.register
+    def _(self, candidates: ParetoLevels) -> list:
+        eqs = reduce(lambda x, y: x.append(y), [self.get_complexities(level)  for 
+                                                level in candidates.levels], [])
+        return eqs
+        
+    def create_best_for_complexity(self, complexity: tuple, pool: TFPool):
+        vars_to_describe = self.complexity_matched[0][0].vars_to_describe # Get dependent variables
+        
+        best_eqs = []
+        for idx, elem in enumerate(complexity):
+            if elem is not None:
+                relaxed_compl = [None,]*len(complexity)
+                relaxed_compl[idx] = elem
+                candidates = [candidate for candidate, _ in self.complexity_matched 
+                             if candidate.matches_complexitiy(relaxed_compl)]
+                best_candidate = sorted(candidates, lambda x: x.obj_fun[idx])[0]
+                # best_eqs.append(best_candidate.vals[vars_to_describe[idx]])
+            else:
+                best_candidate = sorted([candidate for candidate, _ in self.complexity_matched], 
+                                       lambda x: x.obj_fun[idx])[0]
+            best_eqs.append(best_candidate.vals[vars_to_describe[idx]])
+        compound_equation = deepcopy(self.complexity_matched[0][0])
+        compound_equation.create(passed_equations = best_eqs)
+        return compound_equation
+    
+    def create_best(self, pool: TFPool):
+        best_qualities_compl = [complexities[-1] for complexities in self.ordered_complexities]
+        return self.create_best_for_complexity(best_qualities_compl, pool)

@@ -139,7 +139,6 @@ class ParetoLevels(object):
         Returns:
             None
         """
-        # print(f'IN MOEADD UPDATE {point.text_form}')        
         self.levels = self._update_method(point, self.levels)
         self.population.append(point)
  
