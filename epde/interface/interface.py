@@ -880,7 +880,7 @@ class EpdeSearch(object):
                 system_file: str = None, mode: str = 'NN', compiling_params: dict = {}, optimizer_params: dict = {},
                 cache_params: dict = {}, early_stopping_params: dict = {}, plotting_params: dict = {}, 
                 training_params: dict = {}, use_cache: bool = False, use_fourier: bool = False, 
-                fft_params: dict = None, net = None, use_adaptive_lambdas: bool = False):
+                fourier_params: dict = None, net = None, use_adaptive_lambdas: bool = False):
         '''
         Predict state by automatically solving discovered equation or system. Employs solver implementation, adapted from 
         https://github.com/ITMO-NSS-team/torch_DE_solver.  
@@ -931,8 +931,7 @@ class EpdeSearch(object):
         if grid is None:
             grid = global_var.grid_cache.get_all()[1]
         
-        adapter = SolverAdapter(net = net, fft_params = fft_params, use_cache = use_cache,
-                                use_fourier = use_fourier) # var_number = len(system.vars_to_describe), 
+        adapter = SolverAdapter(net = net, use_cache = use_cache) # var_number = len(system.vars_to_describe), 
         
         # Setting various adapater parameters
         adapter.set_compiling_params(**compiling_params)
@@ -952,6 +951,7 @@ class EpdeSearch(object):
         solution_model = adapter.solve_epde_system(system = system, grids = grid, data = data, 
                                                    boundary_conditions = boundary_conditions, 
                                                    mode = mode, use_cache = use_cache, 
+                                                   use_fourier = use_fourier, fourier_params = fourier_params,
                                                    use_adaptive_lambdas = use_adaptive_lambdas)
         return solution_model
 
@@ -1013,3 +1013,7 @@ class ExperimentCombiner(object):
         compound_equation = deepcopy(self.complexity_matched[0][0])
         compound_equation.create(passed_equations = best_eqs)
         return compound_equation
+    
+    def create_best(self, pool: TFPool):
+        best_qualities_compl = [complexities[-1] for complexities in self.ordered_complexities]
+        return self.create_best_for_complexity(best_qualities_compl, pool)

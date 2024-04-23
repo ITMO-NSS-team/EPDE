@@ -723,8 +723,8 @@ class SolverAdapter(object):
         return domain
 
     def solve_epde_system(self, system: SoEq, grids: list=None, boundary_conditions=None, 
-                          mode='NN', data=None, use_cache: bool = False, 
-                          use_adaptive_lambdas: bool = False):
+                          mode='NN', data=None, use_cache: bool = False, use_fourier: bool = False,
+                          fourier_params: dict = None, use_adaptive_lambdas: bool = False):
         system_interface = SystemSolverInterface(system_to_adapt=system)
 
         system_solver_forms = system_interface.form(grids = grids, mode = mode)
@@ -750,6 +750,7 @@ class SolverAdapter(object):
 
         return self.solve(equations=[form[1] for form in system_solver_forms], domain = domain,
                           boundary_conditions = bconds_combined, mode = mode, use_cache = use_cache,
+                          use_fourier = use_fourier, fourier_params = fourier_params, 
                           use_adaptive_lambdas = use_adaptive_lambdas)
 
     def solve(self, equations, domain:Domain, boundary_conditions = None, mode = 'NN', 
