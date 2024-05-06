@@ -873,7 +873,7 @@ class SoEq(moeadd.MOEADDSolution):
         assert callable(obj_funs) or all([callable(fun) for fun in obj_funs])
         self.obj_funs = obj_funs
 
-    def matches_complexitiy(self, complexity : Union[int, list, type(None)]):
+    def matches_complexitiy(self, complexity : Union[int, list]):
         if isinstance(complexity, (int, float)):    
             complexity = [complexity,]
         

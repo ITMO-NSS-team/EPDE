@@ -53,7 +53,7 @@ class ParetoLevels(object):
     
     '''
     def __init__(self, population, sorting_method = fast_non_dominated_sorting, 
-                 update_method = ndl_update, initial_sort : bool = False):
+                 update_method = ndl_update, initial_sort = False):
         """
         Args:
             population (`list`): List with the elements - canidate solutions of the case-specific subclass of 

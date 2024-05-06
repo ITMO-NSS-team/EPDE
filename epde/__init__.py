@@ -1,4 +1,4 @@
-from .interface.interface import EpdeSearch
+from .interface.interface import EpdeSearch, EpdeEnsemble
 from .interface.logger import Logger
 from .interface.equation_translator import translate_equation
 

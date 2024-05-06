@@ -200,11 +200,15 @@ class Cache(object):
 
     @property
     def g_func(self):  # , g_func: Union[Callable, type(None)] = None
-        assert '0' in self.memory_default.keys()  # Check if we are working with the grid cache
-        return self._g_func(self.get_all()[1])
+        try:
+            assert '0' in self.memory_default.keys()  # Check if we are working with the grid cache
+            return self._g_func(self.get_all()[1])
+        except TypeError:
+            assert isinstance(self._g_func, (np.ndarray, list))
+            return self._g_func
 
     @g_func.setter
-    def g_func(self, function: Callable):
+    def g_func(self, function: Union[Callable, np.ndarray, list]):
         self._g_func = function
 
     def add_base_matrix(self, label):
