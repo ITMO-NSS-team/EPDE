@@ -118,7 +118,8 @@ class InputDataEntry(object):
         elif deriv_tensors is not None and isinstance(self.data_tensor, list):
             self.data_tensor = np.concatenate(self.data_tensor, axis = 0)
 
-            self.derivatives = np.concatenate(self.derivatives, axis = 0)
+            print(f'Concatenating arrays of len {len(deriv_tensors)}')
+            self.derivatives = np.concatenate(deriv_tensors, axis = 0)
             self.deriv_properties = {'max order': max_order,
                                      'dimensionality': self.data_tensor.ndim}            
         else:
@@ -630,7 +631,8 @@ class EpdeSearch(object):
 
         self.pool_params = {'variable_names' : variable_names, 'max_deriv_order' : max_deriv_order,
                             'additional_tokens' : [family.token_family.ftype for family in additional_tokens]}
-        assert (isinstance(derivs, list) and isinstance(derivs[0], np.ndarray)) or derivs is None
+        # assert (isinstance(derivs, list) and isinstance(derivs[0], np.ndarray)) or derivs is None
+        # TODO: add better checks
         if isinstance(data, np.ndarray):
             data = [data,]
 
@@ -1052,7 +1054,7 @@ class ExperimentCombiner(object):
         best_qualities_compl = [complexities[-1] for complexities in self.ordered_complexities]
         return self.create_best_for_complexity(best_qualities_compl, pool)
     
-class EpdeEnsemble(EpdeSearch):
+class EpdeMultisample(EpdeSearch):
     def __init__(self, data_samples : List[List], multiobjective_mode: bool = True, 
                  use_default_strategy: bool = True, director=None, 
                  director_params: dict = {'variation_params': {}, 'mutation_params': {},
@@ -1349,7 +1351,7 @@ class EpdeEnsemble(EpdeSearch):
         # else:
         #     self.pool = pool; self.pool_params = cur_params
         if pool is None:
-            self.set_samples(samples, var_names = variable_names, max_deriv_orders = max_deriv_order, 
+            self.set_samples(samples, sample_derivs=derivs, var_names = variable_names, max_deriv_orders = max_deriv_order, 
                              additional_tokens = additional_tokens, data_fun_pow = data_fun_pow, deriv_fun_pow=deriv_fun_pow)
         else:
             self.pool = pool; self.pool_params = cur_params

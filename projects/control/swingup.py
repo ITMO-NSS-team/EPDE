@@ -320,8 +320,8 @@ def epde_multisample_discovery(t: List[np.ndarray], x: List[np.ndarray], angle: 
     
     print(len(t), len(x), len(angle))
     samples = [[t[i], [x[i], angle[i]]] for i in range(len(t))]    
-    epde_search_obj = epde.EpdeEnsemble(data_samples=samples, use_solver = False, dimensionality = dimensionality,
-                                        boundary = 30, verbose_params = {'show_iter_idx' : True})
+    epde_search_obj = epde.EpdeMultisample(data_samples=samples, use_solver = False, dimensionality = dimensionality,
+                                           boundary = 30, verbose_params = {'show_iter_idx' : True})
     
     if diff_method == 'ANN':
         epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
@@ -341,7 +341,8 @@ def epde_multisample_discovery(t: List[np.ndarray], x: List[np.ndarray], angle: 
     
     angle_trig_tokens = epde.CacheStoredTokens('angle_trig', ['sin(phi)', 'cos(phi)'], 
                                                {'sin(phi)' : angle_sin, 'cos(phi)' : angle_cos}, 
-                                               OrderedDict([('power', (1, 3))]), {'power': 0}, meaningful=True)
+                                               OrderedDict([('power', (1, 3))]), {'power': 0}, meaningful=True, 
+                                               unique_token_type=False, unique_specific_token=False)
     u_concat = np.concatenate(u)
     print(f'u_concat.shape is {u_concat.shape}')
     control_var_tokens = epde.CacheStoredTokens('control', ['ctrl',], {'ctrl' : u_concat}, OrderedDict([('power', (1, 1))]),
@@ -355,17 +356,17 @@ def epde_multisample_discovery(t: List[np.ndarray], x: List[np.ndarray], angle: 
 
     eps = 5e-7
     popsize = 24
-    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=200)
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=50)
 
     factors_max_number = {'factors_num' : [1, 2, 3,], 'probas' : [0.2, 0.65, 0.15]}
 
     custom_grid_tokens = epde.GridTokens(dimensionality = dimensionality, max_power=1)
 
-    epde_search_obj.fit(samples=samples, variable_names=['y', 'phi'], max_deriv_order=(2,),
-                        equation_terms_max_number=10, data_fun_pow = 2, derivs = derivs,
-                        additional_tokens=[custom_grid_tokens, control_var_tokens, angle_trig_tokens, sgn_tokens], # , control_var_tokens, 
-                        equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-7, 1e-5)) # TODO: narrow sparsity interval, reduce the population size
+    epde_search_obj.fit(samples = samples, variable_names = ['y', 'phi'], max_deriv_order = (2,),
+                        equation_terms_max_number = 15, data_fun_pow = 2, deriv_fun_pow=2, derivs = derivs,
+                        additional_tokens = [custom_grid_tokens, control_var_tokens, angle_trig_tokens, sgn_tokens], # , control_var_tokens, 
+                        equation_factors_max_number = factors_max_number,
+                        eq_sparsity_interval = (1e-7, 1e-5)) # TODO: narrow sparsity interval, reduce the population size
     epde_search_obj.equations()
     return epde_search_obj
 
