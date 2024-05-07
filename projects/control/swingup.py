@@ -21,7 +21,10 @@ from typing import List
 import gymnasium
 from gymnasium.spaces.box import Box
 from gymnasium.envs.mujoco.swimmer_v4 import SwimmerEnv
-from ray.rllib.env.wrappers.dm_control_wrapper import DMCEnv
+try:
+    from ray.rllib.env.wrappers.dm_control_wrapper import DMCEnv
+except ImportError:
+    from projects.control.ray_replacement import DMCEnv
 
 import matplotlib.pyplot as plt
 
