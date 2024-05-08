@@ -763,7 +763,8 @@ class SolverAdapter(object):
             equations_prepared = SolverEquation()
             for form in equations:
                 equations_prepared.add(form)
-        self.net = self.get_net(equations_prepared, mode, domain, use_fourier, fourier_params)
+        if self.net is None:
+            self.net = self.get_net(equations_prepared, mode, domain, use_fourier, fourier_params)
         
         
         cb_early_stops = early_stopping.EarlyStopping(**self._early_stopping_params)

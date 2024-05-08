@@ -1,11 +1,13 @@
 import numpy as np
 import torch
 
+from functools import partial
 from typing import Tuple, List, Union
 from abc import ABC, abstractmethod
 
 from epde.interface.interface import EpdeMultisample, EpdeSearch, ExperimentCombiner
- 
+from epde.interface.solver_integration import SolverAdapter, net 
+
 # Add logic of transforming control function as a fixed equation token into the  neural network 
 def get_control_nn(n_indep: int, n_dep: int, n_control: int):
     hidden_neurons = 128
@@ -29,14 +31,14 @@ class AutogradDeriv(BasicDeriv):
     def __init__(self):
         pass
 
-    def take_derivative(self, u: torch.nn.Sequential, grid: torch.Tensor, axes: List,
+    def take_derivative(self, u: torch.nn.Sequential, grid: torch.Tensor, axes: List = [],
                         component: int = 0):
         grid.requires_grad = True
-        op_vals = u(grid)[..., component]
-        for axis in axes:
-            if axis is not None:
-                op_vals = torch.autograd.gradient(outputs = op_vals, inputs = grid)
-
+        output_vals = u(grid)[..., component].sum(dim = 0)
+        for axis in axes[:-1]:
+            output_vals = output_vals.sum(dim = 0)
+            output_vals = torch.autograd.grad(outputs = output_vals, inputs = grid)[0][:, axis]
+        return output_vals
 
 
 class ControlConstraint(ABC):
@@ -110,6 +112,8 @@ class ConditionalLoss():
 
 class ControlExp():
     def __init__(self):
+        self._var_net = None
+        self._control_net = None
         pass # TODO: parameters? boundary conditions? 
 
     def train_equation(self):
@@ -118,10 +122,44 @@ class ControlExp():
         res_combiner = ExperimentCombiner(optimal_equations)
         return res_combiner.create_best(self._pool)   
 
-    def train_pinn(self, epochs: int = 1e4):
+    def train_pinn(self, bc_operators: List[], grids: torch.tensor, epochs: int = 1e4):
         t = 0
         stop_training = False
 
+
         # Make preparations for L-BFGS method use
         while t < epochs and not stop_training: # training of control function
+            def fix_control(u_net: torch.nn.Sequential, grid_args: torch.):
+                '''
+                For control function first inputs correspond to independent variables
+                while the latter ones are dependent ones. 
+
+                TODO: use functools partial or similar construction to fix the arguments of the NN. 
+                '''
+                partial()
+                return lambda x: 
+                # equation
+            adapter = SolverAdapter(net = self._var_net, use_cache = False)
+            # adapter = SolverAdapter(net = net, use_cache = use_cache) # var_number = len(system.vars_to_describe), 
             
+            # Setting various adapater parameters
+            adapter.set_compiling_params(**compiling_params)
+            
+            adapter.set_optimizer_params(**optimizer_params)
+            
+            adapter.set_cache_params(**cache_params)
+            
+            adapter.set_early_stopping_params(**early_stopping_params)
+            
+            adapter.set_plotting_params(**plotting_params)
+            
+            adapter.set_training_params(**training_params)
+            
+            adapter.change_parameter('mode', mode, param_dict_key = 'compiling_params')
+            print(f'grid.shape is {grid[0].shape}')
+            solution_model = adapter.solve_epde_system(system = system, grids = grid, data = data, 
+                                                    boundary_conditions = boundary_conditions, 
+                                                    mode = mode, use_cache = use_cache, 
+                                                    use_fourier = use_fourier, fourier_params = fourier_params,
+                                                    use_adaptive_lambdas = use_adaptive_lambdas)          
+                

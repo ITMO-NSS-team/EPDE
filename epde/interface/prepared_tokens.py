@@ -329,7 +329,7 @@ class CacheStoredTokens(CustomTokens):
         super().__init__(token_type=token_type, token_labels=token_labels, evaluator=simple_function_evaluator,
                          params_ranges=params_ranges, params_equality_ranges=params_equality_ranges,
                          dimensionality=dimensionality, unique_specific_token=unique_specific_token,
-                         unique_token_type=unique_token_type, meaningful=meaningful)
+                         unique_token_type=unique_token_type, meaningful=meaningful, non_default_power = non_default_power)
 
 
 class ExternalDerivativesTokens(CustomTokens):
