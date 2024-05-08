@@ -359,7 +359,7 @@ def epde_multisample_discovery(t: List[np.ndarray], x: List[np.ndarray], angle: 
 
     eps = 5e-7
     popsize = 24
-    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=50)
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=100)
 
     factors_max_number = {'factors_num' : [1, 2, 3,], 'probas' : [0.2, 0.65, 0.15]}
 
