@@ -991,7 +991,11 @@ class EpdeSearch(object):
                                                    use_adaptive_lambdas = use_adaptive_lambdas)
         return solution_model
 
-    def visualize_solutions(self, dimensions:list = [0, 1], **visulaizer_kwargs):
+    def visualize_solutions(self, dimensions:list = [0, 1], **visulaizer_kwargs) -> None:
+        '''
+        Plot discovered equation, using matplotlib tools. By default the method plots only the Pareto-optimal 
+        equations from the population. Furthermore, the annotate of the candidate equations are made with LaTeX toolkit. 
+        '''
         if self.multiobjective_mode:
             self.optimizer.plot_pareto(dimensions=dimensions, **visulaizer_kwargs)
         else:

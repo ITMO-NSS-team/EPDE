@@ -27,6 +27,7 @@ class ControlConstraint(ABC):
         raise NotImplementedError('Trying to call abstract constraint discrepancy evaluation.')
 
     @abstractmethod
+    def loss(self, fun_val):
 
 class ControlConstrEq(ABC):
     def __init__(self, val):
