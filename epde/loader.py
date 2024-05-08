@@ -14,7 +14,10 @@ import dill as pickle
 import time
 
 from typing import Union
-from collections import Iterable
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 
 from epde.structure.factor import Factor
 from epde.structure.main_structures import SoEq, Equation, Term 

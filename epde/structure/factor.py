@@ -10,7 +10,10 @@ import numpy as np
 import copy
 import torch
 from typing import Callable
-from collections import Iterable
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 
 import epde.globals as global_var
 from epde.structure.Tokens import TerminalToken

@@ -40,7 +40,11 @@ from functools import partial
 from typing import Union, Callable
 
 from copy import deepcopy
-from collections import OrderedDict, Iterable
+from collections import OrderedDict
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 
 
 def upload_simple_tokens(labels, cache, tensors, grid_setting=False):

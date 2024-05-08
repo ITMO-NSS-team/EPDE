@@ -9,7 +9,10 @@ Created on Mon Jul  6 15:39:18 2020
 import numpy as np
 import itertools
 from typing import Union, Callable
-from collections import Iterable
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 
 import epde.globals as global_var
 from epde.structure.factor import Factor, EvaluatorContained

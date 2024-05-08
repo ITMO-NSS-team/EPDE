@@ -13,7 +13,10 @@ import os
 import pickle
 from typing import Union, Callable
 from functools import singledispatchmethod, reduce
-from collections import Iterable
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 
 
 import numpy as np

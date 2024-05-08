@@ -8,7 +8,10 @@ Created on Tue Jul 26 13:38:20 2022
 
 import numpy as np
 from functools import reduce
-from collections import Iterable
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 
 def check_uniqueness(obj, background):
     return not any([elem == obj for elem in background])
