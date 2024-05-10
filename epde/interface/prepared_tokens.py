@@ -42,8 +42,16 @@ class ArbitraryDataFunction(PreparedTokens):
     def __init__(self, token_type: str, token_labels: list,
                  evaluator: Union[CustomEvaluator, EvaluatorTemplate, Callable],
                  params_ranges: dict, params_equality_ranges: dict = None, dimensionality: int = 1,
-                 unique_specific_token=True, unique_token_type=True, meaningful=False, non_default_power = False):
-        self._token_family = TokenFamily(token_type = )
+                 unique_specific_token=True, unique_token_type=True, meaningful=True, non_default_power = False):
+        self._token_family = TokenFamily(token_type = token_type, variable = var_name,
+                                         family_of_derivs=True)
+
+        self._token_family.set_status(demands_equation=False, meaningful=meaningful,
+                                      unique_specific_token=unique_specific_token, unique_token_type=unique_token_type,
+                                      s_and_d_merged=False, non_default_power = non_default_power)
+
+        self._token_family.set_params(token_labels, params_ranges, params_equality_ranges)                                    
+        self._token_family.set_evaluator(evaluator, [])
 
 
 class DataPolynomials(PreparedTokens):

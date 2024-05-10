@@ -418,7 +418,10 @@ class SystemSolverInterface(object):
                     if param_descr['name'] == 'power':
                         power_param_idx = param_idx
                 deriv_orders.append(factor.deriv_code)
-                deriv_powers.append(factor.params[power_param_idx])
+                if isinstance(factor.evaluator, CustomEvaluator):
+                    deriv_powers.append(factor)
+                else:
+                    deriv_powers.append(factor.params[power_param_idx])
                 try:
                     cur_deriv_var = variables.index(factor.variable)
                 except ValueError:
