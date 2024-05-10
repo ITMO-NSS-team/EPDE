@@ -38,6 +38,13 @@ class PreparedTokens(ABC):
             raise AttributeError(f'Some attributes of the token family have not been declared.')
         return self._token_family
 
+class ArbitraryDataFunction(PreparedTokens):
+    def __init__(self, token_type: str, token_labels: list,
+                 evaluator: Union[CustomEvaluator, EvaluatorTemplate, Callable],
+                 params_ranges: dict, params_equality_ranges: dict = None, dimensionality: int = 1,
+                 unique_specific_token=True, unique_token_type=True, meaningful=False, non_default_power = False):
+        self._token_family = TokenFamily(token_type = )
+
 
 class DataPolynomials(PreparedTokens):
     def __init__(self, var_name: str, max_power: int = 1):

@@ -6,7 +6,8 @@ from typing import Tuple, List, Union
 from abc import ABC, abstractmethod
 
 from epde.interface.interface import EpdeMultisample, EpdeSearch, ExperimentCombiner
-from epde.interface.solver_integration import SolverAdapter, net 
+from epde.interface.solver_integration import SolverAdapter, BOPElement 
+from epde.solver.data import Conditions
 
 # Add logic of transforming control function as a fixed equation token into the  neural network 
 def get_control_nn(n_indep: int, n_dep: int, n_control: int):
@@ -122,26 +123,40 @@ class ControlExp():
         res_combiner = ExperimentCombiner(optimal_equations)
         return res_combiner.create_best(self._pool)   
 
-    def train_pinn(self, bc_operators: List[], grids: torch.tensor, epochs: int = 1e4):
+    @staticmethod
+    def get_ode_bop(key, var, term, grid_loc, value):
+        bop = BOPElement(axis = 0, key = key, term = term, power = 1, var = var)
+        bop_grd_np = np.array([[grid_loc,]])
+        bop.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor))
+        bop.values = torch.from_numpy(np.array([[value,]])).float()
+        return bop
+
+
+    def train_pinn(self, bc_operators: List[BOPElement], grids: torch.tensor, epochs: int = 1e4, 
+                   mode: str = 'NN', compiling_params: dict = {}, optimizer_params: dict = {},
+                   cache_params: dict = {}, early_stopping_params: dict = {}, plotting_params: dict = {}, 
+                   training_params: dict = {}, use_cache: bool = False, use_fourier: bool = False, 
+                   fourier_params: dict = None, net = None, use_adaptive_lambdas: bool = False):
         t = 0
         stop_training = False
 
-
         # Make preparations for L-BFGS method use
         while t < epochs and not stop_training: # training of control function
-            def fix_control(u_net: torch.nn.Sequential, grid_args: torch.):
-                '''
-                For control function first inputs correspond to independent variables
-                while the latter ones are dependent ones. 
+            # def fix_grid_args(u_net: torch.nn.Sequential, grid_args: torch.):
+            #     '''
+            #     For control function first inputs correspond to independent variables
+            #     while the latter ones are dependent ones. 
 
-                TODO: use functools partial or similar construction to fix the arguments of the NN. 
-                '''
-                partial()
-                return lambda x: 
+            #     TODO: use functools partial or similar construction to fix the arguments of the NN. 
+            #     '''
+            #     grid_args = 
+            #     return partial(u_net, )
+                
                 # equation
             adapter = SolverAdapter(net = self._var_net, use_cache = False)
-            # adapter = SolverAdapter(net = net, use_cache = use_cache) # var_number = len(system.vars_to_describe), 
             
+            # Edit solver forms of functions of dependent variable to Callable objects.  
+
             # Setting various adapater parameters
             adapter.set_compiling_params(**compiling_params)
             
@@ -157,9 +172,10 @@ class ControlExp():
             
             adapter.change_parameter('mode', mode, param_dict_key = 'compiling_params')
             print(f'grid.shape is {grid[0].shape}')
-            solution_model = adapter.solve_epde_system(system = system, grids = grid, data = data, 
-                                                    boundary_conditions = boundary_conditions, 
-                                                    mode = mode, use_cache = use_cache, 
-                                                    use_fourier = use_fourier, fourier_params = fourier_params,
-                                                    use_adaptive_lambdas = use_adaptive_lambdas)          
+            self._var_net = adapter.solve_epde_system(system = system, grids = grid, data = data, 
+                                                      boundary_conditions = bc_operators, 
+                                                      mode = mode, use_cache = use_cache, 
+                                                      use_fourier = use_fourier, fourier_params = fourier_params,
+                                                      use_adaptive_lambdas = use_adaptive_lambdas)
+            
                 
