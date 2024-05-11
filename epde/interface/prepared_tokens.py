@@ -39,7 +39,7 @@ class PreparedTokens(ABC):
         return self._token_family
 
 class ArbitraryDataFunction(PreparedTokens):
-    def __init__(self, token_type: str, token_labels: list,
+    def __init__(self, token_type: str, var_name: str, token_labels: list,
                  evaluator: Union[CustomEvaluator, EvaluatorTemplate, Callable],
                  params_ranges: dict, params_equality_ranges: dict = None, dimensionality: int = 1,
                  unique_specific_token=True, unique_token_type=True, meaningful=True, non_default_power = False):

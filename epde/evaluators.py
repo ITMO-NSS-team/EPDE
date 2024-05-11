@@ -51,11 +51,6 @@ class CustomEvaluator(EvaluatorTemplate):
         elif isinstance(grids[0], torch.Tensor) or self._evaluation_functions_np is None:
             funcs = self._evaluation_functions_torch if self._single_function_token else self._evaluation_functions_torch[factor.label]
 
-        # if self.single_function_token:
-        #     evaluation_function = self.evaluation_functions
-        # else:
-        #     evaluation_function = self.evaluation_functions[factor.label]
-
         eval_fun_kwargs = dict()
         for key in self.eval_fun_params_labels:
             for param_idx, param_descr in factor.params_description.items():
@@ -82,7 +77,7 @@ class CustomEvaluator(EvaluatorTemplate):
         value = grid_function(self.indexes_vect)
         return value
 
-
+# TODO!
 def simple_function_evaluator(factor, structural: bool = False, grids=None, **kwargs):
     '''
 
@@ -167,27 +162,47 @@ def sign_function_evaluator(factor, structural: bool = False, grids=None, **kwar
 
 
 
-trig_eval_fun = {'cos': lambda *grids, **kwargs: np.cos(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power'],
-                 'sin': lambda *grids, **kwargs: np.sin(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power']}
+trig_eval_fun_np = {'cos': lambda *grids, **kwargs: np.cos(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power'],
+                    'sin': lambda *grids, **kwargs: np.sin(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power']}
 
-inverse_eval_fun = lambda *grids, **kwargs: np.power(grids[int(kwargs['dim'])], - kwargs['power'])
+trig_eval_fun_torch = {'cos': lambda *grids, **kwargs: torch.cos(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power'],
+                       'sin': lambda *grids, **kwargs: torch.sin(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power']}
 
-grid_eval_fun = lambda *grids, **kwargs: np.power(grids[int(kwargs['dim'])], kwargs['power'])
+inverse_eval_fun_np = lambda *grids, **kwargs: np.power(grids[int(kwargs['dim'])], - kwargs['power'])
+inverse_eval_fun_torch = lambda *grids, **kwargs: torch.pow(grids[int(kwargs['dim'])], - kwargs['power'])
 
-def phased_sine(*grids, **kwargs):
+grid_eval_fun_np = lambda *grids, **kwargs: np.power(grids[int(kwargs['dim'])], kwargs['power'])
+grid_eval_fun_torch = lambda *grids, **kwargs: torch.pow(grids[int(kwargs['dim'])], kwargs['power'])
+
+def phased_sine_np(*grids, **kwargs):
     coordwise_elems = [kwargs['freq'][dim] * 2*np.pi*(grids[dim] + kwargs['phase'][dim]) 
                        for dim in range(len(grids))]
     return np.power(np.sin(np.sum(coordwise_elems, axis = 0)), kwargs['power'])
 
-def phased_sine_1d(*grids, **kwargs):
+def phased_sine_torch(*grids, **kwargs):
+    coordwise_elems = [kwargs['freq'][dim] * 2*torch.pi*(grids[dim] + kwargs['phase'][dim]) 
+                       for dim in range(len(grids))]
+    return torch.pow(torch.sin(torch.sum(coordwise_elems, axis = 0)), kwargs['power'])    
+
+def phased_sine_1d_np(*grids, **kwargs):
     coordwise_elems = kwargs['freq'] * 2*np.pi*(grids[0] + kwargs['phase']/kwargs['freq']) 
     return np.power(np.sin(coordwise_elems), kwargs['power'])
 
-def const_eval_fun(*grids, **kwargs):
+def phased_sine_1d_torch(*grids, **kwargs):
+    coordwise_elems = kwargs['freq'] * 2*torch.pi*(grids[0] + kwargs['phase']/kwargs['freq']) 
+    return torch.pow(torch.sin(coordwise_elems), kwargs['power'])
+
+def const_eval_fun_np(*grids, **kwargs):
     return np.full_like(a=grids[0], fill_value=kwargs['value'])
 
-def const_grad_fun(*grids, **kwargs):
+def const_eval_fun_torch(*grids, **kwargs):
+    return torch.full_like(a=grids[0], fill_value=kwargs['value'])    
+
+def const_grad_fun_np(*grids, **kwargs):
     return np.zeros_like(a=grids[0])
+
+def const_grad_fun_torch(*grids, **kwargs):
+    return torch.zeros_like(a=grids[0])
 
 def get_velocity_common(*grids, **kwargs):
     a = [kwargs['p' + str(idx*3+1)] * grids[0]**2 + kwargs['p' + str(idx*3 + 2)] * grids[0] + kwargs['p' + str(idx*3 + 3)] for idx in range(5)]
@@ -268,14 +283,26 @@ vhef_grad = [vhef_grad_1, vhef_grad_2, vhef_grad_3,
              vhef_grad_10, vhef_grad_11, vhef_grad_12,
              vhef_grad_13, vhef_grad_14, vhef_grad_15]
 
-phased_sine_evaluator = CustomEvaluator(phased_sine_1d, eval_fun_params_labels=['power', 'freq', 'phase'], use_factors_grids=True)
-trigonometric_evaluator = CustomEvaluator(trig_eval_fun, eval_fun_params_labels=['freq', 'dim', 'power'], use_factors_grids=True)
-grid_evaluator = CustomEvaluator(grid_eval_fun, eval_fun_params_labels=['dim', 'power'], use_factors_grids=True)
+phased_sine_evaluator = CustomEvaluator(evaluation_functions_np = phased_sine_1d_np, 
+                                        evaluation_functions_torch = phased_sine_1d_torch,
+                                        eval_fun_params_labels = ['power', 'freq', 'phase'], use_factors_grids = True)
+trigonometric_evaluator = CustomEvaluator(evaluation_functions_np = trig_eval_fun_np,
+                                          evaluation_functions_torch = trig_eval_fun_torch,
+                                          eval_fun_params_labels=['freq', 'dim', 'power'], use_factors_grids=True)
+grid_evaluator = CustomEvaluator(evaluation_functions_np = grid_eval_fun_np,
+                                 evaluation_functions_torch = grid_eval_fun_torch,
+                                 eval_fun_params_labels=['dim', 'power'], use_factors_grids=True)
 
-inverse_function_evaluator = CustomEvaluator(inverse_eval_fun, eval_fun_params_labels=['dim', 'power'], use_factors_grids=True)
+inverse_function_evaluator = CustomEvaluator(evaluation_functions_np = inverse_eval_fun_np,
+                                             evaluation_functions_torch = inverse_eval_fun_torch,
+                                             eval_fun_params_labels=['dim', 'power'], use_factors_grids=True)
 
-const_evaluator = CustomEvaluator(const_eval_fun, ['power', 'value'])
-const_grad_evaluator = CustomEvaluator(const_grad_fun, ['power', 'value'])
+const_evaluator = CustomEvaluator(evaluation_functions_np = const_eval_fun_np,
+                                  evaluation_functions_torch = const_eval_fun_torch, 
+                                  eval_fun_params_labels = ['power', 'value'])
+const_grad_evaluator = CustomEvaluator(evaluation_functions_np = const_grad_fun_np,
+                                       evaluation_functions_torch =  const_grad_fun_np,
+                                       eval_fun_params_labels = ['power', 'value'])
 
 velocity_evaluator = CustomEvaluator(velocity_heating_eval_fun, ['p' + str(idx+1) for idx in range(15)])
 velocity_grad_evaluators = [CustomEvaluator(component, ['p' + str(idx+1) for idx in range(15)])
