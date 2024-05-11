@@ -11,7 +11,7 @@ import torch
 device = torch.device('cpu')
 
 from abc import ABC
-from typing import Callable, Union
+from typing import Callable, Union, List, Tuple
 
 import epde.globals as global_var
 from epde.supplementary import factor_params_to_str
@@ -26,25 +26,35 @@ class EvaluatorTemplate(ABC):
 
 
 class CustomEvaluator(EvaluatorTemplate):
-    def __init__(self, evaluation_functions: Union[Callable, dict],
-                 eval_fun_params_labels: Union[list, tuple, set], use_factors_grids: bool = True):
-        if isinstance(evaluation_functions, dict):
-            self.single_function_token = False
-        else:
-            self.single_function_token = True
+    def __init__(self, evaluation_functions_np: Union[Callable, dict] = None, evaluation_functions_torch: Union[Callable, dict] = None,
+                 eval_fun_params_labels: Union[list, tuple, set] = ['power'], use_factors_grids: bool = True):
+        self._evaluation_functions_np = evaluation_functions_np
+        self._evaluation_functions_torch = evaluation_functions_torch
 
-        self.evaluation_functions = evaluation_functions
+        if (evaluation_functions_np is None) and (evaluation_functions_torch is None):
+            raise ValueError('No evaluation function set in the initialization of CustomEvaluator.')
+
+        if isinstance(evaluation_functions_np, dict):
+            self._single_function_token = False
+        else:
+            self._single_function_token = True
+
         self.use_factors_grids = use_factors_grids
         self.eval_fun_params_labels = eval_fun_params_labels
 
-    def __call__(self, factor, structural: bool = False, grids: list = None, **kwargs):
+    def __call__(self, factor, grids: List[torch.Tensor, np.ndarray] = None, **kwargs): # structural: bool = False, 
         if not self.single_function_token and factor.label not in self.evaluation_functions.keys():
             raise KeyError(
                 'The label of the token function does not match keys of the evaluator functions')
-        if self.single_function_token:
-            evaluation_function = self.evaluation_functions
-        else:
-            evaluation_function = self.evaluation_functions[factor.label]
+        if isinstance(grids[0], np.ndarray) or self._evaluation_functions_torch is None:
+            funcs = self._evaluation_functions_np if self._single_function_token else self._evaluation_functions_np[factor.label]
+        elif isinstance(grids[0], torch.Tensor) or self._evaluation_functions_np is None:
+            funcs = self._evaluation_functions_torch if self._single_function_token else self._evaluation_functions_torch[factor.label]
+
+        # if self.single_function_token:
+        #     evaluation_function = self.evaluation_functions
+        # else:
+        #     evaluation_function = self.evaluation_functions[factor.label]
 
         eval_fun_kwargs = dict()
         for key in self.eval_fun_params_labels:
@@ -52,7 +62,7 @@ class CustomEvaluator(EvaluatorTemplate):
                 if param_descr['name'] == key:
                     eval_fun_kwargs[key] = factor.params[param_idx]
 
-        grid_function = np.vectorize(lambda args: evaluation_function(*args, **eval_fun_kwargs))
+        grid_function = np.vectorize(lambda args: funcs(*args, **eval_fun_kwargs))
 
         if grids is None:
             new_grid = False
