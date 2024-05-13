@@ -8,7 +8,7 @@ Created on Mon Jul  6 15:39:18 2020
 
 import numpy as np
 import itertools
-from typing import Union, Callable
+from typing import Union, Callable, List
 try:
     from collections.abc import Iterable
 except ImportError:
@@ -292,7 +292,7 @@ class TokenFamily(object):
             raise TypeError(
                 'Evaluator function or its parameters not set before evaluator application.')
 
-    def create(self, label=None, token_status: dict = None,
+    def create(self, label=None, token_status: dict = None, all_vars: List[str] = None,
                create_derivs: bool = False, **factor_params):
         """
         Method for creating element of the token family
@@ -328,7 +328,7 @@ class TokenFamily(object):
         else:
             factor_deriv_code = None
         new_factor = Factor(token_name=label, deriv_code=factor_deriv_code, status=self.status,
-                            family_type=self.ftype, variable = self.variable,
+                            family_type=self.ftype, variable = self.variable, all_vars = all_vars,
                             latex_constructor = self.latex_constructor)
 
         if self.status['unique_token_type']:
@@ -366,7 +366,7 @@ class TokenFamily(object):
                             for label in self.tokens}
         return len([token for token in self.tokens if token_status[token][0] < token_status[token][1]])
 
-    def evaluate_all(self):
+    def evaluate_all(self, all_vars: List[str]):
         """
         Apply method of evaluation for all tokens in token family
         """
@@ -383,7 +383,7 @@ class TokenFamily(object):
             for params_selection in params_sets:
                 params_sets_labeled = dict(zip(list(self.token_params.keys()), params_selection))
 
-                _, generated_token = self.create(token_label, **params_sets_labeled)
+                _, generated_token = self.create(token_label, all_vars=all_vars, **params_sets_labeled)
                 generated_token.use_cache()
                 if self.status['requires_grid']:
                     generated_token.use_grids_cache()
@@ -491,6 +491,8 @@ class TFPool(object):
                                         p=probabilities).create(label=None,
                                                                 token_status=token_status,
                                                                 create_derivs=create_derivs,
+                                                                all_vars = [family.variable for family in 
+                                                                            self.families_demand_equation], 
                                                                 **kwargs)
             else:
                 probabilities = (self.families_cardinality(False, token_status) /
@@ -499,6 +501,8 @@ class TFPool(object):
                                         p=probabilities).create(label=None,
                                                                 token_status=token_status,
                                                                 create_derivs=create_derivs,
+                                                                all_vars = [family.variable for family in 
+                                                                            self.families_demand_equation],                                                                 
                                                                 **kwargs)
         else:
             token_families = [family for family in self.families if label in family.tokens]
@@ -510,8 +514,8 @@ class TFPool(object):
                 raise Exception(
                     'Desired label does not match tokens in any family.')
             else:
-                return token_families[0].create(label=label,
-                                                token_status=token_status,
+                return token_families[0].create(label=label, token_status=token_status,
+                                                all_vars = [family.variable for family in self.families_demand_equation],
                                                 **kwargs)
 
     def create_from_family(self, family_label: str, token_status=None, **kwargs):
@@ -527,7 +531,9 @@ class TFPool(object):
         """
         # print([f.ftype for f in self.families], family_label)
         family = [f for f in self.families if family_label == f.ftype][0]
-        return family.create(label=None, token_status=token_status, **kwargs)
+        return family.create(label=None, token_status=token_status, 
+                             all_vars = [family.variable for family in self.families_demand_equation], 
+                             **kwargs)
 
     def create_with_var(self, variable: str, token_status=None, **kwargs):
         """
@@ -548,7 +554,9 @@ class TFPool(object):
             try:
                 probabilities = np.array([len(f.tokens) for f in families])
                 family = np.random.choice(families, p = probabilities/probabilities.sum())                
-                return family.create(label=None, token_status=token_status, **kwargs)
+                return family.create(label=None, token_status=token_status, 
+                                     all_vars = [family.variable for family in self.families_demand_equation],
+                                     **kwargs)
             except ValueError:
                 families.remove(family)
                 

@@ -147,12 +147,17 @@ class Cache(object):
     """
     def __init__(self):
         self.max_allowed_tensors = None
+        
         self.memory_default = {'torch' : dict(), 'numpy' : dict()} # TODO: add separate cache for torch tensors and numpy
         self.memory_normalized = {'torch' : dict(), 'numpy' : dict()}
         self.memory_structural = {'torch' : dict(), 'numpy' : dict()}
+        
         self.mem_prop_set = False 
         self.base_tensors = []  # storage of non-normalized tensors, that will not be affected by change of variables
         self.structural_and_base_merged = dict()
+        self._deriv_codes = [] # Elements of this list must be tuples with the first element - 
+                               # deriv code ([var, term]) like ([1], [0]) for dy/dt in LV, and the second - cache label in 
+                               # standard form ('dy/dx1', (1.0,))
 
     def attrs_from_dict(self, attributes, except_attrs: dict = {}):
         except_attrs['obj_type'] = None
@@ -163,10 +168,8 @@ class Cache(object):
                 self.__dict__[key] = elem
 
     def use_structural(self, use_base_data=True, label=None, replacing_data=None):
-        # print(f'Setting structural data for {label}, for it: {use_base_data} - use_base_data')
         assert use_base_data or replacing_data is not None, 'Structural data must be declared with base data or by additional tensors.'
         if label is None:
-            # self.structural_used = True
             if use_base_data:
                 self.memory_structural['numpy'] = {key: val for key, val in self.memory_default['numpy'].items()}
                 try:
@@ -194,7 +197,6 @@ class Cache(object):
                 if label not in self.memory_default['numpy'].keys():
                     self.add(label=label, tensor=replacing_data)
             else:
-                # print(self.structural_and_base_merged)
                 self.structural_and_base_merged[label] = False
                 if type(replacing_data) != np.ndarray:
                     raise TypeError('Replacing data with provided label shall be set with np.ndarray ')
@@ -271,6 +273,7 @@ class Cache(object):
             print('The memory can not containg any tensor even if it is entirely free (This message can not appear)')
 
     def clear(self, full=False):
+        self._deriv_codes = []
         if full:
             del self.memory_default, self.memory_normalized, self.memory_structural, self.base_tensors
             self.memory_default = {'torch' : dict(), 'numpy' : dict()}
@@ -301,6 +304,9 @@ class Cache(object):
         '''
         Method for addition of a new tensor into the cache. Returns True if there was enough memory and the tensor was save, and False otherwise.
         '''
+        # print(deriv_code)
+        if deriv_code is not None:
+            self._deriv_codes.append((deriv_code, label))
         assert not (normalized and structural), 'The added matrix can not be simultaneously normalized and structural. Possibly, bug in token/term saving'
         type_key = 'torch' if isinstance(tensor, torch.Tensor) else 'numpy'
         if normalized:
@@ -356,9 +362,11 @@ class Cache(object):
         except KeyError:
             pass
 
-    def get(self, label, normalized=False, structural=False, saved_as=None, torch_mode: bool = False):
+    def get(self, label, normalized=False, structural=False, saved_as=None, torch_mode: bool = False, deriv_code = None):
         assert not (normalized and structural), 'The added matrix can not be simultaneously normalized and scaled'
         type_key, other, other_bool = ('torch', 'numpy', False) if torch_mode else ('numpy', 'torch', True)
+        if deriv_code is not None:
+            label = [elem[1] for elem in self._deriv_codes if elem[0] == deriv_code]
 
         def switch_format(inp: Union[torch.Tensor, np.ndarray]):
             if isinstance(inp, np.ndarray):

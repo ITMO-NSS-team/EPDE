@@ -56,16 +56,17 @@ class EvaluatorContained(object):
 
 
 class Factor(TerminalToken):
-    __slots__ = ['_params', '_params_description', '_hash_val', '_latex_constructor',
-                 'label', 'ftype', '_variable', 'grid_set', 'grid_idx', 'is_deriv', 'deriv_code',
+    __slots__ = ['_params', '_params_description', '_hash_val', '_latex_constructor', 'label',
+                 'ftype', '_variable', '_all_vars', 'grid_set', 'grid_idx', 'is_deriv', 'deriv_code',
                  'cache_linked', '_status', 'equality_ranges', '_evaluator', 'saved']
 
     def __init__(self, token_name: str, status: dict, family_type: str, latex_constructor: Callable,
-                 variable: str = None, randomize: bool = False, params_description=None, deriv_code=None, 
-                 equality_ranges = None):
+                 variable: str = None, all_vars: list = None, randomize: bool = False, 
+                 params_description=None, deriv_code=None, equality_ranges = None):
         self.label = token_name
         self.ftype = family_type
         self._variable = variable
+        self._all_vars = all_vars
         
         self.status = status
         self.grid_set = False
@@ -225,8 +226,10 @@ class Factor(TerminalToken):
             if self.is_deriv:
                 if grids is not None:
                     raise Exception('Data-reliant tokens shall not get grids as arguments for evaluation.')
-                fun_arg = global_var.tensor_cache.get()
-                value = self._evaluator.apply(self, structural=structural, func_args=, torch_mode = torch_mode)
+                var = self._all_vars.index(self.variable)
+                # TODO: thoroughly inspect
+                fun_arg = global_var.tensor_cache.get(label=None, torch_mode=torch_mode, deriv_code=(var, self.deriv_code))
+                value = self._evaluator.apply(self, structural=structural, func_args=fun_arg, torch_mode = torch_mode)
             else:
                 value = self._evaluator.apply(self, structural=structural, func_args=grids, torch_mode = torch_mode)
             if grids is None:
