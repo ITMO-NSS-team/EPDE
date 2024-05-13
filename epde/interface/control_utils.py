@@ -105,7 +105,7 @@ class ControlConstrNEq():
         return torch.norm(discrepancy)
 
 class ConditionalLoss():
-    def __init__(self, conditions: List[Tuple[float, ControlConstraint]]):
+    def __init__(self, conditions: List[Tuple[Union[float, ControlConstraint]]]):
         self._cond = conditions
 
     def __call__(self, u: torch.nn.Sequential):

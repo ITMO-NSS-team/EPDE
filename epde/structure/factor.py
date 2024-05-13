@@ -38,7 +38,7 @@ class EvaluatorContained(object):
         self._evaluator = eval_function
         self.eval_kwargs_keys = eval_kwargs_keys
 
-    def apply(self, token, structural=False, grids=None, **kwargs):
+    def apply(self, token, structural=False, func_args=None, torch_mode=False, **kwargs):
         """
         Apply the defined evaluator to evaluate the token with specific parameters.
 
@@ -51,8 +51,8 @@ class EvaluatorContained(object):
             `TypeError`
                 If the evaluator could not be applied to the token.
         """
-        assert list(kwargs.keys()) == self.eval_kwargs_keys
-        return self._evaluator(token, structural, grids, **kwargs)
+        assert list(kwargs.keys()) == self.eval_kwargs_keys, f'Kwargs {kwargs.keys()} != {self.eval_kwargs_keys}'
+        return self._evaluator(token, structural, func_args, torch_mode = torch_mode, **kwargs)
 
 
 class Factor(TerminalToken):
@@ -210,8 +210,8 @@ class Factor(TerminalToken):
             factor_family = [family for family in evaluator.families if family.ftype == self.ftype][0]
             self._evaluator = factor_family._evaluator # TODO: fix calling private attribute
             
-    def evaluate(self, structural=False, grids=None, torch: bool = False):
-        assert self.cache_linked
+    def evaluate(self, structural=False, grids=None, torch_mode: bool = False):
+        assert self.cache_linked, 'Missing linked cache.'
         if self.is_deriv and grids is not None:
             raise Exception(
                 'Derivatives have to evaluated on the initial grid')
@@ -219,14 +219,16 @@ class Factor(TerminalToken):
         key = 'structural' if structural else 'base'
         if self.saved[key] and grids is None:
             return global_var.tensor_cache.get(self.cache_label,
-                                                structural=structural, torch = torch)
-            # if (not torch) and isinstance(value, torch.Tensor):
-                
-            #     return value.
-
+                                                structural=structural, torch_mode = torch_mode)
  
         else:
-            value = self._evaluator.apply(self, structural=structural, grids=grids, torch = torch)
+            if self.is_deriv:
+                if grids is not None:
+                    raise Exception('Data-reliant tokens shall not get grids as arguments for evaluation.')
+                fun_arg = global_var.tensor_cache.get()
+                value = self._evaluator.apply(self, structural=structural, func_args=, torch_mode = torch_mode)
+            else:
+                value = self._evaluator.apply(self, structural=structural, func_args=grids, torch_mode = torch_mode)
             if grids is None:
                 if key == 'structural' and self.status['structural_and_defalut_merged']:
                     global_var.tensor_cache.use_structural(use_base_data=True)

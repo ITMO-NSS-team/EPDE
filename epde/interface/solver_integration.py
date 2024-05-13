@@ -17,6 +17,7 @@ from torch.nn import Sequential
 
 from epde.structure.main_structures import Equation, SoEq
 import epde.globals as global_var
+from epde.evaluators import CustomEvaluator
 
 from epde.solver.data import Domain, Conditions
 from epde.solver.data import Equation as SolverEquation
@@ -127,7 +128,7 @@ BASE_TRAINING_PARAMS = {
 
 class BOPElement(object):
     def __init__(self, axis: int, key: str, coeff: float = 1., term: list = [None],
-                 power: Union[List[int], int] = 1, var: Union[List[int], int] = 1, rel_location: float = 0.):
+                 power: Union[Union[List[int], int]] = 1, var: Union[List[int], int] = 1, rel_location: float = 0.):
         self.axis = axis
         self.key = key
         self.coefficient = coeff
@@ -247,7 +248,7 @@ class PregenBOperator(object):
         return self.get_max_deriv_orders(self.equation_sf, self.variables)
 
     @staticmethod
-    def get_max_deriv_orders(system_sf: List[Dict[str, Dict]], variables: List[str] = ['u',]) -> np.ndarray:
+    def get_max_deriv_orders(system_sf: List[Union[Dict[str, Dict]]], variables: List[str] = ['u',]) -> np.ndarray:
         def count_factor_order(factor_code, deriv_ax):
             if factor_code is None:
                 return 0
@@ -408,7 +409,7 @@ class SystemSolverInterface(object):
         derivs_detected = False
 
         try:
-            coeff_tensor = np.ones_like(grids[0])
+            coeff_tensor = torch.ones_like(grids[0])
             
         except KeyError:
             raise NotImplementedError('No cache implemented')
@@ -419,7 +420,11 @@ class SystemSolverInterface(object):
                         power_param_idx = param_idx
                 deriv_orders.append(factor.deriv_code)
                 if isinstance(factor.evaluator, CustomEvaluator):
-                    deriv_powers.append(factor)
+                    if factor.evaluator._single_function_token:
+                        eval_func = factor.evaluator._evaluation_functions_torch 
+                    else:
+                        eval_func = factor.evaluator._evaluation_functions_torch[factor.label]
+                    deriv_powers.append(eval_func)
                 else:
                     deriv_powers.append(factor.params[power_param_idx])
                 try:
@@ -432,7 +437,7 @@ class SystemSolverInterface(object):
                 deriv_vars.append(cur_deriv_var)
             else:
                 grid_arg = None if default_domain else grids
-                coeff_tensor = coeff_tensor * factor.evaluate(grids=grid_arg)
+                coeff_tensor = coeff_tensor * factor.evaluate(grids=grid_arg, torch_mode = True)
         if not derivs_detected:
             deriv_powers = [0]
             deriv_orders = [[None,],]

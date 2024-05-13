@@ -20,7 +20,8 @@ class EvaluatorTemplate(ABC):
     def __init__(self):
         pass
 
-    def __call__(self, factor, structural: bool = False, grids: list = None, **kwargs):
+    def __call__(self, factor, structural: bool = False, grids: list = None, 
+                 torch_mode: bool = False, **kwargs):
         raise NotImplementedError(
             'Trying to call the method of an abstract class')
 
@@ -42,16 +43,24 @@ class CustomEvaluator(EvaluatorTemplate):
         self.use_factors_grids = use_factors_grids
         self.eval_fun_params_labels = eval_fun_params_labels
 
-    def __call__(self, factor, grids: List[torch.Tensor, np.ndarray] = None, **kwargs): # structural: bool = False, 
-        if not self.single_function_token and factor.label not in self.evaluation_functions.keys():
+    def __call__(self, factor, structural: bool = False, func_args: List[Union[torch.Tensor, np.ndarray]] = None, 
+                 torch_mode: bool = False, **kwargs): # s
+        if torch_mode: # TODO: rewrite
+            torch_mode_explicit = True
+        if not self._single_function_token and factor.label not in self._evaluation_functions_np.keys():
             raise KeyError(
                 'The label of the token function does not match keys of the evaluator functions')
-        if isinstance(grids[0], np.ndarray) or self._evaluation_functions_torch is None:
-            funcs = self._evaluation_functions_np if self._single_function_token else self._evaluation_functions_np[factor.label]
-        elif isinstance(grids[0], torch.Tensor) or self._evaluation_functions_np is None:
+        if func_args is not None:
+            if isinstance(func_args[0], np.ndarray) or self._evaluation_functions_torch is None:
+                funcs = self._evaluation_functions_np if self._single_function_token else self._evaluation_functions_np[factor.label]
+            elif isinstance(func_args[0], torch.Tensor) or self._evaluation_functions_np is None or torch_mode_explicit:
+                funcs = self._evaluation_functions_torch if self._single_function_token else self._evaluation_functions_torch[factor.label]
+        elif torch_mode:
             funcs = self._evaluation_functions_torch if self._single_function_token else self._evaluation_functions_torch[factor.label]
+        else:
+            funcs = self._evaluation_functions_np if self._single_function_token else self._evaluation_functions_np[factor.label]
 
-        eval_fun_kwargs = dict()
+            eval_fun_kwargs = dict()
         for key in self.eval_fun_params_labels:
             for param_idx, param_descr in factor.params_description.items():
                 if param_descr['name'] == key:
@@ -59,9 +68,9 @@ class CustomEvaluator(EvaluatorTemplate):
 
         grid_function = np.vectorize(lambda args: funcs(*args, **eval_fun_kwargs))
 
-        if grids is None:
+        if func_args is None:
             new_grid = False
-            grids = factor.grids
+            func_args = factor.grids
         else:
             new_grid = True
         try:
@@ -69,16 +78,17 @@ class CustomEvaluator(EvaluatorTemplate):
                 raise AttributeError
             self.indexes_vect
         except AttributeError:
-            self.indexes_vect = np.empty_like(grids[0], dtype=object)
-            for tensor_idx, _ in np.ndenumerate(grids[0]):
-                self.indexes_vect[tensor_idx] = tuple([grid[tensor_idx]
-                                                       for grid in grids])
+            self.indexes_vect = np.empty_like(func_args[0], dtype=object)
+            for tensor_idx, _ in np.ndenumerate(func_args[0]):
+                self.indexes_vect[tensor_idx] = tuple([subarg[tensor_idx]
+                                                       for subarg in func_args])
 
         value = grid_function(self.indexes_vect)
         return value
 
 # TODO!
-def simple_function_evaluator(factor, structural: bool = False, grids=None, **kwargs):
+def simple_function_evaluator(factor, structural: bool = False, grids=None, 
+                              torch_mode: bool = False, **kwargs):
     '''
 
     Example of the evaluator of token values, that can be used for uploading values of stored functions from cache. Cases, when
