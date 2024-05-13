@@ -39,6 +39,7 @@ from functools import partial
 
 from typing import Union, Callable
 
+import torch
 from copy import deepcopy
 from collections import OrderedDict
 try:
@@ -146,9 +147,9 @@ class Cache(object):
     """
     def __init__(self):
         self.max_allowed_tensors = None
-        self.memory_default = dict()
-        self.memory_normalized = dict()
-        self.memory_structural = dict()
+        self.memory_default = {'torch' : dict(), 'numpy' : dict()} # TODO: add separate cache for torch tensors and numpy
+        self.memory_normalized = {'torch' : dict(), 'numpy' : dict()}
+        self.memory_structural = {'torch' : dict(), 'numpy' : dict()}
         self.mem_prop_set = False 
         self.base_tensors = []  # storage of non-normalized tensors, that will not be affected by change of variables
         self.structural_and_base_merged = dict()
@@ -270,23 +271,28 @@ class Cache(object):
     def clear(self, full=False):
         if full:
             del self.memory_default, self.memory_normalized, self.memory_structural, self.base_tensors
-            self.memory_default = dict()
-            self.memory_normalized = dict()
-            self.memory_structural = dict()
+            self.memory_default = {'torch' : dict(), 'numpy' : dict()}
+            self.memory_normalized = {'torch' : dict(), 'numpy' : dict()}
+            self.memory_structural = {'torch' : dict(), 'numpy' : dict()}
             self.base_tensors = []
         else:
-            memory_new = dict()
-            memory_new_norm = dict()
-            memory_new_structural = dict()
+            new_memory_default = {'torch' : dict(), 'numpy' : dict()}
+            new_memory_normalized = {'torch' : dict(), 'numpy' : dict()}
+            new_memory_structural = {'torch' : dict(), 'numpy' : dict()}
             for key in self.base_tensors:
-                memory_new[key] = self.memory_default[key]
-                memory_new_norm[key] = self.memory_normalized[key]
-                memory_new_structural[key] = self.memory_structural[key]
+                new_memory_default['torch'][key] = self.get(key, False, False, None, True)
+                new_memory_default['numpy'][key] = self.get(key, False, False, None, False)
+
+                new_memory_normalized['torch'][key] = self.get(key, True, False, None, True)
+                new_memory_normalized['numpy'][key] = self.get(key, True, False, None, False)
+
+                new_memory_structural['torch'][key] = self.get(key, False, True, None, True)
+                new_memory_structural['numpy'][key] = self.get(key, False, True, None, False)
 
             del self.memory_default, self.memory_normalized, self.memory_structural
-            self.memory_default = memory_new
-            self.memory_normalized = memory_new_norm
-            self.memory_structural = memory_new_structural
+            self.memory_default = new_memory_default
+            self.memory_normalized = new_memory_normalized
+            self.memory_structural = new_memory_structural
 
     def add(self, label, tensor, normalized: bool = False, structural: bool = False,
             indication: bool = False):
@@ -294,37 +300,39 @@ class Cache(object):
         Method for addition of a new tensor into the cache. Returns True if there was enough memory and the tensor was save, and False otherwise.
         '''
         assert not (normalized and structural), 'The added matrix can not be simultaneously normalized and structural. Possibly, bug in token/term saving'
+        type_key = 'torch' if isinstance(tensor, torch.Tensor) else 'numpy'
         if normalized:
             if self.max_allowed_tensors is None:
                 self.memory_usage_properties(obj_test_case=tensor, mem_for_cache_frac=5)
-            if (len(self.memory_normalized) + len(self.memory_default) + len(self.memory_structural) < self.max_allowed_tensors and
-                label not in self.memory_normalized.keys()):
-                self.memory_normalized[label] = tensor
+            if ((len(self.memory_normalized[type_key]) + len(self.memory_default[type_key]) +
+                 len(self.memory_structural[type_key])) < self.max_allowed_tensors and
+                label not in self.memory_normalized[type_key].keys()):
+                self.memory_normalized[type_key][label] = tensor
                 if indication:
                     print('Enough space for saved normalized term ', label, tensor.nbytes)
                 return True
-            elif label in self.memory_normalized.keys():
-                assert np.all(np.isclose(self.memory_normalized[label], tensor))
+            elif label in self.memory_normalized[type_key].keys():
                 if indication:
                     print('The term already present in normalized cache, no addition required', label, tensor.nbytes)
                 return True
             else:
                 if indication:
-                    print('Not enough space for term ', label, tensor.nbytes, 'Can save only', self.max_allowed_tensors, 'tensors. While already uploaded ', len(self.memory_normalized) + len(self.memory_default) + len(self.memory_structural))
+                    print('Not enough space for term ', label, tensor.nbytes, 'Can save only', self.max_allowed_tensors, 
+                          'tensors. While already uploaded ', len(self.memory_normalized) + len(self.memory_default) + len(self.memory_structural))
                 return False
         elif structural:
             raise NotImplementedError('The structural data must be added with cache.use_structural method')
         else:
             if self.max_allowed_tensors is None:
                 self.memory_usage_properties(obj_test_case=tensor, mem_for_cache_frac=5)
-            if (len(self.memory_normalized) + len(self.memory_default) + len(self.memory_structural) < self.max_allowed_tensors and
-                label not in self.memory_default.keys()):
-                self.memory_default[label] = tensor
+            if ((len(self.memory_normalized[type_key]) + len(self.memory_default[type_key]) +
+                 len(self.memory_structural[type_key])) < self.max_allowed_tensors and
+                label not in self.memory_default[type_key].keys()):
+                self.memory_default[type_key][label] = tensor
                 if indication:
                     print('Enough space for saved unnormalized term ', label, tensor.nbytes)
                 return True
-            elif label in self.memory_default.keys():
-                assert np.all(np.isclose(self.memory_default[label], tensor))
+            elif label in self.memory_default[type_key].keys():
                 if indication:
                     print('The term already present in unnormalized cache, no addition required', label, tensor.nbytes)
                 return True
@@ -346,39 +354,37 @@ class Cache(object):
         except KeyError:
             pass
 
-    def get(self, label, normalized=False, structural=False, saved_as=None):
+    def get(self, label, normalized=False, structural=False, saved_as=None, torch: bool = False):
         assert not (normalized and structural), 'The added matrix can not be simultaneously normalized and scaled'
-#        assert not scaled or self.scale_used, 'Trying to add scaled data, while the cache it not allowed to get it'
+        type_key, other, other_bool = ('torch', 'numpy', False) if torch else ('numpy', 'torch', True)
+
+        def switch_format(inp: Union[torch.Tensor, np.ndarray]):
+            if isinstance(inp, np.ndarray):
+                return torch.from_numpy(inp)
+            elif isinstance(inp, torch.Tensor):
+                return inp.detach().numpy()
+
         if label is None:
-            print(self.memory_default.keys())
-            return np.random.choice(list(self.memory_default.values()))
+            print(self.memory_default[type_key].keys())
+            return np.random.choice(list(self.memory_default[type_key].values()))
         if normalized:
-            try:
-                return self.memory_normalized[label]
-            except KeyError:
-                print('memory keys: ', self.memory_normalized.keys())
-                print('fetched label:', label, ' prev. known as ', saved_as)
-                raise KeyError('Can not fetch tensor from cache with normalied data')
+            if label not in self.memory_normalized[type_key][label]:
+                self.memory_normalized[type_key][label] = switch_format(self.get(label, normalized,
+                                                                                  structural, saved_as, other_bool))
+            return self.memory_normalized[type_key][label]
         elif structural:
-            try:
-                return self.memory_default[label] if self.structural_and_base_merged[label] else self.memory_structural[label]
-            except KeyError:
-                print('structural', structural)
-                print('self.structural_and_base_merged', self.structural_and_base_merged.keys())
-                print('self.memory_default', self.memory_default.keys())
-                if self.structural_and_base_merged[label]:
-                    print('memory keys (structural data taken from the default): ', self.memory_default.keys())
-                else:
-                    print('memory keys: ', self.memory_structural.keys())
-                print('fetched label:', label, ' prev. known as ', saved_as)
-                raise KeyError('Can not fetch tensor from cache with normalied data')
+            if self.structural_and_base_merged[label]:
+                return self.get(self, label, normalized, False, saved_as, torch)
+            else:
+                if label not in self.memory_structural[type_key][label]:
+                    self.memory_structural[type_key][label] = switch_format(self.get(label, normalized, 
+                                                                                     structural, saved_as, other_bool))
+                return self.memory_structural[type_key][label]                
         else:
-            try:
-                return self.memory_default[label]
-            except KeyError:
-                print('memory keys: ', self.memory_default.keys())
-                print('fetched label:', label, ' prev. known as ', saved_as)
-                raise KeyError('Can not fetch tensor from cache with non-normalied data')
+            if label not in self.memory_default[type_key][label]:
+                self.memory_default[type_key][label] = switch_format(self.get(label, normalized, 
+                                                                              structural, saved_as, other_bool))
+            return self.default[type_key][label]
 
     def get_all(self, normalized=False, structural=False):
         if normalized:

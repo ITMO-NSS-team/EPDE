@@ -210,8 +210,7 @@ class Factor(TerminalToken):
             factor_family = [family for family in evaluator.families if family.ftype == self.ftype][0]
             self._evaluator = factor_family._evaluator # TODO: fix calling private attribute
             
-    # Переработать/удалить __call__, т.к. его функции уже тут
-    def evaluate(self, structural=False, grids=None):
+    def evaluate(self, structural=False, grids=None, torch: bool = False):
         assert self.cache_linked
         if self.is_deriv and grids is not None:
             raise Exception(
@@ -220,9 +219,14 @@ class Factor(TerminalToken):
         key = 'structural' if structural else 'base'
         if self.saved[key] and grids is None:
             return global_var.tensor_cache.get(self.cache_label,
-                                               structural=structural)
+                                                structural=structural, torch = torch)
+            # if (not torch) and isinstance(value, torch.Tensor):
+                
+            #     return value.
+
+ 
         else:
-            value = self._evaluator.apply(self, structural=structural, grids=grids)
+            value = self._evaluator.apply(self, structural=structural, grids=grids, torch = torch)
             if grids is None:
                 if key == 'structural' and self.status['structural_and_defalut_merged']:
                     global_var.tensor_cache.use_structural(use_base_data=True)
