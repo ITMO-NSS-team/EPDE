@@ -35,24 +35,24 @@ def rts(value, sign_num: int = 5):
     return np.around(value, int(idx))
 
 
-def train_ann(grids: list, data: np.ndarray, epochs_max: int = 500):
+def train_ann(args: list, data: np.ndarray, epochs_max: int = 500):
     dim = 1 if np.any([s == 1 for s in data.shape]) and data.ndim == 2 else data.ndim
-    assert len(grids) == dim, 'Dimensionality of data does not match with passed grids.'
+    assert len(args) == dim, 'Dimensionality of data does not match with passed grids.'
     data_size = data.size
 
     model = torch.nn.Sequential(
-                torch.nn.Linear(dim, 256),
-                torch.nn.Tanh(),
-                torch.nn.Linear(256, 256),
-                torch.nn.Tanh(),
-                torch.nn.Linear(256, 64),
-                torch.nn.Tanh(),
-                torch.nn.Linear(64, 1024),
-                torch.nn.Tanh(),
-                torch.nn.Linear(1024, 1)
-            )
+                                torch.nn.Linear(dim, 256),
+                                torch.nn.Tanh(),
+                                torch.nn.Linear(256, 256),
+                                torch.nn.Tanh(),
+                                torch.nn.Linear(256, 64),
+                                torch.nn.Tanh(),
+                                torch.nn.Linear(64, 1024),
+                                torch.nn.Tanh(),
+                                torch.nn.Linear(1024, 1)
+                                )
 
-    data_grid = np.stack([grid.reshape(-1) for grid in grids])
+    data_grid = np.stack([arg.reshape(-1) for arg in args])
     grid_tensor = torch.from_numpy(data_grid).float().T
     grid_tensor.to(device)
     data = torch.from_numpy(data.reshape(-1, 1)).float()

@@ -60,7 +60,7 @@ class CustomEvaluator(EvaluatorTemplate):
         else:
             funcs = self._evaluation_functions_np if self._single_function_token else self._evaluation_functions_np[factor.label]
 
-            eval_fun_kwargs = dict()
+        eval_fun_kwargs = dict()
         for key in self.eval_fun_params_labels:
             for param_idx, param_descr in factor.params_description.items():
                 if param_descr['name'] == key:

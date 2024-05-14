@@ -25,6 +25,7 @@ import torch
 import epde.globals as global_var
 import epde.optimizers.moeadd.solution_template as moeadd
 
+from epde.evaluators import simple_function_evaluator
 from epde.structure.encoding import Chromosome
 from epde.interface.token_family import TFPool
 from epde.decorators import HistoryExtender
@@ -299,9 +300,13 @@ class Term(ComplexStructure):
 
     def contains_deriv(self, variable=None):
         if variable is None:
-            return any([factor.is_deriv and factor.deriv_code != [None,] for factor in self.structure])
+            return any([factor.is_deriv and factor.deriv_code != [None,] and
+                        factor.evaluator._evaluator == simple_function_evaluator
+                        for factor in self.structure])
         else:
-            return any([factor.variable == variable and factor.deriv_code != [None,] for factor in self.structure])
+            return any([factor.variable == variable and factor.deriv_code != [None,] and
+                        factor.evaluator._evaluator == simple_function_evaluator
+                        for factor in self.structure])
 
     def contains_variable(self, variable):
         return any([factor.variable == variable for factor in self.structure])

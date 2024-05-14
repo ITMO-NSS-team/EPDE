@@ -83,7 +83,7 @@ class ControlConstrNEq():
     '''
     Class for constrints of type $c(u, x) = f(u, x) - val < 0$
     '''
-    def __init__(self, val: Union[float, torch.Tensor], grid: torch.Tensor, deriv_method: TensorDeriv,
+    def __init__(self, val: Union[float, torch.Tensor], grid: torch.Tensor, deriv_method: BasicDeriv,
                  deriv_axes: List = [None,]):
         self._val = val
         self._grid = grid
@@ -120,6 +120,7 @@ class ControlExp():
     def train_equation(self):
         # raise NotImplementedError() # TODO: combine input samples, train equations
 
+
         res_combiner = ExperimentCombiner(optimal_equations)
         return res_combiner.create_best(self._pool)   
 
@@ -132,15 +133,19 @@ class ControlExp():
         return bop
 
 
-    def train_pinn(self, bc_operators: List[BOPElement], grids: torch.tensor, epochs: int = 1e4, 
+    def train_pinn(self, bc_operators: List[BOPElement], grids: List[torch.tensor], epochs: int = 1e4, 
                    mode: str = 'NN', compiling_params: dict = {}, optimizer_params: dict = {},
                    cache_params: dict = {}, early_stopping_params: dict = {}, plotting_params: dict = {}, 
                    training_params: dict = {}, use_cache: bool = False, use_fourier: bool = False, 
                    fourier_params: dict = None, net = None, use_adaptive_lambdas: bool = False):
         t = 0
+        min_loss = np.inf
         stop_training = False
 
-        # Make preparations for L-BFGS method use
+        control_optim_params = {'lr': 1e-2, 'max_iter': 10, 'max_eval': None, 'tolerance_grad': 1e-07,
+                                'tolerance_change': 1e-09, 'history_size': 100, 'line_search_fn': 'strong_wolfe'}
+        optimizer = torch.optim.LBFGS(**control_optim_params)
+        
         while t < epochs and not stop_training: # training of control function
             # def fix_grid_args(u_net: torch.nn.Sequential, grid_args: torch.):
             #     '''
@@ -153,29 +158,25 @@ class ControlExp():
             #     return partial(u_net, )
                 
                 # equation
-            adapter = SolverAdapter(net = self._var_net, use_cache = False)
-            
-            # Edit solver forms of functions of dependent variable to Callable objects.  
+            with SolverAdapter(net = self._var_net, use_cache = False) as adapter:
+                # Edit solver forms of functions of dependent variable to Callable objects.
+                # Setting various adapater parameters
+                adapter.set_compiling_params(**compiling_params)
+                adapter.set_optimizer_params(**optimizer_params)
+                adapter.set_cache_params(**cache_params)
+                adapter.set_early_stopping_params(**early_stopping_params)
+                adapter.set_plotting_params(**plotting_params)
+                adapter.set_training_params(**training_params)
+                adapter.change_parameter('mode', mode, param_dict_key = 'compiling_params')
 
-            # Setting various adapater parameters
-            adapter.set_compiling_params(**compiling_params)
+                print(f'grid.shape is {grids[0].shape}')
+                self._var_net = adapter.solve_epde_system(system = system, grids = grids, data = None, 
+                                                          boundary_conditions = bc_operators, 
+                                                          mode = mode, use_cache = use_cache, 
+                                                          use_fourier = use_fourier, fourier_params = fourier_params,
+                                                          use_adaptive_lambdas = use_adaptive_lambdas)
+                
             
-            adapter.set_optimizer_params(**optimizer_params)
             
-            adapter.set_cache_params(**cache_params)
-            
-            adapter.set_early_stopping_params(**early_stopping_params)
-            
-            adapter.set_plotting_params(**plotting_params)
-            
-            adapter.set_training_params(**training_params)
-            
-            adapter.change_parameter('mode', mode, param_dict_key = 'compiling_params')
-            print(f'grid.shape is {grid[0].shape}')
-            self._var_net = adapter.solve_epde_system(system = system, grids = grid, data = data, 
-                                                      boundary_conditions = bc_operators, 
-                                                      mode = mode, use_cache = use_cache, 
-                                                      use_fourier = use_fourier, fourier_params = fourier_params,
-                                                      use_adaptive_lambdas = use_adaptive_lambdas)
-            
+
                 

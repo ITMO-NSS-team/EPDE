@@ -439,10 +439,7 @@ if __name__ == '__main__':
     cosine_policy = CosinePolicy(period=180, amplitude=0.004)
     cosine_signum_policy = CosineSignPolicy(period=180, amplitude=0.002)
     two_cosine_policy = TwoCosinePolicy(180, 90, 0.002)
-    # policy = cosine_signum_policy
 
-    # print('action space ', policy.action_space.shape, policy.action_space.low,
-    #       policy.action_space.high, policy.action_space.contains([0.]))
     single_sample = False
     if single_sample:
         traj_obs, traj_acts, traj_rews = rollout_env(cart_env, two_cosine_policy, n_steps = 250, 

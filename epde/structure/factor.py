@@ -228,7 +228,7 @@ class Factor(TerminalToken):
                 if grids is not None:
                     raise Exception('Data-reliant tokens shall not get grids as arguments for evaluation.')
                 var = self._all_vars.index(self.variable)
-                # TODO: thoroughly inspect
+
                 fun_arg = global_var.tensor_cache.get(label=None, torch_mode=torch_mode, deriv_code=(var, self.deriv_code))
                 value = self.evaluator.apply(self, structural=structural, func_args=fun_arg, torch_mode=torch_mode)
             else:

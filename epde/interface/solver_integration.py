@@ -186,7 +186,7 @@ class BOPElement(object):
         if self.grid is not None:
             boundary = self.grid
         elif self.grid is None and self.location is not None:
-            _, all_grids = global_var.grid_cache.get_all()
+            _, all_grids = global_var.grid_cache.get_all(mode = 'torch')
 
             abs_loc = self.location * all_grids[0].shape[self.axis]
             if all_grids[0].ndim > 1:
@@ -330,7 +330,7 @@ class PregenBOperator(object):
             val_keys = {key: (key, (1.0,)) for key in self.variables}
 
         if grids is None:
-            _, grids = grid_cache.get_all()
+            _, grids = grid_cache.get_all(mode = 'torch')
 
         relative_bc_location = {0: (), 1: (0,), 2: (0, 1),
                                 3: (0., 0.5, 1.), 4: (0., 1/3., 2/3., 1.)}
@@ -384,9 +384,9 @@ class BoundaryConditions(object):
 
 def solver_formed_grid(training_grid=None):
     if training_grid is None:
-        keys, training_grid = global_var.grid_cache.get_all()
+        keys, training_grid = global_var.grid_cache.get_all(mode = 'torch')
     else:
-        keys, _ = global_var.grid_cache.get_all()
+        keys, _ = global_var.grid_cache.get_all(mode = 'torch')
 
     assert len(keys) == training_grid[0].ndim, 'Mismatching dimensionalities'
 
@@ -445,7 +445,7 @@ class SystemSolverInterface(object):
             deriv_powers = deriv_powers[0]
             deriv_orders = deriv_orders[0]
 
-        coeff_tensor = torch.from_numpy(coeff_tensor)
+        # coeff_tensor = torch.from_numpy(coeff_tensor)
 
         if deriv_vars == []:
             if deriv_powers != 0:
@@ -478,6 +478,8 @@ class SystemSolverInterface(object):
             grids = self.grids
             default_domain = True
         else:
+            if isinstance(grids[0], np.ndarray):
+                grids = [torch.from_numpy(subgrid) for subgrid in grids]            
             default_domain = False
         for term_idx, term in enumerate(equation.structure):
             if term_idx != equation.target_idx:
@@ -489,10 +491,9 @@ class SystemSolverInterface(object):
                     _solver_form[term.name] = self._term_solver_form(term, grids, default_domain, variables)
                     _solver_form[term.name]['coeff'] = _solver_form[term.name]['coeff'] * weight
                     _solver_form[term.name]['coeff'] = adjust_shape(_solver_form[term.name]['coeff'], mode = mode)
-                    #torch.flatten(_solver_form[term.name]['coeff']).unsqueeze(1).type(torch.FloatTensor)
 
-        free_coeff_weight = torch.from_numpy(np.full_like(a=grids[0],
-                                                          fill_value=equation.weights_final[-1]))
+        free_coeff_weight = torch.full_like(input=grids[0], fill_value=equation.weights_final[-1])
+
         free_coeff_weight = adjust_shape(free_coeff_weight, mode = mode)
         free_coeff_term = {'coeff': free_coeff_weight,
                            'term': [None],
@@ -500,7 +501,8 @@ class SystemSolverInterface(object):
                            'var': [0,]}
         _solver_form['C'] = free_coeff_term
 
-        target_weight = torch.from_numpy(np.full_like(a=grids[0], fill_value=-1.))
+        target_weight = torch.full_like(input = grids[0], fill_value = -1.)
+
         target_form = self._term_solver_form(equation.structure[equation.target_idx], grids, default_domain, variables)
         target_form['coeff'] = target_form['coeff'] * target_weight
         target_form['coeff'] = adjust_shape(target_form['coeff'], mode = mode)
@@ -512,11 +514,15 @@ class SystemSolverInterface(object):
 
     def use_grids(self, grids=None):
         if grids is None and self.grids is None:
-            _, self.grids = global_var.grid_cache.get_all()
+            _, self.grids = global_var.grid_cache.get_all(mode = 'torch')
         elif grids is not None:
-            if len(grids) != len(global_var.grid_cache.get_all()[1]):
+            if len(grids) != len(global_var.grid_cache.get_all(mode = 'torch')[1]):
+                print(f'len(grids) {len(grids)} does not match len of cached grids \
+                    {len(global_var.grid_cache.get_all(mode = 'torch')[1])}')
                 raise ValueError(
                     'Number of passed grids does not match the problem')
+            if isinstance(grids[0], np.ndarray):
+                grids = [torch.from_numpy(subgrid) for subgrid in grids]
             self.grids = grids
             
 
@@ -750,9 +756,9 @@ class SolverAdapter(object):
                                      value = cond['bnd_val'])
 
         if grids is None:
-            grid_var_keys, grids = global_var.grid_cache.get_all()
+            grid_var_keys, grids = global_var.grid_cache.get_all(mode = 'torch')
         else:
-            grid_var_keys, _ = global_var.grid_cache.get_all()
+            grid_var_keys, _ = global_var.grid_cache.get_all(mode = 'torch')
 
         domain = self.create_domain(grid_var_keys, grids)
 

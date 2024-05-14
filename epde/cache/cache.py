@@ -106,6 +106,11 @@ def prepare_var_tensor(var_tensor, derivs_tensor, time_axis):
                                                          source=time_axis, destination=0)
     return result
 
+def switch_format(inp: Union[torch.Tensor, np.ndarray]):
+    if isinstance(inp, np.ndarray):
+        return torch.from_numpy(inp)
+    elif isinstance(inp, torch.Tensor):
+        return inp.detach().numpy()
 
 def download_variable(var_filename, deriv_filename, time_axis):
     """
@@ -137,6 +142,7 @@ class Cache(object):
         self.memory_default = {'torch' : dict(), 'numpy' : dict()} # TODO: add separate cache for torch tensors and numpy
         self.memory_normalized = {'torch' : dict(), 'numpy' : dict()}
         self.memory_structural = {'torch' : dict(), 'numpy' : dict()}
+        self.memory_anns = dict()
         
         self.mem_prop_set = False 
         self.base_tensors = []  # storage of non-normalized tensors, that will not be affected by change of variables
@@ -354,12 +360,6 @@ class Cache(object):
         if deriv_code is not None:
             label = [elem[1] for elem in self._deriv_codes if elem[0] == deriv_code]
 
-        def switch_format(inp: Union[torch.Tensor, np.ndarray]):
-            if isinstance(inp, np.ndarray):
-                return torch.from_numpy(inp)
-            elif isinstance(inp, torch.Tensor):
-                return inp.detach().numpy()
-
         if label is None:
             print(self.memory_default[type_key].keys())
             return np.random.choice(list(self.memory_default[type_key].values()))
@@ -383,18 +383,27 @@ class Cache(object):
             return self.memory_default[type_key][label]
 
     def get_all(self, normalized=False, structural=False, mode: str = 'numpy'):
+        other = 'torch' if mode is 'numpy' else 'numpy'
         if normalized:
             processed_mem = self.memory_normalized[mode]
+            other_mem = self.memory_normalized[other]
         elif structural:
             processed_mem = self.memory_structural[mode]
+            other_mem = self.memory_structural[other]
         else:
             processed_mem = self.memory_default[mode]
+            other_mem = self.memory_default[other]
 
         keys = []
         tensors = []
         for key, value in processed_mem.items():
             keys.append(key)
             tensors.append(value)
+
+        for key, value in other_mem.items():
+            if key not in processed_mem.keys():
+                keys.append(key)
+                tensors.append(switch_format(value))
 
         return keys, tensors
 
