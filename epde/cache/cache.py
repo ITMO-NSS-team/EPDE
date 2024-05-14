@@ -15,20 +15,6 @@ The recommended way to declare the cache object isto declare it as a global vari
 
 '''
 
-"""
-This is an example of Google style.
-
-Args:
-    param1: This is the first param.
-    param2: This is a second param.
-
-Returns:
-    This is a description of what is returned.
-
-Raises:
-    KeyError: Raises an exception.
-"""
-
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 

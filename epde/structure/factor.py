@@ -18,6 +18,7 @@ except ImportError:
 import epde.globals as global_var
 from epde.structure.Tokens import TerminalToken
 from epde.supplementary import factor_params_to_str, train_ann, use_ann_to_predict, exp_form
+from epde.evaluators import simple_function_evaluator
 
 class EvaluatorContained(object):
     """
@@ -223,15 +224,15 @@ class Factor(TerminalToken):
                                                 structural=structural, torch_mode = torch_mode)
  
         else:
-            if self.is_deriv:
+            if self.is_deriv and self.evaluator._evaluator != simple_function_evaluator:
                 if grids is not None:
                     raise Exception('Data-reliant tokens shall not get grids as arguments for evaluation.')
                 var = self._all_vars.index(self.variable)
                 # TODO: thoroughly inspect
                 fun_arg = global_var.tensor_cache.get(label=None, torch_mode=torch_mode, deriv_code=(var, self.deriv_code))
-                value = self._evaluator.apply(self, structural=structural, func_args=fun_arg, torch_mode = torch_mode)
+                value = self.evaluator.apply(self, structural=structural, func_args=fun_arg, torch_mode=torch_mode)
             else:
-                value = self._evaluator.apply(self, structural=structural, func_args=grids, torch_mode = torch_mode)
+                value = self.evaluator.apply(self, structural=structural, func_args=grids, torch_mode=torch_mode)
             if grids is None:
                 if key == 'structural' and self.status['structural_and_defalut_merged']:
                     global_var.tensor_cache.use_structural(use_base_data=True)
@@ -240,8 +241,13 @@ class Factor(TerminalToken):
                                                            label=self.cache_label,
                                                            replacing_data=value)
                 else:
-                    self.saved[key] = global_var.tensor_cache.add(self.cache_label, value,
-                                                                  structural=False)
+                    if self.is_deriv and self.evaluator._evaluator == simple_function_evaluator:
+                        full_deriv_code = (self._all_vars.index(self.variable), self.deriv_code) 
+                    else:
+                        full_deriv_code = None
+                    # var = 
+                    self.saved[key] = global_var.tensor_cache.add(self.cache_label, value, structural=False, 
+                                                                  deriv_code=full_deriv_code)
             return value
 
     @property

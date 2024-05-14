@@ -17,7 +17,7 @@ from torch.nn import Sequential
 
 from epde.structure.main_structures import Equation, SoEq
 import epde.globals as global_var
-from epde.evaluators import CustomEvaluator
+from epde.evaluators import CustomEvaluator, simple_function_evaluator
 
 from epde.solver.data import Domain, Conditions
 from epde.solver.data import Equation as SolverEquation
@@ -419,7 +419,7 @@ class SystemSolverInterface(object):
                     if param_descr['name'] == 'power':
                         power_param_idx = param_idx
                 deriv_orders.append(factor.deriv_code)
-                if isinstance(factor.evaluator, CustomEvaluator):
+                if factor.evaluator._evaluator != simple_function_evaluator:
                     if factor.evaluator._single_function_token:
                         eval_func = factor.evaluator._evaluation_functions_torch 
                     else:

@@ -118,17 +118,19 @@ def simple_function_evaluator(factor, structural: bool = False, grids=None,
     if grids is not None:
         # base_val = global_var.tensor_cache.get(factor.cache_label, structural=structural)
 
-        value = factor.predict_with_ann(grids)
+        value = factor.predict_with_ann(grids) # Modify in accordance to tensors
         value = value**(factor.params[power_param_idx])
+
         return value
 
     else:
         if factor.params[power_param_idx] == 1:
-            value = global_var.tensor_cache.get(factor.cache_label, structural=structural)
+            value = global_var.tensor_cache.get(factor.cache_label, structural = structural, torch_mode = torch_mode)
             return value
         else:
-            value = global_var.tensor_cache.get(factor_params_to_str(factor, set_default_power=True, power_idx=power_param_idx),
-                                                structural=structural)
+            value = global_var.tensor_cache.get(factor_params_to_str(factor, set_default_power = True, 
+                                                                     power_idx = power_param_idx),
+                                                structural = structural, torch_mode = torch_mode)
             value = value**(factor.params[power_param_idx])
             return value
 
