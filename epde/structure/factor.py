@@ -35,11 +35,11 @@ class EvaluatorContained(object):
             apply the defined evaluator to evaluate the token with specific parameters
     """
 
-    def __init__(self, eval_function, eval_kwargs_keys={}):
+    def __init__(self, eval_function): # , eval_kwargs_keys={}
         self._evaluator = eval_function
-        self.eval_kwargs_keys = eval_kwargs_keys
+        # self.eval_kwargs_keys = eval_kwargs_keys
 
-    def apply(self, token, structural=False, func_args=None, torch_mode=False, **kwargs):
+    def apply(self, token, structural=False, func_args=None, torch_mode=False): # , **kwargs
         """
         Apply the defined evaluator to evaluate the token with specific parameters.
 
@@ -52,8 +52,8 @@ class EvaluatorContained(object):
             `TypeError`
                 If the evaluator could not be applied to the token.
         """
-        assert list(kwargs.keys()) == self.eval_kwargs_keys, f'Kwargs {kwargs.keys()} != {self.eval_kwargs_keys}'
-        return self._evaluator(token, structural, func_args, torch_mode = torch_mode, **kwargs)
+        # assert list(kwargs.keys()) == self.eval_kwargs_keys, f'Kwargs {kwargs.keys()} != {self.eval_kwargs_keys}'
+        return self._evaluator(token, structural, func_args, torch_mode = torch_mode)
 
 
 class Factor(TerminalToken):

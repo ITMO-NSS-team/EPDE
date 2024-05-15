@@ -517,8 +517,8 @@ class SystemSolverInterface(object):
             _, self.grids = global_var.grid_cache.get_all(mode = 'torch')
         elif grids is not None:
             if len(grids) != len(global_var.grid_cache.get_all(mode = 'torch')[1]):
-                print(f'len(grids) {len(grids)} does not match len of cached grids \
-                    {len(global_var.grid_cache.get_all(mode = 'torch')[1])}')
+                # print(f'len(grids) {len(grids)} does not match len of cached grids \
+                #     {len(global_var.grid_cache.get_all(mode = 'torch')[1])}')
                 raise ValueError(
                     'Number of passed grids does not match the problem')
             if isinstance(grids[0], np.ndarray):

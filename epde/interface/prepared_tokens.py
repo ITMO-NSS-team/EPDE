@@ -42,7 +42,11 @@ class ArbitraryDataFunction(PreparedTokens):
     def __init__(self, token_type: str, var_name: str, token_labels: list,
                  evaluator: Union[CustomEvaluator, EvaluatorTemplate, Callable],
                  params_ranges: dict, params_equality_ranges: dict = None, dimensionality: int = 1,
-                 unique_specific_token=True, unique_token_type=True, meaningful=True, non_default_power = False):
+                 unique_specific_token=True, unique_token_type=True, meaningful=True, non_default_power = False,
+                 deriv_solver_orders: list = [[None,],]): # Add more intuitive method of declaring solver orders
+        """
+        Class for tokens, representing arbitrary functions of the modelled variable passed in `var_name` or its derivatives.  
+        """        
         self._token_family = TokenFamily(token_type = token_type, variable = var_name,
                                          family_of_derivs=True)
 
@@ -50,8 +54,9 @@ class ArbitraryDataFunction(PreparedTokens):
                                       unique_specific_token=unique_specific_token, unique_token_type=unique_token_type,
                                       s_and_d_merged=False, non_default_power = non_default_power)
 
-        self._token_family.set_params(token_labels, params_ranges, params_equality_ranges)  
-        self._token_family.set_evaluator(evaluator, [])
+        self._token_family.set_params(token_labels, params_ranges, params_equality_ranges,
+                                      derivs_solver_orders=deriv_solver_orders)  
+        self._token_family.set_evaluator(evaluator)
 
 class DataPolynomials(PreparedTokens):
     def __init__(self, var_name: str, max_power: int = 1):
@@ -93,7 +98,7 @@ class DataPolynomials(PreparedTokens):
                                       s_and_d_merged=False, non_default_power = True)
         self._token_family.set_params([var_name,], OrderedDict([('power', (1, max_power))]), 
                                       {'power': 0}, [[None,],])
-        self._token_family.set_evaluator(simple_function_evaluator, [])
+        self._token_family.set_evaluator(simple_function_evaluator)
         
 class DataSign(PreparedTokens):
     def __init__(self, var_name: str, max_power: int = 1):
@@ -136,7 +141,7 @@ class DataSign(PreparedTokens):
                                       s_and_d_merged=False, non_default_power = True)
         self._token_family.set_params([var_name,], OrderedDict([('power', (1, max_power))]), 
                                       {'power': 0}, [[None,],])
-        self._token_family.set_evaluator(simple_function_evaluator, [])    
+        self._token_family.set_evaluator(simple_function_evaluator)    
 
 
 class TrigonometricTokens(PreparedTokens):
@@ -187,7 +192,7 @@ class TrigonometricTokens(PreparedTokens):
         trig_equal_params = {'power': 0, 'freq': (freq[1] - freq[0]) / freq_equality_fraction,
                              'dim': 0}
         self._token_family.set_params(['sin', 'cos'], trig_token_params, trig_equal_params)
-        self._token_family.set_evaluator(trigonometric_evaluator, [])
+        self._token_family.set_evaluator(trigonometric_evaluator)
 
 
 class PhasedSine1DTokens(PreparedTokens):
@@ -225,7 +230,7 @@ class PhasedSine1DTokens(PreparedTokens):
         sine_equal_params = {'power': 0, 'freq': (freq[1] - freq[0]) / freq_equality_fraction,
                              'phase': 0.05}
         self._token_family.set_params(['sine',], sine_token_params, sine_equal_params)
-        self._token_family.set_evaluator(phased_sine_evaluator, [])        
+        self._token_family.set_evaluator(phased_sine_evaluator)        
 
 
 class GridTokens(PreparedTokens):
@@ -272,7 +277,7 @@ class GridTokens(PreparedTokens):
 
         grid_equal_params = {'power': 0, 'dim': 0}
         self._token_family.set_params(labels, grid_token_params, grid_equal_params)
-        self._token_family.set_evaluator(grid_evaluator, [])
+        self._token_family.set_evaluator(grid_evaluator)
 
 
 class LogfunTokens(PreparedTokens):
@@ -328,7 +333,7 @@ class CustomTokens(PreparedTokens):
                     params_equality_ranges[param_key] = 0
 
         self._token_family.set_params(token_labels, params_ranges, params_equality_ranges)
-        self._token_family.set_evaluator(evaluator, [])
+        self._token_family.set_evaluator(evaluator)
 
 
 class CacheStoredTokens(CustomTokens):
@@ -397,9 +402,9 @@ class ConstantToken(PreparedTokens):
         print('Conducting init procedure for ConstantToken:')
         self._token_family.set_params(['const'], const_token_params, const_equal_params)
         print('Parameters set')
-        self._token_family.set_evaluator(const_evaluator, [])
+        self._token_family.set_evaluator(const_evaluator)
         print('Evaluator set')
-        self._token_family.set_deriv_evaluator({'value': const_grad_evaluator}, [])
+        self._token_family.set_deriv_evaluator({'value': const_grad_evaluator})
 
 
 class VelocityHEQTokens(PreparedTokens):
@@ -421,6 +426,6 @@ class VelocityHEQTokens(PreparedTokens):
         equal_params = {'power': 0}
         equal_params.update(opt_params_equality)
         self._token_family.set_params(['v'], token_params, equal_params)
-        self._token_family.set_evaluator(velocity_evaluator, [])
+        self._token_family.set_evaluator(velocity_evaluator)
         grad_eval_labeled = {'p'+str(idx+1): fun for idx, fun in enumerate(velocity_grad_evaluators)}
         self._token_family.set_deriv_evaluator(grad_eval_labeled, [])

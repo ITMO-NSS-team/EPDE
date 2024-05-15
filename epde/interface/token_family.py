@@ -58,7 +58,7 @@ class TokenFamily(object):
         set_params(tokens, token_params)
             Method to set the list of tokens, present in the family, and their parameters;
 
-        set_evaluator(eval_function, **eval_params)
+        set_evaluator(eval_function)
             Method to set the evaluator for the token family & its parameters;
 
         test_evaluator()
@@ -155,7 +155,7 @@ class TokenFamily(object):
         if self.evaluator_set:
             self.test_evaluator()
 
-    def set_evaluator(self, eval_function, eval_kwargs_keys=[], suppress_eval_test=True):
+    def set_evaluator(self, eval_function, suppress_eval_test=True):
         """
         Define the evaluator for the token family and its parameters
 
@@ -198,14 +198,14 @@ class TokenFamily(object):
             >>>     return value
             >>> 
             >>> der_eval_params = {'token_matrices':simple_functions, 'params_names':['power'], 'params_equality':{'power' : 0}}
-            >>> trig_eval_params = {'grid':grid, 'params_names':['power',  'freq', 'dim'], 'params_equality':{'power': 0, 'freq':0.05, 'dim':0}}
-            >>> trigonometric_tokens.set_evaluator(trigonometric_evaluator, **trig_eval_params)
+            # >>> trig_eval_params = {'grid':grid, 'params_names':['power',  'freq', 'dim'], 'params_equality':{'power': 0, 'freq':0.05, 'dim':0}}
+            >>> trigonometric_tokens.set_evaluator(trigonometric_evaluator,)
 
         """
         if isinstance(eval_function, EvaluatorContained):
             self._evaluator = eval_function
         else:
-            self._evaluator = EvaluatorContained(eval_function, eval_kwargs_keys)
+            self._evaluator = EvaluatorContained(eval_function)
         self.evaluator_set = True
         if self.params_set and not suppress_eval_test:
             self.test_evaluator()

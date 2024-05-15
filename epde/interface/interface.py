@@ -179,7 +179,7 @@ class InputDataEntry(object):
                                       meaningful=True)
         self._derivs_family.set_params(self.names, OrderedDict([('power', (1, max_deriv_power))]),
                                       {'power': 0}, self.d_orders)
-        self._derivs_family.set_evaluator(simple_function_evaluator, [])
+        self._derivs_family.set_evaluator(simple_function_evaluator)
 
     def create_polynomial_family(self, max_power):
         polynomials = DataPolynomials(self.var_name, max_power = max_power)

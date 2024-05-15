@@ -383,7 +383,7 @@ class Cache(object):
             return self.memory_default[type_key][label]
 
     def get_all(self, normalized=False, structural=False, mode: str = 'numpy'):
-        other = 'torch' if mode is 'numpy' else 'numpy'
+        other = 'torch' if mode == 'numpy' else 'numpy'
         if normalized:
             processed_mem = self.memory_normalized[mode]
             other_mem = self.memory_normalized[other]
