@@ -114,7 +114,6 @@ class CompoundOperator():
         return args
 
     def _check_objective_type(method):
-        # TODO: separate into an external decorator.
         @wraps
         def wrapper(self, *args, **kwargs):
             objective = args[0]

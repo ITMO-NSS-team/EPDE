@@ -16,11 +16,11 @@ from epde.preprocessing.derivatives import preprocess_derivatives
 
 import epde.globals as global_var
 from epde.interface.token_family import TokenFamily
-from epde.evaluators import CustomEvaluator, EvaluatorTemplate, trigonometric_evaluator, simple_function_evaluator
-from epde.evaluators import const_evaluator, const_grad_evaluator, grid_evaluator
-from epde.evaluators import velocity_evaluator, velocity_grad_evaluators, phased_sine_evaluator
 from epde.cache.cache import upload_simple_tokens, prepare_var_tensor  # np_ndarray_section,
 
+from epde.evaluators import CustomEvaluator, EvaluatorTemplate, trigonometric_evaluator, \
+     simple_function_evaluator, const_evaluator, const_grad_evaluator, grid_evaluator, \
+     velocity_evaluator, velocity_grad_evaluators, phased_sine_evaluator
 
 class PreparedTokens(ABC):
     """
@@ -41,8 +41,28 @@ class PreparedTokens(ABC):
 class ArbitraryDataFunction(PreparedTokens):
     def __init__(self, token_type: str, var_name: str, token_labels: list,
                  evaluator: Union[CustomEvaluator, EvaluatorTemplate, Callable],
-                 params_ranges: dict, params_equality_ranges: dict = None, dimensionality: int = 1,
-                 unique_specific_token=True, unique_token_type=True, meaningful=True, non_default_power = False,
+                 params_ranges: dict, params_equality_ranges: dict = None, unique_specific_token=True, 
+                 unique_token_type=True, meaningful=True, non_default_power = False,
+                 deriv_solver_orders: list = [[None,],]): # Add more intuitive method of declaring solver orders
+        """
+        Class for tokens, representing arbitrary functions of the modelled variable passed in `var_name` or its derivatives.  
+        """        
+        self._token_family = TokenFamily(token_type = token_type, variable = var_name,
+                                         family_of_derivs=True)
+
+        self._token_family.set_status(demands_equation=False, meaningful=meaningful,
+                                      unique_specific_token=unique_specific_token, unique_token_type=unique_token_type,
+                                      s_and_d_merged=False, non_default_power = non_default_power)
+
+        self._token_family.set_params(token_labels, params_ranges, params_equality_ranges,
+                                      derivs_solver_orders=deriv_solver_orders)  
+        self._token_family.set_evaluator(evaluator)
+
+class DerivSignFunction(PreparedTokens):
+    def __init__(self, token_type: str, var_name: str, token_labels: list,
+                 evaluator: Union[CustomEvaluator, EvaluatorTemplate, Callable],
+                 params_ranges: dict, params_equality_ranges: dict = None, unique_specific_token=True, 
+                 unique_token_type=True, meaningful=True, non_default_power = False,
                  deriv_solver_orders: list = [[None,],]): # Add more intuitive method of declaring solver orders
         """
         Class for tokens, representing arbitrary functions of the modelled variable passed in `var_name` or its derivatives.  

@@ -95,11 +95,12 @@ class L2Fitness(CompoundOperator):
 
 
 class SolverBasedFitness(CompoundOperator):
+
     key = 'SolverBasedFitness'
     
-    def __init__(self, param_keys: list, solver_kwargs: dict = {'model' : None, 'use_cache' : True}):
+    def __init__(self, param_keys: list):
         super().__init__(param_keys)
-        solver_kwargs['dim'] = len(global_var.grid_cache.get_all()[1])
+        # solver_kwargs['dim'] = len(global_var.grid_cache.get_all()[1])
         
         self.adapter = None # SolverAdapter(var_number = len(system.vars_to_describe))
 

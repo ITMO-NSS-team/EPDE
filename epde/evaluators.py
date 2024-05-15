@@ -41,7 +41,6 @@ class CustomEvaluator(EvaluatorTemplate):
         else:
             self._single_function_token = True
 
-        # self.use_factors_grids = use_factors_grids
         self.eval_fun_params_labels = eval_fun_params_labels
 
     def __call__(self, factor, structural: bool = False, func_args: List[Union[torch.Tensor, np.ndarray]] = None, 
@@ -87,7 +86,7 @@ class CustomEvaluator(EvaluatorTemplate):
         value = grid_function(self.indexes_vect)
         return value
 
-# TODO!
+
 def simple_function_evaluator(factor, structural: bool = False, grids=None, 
                               torch_mode: bool = False, **kwargs):
     '''
@@ -115,11 +114,9 @@ def simple_function_evaluator(factor, structural: bool = False, grids=None,
     for param_idx, param_descr in factor.params_description.items():
         if param_descr['name'] == 'power':
             power_param_idx = param_idx
-            
+        
     if grids is not None:
-        # base_val = global_var.tensor_cache.get(factor.cache_label, structural=structural)
-
-        value = factor.predict_with_ann(grids) # Modify in accordance to tensors
+        value = factor.predict_with_ann(grids)
         value = value**(factor.params[power_param_idx])
 
         return value
@@ -129,52 +126,15 @@ def simple_function_evaluator(factor, structural: bool = False, grids=None,
             value = global_var.tensor_cache.get(factor.cache_label, structural = structural, torch_mode = torch_mode)
             return value
         else:
-            value = global_var.tensor_cache.get(factor_params_to_str(factor, set_default_power = True, 
+            value = global_var.tensor_cache.get(factor_params_to_str(factor, set_default_power = True,
                                                                      power_idx = power_param_idx),
                                                 structural = structural, torch_mode = torch_mode)
             value = value**(factor.params[power_param_idx])
             return value
 
-# def sign_function_evaluator(factor, structural: bool = False, args=None, **kwargs):
-#     '''
 
-#     Example of the evaluator of token values, that can be used for uploading values of stored functions from cache. Cases, when
-#     this approach can be used, include evaluating derivatives, coordinates, etc.
-
-
-#     Parameters
-#     ----------
-
-#     factor : epde.factor.Factor object,
-#         Object, that represents a factor from the equation terms, for that we want to calculate the values.
-
-#     structural : bool,
-#         Mark, if the evaluated value will be used for discovering equation structure (True), or calculating coefficients (False)
-
-#     Returns
-#     ----------
-#     value : numpy.ndarray
-#         Vector of the evaluation of the token values, that can be used as target, or feature during the LASSO regression.
-
-#     '''
-
-#     for param_idx, param_descr in factor.params_description.items():
-#         if param_descr['name'] == 'power':
-#             power_param_idx = param_idx
-            
-#     assert factor.params[power_param_idx] == 1, 'Power of sgn function token must be "1".'
-#     if grids is not None:
-#         # base_val = global_var.tensor_cache.get(factor.cache_label, structural=structural)
-
-#         value = factor.predict_with_ann(grids)
-#         return np.sign(value)
-
-#     else:
-#         value = global_var.tensor_cache.get(factor.cache_label, structural=structural)
-#         return np.sign(value)
-
-sign_eval_fun_np = lambda *args, **kwargs: np.sign(*args[int(kwargs['dim'])])
-sign_eval_fun_torch = lambda *args, **kwargs: torch.sign(*args[int(kwargs['dim'])])
+sign_eval_fun_np = lambda *args, **kwargs: np.sign(*args[0]) # Is dim argument needed here? int(kwargs['dim'])
+sign_eval_fun_torch = lambda *args, **kwargs: torch.sign(*args[0])
 
 trig_eval_fun_np = {'cos': lambda *grids, **kwargs: np.cos(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power'],
                     'sin': lambda *grids, **kwargs: np.sin(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power']}
@@ -297,9 +257,9 @@ vhef_grad = [vhef_grad_1, vhef_grad_2, vhef_grad_3,
              vhef_grad_10, vhef_grad_11, vhef_grad_12,
              vhef_grad_13, vhef_grad_14, vhef_grad_15]
 
-sign_evluator = CustomEvaluator(evaluation_functions_np=sign_eval_fun_np, 
+sign_evaluator = CustomEvaluator(evaluation_functions_np=sign_eval_fun_np, 
                                 evaluation_functions_torch=sign_eval_fun_torch, 
-                                eval_fun_params_labels = ['dim', 'power'])
+                                eval_fun_params_labels = ['power', 'dim'])
 
 phased_sine_evaluator = CustomEvaluator(evaluation_functions_np = phased_sine_1d_np, 
                                         evaluation_functions_torch = phased_sine_1d_torch,
