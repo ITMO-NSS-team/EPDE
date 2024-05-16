@@ -28,7 +28,7 @@ the population size, and *M* is the number of objective functions.
 
 from copy import deepcopy
 import numpy as np
-from abc import ABC, abstractproperty, abstractmethod
+from abc import ABC, abstractmethod
 
 from epde.supplementary import rts
 
@@ -84,7 +84,7 @@ def ndl_update(new_solution, levels) -> list:   # efficient_ndl_update
     """
     moving_set = {new_solution}
     new_levels = deepcopy(levels)  # levels# CAUSES ERRORS DUE TO DEEPCOPY
-    # print(f'type(levels) is {type(levels)}')
+
     for level_idx in np.arange(len(levels)):
         moving_set_new = set()
         for ms_idx, moving_set_elem in enumerate(moving_set):

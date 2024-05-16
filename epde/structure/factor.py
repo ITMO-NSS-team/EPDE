@@ -219,18 +219,26 @@ class Factor(TerminalToken):
                 'Derivatives have to evaluated on the initial grid')
 
         key = 'structural' if structural else 'base'
-        if self.saved[key] and grids is None:
+        if (self.cache_label, structural) in global_var.tensor_cache and grids is None:
             return global_var.tensor_cache.get(self.cache_label,
-                                                structural=structural, torch_mode = torch_mode)
+                                               structural=structural, torch_mode = torch_mode)
  
         else:
             if self.is_deriv and self.evaluator._evaluator != simple_function_evaluator:
                 if grids is not None:
                     raise Exception('Data-reliant tokens shall not get grids as arguments for evaluation.')
-                var = self._all_vars.index(self.variable)
+                if isinstance(self.variable, str):
+                    var = self._all_vars.index(self.variable)
+                    funс_arg = [global_var.tensor_cache.get(label=None, torch_mode=torch_mode, 
+                                                           deriv_code=(var, self.deriv_code)),]
+                elif isinstance(self.variable, [list, tuple]):
+                    funс_arg = []
+                    for var_idx, var in enumerate(self.variable):
+                        assert len(var) == self.deriv_code[var_idx]
+                        funс_arg.append(global_var.tensor_cache.get(label=None, torch_mode=torch_mode, 
+                                                                    deriv_code=(var, self.deriv_code[var_idx])))
 
-                fun_arg = global_var.tensor_cache.get(label=None, torch_mode=torch_mode, deriv_code=(var, self.deriv_code))
-                value = self.evaluator.apply(self, structural=structural, func_args=fun_arg, torch_mode=torch_mode)
+                value = self.evaluator.apply(self, structural=structural, func_args=funс_arg, torch_mode=torch_mode)
             else:
                 value = self.evaluator.apply(self, structural=structural, func_args=grids, torch_mode=torch_mode)
             if grids is None:

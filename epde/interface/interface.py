@@ -64,8 +64,9 @@ class InputDataEntry(object):
         derivatives (`np.ndarray`): values of derivatives
         deriv_properties (`dict`): settings of derivatives
     """
-    def __init__(self, var_name: str, data_tensor: Union[List[np.ndarray], np.ndarray]):
+    def __init__(self, var_name: str, var_idx: int, data_tensor: Union[List[np.ndarray], np.ndarray]):
         self.var_name = var_name
+        self.var_idx = var_idx 
         if isinstance(data_tensor, np.ndarray):
             check_nparray(data_tensor) 
             self.ndim = data_tensor.ndim
@@ -127,20 +128,25 @@ class InputDataEntry(object):
             self.deriv_properties = {'max order': max_order,
                                      'dimensionality': self.data_tensor.ndim}
 
-    def use_global_cache(self):
+    def use_global_cache(self): # , var_idx: int, deriv_codes: list
         """
         Method for add calculated derivatives in the cache
         """
+        var_idx = self.var_idx
+        deriv_codes = self.d_orders
         derivs_stacked = prepare_var_tensor(self.data_tensor, self.derivatives, time_axis=global_var.time_axis)
+        deriv_codes = [(var_idx, code) for code in deriv_codes]
 
         try:
-            upload_simple_tokens(self.names, global_var.tensor_cache, derivs_stacked)
-            upload_simple_tokens([self.var_name,], global_var.tensor_cache, [self.data_tensor,])            
+            upload_simple_tokens(self.names, global_var.tensor_cache, derivs_stacked, 
+                                 deriv_codes=deriv_codes)
+            upload_simple_tokens([self.var_name,], global_var.tensor_cache, [self.data_tensor,],
+                                 deriv_codes=[(var_idx, [None,]),])            
             upload_simple_tokens([self.var_name,], global_var.initial_data_cache, [self.data_tensor,])
 
         except AttributeError:
             raise NameError('Cache has not been declared before tensor addition.')
-
+        print(f'Size of linked labels is {len(global_var.tensor_cache._deriv_codes)}')
         global_var.tensor_cache.use_structural()
 
     @staticmethod
@@ -652,7 +658,7 @@ class EpdeSearch(object):
         for data_elem_idx, data_tensor in enumerate(data):
             # TODO: add more relevant checks
             # assert isinstance(data_tensor, np.ndarray), 'Input data must be in format of numpy ndarrays or iterable (list or tuple) of numpy arrays'
-            entry = InputDataEntry(var_name=variable_names[data_elem_idx],
+            entry = InputDataEntry(var_name=variable_names[data_elem_idx], var_idx=data_elem_idx,
                                    data_tensor=data_tensor)
             derivs_tensor = derivs[data_elem_idx] if derivs is not None else None
             entry.set_derivatives(preprocesser=self.preprocessor_pipeline, deriv_tensors=derivs_tensor,

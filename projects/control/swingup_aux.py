@@ -109,7 +109,18 @@ class VarTrigTokens(PreparedTokens):
         self._token_family.set_evaluator(eval)
 
 class ControlVarTokens(PreparedTokens):
-    def __init__(self, )
+    def __init__(self, var_name: str = 'ctrl'):
+
+        self._token_family = TokenFamily(token_type = var_name, variable = None,
+                                         family_of_derivs=True)
+
+        self._token_family.set_status(demands_equation=False, meaningful=True,
+                                      unique_specific_token=True, unique_token_type=True,
+                                      s_and_d_merged=False, non_default_power = False)
+
+        self._token_family.set_params(token_labels, params_ranges, params_equality_ranges,
+                                      derivs_solver_orders=deriv_solver_orders)
+        self._token_family.set_evaluator(sign_evaluator)        
 
 def safe_reset(res):
     '''A ''safe'' wrapper for dealing with OpenAI gym's refactor.'''

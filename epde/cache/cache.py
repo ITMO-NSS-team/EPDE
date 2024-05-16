@@ -23,7 +23,7 @@ import numpy as np
 import psutil
 from functools import partial
 
-from typing import Union, Callable
+from typing import Union, Callable, List
 
 import torch
 from copy import deepcopy
@@ -34,7 +34,8 @@ except ImportError:
     from collections import Iterable
 
 
-def upload_simple_tokens(labels, cache, tensors, grid_setting=False):
+def upload_simple_tokens(labels, cache, tensors, deriv_codes: List = None, 
+                         grid_setting=False):
     """
     Uploads the basic factor into the cache with its value in ndimensional numpy.array
 
@@ -47,12 +48,18 @@ def upload_simple_tokens(labels, cache, tensors, grid_setting=False):
     Returns:
         None
     """
+    if deriv_codes is not None and len(deriv_codes) != len(labels):
+        print(deriv_codes, labels)
+        raise ValueError('Incorrect number of deriv codes passed, expected ')
+    
     for idx, label in enumerate(labels):
         if grid_setting:
             label_completed = label
+            deriv_code = None
         else:
             label_completed = (label, (1.0,))
-        cache.add(label_completed, tensors[idx])
+            deriv_code = None if deriv_codes is None else deriv_codes[idx]
+        cache.add(label_completed, tensors[idx], deriv_code = deriv_code)
         cache.add_base_matrix(label_completed)
 
 
