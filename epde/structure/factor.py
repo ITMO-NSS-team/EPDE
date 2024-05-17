@@ -230,13 +230,13 @@ class Factor(TerminalToken):
                 if isinstance(self.variable, str):
                     var = self._all_vars.index(self.variable)
                     funс_arg = [global_var.tensor_cache.get(label=None, torch_mode=torch_mode, 
-                                                           deriv_code=(var, self.deriv_code)),]
+                                                            deriv_code=(var, self.deriv_code)),]
                 elif isinstance(self.variable, [list, tuple]):
                     funс_arg = []
-                    for var_idx, var in enumerate(self.variable):
-                        assert len(var) == self.deriv_code[var_idx]
+                    for var_idx, code in enumerate(self.deriv_code):
+                        assert len(self.variable) == len(self.deriv_code)
                         funс_arg.append(global_var.tensor_cache.get(label=None, torch_mode=torch_mode, 
-                                                                    deriv_code=(var, self.deriv_code[var_idx])))
+                                                                    deriv_code=(self.variable[var_idx], code)))
 
                 value = self.evaluator.apply(self, structural=structural, func_args=funс_arg, torch_mode=torch_mode)
             else:

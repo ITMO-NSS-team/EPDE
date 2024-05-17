@@ -6,7 +6,7 @@ import tqdm
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../..')))
 
 import numpy as np
-from typing import Union, Callable
+from typing import Union, Callable, Tuple, List
 from collections import OrderedDict
 
 from epde.evaluators import CustomEvaluator, EvaluatorTemplate, sign_evaluator, \
@@ -109,18 +109,29 @@ class VarTrigTokens(PreparedTokens):
         self._token_family.set_evaluator(eval)
 
 class ControlVarTokens(PreparedTokens):
-    def __init__(self, var_name: str = 'ctrl'):
+    def __init__(self, ann: torch.nn.Sequential, var_name: str = 'ctrl',
+                 arg_var: List[Tuple[Union[int, List]]] = [(0, [None,]),]):
+        vars, der_ords = zip(*arg_var)
 
-        self._token_family = TokenFamily(token_type = var_name, variable = None,
+        token_params = OrderedDict([('power', (1, 1)),])
+        
+        equal_params = {'power': 0}
+
+        self._token_family = TokenFamily(token_type = var_name, variable = vars,
                                          family_of_derivs=True)
 
         self._token_family.set_status(demands_equation=False, meaningful=True,
                                       unique_specific_token=True, unique_token_type=True,
                                       s_and_d_merged=False, non_default_power = False)
+        
+        self._token_family.set_params([var_name,], token_params, equal_params,
+                                      derivs_solver_orders=der_ords)
+        
+        def torch_eval(*args, **kwargs):
+            inp = torch.stack([torch.reshape(tensor, -1) for tensor in args]) # Validate correctness
+            
 
-        self._token_family.set_params(token_labels, params_ranges, params_equality_ranges,
-                                      derivs_solver_orders=deriv_solver_orders)
-        self._token_family.set_evaluator(sign_evaluator)        
+        self._token_family.set_evaluator(ann_eval)        
 
 def safe_reset(res):
     '''A ''safe'' wrapper for dealing with OpenAI gym's refactor.'''
