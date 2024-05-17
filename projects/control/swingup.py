@@ -7,10 +7,13 @@ Created on Wed Apr  3 17:43:03 2024
 """
 import os
 import sys
+import faulthandler
 
-sys.path.append('../')
+faulthandler.enable()
 
-sys.path.pop()
+# sys.path.append('../')
+
+# sys.path.pop()
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../..')))
 
 import numpy as np
@@ -18,11 +21,14 @@ from tqdm import tqdm
 from collections import OrderedDict
 from typing import List
 
+import matplotlib as mpl
+mpl.use('TkAgg')
 import matplotlib.pyplot as plt
 
 import epde
 from projects.control.swingup_aux import DMCEnvWrapper, RandomPolicy, CosinePolicy, CosineSignPolicy, \
-                                         TwoCosinePolicy, rollout_env
+                                         TwoCosinePolicy, rollout_env, ControlVarTokens, VarTrigTokens, \
+                                         DerivSignFunction
 
 
 def epde_discovery(t, x, angle, u, derivs, diff_method = 'FD'):
@@ -155,19 +161,23 @@ def translate_equation(t, x, angle, u, derivs: dict, diff_method = 'FD'):
     else:
         raise ValueError('Incorrect preprocessing tool selected.')
     
-    angle_cos = np.cos(angle)
-    angle_sin = np.sin(angle)
+    # angle_cos = np.cos(angle)
+    # angle_sin = np.sin(angle)
     
-    angle_trig_tokens = epde.CacheStoredTokens('angle_trig', ['sin(phi)', 'cos(phi)'], 
-                                               {'sin(phi)' : angle_sin, 'cos(phi)' : angle_cos}, 
-                                               OrderedDict([('power', (1, 3))]), {'power': 0})
-    control_var_tokens = epde.CacheStoredTokens('control', ['ctrl',], {'ctrl' : u}, OrderedDict([('power', (1, 1))]),
-                                                {'power': 0})
-    sgn_tokens = epde.CacheStoredTokens('signum of y', ['sgn(dy)', 'sgn(ddy)'], 
-                                        {'sgn(dy)' : np.sign(derivs['y'][:, 0]),
-                                         'sgn(ddy)' : np.sign(derivs['y'][:, 1]),}, 
-                                        OrderedDict([('power', (1, 1))]), {'power': 0})
+    # angle_trig_tokens = epde.CacheStoredTokens('angle_trig', ['sin(phi)', 'cos(phi)'], 
+    #                                            {'sin(phi)' : angle_sin, 'cos(phi)' : angle_cos}, 
+    #                                            OrderedDict([('power', (1, 3))]), {'power': 0})
+    # control_var_tokens = epde.CacheStoredTokens('control', ['ctrl',], {'ctrl' : u}, OrderedDict([('power', (1, 1))]),
+    #                                             {'power': 0})
+    # sgn_tokens = epde.CacheStoredTokens('signum of y', ['sgn(dy)', 'sgn(ddy)'], 
+    #                                     {'sgn(dy)' : np.sign(derivs['y'][:, 0]),
+    #                                      'sgn(ddy)' : np.sign(derivs['y'][:, 1]),}, 
+    #                                     OrderedDict([('power', (1, 1))]), {'power': 0})
     
+    angle_trig_tokens = VarTrigTokens('phi', max_power=2, freq_center=1.)
+    sgn_tokens = DerivSignFunction('u', ['du/dx1', 'd^2u/dx1^2'])
+    control_var_tokens = ControlVarTokens(sample=u, arg_var = [(0, [None,]), (1, [None,]), 
+                                                               (0, [1,]), (1, [1,])])
 
     epde_search_obj.create_pool(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,), derivs = [derivs['y'], derivs['phi']],
                                 additional_tokens = [angle_trig_tokens, control_var_tokens, sgn_tokens])
@@ -197,7 +207,7 @@ if __name__ == '__main__':
     cosine_signum_policy = CosineSignPolicy(period=180, amplitude=0.002)
     two_cosine_policy = TwoCosinePolicy(180, 90, 0.002)
 
-    single_sample = False
+    single_sample = True
     if single_sample:
         traj_obs, traj_acts, traj_rews = rollout_env(cart_env, two_cosine_policy, n_steps = 250, 
                                                     n_steps_reset=1000)
@@ -271,7 +281,7 @@ if __name__ == '__main__':
             angles_d.append(angle_d)
             us.append(u)
 
-            discover = False
+            discover = True
             if discover:
                 res = epde_discovery(t, x, angle, u, derivs, 'FD')
             else:

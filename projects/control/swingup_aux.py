@@ -13,6 +13,7 @@ from epde.evaluators import CustomEvaluator, EvaluatorTemplate, sign_evaluator, 
      trigonometric_evaluator
 from epde.interface.prepared_tokens import PreparedTokens
 from epde.interface.token_family import TokenFamily
+import epde.globals as global_var
 
 import gymnasium
 from gymnasium.spaces.box import Box
@@ -108,8 +109,9 @@ class VarTrigTokens(PreparedTokens):
                                       derivs_solver_orders=deriv_solver_orders)
         self._token_family.set_evaluator(eval)
 
+
 class ControlVarTokens(PreparedTokens):
-    def __init__(self, ann: torch.nn.Sequential, var_name: str = 'ctrl',
+    def __init__(self, sample: np.ndarray, ann: torch.nn.Sequential = None, var_name: str = 'ctrl',
                  arg_var: List[Tuple[Union[int, List]]] = [(0, [None,]),]):
         vars, der_ords = zip(*arg_var)
 
@@ -127,11 +129,22 @@ class ControlVarTokens(PreparedTokens):
         self._token_family.set_params([var_name,], token_params, equal_params,
                                       derivs_solver_orders=der_ords)
         
-        def torch_eval(*args, **kwargs):
+        def nn_eval_torch(*args, **kwargs):
             inp = torch.stack([torch.reshape(tensor, -1) for tensor in args]) # Validate correctness
-            
+            return global_var.control_nn(inp)**kwargs['power']
 
-        self._token_family.set_evaluator(ann_eval)        
+        def nn_eval_np(*args, **kwargs):
+            return nn_eval_torch(*args, **kwargs).detach().numpy()**kwargs['power']
+
+        eval = CustomEvaluator(evaluation_functions_np=nn_eval_torch,
+                               evaluation_functions_torch=nn_eval_np,
+                               eval_fun_params_labels = ['power'])
+
+        global_var.reset_control_nn(ann=ann, n_var=len(vars))
+        global_var.tensor_cache.add(tensor=sample, label = (var_name, (1.0,)))
+
+        self._token_family.set_evaluator(eval)
+
 
 def safe_reset(res):
     '''A ''safe'' wrapper for dealing with OpenAI gym's refactor.'''
@@ -186,7 +199,7 @@ def rollout_env(env, policy, n_steps, n_steps_reset=np.inf, seed=None, verbose =
     trajs_acts = []
     trajs_rews = []
 
-    for i in tqdm(range(n_steps), disable=not verbose):
+    for i in tqdm.tqdm(range(n_steps), disable=not verbose):
         
         # collect experience
         action = policy.compute_action(obs_list[-1])

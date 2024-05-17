@@ -152,7 +152,10 @@ class Factor(TerminalToken):
         _params_description = {}
         if not random:
             _params = np.empty(len(kwargs))
-            assert len(kwargs) == len(params_description), 'Not all parameters have been declared. Partial randomization TBD'
+            if len(kwargs) != len(params_description):
+                print('Not all parameters have been declared. Partial randomization TBD')
+                print(f'kwargs {kwargs}, while params_descr {params_description}')
+                raise ValueError('...')
             for param_idx, param_info in enumerate(kwargs.items()):
                 _params[param_idx] = param_info[1]
                 _params_description[param_idx] = {'name': param_info[0],
@@ -229,16 +232,16 @@ class Factor(TerminalToken):
                     raise Exception('Data-reliant tokens shall not get grids as arguments for evaluation.')
                 if isinstance(self.variable, str):
                     var = self._all_vars.index(self.variable)
-                    funс_arg = [global_var.tensor_cache.get(label=None, torch_mode=torch_mode, 
+                    func_arg = [global_var.tensor_cache.get(label=None, torch_mode=torch_mode,
                                                             deriv_code=(var, self.deriv_code)),]
                 elif isinstance(self.variable, [list, tuple]):
-                    funс_arg = []
+                    func_arg = []
                     for var_idx, code in enumerate(self.deriv_code):
                         assert len(self.variable) == len(self.deriv_code)
-                        funс_arg.append(global_var.tensor_cache.get(label=None, torch_mode=torch_mode, 
+                        func_arg.append(global_var.tensor_cache.get(label=None, torch_mode=torch_mode,
                                                                     deriv_code=(self.variable[var_idx], code)))
 
-                value = self.evaluator.apply(self, structural=structural, func_args=funс_arg, torch_mode=torch_mode)
+                value = self.evaluator.apply(self, structural=structural, func_args=func_arg, torch_mode=torch_mode)
             else:
                 value = self.evaluator.apply(self, structural=structural, func_args=grids, torch_mode=torch_mode)
             if grids is None:
@@ -250,10 +253,10 @@ class Factor(TerminalToken):
                                                            replacing_data=value)
                 else:
                     if self.is_deriv and self.evaluator._evaluator == simple_function_evaluator:
-                        full_deriv_code = (self._all_vars.index(self.variable), self.deriv_code) 
+                        full_deriv_code = (self._all_vars.index(self.variable), self.deriv_code)
                     else:
                         full_deriv_code = None
-                    # var = 
+
                     self.saved[key] = global_var.tensor_cache.add(self.cache_label, value, structural=False, 
                                                                   deriv_code=full_deriv_code)
             return value

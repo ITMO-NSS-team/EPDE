@@ -363,6 +363,7 @@ class Cache(object):
 
     def get(self, label, normalized=False, structural=False, saved_as=None, torch_mode: bool = False, deriv_code = None):
         assert not (normalized and structural), 'The added matrix can not be simultaneously normalized and scaled'
+        # print(f'Called {label} with torch mode {torch_mode}')
         type_key, other, other_bool = ('torch', 'numpy', False) if torch_mode else ('numpy', 'torch', True)
         if deriv_code is not None:
             label = [elem[1] for elem in self._deriv_codes if elem[0] == deriv_code]

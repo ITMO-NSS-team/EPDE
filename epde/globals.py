@@ -8,6 +8,7 @@ Created on Tue Feb  9 16:14:57 2021
 
 from dataclasses import dataclass
 import warnings
+import torch
 
 from epde.cache.cache import Cache
 
@@ -112,3 +113,22 @@ def init_verbose(plot_DE_solutions : bool = False, show_iter_idx : bool = True,
         warnings.filterwarnings("ignore")
     verbose = VerboseManager(plot_DE_solutions, show_iter_idx, show_iter_fitness, 
                              show_iter_stats, show_ann_loss, show_warnings)
+
+def reset_control_nn(n_var: int = 1, n_control: int = 1, ann: torch.nn.Sequential = None):
+    '''
+    Use of bad practices, link control nn to the token family. 
+    '''
+    if ann is None:
+        hidden_neurons = 128
+        print(n_var)
+        layers = [torch.nn.Linear(n_var, hidden_neurons),
+                  torch.nn.Tanh(),
+                  torch.nn.Linear(hidden_neurons, hidden_neurons),
+                  torch.nn.Tanh(),
+                  torch.nn.Linear(hidden_neurons, hidden_neurons),
+                  torch.nn.Tanh(),
+                  torch.nn.Linear(hidden_neurons, n_control)]
+        ann = torch.nn.Sequential(*layers)
+
+    global control_nn
+    control_nn = ann

@@ -6,20 +6,21 @@ from typing import Tuple, List, Union
 from abc import ABC, abstractmethod
 
 from epde.interface.interface import EpdeMultisample, EpdeSearch, ExperimentCombiner
+from epde.optimizers.moeadd.moeadd import ParetoLevels
 from epde.interface.solver_integration import SolverAdapter, BOPElement 
 from epde.solver.data import Conditions
 
-# Add logic of transforming control function as a fixed equation token into the  neural network 
-def get_control_nn(n_indep: int, n_dep: int, n_control: int):
-    hidden_neurons = 128
-    layers = [torch.nn.Linear(n_indep + n_dep, hidden_neurons),
-              torch.nn.Tanh(),
-              torch.nn.Linear(hidden_neurons, hidden_neurons),
-              torch.nn.Tanh(),
-              torch.nn.Linear(hidden_neurons, hidden_neurons),
-              torch.nn.Tanh(),
-              torch.nn.Linear(hidden_neurons, n_control)]
-    return torch.nn.Sequential(*layers)
+# # Add logic of transforming control function as a fixed equation token into the  neural network 
+# def get_control_nn(n_indep: int, n_dep: int, n_control: int):
+#     hidden_neurons = 128
+#     layers = [torch.nn.Linear(n_indep + n_dep, hidden_neurons),
+#               torch.nn.Tanh(),
+#               torch.nn.Linear(hidden_neurons, hidden_neurons),
+#               torch.nn.Tanh(),
+#               torch.nn.Linear(hidden_neurons, hidden_neurons),
+#               torch.nn.Tanh(),
+#               torch.nn.Linear(hidden_neurons, n_control)]
+#     return torch.nn.Sequential(*layers)
 
 class BasicDeriv(ABC):
     def __init__(self, *args, **kwargs):
@@ -27,6 +28,7 @@ class BasicDeriv(ABC):
     
     def take_derivative(self, u: torch.Tensor, grid: torch.Tensor, axes: list):
         raise NotImplementedError('Trying to differentiate with abstract differentiation method')
+
 
 class AutogradDeriv(BasicDeriv):
     def __init__(self):
@@ -117,7 +119,7 @@ class ControlExp():
         self._control_net = None
         pass # TODO: parameters? boundary conditions? 
 
-    def train_equation(self):
+    def train_equation(self, optimal_equations: Union[list, ParetoLevels]):
         # raise NotImplementedError() # TODO: combine input samples, train equations
 
 
