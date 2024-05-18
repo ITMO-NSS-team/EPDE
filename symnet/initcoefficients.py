@@ -136,7 +136,7 @@ def get_csym_tsym(u, derivs, shape, input_names, pool_names, additional_tokens=N
     """
     # TODO: SymNet имеет 4 todo (+, pool_terms, preproc_input)
 
-    # TODO: если в левой части e.g. d^2u/dx2^2, то как получить в правой слагаемое d^2u/dx2^2 * u?
+    # TODO: если в левой части e.g. d^2u/dx1^2, то как получить в правой слагаемое d^2u/dx1^2 * u?
 
     left_pool = get_left_pool(max_deriv_order)
     model, left_side_name = select_model(input_names, left_pool, u, derivs, shape, additional_tokens)

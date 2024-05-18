@@ -57,8 +57,7 @@ def to_symbolic(term):
         return Symbol(str(term.cache_label[0]))
 
 
-def get_cross_distr(custom_cross_prob, start_idx, end_idx_exclude):
-    mmf = 2.4
+def get_cross_distr(custom_cross_prob, start_idx, end_idx_exclude, mmf):
     values = list(custom_cross_prob.values())
     csym_arr = np.fabs(np.array(values))
 

@@ -6,11 +6,12 @@ import itertools
 
 
 class PoolTerms:
-    def __init__(self, max_factors_in_term, families):
+    def __init__(self, max_factors_in_term, families, mmf):
 
         self.pool_sym_dict = None
         self.pool_sym_ls = None
         self.pool_dict = None
+        self.mmf = mmf
 
         token_ls = []
         for family in families:

@@ -98,7 +98,10 @@ def init_verbose(plot_DE_solutions : bool = False, show_iter_idx : bool = True,
                              show_iter_stats, show_warnings)
 
 
-def init_symnet_pool(max_factors_in_term, families, u, derivs, shape, names, grids, max_deriv_order):
+def init_symnet_pool(max_factors_in_term, families, u, derivs, shape, names, grids, max_deriv_order, mmf):
     global sympool
-    sympool = pool_terms.PoolTerms(max_factors_in_term, families)
+    sympool = pool_terms.PoolTerms(max_factors_in_term, families, mmf=mmf)
     sympool.set_initial_distr(u, derivs, shape, names, families=families, grids=grids, max_deriv_order=max_deriv_order)
+    # temporary_cf = [0.3, 1.5, 0.3, 0.3, 1.5, 0.3, 1.5, 0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3,]
+    # for i, key in enumerate(sympool.pool_dict.keys()):
+    #     sympool.pool_dict[key] = temporary_cf[i]

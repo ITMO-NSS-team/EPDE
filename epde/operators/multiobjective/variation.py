@@ -202,9 +202,8 @@ class EquationCrossover(CompoundOperator):
         for i in range(start_idx, len(equation.structure)):
             sym_term = to_symbolic(equation.structure[i])
             importance_coeffs[sym_term] = global_var.sympool.pool_dict.get(sym_term)
-        cross_distr = get_cross_distr(importance_coeffs, start_idx, len(equation.structure))
+        cross_distr = get_cross_distr(importance_coeffs, start_idx, len(equation.structure), global_var.sympool.mmf)
         return cross_distr
-
 
 
 class EquationExchangeCrossover(CompoundOperator):

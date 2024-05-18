@@ -335,11 +335,11 @@ class StructureStatus:
         for tsym in allow_tsym:
             allow_csym.append(global_var.sympool.pool_dict.get(tsym))
 
-        eq_prob_ls = self._set_probabilities(allow_csym, draw_prob=False)
+        eq_prob_ls = self._set_probabilities(allow_csym, draw_prob=False, mmf=global_var.sympool.mmf)
         return allow_tsym, eq_prob_ls
 
     @staticmethod
-    def _set_probabilities(csym_pool_ls, mmf=2.4, draw_prob=False):
+    def _set_probabilities(csym_pool_ls, mmf=1.4, draw_prob=False):
         def draw_probabilities(final_probabilities, mmf, smoothing_factor, title):
             final_probabilities = final_probabilities.copy()
             final_probabilities.sort()
@@ -348,15 +348,13 @@ class StructureStatus:
             fig, ax = plt.subplots(figsize=(16, 8))
             ax.set_ylim(0, max(final_probabilities) + 0.01)
             sns.barplot(x=np.arange(len(final_probabilities)), y=final_probabilities, orient="v", ax=ax)
-            # plt.title(f"Smoothing factor: {smoothing_factor:.3f}, mmf: {mmf:.1f}")
             plt.grid()
             # plt.show()
             plt.yticks(fontsize=50)
             plt.savefig(f'individual_distr_{title}.png', transparent=True)
 
         csym_arr = np.fabs(np.array(csym_pool_ls))
-        # draw_probabilities(csym_arr, mmf, smoothing_factor, "before")
-        if np.max(csym_arr) / np.min(csym_arr) > 2.6:
+        if np.max(csym_arr) / np.min(csym_arr) > mmf:
             min_max_coeff = mmf * np.min(csym_arr) - np.max(csym_arr)
             smoothing_factor = min_max_coeff / (min_max_coeff - (mmf - 1) * np.average(csym_arr))
             uniform_csym = np.array([np.sum(csym_arr) / len(csym_arr)] * len(csym_arr))
