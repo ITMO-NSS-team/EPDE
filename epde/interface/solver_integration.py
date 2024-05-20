@@ -25,7 +25,6 @@ from epde.solver.model import Model
 from epde.solver.callbacks import cache, early_stopping, plot, adaptive_lambda
 from epde.solver.optimizers.optimizer import Optimizer
 from epde.solver.device import solver_device, check_device, device_type
-from epde.solver.models import Fourier_embedding, mat_model
 
 VAL_TYPES = Union[FunctionType, int, float, torch.Tensor, np.ndarray]
 
@@ -97,7 +96,7 @@ BASE_EARLY_STOPPING_PARAMS = {
                               'eps'                     : 1e-7,
                               'loss_window'             : 100,
                               'no_improvement_patience' : 1000,
-                              'patience'                : 5,
+                              'patience'                : 8,
                               'abs_loss'                : 1e-5,
                               'normalized_loss'         : False,
                               'randomize_parameter'     : 1e-5,
@@ -367,8 +366,6 @@ class PregenBOperator(object):
                     bconds.append(operator)
         print('obtained bconds:', bconds)
         self.conditions = bconds
-        #print('cond[0]', [cond[0].shape for cond in self.conditions])
-        #print('cond[2]', [cond[2].shape for cond in self.conditions])
 
 
 class BoundaryConditions(object):
@@ -445,8 +442,6 @@ class SystemSolverInterface(object):
             deriv_powers = deriv_powers[0]
             deriv_orders = deriv_orders[0]
 
-        # coeff_tensor = torch.from_numpy(coeff_tensor)
-
         if deriv_vars == []:
             if deriv_powers != 0:
                 raise Exception('Something went wrong with parsing an equation for solver')
@@ -481,6 +476,9 @@ class SystemSolverInterface(object):
             if isinstance(grids[0], np.ndarray):
                 grids = [torch.from_numpy(subgrid) for subgrid in grids]            
             default_domain = False
+
+        print(f'In the solver form declaration, default_domain mode flag is {default_domain}')
+
         for term_idx, term in enumerate(equation.structure):
             if term_idx != equation.target_idx:
                 if term_idx < equation.target_idx:
@@ -564,43 +562,6 @@ class SolverAdapter(object):
     @property
     def mode(self):
         return self._compiling_params['mode']
-    
-    @staticmethod
-    def get_net(equations: SolverEquation, mode: str, domain: Domain, use_fourier = True, 
-                fft_params: dict = {'L' : [4,], 'M' : [3,]}):
-        if mode == 'mat':
-            return mat_model(domain, equations)
-        elif mode in ['autograd', 'NN']:
-            L_default, M_default = 4, 10
-            if use_fourier:
-                if fft_params is None:
-                    if domain.dim == 1:
-                       fft_params = {'L' : [L_default],
-                                     'M' : [M_default]}
-                    else:
-                       fft_params = {'L' : [L_default] + [None,] * (domain.dim - 1), 
-                                     'M' : [M_default] + [None,] * (domain.dim - 1)}
-                net_default = [Fourier_embedding(**fft_params),]
-            else:
-                net_default = []        
-            linear_inputs = net_default[0].out_features if use_fourier else domain.dim
-            
-            if domain.dim == 1:            
-                hidden_neurons = 128
-            else:
-                hidden_neurons = 112
-   
-            operators = net_default + [torch.nn.Linear(linear_inputs, hidden_neurons),
-                                       torch.nn.Tanh(),
-                                       torch.nn.Linear(hidden_neurons, hidden_neurons),
-                                       torch.nn.Tanh(),
-                                       torch.nn.Linear(hidden_neurons, hidden_neurons),
-                                       torch.nn.Tanh(),
-                                       torch.nn.Linear(hidden_neurons, equations.num)]
-            model = torch.nn.Sequential(*operators)
-        else:
-            raise ValueError('Incorrect mode specified.')
-        return model
         
     def set_compiling_params(self, mode: str = None, lambda_operator: float = None, 
                              lambda_bound : float = None, normalized_loss_stop: bool = None,
@@ -730,8 +691,9 @@ class SolverAdapter(object):
         assert len(variables) == grids[0].ndim, 'Grids have to be set as a N-dimensional np.ndarrays with dim \
             matching the domain dimensionality'
         domain = Domain('uniform')
+        # if isinstance(grids[0], np.ndarray):
         for idx, var_name in enumerate(variables):
-            domain.variable(variable_name = var_name, variable_set = torch.tensor(grids), 
+            domain.variable(variable_name = var_name, variable_set = torch.tensor(grids[idx]), 
                             n_points = None)
             
         return domain
@@ -760,6 +722,7 @@ class SolverAdapter(object):
         else:
             grid_var_keys, _ = global_var.grid_cache.get_all(mode = 'torch')
 
+        print(f'Before grid creation {grids}')
         domain = self.create_domain(grid_var_keys, grids)
 
         return self.solve(equations=[form[1] for form in system_solver_forms], domain = domain,

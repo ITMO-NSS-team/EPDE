@@ -68,12 +68,9 @@ class L2Fitness(CompoundOperator):
             if features is None:
                 discr_feats = 0
             else:
-                discr_feats = np.dot(features, objective.weights_final[:-1][objective.weights_internal != 0]) # weights_final -> weights_internal
+                discr_feats = np.dot(features, objective.weights_final[:-1][objective.weights_internal != 0])
 
-            discr = (discr_feats + np.full(target.shape, objective.weights_final[-1]) - target)  # Normalization on target values
-            # t_mean = np.mean(target)
-            # if t_mean != 0:
-                # discr = discr / t_mean
+            discr = (discr_feats + np.full(target.shape, objective.weights_final[-1]) - target)
             self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)
             discr = np.multiply(discr, self.g_fun_vals)
             rl_error = np.linalg.norm(discr, ord = 2)
@@ -100,35 +97,35 @@ class SolverBasedFitness(CompoundOperator):
     
     def __init__(self, param_keys: list):
         super().__init__(param_keys)
-        # solver_kwargs['dim'] = len(global_var.grid_cache.get_all()[1])
-        
-        self.adapter = None # SolverAdapter(var_number = len(system.vars_to_describe))
+        self.adapter = None
 
-    def set_adapter(self, var_number):
-        if self.adapter is not None:
-            self.adapter = SolverAdapter(var_number = var_number)
+    def set_adapter(self):
+        if self.adapter is None:
+            try:
+                net = global_var
+            except NameError:
+                net = None
+            self.adapter = SolverAdapter(net = net, use_cache = False)
 
     def apply(self, objective : SoEq, arguments : dict):
-        self.set_adapter(len(objective.vars_to_describe))
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
+
+        self.set_adapter()
 
         self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
         self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
 
-        # _, target, features = objective.evaluate(normalize = False, return_val = False)
+        # 
+        solution = self.adapter.solve_epde_system(system = objective, grids = None, 
+                                                  boundary_conditions = None)
 
         grid = global_var.grid_cache.get_all()[1]
-        solution_model = self.adapter.solve_epde_system(system = objective, grids = grid, 
-                                                        boundary_conditions = None)
-
-        self.g_fun_vals = global_var.grid_cache.g_func #.reshape(-1)
+        self.g_fun_vals = global_var.grid_cache.g_func
         
-        solution = solution_model(self.adapter.convert_grid(grid)).detach().numpy()
         for eq_idx, eq in enumerate(objective.structure):
             referential_data = global_var.tensor_cache.get((eq.main_var_to_explain, (1.0,)))
 
-            discr = (solution[eq_idx, ...] - referential_data.reshape(solution[eq_idx, ...].shape))
-
+            discr = (solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape))
             discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape))
             rl_error = np.linalg.norm(discr, ord = 2)
             
@@ -139,10 +136,13 @@ class SolverBasedFitness(CompoundOperator):
             eq.fitness_calculated = True
             eq.fitness_value = fitness_value
 
-            if global_var.verbose.plot_DE_solutions:
-                plot_data_vs_solution(self.adapter.convert_grid(grid),
-                                      data = referential_data.reshape(solution[eq_idx, ...].shape), 
-                                      solution = solution[eq_idx, ...])
+            # if global_var.verbose.plot_DE_solutions:
+            #     plot_data_vs_solution(self.adapter.convert_grid(grid),
+            #                           data = referential_data.reshape(solution[eq_idx, ...].shape), 
+            #                           solution = solution[eq_idx, ...])
+
+    def use_default_tags(self):
+        self._tags = {'fitness evaluation', 'chromosome level', 'contains suboperators', 'inplace'}
 
     
 def plot_data_vs_solution(grid, data, solution):

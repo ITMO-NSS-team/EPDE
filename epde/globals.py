@@ -8,7 +8,11 @@ Created on Tue Feb  9 16:14:57 2021
 
 from dataclasses import dataclass
 import warnings
+from typing import List
+
+import numpy as np
 import torch
+# device = torch.device('cpu') # TODO: make system-agnostic approach
 
 from epde.cache.cache import Cache
 
@@ -132,3 +136,17 @@ def reset_control_nn(n_var: int = 1, n_control: int = 1, ann: torch.nn.Sequentia
 
     global control_nn
     control_nn = ann
+
+
+def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], ann: torch.nn.Sequential = None,
+                       epochs_max=1e3, loss_mean=1000, batch_frac=0.5, learining_rate=1e-4,
+                       use_pretrained: bool = False):
+    '''
+    Represent the data with ANN, suitable to be used as the initial guess of the candidate equations solutions 
+    during the equation search, employing solver-based fitness function.
+    '''
+
+    
+
+    global solution_guess_nn
+    solution_guess_nn = 

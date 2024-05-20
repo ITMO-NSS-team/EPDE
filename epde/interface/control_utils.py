@@ -8,19 +8,18 @@ from abc import ABC, abstractmethod
 from epde.interface.interface import EpdeMultisample, EpdeSearch, ExperimentCombiner
 from epde.optimizers.moeadd.moeadd import ParetoLevels
 from epde.interface.solver_integration import SolverAdapter, BOPElement 
-from epde.solver.data import Conditions
 
-# # Add logic of transforming control function as a fixed equation token into the  neural network 
-# def get_control_nn(n_indep: int, n_dep: int, n_control: int):
-#     hidden_neurons = 128
-#     layers = [torch.nn.Linear(n_indep + n_dep, hidden_neurons),
-#               torch.nn.Tanh(),
-#               torch.nn.Linear(hidden_neurons, hidden_neurons),
-#               torch.nn.Tanh(),
-#               torch.nn.Linear(hidden_neurons, hidden_neurons),
-#               torch.nn.Tanh(),
-#               torch.nn.Linear(hidden_neurons, n_control)]
-#     return torch.nn.Sequential(*layers)
+from epde.solver.data import Conditions
+from epde.solver.optimizers.closure import Closure
+
+# TODO: Later to be refactored into multiple files
+
+# class ControlOptClosure():
+#     '''
+#     Inspired by https://github.com/ITMO-NSS-team/torch_DE_solver/blob/main/tedeous/optimizers/closure.py
+#     '''
+#     def __init__(self, model):
+#         self.set_model()
 
 class BasicDeriv(ABC):
     def __init__(self, *args, **kwargs):
@@ -117,11 +116,10 @@ class ControlExp():
     def __init__(self):
         self._var_net = None
         self._control_net = None
-        pass # TODO: parameters? boundary conditions? 
+        # TODO: parameters? boundary conditions? 
 
     def train_equation(self, optimal_equations: Union[list, ParetoLevels]):
         # raise NotImplementedError() # TODO: combine input samples, train equations
-
 
         res_combiner = ExperimentCombiner(optimal_equations)
         return res_combiner.create_best(self._pool)   
@@ -134,32 +132,28 @@ class ControlExp():
         bop.values = torch.from_numpy(np.array([[value,]])).float()
         return bop
 
-
-    def train_pinn(self, bc_operators: List[BOPElement], grids: List[torch.tensor], epochs: int = 1e4, 
+    def train_pinn(self, bc_operators: List[BOPElement], grids: List[np.ndarray], epochs: int = 1e4, 
                    mode: str = 'NN', compiling_params: dict = {}, optimizer_params: dict = {},
                    cache_params: dict = {}, early_stopping_params: dict = {}, plotting_params: dict = {}, 
                    training_params: dict = {}, use_cache: bool = False, use_fourier: bool = False, 
-                   fourier_params: dict = None, net = None, use_adaptive_lambdas: bool = False):
+                   fourier_params: dict = None, net = None, use_adaptive_lambdas: bool = False, 
+                   device = torch.device('cpu')):
         t = 0
         min_loss = np.inf
         stop_training = False
+        self._var_net = None
+
+        grids_merged = torch.from_numpy(np.array([subgrid.reshape(-1) for subgrid in grids])).float().T
+        grids_merged.to(device=device)
 
         control_optim_params = {'lr': 1e-2, 'max_iter': 10, 'max_eval': None, 'tolerance_grad': 1e-07,
                                 'tolerance_change': 1e-09, 'history_size': 100, 'line_search_fn': 'strong_wolfe'}
         optimizer = torch.optim.LBFGS(**control_optim_params)
-        
-        while t < epochs and not stop_training: # training of control function
-            # def fix_grid_args(u_net: torch.nn.Sequential, grid_args: torch.):
-            #     '''
-            #     For control function first inputs correspond to independent variables
-            #     while the latter ones are dependent ones. 
+        # Implement closure for loss function
 
-            #     TODO: use functools partial or similar construction to fix the arguments of the NN. 
-            #     '''
-            #     grid_args = 
-            #     return partial(u_net, )
-                
-                # equation
+
+        while t < epochs and not stop_training:
+
             with SolverAdapter(net = self._var_net, use_cache = False) as adapter:
                 # Edit solver forms of functions of dependent variable to Callable objects.
                 # Setting various adapater parameters
@@ -172,13 +166,17 @@ class ControlExp():
                 adapter.change_parameter('mode', mode, param_dict_key = 'compiling_params')
 
                 print(f'grid.shape is {grids[0].shape}')
-                self._var_net = adapter.solve_epde_system(system = system, grids = grids, data = None, 
-                                                          boundary_conditions = bc_operators, 
-                                                          mode = mode, use_cache = use_cache, 
-                                                          use_fourier = use_fourier, fourier_params = fourier_params,
-                                                          use_adaptive_lambdas = use_adaptive_lambdas)
-                
-            
-            
+                model = adapter.solve_epde_system(system = self.system, grids = grids, data = None, 
+                                                  boundary_conditions = bc_operators, 
+                                                  mode = mode, use_cache = use_cache, 
+                                                  use_fourier = use_fourier, fourier_params = fourier_params,
+                                                  use_adaptive_lambdas = use_adaptive_lambdas)
+                loss = self.loss(model, grids_merged)
+                loss.backward()
+                optimizer.step()
 
-                
+                if loss < min_loss:
+                    self._var_net = model
+                print(loss)
+            
+        return self._var_net

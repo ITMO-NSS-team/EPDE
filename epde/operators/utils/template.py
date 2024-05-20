@@ -17,23 +17,11 @@ OPERATOR_LEVELS = ('custom level', 'term level', 'gene level', 'chromosome level
 OPERATOR_LEVELS_SUPPORTED_TYPES = {'custom level': None, 'term level': Term, 'gene level': Gene,
                                    'chromosome level': Chromosome, 'population level': ParetoLevels}
 
-
-# def add_base_param_to_operator(operator):
-#     params_container = EvolutionaryParams()
-#     for param_key, param_value in params_container[operator.key].items():
-#         operator.params[param_key] = param_value
-
 def add_base_param_to_operator(operator, target_dict):
     params_container = EvolutionaryParams()
     for param_key, param_value in params_container.get_default_params_for_operator(operator.key).items():
         operator.params[param_key] = target_dict[param_key] if param_key in target_dict.keys(
         ) else param_value
-        
-# def add_param_to_operator(operator, target_dict, labeled_base_val):
-#     for key, base_val in labeled_base_val.items():
-#         if base_val is None and key not in target_dict.keys():
-#             raise ValueError('Mandatory parameter for evolutionary operator')
-#         operator.params[key] = target_dict[key] if key in target_dict.keys() else base_val
 
 class CompoundOperator():
     '''

@@ -13,7 +13,47 @@ import torch
 device = torch.device('cpu')
 
 import matplotlib.pyplot as plt
-import epde.globals as global_var
+
+from epde.solver.data import Domain
+from epde.solver.models import Fourier_embedding, mat_model
+
+# from epde.
+
+def get_net(equations, mode: str, domain: Domain, use_fourier = True, 
+            fft_params: dict = {'L' : [4,], 'M' : [3,]}):
+    if mode == 'mat':
+        return mat_model(domain, equations)
+    elif mode in ['autograd', 'NN']:
+        L_default, M_default = 4, 10
+        if use_fourier:
+            if fft_params is None:
+                if domain.dim == 1:
+                    fft_params = {'L' : [L_default],
+                                    'M' : [M_default]}
+                else:
+                    fft_params = {'L' : [L_default] + [None,] * (domain.dim - 1), 
+                                    'M' : [M_default] + [None,] * (domain.dim - 1)}
+            net_default = [Fourier_embedding(**fft_params),]
+        else:
+            net_default = []        
+        linear_inputs = net_default[0].out_features if use_fourier else domain.dim
+        
+        if domain.dim == 1:            
+            hidden_neurons = 128
+        else:
+            hidden_neurons = 112
+
+        operators = net_default + [torch.nn.Linear(linear_inputs, hidden_neurons),
+                                    torch.nn.Tanh(),
+                                    torch.nn.Linear(hidden_neurons, hidden_neurons),
+                                    torch.nn.Tanh(),
+                                    torch.nn.Linear(hidden_neurons, hidden_neurons),
+                                    torch.nn.Tanh(),
+                                    torch.nn.Linear(hidden_neurons, equations.num)]
+        model = torch.nn.Sequential(*operators)
+    else:
+        raise ValueError('Incorrect mode specified.')
+    return model
 
 def exp_form(a, sign_num: int = 4):
     if np.isclose(a, 0):
@@ -35,7 +75,7 @@ def rts(value, sign_num: int = 5):
     return np.around(value, int(idx))
 
 
-def train_ann(args: list, data: np.ndarray, epochs_max: int = 500):
+def train_ann(args: list, data: np.ndarray, epochs_max: int = 500, batch_frac = 0.5):
     dim = 1 if np.any([s == 1 for s in data.shape]) and data.ndim == 2 else data.ndim
     assert len(args) == dim, 'Dimensionality of data does not match with passed grids.'
     data_size = data.size
@@ -60,7 +100,6 @@ def train_ann(args: list, data: np.ndarray, epochs_max: int = 500):
     data.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 
-    batch_frac = 0.5
     batch_size = int(data_size * batch_frac)
 
     t = 0
@@ -91,8 +130,8 @@ def train_ann(args: list, data: np.ndarray, epochs_max: int = 500):
             best_model = model
             min_loss = loss_mean
         losses.append(loss_mean)
-        if global_var.verbose.show_ann_loss:
-            print('Surface training t={}, loss={}'.format(t, loss_mean))
+        # if global_var.verbose.show_ann_loss:
+        #     print('Surface training t={}, loss={}'.format(t, loss_mean))
         t += 1
     print_loss = True
     if print_loss:
@@ -101,25 +140,12 @@ def train_ann(args: list, data: np.ndarray, epochs_max: int = 500):
         plt.show()
     return best_model
 
-
 def use_ann_to_predict(model, recalc_grids: list):
     data_grid = np.stack([grid.reshape(-1) for grid in recalc_grids])
     recalc_grid_tensor = torch.from_numpy(data_grid).float().T
     recalc_grid_tensor.to(device)
 
     return model(recalc_grid_tensor).detach().numpy().reshape(recalc_grids[0].shape)
-
-
-
-def np_cartesian_product(*arrays):
-    print(arrays)
-    la = len(arrays)
-    dtype = np.result_type(*arrays)
-    arr = np.empty([len(a) for a in arrays] + [la], dtype=dtype)
-    for i, a in enumerate(np.ix_(*arrays)):
-        arr[..., i] = a
-    return arr.reshape(-1, la)
-
 
 def flatten(obj):
     '''
@@ -132,36 +158,15 @@ def flatten(obj):
             obj[idx] = [elem,]
     return reduce(lambda x, y: x+y, obj)
 
-
-def try_iterable(arg):
-    try:
-        _ = [elem for elem in arg]
-    except TypeError:
-        return False
-    return True
-
-
-def memory_assesment():
-    try:
-        h = hpy()
-    except NameError:
-        from guppy import hpy
-        h = hpy()
-    print(h.heap())
-    del h
-
-
 def factor_params_to_str(factor, set_default_power=False, power_idx=0):
     param_label = np.copy(factor.params)
     if set_default_power:
         param_label[power_idx] = 1.
     return (factor.label, tuple(param_label))
 
-
 def form_label(x, y):
     print(type(x), type(y.cache_label))
     return x + ' * ' + y.cache_label if len(x) > 0 else x + y.cache_label
-
 
 def detect_similar_terms(base_equation_1, base_equation_2):   # Переделать!
     same_terms_from_eq1 = []
