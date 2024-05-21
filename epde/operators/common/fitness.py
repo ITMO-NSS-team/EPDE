@@ -102,7 +102,7 @@ class SolverBasedFitness(CompoundOperator):
     def set_adapter(self):
         if self.adapter is None:
             try:
-                net = global_var
+                net = global_var.solution_guess_nn
             except NameError:
                 net = None
             self.adapter = SolverAdapter(net = net, use_cache = False)
@@ -122,7 +122,7 @@ class SolverBasedFitness(CompoundOperator):
         grid = global_var.grid_cache.get_all()[1]
         self.g_fun_vals = global_var.grid_cache.g_func
         
-        for eq_idx, eq in enumerate(objective.structure):
+        for eq_idx, eq in enumerate(objective.vals):
             referential_data = global_var.tensor_cache.get((eq.main_var_to_explain, (1.0,)))
 
             discr = (solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape))

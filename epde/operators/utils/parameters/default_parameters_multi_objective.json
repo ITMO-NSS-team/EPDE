@@ -18,6 +18,9 @@
  	"DiscrepancyBasedFitness" : {
         "penalty_coeff" : 0.2
  	},
+ 	"SolverBasedFitness" : {
+        "penalty_coeff" : 0.2
+ 	},
  	"ParetoLevelsCrossover" : {
 
  	},

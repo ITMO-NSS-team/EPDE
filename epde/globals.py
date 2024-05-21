@@ -12,9 +12,10 @@ from typing import List
 
 import numpy as np
 import torch
-# device = torch.device('cpu') # TODO: make system-agnostic approach
+device = torch.device('cpu') # TODO: make system-agnostic approach
 
 from epde.cache.cache import Cache
+from epde.supplementary import create_solution_net
 
 
 def init_caches(set_grids: bool = False):
@@ -138,15 +139,56 @@ def reset_control_nn(n_var: int = 1, n_control: int = 1, ann: torch.nn.Sequentia
     control_nn = ann
 
 
-def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], ann: torch.nn.Sequential = None,
-                       epochs_max=1e3, loss_mean=1000, batch_frac=0.5, learining_rate=1e-4,
-                       use_pretrained: bool = False):
+def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], predefined_ann: torch.nn.Sequential = None,
+                       train: bool = True, epochs_max=1e3, loss_mean=1000, batch_frac=0.5, learining_rate=1e-4):
     '''
     Represent the data with ANN, suitable to be used as the initial guess of the candidate equations solutions 
     during the equation search, employing solver-based fitness function.
+
+    Possible addition: add optimization in Sobolev space, using passed derivatives, incl. higher orders.
     '''
 
-    
+
 
     global solution_guess_nn
-    solution_guess_nn = 
+    if predefined_ann is None:
+        model = create_solution_net(equations_num=len(data), domain_dim=len(grids))
+    else:
+        model = predefined_ann
+
+    if train:
+        grids_tr = torch.from_numpy(np.array([subgrid.reshape(-1) for subgrid in grids])).float().T
+        data_tr = torch.from_numpy(np.array([data_var.reshape(-1) for data_var in data])).float().T
+        grids_tr.to(device)
+        data_tr.to(device)
+
+        batch_size = int(data[0].size * batch_frac)
+        optimizer = torch.optim.Adam(model.parameters(), lr = learining_rate)
+        
+        t = 0
+        min_loss = np.inf
+        while loss_mean > 1e-6 and t < epochs_max:
+
+            permutation = torch.randperm(grids_tr.size()[0])
+
+            loss_list = []
+
+            for i in range(0, grids_tr.size()[0], batch_size):
+                optimizer.zero_grad()
+
+                indices = permutation[i:i+batch_size]
+                batch_x, batch_y = grids_tr[indices], data_tr[indices]
+
+                loss = torch.mean(torch.abs(batch_y-model(batch_x)))
+
+                loss.backward()
+                optimizer.step()
+                loss_list.append(loss.item())
+            loss_mean = np.mean(loss_list)
+            if loss_mean < min_loss:
+                best_model = model
+                min_loss = loss_mean
+            print('Surface training t={}, loss={}'.format(t, loss_mean))
+            t += 1
+        model = best_model
+    solution_guess_nn = best_model

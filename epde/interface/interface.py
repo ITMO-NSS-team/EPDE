@@ -284,17 +284,12 @@ class EpdeSearch(object):
                                        threshold=threshold, division_fractions=division_fractions,
                                        rectangular=rectangular)
 
-        if multiobjective_mode:
-            mode_key = 'multi objective'
-        else:
-            mode_key = 'single objective'
-        
+        self._mode_info = {'criteria': 'multi objective' if multiobjective_mode else 'single objective',
+                           'solver_fitness': use_solver}
+
         # Here we initialize a singleton object with evolutionary params. It is used in operators' initialization.
         EvolutionaryParams.reset()
-        evo_param = EvolutionaryParams(parameter_file = params_filename, mode = mode_key)
-
-        if use_solver:
-            global_var.dimensionality = dimensionality
+        evo_param = EvolutionaryParams(parameter_file = params_filename, mode = self._mode_info['criteria'])
 
         if director is not None and not use_default_strategy:
             self.director = director
@@ -306,7 +301,7 @@ class EpdeSearch(object):
                 self.director = BaselineDirector()
                 builder = StrategyBuilder(EvolutionaryStrategy)
             self.director.builder = builder
-            self.director.use_baseline(params=director_params)
+            self.director.use_baseline(use_solver=self._mode_info['solver_fitness'], params=director_params)
         else:
             raise NotImplementedError('Wrong arguments passed during the epde search initialization')
 
@@ -644,8 +639,8 @@ class EpdeSearch(object):
 
         if derivs is None:
             if len(data) != len(variable_names):
-                print(len(data), len(variable_names))
-                raise ValueError('Mismatching lengths of data tensors and the names of the variables')
+                msg = f'Mismatching nums of data tensors {len(data)} and the names of the variables { len(variable_names)}'
+                raise ValueError(msg)
         else:
             if not (len(data) == len(variable_names) == len(derivs)):
                 raise ValueError('Mismatching lengths of data tensors, names of the variables and passed derivatives')
@@ -662,14 +657,20 @@ class EpdeSearch(object):
                                    data_tensor=data_tensor)
             derivs_tensor = derivs[data_elem_idx] if derivs is not None else None
             entry.set_derivatives(preprocesser=self.preprocessor_pipeline, deriv_tensors=derivs_tensor,
-                                  grid=grid, max_order=max_deriv_order) # Diff with appropriate method
+                                  grid=grid, max_order=max_deriv_order)
             entry.use_global_cache()
 
-            self.set_derivatives(variable=variable_names[data_elem_idx], deriv=entry.derivatives)  
+            self.save_derivatives(variable=variable_names[data_elem_idx], deriv=entry.derivatives)  
             entry.create_derivs_family(max_deriv_power=deriv_fun_pow)
             entry.create_polynomial_family(max_power=data_fun_pow)
             
             data_tokens.extend(entry.get_families())
+
+        if self._mode_info['solver_fitness']:
+            try:
+                global_var.solution_guess_nn
+            except AttributeError:
+                global_var.reset_data_repr_nn(data = data, grids = grid, predefined_ann=None)
 
         if isinstance(additional_tokens, list):
             if not all([isinstance(tf, (TokenFamily, PreparedTokens)) for tf in additional_tokens]):
@@ -684,7 +685,7 @@ class EpdeSearch(object):
         print(f'The cardinality of defined token pool is {self.pool.families_cardinality()}')
         print(f'Among them, the pool contains {self.pool.families_cardinality(meaningful_only=True)}')
         
-    def set_derivatives(self, variable:str, deriv:np.ndarray):
+    def save_derivatives(self, variable:str, deriv:np.ndarray):
         '''
         Pass the derivatives of a variable as a np.ndarray.
     

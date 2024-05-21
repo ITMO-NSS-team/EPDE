@@ -6,7 +6,7 @@ Created on Fri Feb  3 17:15:31 2023
 @author: maslyaev
 """
 
-from abc import ABC, abstractproperty
+from abc import ABC, abstractmethod
 
 from epde.optimizers.blocks import EvolutionaryBlock, InputBlock
 from epde.optimizers.strategy import Strategy
@@ -55,7 +55,7 @@ class StrategyBuilder():
         self.reachable = dict()
         self.initial_label = None        
     
-    @abstractproperty
+    @property
     def processer(self):
         return self._processer
 

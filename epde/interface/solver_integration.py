@@ -19,12 +19,14 @@ from epde.structure.main_structures import Equation, SoEq
 import epde.globals as global_var
 from epde.evaluators import CustomEvaluator, simple_function_evaluator
 
+from epde.supplementary import create_solution_net
 from epde.solver.data import Domain, Conditions
 from epde.solver.data import Equation as SolverEquation
 from epde.solver.model import Model
 from epde.solver.callbacks import cache, early_stopping, plot, adaptive_lambda
 from epde.solver.optimizers.optimizer import Optimizer
 from epde.solver.device import solver_device, check_device, device_type
+from epde.solver.models import mat_model
 
 VAL_TYPES = Union[FunctionType, int, float, torch.Tensor, np.ndarray]
 
@@ -268,7 +270,7 @@ class PregenBOperator(object):
         def _(equation_sf: dict, variables=['u',]) -> dict:  # dict = {u: 0}):
             dim = global_var.grid_cache.get('0').ndim
             if len(variables) == 1:
-                print('processing a single variable')
+                # print('processing a single variable')
                 var_max_orders = np.zeros(dim)
                 for term in equation_sf.values():
                     if isinstance(term['pow'], list):
@@ -562,7 +564,17 @@ class SolverAdapter(object):
     @property
     def mode(self):
         return self._compiling_params['mode']
-        
+    
+    @staticmethod
+    def get_net(equations, mode: str, domain: Domain, use_fourier = True, 
+                fft_params: dict = {'L' : [4,], 'M' : [3,]}):
+        if mode == 'mat':
+            return mat_model(domain, equations)
+        elif mode in ['autograd', 'NN']:
+            return create_solution_net(equations_num=equations.num, domain_dim=domain.ndim,
+                                       use_fourier=use_fourier, fft_params=fft_params)
+            
+
     def set_compiling_params(self, mode: str = None, lambda_operator: float = None, 
                              lambda_bound : float = None, normalized_loss_stop: bool = None,
                              h: float = None, inner_order: str = None, boundary_order: str = None,

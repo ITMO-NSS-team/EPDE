@@ -19,41 +19,35 @@ from epde.solver.models import Fourier_embedding, mat_model
 
 # from epde.
 
-def get_net(equations, mode: str, domain: Domain, use_fourier = True, 
-            fft_params: dict = {'L' : [4,], 'M' : [3,]}):
-    if mode == 'mat':
-        return mat_model(domain, equations)
-    elif mode in ['autograd', 'NN']:
-        L_default, M_default = 4, 10
-        if use_fourier:
-            if fft_params is None:
-                if domain.dim == 1:
-                    fft_params = {'L' : [L_default],
-                                    'M' : [M_default]}
-                else:
-                    fft_params = {'L' : [L_default] + [None,] * (domain.dim - 1), 
-                                    'M' : [M_default] + [None,] * (domain.dim - 1)}
-            net_default = [Fourier_embedding(**fft_params),]
-        else:
-            net_default = []        
-        linear_inputs = net_default[0].out_features if use_fourier else domain.dim
-        
-        if domain.dim == 1:            
-            hidden_neurons = 128
-        else:
-            hidden_neurons = 112
-
-        operators = net_default + [torch.nn.Linear(linear_inputs, hidden_neurons),
-                                    torch.nn.Tanh(),
-                                    torch.nn.Linear(hidden_neurons, hidden_neurons),
-                                    torch.nn.Tanh(),
-                                    torch.nn.Linear(hidden_neurons, hidden_neurons),
-                                    torch.nn.Tanh(),
-                                    torch.nn.Linear(hidden_neurons, equations.num)]
-        model = torch.nn.Sequential(*operators)
+def create_solution_net(equations_num: int, domain_dim: int, use_fourier = True, #  mode: str, domain: Domain 
+                        fft_params: dict = {'L' : [4,], 'M' : [3,]}):
+    L_default, M_default = 4, 10
+    if use_fourier:
+        if fft_params is None:
+            if domain_dim == 1:
+                fft_params = {'L' : [L_default],
+                                'M' : [M_default]}
+            else:
+                fft_params = {'L' : [L_default] + [None,] * (domain_dim - 1), 
+                                'M' : [M_default] + [None,] * (domain_dim - 1)}
+        net_default = [Fourier_embedding(**fft_params),]
     else:
-        raise ValueError('Incorrect mode specified.')
-    return model
+        net_default = []        
+    linear_inputs = net_default[0].out_features if use_fourier else domain_dim
+    
+    if domain_dim == 1:            
+        hidden_neurons = 128
+    else:
+        hidden_neurons = 112
+
+    operators = net_default + [torch.nn.Linear(linear_inputs, hidden_neurons),
+                                torch.nn.Tanh(),
+                                torch.nn.Linear(hidden_neurons, hidden_neurons),
+                                torch.nn.Tanh(),
+                                torch.nn.Linear(hidden_neurons, hidden_neurons),
+                                torch.nn.Tanh(),
+                                torch.nn.Linear(hidden_neurons, equations_num)]
+    return torch.nn.Sequential(*operators)
 
 def exp_form(a, sign_num: int = 4):
     if np.isclose(a, 0):
