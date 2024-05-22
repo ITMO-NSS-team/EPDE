@@ -148,8 +148,8 @@ class Model():
 
         self.cur_loss = self.min_loss
 
-        print('[{}] initial (min) loss is {}'.format(
-                datetime.datetime.now(), self.min_loss.item()))
+        # print('[{}] initial (min) loss is {}'.format(
+        #         datetime.datetime.now(), self.min_loss.item()))
 
         while self.t < epochs and self.stop_training == False:
             callbacks.on_epoch_begin()
@@ -175,6 +175,3 @@ class Model():
         callbacks.on_train_end()
 
         self._model_save(save_model, model_name)
-
-
-        

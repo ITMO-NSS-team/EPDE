@@ -115,7 +115,9 @@ class SolverBasedFitness(CompoundOperator):
         self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
         self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
 
-        # 
+        print('solving equation:')
+        print(objective.text_form)
+
         solution = self.adapter.solve_epde_system(system = objective, grids = None, 
                                                   boundary_conditions = None)
 

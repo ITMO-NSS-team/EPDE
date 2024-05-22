@@ -17,7 +17,6 @@ import matplotlib.pyplot as plt
 from epde.solver.data import Domain
 from epde.solver.models import Fourier_embedding, mat_model
 
-# from epde.
 
 def create_solution_net(equations_num: int, domain_dim: int, use_fourier = True, #  mode: str, domain: Domain 
                         fft_params: dict = {'L' : [4,], 'M' : [3,]}):
@@ -26,10 +25,10 @@ def create_solution_net(equations_num: int, domain_dim: int, use_fourier = True,
         if fft_params is None:
             if domain_dim == 1:
                 fft_params = {'L' : [L_default],
-                                'M' : [M_default]}
+                              'M' : [M_default]}
             else:
                 fft_params = {'L' : [L_default] + [None,] * (domain_dim - 1), 
-                                'M' : [M_default] + [None,] * (domain_dim - 1)}
+                              'M' : [M_default] + [None,] * (domain_dim - 1)}
         net_default = [Fourier_embedding(**fft_params),]
     else:
         net_default = []        
@@ -41,12 +40,12 @@ def create_solution_net(equations_num: int, domain_dim: int, use_fourier = True,
         hidden_neurons = 112
 
     operators = net_default + [torch.nn.Linear(linear_inputs, hidden_neurons),
-                                torch.nn.Tanh(),
-                                torch.nn.Linear(hidden_neurons, hidden_neurons),
-                                torch.nn.Tanh(),
-                                torch.nn.Linear(hidden_neurons, hidden_neurons),
-                                torch.nn.Tanh(),
-                                torch.nn.Linear(hidden_neurons, equations_num)]
+                               torch.nn.Tanh(),
+                               torch.nn.Linear(hidden_neurons, hidden_neurons),
+                               torch.nn.Tanh(),
+                               torch.nn.Linear(hidden_neurons, hidden_neurons),
+                               torch.nn.Tanh(),
+                               torch.nn.Linear(hidden_neurons, equations_num)]
     return torch.nn.Sequential(*operators)
 
 def exp_form(a, sign_num: int = 4):
@@ -90,7 +89,7 @@ def train_ann(args: list, data: np.ndarray, epochs_max: int = 500, batch_frac = 
     grid_tensor = torch.from_numpy(data_grid).float().T
     grid_tensor.to(device)
     data = torch.from_numpy(data.reshape(-1, 1)).float()
-    print(data.size)
+    # print(data.size)
     data.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 

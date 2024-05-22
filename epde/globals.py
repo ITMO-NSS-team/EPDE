@@ -125,7 +125,6 @@ def reset_control_nn(n_var: int = 1, n_control: int = 1, ann: torch.nn.Sequentia
     '''
     if ann is None:
         hidden_neurons = 128
-        print(n_var)
         layers = [torch.nn.Linear(n_var, hidden_neurons),
                   torch.nn.Tanh(),
                   torch.nn.Linear(hidden_neurons, hidden_neurons),
@@ -188,7 +187,7 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], predefin
             if loss_mean < min_loss:
                 best_model = model
                 min_loss = loss_mean
-            print('Surface training t={}, loss={}'.format(t, loss_mean))
+            # print('Surface training t={}, loss={}'.format(t, loss_mean))
             t += 1
         model = best_model
     solution_guess_nn = best_model

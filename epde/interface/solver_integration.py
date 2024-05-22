@@ -103,7 +103,7 @@ BASE_EARLY_STOPPING_PARAMS = {
                               'normalized_loss'         : False,
                               'randomize_parameter'     : 1e-5,
                               'info_string_every'       : 'None',
-                              'verbose'                 : True
+                              'verbose'                 : False
                               }
 
 try:
@@ -121,7 +121,7 @@ BASE_PLOTTER_PARAMS = {
 
 BASE_TRAINING_PARAMS = {
                         'epochs'            : 1e5, 
-                        'info_string_every' : 1e4,
+                        'info_string_every' : 'None', #1e4,
                         'mixed_precision'   : False,
                         'save_model'        : False,
                         'model_name'        : 'None'
@@ -201,7 +201,6 @@ class BOPElement(object):
                 boundary = torch.moveaxis(boundary, source=0, destination=self.axis).resize()
             else:
                 boundary = torch.from_numpy(np.array([[abs_loc,],])).float() # TODO: work from here
-            print('boundary.shape', boundary.shape, boundary.ndim)
             
         elif boundary is None and self.location is None:
             raise ValueError('No location passed into the BOP.')
@@ -223,8 +222,6 @@ class PregenBOperator(object):
     def demonstrate_required_ords(self):
         linked_ords = list(zip([eq.main_var_to_explain for eq in self.system],
                                self.max_deriv_orders))
-        print(
-            f'Orders, required by an equation, are as follows: {linked_ords}')
 
     @property
     def conditions(self):
@@ -270,7 +267,6 @@ class PregenBOperator(object):
         def _(equation_sf: dict, variables=['u',]) -> dict:  # dict = {u: 0}):
             dim = global_var.grid_cache.get('0').ndim
             if len(variables) == 1:
-                # print('processing a single variable')
                 var_max_orders = np.zeros(dim)
                 for term in equation_sf.values():
                     if isinstance(term['pow'], list):
@@ -366,7 +362,6 @@ class PregenBOperator(object):
                     operator.set_grid(grid=coords)
                     operator.values = bc_values
                     bconds.append(operator)
-        print('obtained bconds:', bconds)
         self.conditions = bconds
 
 
@@ -479,8 +474,6 @@ class SystemSolverInterface(object):
                 grids = [torch.from_numpy(subgrid) for subgrid in grids]            
             default_domain = False
 
-        print(f'In the solver form declaration, default_domain mode flag is {default_domain}')
-
         for term_idx, term in enumerate(equation.structure):
             if term_idx != equation.target_idx:
                 if term_idx < equation.target_idx:
@@ -506,7 +499,7 @@ class SystemSolverInterface(object):
         target_form = self._term_solver_form(equation.structure[equation.target_idx], grids, default_domain, variables)
         target_form['coeff'] = target_form['coeff'] * target_weight
         target_form['coeff'] = adjust_shape(target_form['coeff'], mode = mode)
-        print(f'target_form shape is {target_form["coeff"].shape}')
+        # print(f'target_form shape is {target_form["coeff"].shape}')
 
         _solver_form[equation.structure[equation.target_idx].name] = target_form
 
@@ -734,7 +727,7 @@ class SolverAdapter(object):
         else:
             grid_var_keys, _ = global_var.grid_cache.get_all(mode = 'torch')
 
-        print(f'Before grid creation {grids}')
+        # print(f'Before grid creation {grids}')
         domain = self.create_domain(grid_var_keys, grids)
 
         return self.solve(equations=[form[1] for form in system_solver_forms], domain = domain,
