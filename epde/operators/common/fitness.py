@@ -118,10 +118,9 @@ class SolverBasedFitness(CompoundOperator):
         print('solving equation:')
         print(objective.text_form)
 
-        solution = self.adapter.solve_epde_system(system = objective, grids = None, 
-                                                  boundary_conditions = None)
+        loss_add, solution = self.adapter.solve_epde_system(system = objective, grids = None, 
+                                                            boundary_conditions = None)
 
-        grid = global_var.grid_cache.get_all()[1]
         self.g_fun_vals = global_var.grid_cache.g_func
         
         for eq_idx, eq in enumerate(objective.vals):
@@ -130,8 +129,10 @@ class SolverBasedFitness(CompoundOperator):
             discr = (solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape))
             discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape))
             rl_error = np.linalg.norm(discr, ord = 2)
-            
-            fitness_value = rl_error
+
+
+            print(f'fitness error is {rl_error}, while loss addition is {float(loss_add)}')            
+            fitness_value = rl_error + self.params['pinn_loss_mult'] * float(loss_add)
             if np.sum(eq.weights_final) == 0: 
                 fitness_value /= self.params['penalty_coeff']
 

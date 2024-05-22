@@ -98,7 +98,7 @@ BASE_EARLY_STOPPING_PARAMS = {
                               'eps'                     : 1e-7,
                               'loss_window'             : 100,
                               'no_improvement_patience' : 1000,
-                              'patience'                : 8,
+                              'patience'                : 2,
                               'abs_loss'                : 1e-5,
                               'normalized_loss'         : False,
                               'randomize_parameter'     : 1e-5,
@@ -120,7 +120,7 @@ BASE_PLOTTER_PARAMS = {
 
 
 BASE_TRAINING_PARAMS = {
-                        'epochs'            : 1e5, 
+                        'epochs'            : 1e3, 
                         'info_string_every' : 'None', #1e4,
                         'mixed_precision'   : False,
                         'save_model'        : False,
@@ -762,7 +762,7 @@ class SolverAdapter(object):
         model = Model(net = self.net, domain = domain, equation = equations_prepared, 
                       conditions = boundary_conditions)
         model.compile(**self._compiling_params)
-        model.train(optimizer, callbacks=callbacks, **self._training_params)
+        loss = model.train(optimizer, callbacks=callbacks, **self._training_params)
         
         grid = domain.build(mode = self.mode)
         self.net  = self.net.to(device = device_type())
@@ -772,4 +772,4 @@ class SolverAdapter(object):
             solution = self.net(grid).detach().cpu().numpy()
         else:
             solution = self.net.detach().cpu().numpy()
-        return solution
+        return loss, solution

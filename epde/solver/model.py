@@ -175,3 +175,4 @@ class Model():
         callbacks.on_train_end()
 
         self._model_save(save_model, model_name)
+        return self.cur_loss # Or min_loss?
