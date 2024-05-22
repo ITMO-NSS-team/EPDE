@@ -11,7 +11,8 @@ sns.set(style="whitegrid", color_codes=True)
 
 path = 'data_kdv/'
 path = str(os.path.join(Path().absolute().parent, path))
-names = ["0", "0.001", "0.01", "0.07", "0.08", "0.09", "0.092"]
+# names = ["0", "0.001", "0.01", "0.07", "0.08", "0.09", "0.092"]
+names = ["0", "0.023", "0.046", "0.069", "0.092"]
 n_df = 2
 decimals = 4
 
@@ -20,8 +21,8 @@ categories, df_lsr = _round_values(df_ls, decimals=decimals)
 categories = categories[np.argsort(categories)]
 categories = categories[:len(categories)-1]
 
-core_values = [1.2e-05, 1.0e-04, 1.0e-03, 1.4e-03]
-core_colors = ["#385623", "#669D41", "#A8D08D", "#E2EFD9"]
+core_values = [1.0e-05, 4.9e-05, 1.0e-04,  6.0e-04, 1.1e-03, 1.4e-03]
+core_colors = ["#385623", "#43682A", "#5A8B39", "#669D41", "#A8D08D", "#FDFEFC"]
 
 categories_log = np.log(categories)
 core_values_log = np.log(core_values)
