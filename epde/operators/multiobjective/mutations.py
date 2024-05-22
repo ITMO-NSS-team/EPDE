@@ -63,6 +63,11 @@ class EquationMutation(CompoundOperator):
             if np.random.uniform(0, 1) <= self.params['r_mutation']:
                 objective.structure[term_idx] = self.suboperators['mutation'].apply(objective = (term_idx, objective),
                                                                                     arguments = subop_args['mutation'])
+                # str_ls = ["A: ["]
+                # for term in objective.structure:
+                #     str_ls.append(f'{term.name.replace("{power: 1.0}", "")}, ')
+                # str_ls.append(']')
+                # print("".join(str_ls))
         return objective
 
     def use_default_tags(self):
@@ -114,6 +119,25 @@ class TermMutation(CompoundOperator):
 
         # if len(objective[1].pool.custom_prob_terms) != 0:
         term_ls, prob_ls = objective[1].equation_status.set_mutation_probability()
+
+
+
+        # str_ls = ["\nB: ["]
+        # for term in objective[1].structure:
+        #     str_ls.append(f'{term.name.replace("{power: 1.0}", "")}, ')
+        # str_ls.append(']')
+        # print("".join(str_ls))
+        # dictionary = dict(zip(term_ls, prob_ls))
+        # for i, (key, val) in enumerate(dictionary.items()):
+        #     if i == 0:
+        #         print(f"{{{key}: {val:.3f}")
+        #     elif i == len(dictionary) - 1:
+        #         print(f"{key}: {val:.3f}}}")
+        #     else:
+        #         print(f"{key}: {val:.3f}")
+
+
+
         new_term_sym = np.random.choice(a=term_ls, p=prob_ls)
         new_term = Term(objective[1].pool, max_factors_in_term=objective[1].metaparameters['max_factors_in_term']['value'],
                         passed_term=list(global_var.sympool.pool_sym_dict.get(new_term_sym)))
