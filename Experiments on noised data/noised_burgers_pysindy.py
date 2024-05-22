@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import matplotlib.pyplot as plt
 from pysindy_calc_mae import calc_difference
+import pickle
 warnings.filterwarnings("ignore", category=UserWarning)
 
 
@@ -31,15 +32,18 @@ true_names = ["x0_11", "x0x0_1"]
 
 ''' Parameters of the experiment '''
 iter_number = 50
-write_csv = False
+write_csv = True
 print_results = True
+eq_type = "data_pysindy_burg"
 
 draw_not_found = []
 draw_time = []
 draw_mae = []
-magnitudes = [0., 1. * 1e-3, 5. * 1e-3, 1. * 1e-2, 2 * 1e-2, 3 * 1e-2]
-for magnitude in magnitudes:
-    title = f"dfp{magnitude}"
+magnitudes = [0, 0.0075,  0.015,  0.0225, 0.03]
+magnames = ["0", "0.0075",  "0.015",  "0.0225", "0.03"]
+
+for magnitude, magname in zip(magnitudes, magnames):
+    title = f"dfp{magname}"
     time_ls = []
     mae_ls = []
     found_ls = []
@@ -64,6 +68,11 @@ for magnitude in magnitudes:
         model.print()
 
         eq = model.equations(17)
+
+        # path_exp = os.path.join(Path().absolute().parent, eq_type, "equations", f"{title}_{i}.pickle")
+        # with open(path_exp, "wb") as f:
+        #     pickle.dump(eq, f)
+
         mae, found_flag = calc_difference(eq[0], true_coef, true_names)
         mae_ls.append(mae)
 
@@ -80,7 +89,7 @@ for magnitude in magnitudes:
         arr = np.array([mae_ls, time_ls, found_ls])
         arr = arr.T
         df = pd.DataFrame(data=arr, columns=["MAE", 'time', "found"])
-        df.to_csv(os.path.join(Path().absolute().parent, "data_burg_sindy", f"{title}.csv"))
+        df.to_csv(os.path.join(Path().absolute().parent, "data_pysindy_burg", f"{title}.csv"))
     if print_results:
         print(f"Average time, s: {sum(time_ls) / iter_number:.2f}")
         print(f"Average min MAE: {df.MAE.mean():.2f}")

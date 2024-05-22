@@ -9,6 +9,7 @@ import logging
 import os
 from pathlib import Path
 import matplotlib.pyplot as plt
+import pickle
 
 
 def find_coeff_diff(res):
@@ -107,15 +108,22 @@ if __name__ == '__main__':
     write_csv = True
     print_results = True
     max_iter_number = 50
+    eq_type = "data_pysindy_kdv"
 
     draw_not_found = []
     draw_time = []
     draw_avgmae = []
     start_gl = time.time()
-    # magnitudes = [1. * 1e-5, 1. * 1e-4, 3.5 * 1e-5, 5.5 * 1e-5, 8. * 1e-5, 2.26 * 1e-4]
-    magnitudes = [1. * 1e-4]
-    for magnitude in magnitudes:
-        title = f'dfs{magnitude}'
+    # magnitudes = [1. * 1e-5, 3.5 * 1e-5, 5.5 * 1e-5, 8. * 1e-5, 1. * 1e-4, 2.26 * 1e-4]
+    # magnitudes = [2.26 * 1e-4]
+    magnitudes = [0, 2e-5, 4e-5, 6e-5, 8. * 1e-5] #
+    magnames = ["0", "2e-5", "4e-5", "6e-5", "8e-5"] #
+
+    magnitudes = [4e-5]  #
+    magnames = ["4e-5"]  #
+
+    for magnitude, magname in zip(magnitudes, magnames):
+        title = f'dfs{magname}_142'
 
         time_ls = []
         differences_ls = []
@@ -125,7 +133,10 @@ if __name__ == '__main__':
         i = 0
         population_error = 0
         while i < max_iter_number:
-            u = u_init + np.random.normal(scale=magnitude * np.abs(u_init), size=u_init.shape)
+            if magnitude != 0:
+                u = u_init + np.random.normal(scale=magnitude * np.abs(u_init), size=u_init.shape)
+            else:
+                u = u_init
             epde_search_obj = epde_alg.EpdeSearch(use_solver=False, boundary=boundary,
                                                    dimensionality=dimensionality, coordinate_tensors=grids)
 
@@ -145,6 +156,11 @@ if __name__ == '__main__':
             time1 = end-start
 
             res = epde_search_obj.equation_search_results(only_print=False, num=4)
+
+            path_exp = os.path.join(Path().absolute().parent, eq_type, "equations", f"{title}_{i}.pickle")
+            with open(path_exp, "wb") as f:
+                pickle.dump(res, f)
+
             difference_ls = find_coeff_diff(res)
             if len(difference_ls) != 0:
                 differences_ls.append(min(difference_ls))
@@ -194,16 +210,16 @@ if __name__ == '__main__':
     plt.grid()
     plt.show()
 
-    plt.plot(magnitudes, draw_time, linewidth=2, markersize=9, marker='o')
-    plt.title("SymNet")
-    plt.ylabel("Time, s.")
-    plt.xlabel("Magnitude value")
-    plt.grid()
-    plt.show()
-
-    plt.plot(magnitudes, draw_avgmae, linewidth=2, markersize=9, marker='o')
-    plt.title("SymNet")
-    plt.ylabel("Average MAE")
-    plt.xlabel("Magnitude value")
-    plt.grid()
-    plt.show()
+    # plt.plot(magnitudes, draw_time, linewidth=2, markersize=9, marker='o')
+    # plt.title("SymNet")
+    # plt.ylabel("Time, s.")
+    # plt.xlabel("Magnitude value")
+    # plt.grid()
+    # plt.show()
+    #
+    # plt.plot(magnitudes, draw_avgmae, linewidth=2, markersize=9, marker='o')
+    # plt.title("SymNet")
+    # plt.ylabel("Average MAE")
+    # plt.xlabel("Magnitude value")
+    # plt.grid()
+    # plt.show()

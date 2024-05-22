@@ -11,6 +11,7 @@ import traceback
 import logging
 import os
 from pathlib import Path
+import pickle
 
 
 def find_coeff_diff(res, coefficients: dict):
@@ -110,10 +111,15 @@ if __name__ == '__main__':
     draw_time = []
     draw_avgmae = []
     start_gl = time.time()
-    magnitudes = [1. * 1e-3, 5. * 1e-3, 1. * 1e-2, 2 * 1e-2, 3 * 1e-2]
-    # magnitudes = [3. * 1e-2, ]
-    for magnitude in magnitudes:
-        title = f'dfs{magnitude}'
+    # magnitudes = [0.0075, 0.015, 0.0225, 0.03]
+    # magnames = ["0.0075", "0.015", "0.0225", "0.03"]
+
+    magnitudes = [0, 0.0075, 0.015, 0.0225, 0.03]
+    magnames = ["0", "0.0075", "0.015", "0.0225", "0.03"]
+    mmfs = [3.2, 3.2, 3.1, 2.8, 2.8]
+
+    for magnitude, magname, mmf in zip(magnitudes, magnames, mmfs):
+        title = f'dfs{magnitude}_tuned'
 
         time_ls = []
         differences_ls = []
@@ -123,7 +129,10 @@ if __name__ == '__main__':
         i = 0
         population_error = 0
         while i < max_iter_number:
-            u = u_init + np.random.normal(scale=magnitude * np.abs(u_init), size=u_init.shape)
+            if magnitude != 0:
+                u = u_init + np.random.normal(scale=magnitude * np.abs(u_init), size=u_init.shape)
+            else:
+                u = u_init
             epde_search_obj = epde_alg.EpdeSearch(use_solver=False, boundary=boundary,
                                                   dimensionality=dimensionality, coordinate_tensors=grids)
 
@@ -132,7 +141,7 @@ if __name__ == '__main__':
             try:
                 epde_search_obj.fit(data=u, max_deriv_order=(1, 2),
                                     equation_terms_max_number=3, equation_factors_max_number=2,
-                                    eq_sparsity_interval=(1e-08, 1e-1))
+                                    eq_sparsity_interval=(1e-08, 1e-1), mmf=mmf)
             except Exception as e:
                 logging.error(traceback.format_exc())
                 population_error += 1

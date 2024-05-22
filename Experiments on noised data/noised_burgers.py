@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import traceback
 import logging
 import os
+import pickle
 rcParams.update({'figure.autolayout': True})
 
 
@@ -99,9 +100,12 @@ if __name__ == '__main__':
     ''' Parameters of the experiment '''
     write_csv = True
     print_results = True
-    max_iter_number = 5
-    # magnitudes = [1. * 1e-5, 1.5 * 1e-5, 2 * 1e-5, 2.5 * 1e-5, 3. * 1e-5, 3.67 * 1e-5] #
-    magnitudes = [3. * 1e-5]
+    max_iter_number = 50
+    eq_type = "data_burg"
+    # magnitudes = [1. * 1e-5, 1.5 * 1e-5, 2 * 1e-5, 2.5 * 1e-5, 3. * 1e-5, 3.67 * 1e-5]
+    magnitudes = [0, 9.175e-6, 1.835e-5, 2.7525e-5, 3.67 * 1e-5]
+    magnames = ["0", "9.175e-6", "1.835e-5", "2.7525e-5", "3.67e-5"]
+    mmfs = [3.5, 3.4, 3.4, 3.5, 3.5]
 
     terms = [('du/dx1',), ('du/dx2', 'u'), ('u',), ('du/dx2',), ('u', 'du/dx1'), ('du/dx1', 'du/dx2'), ]
     hashed_ls = [hash_term(term) for term in terms]
@@ -111,8 +115,8 @@ if __name__ == '__main__':
     draw_not_found = []
     draw_time = []
     draw_avgmae = []
-    for magnitude in magnitudes:
-        title = f'dfs{magnitude}'
+    for magnitude, magname, mmf in zip(magnitudes, magnames, mmfs):
+        title = f'dfs{magname}_tuned2'
         time_ls = []
         differences_ls = []
         mean_diff_ls = []
@@ -121,7 +125,10 @@ if __name__ == '__main__':
         i = 0
         population_error = 0
         while i < max_iter_number:
-            u = u_init + np.random.normal(scale=magnitude * np.abs(u_init), size=u_init.shape)
+            if magnitude != 0:
+                u = u_init + np.random.normal(scale=magnitude * np.abs(u_init), size=u_init.shape)
+            else:
+                u = u_init
             epde_search_obj = epde_alg.EpdeSearch(use_solver=False, boundary=boundary,
                                                   dimensionality=dimensionality, coordinate_tensors=grids,)
             # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN', preprocessor_kwargs={'epochs_max': 800})
@@ -130,7 +137,7 @@ if __name__ == '__main__':
             try:
                 epde_search_obj.fit(data=u, max_deriv_order=(1, 1),
                                     equation_terms_max_number=3, equation_factors_max_number=2,
-                                    eq_sparsity_interval=(1e-08, 1e-4))
+                                    eq_sparsity_interval=(1e-08, 1e-4), mmf=mmf)
             except Exception as e:
                 logging.error(traceback.format_exc())
                 population_error += 1
@@ -140,6 +147,11 @@ if __name__ == '__main__':
             time1 = end-start
 
             res = epde_search_obj.equation_search_results(only_print=False, num=2)
+
+            path_exp = os.path.join(Path().absolute().parent, eq_type, "equations", f"{title}_{i}.pickle")
+            with open(path_exp, "wb") as f:
+                pickle.dump(res, f)
+
             difference_ls = find_coeff_diff(res, coefficients)
 
             if len(difference_ls) != 0:

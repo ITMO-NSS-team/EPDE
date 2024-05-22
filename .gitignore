@@ -11,6 +11,8 @@ classic_alg_exp/
 *.png
 *.csv
 *.docx
+*.txt
+*.pickle
 # Distribution / packaging
 .Python
 pyvenv.cfg
