@@ -6,6 +6,8 @@ Created on Thu Feb 13 16:33:34 2020
 @author: mike_ubuntu
 """
 
+from abc import ABC
+
 import numpy as np
 from functools import reduce
 import copy
@@ -18,8 +20,33 @@ from epde.solver.data import Domain
 from epde.solver.models import Fourier_embedding, mat_model
 
 
+class BasicDeriv(ABC):
+    def __init__(self, *args, **kwargs):
+        raise NotImplementedError('Trying to create abstract differentiation method')
+    
+    def take_derivative(self, u: torch.Tensor, grid: torch.Tensor, axes: list):
+        raise NotImplementedError('Trying to differentiate with abstract differentiation method')
+
+class AutogradDeriv(BasicDeriv):
+    def __init__(self):
+        pass
+
+    def take_derivative(self, u: torch.nn.Sequential, grid: torch.Tensor, axes: list = [],
+                        component: int = 0):
+        grid.requires_grad = True
+        output_vals = u(grid)[..., component].sum(dim = 0)
+        for axis in axes:
+            output_vals = output_vals.sum(dim = 0)
+            output_vals = torch.autograd.grad(outputs = output_vals, inputs = grid)[0][:, axis]
+            # print(f'temp is {temp}')
+            # output_vals = temp[:, axis]
+        return output_vals
+
 def create_solution_net(equations_num: int, domain_dim: int, use_fourier = True, #  mode: str, domain: Domain 
-                        fft_params: dict = {'L' : [4,], 'M' : [3,]}):
+                        fft_params: dict = None):
+    '''
+    fft_params have to be passed as dict with entries like: {'L' : [4,], 'M' : [3,]}
+    '''
     L_default, M_default = 4, 10
     if use_fourier:
         if fft_params is None:

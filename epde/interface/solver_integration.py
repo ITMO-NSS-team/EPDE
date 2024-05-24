@@ -98,7 +98,7 @@ BASE_EARLY_STOPPING_PARAMS = {
                               'eps'                     : 1e-7,
                               'loss_window'             : 100,
                               'no_improvement_patience' : 1000,
-                              'patience'                : 2,
+                              'patience'                : 7,
                               'abs_loss'                : 1e-5,
                               'normalized_loss'         : False,
                               'randomize_parameter'     : 1e-5,
@@ -120,7 +120,7 @@ BASE_PLOTTER_PARAMS = {
 
 
 BASE_TRAINING_PARAMS = {
-                        'epochs'            : 1e3, 
+                        'epochs'            : 1e5, 
                         'info_string_every' : 'None', #1e4,
                         'mixed_precision'   : False,
                         'save_model'        : False,
@@ -564,7 +564,7 @@ class SolverAdapter(object):
         if mode == 'mat':
             return mat_model(domain, equations)
         elif mode in ['autograd', 'NN']:
-            return create_solution_net(equations_num=equations.num, domain_dim=domain.ndim,
+            return create_solution_net(equations_num=equations.num, domain_dim=domain.dim,
                                        use_fourier=use_fourier, fft_params=fft_params)
             
 

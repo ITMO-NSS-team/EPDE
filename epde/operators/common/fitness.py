@@ -102,7 +102,7 @@ class SolverBasedFitness(CompoundOperator):
     def set_adapter(self):
         if self.adapter is None:
             try:
-                net = global_var.solution_guess_nn
+                net = deepcopy(global_var.solution_guess_nn)
             except NameError:
                 net = None
             self.adapter = SolverAdapter(net = net, use_cache = False)

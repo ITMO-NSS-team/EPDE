@@ -9,6 +9,7 @@ import epde.globals as global_var
 from epde.interface.interface import EpdeMultisample, EpdeSearch, ExperimentCombiner
 from epde.optimizers.moeadd.moeadd import ParetoLevels
 from epde.interface.solver_integration import SolverAdapter, BOPElement 
+from epde.supplementary import AutogradDeriv
 
 from epde.solver.data import Conditions
 from epde.solver.optimizers.closure import Closure
@@ -27,28 +28,6 @@ from epde.solver.optimizers.closure import Closure
 #     def get_closure(self):
 #         self._optimizer.zero_grad()
 
-
-
-class BasicDeriv(ABC):
-    def __init__(self, *args, **kwargs):
-        raise NotImplementedError('Trying to create abstract differentiation method')
-    
-    def take_derivative(self, u: torch.Tensor, grid: torch.Tensor, axes: list):
-        raise NotImplementedError('Trying to differentiate with abstract differentiation method')
-
-
-class AutogradDeriv(BasicDeriv):
-    def __init__(self):
-        pass
-
-    def take_derivative(self, u: torch.nn.Sequential, grid: torch.Tensor, axes: List = [],
-                        component: int = 0):
-        grid.requires_grad = True
-        output_vals = u(grid)[..., component].sum(dim = 0)
-        for axis in axes[:-1]:
-            output_vals = output_vals.sum(dim = 0)
-            output_vals = torch.autograd.grad(outputs = output_vals, inputs = grid)[0][:, axis]
-        return output_vals
 
 
 class ControlConstraint(ABC):

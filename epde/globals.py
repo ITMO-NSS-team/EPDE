@@ -8,14 +8,14 @@ Created on Tue Feb  9 16:14:57 2021
 
 from dataclasses import dataclass
 import warnings
-from typing import List
+from typing import List, Union
 
 import numpy as np
 import torch
 device = torch.device('cpu') # TODO: make system-agnostic approach
 
 from epde.cache.cache import Cache
-from epde.supplementary import create_solution_net
+from epde.supplementary import create_solution_net, AutogradDeriv
 
 
 def init_caches(set_grids: bool = False):
@@ -138,8 +138,10 @@ def reset_control_nn(n_var: int = 1, n_control: int = 1, ann: torch.nn.Sequentia
     control_nn = ann
 
 
-def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], predefined_ann: torch.nn.Sequential = None,
-                       train: bool = True, epochs_max=1e3, loss_mean=1000, batch_frac=0.5, learining_rate=1e-4):
+def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: bool = True,
+                       derivs: List[Union[int, List, Union[np.ndarray]]] = None, epochs_max=1e5,
+                       predefined_ann: torch.nn.Sequential = None,
+                       batch_frac=0.5, learining_rate=1e-4): # loss_mean=1000, 
     '''
     Represent the data with ANN, suitable to be used as the initial guess of the candidate equations solutions 
     during the equation search, employing solver-based fitness function.
@@ -147,9 +149,9 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], predefin
     Possible addition: add optimization in Sobolev space, using passed derivatives, incl. higher orders.
     '''
 
-
-
     global solution_guess_nn
+    
+
     if predefined_ann is None:
         model = create_solution_net(equations_num=len(data), domain_dim=len(grids))
     else:
@@ -163,9 +165,11 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], predefin
 
         batch_size = int(data[0].size * batch_frac)
         optimizer = torch.optim.Adam(model.parameters(), lr = learining_rate)
-        
+        deriv_calc = AutogradDeriv()
+
         t = 0
         min_loss = np.inf
+        loss_mean = np.inf
         while loss_mean > 1e-6 and t < epochs_max:
 
             permutation = torch.randperm(grids_tr.size()[0])
@@ -178,7 +182,14 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], predefin
                 indices = permutation[i:i+batch_size]
                 batch_x, batch_y = grids_tr[indices], data_tr[indices]
 
-                loss = torch.mean(torch.abs(batch_y-model(batch_x)))
+                loss = torch.mean(torch.abs(batch_y - model(batch_x)))
+                if derivs is not None:
+                    for var_idx, deriv_axes, deriv_tensor in derivs:
+                        deriv_autograd = deriv_calc.take_derivative(model, batch_x, axes = deriv_axes, component = var_idx)
+                        batch_derivs = torch.from_numpy(deriv_tensor)[indices].reshape_as(deriv_autograd)
+ 
+                        loss_add = 1e3 * torch.mean(torch.abs(batch_derivs - deriv_autograd))
+                        loss += loss_add
 
                 loss.backward()
                 optimizer.step()
@@ -187,7 +198,6 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], predefin
             if loss_mean < min_loss:
                 best_model = model
                 min_loss = loss_mean
-            # print('Surface training t={}, loss={}'.format(t, loss_mean))
             t += 1
         model = best_model
     solution_guess_nn = best_model
