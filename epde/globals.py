@@ -139,8 +139,9 @@ def reset_control_nn(n_var: int = 1, n_control: int = 1, ann: torch.nn.Sequentia
 
 
 def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: bool = True,
-                       derivs: List[Union[int, List, Union[np.ndarray]]] = None, epochs_max=1e5,
-                       predefined_ann: torch.nn.Sequential = None,
+                       derivs: List[Union[int, List, Union[np.ndarray]]] = None, 
+                       penalised_derivs: List[Union[int, List]] = None,
+                       epochs_max=1e5, predefined_ann: torch.nn.Sequential = None,
                        batch_frac=0.5, learining_rate=1e-4): # loss_mean=1000, 
     '''
     Represent the data with ANN, suitable to be used as the initial guess of the candidate equations solutions 
@@ -188,10 +189,20 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: b
                         deriv_autograd = deriv_calc.take_derivative(model, batch_x, axes = deriv_axes, component = var_idx)
                         batch_derivs = torch.from_numpy(deriv_tensor)[indices].reshape_as(deriv_autograd)
  
-                        loss_add = 1e3 * torch.mean(torch.abs(batch_derivs - deriv_autograd))
+                        loss_add = 1e2 * torch.mean(torch.abs(batch_derivs - deriv_autograd))
+                        # print(loss, loss_add)
                         loss += loss_add
 
-                loss.backward()
+                if penalised_derivs is not None:
+                    for var_idx, deriv_axes in derivs:
+                        deriv_autograd = deriv_calc.take_derivative(model, batch_x, axes = deriv_axes, component = var_idx)
+                        batch_derivs = torch.from_numpy(deriv_tensor)[indices].reshape_as(deriv_autograd)
+                        higher_ord_penalty = 1e3 * torch.mean(torch.abs(deriv_autograd))
+
+                        loss += higher_ord_penalty
+
+                loss.backward() # retain_graph=True, inputs=batch_x retain_graph=True, inputs=batch_x
+                # print('loss grad is', loss_add.grad, loss_add)
                 optimizer.step()
                 loss_list.append(loss.item())
             loss_mean = np.mean(loss_list)
@@ -200,4 +211,5 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: b
                 min_loss = loss_mean
             t += 1
         model = best_model
+    print(f'min loss is {min_loss}, in last epoch: {loss_list}, ')
     solution_guess_nn = best_model

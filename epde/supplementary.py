@@ -34,13 +34,20 @@ class AutogradDeriv(BasicDeriv):
     def take_derivative(self, u: torch.nn.Sequential, grid: torch.Tensor, axes: list = [],
                         component: int = 0):
         grid.requires_grad = True
-        output_vals = u(grid)[..., component].sum(dim = 0)
+        comp_sum = u(grid)[..., component].sum(dim = 0)
         for axis in axes:
-            output_vals = output_vals.sum(dim = 0)
-            output_vals = torch.autograd.grad(outputs = output_vals, inputs = grid)[0][:, axis]
-            # print(f'temp is {temp}')
-            # output_vals = temp[:, axis]
+            output_vals = torch.autograd.grad(outputs = comp_sum, inputs = grid, create_graph=True)[0]
+            comp_sum = output_vals[:, axis].sum()
+        output_vals = output_vals[:, axes[-1]].reshape(-1, 1)
         return output_vals
+
+    #    points.requires_grad = True
+    #     fi = model(points)[:, var].sum(0)
+    #     for ax in axis:
+    #         grads, = torch.autograd.grad(fi, points, create_graph=True)
+    #         fi = grads[:, ax].sum()
+    #     gradient_full = grads[:, axis[-1]].reshape(-1, 1)
+    #     return gradient_full
 
 def create_solution_net(equations_num: int, domain_dim: int, use_fourier = True, #  mode: str, domain: Domain 
                         fft_params: dict = None):
@@ -67,9 +74,9 @@ def create_solution_net(equations_num: int, domain_dim: int, use_fourier = True,
         hidden_neurons = 112
 
     operators = net_default + [torch.nn.Linear(linear_inputs, hidden_neurons),
-                               torch.nn.Tanh(),
+                               torch.nn.ReLU(),
                                torch.nn.Linear(hidden_neurons, hidden_neurons),
-                               torch.nn.Tanh(),
+                               torch.nn.ReLU(),
                                torch.nn.Linear(hidden_neurons, hidden_neurons),
                                torch.nn.Tanh(),
                                torch.nn.Linear(hidden_neurons, equations_num)]
