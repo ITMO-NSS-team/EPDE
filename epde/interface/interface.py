@@ -134,14 +134,15 @@ class InputDataEntry(object):
         """
         var_idx = self.var_idx
         deriv_codes = self.d_orders
-        derivs_stacked = prepare_var_tensor(self.data_tensor, self.derivatives, time_axis=global_var.time_axis)
+        derivs_stacked = prepare_var_tensor(self.data_tensor, self.derivatives, 
+                                            time_axis=global_var.time_axis)
         deriv_codes = [(var_idx, code) for code in deriv_codes]
 
         try:
             upload_simple_tokens(self.names, global_var.tensor_cache, derivs_stacked, 
                                  deriv_codes=deriv_codes)
             upload_simple_tokens([self.var_name,], global_var.tensor_cache, [self.data_tensor,],
-                                 deriv_codes=[(var_idx, [None,]),])            
+                                 deriv_codes=[(var_idx, [None,]),])
             upload_simple_tokens([self.var_name,], global_var.initial_data_cache, [self.data_tensor,])
 
         except AttributeError:
@@ -178,11 +179,10 @@ class InputDataEntry(object):
         self._derivs_family = TokenFamily(token_type=f'deriv of {self.var_name}', variable = self.var_name, 
                                           family_of_derivs=True)
         
-        
         self._derivs_family.set_latex_form_constructor(self.latex_form)
         self._derivs_family.set_status(demands_equation=True, unique_specific_token=False,
-                                      unique_token_type=False, s_and_d_merged=False,
-                                      meaningful=True)
+                                       unique_token_type=False, s_and_d_merged=False,
+                                       meaningful=True)
         self._derivs_family.set_params(self.names, OrderedDict([('power', (1, max_deriv_power))]),
                                       {'power': 0}, self.d_orders)
         self._derivs_family.set_evaluator(simple_function_evaluator)
@@ -193,6 +193,12 @@ class InputDataEntry(object):
 
     def get_families(self):
         return [self._polynomial_family, self._derivs_family]
+
+    def matched_derivs(self, max_order = 1):
+        derivs_stacked = prepare_var_tensor(self.data_tensor, self.derivatives, 
+                                            time_axis=global_var.time_axis)        
+        return [[self.var_idx, key, derivs_stacked[idx, ...]] for idx, key in enumerate(self.names)
+                if len(key) <= max_order]
 
 def simple_selector(sorted_neighbors, number_of_neighbors=4):
     return sorted_neighbors[:number_of_neighbors]
@@ -649,7 +655,9 @@ class EpdeSearch(object):
             self.set_preprocessor()
 
         data_tokens = []
-        
+        if self._mode_info['solver_fitness']: 
+            base_derivs = []
+            
         for data_elem_idx, data_tensor in enumerate(data):
             # TODO: add more relevant checks
             # assert isinstance(data_tensor, np.ndarray), 'Input data must be in format of numpy ndarrays or iterable (list or tuple) of numpy arrays'
@@ -663,14 +671,17 @@ class EpdeSearch(object):
             self.save_derivatives(variable=variable_names[data_elem_idx], deriv=entry.derivatives)  
             entry.create_derivs_family(max_deriv_power=deriv_fun_pow)
             entry.create_polynomial_family(max_power=data_fun_pow)
-            
+            if self._mode_info['solver_fitness']:
+                base_derivs.extend(entry.matched_derivs(max_ord = 2)) # TODO: add setup of Sobolev learning order
+                
             data_tokens.extend(entry.get_families())
 
         if self._mode_info['solver_fitness']:
             try:
                 global_var.solution_guess_nn
             except AttributeError:
-                global_var.reset_data_repr_nn(data = data, grids = grid, predefined_ann=None)
+                global_var.reset_data_repr_nn(data = data, derivs = base_derivs, 
+                                              grids = grid, predefined_ann=None)
 
         if isinstance(additional_tokens, list):
             if not all([isinstance(tf, (TokenFamily, PreparedTokens)) for tf in additional_tokens]):
