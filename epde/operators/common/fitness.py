@@ -100,12 +100,22 @@ class SolverBasedFitness(CompoundOperator):
         self.adapter = None
 
     def set_adapter(self):
+
         if self.adapter is None:
+            compiling_params = {'tol':0.01, 'lambda_bound': 1e0, 'h': 1e-1} #
+            optimizer_params = {'optimizer': 'LBFGS', 'params': {'lr': 1e-4}}
+            training_params = {'epochs': 1e3, 'info_string_every' : 1e3}
+            early_stopping_params = {'patience': 5}
             try:
                 net = deepcopy(global_var.solution_guess_nn)
             except NameError:
                 net = None
             self.adapter = SolverAdapter(net = net, use_cache = False)
+
+            self.adapter.set_compiling_params(**compiling_params)            
+            self.adapter.set_optimizer_params(**optimizer_params)
+            self.adapter.set_early_stopping_params(**early_stopping_params)
+            self.adapter.set_training_params(**training_params)
 
     def apply(self, objective : SoEq, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)

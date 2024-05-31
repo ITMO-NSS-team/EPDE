@@ -672,7 +672,7 @@ class EpdeSearch(object):
             entry.create_derivs_family(max_deriv_power=deriv_fun_pow)
             entry.create_polynomial_family(max_power=data_fun_pow)
             if self._mode_info['solver_fitness']:
-                base_derivs.extend(entry.matched_derivs(max_ord = 2)) # TODO: add setup of Sobolev learning order
+                base_derivs.extend(entry.matched_derivs(max_order = 2)) # TODO: add setup of Sobolev learning order
                 
             data_tokens.extend(entry.get_families())
 

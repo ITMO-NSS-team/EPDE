@@ -9,7 +9,7 @@ import epde.globals as global_var
 from epde.interface.interface import EpdeMultisample, EpdeSearch, ExperimentCombiner
 from epde.optimizers.moeadd.moeadd import ParetoLevels
 from epde.interface.solver_integration import SolverAdapter, BOPElement 
-from epde.supplementary import AutogradDeriv
+from epde.supplementary import BasicDeriv, AutogradDeriv
 
 from epde.solver.data import Conditions
 from epde.solver.optimizers.closure import Closure
