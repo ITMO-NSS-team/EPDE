@@ -13,6 +13,7 @@ such as initialization of neccessary token families and derivatives calculation.
 """
 import pickle
 import numpy as np
+import torch
 
 from copy import deepcopy
 from typing import Union, Callable, List, Tuple
@@ -626,7 +627,8 @@ class EpdeSearch(object):
 
     def create_pool(self, data: Union[np.ndarray, list, tuple], variable_names=['u',],
                     derivs=None, max_deriv_order=1, additional_tokens=[],
-                    data_fun_pow: int = 1, deriv_fun_pow: int = 1, grid: list = None):
+                    data_fun_pow: int = 1, deriv_fun_pow: int = 1, grid: list = None,
+                    data_nn: torch.nn.Sequential = None):
         '''
         Create pool of tokens to represent elementary functions, that can be included in equations.
         
@@ -677,11 +679,16 @@ class EpdeSearch(object):
             data_tokens.extend(entry.get_families())
 
         if self._mode_info['solver_fitness']:
-            try:
-                global_var.solution_guess_nn
-            except AttributeError:
+            if data_nn is not None:
                 global_var.reset_data_repr_nn(data = data, derivs = base_derivs, 
-                                              grids = grid, predefined_ann=None)
+                                              grids = grid, predefined_ann=data_nn)
+            else:
+                try:
+                    global_var.solution_guess_nn
+                    print('Reusing existing NN data approximation')
+                except AttributeError:
+                    global_var.reset_data_repr_nn(data = data, derivs = base_derivs, 
+                                                grids = grid, predefined_ann=None)
 
         if isinstance(additional_tokens, list):
             if not all([isinstance(tf, (TokenFamily, PreparedTokens)) for tf in additional_tokens]):

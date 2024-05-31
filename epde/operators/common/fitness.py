@@ -8,6 +8,7 @@ Created on Fri Jun  4 13:20:59 2021
 
 import numpy as np
 from copy import deepcopy
+import torch
 
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -16,6 +17,8 @@ from epde.interface.solver_integration import SolverAdapter
 from epde.structure.main_structures import SoEq, Equation
 from epde.operators.utils.template import CompoundOperator
 import epde.globals as global_var
+
+LOSS_NAN_VAL = 1e7
 
 class L2Fitness(CompoundOperator):
     """
@@ -103,14 +106,10 @@ class SolverBasedFitness(CompoundOperator):
 
         if self.adapter is None:
             compiling_params = {'tol':0.01, 'lambda_bound': 1e0, 'h': 1e-1} #
-            optimizer_params = {'optimizer': 'LBFGS', 'params': {'lr': 1e-4}}
-            training_params = {'epochs': 1e3, 'info_string_every' : 1e3}
-            early_stopping_params = {'patience': 5}
-            try:
-                net = deepcopy(global_var.solution_guess_nn)
-            except NameError:
-                net = None
-            self.adapter = SolverAdapter(net = net, use_cache = False)
+            optimizer_params = {} # 'optimizer': 'LBFGS', 'params': {'lr': 1e-4}
+            training_params = {'epochs': 5e2, 'info_string_every' : 1e2}
+            early_stopping_params = {'patience': 3, 'no_improvement_patience' : 50}
+            self.adapter = SolverAdapter(net = None, use_cache = False)
 
             self.adapter.set_compiling_params(**compiling_params)            
             self.adapter.set_optimizer_params(**optimizer_params)
@@ -121,6 +120,10 @@ class SolverBasedFitness(CompoundOperator):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
         self.set_adapter()
+        try:
+            net = deepcopy(global_var.solution_guess_nn)
+        except NameError:
+            net = None
 
         self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
         self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
@@ -130,29 +133,28 @@ class SolverBasedFitness(CompoundOperator):
 
         loss_add, solution = self.adapter.solve_epde_system(system = objective, grids = None, 
                                                             boundary_conditions = None)
+        # if torch.isnan(loss_add):
+        #     loss_add = LOSS_NAN_VAL
 
         self.g_fun_vals = global_var.grid_cache.g_func
         
         for eq_idx, eq in enumerate(objective.vals):
-            referential_data = global_var.tensor_cache.get((eq.main_var_to_explain, (1.0,)))
+            if torch.isnan(loss_add):
+                fitness_value = 2*LOSS_NAN_VAL
+            else:
+                referential_data = global_var.tensor_cache.get((eq.main_var_to_explain, (1.0,)))
 
-            discr = (solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape))
-            discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape))
-            rl_error = np.linalg.norm(discr, ord = 2)
-
-
-            print(f'fitness error is {rl_error}, while loss addition is {float(loss_add)}')            
-            fitness_value = rl_error + self.params['pinn_loss_mult'] * float(loss_add)
-            if np.sum(eq.weights_final) == 0: 
-                fitness_value /= self.params['penalty_coeff']
+                discr = (solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape))
+                discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape))
+                rl_error = np.linalg.norm(discr, ord = 2) 
+                
+                print(f'fitness error is {rl_error}, while loss addition is {float(loss_add)}')            
+                fitness_value = rl_error + self.params['pinn_loss_mult'] * float(loss_add)
+                if np.sum(eq.weights_final) == 0: 
+                    fitness_value /= self.params['penalty_coeff']
 
             eq.fitness_calculated = True
             eq.fitness_value = fitness_value
-
-            # if global_var.verbose.plot_DE_solutions:
-            #     plot_data_vs_solution(self.adapter.convert_grid(grid),
-            #                           data = referential_data.reshape(solution[eq_idx, ...].shape), 
-            #                           solution = solution[eq_idx, ...])
 
     def use_default_tags(self):
         self._tags = {'fitness evaluation', 'chromosome level', 'contains suboperators', 'inplace'}

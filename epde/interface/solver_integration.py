@@ -554,6 +554,9 @@ class SolverAdapter(object):
         
         self.use_cache = use_cache
     
+    # def set_net(self, net, get_net_kwargs: dict):
+    #     self.net = net if net is None else self.get_net(**get_net_kwargs)
+
     @property
     def mode(self):
         return self._compiling_params['mode']
