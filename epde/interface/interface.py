@@ -683,12 +683,8 @@ class EpdeSearch(object):
                 global_var.reset_data_repr_nn(data = data, derivs = base_derivs, 
                                               grids = grid, predefined_ann=data_nn)
             else:
-                try:
-                    global_var.solution_guess_nn
-                    print('Reusing existing NN data approximation')
-                except AttributeError:
-                    global_var.reset_data_repr_nn(data = data, derivs = base_derivs, 
-                                                grids = grid, predefined_ann=None)
+                global_var.reset_data_repr_nn(data = data, derivs = base_derivs, 
+                                            grids = grid, predefined_ann=None)
 
         if isinstance(additional_tokens, list):
             if not all([isinstance(tf, (TokenFamily, PreparedTokens)) for tf in additional_tokens]):

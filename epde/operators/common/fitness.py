@@ -107,8 +107,8 @@ class SolverBasedFitness(CompoundOperator):
         if self.adapter is None:
             compiling_params = {'tol':0.01, 'lambda_bound': 1e0, 'h': 1e-1} #
             optimizer_params = {} # 'optimizer': 'LBFGS', 'params': {'lr': 1e-4}
-            training_params = {'epochs': 5e2, 'info_string_every' : 1e2}
-            early_stopping_params = {'patience': 3, 'no_improvement_patience' : 50}
+            training_params = {'epochs': 5e3, 'info_string_every' : 1e4}
+            early_stopping_params = {'patience': 4, 'no_improvement_patience' : 50}
             self.adapter = SolverAdapter(net = None, use_cache = False)
 
             self.adapter.set_compiling_params(**compiling_params)            
