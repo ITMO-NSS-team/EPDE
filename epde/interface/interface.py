@@ -197,8 +197,11 @@ class InputDataEntry(object):
 
     def matched_derivs(self, max_order = 1):
         derivs_stacked = prepare_var_tensor(self.data_tensor, self.derivatives, 
-                                            time_axis=global_var.time_axis)        
-        return [[self.var_idx, key, derivs_stacked[idx, ...]] for idx, key in enumerate(self.names)
+                                            time_axis=global_var.time_axis)
+        # print(f'Creating matched derivs: {[[self.var_idx, key, len(key) <= max_order] for idx, 
+        #                                    key in enumerate(self.d_orders)]}')
+        # print(f'From {self.d_orders}')
+        return [[self.var_idx, key, derivs_stacked[idx, ...]] for idx, key in enumerate(self.d_orders)
                 if len(key) <= max_order]
 
 def simple_selector(sorted_neighbors, number_of_neighbors=4):
@@ -679,6 +682,7 @@ class EpdeSearch(object):
             data_tokens.extend(entry.get_families())
 
         if self._mode_info['solver_fitness']:
+            # print(f'Base derivs are {base_derivs}')
             if data_nn is not None:
                 global_var.reset_data_repr_nn(data = data, derivs = base_derivs, 
                                               grids = grid, predefined_ann=data_nn)
@@ -734,7 +738,7 @@ class EpdeSearch(object):
             equation_factors_max_number=1, variable_names=['u',], eq_sparsity_interval=(1e-4, 2.5), 
             derivs=None, max_deriv_order=1, additional_tokens=[], data_fun_pow: int = 1, deriv_fun_pow: int = 1,
             optimizer: Union[SimpleOptimizer, MOEADDOptimizer] = None, pool: TFPool = None,
-            population: Union[ParetoLevels, Population] = None):
+            population: Union[ParetoLevels, Population] = None, data_nn = None):
         """
         Fit epde search algorithm to obtain differential equations, describing passed data.
 
@@ -803,7 +807,8 @@ class EpdeSearch(object):
                 self.create_pool(data = data, variable_names=variable_names, 
                                  derivs=derivs, max_deriv_order=max_deriv_order, 
                                  additional_tokens=additional_tokens, 
-                                 data_fun_pow=data_fun_pow, deriv_fun_pow = deriv_fun_pow)
+                                 data_fun_pow = data_fun_pow, deriv_fun_pow = deriv_fun_pow, 
+                                 data_nn = data_nn)
         else:
             self.pool = pool; self.pool_params = cur_params
 

@@ -102,14 +102,14 @@ class SolverBasedFitness(CompoundOperator):
         super().__init__(param_keys)
         self.adapter = None
 
-    def set_adapter(self):
+    def set_adapter(self, net = None):
 
-        if self.adapter is None:
+        if self.adapter is None or net is not None:
             compiling_params = {'tol':0.01, 'lambda_bound': 1e0, 'h': 1e-1} #
             optimizer_params = {} # 'optimizer': 'LBFGS', 'params': {'lr': 1e-4}
-            training_params = {'epochs': 5e3, 'info_string_every' : 1e4}
-            early_stopping_params = {'patience': 4, 'no_improvement_patience' : 50}
-            self.adapter = SolverAdapter(net = None, use_cache = False)
+            training_params = {'epochs': 5e4, 'info_string_every' : 1e4}
+            early_stopping_params = {'patience': 6, 'no_improvement_patience' : 500}
+            self.adapter = SolverAdapter(net = net, use_cache = False)
 
             self.adapter.set_compiling_params(**compiling_params)            
             self.adapter.set_optimizer_params(**optimizer_params)
@@ -119,11 +119,12 @@ class SolverBasedFitness(CompoundOperator):
     def apply(self, objective : SoEq, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
-        self.set_adapter()
         try:
             net = deepcopy(global_var.solution_guess_nn)
         except NameError:
             net = None
+
+        self.set_adapter(net=net)
 
         self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
         self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])

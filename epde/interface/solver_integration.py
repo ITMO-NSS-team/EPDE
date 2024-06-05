@@ -277,8 +277,8 @@ class PregenBOperator(object):
                     else:
                         orders = np.array([count_factor_order(term['term'], ax) for ax
                                            in np.arange(dim)])
-                var_max_orders = {variables[0]: np.maximum(var_max_orders, orders)}
-                return var_max_orders
+                        var_max_orders = np.maximum(var_max_orders, orders)
+                return {variables[0]: var_max_orders}
             else:
                 var_max_orders = {var_key: np.zeros(dim) for var_key in variables}
                 for term_key, symb_form in equation_sf.items():
@@ -699,7 +699,7 @@ class SolverAdapter(object):
         assert len(variables) == grids[0].ndim, 'Grids have to be set as a N-dimensional np.ndarrays with dim \
             matching the domain dimensionality'
         domain = Domain('uniform')
-        # if isinstance(grids[0], np.ndarray):
+
         for idx, var_name in enumerate(variables):
             domain.variable(variable_name = var_name, variable_set = torch.tensor(grids[idx]), 
                             n_points = None)
@@ -722,6 +722,7 @@ class SolverAdapter(object):
             
         bconds_combined = Conditions()
         for cond in boundary_conditions:
+            print(f'cond: loc: {cond['bnd_loc']}, operator: {cond['bnd_op']}, value: {cond['bnd_val']}')
             bconds_combined.operator(bnd = cond['bnd_loc'], operator = cond['bnd_op'], 
                                      value = cond['bnd_val'])
 

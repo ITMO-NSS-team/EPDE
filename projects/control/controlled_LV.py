@@ -1,0 +1,104 @@
+import numpy as np
+from typing import Callable, Union
+from collections import OrderedDict
+
+import matplotlib as mpl
+mpl.use('TkAgg')
+import matplotlib.pyplot as plt
+import epde
+
+def controlled_lv_by_RK(initial : tuple, timestep : float, steps : int, alpha : float, 
+                        beta : float, delta : float, gamma : float, c1: float = 0, c2: float = 0,
+                        conrol_intensity: Union[np.ndarray, Callable] = lambda x: 1):
+    res = np.full(shape = (steps, 2), fill_value = initial, dtype=np.float64)
+    if not isinstance(conrol_intensity, np.ndarray):
+        conrol_intensity_vect = np.vectorize(conrol_intensity)
+        conrol_intensity = conrol_intensity_vect(np.linspace(0, steps*timestep, steps*2 - 1))
+    assert conrol_intensity.size == steps*2-1, 'Incorrect shape of control, not taking Runge-Kutta half-steps into account'
+
+    for step in range(steps-1):
+        alpha_1 = alpha - c1*conrol_intensity[2*step]
+        alpha_2 = alpha - c1*conrol_intensity[2*step + 1]
+        alpha_3 = alpha - c1*conrol_intensity[2*step + 2]
+
+        gamma_1 = gamma + c2*conrol_intensity[2*step]
+        gamma_2 = gamma + c2*conrol_intensity[2*step + 1]
+        gamma_3 = gamma + c2*conrol_intensity[2*step + 2]
+
+
+        k1 = alpha_1 * res[step, 0] - beta * res[step, 0] * res[step, 1]; x1 = res[step, 0] + timestep/2. * k1
+        l1 = delta * res[step, 0] * res[step, 1] - gamma_1 * res[step, 1]; y1 = res[step, 1] + timestep/2. * l1
+
+        k2 = alpha_2 * x1 - beta * x1 * y1; x2 = res[step, 0] + timestep/2. * k2
+        l2 = delta * x1 * y1 - gamma_2 * y1; y2 = res[step, 1] + timestep/2. * l2
+
+        k3 = alpha_2 * x2 - beta * x2 * y2
+        l3 = delta * x2 * y2 - gamma_2 * y1
+        
+        x3 = res[step, 0] + timestep * k1 - 2 * timestep * k2 + 2 * timestep * k3
+        y3 = res[step, 1] + timestep * l1 - 2 * timestep * l2 + 2 * timestep * l3
+        k4 = alpha_3 * x3 - beta * x3 * y3
+        l4 = delta * x3 * y3 - gamma_3 * y3
+        
+        res[step+1, 0] = res[step, 0] + timestep / 6. * (k1 + 2 * k2 + 2 * k3 + k4)
+        res[step+1, 1] = res[step, 1] + timestep / 6. * (l1 + 2 * l2 + 2 * l3 + l4)
+    return res
+
+def prepare_data(steps_num: int = 301, t_max: float = 1.):
+    def get_sine_control(ampl: float = 1, period: float = 1., 
+                         phase_shift: float = 0.) -> Callable:
+        return lambda x: ampl*(np.sin(2*np.pi/period*(x + phase_shift)) + 1.)
+    
+    step = t_max/steps_num
+    t = np.arange(start = 0, stop = step * steps_num, step = step)
+    ctrl = get_sine_control(ampl = 15., period=0.3)(np.linspace(0, 1, t.size*2 - 1))
+    solution = controlled_lv_by_RK(initial=(4., 2.), timestep=step, steps=steps_num, 
+                                   alpha=20., beta=20., delta=20., gamma=20., 
+                                   c1 = 1., c2 = 1., conrol_intensity = ctrl)
+
+    return t, ctrl[::2], solution
+
+def epde_discovery(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np.ndarray, diff_method = 'FD'):
+    dimensionality = t.ndim - 1
+    
+    epde_search_obj = epde.EpdeSearch(use_solver = False, dimensionality = dimensionality, boundary = 30,
+                                      coordinate_tensors = [t,], verbose_params = {'show_iter_idx' : True})    
+    
+    if diff_method == 'ANN':
+        epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
+                                         preprocessor_kwargs={'epochs_max' : 50000})
+    elif diff_method == 'poly':
+        epde_search_obj.set_preprocessor(default_preprocessor_type='poly',
+                                         preprocessor_kwargs={'use_smoothing' : False, 'sigma' : 1, 
+                                                              'polynomial_window' : 3, 'poly_order' : 4}) 
+    elif diff_method == 'FD':
+        epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+                                         preprocessor_kwargs={}) 
+    else:
+        raise ValueError('Incorrect preprocessing tool selected.')
+
+    
+    control_var_tokens = epde.CacheStoredTokens('control', ['ctrl',], {'ctrl' : control}, OrderedDict([('power', (1, 1))]),
+                                                {'power': 0}, meaningful=True)
+    
+    eps = 5e-7
+    popsize = 24
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=200)
+
+    factors_max_number = {'factors_num' : [1, 2, 3,], 'probas' : [0.2, 0.65, 0.15]}
+
+    custom_grid_tokens = epde.GridTokens(dimensionality = dimensionality, max_power=1)
+    
+    epde_search_obj.fit(data=[u, v], variable_names=['u', 'v'], max_deriv_order=(1,),
+                        equation_terms_max_number=5, data_fun_pow = 2,#, derivs = [derivs['y'], derivs['phi']],
+                        additional_tokens=[custom_grid_tokens, control_var_tokens], # , control_var_tokens, 
+                        equation_factors_max_number=factors_max_number,
+                        eq_sparsity_interval=(1e-7, 1e-5)) # TODO: narrow sparsity interval, reduce the population size
+    epde_search_obj.equations()
+    return epde_search_obj
+
+if __name__ == '__main__':
+    t, ctrl, solution = prepare_data()
+
+
+
