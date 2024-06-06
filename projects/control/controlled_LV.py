@@ -1,11 +1,21 @@
+import os
+import sys
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../..')))
+
 import numpy as np
+import torch
+
 from typing import Callable, Union
 from collections import OrderedDict
 
 import matplotlib as mpl
 mpl.use('TkAgg')
 import matplotlib.pyplot as plt
+
 import epde
+import epde.interface.control_utils as control_utils
+
 
 def controlled_lv_by_RK(initial : tuple, timestep : float, steps : int, alpha : float, 
                         beta : float, delta : float, gamma : float, c1: float = 0, c2: float = 0,
@@ -58,12 +68,55 @@ def prepare_data(steps_num: int = 301, t_max: float = 1.):
 
     return t, ctrl[::2], solution
 
-def epde_discovery(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np.ndarray, diff_method = 'FD'):
+def epde_discovery(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np.ndarray, diff_method = 'FD',
+                   bnd = 30):
     dimensionality = t.ndim - 1
     
-    epde_search_obj = epde.EpdeSearch(use_solver = False, dimensionality = dimensionality, boundary = 30,
+    epde_search_obj = epde.EpdeSearch(use_solver = False, dimensionality = dimensionality, boundary = bnd,
                                       coordinate_tensors = [t,], verbose_params = {'show_iter_idx' : True})    
     
+    if diff_method == 'ANN':
+        epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
+                                         preprocessor_kwargs={'epochs_max' : 50000})
+    elif diff_method == 'poly':
+        epde_search_obj.set_preprocessor(default_preprocessor_type='poly',
+                                         preprocessor_kwargs={'use_smoothing' : False, 'sigma' : 1, 
+                                                              'polynomial_window' : 3, 'poly_order' : 4}) 
+    elif diff_method == 'FD':
+        epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+                                         preprocessor_kwargs={}) 
+    else:
+        raise ValueError('Incorrect preprocessing tool selected.')
+
+    
+    # control_var_tokens = epde.CacheStoredTokens('control', ['ctrl',], {'ctrl' : control}, OrderedDict([('power', (1, 1))]),
+    #                                             {'power': 0}, meaningful=True)
+
+    control_var_tokens = epde.interface.prepared_tokens.ControlVarTokens()
+
+    eps = 5e-7
+    popsize = 24
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=200)
+
+    factors_max_number = {'factors_num' : [1, 2, 3,], 'probas' : [0.2, 0.65, 0.15]}
+
+    custom_grid_tokens = epde.GridTokens(dimensionality = dimensionality, max_power=1)
+    
+    epde_search_obj.fit(data=[u, v], variable_names=['u', 'v'], max_deriv_order=(1,),
+                        equation_terms_max_number=5, data_fun_pow = 2,
+                        additional_tokens=[custom_grid_tokens, control_var_tokens],
+                        equation_factors_max_number=factors_max_number,
+                        eq_sparsity_interval=(1e-7, 1e-5))
+    epde_search_obj.equations()
+    return epde_search_obj
+
+def translate_dummy_eqs(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np.ndarray, diff_method = 'FD',
+                        bnd = 30):
+    dimensionality = t.ndim - 1
+    
+    epde_search_obj = epde.EpdeSearch(use_solver = False, dimensionality = dimensionality, boundary = bnd,
+                                      coordinate_tensors = [t,], verbose_params = {'show_iter_idx' : True})    
+
     if diff_method == 'ANN':
         epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
                                          preprocessor_kwargs={'epochs_max' : 50000})
@@ -81,24 +134,41 @@ def epde_discovery(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np.ndar
     control_var_tokens = epde.CacheStoredTokens('control', ['ctrl',], {'ctrl' : control}, OrderedDict([('power', (1, 1))]),
                                                 {'power': 0}, meaningful=True)
     
-    eps = 5e-7
-    popsize = 24
-    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=200)
 
-    factors_max_number = {'factors_num' : [1, 2, 3,], 'probas' : [0.2, 0.65, 0.15]}
+    epde_search_obj.create_pool(data=[u, v], variable_names=['u', 'v'], max_deriv_order=(1,),
+                            additional_tokens = [control_var_tokens,])
 
-    custom_grid_tokens = epde.GridTokens(dimensionality = dimensionality, max_power=1)
+
+    eq_u = '20. * u{power: 1} + -1. * ctrl{power: 1} * u{power: 1} + -20. * u{power: 1} * v{power: 1} + 0 = du/dx0{power: 1}'
+    eq_v = '-20. * v{power: 1} + 1. * ctrl{power: 1} * v{power: 1} + 20. * u{power: 1} * v{power: 1} + 0 = dv/dx0{power: 1}'
+
+    test = epde.interface.equation_translator.translate_equation({'u': eq_u, 'v': eq_v}, pool = epde_search_obj.pool)
+    return test
+
+def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
+                  u_tar: float, v_tar: float):
+    from epde.supplementary import AutogradDeriv
+    autograd = AutogradDeriv()
+
+    u_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = u_tar),
+                                                 grid = t, deriv_method = autograd)
+    v_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = v_tar),
+                                                 grid = t, deriv_method = autograd)
+    contr_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = 0.),
+                                                 grid = t, deriv_method = autograd)
     
-    epde_search_obj.fit(data=[u, v], variable_names=['u', 'v'], max_deriv_order=(1,),
-                        equation_terms_max_number=5, data_fun_pow = 2,#, derivs = [derivs['y'], derivs['phi']],
-                        additional_tokens=[custom_grid_tokens, control_var_tokens], # , control_var_tokens, 
-                        equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-7, 1e-5)) # TODO: narrow sparsity interval, reduce the population size
-    epde_search_obj.equations()
-    return epde_search_obj
+    loss = control_utils.ConditionalLoss([(10., u_tar_constr, 0),
+                                          (10., v_tar_constr, 1),
+                                          (1.,  contr_constr, 2)])
+    optimizer = control_utils.ControlExp(loss=loss)
+
+
+
+    return 
 
 if __name__ == '__main__':
     t, ctrl, solution = prepare_data()
+    model = translate_dummy_eqs(t, solution[:, 0], solution[:, 1], ctrl)
 
-
-
+    # constr = []
+    # constr.append(control_utils.)

@@ -684,7 +684,8 @@ class EpdeSearch(object):
         if self._mode_info['solver_fitness']:
             # print(f'Base derivs are {base_derivs}')
             if data_nn is not None:
-                global_var.reset_data_repr_nn(data = data, derivs = base_derivs, 
+                print('Using pre-trained ANN')
+                global_var.reset_data_repr_nn(data = data, derivs = base_derivs, train = False, 
                                               grids = grid, predefined_ann=data_nn)
             else:
                 global_var.reset_data_repr_nn(data = data, derivs = base_derivs, 

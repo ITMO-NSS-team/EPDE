@@ -722,7 +722,7 @@ class SolverAdapter(object):
             
         bconds_combined = Conditions()
         for cond in boundary_conditions:
-            print(f'cond: loc: {cond['bnd_loc']}, operator: {cond['bnd_op']}, value: {cond['bnd_val']}')
+            # print(f'cond: loc: {cond['bnd_loc']}, operator: {cond['bnd_op']}, value: {cond['bnd_val']}')
             bconds_combined.operator(bnd = cond['bnd_loc'], operator = cond['bnd_op'], 
                                      value = cond['bnd_val'])
 

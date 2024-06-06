@@ -105,10 +105,10 @@ class SolverBasedFitness(CompoundOperator):
     def set_adapter(self, net = None):
 
         if self.adapter is None or net is not None:
-            compiling_params = {'tol':0.01, 'lambda_bound': 1e0, 'h': 1e-1} #
-            optimizer_params = {} # 'optimizer': 'LBFGS', 'params': {'lr': 1e-4}
-            training_params = {'epochs': 5e4, 'info_string_every' : 1e4}
-            early_stopping_params = {'patience': 6, 'no_improvement_patience' : 500}
+            compiling_params = {'mode': 'autograd', 'tol':0.01, 'lambda_bound': 1e2} #  'h': 1e-1
+            optimizer_params = {}
+            training_params = {'epochs': 5e3, 'info_string_every' : 1e3}
+            early_stopping_params = {'patience': 4, 'no_improvement_patience' : 250}
             self.adapter = SolverAdapter(net = net, use_cache = False)
 
             self.adapter.set_compiling_params(**compiling_params)            
@@ -134,8 +134,6 @@ class SolverBasedFitness(CompoundOperator):
 
         loss_add, solution = self.adapter.solve_epde_system(system = objective, grids = None, 
                                                             boundary_conditions = None)
-        # if torch.isnan(loss_add):
-        #     loss_add = LOSS_NAN_VAL
 
         self.g_fun_vals = global_var.grid_cache.g_func
         

@@ -93,11 +93,11 @@ class ControlConstrNEq(ControlConstraint):
         return torch.norm(discrepancy)
 
 class ConditionalLoss():
-    def __init__(self, conditions: List[Tuple[Union[float, ControlConstraint]]]):
+    def __init__(self, conditions: List[Tuple[Union[float, ControlConstraint, int]]]):
         self._cond = conditions
 
-    def __call__(self, u: torch.nn.Sequential):
-        return sum([cond[1]* cond[1].loss(u) for cond in self._cond])
+    def __call__(self, args: List[torch.nn.Sequential]):
+        return sum([cond[0] * cond[1].loss(args[cond[2]]) for cond in self._cond])
 
 class ControlExp():
     def __init__(self, loss : ConditionalLoss):
@@ -142,14 +142,15 @@ class ControlExp():
                                }
 
     def train_pinn(self, bc_operators: List[BOPElement], grids: List[np.ndarray], control_args = [], 
-                   n_control: int = 1, epochs: int = 1e4, net = None):
+                   n_control: int = 1, epochs: int = 1e4, var_net: torch.nn.Sequential = None,
+                   state_net: torch.nn.Sequential = None):
         # Properly formulate training approach
         t = 0
         min_loss = np.inf
         stop_training = False
-        if isinstance(net, torch.nn.Sequential): self._var_net = net
+        if isinstance(var_net, torch.nn.Sequential): self._var_net = var_net
 
-        global_var.reset_control_nn(n_var = len(control_args), n_control=n_control, net = net)
+        global_var.reset_control_nn(n_var = len(control_args), n_control=n_control, net = state_net)
         self._control_net = global_var.control_nn
 
         grids_merged = torch.from_numpy(np.array([subgrid.reshape(-1) for subgrid in grids])).float().T

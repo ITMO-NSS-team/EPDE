@@ -211,5 +211,7 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: b
                 min_loss = loss_mean
             t += 1
         model = best_model
-    print(f'min loss is {min_loss}, in last epoch: {loss_list}, ')
-    solution_guess_nn = best_model
+        print(f'min loss is {min_loss}, in last epoch: {loss_list}, ')
+        solution_guess_nn = best_model
+    else:
+        solution_guess_nn = model
