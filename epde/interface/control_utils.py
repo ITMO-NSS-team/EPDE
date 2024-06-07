@@ -101,7 +101,7 @@ class ConditionalLoss():
 
 class ControlExp():
     def __init__(self, loss : ConditionalLoss):
-        self._var_net = None
+        self._state_net = None
         self._control_net = None
         self.loss = loss
 
@@ -141,30 +141,37 @@ class ControlExp():
                                'device': device
                                }
 
-    def train_pinn(self, bc_operators: List[BOPElement], grids: List[np.ndarray], control_args = [], 
-                   n_control: int = 1, epochs: int = 1e4, var_net: torch.nn.Sequential = None,
-                   state_net: torch.nn.Sequential = None):
+    # def optimize_control_function 
+
+    def train_pinn(self, bc_operators: List[BOPElement], grids: List[Union[np.ndarray, torch.Tensor]], 
+                   control_args = [], n_control: int = 1, epochs: int = 1e4, 
+                   state_net: torch.nn.Sequential = None, control_net: torch.nn.Sequential = None):
         # Properly formulate training approach
         t = 0
         min_loss = np.inf
         stop_training = False
-        if isinstance(var_net, torch.nn.Sequential): self._var_net = var_net
+        if isinstance(state_net, torch.nn.Sequential): self._state_net = state_net
 
-        global_var.reset_control_nn(n_var = len(control_args), n_control=n_control, net = state_net)
-        self._control_net = global_var.control_nn
+        global_var.reset_control_nn(n_var = len(control_args), n_control=n_control, net = control_net)
+        # self._control_net = global_var.control_nn
+        
+        # TODO: To optimize the net in gloabl variables is a terrific approach, rethink it
 
-        grids_merged = torch.from_numpy(np.array([subgrid.reshape(-1) for subgrid in grids])).float().T
+        if isinstance(grids[0], np.ndarray):
+            grids_merged = torch.from_numpy(np.array([subgrid.reshape(-1) for subgrid in grids])).float().T
+        elif isinstance(grids[0], torch.Tensor):
+            grids_merged = torch.concatenate([subgrid.reshape(-1) for subgrid in grids]).float().T
         grids_merged.to(device=self._solver_params['device'])
 
         control_optim_params = {'lr': 1e-2, 'max_iter': 10, 'max_eval': None, 'tolerance_grad': 1e-07,
                                 'tolerance_change': 1e-09, 'history_size': 100, 'line_search_fn': 'strong_wolfe'}
 
-        optimizer = torch.optim.LBFGS(params = self._var_net.parameters(), **control_optim_params)
+        optimizer = torch.optim.LBFGS(params = global_var.control_nn.parameters(), **control_optim_params)
         # Implement closure for loss function
 
         while t < epochs and not stop_training:
             
-            with SolverAdapter(net = self._var_net, use_cache = False) as adapter:
+            with SolverAdapter(net = self._state_net, use_cache = False) as adapter:
                 # Edit solver forms of functions of dependent variable to Callable objects.
                 # Setting various adapater parameters
                 adapter.set_compiling_params(**self._solver_params['compiling_params'])
@@ -188,7 +195,7 @@ class ControlExp():
                 optimizer.step()
 
                 if loss < min_loss:
-                    self._var_net = model
+                    self._state_net = model
                 print(loss)
             
-        return self._var_net
+        return self._state_net

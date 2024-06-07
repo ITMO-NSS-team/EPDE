@@ -107,7 +107,7 @@ class SolverBasedFitness(CompoundOperator):
         if self.adapter is None or net is not None:
             compiling_params = {'mode': 'autograd', 'tol':0.01, 'lambda_bound': 1e2} #  'h': 1e-1
             optimizer_params = {}
-            training_params = {'epochs': 5e3, 'info_string_every' : 1e3}
+            training_params = {'epochs': 2e4, 'info_string_every' : 1e3}
             early_stopping_params = {'patience': 4, 'no_improvement_patience' : 250}
             self.adapter = SolverAdapter(net = net, use_cache = False)
 
@@ -148,7 +148,7 @@ class SolverBasedFitness(CompoundOperator):
                 rl_error = np.linalg.norm(discr, ord = 2) 
                 
                 print(f'fitness error is {rl_error}, while loss addition is {float(loss_add)}')            
-                fitness_value = rl_error + self.params['pinn_loss_mult'] * float(loss_add)
+                fitness_value = rl_error + self.params['pinn_loss_mult'] * float(loss_add) # TODO: make pinn_loss_mult case dependent
                 if np.sum(eq.weights_final) == 0: 
                     fitness_value /= self.params['penalty_coeff']
 

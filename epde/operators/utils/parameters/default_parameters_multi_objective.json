@@ -20,7 +20,7 @@
  	},
  	"SolverBasedFitness" : {
         "penalty_coeff" : 0.2,
-        "pinn_loss_mult" : 1e3
+        "pinn_loss_mult" : 1e4
  	},
  	"ParetoLevelsCrossover" : {
 

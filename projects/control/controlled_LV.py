@@ -1,6 +1,8 @@
 import os
 import sys
 
+import epde.globals
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../..')))
 
 import numpy as np
@@ -17,9 +19,9 @@ import epde
 import epde.interface.control_utils as control_utils
 
 
-def controlled_lv_by_RK(initial : tuple, timestep : float, steps : int, alpha : float, 
-                        beta : float, delta : float, gamma : float, c1: float = 0, c2: float = 0,
-                        conrol_intensity: Union[np.ndarray, Callable] = lambda x: 1):
+def controlled_lv_by_RK_t(initial : tuple, timestep : float, steps : int, alpha : float, 
+                          beta : float, delta : float, gamma : float, c1: float = 0, c2: float = 0,
+                          conrol_intensity: Union[np.ndarray, Callable] = lambda x: 1):
     res = np.full(shape = (steps, 2), fill_value = initial, dtype=np.float64)
     if not isinstance(conrol_intensity, np.ndarray):
         conrol_intensity_vect = np.vectorize(conrol_intensity)
@@ -54,6 +56,49 @@ def controlled_lv_by_RK(initial : tuple, timestep : float, steps : int, alpha : 
         res[step+1, 1] = res[step, 1] + timestep / 6. * (l1 + 2 * l2 + 2 * l3 + l4)
     return res
 
+def controlled_lv_by_RK(initial : tuple, timestep : float, steps : int, alpha : float, 
+                        beta : float, delta : float, gamma : float, c1: float = 0, c2: float = 0,
+                        control_intensity: Union[Callable, torch.nn.Sequential] = lambda x: 1):
+    res = np.full(shape = (steps, 2), fill_value = initial, dtype=np.float64)
+    controls = np.empty(shape = steps)
+
+    if isinstance(control_intensity, torch.nn.Sequential):
+        prepare_input = lambda *args: torch.from_numpy(np.array(args))
+    else:
+        prepare_input = lambda *args: args
+
+    for step in range(steps-1):
+        alpha_1 = alpha - c1*control_intensity(prepare_input(res[step, 0], res[step, 1]))
+        gamma_1 = gamma + c2*control_intensity(prepare_input(res[step, 0], res[step, 1]))
+
+        k1 = alpha_1 * res[step, 0] - beta * res[step, 0] * res[step, 1]; x1 = res[step, 0] + timestep/2. * k1
+        l1 = delta * res[step, 0] * res[step, 1] - gamma_1 * res[step, 1]; y1 = res[step, 1] + timestep/2. * l1
+
+        alpha_2 = alpha - c1*control_intensity(prepare_input(x1, y1))
+        gamma_2 = gamma + c2*control_intensity(prepare_input(x1, y1))
+
+        k2 = alpha_2 * x1 - beta * x1 * y1; x2 = res[step, 0] + timestep/2. * k2
+        l2 = delta * x1 * y1 - gamma_2 * y1; y2 = res[step, 1] + timestep/2. * l2
+
+        alpha_3 = alpha - c1*control_intensity(prepare_input(x2, y2))
+        gamma_3 = gamma + c2*control_intensity(prepare_input(x2, y2))
+
+        k3 = alpha_3 * x2 - beta * x2 * y2
+        l3 = delta * x2 * y2 - gamma_3 * y1
+        
+        x3 = res[step, 0] + timestep * k1 - 2 * timestep * k2 + 2 * timestep * k3
+        y3 = res[step, 1] + timestep * l1 - 2 * timestep * l2 + 2 * timestep * l3
+
+        alpha_4 = alpha - c1*control_intensity(prepare_input(x3, y3))
+        gamma_4 = gamma + c2*control_intensity(prepare_input(x3, y3))
+
+        k4 = alpha_4 * x3 - beta * x3 * y3
+        l4 = delta * x3 * y3 - gamma_4 * y3
+        
+        res[step+1, 0] = res[step, 0] + timestep / 6. * (k1 + 2 * k2 + 2 * k3 + k4)
+        res[step+1, 1] = res[step, 1] + timestep / 6. * (l1 + 2 * l2 + 2 * l3 + l4)
+    return res
+
 def prepare_data(steps_num: int = 301, t_max: float = 1.):
     def get_sine_control(ampl: float = 1, period: float = 1., 
                          phase_shift: float = 0.) -> Callable:
@@ -72,7 +117,7 @@ def epde_discovery(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np.ndar
                    bnd = 30):
     dimensionality = t.ndim - 1
     
-    epde_search_obj = epde.EpdeSearch(use_solver = False, dimensionality = dimensionality, boundary = bnd,
+    epde_search_obj = epde.EpdeSearch(use_solver = True, dimensionality = dimensionality, boundary = bnd,
                                       coordinate_tensors = [t,], verbose_params = {'show_iter_idx' : True})    
     
     if diff_method == 'ANN':
@@ -111,7 +156,7 @@ def epde_discovery(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np.ndar
     return epde_search_obj
 
 def translate_dummy_eqs(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np.ndarray, diff_method = 'FD',
-                        bnd = 30):
+                        bnd = 30, control_ann: torch.nn.Sequential = None):
     dimensionality = t.ndim - 1
     
     epde_search_obj = epde.EpdeSearch(use_solver = False, dimensionality = dimensionality, boundary = bnd,
@@ -131,9 +176,11 @@ def translate_dummy_eqs(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np
         raise ValueError('Incorrect preprocessing tool selected.')
 
     
-    control_var_tokens = epde.CacheStoredTokens('control', ['ctrl',], {'ctrl' : control}, OrderedDict([('power', (1, 1))]),
-                                                {'power': 0}, meaningful=True)
-    
+    # control_var_tokens = epde.CacheStoredTokens('control', ['ctrl',], {'ctrl' : control}, OrderedDict([('power', (1, 1))]),
+    #                                             {'power': 0}, meaningful=True)
+    control_var_tokens = epde.interface.prepared_tokens.ControlVarTokens(sample = control, ann = control_ann, 
+                                                                         arg_var = [(0, [None]),
+                                                                                    (1, [None])])    
 
     epde_search_obj.create_pool(data=[u, v], variable_names=['u', 'v'], max_deriv_order=(1,),
                             additional_tokens = [control_var_tokens,])
@@ -146,7 +193,9 @@ def translate_dummy_eqs(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np
     return test
 
 def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
-                  u_tar: float, v_tar: float):
+                  u_tar: float, v_tar: float, u_init: float, v_init: float,
+                  state_nn_pretrained: torch.nn.Sequential, ctrl_nn_pretrained: torch.nn.Sequential):
+    
     from epde.supplementary import AutogradDeriv
     autograd = AutogradDeriv()
 
@@ -157,18 +206,43 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     contr_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = 0.),
                                                  grid = t, deriv_method = autograd)
     
-    loss = control_utils.ConditionalLoss([(10., u_tar_constr, 0),
-                                          (10., v_tar_constr, 1),
+    loss = control_utils.ConditionalLoss([(100., u_tar_constr, 0),
+                                          (100., v_tar_constr, 1),
                                           (1.,  contr_constr, 2)])
     optimizer = control_utils.ControlExp(loss=loss)
+    
+    def get_ode_bop(key, var, term, grid_loc, value):
+        bop = epde.interface.solver_integration.BOPElement(axis = 0, key = key, term = term,
+                                                           power = 1, var = var)
+        if isinstance(grid_loc, float):
+            bop_grd_np = np.array([[grid_loc,]])
+            bop.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor))
+        elif isinstance(grid_loc, torch.Tensor):
+            bop.set_grid(grid_loc.reshape((1, 1)).type(torch.FloatTensor))
+        else:
+            raise TypeError('Incorret value type, expected float or torch.Tensor.')
+        bop.values = torch.from_numpy(np.array([[value,]])).float()
+        return bop
 
+    bop_u = get_ode_bop('u', 0, [None], t[0], u_init)
+    bop_v = get_ode_bop('u', 0, [None], t[0], v_init)
 
+    optimizer.system = eq
+    optimizer.train_pinn(bc_operators = [bop_u, bop_v], grids = [t,], control_args = [(0, [None]), (1, [None])],
+                         n_control = 1., var_net = state_nn_pretrained, state_net = ctrl_nn_pretrained)
 
-    return 
+    return optimizer
+
+# def train_control_nn()
 
 if __name__ == '__main__':
     t, ctrl, solution = prepare_data()
     model = translate_dummy_eqs(t, solution[:, 0], solution[:, 1], ctrl)
+
+    # state_net = epde.globals.solution_guess_nn
+    # control_net = 
+
+    # optimize_ctrl(model, torch.from_numpy(t), u_tar = 1, v_tar = 0, )
 
     # constr = []
     # constr.append(control_utils.)

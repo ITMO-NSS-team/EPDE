@@ -128,7 +128,7 @@ class DataSign(PreparedTokens):
         Argument `max_power` represents the maximum power, in which the tokens will exponentiated.
         Should be included into the pool by default, replacing the default 1-st power of the data.
         """
-        raise NotImplementedError('Sign is still not implemented.')
+        raise NotImplementedError('TBD.')
         self._token_family = TokenFamily(token_type=f'poly of {var_name}', variable = var_name,
                                          family_of_derivs=True)
         
