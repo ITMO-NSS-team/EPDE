@@ -160,7 +160,7 @@ def epde_discovery(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np.ndar
     return epde_search_obj
 
 def translate_dummy_eqs(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np.ndarray, diff_method = 'FD',
-                        bnd = 30, control_ann: torch.nn.Sequential = None):
+                        bnd = 30, control_ann: torch.nn.Sequential = None, data_nn: torch.nn.Sequential = None):
     dimensionality = t.ndim - 1
     
     epde_search_obj = epde.EpdeSearch(use_solver = True, dimensionality = dimensionality, boundary = bnd,
@@ -175,7 +175,7 @@ def translate_dummy_eqs(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np
                                                               'polynomial_window' : 3, 'poly_order' : 4}) 
     elif diff_method == 'FD':
         epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
-                                         preprocessor_kwargs={}) 
+                                         preprocessor_kwargs={})
     else:
         raise ValueError('Incorrect preprocessing tool selected.')
 
@@ -187,7 +187,7 @@ def translate_dummy_eqs(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np
                                                                                     (1, [None])])    
 
     epde_search_obj.create_pool(data=[u, v], variable_names=['u', 'v'], max_deriv_order=(1,),
-                                additional_tokens = [control_var_tokens,])
+                                additional_tokens = [control_var_tokens,], data_nn = data_nn)
 
 
     eq_u = '20. * u{power: 1} + -1. * ctrl{power: 1} * u{power: 1} + -20. * u{power: 1} * v{power: 1} + 0 = du/dx0{power: 1}'
@@ -232,8 +232,12 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     bop_v = get_ode_bop('u', 0, [None], t[0], v_init)
 
     optimizer.system = eq
-    optimizer.train_pinn(bc_operators = [bop_u, bop_v], grids = [t,], control_args = [(0, [None]), (1, [None])],
-                         n_control = 1., var_net = state_nn_pretrained, state_net = ctrl_nn_pretrained, 
+
+    optimizer.set_control_optim_params()
+    optimizer.set_solver_params()
+
+    optimizer.train_pinn(bc_operators = [bop_u(), bop_v()], grids = [t,], control_args = [(0, [None]), (1, [None])],
+                         n_control = 1., state_net = state_nn_pretrained, control_net = ctrl_nn_pretrained, 
                          epochs = 1e1)
 
     return optimizer
@@ -241,6 +245,49 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 # def train_control_nn()
 
 if __name__ == '__main__':
+    # import pickle
+    # with open(r"/home/maslyaev/Documents/EPDE/projects/control/data_ann.pickle", 'rb') as input_file:  
+    #     data_nn = pickle.load(input_file)
+    # print('Dumped ANN')
+
+    # t, ctrl, solution = prepare_data(ctrl_fun = lambda x: 17*x[1] + 0.05*x[0]  + 0.2) # x[0]
+    # t, ctrl, solution = t[:-1], ctrl[:-1], solution[:-1, ...]
+
+    # print(t.shape, ctrl.shape, solution.shape)
+    # plt.plot(t, solution[:, 0], color = 'k', label = 'Prey, relative units')
+    # plt.plot(t, solution[:, 1], color = 'r', label = 'Hunters, relative units')
+    # plt.plot(t, ctrl, '*', color = 'y', label = 'control variable')
+    # plt.legend()
+    # plt.show()
+
+    # model = translate_dummy_eqs(t, solution[:, 0], solution[:, 1], ctrl, data_nn = data_nn)
+
+    # args = torch.from_numpy(solution).float()
+    # print(args.shape)
+    # ctrl_ann = epde.supplementary.train_ann(args=[solution[:, 0], solution[:, 1]], data = ctrl, epochs_max = 1e4, dim = 2)
+
+
+    # plt.plot(t, ctrl_ann(args).detach().numpy(), color = 'b', label = 'control variable, nn approx')
+    # plt.plot(t, ctrl, '*', color = 'y', label = 'control variable')
+    # plt.legend()
+    # plt.show()
+
+
+    # # print('Dumped ANN')
+
+    # # state_net = epde.globals.solution_guess_nn
+    # # control_net = 
+
+    # nn = optimize_ctrl(model, torch.from_numpy(t), u_tar = 1, v_tar = 0, u_init=solution[0, 0], v_init=solution[0, 1],
+    #                    state_nn_pretrained=epde.globals.solution_guess_nn, ctrl_nn_pretrained=ctrl_ann)
+
+    # with open(r"C:\\Users\\Mike\\Documents\\Work\\EPDE\\projects\\control\\control_ann.pickle", 'wb') as output_file:  
+    #     pickle.dump(nn, output_file)
+    import pickle
+    # with open(r"/home/maslyaev/Documents/EPDE/projects/control/data_ann.pickle", 'rb') as input_file:  
+    #     data_nn = pickle.load(input_file)
+    # print('Dumped ANN')
+
     t, ctrl, solution = prepare_data(ctrl_fun = lambda x: 17*x[1] + 0.05*x[0]  + 0.2) # x[0]
     t, ctrl, solution = t[:-1], ctrl[:-1], solution[:-1, ...]
 
@@ -251,28 +298,25 @@ if __name__ == '__main__':
     plt.legend()
     plt.show()
 
-    model = translate_dummy_eqs(t, solution[:, 0], solution[:, 1], ctrl)
+    model = translate_dummy_eqs(t, solution[:, 0], solution[:, 1], ctrl) # , data_nn = data_nn
+    with open(r"/home/maslyaev/Documents/EPDE/projects/control/control_ann.pickle", 'wb') as output_file:  
+        pickle.dump(epde.globals.solution_guess_nn, output_file)
 
     args = torch.from_numpy(solution).float()
     print(args.shape)
-    ctrl_ann = epde.supplementary.train_ann(args=[solution[:, 0], solution[:, 1]], data = ctrl, epochs_max = 1e4, dim = 2)
 
+
+    ctrl_ann = epde.supplementary.train_ann(args=[solution[:, 0], solution[:, 1]], data = ctrl, epochs_max = 1e4, dim = 2)
+    with open(r"/home/maslyaev/Documents/EPDE/projects/control/control_ann.pickle", 'wb') as output_file:  
+        pickle.dump(ctrl_ann, output_file)
 
     plt.plot(t, ctrl_ann(args).detach().numpy(), color = 'b', label = 'control variable, nn approx')
     plt.plot(t, ctrl, '*', color = 'y', label = 'control variable')
     plt.legend()
-    plt.show()
-
-    import pickle
-    with open(r"C:\\Users\\Mike\\Documents\\Work\\EPDE\\projects\\control\\data_ann.pickle", 'wb') as output_file:  
-        pickle.dump(epde.globals.solution_guess_nn, output_file)
-    print('Dumped ANN')
-
-    # state_net = epde.globals.solution_guess_nn
-    # control_net = 
+    plt.show()   
 
     nn = optimize_ctrl(model, torch.from_numpy(t), u_tar = 1, v_tar = 0, u_init=solution[0, 0], v_init=solution[0, 1],
-                       state_nn_pretrained=epde.globals.solution_guess_nn, ctrl_nn_pretrained=ctrl_ann)
+                        state_nn_pretrained=epde.globals.solution_guess_nn, ctrl_nn_pretrained=ctrl_ann)
 
-    # constr = []
-    # constr.append(control_utils.)
+    with open(r"/home/maslyaev/Documents/EPDE/projects/control/control_opt_ann.pickle", 'wb') as output_file:  
+        pickle.dump(nn, output_file)    

@@ -168,6 +168,7 @@ class ControlVarTokens(PreparedTokens):
     def __init__(self, sample: np.ndarray, ann: torch.nn.Sequential = None, var_name: str = 'ctrl',
                  arg_var: List[Tuple[Union[int, List]]] = [(0, [None,]),]):
         vars, der_ords = zip(*arg_var)
+        print('vars {}, der_ords {}'.format(vars, der_ords))
 
         token_params = OrderedDict([('power', (1, 1)),])
         
@@ -181,7 +182,7 @@ class ControlVarTokens(PreparedTokens):
                                       s_and_d_merged=False, non_default_power = False)
         
         self._token_family.set_params([var_name,], token_params, equal_params,
-                                      derivs_solver_orders=der_ords)
+                                      derivs_solver_orders=[der_ords,])
         
         def nn_eval_torch(*args, **kwargs):
             inp = torch.stack([torch.reshape(tensor, -1) for tensor in args]) # Validate correctness

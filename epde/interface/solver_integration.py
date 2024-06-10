@@ -414,18 +414,24 @@ class SystemSolverInterface(object):
                         power_param_idx = param_idx
                 deriv_orders.append(factor.deriv_code)
                 if factor.evaluator._evaluator != simple_function_evaluator:
-                    if factor.evaluator._single_function_token:
-                        eval_func = factor.evaluator._evaluation_functions_torch 
+                    if factor.evaluator._evaluator._single_function_token:
+                        eval_func = factor.evaluator._evaluator._evaluation_functions_torch 
                     else:
-                        eval_func = factor.evaluator._evaluation_functions_torch[factor.label]
+                        eval_func = factor.evaluator._evaluator._evaluation_functions_torch[factor.label]
                     deriv_powers.append(eval_func)
                 else:
                     deriv_powers.append(factor.params[power_param_idx])
                 try:
-                    cur_deriv_var = variables.index(factor.variable)
+                    if isinstance(factor.variable, str):
+                        cur_deriv_var = variables.index(factor.variable)
+                    elif isinstance(factor.variable, int) or (isinstance(factor.variable, (list, tuple)) and
+                                                              isinstance(factor.variable[0], int)):
+                        cur_deriv_var = factor.variable
+                    elif isinstance(factor.variable, (list, tuple)) and isinstance(factor.variable[0], str):
+                        cur_deriv_var = [variables.index(var_elem) for var_elem in factor.variable]
                 except ValueError:
                     raise ValueError(
-                        f'Variable family of passed derivative {variables}, other than {cur_deriv_var}')
+                        f'Variable family of passed derivative {variables}, other than {factor.variable}')
                 derivs_detected = True
 
                 deriv_vars.append(cur_deriv_var)
@@ -510,8 +516,6 @@ class SystemSolverInterface(object):
             _, self.grids = global_var.grid_cache.get_all(mode = 'torch')
         elif grids is not None:
             if len(grids) != len(global_var.grid_cache.get_all(mode = 'torch')[1]):
-                # print(f'len(grids) {len(grids)} does not match len of cached grids \
-                #     {len(global_var.grid_cache.get_all(mode = 'torch')[1])}')
                 raise ValueError(
                     'Number of passed grids does not match the problem')
             if isinstance(grids[0], np.ndarray):

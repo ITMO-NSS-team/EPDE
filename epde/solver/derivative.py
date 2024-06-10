@@ -1,7 +1,7 @@
 """Module of derivative calculations.
 """
 
-from typing import Any, Union, List, Tuple
+from typing import Any, Union, List, Tuple, Callable
 import numpy as np
 from scipy import linalg
 import torch
@@ -45,11 +45,37 @@ class Derivative_NN(DerivativeInt):
 
         der_term = 1.
         for j, scheme in enumerate(term[dif_dir][0]):
-            grid_sum = 0.
-            for k, grid in enumerate(scheme):
-                grid_sum += self.model(grid)[:, term['var'][j]].reshape(-1, 1)\
-                    * term[dif_dir][1][j][k]
-            der_term = der_term * grid_sum ** term['pow'][j]
+            if isinstance(term['var'][j], (list, tuple)):
+                if not isinstance(term['pow'][j], (Callable, torch.nn.Sequential)):
+                    raise ValueError('Multivariate function can not be passed as a simple power func.')
+                der_args = []
+                for var_idx, cur_var in enumerate(term['var'][j]):
+                    grid_sum = 0.
+                    for k, grid in enumerate(scheme):
+                        grid_sum += self.model(grid)[:, cur_var].reshape(-1, 1)\
+                                * term[dif_dir][1][j][k]
+                    der_args.append(grid_sum)
+
+                    # if derivative[var_idx] == [None]:
+                    #     der_args.append(self.model(grid_points)[:, cur_var].reshape(-1, 1))
+                    # else:
+                    #     der_args.append(self._nn_autograd(self.model, grid_points, cur_var, axis=derivative[var_idx]))
+                if isinstance(term['pow'][j], torch.nn.Sequential):
+                    der_args = torch.cat(der_args, dim=1)
+                    factor_val = term['pow'][j](der_args)
+                else:
+                    factor_val = term['pow'][j](*der_args)
+                der_term = der_term * factor_val
+            else:
+                grid_sum = 0.
+                for k, grid in enumerate(scheme):
+                    grid_sum += self.model(grid)[:, term['var'][j]].reshape(-1, 1)\
+                            * term[dif_dir][1][j][k]
+                    
+                if isinstance(term['pow'][j],(int,float)):
+                    der_term = der_term * grid_sum ** term['pow'][j]
+                elif isinstance(term['pow'][j],Callable):
+                    der_term = der_term * term['pow'][j](grid_sum)
         der_term = coeff * der_term
 
         return der_term
@@ -115,12 +141,30 @@ class Derivative_autograd(DerivativeInt):
 
         der_term = 1.
         for j, derivative in enumerate(term[dif_dir]):
-            if derivative == [None]:
-                der = self.model(grid_points)[:, term['var'][j]].reshape(-1, 1)
+            if isinstance(term['var'][j], (list, tuple)):
+                if not isinstance(term['pow'][j], (Callable, torch.nn.Sequential)):
+                    raise ValueError('Multivariate function can not be passed as a simple power func.')
+                der_args = []
+                for var_idx, cur_var in enumerate(term['var'][j]):
+                    if derivative[var_idx] == [None]:
+                        der_args.append(self.model(grid_points)[:, cur_var].reshape(-1, 1))
+                    else:
+                        der_args.append(self._nn_autograd(self.model, grid_points, cur_var, axis=derivative[var_idx]))
+                if isinstance(term['pow'][j], torch.nn.Sequential):
+                    der_args = torch.cat(der_args, dim=1)
+                    factor_val = term['pow'][j](der_args)
+                else:
+                    factor_val = term['pow'][j](*der_args)
+                der_term = der_term * factor_val
             else:
-                der = self._nn_autograd(
-                    self.model, grid_points, term['var'][j], axis=derivative)
-            der_term = der_term * der ** term['pow'][j]
+                if derivative == [None]:
+                    der = self.model(grid_points)[:, term['var'][j]].reshape(-1, 1)
+                else:
+                    der = self._nn_autograd(self.model, grid_points, term['var'][j], axis=derivative)
+                if isinstance(term['pow'][j],(int,float)):
+                    der_term = der_term * der ** term['pow'][j]
+                elif isinstance(term['pow'][j],Callable):
+                    der_term = der_term * term['pow'][j](der)
         der_term = coeff * der_term
 
         return der_term

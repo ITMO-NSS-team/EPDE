@@ -117,16 +117,16 @@ class ControlExp():
         bop.values = torch.from_numpy(np.array([[value,]])).float()
         return bop
 
-    def control_optim_params(self, lr: float = 1e-2, max_iter: int = 10, max_eval = None, tolerance_grad: float = 1e-7,
-                          tolerance_change: float = 1e-9, history_size: int = 100, line_search_fn = 'strong_wolfe'):
-        self._optim_params = {'lr': lr, 'max_iter': max_iter, 'max_eval': max_eval, 'tolerance_grad': tolerance_grad,
-                              'tolerance_change': tolerance_change, 'history_size': history_size, 
-                              'line_search_fn': line_search_fn}
+    def set_control_optim_params(self, lr: float = 1e-2, max_iter: int = 10, max_eval = None, tolerance_grad: float = 1e-7,
+                                 tolerance_change: float = 1e-9, history_size: int = 100, line_search_fn = 'strong_wolfe'):
+        self._control_opt_params = {'lr': lr, 'max_iter': max_iter, 'max_eval': max_eval, 'tolerance_grad': tolerance_grad,
+                                    'tolerance_change': tolerance_change, 'history_size': history_size, 
+                                    'line_search_fn': line_search_fn}
 
-    def solver_params(self, mode: str = 'NN', compiling_params: dict = {}, optimizer_params: dict = {},
-                      cache_params: dict = {}, early_stopping_params: dict = {}, plotting_params: dict = {}, 
-                      training_params: dict = {}, use_cache: bool = False, use_fourier: bool = False, 
-                      fourier_params: dict = None, use_adaptive_lambdas: bool = False, device = torch.device('cpu')):
+    def set_solver_params(self, mode: str = 'autograd', compiling_params: dict = {}, optimizer_params: dict = {},
+                          cache_params: dict = {}, early_stopping_params: dict = {}, plotting_params: dict = {}, 
+                          training_params: dict = {}, use_cache: bool = False, use_fourier: bool = False, 
+                          fourier_params: dict = None, use_adaptive_lambdas: bool = False, device = torch.device('cpu')):
         self._solver_params = {'mode': mode, 
                                'compiling_params': compiling_params, 
                                'optimizer_params': optimizer_params,
@@ -152,8 +152,7 @@ class ControlExp():
         stop_training = False
         if isinstance(state_net, torch.nn.Sequential): self._state_net = state_net
 
-        global_var.reset_control_nn(n_var = len(control_args), n_control=n_control, net = control_net)
-        # self._control_net = global_var.control_nn
+        global_var.reset_control_nn(n_var = len(control_args), n_control = n_control, ann = control_net)
         
         # TODO: To optimize the net in gloabl variables is a terrific approach, rethink it
 
@@ -163,39 +162,41 @@ class ControlExp():
             grids_merged = torch.concatenate([subgrid.reshape(-1) for subgrid in grids]).float().T
         grids_merged.to(device=self._solver_params['device'])
 
-        control_optim_params = {'lr': 1e-2, 'max_iter': 10, 'max_eval': None, 'tolerance_grad': 1e-07,
-                                'tolerance_change': 1e-09, 'history_size': 100, 'line_search_fn': 'strong_wolfe'}
+        # control_optim_params = {'lr': 1e-2, 'max_iter': 10, 'max_eval': None, 'tolerance_grad': 1e-07,
+        #                         'tolerance_change': 1e-09, 'history_size': 100, 'line_search_fn': 'strong_wolfe'}
 
-        optimizer = torch.optim.LBFGS(params = global_var.control_nn.parameters(), **control_optim_params)
+        optimizer = torch.optim.LBFGS(params = global_var.control_nn.parameters(), **self._control_opt_params)
         # Implement closure for loss function
 
         while t < epochs and not stop_training:
             
-            with SolverAdapter(net = self._state_net, use_cache = False) as adapter:
-                # Edit solver forms of functions of dependent variable to Callable objects.
-                # Setting various adapater parameters
-                adapter.set_compiling_params(**self._solver_params['compiling_params'])
-                adapter.set_optimizer_params(**self._solver_params['optimizer_params'])
-                adapter.set_cache_params(**self._solver_params['cache_params'])
-                adapter.set_early_stopping_params(**self._solver_params['early_stopping_params'])
-                adapter.set_plotting_params(**self._solver_params['plotting_params'])
-                adapter.set_training_params(**self._solver_params['training_params'])
-                adapter.change_parameter('mode', self._solver_params['mode'], param_dict_key = 'compiling_params')
+            adapter = SolverAdapter(net = self._state_net, use_cache = False)
+            # Edit solver forms of functions of dependent variable to Callable objects.
+            # Setting various adapater parameters
+            adapter.set_compiling_params(**self._solver_params['compiling_params'])
+            adapter.set_optimizer_params(**self._solver_params['optimizer_params'])
+            adapter.set_cache_params(**self._solver_params['cache_params'])
+            adapter.set_early_stopping_params(**self._solver_params['early_stopping_params'])
+            adapter.set_plotting_params(**self._solver_params['plotting_params'])
+            adapter.set_training_params(**self._solver_params['training_params'])
+            adapter.change_parameter('mode', self._solver_params['mode'], param_dict_key = 'compiling_params')
 
-                print(f'grid.shape is {grids[0].shape}')
-                solver_loss, model = adapter.solve_epde_system(system = self.system, grids = grids, data = None, 
-                                                               boundary_conditions = bc_operators, 
-                                                               mode = self._solver_params['mode'], 
-                                                               use_cache = self._solver_params['use_cache'], 
-                                                               use_fourier = self._solver_params['use_fourier'],
-                                                               fourier_params = self._solver_params['fourier_params'],
-                                                               use_adaptive_lambdas = self._solver_params['use_adaptive_lambdas'])
-                loss = self.loss(model, grids_merged)
-                loss.backward()
-                optimizer.step()
+            print(f'grid.shape is {grids[0].shape}')
+            solver_loss, model = adapter.solve_epde_system(system = self.system, grids = grids, data = None, 
+                                                            boundary_conditions = bc_operators, 
+                                                            mode = self._solver_params['mode'], 
+                                                            use_cache = self._solver_params['use_cache'], 
+                                                            use_fourier = self._solver_params['use_fourier'],
+                                                            fourier_params = self._solver_params['fourier_params'],
+                                                            use_adaptive_lambdas = self._solver_params['use_adaptive_lambdas'])
+            del adapter
 
-                if loss < min_loss:
-                    self._state_net = model
-                print(loss)
+            loss = self.loss(model, grids_merged)
+            loss.backward()
+            optimizer.step()
+
+            if loss < min_loss:
+                self._state_net = model
+            print(loss)
             
         return self._state_net
