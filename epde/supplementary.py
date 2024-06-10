@@ -102,9 +102,11 @@ def rts(value, sign_num: int = 5):
     return np.around(value, int(idx))
 
 
-def train_ann(args: list, data: np.ndarray, epochs_max: int = 500, batch_frac = 0.5):
-    dim = 1 if np.any([s == 1 for s in data.shape]) and data.ndim == 2 else data.ndim
-    assert len(args) == dim, 'Dimensionality of data does not match with passed grids.'
+def train_ann(args: list, data: np.ndarray, epochs_max: int = 500, batch_frac = 0.5, 
+              dim = None):
+    if dim is None:
+        dim = 1 if np.any([s == 1 for s in data.shape]) and data.ndim == 2 else data.ndim
+    # assert len(args) == dim, 'Dimensionality of data does not match with passed grids.'
     data_size = data.size
 
     model = torch.nn.Sequential(

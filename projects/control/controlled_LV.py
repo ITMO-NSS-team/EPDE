@@ -1,8 +1,6 @@
 import os
 import sys
 
-import epde.globals
-
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../..')))
 
 import numpy as np
@@ -16,6 +14,7 @@ mpl.use('TkAgg')
 import matplotlib.pyplot as plt
 
 import epde
+import epde.globals
 import epde.interface.control_utils as control_utils
 
 
@@ -60,7 +59,7 @@ def controlled_lv_by_RK(initial : tuple, timestep : float, steps : int, alpha : 
                         beta : float, delta : float, gamma : float, c1: float = 0, c2: float = 0,
                         control_intensity: Union[Callable, torch.nn.Sequential] = lambda x: 1):
     res = np.full(shape = (steps, 2), fill_value = initial, dtype=np.float64)
-    controls = np.empty(shape = steps)
+    controls = np.zeros(shape = steps)
 
     if isinstance(control_intensity, torch.nn.Sequential):
         prepare_input = lambda *args: torch.from_numpy(np.array(args))
@@ -68,20 +67,25 @@ def controlled_lv_by_RK(initial : tuple, timestep : float, steps : int, alpha : 
         prepare_input = lambda *args: args
 
     for step in range(steps-1):
-        alpha_1 = alpha - c1*control_intensity(prepare_input(res[step, 0], res[step, 1]))
-        gamma_1 = gamma + c2*control_intensity(prepare_input(res[step, 0], res[step, 1]))
+        ctrl_val_1 = control_intensity(prepare_input(res[step, 0], res[step, 1]))
+        controls[step] = ctrl_val_1
+
+        alpha_1 = alpha - c1 * ctrl_val_1
+        gamma_1 = gamma + c2 * ctrl_val_1
 
         k1 = alpha_1 * res[step, 0] - beta * res[step, 0] * res[step, 1]; x1 = res[step, 0] + timestep/2. * k1
         l1 = delta * res[step, 0] * res[step, 1] - gamma_1 * res[step, 1]; y1 = res[step, 1] + timestep/2. * l1
 
-        alpha_2 = alpha - c1*control_intensity(prepare_input(x1, y1))
-        gamma_2 = gamma + c2*control_intensity(prepare_input(x1, y1))
+        ctrl_val_2 = control_intensity(prepare_input(x1, y1))
+        alpha_2 = alpha - c1 * ctrl_val_2
+        gamma_2 = gamma + c2 * ctrl_val_2
 
         k2 = alpha_2 * x1 - beta * x1 * y1; x2 = res[step, 0] + timestep/2. * k2
         l2 = delta * x1 * y1 - gamma_2 * y1; y2 = res[step, 1] + timestep/2. * l2
 
-        alpha_3 = alpha - c1*control_intensity(prepare_input(x2, y2))
-        gamma_3 = gamma + c2*control_intensity(prepare_input(x2, y2))
+        ctrl_val_3 = control_intensity(prepare_input(x2, y2))
+        alpha_3 = alpha - c1 * ctrl_val_3
+        gamma_3 = gamma + c2 * ctrl_val_3
 
         k3 = alpha_3 * x2 - beta * x2 * y2
         l3 = delta * x2 * y2 - gamma_3 * y1
@@ -97,21 +101,21 @@ def controlled_lv_by_RK(initial : tuple, timestep : float, steps : int, alpha : 
         
         res[step+1, 0] = res[step, 0] + timestep / 6. * (k1 + 2 * k2 + 2 * k3 + k4)
         res[step+1, 1] = res[step, 1] + timestep / 6. * (l1 + 2 * l2 + 2 * l3 + l4)
-    return res
+    return controls, res
 
-def prepare_data(steps_num: int = 301, t_max: float = 1.):
-    def get_sine_control(ampl: float = 1, period: float = 1., 
-                         phase_shift: float = 0.) -> Callable:
-        return lambda x: ampl*(np.sin(2*np.pi/period*(x + phase_shift)) + 1.)
+def prepare_data(steps_num: int = 301, t_max: float = 1, ctrl_fun: Callable = lambda x: x[0]*x[1]):
+    # def get_sine_control(ampl: float = 1, period: float = 1., 
+    #                      phase_shift: float = 0.) -> Callable:
+    #     return lambda x: ampl*(np.sin(2*np.pi/period*(x + phase_shift)) + 1.)
     
     step = t_max/steps_num
     t = np.arange(start = 0, stop = step * steps_num, step = step)
-    ctrl = get_sine_control(ampl = 15., period=0.3)(np.linspace(0, 1, t.size*2 - 1))
-    solution = controlled_lv_by_RK(initial=(4., 2.), timestep=step, steps=steps_num, 
+    # ctrl = get_sine_control(ampl = 15., period=0.3)(np.linspace(0, 1, t.size*2 - 1))
+    ctrl, solution = controlled_lv_by_RK(initial=(4., 2.), timestep=step, steps=steps_num, 
                                    alpha=20., beta=20., delta=20., gamma=20., 
-                                   c1 = 1., c2 = 1., conrol_intensity = ctrl)
+                                   c1 = 1., c2 = 1., control_intensity = ctrl_fun)
 
-    return t, ctrl[::2], solution
+    return t, ctrl, solution
 
 def epde_discovery(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np.ndarray, diff_method = 'FD',
                    bnd = 30):
@@ -159,7 +163,7 @@ def translate_dummy_eqs(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np
                         bnd = 30, control_ann: torch.nn.Sequential = None):
     dimensionality = t.ndim - 1
     
-    epde_search_obj = epde.EpdeSearch(use_solver = False, dimensionality = dimensionality, boundary = bnd,
+    epde_search_obj = epde.EpdeSearch(use_solver = True, dimensionality = dimensionality, boundary = bnd,
                                       coordinate_tensors = [t,], verbose_params = {'show_iter_idx' : True})    
 
     if diff_method == 'ANN':
@@ -183,7 +187,7 @@ def translate_dummy_eqs(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np
                                                                                     (1, [None])])    
 
     epde_search_obj.create_pool(data=[u, v], variable_names=['u', 'v'], max_deriv_order=(1,),
-                            additional_tokens = [control_var_tokens,])
+                                additional_tokens = [control_var_tokens,])
 
 
     eq_u = '20. * u{power: 1} + -1. * ctrl{power: 1} * u{power: 1} + -20. * u{power: 1} * v{power: 1} + 0 = du/dx0{power: 1}'
@@ -229,20 +233,46 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
     optimizer.system = eq
     optimizer.train_pinn(bc_operators = [bop_u, bop_v], grids = [t,], control_args = [(0, [None]), (1, [None])],
-                         n_control = 1., var_net = state_nn_pretrained, state_net = ctrl_nn_pretrained)
+                         n_control = 1., var_net = state_nn_pretrained, state_net = ctrl_nn_pretrained, 
+                         epochs = 1e1)
 
     return optimizer
 
 # def train_control_nn()
 
 if __name__ == '__main__':
-    t, ctrl, solution = prepare_data()
+    t, ctrl, solution = prepare_data(ctrl_fun = lambda x: 17*x[1] + 0.05*x[0]  + 0.2) # x[0]
+    t, ctrl, solution = t[:-1], ctrl[:-1], solution[:-1, ...]
+
+    print(t.shape, ctrl.shape, solution.shape)
+    plt.plot(t, solution[:, 0], color = 'k', label = 'Prey, relative units')
+    plt.plot(t, solution[:, 1], color = 'r', label = 'Hunters, relative units')
+    plt.plot(t, ctrl, '*', color = 'y', label = 'control variable')
+    plt.legend()
+    plt.show()
+
     model = translate_dummy_eqs(t, solution[:, 0], solution[:, 1], ctrl)
+
+    args = torch.from_numpy(solution).float()
+    print(args.shape)
+    ctrl_ann = epde.supplementary.train_ann(args=[solution[:, 0], solution[:, 1]], data = ctrl, epochs_max = 1e4, dim = 2)
+
+
+    plt.plot(t, ctrl_ann(args).detach().numpy(), color = 'b', label = 'control variable, nn approx')
+    plt.plot(t, ctrl, '*', color = 'y', label = 'control variable')
+    plt.legend()
+    plt.show()
+
+    import pickle
+    with open(r"C:\\Users\\Mike\\Documents\\Work\\EPDE\\projects\\control\\data_ann.pickle", 'wb') as output_file:  
+        pickle.dump(epde.globals.solution_guess_nn, output_file)
+    print('Dumped ANN')
 
     # state_net = epde.globals.solution_guess_nn
     # control_net = 
 
-    # optimize_ctrl(model, torch.from_numpy(t), u_tar = 1, v_tar = 0, )
+    nn = optimize_ctrl(model, torch.from_numpy(t), u_tar = 1, v_tar = 0, u_init=solution[0, 0], v_init=solution[0, 1],
+                       state_nn_pretrained=epde.globals.solution_guess_nn, ctrl_nn_pretrained=ctrl_ann)
 
     # constr = []
     # constr.append(control_utils.)
