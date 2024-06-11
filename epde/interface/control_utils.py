@@ -54,7 +54,7 @@ class ControlConstrEq(ControlConstraint):
         self._axes = deriv_axes
         self._deriv_method = deriv_method
 
-    def __call__(self, fun_nn: torch.nn.Sequential) -> Tuple[bool, torch.Tensor]:
+    def __call__(self, fun_nn: Union[torch.nn.Sequential, torch.Tensor]) -> Tuple[bool, torch.Tensor]:
         to_compare = self._deriv_method.take_derivative(u = fun_nn, grid=self._grid, axes=self._axes)
         if not isinstance(self._val, torch.Tensor):
             val_transformed = torch.full_like(input = to_compare, fill_value=self._val)
@@ -63,7 +63,8 @@ class ControlConstrEq(ControlConstraint):
             val_transformed = self._val
         return torch.isclose(val_transformed, to_compare, r_tol = self._eps), val_transformed - to_compare
         
-    def loss(self, fun_nn: torch.nn.Sequential) -> torch.Tensor:
+    def loss(self, fun_nn: Union[torch.nn.Sequential, torch.Tensor]) -> torch.Tensor:
+        print(f'fun_nn is {fun_nn}')
         _, discrepancy = self(fun_nn)
         return torch.norm(discrepancy)
 
@@ -97,7 +98,12 @@ class ConditionalLoss():
         self._cond = conditions
 
     def __call__(self, args: List[torch.nn.Sequential]):
-        return sum([cond[0] * cond[1].loss(args[cond[2]]) for cond in self._cond])
+        temp = []
+        for cond in self._cond:
+            print(cond[1]._val, cond[1]._grid, cond[1]._axes)
+            temp.append(cond[0] * cond[1].loss(args[cond[2]]))
+        print('temp loss', temp)
+        return  torch.stack(temp, dim=0).sum(dim=0).sum(dim=0) #torch.add()
 
 class ControlExp():
     def __init__(self, loss : ConditionalLoss):
@@ -125,7 +131,7 @@ class ControlExp():
 
     def set_solver_params(self, mode: str = 'autograd', compiling_params: dict = {}, optimizer_params: dict = {},
                           cache_params: dict = {}, early_stopping_params: dict = {}, plotting_params: dict = {}, 
-                          training_params: dict = {}, use_cache: bool = False, use_fourier: bool = False, 
+                          training_params: dict = {'epochs':1e2,}, use_cache: bool = False, use_fourier: bool = False, 
                           fourier_params: dict = None, use_adaptive_lambdas: bool = False, device = torch.device('cpu')):
         self._solver_params = {'mode': mode, 
                                'compiling_params': compiling_params, 
@@ -159,7 +165,7 @@ class ControlExp():
         if isinstance(grids[0], np.ndarray):
             grids_merged = torch.from_numpy(np.array([subgrid.reshape(-1) for subgrid in grids])).float().T
         elif isinstance(grids[0], torch.Tensor):
-            grids_merged = torch.concatenate([subgrid.reshape(-1) for subgrid in grids]).float().T
+            grids_merged = torch.cat([subgrid.reshape(-1, 1) for subgrid in grids], dim = 1).float()
         grids_merged.to(device=self._solver_params['device'])
 
         # control_optim_params = {'lr': 1e-2, 'max_iter': 10, 'max_eval': None, 'tolerance_grad': 1e-07,
@@ -181,17 +187,29 @@ class ControlExp():
             adapter.set_training_params(**self._solver_params['training_params'])
             adapter.change_parameter('mode', self._solver_params['mode'], param_dict_key = 'compiling_params')
 
-            print(f'grid.shape is {grids[0].shape}')
-            solver_loss, model = adapter.solve_epde_system(system = self.system, grids = grids, data = None, 
-                                                            boundary_conditions = bc_operators, 
-                                                            mode = self._solver_params['mode'], 
-                                                            use_cache = self._solver_params['use_cache'], 
-                                                            use_fourier = self._solver_params['use_fourier'],
-                                                            fourier_params = self._solver_params['fourier_params'],
-                                                            use_adaptive_lambdas = self._solver_params['use_adaptive_lambdas'])
+            # print(f'grid.shape is {grids[0].shape}')
+            _, model = adapter.solve_epde_system(system = self.system, grids = grids, data = None, 
+                                                 boundary_conditions = bc_operators, 
+                                                 mode = self._solver_params['mode'], 
+                                                 use_cache = self._solver_params['use_cache'], 
+                                                 use_fourier = self._solver_params['use_fourier'],
+                                                 fourier_params = self._solver_params['fourier_params'],
+                                                 use_adaptive_lambdas = self._solver_params['use_adaptive_lambdas'])
             del adapter
 
-            loss = self.loss(model, grids_merged)
+            # loss = self.loss(model, grids_merged)
+            # print(f'grids_merged.shape is {grids_merged.shape}')
+            var_prediction = model(grids_merged)
+            # print(f'var_pred is {var_prediction[..., 0].reshape(-1, 1)}')
+
+            # print(f'var_pred.shape is {var_prediction.shape}')
+            ctrl_pred = global_var.control_nn(var_prediction)
+            loss_arg = [var_prediction[..., idx].reshape((-1, 1)) for idx 
+                        in np.arange(var_prediction.shape[-1])] + [ctrl_pred,]
+            print(f'loss_arg len is {len(loss_arg)}')
+            print(f'loss_arg vals is {[var.shape for var in loss_arg]}')
+            
+            loss = self.loss(loss_arg)
             loss.backward()
             optimizer.step()
 

@@ -46,6 +46,7 @@ class Derivative_NN(DerivativeInt):
         der_term = 1.
         for j, scheme in enumerate(term[dif_dir][0]):
             if isinstance(term['var'][j], (list, tuple)):
+                raise NotImplementedError('Support for multivariate function tokens was introduced only for autograd.')
                 if not isinstance(term['pow'][j], (Callable, torch.nn.Sequential)):
                     raise ValueError('Multivariate function can not be passed as a simple power func.')
                 der_args = []
@@ -141,11 +142,15 @@ class Derivative_autograd(DerivativeInt):
 
         der_term = 1.
         for j, derivative in enumerate(term[dif_dir]):
-            if isinstance(term['var'][j], (list, tuple)):
-                if not isinstance(term['pow'][j], (Callable, torch.nn.Sequential)):
-                    raise ValueError('Multivariate function can not be passed as a simple power func.')
+            # print(f'term[dif_dir] {term[dif_dir]}')
+            # print(term)
+            if isinstance(term['pow'][j], (Callable, torch.nn.Sequential)): #isinstance(term['var'][j], (list, tuple)):
+                # if not isinstance(term['pow'][j], (Callable, torch.nn.Sequential)):
+                #     print(term, term['pow'][j])                    
+                #     raise ValueError('Multivariate function can not be passed as a simple power func.')
                 der_args = []
                 for var_idx, cur_var in enumerate(term['var'][j]):
+                    # print(f'derivative[var_idx] {derivative[var_idx]}, for {var_idx, cur_var}')
                     if derivative[var_idx] == [None]:
                         der_args.append(self.model(grid_points)[:, cur_var].reshape(-1, 1))
                     else:

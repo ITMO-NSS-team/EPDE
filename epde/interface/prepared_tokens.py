@@ -168,7 +168,7 @@ class ControlVarTokens(PreparedTokens):
     def __init__(self, sample: np.ndarray, ann: torch.nn.Sequential = None, var_name: str = 'ctrl',
                  arg_var: List[Tuple[Union[int, List]]] = [(0, [None,]),]):
         vars, der_ords = zip(*arg_var)
-        print('vars {}, der_ords {}'.format(vars, der_ords))
+        # print('vars {}, der_ords {}'.format(vars, der_ords))
 
         token_params = OrderedDict([('power', (1, 1)),])
         
@@ -185,14 +185,15 @@ class ControlVarTokens(PreparedTokens):
                                       derivs_solver_orders=[der_ords,])
         
         def nn_eval_torch(*args, **kwargs):
-            inp = torch.stack([torch.reshape(tensor, -1) for tensor in args]) # Validate correctness
-            return global_var.control_nn(inp)**kwargs['power']
+            inp = torch.cat([torch.reshape(tensor, (-1, 1)) for tensor in args], dim = 1) # Validate correctness
+            # print(f'inp shape is {inp.shape}, args are {args}, kwargs are {kwargs}')
+            return global_var.control_nn(inp)#**kwargs['power']
 
         def nn_eval_np(*args, **kwargs):
-            return nn_eval_torch(*args, **kwargs).detach().numpy()**kwargs['power']
+            return nn_eval_torch(*args, **kwargs).detach().numpy()#**kwargs['power']
 
-        eval = CustomEvaluator(evaluation_functions_np=nn_eval_torch,
-                               evaluation_functions_torch=nn_eval_np,
+        eval = CustomEvaluator(evaluation_functions_np=nn_eval_np,
+                               evaluation_functions_torch=nn_eval_torch,
                                eval_fun_params_labels = ['power'])
 
         global_var.reset_control_nn(ann=ann, n_var=len(vars))

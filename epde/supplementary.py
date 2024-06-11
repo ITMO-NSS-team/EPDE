@@ -7,6 +7,7 @@ Created on Thu Feb 13 16:33:34 2020
 """
 
 from abc import ABC
+from typing import Callable, Union
 
 import numpy as np
 from functools import reduce
@@ -31,10 +32,15 @@ class AutogradDeriv(BasicDeriv):
     def __init__(self):
         pass
 
-    def take_derivative(self, u: torch.nn.Sequential, grid: torch.Tensor, axes: list = [],
-                        component: int = 0):
+    def take_derivative(self, u: Union[torch.nn.Sequential, torch.Tensor], grid: torch.Tensor, 
+                        axes: list = [], component: int = 0):
         grid.requires_grad = True
-        comp_sum = u(grid)[..., component].sum(dim = 0)
+        if isinstance(u, torch.nn.Sequential):
+            comp_sum = u(grid)[..., component].sum(dim = 0)
+        else:
+            print(f'u.shape, {u.shape}')
+            comp_sum = u.sum(dim = 0)
+        print(f'differentiating {comp_sum}')
         for axis in axes:
             output_vals = torch.autograd.grad(outputs = comp_sum, inputs = grid, create_graph=True)[0]
             comp_sum = output_vals[:, axis].sum()

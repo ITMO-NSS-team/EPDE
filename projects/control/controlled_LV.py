@@ -211,8 +211,7 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
                                                  grid = t, deriv_method = autograd)
     
     loss = control_utils.ConditionalLoss([(100., u_tar_constr, 0),
-                                          (100., v_tar_constr, 1),
-                                          (1.,  contr_constr, 2)])
+                                          (100., v_tar_constr, 1),]) #  (1.,  contr_constr, 2)
     optimizer = control_utils.ControlExp(loss=loss)
     
     def get_ode_bop(key, var, term, grid_loc, value):
@@ -298,17 +297,18 @@ if __name__ == '__main__':
     plt.legend()
     plt.show()
 
-    model = translate_dummy_eqs(t, solution[:, 0], solution[:, 1], ctrl) # , data_nn = data_nn
-    with open(r"/home/maslyaev/Documents/EPDE/projects/control/control_ann.pickle", 'wb') as output_file:  
-        pickle.dump(epde.globals.solution_guess_nn, output_file)
+    with open(r"/home/maslyaev/Documents/EPDE/projects/control/data_ann.pickle", 'rb') as data_input_file:  
+        data_nn = pickle.load(data_input_file)
+
+    model = translate_dummy_eqs(t, solution[:, 0], solution[:, 1], ctrl, data_nn = data_nn) # , 
+    # with open(r"/home/maslyaev/Documents/EPDE/projects/control/data_ann.pickle", 'wb') as output_file:  
+    #     pickle.dump(epde.globals.solution_guess_nn, output_file)
 
     args = torch.from_numpy(solution).float()
-    print(args.shape)
 
-
-    ctrl_ann = epde.supplementary.train_ann(args=[solution[:, 0], solution[:, 1]], data = ctrl, epochs_max = 1e4, dim = 2)
-    with open(r"/home/maslyaev/Documents/EPDE/projects/control/control_ann.pickle", 'wb') as output_file:  
-        pickle.dump(ctrl_ann, output_file)
+    # ctrl_ann = epde.supplementary.train_ann(args=[solution[:, 0], solution[:, 1]], data = ctrl, epochs_max = 1e4, dim = 2)
+    with open(r"/home/maslyaev/Documents/EPDE/projects/control/control_ann.pickle", 'rb') as ctrl_input_file:  
+        ctrl_ann = pickle.load(ctrl_input_file)
 
     plt.plot(t, ctrl_ann(args).detach().numpy(), color = 'b', label = 'control variable, nn approx')
     plt.plot(t, ctrl, '*', color = 'y', label = 'control variable')
@@ -319,4 +319,4 @@ if __name__ == '__main__':
                         state_nn_pretrained=epde.globals.solution_guess_nn, ctrl_nn_pretrained=ctrl_ann)
 
     with open(r"/home/maslyaev/Documents/EPDE/projects/control/control_opt_ann.pickle", 'wb') as output_file:  
-        pickle.dump(nn, output_file)    
+        pickle.dump(nn, output_file)

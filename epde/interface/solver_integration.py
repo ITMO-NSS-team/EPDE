@@ -712,7 +712,7 @@ class SolverAdapter(object):
 
     def solve_epde_system(self, system: SoEq, grids: list=None, boundary_conditions=None, 
                           mode='NN', data=None, use_cache: bool = False, use_fourier: bool = False,
-                          fourier_params: dict = None, use_adaptive_lambdas: bool = False):
+                          fourier_params: dict = None, use_adaptive_lambdas: bool = False, to_numpy: bool = False):
         system_interface = SystemSolverInterface(system_to_adapt=system)
 
         system_solver_forms = system_interface.form(grids = grids, mode = mode)
@@ -726,7 +726,6 @@ class SolverAdapter(object):
             
         bconds_combined = Conditions()
         for cond in boundary_conditions:
-            # print(f'cond: loc: {cond['bnd_loc']}, operator: {cond['bnd_op']}, value: {cond['bnd_val']}')
             bconds_combined.operator(bnd = cond['bnd_loc'], operator = cond['bnd_op'], 
                                      value = cond['bnd_val'])
 
@@ -734,18 +733,16 @@ class SolverAdapter(object):
             grid_var_keys, grids = global_var.grid_cache.get_all(mode = 'torch')
         else:
             grid_var_keys, _ = global_var.grid_cache.get_all(mode = 'torch')
-
-        # print(f'Before grid creation {grids}')
         domain = self.create_domain(grid_var_keys, grids)
 
         return self.solve(equations=[form[1] for form in system_solver_forms], domain = domain,
                           boundary_conditions = bconds_combined, mode = mode, use_cache = use_cache,
                           use_fourier = use_fourier, fourier_params = fourier_params, 
-                          use_adaptive_lambdas = use_adaptive_lambdas)
+                          use_adaptive_lambdas = use_adaptive_lambdas, to_numpy = to_numpy)
 
     def solve(self, equations, domain:Domain, boundary_conditions = None, mode = 'NN', 
               epochs = 1e3, use_cache: bool = False, use_fourier: bool = False, fourier_params: dict = None,
-              use_adaptive_lambdas: bool = False):
+              use_adaptive_lambdas: bool = False, to_numpy = False):
     
         if isinstance(equations, SolverEquation):
             equations_prepared = equations
@@ -776,8 +773,14 @@ class SolverAdapter(object):
         self.net  = self.net.to(device = device_type())
         grid = check_device(grid)
         
-        if mode in ['NN', 'autograd']:
+        if mode in ['NN', 'autograd'] and to_numpy:
             solution = self.net(grid).detach().cpu().numpy()
-        else:
+        elif mode in ['NN', 'autograd'] and not to_numpy:
+            solution = self.net
+        elif mode == 'mat' and to_numpy:
             solution = self.net.detach().cpu().numpy()
+        elif mode == 'mat' and not to_numpy:
+            solution = self.net
+        else:
+            raise ValueError('Incorrect mode.')
         return loss, solution
