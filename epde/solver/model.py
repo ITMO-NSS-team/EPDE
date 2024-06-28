@@ -21,7 +21,8 @@ class Model():
             net: Union[torch.nn.Module, torch.Tensor],
             domain: Domain,
             equation: Equation,
-            conditions: Conditions):
+            conditions: Conditions, 
+            control_net: Union[torch.nn.Module] = None):
         """
         Args:
             net (Union[torch.nn.Module, torch.Tensor]): neural network or torch.Tensor for mode *mat*
@@ -30,6 +31,8 @@ class Model():
             conditions (Conditions): object of class Conditions
         """
         self.net = net
+        self.control_net = control_net
+            
         self.domain = domain
         self.equation = equation
         self.conditions = conditions
@@ -47,6 +50,7 @@ class Model():
             mode: str,
             lambda_operator: Union[List[float], float],
             lambda_bound: Union[List[float], float],
+            lambda_control: Union[List[float], float] = None,
             normalized_loss_stop: bool = False,
             h: float = 0.001,
             inner_order: str = '1',
@@ -76,6 +80,7 @@ class Model():
         self.mode = mode
         self.lambda_bound = lambda_bound
         self.lambda_operator = lambda_operator
+        self.lambda_control = lambda_control
         self.normalized_loss_stop = normalized_loss_stop
         self.weak_form = weak_form
 
@@ -91,6 +96,9 @@ class Model():
         
         self.solution_cls = Solution(grid, self.equation_cls, self.net, mode, weak_form,
                                      lambda_operator, lambda_bound, tol, derivative_points)
+
+        # if self.control_net is not None:
+        #     self.control_cls = Control(grid, self.c, self.control_net)
 
     def _model_save(
         self,

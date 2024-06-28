@@ -66,9 +66,10 @@ class Solution():
         self.derivative_points = derivative_points
 
         self.operator = Operator(self.grid, prepared_operator, self.model,
-                                   self.mode, weak_form, derivative_points)
+                                 self.mode, weak_form, derivative_points)
         self.boundary = Bounds(self.grid,self.prepared_bconds, self.model,
-                                   self.mode, weak_form, derivative_points)
+                               self.mode, weak_form, derivative_points)
+        self.control_operators = 
 
         self.loss_cls = Losses(self.mode, self.weak_form, self.n_t, self.tol)
         self.op_list = []

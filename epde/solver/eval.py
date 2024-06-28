@@ -397,3 +397,44 @@ class Bounds():
                                                     bval_dict, true_bval_dict)
 
         return bval, true_bval, keys, bval_length
+
+class ControlCond():
+    def __init__(self, 
+                 grid: torch.Tensor,
+                 prepared_bconds: Union[list, dict],
+                 model_sln: Union[torch.nn.Sequential, torch.Tensor],
+                 model_ctrl: Union[torch.nn.Sequential, torch.Tensor],
+                 mode: str,
+                 weak_form: List[callable],
+                 derivative_points: int):
+        """_summary_
+
+        Args:
+            grid (torch.Tensor): grid (domain discretization).
+            prepared_bconds (Union[list,dict]): prepared (after Equation class) baund-y con-s.
+            model_sln (Union[torch.nn.Sequential, torch.Tensor]): *mat or NN or autograd* model.
+            model_ctrl torch.Tensor: *NN or autograd*-like model for control representation.
+            mode (str): *mat or NN or autograd*
+            weak_form (List[callable]): list with basis functions (if the form is *weak*).
+            derivative_points (int): points number for derivative calculation.
+                                     For details to Derivative_mat class.
+        """
+        self.grid = check_device(grid)
+        self.conds_on_sln, self.conds_on_ctrl = self.parse_by_model(prepared_bconds)
+        self.model_sln = model_sln.to(device_type())
+        self.model_ctrl = model_ctrl.to(device_type())
+
+        self.mode = mode
+        # Parse operator form into conditions over control and solution equations
+        self.operator_sln = Operator(self.grid, self.prepared_bconds,
+                                     self.model_sln, self.mode, weak_form,
+                                     derivative_points)
+        self.operator_ctrl = Operator(self.grid, self.prepared_bconds,
+                                      self.model_ctrl, self.mode, weak_form,
+                                      derivative_points)
+        
+    @staticmethod
+    def parse_by_model(conditions: List):
+        conds_on_sln, conds_on_ctrl = [], []
+        for cond in conditions:
+            if cond[]

@@ -32,8 +32,8 @@ class Losses():
         # is None + fix causal_loss operator crutch (line 76).
 
     def _loss_op(self,
-                operator: torch.Tensor,
-                lambda_op: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+                 operator: torch.Tensor,
+                 lambda_op: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         """ Operator term in loss calc-n.
 
         Args:
@@ -76,14 +76,24 @@ class Losses():
         loss_bnd = bval_diff @ lambda_bound.T
         return loss_bnd, bval_diff
 
+    def _loss_ctrl(self, controlled_val: torch.Tensor,
+                   target_val: torch.Tensor,
+                   lambda_ctrl: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        cond_diff = torch.mean((controlled_val - target_val)**2, 0)
+
+        loss_ctrl = cond_diff @ lambda_ctrl.T
+        return loss_ctrl, cond_diff        
 
     def _default_loss(self,
-                     operator: torch.Tensor,
-                     bval: torch.Tensor,
-                     true_bval: torch.Tensor,
-                     lambda_op: torch.Tensor,
-                     lambda_bound: torch.Tensor,
-                     save_graph: bool = True) -> Tuple[torch.Tensor, torch.Tensor]:
+                      operator: torch.Tensor,
+                      bval: torch.Tensor,
+                      true_bval: torch.Tensor,
+                      lambda_op: torch.Tensor,
+                      lambda_bound: torch.Tensor,
+                      ctrl_val: torch.Tensor = None, # Hereby, not only the control function is to be passed, but also target state                      
+                      control_op: torch.Tensor = None, # Operators for penalizing according to forced control and achieved target state
+                      lambda_ctrl: torch.Tensor = None,
+                      save_graph: bool = True) -> Tuple[torch.Tensor, torch.Tensor]:
         """ Compute l2 loss.
 
         Args:
@@ -99,6 +109,15 @@ class Losses():
             loss (torch.Tensor): loss.
             loss_normalized (torch.Tensor): loss, where regularization parameters are 1.
         """
+        if (any([ctrl_descr is None for ctrl_descr in [ctrl_val, control_op, lambda_ctrl]]) and \
+            any([ctrl_descr is not None for ctrl_descr in [ctrl_val, control_op, lambda_ctrl]])):
+
+            raise ValueError(f'Incorrect solution for controlled version instigated. Got args: ctrl_val - {type(ctrl_val)}, \
+                               control_op - {type(control_op)}, lambda_ctrl - {type(lambda_ctrl)}.')
+        elif all([ctrl_descr is not None for ctrl_descr in [ctrl_val, control_op, lambda_ctrl]]):
+            ctrl_mode = True
+        else:
+            ctrl_mode = False
 
         if bval is None:
             return torch.sum(torch.mean((operator) ** 2, 0))
@@ -106,14 +125,19 @@ class Losses():
         loss_oper, op = self._loss_op(operator, lambda_op)
         dtype = op.dtype
         loss_bnd, bval_diff = self._loss_bcs(bval, true_bval, lambda_bound)
-        loss = loss_oper + loss_bnd
 
         lambda_op_normalized = lambda_prepare(operator, 1).to(dtype)
         lambda_bound_normalized = lambda_prepare(bval, 1).to(dtype)
+        if ctrl_mode:
+            loss_ctrl, ctrl_diff = self._loss_ctrl(controlled_val=ctrl_val, )
+            lambda_ctrl_normalized = lambda_prepare(ctrl_val, 1).to(dtype) 
+
+        loss = loss_oper + loss_bnd + loss_ctrl
 
         with torch.no_grad():
             loss_normalized = op @ lambda_op_normalized.T +\
-                        bval_diff @ lambda_bound_normalized.T
+                              bval_diff @ lambda_bound_normalized.T +\
+                              ctrl_diff @ lambda_ctrl_normalized.T
 
         # TODO make decorator and apply it for all losses.
         if not save_graph:
