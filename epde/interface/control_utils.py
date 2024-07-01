@@ -171,9 +171,11 @@ class ControlExp():
         # control_optim_params = {'lr': 1e-2, 'max_iter': 10, 'max_eval': None, 'tolerance_grad': 1e-07,
         #                         'tolerance_change': 1e-09, 'history_size': 100, 'line_search_fn': 'strong_wolfe'}
 
-        optimizer = torch.optim.LBFGS(params = global_var.control_nn.parameters(), **self._control_opt_params)
-        # Implement closure for loss function
-
+        # optimizer = torch.optim.LBFGS(params = global_var.control_nn.parameters(), **self._control_opt_params)
+        # Implement closure for loss function?
+        # Parameters update - by epsilon in loop one-by-one, without deepcopy. 
+        params = deepcopy()
+        optimizer = AdamOptimizer()
         while t < epochs and not stop_training:
             
             adapter = SolverAdapter(net = self._state_net, use_cache = False)
@@ -218,3 +220,34 @@ class ControlExp():
             print(loss)
             
         return self._state_net
+    
+class FirstOrderOptimizer(ABC):
+    def __init__(self, parameters: np.ndarray, optimized: np.ndarray):
+        raise NotImplementedError('Calling __init__ of an abstract optimizer')
+    
+    def step(self, gradient: np.ndarray):
+        raise NotImplementedError('Calling step of an abstract optimizer')
+
+class AdamOptimizer(FirstOrderOptimizer):
+    def __init__(self, optimized: np.ndarray, parameters: np.ndarray = np.array([0.001, 0.9, 0.999, 1e-8])):
+        '''
+        parameters[0] - alpha, parameters[1] - beta_1, parameters[2] - beta_2
+        parameters[3] - eps  
+        '''
+        self.reset(optimized, parameters)
+
+    def reset(self, optimized: np.ndarray, parameters: np.ndarray):
+        self._moment = np.zeros_like(optimized)
+        self._second_moment = np.zeros_like(optimized)
+        self._second_moment_max = np.zeros_like(optimized)
+        self.parameters = parameters
+        self.time = 0
+
+    def step(self, gradient: np.ndarray, optimized: np.ndarray):
+        self.time += 1
+        self._moment = self.parameters[1] * self._moment + (1-self.parameters[1]) * gradient
+        self._second_moment = self.parameters[2] * self._second_moment +\
+                              (1-self.parameters[2]) * np.power(gradient)
+        moment_cor = self._moment/(1 - np.power(self.parameters[1], self.time))
+        second_moment_cor = self._second_moment/(1 - np.power(self.parameters[2], self.time))
+        return optimized - self.parameters[0]*moment_cor/(np.sqrt(second_moment_cor)+self.parameters[3])
