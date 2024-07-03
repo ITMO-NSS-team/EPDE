@@ -2,8 +2,10 @@ import numpy as np
 import torch
 
 from functools import partial
-from typing import Tuple, List, Union
+from typing import Tuple, List, Dict, Union
 from abc import ABC, abstractmethod
+from copy import deepcopy
+from collections import OrderedDict
 
 import epde.globals as global_var
 from epde.interface.interface import EpdeMultisample, EpdeSearch, ExperimentCombiner
@@ -13,6 +15,7 @@ from epde.supplementary import BasicDeriv, AutogradDeriv
 
 from epde.solver.data import Conditions
 from epde.solver.optimizers.closure import Closure
+
 
 # TODO: Later to be refactored into multiple files
 
@@ -173,30 +176,62 @@ class ControlExp():
 
         # optimizer = torch.optim.LBFGS(params = global_var.control_nn.parameters(), **self._control_opt_params)
         # Implement closure for loss function?
-        # Parameters update - by epsilon in loop one-by-one, without deepcopy. 
-        params = deepcopy()
+        # Parameters update - by epsilon in loop one-by-one, without deepcopy.
+        grad_tensors = deepcopy(global_var.control_net.state_dict)
+        param_keys = list(global_var.control_net.state_dict.keys())
+
         optimizer = AdamOptimizer()
+        adapter = self.get_solver_adapter(None)
         while t < epochs and not stop_training:
-            
-            adapter = SolverAdapter(net = self._state_net, use_cache = False)
-            # Edit solver forms of functions of dependent variable to Callable objects.
-            # Setting various adapater parameters
-            adapter.set_compiling_params(**self._solver_params['compiling_params'])
-            adapter.set_optimizer_params(**self._solver_params['optimizer_params'])
-            adapter.set_cache_params(**self._solver_params['cache_params'])
-            adapter.set_early_stopping_params(**self._solver_params['early_stopping_params'])
-            adapter.set_plotting_params(**self._solver_params['plotting_params'])
-            adapter.set_training_params(**self._solver_params['training_params'])
-            adapter.change_parameter('mode', self._solver_params['mode'], param_dict_key = 'compiling_params')
+            prev_loc = None
+            state_net = deepcopy(self._state_net)
+            eps = 1e-4
+            for param_key, param_tensor in grad_tensors.items():
+                if len(param_tensor.size()) == 1:
+                    #loss in the forward parameter point calculation
+                    for param_idx, _ in enumerate(param_tensor):
+                        # Calculating loss in p[i]+eps:
+                        loc = [param_key, param_idx]
+                        global_var.control_nn.load_state_dict(eps_increment_diff(input_params=global_var.control_nn.state_dict,
+                                                                                 input_keys=param_keys,
+                                                                                 loc = loc, prev_loc = prev_loc,
+                                                                                 forward=True, eps=eps))
+                        adapter.set_net(self._state_net)
+                        _, model = adapter.solve_epde_system(system = self.system, grids = grids, data = None,
+                                                            boundary_conditions = bc_operators,
+                                                            mode = self._solver_params['mode'],
+                                                            use_cache = self._solver_params['use_cache'],
+                                                            use_fourier = self._solver_params['use_fourier'],
+                                                            fourier_params = self._solver_params['fourier_params'],
+                                                            use_adaptive_lambdas = self._solver_params['use_adaptive_lambdas'])
+                        
+                        loss_forward = self.loss(model, grids_merged)
+                        # Calculating loss in p[i]-eps:
+
+                        global_var.control_nn.load_state_dict(eps_increment_diff(input_params=global_var.control_nn.state_dict,
+                                                                                 input_keys=param_keys,
+                                                                                 loc = loc, prev_loc = loc,
+                                                                                 forward=False, eps=eps))
+                        adapter.set_net(self._state_net)
+                        _, model = adapter.solve_epde_system(system = self.system, grids = grids, data = None,
+                                                             boundary_conditions = bc_operators,
+                                                             mode = self._solver_params['mode'],
+                                                             use_cache = self._solver_params['use_cache'],
+                                                             use_fourier = self._solver_params['use_fourier'],
+                                                             fourier_params = self._solver_params['fourier_params'],
+                                                             use_adaptive_lambdas = self._solver_params['use_adaptive_lambdas'])
+                        
+                        loss_back = self.loss(model, grids_merged)
+                        prev_loc = loc
+
+                        grad_tensors[loc[0]][loc[1:]] = (loss_forward - loss_back)/(2*eps)
+
+            self._state_net
+            self._state_net.load_state_dict()
+
 
             # print(f'grid.shape is {grids[0].shape}')
-            _, model = adapter.solve_epde_system(system = self.system, grids = grids, data = None, 
-                                                 boundary_conditions = bc_operators, 
-                                                 mode = self._solver_params['mode'], 
-                                                 use_cache = self._solver_params['use_cache'], 
-                                                 use_fourier = self._solver_params['use_fourier'],
-                                                 fourier_params = self._solver_params['fourier_params'],
-                                                 use_adaptive_lambdas = self._solver_params['use_adaptive_lambdas'])
+
             del adapter
 
             # loss = self.loss(model, grids_merged)
@@ -212,23 +247,48 @@ class ControlExp():
             print(f'loss_arg vals is {[var.shape for var in loss_arg]}')
             
             loss = self.loss(loss_arg)
-            loss.backward()
-            optimizer.step()
+            # loss.backward()
+            # optimizer.step()
 
             if loss < min_loss:
                 self._state_net = model
             print(loss)
             
         return self._state_net
-    
-class FirstOrderOptimizer(ABC):
+
+    def get_solver_adapter(self, net: torch.nn.Sequential):
+        adapter = SolverAdapter(net = net, use_cache = False)
+        # Edit solver forms of functions of dependent variable to Callable objects.
+        # Setting various adapater parameters
+        adapter.set_compiling_params(**self._solver_params['compiling_params'])
+        adapter.set_optimizer_params(**self._solver_params['optimizer_params'])
+        adapter.set_cache_params(**self._solver_params['cache_params'])
+        adapter.set_early_stopping_params(**self._solver_params['early_stopping_params'])
+        adapter.set_plotting_params(**self._solver_params['plotting_params'])
+        adapter.set_training_params(**self._solver_params['training_params'])
+        adapter.change_parameter('mode', self._solver_params['mode'], param_dict_key = 'compiling_params')
+        
+        return adapter
+
+@torch.no_grad()
+def eps_increment_diff(input_params: OrderedDict, loc: List, prev_loc: List = None, # input_keys: list,  
+                       forward: bool = True, eps = 1e-4):
+    if forward:
+        input_params[loc][tuple(loc[1:])] += eps
+        if prev_loc is not None:
+            input_params[prev_loc[0]][tuple(prev_loc[1:])] += eps
+    else:
+        input_params[loc][tuple(loc[1:])] -= 2*eps
+    return input_params
+
+class FirstOrderOptimizerNp(ABC):
     def __init__(self, parameters: np.ndarray, optimized: np.ndarray):
         raise NotImplementedError('Calling __init__ of an abstract optimizer')
     
     def step(self, gradient: np.ndarray):
         raise NotImplementedError('Calling step of an abstract optimizer')
 
-class AdamOptimizer(FirstOrderOptimizer):
+class AdamOptimizerNp(FirstOrderOptimizerNp):
     def __init__(self, optimized: np.ndarray, parameters: np.ndarray = np.array([0.001, 0.9, 0.999, 1e-8])):
         '''
         parameters[0] - alpha, parameters[1] - beta_1, parameters[2] - beta_2
@@ -251,3 +311,36 @@ class AdamOptimizer(FirstOrderOptimizer):
         moment_cor = self._moment/(1 - np.power(self.parameters[1], self.time))
         second_moment_cor = self._second_moment/(1 - np.power(self.parameters[2], self.time))
         return optimized - self.parameters[0]*moment_cor/(np.sqrt(second_moment_cor)+self.parameters[3])
+    
+class FirstOrderOptimizer(ABC):
+    def __init__(self, optimized: List[torch.Tensor], parameters: list):
+        raise NotImplementedError('Calling __init__ of an abstract optimizer')
+    
+    def step(self, gradient: List[torch.Tensor], optimized: List[torch.Tensor]) -> List[torch.Tensor]:
+        raise NotImplementedError('Calling step of an abstract optimizer')
+    
+class AdamOptimizer(FirstOrderOptimizer):
+    def __init__(self, optimized: List[torch.Tensor], parameters: list = [0.001, 0.9, 0.999, 1e-8]):
+        '''
+        parameters[0] - alpha, parameters[1] - beta_1, parameters[2] - beta_2
+        parameters[3] - eps  
+        '''
+        self.reset(optimized, parameters)
+
+    def reset(self, optimized: Dict[str, torch.Tensor], parameters: np.ndarray):
+        self._moment = [torch.zeros_like(param_subtensor) for param_subtensor in optimized.items()] 
+        self._second_moment = [torch.zeros_like(param_subtensor) for param_subtensor in optimized.items()]
+        self.parameters = parameters
+        self.time = 0
+
+    def step(self, gradient: Dict[str, torch.Tensor], optimized: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
+        self.time += 1
+        self._moment = [self.parameters[1] * moment_subtensor + (1-self.parameters[1]) * gradient[tensor_idx]
+                        for tensor_idx, moment_subtensor in enumerate(self._moment)]
+        self._second_moment = [self.parameters[2]*sm_subtensor + (1-self.parameters[2])*torch.power(gradient[tensor_idx], 2)
+                               for tensor_idx, sm_subtensor in enumerate(self._second_moment)]
+        moment_cor = self._moment/(1 - self.parameters[1] ** self.time) #np.power(self.parameters[1], self.time))
+        second_moment_cor = self._second_moment/(1 - self.parameters[2] ** self.time) # np.power(self.parameters[2], self.time)
+        return [opt_subtensor - self.parameters[0]*moment_cor[tensor_idx]/(torch.sqrt(second_moment_cor[tensor_idx]) +\
+                                                                           self.parameters[3])
+                for tensor_idx, opt_subtensor in enumerate(optimized)]

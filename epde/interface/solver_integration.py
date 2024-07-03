@@ -536,7 +536,7 @@ class SystemSolverInterface(object):
 
 class SolverAdapter(object):
     def __init__(self, net=None, use_cache: bool = True):
-        self.net = net
+        self.set_net(net)
         
         self._compiling_params = dict()
         self.set_compiling_params(**BASE_COMPILING_PARAMS)
@@ -565,6 +565,10 @@ class SolverAdapter(object):
     def mode(self):
         return self._compiling_params['mode']
     
+    def set_net(self, net: torch.nn.Sequential):
+        # if self.net is not None and 
+        self.net = net
+
     @staticmethod
     def get_net(equations, mode: str, domain: Domain, use_fourier = True, 
                 fft_params: dict = {'L' : [4,], 'M' : [3,]}):
