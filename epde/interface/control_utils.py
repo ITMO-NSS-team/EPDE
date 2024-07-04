@@ -226,8 +226,8 @@ class ControlExp():
 
                         grad_tensors[loc[0]][loc[1:]] = (loss_forward - loss_back)/(2*eps)
 
-            self._state_net
-            self._state_net.load_state_dict()
+
+            self._control_net.load_state_dict(optimizer.step(gradient= grad_tensors))
 
 
             # print(f'grid.shape is {grids[0].shape}')
@@ -271,7 +271,7 @@ class ControlExp():
         return adapter
 
 @torch.no_grad()
-def eps_increment_diff(input_params: OrderedDict, loc: List, prev_loc: List = None, # input_keys: list,  
+def eps_increment_diff(input_params: OrderedDict, loc: List[str, Tuple[int]], prev_loc: List = None, # input_keys: list,  
                        forward: bool = True, eps = 1e-4):
     if forward:
         input_params[loc][tuple(loc[1:])] += eps
@@ -335,12 +335,12 @@ class AdamOptimizer(FirstOrderOptimizer):
 
     def step(self, gradient: Dict[str, torch.Tensor], optimized: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
         self.time += 1
-        self._moment = [self.parameters[1] * moment_subtensor + (1-self.parameters[1]) * gradient[tensor_idx]
-                        for tensor_idx, moment_subtensor in enumerate(self._moment)]
-        self._second_moment = [self.parameters[2]*sm_subtensor + (1-self.parameters[2])*torch.power(gradient[tensor_idx], 2)
-                               for tensor_idx, sm_subtensor in enumerate(self._second_moment)]
+        self._moment = [self.parameters[1] * self._moment[tensor_idx] + (1-self.parameters[1]) * grad_subtensor
+                        for tensor_idx, grad_subtensor in enumerate(gradient.values())]
+        self._second_moment = [self.parameters[2]*self._second_moment[tensor_idx] + (1-self.parameters[2])*torch.power(grad_subtensor, 2)
+                               for tensor_idx, grad_subtensor in enumerate(gradient.values())]
         moment_cor = self._moment/(1 - self.parameters[1] ** self.time) #np.power(self.parameters[1], self.time))
         second_moment_cor = self._second_moment/(1 - self.parameters[2] ** self.time) # np.power(self.parameters[2], self.time)
-        return [opt_subtensor - self.parameters[0]*moment_cor[tensor_idx]/(torch.sqrt(second_moment_cor[tensor_idx]) +\
+        return [optimized[subtensor_key] - self.parameters[0]*moment_cor[tensor_idx]/(torch.sqrt(second_moment_cor[tensor_idx]) +\
                                                                            self.parameters[3])
-                for tensor_idx, opt_subtensor in enumerate(optimized)]
+                for tensor_idx, subtensor_key in enumerate(optimized.keys())]
