@@ -9,14 +9,10 @@ import os
 import sys
 import faulthandler
 
-import epde.interface
-import epde.interface.prepared_tokens
+
 
 faulthandler.enable()
 
-# sys.path.append('../')
-
-# sys.path.pop()
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../..')))
 
 import numpy as np
@@ -31,7 +27,7 @@ import matplotlib.pyplot as plt
 import epde
 from projects.control.swingup_aux import DMCEnvWrapper, RandomPolicy, CosinePolicy, CosineSignPolicy, \
                                          TwoCosinePolicy, rollout_env, VarTrigTokens, DerivSignFunction
-                                         
+
 
 
 def epde_discovery(t, x, angle, u, derivs, diff_method = 'FD'):
@@ -198,7 +194,26 @@ def translate_equation(t, x, angle, u, derivs: dict, diff_method = 'FD'):
 
     return test
 
-if __name__ == '__main__':
+
+def prepare_trajectories(n_sample: int = 250, single_sample: bool = True):
+    env_config = {'domain_name': "cartpole",
+                  'task_name': "swingup",
+                  'frame_skip': 1,
+                  'from_pixels': False}
+
+    cart_env = DMCEnvWrapper(env_config)
+    random_policy = RandomPolicy(cart_env.action_space)
+    cosine_policy = CosinePolicy(period=180, amplitude=0.004)
+    cosine_signum_policy = CosineSignPolicy(period=180, amplitude=0.002)
+    two_cosine_policy = TwoCosinePolicy(180, 90, 0.002)
+
+    step = 0.01
+    t = np.linspace(0, step*n_sample, num = n_sample, endpoint=False)
+
+    return t, rollout_env(cart_env, two_cosine_policy, n_steps = 250, 
+                          n_steps_reset=1000)
+
+def general():
     env_config = {'domain_name': "cartpole",
                   'task_name': "swingup",
                   'frame_skip': 1,
@@ -349,3 +364,15 @@ if __name__ == '__main__':
         samples_u = [tc_comb[4], tc_comb[4], tc_comb[4]]
 
         res = epde_multisample_discovery(samples_t, samples_pos, samples_angle, samples_derivs, samples_u, 'FD')
+
+if __name__ == '__main__':
+    only_prepare = True
+    if only_prepare:
+        t, traj_data = prepare_trajectories() # traj_data = (traj_obj, traj_acts, traj_rews) 
+        print(f'Acts len is {len(traj_data[0])}, while shape {traj_data[0][0].shape}')
+        assert(t.size == traj_data[0][0].shape[0]), 'Incorrect t detected'
+        np.save(file = 'reserve/t.npy', arr = t)
+        np.save(file = 'reserve/state.npy', arr = traj_data[0][0])
+        np.save(file = 'reserve/acts.npy', arr = traj_data[1][0])
+    else:
+        general()

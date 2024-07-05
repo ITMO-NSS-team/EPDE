@@ -124,19 +124,22 @@ def reset_control_nn(n_var: int = 1, n_control: int = 1, ann: torch.nn.Sequentia
     Use of bad practices, link control nn to the token family. 
     '''
     if ann is None:
-        hidden_neurons = 128
+        hidden_neurons = 256
         layers = [torch.nn.Linear(n_var, hidden_neurons),
-                  torch.nn.Tanh(),
-                  torch.nn.Linear(hidden_neurons, hidden_neurons),
-                  torch.nn.Tanh(),
-                  torch.nn.Linear(hidden_neurons, hidden_neurons),
-                  torch.nn.Tanh(),
+                  torch.nn.ReLU(),
                   torch.nn.Linear(hidden_neurons, n_control)]
         ann = torch.nn.Sequential(*layers)
 
     global control_nn
     control_nn = ann
 
+# layers = [torch.nn.Linear(n_var, hidden_neurons), OLD setup, before shallow neural networks.
+#           torch.nn.Tanh(),
+#           torch.nn.Linear(hidden_neurons, hidden_neurons),
+#           torch.nn.Tanh(),
+#           torch.nn.Linear(hidden_neurons, hidden_neurons),
+#           torch.nn.Tanh(),
+#           torch.nn.Linear(hidden_neurons, n_control)]
 
 def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: bool = True,
                        derivs: List[Union[int, List, Union[np.ndarray]]] = None, 
