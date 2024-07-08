@@ -701,15 +701,17 @@ class SolverAdapter(object):
                     param_elem[1](**param_labeled)
                 
     @staticmethod
-    def create_domain(variables: List[str], grids : List[np.ndarray]) -> Domain:
+    def create_domain(variables: List[str], grids : List[Union[np.ndarray, torch.Tensor]]) -> Domain:
         assert len(variables) == len(grids), f'Number of passed variables {len(variables)} does not \
             match number of grids {len(grids)}.'
-        assert len(variables) == grids[0].ndim, 'Grids have to be set as a N-dimensional np.ndarrays with dim \
-            matching the domain dimensionality'
+        if isinstance(grids[0], np.ndarray):
+            assert len(variables) == grids[0].ndim, 'Grids have to be set as a N-dimensional np.ndarrays with dim \
+                matching the domain dimensionality'
         domain = Domain('uniform')
 
         for idx, var_name in enumerate(variables):
-            domain.variable(variable_name = var_name, variable_set = torch.tensor(grids[idx]), 
+            var_grid = grids[idx] if isinstance(grids[idx], torch.Tensor) else torch.tensor(grids[idx])
+            domain.variable(variable_name = var_name, variable_set = var_grid, 
                             n_points = None)
             
         return domain

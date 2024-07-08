@@ -180,8 +180,7 @@ def translate_dummy_eqs(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np
         raise ValueError('Incorrect preprocessing tool selected.')
 
     
-    # control_var_tokens = epde.CacheStoredTokens('control', ['ctrl',], {'ctrl' : control}, OrderedDict([('power', (1, 1))]),
-    #                                             {'power': 0}, meaningful=True)
+
     control_var_tokens = epde.interface.prepared_tokens.ControlVarTokens(sample = control, ann = control_ann, 
                                                                          arg_var = [(0, [None]),
                                                                                     (1, [None])])    
@@ -204,14 +203,15 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     autograd = AutogradDeriv()
 
     u_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = u_tar),
-                                                 grid = t, deriv_method = autograd)
+                                                 grid = t, deriv_method = autograd, nn_output=0)
     v_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = v_tar),
-                                                 grid = t, deriv_method = autograd)
+                                                 grid = t, deriv_method = autograd, nn_output=1)
     contr_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = 0.),
-                                                 grid = t, deriv_method = autograd)
+                                                 grid = t, deriv_method = autograd, nn_output=0)
     
     loss = control_utils.ConditionalLoss([(100., u_tar_constr, 0),
-                                          (100., v_tar_constr, 1),]) #  (1.,  contr_constr, 2)
+                                          (100., v_tar_constr, 0),
+                                          (0.001, contr_constr, 1)])
     optimizer = control_utils.ControlExp(loss=loss)
     
     def get_ode_bop(key, var, term, grid_loc, value):
@@ -221,25 +221,26 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
             bop_grd_np = np.array([[grid_loc,]])
             bop.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor))
         elif isinstance(grid_loc, torch.Tensor):
-            bop.set_grid(grid_loc.reshape((1, 1)).type(torch.FloatTensor))
+            bop.set_grid(grid_loc.reshape((1, 1)).type(torch.FloatTensor)) # What is the correct shape here?
         else:
             raise TypeError('Incorret value type, expected float or torch.Tensor.')
         bop.values = torch.from_numpy(np.array([[value,]])).float()
         return bop
 
-    bop_u = get_ode_bop('u', 0, [None], t[0], u_init)
-    bop_v = get_ode_bop('u', 0, [None], t[0], v_init)
+    bop_u = get_ode_bop('u', 0, [None], t[0, 0], u_init)
+    bop_v = get_ode_bop('u', 0, [None], t[0, 0], v_init)
 
     optimizer.system = eq
 
     optimizer.set_control_optim_params()
     optimizer.set_solver_params()
 
-    optimizer.train_pinn(bc_operators = [bop_u(), bop_v()], grids = [t,], control_args = [(0, [None]), (1, [None])],
-                         n_control = 1., state_net = state_nn_pretrained, control_net = ctrl_nn_pretrained, 
-                         epochs = 1e1)
+    state_nn, ctrl_net, ctrl_pred = optimizer.train_pinn(bc_operators = [bop_u(), bop_v()], grids = [t,], 
+                                                         control_args = [(0, [None]), (1, [None])],
+                                                         n_control = 1., state_net = state_nn_pretrained, 
+                                                         control_net = ctrl_nn_pretrained, epochs = 1e1)
 
-    return optimizer
+    return state_nn, ctrl_net, ctrl_pred
 
 # def train_control_nn()
 
@@ -287,7 +288,7 @@ if __name__ == '__main__':
     #     data_nn = pickle.load(input_file)
     # print('Dumped ANN')
 
-    t, ctrl, solution = prepare_data(ctrl_fun = lambda x: 17*x[1] + 0.05*x[0]  + 0.2) # x[0]
+    t, ctrl, solution = prepare_data(ctrl_fun = lambda x: 17*x[1] + 0.05*x[0] + 0.2) # x[0]
     t, ctrl, solution = t[:-1], ctrl[:-1], solution[:-1, ...]
 
     print(t.shape, ctrl.shape, solution.shape)
@@ -315,8 +316,9 @@ if __name__ == '__main__':
     plt.legend()
     plt.show()   
 
-    nn = optimize_ctrl(model, torch.from_numpy(t), u_tar = 1, v_tar = 0, u_init=solution[0, 0], v_init=solution[0, 1],
-                        state_nn_pretrained=epde.globals.solution_guess_nn, ctrl_nn_pretrained=ctrl_ann)
+    res = optimize_ctrl(model, torch.from_numpy(t).reshape((-1, 1)).float(), u_tar = 1, v_tar = 0,
+                         u_init=solution[0, 0], v_init=solution[0, 1],
+                         state_nn_pretrained=epde.globals.solution_guess_nn, ctrl_nn_pretrained=ctrl_ann)
 
-    with open(r"/home/maslyaev/Documents/EPDE/projects/control/control_opt_ann.pickle", 'wb') as output_file:  
-        pickle.dump(nn, output_file)
+    with open(r"/home/maslyaev/Documents/EPDE/projects/control/control_opt_res.pickle", 'wb') as output_file:  
+        pickle.dump(res, output_file)

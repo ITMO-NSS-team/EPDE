@@ -15,6 +15,7 @@ import torch
 device = torch.device('cpu') # TODO: make system-agnostic approach
 
 from epde.cache.cache import Cache
+from epde.cache.ctrl_cache import ControlNNContainer
 from epde.supplementary import create_solution_net, AutogradDeriv
 
 
@@ -119,10 +120,12 @@ def init_verbose(plot_DE_solutions : bool = False, show_iter_idx : bool = True,
     verbose = VerboseManager(plot_DE_solutions, show_iter_idx, show_iter_fitness, 
                              show_iter_stats, show_ann_loss, show_warnings)
 
-def reset_control_nn(n_var: int = 1, n_control: int = 1, ann: torch.nn.Sequential = None):
+def reset_control_nn(n_var: int = 1, n_control: int = 1, ann: torch.nn.Sequential = None, 
+                     ctrl_args: list = [(0, [None,]),]):
     '''
     Use of bad practices, link control nn to the token family. 
     '''
+
     if ann is None:
         hidden_neurons = 256
         layers = [torch.nn.Linear(n_var, hidden_neurons),
@@ -130,16 +133,9 @@ def reset_control_nn(n_var: int = 1, n_control: int = 1, ann: torch.nn.Sequentia
                   torch.nn.Linear(hidden_neurons, n_control)]
         ann = torch.nn.Sequential(*layers)
 
-    global control_nn
-    control_nn = ann
+    global control
+    control = ControlNNContainer()
 
-# layers = [torch.nn.Linear(n_var, hidden_neurons), OLD setup, before shallow neural networks.
-#           torch.nn.Tanh(),
-#           torch.nn.Linear(hidden_neurons, hidden_neurons),
-#           torch.nn.Tanh(),
-#           torch.nn.Linear(hidden_neurons, hidden_neurons),
-#           torch.nn.Tanh(),
-#           torch.nn.Linear(hidden_neurons, n_control)]
 
 def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: bool = True,
                        derivs: List[Union[int, List, Union[np.ndarray]]] = None, 

@@ -32,8 +32,13 @@ from epde.solver.optimizers.closure import Closure
 #         self._optimizer.zero_grad()
 
 class ControlConstraint(ABC):
-    def __init__(self, val, deriv_method, deriv_axes, **kwargs):
+    def __init__(self, val : Union[float, torch.Tensor], deriv_method: BasicDeriv, # grid: torch.Tensor, 
+                 deriv_axes: List = [None,], nn_output: int = 0, **kwargs):
         self._val = val
+        # self._grid = grid
+        self._axes = deriv_axes
+        self._nn_output = nn_output
+        self._deriv_method = deriv_method
 
     @abstractmethod
     def __call__(self, fun_nn):
@@ -47,14 +52,11 @@ class ControlConstrEq(ControlConstraint):
     '''
     Class for constrints of type $c(u^(n)) = f(u) - val = 0$
     '''
-    def __init__(self, val : Union[float, torch.Tensor], grid: torch.Tensor, deriv_method: BasicDeriv, 
-                 deriv_axes: List = [None,], tolerance: float = 1e-7):
-        self._val = val
-        self._grid = grid        
+    def __init__(self, val : Union[float, torch.Tensor], deriv_method: BasicDeriv, # grid: torch.Tensor, 
+                 deriv_axes: List = [None,], nn_output: int = 0, tolerance: float = 1e-7, ):
+        super().__init__(val, deriv_method, deriv_axes, nn_output) # grid, 
         self._eps = tolerance
-        self._axes = deriv_axes
-        self._deriv_method = deriv_method
-
+ 
     def __call__(self, fun_nn: Union[torch.nn.Sequential, torch.Tensor]) -> Tuple[bool, torch.Tensor]:
         to_compare = self._deriv_method.take_derivative(u = fun_nn, grid=self._grid, axes=self._axes)
         if not isinstance(self._val, torch.Tensor):
@@ -62,7 +64,7 @@ class ControlConstrEq(ControlConstraint):
         else:
             assert to_compare.shape == self._val.shape, 'Incorrect shapes of constraint value tensor'
             val_transformed = self._val
-        return torch.isclose(val_transformed, to_compare, r_tol = self._eps), val_transformed - to_compare
+        return torch.isclose(val_transformed, to_compare, rtol = self._eps), val_transformed - to_compare
         
     def loss(self, fun_nn: Union[torch.nn.Sequential, torch.Tensor]) -> torch.Tensor:
         print(f'fun_nn is {fun_nn}')
@@ -73,14 +75,6 @@ class ControlConstrNEq(ControlConstraint):
     '''
     Class for constrints of type $c(u, x) = f(u, x) - val < 0$
     '''
-    def __init__(self, val: Union[float, torch.Tensor], grid: torch.Tensor, deriv_method: BasicDeriv,
-                 deriv_axes: List = [None,], nn_output: int = 0):
-        self._val = val
-        self._grid = grid
-        self._axes = deriv_axes
-        self._nn_output = nn_output
-        self._deriv_method = deriv_method
-
     def __call__(self, fun_nn: torch.nn.Sequential) -> Tuple[bool, torch.Tensor]:
         to_compare = self._deriv_method.take_derivative(u = fun_nn, grid=self._grid,
                                                         axes=self._axes, component = self._nn_output)
@@ -99,11 +93,11 @@ class ConditionalLoss():
     def __init__(self, conditions: List[Tuple[Union[float, ControlConstraint, int]]]):
         self._cond = conditions
 
-    def __call__(self, args: List[torch.nn.Sequential]):
+    def __call__(self, models: List[torch.nn.Sequential], ):
         temp = []
         for cond in self._cond:
             print(cond[1]._val, cond[1]._grid, cond[1]._axes)
-            temp.append(cond[0] * cond[1].loss(args[cond[2]]))
+            temp.append(cond[0] * cond[1].loss(models[cond[2]]))
         print('temp loss', temp)
         return torch.stack(temp, dim=0).sum(dim=0).sum(dim=0)
 
@@ -115,7 +109,7 @@ class ControlExp():
 
     def create_best_equations(self, optimal_equations: Union[list, ParetoLevels]):
         res_combiner = ExperimentCombiner(optimal_equations)
-        return res_combiner.create_best(self._pool)   
+        return res_combiner.create_best(self._pool)
 
     @staticmethod
     def create_ode_bop(key, var, term, grid_loc, value):
@@ -151,12 +145,10 @@ class ControlExp():
 
     @staticmethod
     def finite_diff_calculation(system, adapter, loc, control_loss, state_net: torch.nn.Sequential, # prev_loc,  
-                                bc_operators, grids: list, solver_params: dict, eps: float, param_keys):
+                                bc_operators, grids: list, solver_params: dict, eps: float):
         # Calculating loss in p[i]+eps:        
         global_var.control_nn.load_state_dict(eps_increment_diff(input_params=global_var.control_nn.state_dict(),
-                                                                 input_keys=param_keys,
-                                                                 loc = loc, # prev_loc = prev_loc,
-                                                                 forward=True, eps=eps))
+                                                                 loc = loc, forward=True, eps=eps))
         adapter.set_net(state_net)
         _, model = adapter.solve_epde_system(system = system, grids = grids[0], data = None,
                                              boundary_conditions = bc_operators,
@@ -166,13 +158,11 @@ class ControlExp():
                                              fourier_params = solver_params['fourier_params'],
                                              use_adaptive_lambdas = solver_params['use_adaptive_lambdas'])
         
-        loss_forward = control_loss(model, grids[1])
+        loss_forward = control_loss([model, global_var.control_nn])
         # Calculating loss in p[i]-eps:
 
         global_var.control_nn.load_state_dict(eps_increment_diff(input_params=global_var.control_nn.state_dict(),
-                                                                 input_keys=param_keys,
-                                                                 loc = loc, # prev_loc = loc,
-                                                                 forward=False, eps=eps))
+                                                                 loc = loc, forward=False, eps=eps))
         adapter.set_net(state_net)
         _, model = adapter.solve_epde_system(system = system, grids = grids[0], data = None,
                                              boundary_conditions = bc_operators,
@@ -182,15 +172,13 @@ class ControlExp():
                                              fourier_params = solver_params['fourier_params'],
                                              use_adaptive_lambdas = solver_params['use_adaptive_lambdas'])
         
-        loss_back = control_loss(model, grids[1])
+        loss_back = control_loss([model, global_var.control_nn])
         
         # Restore values of the control NN parameters
         global_var.control_nn.load_state_dict(eps_increment_diff(input_params=global_var.control_nn.state_dict(),
-                                                                 input_keys=param_keys,
-                                                                 loc = loc, # prev_loc = None,
-                                                                 forward=True, eps=eps))
+                                                                 loc = loc, forward=True, eps=eps))
 
-        return (loss_forward - loss_back)/(2*eps)        # grad_tensors[loc[0]][loc[1:]] =
+        return (loss_forward - loss_back)/(2*eps)
 
     def train_pinn(self, bc_operators: List[BOPElement], grids: List[Union[np.ndarray, torch.Tensor]], 
                    control_args = [], n_control: int = 1, epochs: int = 1e4, 
@@ -213,10 +201,10 @@ class ControlExp():
 
         # Implement closure for loss function?
         # Parameters update - by epsilon in loop one-by-one, without deepcopy.
-        grad_tensors = deepcopy(global_var.control_net.state_dict())
-        param_keys = list(global_var.control_net.state_dict().keys())
+        grad_tensors = deepcopy(global_var.control_nn.state_dict())
+        param_keys = list(global_var.control_nn.state_dict().keys())
 
-        optimizer = AdamOptimizer()
+        optimizer = AdamOptimizer(optimized = global_var.control_nn.state_dict())
         adapter = self.get_solver_adapter(None)
         while t < epochs and not stop_training:
             state_net = deepcopy(self._state_net)
@@ -234,7 +222,7 @@ class ControlExp():
                                                                                      bc_operators = bc_operators,
                                                                                      grids = [grids, grids_merged], 
                                                                                      solver_params = self._solver_params,
-                                                                                     eps = eps, param_keys = param_keys)
+                                                                                     eps = eps) # param_keys = param_keys
                 elif len(param_tensor.size()) == 2:
                     for param_outer_idx, _ in enumerate(param_tensor):
                         for param_inner_idx, _ in enumerate(param_tensor[0]):
@@ -246,7 +234,7 @@ class ControlExp():
                                                                                          bc_operators = bc_operators,
                                                                                          grids = [grids, grids_merged], 
                                                                                          solver_params = self._solver_params,
-                                                                                         eps = eps, param_keys = param_keys)                       
+                                                                                         eps = eps) # param_keys = param_keys                       
                 else:
                     raise Exception(f'Incorrect shape of weights/bias. Got {param_tensor.size()} tensor.')
             global_var.control_nn.load_state_dict(optimizer.step(gradient = grad_tensors, 
@@ -342,8 +330,8 @@ class AdamOptimizer(FirstOrderOptimizer):
         self.reset(optimized, parameters)
 
     def reset(self, optimized: Dict[str, torch.Tensor], parameters: np.ndarray):
-        self._moment = [torch.zeros_like(param_subtensor) for param_subtensor in optimized.items()] 
-        self._second_moment = [torch.zeros_like(param_subtensor) for param_subtensor in optimized.items()]
+        self._moment = [torch.zeros_like(param_subtensor) for param_subtensor in optimized.values()] 
+        self._second_moment = [torch.zeros_like(param_subtensor) for param_subtensor in optimized.values()]
         self.parameters = parameters
         self.time = 0
 

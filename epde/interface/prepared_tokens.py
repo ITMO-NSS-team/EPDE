@@ -168,7 +168,6 @@ class ControlVarTokens(PreparedTokens):
     def __init__(self, sample: np.ndarray, ann: torch.nn.Sequential = None, var_name: str = 'ctrl',
                  arg_var: List[Tuple[Union[int, List]]] = [(0, [None,]),]):
         vars, der_ords = zip(*arg_var)
-        # print('vars {}, der_ords {}'.format(vars, der_ords))
 
         token_params = OrderedDict([('power', (1, 1)),])
         
