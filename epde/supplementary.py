@@ -25,24 +25,24 @@ class BasicDeriv(ABC):
     def __init__(self, *args, **kwargs):
         raise NotImplementedError('Trying to create abstract differentiation method')
     
-    def take_derivative(self, u: torch.Tensor, grid: torch.Tensor, axes: list):
+    def take_derivative(self, u: torch.Tensor, args: torch.Tensor, axes: list):
         raise NotImplementedError('Trying to differentiate with abstract differentiation method')
 
 class AutogradDeriv(BasicDeriv):
     def __init__(self):
         pass
 
-    def take_derivative(self, u: Union[torch.nn.Sequential, torch.Tensor], grid: torch.Tensor, 
+    def take_derivative(self, u: Union[torch.nn.Sequential, torch.Tensor], args: torch.Tensor, 
                         axes: list = [], component: int = 0):
-        grid.requires_grad = True
+        args.requires_grad = True
         if isinstance(u, torch.nn.Sequential):
-            comp_sum = u(grid)[..., component].sum(dim = 0)
+            comp_sum = u(args)[..., component].sum(dim = 0)
         else:
             print(f'u.shape, {u.shape}')
             comp_sum = u.sum(dim = 0)
         print(f'differentiating {comp_sum}')
         for axis in axes:
-            output_vals = torch.autograd.grad(outputs = comp_sum, inputs = grid, create_graph=True)[0]
+            output_vals = torch.autograd.grad(outputs = comp_sum, inputs = args, create_graph=True)[0]
             comp_sum = output_vals[:, axis].sum()
         output_vals = output_vals[:, axes[-1]].reshape(-1, 1)
         return output_vals

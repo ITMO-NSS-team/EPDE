@@ -14,7 +14,7 @@ mpl.use('TkAgg')
 import matplotlib.pyplot as plt
 
 import epde
-import epde.globals
+import epde.globals as global_var
 import epde.interface.control_utils as control_utils
 
 
@@ -118,7 +118,7 @@ def prepare_data(steps_num: int = 301, t_max: float = 1, ctrl_fun: Callable = la
     return t, ctrl, solution
 
 def epde_discovery(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np.ndarray, diff_method = 'FD',
-                   bnd = 30):
+                   control_ann: torch.nn.Sequential = None, bnd = 30):
     dimensionality = t.ndim - 1
     
     epde_search_obj = epde.EpdeSearch(use_solver = True, dimensionality = dimensionality, boundary = bnd,
@@ -141,7 +141,10 @@ def epde_discovery(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np.ndar
     # control_var_tokens = epde.CacheStoredTokens('control', ['ctrl',], {'ctrl' : control}, OrderedDict([('power', (1, 1))]),
     #                                             {'power': 0}, meaningful=True)
 
-    control_var_tokens = epde.interface.prepared_tokens.ControlVarTokens()
+    # control_ann = global_var.control_nn.net
+    control_var_tokens = epde.interface.prepared_tokens.ControlVarTokens(sample = control, ann = control_ann, 
+                                                                         arg_var = [(0, [None]),
+                                                                                    (1, [None])])
 
     eps = 5e-7
     popsize = 24

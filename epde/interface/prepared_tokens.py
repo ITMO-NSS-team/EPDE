@@ -165,9 +165,14 @@ class DataSign(PreparedTokens):
         self._token_family.set_evaluator(simple_function_evaluator)    
 
 class ControlVarTokens(PreparedTokens):
-    def __init__(self, sample: np.ndarray, ann: torch.nn.Sequential = None, var_name: str = 'ctrl',
-                 arg_var: List[Tuple[Union[int, List]]] = [(0, [None,]),]):
+    def __init__(self, sample: Union[np.ndarray, List[np.ndarray]], ann: torch.nn.Sequential = None, 
+                 var_name: Union[str, List[str]] = 'ctrl', arg_var: List[Tuple[Union[int, List]]] = [(0, [None,]),]):
         vars, der_ords = zip(*arg_var)
+        if isinstance(sample, List):
+            assert isinstance(var_name, List), 'Both samples and var names have to be set as Lists or single elements.'
+            num_ctrl_comp = len(var_name)
+        else:
+            num_ctrl_comp = 1
 
         token_params = OrderedDict([('power', (1, 1)),])
         
@@ -195,8 +200,12 @@ class ControlVarTokens(PreparedTokens):
                                evaluation_functions_torch=nn_eval_torch,
                                eval_fun_params_labels = ['power'])
 
-        global_var.reset_control_nn(ann=ann, n_var=len(vars), ctrl_args=arg_var)
-        global_var.tensor_cache.add(tensor=sample, label = (var_name, (1.0,)))
+        global_var.reset_control_nn(n_control = num_ctrl_comp, ann = ann, ctrl_args = arg_var)
+        if isinstance(sample, np.ndarray):
+            global_var.tensor_cache.add(tensor = sample, label = (var_name, (1.0,)))
+        else:
+            for idx, var_elem in enumerate(var_name):
+                global_var.tensor_cache.add(tensor = sample[idx], label = (var_elem, (1.0,)))
 
         self._token_family.set_evaluator(eval)
 

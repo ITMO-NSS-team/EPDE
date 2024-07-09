@@ -2,7 +2,7 @@ import numpy as np
 import torch
 
 from functools import partial
-from typing import Tuple, List, Dict, Union
+from typing import Tuple, List, Dict, Union, Callable
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from collections import OrderedDict
@@ -33,23 +33,60 @@ from epde.solver.optimizers.closure import Closure
 
 def prepare_control_inputs(model: torch.nn.Sequential, grid: torch.Tensor, args: List[Tuple[Union[int, List]]]):
     differntiatior = AutogradDeriv()
-    torch.stack([differntiatior.take_derivative(u = model, grid = grid, axes = ) for arg in args])
+    return torch.cat([differntiatior.take_derivative(u = model, args = grid, axes = arg[1],
+                                                     component = arg[0]).reshape(-1, 1) for arg in args], dim = 1)
+
+class ConstrLocation():
+    def __init__(self, domain_shape: Tuple[int], axis: int = None, loc: int = None, indices: List[np.ndarray] = None):
+        '''
+        Contruct indices of the control training contraint location.
+        Args:
+            domain_shape (`Tuple[int]`): shape of the domain, for which the control problem is solved.
+            axis (`int`): axis, along that the boundary conditions are selected. Shall be introduced only for constraints on the boundary.
+            loc (`int`): position along axis, where the "boundary" is located. Shall be introduced only for constraints on the boundary.
+        
+        '''
+        self._initial_shape = domain_shape
+        self.domain_indixes = np.indices(domain_shape)
+        if indices is not None:
+            self.loc_indices = indices
+        elif axis is not None and loc is not None:
+            self.loc_indices = self.get_boundary_indices(self.domain_indixes, axis, loc)
+        else:
+            self.loc_indices = self.domain_indixes
+
+    @staticmethod
+    def get_boundary_indices(domain_indices: np.ndarray, axis: int, loc: Union[int, Tuple[int]]): # , shape: Tuple[int]
+        return np.stack([np.take(domain_indices[idx], indices = loc, axis = axis).reshape(-1)
+                         for idx in np.arange(domain_indices.shape[0])])
+    
+    def apply(self, tensor: torch.Tensor, flattened: bool = True, along_axis: int = None): # Union[int, Tuple[int]]
+        if flattened:
+            idxs = np.ravel_multi_index(self.loc_indices)
+            return torch.take_along_dim(input = tensor, indices = idxs, dim = along_axis)
+        else:
+            raise NotImplementedError('Currently, apply can be applied only to flattened tensors.')
+            idxs = self.loc_indices # loop will be held over the first dimension
+            return tensor.take()
+        # idxs = torch.from_numpy(idxs).long().unsqueeze(1) # am I needed?
+
 
 class ControlConstraint(ABC):
     def __init__(self, val : Union[float, torch.Tensor], deriv_method: BasicDeriv, # grid: torch.Tensor, 
-                 deriv_axes: List = [None,], nn_output: int = 0, **kwargs):
+                 indices: ConstrLocation, deriv_axes: List = [None,], nn_output: int = 0, **kwargs):
         self._val = val
-        # self._grid = grid
+        self._indices = indices
         self._axes = deriv_axes
         self._nn_output = nn_output
         self._deriv_method = deriv_method
 
     @abstractmethod
-    def __call__(self, fun_nn):
+    def __call__(self, fun_nn: Union[torch.nn.Sequential, torch.Tensor], 
+                 arg_tensor: torch.Tensor) -> Tuple[bool, torch.Tensor]:
         raise NotImplementedError('Trying to call abstract constraint discrepancy evaluation.')
 
     @abstractmethod
-    def loss(self, fun_nn):
+    def loss(self, fun_nn: torch.nn.Sequential, arg_tensor: torch.Tensor) -> torch.Tensor:
         raise NotImplementedError('Trying to call abstract constraint discrepancy evaluation.')
 
 class ControlConstrEq(ControlConstraint):
@@ -57,12 +94,15 @@ class ControlConstrEq(ControlConstraint):
     Class for constrints of type $c(u^(n)) = f(u) - val = 0$
     '''
     def __init__(self, val : Union[float, torch.Tensor], deriv_method: BasicDeriv, # grid: torch.Tensor, 
-                 deriv_axes: List = [None,], nn_output: int = 0, tolerance: float = 1e-7, ):
-        super().__init__(val, deriv_method, deriv_axes, nn_output) # grid, 
+                 indices: ConstrLocation, deriv_axes: List = [None,], 
+                 nn_output: int = 0, tolerance: float = 1e-7):
+        super().__init__(val, deriv_method, indices, deriv_axes, nn_output) # grid, 
         self._eps = tolerance
  
-    def __call__(self, fun_nn: Union[torch.nn.Sequential, torch.Tensor]) -> Tuple[bool, torch.Tensor]:
-        to_compare = self._deriv_method.take_derivative(u = fun_nn, grid=self._grid, axes=self._axes)
+    def __call__(self, fun_nn: Union[torch.nn.Sequential, torch.Tensor], 
+                 arg_tensor: torch.Tensor) -> Tuple[bool, torch.Tensor]:
+        to_compare = self._deriv_method.take_derivative(u = fun_nn, args=self._indices.apply(arg_tensor, along_axis=0), # correct along_axis argument 
+                                                        axes=self._axes)
         if not isinstance(self._val, torch.Tensor):
             val_transformed = torch.full_like(input = to_compare, fill_value=self._val)
         else:
@@ -70,17 +110,17 @@ class ControlConstrEq(ControlConstraint):
             val_transformed = self._val
         return torch.isclose(val_transformed, to_compare, rtol = self._eps), val_transformed - to_compare
         
-    def loss(self, fun_nn: Union[torch.nn.Sequential, torch.Tensor]) -> torch.Tensor:
+    def loss(self, fun_nn: torch.nn.Sequential, arg_tensor: torch.Tensor) -> torch.Tensor:
         print(f'fun_nn is {fun_nn}')
-        _, discrepancy = self(fun_nn)
+        _, discrepancy = self(fun_nn, arg_tensor)
         return torch.norm(discrepancy)
 
 class ControlConstrNEq(ControlConstraint):
     '''
     Class for constrints of type $c(u, x) = f(u, x) - val < 0$
     '''
-    def __call__(self, fun_nn: torch.nn.Sequential) -> Tuple[bool, torch.Tensor]:
-        to_compare = self._deriv_method.take_derivative(u = fun_nn, grid=self._grid,
+    def __call__(self, fun_nn: torch.nn.Sequential, arg_tensor: torch.Tensor) -> Tuple[bool, torch.Tensor]:
+        to_compare = self._deriv_method.take_derivative(u = fun_nn, args=self._indices.apply(arg_tensor, along_axis=0), # correct along_axis argument 
                                                         axes=self._axes, component = self._nn_output)
         if not isinstance(self._val, torch.Tensor):
             val_transformed = torch.full_like(input = to_compare, fill_value=self._val)
@@ -89,8 +129,8 @@ class ControlConstrNEq(ControlConstraint):
             val_transformed = self._val
         return torch.greater(val_transformed, to_compare), torch.nn.functional.relu(val_transformed - to_compare)
         
-    def loss(self, fun_nn: torch.nn.Sequential) -> torch.Tensor:
-        _, discrepancy = self(fun_nn)
+    def loss(self, fun_nn: torch.nn.Sequential, arg_tensor: torch.Tensor) -> torch.Tensor:
+        _, discrepancy = self(fun_nn, arg_tensor)
         return torch.norm(discrepancy)
 
 class ConditionalLoss():
@@ -101,7 +141,7 @@ class ConditionalLoss():
         temp = []
         for cond in self._cond:
             print(cond[1]._val, cond[1]._grid, cond[1]._axes)
-            temp.append(cond[0] * cond[1].loss(models[cond[2]]))
+            temp.append(cond[0] * cond[1].loss(models[cond[2]], args[cond[2]]))
         print('temp loss', temp)
         return torch.stack(temp, dim=0).sum(dim=0).sum(dim=0)
 

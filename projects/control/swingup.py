@@ -176,7 +176,7 @@ def translate_equation(t, x, angle, u, derivs: dict, diff_method = 'FD'):
     angle_trig_tokens = VarTrigTokens('phi', max_power=2, freq_center=1.)
     sgn_tokens = DerivSignFunction('u', ['du/dx1', 'd^2u/dx1^2'])
     control_var_tokens = epde.interface.prepared_tokens.ControlVarTokens(sample=u, arg_var = [(0, [None,]), (1, [None,]), 
-                                                                         (0, [1,]), (1, [1,])])
+                                                                                              (0, [1,]), (1, [1,])])
 
     epde_search_obj.create_pool(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,), derivs = [derivs['y'], derivs['phi']],
                                 additional_tokens = [angle_trig_tokens, control_var_tokens, sgn_tokens])
