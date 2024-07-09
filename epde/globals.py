@@ -120,21 +120,14 @@ def init_verbose(plot_DE_solutions : bool = False, show_iter_idx : bool = True,
     verbose = VerboseManager(plot_DE_solutions, show_iter_idx, show_iter_fitness, 
                              show_iter_stats, show_ann_loss, show_warnings)
 
-def reset_control_nn(n_var: int = 1, n_control: int = 1, ann: torch.nn.Sequential = None, 
+def reset_control_nn(n_control: int = 1, ann: torch.nn.Sequential = None, 
                      ctrl_args: list = [(0, [None,]),]):
     '''
     Use of bad practices, link control nn to the token family. 
     '''
 
-    if ann is None:
-        hidden_neurons = 256
-        layers = [torch.nn.Linear(n_var, hidden_neurons),
-                  torch.nn.ReLU(),
-                  torch.nn.Linear(hidden_neurons, n_control)]
-        ann = torch.nn.Sequential(*layers)
-
-    global control
-    control = ControlNNContainer()
+    global control_nn
+    control_nn = ControlNNContainer(output_num=n_control, args=ctrl_args, net = ann)
 
 
 def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: bool = True,

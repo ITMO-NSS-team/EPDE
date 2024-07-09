@@ -31,6 +31,10 @@ from epde.solver.optimizers.closure import Closure
 #     def get_closure(self):
 #         self._optimizer.zero_grad()
 
+def prepare_control_inputs(model: torch.nn.Sequential, grid: torch.Tensor, args: List[Tuple[Union[int, List]]]):
+    differntiatior = AutogradDeriv()
+    torch.stack([differntiatior.take_derivative(u = model, grid = grid, axes = ) for arg in args])
+
 class ControlConstraint(ABC):
     def __init__(self, val : Union[float, torch.Tensor], deriv_method: BasicDeriv, # grid: torch.Tensor, 
                  deriv_axes: List = [None,], nn_output: int = 0, **kwargs):
@@ -93,7 +97,7 @@ class ConditionalLoss():
     def __init__(self, conditions: List[Tuple[Union[float, ControlConstraint, int]]]):
         self._cond = conditions
 
-    def __call__(self, models: List[torch.nn.Sequential], ):
+    def __call__(self, models: List[torch.nn.Sequential], args: list): # Introduce prepare control input: get torch tensors from solver & autodiff them
         temp = []
         for cond in self._cond:
             print(cond[1]._val, cond[1]._grid, cond[1]._axes)
@@ -147,8 +151,8 @@ class ControlExp():
     def finite_diff_calculation(system, adapter, loc, control_loss, state_net: torch.nn.Sequential, # prev_loc,  
                                 bc_operators, grids: list, solver_params: dict, eps: float):
         # Calculating loss in p[i]+eps:        
-        global_var.control_nn.load_state_dict(eps_increment_diff(input_params=global_var.control_nn.state_dict(),
-                                                                 loc = loc, forward=True, eps=eps))
+        global_var.control_nn.net.load_state_dict(eps_increment_diff(input_params=global_var.control_nn.net.state_dict(),
+                                                                     loc = loc, forward=True, eps=eps))
         adapter.set_net(state_net)
         _, model = adapter.solve_epde_system(system = system, grids = grids[0], data = None,
                                              boundary_conditions = bc_operators,
@@ -158,10 +162,11 @@ class ControlExp():
                                              fourier_params = solver_params['fourier_params'],
                                              use_adaptive_lambdas = solver_params['use_adaptive_lambdas'])
         
-        loss_forward = control_loss([model, global_var.control_nn])
+        control_inputs = prepare_control_inputs(model, grids[1], global_var.control_nn.net_args)
+        loss_forward = control_loss([model, global_var.control_nn.net], [grids[1], ])
         # Calculating loss in p[i]-eps:
 
-        global_var.control_nn.load_state_dict(eps_increment_diff(input_params=global_var.control_nn.state_dict(),
+        global_var.control_nn.load_state_dict(eps_increment_diff(input_params=global_var.control_nn.net.state_dict(),
                                                                  loc = loc, forward=False, eps=eps))
         adapter.set_net(state_net)
         _, model = adapter.solve_epde_system(system = system, grids = grids[0], data = None,
@@ -171,12 +176,13 @@ class ControlExp():
                                              use_fourier = solver_params['use_fourier'],
                                              fourier_params = solver_params['fourier_params'],
                                              use_adaptive_lambdas = solver_params['use_adaptive_lambdas'])
-        
-        loss_back = control_loss([model, global_var.control_nn])
+
+        control_inputs = prepare_control_inputs(model, grids[1], global_var.control_nn.net_args)        
+        loss_back = control_loss([model, global_var.control_nn.net])
         
         # Restore values of the control NN parameters
-        global_var.control_nn.load_state_dict(eps_increment_diff(input_params=global_var.control_nn.state_dict(),
-                                                                 loc = loc, forward=True, eps=eps))
+        global_var.control_nn.net.load_state_dict(eps_increment_diff(input_params=global_var.control_nn.net.state_dict(),
+                                                                     loc = loc, forward=True, eps=eps))
 
         return (loss_forward - loss_back)/(2*eps)
 
@@ -201,10 +207,10 @@ class ControlExp():
 
         # Implement closure for loss function?
         # Parameters update - by epsilon in loop one-by-one, without deepcopy.
-        grad_tensors = deepcopy(global_var.control_nn.state_dict())
-        param_keys = list(global_var.control_nn.state_dict().keys())
+        grad_tensors = deepcopy(global_var.control_nn.net.state_dict())
+        # param_keys = list(global_var.control_nn.net.state_dict().keys())
 
-        optimizer = AdamOptimizer(optimized = global_var.control_nn.state_dict())
+        optimizer = AdamOptimizer(optimized = global_var.control_nn.net.state_dict())
         adapter = self.get_solver_adapter(None)
         while t < epochs and not stop_training:
             state_net = deepcopy(self._state_net)
@@ -237,8 +243,8 @@ class ControlExp():
                                                                                          eps = eps) # param_keys = param_keys                       
                 else:
                     raise Exception(f'Incorrect shape of weights/bias. Got {param_tensor.size()} tensor.')
-            global_var.control_nn.load_state_dict(optimizer.step(gradient = grad_tensors, 
-                                                                 optimized = global_var.control_nn.state_dict()))
+            global_var.control_nn.net.load_state_dict(optimizer.step(gradient = grad_tensors, 
+                                                                     optimized = global_var.control_nn.net.state_dict()))
             adapter.set_net(self._state_net)
             _, model = adapter.solve_epde_system(system = self.system, grids = grids, data = None,
                                                  boundary_conditions = bc_operators,
@@ -251,6 +257,7 @@ class ControlExp():
             var_prediction = model(grids_merged)
             self._state_net = model
 
+            control_inputs = prepare_control_inputs(model, grids[1], global_var.control_nn.net_args)        
             loss = self.loss([self._state_net, global_var.control_nn])
             print(loss)
             if loss < min_loss:

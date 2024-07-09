@@ -195,7 +195,7 @@ class ControlVarTokens(PreparedTokens):
                                evaluation_functions_torch=nn_eval_torch,
                                eval_fun_params_labels = ['power'])
 
-        global_var.reset_control_nn(ann=ann, n_var=len(vars))
+        global_var.reset_control_nn(ann=ann, n_var=len(vars), ctrl_args=arg_var)
         global_var.tensor_cache.add(tensor=sample, label = (var_name, (1.0,)))
 
         self._token_family.set_evaluator(eval)
