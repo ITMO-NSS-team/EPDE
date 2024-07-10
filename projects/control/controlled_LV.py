@@ -205,12 +205,13 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     from epde.supplementary import AutogradDeriv
     autograd = AutogradDeriv()
 
+    loc = control_utils.ConstrLocation(domain_shape = (t.size()[0],)) # Declaring const in the entire domain
     u_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = u_tar),
-                                                 grid = t, deriv_method = autograd, nn_output=0)
+                                                 indices = loc, deriv_method = autograd, nn_output=0)
     v_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = v_tar),
-                                                 grid = t, deriv_method = autograd, nn_output=1)
+                                                 indices = loc, deriv_method = autograd, nn_output=1)
     contr_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = 0.),
-                                                 grid = t, deriv_method = autograd, nn_output=0)
+                                                 indices = loc, deriv_method = autograd, nn_output=0)
     
     loss = control_utils.ConditionalLoss([(100., u_tar_constr, 0),
                                           (100., v_tar_constr, 0),
@@ -310,9 +311,19 @@ if __name__ == '__main__':
 
     args = torch.from_numpy(solution).float()
 
-    # ctrl_ann = epde.supplementary.train_ann(args=[solution[:, 0], solution[:, 1]], data = ctrl, epochs_max = 1e4, dim = 2)
-    with open(r"/home/maslyaev/Documents/EPDE/projects/control/control_ann.pickle", 'rb') as ctrl_input_file:  
-        ctrl_ann = pickle.load(ctrl_input_file)
+    def create_shallow_nn(arg_num: int = 1, output_num: int = 1) -> torch.nn.Sequential: # net: torch.nn.Sequential = None, 
+        hidden_neurons = 256
+        layers = [torch.nn.Linear(arg_num, hidden_neurons),
+                  torch.nn.ReLU(),
+                  torch.nn.Linear(hidden_neurons, output_num)]
+        return torch.nn.Sequential(*layers)
+    
+    ctrl_ann = epde.supplementary.train_ann(args=[solution[:, 0], solution[:, 1]], data = ctrl, 
+                                            epochs_max = 1e4, dim = 2, model = create_shallow_nn(2, 1))
+    # with open(r"/home/maslyaev/Documents/EPDE/projects/control/control_ann.pickle", 'rb') as ctrl_input_file:  
+    #     ctrl_ann = pickle.load(ctrl_input_file)
+    with open(r"/home/maslyaev/Documents/EPDE/projects/control/control_ann_shallow.pickle", 'wb') as ctrl_output_file:  
+        pickle.dump(ctrl_ann, file = ctrl_output_file)
 
     plt.plot(t, ctrl_ann(args).detach().numpy(), color = 'b', label = 'control variable, nn approx')
     plt.plot(t, ctrl, '*', color = 'y', label = 'control variable')

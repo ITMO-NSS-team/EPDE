@@ -191,7 +191,7 @@ class ControlVarTokens(PreparedTokens):
         def nn_eval_torch(*args, **kwargs):
             inp = torch.cat([torch.reshape(tensor, (-1, 1)) for tensor in args], dim = 1) # Validate correctness
             # print(f'inp shape is {inp.shape}, args are {args}, kwargs are {kwargs}')
-            return global_var.control_nn(inp)#**kwargs['power']
+            return global_var.control_nn.net(inp)#**kwargs['power']
 
         def nn_eval_np(*args, **kwargs):
             return nn_eval_torch(*args, **kwargs).detach().numpy()#**kwargs['power']

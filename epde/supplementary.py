@@ -28,32 +28,30 @@ class BasicDeriv(ABC):
     def take_derivative(self, u: torch.Tensor, args: torch.Tensor, axes: list):
         raise NotImplementedError('Trying to differentiate with abstract differentiation method')
 
+
 class AutogradDeriv(BasicDeriv):
     def __init__(self):
         pass
 
     def take_derivative(self, u: Union[torch.nn.Sequential, torch.Tensor], args: torch.Tensor, 
                         axes: list = [], component: int = 0):
-        args.requires_grad = True
+        if not args.requires_grad:
+            args.requires_grad = True
+        if axes == [None,]:
+            return u(args)[..., component].reshape(-1, 1)
         if isinstance(u, torch.nn.Sequential):
             comp_sum = u(args)[..., component].sum(dim = 0)
+        elif isinstance(u, torch.Tensor):
+            raise TypeError('Autograd shall have torch.nn.Sequential as its inputs.')
         else:
             print(f'u.shape, {u.shape}')
             comp_sum = u.sum(dim = 0)
-        print(f'differentiating {comp_sum}')
         for axis in axes:
             output_vals = torch.autograd.grad(outputs = comp_sum, inputs = args, create_graph=True)[0]
             comp_sum = output_vals[:, axis].sum()
         output_vals = output_vals[:, axes[-1]].reshape(-1, 1)
         return output_vals
-
-    #    points.requires_grad = True
-    #     fi = model(points)[:, var].sum(0)
-    #     for ax in axis:
-    #         grads, = torch.autograd.grad(fi, points, create_graph=True)
-    #         fi = grads[:, ax].sum()
-    #     gradient_full = grads[:, axis[-1]].reshape(-1, 1)
-    #     return gradient_full
+    
 
 def create_solution_net(equations_num: int, domain_dim: int, use_fourier = True, #  mode: str, domain: Domain 
                         fft_params: dict = None):
@@ -109,23 +107,23 @@ def rts(value, sign_num: int = 5):
 
 
 def train_ann(args: list, data: np.ndarray, epochs_max: int = 500, batch_frac = 0.5, 
-              dim = None):
+              dim = None, model = None):
     if dim is None:
         dim = 1 if np.any([s == 1 for s in data.shape]) and data.ndim == 2 else data.ndim
     # assert len(args) == dim, 'Dimensionality of data does not match with passed grids.'
     data_size = data.size
-
-    model = torch.nn.Sequential(
-                                torch.nn.Linear(dim, 256),
-                                torch.nn.Tanh(),
-                                torch.nn.Linear(256, 256),
-                                torch.nn.Tanh(),
-                                torch.nn.Linear(256, 64),
-                                torch.nn.Tanh(),
-                                torch.nn.Linear(64, 1024),
-                                torch.nn.Tanh(),
-                                torch.nn.Linear(1024, 1)
-                                )
+    if model is None:
+        model = torch.nn.Sequential(
+                                    torch.nn.Linear(dim, 256),
+                                    torch.nn.Tanh(),
+                                    torch.nn.Linear(256, 256),
+                                    torch.nn.Tanh(),
+                                    torch.nn.Linear(256, 64),
+                                    torch.nn.Tanh(),
+                                    torch.nn.Linear(64, 1024),
+                                    torch.nn.Tanh(),
+                                    torch.nn.Linear(1024, 1)
+                                    )
 
     data_grid = np.stack([arg.reshape(-1) for arg in args])
     grid_tensor = torch.from_numpy(data_grid).float().T

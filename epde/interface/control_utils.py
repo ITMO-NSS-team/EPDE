@@ -33,8 +33,10 @@ from epde.solver.optimizers.closure import Closure
 
 def prepare_control_inputs(model: torch.nn.Sequential, grid: torch.Tensor, args: List[Tuple[Union[int, List]]]):
     differntiatior = AutogradDeriv()
-    return torch.cat([differntiatior.take_derivative(u = model, args = grid, axes = arg[1],
-                                                     component = arg[0]).reshape(-1, 1) for arg in args], dim = 1)
+    res = torch.cat([differntiatior.take_derivative(u = model, args = grid, axes = arg[1],
+                                                    component = arg[0]).reshape(-1, 1) for arg in args], dim = 1)
+    # print('res.shape', res.shape)
+    return res
 
 class ConstrLocation():
     def __init__(self, domain_shape: Tuple[int], axis: int = None, loc: int = None, indices: List[np.ndarray] = None):
@@ -54,6 +56,9 @@ class ConstrLocation():
             self.loc_indices = self.get_boundary_indices(self.domain_indixes, axis, loc)
         else:
             self.loc_indices = self.domain_indixes
+        self.flat_idxs = torch.from_numpy(np.ravel_multi_index(self.loc_indices,
+                                                               dims = self._initial_shape)).long()
+
 
     @staticmethod
     def get_boundary_indices(domain_indices: np.ndarray, axis: int, loc: Union[int, Tuple[int]]): # , shape: Tuple[int]
@@ -62,8 +67,9 @@ class ConstrLocation():
     
     def apply(self, tensor: torch.Tensor, flattened: bool = True, along_axis: int = None): # Union[int, Tuple[int]]
         if flattened:
-            idxs = np.ravel_multi_index(self.loc_indices)
-            return torch.take_along_dim(input = tensor, indices = idxs, dim = along_axis)
+            shape = [1,] * tensor.ndim
+            shape[along_axis] = -1
+            return torch.take_along_dim(input = tensor, indices = self.flat_idxs.view(*shape), dim = along_axis)
         else:
             raise NotImplementedError('Currently, apply can be applied only to flattened tensors.')
             idxs = self.loc_indices # loop will be held over the first dimension
@@ -106,12 +112,12 @@ class ControlConstrEq(ControlConstraint):
         if not isinstance(self._val, torch.Tensor):
             val_transformed = torch.full_like(input = to_compare, fill_value=self._val)
         else:
-            assert to_compare.shape == self._val.shape, 'Incorrect shapes of constraint value tensor'
+            if to_compare.shape != self._val.shape:
+                raise TypeError(f'Incorrect shapes of constraint value tensor: expected {self._val.shape}, got {to_compare.shape}.')
             val_transformed = self._val
         return torch.isclose(val_transformed, to_compare, rtol = self._eps), val_transformed - to_compare
         
     def loss(self, fun_nn: torch.nn.Sequential, arg_tensor: torch.Tensor) -> torch.Tensor:
-        print(f'fun_nn is {fun_nn}')
         _, discrepancy = self(fun_nn, arg_tensor)
         return torch.norm(discrepancy)
 
@@ -140,9 +146,8 @@ class ConditionalLoss():
     def __call__(self, models: List[torch.nn.Sequential], args: list): # Introduce prepare control input: get torch tensors from solver & autodiff them
         temp = []
         for cond in self._cond:
-            print(cond[1]._val, cond[1]._grid, cond[1]._axes)
             temp.append(cond[0] * cond[1].loss(models[cond[2]], args[cond[2]]))
-        print('temp loss', temp)
+        # print('temp loss', temp)
         return torch.stack(temp, dim=0).sum(dim=0).sum(dim=0)
 
 class ControlExp():
@@ -171,7 +176,7 @@ class ControlExp():
 
     def set_solver_params(self, mode: str = 'autograd', compiling_params: dict = {}, optimizer_params: dict = {},
                           cache_params: dict = {}, early_stopping_params: dict = {}, plotting_params: dict = {}, 
-                          training_params: dict = {'epochs':1e2,}, use_cache: bool = False, use_fourier: bool = False, 
+                          training_params: dict = {'epochs':1e1,}, use_cache: bool = False, use_fourier: bool = False, 
                           fourier_params: dict = None, use_adaptive_lambdas: bool = False, device = torch.device('cpu')):
         self._solver_params = {'mode': mode, 
                                'compiling_params': compiling_params, 
@@ -203,10 +208,10 @@ class ControlExp():
                                              use_adaptive_lambdas = solver_params['use_adaptive_lambdas'])
         
         control_inputs = prepare_control_inputs(model, grids[1], global_var.control_nn.net_args)
-        loss_forward = control_loss([model, global_var.control_nn.net], [grids[1], ])
+        loss_forward = control_loss([model, global_var.control_nn.net], [grids[1], control_inputs])
         # Calculating loss in p[i]-eps:
 
-        global_var.control_nn.load_state_dict(eps_increment_diff(input_params=global_var.control_nn.net.state_dict(),
+        global_var.control_nn.net.load_state_dict(eps_increment_diff(input_params=global_var.control_nn.net.state_dict(),
                                                                  loc = loc, forward=False, eps=eps))
         adapter.set_net(state_net)
         _, model = adapter.solve_epde_system(system = system, grids = grids[0], data = None,
@@ -218,7 +223,7 @@ class ControlExp():
                                              use_adaptive_lambdas = solver_params['use_adaptive_lambdas'])
 
         control_inputs = prepare_control_inputs(model, grids[1], global_var.control_nn.net_args)        
-        loss_back = control_loss([model, global_var.control_nn.net])
+        loss_back = control_loss([model, global_var.control_nn.net], [grids[1], control_inputs])
         
         # Restore values of the control NN parameters
         global_var.control_nn.net.load_state_dict(eps_increment_diff(input_params=global_var.control_nn.net.state_dict(),
@@ -235,7 +240,7 @@ class ControlExp():
         stop_training = False
 
         if isinstance(state_net, torch.nn.Sequential): self._state_net = state_net
-        global_var.reset_control_nn(n_var = len(control_args), n_control = n_control, ann = control_net)
+        global_var.reset_control_nn(n_control = n_control, ann = control_net, ctrl_args = global_var.control_nn.net_args)
         
         # TODO: To optimize the net in gloabl variables is a terrific approach, rethink it
 
@@ -255,11 +260,13 @@ class ControlExp():
         while t < epochs and not stop_training:
             state_net = deepcopy(self._state_net)
             eps = 1e-4
-
+            print(f'Control function optimization epoch {t}.')
             for param_key, param_tensor in grad_tensors.items():
+                print(f'working with params {param_key}')
                 if len(param_tensor.size()) == 1:
                     #loss in the forward parameter point calculation
                     for param_idx, _ in enumerate(param_tensor):
+                        print(f'working with param {param_idx}')                        
                         loc = (param_key, param_idx)
                         grad_tensors[loc[0]][loc[1:]] = self.finite_diff_calculation(system = self.system, 
                                                                                      adapter = adapter,
@@ -272,6 +279,7 @@ class ControlExp():
                 elif len(param_tensor.size()) == 2:
                     for param_outer_idx, _ in enumerate(param_tensor):
                         for param_inner_idx, _ in enumerate(param_tensor[0]):
+                            print(f'working with param {param_outer_idx, param_inner_idx}')                                        
                             loc = (param_key, param_outer_idx, param_inner_idx)
                             grad_tensors[loc[0]][loc[1:]] = self.finite_diff_calculation(system = self.system, 
                                                                                          adapter = adapter,
@@ -298,14 +306,14 @@ class ControlExp():
             self._state_net = model
 
             control_inputs = prepare_control_inputs(model, grids[1], global_var.control_nn.net_args)        
-            loss = self.loss([self._state_net, global_var.control_nn])
+            loss = self.loss([self._state_net, global_var.control_nn.net], [grids_merged, control_inputs])
             print(loss)
             if loss < min_loss:
                 min_loss = loss
-                self._best_control_params = global_var.control_nn.state_dict()
-        ctrl_pred = global_var.control_nn(var_prediction)
+                self._best_control_params = global_var.control_nn.net.state_dict()
+        ctrl_pred = global_var.control_nn.net(var_prediction)
 
-        return self._state_net, global_var.control_nn, ctrl_pred
+        return self._state_net, global_var.control_nn.net, ctrl_pred
 
     def get_solver_adapter(self, net: torch.nn.Sequential):
         adapter = SolverAdapter(net = net, use_cache = False)
@@ -386,10 +394,11 @@ class AdamOptimizer(FirstOrderOptimizer):
         self.time += 1
         self._moment = [self.parameters[1] * self._moment[tensor_idx] + (1-self.parameters[1]) * grad_subtensor
                         for tensor_idx, grad_subtensor in enumerate(gradient.values())]
-        self._second_moment = [self.parameters[2]*self._second_moment[tensor_idx] + (1-self.parameters[2])*torch.power(grad_subtensor, 2)
+        self._second_moment = [self.parameters[2]*self._second_moment[tensor_idx] + (1-self.parameters[2])*torch.pow(grad_subtensor, 2)
                                for tensor_idx, grad_subtensor in enumerate(gradient.values())]
-        moment_cor = self._moment/(1 - self.parameters[1] ** self.time) #np.power(self.parameters[1], self.time))
-        second_moment_cor = self._second_moment/(1 - self.parameters[2] ** self.time) # np.power(self.parameters[2], self.time)
+        moment_cor = [moment_tensor/(1 - self.parameters[1] ** self.time) for moment_tensor in self._moment] 
+        second_moment_cor = [sm_tensor/(1 - self.parameters[2] ** self.time) for sm_tensor in self._second_moment] 
         return [optimized[subtensor_key] - self.parameters[0]*moment_cor[tensor_idx]/(torch.sqrt(second_moment_cor[tensor_idx]) +\
                                                                            self.parameters[3])
                 for tensor_idx, subtensor_key in enumerate(optimized.keys())]
+    #np.power(self.parameters[1], self.time)) # np.power(self.parameters[2], self.time)
