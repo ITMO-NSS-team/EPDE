@@ -1,11 +1,13 @@
 import numpy as np
 import torch
 
+import gc
 from functools import partial
 from typing import Tuple, List, Dict, Union, Callable
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from collections import OrderedDict
+
 
 import epde.globals as global_var
 from epde.interface.interface import EpdeMultisample, EpdeSearch, ExperimentCombiner
@@ -192,12 +194,21 @@ class ControlExp():
                                'device': device
                                }
 
+    # @staticmethod
+    # def calc_loss(system, adapter, loc, control_loss, state_net: torch.nn.Sequential, # prev_loc,  
+    #               bc_operators, grids: list, solver_params: dict, eps: float):
+    #     state_dict = 
+
     @staticmethod
     def finite_diff_calculation(system, adapter, loc, control_loss, state_net: torch.nn.Sequential, # prev_loc,  
                                 bc_operators, grids: list, solver_params: dict, eps: float):
-        # Calculating loss in p[i]+eps:        
-        global_var.control_nn.net.load_state_dict(eps_increment_diff(input_params=global_var.control_nn.net.state_dict(),
-                                                                     loc = loc, forward=True, eps=eps))
+        # Calculating loss in p[i]+eps: 
+        state_dict_prev = global_var.control_nn.net.state_dict()
+        state_dict = eps_increment_diff(input_params=state_dict_prev,
+                                        loc = loc, forward=True, eps=eps)
+        global_var.control_nn.net.load_state_dict(state_dict)
+        del state_dict, state_dict_prev
+
         adapter.set_net(state_net)
         _, model = adapter.solve_epde_system(system = system, grids = grids[0], data = None,
                                              boundary_conditions = bc_operators,
@@ -211,8 +222,12 @@ class ControlExp():
         loss_forward = control_loss([model, global_var.control_nn.net], [grids[1], control_inputs])
         # Calculating loss in p[i]-eps:
 
-        global_var.control_nn.net.load_state_dict(eps_increment_diff(input_params=global_var.control_nn.net.state_dict(),
-                                                                 loc = loc, forward=False, eps=eps))
+        state_dict_prev = global_var.control_nn.net.state_dict()
+        state_dict = eps_increment_diff(input_params=state_dict_prev,
+                                        loc = loc, forward=False, eps=eps)
+        global_var.control_nn.net.load_state_dict(state_dict)
+        del state_dict, state_dict_prev, model, control_inputs
+
         adapter.set_net(state_net)
         _, model = adapter.solve_epde_system(system = system, grids = grids[0], data = None,
                                              boundary_conditions = bc_operators,
@@ -226,10 +241,17 @@ class ControlExp():
         loss_back = control_loss([model, global_var.control_nn.net], [grids[1], control_inputs])
         
         # Restore values of the control NN parameters
-        global_var.control_nn.net.load_state_dict(eps_increment_diff(input_params=global_var.control_nn.net.state_dict(),
-                                                                     loc = loc, forward=True, eps=eps))
+        state_dict_prev = global_var.control_nn.net.state_dict()
+        state_dict = eps_increment_diff(input_params=state_dict_prev,
+                                        loc = loc, forward=True, eps=eps)
+        global_var.control_nn.net.load_state_dict(state_dict)
+        del state_dict, state_dict_prev, model, control_inputs
 
-        return (loss_forward - loss_back)/(2*eps)
+        res = (loss_forward - loss_back)/(2*eps)
+        # del loss_forward, loss_back
+        gc.collect()
+        return res
+        
 
     def train_pinn(self, bc_operators: List[BOPElement], grids: List[Union[np.ndarray, torch.Tensor]], 
                    control_args = [], n_control: int = 1, epochs: int = 1e4, 
@@ -291,8 +313,11 @@ class ControlExp():
                                                                                          eps = eps) # param_keys = param_keys                       
                 else:
                     raise Exception(f'Incorrect shape of weights/bias. Got {param_tensor.size()} tensor.')
-            global_var.control_nn.net.load_state_dict(optimizer.step(gradient = grad_tensors, 
-                                                                     optimized = global_var.control_nn.net.state_dict()))
+            state_dict_prev = global_var.control_nn.net.state_dict()
+            state_dict = optimizer.step(gradient = grad_tensors, optimized = state_dict_prev)
+            global_var.control_nn.net.load_state_dict(state_dict)
+            del state_dict, state_dict_prev
+
             adapter.set_net(self._state_net)
             _, model = adapter.solve_epde_system(system = self.system, grids = grids, data = None,
                                                  boundary_conditions = bc_operators,
@@ -305,12 +330,13 @@ class ControlExp():
             var_prediction = model(grids_merged)
             self._state_net = model
 
-            control_inputs = prepare_control_inputs(model, grids[1], global_var.control_nn.net_args)        
+            control_inputs = prepare_control_inputs(model, grids_merged, global_var.control_nn.net_args)        
             loss = self.loss([self._state_net, global_var.control_nn.net], [grids_merged, control_inputs])
             print(loss)
             if loss < min_loss:
                 min_loss = loss
                 self._best_control_params = global_var.control_nn.net.state_dict()
+            gc.collect()
         ctrl_pred = global_var.control_nn.net(var_prediction)
 
         return self._state_net, global_var.control_nn.net, ctrl_pred
@@ -398,7 +424,7 @@ class AdamOptimizer(FirstOrderOptimizer):
                                for tensor_idx, grad_subtensor in enumerate(gradient.values())]
         moment_cor = [moment_tensor/(1 - self.parameters[1] ** self.time) for moment_tensor in self._moment] 
         second_moment_cor = [sm_tensor/(1 - self.parameters[2] ** self.time) for sm_tensor in self._second_moment] 
-        return [optimized[subtensor_key] - self.parameters[0]*moment_cor[tensor_idx]/(torch.sqrt(second_moment_cor[tensor_idx]) +\
-                                                                           self.parameters[3])
-                for tensor_idx, subtensor_key in enumerate(optimized.keys())]
+        return OrderedDict([(subtensor_key, optimized[subtensor_key] - self.parameters[0] * moment_cor[tensor_idx]/\
+                             (torch.sqrt(second_moment_cor[tensor_idx]) + self.parameters[3]))
+                            for tensor_idx, subtensor_key in enumerate(optimized.keys())])
     #np.power(self.parameters[1], self.time)) # np.power(self.parameters[2], self.time)
