@@ -207,7 +207,8 @@ class ControlExp():
         state_dict = eps_increment_diff(input_params=state_dict_prev,
                                         loc = loc, forward=True, eps=eps)
         global_var.control_nn.net.load_state_dict(state_dict)
-        del state_dict, state_dict_prev
+        state_dict_prev = state_dict = None
+        # del state_dict, state_dict_prev
 
         adapter.set_net(state_net)
         _, model = adapter.solve_epde_system(system = system, grids = grids[0], data = None,
@@ -226,7 +227,7 @@ class ControlExp():
         state_dict = eps_increment_diff(input_params=state_dict_prev,
                                         loc = loc, forward=False, eps=eps)
         global_var.control_nn.net.load_state_dict(state_dict)
-        del state_dict, state_dict_prev, model, control_inputs
+        # del state_dict, state_dict_prev, model, control_inputs
 
         adapter.set_net(state_net)
         _, model = adapter.solve_epde_system(system = system, grids = grids[0], data = None,
@@ -245,7 +246,7 @@ class ControlExp():
         state_dict = eps_increment_diff(input_params=state_dict_prev,
                                         loc = loc, forward=True, eps=eps)
         global_var.control_nn.net.load_state_dict(state_dict)
-        del state_dict, state_dict_prev, model, control_inputs
+        state_dict = state_dict_prev = None #, model, control_inputs
 
         res = (loss_forward - loss_back)/(2*eps)
         # del loss_forward, loss_back
@@ -254,8 +255,8 @@ class ControlExp():
         
 
     def train_pinn(self, bc_operators: List[BOPElement], grids: List[Union[np.ndarray, torch.Tensor]], 
-                   control_args = [], n_control: int = 1, epochs: int = 1e4, 
-                   state_net: torch.nn.Sequential = None, control_net: torch.nn.Sequential = None):
+                   n_control: int = 1, epochs: int = 1e4, state_net: torch.nn.Sequential = None, 
+                   control_net: torch.nn.Sequential = None):
         # Properly formulate training approach
         t = 0
         min_loss = np.inf
@@ -341,6 +342,50 @@ class ControlExp():
 
         return self._state_net, global_var.control_nn.net, ctrl_pred
 
+    def test_memory_fd(self, bc_operators: List[BOPElement], grids: List[Union[np.ndarray, torch.Tensor]], 
+                       n_control: int = 1, epochs: int = 1e4, 
+                       state_net: torch.nn.Sequential = None, control_net: torch.nn.Sequential = None):
+        t = 0
+        min_loss = np.inf
+        stop_training = False
+
+        if isinstance(state_net, torch.nn.Sequential): self._state_net = state_net
+        global_var.reset_control_nn(n_control = n_control, ann = control_net, ctrl_args = global_var.control_nn.net_args)
+        
+        # TODO: To optimize the net in gloabl variables is a terrific approach, rethink it
+
+        if isinstance(grids[0], np.ndarray):
+            grids_merged = torch.from_numpy(np.array([subgrid.reshape(-1) for subgrid in grids])).float().T
+        elif isinstance(grids[0], torch.Tensor):
+            grids_merged = torch.cat([subgrid.reshape(-1, 1) for subgrid in grids], dim = 1).float()
+        grids_merged.to(device=self._solver_params['device'])
+
+        # Implement closure for loss function?
+        # Parameters update - by epsilon in loop one-by-one, without deepcopy.
+        grad_tensors = deepcopy(global_var.control_nn.net.state_dict())
+        # param_keys = list(global_var.control_nn.net.state_dict().keys())
+
+        # optimizer = AdamOptimizer(optimized = global_var.control_nn.net.state_dict())
+        adapter = self.get_solver_adapter(None)
+        while t < epochs and not stop_training:
+            state_net = deepcopy(self._state_net)
+            eps = 1e-4
+            print(f'Control function optimization epoch {t}.')
+            for param_key, param_tensor in grad_tensors.items():
+                param_outer_idx = 0
+                param_inner_idx = 0
+                print(f'working with param {param_outer_idx, param_inner_idx}')                                        
+                loc = (param_key, param_outer_idx, param_inner_idx)
+                for i in range(1e4):
+                    _ = self.finite_diff_calculation(system = self.system, 
+                                                     adapter = adapter,
+                                                     loc = loc, control_loss = self.loss, 
+                                                     state_net = self._state_net,
+                                                     bc_operators = bc_operators,
+                                                     grids = [grids, grids_merged], 
+                                                     solver_params = self._solver_params,
+                                                     eps = eps) # param_keys = param_keys
+                            
     def get_solver_adapter(self, net: torch.nn.Sequential):
         adapter = SolverAdapter(net = net, use_cache = False)
         # Edit solver forms of functions of dependent variable to Callable objects.
