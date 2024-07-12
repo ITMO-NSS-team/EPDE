@@ -212,10 +212,19 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
                                                  indices = loc, deriv_method = autograd, nn_output=1)
     contr_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = 0.),
                                                  indices = loc, deriv_method = autograd, nn_output=0)
+
+    u_var_non_neg = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0.), sign='>',
+                                                   indices = loc, deriv_method = autograd, nn_output=0)
+    v_var_non_neg = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0.), sign='>',
+                                                   indices = loc, deriv_method = autograd, nn_output=1)
     
-    loss = control_utils.ConditionalLoss([(100., u_tar_constr, 0),
-                                          (100., v_tar_constr, 0),
-                                          (0.001, contr_constr, 1)])
+
+    
+    loss = control_utils.ConditionalLoss([(1., u_tar_constr, 0),
+                                          (1., v_tar_constr, 0), 
+                                        #   (0.00001, contr_constr, 1),
+                                          (100, u_var_non_neg, 0),
+                                          (100, v_var_non_neg, 0)])
     optimizer = control_utils.ControlExp(loss=loss)
     
     def get_ode_bop(key, var, term, grid_loc, value):
@@ -232,7 +241,7 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
         return bop
 
     bop_u = get_ode_bop('u', 0, [None], t[0, 0], u_init)
-    bop_v = get_ode_bop('u', 0, [None], t[0, 0], v_init)
+    bop_v = get_ode_bop('u', 1, [None], t[0, 0], v_init)
 
     optimizer.system = eq
 
@@ -241,7 +250,8 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
     state_nn, ctrl_net, ctrl_pred = optimizer.train_pinn(bc_operators = [bop_u(), bop_v()], grids = [t,], 
                                                          n_control = 1., state_net = state_nn_pretrained, 
-                                                         control_net = ctrl_nn_pretrained, epochs = 1e2)
+                                                         control_net = ctrl_nn_pretrained, epochs = 1e2,
+                                                         fig_folder='/home/maslyaev/Documents/EPDE/projects/control/figs')
 
     return state_nn, ctrl_net, ctrl_pred
 
@@ -289,7 +299,7 @@ if __name__ == '__main__':
     plt.legend()
     plt.show()   
 
-    res = optimize_ctrl(model, torch.from_numpy(t).reshape((-1, 1)).float(), u_tar = 1, v_tar = 0,
+    res = optimize_ctrl(model, torch.from_numpy(t).reshape((-1, 1)).float(), u_tar = 3, v_tar = 1,
                          u_init=solution[0, 0], v_init=solution[0, 1],
                          state_nn_pretrained=epde.globals.solution_guess_nn, ctrl_nn_pretrained=ctrl_ann)
 

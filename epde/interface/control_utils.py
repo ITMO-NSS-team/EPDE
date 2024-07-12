@@ -1,6 +1,10 @@
 import numpy as np
 import torch
 
+import matplotlib.pyplot as plt
+import datetime
+import os 
+
 import gc
 from functools import partial
 from typing import Tuple, List, Dict, Union, Callable
@@ -125,8 +129,14 @@ class ControlConstrEq(ControlConstraint):
 
 class ControlConstrNEq(ControlConstraint):
     '''
-    Class for constrints of type $c(u, x) = f(u, x) - val < 0$
+    Class for constrints of type $c(u, x) = f(u, x) - val `self._sign` 0$
     '''
+    def __init__(self, val : Union[float, torch.Tensor], deriv_method: BasicDeriv, # grid: torch.Tensor, 
+                 indices: ConstrLocation, sign: str = '>', deriv_axes: List = [None,], 
+                 nn_output: int = 0, tolerance: float = 1e-7):
+        super().__init__(val, deriv_method, indices, deriv_axes, nn_output) # grid, 
+        self._sign = sign
+
     def __call__(self, fun_nn: torch.nn.Sequential, arg_tensor: torch.Tensor) -> Tuple[bool, torch.Tensor]:
         to_compare = self._deriv_method.take_derivative(u = fun_nn, args=self._indices.apply(arg_tensor, along_axis=0), # correct along_axis argument 
                                                         axes=self._axes, component = self._nn_output)
@@ -135,7 +145,11 @@ class ControlConstrNEq(ControlConstraint):
         else:
             assert to_compare.shape == self._val.shape, 'Incorrect shapes of constraint value tensor'
             val_transformed = self._val
-        return torch.greater(val_transformed, to_compare), torch.nn.functional.relu(val_transformed - to_compare)
+        if self._sign == '>':
+            return torch.greater(val_transformed, to_compare), torch.nn.functional.relu(val_transformed - to_compare)
+        elif self._sign == '<':
+            return torch.less(val_transformed, to_compare), torch.nn.functional.relu(to_compare - val_transformed)            
+
         
     def loss(self, fun_nn: torch.nn.Sequential, arg_tensor: torch.Tensor) -> torch.Tensor:
         _, discrepancy = self(fun_nn, arg_tensor)
@@ -247,11 +261,13 @@ class ControlExp():
 
     def train_pinn(self, bc_operators: List[BOPElement], grids: List[Union[np.ndarray, torch.Tensor]], 
                    n_control: int = 1, epochs: int = 1e2, state_net: torch.nn.Sequential = None, 
-                   control_net: torch.nn.Sequential = None):
+                   control_net: torch.nn.Sequential = None, fig_folder: str = None, LV_exp: bool = True):
         # Properly formulate training approach
         t = 0
         min_loss = np.inf
         stop_training = False
+
+        time = datetime.datetime.now()
 
         if isinstance(state_net, torch.nn.Sequential): self._state_net = state_net
         global_var.reset_control_nn(n_control = n_control, ann = control_net, ctrl_args = global_var.control_nn.net_args)
@@ -270,6 +286,14 @@ class ControlExp():
         adapter = self.get_solver_adapter(None)
         while t < epochs and not stop_training:
             state_net = deepcopy(self._state_net)
+            # plt.figure(figsize=(11, 6))
+            # plt.plot(grids_merged.detach().numpy(), state_net(grids_merged).detach().numpy()[:, 0], color = 'k')
+            # plt.plot(grids_merged.detach().numpy(), state_net(grids_merged).detach().numpy()[:, 1], color = 'r')
+            # plt.show()
+
+            # frame_name = f'Exp_{time.month}_{time.day}_at_{time.hour}_{time.minute}_{t}.png'
+            # plt.savefig(os.path.join(fig_folder, frame_name))            
+
             eps = 1e-4
             print(f'Control function optimization epoch {t}.')
             for param_key, param_tensor in grad_tensors.items():
@@ -326,8 +350,17 @@ class ControlExp():
                 min_loss = loss
                 self._best_control_params = global_var.control_nn.net.state_dict()
             
+            if fig_folder is not None and LV_exp:
+                plt.figure(figsize=(11, 6))
+                plt.plot(grids_merged.detach().numpy(), control_inputs.detach().numpy()[:, 0], color = 'k')
+                plt.plot(grids_merged.detach().numpy(), control_inputs.detach().numpy()[:, 1], color = 'r')
+                plt.plot(grids_merged.detach().numpy(), global_var.control_nn.net(control_inputs).detach().numpy(),
+                         color = 'tab:orange')
+                frame_name = f'Exp_{time.month}_{time.day}_at_{time.hour}_{time.minute}_{t}.png'
+                plt.savefig(os.path.join(fig_folder, frame_name))
             gc.collect()
             t += 1
+
         ctrl_pred = global_var.control_nn.net(var_prediction)
 
         return self._state_net, global_var.control_nn.net, ctrl_pred
