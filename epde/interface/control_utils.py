@@ -192,7 +192,7 @@ class ControlExp():
 
     def set_solver_params(self, mode: str = 'autograd', compiling_params: dict = {}, optimizer_params: dict = {},
                           cache_params: dict = {}, early_stopping_params: dict = {}, plotting_params: dict = {},
-                          training_params: dict = {'epochs': 25,}, use_cache: bool = False, use_fourier: bool = False, #  5*1e0
+                          training_params: dict = {'epochs': 50,}, use_cache: bool = False, use_fourier: bool = False, #  5*1e0
                           fourier_params: dict = None, use_adaptive_lambdas: bool = False, device = torch.device('cpu')):
         self._solver_params = {'mode': mode, 
                                'compiling_params': compiling_params, 
@@ -282,18 +282,10 @@ class ControlExp():
 
         grad_tensors = deepcopy(global_var.control_nn.net.state_dict())
 
-        optimizer = AdamOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = [0.01, 0.9, 0.999, 1e-8])
+        optimizer = AdamOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = [0.0005, 0.9, 0.999, 1e-8])
         adapter = self.get_solver_adapter(None)
         while t < epochs and not stop_training:
             state_net = deepcopy(self._state_net)
-            # plt.figure(figsize=(11, 6))
-            # plt.plot(grids_merged.detach().numpy(), state_net(grids_merged).detach().numpy()[:, 0], color = 'k')
-            # plt.plot(grids_merged.detach().numpy(), state_net(grids_merged).detach().numpy()[:, 1], color = 'r')
-            # plt.show()
-
-            # frame_name = f'Exp_{time.month}_{time.day}_at_{time.hour}_{time.minute}_{t}.png'
-            # plt.savefig(os.path.join(fig_folder, frame_name))            
-
             eps = 1e-4
             print(f'Control function optimization epoch {t}.')
             for param_key, param_tensor in grad_tensors.items():

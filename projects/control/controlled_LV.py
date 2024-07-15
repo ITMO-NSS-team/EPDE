@@ -193,7 +193,7 @@ def translate_dummy_eqs(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np
 
 
     eq_u = '20. * u{power: 1} + -1. * ctrl{power: 1} * u{power: 1} + -20. * u{power: 1} * v{power: 1} + 0 = du/dx0{power: 1}'
-    eq_v = '-20. * v{power: 1} + 1. * ctrl{power: 1} * v{power: 1} + 20. * u{power: 1} * v{power: 1} + 0 = dv/dx0{power: 1}'
+    eq_v = '-20. * v{power: 1} + -1. * ctrl{power: 1} * v{power: 1} + 20. * u{power: 1} * v{power: 1} + 0 = dv/dx0{power: 1}'
 
     test = epde.interface.equation_translator.translate_equation({'u': eq_u, 'v': eq_v}, pool = epde_search_obj.pool)
     return test
@@ -220,7 +220,7 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     
 
     
-    loss = control_utils.ConditionalLoss([(1., u_tar_constr, 0),
+    loss = control_utils.ConditionalLoss([(10., u_tar_constr, 0),
                                           (1., v_tar_constr, 0), 
                                         #   (0.00001, contr_constr, 1),
                                           (100, u_var_non_neg, 0),
@@ -259,7 +259,7 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 if __name__ == '__main__':
     import pickle
 
-    t, ctrl, solution = prepare_data(ctrl_fun = lambda x: 17*x[1] + 0.05*x[0] + 0.2) # x[0]
+    t, ctrl, solution = prepare_data(ctrl_fun = lambda x: 12*x[1] + 0.05*x[0] + 0.2) # x[0]
     t, ctrl, solution = t[:-1], ctrl[:-1], solution[:-1, ...]
 
     print(t.shape, ctrl.shape, solution.shape)
