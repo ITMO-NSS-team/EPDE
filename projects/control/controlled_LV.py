@@ -103,7 +103,7 @@ def controlled_lv_by_RK(initial : tuple, timestep : float, steps : int, alpha : 
         res[step+1, 1] = res[step, 1] + timestep / 6. * (l1 + 2 * l2 + 2 * l3 + l4)
     return controls, res
 
-def prepare_data(steps_num: int = 151, t_max: float = 1, ctrl_fun: Callable = lambda x: x[0]*x[1]):
+def prepare_data(steps_num: int = 151, t_max: float = 0.5, ctrl_fun: Callable = lambda x: x[0]*x[1]):
     # def get_sine_control(ampl: float = 1, period: float = 1., 
     #                      phase_shift: float = 0.) -> Callable:
     #     return lambda x: ampl*(np.sin(2*np.pi/period*(x + phase_shift)) + 1.)
@@ -220,9 +220,9 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     
 
     
-    loss = control_utils.ConditionalLoss([(10., u_tar_constr, 0),
+    loss = control_utils.ConditionalLoss([(1., u_tar_constr, 0),
                                           (1., v_tar_constr, 0), 
-                                        #   (0.00001, contr_constr, 1),
+                                          (0.0001, contr_constr, 1),
                                           (100, u_var_non_neg, 0),
                                           (100, v_var_non_neg, 0)])
     optimizer = control_utils.ControlExp(loss=loss)
@@ -248,9 +248,9 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     optimizer.set_control_optim_params()
     optimizer.set_solver_params()
 
-    state_nn, ctrl_net, ctrl_pred = optimizer.train_pinn(bc_operators = [bop_u(), bop_v()], grids = [t,], 
+    state_nn, ctrl_net, ctrl_pred = optimizer.train_pinn(bc_operators = [(bop_u(), 0.2), (bop_v(), 0.2)], grids = [t,], 
                                                          n_control = 1., state_net = state_nn_pretrained, 
-                                                         control_net = ctrl_nn_pretrained, epochs = 1e2,
+                                                         control_net = ctrl_nn_pretrained, epochs = 30,
                                                          fig_folder='/home/maslyaev/Documents/EPDE/projects/control/figs')
 
     return state_nn, ctrl_net, ctrl_pred

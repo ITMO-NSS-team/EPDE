@@ -259,9 +259,14 @@ class ControlExp():
         return res
         
 
-    def train_pinn(self, bc_operators: List[BOPElement], grids: List[Union[np.ndarray, torch.Tensor]], 
+    def train_pinn(self, bc_operators: List[Union[dict, float]], grids: List[Union[np.ndarray, torch.Tensor]], 
                    n_control: int = 1, epochs: int = 1e2, state_net: torch.nn.Sequential = None, 
                    control_net: torch.nn.Sequential = None, fig_folder: str = None, LV_exp: bool = True):
+        def modify_bc(operator: dict, scale: Union[float, torch.Tensor]) -> dict:
+            noised_operator = deepcopy(operator)
+            noised_operator['bnd_val'] = torch.normal(operator['bnd_val'], scale)
+            return noised_operator
+
         # Properly formulate training approach
         t = 0
         min_loss = np.inf
@@ -285,7 +290,9 @@ class ControlExp():
         optimizer = AdamOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = [0.0005, 0.9, 0.999, 1e-8])
         adapter = self.get_solver_adapter(None)
         while t < epochs and not stop_training:
-            state_net = deepcopy(self._state_net)
+            sampled_bc = [modify_bc(operator, noise_std) for operator, noise_std in bc_operators]
+            
+            state_net  = deepcopy(self._state_net)
             eps = 1e-4
             print(f'Control function optimization epoch {t}.')
             for param_key, param_tensor in grad_tensors.items():
@@ -299,7 +306,7 @@ class ControlExp():
                                                                                      adapter = adapter,
                                                                                      loc = loc, control_loss = self.loss, 
                                                                                      state_net = self._state_net,
-                                                                                     bc_operators = bc_operators,
+                                                                                     bc_operators = sampled_bc,
                                                                                      grids = [grids, grids_merged], 
                                                                                      solver_params = self._solver_params,
                                                                                      eps = eps)
@@ -312,7 +319,7 @@ class ControlExp():
                                                                                          adapter = adapter,
                                                                                          loc = loc, control_loss = self.loss, 
                                                                                          state_net = self._state_net,
-                                                                                         bc_operators = bc_operators,
+                                                                                         bc_operators = sampled_bc,
                                                                                          grids = [grids, grids_merged], 
                                                                                          solver_params = self._solver_params,
                                                                                          eps = eps)                   
@@ -325,7 +332,7 @@ class ControlExp():
 
             adapter.set_net(self._state_net)
             _, model = adapter.solve_epde_system(system = self.system, grids = grids, data = None,
-                                                 boundary_conditions = bc_operators,
+                                                 boundary_conditions = sampled_bc,
                                                  mode = self._solver_params['mode'],
                                                  use_cache = self._solver_params['use_cache'],
                                                  use_fourier = self._solver_params['use_fourier'],

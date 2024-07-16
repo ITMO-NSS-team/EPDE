@@ -149,9 +149,9 @@ class TokenFamily(object):
         self.params_set = True
         self.equality_ranges = equality_ranges
 
-        if self.family_of_derivs:
-            print(f'self.tokens is {self.tokens}')
-            print(f'Here, derivs order is {self.derivs_ords}')
+        # if self.family_of_derivs:
+        #     print(f'self.tokens is {self.tokens}')
+        #     print(f'Here, derivs order is {self.derivs_ords}')
         if self.evaluator_set:
             self.test_evaluator()
 
