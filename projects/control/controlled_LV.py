@@ -248,7 +248,7 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     optimizer.set_control_optim_params()
     optimizer.set_solver_params()
 
-    state_nn, ctrl_net, ctrl_pred = optimizer.train_pinn(bc_operators = [(bop_u(), 0.2), (bop_v(), 0.2)], grids = [t,], 
+    state_nn, ctrl_net, ctrl_pred = optimizer.train_pinn(bc_operators = [(bop_u(), 0.03), (bop_v(), 0.03)], grids = [t,], 
                                                          n_control = 1., state_net = state_nn_pretrained, 
                                                          control_net = ctrl_nn_pretrained, epochs = 30,
                                                          fig_folder='/home/maslyaev/Documents/EPDE/projects/control/figs')
@@ -269,12 +269,12 @@ if __name__ == '__main__':
     plt.legend()
     plt.show()
 
-    with open(r"/home/maslyaev/Documents/EPDE/projects/control/data_ann.pickle", 'rb') as data_input_file:  
+    with open(r"/home/maslyaev/Documents/EPDE/projects/control/data_ann_1.pickle", 'rb') as data_input_file:  
         data_nn = pickle.load(data_input_file)
     # data_nn = None
 
     model = translate_dummy_eqs(t, solution[:, 0], solution[:, 1], ctrl, data_nn = data_nn) # , 
-    # with open(r"/home/maslyaev/Documents/EPDE/projects/control/data_ann.pickle", 'wb') as output_file:  
+    # with open(r"/home/maslyaev/Documents/EPDE/projects/control/data_ann_1.pickle", 'wb') as output_file:  
     #     pickle.dump(epde.globals.solution_guess_nn, output_file)
 
     args = torch.from_numpy(solution).float()

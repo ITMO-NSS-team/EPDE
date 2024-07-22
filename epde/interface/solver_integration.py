@@ -49,7 +49,7 @@ BASE_COMPILING_PARAMS = {
                          }
 
 ADAM_OPTIMIZER_PARAMS = {
-                         'lr'  : 1e-3,
+                         'lr'  : 1e-5,
                          'eps' : 1e-6
                          }
 

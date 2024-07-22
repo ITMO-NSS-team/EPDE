@@ -51,7 +51,10 @@ class ConstrLocation():
         Args:
             domain_shape (`Tuple[int]`): shape of the domain, for which the control problem is solved.
             axis (`int`): axis, along that the boundary conditions are selected. Shall be introduced only for constraints on the boundary.
-            loc (`int`): position along axis, where the "boundary" is located. Shall be introduced only for constraints on the boundary.
+            loc (`int`): position along axis, where the "bounindices = self.get_boundary_indices(self.domain_indixes, axis, loc)
+        else:
+            self.loc_indices = self.domain_indixes
+        self.flat_idxdary" is located. Shall be introduced only for constraints on the boundary.
         
         '''
         self._initial_shape = domain_shape
@@ -184,7 +187,7 @@ class ControlExp():
         bop.values = torch.from_numpy(np.array([[value,]])).float()
         return bop
 
-    def set_control_optim_params(self, lr: float = 1e-2, max_iter: int = 10, max_eval = None, tolerance_grad: float = 1e-7,
+    def set_control_optim_params(self, lr: float = 1e-3, max_iter: int = 10, max_eval = None, tolerance_grad: float = 1e-7,
                                  tolerance_change: float = 1e-9, history_size: int = 100, line_search_fn = 'strong_wolfe'):
         self._control_opt_params = {'lr': lr, 'max_iter': max_iter, 'max_eval': max_eval, 'tolerance_grad': tolerance_grad,
                                     'tolerance_change': tolerance_change, 'history_size': history_size, 
@@ -192,10 +195,10 @@ class ControlExp():
 
     def set_solver_params(self, mode: str = 'autograd', compiling_params: dict = {}, optimizer_params: dict = {},
                           cache_params: dict = {}, early_stopping_params: dict = {}, plotting_params: dict = {},
-                          training_params: dict = {'epochs': 50,}, use_cache: bool = False, use_fourier: bool = False, #  5*1e0
+                          training_params: dict = {'epochs': 200,}, use_cache: bool = False, use_fourier: bool = False, #  5*1e0
                           fourier_params: dict = None, use_adaptive_lambdas: bool = False, device = torch.device('cpu')):
-        self._solver_params = {'mode': mode, 
-                               'compiling_params': compiling_params, 
+        self._solver_params = {'mode': mode,
+                               'compiling_params': compiling_params,
                                'optimizer_params': optimizer_params,
                                'cache_params': cache_params,
                                'early_stopping_params': early_stopping_params,
@@ -209,7 +212,7 @@ class ControlExp():
                                }
 
     @staticmethod
-    def finite_diff_calculation(system, adapter, loc, control_loss, state_net: torch.nn.Sequential, # prev_loc,  
+    def finite_diff_calculation(system, adapter, loc, control_loss, state_net: torch.nn.Sequential, # prev_loc,
                                 bc_operators, grids: list, solver_params: dict, eps: float):
         # Calculating loss in p[i]+eps: 
         state_dict_prev = global_var.control_nn.net.state_dict()
@@ -237,13 +240,14 @@ class ControlExp():
         global_var.control_nn.net.load_state_dict(state_dict)
 
         adapter.set_net(state_net)
-        _, model = adapter.solve_epde_system(system = system, grids = grids[0], data = None,
-                                             boundary_conditions = bc_operators,
-                                             mode = solver_params['mode'],
-                                             use_cache = solver_params['use_cache'],
-                                             use_fourier = solver_params['use_fourier'],
-                                             fourier_params = solver_params['fourier_params'],
-                                             use_adaptive_lambdas = solver_params['use_adaptive_lambdas'])
+        solver_loss, model = adapter.solve_epde_system(system = system, grids = grids[0], data = None,
+                                                       boundary_conditions = bc_operators,
+                                                       mode = solver_params['mode'],
+                                                       use_cache = solver_params['use_cache'],
+                                                       use_fourier = solver_params['use_fourier'],
+                                                       fourier_params = solver_params['fourier_params'],
+                                                       use_adaptive_lambdas = solver_params['use_adaptive_lambdas'])
+        print(f'solver_loss: {solver_loss}')
 
         control_inputs = prepare_control_inputs(model, grids[1], global_var.control_nn.net_args)
         loss_back = control_loss([model, global_var.control_nn.net], [grids[1], control_inputs])
@@ -287,13 +291,13 @@ class ControlExp():
 
         grad_tensors = deepcopy(global_var.control_nn.net.state_dict())
 
-        optimizer = AdamOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = [0.0005, 0.9, 0.999, 1e-8])
+        optimizer = AdamOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = [0.05, 0.9, 0.999, 1e-8])
         adapter = self.get_solver_adapter(None)
         while t < epochs and not stop_training:
             sampled_bc = [modify_bc(operator, noise_std) for operator, noise_std in bc_operators]
-            
+
             state_net  = deepcopy(self._state_net)
-            eps = 1e-4
+            eps = 1e-3
             print(f'Control function optimization epoch {t}.')
             for param_key, param_tensor in grad_tensors.items():
                 print(f'Optimizing {param_key}: shape is {param_tensor.shape}')
@@ -355,6 +359,7 @@ class ControlExp():
                 plt.plot(grids_merged.detach().numpy(), control_inputs.detach().numpy()[:, 1], color = 'r')
                 plt.plot(grids_merged.detach().numpy(), global_var.control_nn.net(control_inputs).detach().numpy(),
                          color = 'tab:orange')
+                plt.grid()
                 frame_name = f'Exp_{time.month}_{time.day}_at_{time.hour}_{time.minute}_{t}.png'
                 plt.savefig(os.path.join(fig_folder, frame_name))
             gc.collect()
@@ -396,7 +401,7 @@ class FirstOrderOptimizerNp(ABC):
         raise NotImplementedError('Calling step of an abstract optimizer')
 
 class AdamOptimizerNp(FirstOrderOptimizerNp):
-    def __init__(self, optimized: np.ndarray, parameters: np.ndarray = np.array([0.001, 0.9, 0.999, 1e-8])):
+    def __init__(self, optimized: np.ndarray, parameters: np.ndarray = np.array([0.0005, 0.9, 0.999, 1e-8])):
         '''
         parameters[0] - alpha, parameters[1] - beta_1, parameters[2] - beta_2
         parameters[3] - eps  
@@ -452,3 +457,18 @@ class AdamOptimizer(FirstOrderOptimizer):
                              (torch.sqrt(second_moment_cor[tensor_idx]) + self.parameters[3]))
                             for tensor_idx, subtensor_key in enumerate(optimized.keys())])
     #np.power(self.parameters[1], self.time)) # np.power(self.parameters[2], self.time)
+
+# class LBFGS(FirstOrderOptimizer):
+#     def __init__(self, optimized: List[torch.Tensor], parameters: list = []):
+#         pass
+
+#     def step(self, gradient: Dict[str, torch.Tensor], optimized: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
+#         pass
+
+#     def update_hessian(self, gradient: Dict[str, torch.Tensor], x_vals: Dict[str, torch.Tensor]):
+#         # Use self._prev_grad
+#         for i in range(self._mem_size - 1):
+#             alpha = 
+
+#     def get_alpha(self):
+#         return alpha

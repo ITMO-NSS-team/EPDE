@@ -79,8 +79,8 @@ def create_solution_net(equations_num: int, domain_dim: int, use_fourier = True,
 
     operators = net_default + [torch.nn.Linear(linear_inputs, hidden_neurons),
                                torch.nn.ReLU(),
-                               torch.nn.Linear(hidden_neurons, hidden_neurons),
-                               torch.nn.ReLU(),
+                            #    torch.nn.Linear(hidden_neurons, hidden_neurons),
+                            #    torch.nn.ReLU(),
                                torch.nn.Linear(hidden_neurons, hidden_neurons),
                                torch.nn.Tanh(),
                                torch.nn.Linear(hidden_neurons, equations_num)]
