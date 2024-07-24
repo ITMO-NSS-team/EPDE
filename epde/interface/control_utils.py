@@ -247,7 +247,7 @@ class ControlExp():
                                                        use_fourier = solver_params['use_fourier'],
                                                        fourier_params = solver_params['fourier_params'],
                                                        use_adaptive_lambdas = solver_params['use_adaptive_lambdas'])
-        print(f'solver_loss: {solver_loss}')
+        # print(f'solver_loss: {solver_loss}')
 
         control_inputs = prepare_control_inputs(model, grids[1], global_var.control_nn.net_args)
         loss_back = control_loss([model, global_var.control_nn.net], [grids[1], control_inputs])
@@ -291,7 +291,7 @@ class ControlExp():
 
         grad_tensors = deepcopy(global_var.control_nn.net.state_dict())
 
-        optimizer = AdamOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = [0.05, 0.9, 0.999, 1e-8])
+        optimizer = AdamOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = [0.01, 0.9, 0.999, 1e-8])
         adapter = self.get_solver_adapter(None)
         while t < epochs and not stop_training:
             sampled_bc = [modify_bc(operator, noise_std) for operator, noise_std in bc_operators]
@@ -401,7 +401,7 @@ class FirstOrderOptimizerNp(ABC):
         raise NotImplementedError('Calling step of an abstract optimizer')
 
 class AdamOptimizerNp(FirstOrderOptimizerNp):
-    def __init__(self, optimized: np.ndarray, parameters: np.ndarray = np.array([0.0005, 0.9, 0.999, 1e-8])):
+    def __init__(self, optimized: np.ndarray, parameters: np.ndarray = np.array([0.001, 0.9, 0.999, 1e-8])):
         '''
         parameters[0] - alpha, parameters[1] - beta_1, parameters[2] - beta_2
         parameters[3] - eps  
