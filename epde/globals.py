@@ -12,7 +12,7 @@ from typing import List, Union
 
 import numpy as np
 import torch
-device = torch.device('cpu') # TODO: make system-agnostic approach
+# device = torch.device('cpu') # TODO: make system-agnostic approach
 
 from epde.cache.cache import Cache
 from epde.cache.ctrl_cache import ControlNNContainer
@@ -134,7 +134,7 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: b
                        derivs: List[Union[int, List, Union[np.ndarray]]] = None, 
                        penalised_derivs: List[Union[int, List]] = None,
                        epochs_max=1e5, predefined_ann: torch.nn.Sequential = None,
-                       batch_frac=0.5, learining_rate=1e-4): # loss_mean=1000, 
+                       batch_frac=0.5, learining_rate=1e-4, device = 'cpu'): # loss_mean=1000, 
     '''
     Represent the data with ANN, suitable to be used as the initial guess of the candidate equations solutions 
     during the equation search, employing solver-based fitness function.
@@ -143,18 +143,22 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: b
     '''
 
     global solution_guess_nn
-    
 
     if predefined_ann is None:
-        model = create_solution_net(equations_num=len(data), domain_dim=len(grids))
+        model = create_solution_net(equations_num=len(data), domain_dim=len(grids), device = device)
     else:
         model = predefined_ann
 
     if train:
+        model.to(device)
+
         grids_tr = torch.from_numpy(np.array([subgrid.reshape(-1) for subgrid in grids])).float().T
         data_tr = torch.from_numpy(np.array([data_var.reshape(-1) for data_var in data])).float().T
-        grids_tr.to(device)
-        data_tr.to(device)
+        grids_tr = grids_tr.to(device)
+        data_tr = data_tr.to(device)
+
+        # print('device ', device)
+        # print(f'grds {grids_tr.get_device()} and data {data_tr.get_device()}')
 
         batch_size = int(data[0].size * batch_frac)
         optimizer = torch.optim.Adam(model.parameters(), lr = learining_rate)
@@ -175,12 +179,14 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: b
                 indices = permutation[i:i+batch_size]
                 batch_x, batch_y = grids_tr[indices], data_tr[indices]
 
+                # print(f'batch_y {batch_y.get_device()}, batch_x {batch_x.get_device()},, {next(model.parameters()).is_cuda}')
+                # print(f'model(batch_x) {model(batch_x)}') 
                 loss = torch.mean(torch.abs(batch_y - model(batch_x)))
                 if derivs is not None:
                     for var_idx, deriv_axes, deriv_tensor in derivs:
                         deriv_autograd = deriv_calc.take_derivative(model, batch_x, axes = deriv_axes, component = var_idx)
-                        batch_derivs = torch.from_numpy(deriv_tensor)[indices].reshape_as(deriv_autograd)
- 
+                        batch_derivs = torch.from_numpy(deriv_tensor)[indices].reshape_as(deriv_autograd).to(device)
+                        
                         loss_add = 1e2 * torch.mean(torch.abs(batch_derivs - deriv_autograd))
                         # print(loss, loss_add)
                         loss += loss_add
@@ -188,13 +194,12 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: b
                 if penalised_derivs is not None:
                     for var_idx, deriv_axes in derivs:
                         deriv_autograd = deriv_calc.take_derivative(model, batch_x, axes = deriv_axes, component = var_idx)
-                        batch_derivs = torch.from_numpy(deriv_tensor)[indices].reshape_as(deriv_autograd)
+                        batch_derivs = torch.from_numpy(deriv_tensor)[indices].reshape_as(deriv_autograd).to(device)
                         higher_ord_penalty = 1e3 * torch.mean(torch.abs(deriv_autograd))
 
                         loss += higher_ord_penalty
 
-                loss.backward() # retain_graph=True, inputs=batch_x retain_graph=True, inputs=batch_x
-                # print('loss grad is', loss_add.grad, loss_add)
+                loss.backward()
                 optimizer.step()
                 loss_list.append(loss.item())
             loss_mean = np.mean(loss_list)

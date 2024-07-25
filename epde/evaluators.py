@@ -8,7 +8,7 @@ Created on Fri Mar  5 13:41:07 2021
 
 import numpy as np
 import torch
-device = torch.device('cpu')
+# device = torch.device('cpu')
 
 from abc import ABC, abstractmethod
 from typing import Callable, Union, List

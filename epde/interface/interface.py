@@ -631,7 +631,7 @@ class EpdeSearch(object):
     def create_pool(self, data: Union[np.ndarray, list, tuple], variable_names=['u',],
                     derivs=None, max_deriv_order=1, additional_tokens=[],
                     data_fun_pow: int = 1, deriv_fun_pow: int = 1, grid: list = None,
-                    data_nn: torch.nn.Sequential = None):
+                    data_nn: torch.nn.Sequential = None, device: str = 'cpu'):
         '''
         Create pool of tokens to represent elementary functions, that can be included in equations.
         
@@ -686,10 +686,10 @@ class EpdeSearch(object):
             if data_nn is not None:
                 print('Using pre-trained ANN')
                 global_var.reset_data_repr_nn(data = data, derivs = base_derivs, train = False, 
-                                              grids = grid, predefined_ann=data_nn)
+                                              grids = grid, predefined_ann = data_nn, device = device)
             else:
                 global_var.reset_data_repr_nn(data = data, derivs = base_derivs, 
-                                            grids = grid, predefined_ann=None)
+                                              grids = grid, predefined_ann=None, device = device)
 
         if isinstance(additional_tokens, list):
             if not all([isinstance(tf, (TokenFamily, PreparedTokens)) for tf in additional_tokens]):

@@ -141,7 +141,7 @@ class Model():
         self.net = self.solution_cls.model
 
         self.optimizer = optimizer.optimizer_choice(self.mode, self.net)
-
+        print(f'device_type() is {device_type()}')
         closure = Closure(mixed_precision, self).get_closure(optimizer.optimizer)
 
         self.min_loss, _ = self.solution_cls.evaluate()
@@ -155,7 +155,7 @@ class Model():
             callbacks.on_epoch_begin()
 
             self.optimizer.zero_grad()
-            
+
             if device_type() == 'cuda' and mixed_precision:
                 closure()
             else:

@@ -45,7 +45,8 @@ def prepare_control_inputs(model: torch.nn.Sequential, grid: torch.Tensor, args:
     return res
 
 class ConstrLocation():
-    def __init__(self, domain_shape: Tuple[int], axis: int = None, loc: int = None, indices: List[np.ndarray] = None):
+    def __init__(self, domain_shape: Tuple[int], axis: int = None, loc: int = None, 
+                 indices: List[np.ndarray] = None, device: str = 'cpu'):
         '''
         Contruct indices of the control training contraint location.
         Args:
@@ -57,7 +58,9 @@ class ConstrLocation():
         self.flat_idxdary" is located. Shall be introduced only for constraints on the boundary.
         
         '''
+        self._device = device
         self._initial_shape = domain_shape
+        
         self.domain_indixes = np.indices(domain_shape)
         if indices is not None:
             self.loc_indices = indices
@@ -66,7 +69,7 @@ class ConstrLocation():
         else:
             self.loc_indices = self.domain_indixes
         self.flat_idxs = torch.from_numpy(np.ravel_multi_index(self.loc_indices,
-                                                               dims = self._initial_shape)).long()
+                                                               dims = self._initial_shape)).long().to(self._device)
 
 
     @staticmethod
@@ -119,7 +122,7 @@ class ControlConstrEq(ControlConstraint):
         to_compare = self._deriv_method.take_derivative(u = fun_nn, args=self._indices.apply(arg_tensor, along_axis=0), # correct along_axis argument 
                                                         axes=self._axes)
         if not isinstance(self._val, torch.Tensor):
-            val_transformed = torch.full_like(input = to_compare, fill_value=self._val)
+            val_transformed = torch.full_like(input = to_compare, fill_value=self._val).to(self._device)
         else:
             if to_compare.shape != self._val.shape:
                 raise TypeError(f'Incorrect shapes of constraint value tensor: expected {self._val.shape}, got {to_compare.shape}.')
@@ -170,7 +173,8 @@ class ConditionalLoss():
         return torch.stack(temp, dim=0).sum(dim=0).sum(dim=0)
 
 class ControlExp():
-    def __init__(self, loss : ConditionalLoss):
+    def __init__(self, loss : ConditionalLoss, device: str = 'cpu'):
+        self._device = device
         self._state_net = None
         self._best_control_net = None
         self.loss = loss
@@ -180,11 +184,11 @@ class ControlExp():
         return res_combiner.create_best(self._pool)
 
     @staticmethod
-    def create_ode_bop(key, var, term, grid_loc, value):
+    def create_ode_bop(key, var, term, grid_loc, value, device: str = 'cpu'):
         bop = BOPElement(axis = 0, key = key, term = term, power = 1, var = var)
         bop_grd_np = np.array([[grid_loc,]])
-        bop.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor))
-        bop.values = torch.from_numpy(np.array([[value,]])).float()
+        bop.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor).to(device))
+        bop.values = torch.from_numpy(np.array([[value,]])).float().to(device)
         return bop
 
     def set_control_optim_params(self, lr: float = 1e-3, max_iter: int = 10, max_eval = None, tolerance_grad: float = 1e-7,
@@ -196,7 +200,7 @@ class ControlExp():
     def set_solver_params(self, mode: str = 'autograd', compiling_params: dict = {}, optimizer_params: dict = {},
                           cache_params: dict = {}, early_stopping_params: dict = {}, plotting_params: dict = {},
                           training_params: dict = {'epochs': 200,}, use_cache: bool = False, use_fourier: bool = False, #  5*1e0
-                          fourier_params: dict = None, use_adaptive_lambdas: bool = False, device = torch.device('cpu')):
+                          fourier_params: dict = None, use_adaptive_lambdas: bool = False, device: str = 'cpu'):
         self._solver_params = {'mode': mode,
                                'compiling_params': compiling_params,
                                'optimizer_params': optimizer_params,
@@ -208,7 +212,7 @@ class ControlExp():
                                'use_fourier': use_fourier,
                                'fourier_params': fourier_params,
                                'use_adaptive_lambdas': use_adaptive_lambdas,
-                               'device': device
+                               'device': torch.device(self._device)
                                }
 
     @staticmethod
@@ -268,7 +272,7 @@ class ControlExp():
                    control_net: torch.nn.Sequential = None, fig_folder: str = None, LV_exp: bool = True):
         def modify_bc(operator: dict, scale: Union[float, torch.Tensor]) -> dict:
             noised_operator = deepcopy(operator)
-            noised_operator['bnd_val'] = torch.normal(operator['bnd_val'], scale)
+            noised_operator['bnd_val'] = torch.normal(operator['bnd_val'], scale).to(self._device)
             return noised_operator
 
         # Properly formulate training approach
@@ -284,10 +288,10 @@ class ControlExp():
         # TODO Refactor hook: To optimize the net in global variables is a terrific approach, rethink it
 
         if isinstance(grids[0], np.ndarray):
-            grids_merged = torch.from_numpy(np.array([subgrid.reshape(-1) for subgrid in grids])).float().T
+            grids_merged = torch.from_numpy(np.array([subgrid.reshape(-1) for subgrid in grids])).float().T.to(self._device)
         elif isinstance(grids[0], torch.Tensor):
-            grids_merged = torch.cat([subgrid.reshape(-1, 1) for subgrid in grids], dim = 1).float()
-        grids_merged.to(device=self._solver_params['device'])
+            grids_merged = torch.cat([subgrid.reshape(-1, 1) for subgrid in grids], dim = 1).float()#.to(self._device)
+        grids_merged.to(device=self._device)
 
         grad_tensors = deepcopy(global_var.control_nn.net.state_dict())
 
@@ -371,7 +375,7 @@ class ControlExp():
 
                             
     def get_solver_adapter(self, net: torch.nn.Sequential):
-        adapter = SolverAdapter(net = net, use_cache = False)
+        adapter = SolverAdapter(net = net, use_cache = False, device = self._device)
         # Edit solver forms of functions of dependent variable to Callable objects.
         # Setting various adapater parameters
         adapter.set_compiling_params(**self._solver_params['compiling_params'])

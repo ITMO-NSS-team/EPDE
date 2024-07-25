@@ -178,7 +178,7 @@ class BOPElement(object):
             raise TypeError(
                 f'Incorrect type of coefficients. Must be a type from list {VAL_TYPES}.')
 
-    def __call__(self, values: VAL_TYPES = None):
+    def __call__(self, values: VAL_TYPES = None, device: str = 'cpu') -> dict:
         if not self.vals_set and values is not None:
             self.values = values
             self.status['boundary_values_set'] = True
@@ -210,7 +210,7 @@ class BOPElement(object):
         
         boundary_value = self.values
         
-        return {'bnd_loc' : boundary, 'bnd_op' : boundary_operator, 'bnd_val' : boundary_value, 
+        return {'bnd_loc' : boundary.to(device), 'bnd_op' : boundary_operator, 'bnd_val' : boundary_value.to(device), 
                 'variables' : self.variables, 'type' : 'operator'}
 
 class PregenBOperator(object):
@@ -535,7 +535,8 @@ class SystemSolverInterface(object):
 
 
 class SolverAdapter(object):
-    def __init__(self, net=None, use_cache: bool = True):
+    def __init__(self, net=None, use_cache: bool = True, device: str = 'cpu'):
+        self._device = device
         self.set_net(net)
         
         self._compiling_params = dict()
@@ -571,12 +572,12 @@ class SolverAdapter(object):
 
     @staticmethod
     def get_net(equations, mode: str, domain: Domain, use_fourier = True, 
-                fft_params: dict = {'L' : [4,], 'M' : [3,]}):
+                fft_params: dict = {'L' : [4,], 'M' : [3,]}, device: str = 'cpu'):
         if mode == 'mat':
             return mat_model(domain, equations)
         elif mode in ['autograd', 'NN']:
             return create_solution_net(equations_num=equations.num, domain_dim=domain.dim,
-                                       use_fourier=use_fourier, fft_params=fft_params)
+                                       use_fourier=use_fourier, fft_params=fft_params, device=device)
             
 
     def set_compiling_params(self, mode: str = None, lambda_operator: float = None, 
@@ -701,7 +702,8 @@ class SolverAdapter(object):
                     param_elem[1](**param_labeled)
                 
     @staticmethod
-    def create_domain(variables: List[str], grids : List[Union[np.ndarray, torch.Tensor]]) -> Domain:
+    def create_domain(variables: List[str], grids : List[Union[np.ndarray, torch.Tensor]],
+                      device: str = 'cpu') -> Domain:
         assert len(variables) == len(grids), f'Number of passed variables {len(variables)} does not \
             match number of grids {len(grids)}.'
         if isinstance(grids[0], np.ndarray):
@@ -710,7 +712,7 @@ class SolverAdapter(object):
         domain = Domain('uniform')
 
         for idx, var_name in enumerate(variables):
-            var_grid = grids[idx] if isinstance(grids[idx], torch.Tensor) else torch.tensor(grids[idx])
+            var_grid = grids[idx].to(device) if isinstance(grids[idx], torch.Tensor) else torch.tensor(grids[idx]).to(device)
             domain.variable(variable_name = var_name, variable_set = var_grid, 
                             n_points = None)
             
@@ -719,6 +721,8 @@ class SolverAdapter(object):
     def solve_epde_system(self, system: SoEq, grids: list=None, boundary_conditions=None, 
                           mode='NN', data=None, use_cache: bool = False, use_fourier: bool = False,
                           fourier_params: dict = None, use_adaptive_lambdas: bool = False, to_numpy: bool = False):
+        solver_device(device = self._device)
+
         system_interface = SystemSolverInterface(system_to_adapt=system)
 
         system_solver_forms = system_interface.form(grids = grids, mode = mode)
@@ -739,7 +743,7 @@ class SolverAdapter(object):
             grid_var_keys, grids = global_var.grid_cache.get_all(mode = 'torch')
         else:
             grid_var_keys, _ = global_var.grid_cache.get_all(mode = 'torch')
-        domain = self.create_domain(grid_var_keys, grids)
+        domain = self.create_domain(grid_var_keys, grids, self._device)
 
         return self.solve(equations=[form[1] for form in system_solver_forms], domain = domain,
                           boundary_conditions = bconds_combined, mode = mode, use_cache = use_cache,
@@ -747,7 +751,7 @@ class SolverAdapter(object):
                           use_adaptive_lambdas = use_adaptive_lambdas, to_numpy = to_numpy)
 
     def solve(self, equations, domain:Domain, boundary_conditions = None, mode = 'NN', 
-              epochs = 1e3, use_cache: bool = False, use_fourier: bool = False, fourier_params: dict = None,
+              use_cache: bool = False, use_fourier: bool = False, fourier_params: dict = None, #  epochs = 1e3, 
               use_adaptive_lambdas: bool = False, to_numpy = False):
     
         if isinstance(equations, SolverEquation):
@@ -757,7 +761,8 @@ class SolverAdapter(object):
             for form in equations:
                 equations_prepared.add(form)
         if self.net is None:
-            self.net = self.get_net(equations_prepared, mode, domain, use_fourier, fourier_params)
+            self.net = self.get_net(equations_prepared, mode, domain, use_fourier,
+                                    fourier_params, device=self._device)
         
         
         cb_early_stops = early_stopping.EarlyStopping(**self._early_stopping_params)
@@ -769,14 +774,17 @@ class SolverAdapter(object):
             callbacks.append(adaptive_lambda.AdaptiveLambda())
         
         optimizer = Optimizer(**self._optimizer_params)
-        
+
+        self.net.to(device = self._device) # self.net  =        
+        print(f'self.net is on Cuda: {next(self.net.parameters()).is_cuda}')
+        # print(self._para)
         model = Model(net = self.net, domain = domain, equation = equations_prepared, 
                       conditions = boundary_conditions)
         model.compile(**self._compiling_params)
         loss = model.train(optimizer, callbacks=callbacks, **self._training_params)
         
         grid = domain.build(mode = self.mode)
-        self.net  = self.net.to(device = device_type())
+ 
         grid = check_device(grid)
         
         if mode in ['NN', 'autograd'] and to_numpy:

@@ -46,6 +46,7 @@ class Solution():
         """
 
         self.grid = check_device(grid)
+        # print(f'self.grid.get_device {self.grid.get_device()} device_type() {device_type()}')
         if mode == 'NN':
             sorted_grid = Points_type(self.grid).grid_sort()
             self.n_t = len(sorted_grid['central'][:, 0].unique())

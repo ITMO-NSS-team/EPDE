@@ -13,7 +13,7 @@ import numpy as np
 from functools import reduce
 import copy
 import torch
-device = torch.device('cpu')
+# device = torch.device('cpu')
 
 import matplotlib.pyplot as plt
 
@@ -54,7 +54,7 @@ class AutogradDeriv(BasicDeriv):
     
 
 def create_solution_net(equations_num: int, domain_dim: int, use_fourier = True, #  mode: str, domain: Domain 
-                        fft_params: dict = None):
+                        fft_params: dict = None, device = 'cpu'):
     '''
     fft_params have to be passed as dict with entries like: {'L' : [4,], 'M' : [3,]}
     '''
@@ -67,7 +67,11 @@ def create_solution_net(equations_num: int, domain_dim: int, use_fourier = True,
             else:
                 fft_params = {'L' : [L_default] + [None,] * (domain_dim - 1), 
                               'M' : [M_default] + [None,] * (domain_dim - 1)}
-        net_default = [Fourier_embedding(**fft_params),]
+        fft_params['device'] = device
+        four_emb = Fourier_embedding(**fft_params)
+        if device == 'cuda':
+            four_emb = four_emb.cuda()
+        net_default = [four_emb,]
     else:
         net_default = []        
     linear_inputs = net_default[0].out_features if use_fourier else domain_dim
@@ -77,13 +81,13 @@ def create_solution_net(equations_num: int, domain_dim: int, use_fourier = True,
     else:
         hidden_neurons = 112
 
-    operators = net_default + [torch.nn.Linear(linear_inputs, hidden_neurons),
+    operators = net_default + [torch.nn.Linear(linear_inputs, hidden_neurons, device=device),
                                torch.nn.ReLU(),
                             #    torch.nn.Linear(hidden_neurons, hidden_neurons),
                             #    torch.nn.ReLU(),
-                               torch.nn.Linear(hidden_neurons, hidden_neurons),
+                               torch.nn.Linear(hidden_neurons, hidden_neurons, device=device),
                                torch.nn.Tanh(),
-                               torch.nn.Linear(hidden_neurons, equations_num)]
+                               torch.nn.Linear(hidden_neurons, equations_num, device=device)]
     return torch.nn.Sequential(*operators)
 
 def exp_form(a, sign_num: int = 4):
@@ -107,30 +111,31 @@ def rts(value, sign_num: int = 5):
 
 
 def train_ann(args: list, data: np.ndarray, epochs_max: int = 500, batch_frac = 0.5, 
-              dim = None, model = None):
+              dim = None, model = None, device = 'cpu'):
     if dim is None:
         dim = 1 if np.any([s == 1 for s in data.shape]) and data.ndim == 2 else data.ndim
     # assert len(args) == dim, 'Dimensionality of data does not match with passed grids.'
     data_size = data.size
     if model is None:
         model = torch.nn.Sequential(
-                                    torch.nn.Linear(dim, 256),
+                                    torch.nn.Linear(dim, 256, device=device),
                                     torch.nn.Tanh(),
-                                    torch.nn.Linear(256, 256),
+                                    torch.nn.Linear(256, 256, device=device),
                                     torch.nn.Tanh(),
-                                    torch.nn.Linear(256, 64),
+                                    torch.nn.Linear(256, 64, device=device),
                                     torch.nn.Tanh(),
-                                    torch.nn.Linear(64, 1024),
+                                    torch.nn.Linear(64, 1024, device=device),
                                     torch.nn.Tanh(),
-                                    torch.nn.Linear(1024, 1)
+                                    torch.nn.Linear(1024, 1, device=device)
                                     )
-
+    
+    model.to(device)
     data_grid = np.stack([arg.reshape(-1) for arg in args])
-    grid_tensor = torch.from_numpy(data_grid).float().T
-    grid_tensor.to(device)
-    data = torch.from_numpy(data.reshape(-1, 1)).float()
+    grid_tensor = torch.from_numpy(data_grid).float().T.to(device)
+    # grid_tensor.to(device)
+    data = torch.from_numpy(data.reshape(-1, 1)).float().to(device)
     # print(data.size)
-    data.to(device)
+    # data.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 
     batch_size = int(data_size * batch_frac)
@@ -176,7 +181,7 @@ def train_ann(args: list, data: np.ndarray, epochs_max: int = 500, batch_frac = 
 def use_ann_to_predict(model, recalc_grids: list):
     data_grid = np.stack([grid.reshape(-1) for grid in recalc_grids])
     recalc_grid_tensor = torch.from_numpy(data_grid).float().T
-    recalc_grid_tensor.to(device)
+    recalc_grid_tensor = recalc_grid_tensor.to(device)
 
     return model(recalc_grid_tensor).detach().numpy().reshape(recalc_grids[0].shape)
 

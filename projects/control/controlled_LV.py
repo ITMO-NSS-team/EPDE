@@ -10,7 +10,7 @@ from typing import Callable, Union
 from collections import OrderedDict
 
 import matplotlib as mpl
-mpl.use('TkAgg')
+# mpl.use('TkAgg')
 import matplotlib.pyplot as plt
 
 import epde
@@ -163,7 +163,8 @@ def epde_discovery(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np.ndar
     return epde_search_obj
 
 def translate_dummy_eqs(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np.ndarray, diff_method = 'FD',
-                        bnd = 30, control_ann: torch.nn.Sequential = None, data_nn: torch.nn.Sequential = None):
+                        bnd = 30, control_ann: torch.nn.Sequential = None, data_nn: torch.nn.Sequential = None, 
+                        device = 'cpu'):
     dimensionality = t.ndim - 1
     
     epde_search_obj = epde.EpdeSearch(use_solver = True, dimensionality = dimensionality, boundary = bnd,
@@ -171,7 +172,7 @@ def translate_dummy_eqs(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np
 
     if diff_method == 'ANN':
         epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
-                                         preprocessor_kwargs={'epochs_max' : 50000})
+                                         preprocessor_kwargs={'epochs_max': 50000, 'device': device})
     elif diff_method == 'poly':
         epde_search_obj.set_preprocessor(default_preprocessor_type='poly',
                                          preprocessor_kwargs={'use_smoothing' : False, 'sigma' : 1, 
@@ -189,7 +190,7 @@ def translate_dummy_eqs(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np
                                                                                     (1, [None])])    
 
     epde_search_obj.create_pool(data=[u, v], variable_names=['u', 'v'], max_deriv_order=(1,),
-                                additional_tokens = [control_var_tokens,], data_nn = data_nn)
+                                additional_tokens = [control_var_tokens,], data_nn = data_nn, device = device)
 
 
     eq_u = '20. * u{power: 1} + -1. * ctrl{power: 1} * u{power: 1} + -20. * u{power: 1} * v{power: 1} + 0 = du/dx0{power: 1}'
@@ -200,22 +201,23 @@ def translate_dummy_eqs(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np
 
 def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
                   u_tar: float, v_tar: float, u_init: float, v_init: float,
-                  state_nn_pretrained: torch.nn.Sequential, ctrl_nn_pretrained: torch.nn.Sequential):
+                  state_nn_pretrained: torch.nn.Sequential, ctrl_nn_pretrained: torch.nn.Sequential, 
+                  device = 'cpu'):
     
     from epde.supplementary import AutogradDeriv
     autograd = AutogradDeriv()
 
-    loc = control_utils.ConstrLocation(domain_shape = (t.size()[0],)) # Declaring const in the entire domain
-    u_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = u_tar),
+    loc = control_utils.ConstrLocation(domain_shape = (t.size()[0],), device=device) # Declaring const in the entire domain
+    u_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = u_tar, device=device),
                                                  indices = loc, deriv_method = autograd, nn_output=0)
-    v_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = v_tar),
+    v_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = v_tar, device=device),
                                                  indices = loc, deriv_method = autograd, nn_output=1)
-    contr_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = 0.),
+    contr_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = 0., device=device),
                                                  indices = loc, deriv_method = autograd, nn_output=0)
 
-    u_var_non_neg = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0.), sign='>',
+    u_var_non_neg = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0., device=device), sign='>',
                                                    indices = loc, deriv_method = autograd, nn_output=0)
-    v_var_non_neg = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0.), sign='>',
+    v_var_non_neg = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0., device=device), sign='>',
                                                    indices = loc, deriv_method = autograd, nn_output=1)
     
 
@@ -225,19 +227,19 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
                                           (0.0001, contr_constr, 1),
                                           (100, u_var_non_neg, 0),
                                           (100, v_var_non_neg, 0)])
-    optimizer = control_utils.ControlExp(loss=loss)
+    optimizer = control_utils.ControlExp(loss=loss, device=device)
     
     def get_ode_bop(key, var, term, grid_loc, value):
         bop = epde.interface.solver_integration.BOPElement(axis = 0, key = key, term = term,
                                                            power = 1, var = var)
         if isinstance(grid_loc, float):
             bop_grd_np = np.array([[grid_loc,]])
-            bop.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor))
+            bop.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor)).to(device)
         elif isinstance(grid_loc, torch.Tensor):
             bop.set_grid(grid_loc.reshape((1, 1)).type(torch.FloatTensor)) # What is the correct shape here?
         else:
             raise TypeError('Incorret value type, expected float or torch.Tensor.')
-        bop.values = torch.from_numpy(np.array([[value,]])).float()
+        bop.values = torch.from_numpy(np.array([[value,]])).float().to(device)
         return bop
 
     bop_u = get_ode_bop('u', 0, [None], t[0, 0], u_init)
@@ -248,7 +250,7 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     optimizer.set_control_optim_params()
     optimizer.set_solver_params()
 
-    state_nn, ctrl_net, ctrl_pred = optimizer.train_pinn(bc_operators = [(bop_u(), 0.1), (bop_v(), 0.1)], grids = [t,], 
+    state_nn, ctrl_net, ctrl_pred = optimizer.train_pinn(bc_operators = [(bop_u(device=device), 0.1), (bop_v(device=device), 0.1)], grids = [t,], 
                                                          n_control = 1., state_net = state_nn_pretrained, 
                                                          control_net = ctrl_nn_pretrained, epochs = 15,
                                                          fig_folder='/home/maslyaev/Documents/EPDE/projects/control/figs')
@@ -258,6 +260,7 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
 if __name__ == '__main__':
     import pickle
+    device = 'cuda' if torch.cuda.is_available else 'cpu'
 
     t, ctrl, solution = prepare_data(steps_num = 101, ctrl_fun = lambda x: 12*x[1] + 0.05*x[0] + 0.2) # x[0]
     t, ctrl, solution = t[:-1], ctrl[:-1], solution[:-1, ...]
@@ -269,29 +272,31 @@ if __name__ == '__main__':
     plt.legend()
     plt.show()
 
-    with open(r"/home/maslyaev/Documents/EPDE/projects/control/data_ann_2.pickle", 'rb') as data_input_file:  
+    with open(r"/home/mikemaslyaev/Documents/EPDE/projects/control/data_ann_2.pickle", 'rb') as data_input_file:  
         data_nn = pickle.load(data_input_file)
     # data_nn = None
 
-    model = translate_dummy_eqs(t, solution[:, 0], solution[:, 1], ctrl, data_nn = data_nn) # , 
-    # with open(r"/home/maslyaev/Documents/EPDE/projects/control/data_ann_2.pickle", 'wb') as output_file:  
+    model = translate_dummy_eqs(t, solution[:, 0], solution[:, 1], ctrl, data_nn = data_nn, device = device) # , 
+    _ = epde.globals.solution_guess_nn(torch.from_numpy(t).reshape((-1, 1)).float().to(device))
+    # with open(r"/home/mikemaslyaev/Documents/EPDE/projects/control/data_ann_2.pickle", 'wb') as output_file:  
     #     pickle.dump(epde.globals.solution_guess_nn, output_file)
 
     args = torch.from_numpy(solution).float()
 
-    def create_shallow_nn(arg_num: int = 1, output_num: int = 1) -> torch.nn.Sequential: # net: torch.nn.Sequential = None, 
+    def create_shallow_nn(arg_num: int = 1, output_num: int = 1, device = 'cpu') -> torch.nn.Sequential: # net: torch.nn.Sequential = None, 
         hidden_neurons = 180
-        layers = [torch.nn.Linear(arg_num, hidden_neurons),
+        layers = [torch.nn.Linear(arg_num, hidden_neurons, device=device),
                   torch.nn.ReLU(),
-                  torch.nn.Linear(hidden_neurons, output_num)]
+                  torch.nn.Linear(hidden_neurons, output_num, device=device)]
         return torch.nn.Sequential(*layers)
     
     ctrl_ann = epde.supplementary.train_ann(args=[solution[:, 0], solution[:, 1]], data = ctrl, 
-                                            epochs_max = 1e4, dim = 2, model = create_shallow_nn(2, 1))
+                                            epochs_max = 1e4, dim = 2, model = create_shallow_nn(2, 1, device=device))
     
-    # with open(r"/home/maslyaev/Documents/EPDE/projects/control/control_ann.pickle", 'rb') as ctrl_input_file:  
+    
+    # with open(r"/home/mikemaslyaev/Documents/EPDE/projects/control/control_ann.pickle", 'rb') as ctrl_input_file:  
     #     ctrl_ann = pickle.load(ctrl_input_file)
-    with open(r"/home/maslyaev/Documents/EPDE/projects/control/control_ann_shallow.pickle", 'wb') as ctrl_output_file:  
+    with open(r"/home/mikemaslyaev/Documents/EPDE/projects/control/control_ann_shallow.pickle", 'wb') as ctrl_output_file:  
         pickle.dump(ctrl_ann, file = ctrl_output_file)
 
     plt.plot(t, ctrl_ann(args).detach().numpy(), color = 'b', label = 'control variable, nn approx')
@@ -299,15 +304,17 @@ if __name__ == '__main__':
     plt.legend()
     plt.show()   
 
-    res = optimize_ctrl(model, torch.from_numpy(t).reshape((-1, 1)).float(), u_tar = 3, v_tar = 1,
+    res = optimize_ctrl(model, torch.from_numpy(t).reshape((-1, 1)).float().to(device), u_tar = 3, v_tar = 1,
                          u_init=solution[0, 0], v_init=solution[0, 1],
-                         state_nn_pretrained=epde.globals.solution_guess_nn, ctrl_nn_pretrained=ctrl_ann)
+                         state_nn_pretrained=epde.globals.solution_guess_nn, ctrl_nn_pretrained=ctrl_ann, 
+                         device=device)
 
-    with open(r"/home/maslyaev/Documents/EPDE/projects/control/control_opt_res.pickle", 'wb') as output_file:  
+    with open(r"/home/mikemaslyaev/Documents/EPDE/projects/control/control_opt_res.pickle", 'wb') as output_file:  
         pickle.dump(res, output_file)
 
     u_plots, v_plots = torch.linspace(0, 6, 61), torch.linspace(0, 6, 61)
     UU, VV = torch.meshgrid(u_plots, v_plots)
     ctrl_args = torch.stack(tensors = (UU.reshape(-1), VV.reshape(-1)), dim = 0).T
 
-    res[1]().reshape(ctrl_args)
+    ctrl_landscape = res[1](ctrl_args).detach().numpy().reshape((u_plots.size[0], v_plots.size[0]))
+    np.save(file = "/home/mikemaslyaev/Documents/EPDE/projects/control/ctrl_landscape.npy", arr=ctrl_landscape)

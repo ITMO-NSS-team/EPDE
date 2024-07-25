@@ -15,7 +15,7 @@ class Fourier_embedding(nn.Module):
             L=[None, 5], M=[None, 5].
     """
 
-    def __init__(self, L=[1], M=[1], ones=False):
+    def __init__(self, L=[1], M=[1], ones=False, device='cpu'):
         """
         Args:
             L (list, optional): (sin(w*x), cos(w*X)) frequencie parameter,
@@ -24,6 +24,7 @@ class Fourier_embedding(nn.Module):
             ones (bool, optional): enter or not ones vector in result embedding. Defaults to False.
         """
 
+        self._device = device
         super().__init__()
         self.M = M
         self.L = L
@@ -59,7 +60,7 @@ class Fourier_embedding(nn.Module):
                 Mi = self.M[i]
                 Li = self.L[i]
                 w = 2.0 * np.pi / Li
-                k = torch.arange(1, Mi + 1).reshape(-1, 1).float()
+                k = torch.arange(1, Mi + 1, device=self._device).reshape(-1, 1).float()
                 x = grid[:, i].reshape(1, -1)
                 x = (k @ x).T
                 embed_cos = torch.cos(w * x)
