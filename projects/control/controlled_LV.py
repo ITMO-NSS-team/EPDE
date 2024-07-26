@@ -252,8 +252,8 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
     state_nn, ctrl_net, ctrl_pred = optimizer.train_pinn(bc_operators = [(bop_u(device=device), 0.1), (bop_v(device=device), 0.1)], grids = [t,], 
                                                          n_control = 1., state_net = state_nn_pretrained, 
-                                                         control_net = ctrl_nn_pretrained, epochs = 15,
-                                                         fig_folder='/home/maslyaev/Documents/EPDE/projects/control/figs')
+                                                         control_net = ctrl_nn_pretrained, epochs = 50,
+                                                         fig_folder='/home/mikemaslyaev/Documents/EPDE/projects/control/figs')
 
     return state_nn, ctrl_net, ctrl_pred
 
@@ -277,11 +277,12 @@ if __name__ == '__main__':
     # data_nn = None
 
     model = translate_dummy_eqs(t, solution[:, 0], solution[:, 1], ctrl, data_nn = data_nn, device = device) # , 
-    _ = epde.globals.solution_guess_nn(torch.from_numpy(t).reshape((-1, 1)).float().to(device))
+    example_sol = epde.globals.solution_guess_nn(torch.from_numpy(t).reshape((-1, 1)).float().to(device))
+    print(f'example_sol: {type(example_sol)}, {example_sol.shape}, {example_sol.get_device()}')
     # with open(r"/home/mikemaslyaev/Documents/EPDE/projects/control/data_ann_2.pickle", 'wb') as output_file:  
     #     pickle.dump(epde.globals.solution_guess_nn, output_file)
 
-    args = torch.from_numpy(solution).float()
+    args = torch.from_numpy(solution).float().to(device)
 
     def create_shallow_nn(arg_num: int = 1, output_num: int = 1, device = 'cpu') -> torch.nn.Sequential: # net: torch.nn.Sequential = None, 
         hidden_neurons = 180
@@ -291,15 +292,18 @@ if __name__ == '__main__':
         return torch.nn.Sequential(*layers)
     
     ctrl_ann = epde.supplementary.train_ann(args=[solution[:, 0], solution[:, 1]], data = ctrl, 
-                                            epochs_max = 1e4, dim = 2, model = create_shallow_nn(2, 1, device=device))
-    
+                                            epochs_max = 1e4, dim = 2, model = create_shallow_nn(2, 1, device=device),
+                                            device = device)
+    # ctrl_vals = ctrl_ann(example_sol)
     
     # with open(r"/home/mikemaslyaev/Documents/EPDE/projects/control/control_ann.pickle", 'rb') as ctrl_input_file:  
     #     ctrl_ann = pickle.load(ctrl_input_file)
     with open(r"/home/mikemaslyaev/Documents/EPDE/projects/control/control_ann_shallow.pickle", 'wb') as ctrl_output_file:  
         pickle.dump(ctrl_ann, file = ctrl_output_file)
 
-    plt.plot(t, ctrl_ann(args).detach().numpy(), color = 'b', label = 'control variable, nn approx')
+    print(f'ctrl_ann is on cuda: {next(ctrl_ann.parameters()).is_cuda}, ')
+    plt.plot(t, ctrl_ann(args).cpu().detach().numpy(), color = 'b', label = 'control variable, nn approx on input states')
+    plt.plot(t, ctrl_ann(example_sol).cpu().detach().numpy(), '--', color = 'k', label = 'control variable, nn approx with nn approx state')
     plt.plot(t, ctrl, '*', color = 'y', label = 'control variable')
     plt.legend()
     plt.show()   
@@ -316,5 +320,5 @@ if __name__ == '__main__':
     UU, VV = torch.meshgrid(u_plots, v_plots)
     ctrl_args = torch.stack(tensors = (UU.reshape(-1), VV.reshape(-1)), dim = 0).T
 
-    ctrl_landscape = res[1](ctrl_args).detach().numpy().reshape((u_plots.size[0], v_plots.size[0]))
+    ctrl_landscape = res[1](ctrl_args).cpu().detach().numpy().reshape((u_plots.size[0], v_plots.size[0]))
     np.save(file = "/home/mikemaslyaev/Documents/EPDE/projects/control/ctrl_landscape.npy", arr=ctrl_landscape)

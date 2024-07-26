@@ -181,7 +181,7 @@ def train_ann(args: list, data: np.ndarray, epochs_max: int = 500, batch_frac = 
 def use_ann_to_predict(model, recalc_grids: list):
     data_grid = np.stack([grid.reshape(-1) for grid in recalc_grids])
     recalc_grid_tensor = torch.from_numpy(data_grid).float().T
-    recalc_grid_tensor = recalc_grid_tensor.to(device)
+    recalc_grid_tensor = recalc_grid_tensor #.to(device)
 
     return model(recalc_grid_tensor).detach().numpy().reshape(recalc_grids[0].shape)
 

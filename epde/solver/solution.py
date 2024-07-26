@@ -20,17 +20,9 @@ class Solution():
     """
     class for different loss functions calculation.
     """
-    def __init__(
-        self,
-        grid: torch.Tensor,
-        equal_cls: Union[Equation_NN, Equation_mat, Equation_autograd],
-        model: Union[torch.nn.Sequential, torch.Tensor],
-        mode: str,
-        weak_form: Union[None, List[callable]],
-        lambda_operator,
-        lambda_bound,
-        tol: float = 0,
-        derivative_points: int = 2):
+    def __init__(self, grid: torch.Tensor, equal_cls: Union[Equation_NN, Equation_mat, Equation_autograd],
+                 model: Union[torch.nn.Sequential, torch.Tensor], mode: str, weak_form: Union[None, List[callable]],
+                 lambda_operator, lambda_bound, tol: float = 0, derivative_points: int = 2):
         """
         Args:
             grid (torch.Tensor): discretization of comp-l domain.
@@ -114,8 +106,7 @@ class Solution():
                                           self.weak_form,
                                           self.derivative_points)
 
-    def evaluate(self,
-                 save_graph: bool = True) -> Tuple[torch.Tensor, torch.Tensor]:
+    def evaluate(self, save_graph: bool = True) -> Tuple[torch.Tensor, torch.Tensor]:
         """ Computes loss.
 
         Args:

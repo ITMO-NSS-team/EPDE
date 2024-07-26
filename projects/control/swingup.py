@@ -137,12 +137,19 @@ def epde_multisample_discovery(t: List[np.ndarray], x: List[np.ndarray], angle: 
 def translate_equation(t, x, angle, u, derivs: dict, diff_method = 'FD'):
     dimensionality = x.ndim - 1
     
-    lp_terms = [['ctrl{power: 1}',], 
-                ['d^2phi/dx0^2{power: 1}', 'cos(phi){power: 1}'],
-                ['dphi/dx0{power: 2}', 'sin(phi){power: 1}'],
-                ['sgn(dy){power: 1}']]
-    rp_term  = ['d^2y/dx0^2{power: 1}',]
+    lp_y_terms = [['ctrl{power: 1}',], 
+                  ['d^2phi/dx0^2{power: 1}', 'cos(phi){power: 1}'],
+                  ['dphi/dx0{power: 2}', 'sin(phi){power: 1}'],
+                  ['sgn(dy){power: 1}']]
+    rp_y_term  = ['d^2y/dx0^2{power: 1}',]
     
+    lp_phi_terms = [['ctrl{power: 1}', 'sin(phi){power: 1}'], 
+                    ['d^2phi/dx0^2{power: 1}', 'cos(phi){power: 1}'],
+                    ['dphi/dx0{power: 2}', 'sin(phi){power: 1}'],
+                    ['sgn(dy){power: 1}']]
+    rp_phi_term  = ['d^2phi/dx0^2{power: 1}',]
+        
+
 
     epde_search_obj = epde.EpdeSearch(use_solver = False, dimensionality = dimensionality, boundary = 30,
                                       coordinate_tensors = [t,], verbose_params = {'show_iter_idx' : False})    

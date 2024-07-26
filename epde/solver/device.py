@@ -3,6 +3,7 @@
 from typing import Any
 import torch
 
+verbose = False
 
 def solver_device(device: str):
     """ Corresponding to chosen device, all futher
@@ -13,13 +14,16 @@ def solver_device(device: str):
 
     """
     if device in ['cuda','gpu'] and torch.cuda.is_available():
-        print('CUDA is available and used.')
+        if verbose:
+            print('CUDA is available and used.')
         return torch.set_default_device('cuda')
     elif device in ['cuda','gpu'] and not torch.cuda.is_available():
-        print('CUDA is not available, cpu is used!')
+        if verbose:
+            print('CUDA is not available, cpu is used!')
         return torch.set_default_device('cpu')
     else:
-        print('Default cpu processor is used.')
+        if verbose:        
+            print('Default cpu processor is used.')
         return torch.set_default_device('cpu')
 
 def check_device(data: Any):

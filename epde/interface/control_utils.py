@@ -199,7 +199,7 @@ class ControlExp():
 
     def set_solver_params(self, mode: str = 'autograd', compiling_params: dict = {}, optimizer_params: dict = {},
                           cache_params: dict = {}, early_stopping_params: dict = {}, plotting_params: dict = {},
-                          training_params: dict = {'epochs': 200,}, use_cache: bool = False, use_fourier: bool = False, #  5*1e0
+                          training_params: dict = {'epochs': 150,}, use_cache: bool = False, use_fourier: bool = False, #  5*1e0
                           fourier_params: dict = None, use_adaptive_lambdas: bool = False, device: str = 'cpu'):
         self._solver_params = {'mode': mode,
                                'compiling_params': compiling_params,
@@ -272,7 +272,7 @@ class ControlExp():
                    control_net: torch.nn.Sequential = None, fig_folder: str = None, LV_exp: bool = True):
         def modify_bc(operator: dict, scale: Union[float, torch.Tensor]) -> dict:
             noised_operator = deepcopy(operator)
-            noised_operator['bnd_val'] = torch.normal(operator['bnd_val'], scale).to(self._device)
+            # noised_operator['bnd_val'] = torch.normal(operator['bnd_val'], scale).to(self._device)
             return noised_operator
 
         # Properly formulate training approach
@@ -359,9 +359,9 @@ class ControlExp():
             
             if fig_folder is not None and LV_exp:
                 plt.figure(figsize=(11, 6))
-                plt.plot(grids_merged.detach().numpy(), control_inputs.detach().numpy()[:, 0], color = 'k')
-                plt.plot(grids_merged.detach().numpy(), control_inputs.detach().numpy()[:, 1], color = 'r')
-                plt.plot(grids_merged.detach().numpy(), global_var.control_nn.net(control_inputs).detach().numpy(),
+                plt.plot(grids_merged.cpu().detach().numpy(), control_inputs.cpu().detach().numpy()[:, 0], color = 'k')
+                plt.plot(grids_merged.cpu().detach().numpy(), control_inputs.cpu().detach().numpy()[:, 1], color = 'r')
+                plt.plot(grids_merged.cpu().detach().numpy(), global_var.control_nn.net(control_inputs).cpu().detach().numpy(),
                          color = 'tab:orange')
                 plt.grid()
                 frame_name = f'Exp_{time.month}_{time.day}_at_{time.hour}_{time.minute}_{t}.png'

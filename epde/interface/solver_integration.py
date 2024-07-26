@@ -776,10 +776,11 @@ class SolverAdapter(object):
         optimizer = Optimizer(**self._optimizer_params)
 
         self.net.to(device = self._device) # self.net  =        
-        print(f'self.net is on Cuda: {next(self.net.parameters()).is_cuda}')
+        # print(f'self.net is on Cuda: {next(self.net.parameters()).is_cuda}')
         # print(self._para)
         model = Model(net = self.net, domain = domain, equation = equations_prepared, 
                       conditions = boundary_conditions)
+        
         model.compile(**self._compiling_params)
         loss = model.train(optimizer, callbacks=callbacks, **self._training_params)
         
