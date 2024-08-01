@@ -268,7 +268,7 @@ class ControlExp():
         
 
     def train_pinn(self, bc_operators: List[Union[dict, float]], grids: List[Union[np.ndarray, torch.Tensor]], 
-                   n_control: int = 1, epochs: int = 1e2, state_net: torch.nn.Sequential = None, 
+                   n_control: int = 1, epochs: int = 1e2, state_net: torch.nn.Sequential = None, opt_params: List[float] = [0.01, 0.9, 0.999, 1e-8],
                    control_net: torch.nn.Sequential = None, fig_folder: str = None, LV_exp: bool = True):
         def modify_bc(operator: dict, scale: Union[float, torch.Tensor]) -> dict:
             noised_operator = deepcopy(operator)
@@ -277,7 +277,8 @@ class ControlExp():
 
         # Properly formulate training approach
         t = 0
-        min_loss = np.inf
+        # min_loss = np.inf
+        loss_hist = []
         stop_training = False
 
         time = datetime.datetime.now()
@@ -295,7 +296,7 @@ class ControlExp():
 
         grad_tensors = deepcopy(global_var.control_nn.net.state_dict())
 
-        optimizer = AdamOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = [0.01, 0.9, 0.999, 1e-8])
+        optimizer = AdamOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = opt_params)
         adapter = self.get_solver_adapter(None)
         while t < epochs and not stop_training:
             sampled_bc = [modify_bc(operator, noise_std) for operator, noise_std in bc_operators]
@@ -353,9 +354,10 @@ class ControlExp():
             control_inputs = prepare_control_inputs(model, grids_merged, global_var.control_nn.net_args)        
             loss = self.loss([self._state_net, global_var.control_nn.net], [grids_merged, control_inputs])
             print('current loss is ', loss)
-            if loss < min_loss:
-                min_loss = loss
-                self._best_control_params = global_var.control_nn.net.state_dict()
+            # if loss < min_loss:
+            # min_loss = loss
+            loss_hist.append(loss)
+            self._best_control_params = global_var.control_nn.net.state_dict()
             
             if fig_folder is not None and LV_exp:
                 plt.figure(figsize=(11, 6))
@@ -371,7 +373,7 @@ class ControlExp():
 
         ctrl_pred = global_var.control_nn.net(var_prediction)
 
-        return self._state_net, global_var.control_nn.net, ctrl_pred
+        return self._state_net, global_var.control_nn.net, ctrl_pred, loss_hist
 
                             
     def get_solver_adapter(self, net: torch.nn.Sequential):
@@ -392,9 +394,9 @@ class ControlExp():
 def eps_increment_diff(input_params: OrderedDict, loc: List[Union[str, Tuple[int]]], 
                        forward: bool = True, eps = 1e-4): # input_keys: list,  prev_loc: List = None, 
     if forward:
-        input_params[loc[0]][loc[1:]] += eps
+        input_params[loc[0]][tuple(loc[1:])] += eps
     else:
-        input_params[loc[0]][loc[1:]] -= 2*eps
+        input_params[loc[0]][tuple(loc[1:])] -= 2*eps
     return input_params
 
 class FirstOrderOptimizerNp(ABC):
@@ -432,7 +434,10 @@ class FirstOrderOptimizer(ABC):
     def __init__(self, optimized: List[torch.Tensor], parameters: list):
         raise NotImplementedError('Calling __init__ of an abstract optimizer')
     
-    def step(self, gradient: List[torch.Tensor], optimized: List[torch.Tensor]) -> List[torch.Tensor]:
+    def reset(self, optimized: Dict[str, torch.Tensor], parameters: np.ndarray):
+        raise NotImplementedError('Calling reset method of an abstract optimizer')
+
+    def step(self, gradient: Dict[str, torch.Tensor], optimized: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
         raise NotImplementedError('Calling step of an abstract optimizer')
     
 class AdamOptimizer(FirstOrderOptimizer):

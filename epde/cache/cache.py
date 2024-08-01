@@ -366,7 +366,8 @@ class Cache(object):
         # print(f'Called {label} with torch mode {torch_mode}')
         type_key, other, other_bool = ('torch', 'numpy', False) if torch_mode else ('numpy', 'torch', True)
         if deriv_code is not None:
-            label = [elem[1] for elem in self._deriv_codes if elem[0] == deriv_code]
+            print(f'self._deriv_codes {self._deriv_codes} for {deriv_code}')
+            label = [elem[1] for elem in self._deriv_codes if elem[0] == deriv_code][0]
 
         if label is None:
             print(self.memory_default[type_key].keys())

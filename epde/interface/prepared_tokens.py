@@ -21,7 +21,7 @@ from epde.cache.cache import upload_simple_tokens, prepare_var_tensor  # np_ndar
 
 from epde.evaluators import CustomEvaluator, EvaluatorTemplate, trigonometric_evaluator, \
      simple_function_evaluator, const_evaluator, const_grad_evaluator, grid_evaluator, \
-     velocity_evaluator, velocity_grad_evaluators, phased_sine_evaluator
+     velocity_evaluator, velocity_grad_evaluators, phased_sine_evaluator, sign_evaluator
 
 class PreparedTokens(ABC):
     """
@@ -60,9 +60,9 @@ class ArbitraryDataFunction(PreparedTokens):
         self._token_family.set_evaluator(evaluator)
 
 class DerivSignFunction(PreparedTokens):
-    def __init__(self, token_type: str, var_name: str, token_labels: list,
-                 evaluator: Union[CustomEvaluator, EvaluatorTemplate, Callable],
-                 params_ranges: dict, params_equality_ranges: dict = None, unique_specific_token=True, 
+    def __init__(self, token_type: str, var_name: str, token_labels: list, unique_specific_token=True, 
+                #  evaluator: Union[CustomEvaluator, EvaluatorTemplate, Callable], 
+                #  params_ranges: dict, params_equality_ranges: dict = None,
                  unique_token_type=True, meaningful=True, non_default_power = False,
                  deriv_solver_orders: list = [[None,],]): # Add more intuitive method of declaring solver orders
         """
@@ -75,9 +75,11 @@ class DerivSignFunction(PreparedTokens):
                                       unique_specific_token=unique_specific_token, unique_token_type=unique_token_type,
                                       s_and_d_merged=False, non_default_power = non_default_power)
 
+        params_ranges = OrderedDict([('power', (1, 1))])
+        params_equality_ranges = {'power': 0}
         self._token_family.set_params(token_labels, params_ranges, params_equality_ranges,
                                       derivs_solver_orders=deriv_solver_orders)  
-        self._token_family.set_evaluator(evaluator)
+        self._token_family.set_evaluator(sign_evaluator)
 
 class DataPolynomials(PreparedTokens):
     def __init__(self, var_name: str, max_power: int = 1):

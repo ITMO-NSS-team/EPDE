@@ -28,7 +28,8 @@ class EvaluatorTemplate(ABC):
 
 
 class CustomEvaluator(EvaluatorTemplate):
-    def __init__(self, evaluation_functions_np: Union[Callable, dict] = None, evaluation_functions_torch: Union[Callable, dict] = None,
+    def __init__(self, evaluation_functions_np: Union[Callable, dict] = None, 
+                 evaluation_functions_torch: Union[Callable, dict] = None,
                  eval_fun_params_labels: Union[list, tuple, set] = ['power']):
         self._evaluation_functions_np = evaluation_functions_np
         self._evaluation_functions_torch = evaluation_functions_torch
@@ -133,8 +134,8 @@ def simple_function_evaluator(factor, structural: bool = False, grids=None,
             return value
 
 
-sign_eval_fun_np = lambda *args, **kwargs: np.sign(*args[0]) # Is dim argument needed here? int(kwargs['dim'])
-sign_eval_fun_torch = lambda *args, **kwargs: torch.sign(*args[0])
+sign_eval_fun_np = lambda *args, **kwargs: np.sign(args[0]) # Is dim argument needed here? int(kwargs['dim'])
+sign_eval_fun_torch = lambda *args, **kwargs: torch.sign(args[0])
 
 trig_eval_fun_np = {'cos': lambda *grids, **kwargs: np.cos(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power'],
                     'sin': lambda *grids, **kwargs: np.sin(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power']}
