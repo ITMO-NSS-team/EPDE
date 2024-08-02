@@ -7,24 +7,23 @@ Created on Wed Apr  3 17:43:03 2024
 """
 import os
 import sys
+from collections import OrderedDict
+from typing import List
 import faulthandler
 
-
-
 faulthandler.enable()
-
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../..')))
 
 import numpy as np
-from tqdm import tqdm
-from collections import OrderedDict
-from typing import List
+import torch
 
+from tqdm import tqdm
 import matplotlib as mpl
 mpl.use('TkAgg')
 import matplotlib.pyplot as plt
 
 import epde
+import epde.interface.control_utils as control_utils
 from projects.control.swingup_aux import DMCEnvWrapper, RandomPolicy, CosinePolicy, CosineSignPolicy, \
                                          TwoCosinePolicy, rollout_env, VarTrigTokens # ,, DerivSignFunction
 from epde.interface.prepared_tokens import DerivSignFunction
@@ -34,7 +33,7 @@ def get_additional_token_families(ctrl):
     sgn_tokens = DerivSignFunction(token_type = 'speed_sign', var_name = 'y', token_labels=['sign(dy/dx1)',],
                                    deriv_solver_orders = [[0,],])
     control_var_tokens = epde.interface.prepared_tokens.ControlVarTokens(sample = ctrl, arg_var = [(0, [None,]), (1, [None,]), 
-                                                                                                   (0, [1,]), (1, [1,])])
+                                                                                                   (0, [0,]), (1, [0,])])
     return [angle_trig_tokens, sgn_tokens, control_var_tokens] 
 
 def epde_discovery(t, x, angle, u, derivs, diff_method = 'FD'):
@@ -216,6 +215,71 @@ def translate_equation(t, x, angle, u, derivs: dict, diff_method = 'FD'):
 
     return test
 
+def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
+                  y_left: float, y_right: float, stab_der_ord: int,
+                  state_nn_pretrained: torch.nn.Sequential, ctrl_nn_pretrained: torch.nn.Sequential, 
+                  fig_folder: str, device = 'cpu'):
+    
+    from epde.supplementary import AutogradDeriv
+    autograd = AutogradDeriv()
+
+    loc = control_utils.ConstrLocation(domain_shape = (t.size()[0],), device=device) # Declaring const in the entire domain
+    cosine_cond = lambda x, ref: torch.cos(x) - ref
+    phi_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t[-1], fill_value = 1., device=device), # Better processing for periodic
+                                                   indices = loc, deriv_axes=[None,], deriv_method = autograd, nn_output=0, 
+                                                   estim_func=cosine_cond)
+    dphi_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t[-1], fill_value = 0, device=device),
+                                                    indices = loc, deriv_axes=[0,], deriv_method = autograd, nn_output=1)
+    contr_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = 0., device=device),
+                                                 indices = loc, deriv_axes=[None,], deriv_method = autograd, nn_output=0)
+
+    u_var_non_neg = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0., device=device), sign='>',
+                                                   indices = loc, deriv_method = autograd, nn_output=0)
+    v_var_non_neg = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0., device=device), sign='>',
+                                                   indices = loc, deriv_method = autograd, nn_output=1)
+    contr_non_neg = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0., device=device), sign='>',
+                                                   indices = loc, deriv_method = autograd, nn_output=0)    
+
+    
+    loss = control_utils.ConditionalLoss([(1., y_tar_constr, 0),
+                                          (1., v_tar_constr, 0), 
+                                          (0.001, contr_constr, 1),
+                                          (10., u_var_non_neg, 0),
+                                          (10., v_var_non_neg, 0),
+                                          (10., contr_non_neg, 1)])
+    optimizer = control_utils.ControlExp(loss=loss, device=device)
+    
+    def get_ode_bop(key, var, term, grid_loc, value):
+        bop = epde.interface.solver_integration.BOPElement(axis = 0, key = key, term = term,
+                                                           power = 1, var = var)
+        if isinstance(grid_loc, float):
+            bop_grd_np = np.array([[grid_loc,]])
+            bop.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor)).to(device)
+        elif isinstance(grid_loc, torch.Tensor):
+            bop.set_grid(grid_loc.reshape((1, 1)).type(torch.FloatTensor)) # What is the correct shape here?
+        else:
+            raise TypeError('Incorret value type, expected float or torch.Tensor.')
+        bop.values = torch.from_numpy(np.array([[value,]])).float().to(device)
+        return bop
+
+    bop_y = get_ode_bop('y', 0, [None], t[0, 0], u_init)
+    bop_dy = get_ode_bop('y', 0, [0,], t[0, 0], v_init)
+
+    optimizer.system = eq
+
+    optimizer.set_control_optim_params()
+
+    optimizer.set_solver_params(training_params = {'epochs': 200,})
+
+    state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_u(device=device), 0.001), 
+                                                                               (bop_v(device=device), 0.001)], 
+                                                               grids = [t,], n_control = 1., 
+                                                               state_net = state_nn_pretrained, 
+                                                               opt_params = [0.005, 0.9, 0.999, 1e-8],
+                                                               control_net = ctrl_nn_pretrained, epochs = 50,
+                                                               fig_folder = fig_folder)
+
+    return state_nn, ctrl_net, ctrl_pred, hist
 
 def prepare_trajectories(n_sample: int = 250, single_sample: bool = True):
     env_config = {'domain_name': "cartpole",

@@ -212,18 +212,18 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
     loc = control_utils.ConstrLocation(domain_shape = (t.size()[0],), device=device) # Declaring const in the entire domain
     u_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = u_tar, device=device),
-                                                 indices = loc, deriv_method = autograd, nn_output=0)
+                                                 indices = loc, deriv_method = autograd, nn_output=0, device=device)
     v_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = v_tar, device=device),
-                                                 indices = loc, deriv_method = autograd, nn_output=1)
+                                                 indices = loc, deriv_method = autograd, nn_output=1, device=device)
     contr_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = 0., device=device),
-                                                 indices = loc, deriv_method = autograd, nn_output=0)
+                                                 indices = loc, deriv_method = autograd, nn_output=0, device=device)
 
     u_var_non_neg = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0., device=device), sign='>',
-                                                   indices = loc, deriv_method = autograd, nn_output=0)
+                                                   indices = loc, deriv_method = autograd, nn_output=0, device=device)
     v_var_non_neg = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0., device=device), sign='>',
-                                                   indices = loc, deriv_method = autograd, nn_output=1)
+                                                   indices = loc, deriv_method = autograd, nn_output=1, device=device)
     contr_non_neg = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0., device=device), sign='>',
-                                                   indices = loc, deriv_method = autograd, nn_output=0)    
+                                                   indices = loc, deriv_method = autograd, nn_output=0, device=device)
 
     
     loss = control_utils.ConditionalLoss([(1., u_tar_constr, 0),
@@ -254,14 +254,14 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
     optimizer.set_control_optim_params()
 
-    optimizer.set_solver_params(training_params = {'epochs': 100,})
+    optimizer.set_solver_params(training_params = {'epochs': 150,})
 
-    state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_u(device=device), 0.001), 
-                                                                               (bop_v(device=device), 0.001)], 
+    state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_u(device=device), 0.0),
+                                                                               (bop_v(device=device), 0.0)],
                                                                grids = [t,], n_control = 1., 
                                                                state_net = state_nn_pretrained, 
-                                                               opt_params = [0.05, 0.9, 0.999, 1e-8],
-                                                               control_net = ctrl_nn_pretrained, epochs = 30,
+                                                               opt_params = [0.01, 0.9, 0.999, 1e-8],
+                                                               control_net = ctrl_nn_pretrained, epochs = 75,
                                                                fig_folder = fig_folder)
 
     return state_nn, ctrl_net, ctrl_pred, hist
@@ -318,14 +318,14 @@ if __name__ == '__main__':
     args = torch.from_numpy(solution).float().to(device)
 
     def create_shallow_nn(arg_num: int = 1, output_num: int = 1, device = 'cpu') -> torch.nn.Sequential: # net: torch.nn.Sequential = None, 
-        hidden_neurons = 180
+        hidden_neurons = 100
         layers = [torch.nn.Linear(arg_num, hidden_neurons, device=device),
-                  torch.nn.ReLU(),
+                  torch.nn.ReLU(), # ReLU(),
                   torch.nn.Linear(hidden_neurons, output_num, device=device)]
         return torch.nn.Sequential(*layers)
     
     def create_deep_nn(arg_num: int = 1, output_num: int = 1, device = 'cpu') -> torch.nn.Sequential: # net: torch.nn.Sequential = None, 
-        hidden_neurons = 13
+        hidden_neurons = 18
         layers = [torch.nn.Linear(arg_num, hidden_neurons, device=device),
                   torch.nn.Tanh(),
                   torch.nn.Linear(hidden_neurons, hidden_neurons, device=device),
@@ -335,18 +335,20 @@ if __name__ == '__main__':
     
     time_exp_start = datetime.datetime.now()
     
+    nn = 'shallow'
     load_ctrl = False
 
     if device == 'cpu':
-        ctrl_fname = r"/home/mikemaslyaev/Documents/EPDE/projects/control/control_ann_shallow_cpu.pickle"
+        ctrl_fname = f"/home/mikemaslyaev/Documents/EPDE/projects/control/control_ann_{nn}_cpu.pickle"
     else:
-        ctrl_fname = r"/home/mikemaslyaev/Documents/EPDE/projects/control/control_ann_shallow_cuda.pickle"
+        ctrl_fname = f"/home/mikemaslyaev/Documents/EPDE/projects/control/control_ann_{nn}_cuda.pickle"
     if load_ctrl:
         with open(ctrl_fname, 'rb') as ctrl_input_file:  
             ctrl_ann = pickle.load(ctrl_input_file)
     else:
+        nn_method = create_shallow_nn if nn == 'shallow' else create_deep_nn
         ctrl_ann = epde.supplementary.train_ann(args=[solution[:, 0], solution[:, 1]], data = ctrl, 
-                                                epochs_max = 2e4, dim = 2, model = create_deep_nn(2, 1, device=device),
+                                                epochs_max = 2e4, dim = 2, model = nn_method(2, 1, device=device),
                                                 device = device)
 
         with open(ctrl_fname, 'wb') as ctrl_output_file:  

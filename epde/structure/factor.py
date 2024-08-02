@@ -238,6 +238,7 @@ class Factor(TerminalToken):
                     func_arg = []
                     for var_idx, code in enumerate(self.deriv_code):
                         assert len(self.variable) == len(self.deriv_code)
+                        print(self.name)
                         func_arg.append(global_var.tensor_cache.get(label=None, torch_mode=torch_mode,
                                                                     deriv_code=(self.variable[var_idx], code)))
 

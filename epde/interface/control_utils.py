@@ -90,13 +90,14 @@ class ConstrLocation():
 
 
 class ControlConstraint(ABC):
-    def __init__(self, val : Union[float, torch.Tensor], deriv_method: BasicDeriv, # grid: torch.Tensor, 
-                 indices: ConstrLocation, deriv_axes: List = [None,], nn_output: int = 0, **kwargs):
+    def __init__(self, val : Union[float, torch.Tensor], deriv_method: BasicDeriv, indices: ConstrLocation,
+                 device: str = 'cpu', deriv_axes: List = [None,], nn_output: int = 0, **kwargs):
         self._val = val
         self._indices = indices
         self._axes = deriv_axes
         self._nn_output = nn_output
         self._deriv_method = deriv_method
+        self._device = device
 
     @abstractmethod
     def __call__(self, fun_nn: Union[torch.nn.Sequential, torch.Tensor], 
@@ -112,10 +113,11 @@ class ControlConstrEq(ControlConstraint):
     Class for constrints of type $c(u^(n)) = f(u) - val = 0$
     '''
     def __init__(self, val : Union[float, torch.Tensor], deriv_method: BasicDeriv, # grid: torch.Tensor, 
-                 indices: ConstrLocation, deriv_axes: List = [None,], 
-                 nn_output: int = 0, tolerance: float = 1e-7):
-        super().__init__(val, deriv_method, indices, deriv_axes, nn_output) # grid, 
+                 indices: ConstrLocation, device: str = 'cpu', deriv_axes: List = [None,], 
+                 nn_output: int = 0, tolerance: float = 1e-7, estim_func: Callable = None):
+        super().__init__(val, deriv_method, indices, device, deriv_axes, nn_output) # grid, 
         self._eps = tolerance
+        self._estim_func = estim_func
  
     def __call__(self, fun_nn: Union[torch.nn.Sequential, torch.Tensor], 
                  arg_tensor: torch.Tensor) -> Tuple[bool, torch.Tensor]:
@@ -127,7 +129,12 @@ class ControlConstrEq(ControlConstraint):
             if to_compare.shape != self._val.shape:
                 raise TypeError(f'Incorrect shapes of constraint value tensor: expected {self._val.shape}, got {to_compare.shape}.')
             val_transformed = self._val
-        return torch.isclose(val_transformed, to_compare, rtol = self._eps), val_transformed - to_compare
+        if self._estim_func is not None:
+            constr_enf = self._estim_func(val_transformed, to_compare)
+        else:
+            constr_enf = val_transformed - to_compare
+        return (torch.isclose(constr_enf, torch.zeros_like(constr_enf).to(self._device), rtol = self._eps), 
+                val_transformed - to_compare)
         
     def loss(self, fun_nn: torch.nn.Sequential, arg_tensor: torch.Tensor) -> torch.Tensor:
         _, discrepancy = self(fun_nn, arg_tensor)
@@ -138,10 +145,11 @@ class ControlConstrNEq(ControlConstraint):
     Class for constrints of type $c(u, x) = f(u, x) - val `self._sign` 0$
     '''
     def __init__(self, val : Union[float, torch.Tensor], deriv_method: BasicDeriv, # grid: torch.Tensor, 
-                 indices: ConstrLocation, sign: str = '>', deriv_axes: List = [None,], 
-                 nn_output: int = 0, tolerance: float = 1e-7):
-        super().__init__(val, deriv_method, indices, deriv_axes, nn_output) # grid, 
+                 indices: ConstrLocation, device: str = 'cpu', sign: str = '>', deriv_axes: List = [None,], 
+                 nn_output: int = 0, tolerance: float = 1e-7, estim_func: Callable = None):
+        super().__init__(val, deriv_method, indices, device, deriv_axes, nn_output) # grid, 
         self._sign = sign
+        self._estim_func = estim_func
 
     def __call__(self, fun_nn: torch.nn.Sequential, arg_tensor: torch.Tensor) -> Tuple[bool, torch.Tensor]:
         to_compare = self._deriv_method.take_derivative(u = fun_nn, args=self._indices.apply(arg_tensor, along_axis=0), # correct along_axis argument 
@@ -151,10 +159,17 @@ class ControlConstrNEq(ControlConstraint):
         else:
             assert to_compare.shape == self._val.shape, 'Incorrect shapes of constraint value tensor'
             val_transformed = self._val
+        
+        if self._estim_func is not None:
+            constr_enf = self._estim_func(val_transformed, to_compare)
+        else:
+            constr_enf = val_transformed - to_compare
+
         if self._sign == '>':
-            return torch.greater(val_transformed, to_compare), torch.nn.functional.relu(val_transformed - to_compare)
+            return torch.greater(constr_enf, torch.zeros_like(constr_enf).to(self._device)), torch.nn.functional.relu(constr_enf)
         elif self._sign == '<':
-            return torch.less(val_transformed, to_compare), torch.nn.functional.relu(to_compare - val_transformed)            
+            return torch.less(constr_enf, torch.zeros_like(constr_enf).to(self._device)), torch.nn.functional.relu(constr_enf)
+        #torch.less(val_transformed, to_compare), torch.nn.functional.relu(to_compare - val_transformed)            
 
         
     def loss(self, fun_nn: torch.nn.Sequential, arg_tensor: torch.Tensor) -> torch.Tensor:
@@ -262,8 +277,8 @@ class ControlExp():
                                         loc = loc, forward=True, eps=eps)
         global_var.control_nn.net.load_state_dict(state_dict)
         state_dict = state_dict_prev = None
-
-        res = (loss_forward - loss_back)/(2*eps)
+        with torch.no_grad():
+            res = (loss_forward - loss_back)/(2*eps)
         return res
         
 
@@ -302,7 +317,7 @@ class ControlExp():
             sampled_bc = [modify_bc(operator, noise_std) for operator, noise_std in bc_operators]
 
             state_net  = deepcopy(self._state_net)
-            eps = 1e-3
+            eps = 1e-5
             print(f'Control function optimization epoch {t}.')
             for param_key, param_tensor in grad_tensors.items():
                 print(f'Optimizing {param_key}: shape is {param_tensor.shape}')
@@ -313,10 +328,10 @@ class ControlExp():
                         grad_tensors[loc[0]] = grad_tensors[loc[0]].detach()
                         grad_tensors[loc[0]][loc[1:]] = self.finite_diff_calculation(system = self.system,
                                                                                      adapter = adapter,
-                                                                                     loc = loc, control_loss = self.loss, 
+                                                                                     loc = loc, control_loss = self.loss,
                                                                                      state_net = self._state_net,
                                                                                      bc_operators = sampled_bc,
-                                                                                     grids = [grids, grids_merged], 
+                                                                                     grids = [grids, grids_merged],
                                                                                      solver_params = self._solver_params,
                                                                                      eps = eps)
                 elif len(param_tensor.size()) == 2:
@@ -324,14 +339,14 @@ class ControlExp():
                         for param_inner_idx, _ in enumerate(param_tensor[0]):
                             loc = (param_key, param_outer_idx, param_inner_idx)
                             grad_tensors[loc[0]] = grad_tensors[loc[0]].detach()
-                            grad_tensors[loc[0]][loc[1:]] = self.finite_diff_calculation(system = self.system,
-                                                                                         adapter = adapter,
-                                                                                         loc = loc, control_loss = self.loss, 
-                                                                                         state_net = self._state_net,
-                                                                                         bc_operators = sampled_bc,
-                                                                                         grids = [grids, grids_merged], 
-                                                                                         solver_params = self._solver_params,
-                                                                                         eps = eps)                   
+                            grad_tensors[loc[0]][tuple(loc[1:])] = self.finite_diff_calculation(system = self.system,
+                                                                                                adapter = adapter,
+                                                                                                loc = loc, control_loss = self.loss,
+                                                                                                state_net = self._state_net,
+                                                                                                bc_operators = sampled_bc,
+                                                                                                grids = [grids, grids_merged],
+                                                                                                solver_params = self._solver_params,
+                                                                                                eps = eps)
                 else:
                     raise Exception(f'Incorrect shape of weights/bias. Got {param_tensor.size()} tensor.')
             state_dict_prev = global_var.control_nn.net.state_dict()
@@ -351,8 +366,9 @@ class ControlExp():
             var_prediction = model(grids_merged)
             self._state_net = model
 
-            control_inputs = prepare_control_inputs(model, grids_merged, global_var.control_nn.net_args)        
-            loss = self.loss([self._state_net, global_var.control_nn.net], [grids_merged, control_inputs])
+            control_inputs = prepare_control_inputs(model, grids_merged, global_var.control_nn.net_args)
+            with torch.no_grad():
+                loss = self.loss([self._state_net, global_var.control_nn.net], [grids_merged, control_inputs])
             print('current loss is ', loss)
             # if loss < min_loss:
             # min_loss = loss
