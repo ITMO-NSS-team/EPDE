@@ -254,13 +254,13 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
     optimizer.set_control_optim_params()
 
-    optimizer.set_solver_params(training_params = {'epochs': 150,})
+    optimizer.set_solver_params(training_params = {'epochs': 125,})
 
     state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_u(device=device), 0.0),
                                                                                (bop_v(device=device), 0.0)],
                                                                grids = [t,], n_control = 1., 
                                                                state_net = state_nn_pretrained, 
-                                                               opt_params = [0.01, 0.9, 0.999, 1e-8],
+                                                               opt_params = [0.1, 0.9, 0.999, 1e-8],
                                                                control_net = ctrl_nn_pretrained, epochs = 75,
                                                                fig_folder = fig_folder)
 
