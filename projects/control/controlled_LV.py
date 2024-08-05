@@ -189,7 +189,9 @@ def translate_dummy_eqs(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np
 
     control_var_tokens = epde.interface.prepared_tokens.ControlVarTokens(sample = control, ann = control_ann, 
                                                                          arg_var = [(0, [None]),
-                                                                                    (1, [None])])    
+                                                                                    (1, [None]),
+                                                                                    (0, [0,]),
+                                                                                    (1, [0,])])    
 
     epde_search_obj.create_pool(data=[u, v], variable_names=['u', 'v'], max_deriv_order=(1,),
                                 additional_tokens = [control_var_tokens,], data_nn = data_nn, device = device)
@@ -254,13 +256,13 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
     optimizer.set_control_optim_params()
 
-    optimizer.set_solver_params(training_params = {'epochs': 125,})
+    optimizer.set_solver_params(training_params = {'epochs': 100,})
 
     state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_u(device=device), 0.0),
                                                                                (bop_v(device=device), 0.0)],
                                                                grids = [t,], n_control = 1., 
                                                                state_net = state_nn_pretrained, 
-                                                               opt_params = [0.1, 0.9, 0.999, 1e-8],
+                                                               opt_params = [0.0001, 0.9, 0.999, 1e-8],
                                                                control_net = ctrl_nn_pretrained, epochs = 75,
                                                                fig_folder = fig_folder)
 
@@ -315,7 +317,7 @@ if __name__ == '__main__':
         with open(fname, 'wb') as output_file:
             pickle.dump(epde.globals.solution_guess_nn, output_file)
 
-    args = torch.from_numpy(solution).float().to(device)
+
 
     def create_shallow_nn(arg_num: int = 1, output_num: int = 1, device = 'cpu') -> torch.nn.Sequential: # net: torch.nn.Sequential = None, 
         hidden_neurons = 100
@@ -335,6 +337,59 @@ if __name__ == '__main__':
     
     time_exp_start = datetime.datetime.now()
     
+    from epde.supplementary import define_derivatives
+    from epde.preprocessing.preprocessor_setups import PreprocessorSetup
+    from epde.preprocessing.preprocessor import ConcretePrepBuilder, PreprocessingPipe
+
+
+    # preprocessor_kwargs = {'epochs_max' : 10000}
+    
+    def prepare_derivs(var_name: str, var_array: np.ndarray, grid: np.ndarray, max_order: tuple = (1,)):
+        default_preprocessor_type = 'FD'
+        preprocessor_kwargs = {}#{'use_smoothing' : False,
+                              #  'include_time' : True}        
+        setup = PreprocessorSetup()
+        builder = ConcretePrepBuilder()
+        setup.builder = builder
+        
+        if default_preprocessor_type == 'ANN':
+            setup.build_ANN_preprocessing(**preprocessor_kwargs)
+        elif default_preprocessor_type == 'poly':
+            setup.build_poly_diff_preprocessing(**preprocessor_kwargs)
+        elif default_preprocessor_type == 'spectral':
+            setup.build_spectral_preprocessing(**preprocessor_kwargs)
+        elif default_preprocessor_type == 'FD':
+            setup.build_FD_preprocessing(**preprocessor_kwargs)
+
+        preprocessor_pipeline = setup.builder.prep_pipeline
+
+        if 'max_order' not in preprocessor_pipeline.deriv_calculator_kwargs.keys():
+            preprocessor_pipeline.deriv_calculator_kwargs['max_order'] = None
+            
+        max_order = (1,)
+        deriv_names, _ = define_derivatives(var_name, dimensionality=var_array.ndim,
+                                            max_order=max_order)
+
+        _, derivatives_n = preprocessor_pipeline.run(var_array, grid=[grid,],
+                                                     max_order=max_order)
+        return deriv_names, derivatives_n
+    
+    der_names_u, derivatives_u = prepare_derivs('u', var_array = solution[:, 0], grid = t)
+    der_names_v, derivatives_v = prepare_derivs('v', var_array = solution[:, 1], grid = t)
+    
+    args = torch.from_numpy(solution).float().to(device)
+    args = torch.cat([args, torch.from_numpy(derivatives_u).float().to(device), 
+                      torch.from_numpy(derivatives_v).float().to(device)], dim=1)
+    print(f'args.shape is {args.shape}')
+    # print(f'derivatives_u.shape {derivatives_u.shape, type(derivatives_u)}')
+    # plt.plot(t, derivatives_u, color = 'k')
+    # plt.plot(t, derivatives_v, color = 'r')
+    # plt.plot(t, solution[:, 0], '*', color = 'k')
+    # plt.plot(t, solution[:, 1], '*', color = 'r')
+    # plt.show()
+
+    # raise NotImplementedError('Fin!')
+
     nn = 'shallow'
     load_ctrl = False
 
@@ -347,14 +402,17 @@ if __name__ == '__main__':
             ctrl_ann = pickle.load(ctrl_input_file)
     else:
         nn_method = create_shallow_nn if nn == 'shallow' else create_deep_nn
-        ctrl_ann = epde.supplementary.train_ann(args=[solution[:, 0], solution[:, 1]], data = ctrl, 
-                                                epochs_max = 2e4, dim = 2, model = nn_method(2, 1, device=device),
+        ctrl_ann = epde.supplementary.train_ann(args=[solution[:, 0], solution[:, 1], 
+                                                      derivatives_u.reshape(-1), 
+                                                      derivatives_v.reshape(-1)], 
+                                                data = ctrl, epochs_max = 2e4, dim = 4, 
+                                                model = nn_method(4, 1, device=device),
                                                 device = device)
 
         with open(ctrl_fname, 'wb') as ctrl_output_file:  
             pickle.dump(ctrl_ann, file = ctrl_output_file)
 
-    ctrl_vals = ctrl_ann(example_sol)
+    # ctrl_vals = ctrl_ann(example_sol)
 
 
     @torch.no_grad()

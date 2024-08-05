@@ -248,7 +248,7 @@ class PregenBOperator(object):
     @staticmethod
     def get_max_deriv_orders(system_sf: List[Union[Dict[str, Dict]]], variables: List[str] = ['u',]) -> np.ndarray:
         def count_factor_order(factor_code, deriv_ax):
-            if factor_code is None:
+            if factor_code is None or isinstance(factor_code, tuple):
                 return 0
             else:
                 if isinstance(factor_code, list):
@@ -256,7 +256,7 @@ class PregenBOperator(object):
                 elif isinstance(factor_code, int):
                     return 1 if factor_code == deriv_ax else 0
                 else:
-                    raise TypeError('Incorrect type of the input.')
+                    raise TypeError(f'Incorrect type of the input. Got {type(factor_code), factor_code}, expecting int or list')
 
         @singledispatch
         def get_equation_requirements(equation_sf, variables=['u',]):
@@ -283,11 +283,16 @@ class PregenBOperator(object):
                 var_max_orders = {var_key: np.zeros(dim) for var_key in variables}
                 for term_key, symb_form in equation_sf.items():
                     if isinstance(symb_form['var'], list):
+                        print(variables, symb_form['term'], symb_form['var'])
                         assert len(symb_form['term']) == len(symb_form['var'])
                         for factor_idx, deriv_factor in enumerate(symb_form['term']):
                             var_orders = np.array([count_factor_order(deriv_factor, ax) for ax
                                                    in np.arange(dim)])
-                            var_key = symb_form['var'][factor_idx] - 1
+                            if isinstance(symb_form['var'][factor_idx], int):
+                                var_key = symb_form['var'][factor_idx] - 1
+                                print(f'var_key is {var_key} for {symb_form["var"][factor_idx]}')
+                            else:
+                                print(f'var_key passed was {var_key} and got {symb_form["var"][factor_idx]}')
                             var_max_orders[variables[var_key]] = np.maximum(var_max_orders[variables[var_key]],
                                                                             var_orders)
                     elif isinstance(symb_form['var'], int):

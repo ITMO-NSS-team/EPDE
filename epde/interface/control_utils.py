@@ -234,11 +234,11 @@ class ControlExp():
     def finite_diff_calculation(system, adapter, loc, control_loss, state_net: torch.nn.Sequential, # prev_loc,
                                 bc_operators, grids: list, solver_params: dict, eps: float):
         # Calculating loss in p[i]+eps: 
-        state_dict_prev = global_var.control_nn.net.state_dict()
-        state_dict = eps_increment_diff(input_params=state_dict_prev,
+        ctrl_dict_prev = global_var.control_nn.net.state_dict() # deepcopy()
+        ctrl_nn_dict = eps_increment_diff(input_params=ctrl_dict_prev,
                                         loc = loc, forward=True, eps=eps)
-        global_var.control_nn.net.load_state_dict(state_dict)
-        state_dict_prev = state_dict = None
+        global_var.control_nn.net.load_state_dict(ctrl_nn_dict)
+        # state_dict_prev = state_dict = None
 
         adapter.set_net(state_net)
         _, model = adapter.solve_epde_system(system = system, grids = grids[0], data = None,
@@ -251,12 +251,12 @@ class ControlExp():
         
         control_inputs = prepare_control_inputs(model, grids[1], global_var.control_nn.net_args)
         loss_forward = control_loss([model, global_var.control_nn.net], [grids[1], control_inputs])
-        # Calculating loss in p[i]-eps:
 
-        state_dict_prev = global_var.control_nn.net.state_dict()
-        state_dict = eps_increment_diff(input_params=state_dict_prev,
-                                        loc = loc, forward=False, eps=eps)
-        global_var.control_nn.net.load_state_dict(state_dict)
+        # Calculating loss in p[i]-eps:
+        ctrl_dict_prev = global_var.control_nn.net.state_dict() # deepcopy()
+        ctrl_nn_dict = eps_increment_diff(input_params=ctrl_dict_prev,
+                                        loc = loc, forward=True, eps=eps)
+        global_var.control_nn.net.load_state_dict(ctrl_nn_dict)
 
         adapter.set_net(state_net)
         solver_loss, model = adapter.solve_epde_system(system = system, grids = grids[0], data = None,
@@ -313,11 +313,13 @@ class ControlExp():
 
         optimizer = AdamOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = opt_params)
         adapter = self.get_solver_adapter(None)
+
+
         while t < epochs and not stop_training:
             sampled_bc = [modify_bc(operator, noise_std) for operator, noise_std in bc_operators]
 
             state_net  = deepcopy(self._state_net)
-            eps = 1e-5
+            eps = 1e-3
             print(f'Control function optimization epoch {t}.')
             for param_key, param_tensor in grad_tensors.items():
                 print(f'Optimizing {param_key}: shape is {param_tensor.shape}')
@@ -326,10 +328,11 @@ class ControlExp():
                     for param_idx, _ in enumerate(param_tensor):
                         loc = (param_key, param_idx)
                         grad_tensors[loc[0]] = grad_tensors[loc[0]].detach()
+                        # print(grad_tensors[loc[0]][loc[1:]])                        
                         grad_tensors[loc[0]][loc[1:]] = self.finite_diff_calculation(system = self.system,
                                                                                      adapter = adapter,
                                                                                      loc = loc, control_loss = self.loss,
-                                                                                     state_net = self._state_net,
+                                                                                     state_net = state_net,
                                                                                      bc_operators = sampled_bc,
                                                                                      grids = [grids, grids_merged],
                                                                                      solver_params = self._solver_params,
@@ -339,10 +342,11 @@ class ControlExp():
                         for param_inner_idx, _ in enumerate(param_tensor[0]):
                             loc = (param_key, param_outer_idx, param_inner_idx)
                             grad_tensors[loc[0]] = grad_tensors[loc[0]].detach()
+                            # print(grad_tensors[loc[0]][tuple(loc[1:])])
                             grad_tensors[loc[0]][tuple(loc[1:])] = self.finite_diff_calculation(system = self.system,
                                                                                                 adapter = adapter,
                                                                                                 loc = loc, control_loss = self.loss,
-                                                                                                state_net = self._state_net,
+                                                                                                state_net = state_net,
                                                                                                 bc_operators = sampled_bc,
                                                                                                 grids = [grids, grids_merged],
                                                                                                 solver_params = self._solver_params,

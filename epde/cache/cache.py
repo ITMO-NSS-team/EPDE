@@ -371,7 +371,7 @@ class Cache(object):
             # print(self.memory_default[type_key].keys())
             return np.random.choice(list(self.memory_default[type_key].values()))
         if normalized:
-            if label not in self.memory_normalized[type_key]:
+            if label not in self.memory_normalized[type_key] and label in self.memory_normalized[other]:
                 self.memory_normalized[type_key][label] = switch_format(self.get(label, normalized,
                                                                                   structural, saved_as, other_bool))
             return self.memory_normalized[type_key][label]
@@ -379,12 +379,13 @@ class Cache(object):
             if self.structural_and_base_merged[label]:
                 return self.get(label, normalized, False, saved_as, torch_mode)
             else:
-                if label not in self.memory_structural[type_key]:
+                if label not in self.memory_structural[type_key] and label in self.memory_structural[other]:
                     self.memory_structural[type_key][label] = switch_format(self.get(label, normalized, 
                                                                                      structural, saved_as, other_bool))
+                print('keys in mem_struct:', self.memory_structural[type_key].keys())
                 return self.memory_structural[type_key][label]                
         else:
-            if label not in self.memory_default[type_key]:
+            if label not in self.memory_default[type_key] and label in self.memory_default[other]:
                 self.memory_default[type_key][label] = switch_format(self.get(label, normalized, 
                                                                               structural, saved_as, other_bool))
             return self.memory_default[type_key][label]

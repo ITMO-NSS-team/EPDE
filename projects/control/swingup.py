@@ -16,6 +16,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../..
 
 import numpy as np
 import torch
+import pickle
 
 from tqdm import tqdm
 import matplotlib as mpl
@@ -24,6 +25,7 @@ import matplotlib.pyplot as plt
 
 import epde
 import epde.interface.control_utils as control_utils
+import epde.globals as global_var
 from projects.control.swingup_aux import DMCEnvWrapper, RandomPolicy, CosinePolicy, CosineSignPolicy, \
                                          TwoCosinePolicy, rollout_env, VarTrigTokens # ,, DerivSignFunction
 from epde.interface.prepared_tokens import DerivSignFunction
@@ -36,10 +38,10 @@ def get_additional_token_families(ctrl):
                                                                                                    (0, [0,]), (1, [0,])])
     return [angle_trig_tokens, sgn_tokens, control_var_tokens] 
 
-def epde_discovery(t, x, angle, u, derivs, diff_method = 'FD'):
+def epde_discovery(t, x, angle, u, derivs, diff_method = 'FD', data_nn: torch.nn.Sequential = None, device: str = 'cpu'):
     dimensionality = x.ndim - 1
     
-    epde_search_obj = epde.EpdeSearch(use_solver = False, dimensionality = dimensionality, boundary = 30,
+    epde_search_obj = epde.EpdeSearch(use_solver = True, dimensionality = dimensionality, boundary = 30,
                                       coordinate_tensors = [t,], verbose_params = {'show_iter_idx' : True})    
     
     if diff_method == 'ANN':
@@ -51,7 +53,7 @@ def epde_discovery(t, x, angle, u, derivs, diff_method = 'FD'):
                                                               'polynomial_window' : 3, 'poly_order' : 4}) 
     elif diff_method == 'FD':
         epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
-                                         preprocessor_kwargs={}) 
+                                         preprocessor_kwargs={})
     else:
         raise ValueError('Incorrect preprocessing tool selected.')
     
@@ -70,17 +72,29 @@ def epde_discovery(t, x, angle, u, derivs, diff_method = 'FD'):
 
     eps = 5e-7
     popsize = 24
-    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=200)
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=5)
 
     factors_max_number = {'factors_num' : [1, 2, 3,], 'probas' : [0.2, 0.65, 0.15]}
 
     # custom_grid_tokens = epde.GridTokens(dimensionality = dimensionality, max_power=1)
+    epde_search_obj.create_pool(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,),
+                                data_fun_pow = 2, derivs = [derivs['y'], derivs['phi']],
+                                additional_tokens=get_additional_token_families(ctrl=u), data_nn=data_nn)
     
+    if data_nn is None:
+        data_nn = global_var.solution_guess_nn
+        if device == 'cpu':
+            fname = r"/home/mikemaslyaev/Documents/EPDE/projects/control/swingup_ann_cpu.pickle"
+        else:
+            fname = r"/home/mikemaslyaev/Documents/EPDE/projects/control/swingup_ann_cuda.pickle"
+        with open(fname, 'wb') as output_file:
+            pickle.dump(data_nn, output_file)
+
     epde_search_obj.fit(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,),
                         equation_terms_max_number=10, data_fun_pow = 2, derivs = [derivs['y'], derivs['phi']],
                         additional_tokens=get_additional_token_families(ctrl=u),
                         equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-7, 1e-5)) # TODO: narrow sparsity interval, reduce the population size
+                        eq_sparsity_interval=(1e-7, 1e-5), data_nn=data_nn) # TODO: narrow sparsity interval, reduce the population size
     epde_search_obj.equations()
     return epde_search_obj
 
@@ -384,8 +398,19 @@ def general(single_sample: bool = True, discover: bool = True):
             angles_d.append(angle_d)
             us.append(u)
 
+            device = 'cpu'
+            try:
+                if device == 'cpu':
+                    fname = r"/home/mikemaslyaev/Documents/EPDE/projects/control/swingup_ann_cpu.pickle"
+                else:
+                    fname = r"/home/mikemaslyaev/Documents/EPDE/projects/control/swingup_ann_cuda.pickle"
+                with open(fname, 'rb') as data_input_file:  
+                    data_nn = pickle.load(data_input_file)
+            except:
+                data_nn = None
+
             if discover:
-                res = epde_discovery(t, x, angle, u, derivs, 'FD')
+                res = epde_discovery(t, x, angle, u, derivs, 'FD', data_nn = data_nn, device = device)
             else:
                 res = translate_equation(t, x, angle, u, derivs, 'FD')
     else:

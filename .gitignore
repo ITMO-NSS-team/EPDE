@@ -129,3 +129,6 @@ dmypy.json
 .pyre/
 #cache
 /cache/*.tar
+
+# Custom ignore
+figs/
