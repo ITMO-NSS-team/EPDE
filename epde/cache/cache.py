@@ -273,6 +273,7 @@ class Cache(object):
 
     def clear(self, full=False):
         self._deriv_codes = []
+        print('Clearing cache')
         if full:
             del self.memory_default, self.memory_normalized, self.memory_structural, self.base_tensors
             self.memory_default = {'torch' : dict(), 'numpy' : dict()}
@@ -349,6 +350,7 @@ class Cache(object):
                 return False
 
     def delete_entry(self, entry_label):
+        print(f'Deleting {entry_label} from cache!')
         if entry_label not in self.memory_default.keys():
             raise ValueError('deleted element already not in memory')
         del self.memory_default[entry_label]
@@ -382,7 +384,7 @@ class Cache(object):
                 if label not in self.memory_structural[type_key] and label in self.memory_structural[other]:
                     self.memory_structural[type_key][label] = switch_format(self.get(label, normalized, 
                                                                                      structural, saved_as, other_bool))
-                print('keys in mem_struct:', self.memory_structural[type_key].keys())
+                print('keys in mem_struct:', type_key, self.memory_structural[type_key].keys())
                 return self.memory_structural[type_key][label]                
         else:
             if label not in self.memory_default[type_key] and label in self.memory_default[other]:

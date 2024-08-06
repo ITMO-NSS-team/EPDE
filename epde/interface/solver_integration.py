@@ -283,16 +283,18 @@ class PregenBOperator(object):
                 var_max_orders = {var_key: np.zeros(dim) for var_key in variables}
                 for term_key, symb_form in equation_sf.items():
                     if isinstance(symb_form['var'], list):
-                        print(variables, symb_form['term'], symb_form['var'])
+                        print(f'symb_form {symb_form["term"], symb_form["pow"], symb_form["var"]}')
+                        print(f"{len(symb_form['term'])} == {len(symb_form['var'])}")
+                        print(variables)
                         assert len(symb_form['term']) == len(symb_form['var'])
                         for factor_idx, deriv_factor in enumerate(symb_form['term']):
                             var_orders = np.array([count_factor_order(deriv_factor, ax) for ax
                                                    in np.arange(dim)])
                             if isinstance(symb_form['var'][factor_idx], int):
-                                var_key = symb_form['var'][factor_idx] - 1
+                                var_key = symb_form['var'][factor_idx] #- 1
                                 print(f'var_key is {var_key} for {symb_form["var"][factor_idx]}')
                             else:
-                                print(f'var_key passed was {var_key} and got {symb_form["var"][factor_idx]}')
+                                print(f'var_key passed and got {symb_form["var"][factor_idx]}')
                             var_max_orders[variables[var_key]] = np.maximum(var_max_orders[variables[var_key]],
                                                                             var_orders)
                     elif isinstance(symb_form['var'], int):
@@ -460,6 +462,7 @@ class SystemSolverInterface(object):
                'pow': deriv_powers,
                'var': deriv_vars}
 
+        print(f'Translated {term.name} to "term" {deriv_orders}, "pow" {deriv_powers}, "var" {deriv_vars} ')
         return res
 
     @singledispatchmethod
