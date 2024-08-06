@@ -93,13 +93,32 @@ class VarTrigTokens(PreparedTokens):
         adapted_labels = [f'sin({var_name})', f'cos({var_name})']
         deriv_solver_orders = [[None,] for label in adapted_labels]
 
-        trig_eval_fun_np = {adapted_labels[0]: lambda *args, **kwargs: np.sin(kwargs['freq'] * args[0]) ** kwargs['power'],
-                            adapted_labels[1]: lambda *args, **kwargs: np.cos(kwargs['freq'] * args[0]) ** kwargs['power']}
+        def trig_sine(*args, **kwargs):
+            print(f'args{args} kwargs {kwargs}')
+            return np.sin(kwargs['freq'] * args[0]) ** kwargs['power']
+        
+        def trig_cosine(*args, **kwargs):
+            print(f'args{args} kwargs {kwargs}')            
+            return np.cos(kwargs['freq'] * args[0]) ** kwargs['power']
 
-        trig_eval_fun_torch = {adapted_labels[0]: lambda *grids, **kwargs: torch.cos(kwargs['freq'] 
-                                                                                     * grids[0]) ** kwargs['power'],
-                               adapted_labels[1]: lambda *grids, **kwargs: torch.sin(kwargs['freq']
-                                                                                     * grids[0]) ** kwargs['power']}
+        def torch_trig_sine(*args, **kwargs):
+            print(f'args{args} kwargs {kwargs}')
+            return torch.sin(kwargs['freq'] * args[0]) ** kwargs['power']
+        
+        def torch_trig_cosine(*args, **kwargs):
+            print(f'args{args} ,kwargs {kwargs}')            
+            return torch.cos(kwargs['freq'] * args[0]) ** kwargs['power']
+
+        trig_eval_fun_np = {adapted_labels[0]: trig_sine,
+                            adapted_labels[1]: trig_cosine}
+
+        # trig_eval_fun_torch = {adapted_labels[0]: lambda *grids, **kwargs: torch.cos(kwargs['freq'] 
+        #                                                                              * grids[0]) ** kwargs['power'],
+        #                        adapted_labels[1]: lambda *grids, **kwargs: torch.sin(kwargs['freq']
+        #                                                                              * grids[0]) ** kwargs['power']}
+
+        trig_eval_fun_torch = {adapted_labels[0]: torch_trig_sine,
+                            adapted_labels[1]: torch_trig_cosine}        
 
         eval = CustomEvaluator(evaluation_functions_np = trig_eval_fun_np,
                                evaluation_functions_torch = trig_eval_fun_torch,

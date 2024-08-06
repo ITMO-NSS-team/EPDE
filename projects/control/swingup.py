@@ -34,9 +34,9 @@ def get_additional_token_families(ctrl):
     angle_trig_tokens = VarTrigTokens('phi', max_power=2, freq_center=1.)
     sgn_tokens = DerivSignFunction(token_type = 'speed_sign', var_name = 'y', token_labels=['sign(dy/dx1)',],
                                    deriv_solver_orders = [[0,],])
-    control_var_tokens = epde.interface.prepared_tokens.ControlVarTokens(sample = ctrl, arg_var = [(0, [None,]), (1, [None,]), 
-                                                                                                   (0, [0,]), (1, [0,])])
-    return [angle_trig_tokens, sgn_tokens, control_var_tokens] 
+    # control_var_tokens = epde.interface.prepared_tokens.ControlVarTokens(sample = ctrl, arg_var = [(0, [None,]), (1, [None,]), 
+    #                                                                                                (0, [0,]), (1, [0,])])
+    return [angle_trig_tokens, sgn_tokens] # , control_var_tokens
 
 def epde_discovery(t, x, angle, u, derivs, diff_method = 'FD', data_nn: torch.nn.Sequential = None, device: str = 'cpu'):
     dimensionality = x.ndim - 1
@@ -77,20 +77,20 @@ def epde_discovery(t, x, angle, u, derivs, diff_method = 'FD', data_nn: torch.nn
     factors_max_number = {'factors_num' : [1, 2, 3,], 'probas' : [0.2, 0.65, 0.15]}
 
     # custom_grid_tokens = epde.GridTokens(dimensionality = dimensionality, max_power=1)
-    if use_solver:
-        epde_search_obj.create_pool(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,),
-                                    data_fun_pow = 2, derivs = [derivs['y'], derivs['phi']],
-                                    additional_tokens=get_additional_token_families(ctrl=u), data_nn=data_nn)
+    # if use_solver:
+    #     epde_search_obj.create_pool(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,),
+    #                                 data_fun_pow = 2, derivs = [derivs['y'], derivs['phi']],
+    #                                 additional_tokens=get_additional_token_families(ctrl=u), data_nn=data_nn)
     
-    if data_nn is None and use_solver:
-        data_nn = global_var.solution_guess_nn
-        if device == 'cpu':
-            fname = 'C://Users//Mike//Documents//Work//EPDE//projects//control//swingup_ann_cpu.pickle'
-            #r"/home/mikemaslyaev/Documents/EPDE/projects/control/swingup_ann_cpu.pickle"
-        else:
-            fname = r"/home/mikemaslyaev/Documents/EPDE/projects/control/swingup_ann_cuda.pickle"
-        with open(fname, 'wb') as output_file:
-            pickle.dump(data_nn, output_file)
+    # if data_nn is None and use_solver:
+    #     data_nn = global_var.solution_guess_nn
+    #     if device == 'cpu':
+    #         # fname = 'C://Users//Mike//Documents//Work//EPDE//projects//control//swingup_ann_cpu.pickle'
+    #         fname = r"/home/mikemaslyaev/Documents/EPDE/projects/control/swingup_ann_cpu.pickle"
+    #     else:
+    #         fname = r"/home/mikemaslyaev/Documents/EPDE/projects/control/swingup_ann_cuda.pickle"
+    #     with open(fname, 'wb') as output_file:
+    #         pickle.dump(data_nn, output_file)
 
     epde_search_obj.fit(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,),
                         equation_terms_max_number=10, data_fun_pow = 2, derivs = [derivs['y'], derivs['phi']],
@@ -403,8 +403,8 @@ def general(single_sample: bool = True, discover: bool = True):
             device = 'cpu'
             try:
                 if device == 'cpu':
-                    fname = 'C://Users//Mike//Documents//Work//EPDE//projects//control//swingup_ann_cpu.pickle'
-                    #r"/home/mikemaslyaev/Documents/EPDE/projects/control/swingup_ann_cpu.pickle"
+                    # fname = 'C://Users//Mike//Documents//Work//EPDE//projects//control//swingup_ann_cpu.pickle'
+                    fname = r"/home/mikemaslyaev/Documents/EPDE/projects/control/swingup_ann_cpu.pickle"
                 else:
                     fname = r"/home/mikemaslyaev/Documents/EPDE/projects/control/swingup_ann_cuda.pickle"
                 with open(fname, 'rb') as data_input_file:  

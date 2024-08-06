@@ -115,6 +115,7 @@ class Derivative_autograd(DerivativeInt):
 
         points.requires_grad = True
         fi = model(points)[:, var].sum(0)
+        # print(axis)
         for ax in axis:
             grads, = torch.autograd.grad(fi, points, create_graph=True)
             fi = grads[:, ax].sum()
@@ -140,18 +141,18 @@ class Derivative_autograd(DerivativeInt):
         else:
             coeff = term['coeff']
 
-        der_term = 1.
+        der_term = 1. # TODO: Переписать!
         for j, derivative in enumerate(term[dif_dir]):
-            # print(f'term[dif_dir] {term[dif_dir]}')
+            # print(f'term[dif_dir] {dif_dir} {term[dif_dir]}, here j is {j}, and der {derivative}')
+            # print(term['pow'], term['var'])
             # print(term)
             if isinstance(term['pow'][j], (Callable, torch.nn.Sequential)): #isinstance(term['var'][j], (list, tuple)):
-                # if not isinstance(term['pow'][j], (Callable, torch.nn.Sequential)):
-                #     print(term, term['pow'][j])                    
-                #     raise ValueError('Multivariate function can not be passed as a simple power func.')
                 der_args = []
-                for var_idx, cur_var in enumerate(term['var'][j]):
-                    # print(f'derivative[var_idx] {derivative[var_idx]}, for {var_idx, cur_var}')
-                    if derivative[var_idx] == [None]:
+                # print(f"In derivative estimation {term['var'], term['pow']}")
+                iter_arg = term['var'][j] if isinstance(term['var'][j], (list, tuple)) else [term['var'][j],]
+                for var_idx, cur_var in enumerate(iter_arg):
+                    # print(j, derivative[var_idx])                    
+                    if derivative[var_idx] == [None] or derivative[var_idx] is None:
                         der_args.append(self.model(grid_points)[:, cur_var].reshape(-1, 1))
                     else:
                         der_args.append(self._nn_autograd(self.model, grid_points, cur_var, axis=derivative[var_idx]))
@@ -162,9 +163,10 @@ class Derivative_autograd(DerivativeInt):
                     factor_val = term['pow'][j](*der_args)
                 der_term = der_term * factor_val
             else:
-                if derivative == [None]:
+                if derivative == [None] or derivative is None:
                     der = self.model(grid_points)[:, term['var'][j]].reshape(-1, 1)
                 else:
+                    # print(j, derivative)
                     der = self._nn_autograd(self.model, grid_points, term['var'][j], axis=derivative)
                 if isinstance(term['pow'][j],(int,float)):
                     der_term = der_term * der ** term['pow'][j]

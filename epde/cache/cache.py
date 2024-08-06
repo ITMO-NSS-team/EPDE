@@ -168,6 +168,7 @@ class Cache(object):
 
     def use_structural(self, use_base_data=True, label=None, replacing_data=None):
         assert use_base_data or replacing_data is not None, 'Structural data must be declared with base data or by additional tensors.'
+        # print('Called `use_structural`, expect caches to alter')
         if label is None:
             if use_base_data:
                 self.memory_structural['numpy'] = {key: val for key, val in self.memory_default['numpy'].items()}
@@ -190,12 +191,16 @@ class Cache(object):
                 for key in self.memory_default['numpy'].keys():
                     self.structural_and_base_merged[label] = False
                 self.memory_structural = replacing_data
-        elif type(label) == tuple:
+        elif isinstance(label, tuple):
             if use_base_data:
+                # print(self.memory_default['numpy'].keys())
+                replacing_data = self.memory_default['numpy'][label]
                 self.structural_and_base_merged[label] = True
                 if label not in self.memory_default['numpy'].keys():
                     self.add(label=label, tensor=replacing_data)
             else:
+                if replacing_data is None:
+                    raise ValueError('Got no replacing data, when expected!')
                 self.structural_and_base_merged[label] = False
                 if type(replacing_data) != np.ndarray:
                     raise TypeError('Replacing data with provided label shall be set with np.ndarray ')
@@ -384,7 +389,7 @@ class Cache(object):
                 if label not in self.memory_structural[type_key] and label in self.memory_structural[other]:
                     self.memory_structural[type_key][label] = switch_format(self.get(label, normalized, 
                                                                                      structural, saved_as, other_bool))
-                print('keys in mem_struct:', type_key, self.memory_structural[type_key].keys())
+                # print('keys in mem_struct:', type_key, self.memory_structural[type_key].keys())
                 return self.memory_structural[type_key][label]                
         else:
             if label not in self.memory_default[type_key] and label in self.memory_default[other]:

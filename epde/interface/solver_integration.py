@@ -425,7 +425,15 @@ class SystemSolverInterface(object):
                         eval_func = factor.evaluator._evaluator._evaluation_functions_torch 
                     else:
                         eval_func = factor.evaluator._evaluator._evaluation_functions_torch[factor.label]
-                    deriv_powers.append(eval_func)
+                    if not isinstance(eval_func, torch.nn.Sequential):
+                        eval_func_kwargs = dict()
+                        for key in factor.evaluator._evaluator.eval_fun_params_labels:
+                            for param_idx, param_descr in factor.params_description.items():
+                                if param_descr['name'] == key:
+                                    eval_func_kwargs[key] = factor.params[param_idx]
+                        # print(f'eval_func_kwargs for {factor.name} are {eval_func_kwargs}')
+                        lbd_eval_func = lambda *args: eval_func(*args, **eval_func_kwargs)
+                    deriv_powers.append(lbd_eval_func)
                 else:
                     deriv_powers.append(factor.params[power_param_idx])
                 try:
@@ -449,20 +457,20 @@ class SystemSolverInterface(object):
             deriv_powers = [0]
             deriv_orders = [[None,],]
         if len(deriv_powers) == 1:
-            deriv_powers = deriv_powers[0]
-            deriv_orders = deriv_orders[0]
+            deriv_powers = [deriv_powers[0],]
+            deriv_orders = [deriv_orders[0],]
 
         if deriv_vars == []:
             if deriv_powers != 0:
                 raise Exception('Something went wrong with parsing an equation for solver')
             else:
-                deriv_vars = [0]
+                deriv_vars = [[0],]
         res = {'coeff': coeff_tensor,
                'term': deriv_orders,
                'pow': deriv_powers,
                'var': deriv_vars}
 
-        print(f'Translated {term.name} to "term" {deriv_orders}, "pow" {deriv_powers}, "var" {deriv_vars} ')
+        # print(f'Translated {term.name} to "term" {deriv_orders}, "pow" {deriv_powers}, "var" {deriv_vars} ')
         return res
 
     @singledispatchmethod

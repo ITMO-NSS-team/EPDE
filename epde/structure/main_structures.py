@@ -569,8 +569,8 @@ class Equation(ComplexStructure):
                     features_val = np.expand_dims(features_val, axis=1)
                 else:
                     features_val = np.zeros_like(target)
-                value = np.add(elem1, -  features_val)
-                print(value.shape)
+                value = np.add(elem1, - features_val)
+                # print(value.shape)
             return value, target, features
         else:
             return None, target, features

@@ -255,7 +255,7 @@ class ControlExp():
         # Calculating loss in p[i]-eps:
         ctrl_dict_prev = global_var.control_nn.net.state_dict() # deepcopy()
         ctrl_nn_dict = eps_increment_diff(input_params=ctrl_dict_prev,
-                                        loc = loc, forward=True, eps=eps)
+                                          loc = loc, forward=True, eps=eps)
         global_var.control_nn.net.load_state_dict(ctrl_nn_dict)
 
         adapter.set_net(state_net)
@@ -274,7 +274,7 @@ class ControlExp():
         # Restore values of the control NN parameters
         state_dict_prev = global_var.control_nn.net.state_dict()
         state_dict = eps_increment_diff(input_params=state_dict_prev,
-                                        loc = loc, forward=True, eps=eps)
+                                        loc = loc, forward=False, eps=eps)
         global_var.control_nn.net.load_state_dict(state_dict)
         state_dict = state_dict_prev = None
         with torch.no_grad():

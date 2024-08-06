@@ -223,6 +223,10 @@ class Factor(TerminalToken):
 
         key = 'structural' if structural else 'base'
         if (self.cache_label, structural) in global_var.tensor_cache and grids is None:
+            # print(f'Asking for {self.cache_label} in tmode {torch_mode}')
+            # print(f'From numpy cache of {global_var.tensor_cache.memory_structural["numpy"].keys()}')
+            # print(f'And torch cache of {global_var.tensor_cache.memory_structural["torch"].keys()}')
+
             return global_var.tensor_cache.get(self.cache_label,
                                                structural=structural, torch_mode = torch_mode)
  
@@ -238,7 +242,6 @@ class Factor(TerminalToken):
                     func_arg = []
                     for var_idx, code in enumerate(self.deriv_code):
                         assert len(self.variable) == len(self.deriv_code)
-                        print(self.name)
                         func_arg.append(global_var.tensor_cache.get(label=None, torch_mode=torch_mode,
                                                                     deriv_code=(self.variable[var_idx], code)))
 
@@ -246,18 +249,21 @@ class Factor(TerminalToken):
             else:
                 value = self.evaluator.apply(self, structural=structural, func_args=grids, torch_mode=torch_mode)
             if grids is None:
+                if self.is_deriv and self.evaluator._evaluator == simple_function_evaluator:
+                    full_deriv_code = (self._all_vars.index(self.variable), self.deriv_code)
+                else:
+                    full_deriv_code = None      
+
                 if key == 'structural' and self.status['structural_and_defalut_merged']:
-                    global_var.tensor_cache.use_structural(use_base_data=True)
+                    self.saved[key] = global_var.tensor_cache.add(self.cache_label, value, structural=False, 
+                                                                  deriv_code=full_deriv_code)                    
+                    global_var.tensor_cache.use_structural(use_base_data=True,
+                                                           label=self.cache_label)
                 elif key == 'structural' and not self.status['structural_and_defalut_merged']:
                     global_var.tensor_cache.use_structural(use_base_data=False,
                                                            label=self.cache_label,
                                                            replacing_data=value)
                 else:
-                    if self.is_deriv and self.evaluator._evaluator == simple_function_evaluator:
-                        full_deriv_code = (self._all_vars.index(self.variable), self.deriv_code)
-                    else:
-                        full_deriv_code = None
-
                     self.saved[key] = global_var.tensor_cache.add(self.cache_label, value, structural=False, 
                                                                   deriv_code=full_deriv_code)
             return value

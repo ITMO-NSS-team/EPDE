@@ -189,9 +189,9 @@ def translate_dummy_eqs(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np
 
     control_var_tokens = epde.interface.prepared_tokens.ControlVarTokens(sample = control, ann = control_ann, 
                                                                          arg_var = [(0, [None]),
-                                                                                    (1, [None])])#,
-                                                                                    # (0, [0,]),
-                                                                                    # (1, [0,])])   
+                                                                                    (1, [None]),
+                                                                                    (0, [0,]),
+                                                                                    (1, [0,])])    
 
     epde_search_obj.create_pool(data=[u, v], variable_names=['u', 'v'], max_deriv_order=(1,),
                                 additional_tokens = [control_var_tokens,], data_nn = data_nn, device = device)
@@ -256,13 +256,13 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
     optimizer.set_control_optim_params()
 
-    optimizer.set_solver_params(training_params = {'epochs': 150,})
+    optimizer.set_solver_params(training_params = {'epochs': 100,})
 
     state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_u(device=device), 0.0),
                                                                                (bop_v(device=device), 0.0)],
                                                                grids = [t,], n_control = 1., 
                                                                state_net = state_nn_pretrained, 
-                                                               opt_params = [0.001, 0.9, 0.999, 1e-8],
+                                                               opt_params = [0.0001, 0.9, 0.999, 1e-8],
                                                                control_net = ctrl_nn_pretrained, epochs = 75,
                                                                fig_folder = fig_folder)
 
@@ -378,8 +378,8 @@ if __name__ == '__main__':
     der_names_v, derivatives_v = prepare_derivs('v', var_array = solution[:, 1], grid = t)
     
     args = torch.from_numpy(solution).float().to(device)
-    # args = torch.cat([args, torch.from_numpy(derivatives_u).float().to(device), 
-                    #   torch.from_numpy(derivatives_v).float().to(device)], dim=1)
+    args = torch.cat([args, torch.from_numpy(derivatives_u).float().to(device), 
+                      torch.from_numpy(derivatives_v).float().to(device)], dim=1)
     print(f'args.shape is {args.shape}')
     # print(f'derivatives_u.shape {derivatives_u.shape, type(derivatives_u)}')
     # plt.plot(t, derivatives_u, color = 'k')
@@ -402,11 +402,11 @@ if __name__ == '__main__':
             ctrl_ann = pickle.load(ctrl_input_file)
     else:
         nn_method = create_shallow_nn if nn == 'shallow' else create_deep_nn
-        ctrl_ann = epde.supplementary.train_ann(args=[solution[:, 0], solution[:, 1]],#, 
-                                                    #   derivatives_u.reshape(-1), 
-                                                    #   derivatives_v.reshape(-1)], 
-                                                data = ctrl, epochs_max = 2e4, dim = 2, 
-                                                model = nn_method(2, 1, device=device),
+        ctrl_ann = epde.supplementary.train_ann(args=[solution[:, 0], solution[:, 1], 
+                                                      derivatives_u.reshape(-1), 
+                                                      derivatives_v.reshape(-1)], 
+                                                data = ctrl, epochs_max = 2e4, dim = 4, 
+                                                model = nn_method(4, 1, device=device),
                                                 device = device)
 
         with open(ctrl_fname, 'wb') as ctrl_output_file:  
