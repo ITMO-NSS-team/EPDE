@@ -185,7 +185,6 @@ def translate_dummy_eqs(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np
     else:
         raise ValueError('Incorrect preprocessing tool selected.')
 
-    
 
     control_var_tokens = epde.interface.prepared_tokens.ControlVarTokens(sample = control, ann = control_ann, 
                                                                          arg_var = [(0, [None]),
@@ -256,15 +255,15 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
     optimizer.set_control_optim_params()
 
-    optimizer.set_solver_params(training_params = {'epochs': 150,})
+    optimizer.set_solver_params(training_params = {'epochs': 100,})
 
     state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_u(device=device), 0.0),
                                                                                (bop_v(device=device), 0.0)],
                                                                grids = [t,], n_control = 1., 
                                                                state_net = state_nn_pretrained, 
-                                                               opt_params = [0.001, 0.9, 0.999, 1e-8],
+                                                               opt_params = [0.01, 0.9, 0.999, 1e-8],
                                                                control_net = ctrl_nn_pretrained, epochs = 75,
-                                                               fig_folder = fig_folder)
+                                                               fig_folder = fig_folder, eps = 1e0)
 
     return state_nn, ctrl_net, ctrl_pred, hist
 
@@ -320,9 +319,9 @@ if __name__ == '__main__':
 
 
     def create_shallow_nn(arg_num: int = 1, output_num: int = 1, device = 'cpu') -> torch.nn.Sequential: # net: torch.nn.Sequential = None, 
-        hidden_neurons = 100
+        hidden_neurons = 175
         layers = [torch.nn.Linear(arg_num, hidden_neurons, device=device),
-                  torch.nn.ReLU(), # ReLU(),
+                  torch.nn.Tanh(), # ReLU(),
                   torch.nn.Linear(hidden_neurons, output_num, device=device)]
         return torch.nn.Sequential(*layers)
     
@@ -424,22 +423,34 @@ if __name__ == '__main__':
             input_params[loc[0]][tuple(loc[1:])] -= 2*eps
         return input_params
     
-    play_with_params = False
+    play_with_params = True
     if play_with_params:
-        eps = 1e-1
-        ctrl_alt = deepcopy(ctrl_ann)
-        state_dict_alt = ctrl_alt.state_dict()
+        eps = 1e0
+        ctrl_alt_p = deepcopy(ctrl_ann)
+        state_dict_alt = ctrl_alt_p.state_dict()
+        print(f'state_dict_alt["0.weight"] {state_dict_alt["0.weight"].shape}, with value of {state_dict_alt["0.weight"][10, 0]}')        
         # print(f'ctrl_alt.keys()[0] {list(state_dict_prev.keys())[0]}')
         # state_dict_prev['0.weight'][0, 0]
-        print(f'state_dict_alt["4.weight"] {state_dict_alt["4.weight"].shape}')
-        state_dict_alt = eps_increment_diff(state_dict_alt, loc = ['4.weight', 0, 10], eps = eps)
-        ctrl_alt.load_state_dict(state_dict_alt)
+        state_dict_alt = eps_increment_diff(state_dict_alt, loc = ['0.weight', 10, 0], forward=True, eps = eps)
+        print(f'state_dict_alt["0.weight"] {state_dict_alt["0.weight"].shape}, with value of {state_dict_alt["0.weight"][10, 0]}')
+        ctrl_alt_p.load_state_dict(state_dict_alt)
+        print(f'ctrl_alt_p(args).cpu().detach().numpy() min val is {np.min(ctrl_alt_p(args).cpu().detach().numpy())}, max is {np.max(ctrl_alt_p(args).cpu().detach().numpy())}')        
+
+        ctrl_alt_m = deepcopy(ctrl_ann)
+        state_dict_alt = ctrl_alt_m.state_dict()
+        # print(f'ctrl_alt.keys()[0] {list(state_dict_prev.keys())[0]}')
+        # state_dict_prev['0.weight'][0, 0]
+        state_dict_alt = eps_increment_diff(state_dict_alt, loc = ['0.weight', 10, 0], forward=True, eps = -eps)
+        print(f'state_dict_alt["0.weight"] {state_dict_alt["0.weight"].shape}, with value of {state_dict_alt["0.weight"][10, 0]}')
+        ctrl_alt_m.load_state_dict(state_dict_alt)
+        print(f'ctrl_alt_m(args).cpu().detach().numpy() min val is {np.min(ctrl_alt_m(args).cpu().detach().numpy())}, max is {np.max(ctrl_alt_m(args).cpu().detach().numpy())}')    
     # raise NotImplementedError
 
     print(f'ctrl_ann is on cuda: {next(ctrl_ann.parameters()).is_cuda}, ')
     plt.plot(t, ctrl_ann(args).cpu().detach().numpy(), color = 'b', label = 'control variable, nn approx on input states')
     if play_with_params:
-        plt.plot(t, ctrl_alt(args).cpu().detach().numpy(), color = 'g', label = 'control variable, altered')
+        plt.plot(t, ctrl_alt_m(args).cpu().detach().numpy(), color = 'g', label = 'control variable, altered -')
+        plt.plot(t, ctrl_alt_p(args).cpu().detach().numpy(), color = 'r', label = 'control variable, altered +')        
     # plt.plot(t, ctrl_ann(example_sol).cpu().detach().numpy(), '--', color = 'k', label = 'control variable, nn approx with nn approx state')
     plt.plot(t, ctrl, '*', color = 'y', label = 'control variable')
     plt.legend()

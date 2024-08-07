@@ -132,9 +132,11 @@ class SolverBasedFitness(CompoundOperator):
         print('solving equation:')
         print(objective.text_form)
 
-        loss_add, solution = self.adapter.solve_epde_system(system = objective, grids = None, 
+        loss_add, solution_nn = self.adapter.solve_epde_system(system = objective, grids = None, 
                                                             boundary_conditions = None)
-
+        _, grids = global_var.grid_cache.get_all(mode = 'torch')
+        grids = torch.stack([grid.reshape(-1) for grid in grids], dim = 1).float()
+        solution = solution_nn(grids).detach().numpy()
         self.g_fun_vals = global_var.grid_cache.g_func
         
         for eq_idx, eq in enumerate(objective.vals):
@@ -143,6 +145,8 @@ class SolverBasedFitness(CompoundOperator):
             else:
                 referential_data = global_var.tensor_cache.get((eq.main_var_to_explain, (1.0,)))
 
+                print(f'solution shape {solution.shape}')
+                print(f'solution[..., eq_idx] {solution[..., eq_idx].shape}, eq_idx {eq_idx}')
                 discr = (solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape))
                 discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape))
                 rl_error = np.linalg.norm(discr, ord = 2) 

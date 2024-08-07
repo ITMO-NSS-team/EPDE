@@ -11,7 +11,7 @@ if __name__ == '__main__':
     env = gym.make("LunarLander-v2",
                 continuous = True,
                 gravity = -9.8,
-                enable_wind = True,
+                enable_wind = False,
                 wind_power = 1.0,
                 turbulence_power = 1.5,
                 render_mode="rgb_array")
@@ -27,7 +27,7 @@ if __name__ == '__main__':
     num_steps = 200
 
     k = 3
-    main_thrust = lambda x: (np.power(x, k/2.-1)*np.exp(-x/2.))/(2**(k/2.)*scipy.special.gamma(k/2.))+0.5
+    main_thrust = lambda x: (np.power(x, k/2.-1)*np.exp(-x/2.))/(2**(k/2.)*scipy.special.gamma(k/2.))/3.
     test_range = np.linspace(0, 5, 100)
     plt.plot(test_range, main_thrust(test_range))
     plt.show()
@@ -42,7 +42,7 @@ if __name__ == '__main__':
         # action = my_intelligent_agent_fn(obs) 
         if not (left_landed or right_landed):
             print(observations[-1][3])
-            hor_thrust = np.sign(observations[-1][3]) * (np.abs(observations[-1][3])+0.2)
+            hor_thrust = -np.sign(observations[-1][0]) * (np.abs(observations[-1][0]))
             action = [main_thrust(observations[-1][1]), hor_thrust]#env.action_space.sample()
         else:
             action = [0., 0.]
@@ -71,7 +71,7 @@ if __name__ == '__main__':
     observations = np.stack(observations, axis = 1)
     acts = np.array(acts).T
     acts[0, :] = np.where(acts[0, :] > 0.5, acts[0, :], 0.)    
-    acts[1, :] = np.where(np.abs(acts[1, :]) < -0.5, 0., acts[1, :])    
+    acts[1, :] = np.where(np.abs(acts[1, :]) < 0.5, 0., acts[1, :])    
     # print('Obs:', observations.shape, ' Acts:', acts.shape)
     # print(acts[0, :])
     # print(acts[1, :])

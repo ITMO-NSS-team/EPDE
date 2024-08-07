@@ -283,8 +283,10 @@ class ControlExp():
         
 
     def train_pinn(self, bc_operators: List[Union[dict, float]], grids: List[Union[np.ndarray, torch.Tensor]], 
-                   n_control: int = 1, epochs: int = 1e2, state_net: torch.nn.Sequential = None, opt_params: List[float] = [0.01, 0.9, 0.999, 1e-8],
-                   control_net: torch.nn.Sequential = None, fig_folder: str = None, LV_exp: bool = True):
+                   n_control: int = 1, epochs: int = 1e2, state_net: torch.nn.Sequential = None, 
+                   opt_params: List[float] = [0.01, 0.9, 0.999, 1e-8],
+                   control_net: torch.nn.Sequential = None, fig_folder: str = None, 
+                   LV_exp: bool = True, eps: float = 1e-2):
         def modify_bc(operator: dict, scale: Union[float, torch.Tensor]) -> dict:
             noised_operator = deepcopy(operator)
             # noised_operator['bnd_val'] = torch.normal(operator['bnd_val'], scale).to(self._device)
@@ -319,7 +321,7 @@ class ControlExp():
             sampled_bc = [modify_bc(operator, noise_std) for operator, noise_std in bc_operators]
 
             state_net  = deepcopy(self._state_net)
-            eps = 1e-3
+            eps = 1e-2
             print(f'Control function optimization epoch {t}.')
             for param_key, param_tensor in grad_tensors.items():
                 print(f'Optimizing {param_key}: shape is {param_tensor.shape}')
@@ -483,7 +485,7 @@ class AdamOptimizer(FirstOrderOptimizer):
         moment_cor = [moment_tensor/(1 - self.parameters[1] ** self.time) for moment_tensor in self._moment] 
         second_moment_cor = [sm_tensor/(1 - self.parameters[2] ** self.time) for sm_tensor in self._second_moment] 
         return OrderedDict([(subtensor_key, optimized[subtensor_key] - self.parameters[0] * moment_cor[tensor_idx]/\
-                             (torch.sqrt(second_moment_cor[tensor_idx]) + self.parameters[3]))
+                             (torch.sqrt(second_moment_cor[tensor_idx]) + self.parameters[3])) # TODO: validate "+"
                             for tensor_idx, subtensor_key in enumerate(optimized.keys())])
     #np.power(self.parameters[1], self.time)) # np.power(self.parameters[2], self.time)
 

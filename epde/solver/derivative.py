@@ -146,31 +146,36 @@ class Derivative_autograd(DerivativeInt):
             # print(f'term[dif_dir] {dif_dir} {term[dif_dir]}, here j is {j}, and der {derivative}')
             # print(term['pow'], term['var'])
             # print(term)
-            if isinstance(term['pow'][j], (Callable, torch.nn.Sequential)): #isinstance(term['var'][j], (list, tuple)):
+            # Possible, introduce 
+            if (isinstance(term['pow'][j], torch.nn.Sequential) or 
+                (isinstance(term['pow'][j], Callable) and isinstance(term['var'][j], (list, tuple)))): #isinstance(term['var'][j], (list, tuple)):
                 der_args = []
                 # print(f"In derivative estimation {term['var'], term['pow']}")
                 iter_arg = term['var'][j] if isinstance(term['var'][j], (list, tuple)) else [term['var'][j],]
                 for var_idx, cur_var in enumerate(iter_arg):
-                    # print(j, derivative[var_idx])                    
+                    # print(j, derivative[var_idx])
                     if derivative[var_idx] == [None] or derivative[var_idx] is None:
                         der_args.append(self.model(grid_points)[:, cur_var].reshape(-1, 1))
                     else:
                         der_args.append(self._nn_autograd(self.model, grid_points, cur_var, axis=derivative[var_idx]))
                 if isinstance(term['pow'][j], torch.nn.Sequential):
                     der_args = torch.cat(der_args, dim=1)
+                    # print('der_args.shape', der_args.shape)
                     factor_val = term['pow'][j](der_args)
                 else:
+                    # print('der_args.shape', len(der_args))
                     factor_val = term['pow'][j](*der_args)
                 der_term = der_term * factor_val
             else:
                 if derivative == [None] or derivative is None:
                     der = self.model(grid_points)[:, term['var'][j]].reshape(-1, 1)
                 else:
-                    # print(j, derivative)
+                    # print(j, derivative, term['pow'][j], term['var'][j])
                     der = self._nn_autograd(self.model, grid_points, term['var'][j], axis=derivative)
                 if isinstance(term['pow'][j],(int,float)):
                     der_term = der_term * der ** term['pow'][j]
                 elif isinstance(term['pow'][j],Callable):
+                    # print('term["pow"][j] is ', j, term['pow'], term['var'])
                     der_term = der_term * term['pow'][j](der)
         der_term = coeff * der_term
 

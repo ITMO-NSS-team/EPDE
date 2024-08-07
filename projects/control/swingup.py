@@ -34,9 +34,9 @@ def get_additional_token_families(ctrl):
     angle_trig_tokens = VarTrigTokens('phi', max_power=2, freq_center=1.)
     sgn_tokens = DerivSignFunction(token_type = 'speed_sign', var_name = 'y', token_labels=['sign(dy/dx1)',],
                                    deriv_solver_orders = [[0,],])
-    # control_var_tokens = epde.interface.prepared_tokens.ControlVarTokens(sample = ctrl, arg_var = [(0, [None,]), (1, [None,]), 
-    #                                                                                                (0, [0,]), (1, [0,])])
-    return [angle_trig_tokens, sgn_tokens] # , control_var_tokens
+    control_var_tokens = epde.interface.prepared_tokens.ControlVarTokens(sample = ctrl, arg_var = [(0, [None,]), (1, [None,]), 
+                                                                                                   (0, [0,]), (1, [0,])])
+    return [angle_trig_tokens, sgn_tokens, control_var_tokens] #  
 
 def epde_discovery(t, x, angle, u, derivs, diff_method = 'FD', data_nn: torch.nn.Sequential = None, device: str = 'cpu'):
     dimensionality = x.ndim - 1
@@ -71,7 +71,7 @@ def epde_discovery(t, x, angle, u, derivs, diff_method = 'FD', data_nn: torch.nn
     #                                     OrderedDict([('power', (1, 1))]), {'power': 0}, meaningful=True)    
 
     eps = 5e-7
-    popsize = 24
+    popsize = 12
     epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=5)
 
     factors_max_number = {'factors_num' : [1, 2, 3,], 'probas' : [0.2, 0.65, 0.15]}
@@ -96,7 +96,7 @@ def epde_discovery(t, x, angle, u, derivs, diff_method = 'FD', data_nn: torch.nn
                         equation_terms_max_number=10, data_fun_pow = 2, derivs = [derivs['y'], derivs['phi']],
                         additional_tokens=get_additional_token_families(ctrl=u),
                         equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-7, 1e-5), data_nn=data_nn) # TODO: narrow sparsity interval, reduce the population size
+                        eq_sparsity_interval=(1e-7, 1e-4), data_nn=data_nn) # TODO: narrow sparsity interval, reduce the population size
     epde_search_obj.equations()
     return epde_search_obj
 

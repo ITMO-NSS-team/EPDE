@@ -94,19 +94,19 @@ class VarTrigTokens(PreparedTokens):
         deriv_solver_orders = [[None,] for label in adapted_labels]
 
         def trig_sine(*args, **kwargs):
-            print(f'args{args} kwargs {kwargs}')
+            # print(f'args{args} kwargs {kwargs}')
             return np.sin(kwargs['freq'] * args[0]) ** kwargs['power']
         
         def trig_cosine(*args, **kwargs):
-            print(f'args{args} kwargs {kwargs}')            
+            # print(f'args{args} kwargs {kwargs}')            
             return np.cos(kwargs['freq'] * args[0]) ** kwargs['power']
 
         def torch_trig_sine(*args, **kwargs):
-            print(f'args{args} kwargs {kwargs}')
+            # print(f'args{args} kwargs {kwargs}')
             return torch.sin(kwargs['freq'] * args[0]) ** kwargs['power']
         
         def torch_trig_cosine(*args, **kwargs):
-            print(f'args{args} ,kwargs {kwargs}')            
+            # print(f'args{args} ,kwargs {kwargs}')            
             return torch.cos(kwargs['freq'] * args[0]) ** kwargs['power']
 
         trig_eval_fun_np = {adapted_labels[0]: trig_sine,

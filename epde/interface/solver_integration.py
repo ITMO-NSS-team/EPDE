@@ -283,18 +283,20 @@ class PregenBOperator(object):
                 var_max_orders = {var_key: np.zeros(dim) for var_key in variables}
                 for term_key, symb_form in equation_sf.items():
                     if isinstance(symb_form['var'], list):
-                        print(f'symb_form {symb_form["term"], symb_form["pow"], symb_form["var"]}')
-                        print(f"{len(symb_form['term'])} == {len(symb_form['var'])}")
-                        print(variables)
+                        # print(f'symb_form {symb_form["term"], symb_form["pow"], symb_form["var"]}')
+                        # print(f"{len(symb_form['term'])} == {len(symb_form['var'])}")
+                        # print(variables)
                         assert len(symb_form['term']) == len(symb_form['var'])
                         for factor_idx, deriv_factor in enumerate(symb_form['term']):
                             var_orders = np.array([count_factor_order(deriv_factor, ax) for ax
                                                    in np.arange(dim)])
                             if isinstance(symb_form['var'][factor_idx], int):
                                 var_key = symb_form['var'][factor_idx] #- 1
-                                print(f'var_key is {var_key} for {symb_form["var"][factor_idx]}')
+                                # print(f'var_key is {var_key} for {symb_form["var"][factor_idx]}')
                             else:
-                                print(f'var_key passed and got {symb_form["var"][factor_idx]}')
+                                var_key = 0
+                                var_orders = 0 # Such tokens do not increase order of the DE
+                                # print(f'var_key passed and got {symb_form["var"][factor_idx]}')
                             var_max_orders[variables[var_key]] = np.maximum(var_max_orders[variables[var_key]],
                                                                             var_orders)
                     elif isinstance(symb_form['var'], int):
@@ -395,6 +397,9 @@ def solver_formed_grid(training_grid=None):
     return torch.from_numpy(training_grid).T.float()
 
 
+def make_eval_func(eval_func, eval_func_kwargs):
+    return lambda *args: eval_func(*args, **eval_func_kwargs)
+
 class SystemSolverInterface(object):
     def __init__(self, system_to_adapt: SoEq, coeff_tol: float = 1.e-9):
         self.variables = list(system_to_adapt.vars_to_describe)
@@ -426,13 +431,14 @@ class SystemSolverInterface(object):
                     else:
                         eval_func = factor.evaluator._evaluator._evaluation_functions_torch[factor.label]
                     if not isinstance(eval_func, torch.nn.Sequential):
+                        # print(f'for term {factor.name} eval func {eval_func} is non')
                         eval_func_kwargs = dict()
                         for key in factor.evaluator._evaluator.eval_fun_params_labels:
                             for param_idx, param_descr in factor.params_description.items():
                                 if param_descr['name'] == key:
                                     eval_func_kwargs[key] = factor.params[param_idx]
                         # print(f'eval_func_kwargs for {factor.name} are {eval_func_kwargs}')
-                        lbd_eval_func = lambda *args: eval_func(*args, **eval_func_kwargs)
+                        lbd_eval_func = make_eval_func(eval_func, eval_func_kwargs)
                     deriv_powers.append(lbd_eval_func)
                 else:
                     deriv_powers.append(factor.params[power_param_idx])
@@ -454,7 +460,7 @@ class SystemSolverInterface(object):
                 grid_arg = None if default_domain else grids
                 coeff_tensor = coeff_tensor * factor.evaluate(grids=grid_arg, torch_mode = True)
         if not derivs_detected:
-            deriv_powers = [0]
+            deriv_powers = [0,]
             deriv_orders = [[None,],]
         if len(deriv_powers) == 1:
             deriv_powers = [deriv_powers[0],]
@@ -464,7 +470,7 @@ class SystemSolverInterface(object):
             if deriv_powers != 0:
                 raise Exception('Something went wrong with parsing an equation for solver')
             else:
-                deriv_vars = [[0],]
+                deriv_vars = [0,]
         res = {'coeff': coeff_tensor,
                'term': deriv_orders,
                'pow': deriv_powers,
