@@ -253,9 +253,9 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
     optimizer.system = eq
 
-    optimizer.set_control_optim_params()
+    # optimizer.set_control_optim_params()
 
-    optimizer.set_solver_params(training_params = {'epochs': 100,})
+    optimizer.set_solver_params(training_params = {'epochs': 1000,}, optimizer_params = {'params': {'lr': 1e-5}})
 
     state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_u(device=device), 0.0),
                                                                                (bop_v(device=device), 0.0)],
@@ -263,7 +263,7 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
                                                                state_net = state_nn_pretrained, 
                                                                opt_params = [0.01, 0.9, 0.999, 1e-8],
                                                                control_net = ctrl_nn_pretrained, epochs = 75,
-                                                               fig_folder = fig_folder, eps = 1e0)
+                                                               fig_folder = fig_folder, eps = 1e-1)
 
     return state_nn, ctrl_net, ctrl_pred, hist
 
@@ -319,7 +319,7 @@ if __name__ == '__main__':
 
 
     def create_shallow_nn(arg_num: int = 1, output_num: int = 1, device = 'cpu') -> torch.nn.Sequential: # net: torch.nn.Sequential = None, 
-        hidden_neurons = 175
+        hidden_neurons = 50
         layers = [torch.nn.Linear(arg_num, hidden_neurons, device=device),
                   torch.nn.Tanh(), # ReLU(),
                   torch.nn.Linear(hidden_neurons, output_num, device=device)]
@@ -404,7 +404,7 @@ if __name__ == '__main__':
         ctrl_ann = epde.supplementary.train_ann(args=[solution[:, 0], solution[:, 1]],#, 
                                                     #   derivatives_u.reshape(-1), 
                                                     #   derivatives_v.reshape(-1)], 
-                                                data = ctrl, epochs_max = 2e4, dim = 2, 
+                                                data = ctrl, epochs_max = 2e6, dim = 2, 
                                                 model = nn_method(2, 1, device=device),
                                                 device = device)
 

@@ -206,11 +206,11 @@ class ControlExp():
         bop.values = torch.from_numpy(np.array([[value,]])).float().to(device)
         return bop
 
-    def set_control_optim_params(self, lr: float = 1e-3, max_iter: int = 10, max_eval = None, tolerance_grad: float = 1e-7,
-                                 tolerance_change: float = 1e-9, history_size: int = 100, line_search_fn = 'strong_wolfe'):
-        self._control_opt_params = {'lr': lr, 'max_iter': max_iter, 'max_eval': max_eval, 'tolerance_grad': tolerance_grad,
-                                    'tolerance_change': tolerance_change, 'history_size': history_size, 
-                                    'line_search_fn': line_search_fn}
+    # def set_control_optim_params(self, lr: float = 1e-3, max_iter: int = 10, max_eval = None, tolerance_grad: float = 1e-7,
+    #                              tolerance_change: float = 1e-9, history_size: int = 100, line_search_fn = 'strong_wolfe'):
+    #     self._control_opt_params = {'lr': lr, 'max_iter': max_iter, 'max_eval': max_eval, 'tolerance_grad': tolerance_grad,
+    #                                 'tolerance_change': tolerance_change, 'history_size': history_size, 
+    #                                 'line_search_fn': line_search_fn}
 
     def set_solver_params(self, mode: str = 'autograd', compiling_params: dict = {}, optimizer_params: dict = {},
                           cache_params: dict = {}, early_stopping_params: dict = {}, plotting_params: dict = {},
@@ -241,7 +241,7 @@ class ControlExp():
         # state_dict_prev = state_dict = None
 
         adapter.set_net(state_net)
-        _, model = adapter.solve_epde_system(system = system, grids = grids[0], data = None,
+        solver_loss_forward, model = adapter.solve_epde_system(system = system, grids = grids[0], data = None,
                                              boundary_conditions = bc_operators,
                                              mode = solver_params['mode'],
                                              use_cache = solver_params['use_cache'],
@@ -259,14 +259,14 @@ class ControlExp():
         global_var.control_nn.net.load_state_dict(ctrl_nn_dict)
 
         adapter.set_net(state_net)
-        solver_loss, model = adapter.solve_epde_system(system = system, grids = grids[0], data = None,
+        solver_loss_backward, model = adapter.solve_epde_system(system = system, grids = grids[0], data = None,
                                                        boundary_conditions = bc_operators,
                                                        mode = solver_params['mode'],
                                                        use_cache = solver_params['use_cache'],
                                                        use_fourier = solver_params['use_fourier'],
                                                        fourier_params = solver_params['fourier_params'],
                                                        use_adaptive_lambdas = solver_params['use_adaptive_lambdas'])
-        # print(f'solver_loss: {solver_loss}')
+        print(f'solver_loss: {solver_loss_forward, solver_loss_backward}')
 
         control_inputs = prepare_control_inputs(model, grids[1], global_var.control_nn.net_args)
         loss_back = control_loss([model, global_var.control_nn.net], [grids[1], control_inputs])
@@ -277,8 +277,10 @@ class ControlExp():
                                         loc = loc, forward=False, eps=eps)
         global_var.control_nn.net.load_state_dict(state_dict)
         state_dict = state_dict_prev = None
+
+        loss_alpha = 1e0
         with torch.no_grad():
-            res = (loss_forward - loss_back)/(2*eps)
+            res = (loss_forward - loss_back)/(2*eps*(1+loss_alpha*(solver_loss_forward+solver_loss_backward)))
         return res
         
 
@@ -313,6 +315,9 @@ class ControlExp():
 
         grad_tensors = deepcopy(global_var.control_nn.net.state_dict())
 
+        min_loss = np.inf
+        self._best_control_params = global_var.control_nn.net.state_dict()
+
         optimizer = AdamOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = opt_params)
         adapter = self.get_solver_adapter(None)
 
@@ -320,6 +325,8 @@ class ControlExp():
         while t < epochs and not stop_training:
             sampled_bc = [modify_bc(operator, noise_std) for operator, noise_std in bc_operators]
 
+            
+            global_var.control_nn.net.load_state_dict(self._best_control_params)
             state_net  = deepcopy(self._state_net)
             eps = 1e-2
             print(f'Control function optimization epoch {t}.')
@@ -376,10 +383,11 @@ class ControlExp():
             with torch.no_grad():
                 loss = self.loss([self._state_net, global_var.control_nn.net], [grids_merged, control_inputs])
             print('current loss is ', loss)
-            # if loss < min_loss:
-            # min_loss = loss
+            if loss < min_loss:
+                min_loss = loss
+                self._best_control_params = global_var.control_nn.net.state_dict()
             loss_hist.append(loss)
-            self._best_control_params = global_var.control_nn.net.state_dict()
+            
             
             if fig_folder is not None and LV_exp:
                 plt.figure(figsize=(11, 6))

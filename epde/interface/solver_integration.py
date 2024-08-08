@@ -120,7 +120,7 @@ BASE_PLOTTER_PARAMS = {
 
 
 BASE_TRAINING_PARAMS = {
-                        'epochs'            : 1e5, 
+                        'epochs'            : 3e4,  # 1e5
                         'info_string_every' : 'None', #1e4,
                         'mixed_precision'   : False,
                         'save_model'        : False,

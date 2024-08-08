@@ -71,8 +71,8 @@ def epde_discovery(t, x, angle, u, derivs, diff_method = 'FD', data_nn: torch.nn
     #                                     OrderedDict([('power', (1, 1))]), {'power': 0}, meaningful=True)    
 
     eps = 5e-7
-    popsize = 12
-    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=5)
+    popsize = 10
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=8)
 
     factors_max_number = {'factors_num' : [1, 2, 3,], 'probas' : [0.2, 0.65, 0.15]}
 
