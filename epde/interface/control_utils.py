@@ -4,6 +4,7 @@ import torch
 import matplotlib.pyplot as plt
 import datetime
 import os 
+from warnings import warn
 
 import gc
 from functools import partial
@@ -266,7 +267,7 @@ class ControlExp():
                                                        use_fourier = solver_params['use_fourier'],
                                                        fourier_params = solver_params['fourier_params'],
                                                        use_adaptive_lambdas = solver_params['use_adaptive_lambdas'])
-        print(f'solver_loss: {solver_loss_forward, solver_loss_backward}')
+        # print(f'solver_loss: {solver_loss_forward, solver_loss_backward}')
 
         control_inputs = prepare_control_inputs(model, grids[1], global_var.control_nn.net_args)
         loss_back = control_loss([model, global_var.control_nn.net], [grids[1], control_inputs])
@@ -318,7 +319,9 @@ class ControlExp():
         min_loss = np.inf
         self._best_control_params = global_var.control_nn.net.state_dict()
 
-        optimizer = AdamOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = opt_params)
+        # optimizer = AdamOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = opt_params)
+        optimizer = CoordDescentOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = opt_params)
+
         adapter = self.get_solver_adapter(None)
 
 
@@ -346,6 +349,10 @@ class ControlExp():
                                                                                      grids = [grids, grids_merged],
                                                                                      solver_params = self._solver_params,
                                                                                      eps = eps)
+                        if optimizer.behavior == 'Coordinate':
+                            state_dict_prev = global_var.control_nn.net.state_dict()
+                            state_dict = optimizer.step(gradient = grad_tensors, optimized = state_dict_prev, loc = loc)
+                            global_var.control_nn.net.load_state_dict(state_dict)                                            
                 elif len(param_tensor.size()) == 2:
                     for param_outer_idx, _ in enumerate(param_tensor):
                         for param_inner_idx, _ in enumerate(param_tensor[0]):
@@ -360,11 +367,16 @@ class ControlExp():
                                                                                                 grids = [grids, grids_merged],
                                                                                                 solver_params = self._solver_params,
                                                                                                 eps = eps)
+                            if optimizer.behavior == 'Coordinate':
+                                state_dict_prev = global_var.control_nn.net.state_dict()
+                                state_dict = optimizer.step(gradient = grad_tensors, optimized = state_dict_prev, loc = loc)
+                                global_var.control_nn.net.load_state_dict(state_dict)                               
                 else:
                     raise Exception(f'Incorrect shape of weights/bias. Got {param_tensor.size()} tensor.')
-            state_dict_prev = global_var.control_nn.net.state_dict()
-            state_dict = optimizer.step(gradient = grad_tensors, optimized = state_dict_prev)
-            global_var.control_nn.net.load_state_dict(state_dict)
+            if optimizer.behavior == 'Gradient':
+                state_dict_prev = global_var.control_nn.net.state_dict()
+                state_dict = optimizer.step(gradient = grad_tensors, optimized = state_dict_prev)
+                global_var.control_nn.net.load_state_dict(state_dict)
             del state_dict, state_dict_prev
 
             adapter.set_net(self._state_net)
@@ -461,16 +473,19 @@ class AdamOptimizerNp(FirstOrderOptimizerNp):
         return optimized - self.parameters[0]*moment_cor/(np.sqrt(second_moment_cor)+self.parameters[3])
     
 class FirstOrderOptimizer(ABC):
+    behavior = 'Gradient'    
     def __init__(self, optimized: List[torch.Tensor], parameters: list):
         raise NotImplementedError('Calling __init__ of an abstract optimizer')
     
     def reset(self, optimized: Dict[str, torch.Tensor], parameters: np.ndarray):
         raise NotImplementedError('Calling reset method of an abstract optimizer')
 
-    def step(self, gradient: Dict[str, torch.Tensor], optimized: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
+    def step(self, gradient: Dict[str, torch.Tensor], optimized: Dict[str, torch.Tensor],
+             *args, **kwargs) -> Dict[str, torch.Tensor]:
         raise NotImplementedError('Calling step of an abstract optimizer')
     
 class AdamOptimizer(FirstOrderOptimizer):
+    behavior = 'Gradient'
     def __init__(self, optimized: List[torch.Tensor], parameters: list = [0.001, 0.9, 0.999, 1e-8]):
         '''
         parameters[0] - alpha, parameters[1] - beta_1, parameters[2] - beta_2
@@ -484,7 +499,8 @@ class AdamOptimizer(FirstOrderOptimizer):
         self.parameters = parameters
         self.time = 0
 
-    def step(self, gradient: Dict[str, torch.Tensor], optimized: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
+    def step(self, gradient: Dict[str, torch.Tensor], optimized: Dict[str, torch.Tensor],
+             *args, **kwargs) -> Dict[str, torch.Tensor]:
         self.time += 1
         self._moment = [self.parameters[1] * self._moment[tensor_idx] + (1-self.parameters[1]) * grad_subtensor
                         for tensor_idx, grad_subtensor in enumerate(gradient.values())]
@@ -492,9 +508,40 @@ class AdamOptimizer(FirstOrderOptimizer):
                                for tensor_idx, grad_subtensor in enumerate(gradient.values())]
         moment_cor = [moment_tensor/(1 - self.parameters[1] ** self.time) for moment_tensor in self._moment] 
         second_moment_cor = [sm_tensor/(1 - self.parameters[2] ** self.time) for sm_tensor in self._second_moment] 
-        return OrderedDict([(subtensor_key, optimized[subtensor_key] - self.parameters[0] * moment_cor[tensor_idx]/\
+        return OrderedDict([(subtensor_key, optimized[subtensor_key] + self.parameters[0] * moment_cor[tensor_idx]/\
                              (torch.sqrt(second_moment_cor[tensor_idx]) + self.parameters[3])) # TODO: validate "+"
                             for tensor_idx, subtensor_key in enumerate(optimized.keys())])
+    
+class CoordDescentOptimizer(FirstOrderOptimizer):
+    behavior = 'Coordinate'    
+    def __init__(self, optimized: List[torch.Tensor], parameters: list = [0.001,]):
+        '''
+        parameters[0] - alpha, parameters[1] - beta_1, parameters[2] - beta_2
+        parameters[3] - eps  
+        '''
+        self.reset(optimized, parameters)
+
+    def reset(self, optimized: Dict[str, torch.Tensor], parameters: np.ndarray):
+        self.parameters = parameters
+        self.time = 0
+
+    def step(self, gradient: Dict[str, torch.Tensor], optimized: Dict[str, torch.Tensor], *args, **kwargs) -> Dict[str, torch.Tensor]:
+        self.time += 1
+        assert 'loc' in kwargs.keys(), 'Missing location of parameter value shift in coordinate descent.'
+        loc = kwargs['loc']
+        if torch.isclose(gradient[loc[0]][tuple(loc[1:])], 
+                         torch.tensor((0,)).to(device=gradient[loc[0]][tuple(loc[1:])].get_device()).float()):
+            warn(f'Gradient at {loc} is close to zero: {gradient[loc[0]][tuple(loc[1:])]}.')
+        # print(optimized[loc[0]][tuple(loc[1:])], gradient[loc[0]][tuple(loc[1:])])
+        optimized[loc[0]][tuple(loc[1:])] = optimized[loc[0]][tuple(loc[1:])] -\
+                                            self.parameters[0]*gradient[loc[0]][tuple(loc[1:])]
+        return optimized
+    
+        # return OrderedDict([(subtensor_key, optimized[subtensor_key] - self.parameters[0] * moment_cor[tensor_idx]/\
+        #                      (torch.sqrt(second_moment_cor[tensor_idx]) + self.parameters[3])) # TODO: validate "+"
+        #                     for tensor_idx, subtensor_key in enumerate(optimized.keys())])    
+    
+# TODO: implement coordinate descent
     #np.power(self.parameters[1], self.time)) # np.power(self.parameters[2], self.time)
 
 # class LBFGS(FirstOrderOptimizer):

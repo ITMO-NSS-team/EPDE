@@ -7,7 +7,78 @@ import time
 import gym
 import scipy.special
 
-if __name__ == '__main__':
+def get_additional_token_families(ctrl):
+    angle_trig_tokens = VarTrigTokens('phi', max_power=2, freq_center=1.)
+    sgn_tokens = DerivSignFunction(token_type = 'speed_sign', var_name = 'y', token_labels=['sign(dy/dx1)',],
+                                   deriv_solver_orders = [[0,],])
+    control_var_tokens = epde.interface.prepared_tokens.ControlVarTokens(sample = ctrl, arg_var = [(0, [None,]), (1, [None,]), 
+                                                                                                   (0, [0,]), (1, [0,])])
+    return [angle_trig_tokens, sgn_tokens, control_var_tokens] #  
+
+def epde_discovery(t, x, angle, u, derivs, diff_method = 'FD', data_nn: torch.nn.Sequential = None, device: str = 'cpu'):
+    dimensionality = x.ndim - 1
+    use_solver = True
+    epde_search_obj = epde.EpdeSearch(use_solver = use_solver, dimensionality = dimensionality, boundary = 30,
+                                      coordinate_tensors = [t,], verbose_params = {'show_iter_idx' : True})    
+    
+    if diff_method == 'ANN':
+        epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
+                                         preprocessor_kwargs={'epochs_max' : 50000})
+    elif diff_method == 'poly':
+        epde_search_obj.set_preprocessor(default_preprocessor_type='poly',
+                                         preprocessor_kwargs={'use_smoothing' : False, 'sigma' : 1, 
+                                                              'polynomial_window' : 3, 'poly_order' : 4}) 
+    elif diff_method == 'FD':
+        epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+                                         preprocessor_kwargs={})
+    else:
+        raise ValueError('Incorrect preprocessing tool selected.')
+    
+    # angle_cos = np.cos(angle)
+    # angle_sin = np.sin(angle)
+    
+    # angle_trig_tokens = epde.CacheStoredTokens('angle_trig', ['sin(phi)', 'cos(phi)'], 
+    #                                            {'sin(phi)' : angle_sin, 'cos(phi)' : angle_cos}, 
+    #                                            OrderedDict([('power', (1, 3))]), {'power': 0}, meaningful=True)
+    # control_var_tokens = epde.CacheStoredTokens('control', ['ctrl',], {'ctrl' : u}, OrderedDict([('power', (1, 1))]),
+    #                                             {'power': 0}, meaningful=True)
+    # sgn_tokens = epde.CacheStoredTokens('signum of y', ['sgn(dy)', 'sgn(ddy)'], 
+    #                                     {'sgn(dy)' : np.sign(derivs['y'][:, 0]),
+    #                                      'sgn(ddy)' : np.sign(derivs['y'][:, 1]),}, 
+    #                                     OrderedDict([('power', (1, 1))]), {'power': 0}, meaningful=True)    
+
+    eps = 5e-7
+    popsize = 10
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=30)
+
+    factors_max_number = {'factors_num' : [1, 2, 3,], 'probas' : [0.2, 0.65, 0.15]}
+
+    # custom_grid_tokens = epde.GridTokens(dimensionality = dimensionality, max_power=1)
+    # if use_solver:
+    #     epde_search_obj.create_pool(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,),
+    #                                 data_fun_pow = 2, derivs = [derivs['y'], derivs['phi']],
+    #                                 additional_tokens=get_additional_token_families(ctrl=u), data_nn=data_nn)
+    
+    # if data_nn is None and use_solver:
+    #     data_nn = global_var.solution_guess_nn
+    #     if device == 'cpu':
+    #         # fname = 'C://Users//Mike//Documents//Work//EPDE//projects//control//swingup_ann_cpu.pickle'
+    #         fname = r"/home/mikemaslyaev/Documents/EPDE/projects/control/swingup_ann_cpu.pickle"
+    #     else:
+    #         fname = r"/home/mikemaslyaev/Documents/EPDE/projects/control/swingup_ann_cuda.pickle"
+    #     with open(fname, 'wb') as output_file:
+    #         pickle.dump(data_nn, output_file)
+
+    epde_search_obj.fit(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,),
+                        equation_terms_max_number=10, data_fun_pow = 2, derivs = [derivs['y'], derivs['phi']],
+                        additional_tokens=get_additional_token_families(ctrl=u),
+                        equation_factors_max_number=factors_max_number,
+                        eq_sparsity_interval=(1e-7, 1e-4), data_nn=data_nn) # TODO: narrow sparsity interval, reduce the population size
+    epde_search_obj.equations()
+    return epde_search_obj
+
+
+def prepare_data(*args, **kwargs):
     env = gym.make("LunarLander-v2",
                 continuous = True,
                 gravity = -9.8,
@@ -48,16 +119,10 @@ if __name__ == '__main__':
             action = [0., 0.]
 
         acts.append(action)
-        # print(action)
-        # print(env.step(action))
-        # apply the action
+
         obs, reward, left_landed, right_landed, info = env.step(action)
         observations.append(obs)
-        # Render the env
-        # Wait a bit before the next frame unless you want to see a crazy fast video
-        # time.sleep(0.001)
-        
-        # If the epsiode is up, then start another one
+
         if left_landed or right_landed:
             print(f'Ouch: l {left_landed} r {right_landed} on {step}')
         if left_landed or right_landed:
@@ -118,3 +183,12 @@ if __name__ == '__main__':
     plt.plot(np.arange(acts[0, :].size), acts[0, :], color = 'k')
     plt.plot(np.arange(acts[1, :].size), acts[1, :], color = 'r')
     plt.show()
+    return observations, acts
+
+def discover_equations(observations: np.ndarray, actions: np.ndarray):
+    
+
+if __name__ == '__main__':
+    obs, acts = prepare_data()
+
+    discover_equations(obs, acts)

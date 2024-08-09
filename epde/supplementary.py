@@ -77,14 +77,12 @@ def create_solution_net(equations_num: int, domain_dim: int, use_fourier = True,
     linear_inputs = net_default[0].out_features if use_fourier else domain_dim
     
     if domain_dim == 1:            
-        hidden_neurons = 128
+        hidden_neurons = 64 #128
     else:
-        hidden_neurons = 112
+        hidden_neurons = 54 #112
 
     operators = net_default + [torch.nn.Linear(linear_inputs, hidden_neurons, device=device),
                                torch.nn.ReLU(),
-                            #    torch.nn.Linear(hidden_neurons, hidden_neurons),
-                            #    torch.nn.ReLU(),
                                torch.nn.Linear(hidden_neurons, hidden_neurons, device=device),
                                torch.nn.Tanh(),
                                torch.nn.Linear(hidden_neurons, equations_num, device=device)]
@@ -291,7 +289,6 @@ def define_derivatives(var_name='u', dimensionality=1, max_order=2):
                 deriv_names.append('d' + var_name + '/dx' + str(var_idx))
             else:
                 deriv_names.append(
-                    
                     'd^'+str(order+1) + var_name + '/dx'+str(var_idx)+'^'+str(order+1))
     print('Deriv orders after definition', var_deriv_orders)
     return deriv_names, var_deriv_orders
