@@ -108,7 +108,7 @@ def epde_multisample_discovery(t: List[np.ndarray], x: List[np.ndarray], angle: 
     samples = [[t[i], [x[i], angle[i]]] for i in range(len(t))]    
     epde_search_obj = epde.EpdeMultisample(data_samples=samples, use_solver = False, dimensionality = dimensionality,
                                            boundary = 30, verbose_params = {'show_iter_idx' : True})
-    
+    raise NotImplementedError('Currently, only single sample shall be used with solver.')
     if diff_method == 'ANN':
         epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
                                          preprocessor_kwargs={'epochs_max' : 50000})
