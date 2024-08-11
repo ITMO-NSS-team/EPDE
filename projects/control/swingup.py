@@ -239,22 +239,23 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     from epde.supplementary import AutogradDeriv
     autograd = AutogradDeriv()
 
-    loc = control_utils.ConstrLocation(domain_shape = (t.size()[0],), device=device) # Declaring const in the entire domain
+    loc_domain = control_utils.ConstrLocation(domain_shape = (t.size()[0],), device=device) # Declaring const in the entire domain
+    loc_end = control_utils.ConstrLocation(domain_shape = (t.size()[0],), device=device) # Check format
     cosine_cond = lambda x, ref: torch.cos(x) - ref
     phi_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t[-1], fill_value = 1., device=device), # Better processing for periodic
-                                                   indices = loc, deriv_axes=[None,], deriv_method = autograd, nn_output=0, 
+                                                   indices = loc_end, deriv_axes=[None,], deriv_method = autograd, nn_output=0, 
                                                    estim_func=cosine_cond)
     dphi_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t[-1], fill_value = 0, device=device),
-                                                    indices = loc, deriv_axes=[0,], deriv_method = autograd, nn_output=1)
+                                                    indices = loc_end, deriv_axes=[0,], deriv_method = autograd, nn_output=1)
     contr_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = 0., device=device),
-                                                 indices = loc, deriv_axes=[None,], deriv_method = autograd, nn_output=0)
+                                                 indices = loc_domain, deriv_axes=[None,], deriv_method = autograd, nn_output=0)
 
-    u_var_non_neg = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0., device=device), sign='>',
-                                                   indices = loc, deriv_method = autograd, nn_output=0)
-    v_var_non_neg = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0., device=device), sign='>',
-                                                   indices = loc, deriv_method = autograd, nn_output=1)
-    contr_non_neg = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0., device=device), sign='>',
-                                                   indices = loc, deriv_method = autograd, nn_output=0)    
+    u_right_bnd = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = y_right, device=device), sign='<',
+                                                 indices = loc_domain, deriv_method = autograd, nn_output=0)
+    u_left_bnd = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = y_left, device=device), sign='>',
+                                                indices = loc_domain, deriv_method = autograd, nn_output=1)
+    # contr_non_neg = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0., device=device), sign='>',
+    #                                                indices = loc_domain, deriv_method = autograd, nn_output=0)    
 
     
     loss = control_utils.ConditionalLoss([(1., y_tar_constr, 0),
