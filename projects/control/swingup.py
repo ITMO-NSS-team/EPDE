@@ -232,6 +232,7 @@ def translate_equation(t, x, angle, u, derivs: dict, diff_method = 'FD'):
     return test
 
 def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
+                  y_init: float, dy_init: float, phi_init: float, dphi_init: float,
                   y_left: float, y_right: float, stab_der_ord: int,
                   state_nn_pretrained: torch.nn.Sequential, ctrl_nn_pretrained: torch.nn.Sequential, 
                   fig_folder: str, device = 'cpu'):
@@ -240,7 +241,8 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     autograd = AutogradDeriv()
 
     loc_domain = control_utils.ConstrLocation(domain_shape = (t.size()[0],), device=device) # Declaring const in the entire domain
-    loc_end = control_utils.ConstrLocation(domain_shape = (t.size()[0],), device=device) # Check format
+    loc_end = control_utils.ConstrLocation(domain_shape = (t.size()[0],), axis = 0, loc = -1, device=device) # Check format
+    print(f'loc_end.flat_idxs : {loc_end.flat_idxs}')
     cosine_cond = lambda x, ref: torch.cos(x) - ref
     phi_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t[-1], fill_value = 1., device=device), # Better processing for periodic
                                                    indices = loc_end, deriv_axes=[None,], deriv_method = autograd, nn_output=0, 
@@ -258,12 +260,12 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     #                                                indices = loc_domain, deriv_method = autograd, nn_output=0)    
 
     
-    loss = control_utils.ConditionalLoss([(1., y_tar_constr, 0),
-                                          (1., v_tar_constr, 0), 
+    loss = control_utils.ConditionalLoss([(1., phi_tar_constr, 0),
+                                          (1., dphi_tar_constr, 0), 
                                           (0.001, contr_constr, 1),
-                                          (10., u_var_non_neg, 0),
-                                          (10., v_var_non_neg, 0),
-                                          (10., contr_non_neg, 1)])
+                                          (10., u_right_bnd, 0),
+                                          (10., u_left_bnd, 0)])
+                                        #   (10., contr_non_neg, 1)])
     optimizer = control_utils.ControlExp(loss=loss, device=device)
     
     def get_ode_bop(key, var, term, grid_loc, value):
@@ -279,8 +281,11 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
         bop.values = torch.from_numpy(np.array([[value,]])).float().to(device)
         return bop
 
-    bop_y = get_ode_bop('y', 0, [None], t[0, 0], u_init)
-    bop_dy = get_ode_bop('y', 0, [0,], t[0, 0], v_init)
+    bop_y = get_ode_bop('y', 0, [None], t[0, 0], y_init)
+    bop_dy = get_ode_bop('y', 0, [0,], t[0, 0], dy_init)
+
+    bop_phi = get_ode_bop('y', 0, [None], t[0, 0], phi_init)
+    bop_dphi = get_ode_bop('y', 0, [0,], t[0, 0], dphi_init)
 
     optimizer.system = eq
 
@@ -288,8 +293,10 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
     optimizer.set_solver_params(training_params = {'epochs': 200,})
 
-    state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_u(device=device), 0.001), 
-                                                                               (bop_v(device=device), 0.001)], 
+    state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_y(device=device), 0.001), 
+                                                                               (bop_dy(device=device), 0.001),
+                                                                               (bop_phi(device=device), 0.001),
+                                                                               (bop_dphi(device=device), 0.001)], 
                                                                grids = [t,], n_control = 1., 
                                                                state_net = state_nn_pretrained, 
                                                                opt_params = [0.005, 0.9, 0.999, 1e-8],

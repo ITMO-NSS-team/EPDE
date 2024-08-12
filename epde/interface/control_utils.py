@@ -508,7 +508,7 @@ class AdamOptimizer(FirstOrderOptimizer):
                                for tensor_idx, grad_subtensor in enumerate(gradient.values())]
         moment_cor = [moment_tensor/(1 - self.parameters[1] ** self.time) for moment_tensor in self._moment] 
         second_moment_cor = [sm_tensor/(1 - self.parameters[2] ** self.time) for sm_tensor in self._second_moment] 
-        return OrderedDict([(subtensor_key, optimized[subtensor_key] + self.parameters[0] * moment_cor[tensor_idx]/\
+        return OrderedDict([(subtensor_key, optimized[subtensor_key] - self.parameters[0] * moment_cor[tensor_idx]/\
                              (torch.sqrt(second_moment_cor[tensor_idx]) + self.parameters[3])) # TODO: validate "+"
                             for tensor_idx, subtensor_key in enumerate(optimized.keys())])
     

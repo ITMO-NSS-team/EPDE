@@ -1,8 +1,35 @@
+import os
+import sys
+from collections import OrderedDict
+from typing import List
+import faulthandler
+
+faulthandler.enable()
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../..')))
+
+import numpy as np
+import torch
+import pickle
+
+from tqdm import tqdm
+import matplotlib as mpl
+mpl.use('TkAgg')
+import matplotlib.pyplot as plt
+from matplotlib.collections import LineCollection
+
+import epde
+import epde.interface.control_utils as control_utils
+import epde.globals as global_var
+from projects.control.swingup_aux import DMCEnvWrapper, RandomPolicy, CosinePolicy, CosineSignPolicy, \
+                                         TwoCosinePolicy, rollout_env, VarTrigTokens # ,, DerivSignFunction
+from epde.interface.prepared_tokens import DerivSignFunction
+
 import numpy as np
 import scipy
 import matplotlib.pyplot as plt
-from matplotlib.collections import LineCollection
+
 import time
+
 
 import gym
 import scipy.special
@@ -185,10 +212,10 @@ def prepare_data(*args, **kwargs):
     plt.show()
     return observations, acts
 
-def discover_equations(observations: np.ndarray, actions: np.ndarray):
+# def discover_equations(observations: np.ndarray, actions: np.ndarray):
     
 
 if __name__ == '__main__':
     obs, acts = prepare_data()
 
-    discover_equations(obs, acts)
+    # discover_equations(obs, acts)
