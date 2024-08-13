@@ -319,8 +319,8 @@ class ControlExp():
         min_loss = np.inf
         self._best_control_params = global_var.control_nn.net.state_dict()
 
-        # optimizer = AdamOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = opt_params)
-        optimizer = CoordDescentOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = opt_params)
+        optimizer = AdamOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = opt_params)
+        # optimizer = CoordDescentOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = opt_params)
 
         adapter = self.get_solver_adapter(None)
 
@@ -530,7 +530,7 @@ class CoordDescentOptimizer(FirstOrderOptimizer):
         assert 'loc' in kwargs.keys(), 'Missing location of parameter value shift in coordinate descent.'
         loc = kwargs['loc']
         if torch.isclose(gradient[loc[0]][tuple(loc[1:])], 
-                         torch.tensor((0,)).to(device=gradient[loc[0]][tuple(loc[1:])].get_device()).float()):
+                         torch.tensor((0,)).to(device=gradient[loc[0]][tuple(loc[1:])].device).float()):
             warn(f'Gradient at {loc} is close to zero: {gradient[loc[0]][tuple(loc[1:])]}.')
         # print(optimized[loc[0]][tuple(loc[1:])], gradient[loc[0]][tuple(loc[1:])])
         optimized[loc[0]][tuple(loc[1:])] = optimized[loc[0]][tuple(loc[1:])] -\
