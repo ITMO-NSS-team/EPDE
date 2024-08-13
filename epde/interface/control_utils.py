@@ -236,12 +236,12 @@ class ControlExp():
                                 bc_operators, grids: list, solver_params: dict, eps: float):
         # Calculating loss in p[i]+eps: 
         ctrl_dict_prev = global_var.control_nn.net.state_dict() # deepcopy()
+        # print(f'Altering with {eps}')
         ctrl_nn_dict = eps_increment_diff(input_params=ctrl_dict_prev,
-                                        loc = loc, forward=True, eps=eps)
+                                          loc = loc, forward=True, eps=eps)
         global_var.control_nn.net.load_state_dict(ctrl_nn_dict)
-        # state_dict_prev = state_dict = None
 
-        adapter.set_net(state_net)
+        adapter.set_net(deepcopy(state_net))
         solver_loss_forward, model = adapter.solve_epde_system(system = system, grids = grids[0], data = None,
                                              boundary_conditions = bc_operators,
                                              mode = solver_params['mode'],
@@ -256,10 +256,10 @@ class ControlExp():
         # Calculating loss in p[i]-eps:
         ctrl_dict_prev = global_var.control_nn.net.state_dict() # deepcopy()
         ctrl_nn_dict = eps_increment_diff(input_params=ctrl_dict_prev,
-                                          loc = loc, forward=True, eps=eps)
+                                          loc = loc, forward=False, eps=eps)
         global_var.control_nn.net.load_state_dict(ctrl_nn_dict)
 
-        adapter.set_net(state_net)
+        adapter.set_net(deepcopy(state_net))
         solver_loss_backward, model = adapter.solve_epde_system(system = system, grids = grids[0], data = None,
                                                        boundary_conditions = bc_operators,
                                                        mode = solver_params['mode'],
@@ -267,7 +267,6 @@ class ControlExp():
                                                        use_fourier = solver_params['use_fourier'],
                                                        fourier_params = solver_params['fourier_params'],
                                                        use_adaptive_lambdas = solver_params['use_adaptive_lambdas'])
-        # print(f'solver_loss: {solver_loss_forward, solver_loss_backward}')
 
         control_inputs = prepare_control_inputs(model, grids[1], global_var.control_nn.net_args)
         loss_back = control_loss([model, global_var.control_nn.net], [grids[1], control_inputs])
@@ -275,13 +274,14 @@ class ControlExp():
         # Restore values of the control NN parameters
         state_dict_prev = global_var.control_nn.net.state_dict()
         state_dict = eps_increment_diff(input_params=state_dict_prev,
-                                        loc = loc, forward=False, eps=eps)
+                                        loc = loc, forward=True, eps=eps)
         global_var.control_nn.net.load_state_dict(state_dict)
         state_dict = state_dict_prev = None
 
         loss_alpha = 1e0
         with torch.no_grad():
             res = (loss_forward - loss_back)/(2*eps*(1+loss_alpha*(solver_loss_forward+solver_loss_backward)))
+            # print('loss_forward: ', loss_forward, 'loss_back: ', loss_back, 'delta:', loss_forward - loss_back,'res: ', res)
         return res
         
 
@@ -319,8 +319,8 @@ class ControlExp():
         min_loss = np.inf
         self._best_control_params = global_var.control_nn.net.state_dict()
 
-        optimizer = AdamOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = opt_params)
-        # optimizer = CoordDescentOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = opt_params)
+        # optimizer = AdamOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = opt_params)
+        optimizer = CoordDescentOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = opt_params)
 
         adapter = self.get_solver_adapter(None)
 
@@ -331,7 +331,7 @@ class ControlExp():
             
             global_var.control_nn.net.load_state_dict(self._best_control_params)
             state_net  = deepcopy(self._state_net)
-            eps = 1e-2
+            # eps = 1e-2
             print(f'Control function optimization epoch {t}.')
             for param_key, param_tensor in grad_tensors.items():
                 print(f'Optimizing {param_key}: shape is {param_tensor.shape}')
@@ -436,9 +436,13 @@ class ControlExp():
 def eps_increment_diff(input_params: OrderedDict, loc: List[Union[str, Tuple[int]]], 
                        forward: bool = True, eps = 1e-4): # input_keys: list,  prev_loc: List = None, 
     if forward:
+        # print('before increase', input_params[loc[0]][tuple(loc[1:])])
         input_params[loc[0]][tuple(loc[1:])] += eps
+        # print('after increase', input_params[loc[0]][tuple(loc[1:])])        
     else:
+        # print('before decrease', input_params[loc[0]][tuple(loc[1:])])        
         input_params[loc[0]][tuple(loc[1:])] -= 2*eps
+        # print('after decrease', input_params[loc[0]][tuple(loc[1:])])           
     return input_params
 
 class FirstOrderOptimizerNp(ABC):

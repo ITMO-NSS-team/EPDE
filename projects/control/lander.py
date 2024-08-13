@@ -1,7 +1,7 @@
 import os
 import sys
 from collections import OrderedDict
-from typing import List
+from typing import List, Union
 import faulthandler
 
 faulthandler.enable()
@@ -36,15 +36,84 @@ import scipy.special
 
 def get_additional_token_families(ctrl):
     angle_trig_tokens = VarTrigTokens('phi', max_power=2, freq_center=1.)
-    sgn_tokens = DerivSignFunction(token_type = 'speed_sign', var_name = 'y', token_labels=['sign(dy/dx1)',],
-                                   deriv_solver_orders = [[0,],])
-    control_var_tokens = epde.interface.prepared_tokens.ControlVarTokens(sample = ctrl, arg_var = [(0, [None,]), (1, [None,]), 
-                                                                                                   (0, [0,]), (1, [0,])])
-    return [angle_trig_tokens, sgn_tokens, control_var_tokens] #  
+    # sgn_tokens = DerivSignFunction(token_type = 'speed_sign', var_name = 'y', token_labels=['sign(dy/dx1)',],
+    #                                deriv_solver_orders = [[0,],])
+    
+    ctrl_keys = ['ctrl_main', 'ctrl_thrust']
 
-def epde_discovery(t, x, angle, u, derivs, diff_method = 'FD', data_nn: torch.nn.Sequential = None, device: str = 'cpu'):
-    dimensionality = x.ndim - 1
-    use_solver = True
+    def main_thrust_filtering(thrust: Union[np.ndarray, torch.tensor]):
+        # acts[0, :] = np.where(acts[0, :] > 0.5, acts[0, :], 0.)    
+        # acts[1, :] = np.where(np.abs(acts[1, :]) < 0.5, 0., acts[1, :])
+        if isinstance(thrust, np.ndarray):
+            return np.where(thrust > 0.5, thrust, 0.)
+        else:
+            return torch.where(thrust > 0.5, thrust, 0.)
+    
+    def manuever_thrust_filtering(thrust: Union[np.ndarray, torch.tensor]):
+        if isinstance(thrust, np.ndarray):
+            return np.where(np.abs(thrust) < 0.5, 0., thrust)
+        else:
+            return torch.where(torch.abs(thrust) < 0.5, 0., thrust)
+
+    def main_thrust_nn_eval_torch(*args, **kwargs):
+        if isinstance(args[0], torch.Tensor):
+            inp = torch.cat([torch.reshape(tensor, (-1, 1)) for tensor in args], dim = 1)  # Validate correctness
+        else:
+            inp = torch.cat([torch.reshape(torch.Tensor([elem,]), (-1, 1)) for elem in args], dim = 1)
+        return main_thrust_filtering(global_var.control_nn.net(inp)[..., 0])
+
+    def manuever_thrust_nn_eval_torch(*args, **kwargs):
+        if isinstance(args[0], torch.Tensor):
+            inp = torch.cat([torch.reshape(tensor, (-1, 1)) for tensor in args], dim = 1)  # Validate correctness
+        else:
+            inp = torch.cat([torch.reshape(torch.Tensor([elem,]), (-1, 1)) for elem in args], dim = 1)
+        return manuever_thrust_filtering(global_var.control_nn.net(inp)[..., 1])
+
+    # def nn_eval_torch(*args, **kwargs):
+    #     if isinstance(args[0], torch.Tensor):
+    #         inp = torch.cat([torch.reshape(tensor, (-1, 1)) for tensor in args], dim = 1) # Validate correctness
+    #     else:
+    #         inp = torch.cat([torch.reshape(torch.Tensor([elem,]), (-1, 1)) for elem in args], dim = 1)
+    #     # print(f'passing tensor, stored at {inp.get_device()}')
+    #     # print(f'inp shape is {inp.shape}, args are {args}, kwargs are {kwargs}')
+    #     if kwargs['axis'] == 0:
+    #         return main_thrust_filtering(global_var.control_nn.net(inp)[..., kwargs['axis']])
+    #     elif kwargs['axis'] == 1:
+    #         return manuever_thrust_filtering(global_var.control_nn.net(inp)[..., kwargs['axis']])
+    #     else:
+    #         raise IndexError(f'Incorrect index selected: got kwargs["axis"] {kwargs["axis"]}.')
+    #     # return global_var.control_nn.net(inp)[..., kwargs['axis']]#**kwargs['power']
+
+    def main_thrust_nn_eval_np(*args, **kwargs):
+        # if kwargs['axis'] == 0:        
+        return main_thrust_nn_eval_torch(*args, **kwargs).detach().cpu().numpy()  #**kwargs['power']
+    
+    def manuever_thrust_nn_eval_np(*args, **kwargs):
+        # if kwargs['axis'] == 0:
+        return manuever_thrust_nn_eval_torch(*args, **kwargs).detach().cpu().numpy()  #**kwargs['power']
+    
+    nn_eval_torch = {ctrl_keys[0] : main_thrust_nn_eval_torch, 
+                     ctrl_keys[1] : manuever_thrust_nn_eval_torch}
+    
+    nn_eval_np = {ctrl_keys[0] : main_thrust_nn_eval_np, 
+                  ctrl_keys[1] : manuever_thrust_nn_eval_np}
+
+    control_var_tokens = epde.interface.prepared_tokens.ControlVarTokens(sample = [ctrl[0, ...], ctrl[1, ...]], 
+                                                                         var_name = ctrl_keys,
+                                                                         arg_var = [(0, [None,]), 
+                                                                                    (1, [None,]),
+                                                                                    (2, [None,]), 
+                                                                                    (0, [0,]), 
+                                                                                    (1, [0,]),
+                                                                                    (2, [0,])], 
+                                                                         eval_torch = nn_eval_torch, eval_np = nn_eval_np)
+    
+    return [angle_trig_tokens, control_var_tokens] # sgn_tokens, 
+
+def epde_discovery(t, y, z, angle, u, derivs = None, diff_method = 'FD', data_nn: torch.nn.Sequential = None, 
+                   device: str = 'cpu', use_solver = True):
+    dimensionality = t.ndim - 1
+    
     epde_search_obj = epde.EpdeSearch(use_solver = use_solver, dimensionality = dimensionality, boundary = 30,
                                       coordinate_tensors = [t,], verbose_params = {'show_iter_idx' : True})    
     
@@ -76,9 +145,9 @@ def epde_discovery(t, x, angle, u, derivs, diff_method = 'FD', data_nn: torch.nn
 
     eps = 5e-7
     popsize = 10
-    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=30)
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs = 30)
 
-    factors_max_number = {'factors_num' : [1, 2, 3,], 'probas' : [0.2, 0.65, 0.15]}
+    factors_max_number = {'factors_num' : [1, 2, 3,], 'probas' : [0.4, 0.4, 0.2]}
 
     # custom_grid_tokens = epde.GridTokens(dimensionality = dimensionality, max_power=1)
     # if use_solver:
@@ -96,11 +165,13 @@ def epde_discovery(t, x, angle, u, derivs, diff_method = 'FD', data_nn: torch.nn
     #     with open(fname, 'wb') as output_file:
     #         pickle.dump(data_nn, output_file)
 
-    epde_search_obj.fit(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,),
-                        equation_terms_max_number=10, data_fun_pow = 2, derivs = [derivs['y'], derivs['phi']],
+    if derivs is not None:
+        derivs = [derivs['y'], derivs['phi']]
+    epde_search_obj.fit(data=[y, z, angle], variable_names=['y', 'z', 'phi'], max_deriv_order=(2,),
+                        equation_terms_max_number=6, data_fun_pow = 2, derivs = derivs,
                         additional_tokens=get_additional_token_families(ctrl=u),
                         equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-7, 1e-4), data_nn=data_nn) # TODO: narrow sparsity interval, reduce the population size
+                        eq_sparsity_interval=(1e-7, 1e-4), data_nn=data_nn, device=device) # TODO: narrow sparsity interval, reduce the population size
     epde_search_obj.equations()
     return epde_search_obj
 
@@ -171,13 +242,13 @@ def prepare_data(*args, **kwargs):
     
 
     # print([len(obs) for obs in observations])
+    t    = np.arange(observations[0, :].size)
+    y    = observations[0, :].reshape(-1)
+    z    = observations[1, :].reshape(-1)
+    cols = np.linspace(0,1, y.size)
 
-    x    = observations[0, :].reshape(-1)
-    y    = observations[1, :].reshape(-1)
-    cols = np.linspace(0,1, x.size)
 
-
-    points = np.array([x, y]).T.reshape(-1, 1, 2)
+    points = np.array([y, z]).T.reshape(-1, 1, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
 
     fig, axs = plt.subplots() # 1, 1, sharex=True, sharey=True
@@ -192,8 +263,8 @@ def prepare_data(*args, **kwargs):
     fig.colorbar(line, ax=axs)
 
     eps = 0.1
-    axs.set_xlim(-max(np.abs(x.min()), np.abs(x.max()))- eps, max(np.abs(x.min()), np.abs(x.max()))+eps)
-    axs.set_ylim(y.min()-eps, y.max()+eps)
+    axs.set_xlim(-max(np.abs(y.min()), np.abs(y.max()))- eps, max(np.abs(y.min()), np.abs(y.max()))+eps)
+    axs.set_ylim(z.min()-eps, z.max()+eps)
 
     every = int(observations[0, :].size / 10.)
     origins = np.stack([observations[0, :].reshape(-1)[::every], observations[1, :].reshape(-1)[::every]], axis = 0)
@@ -210,12 +281,15 @@ def prepare_data(*args, **kwargs):
     plt.plot(np.arange(acts[0, :].size), acts[0, :], color = 'k')
     plt.plot(np.arange(acts[1, :].size), acts[1, :], color = 'r')
     plt.show()
-    return observations, acts
+    print(observations.shape, acts.shape)
+    return t, observations, acts, env.moon, (env.helipad_x1, env.helipad_x2, env.helipad_y)
 
 # def discover_equations(observations: np.ndarray, actions: np.ndarray):
     
 
 if __name__ == '__main__':
-    obs, acts = prepare_data()
+    t, obs, acts, moon, helipad = prepare_data()
 
-    # discover_equations(obs, acts)
+    # derivs = np.stack([obs[1, ...], obs[3, ...], obs[5, ...]])
+
+    epde_discovery(t = t, y = obs[0, ...], z = obs[2, ...], angle = obs[4, ...], u = acts, device = 'cuda')

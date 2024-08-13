@@ -255,15 +255,15 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
     # optimizer.set_control_optim_params()
 
-    optimizer.set_solver_params(training_params = {'epochs': 800,}, optimizer_params = {'params': {'lr': 1e-5}})
+    optimizer.set_solver_params(training_params = {'epochs': 400,}, optimizer_params = {'params': {'lr': 1e-5}})
 
     state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_u(device=device), 0.0),
                                                                                (bop_v(device=device), 0.0)],
                                                                grids = [t,], n_control = 1., 
                                                                state_net = state_nn_pretrained, 
-                                                               opt_params = [0.0001, 0.9, 0.999, 1e-8],
-                                                               control_net = ctrl_nn_pretrained, epochs = 75,
-                                                               fig_folder = fig_folder, eps = 1e-1)
+                                                               opt_params = [0.001, 0.9, 0.999, 1e-8],
+                                                               control_net = ctrl_nn_pretrained, epochs = 20,
+                                                               fig_folder = fig_folder, eps = 5e-1)
 
     return state_nn, ctrl_net, ctrl_pred, hist
 
@@ -271,12 +271,12 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 if __name__ == '__main__':
     import pickle
 
-    explicit_cpu = True
+    explicit_cpu = False
     device = 'cuda' if (torch.cuda.is_available and not explicit_cpu) else 'cpu'
     print(f'Working on {device}')
     # fig_folder = '/home/mikemaslyaev/Documents/EPDE/projects/control/figs'
-    # res_folder = '/home/mikemaslyaev/Documents/EPDE/projects/control'
-    res_folder = 'C:\\Users\\Mike\\Documents\\Work\\EPDE\\projects'
+    res_folder = '/home/mikemaslyaev/Documents/EPDE/projects/control'
+    # res_folder = 'C:\\Users\\Mike\\Documents\\Work\\EPDE\\projects'
     fig_folder = os.path.join(res_folder, 'figs')
 
     t, ctrl, solution = prepare_data(steps_num = 101, ctrl_fun = lambda x: 12*x[1] + 0.05*x[0] + 0.2) # x[0]
@@ -291,9 +291,9 @@ if __name__ == '__main__':
 
     try:
         if device == 'cpu':
-            fname = os.path.join(res_folder, r"data_ann_2_cpu.pickle")
+            fname = os.path.join(res_folder, r"data_ann_3_cpu.pickle")
         else:
-            fname = os.path.join(res_folder, r"data_ann_2_cuda.pickle")
+            fname = os.path.join(res_folder, r"data_ann_3_cuda.pickle")
         with open(fname, 'rb') as data_input_file:  
             data_nn = pickle.load(data_input_file)
         data_nn = data_nn.to(device)
@@ -311,9 +311,9 @@ if __name__ == '__main__':
     print(f'example_sol: {type(example_sol)}, {example_sol.shape}, {example_sol.get_device()}')
     if save_nn:
         if device == 'cpu':
-            fname =  os.path.join(res_folder, r"data_ann_2_cpu.pickle")
+            fname =  os.path.join(res_folder, r"data_ann_3_cpu.pickle")
         else:
-            fname = os.path.join(res_folder, r"data_ann_2_cuda.pickle")
+            fname = os.path.join(res_folder, r"data_ann_3_cuda.pickle")
         with open(fname, 'wb') as output_file:
             pickle.dump(epde.globals.solution_guess_nn, output_file)
 
@@ -459,7 +459,7 @@ if __name__ == '__main__':
     plt.show()
 
     # raise NotImplementedError()
-    res = optimize_ctrl(model, torch.from_numpy(t).reshape((-1, 1)).float().to(device), u_tar = 3, v_tar = 1,
+    res = optimize_ctrl(model, torch.from_numpy(t).reshape((-1, 1)).float().to(device), u_tar = 1.5, v_tar = 0.5,
                         u_init=solution[0, 0], v_init=solution[0, 1],
                         state_nn_pretrained=epde.globals.solution_guess_nn, ctrl_nn_pretrained=ctrl_ann, 
                         fig_folder=fig_folder, device=device)

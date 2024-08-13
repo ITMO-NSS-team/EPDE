@@ -168,7 +168,8 @@ class DataSign(PreparedTokens):
 
 class ControlVarTokens(PreparedTokens):
     def __init__(self, sample: Union[np.ndarray, List[np.ndarray]], ann: torch.nn.Sequential = None, 
-                 var_name: Union[str, List[str]] = 'ctrl', arg_var: List[Tuple[Union[int, List]]] = [(0, [None,]),]):
+                 var_name: Union[str, List[str]] = 'ctrl', arg_var: List[Tuple[Union[int, List]]] = [(0, [None,]),], 
+                 eval_torch: Union[Callable, dict] = None, eval_np: Union[Callable, dict] = None,):
         vars, der_ords = zip(*arg_var)
         if isinstance(sample, List):
             assert isinstance(var_name, List), 'Both samples and var names have to be set as Lists or single elements.'
@@ -180,15 +181,15 @@ class ControlVarTokens(PreparedTokens):
         
         equal_params = {'power': 0}
 
-        self._token_family = TokenFamily(token_type = var_name, variable = vars,
+        self._token_family = TokenFamily(token_type = 'ctrl', variable = vars,
                                          family_of_derivs=True)
 
         self._token_family.set_status(demands_equation=False, meaningful=True,
                                       unique_specific_token=True, unique_token_type=True,
                                       s_and_d_merged=False, non_default_power = False)
-        
-        self._token_family.set_params([var_name,], token_params, equal_params,
-                                      derivs_solver_orders=[der_ords,])
+        if isinstance(var_name, str): var_name = [var_name,]
+        self._token_family.set_params(var_name, token_params, equal_params,
+                                      derivs_solver_orders=[der_ords for label in var_name])
         
         def nn_eval_torch(*args, **kwargs):
             if isinstance(args[0], torch.Tensor):
@@ -202,13 +203,16 @@ class ControlVarTokens(PreparedTokens):
         def nn_eval_np(*args, **kwargs):
             return nn_eval_torch(*args, **kwargs).detach().numpy()#**kwargs['power']
 
-        eval = CustomEvaluator(evaluation_functions_np=nn_eval_np,
-                               evaluation_functions_torch=nn_eval_torch,
+        if eval_np    is None: eval_np = nn_eval_np
+        if eval_torch is None: eval_torch = nn_eval_torch
+
+        eval = CustomEvaluator(evaluation_functions_np = eval_np,
+                               evaluation_functions_torch = nn_eval_torch,
                                eval_fun_params_labels = ['power'])
 
         global_var.reset_control_nn(n_control = num_ctrl_comp, ann = ann, ctrl_args = arg_var)
         if isinstance(sample, np.ndarray):
-            global_var.tensor_cache.add(tensor = sample, label = (var_name, (1.0,)))
+            global_var.tensor_cache.add(tensor = sample, label = (var_name[0], (1.0,)))
         else:
             for idx, var_elem in enumerate(var_name):
                 global_var.tensor_cache.add(tensor = sample[idx], label = (var_elem, (1.0,)))

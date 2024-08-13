@@ -739,7 +739,7 @@ class EpdeSearch(object):
             equation_factors_max_number=1, variable_names=['u',], eq_sparsity_interval=(1e-4, 2.5), 
             derivs=None, max_deriv_order=1, additional_tokens=[], data_fun_pow: int = 1, deriv_fun_pow: int = 1,
             optimizer: Union[SimpleOptimizer, MOEADDOptimizer] = None, pool: TFPool = None,
-            population: Union[ParetoLevels, Population] = None, data_nn = None):
+            population: Union[ParetoLevels, Population] = None, data_nn = None, device: str = 'cpu'):
         """
         Fit epde search algorithm to obtain differential equations, describing passed data.
 
@@ -809,7 +809,7 @@ class EpdeSearch(object):
                                  derivs=derivs, max_deriv_order=max_deriv_order, 
                                  additional_tokens=additional_tokens, 
                                  data_fun_pow = data_fun_pow, deriv_fun_pow = deriv_fun_pow, 
-                                 data_nn = data_nn)
+                                 data_nn = data_nn, device=device)
         else:
             self.pool = pool; self.pool_params = cur_params
 
