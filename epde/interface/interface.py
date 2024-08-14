@@ -688,7 +688,7 @@ class EpdeSearch(object):
                 global_var.reset_data_repr_nn(data = data, derivs = base_derivs, train = False, 
                                               grids = grid, predefined_ann = data_nn, device = device)
             else:
-                global_var.reset_data_repr_nn(data = data, derivs = base_derivs, 
+                global_var.reset_data_repr_nn(data = data, derivs = base_derivs, epochs_max=1e5,
                                               grids = grid, predefined_ann=None, device = device)
 
         if isinstance(additional_tokens, list):

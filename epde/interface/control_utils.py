@@ -319,8 +319,8 @@ class ControlExp():
         min_loss = np.inf
         self._best_control_params = global_var.control_nn.net.state_dict()
 
-        # optimizer = AdamOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = opt_params)
-        optimizer = CoordDescentOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = opt_params)
+        optimizer = AdamOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = opt_params)
+        # optimizer = CoordDescentOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = opt_params)
 
         adapter = self.get_solver_adapter(None)
 

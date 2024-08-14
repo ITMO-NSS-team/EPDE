@@ -207,7 +207,7 @@ class ControlVarTokens(PreparedTokens):
         if eval_torch is None: eval_torch = nn_eval_torch
 
         eval = CustomEvaluator(evaluation_functions_np = eval_np,
-                               evaluation_functions_torch = nn_eval_torch,
+                               evaluation_functions_torch = eval_torch,
                                eval_fun_params_labels = ['power'])
 
         global_var.reset_control_nn(n_control = num_ctrl_comp, ann = ann, ctrl_args = arg_var)

@@ -35,7 +35,7 @@ import gym
 import scipy.special
 
 def get_additional_token_families(ctrl):
-    angle_trig_tokens = VarTrigTokens('phi', max_power=2, freq_center=1.)
+    angle_trig_tokens = VarTrigTokens('phi', max_power=1, freq_center=1.)
     # sgn_tokens = DerivSignFunction(token_type = 'speed_sign', var_name = 'y', token_labels=['sign(dy/dx1)',],
     #                                deriv_solver_orders = [[0,],])
     
@@ -108,7 +108,7 @@ def get_additional_token_families(ctrl):
                                                                                     (2, [0,])], 
                                                                          eval_torch = nn_eval_torch, eval_np = nn_eval_np)
     
-    return [angle_trig_tokens, control_var_tokens] # sgn_tokens, 
+    return [angle_trig_tokens,]# control_var_tokens] # sgn_tokens, 
 
 def epde_discovery(t, y, z, angle, u, derivs = None, diff_method = 'FD', data_nn: torch.nn.Sequential = None, 
                    device: str = 'cpu', use_solver = True):
@@ -145,9 +145,9 @@ def epde_discovery(t, y, z, angle, u, derivs = None, diff_method = 'FD', data_nn
 
     eps = 5e-7
     popsize = 10
-    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs = 30)
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs = 150)
 
-    factors_max_number = {'factors_num' : [1, 2, 3,], 'probas' : [0.4, 0.4, 0.2]}
+    factors_max_number = {'factors_num' : [1, 2, 3,], 'probas' : [0.4, 0.5, 0.1]}
 
     # custom_grid_tokens = epde.GridTokens(dimensionality = dimensionality, max_power=1)
     # if use_solver:
@@ -196,10 +196,10 @@ def prepare_data(*args, **kwargs):
     num_steps = 200
 
     k = 3
-    main_thrust = lambda x: (np.power(x, k/2.-1)*np.exp(-x/2.))/(2**(k/2.)*scipy.special.gamma(k/2.))/3.
+    main_thrust = lambda x: 0#(np.power(x, k/2.-1)*np.exp(-x/2.))/(2**(k/2.)*scipy.special.gamma(k/2.))/3.
     test_range = np.linspace(0, 5, 100)
-    plt.plot(test_range, main_thrust(test_range))
-    plt.show()
+    # plt.plot(test_range, main_thrust(test_range))
+    # plt.show()
 
     obs = env.reset()
     observations = [obs[0],]
@@ -211,7 +211,7 @@ def prepare_data(*args, **kwargs):
         # action = my_intelligent_agent_fn(obs) 
         if not (left_landed or right_landed):
             print(observations[-1][3])
-            hor_thrust = -np.sign(observations[-1][0]) * (np.abs(observations[-1][0]))
+            hor_thrust = 0 #-np.sign(observations[-1][0]) * (np.abs(observations[-1][0]))
             action = [main_thrust(observations[-1][1]), hor_thrust]#env.action_space.sample()
         else:
             action = [0., 0.]
@@ -292,4 +292,17 @@ if __name__ == '__main__':
 
     # derivs = np.stack([obs[1, ...], obs[3, ...], obs[5, ...]])
 
-    epde_discovery(t = t, y = obs[0, ...], z = obs[2, ...], angle = obs[4, ...], u = acts, device = 'cuda')
+    print(f'Observations {obs.shape}, acts {acts.shape}')
+
+    plt.plot(t, obs[0, ...], color = 'k', label = 'y')
+    plt.plot(t, obs[2, ...], '--', color = 'k', label = 'dy')    
+    plt.plot(t, obs[1, ...], color = 'r', label = 'z')
+    plt.plot(t, obs[3, ...], '--', color = 'r', label = 'dz')    
+    plt.plot(t, obs[4, ...], color = 'b', label = 'phi')
+    plt.plot(t, obs[5, ...], '--', color = 'b', label = 'd phi')
+    plt.legend()
+    plt.show()
+
+
+    epde_discovery(t = t[:-5], y = obs[0, :-5], z = obs[1, :-5], angle = obs[4, :-5], 
+                   u = acts[..., :-5], device = 'cuda', use_solver = True)

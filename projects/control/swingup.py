@@ -7,6 +7,7 @@ Created on Wed Apr  3 17:43:03 2024
 """
 import os
 import sys
+import datetime
 from collections import OrderedDict
 from typing import List
 import faulthandler
@@ -156,7 +157,7 @@ def epde_multisample_discovery(t: List[np.ndarray], x: List[np.ndarray], angle: 
     epde_search_obj.equations()
     return epde_search_obj
 
-def translate_equation(t, x, angle, u, derivs: dict, diff_method = 'FD'):
+def translate_equation(t, x, angle, u, derivs: dict, diff_method = 'FD', device: str = 'cpu'):
     print('Shapes:', x.shape, angle.shape)
     dimensionality = x.ndim - 1
     
@@ -176,7 +177,7 @@ def translate_equation(t, x, angle, u, derivs: dict, diff_method = 'FD'):
         
 
 
-    epde_search_obj = epde.EpdeSearch(use_solver = False, dimensionality = dimensionality, boundary = 30,
+    epde_search_obj = epde.EpdeSearch(use_solver = True, dimensionality = dimensionality, boundary = 30,
                                       coordinate_tensors = [t,], verbose_params = {'show_iter_idx' : False})
 
     if diff_method == 'ANN':
@@ -208,7 +209,7 @@ def translate_equation(t, x, angle, u, derivs: dict, diff_method = 'FD'):
 
 
     epde_search_obj.create_pool(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,), derivs = [derivs['y'], derivs['phi']],
-                                additional_tokens = get_additional_token_families(ctrl=u))
+                                additional_tokens = get_additional_token_families(ctrl=u), device=device)
 
     test = epde.interface.equation_translator.CoeffLessEquation(lp_terms = {'phi': lp_phi_terms, 'y': lp_y_terms},
                                                                 rp_term = {'phi': rp_phi_term, 'y': rp_y_term}, 
@@ -323,7 +324,7 @@ def prepare_trajectories(n_sample: int = 250, single_sample: bool = True):
     return t, rollout_env(cart_env, two_cosine_policy, n_steps = 250, 
                           n_steps_reset=1000)
 
-def general(single_sample: bool = True, discover: bool = True):
+def general(experiment, res_folder, single_sample: bool = True, discover: bool = True, device: str = 'cpu'):
     env_config = {'domain_name': "cartpole",
                   'task_name': "swingup",
                   'frame_skip': 1,
@@ -408,22 +409,34 @@ def general(single_sample: bool = True, discover: bool = True):
             angles_d.append(angle_d)
             us.append(u)
 
-            device = 'cpu'
+            # device = 'cpu'
             try:
                 if device == 'cpu':
-                    # fname = 'C://Users//Mike//Documents//Work//EPDE//projects//control//swingup_ann_cpu.pickle'
-                    fname = r"/home/mikemaslyaev/Documents/EPDE/projects/control/swingup_ann_cpu.pickle"
+                    fname = os.path.join(res_folder, f"data_ann_3_{experiment}_cpu.pickle")
                 else:
-                    fname = r"/home/mikemaslyaev/Documents/EPDE/projects/control/swingup_ann_cuda.pickle"
+                    fname = os.path.join(res_folder, f"data_ann_3_{experiment}_cuda.pickle")
                 with open(fname, 'rb') as data_input_file:  
                     data_nn = pickle.load(data_input_file)
-            except:
+                data_nn = data_nn.to(device)
+                save_nn = False
+            except FileNotFoundError:
+                print('No model located, ')
                 data_nn = None
+                save_nn = True
 
             if discover:
                 res = epde_discovery(t, x, angle, u, derivs, 'FD', data_nn = data_nn, device = device)
             else:
                 res = translate_equation(t, x, angle, u, derivs, 'FD')
+            if save_nn:
+                if device == 'cpu':
+                    fname =  os.path.join(res_folder, f"data_ann_{experiment}__cpu.pickle")
+                else:
+                    fname = os.path.join(res_folder, f"data_ann_{experiment}__cuda.pickle")
+                with open(fname, 'wb') as output_file:
+                    pickle.dump(epde.globals.solution_guess_nn, output_file)
+
+            return t, u, np.stack([x, x_d, angle, angle_d]).T, res
     else:
         traj_obs_sc, traj_acts_sc, traj_rews_sc = rollout_env(cart_env, cosine_signum_policy, n_steps = 250, 
                                                             n_steps_reset=1000)
@@ -483,10 +496,23 @@ def general(single_sample: bool = True, discover: bool = True):
 
         samples_u = [tc_comb[4], tc_comb[4], tc_comb[4]]
 
-        return epde_multisample_discovery(samples_t, samples_pos, samples_angle, samples_derivs, samples_u, 'FD')
+        return t, epde_multisample_discovery(samples_t, samples_pos, samples_angle, 
+                                             samples_derivs, samples_u, 'FD')
 
 if __name__ == '__main__':
+    import pickle
+
+    experiment = 'swingup'
+    explicit_cpu = False
+    device = 'cuda' if (torch.cuda.is_available and not explicit_cpu) else 'cpu'
+    print(f'Working on {device}')
+    # fig_folder = '/home/mikemaslyaev/Documents/EPDE/projects/control/figs'
+    res_folder = '/home/mikemaslyaev/Documents/EPDE/projects/control'
+    # res_folder = 'C:\\Users\\Mike\\Documents\\Work\\EPDE\\projects'
+    fig_folder = os.path.join(res_folder, 'figs')
+
     only_prepare = False
+    discover = False
     if only_prepare:
         t, traj_data = prepare_trajectories() # traj_data = (traj_obj, traj_acts, traj_rews)
         print(f'Acts len is {len(traj_data[0])}, while shape {traj_data[0][0].shape}')
@@ -495,4 +521,133 @@ if __name__ == '__main__':
         np.save(file = '/home/mikemaslyaev/Documents/EPDE/projects/control/reserve/state.npy', arr = traj_data[0][0])
         np.save(file = '/home/mikemaslyaev/Documents/EPDE/projects/control/reserve/acts.npy', arr = traj_data[1][0])
     else:
-        res = general(discover=True)
+        # t, _ = prepare_trajectories()
+        t, ctrl, solution, res = general(experiment, res_folder=res_folder, discover=discover, device = device)
+
+        # print(f'type(res) is {type(res.system)}')
+        # print(f't.shape: {t.shape}, ctrl.shape: {ctrl.shape}, solution.shape: {solution.shape}')
+        # # raise NotImplementedError()
+        # try:
+        #     if device == 'cpu':
+        #         fname = os.path.join(res_folder, f"data_ann_3_{experiment}_cpu.pickle")
+        #     else:
+        #         fname = os.path.join(res_folder, f"data_ann_3_{experiment}_cuda.pickle")
+        #     with open(fname, 'rb') as data_input_file:  
+        #         data_nn = pickle.load(data_input_file)
+        #     data_nn = data_nn.to(device)
+        #     save_nn = False
+        # except FileNotFoundError:
+        #     print('No model located, ')
+        #     data_nn = None
+        #     save_nn = True
+
+        # model = translate_dummy_eqs(t, solution[:, 0], solution[:, 1], ctrl, data_nn = data_nn, device = device) # , 
+        example_sol = epde.globals.solution_guess_nn(torch.from_numpy(t).reshape((-1, 1)).float().to(device))
+        epde.globals.solution_guess_nn.to(device)
+        print(f'example_sol: {type(example_sol)}, {example_sol.shape}, {example_sol.get_device()}')
+        # if save_nn:
+        #     if device == 'cpu':
+        #         fname =  os.path.join(res_folder, f"data_ann_{experiment}__cpu.pickle")
+        #     else:
+        #         fname = os.path.join(res_folder, f"data_ann_{experiment}__cuda.pickle")
+        #     with open(fname, 'wb') as output_file:
+        #         pickle.dump(epde.globals.solution_guess_nn, output_file)
+
+        def create_shallow_nn(arg_num: int = 1, output_num: int = 1, device = 'cpu') -> torch.nn.Sequential: # net: torch.nn.Sequential = None, 
+            hidden_neurons = 25
+            layers = [torch.nn.Linear(arg_num, hidden_neurons, device=device),
+                    torch.nn.Tanh(), # ReLU(),
+                    torch.nn.Linear(hidden_neurons, output_num, device=device)]
+            return torch.nn.Sequential(*layers)
+        
+        def create_deep_nn(arg_num: int = 1, output_num: int = 1, device = 'cpu') -> torch.nn.Sequential: # net: torch.nn.Sequential = None, 
+            hidden_neurons = 18
+            layers = [torch.nn.Linear(arg_num, hidden_neurons, device=device),
+                    torch.nn.Tanh(),
+                    torch.nn.Linear(hidden_neurons, hidden_neurons, device=device),
+                    torch.nn.ReLU(),
+                    torch.nn.Linear(hidden_neurons, output_num, device=device)]
+            return torch.nn.Sequential(*layers)        
+
+        time_exp_start = datetime.datetime.now()
+        
+        from epde.supplementary import define_derivatives
+        from epde.preprocessing.preprocessor_setups import PreprocessorSetup
+        from epde.preprocessing.preprocessor import ConcretePrepBuilder, PreprocessingPipe
+
+
+        # preprocessor_kwargs = {'epochs_max' : 10000}
+        
+        def prepare_derivs(var_name: str, var_array: np.ndarray, grid: np.ndarray, max_order: tuple = (2,)):
+            default_preprocessor_type = 'FD'
+            preprocessor_kwargs = {}#{'use_smoothing' : False,
+                                #  'include_time' : True}        
+            setup = PreprocessorSetup()
+            builder = ConcretePrepBuilder()
+            setup.builder = builder
+            
+            if default_preprocessor_type == 'ANN':
+                setup.build_ANN_preprocessing(**preprocessor_kwargs)
+            elif default_preprocessor_type == 'poly':
+                setup.build_poly_diff_preprocessing(**preprocessor_kwargs)
+            elif default_preprocessor_type == 'spectral':
+                setup.build_spectral_preprocessing(**preprocessor_kwargs)
+            elif default_preprocessor_type == 'FD':
+                setup.build_FD_preprocessing(**preprocessor_kwargs)
+
+            preprocessor_pipeline = setup.builder.prep_pipeline
+
+            if 'max_order' not in preprocessor_pipeline.deriv_calculator_kwargs.keys():
+                preprocessor_pipeline.deriv_calculator_kwargs['max_order'] = None
+                
+            max_order = (1,)
+            deriv_names, _ = define_derivatives(var_name, dimensionality=var_array.ndim,
+                                                max_order=max_order)
+
+            _, derivatives_n = preprocessor_pipeline.run(var_array, grid=[grid,],
+                                                        max_order=max_order)
+            return deriv_names, derivatives_n
+        
+        der_names_u, derivatives_u = prepare_derivs('u', var_array = solution[:, 0], grid = t)
+        der_names_v, derivatives_v = prepare_derivs('v', var_array = solution[:, 2], grid = t)
+        
+        args = torch.from_numpy(solution).float().to(device)
+        # args = torch.cat([args, torch.from_numpy(derivatives_u).float().to(device), 
+                        #   torch.from_numpy(derivatives_v).float().to(device)], dim=1)
+        print(f'args.shape is {args.shape}')
+
+
+        nn = 'shallow'
+        load_ctrl = False
+
+        if device == 'cpu':
+            ctrl_fname = os.path.join(res_folder, f"control_ann_{nn}_{experiment}_cpu.pickle")
+            # f"/home/mikemaslyaev/Documents/EPDE/projects/control/control_ann_{nn}_cpu.pickle"
+        else:
+            ctrl_fname = os.path.join(res_folder, f"control_ann_{nn}_{experiment}_cuda.pickle")
+        if load_ctrl:
+            with open(ctrl_fname, 'rb') as ctrl_input_file:  
+                ctrl_ann = pickle.load(ctrl_input_file)
+        else:
+            nn_method = create_shallow_nn if nn == 'shallow' else create_deep_nn
+            ctrl_args = [solution[:, 0], solution[:, 1], solution[:, 2], solution[:, 3]]
+            ctrl_ann = epde.supplementary.train_ann(args=ctrl_args,#, 
+                                                        #   derivatives_u.reshape(-1), 
+                                                        #   derivatives_v.reshape(-1)], 
+                                                    data = ctrl, epochs_max = 5e6, dim = len(ctrl_args), 
+                                                    model = nn_method(len(ctrl_args), 1, device=device),
+                                                    device = device)
+
+            with open(ctrl_fname, 'wb') as ctrl_output_file:  
+                pickle.dump(ctrl_ann, file = ctrl_output_file)
+                
+        res = optimize_ctrl(res, torch.from_numpy(t).reshape((-1, 1)).float().to(device),
+                            y_init=solution[0, 0], dy_init=solution[0, 1], phi_init=solution[0, 2], dphi_init=solution[0, 3],
+                            y_left = -1, y_right = 1, stab_der_ord = 2, 
+                            state_nn_pretrained=epde.globals.solution_guess_nn, ctrl_nn_pretrained=ctrl_ann, 
+                            fig_folder=fig_folder, device=device)
+
+        savename = f'res_{time_exp_start.month}_{time_exp_start.day}_at_{time_exp_start.hour}_{time_exp_start.minute}_{experiment}.pickle'
+        # plt.savefig(os.path.join(fig_folder, frame_name))
+        with open(os.path.join(res_folder, savename), 'wb') as output_file:  
+            pickle.dump(res, output_file)                

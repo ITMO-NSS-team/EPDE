@@ -255,15 +255,15 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
     # optimizer.set_control_optim_params()
 
-    optimizer.set_solver_params(training_params = {'epochs': 400,}, optimizer_params = {'params': {'lr': 1e-5}})
+    optimizer.set_solver_params(training_params = {'epochs': 500,}, optimizer_params = {'params': {'lr': 1e-5}})
 
     state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_u(device=device), 0.0),
                                                                                (bop_v(device=device), 0.0)],
                                                                grids = [t,], n_control = 1., 
                                                                state_net = state_nn_pretrained, 
-                                                               opt_params = [0.001, 0.9, 0.999, 1e-8],
-                                                               control_net = ctrl_nn_pretrained, epochs = 20,
-                                                               fig_folder = fig_folder, eps = 5e-1)
+                                                               opt_params = [0.0001, 0.9, 0.999, 1e-8],
+                                                               control_net = ctrl_nn_pretrained, epochs = 60,
+                                                               fig_folder = fig_folder, eps = 1e0)
 
     return state_nn, ctrl_net, ctrl_pred, hist
 
@@ -271,6 +271,7 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 if __name__ == '__main__':
     import pickle
 
+    experiment = 'LV'
     explicit_cpu = False
     device = 'cuda' if (torch.cuda.is_available and not explicit_cpu) else 'cpu'
     print(f'Working on {device}')
@@ -291,9 +292,9 @@ if __name__ == '__main__':
 
     try:
         if device == 'cpu':
-            fname = os.path.join(res_folder, r"data_ann_3_cpu.pickle")
+            fname = os.path.join(res_folder, f"data_ann_{experiment}_cpu.pickle")
         else:
-            fname = os.path.join(res_folder, r"data_ann_3_cuda.pickle")
+            fname = os.path.join(res_folder, f"data_ann_{experiment}_cuda.pickle")
         with open(fname, 'rb') as data_input_file:  
             data_nn = pickle.load(data_input_file)
         data_nn = data_nn.to(device)
@@ -311,9 +312,9 @@ if __name__ == '__main__':
     print(f'example_sol: {type(example_sol)}, {example_sol.shape}, {example_sol.get_device()}')
     if save_nn:
         if device == 'cpu':
-            fname =  os.path.join(res_folder, r"data_ann_3_cpu.pickle")
+            fname =  os.path.join(res_folder, f"data_ann_{experiment}_cpu.pickle")
         else:
-            fname = os.path.join(res_folder, r"data_ann_3_cuda.pickle")
+            fname = os.path.join(res_folder, f"data_ann_{experiment}_cuda.pickle")
         with open(fname, 'wb') as output_file:
             pickle.dump(epde.globals.solution_guess_nn, output_file)
 
@@ -394,10 +395,10 @@ if __name__ == '__main__':
     load_ctrl = False
 
     if device == 'cpu':
-        ctrl_fname = os.path.join(res_folder, f"control_ann_{nn}_cpu.pickle")
+        ctrl_fname = os.path.join(res_folder, f"control_ann_{nn}_{experiment}_cpu.pickle")
         # f"/home/mikemaslyaev/Documents/EPDE/projects/control/control_ann_{nn}_cpu.pickle"
     else:
-        ctrl_fname = os.path.join(res_folder, f"control_ann_{nn}_cuda.pickle")
+        ctrl_fname = os.path.join(res_folder, f"control_ann_{nn}_{experiment}_cuda.pickle")
     if load_ctrl:
         with open(ctrl_fname, 'rb') as ctrl_input_file:  
             ctrl_ann = pickle.load(ctrl_input_file)
@@ -410,7 +411,7 @@ if __name__ == '__main__':
                                                 model = nn_method(2, 1, device=device),
                                                 device = device)
 
-        with open(ctrl_fname, 'wb') as ctrl_output_file:  
+        with open(ctrl_fname, 'wb') as ctrl_output_file:
             pickle.dump(ctrl_ann, file = ctrl_output_file)
 
     # ctrl_vals = ctrl_ann(example_sol)
@@ -464,7 +465,7 @@ if __name__ == '__main__':
                         state_nn_pretrained=epde.globals.solution_guess_nn, ctrl_nn_pretrained=ctrl_ann, 
                         fig_folder=fig_folder, device=device)
 
-    savename = f'res_{time_exp_start.month}_{time_exp_start.day}_at_{time_exp_start.hour}_{time_exp_start.minute}.pickle'
+    savename = f'res_{time_exp_start.month}_{time_exp_start.day}_at_{time_exp_start.hour}_{time_exp_start.minute}_{experiment}.pickle'
     # plt.savefig(os.path.join(fig_folder, frame_name))
     with open(os.path.join(res_folder, savename), 'wb') as output_file:  
         pickle.dump(res, output_file)
