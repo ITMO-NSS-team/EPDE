@@ -255,15 +255,18 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
     # optimizer.set_control_optim_params()
 
-    optimizer.set_solver_params(training_params = {'epochs': 500,}, optimizer_params = {'params': {'lr': 1e-5}})
+    solver_params = {'full':     {'training_params': {'epochs': 1500,}, 'optimizer_params': {'params': {'lr': 1e-5}}}, 
+                     'abridged': {'training_params': {'epochs': 300,}, 'optimizer_params': {'params': {'lr': 5e-5}}}}
+    # optimizer.set_solver_params(training_params = {'epochs': 40,}, optimizer_params = {'params': {'lr': 1e-4}})
 
-    state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_u(device=device), 0.0),
-                                                                               (bop_v(device=device), 0.0)],
+    state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_u(device=device), 0.3),
+                                                                               (bop_v(device=device), 0.3)],
                                                                grids = [t,], n_control = 1., 
                                                                state_net = state_nn_pretrained, 
-                                                               opt_params = [0.0001, 0.9, 0.999, 1e-8],
-                                                               control_net = ctrl_nn_pretrained, epochs = 60,
-                                                               fig_folder = fig_folder, eps = 1e0)
+                                                               opt_params = [0.001, 0.9, 0.999, 1e-8],
+                                                               control_net = ctrl_nn_pretrained, epochs = 150,
+                                                               fig_folder = fig_folder, eps = 1e-1, 
+                                                               solver_params = solver_params)
 
     return state_nn, ctrl_net, ctrl_pred, hist
 
@@ -321,7 +324,7 @@ if __name__ == '__main__':
 
 
     def create_shallow_nn(arg_num: int = 1, output_num: int = 1, device = 'cpu') -> torch.nn.Sequential: # net: torch.nn.Sequential = None, 
-        hidden_neurons = 25
+        hidden_neurons = 50
         layers = [torch.nn.Linear(arg_num, hidden_neurons, device=device),
                   torch.nn.Tanh(), # ReLU(),
                   torch.nn.Linear(hidden_neurons, output_num, device=device)]
@@ -392,7 +395,7 @@ if __name__ == '__main__':
     # raise NotImplementedError('Fin!')
 
     nn = 'shallow'
-    load_ctrl = False
+    load_ctrl = True
 
     if device == 'cpu':
         ctrl_fname = os.path.join(res_folder, f"control_ann_{nn}_{experiment}_cpu.pickle")
@@ -407,7 +410,7 @@ if __name__ == '__main__':
         ctrl_ann = epde.supplementary.train_ann(args=[solution[:, 0], solution[:, 1]],#, 
                                                     #   derivatives_u.reshape(-1), 
                                                     #   derivatives_v.reshape(-1)], 
-                                                data = ctrl, epochs_max = 5e6, dim = 2, 
+                                                data = ctrl, epochs_max = 1e5, dim = 2, 
                                                 model = nn_method(2, 1, device=device),
                                                 device = device)
 
@@ -428,7 +431,7 @@ if __name__ == '__main__':
     
     play_with_params = True
     if play_with_params:
-        eps = 1e0
+        eps = 5e-1
         ctrl_alt_p = deepcopy(ctrl_ann)
         state_dict_alt = ctrl_alt_p.state_dict()
         print(f'state_dict_alt["0.weight"] {state_dict_alt["0.weight"].shape}, with value of {state_dict_alt["0.weight"][10, 0]}')        

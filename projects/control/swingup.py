@@ -157,7 +157,7 @@ def epde_multisample_discovery(t: List[np.ndarray], x: List[np.ndarray], angle: 
     epde_search_obj.equations()
     return epde_search_obj
 
-def translate_equation(t, x, angle, u, derivs: dict, diff_method = 'FD', device: str = 'cpu'):
+def translate_equation(t, x, angle, u, derivs: dict, diff_method = 'FD', data_nn = None, device: str = 'cpu'):
     print('Shapes:', x.shape, angle.shape)
     dimensionality = x.ndim - 1
     
@@ -209,7 +209,7 @@ def translate_equation(t, x, angle, u, derivs: dict, diff_method = 'FD', device:
 
 
     epde_search_obj.create_pool(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,), derivs = [derivs['y'], derivs['phi']],
-                                additional_tokens = get_additional_token_families(ctrl=u), device=device)
+                                additional_tokens = get_additional_token_families(ctrl=u), device=device, data_nn = data_nn)
 
     test = epde.interface.equation_translator.CoeffLessEquation(lp_terms = {'phi': lp_phi_terms, 'y': lp_y_terms},
                                                                 rp_term = {'phi': rp_phi_term, 'y': rp_y_term}, 
@@ -243,23 +243,23 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
     loc_domain = control_utils.ConstrLocation(domain_shape = (t.size()[0],), device=device) # Declaring const in the entire domain
     loc_end = control_utils.ConstrLocation(domain_shape = (t.size()[0],), axis = 0, loc = -1, device=device) # Check format
-    print(f'loc_end.flat_idxs : {loc_end.flat_idxs}')
+    print(f'loc_end.flat_idxs : {loc_end.flat_idxs}, device {device}')
     cosine_cond = lambda x, ref: torch.cos(x) - ref
     phi_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t[-1], fill_value = 1., device=device), # Better processing for periodic
                                                    indices = loc_end, deriv_axes=[None,], deriv_method = autograd, nn_output=0, 
-                                                   estim_func=cosine_cond)
+                                                   estim_func=cosine_cond, device=device)
     dphi_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t[-1], fill_value = 0, device=device),
-                                                    indices = loc_end, deriv_axes=[0,], deriv_method = autograd, nn_output=1)
+                                                    indices = loc_end, deriv_axes=[0,], deriv_method = autograd, nn_output=1, device=device)
     contr_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = 0., device=device),
-                                                 indices = loc_domain, deriv_axes=[None,], deriv_method = autograd, nn_output=0)
+                                                 indices = loc_domain, deriv_axes=[None,], deriv_method = autograd, nn_output=0, device=device)
 
     u_right_bnd = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = y_right, device=device), sign='<',
-                                                 indices = loc_domain, deriv_method = autograd, nn_output=0)
+                                                 indices = loc_domain, deriv_method = autograd, nn_output=0, device=device)
     u_left_bnd = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = y_left, device=device), sign='>',
-                                                indices = loc_domain, deriv_method = autograd, nn_output=1)
+                                                indices = loc_domain, deriv_method = autograd, nn_output=1, device=device)
     # contr_non_neg = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0., device=device), sign='>',
-    #                                                indices = loc_domain, deriv_method = autograd, nn_output=0)    
-
+    #                                                indices = loc_domain, deriv_method = autograd, nn_output=0)
+    # print('phi_tar_constr._indices', phi_tar_constr._indices.flat_idxs)
     
     loss = control_utils.ConditionalLoss([(1., phi_tar_constr, 0),
                                           (1., dphi_tar_constr, 0), 
@@ -288,21 +288,23 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     bop_phi = get_ode_bop('y', 0, [None], t[0, 0], phi_init)
     bop_dphi = get_ode_bop('y', 0, [0,], t[0, 0], dphi_init)
 
-    optimizer.system = eq
+    optimizer.system = eq.system
 
-    optimizer.set_control_optim_params()
+    # optimizer.set_control_optim_params()
 
-    optimizer.set_solver_params(training_params = {'epochs': 200,})
-
-    state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_y(device=device), 0.001), 
-                                                                               (bop_dy(device=device), 0.001),
-                                                                               (bop_phi(device=device), 0.001),
-                                                                               (bop_dphi(device=device), 0.001)], 
+    solver_params = {'full':     {'training_params': {'epochs': 1500,}, 'optimizer_params': {'params': {'lr': 1e-5}}}, 
+                     'abridged': {'training_params': {'epochs': 300,}, 'optimizer_params': {'params': {'lr': 5e-5}}}}
+    
+    state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_y(device=device), 0.1), 
+                                                                               (bop_dy(device=device), 0.1),
+                                                                               (bop_phi(device=device), 0.1),
+                                                                               (bop_dphi(device=device), 0.1)], 
                                                                grids = [t,], n_control = 1., 
                                                                state_net = state_nn_pretrained, 
                                                                opt_params = [0.005, 0.9, 0.999, 1e-8],
-                                                               control_net = ctrl_nn_pretrained, epochs = 50,
-                                                               fig_folder = fig_folder)
+                                                               control_net = ctrl_nn_pretrained, epochs = 55,
+                                                               fig_folder = fig_folder, eps=5e-1,
+                                                               solver_params = solver_params)
 
     return state_nn, ctrl_net, ctrl_pred, hist
 
@@ -410,29 +412,29 @@ def general(experiment, res_folder, single_sample: bool = True, discover: bool =
             us.append(u)
 
             # device = 'cpu'
+            if device == 'cpu':
+                fname = os.path.join(res_folder, f"data_ann_{experiment}_cpu.pickle")
+            else:
+                fname = os.path.join(res_folder, f"data_ann_{experiment}_cuda.pickle")            
             try:
-                if device == 'cpu':
-                    fname = os.path.join(res_folder, f"data_ann_3_{experiment}_cpu.pickle")
-                else:
-                    fname = os.path.join(res_folder, f"data_ann_3_{experiment}_cuda.pickle")
                 with open(fname, 'rb') as data_input_file:  
                     data_nn = pickle.load(data_input_file)
                 data_nn = data_nn.to(device)
                 save_nn = False
             except FileNotFoundError:
-                print('No model located, ')
+                print(f'No model located, with name {fname}')
                 data_nn = None
                 save_nn = True
 
             if discover:
                 res = epde_discovery(t, x, angle, u, derivs, 'FD', data_nn = data_nn, device = device)
             else:
-                res = translate_equation(t, x, angle, u, derivs, 'FD')
+                res = translate_equation(t, x, angle, u, derivs, 'FD', data_nn = data_nn, device=device)
             if save_nn:
                 if device == 'cpu':
-                    fname =  os.path.join(res_folder, f"data_ann_{experiment}__cpu.pickle")
+                    fname =  os.path.join(res_folder, f"data_ann_{experiment}_cpu.pickle")
                 else:
-                    fname = os.path.join(res_folder, f"data_ann_{experiment}__cuda.pickle")
+                    fname = os.path.join(res_folder, f"data_ann_{experiment}_cuda.pickle")
                 with open(fname, 'wb') as output_file:
                     pickle.dump(epde.globals.solution_guess_nn, output_file)
 
@@ -618,7 +620,7 @@ if __name__ == '__main__':
 
 
         nn = 'shallow'
-        load_ctrl = False
+        load_ctrl = True
 
         if device == 'cpu':
             ctrl_fname = os.path.join(res_folder, f"control_ann_{nn}_{experiment}_cpu.pickle")

@@ -122,18 +122,23 @@ class ControlConstrEq(ControlConstraint):
  
     def __call__(self, fun_nn: Union[torch.nn.Sequential, torch.Tensor], 
                  arg_tensor: torch.Tensor) -> Tuple[bool, torch.Tensor]:
-        to_compare = self._deriv_method.take_derivative(u = fun_nn, args=self._indices.apply(arg_tensor, along_axis=0), # correct along_axis argument 
-                                                        axes=self._axes)
+        to_compare = self._deriv_method.take_derivative(u = fun_nn, 
+                                                        args = self._indices.apply(arg_tensor, along_axis=0), # correct along_axis argument 
+                                                        axes = self._axes)
         if not isinstance(self._val, torch.Tensor):
             val_transformed = torch.full_like(input = to_compare, fill_value=self._val).to(self._device)
         else:
             if to_compare.shape != self._val.shape:
-                raise TypeError(f'Incorrect shapes of constraint value tensor: expected {self._val.shape}, got {to_compare.shape}.')
+                try:
+                    to_compare = to_compare.view(self._val.size())
+                except:
+                    raise TypeError(f'Incorrect shapes of constraint value tensor: expected {self._val.shape}, got {to_compare.shape}.')
             val_transformed = self._val
         if self._estim_func is not None:
             constr_enf = self._estim_func(val_transformed, to_compare)
         else:
             constr_enf = val_transformed - to_compare
+            
         return (torch.isclose(constr_enf, torch.zeros_like(constr_enf).to(self._device), rtol = self._eps), 
                 val_transformed - to_compare)
         
@@ -269,6 +274,7 @@ class ControlExp():
                                                        use_adaptive_lambdas = solver_params['use_adaptive_lambdas'])
 
         control_inputs = prepare_control_inputs(model, grids[1], global_var.control_nn.net_args)
+        # print('In fd: working', grids[1].shape, control_inputs.shape)
         loss_back = control_loss([model, global_var.control_nn.net], [grids[1], control_inputs])
         
         # Restore values of the control NN parameters
@@ -278,7 +284,7 @@ class ControlExp():
         global_var.control_nn.net.load_state_dict(state_dict)
         state_dict = state_dict_prev = None
 
-        loss_alpha = 1e0
+        loss_alpha = 1e1
         with torch.no_grad():
             res = (loss_forward - loss_back)/(2*eps*(1+loss_alpha*(solver_loss_forward+solver_loss_backward)))
             # print('loss_forward: ', loss_forward, 'loss_back: ', loss_back, 'delta:', loss_forward - loss_back,'res: ', res)
@@ -289,10 +295,10 @@ class ControlExp():
                    n_control: int = 1, epochs: int = 1e2, state_net: torch.nn.Sequential = None, 
                    opt_params: List[float] = [0.01, 0.9, 0.999, 1e-8],
                    control_net: torch.nn.Sequential = None, fig_folder: str = None, 
-                   LV_exp: bool = True, eps: float = 1e-2):
+                   LV_exp: bool = True, eps: float = 1e-2, solver_params: dict = {}):
         def modify_bc(operator: dict, scale: Union[float, torch.Tensor]) -> dict:
             noised_operator = deepcopy(operator)
-            # noised_operator['bnd_val'] = torch.normal(operator['bnd_val'], scale).to(self._device)
+            noised_operator['bnd_val'] = torch.normal(operator['bnd_val'], scale).to(self._device)
             return noised_operator
 
         # Properly formulate training approach
@@ -322,10 +328,13 @@ class ControlExp():
         optimizer = AdamOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = opt_params)
         # optimizer = CoordDescentOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = opt_params)
 
+        self.set_solver_params(**solver_params['abridged'])
         adapter = self.get_solver_adapter(None)
 
 
         while t < epochs and not stop_training:
+            self.set_solver_params(**solver_params['abridged'])
+            adapter = self.get_solver_adapter(None)
             sampled_bc = [modify_bc(operator, noise_std) for operator, noise_std in bc_operators]
 
             
@@ -379,6 +388,8 @@ class ControlExp():
                 global_var.control_nn.net.load_state_dict(state_dict)
             del state_dict, state_dict_prev
 
+            self.set_solver_params(**solver_params['full'])
+            adapter = self.get_solver_adapter(None)
             adapter.set_net(self._state_net)
             _, model = adapter.solve_epde_system(system = self.system, grids = grids, data = None,
                                                  boundary_conditions = sampled_bc,
@@ -392,12 +403,13 @@ class ControlExp():
             self._state_net = model
 
             control_inputs = prepare_control_inputs(model, grids_merged, global_var.control_nn.net_args)
-            with torch.no_grad():
-                loss = self.loss([self._state_net, global_var.control_nn.net], [grids_merged, control_inputs])
+            # print('In main loss opt: working', grids_merged.shape, control_inputs.shape)
+            # with torch.no_grad():
+            loss = self.loss([self._state_net, global_var.control_nn.net], [grids_merged, control_inputs])
             print('current loss is ', loss)
-            if loss < min_loss:
-                min_loss = loss
-                self._best_control_params = global_var.control_nn.net.state_dict()
+            # if loss < min_loss:
+            #     min_loss = loss
+            self._best_control_params = global_var.control_nn.net.state_dict()
             loss_hist.append(loss)
             
             
@@ -413,7 +425,8 @@ class ControlExp():
             gc.collect()
             t += 1
 
-        ctrl_pred = global_var.control_nn.net(var_prediction)
+        control_inputs = prepare_control_inputs(model, grids_merged, global_var.control_nn.net_args)
+        ctrl_pred = global_var.control_nn.net(control_inputs)
 
         return self._state_net, global_var.control_nn.net, ctrl_pred, loss_hist
 
