@@ -244,7 +244,10 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     loc_domain = control_utils.ConstrLocation(domain_shape = (t.size()[0],), device=device) # Declaring const in the entire domain
     loc_end = control_utils.ConstrLocation(domain_shape = (t.size()[0],), axis = 0, loc = -1, device=device) # Check format
     print(f'loc_end.flat_idxs : {loc_end.flat_idxs}, device {device}')
-    cosine_cond = lambda x, ref: torch.cos(x) - ref
+    # cosine_cond = lambda x, ref: torch.cos(x) - ref
+    def cosine_cond(x, ref):
+        # print(f'x {x}, ref {ref}')
+        return torch.abs(torch.cos(x) - ref)
     phi_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t[-1], fill_value = 1., device=device), # Better processing for periodic
                                                    indices = loc_end, deriv_axes=[None,], deriv_method = autograd, nn_output=0, 
                                                    estim_func=cosine_cond, device=device)
@@ -261,12 +264,12 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     #                                                indices = loc_domain, deriv_method = autograd, nn_output=0)
     # print('phi_tar_constr._indices', phi_tar_constr._indices.flat_idxs)
     
-    loss = control_utils.ConditionalLoss([(1., phi_tar_constr, 0),
-                                          (1., dphi_tar_constr, 0), 
+    loss = control_utils.ConditionalLoss([(1000., phi_tar_constr, 0),
+                                          (10., dphi_tar_constr, 0), 
                                           (0.001, contr_constr, 1),
-                                          (10., u_right_bnd, 0),
-                                          (10., u_left_bnd, 0)])
-                                        #   (10., contr_non_neg, 1)])
+                                          (100., u_right_bnd, 0),
+                                          (100., u_left_bnd, 0)])
+    
     optimizer = control_utils.ControlExp(loss=loss, device=device)
     
     def get_ode_bop(key, var, term, grid_loc, value):
@@ -276,7 +279,7 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
             bop_grd_np = np.array([[grid_loc,]])
             bop.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor)).to(device)
         elif isinstance(grid_loc, torch.Tensor):
-            bop.set_grid(grid_loc.reshape((1, 1)).type(torch.FloatTensor)) # What is the correct shape here?
+            bop.set_grid(grid_loc.reshape((1, 1)).type(torch.FloatTensor))
         else:
             raise TypeError('Incorret value type, expected float or torch.Tensor.')
         bop.values = torch.from_numpy(np.array([[value,]])).float().to(device)
@@ -303,7 +306,7 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
                                                                state_net = state_nn_pretrained, 
                                                                opt_params = [0.005, 0.9, 0.999, 1e-8],
                                                                control_net = ctrl_nn_pretrained, epochs = 55,
-                                                               fig_folder = fig_folder, eps=5e-1,
+                                                               fig_folder = fig_folder, eps=2e0,
                                                                solver_params = solver_params)
 
     return state_nn, ctrl_net, ctrl_pred, hist
@@ -411,7 +414,6 @@ def general(experiment, res_folder, single_sample: bool = True, discover: bool =
             angles_d.append(angle_d)
             us.append(u)
 
-            # device = 'cpu'
             if device == 'cpu':
                 fname = os.path.join(res_folder, f"data_ann_{experiment}_cpu.pickle")
             else:
@@ -440,14 +442,14 @@ def general(experiment, res_folder, single_sample: bool = True, discover: bool =
 
             return t, u, np.stack([x, x_d, angle, angle_d]).T, res
     else:
-        traj_obs_sc, traj_acts_sc, traj_rews_sc = rollout_env(cart_env, cosine_signum_policy, n_steps = 250, 
-                                                            n_steps_reset=1000)
+        traj_obs_sc, traj_acts_sc, _ = rollout_env(cart_env, cosine_signum_policy, n_steps = 250, 
+                                                   n_steps_reset=1000)
 
-        traj_obs_tc, traj_acts_tc, traj_rews_tc = rollout_env(cart_env, two_cosine_policy, n_steps = 250, 
-                                                            n_steps_reset=1000)
+        traj_obs_tc, traj_acts_tc, _ = rollout_env(cart_env, two_cosine_policy, n_steps = 250, 
+                                                   n_steps_reset=1000)
         
-        traj_obs_c, traj_acts_c, traj_rews_c = rollout_env(cart_env, cosine_policy, n_steps = 250, 
-                                                        n_steps_reset=1000)
+        traj_obs_c, traj_acts_c, _ = rollout_env(cart_env, cosine_policy, n_steps = 250, 
+                                                 n_steps_reset=1000)
         
         
         def get_angle_rot(cosine, sine):
@@ -485,10 +487,6 @@ def general(experiment, res_folder, single_sample: bool = True, discover: bool =
         sc_comb = prepare_data(traj_acts_sc, traj_obs_sc)
         c_comb = prepare_data(traj_acts_c, traj_obs_c)
 
-        # samples = [[tc_comb[0], tc_comb[1], tc_comb[2]], 
-        #            [sc_comb[0], sc_comb[1], sc_comb[2]],
-        #            [c_comb[0],  c_comb[1],  c_comb[2]]]
-
         samples_t = [[tc_comb[0],], [sc_comb[0],], [c_comb[0],]]
         samples_pos = [tc_comb[1], sc_comb[1], c_comb[1]]
         samples_angle = [tc_comb[2],  sc_comb[2],  c_comb[2]]
@@ -496,10 +494,12 @@ def general(experiment, res_folder, single_sample: bool = True, discover: bool =
         samples_derivs = [[tc_comb[3]['y'], sc_comb[3]['y'], c_comb[3]['y']],
                           [tc_comb[3]['phi'], sc_comb[3]['phi'], c_comb[3]['phi']]]
 
-        samples_u = [tc_comb[4], tc_comb[4], tc_comb[4]]
+        samples_u = [tc_comb[4], sc_comb[4], c_comb[4]]
 
-        return t, epde_multisample_discovery(samples_t, samples_pos, samples_angle, 
-                                             samples_derivs, samples_u, 'FD')
+        return tc_comb[0], tc_comb[4], np.stack([tc_comb[1], tc_comb[3]['y'], tc_comb[2], tc_comb[3]['phi']]).T, \
+               epde_multisample_discovery(samples_t, samples_pos,
+                                          samples_angle, samples_derivs,
+                                          samples_u, 'FD')
 
 if __name__ == '__main__':
     import pickle
@@ -508,67 +508,42 @@ if __name__ == '__main__':
     explicit_cpu = False
     device = 'cuda' if (torch.cuda.is_available and not explicit_cpu) else 'cpu'
     print(f'Working on {device}')
-    # fig_folder = '/home/mikemaslyaev/Documents/EPDE/projects/control/figs'
+
     res_folder = '/home/mikemaslyaev/Documents/EPDE/projects/control'
-    # res_folder = 'C:\\Users\\Mike\\Documents\\Work\\EPDE\\projects'
+
     fig_folder = os.path.join(res_folder, 'figs')
 
     only_prepare = False
     discover = False
     if only_prepare:
-        t, traj_data = prepare_trajectories() # traj_data = (traj_obj, traj_acts, traj_rews)
+        t, traj_data = prepare_trajectories()
         print(f'Acts len is {len(traj_data[0])}, while shape {traj_data[0][0].shape}')
         assert(t.size == traj_data[0][0].shape[0]), 'Incorrect t detected'
         np.save(file = '/home/mikemaslyaev/Documents/EPDE/projects/control/reserve/t.npy', arr = t)
         np.save(file = '/home/mikemaslyaev/Documents/EPDE/projects/control/reserve/state.npy', arr = traj_data[0][0])
         np.save(file = '/home/mikemaslyaev/Documents/EPDE/projects/control/reserve/acts.npy', arr = traj_data[1][0])
     else:
-        # t, _ = prepare_trajectories()
+
         t, ctrl, solution, res = general(experiment, res_folder=res_folder, discover=discover, device = device)
 
-        # print(f'type(res) is {type(res.system)}')
-        # print(f't.shape: {t.shape}, ctrl.shape: {ctrl.shape}, solution.shape: {solution.shape}')
-        # # raise NotImplementedError()
-        # try:
-        #     if device == 'cpu':
-        #         fname = os.path.join(res_folder, f"data_ann_3_{experiment}_cpu.pickle")
-        #     else:
-        #         fname = os.path.join(res_folder, f"data_ann_3_{experiment}_cuda.pickle")
-        #     with open(fname, 'rb') as data_input_file:  
-        #         data_nn = pickle.load(data_input_file)
-        #     data_nn = data_nn.to(device)
-        #     save_nn = False
-        # except FileNotFoundError:
-        #     print('No model located, ')
-        #     data_nn = None
-        #     save_nn = True
-
-        # model = translate_dummy_eqs(t, solution[:, 0], solution[:, 1], ctrl, data_nn = data_nn, device = device) # , 
         example_sol = epde.globals.solution_guess_nn(torch.from_numpy(t).reshape((-1, 1)).float().to(device))
         epde.globals.solution_guess_nn.to(device)
         print(f'example_sol: {type(example_sol)}, {example_sol.shape}, {example_sol.get_device()}')
-        # if save_nn:
-        #     if device == 'cpu':
-        #         fname =  os.path.join(res_folder, f"data_ann_{experiment}__cpu.pickle")
-        #     else:
-        #         fname = os.path.join(res_folder, f"data_ann_{experiment}__cuda.pickle")
-        #     with open(fname, 'wb') as output_file:
-        #         pickle.dump(epde.globals.solution_guess_nn, output_file)
 
         def create_shallow_nn(arg_num: int = 1, output_num: int = 1, device = 'cpu') -> torch.nn.Sequential: # net: torch.nn.Sequential = None, 
             hidden_neurons = 25
             layers = [torch.nn.Linear(arg_num, hidden_neurons, device=device),
-                    torch.nn.Tanh(), # ReLU(),
-                    torch.nn.Linear(hidden_neurons, output_num, device=device)]
+                      torch.nn.Tanh(), # ReLU(),
+                      torch.nn.Linear(hidden_neurons, output_num, device=device)]
             return torch.nn.Sequential(*layers)
         
         def create_deep_nn(arg_num: int = 1, output_num: int = 1, device = 'cpu') -> torch.nn.Sequential: # net: torch.nn.Sequential = None, 
             hidden_neurons = 18
             layers = [torch.nn.Linear(arg_num, hidden_neurons, device=device),
-                    torch.nn.Tanh(),
-                    torch.nn.Linear(hidden_neurons, hidden_neurons, device=device),
-                    torch.nn.ReLU(),
-                    torch.nn.Linear(hidden_neurons, output_num, device=device)]
+                      torch.nn.Tanh(),
+                      torch.nn.Linear(hidden_neurons, hidden_neurons, device=device),
+                      torch.nn.ReLU(),
+                      torch.nn.Linear(hidden_neurons, output_num, device=device)]
             return torch.nn.Sequential(*layers)        
 
         time_exp_start = datetime.datetime.now()
@@ -577,13 +552,11 @@ if __name__ == '__main__':
         from epde.preprocessing.preprocessor_setups import PreprocessorSetup
         from epde.preprocessing.preprocessor import ConcretePrepBuilder, PreprocessingPipe
 
-
-        # preprocessor_kwargs = {'epochs_max' : 10000}
         
         def prepare_derivs(var_name: str, var_array: np.ndarray, grid: np.ndarray, max_order: tuple = (2,)):
             default_preprocessor_type = 'FD'
-            preprocessor_kwargs = {}#{'use_smoothing' : False,
-                                #  'include_time' : True}        
+            preprocessor_kwargs = {}
+
             setup = PreprocessorSetup()
             builder = ConcretePrepBuilder()
             setup.builder = builder
@@ -614,8 +587,6 @@ if __name__ == '__main__':
         der_names_v, derivatives_v = prepare_derivs('v', var_array = solution[:, 2], grid = t)
         
         args = torch.from_numpy(solution).float().to(device)
-        # args = torch.cat([args, torch.from_numpy(derivatives_u).float().to(device), 
-                        #   torch.from_numpy(derivatives_v).float().to(device)], dim=1)
         print(f'args.shape is {args.shape}')
 
 
@@ -624,7 +595,6 @@ if __name__ == '__main__':
 
         if device == 'cpu':
             ctrl_fname = os.path.join(res_folder, f"control_ann_{nn}_{experiment}_cpu.pickle")
-            # f"/home/mikemaslyaev/Documents/EPDE/projects/control/control_ann_{nn}_cpu.pickle"
         else:
             ctrl_fname = os.path.join(res_folder, f"control_ann_{nn}_{experiment}_cuda.pickle")
         if load_ctrl:
@@ -633,10 +603,10 @@ if __name__ == '__main__':
         else:
             nn_method = create_shallow_nn if nn == 'shallow' else create_deep_nn
             ctrl_args = [solution[:, 0], solution[:, 1], solution[:, 2], solution[:, 3]]
-            ctrl_ann = epde.supplementary.train_ann(args=ctrl_args,#, 
-                                                        #   derivatives_u.reshape(-1), 
-                                                        #   derivatives_v.reshape(-1)], 
-                                                    data = ctrl, epochs_max = 5e6, dim = len(ctrl_args), 
+            ctrl_ann = epde.supplementary.train_ann(args=ctrl_args,
+                                                    data = ctrl, 
+                                                    epochs_max = 5e6, 
+                                                    dim = len(ctrl_args), 
                                                     model = nn_method(len(ctrl_args), 1, device=device),
                                                     device = device)
 
@@ -650,6 +620,6 @@ if __name__ == '__main__':
                             fig_folder=fig_folder, device=device)
 
         savename = f'res_{time_exp_start.month}_{time_exp_start.day}_at_{time_exp_start.hour}_{time_exp_start.minute}_{experiment}.pickle'
-        # plt.savefig(os.path.join(fig_folder, frame_name))
+
         with open(os.path.join(res_folder, savename), 'wb') as output_file:  
             pickle.dump(res, output_file)                

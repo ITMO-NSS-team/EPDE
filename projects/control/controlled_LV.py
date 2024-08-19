@@ -263,9 +263,9 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
                                                                                (bop_v(device=device), 0.3)],
                                                                grids = [t,], n_control = 1., 
                                                                state_net = state_nn_pretrained, 
-                                                               opt_params = [0.001, 0.9, 0.999, 1e-8],
+                                                               opt_params = [0.0001, 0.9, 0.999, 1e-8],
                                                                control_net = ctrl_nn_pretrained, epochs = 150,
-                                                               fig_folder = fig_folder, eps = 1e-1, 
+                                                               fig_folder = fig_folder, eps = 1e0, 
                                                                solver_params = solver_params)
 
     return state_nn, ctrl_net, ctrl_pred, hist
@@ -394,8 +394,8 @@ if __name__ == '__main__':
 
     # raise NotImplementedError('Fin!')
 
-    nn = 'shallow'
-    load_ctrl = True
+    nn = 'deep' # nn = 'shallow'
+    load_ctrl = False
 
     if device == 'cpu':
         ctrl_fname = os.path.join(res_folder, f"control_ann_{nn}_{experiment}_cpu.pickle")

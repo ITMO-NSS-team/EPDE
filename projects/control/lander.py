@@ -288,9 +288,16 @@ def prepare_data(*args, **kwargs):
     
 
 if __name__ == '__main__':
-    t, obs, acts, moon, helipad = prepare_data()
+    import pickle
 
-    # derivs = np.stack([obs[1, ...], obs[3, ...], obs[5, ...]])
+    experiment = 'lander'
+    explicit_cpu = False
+    device = 'cuda' if (torch.cuda.is_available and not explicit_cpu) else 'cpu'
+    print(f'Working on {device}')
+
+    res_folder = '/home/mikemaslyaev/Documents/EPDE/projects/control'
+
+    t, obs, acts, moon, helipad = prepare_data()
 
     print(f'Observations {obs.shape}, acts {acts.shape}')
 
@@ -304,5 +311,8 @@ if __name__ == '__main__':
     plt.show()
 
 
-    epde_discovery(t = t[:-5], y = obs[0, :-5], z = obs[1, :-5], angle = obs[4, :-5], 
-                   u = acts[..., :-5], device = 'cuda', use_solver = True)
+    model = epde_discovery(t = t[:-5], y = obs[0, :-5], z = obs[1, :-5], angle = obs[4, :-5], 
+                           u = acts[..., :-5], device = 'cuda', use_solver = True)
+    
+
+    
