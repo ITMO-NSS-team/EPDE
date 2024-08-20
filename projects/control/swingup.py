@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Apr  3 17:43:03 2024
 
-@author: maslyaev
-"""
 import os
 import sys
 import datetime
@@ -57,41 +53,12 @@ def epde_discovery(t, x, angle, u, derivs, diff_method = 'FD', data_nn: torch.nn
                                          preprocessor_kwargs={})
     else:
         raise ValueError('Incorrect preprocessing tool selected.')
-    
-    # angle_cos = np.cos(angle)
-    # angle_sin = np.sin(angle)
-    
-    # angle_trig_tokens = epde.CacheStoredTokens('angle_trig', ['sin(phi)', 'cos(phi)'], 
-    #                                            {'sin(phi)' : angle_sin, 'cos(phi)' : angle_cos}, 
-    #                                            OrderedDict([('power', (1, 3))]), {'power': 0}, meaningful=True)
-    # control_var_tokens = epde.CacheStoredTokens('control', ['ctrl',], {'ctrl' : u}, OrderedDict([('power', (1, 1))]),
-    #                                             {'power': 0}, meaningful=True)
-    # sgn_tokens = epde.CacheStoredTokens('signum of y', ['sgn(dy)', 'sgn(ddy)'], 
-    #                                     {'sgn(dy)' : np.sign(derivs['y'][:, 0]),
-    #                                      'sgn(ddy)' : np.sign(derivs['y'][:, 1]),}, 
-    #                                     OrderedDict([('power', (1, 1))]), {'power': 0}, meaningful=True)    
 
     eps = 5e-7
     popsize = 10
     epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=30)
 
     factors_max_number = {'factors_num' : [1, 2, 3,], 'probas' : [0.2, 0.65, 0.15]}
-
-    # custom_grid_tokens = epde.GridTokens(dimensionality = dimensionality, max_power=1)
-    # if use_solver:
-    #     epde_search_obj.create_pool(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,),
-    #                                 data_fun_pow = 2, derivs = [derivs['y'], derivs['phi']],
-    #                                 additional_tokens=get_additional_token_families(ctrl=u), data_nn=data_nn)
-    
-    # if data_nn is None and use_solver:
-    #     data_nn = global_var.solution_guess_nn
-    #     if device == 'cpu':
-    #         # fname = 'C://Users//Mike//Documents//Work//EPDE//projects//control//swingup_ann_cpu.pickle'
-    #         fname = r"/home/mikemaslyaev/Documents/EPDE/projects/control/swingup_ann_cpu.pickle"
-    #     else:
-    #         fname = r"/home/mikemaslyaev/Documents/EPDE/projects/control/swingup_ann_cuda.pickle"
-    #     with open(fname, 'wb') as output_file:
-    #         pickle.dump(data_nn, output_file)
 
     epde_search_obj.fit(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,),
                         equation_terms_max_number=10, data_fun_pow = 2, derivs = [derivs['y'], derivs['phi']],
@@ -109,7 +76,7 @@ def epde_multisample_discovery(t: List[np.ndarray], x: List[np.ndarray], angle: 
     samples = [[t[i], [x[i], angle[i]]] for i in range(len(t))]    
     epde_search_obj = epde.EpdeMultisample(data_samples=samples, use_solver = False, dimensionality = dimensionality,
                                            boundary = 30, verbose_params = {'show_iter_idx' : True})
-    raise NotImplementedError('Currently, only single sample shall be used with solver.')
+
     if diff_method == 'ANN':
         epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
                                          preprocessor_kwargs={'epochs_max' : 50000})
@@ -123,32 +90,12 @@ def epde_multisample_discovery(t: List[np.ndarray], x: List[np.ndarray], angle: 
     else:
         raise ValueError('Incorrect preprocessing tool selected.')
     
-    # angle_cos = np.cos(np.concatenate([angle_arr for angle_arr in angle]))
-    # angle_sin = np.sin(np.concatenate([angle_arr for angle_arr in angle]))
-    
-    # angle_trig_tokens = epde.CacheStoredTokens('angle_trig', ['sin(phi)', 'cos(phi)'], 
-    #                                            {'sin(phi)' : angle_sin, 'cos(phi)' : angle_cos}, 
-    #                                            OrderedDict([('power', (1, 3))]), {'power': 0}, meaningful=True, 
-    #                                            unique_token_type=False, unique_specific_token=False, non_default_power=True)
-    # u_concat = np.concatenate(u)
-    # print(f'u_concat.shape is {u_concat.shape}')
-    # control_var_tokens = epde.CacheStoredTokens('control', ['ctrl',], {'ctrl' : u_concat}, OrderedDict([('power', (1, 1))]),
-    #                                             {'power': 0}, meaningful=True)
-    # der_y = np.concatenate(derivs[0])
-    # print(f'der_y shape is {der_y.shape}')
-    # sgn_tokens = epde.CacheStoredTokens('signum of y', ['sgn(dy)', 'sgn(ddy)'], 
-    #                                     {'sgn(dy)' : np.sign(der_y[:, 0]),
-    #                                      'sgn(ddy)' : np.sign(der_y[:, 1]),}, 
-    #                                     OrderedDict([('power', (1, 1))]), {'power': 0}, meaningful=True)    
-
     eps = 5e-7
     popsize = 24
     epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs=150)
 
     factors_max_number = {'factors_num' : [1, 2, 3,], 'probas' : [0.2, 0.65, 0.15]}
-
-    # custom_grid_tokens = epde.GridTokens(dimensionality = dimensionality, max_power=1)
-
+    
     epde_search_obj.fit(samples = samples, variable_names = ['y', 'phi'], max_deriv_order = (2,),
                         equation_terms_max_number = 15, data_fun_pow = 2, deriv_fun_pow=2, derivs = derivs,
                         additional_tokens = get_additional_token_families(ctrl=u), # , control_var_tokens, 
@@ -192,21 +139,6 @@ def translate_equation(t, x, angle, u, derivs: dict, diff_method = 'FD', data_nn
                                          preprocessor_kwargs={}) 
     else:
         raise ValueError('Incorrect preprocessing tool selected.')
-    
-    # angle_cos = np.cos(angle)
-    # angle_sin = np.sin(angle)
-    
-    # angle_trig_tokens = epde.CacheStoredTokens('angle_trig', ['sin(phi)', 'cos(phi)'], 
-    #                                            {'sin(phi)' : angle_sin, 'cos(phi)' : angle_cos}, 
-    #                                            OrderedDict([('power', (1, 3))]), {'power': 0})
-    # control_var_tokens = epde.CacheStoredTokens('control', ['ctrl',], {'ctrl' : u}, OrderedDict([('power', (1, 1))]),
-    #                                             {'power': 0})
-    # sgn_tokens = epde.CacheStoredTokens('signum of y', ['sgn(dy)', 'sgn(ddy)'], 
-    #                                     {'sgn(dy)' : np.sign(derivs['y'][:, 0]),
-    #                                      'sgn(ddy)' : np.sign(derivs['y'][:, 1]),}, 
-    #                                     OrderedDict([('power', (1, 1))]), {'power': 0})
-    
-
 
     epde_search_obj.create_pool(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,), derivs = [derivs['y'], derivs['phi']],
                                 additional_tokens = get_additional_token_families(ctrl=u), device=device, data_nn = data_nn)
@@ -244,10 +176,10 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     loc_domain = control_utils.ConstrLocation(domain_shape = (t.size()[0],), device=device) # Declaring const in the entire domain
     loc_end = control_utils.ConstrLocation(domain_shape = (t.size()[0],), axis = 0, loc = -1, device=device) # Check format
     print(f'loc_end.flat_idxs : {loc_end.flat_idxs}, device {device}')
-    # cosine_cond = lambda x, ref: torch.cos(x) - ref
+
     def cosine_cond(x, ref):
-        # print(f'x {x}, ref {ref}')
         return torch.abs(torch.cos(x) - ref)
+    
     phi_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t[-1], fill_value = 1., device=device), # Better processing for periodic
                                                    indices = loc_end, deriv_axes=[None,], deriv_method = autograd, nn_output=0, 
                                                    estim_func=cosine_cond, device=device)
@@ -256,19 +188,16 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     contr_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = 0., device=device),
                                                  indices = loc_domain, deriv_axes=[None,], deriv_method = autograd, nn_output=0, device=device)
 
-    u_right_bnd = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = y_right, device=device), sign='<',
+    y_right_bnd = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = y_right, device=device), sign='<',
                                                  indices = loc_domain, deriv_method = autograd, nn_output=0, device=device)
-    u_left_bnd = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = y_left, device=device), sign='>',
-                                                indices = loc_domain, deriv_method = autograd, nn_output=1, device=device)
-    # contr_non_neg = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0., device=device), sign='>',
-    #                                                indices = loc_domain, deriv_method = autograd, nn_output=0)
-    # print('phi_tar_constr._indices', phi_tar_constr._indices.flat_idxs)
+    y_left_bnd = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = y_left, device=device), sign='>',
+                                                indices = loc_domain, deriv_method = autograd, nn_output=0, device=device)
     
-    loss = control_utils.ConditionalLoss([(1000., phi_tar_constr, 0),
+    loss = control_utils.ConditionalLoss([(100., phi_tar_constr, 0),
                                           (10., dphi_tar_constr, 0), 
                                           (0.001, contr_constr, 1),
-                                          (100., u_right_bnd, 0),
-                                          (100., u_left_bnd, 0)])
+                                          (100., y_right_bnd, 0),
+                                          (100., y_left_bnd, 0)])
     
     optimizer = control_utils.ControlExp(loss=loss, device=device)
     
@@ -288,8 +217,8 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     bop_y = get_ode_bop('y', 0, [None], t[0, 0], y_init)
     bop_dy = get_ode_bop('y', 0, [0,], t[0, 0], dy_init)
 
-    bop_phi = get_ode_bop('y', 0, [None], t[0, 0], phi_init)
-    bop_dphi = get_ode_bop('y', 0, [0,], t[0, 0], dphi_init)
+    bop_phi = get_ode_bop('phi', 0, [None], t[0, 0], phi_init)
+    bop_dphi = get_ode_bop('phi', 0, [0,], t[0, 0], dphi_init)
 
     optimizer.system = eq.system
 
@@ -326,7 +255,7 @@ def prepare_trajectories(n_sample: int = 250, single_sample: bool = True):
     step = 0.01
     t = np.linspace(0, step*n_sample, num = n_sample, endpoint=False)
 
-    return t, rollout_env(cart_env, two_cosine_policy, n_steps = 250, 
+    return t, rollout_env(cart_env, two_cosine_policy, n_steps = 500, 
                           n_steps_reset=1000)
 
 def general(experiment, res_folder, single_sample: bool = True, discover: bool = True, device: str = 'cpu'):
@@ -339,10 +268,10 @@ def general(experiment, res_folder, single_sample: bool = True, discover: bool =
     random_policy = RandomPolicy(cart_env.action_space)
     cosine_policy = CosinePolicy(period=180, amplitude=0.004)
     cosine_signum_policy = CosineSignPolicy(period=180, amplitude=0.002)
-    two_cosine_policy = TwoCosinePolicy(180, 90, 0.002)
+    two_cosine_policy = TwoCosinePolicy(360, 180, 0.001)
 
     if single_sample:
-        traj_obs, traj_acts, traj_rews = rollout_env(cart_env, two_cosine_policy, n_steps = 250, 
+        traj_obs, traj_acts, traj_rews = rollout_env(cart_env, two_cosine_policy, n_steps = 500, 
                                                     n_steps_reset=1000)
         
         
@@ -442,7 +371,7 @@ def general(experiment, res_folder, single_sample: bool = True, discover: bool =
 
             return t, u, np.stack([x, x_d, angle, angle_d]).T, res
     else:
-        traj_obs_sc, traj_acts_sc, _ = rollout_env(cart_env, cosine_signum_policy, n_steps = 250, 
+        traj_obs_sc, traj_acts_sc, _ = rollout_env(cart_env, cosine_signum_policy, n_steps = 500, 
                                                    n_steps_reset=1000)
 
         traj_obs_tc, traj_acts_tc, _ = rollout_env(cart_env, two_cosine_policy, n_steps = 250, 
@@ -583,8 +512,8 @@ if __name__ == '__main__':
                                                         max_order=max_order)
             return deriv_names, derivatives_n
         
-        der_names_u, derivatives_u = prepare_derivs('u', var_array = solution[:, 0], grid = t)
-        der_names_v, derivatives_v = prepare_derivs('v', var_array = solution[:, 2], grid = t)
+        # der_names_u, derivatives_u = prepare_derivs('u', var_array = solution[:, 0], grid = t)
+        # der_names_v, derivatives_v = prepare_derivs('v', var_array = solution[:, 2], grid = t)
         
         args = torch.from_numpy(solution).float().to(device)
         print(f'args.shape is {args.shape}')

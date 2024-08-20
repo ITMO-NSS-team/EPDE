@@ -139,11 +139,6 @@ def epde_discovery(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np.ndar
     else:
         raise ValueError('Incorrect preprocessing tool selected.')
 
-    
-    # control_var_tokens = epde.CacheStoredTokens('control', ['ctrl',], {'ctrl' : control}, OrderedDict([('power', (1, 1))]),
-    #                                             {'power': 0}, meaningful=True)
-
-    # control_ann = global_var.control_nn.net
     control_var_tokens = epde.interface.prepared_tokens.ControlVarTokens(sample = control, ann = control_ann, 
                                                                          arg_var = [(0, [None]),
                                                                                     (1, [None])])
@@ -253,11 +248,8 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
     optimizer.system = eq
 
-    # optimizer.set_control_optim_params()
-
     solver_params = {'full':     {'training_params': {'epochs': 1500,}, 'optimizer_params': {'params': {'lr': 1e-5}}}, 
                      'abridged': {'training_params': {'epochs': 300,}, 'optimizer_params': {'params': {'lr': 5e-5}}}}
-    # optimizer.set_solver_params(training_params = {'epochs': 40,}, optimizer_params = {'params': {'lr': 1e-4}})
 
     state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_u(device=device), 0.3),
                                                                                (bop_v(device=device), 0.3)],
@@ -278,12 +270,11 @@ if __name__ == '__main__':
     explicit_cpu = False
     device = 'cuda' if (torch.cuda.is_available and not explicit_cpu) else 'cpu'
     print(f'Working on {device}')
-    # fig_folder = '/home/mikemaslyaev/Documents/EPDE/projects/control/figs'
+
     res_folder = '/home/mikemaslyaev/Documents/EPDE/projects/control'
-    # res_folder = 'C:\\Users\\Mike\\Documents\\Work\\EPDE\\projects'
     fig_folder = os.path.join(res_folder, 'figs')
 
-    t, ctrl, solution = prepare_data(steps_num = 101, ctrl_fun = lambda x: 12*x[1] + 0.05*x[0] + 0.2) # x[0]
+    t, ctrl, solution = prepare_data(steps_num = 201, ctrl_fun = lambda x: 12*x[1] + 0.05*x[0] + 0.2) # x[0]
     t, ctrl, solution = t[:-1], ctrl[:-1], solution[:-1, ...]
 
     print(t.shape, ctrl.shape, solution.shape)

@@ -20,43 +20,51 @@ from epde.optimizers.moeadd.moeadd import ParetoLevels
 from epde.interface.solver_integration import SolverAdapter, BOPElement 
 from epde.supplementary import BasicDeriv, AutogradDeriv
 
-from epde.solver.data import Conditions
-from epde.solver.optimizers.closure import Closure
 
 
-# TODO: Later to be refactored into multiple files
+def prepare_control_inputs(model: torch.nn.Sequential, grid: torch.Tensor, 
+                           args: List[Tuple[Union[int, List]]]) -> torch.Tensor:
+    '''
+    Recompute the control ANN arguments tensor from the solutions of 
+    controlled equations $L \mathbf{u}(t, \mathbf{x}, \mathbf{c}) = 0$, 
+    calculating necessary derivatives, as `args` 
 
-# class ControlOptClosure():
-#     '''
-#     Inspired by https://github.com/ITMO-NSS-team/torch_DE_solver/blob/main/tedeous/optimizers/closure.py
-#     '''
-#     def __init__(self, model):
-#         self.set_model()
-#         self.parameters = model.parameters
-#         self._optimizer = model.optimizer
+    Args:
+        model (`torch.nn.Sequential`): solution of the controlled equation $\mathbf{u}(\mathbf{u})$.
+        
+        grid (`torch.Tensor`): tensor of the grids m x n, where m - number of points in the domain, n - number of NN inputs.
 
-#     def get_closure(self):
-#         self._optimizer.zero_grad()
+        args (`List[Tuple[Union[int, List]]]`) - list of arguments of derivative operators.
 
-def prepare_control_inputs(model: torch.nn.Sequential, grid: torch.Tensor, args: List[Tuple[Union[int, List]]]):
+    Returns:
+        `torch.Tensor`: tensor of arguments for the control ANN.
+    '''
     differntiatior = AutogradDeriv()
-    res = torch.cat([differntiatior.take_derivative(u = model, args = grid, axes = arg[1],
-                                                    component = arg[0]).reshape(-1, 1) for arg in args], dim = 1)
-    # print('res.shape', res.shape)
-    return res
+    ctrl_inputs = torch.cat([differntiatior.take_derivative(u = model, args = grid, axes = arg[1],
+                                                            component = arg[0]).reshape(-1, 1) for arg in args], dim = 1)
+    return ctrl_inputs
 
 class ConstrLocation():
     def __init__(self, domain_shape: Tuple[int], axis: int = None, loc: int = None, 
                  indices: List[np.ndarray] = None, device: str = 'cpu'):
         '''
-        Contruct indices of the control training contraint location.
+        Objects to contain the indices of the control training contraint location.
+
         Args:
             domain_shape (`Tuple[int]`): shape of the domain, for which the control problem is solved.
-            axis (`int`): axis, along that the boundary conditions are selected. Shall be introduced only for constraints on the boundary.
-            loc (`int`): position along axis, where the "bounindices = self.get_boundary_indices(self.domain_indixes, axis, loc)
-        else:
-            self.loc_indices = self.domain_indixes
-        self.flat_idxdary" is located. Shall be introduced only for constraints on the boundary.
+
+            axis (`int`): axis, along that the boundary conditions are selected. Shall be introduced 
+                only for constraints on the boundary. 
+                Optional, the default value (`None`) matches the entire domain.
+            
+            
+            loc (`int`): position along axis, where "bounindices = self.get_boundary_indices(self.domain_indixes, axis, loc)
+                self.flat_idxdary" is located. Shall be introduced only for constraints on the boundary.
+                Optional, the default value (`None`) matches the entire domain. For example, -1 will correspond 
+                to the end of the domain along axis. 
+
+            device (`str`): string, matching the device, used for computation. Uses default torch designations.
+                Optional, defaults to `cpu` for CPU computations.
         
         '''
         self._device = device
@@ -74,11 +82,40 @@ class ConstrLocation():
 
 
     @staticmethod
-    def get_boundary_indices(domain_indices: np.ndarray, axis: int, loc: Union[int, Tuple[int]]): # , shape: Tuple[int]
+    def get_boundary_indices(domain_indices: np.ndarray, axis: int, 
+                             loc: Union[int, Tuple[int]]) -> np.array:
+        '''
+        Method of obtaining domain indices for specified position, i.e. all 0-th elements along an axis, or the last
+        elements along a specific axis.
+        
+        Args:
+            domain_indices (`np.ndarray`): an array representing the indices of a grid. The subarrays contain index 
+                values 0, 1, … varying only along the corresponding axis. For furher details inspect `np.indices(...)`
+                function.
+            
+            axis (`int`): index of the axis, along which the elements are taken,
+
+            loc (`int` or `tuple` of `int`): positions along the specified axis, which are taken. Can be tuple to 
+            accomodate for multiple elements along axis.
+
+        Returns:
+            `np.ndarray` of indicies, where the conditions are estimated.
+        '''
         return np.stack([np.take(domain_indices[idx], indices = loc, axis = axis).reshape(-1)
                          for idx in np.arange(domain_indices.shape[0])])
     
-    def apply(self, tensor: torch.Tensor, flattened: bool = True, along_axis: int = None): # Union[int, Tuple[int]]
+    def apply(self, tensor: torch.Tensor, flattened: bool = True, along_axis: int = None):
+        '''
+        Get `tensor` values at the locations, specified by the object indexing. The resulting tensor will be flattened.
+
+        Args:
+            tensor (`torch.Tensor`): the filtered tensor.
+
+            flattened (`bool`): marker, of will the tensor be flattened. Optional, default `True`, and
+            `False` is not yet implemented.
+
+            along_axis (`int`): axis, for which the filtering is taken.
+        '''
         if flattened:
             shape = [1,] * tensor.ndim
             shape[along_axis] = -1
@@ -87,7 +124,6 @@ class ConstrLocation():
             raise NotImplementedError('Currently, apply can be applied only to flattened tensors.')
             idxs = self.loc_indices # loop will be held over the first dimension
             return tensor.take()
-        # idxs = torch.from_numpy(idxs).long().unsqueeze(1) # am I needed?
 
 
 class ControlConstraint(ABC):
