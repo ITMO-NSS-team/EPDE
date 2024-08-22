@@ -127,6 +127,9 @@ class ConstrLocation():
 
 
 class ControlConstraint(ABC):
+    '''
+    Abstract class for constraints declaration in the control optimization problems.
+    '''
     def __init__(self, val : Union[float, torch.Tensor], deriv_method: BasicDeriv, indices: ConstrLocation,
                  device: str = 'cpu', deriv_axes: List = [None,], nn_output: int = 0, **kwargs):
         self._val = val
@@ -147,7 +150,7 @@ class ControlConstraint(ABC):
 
 class ControlConstrEq(ControlConstraint):
     '''
-    Class for constrints of type $c(u^(n)) = f(u) - val = 0$
+    Class for equality constrints of type $c(u^(n)) = f(u) - val = 0$ .
     '''
     def __init__(self, val : Union[float, torch.Tensor], deriv_method: BasicDeriv, # grid: torch.Tensor, 
                  indices: ConstrLocation, device: str = 'cpu', deriv_axes: List = [None,], 
@@ -158,6 +161,9 @@ class ControlConstrEq(ControlConstraint):
  
     def __call__(self, fun_nn: Union[torch.nn.Sequential, torch.Tensor], 
                  arg_tensor: torch.Tensor) -> Tuple[bool, torch.Tensor]:
+        '''
+        calculate 
+        '''
         to_compare = self._deriv_method.take_derivative(u = fun_nn, 
                                                         args = self._indices.apply(arg_tensor, along_axis=0), # correct along_axis argument 
                                                         axes = self._axes)
@@ -171,14 +177,25 @@ class ControlConstrEq(ControlConstraint):
                     raise TypeError(f'Incorrect shapes of constraint value tensor: expected {self._val.shape}, got {to_compare.shape}.')
             val_transformed = self._val
         if self._estim_func is not None:
-            constr_enf = self._estim_func(val_transformed, to_compare)
+            constr_enf = self._estim_func(to_compare, val_transformed)
         else:
             constr_enf = val_transformed - to_compare
             
         return (torch.isclose(constr_enf, torch.zeros_like(constr_enf).to(self._device), rtol = self._eps), 
-                val_transformed - to_compare)
+                constr_enf) # val_transformed - to_compare
         
     def loss(self, fun_nn: torch.nn.Sequential, arg_tensor: torch.Tensor) -> torch.Tensor:
+        '''
+        Return value of the loss function term, created by the condition. 
+
+        Args:
+            fun_nn (`torch.nn.Sequential`): artificial neural network, approximating the function used in the condition.
+
+            arg_tensor (`torch.Tensor`): tensor, used as the argument of the network, passed as `fun_nn`. 
+
+        Returns:
+            `torch.Tensor` with norm of the contraint discrepancy to be used in the combined loss.
+        '''
         _, discrepancy = self(fun_nn, arg_tensor)
         return torch.norm(discrepancy)
 
@@ -210,19 +227,45 @@ class ControlConstrNEq(ControlConstraint):
         if self._sign == '>':
             return torch.greater(constr_enf, torch.zeros_like(constr_enf).to(self._device)), torch.nn.functional.relu(constr_enf)
         elif self._sign == '<':
-            return torch.less(constr_enf, torch.zeros_like(constr_enf).to(self._device)), torch.nn.functional.relu(constr_enf)
+            return (torch.less(constr_enf, torch.zeros_like(constr_enf).to(self._device)), 
+                    torch.nn.functional.relu(constr_enf))
         #torch.less(val_transformed, to_compare), torch.nn.functional.relu(to_compare - val_transformed)            
 
         
     def loss(self, fun_nn: torch.nn.Sequential, arg_tensor: torch.Tensor) -> torch.Tensor:
+        '''
+        Return value of the loss function term, created by the condition. 
+
+        Args:
+            fun_nn (`torch.nn.Sequential`): artificial neural network, approximating the function used in the condition.
+
+            arg_tensor (`torch.Tensor`): tensor, used as the argument of the network, passed as `fun_nn`. 
+
+        Returns:
+            `torch.Tensor` with norm of the contraint discrepancy to be used in the combined loss.
+        '''        
         _, discrepancy = self(fun_nn, arg_tensor)
         return torch.norm(discrepancy)
 
 class ConditionalLoss():
+    '''
+    Class for the loss, used in the control function opimizaton procedure. Conrains terms of the loss
+    function in `self._cond` attribute. 
+    '''
     def __init__(self, conditions: List[Tuple[Union[float, ControlConstraint, int]]]):
+        '''
+        Initialize the conditional loss with the terms, partaking in evaluating inflicted control and 
+        quality of the equation solution with the current control. 
+
+        Args:
+            conditions (`list` of triplet `tuple` as (`float`, `ControlConstraint`, `int`))
+        '''
         self._cond = conditions
 
     def __call__(self, models: List[torch.nn.Sequential], args: list): # Introduce prepare control input: get torch tensors from solver & autodiff them
+        '''
+        Return the summed values of the loss function component 
+        '''
         temp = []
         for cond in self._cond:
             temp.append(cond[0] * cond[1].loss(models[cond[2]], args[cond[2]]))
@@ -275,6 +318,7 @@ class ControlExp():
     @staticmethod
     def finite_diff_calculation(system, adapter, loc, control_loss, state_net: torch.nn.Sequential, # prev_loc,
                                 bc_operators, grids: list, solver_params: dict, eps: float):
+        # print(f'FD calculation at {loc}')
         # Calculating loss in p[i]+eps: 
         ctrl_dict_prev = global_var.control_nn.net.state_dict() # deepcopy()
         # print(f'Altering with {eps}')
@@ -339,7 +383,7 @@ class ControlExp():
 
         # Properly formulate training approach
         t = 0
-        # min_loss = np.inf
+
         loss_hist = []
         stop_training = False
 
@@ -347,13 +391,13 @@ class ControlExp():
 
         if isinstance(state_net, torch.nn.Sequential): self._state_net = state_net
         global_var.reset_control_nn(n_control = n_control, ann = control_net, ctrl_args = global_var.control_nn.net_args)
-        
+
         # TODO Refactor hook: To optimize the net in global variables is a terrific approach, rethink it
 
         if isinstance(grids[0], np.ndarray):
             grids_merged = torch.from_numpy(np.array([subgrid.reshape(-1) for subgrid in grids])).float().T.to(self._device)
         elif isinstance(grids[0], torch.Tensor):
-            grids_merged = torch.cat([subgrid.reshape(-1, 1) for subgrid in grids], dim = 1).float()#.to(self._device)
+            grids_merged = torch.cat([subgrid.reshape(-1, 1) for subgrid in grids], dim = 1).float()
         grids_merged.to(device=self._device)
 
         grad_tensors = deepcopy(global_var.control_nn.net.state_dict())

@@ -19,7 +19,7 @@ from epde.cache.ctrl_cache import ControlNNContainer
 from epde.supplementary import create_solution_net, AutogradDeriv
 
 
-def init_caches(set_grids: bool = False):
+def init_caches(set_grids: bool = False, device = 'cpu'):
     """
     Initialization global variables for keeping input data, values of grid and useful tensors such as evaluated terms
 
@@ -30,10 +30,10 @@ def init_caches(set_grids: bool = False):
         None
     """
     global tensor_cache, grid_cache, initial_data_cache
-    tensor_cache = Cache()
-    initial_data_cache = Cache()
+    tensor_cache = Cache(device = device)
+    initial_data_cache = Cache(device = device)
     if set_grids:
-        grid_cache = Cache()
+        grid_cache = Cache(device = device)
     else:
         grid_cache = None
 

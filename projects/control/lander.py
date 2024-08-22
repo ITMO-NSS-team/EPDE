@@ -9,7 +9,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../..
 
 import numpy as np
 import torch
-import pickle
+import dill as pickle
 
 from tqdm import tqdm
 import matplotlib as mpl
@@ -78,14 +78,14 @@ def get_additional_token_families(ctrl):
     nn_eval_np = {ctrl_keys[0] : main_thrust_nn_eval_np, 
                   ctrl_keys[1] : manuever_thrust_nn_eval_np}
 
-    control_var_tokens = epde.interface.prepared_tokens.ControlVarTokens(sample = [ctrl[0, ...], ctrl[1, ...]], 
+    control_var_tokens = epde.interface.prepared_tokens.ControlVarTokens(sample = [ctrl[0, ...], ctrl[1, ...]],
                                                                          var_name = ctrl_keys,
-                                                                         arg_var = [(0, [None,]), 
+                                                                         arg_var = [(0, [None,]),
                                                                                     (1, [None,]),
                                                                                     (2, [None,]), 
-                                                                                    (0, [0,]), 
+                                                                                    (0, [0,]),
                                                                                     (1, [0,]),
-                                                                                    (2, [0,])], 
+                                                                                    (2, [0,])],
                                                                          eval_torch = nn_eval_torch, eval_np = nn_eval_np)
     
     return [angle_trig_tokens,]
@@ -95,7 +95,7 @@ def epde_discovery(t, y, z, angle, u, derivs = None, diff_method = 'FD', data_nn
     dimensionality = t.ndim - 1
     
     epde_search_obj = epde.EpdeSearch(use_solver = use_solver, dimensionality = dimensionality, boundary = 30,
-                                      coordinate_tensors = [t,], verbose_params = {'show_iter_idx' : True})    
+                                      coordinate_tensors = [t,], verbose_params = {'show_iter_idx' : True}, device=device)
     
     if diff_method == 'ANN':
         epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
@@ -112,7 +112,7 @@ def epde_discovery(t, y, z, angle, u, derivs = None, diff_method = 'FD', data_nn
 
     eps = 5e-7
     popsize = 10
-    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs = 150)
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs = 5)
 
     factors_max_number = {'factors_num' : [1, 2, 3,], 'probas' : [0.4, 0.5, 0.1]}
 
@@ -124,7 +124,7 @@ def epde_discovery(t, y, z, angle, u, derivs = None, diff_method = 'FD', data_nn
                         equation_terms_max_number=6, data_fun_pow = 2, derivs = derivs,
                         additional_tokens=get_additional_token_families(ctrl=u),
                         equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-7, 1e-4), data_nn=data_nn, device=device) # TODO: narrow sparsity interval, reduce the population size
+                        eq_sparsity_interval=(1e-7, 1e-4), data_nn=data_nn) # TODO: narrow sparsity interval, reduce the population size
     epde_search_obj.equations()
     return epde_search_obj
 
@@ -149,7 +149,10 @@ def prepare_data(num_steps: int = 200, *args, **kwargs):
     num_steps = 200
 
     k = 3
-    main_thrust = lambda x: 0#(np.power(x, k/2.-1)*np.exp(-x/2.))/(2**(k/2.)*scipy.special.gamma(k/2.))/3.
+    def main_thrust(x):
+        thrust = 0.4 + (np.power(x, k/2.-1)*np.exp(-x/2.))/(2**(k/2.)*scipy.special.gamma(k/2.))
+        print(x, thrust)
+        return thrust
     test_range = np.linspace(0, 5, 100)
 
     obs = env.reset()
@@ -162,7 +165,7 @@ def prepare_data(num_steps: int = 200, *args, **kwargs):
         # action = my_intelligent_agent_fn(obs) 
         if not (left_landed or right_landed):
             print(observations[-1][3])
-            hor_thrust = 0
+            hor_thrust = 0.5 + observations[-1][4] * 2
             action = [main_thrust(observations[-1][1]), hor_thrust]
         else:
             action = [0., 0.]
@@ -183,6 +186,7 @@ def prepare_data(num_steps: int = 200, *args, **kwargs):
 
     observations = np.stack(observations, axis = 1)
     acts = np.array(acts).T
+    acts_res = np.copy(acts)
     acts[0, :] = np.where(acts[0, :] > 0.5, acts[0, :], 0.)    
     acts[1, :] = np.where(np.abs(acts[1, :]) < 0.5, 0., acts[1, :])    
 
@@ -223,7 +227,10 @@ def prepare_data(num_steps: int = 200, *args, **kwargs):
     plt.show()
 
     plt.plot(np.arange(acts[0, :].size), acts[0, :], color = 'k')
+    plt.plot(np.arange(acts_res[0, :].size), acts_res[0, :], '--',  color = 'k')
+
     plt.plot(np.arange(acts[1, :].size), acts[1, :], color = 'r')
+    plt.plot(np.arange(acts_res[1, :].size), acts_res[1, :], '--',  color = 'r')
     plt.show()
     print(observations.shape, acts.shape)
     return t, observations, acts, env.moon, (env.helipad_x1, env.helipad_x2, env.helipad_y)
@@ -278,9 +285,9 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     contr_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = 0., device=device),
                                                  indices = loc_domain, deriv_axes=[None,], deriv_method = autograd, nn_output=0, device=device)
 
-    x_right_bnd = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = y_right, device=device), sign='<',
+    y_right_bnd = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = y_right, device=device), sign='<',
                                                  indices = loc_domain, deriv_method = autograd, nn_output=0, device=device)
-    x_left_bnd = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = y_left, device=device), sign='>',
+    y_left_bnd = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = y_left, device=device), sign='>',
                                                 indices = loc_domain, deriv_method = autograd, nn_output=0, device=device)
     
     loss = control_utils.ConditionalLoss([(1., y_constr, 0),
@@ -290,8 +297,8 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
                                           (1., phi_tar_constr, 0),
                                           (1., dphi_tar_constr, 0), 
                                           (0.001, contr_constr, 1),
-                                          (100., x_right_bnd, 0),
-                                          (100., x_left_bnd, 0)])
+                                          (100., y_right_bnd, 0),
+                                          (100., y_left_bnd, 0)])
     
     optimizer = control_utils.ControlExp(loss=loss, device=device)
     
@@ -341,7 +348,7 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
 
 if __name__ == '__main__':
-    import pickle
+    # import pickle
     import datetime
 
     experiment = 'lander'
@@ -352,7 +359,19 @@ if __name__ == '__main__':
     res_folder = '/home/mikemaslyaev/Documents/EPDE/projects/control'
     fig_folder = os.path.join(res_folder, 'figs')
 
-    t, obs, acts, moon, helipad = prepare_data()
+    traj_filename = os.path.join(res_folder, f'training_traj_{experiment}.pickle')
+
+    try:
+        with open(traj_filename, 'rb') as data_input_file:  
+            traj_info = pickle.load(data_input_file)
+            t, obs, acts, helipad = traj_info # , moon
+    except FileNotFoundError:
+        t, obs, acts, _, helipad = prepare_data()
+        traj_info = (t, obs, acts, helipad) # , moon
+        with open(traj_filename, 'wb') as output_file:
+            pickle.dump(traj_info, output_file)
+
+
     print('acts.shape:', acts.shape)
 
     print(f'Observations {obs.shape}, acts {acts.shape}')
@@ -366,9 +385,32 @@ if __name__ == '__main__':
     plt.legend()
     plt.show()
 
+    if device == 'cpu':
+        fname = os.path.join(res_folder, f"data_ann_{experiment}_cpu.pickle")
+    else:
+        fname = os.path.join(res_folder, f"data_ann_{experiment}_cuda.pickle")            
+    try:
+        with open(fname, 'rb') as data_input_file:  
+            data_nn = pickle.load(data_input_file)
+        data_nn = data_nn.to(device)
+        save_nn = False
+    except FileNotFoundError:
+        print(f'No model located, with name {fname}')
+        data_nn = None
+        save_nn = True
 
     model = epde_discovery(t = t[:-5], y = obs[0, :-5], z = obs[1, :-5], angle = obs[4, :-5], 
-                           u = acts[..., :-5], device = 'cuda', use_solver = True)
+                           u = acts[..., :-5], device = 'cuda', data_nn=data_nn, use_solver = True)
+    
+    if save_nn:
+        if device == 'cpu':
+            fname =  os.path.join(res_folder, f"data_ann_{experiment}_cpu.pickle")
+        else:
+            fname = os.path.join(res_folder, f"data_ann_{experiment}_cuda.pickle")
+        with open(fname, 'wb') as output_file:
+            pickle.dump(epde.globals.solution_guess_nn, output_file)
+
+    model.equations()
     
     example_sol = epde.globals.solution_guess_nn(torch.from_numpy(t).reshape((-1, 1)).float().to(device))
     epde.globals.solution_guess_nn.to(device)

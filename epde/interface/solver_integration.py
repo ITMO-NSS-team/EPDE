@@ -353,7 +353,10 @@ class PregenBOperator(object):
                 for loc in relative_bc_location[ax_ord]:
                     indexes = get_boundary_ind(tensor_shape, ax_idx, rel_loc=loc)
 
-                    coords = np.array([grids[idx][indexes] for idx in np.arange(len(tensor_shape))]).T
+                    if global_var.grid_cache._device == 'cpu':
+                        coords = np.array([grids[idx][indexes] for idx in np.arange(len(tensor_shape))]).T
+                    else:
+                        coords = np.array([grids[idx][indexes].detach().cpu() for idx in np.arange(len(tensor_shape))]).T
                     if coords.ndim > 2:
                         coords = coords.squeeze()
 
@@ -365,7 +368,7 @@ class PregenBOperator(object):
                     bc_values = np.expand_dims(bc_values, axis=0).T
                     coords = torch.from_numpy(coords).float()
 
-                    bc_values = torch.from_numpy(bc_values).float()
+                    bc_values = torch.from_numpy(bc_values).float() # TODO: set devices for all torch objs
                     operator = BOPElement(axis=ax_idx, key=variable, coeff=1, term=[None],
                                           power=1, var=var_idx, rel_location=loc)
                     operator.set_grid(grid=coords)

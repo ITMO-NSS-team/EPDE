@@ -234,7 +234,8 @@ class EpdeSearch(object):
                  use_solver: bool = False, dimensionality: int = 1, verbose_params: dict = {'show_iter_idx' : True}, 
                  coordinate_tensors=None, memory_for_cache=5, prune_domain: bool = False, 
                  pivotal_tensor_label=None, pruner=None, threshold: float = 1e-2, 
-                 division_fractions=3, rectangular: bool = True, params_filename: str = None):
+                 division_fractions=3, rectangular: bool = True, 
+                 params_filename: str = None, device: str = 'cpu'):
         """
         Args:
             use_default_strategy (`bool`): optional
@@ -281,6 +282,7 @@ class EpdeSearch(object):
             rectangular(`bool`): optional
                 A line of subdomains along an axis can be removed if all values inside them are identical to zero.
         """
+        self._device = device
         self.multiobjective_mode = multiobjective_mode
         global_var.set_time_axis(time_axis)
         global_var.init_verbose(**verbose_params)
@@ -487,7 +489,7 @@ class EpdeSearch(object):
         Returns:
             None
         """
-        global_var.init_caches(set_grids=True)
+        global_var.init_caches(set_grids=True, device=self._device)
         example = coordinate_tensors if isinstance(coordinate_tensors, np.ndarray) else coordinate_tensors[0]
         self.set_memory_properties(example_tensor=example, mem_for_cache_frac=memory_for_cache)
         upload_grids(coordinate_tensors, global_var.initial_data_cache)
@@ -631,7 +633,7 @@ class EpdeSearch(object):
     def create_pool(self, data: Union[np.ndarray, list, tuple], variable_names=['u',],
                     derivs=None, max_deriv_order=1, additional_tokens=[],
                     data_fun_pow: int = 1, deriv_fun_pow: int = 1, grid: list = None,
-                    data_nn: torch.nn.Sequential = None, device: str = 'cpu'):
+                    data_nn: torch.nn.Sequential = None):
         '''
         Create pool of tokens to represent elementary functions, that can be included in equations.
         
@@ -686,10 +688,10 @@ class EpdeSearch(object):
             if data_nn is not None:
                 print('Using pre-trained ANN')
                 global_var.reset_data_repr_nn(data = data, derivs = base_derivs, train = False, 
-                                              grids = grid, predefined_ann = data_nn, device = device)
+                                              grids = grid, predefined_ann = data_nn, device = self._device)
             else:
                 global_var.reset_data_repr_nn(data = data, derivs = base_derivs, epochs_max=1e5,
-                                              grids = grid, predefined_ann=None, device = device)
+                                              grids = grid, predefined_ann=None, device = self._device)
 
         if isinstance(additional_tokens, list):
             if not all([isinstance(tf, (TokenFamily, PreparedTokens)) for tf in additional_tokens]):
@@ -739,7 +741,7 @@ class EpdeSearch(object):
             equation_factors_max_number=1, variable_names=['u',], eq_sparsity_interval=(1e-4, 2.5), 
             derivs=None, max_deriv_order=1, additional_tokens=[], data_fun_pow: int = 1, deriv_fun_pow: int = 1,
             optimizer: Union[SimpleOptimizer, MOEADDOptimizer] = None, pool: TFPool = None,
-            population: Union[ParetoLevels, Population] = None, data_nn = None, device: str = 'cpu'):
+            population: Union[ParetoLevels, Population] = None, data_nn = None):
         """
         Fit epde search algorithm to obtain differential equations, describing passed data.
 
@@ -809,7 +811,7 @@ class EpdeSearch(object):
                                  derivs=derivs, max_deriv_order=max_deriv_order, 
                                  additional_tokens=additional_tokens, 
                                  data_fun_pow = data_fun_pow, deriv_fun_pow = deriv_fun_pow, 
-                                 data_nn = data_nn, device=device)
+                                 data_nn = data_nn)
         else:
             self.pool = pool; self.pool_params = cur_params
 

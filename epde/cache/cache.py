@@ -113,11 +113,15 @@ def prepare_var_tensor(var_tensor, derivs_tensor, time_axis):
                                                          source=time_axis, destination=0)
     return result
 
-def switch_format(inp: Union[torch.Tensor, np.ndarray]):
+def switch_format(inp: Union[torch.Tensor, np.ndarray], device = 'cpu'):
     if isinstance(inp, np.ndarray):
-        return torch.from_numpy(inp)
+        return torch.from_numpy(inp).to(device) # TODO: add device selection
     elif isinstance(inp, torch.Tensor):
-        return inp.detach().numpy()
+        if device == 'cpu':
+            return inp.detach().numpy()
+        else:
+            return inp.detach().cpu().numpy()
+
 
 def download_variable(var_filename, deriv_filename, time_axis):
     """
@@ -143,7 +147,8 @@ class Cache(object):
         memory_normalized (`dict`): key - name of tensor (tuple - (name_of_term, params)), value - derivative. Objects with normalize
         memory_structural (`dict`): key - name of tensor (tuple - (name_of_term, params)), value - derivative. NOT USED ДОПИСАТЬ ПРОСМОТРЯ КОД
     """
-    def __init__(self):
+    def __init__(self, device = 'cpu'):
+        self._device = device
         self.max_allowed_tensors = None
         
         self.memory_default = {'torch' : dict(), 'numpy' : dict()} # TODO: add separate cache for torch tensors and numpy
@@ -380,7 +385,8 @@ class Cache(object):
         if normalized:
             if label not in self.memory_normalized[type_key] and label in self.memory_normalized[other]:
                 self.memory_normalized[type_key][label] = switch_format(self.get(label, normalized,
-                                                                                  structural, saved_as, other_bool))
+                                                                                  structural, saved_as, other_bool), 
+                                                                        device = self._device)
             return self.memory_normalized[type_key][label]
         elif structural:
             if self.structural_and_base_merged[label]:
@@ -388,13 +394,15 @@ class Cache(object):
             else:
                 if label not in self.memory_structural[type_key] and label in self.memory_structural[other]:
                     self.memory_structural[type_key][label] = switch_format(self.get(label, normalized, 
-                                                                                     structural, saved_as, other_bool))
+                                                                                     structural, saved_as, other_bool),
+                                                                            device = self._device)
                 # print('keys in mem_struct:', type_key, self.memory_structural[type_key].keys())
                 return self.memory_structural[type_key][label]                
         else:
             if label not in self.memory_default[type_key] and label in self.memory_default[other]:
                 self.memory_default[type_key][label] = switch_format(self.get(label, normalized, 
-                                                                              structural, saved_as, other_bool))
+                                                                              structural, saved_as, other_bool),
+                                                                     device = self._device)
             return self.memory_default[type_key][label]
 
     def get_all(self, normalized=False, structural=False, mode: str = 'numpy'):
@@ -418,7 +426,7 @@ class Cache(object):
         for key, value in other_mem.items():
             if key not in processed_mem.keys():
                 keys.append(key)
-                tensors.append(switch_format(value))
+                tensors.append(switch_format(value, device = self._device))
 
         return keys, tensors
 

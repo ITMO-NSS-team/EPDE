@@ -39,7 +39,7 @@ def epde_discovery(t, x, angle, u, derivs, diff_method = 'FD', data_nn: torch.nn
     dimensionality = x.ndim - 1
     use_solver = True
     epde_search_obj = epde.EpdeSearch(use_solver = use_solver, dimensionality = dimensionality, boundary = 30,
-                                      coordinate_tensors = [t,], verbose_params = {'show_iter_idx' : True})    
+                                      coordinate_tensors = [t,], verbose_params = {'show_iter_idx' : True}, device=device)    
     
     if diff_method == 'ANN':
         epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
@@ -125,7 +125,7 @@ def translate_equation(t, x, angle, u, derivs: dict, diff_method = 'FD', data_nn
 
 
     epde_search_obj = epde.EpdeSearch(use_solver = True, dimensionality = dimensionality, boundary = 30,
-                                      coordinate_tensors = [t,], verbose_params = {'show_iter_idx' : False})
+                                      coordinate_tensors = [t,], verbose_params = {'show_iter_idx' : False}, device=device)
 
     if diff_method == 'ANN':
         epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
@@ -141,7 +141,7 @@ def translate_equation(t, x, angle, u, derivs: dict, diff_method = 'FD', data_nn
         raise ValueError('Incorrect preprocessing tool selected.')
 
     epde_search_obj.create_pool(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,), derivs = [derivs['y'], derivs['phi']],
-                                additional_tokens = get_additional_token_families(ctrl=u), device=device, data_nn = data_nn)
+                                additional_tokens = get_additional_token_families(ctrl=u), data_nn = data_nn)
 
     test = epde.interface.equation_translator.CoeffLessEquation(lp_terms = {'phi': lp_phi_terms, 'y': lp_y_terms},
                                                                 rp_term = {'phi': rp_phi_term, 'y': rp_y_term}, 
@@ -166,7 +166,7 @@ def translate_equation(t, x, angle, u, derivs: dict, diff_method = 'FD', data_nn
 
 def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
                   y_init: float, dy_init: float, phi_init: float, dphi_init: float,
-                  y_left: float, y_right: float, stab_der_ord: int,
+                  ctrl_max: float, stab_der_ord: int,
                   state_nn_pretrained: torch.nn.Sequential, ctrl_nn_pretrained: torch.nn.Sequential, 
                   fig_folder: str, device = 'cpu'):
     
@@ -178,26 +178,27 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     print(f'loc_end.flat_idxs : {loc_end.flat_idxs}, device {device}')
 
     def cosine_cond(x, ref):
+        # print(f'cos of {x} is {torch.cos(x)}, while ref was {ref}')
         return torch.abs(torch.cos(x) - ref)
     
     phi_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t[-1], fill_value = 1., device=device), # Better processing for periodic
-                                                   indices = loc_end, deriv_axes=[None,], deriv_method = autograd, nn_output=0, 
+                                                   indices = loc_end, deriv_axes=[None,], deriv_method = autograd, nn_output=1, 
                                                    estim_func=cosine_cond, device=device)
     dphi_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t[-1], fill_value = 0, device=device),
                                                     indices = loc_end, deriv_axes=[0,], deriv_method = autograd, nn_output=1, device=device)
     contr_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = 0., device=device),
                                                  indices = loc_domain, deriv_axes=[None,], deriv_method = autograd, nn_output=0, device=device)
 
-    y_right_bnd = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = y_right, device=device), sign='<',
+    contr_right_bnd = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = ctrl_max, device=device), sign='<',
                                                  indices = loc_domain, deriv_method = autograd, nn_output=0, device=device)
-    y_left_bnd = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = y_left, device=device), sign='>',
+    contr_left_bnd = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = -ctrl_max, device=device), sign='>',
                                                 indices = loc_domain, deriv_method = autograd, nn_output=0, device=device)
     
-    loss = control_utils.ConditionalLoss([(100., phi_tar_constr, 0),
+    loss = control_utils.ConditionalLoss([(1e6, phi_tar_constr, 0),
                                           (10., dphi_tar_constr, 0), 
                                           (0.001, contr_constr, 1),
-                                          (100., y_right_bnd, 0),
-                                          (100., y_left_bnd, 0)])
+                                          (100., contr_right_bnd, 1),
+                                          (100., contr_left_bnd, 1)])
     
     optimizer = control_utils.ControlExp(loss=loss, device=device)
     
@@ -224,8 +225,8 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
     # optimizer.set_control_optim_params()
 
-    solver_params = {'full':     {'training_params': {'epochs': 1500,}, 'optimizer_params': {'params': {'lr': 1e-5}}}, 
-                     'abridged': {'training_params': {'epochs': 300,}, 'optimizer_params': {'params': {'lr': 5e-5}}}}
+    solver_params = {'full':     {'training_params': {'epochs': 1000,}, 'optimizer_params': {'params': {'lr': 1e-5}}}, 
+                     'abridged': {'training_params': {'epochs': 200,}, 'optimizer_params': {'params': {'lr': 5e-5}}}}
     
     state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_y(device=device), 0.1), 
                                                                                (bop_dy(device=device), 0.1),
@@ -544,7 +545,7 @@ if __name__ == '__main__':
                 
         res = optimize_ctrl(res, torch.from_numpy(t).reshape((-1, 1)).float().to(device),
                             y_init=solution[0, 0], dy_init=solution[0, 1], phi_init=solution[0, 2], dphi_init=solution[0, 3],
-                            y_left = -1, y_right = 1, stab_der_ord = 2, 
+                            ctrl_max = 1, stab_der_ord = 2, 
                             state_nn_pretrained=epde.globals.solution_guess_nn, ctrl_nn_pretrained=ctrl_ann, 
                             fig_folder=fig_folder, device=device)
 
