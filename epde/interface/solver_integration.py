@@ -313,7 +313,7 @@ class PregenBOperator(object):
         @get_equation_requirements.register
         def _(equation_sf: list, variables=['u',]):
             raise NotImplementedError(
-                'TODO: add equation list form processing')  # TODO
+                'TODO: add equation list form processing') 
 
         eq_forms = []
         for equation_form in system_sf:
@@ -338,6 +338,7 @@ class PregenBOperator(object):
         if grids is None:
             _, grids = grid_cache.get_all(mode = 'torch')
 
+        device_on_cpu = global_var.grid_cache._device  # == 'cpu':
         relative_bc_location = {0: (), 1: (0,), 2: (0, 1),
                                 3: (0., 0.5, 1.), 4: (0., 1/3., 2/3., 1.)}
 
@@ -353,7 +354,7 @@ class PregenBOperator(object):
                 for loc in relative_bc_location[ax_ord]:
                     indexes = get_boundary_ind(tensor_shape, ax_idx, rel_loc=loc)
 
-                    if global_var.grid_cache._device == 'cpu':
+                    if device_on_cpu:
                         coords = np.array([grids[idx][indexes] for idx in np.arange(len(tensor_shape))]).T
                     else:
                         coords = np.array([grids[idx][indexes].detach().cpu() for idx in np.arange(len(tensor_shape))]).T
