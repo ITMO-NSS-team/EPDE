@@ -18,9 +18,11 @@ import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
 
 import epde
-import epde.interface.control_utils as control_utils
+from epde.control import ControlExp, ConstrLocation, ConditionalLoss, ControlConstrNEq, ControlConstrEq
 import epde.globals as global_var
-from projects.control.swingup_aux import VarTrigTokens 
+from projects.control.swingup_aux import VarTrigTokens
+
+from epde.interface.interface import ExperimentCombiner
 from epde.interface.prepared_tokens import DerivSignFunction
 
 import numpy as np
@@ -124,10 +126,9 @@ def epde_discovery(t, y, z, angle, u, derivs = None, diff_method = 'FD', data_nn
                         equation_terms_max_number=6, data_fun_pow = 2, derivs = derivs,
                         additional_tokens=get_additional_token_families(ctrl=u),
                         equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-7, 1e-4), data_nn=data_nn) # TODO: narrow sparsity interval, reduce the population size
+                        eq_sparsity_interval=(1e-4, 1e-1), data_nn=data_nn) # TODO: narrow sparsity interval, reduce the population size
     epde_search_obj.equations()
     return epde_search_obj
-
 
 def prepare_data(num_steps: int = 200, *args, **kwargs):
     env = gym.make("LunarLander-v2",
@@ -245,8 +246,8 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     from epde.supplementary import AutogradDeriv
     autograd = AutogradDeriv()
 
-    loc_domain = control_utils.ConstrLocation(domain_shape = (t.size()[0],), device=device) # Declaring const in the entire domain
-    loc_end = control_utils.ConstrLocation(domain_shape = (t.size()[0],), axis = 0, loc = -1, device=device) # Check format
+    loc_domain = ConstrLocation(domain_shape = (t.size()[0],), device=device) # Declaring const in the entire domain
+    loc_end = ConstrLocation(domain_shape = (t.size()[0],), axis = 0, loc = -1, device=device) # Check format
     print(f'loc_end.flat_idxs : {loc_end.flat_idxs}, device {device}')
 
     def cosine_cond(x, ref):
@@ -261,46 +262,46 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     def landing_x_cond(x, ref):
         return torch.abs(x - ref) - halflength
         
-    y_constr = control_utils.ControlConstrNEq(val = torch.full_like(input = t[-1], fill_value = ycenter, device=device), # Better processing for periodic
-                                              indices = loc_end, deriv_axes=[None,], deriv_method = autograd, nn_output=0,
-                                              estim_func=landing_x_cond, device=device, sign='<')
+    y_constr = ControlConstrNEq(val = torch.full_like(input = t[-1], fill_value = ycenter, device=device), # Better processing for periodic
+                                indices = loc_end, deriv_axes=[None,], deriv_method = autograd, nn_output=0,
+                                estim_func=landing_x_cond, device=device, sign='<')
     
-    dy_constr = control_utils.ControlConstrNEq(val = torch.full_like(input = t[-1], fill_value = dy_max, device=device), # Better processing for periodic
-                                               indices = loc_end, deriv_axes=[0,], deriv_method = autograd, nn_output=0,
-                                               device=device, sign='<')
+    dy_constr = ControlConstrNEq(val = torch.full_like(input = t[-1], fill_value = dy_max, device=device), # Better processing for periodic
+                                 indices = loc_end, deriv_axes=[0,], deriv_method = autograd, nn_output=0,
+                                 device=device, sign='<')
 
-    z_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t[-1], fill_value = helipad[2], device=device), # Better processing for periodic
-                                             indices = loc_end, deriv_axes=[None,], deriv_method = autograd, nn_output=1,
-                                             device=device)
+    z_constr = ControlConstrEq(val = torch.full_like(input = t[-1], fill_value = helipad[2], device=device), # Better processing for periodic
+                               indices = loc_end, deriv_axes=[None,], deriv_method = autograd, nn_output=1,
+                               device=device)
     
-    dz_constr = control_utils.ControlConstrNEq(val = torch.full_like(input = t[-1], fill_value = dz_max, device=device), # Better processing for periodic
-                                               indices = loc_end, deriv_axes=[0,], deriv_method = autograd, nn_output=1,
-                                               device=device, sign='<')
+    dz_constr = ControlConstrNEq(val = torch.full_like(input = t[-1], fill_value = dz_max, device=device), # Better processing for periodic
+                                 indices = loc_end, deriv_axes=[0,], deriv_method = autograd, nn_output=1,
+                                 device=device, sign='<')
 
-    phi_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t[-1], fill_value = 1., device=device), # Better processing for periodic
-                                                   indices = loc_end, deriv_axes=[None,], deriv_method = autograd, nn_output=2, 
-                                                   estim_func=cosine_cond, device=device)
-    dphi_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t[-1], fill_value = 0, device=device),
-                                                    indices = loc_end, deriv_axes=[0,], deriv_method = autograd, nn_output=2, device=device)
-    contr_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = 0., device=device),
-                                                 indices = loc_domain, deriv_axes=[None,], deriv_method = autograd, nn_output=0, device=device)
+    phi_tar_constr = ControlConstrEq(val = torch.full_like(input = t[-1], fill_value = 1., device=device), # Better processing for periodic
+                                     indices = loc_end, deriv_axes=[None,], deriv_method = autograd, nn_output=2, 
+                                     estim_func=cosine_cond, device=device)
+    dphi_tar_constr = ControlConstrEq(val = torch.full_like(input = t[-1], fill_value = 0, device=device),
+                                      indices = loc_end, deriv_axes=[0,], deriv_method = autograd, nn_output=2, device=device)
+    contr_constr = ControlConstrEq(val = torch.full_like(input = t, fill_value = 0., device=device),
+                                   indices = loc_domain, deriv_axes=[None,], deriv_method = autograd, nn_output=0, device=device)
 
-    y_right_bnd = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = y_right, device=device), sign='<',
-                                                 indices = loc_domain, deriv_method = autograd, nn_output=0, device=device)
-    y_left_bnd = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = y_left, device=device), sign='>',
-                                                indices = loc_domain, deriv_method = autograd, nn_output=0, device=device)
+    y_right_bnd = ControlConstrNEq(val = torch.full_like(input = t, fill_value = y_right, device=device), sign='<',
+                                   indices = loc_domain, deriv_method = autograd, nn_output=0, device=device)
+    y_left_bnd = ControlConstrNEq(val = torch.full_like(input = t, fill_value = y_left, device=device), sign='>',
+                                  indices = loc_domain, deriv_method = autograd, nn_output=0, device=device)
     
-    loss = control_utils.ConditionalLoss([(1., y_constr, 0),
-                                          (1., dy_constr, 0),
-                                          (1., z_constr, 0),
-                                          (1., dz_constr, 0),
-                                          (1., phi_tar_constr, 0),
-                                          (1., dphi_tar_constr, 0), 
-                                          (0.001, contr_constr, 1),
-                                          (100., y_right_bnd, 0),
-                                          (100., y_left_bnd, 0)])
+    loss = ConditionalLoss([(1., y_constr, 0),
+                            (1., dy_constr, 0),
+                            (1., z_constr, 0),
+                            (1., dz_constr, 0),
+                            (1., phi_tar_constr, 0),
+                            (1., dphi_tar_constr, 0), 
+                            (0.001, contr_constr, 1),
+                            (100., y_right_bnd, 0),
+                            (100., y_left_bnd, 0)])
     
-    optimizer = control_utils.ControlExp(loss=loss, device=device)
+    optimizer = ControlExp(loss=loss, device=device)
     
     def get_ode_bop(key, var, term, grid_loc, value):
         bop = epde.interface.solver_integration.BOPElement(axis = 0, key = key, term = term,
@@ -399,9 +400,12 @@ if __name__ == '__main__':
         data_nn = None
         save_nn = True
 
-    model = epde_discovery(t = t[:-5], y = obs[0, :-5], z = obs[1, :-5], angle = obs[4, :-5], 
-                           u = acts[..., :-5], device = 'cuda', data_nn=data_nn, use_solver = True)
+    use_solver = True
+    models = epde_discovery(t = t[:-5], y = obs[0, :-5], z = obs[1, :-5], angle = obs[4, :-5], 
+                           u = acts[..., :-5], device = 'cuda', data_nn=data_nn, use_solver = use_solver)
     
+    exp_comb = ExperimentCombiner(models.equations(False))
+    model = exp_comb.create_best(models.pool)
     if save_nn:
         if device == 'cpu':
             fname =  os.path.join(res_folder, f"data_ann_{experiment}_cpu.pickle")
@@ -410,7 +414,7 @@ if __name__ == '__main__':
         with open(fname, 'wb') as output_file:
             pickle.dump(epde.globals.solution_guess_nn, output_file)
 
-    model.equations()
+    # model.equations()
     
     example_sol = epde.globals.solution_guess_nn(torch.from_numpy(t).reshape((-1, 1)).float().to(device))
     epde.globals.solution_guess_nn.to(device)

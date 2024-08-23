@@ -21,8 +21,9 @@ mpl.use('TkAgg')
 import matplotlib.pyplot as plt
 
 import epde
-import epde.interface.control_utils as control_utils
 import epde.globals as global_var
+
+from epde.control import ControlExp, ConstrLocation, ConditionalLoss, ControlConstrEq, ControlConstrNEq
 from projects.control.swingup_aux import DMCEnvWrapper, RandomPolicy, CosinePolicy, CosineSignPolicy, \
                                          TwoCosinePolicy, rollout_env, VarTrigTokens # ,, DerivSignFunction
 from epde.interface.prepared_tokens import DerivSignFunction
@@ -171,40 +172,41 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
                   fig_folder: str, device = 'cpu'):
     
     from epde.supplementary import AutogradDeriv
+
     autograd = AutogradDeriv()
 
-    loc_domain = control_utils.ConstrLocation(domain_shape = (t.size()[0],), device=device) # Declaring const in the entire domain
-    loc_end = control_utils.ConstrLocation(domain_shape = (t.size()[0],), axis = 0, loc = -1, device=device) # Check format
+    loc_domain = ConstrLocation(domain_shape = (t.size()[0],), device=device) # Declaring const in the entire domain
+    loc_end = ConstrLocation(domain_shape = (t.size()[0],), axis = 0, loc = -1, device=device) # Check format
     print(f'loc_end.flat_idxs : {loc_end.flat_idxs}, device {device}')
 
     def cosine_cond(x, ref):
         # print(f'cos of {x} is {torch.cos(x)}, while ref was {ref}')
         return torch.abs(torch.cos(x) - ref)
     
-    phi_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t[-1], fill_value = 1., device=device), # Better processing for periodic
-                                                   indices = loc_end, deriv_axes=[None,], deriv_method = autograd, nn_output=1, 
-                                                   estim_func=cosine_cond, device=device)
-    dphi_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t[-1], fill_value = 0, device=device),
-                                                    indices = loc_end, deriv_axes=[0,], deriv_method = autograd, nn_output=1, device=device)
-    contr_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = 0., device=device),
-                                                 indices = loc_domain, deriv_axes=[None,], deriv_method = autograd, nn_output=0, device=device)
+    phi_tar_constr = ControlConstrEq(val = torch.full_like(input = t[-1], fill_value = 1., device=device), # Better processing for periodic
+                                     indices = loc_end, deriv_axes=[None,], deriv_method = autograd, nn_output=1, 
+                                     estim_func=cosine_cond, device=device)
+    dphi_tar_constr = ControlConstrEq(val = torch.full_like(input = t[-1], fill_value = 0, device=device),
+                                      indices = loc_end, deriv_axes=[0,], deriv_method = autograd, nn_output=1, device=device)
+    contr_constr = ControlConstrEq(val = torch.full_like(input = t, fill_value = 0., device=device),
+                                   indices = loc_domain, deriv_axes=[None,], deriv_method = autograd, nn_output=0, device=device)
 
-    contr_right_bnd = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = ctrl_max, device=device), sign='<',
-                                                 indices = loc_domain, deriv_method = autograd, nn_output=0, device=device)
-    contr_left_bnd = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = -ctrl_max, device=device), sign='>',
-                                                indices = loc_domain, deriv_method = autograd, nn_output=0, device=device)
+    contr_right_bnd = ControlConstrNEq(val = torch.full_like(input = t, fill_value = ctrl_max, device=device), sign='<',
+                                       indices = loc_domain, deriv_method = autograd, nn_output=0, device=device)
+    contr_left_bnd = ControlConstrNEq(val = torch.full_like(input = t, fill_value = -ctrl_max, device=device), sign='>',
+                                      indices = loc_domain, deriv_method = autograd, nn_output=0, device=device)
     
-    loss = control_utils.ConditionalLoss([(1e6, phi_tar_constr, 0),
-                                          (10., dphi_tar_constr, 0), 
-                                          (0.001, contr_constr, 1),
-                                          (100., contr_right_bnd, 1),
-                                          (100., contr_left_bnd, 1)])
+    loss = ConditionalLoss([(1e6, phi_tar_constr, 0),
+                            (10., dphi_tar_constr, 0), 
+                            (0.001, contr_constr, 1),
+                            (100., contr_right_bnd, 1),
+                            (100., contr_left_bnd, 1)])
     
-    optimizer = control_utils.ControlExp(loss=loss, device=device)
+    optimizer = ControlExp(loss=loss, device=device)
     
     def get_ode_bop(key, var, term, grid_loc, value):
         bop = epde.interface.solver_integration.BOPElement(axis = 0, key = key, term = term,
-                                                           power = 1, var = var)
+                                                           power = 1, var = var, device = device)
         if isinstance(grid_loc, float):
             bop_grd_np = np.array([[grid_loc,]])
             bop.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor)).to(device)
@@ -228,10 +230,10 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     solver_params = {'full':     {'training_params': {'epochs': 1000,}, 'optimizer_params': {'params': {'lr': 1e-5}}}, 
                      'abridged': {'training_params': {'epochs': 200,}, 'optimizer_params': {'params': {'lr': 5e-5}}}}
     
-    state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_y(device=device), 0.1), 
-                                                                               (bop_dy(device=device), 0.1),
-                                                                               (bop_phi(device=device), 0.1),
-                                                                               (bop_dphi(device=device), 0.1)], 
+    state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_y(), 0.1),  # device=device
+                                                                               (bop_dy(), 0.1),
+                                                                               (bop_phi(), 0.1),
+                                                                               (bop_dphi(), 0.1)], 
                                                                grids = [t,], n_control = 1., 
                                                                state_net = state_nn_pretrained, 
                                                                opt_params = [0.005, 0.9, 0.999, 1e-8],
@@ -461,7 +463,7 @@ if __name__ == '__main__':
         print(f'example_sol: {type(example_sol)}, {example_sol.shape}, {example_sol.get_device()}')
 
         def create_shallow_nn(arg_num: int = 1, output_num: int = 1, device = 'cpu') -> torch.nn.Sequential: # net: torch.nn.Sequential = None, 
-            hidden_neurons = 25
+            hidden_neurons = 75
             layers = [torch.nn.Linear(arg_num, hidden_neurons, device=device),
                       torch.nn.Tanh(), # ReLU(),
                       torch.nn.Linear(hidden_neurons, output_num, device=device)]
@@ -521,7 +523,7 @@ if __name__ == '__main__':
 
 
         nn = 'shallow'
-        load_ctrl = True
+        load_ctrl = False
 
         if device == 'cpu':
             ctrl_fname = os.path.join(res_folder, f"control_ann_{nn}_{experiment}_cpu.pickle")

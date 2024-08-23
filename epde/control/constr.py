@@ -1,9 +1,10 @@
-from typing import List, Union, Tuple
+from typing import List, Union, Tuple, Callable
 from abc import ABC, abstractmethod
 
 import numpy as np
 import torch
 
+from epde.supplementary import BasicDeriv
 
 class ConstrLocation():
     def __init__(self, domain_shape: Tuple[int], axis: int = None, loc: int = None, 

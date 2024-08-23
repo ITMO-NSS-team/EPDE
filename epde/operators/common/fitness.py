@@ -139,8 +139,9 @@ class SolverBasedFitness(CompoundOperator):
         loss_add, solution_nn = self.adapter.solve_epde_system(system = objective, grids = None, 
                                                             boundary_conditions = None)
         _, grids = global_var.grid_cache.get_all(mode = 'torch')
+        
         grids = torch.stack([grid.reshape(-1) for grid in grids], dim = 1).float()
-        solution = solution_nn(grids).detach().numpy()
+        solution = solution_nn(grids).detach().cpu().numpy()
         self.g_fun_vals = global_var.grid_cache.g_func
         
         for eq_idx, eq in enumerate(objective.vals):

@@ -38,7 +38,7 @@ better handling, i.e. manual setup.
 BASE_COMPILING_PARAMS = {
                          'mode'                 : 'NN',
                          'lambda_operator'      : 1e1,
-                         'lambda_bound'         : 1e2,
+                         'lambda_bound'         : 1e3,
                          'normalized_loss_stop' : False,
                          'h'                    : 0.001,
                          'inner_order'          : '1',
@@ -128,8 +128,9 @@ BASE_TRAINING_PARAMS = {
                         }
 
 class BOPElement(object):
-    def __init__(self, axis: int, key: str, coeff: float = 1., term: list = [None],
-                 power: Union[Union[List[int], int]] = 1, var: Union[List[int], int] = 1, rel_location: float = 0.):
+    def __init__(self, axis: int, key: str, coeff: float = 1., term: list = [None], 
+                 power: Union[Union[List[int], int]] = 1,
+                 var: Union[List[int], int] = 1, rel_location: float = 0., device = 'cpu'):
         self.axis = axis
         self.key = key
         self.coefficient = coeff
@@ -141,6 +142,8 @@ class BOPElement(object):
         
         self.status = {'boundary_location_set': False,
                        'boundary_values_set': False}
+        
+        self._device = device
 
     def set_grid(self, grid: torch.Tensor):
         self.grid = grid
@@ -162,7 +165,7 @@ class BOPElement(object):
             assert self.grid_set, 'Tring to evaluate variable coefficent without a proper grid.'
             res = self._values(self.grids)
             assert res.shape == self.grids[0].shape
-            return torch.from_numpy(res)
+            return torch.from_numpy(res).to(self._device)
         else:
             return self._values
 
@@ -172,13 +175,13 @@ class BOPElement(object):
             self._values = vals
             self.vals_set = True
         elif isinstance(vals, np.ndarray):
-            self._values = torch.from_numpy(vals)
+            self._values = torch.from_numpy(vals).to(self._device)
             self.vals_set = True
         else:
             raise TypeError(
                 f'Incorrect type of coefficients. Must be a type from list {VAL_TYPES}.')
 
-    def __call__(self, values: VAL_TYPES = None, device: str = 'cpu') -> dict:
+    def __call__(self, values: VAL_TYPES = None) -> dict:
         if not self.vals_set and values is not None:
             self.values = values
             self.status['boundary_values_set'] = True
@@ -194,13 +197,13 @@ class BOPElement(object):
                 boundary = np.array(all_grids[:self.axis] + all_grids[self.axis+1:])
                 if isinstance(values, FunctionType):
                     raise NotImplementedError  # TODO: evaluation of BCs passed as functions or lambdas
-                boundary = torch.from_numpy(np.expand_dims(boundary, axis=self.axis)).float()  # .reshape(bnd_shape))
+                boundary = torch.from_numpy(np.expand_dims(boundary, axis=self.axis)).to(self._device).float()
 
                 boundary = torch.cartesian_prod(boundary,
-                                                torch.from_numpy(np.array([abs_loc,], dtype=np.float64))).float()
+                                                torch.from_numpy(np.array([abs_loc,], dtype=np.float64)).to(self._device)).float()
                 boundary = torch.moveaxis(boundary, source=0, destination=self.axis).resize()
             else:
-                boundary = torch.from_numpy(np.array([[abs_loc,],])).float() # TODO: work from here
+                boundary = torch.from_numpy(np.array([[abs_loc,],])).to(self._device).float() # TODO: work from here
             
         elif boundary is None and self.location is None:
             raise ValueError('No location passed into the BOP.')
@@ -210,11 +213,12 @@ class BOPElement(object):
         
         boundary_value = self.values
         
-        return {'bnd_loc' : boundary.to(device), 'bnd_op' : boundary_operator, 'bnd_val' : boundary_value.to(device), 
+        return {'bnd_loc' : boundary.to(self._device), 'bnd_op' : boundary_operator, 
+                'bnd_val' : boundary_value.to(self._device), 
                 'variables' : self.variables, 'type' : 'operator'}
 
 class PregenBOperator(object):
-    def __init__(self, system: SoEq, system_of_equation_solver_form: list):
+    def __init__(self, system: SoEq, system_of_equation_solver_form: list): #, device = 'cpu'
         self.system = system
         self.equation_sf = [eq for eq in system_of_equation_solver_form]
         self.variables = list(system.vars_to_describe)
@@ -283,20 +287,15 @@ class PregenBOperator(object):
                 var_max_orders = {var_key: np.zeros(dim) for var_key in variables}
                 for term_key, symb_form in equation_sf.items():
                     if isinstance(symb_form['var'], list):
-                        # print(f'symb_form {symb_form["term"], symb_form["pow"], symb_form["var"]}')
-                        # print(f"{len(symb_form['term'])} == {len(symb_form['var'])}")
-                        # print(variables)
                         assert len(symb_form['term']) == len(symb_form['var'])
                         for factor_idx, deriv_factor in enumerate(symb_form['term']):
                             var_orders = np.array([count_factor_order(deriv_factor, ax) for ax
                                                    in np.arange(dim)])
                             if isinstance(symb_form['var'][factor_idx], int):
                                 var_key = symb_form['var'][factor_idx] #- 1
-                                # print(f'var_key is {var_key} for {symb_form["var"][factor_idx]}')
                             else:
                                 var_key = 0
                                 var_orders = 0 # Such tokens do not increase order of the DE
-                                # print(f'var_key passed and got {symb_form["var"][factor_idx]}')
                             var_max_orders[variables[var_key]] = np.maximum(var_max_orders[variables[var_key]],
                                                                             var_orders)
                     elif isinstance(symb_form['var'], int):
@@ -338,7 +337,9 @@ class PregenBOperator(object):
         if grids is None:
             _, grids = grid_cache.get_all(mode = 'torch')
 
-        device_on_cpu = global_var.grid_cache._device  # == 'cpu':
+        device = global_var.grid_cache._device
+        # assert self._device
+        device_on_cpu = (device  == 'cpu')
         relative_bc_location = {0: (), 1: (0,), 2: (0, 1),
                                 3: (0., 0.5, 1.), 4: (0., 1/3., 2/3., 1.)}
 
@@ -355,9 +356,10 @@ class PregenBOperator(object):
                     indexes = get_boundary_ind(tensor_shape, ax_idx, rel_loc=loc)
 
                     if device_on_cpu:
-                        coords = np.array([grids[idx][indexes] for idx in np.arange(len(tensor_shape))]).T
+                        coords = np.array([grids[idx][indexes].detach().numpy() for idx in np.arange(len(tensor_shape))]).T
                     else:
-                        coords = np.array([grids[idx][indexes].detach().cpu() for idx in np.arange(len(tensor_shape))]).T
+                        coords = np.array([grids[idx][indexes].detach().cpu().numpy()
+                                           for idx in np.arange(len(tensor_shape))]).T
                     if coords.ndim > 2:
                         coords = coords.squeeze()
 
@@ -367,11 +369,11 @@ class PregenBOperator(object):
                         bc_values = vals[indexes]
 
                     bc_values = np.expand_dims(bc_values, axis=0).T
-                    coords = torch.from_numpy(coords).float()
+                    coords = torch.from_numpy(coords).to(device).float()
 
-                    bc_values = torch.from_numpy(bc_values).float() # TODO: set devices for all torch objs
+                    bc_values = torch.from_numpy(bc_values).to(device).float() # TODO: set devices for all torch objs
                     operator = BOPElement(axis=ax_idx, key=variable, coeff=1, term=[None],
-                                          power=1, var=var_idx, rel_location=loc)
+                                          power=1, var=var_idx, rel_location=loc, device=device)
                     operator.set_grid(grid=coords)
                     operator.values = bc_values
                     bconds.append(operator)
@@ -389,7 +391,7 @@ class BoundaryConditions(object):
         return [list(bcond()) for bcond in self.operators.values()]
 
 
-def solver_formed_grid(training_grid=None):
+def solver_formed_grid(training_grid=None, device = 'cpu'):
     if training_grid is None:
         keys, training_grid = global_var.grid_cache.get_all(mode = 'torch')
     else:
@@ -398,28 +400,30 @@ def solver_formed_grid(training_grid=None):
     assert len(keys) == training_grid[0].ndim, 'Mismatching dimensionalities'
 
     training_grid = np.array(training_grid).reshape((len(training_grid), -1))
-    return torch.from_numpy(training_grid).T.float()
+    return torch.from_numpy(training_grid).T.to(device).float()
 
 
 def make_eval_func(eval_func, eval_func_kwargs):
     return lambda *args: eval_func(*args, **eval_func_kwargs)
 
 class SystemSolverInterface(object):
-    def __init__(self, system_to_adapt: SoEq, coeff_tol: float = 1.e-9):
+    def __init__(self, system_to_adapt: SoEq, coeff_tol: float = 1.e-9, device = 'cpu'):
         self.variables = list(system_to_adapt.vars_to_describe)
         self.adaptee = system_to_adapt
         self.grids = None
         self.coeff_tol = coeff_tol
 
+        self._device = device
+
     @staticmethod
-    def _term_solver_form(term, grids, default_domain, variables: List[str] = ['u',]):
+    def _term_solver_form(term, grids, default_domain, variables: List[str] = ['u',], device = 'cpu'):
         deriv_orders = []
         deriv_powers = []
         deriv_vars = []
         derivs_detected = False
 
         try:
-            coeff_tensor = torch.ones_like(grids[0])
+            coeff_tensor = torch.ones_like(grids[0]).to(device)
             
         except KeyError:
             raise NotImplementedError('No cache implemented')
@@ -503,7 +507,7 @@ class SystemSolverInterface(object):
             default_domain = True
         else:
             if isinstance(grids[0], np.ndarray):
-                grids = [torch.from_numpy(subgrid) for subgrid in grids]            
+                grids = [torch.from_numpy(subgrid).to(self._device) for subgrid in grids]            
             default_domain = False
 
         for term_idx, term in enumerate(equation.structure):
@@ -517,7 +521,7 @@ class SystemSolverInterface(object):
                     _solver_form[term.name]['coeff'] = _solver_form[term.name]['coeff'] * weight
                     _solver_form[term.name]['coeff'] = adjust_shape(_solver_form[term.name]['coeff'], mode = mode)
 
-        free_coeff_weight = torch.full_like(input=grids[0], fill_value=equation.weights_final[-1])
+        free_coeff_weight = torch.full_like(input=grids[0], fill_value=equation.weights_final[-1]).to(self._device)
 
         free_coeff_weight = adjust_shape(free_coeff_weight, mode = mode)
         free_coeff_term = {'coeff': free_coeff_weight,
@@ -526,7 +530,7 @@ class SystemSolverInterface(object):
                            'var': [0,]}
         _solver_form['C'] = free_coeff_term
 
-        target_weight = torch.full_like(input = grids[0], fill_value = -1.)
+        target_weight = torch.full_like(input = grids[0], fill_value = -1.).to(self._device)
 
         target_form = self._term_solver_form(equation.structure[equation.target_idx], grids, default_domain, variables)
         target_form['coeff'] = target_form['coeff'] * target_weight
@@ -537,7 +541,7 @@ class SystemSolverInterface(object):
 
         return _solver_form
 
-    def use_grids(self, grids=None):
+    def use_grids(self, grids=None): # 
         if grids is None and self.grids is None:
             _, self.grids = global_var.grid_cache.get_all(mode = 'torch')
         elif grids is not None:
@@ -545,7 +549,7 @@ class SystemSolverInterface(object):
                 raise ValueError(
                     'Number of passed grids does not match the problem')
             if isinstance(grids[0], np.ndarray):
-                grids = [torch.from_numpy(subgrid) for subgrid in grids]
+                grids = [torch.from_numpy(subgrid).to(self._device) for subgrid in grids]
             self.grids = grids
             
 

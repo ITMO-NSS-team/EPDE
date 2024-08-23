@@ -793,6 +793,7 @@ class Equation(ComplexStructure):
 
 
 def solver_formed_grid(training_grid=None):
+    raise NotImplementedError('solver_formed_grid function is to be depricated')
     if training_grid is None:
         keys, training_grid = global_var.grid_cache.get_all()
     else:

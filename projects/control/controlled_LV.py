@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 
 import epde
 import epde.globals as global_var
-import epde.interface.control_utils as control_utils
+from epde.control import ControlExp, ConstrLocation, ConditionalLoss, ControlConstrNEq, ControlConstrEq
 
 
 def controlled_lv_by_RK_t(initial : tuple, timestep : float, steps : int, alpha : float, 
@@ -206,33 +206,32 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     from epde.supplementary import AutogradDeriv
     autograd = AutogradDeriv()
 
-    loc = control_utils.ConstrLocation(domain_shape = (t.size()[0],), device=device) # Declaring const in the entire domain
-    u_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = u_tar, device=device),
-                                                 indices = loc, deriv_method = autograd, nn_output=0, device=device)
-    v_tar_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = v_tar, device=device),
-                                                 indices = loc, deriv_method = autograd, nn_output=1, device=device)
-    contr_constr = control_utils.ControlConstrEq(val = torch.full_like(input = t, fill_value = 0., device=device),
+    loc = ConstrLocation(domain_shape = (t.size()[0],), device=device) # Declaring const in the entire domain
+    u_tar_constr = ControlConstrEq(val = torch.full_like(input = t, fill_value = u_tar, device=device),
+                                   indices = loc, deriv_method = autograd, nn_output=0, device=device)
+    v_tar_constr = ControlConstrEq(val = torch.full_like(input = t, fill_value = v_tar, device=device),
+                                   indices = loc, deriv_method = autograd, nn_output=1, device=device)
+    contr_constr = ControlConstrEq(val = torch.full_like(input = t, fill_value = 0., device=device),
                                                  indices = loc, deriv_method = autograd, nn_output=0, device=device)
 
-    u_var_non_neg = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0., device=device), sign='>',
+    u_var_non_neg = ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0., device=device), sign='>',
                                                    indices = loc, deriv_method = autograd, nn_output=0, device=device)
-    v_var_non_neg = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0., device=device), sign='>',
+    v_var_non_neg = ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0., device=device), sign='>',
                                                    indices = loc, deriv_method = autograd, nn_output=1, device=device)
-    contr_non_neg = control_utils.ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0., device=device), sign='>',
+    contr_non_neg = ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0., device=device), sign='>',
                                                    indices = loc, deriv_method = autograd, nn_output=0, device=device)
 
     
-    loss = control_utils.ConditionalLoss([(1., u_tar_constr, 0),
-                                          (1., v_tar_constr, 0), 
-                                        #   (0.1, contr_constr, 1),
-                                          (100., u_var_non_neg, 0),
-                                          (100., v_var_non_neg, 0),
-                                          (100., contr_non_neg, 1)])
-    optimizer = control_utils.ControlExp(loss=loss, device=device)
+    loss = ConditionalLoss([(1., u_tar_constr, 0),
+                            (1., v_tar_constr, 0), 
+                            (100., u_var_non_neg, 0),
+                            (100., v_var_non_neg, 0),
+                            (100., contr_non_neg, 1)])
+    optimizer = ControlExp(loss=loss, device=device)
     
     def get_ode_bop(key, var, term, grid_loc, value):
         bop = epde.interface.solver_integration.BOPElement(axis = 0, key = key, term = term,
-                                                           power = 1, var = var)
+                                                           power = 1, var = var, device = device)
         if isinstance(grid_loc, float):
             bop_grd_np = np.array([[grid_loc,]])
             bop.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor)).to(device)
