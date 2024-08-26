@@ -83,7 +83,8 @@ class CustomEvaluator(EvaluatorTemplate):
             for tensor_idx, _ in np.ndenumerate(func_args[0]):
                 self.indexes_vect[tensor_idx] = tuple([subarg[tensor_idx]
                                                        for subarg in func_args])
-
+        print(f'self.indexes_vect.shape, {self.indexes_vect.shape}')
+        # raise NotImplementedError()
         value = grid_function(self.indexes_vect)
         return value
 

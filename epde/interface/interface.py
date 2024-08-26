@@ -690,7 +690,7 @@ class EpdeSearch(object):
                 global_var.reset_data_repr_nn(data = data, derivs = base_derivs, train = False, 
                                               grids = grid, predefined_ann = data_nn, device = self._device)
             else:
-                global_var.reset_data_repr_nn(data = data, derivs = base_derivs, epochs_max=1e5,
+                global_var.reset_data_repr_nn(data = data, derivs = base_derivs, epochs_max=1e2,
                                               grids = grid, predefined_ann=None, device = self._device)
 
         if isinstance(additional_tokens, list):
@@ -1052,10 +1052,11 @@ class ExperimentCombiner(object):
         elif isinstance(candidates[0], SoEq):
             # Here we assume, that the number of objectives is even, having quality 
             # and complexity for each equation
-            compl_objs_num = candidates[0].obj_fun.size/2
+            compl_objs_num = int(candidates[0].obj_fun.size/2)
+            # print(compl_objs_num)
             return [(candidate, candidate.obj_fun[-compl_objs_num:]) for candidate in candidates]
         else:
-            raise ValueError('Incorrect type of the equation')
+            raise ValueError(f'Incorrect type of the equation, got {type(candidates[0])}')
         
     @get_complexities.register
     def _(self, candidates: ParetoLevels) -> list:
@@ -1073,11 +1074,11 @@ class ExperimentCombiner(object):
                 relaxed_compl[idx] = elem
                 candidates = [candidate for candidate, _ in self.complexity_matched 
                              if candidate.matches_complexitiy(relaxed_compl)]
-                best_candidate = sorted(candidates, lambda x: x.obj_fun[idx])[0]
+                best_candidate = sorted(candidates, key=lambda x: x.obj_fun[idx])[0]
                 # best_eqs.append(best_candidate.vals[vars_to_describe[idx]])
             else:
                 best_candidate = sorted([candidate for candidate, _ in self.complexity_matched], 
-                                       lambda x: x.obj_fun[idx])[0]
+                                        key=lambda x: x.obj_fun[idx])[0]
             best_eqs.append(best_candidate.vals[vars_to_describe[idx]])
         compound_equation = deepcopy(self.complexity_matched[0][0])
         compound_equation.create(passed_equations = best_eqs)

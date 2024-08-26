@@ -138,6 +138,8 @@ class Operator():
 
         for term in operator:
             term = operator[term]
+            # print('term', term['var'], term.keys(), term['pow'])
+            print(f'grid_points: {grid_points.shape}')
             dif = self.derivative(term, grid_points)
             try:
                 total += dif
@@ -159,6 +161,7 @@ class Operator():
         else:
             op_list = []
             for i in range(num_of_eq):
+                print(f'self.sorted_grid.shape: {self.sorted_grid.shape}')
                 op_list.append(self.apply_operator(
                     self.prepared_operator[i], self.sorted_grid).reshape(-1,1))
             op = torch.cat(op_list, 1)

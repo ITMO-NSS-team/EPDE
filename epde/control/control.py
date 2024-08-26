@@ -60,6 +60,10 @@ class ControlExp():
     @staticmethod
     def finite_diff_calculation(system, adapter, loc, control_loss, state_net: torch.nn.Sequential,
                                 bc_operators, grids: list, solver_params: dict, eps: float):
+        '''
+        Calculate finite-differecnce approximation of gradient in respect to the specified parameter.
+
+        '''
         # Calculating loss in p[i]+eps:
         ctrl_dict_prev = global_var.control_nn.net.state_dict()
         # print(f'param before: {ctrl_dict_prev[loc[0]][tuple(loc[1:])]}')        
@@ -133,7 +137,8 @@ class ControlExp():
         time = datetime.datetime.now()
 
         if isinstance(state_net, torch.nn.Sequential): self._state_net = state_net
-        global_var.reset_control_nn(n_control = n_control, ann = control_net, ctrl_args = global_var.control_nn.net_args)
+        global_var.reset_control_nn(n_control = n_control, ann = control_net, 
+                                    ctrl_args = global_var.control_nn.net_args, device = self._device)
 
         # TODO Refactor hook: To optimize the net in global variables is a terrific approach, rethink it
 
@@ -214,20 +219,20 @@ class ControlExp():
             self.set_solver_params(**solver_params['full'])
             adapter = self.get_solver_adapter(None)
             adapter.set_net(self._state_net)
-            _, model = adapter.solve_epde_system(system = self.system, grids = grids, data = None,
-                                                 boundary_conditions = sampled_bc,
-                                                 mode = self._solver_params['mode'],
-                                                 use_cache = self._solver_params['use_cache'],
-                                                 use_fourier = self._solver_params['use_fourier'],
-                                                 fourier_params = self._solver_params['fourier_params'],
-                                                 use_adaptive_lambdas = self._solver_params['use_adaptive_lambdas'])
+            loss_pinn, model = adapter.solve_epde_system(system = self.system, grids = grids, data = None,
+                                                         boundary_conditions = sampled_bc,
+                                                         mode = self._solver_params['mode'],
+                                                         use_cache = self._solver_params['use_cache'],
+                                                         use_fourier = self._solver_params['use_fourier'],
+                                                         fourier_params = self._solver_params['fourier_params'],
+                                                         use_adaptive_lambdas = self._solver_params['use_adaptive_lambdas'])
 
             var_prediction = model(grids_merged)
             self._state_net = model
 
             control_inputs = prepare_control_inputs(model, grids_merged, global_var.control_nn.net_args)
             loss = self.loss([self._state_net, global_var.control_nn.net], [grids_merged, control_inputs])
-            print('current loss is ', loss)
+            print('current loss is ', loss, 'model undertrained with loss of ', loss_pinn)
             # if loss < min_loss:
             #     min_loss = loss
             self._best_control_params = global_var.control_nn.net.state_dict()

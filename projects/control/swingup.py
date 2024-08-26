@@ -167,9 +167,8 @@ def translate_equation(t, x, angle, u, derivs: dict, diff_method = 'FD', data_nn
 
 def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
                   y_init: float, dy_init: float, phi_init: float, dphi_init: float,
-                  ctrl_max: float, stab_der_ord: int,
-                  state_nn_pretrained: torch.nn.Sequential, ctrl_nn_pretrained: torch.nn.Sequential, 
-                  fig_folder: str, device = 'cpu'):
+                  ctrl_max: float, stab_der_ord: int, state_nn_pretrained: torch.nn.Sequential,
+                  ctrl_nn_pretrained: torch.nn.Sequential, fig_folder: str, device = 'cpu'):
     
     from epde.supplementary import AutogradDeriv
 
@@ -227,7 +226,7 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
     # optimizer.set_control_optim_params()
 
-    solver_params = {'full':     {'training_params': {'epochs': 1000,}, 'optimizer_params': {'params': {'lr': 1e-5}}}, 
+    solver_params = {'full':     {'training_params': {'epochs': 1000,}, 'optimizer_params': {'params': {'lr': 1e-4}}}, 
                      'abridged': {'training_params': {'epochs': 200,}, 'optimizer_params': {'params': {'lr': 5e-5}}}}
     
     state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_y(), 0.1),  # device=device
@@ -236,7 +235,7 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
                                                                                (bop_dphi(), 0.1)], 
                                                                grids = [t,], n_control = 1., 
                                                                state_net = state_nn_pretrained, 
-                                                               opt_params = [0.005, 0.9, 0.999, 1e-8],
+                                                               opt_params = [0.001, 0.9, 0.999, 1e-8],
                                                                control_net = ctrl_nn_pretrained, epochs = 55,
                                                                fig_folder = fig_folder, eps=2e0,
                                                                solver_params = solver_params)
@@ -463,7 +462,7 @@ if __name__ == '__main__':
         print(f'example_sol: {type(example_sol)}, {example_sol.shape}, {example_sol.get_device()}')
 
         def create_shallow_nn(arg_num: int = 1, output_num: int = 1, device = 'cpu') -> torch.nn.Sequential: # net: torch.nn.Sequential = None, 
-            hidden_neurons = 75
+            hidden_neurons = 50
             layers = [torch.nn.Linear(arg_num, hidden_neurons, device=device),
                       torch.nn.Tanh(), # ReLU(),
                       torch.nn.Linear(hidden_neurons, output_num, device=device)]

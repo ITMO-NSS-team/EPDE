@@ -169,7 +169,7 @@ class DataSign(PreparedTokens):
 class ControlVarTokens(PreparedTokens):
     def __init__(self, sample: Union[np.ndarray, List[np.ndarray]], ann: torch.nn.Sequential = None, 
                  var_name: Union[str, List[str]] = 'ctrl', arg_var: List[Tuple[Union[int, List]]] = [(0, [None,]),], 
-                 eval_torch: Union[Callable, dict] = None, eval_np: Union[Callable, dict] = None,):
+                 eval_torch: Union[Callable, dict] = None, eval_np: Union[Callable, dict] = None, device:str = 'cpu'):
         vars, der_ords = zip(*arg_var)
         if isinstance(sample, List):
             assert isinstance(var_name, List), 'Both samples and var names have to be set as Lists or single elements.'
@@ -193,15 +193,15 @@ class ControlVarTokens(PreparedTokens):
         
         def nn_eval_torch(*args, **kwargs):
             if isinstance(args[0], torch.Tensor):
-                inp = torch.cat([torch.reshape(tensor, (-1, 1)) for tensor in args], dim = 1) # Validate correctness
+                inp = torch.cat([torch.reshape(tensor, (-1, 1)) for tensor in args], dim = 1).to(device) # Validate correctness
             else:
-                inp = torch.cat([torch.reshape(torch.Tensor([elem,]), (-1, 1)) for elem in args], dim = 1)
+                inp = torch.cat([torch.reshape(torch.Tensor([elem,]), (-1, 1)) for elem in args], dim = 1).to(device)
             # print(f'passing tensor, stored at {inp.get_device()}')
             # print(f'inp shape is {inp.shape}, args are {args}, kwargs are {kwargs}')
-            return global_var.control_nn.net(inp)#**kwargs['power']
+            return global_var.control_nn.net(inp).to(device)#**kwargs['power']
 
         def nn_eval_np(*args, **kwargs):
-            return nn_eval_torch(*args, **kwargs).detach().numpy()#**kwargs['power']
+            return nn_eval_torch(*args, **kwargs).detach().cpu().numpy()#**kwargs['power']
 
         if eval_np    is None: eval_np = nn_eval_np
         if eval_torch is None: eval_torch = nn_eval_torch
@@ -210,7 +210,8 @@ class ControlVarTokens(PreparedTokens):
                                evaluation_functions_torch = eval_torch,
                                eval_fun_params_labels = ['power'])
 
-        global_var.reset_control_nn(n_control = num_ctrl_comp, ann = ann, ctrl_args = arg_var)
+        global_var.reset_control_nn(n_control = num_ctrl_comp, ann = ann, 
+                                    ctrl_args = arg_var, device = device)
         if isinstance(sample, np.ndarray):
             global_var.tensor_cache.add(tensor = sample, label = (var_name[0], (1.0,)))
         else:

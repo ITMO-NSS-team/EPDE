@@ -35,35 +35,39 @@ import time
 import gym
 import scipy.special
 
-def get_additional_token_families(ctrl):
+def get_additional_token_families(ctrl, device = 'cpu'):
     angle_trig_tokens = VarTrigTokens('phi', max_power=1, freq_center=1.)
 
     ctrl_keys = ['ctrl_main', 'ctrl_thrust']
 
     def main_thrust_filtering(thrust: Union[np.ndarray, torch.tensor]):
+        # print('In main thrust', thrust.shape)        
         if isinstance(thrust, np.ndarray):
             return np.where(thrust > 0.5, thrust, 0.)
         else:
-            return torch.where(thrust > 0.5, thrust, 0.)
+            return torch.where(thrust > 0.5, thrust, 0.).to(device)
     
     def manuever_thrust_filtering(thrust: Union[np.ndarray, torch.tensor]):
+        # print('In manuever thrust', thrust.shape)
         if isinstance(thrust, np.ndarray):
             return np.where(np.abs(thrust) < 0.5, 0., thrust)
         else:
-            return torch.where(torch.abs(thrust) < 0.5, 0., thrust)
+            return torch.where(torch.abs(thrust) < 0.5, 0., thrust).to(device)
 
     def main_thrust_nn_eval_torch(*args, **kwargs):
         if isinstance(args[0], torch.Tensor):
-            inp = torch.cat([torch.reshape(tensor, (-1, 1)) for tensor in args], dim = 1)  # Validate correctness
+            inp = torch.cat([torch.reshape(tensor, (-1, 1)) for tensor in args], dim = 1).to(device)  # Validate correctness
         else:
-            inp = torch.cat([torch.reshape(torch.Tensor([elem,]), (-1, 1)) for elem in args], dim = 1)
+            inp = torch.cat([torch.reshape(torch.Tensor([elem,]), (-1, 1)) for elem in args], dim = 1).to(device)
+        # print('In main thrust: shape of glob_net_output', inp.shape, global_var.control_nn.net(inp).shape)
         return main_thrust_filtering(global_var.control_nn.net(inp)[..., 0])
 
     def manuever_thrust_nn_eval_torch(*args, **kwargs):
         if isinstance(args[0], torch.Tensor):
-            inp = torch.cat([torch.reshape(tensor, (-1, 1)) for tensor in args], dim = 1)  # Validate correctness
+            inp = torch.cat([torch.reshape(tensor, (-1, 1)) for tensor in args], dim = 1).to(device)  # Validate correctness
         else:
-            inp = torch.cat([torch.reshape(torch.Tensor([elem,]), (-1, 1)) for elem in args], dim = 1)
+            inp = torch.cat([torch.reshape(torch.Tensor([elem,]), (-1, 1)) for elem in args], dim = 1).to(device)
+        # print('In manuever thrust: shape of glob_net_output', inp.shape, global_var.control_nn.net(inp).shape)            
         return manuever_thrust_filtering(global_var.control_nn.net(inp)[..., 1])
 
     def main_thrust_nn_eval_np(*args, **kwargs):
@@ -88,9 +92,11 @@ def get_additional_token_families(ctrl):
                                                                                     (0, [0,]),
                                                                                     (1, [0,]),
                                                                                     (2, [0,])],
-                                                                         eval_torch = nn_eval_torch, eval_np = nn_eval_np)
+                                                                         eval_torch = nn_eval_torch, 
+                                                                         eval_np = nn_eval_np,
+                                                                         device = device)
     
-    return [angle_trig_tokens,]
+    return [angle_trig_tokens, control_var_tokens]
 
 def epde_discovery(t, y, z, angle, u, derivs = None, diff_method = 'FD', data_nn: torch.nn.Sequential = None, 
                    device: str = 'cpu', use_solver = True):
@@ -114,7 +120,7 @@ def epde_discovery(t, y, z, angle, u, derivs = None, diff_method = 'FD', data_nn
 
     eps = 5e-7
     popsize = 10
-    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs = 5)
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs = 1)
 
     factors_max_number = {'factors_num' : [1, 2, 3,], 'probas' : [0.4, 0.5, 0.1]}
 
@@ -123,10 +129,10 @@ def epde_discovery(t, y, z, angle, u, derivs = None, diff_method = 'FD', data_nn
     if derivs is not None:
         derivs = [derivs['y'], derivs['phi']]
     epde_search_obj.fit(data=[y, z, angle], variable_names=['y', 'z', 'phi'], max_deriv_order=(2,),
-                        equation_terms_max_number=6, data_fun_pow = 2, derivs = derivs,
-                        additional_tokens=get_additional_token_families(ctrl=u),
+                        equation_terms_max_number=9, data_fun_pow = 2, derivs = derivs,
+                        additional_tokens=get_additional_token_families(ctrl=u, device = device),
                         equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-4, 1e-1), data_nn=data_nn) # TODO: narrow sparsity interval, reduce the population size
+                        eq_sparsity_interval=(1e-4, 1e-0), data_nn=data_nn) # TODO: narrow sparsity interval, reduce the population size
     epde_search_obj.equations()
     return epde_search_obj
 
@@ -401,11 +407,21 @@ if __name__ == '__main__':
         save_nn = True
 
     use_solver = True
-    models = epde_discovery(t = t[:-5], y = obs[0, :-5], z = obs[1, :-5], angle = obs[4, :-5], 
-                           u = acts[..., :-5], device = 'cuda', data_nn=data_nn, use_solver = use_solver)
+    models = epde_discovery(t = t[:-5], y = obs[0, :-5], z = obs[1, :-5], angle = obs[4, :-5], diff_method='poly',
+                            u = acts[..., :-5], device = 'cuda', data_nn=data_nn, use_solver = use_solver)
     
-    exp_comb = ExperimentCombiner(models.equations(False))
-    model = exp_comb.create_best(models.pool)
+    # exp_comb = 
+    model = ExperimentCombiner(models.equations(False)[0]).create_best(models.pool)
+
+    import epde.loader as Loader
+
+    path_dir = os.path.join(os.path.dirname(os.path.abspath('')), 'EPDE', 'projects', 'control')
+
+    loader = Loader.EPDELoader()
+    loader.save(obj=model, filename=os.path.join(path_dir, f'{experiment}_solver_model.pickle')) # Pickle-saving an equation
+    loader.save(obj = models.pool, filename=os.path.join(path_dir, f'{experiment}_solver_pool.pickle')) # Pickle-saving the pool
+    # raise NotImplementedError()
+
     if save_nn:
         if device == 'cpu':
             fname =  os.path.join(res_folder, f"data_ann_{experiment}_cpu.pickle")
@@ -413,6 +429,7 @@ if __name__ == '__main__':
             fname = os.path.join(res_folder, f"data_ann_{experiment}_cuda.pickle")
         with open(fname, 'wb') as output_file:
             pickle.dump(epde.globals.solution_guess_nn, output_file)
+
 
     # model.equations()
     
@@ -434,7 +451,7 @@ if __name__ == '__main__':
                     torch.nn.Linear(hidden_neurons, hidden_neurons, device=device),
                     torch.nn.ReLU(),
                     torch.nn.Linear(hidden_neurons, output_num, device=device)]
-        return torch.nn.Sequential(*layers)        
+        return torch.nn.Sequential(*layers)
 
     time_exp_start = datetime.datetime.now()
     
