@@ -196,8 +196,9 @@ class ControlVarTokens(PreparedTokens):
                 inp = torch.cat([torch.reshape(tensor, (-1, 1)) for tensor in args], dim = 1).to(device) # Validate correctness
             else:
                 inp = torch.cat([torch.reshape(torch.Tensor([elem,]), (-1, 1)) for elem in args], dim = 1).to(device)
-            # print(f'passing tensor, stored at {inp.get_device()}')
-            # print(f'inp shape is {inp.shape}, args are {args}, kwargs are {kwargs}')
+            # print(f'passing tensor, stored at {inp.get_device()}, nn is to be passed on {device}')
+            # print(f'inp shape is {inp.shape}, kwargs are {kwargs}')
+            # print(global_var.control_nn.net)
             return global_var.control_nn.net(inp).to(device)#**kwargs['power']
 
         def nn_eval_np(*args, **kwargs):

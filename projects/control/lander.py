@@ -40,43 +40,37 @@ def get_additional_token_families(ctrl, device = 'cpu'):
 
     ctrl_keys = ['ctrl_main', 'ctrl_thrust']
 
-    def main_thrust_filtering(thrust: Union[np.ndarray, torch.tensor]):
-        # print('In main thrust', thrust.shape)        
+    def main_thrust_filtering(thrust: Union[np.ndarray, torch.tensor]): 
         if isinstance(thrust, np.ndarray):
             return np.where(thrust > 0.5, thrust, 0.)
         else:
-            return torch.where(thrust > 0.5, thrust, 0.).to(device)
+            return torch.where(thrust > 0.5, thrust, 0.).reshape((-1, 1)).to(device)
     
     def manuever_thrust_filtering(thrust: Union[np.ndarray, torch.tensor]):
-        # print('In manuever thrust', thrust.shape)
         if isinstance(thrust, np.ndarray):
             return np.where(np.abs(thrust) < 0.5, 0., thrust)
         else:
-            return torch.where(torch.abs(thrust) < 0.5, 0., thrust).to(device)
+            return torch.where(torch.abs(thrust) < 0.5, 0., thrust).reshape((-1, 1)).to(device)
 
     def main_thrust_nn_eval_torch(*args, **kwargs):
         if isinstance(args[0], torch.Tensor):
-            inp = torch.cat([torch.reshape(tensor, (-1, 1)) for tensor in args], dim = 1).to(device)  # Validate correctness
+            inp = torch.cat([torch.reshape(tensor, (-1, 1)) for tensor in args], dim = 1).to(device)
         else:
             inp = torch.cat([torch.reshape(torch.Tensor([elem,]), (-1, 1)) for elem in args], dim = 1).to(device)
-        # print('In main thrust: shape of glob_net_output', inp.shape, global_var.control_nn.net(inp).shape)
-        return main_thrust_filtering(global_var.control_nn.net(inp)[..., 0])
+        return main_thrust_filtering(global_var.control_nn.net(inp)[..., 0].reshape((-1, 1)))
 
     def manuever_thrust_nn_eval_torch(*args, **kwargs):
         if isinstance(args[0], torch.Tensor):
-            inp = torch.cat([torch.reshape(tensor, (-1, 1)) for tensor in args], dim = 1).to(device)  # Validate correctness
+            inp = torch.cat([torch.reshape(tensor, (-1, 1)) for tensor in args], dim = 1).to(device)
         else:
-            inp = torch.cat([torch.reshape(torch.Tensor([elem,]), (-1, 1)) for elem in args], dim = 1).to(device)
-        # print('In manuever thrust: shape of glob_net_output', inp.shape, global_var.control_nn.net(inp).shape)            
-        return manuever_thrust_filtering(global_var.control_nn.net(inp)[..., 1])
+            inp = torch.cat([torch.reshape(torch.Tensor([elem,]), (-1, 1)) for elem in args], dim = 1).to(device)           
+        return manuever_thrust_filtering(global_var.control_nn.net(inp)[..., 1].reshape((-1, 1)))
 
     def main_thrust_nn_eval_np(*args, **kwargs):
-        # if kwargs['axis'] == 0:        
-        return main_thrust_nn_eval_torch(*args, **kwargs).detach().cpu().numpy()  #**kwargs['power']
+        return main_thrust_nn_eval_torch(*args, **kwargs).detach().cpu().numpy()
     
     def manuever_thrust_nn_eval_np(*args, **kwargs):
-        # if kwargs['axis'] == 0:
-        return manuever_thrust_nn_eval_torch(*args, **kwargs).detach().cpu().numpy()  #**kwargs['power']
+        return manuever_thrust_nn_eval_torch(*args, **kwargs).detach().cpu().numpy()
     
     nn_eval_torch = {ctrl_keys[0] : main_thrust_nn_eval_torch, 
                      ctrl_keys[1] : manuever_thrust_nn_eval_torch}
@@ -120,19 +114,17 @@ def epde_discovery(t, y, z, angle, u, derivs = None, diff_method = 'FD', data_nn
 
     eps = 5e-7
     popsize = 10
-    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs = 1)
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs = 15)
 
     factors_max_number = {'factors_num' : [1, 2, 3,], 'probas' : [0.4, 0.5, 0.1]}
 
-
-
     if derivs is not None:
         derivs = [derivs['y'], derivs['phi']]
-    epde_search_obj.fit(data=[y, z, angle], variable_names=['y', 'z', 'phi'], max_deriv_order=(2,),
-                        equation_terms_max_number=9, data_fun_pow = 2, derivs = derivs,
-                        additional_tokens=get_additional_token_families(ctrl=u, device = device),
-                        equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-4, 1e-0), data_nn=data_nn) # TODO: narrow sparsity interval, reduce the population size
+    epde_search_obj.fit(data = [y, z, angle], variable_names = ['y', 'z', 'phi'], max_deriv_order = (2,),
+                        equation_terms_max_number = 9, data_fun_pow = 2, derivs = derivs,
+                        additional_tokens = get_additional_token_families(ctrl = u, device = device),
+                        equation_factors_max_number = factors_max_number,
+                        eq_sparsity_interval = (1e-5, 1e-0), data_nn = data_nn)
     epde_search_obj.equations()
     return epde_search_obj
 
@@ -492,7 +484,7 @@ if __name__ == '__main__':
 
 
     nn = 'shallow'
-    load_ctrl = True
+    load_ctrl = False
 
     if device == 'cpu':
         ctrl_fname = os.path.join(res_folder, f"control_ann_{nn}_{experiment}_cpu.pickle")
@@ -513,12 +505,6 @@ if __name__ == '__main__':
 
     with open(ctrl_fname, 'wb') as ctrl_output_file:  
             pickle.dump(ctrl_ann, file = ctrl_output_file)
-            
-                #   (eq: epde.structure.main_structures.SoEq, t: torch.tensor,
-                #   y_init: float, z_init: float, dy_init: float, dz_init: float, phi_init: float, dphi_init: float,
-                #   y_left: float, y_right: float, dy_max: float, dz_max: float, stab_der_ord: int, helipad: Tuple[int], # tuple as (y_left, y_right, z) 
-                #   state_nn_pretrained: torch.nn.Sequential,
-                #   ctrl_nn_pretrained: torch.nn.Sequential, fig_folder: str, device = 'cpu')
 
     res = optimize_ctrl(model, torch.from_numpy(t).reshape((-1, 1)).float().to(device),
                         y_init=obs[0, 0], dy_init=obs[1, 0], z_init=obs[2, 0], dz_init=obs[3, 0], 

@@ -83,8 +83,6 @@ class CustomEvaluator(EvaluatorTemplate):
             for tensor_idx, _ in np.ndenumerate(func_args[0]):
                 self.indexes_vect[tensor_idx] = tuple([subarg[tensor_idx]
                                                        for subarg in func_args])
-        print(f'self.indexes_vect.shape, {self.indexes_vect.shape}')
-        # raise NotImplementedError()
         value = grid_function(self.indexes_vect)
         return value
 
@@ -135,7 +133,7 @@ def simple_function_evaluator(factor, structural: bool = False, grids=None,
             return value
 
 
-sign_eval_fun_np = lambda *args, **kwargs: np.sign(args[0]) # Is dim argument needed here? int(kwargs['dim'])
+sign_eval_fun_np = lambda *args, **kwargs: np.sign(args[0]) # If dim argument is needed here: int(kwargs['dim'])
 sign_eval_fun_torch = lambda *args, **kwargs: torch.sign(args[0])
 
 trig_eval_fun_np = {'cos': lambda *grids, **kwargs: np.cos(kwargs['freq'] * grids[int(kwargs['dim'])]) ** kwargs['power'],

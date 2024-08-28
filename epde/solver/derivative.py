@@ -115,7 +115,6 @@ class Derivative_autograd(DerivativeInt):
 
         points.requires_grad = True
         fi = model(points)[:, var].sum(0)
-        # print(axis)
         for ax in axis:
             grads, = torch.autograd.grad(fi, points, create_graph=True)
             fi = grads[:, ax].sum()
@@ -133,7 +132,6 @@ class Derivative_autograd(DerivativeInt):
         Returns:
             der_term (torch.Tensor): resulting field, computed on a grid.
         """
-        print(f'Inside take_derivative method: {grid_points.shape}')
         dif_dir = list(term.keys())[1]
         # it is may be int, function of grid or torch.Tensor
         if callable(term['coeff']):
@@ -143,7 +141,6 @@ class Derivative_autograd(DerivativeInt):
 
         der_term = 1. # TODO: Переписать!
         for j, derivative in enumerate(term[dif_dir]):
-            print('j, derivative', j, derivative)
             if (isinstance(term['pow'][j], torch.nn.Sequential) or
                 (isinstance(term['pow'][j], Callable) and isinstance(term['var'][j], (list, tuple)))): #isinstance(term['var'][j], (list, tuple)):
                 der_args = []
@@ -154,13 +151,10 @@ class Derivative_autograd(DerivativeInt):
                     else:
                         der_args.append(self._nn_autograd(self.model, grid_points, cur_var, axis=derivative[var_idx]))
                 if isinstance(term['pow'][j], torch.nn.Sequential):
-                    print(f'In combination of nn arg: {[arg.shape for arg in der_args]}')
                     der_args = torch.cat(der_args, dim=1)
                     factor_val = term['pow'][j](der_args)
-                else:
-                    print(f'In combination of nn arg: {[arg.shape for arg in der_args]}')
+                else:             
                     factor_val = term['pow'][j](*der_args)
-                # print(der_term.shape)
                 der_term = der_term * factor_val
             else:
                 if derivative == [None] or derivative is None:
@@ -169,11 +163,9 @@ class Derivative_autograd(DerivativeInt):
                     der = self._nn_autograd(self.model, grid_points, term['var'][j], axis=derivative)
                 if isinstance(term['pow'][j],(int,float)):
                     der_term = der_term * der ** term['pow'][j]
-                elif isinstance(term['pow'][j],Callable):
-                    print(f'In combination of nn arg in weird place: {der}')
+                elif isinstance(term['pow'][j], Callable):
                     der_term = der_term * term['pow'][j](der)
         der_term = coeff * der_term
-
         return der_term
 
 

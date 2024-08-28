@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+import pickle
 
 import matplotlib.pyplot as plt
 import datetime
@@ -125,7 +126,7 @@ class ControlExp():
                    LV_exp: bool = True, eps: float = 1e-2, solver_params: dict = {}):
         def modify_bc(operator: dict, scale: Union[float, torch.Tensor]) -> dict:
             noised_operator = deepcopy(operator)
-            noised_operator['bnd_val'] = torch.normal(operator['bnd_val'], scale).to(self._device)
+            # noised_operator['bnd_val'] = torch.normal(operator['bnd_val'], scale).to(self._device)
             return noised_operator
 
         # Properly formulate training approach
@@ -156,28 +157,36 @@ class ControlExp():
         optimizer = AdamOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = opt_params)
         # optimizer = CoordDescentOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = opt_params)
 
-        self.set_solver_params(**solver_params['abridged'])
+        self.set_solver_params(**solver_params['full'])
         adapter = self.get_solver_adapter(None)
 
+        sampled_bc = [modify_bc(operator, noise_std) for operator, noise_std in bc_operators]
+        loss_pinn, model = adapter.solve_epde_system(system = self.system, grids = grids, data = None,
+                                                        boundary_conditions = sampled_bc,
+                                                        mode = self._solver_params['mode'],
+                                                        use_cache = self._solver_params['use_cache'],
+                                                        use_fourier = self._solver_params['use_fourier'],
+                                                        fourier_params = self._solver_params['fourier_params'],
+                                                        use_adaptive_lambdas = self._solver_params['use_adaptive_lambdas'])
+
+        control_inputs = prepare_control_inputs(model, grids_merged, global_var.control_nn.net_args)
+        loss = self.loss([self._state_net, global_var.control_nn.net], [grids_merged, control_inputs])
+        print('current loss is ', loss, 'model undertrained with loss of ', loss_pinn)
 
         while t < epochs and not stop_training:
             self.set_solver_params(**solver_params['abridged'])
             adapter = self.get_solver_adapter(None)
             sampled_bc = [modify_bc(operator, noise_std) for operator, noise_std in bc_operators]
 
-            
             global_var.control_nn.net.load_state_dict(self._best_control_params)
             state_net  = deepcopy(self._state_net)
-            # eps = 1e-2
             print(f'Control function optimization epoch {t}.')
             for param_key, param_tensor in grad_tensors.items():
                 print(f'Optimizing {param_key}: shape is {param_tensor.shape}')
                 if len(param_tensor.size()) == 1:
-                    #loss in the forward parameter point calculation
                     for param_idx, _ in enumerate(param_tensor):
                         loc = (param_key, param_idx)
-                        grad_tensors[loc[0]] = grad_tensors[loc[0]].detach()
-                        # print(grad_tensors[loc[0]][loc[1:]])                        
+                        grad_tensors[loc[0]] = grad_tensors[loc[0]].detach()                  
                         grad_tensors[loc[0]][loc[1:]] = self.finite_diff_calculation(system = self.system,
                                                                                      adapter = adapter,
                                                                                      loc = loc, control_loss = self.loss,
@@ -195,10 +204,10 @@ class ControlExp():
                         for param_inner_idx, _ in enumerate(param_tensor[0]):
                             loc = (param_key, param_outer_idx, param_inner_idx)
                             grad_tensors[loc[0]] = grad_tensors[loc[0]].detach()
-                            # print(grad_tensors[loc[0]][tuple(loc[1:])])
                             grad_tensors[loc[0]][tuple(loc[1:])] = self.finite_diff_calculation(system = self.system,
                                                                                                 adapter = adapter,
-                                                                                                loc = loc, control_loss = self.loss,
+                                                                                                loc = loc,
+                                                                                                control_loss = self.loss,
                                                                                                 state_net = state_net,
                                                                                                 bc_operators = sampled_bc,
                                                                                                 grids = [grids, grids_merged],
@@ -238,15 +247,23 @@ class ControlExp():
             self._best_control_params = global_var.control_nn.net.state_dict()
             loss_hist.append(loss)
             
-            if fig_folder is not None and LV_exp:
-                plt.figure(figsize=(11, 6))
-                plt.plot(grids_merged.cpu().detach().numpy(), control_inputs.cpu().detach().numpy()[:, 0], color = 'k')
-                plt.plot(grids_merged.cpu().detach().numpy(), control_inputs.cpu().detach().numpy()[:, 1], color = 'r')
-                plt.plot(grids_merged.cpu().detach().numpy(), global_var.control_nn.net(control_inputs).cpu().detach().numpy(),
-                         color = 'tab:orange')
-                plt.grid()
-                frame_name = f'Exp_{time.month}_{time.day}_at_{time.hour}_{time.minute}_{t}.png'
-                plt.savefig(os.path.join(fig_folder, frame_name))
+            # if fig_folder is not None and LV_exp:
+            #     plt.figure(figsize=(11, 6))
+            #     plt.plot(grids_merged.cpu().detach().numpy(), control_inputs.cpu().detach().numpy()[:, 0], color = 'k')
+            #     plt.plot(grids_merged.cpu().detach().numpy(), control_inputs.cpu().detach().numpy()[:, 1], color = 'r')
+            #     plt.plot(grids_merged.cpu().detach().numpy(), global_var.control_nn.net(control_inputs).cpu().detach().numpy(),
+            #              color = 'tab:orange')
+            #     plt.grid()
+            #     frame_name = f'Exp_{time.month}_{time.day}_at_{time.hour}_{time.minute}_{t}.png'
+            #     plt.savefig(os.path.join(fig_folder, frame_name))
+            
+            if fig_folder is not None:
+                exp_res = {'state'   : control_inputs.cpu().detach().numpy(),
+                           'control' : global_var.control_nn.net(control_inputs).cpu().detach().numpy()}
+                frame_name = f'Exp_{time.month}_{time.day}_at_{time.hour}_{time.minute}_{t}.pickle'
+                with open(os.path.join(fig_folder, frame_name), 'wb') as ctrl_output_file:  
+                    pickle.dump(exp_res, file = ctrl_output_file)
+
             gc.collect()
             t += 1
 

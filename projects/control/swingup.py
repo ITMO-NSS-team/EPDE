@@ -28,12 +28,13 @@ from projects.control.swingup_aux import DMCEnvWrapper, RandomPolicy, CosinePoli
                                          TwoCosinePolicy, rollout_env, VarTrigTokens # ,, DerivSignFunction
 from epde.interface.prepared_tokens import DerivSignFunction
 
-def get_additional_token_families(ctrl):
+def get_additional_token_families(ctrl, device = 'cpu'):
     angle_trig_tokens = VarTrigTokens('phi', max_power=2, freq_center=1.)
     sgn_tokens = DerivSignFunction(token_type = 'speed_sign', var_name = 'y', token_labels=['sign(dy/dx1)',],
                                    deriv_solver_orders = [[0,],])
     control_var_tokens = epde.interface.prepared_tokens.ControlVarTokens(sample = ctrl, arg_var = [(0, [None,]), (1, [None,]), 
-                                                                                                   (0, [0,]), (1, [0,])])
+                                                                                                   (0, [0,]), (1, [0,])], 
+                                                                         device = device)
     return [angle_trig_tokens, sgn_tokens, control_var_tokens] #  
 
 def epde_discovery(t, x, angle, u, derivs, diff_method = 'FD', data_nn: torch.nn.Sequential = None, device: str = 'cpu'):
@@ -63,7 +64,7 @@ def epde_discovery(t, x, angle, u, derivs, diff_method = 'FD', data_nn: torch.nn
 
     epde_search_obj.fit(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,),
                         equation_terms_max_number=10, data_fun_pow = 2, derivs = [derivs['y'], derivs['phi']],
-                        additional_tokens=get_additional_token_families(ctrl=u),
+                        additional_tokens=get_additional_token_families(ctrl=u, device=device),
                         equation_factors_max_number=factors_max_number,
                         eq_sparsity_interval=(1e-7, 1e-4), data_nn=data_nn) # TODO: narrow sparsity interval, reduce the population size
     epde_search_obj.equations()
@@ -142,7 +143,7 @@ def translate_equation(t, x, angle, u, derivs: dict, diff_method = 'FD', data_nn
         raise ValueError('Incorrect preprocessing tool selected.')
 
     epde_search_obj.create_pool(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,), derivs = [derivs['y'], derivs['phi']],
-                                additional_tokens = get_additional_token_families(ctrl=u), data_nn = data_nn)
+                                additional_tokens = get_additional_token_families(ctrl=u, device = device), data_nn = data_nn)
 
     test = epde.interface.equation_translator.CoeffLessEquation(lp_terms = {'phi': lp_phi_terms, 'y': lp_y_terms},
                                                                 rp_term = {'phi': rp_phi_term, 'y': rp_y_term}, 
@@ -226,18 +227,18 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
     # optimizer.set_control_optim_params()
 
-    solver_params = {'full':     {'training_params': {'epochs': 1000,}, 'optimizer_params': {'params': {'lr': 1e-4}}}, 
+    solver_params = {'full':     {'training_params': {'epochs': 100000,}, 'optimizer_params': {'params': {'lr': 1e-5}}}, 
                      'abridged': {'training_params': {'epochs': 200,}, 'optimizer_params': {'params': {'lr': 5e-5}}}}
     
-    state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_y(), 0.1),  # device=device
+    state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_y(), 0.1),
                                                                                (bop_dy(), 0.1),
                                                                                (bop_phi(), 0.1),
-                                                                               (bop_dphi(), 0.1)], 
+                                                                               (bop_dphi(), 0.1)],
                                                                grids = [t,], n_control = 1., 
                                                                state_net = state_nn_pretrained, 
-                                                               opt_params = [0.001, 0.9, 0.999, 1e-8],
+                                                               opt_params = [0.0001, 0.9, 0.999, 1e-8],
                                                                control_net = ctrl_nn_pretrained, epochs = 55,
-                                                               fig_folder = fig_folder, eps=2e0,
+                                                               fig_folder = fig_folder, eps=1e-1,
                                                                solver_params = solver_params)
 
     return state_nn, ctrl_net, ctrl_pred, hist
@@ -462,7 +463,7 @@ if __name__ == '__main__':
         print(f'example_sol: {type(example_sol)}, {example_sol.shape}, {example_sol.get_device()}')
 
         def create_shallow_nn(arg_num: int = 1, output_num: int = 1, device = 'cpu') -> torch.nn.Sequential: # net: torch.nn.Sequential = None, 
-            hidden_neurons = 50
+            hidden_neurons = 30
             layers = [torch.nn.Linear(arg_num, hidden_neurons, device=device),
                       torch.nn.Tanh(), # ReLU(),
                       torch.nn.Linear(hidden_neurons, output_num, device=device)]
