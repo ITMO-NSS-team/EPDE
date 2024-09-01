@@ -131,8 +131,8 @@ def epde_discovery(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np.ndar
                                          preprocessor_kwargs={'epochs_max' : 50000})
     elif diff_method == 'poly':
         epde_search_obj.set_preprocessor(default_preprocessor_type='poly',
-                                         preprocessor_kwargs={'use_smoothing' : False, 'sigma' : 1, 
-                                                              'polynomial_window' : 3, 'poly_order' : 4}) 
+                                         preprocessor_kwargs={'use_smoothing' : False, 'sigma' : 1,
+                                                              'polynomial_window' : 3, 'poly_order' : 4})
     elif diff_method == 'FD':
         epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                          preprocessor_kwargs={}) 
@@ -165,7 +165,8 @@ def translate_dummy_eqs(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np
     dimensionality = t.ndim - 1
     
     epde_search_obj = epde.EpdeSearch(use_solver = True, dimensionality = dimensionality, boundary = bnd,
-                                      coordinate_tensors = [t,], verbose_params = {'show_iter_idx' : True})    
+                                      coordinate_tensors = [t,], verbose_params = {'show_iter_idx' : True}, 
+                                      device = device)    
 
     if diff_method == 'ANN':
         epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
@@ -183,12 +184,13 @@ def translate_dummy_eqs(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np
 
     control_var_tokens = epde.interface.prepared_tokens.ControlVarTokens(sample = control, ann = control_ann, 
                                                                          arg_var = [(0, [None]),
-                                                                                    (1, [None])])#,
+                                                                                    (1, [None])], 
+                                                                         device = device)#,
                                                                                     # (0, [0,]),
                                                                                     # (1, [0,])])   
 
     epde_search_obj.create_pool(data=[u, v], variable_names=['u', 'v'], max_deriv_order=(1,),
-                                additional_tokens = [control_var_tokens,], data_nn = data_nn, device = device)
+                                additional_tokens = [control_var_tokens,], data_nn = data_nn)
 
 
     eq_u = '20. * u{power: 1} + -1. * ctrl{power: 1} * u{power: 1} + -20. * u{power: 1} * v{power: 1} + 0 = du/dx0{power: 1}'
@@ -212,14 +214,14 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     v_tar_constr = ControlConstrEq(val = torch.full_like(input = t, fill_value = v_tar, device=device),
                                    indices = loc, deriv_method = autograd, nn_output=1, device=device)
     contr_constr = ControlConstrEq(val = torch.full_like(input = t, fill_value = 0., device=device),
-                                                 indices = loc, deriv_method = autograd, nn_output=0, device=device)
+                                   indices = loc, deriv_method = autograd, nn_output=0, device=device)
 
     u_var_non_neg = ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0., device=device), sign='>',
-                                                   indices = loc, deriv_method = autograd, nn_output=0, device=device)
+                                     indices = loc, deriv_method = autograd, nn_output=0, device=device)
     v_var_non_neg = ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0., device=device), sign='>',
-                                                   indices = loc, deriv_method = autograd, nn_output=1, device=device)
+                                     indices = loc, deriv_method = autograd, nn_output=1, device=device)
     contr_non_neg = ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0., device=device), sign='>',
-                                                   indices = loc, deriv_method = autograd, nn_output=0, device=device)
+                                     indices = loc, deriv_method = autograd, nn_output=0, device=device)
 
     
     loss = ConditionalLoss([(1., u_tar_constr, 0),
@@ -247,15 +249,15 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
     optimizer.system = eq
 
-    solver_params = {'full':     {'training_params': {'epochs': 1500,}, 'optimizer_params': {'params': {'lr': 1e-5}}}, 
-                     'abridged': {'training_params': {'epochs': 300,}, 'optimizer_params': {'params': {'lr': 5e-5}}}}
+    solver_params = {'full':     {'training_params': {'epochs': 1000,}, 'optimizer_params': {'params': {'lr': 1e-5}}}, 
+                     'abridged': {'training_params': {'epochs': 1000,}, 'optimizer_params': {'params': {'lr': 1e-5}}}}
 
-    state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_u(device=device), 0.3),
-                                                                               (bop_v(device=device), 0.3)],
+    state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_u(), 0.3),
+                                                                               (bop_v(), 0.3)],
                                                                grids = [t,], n_control = 1., 
                                                                state_net = state_nn_pretrained, 
-                                                               opt_params = [0.005, 0.9, 0.999, 1e-8],
-                                                               control_net = ctrl_nn_pretrained, epochs = 150,
+                                                               opt_params = [0.0005, 0.9, 0.999, 1e-8],
+                                                               control_net = ctrl_nn_pretrained, epochs = 100,
                                                                fig_folder = fig_folder, eps = 1e0, 
                                                                solver_params = solver_params)
 
@@ -321,7 +323,7 @@ if __name__ == '__main__':
         return torch.nn.Sequential(*layers)
     
     def create_deep_nn(arg_num: int = 1, output_num: int = 1, device = 'cpu') -> torch.nn.Sequential: # net: torch.nn.Sequential = None, 
-        hidden_neurons = 18
+        hidden_neurons = 25
         layers = [torch.nn.Linear(arg_num, hidden_neurons, device=device),
                   torch.nn.Tanh(),
                   torch.nn.Linear(hidden_neurons, hidden_neurons, device=device),
@@ -384,7 +386,7 @@ if __name__ == '__main__':
 
     # raise NotImplementedError('Fin!')
 
-    nn = 'shallow' # nn = 'deep' 
+    nn = 'deep' # nn = 'deep' 
     load_ctrl = False
 
     if device == 'cpu':
@@ -421,7 +423,7 @@ if __name__ == '__main__':
     
     play_with_params = True
     if play_with_params:
-        eps = 5e-1
+        eps = 1e0
         ctrl_alt_p = deepcopy(ctrl_ann)
         state_dict_alt = ctrl_alt_p.state_dict()
         print(f'state_dict_alt["0.weight"] {state_dict_alt["0.weight"].shape}, with value of {state_dict_alt["0.weight"][10, 0]}')        

@@ -19,7 +19,7 @@ from epde.interface.solver_integration import SolverAdapter, BOPElement
 
 from epde.control.constr import ConditionalLoss
 from epde.control.utils import prepare_control_inputs, eps_increment_diff
-from epde.control.optim import AdamOptimizer
+from epde.control.optim import AdamOptimizer, CoordDescentOptimizer
 
 class ControlExp():
     def __init__(self, loss : ConditionalLoss, device: str = 'cpu'):
@@ -154,11 +154,12 @@ class ControlExp():
         min_loss = np.inf
         self._best_control_params = global_var.control_nn.net.state_dict()
 
-        optimizer = AdamOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = opt_params)
-        # optimizer = CoordDescentOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = opt_params)
+        # optimizer = AdamOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = opt_params)
+        optimizer = CoordDescentOptimizer(optimized = global_var.control_nn.net.state_dict(), parameters = opt_params)
 
         self.set_solver_params(**solver_params['full'])
         adapter = self.get_solver_adapter(None)
+        adapter.set_net(deepcopy(self._state_net))
 
         sampled_bc = [modify_bc(operator, noise_std) for operator, noise_std in bc_operators]
         loss_pinn, model = adapter.solve_epde_system(system = self.system, grids = grids, data = None,
@@ -247,15 +248,15 @@ class ControlExp():
             self._best_control_params = global_var.control_nn.net.state_dict()
             loss_hist.append(loss)
             
-            # if fig_folder is not None and LV_exp:
-            #     plt.figure(figsize=(11, 6))
-            #     plt.plot(grids_merged.cpu().detach().numpy(), control_inputs.cpu().detach().numpy()[:, 0], color = 'k')
-            #     plt.plot(grids_merged.cpu().detach().numpy(), control_inputs.cpu().detach().numpy()[:, 1], color = 'r')
-            #     plt.plot(grids_merged.cpu().detach().numpy(), global_var.control_nn.net(control_inputs).cpu().detach().numpy(),
-            #              color = 'tab:orange')
-            #     plt.grid()
-            #     frame_name = f'Exp_{time.month}_{time.day}_at_{time.hour}_{time.minute}_{t}.png'
-            #     plt.savefig(os.path.join(fig_folder, frame_name))
+            if fig_folder is not None and LV_exp:
+                plt.figure(figsize=(11, 6))
+                plt.plot(grids_merged.cpu().detach().numpy(), control_inputs.cpu().detach().numpy()[:, 0], color = 'k')
+                plt.plot(grids_merged.cpu().detach().numpy(), control_inputs.cpu().detach().numpy()[:, 1], color = 'r')
+                plt.plot(grids_merged.cpu().detach().numpy(), global_var.control_nn.net(control_inputs).cpu().detach().numpy(),
+                         color = 'tab:orange')
+                plt.grid()
+                frame_name = f'Exp_{time.month}_{time.day}_at_{time.hour}_{time.minute}_{t}.png'
+                plt.savefig(os.path.join(fig_folder, frame_name))
             
             if fig_folder is not None:
                 exp_res = {'state'   : control_inputs.cpu().detach().numpy(),

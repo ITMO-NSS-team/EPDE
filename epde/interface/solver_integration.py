@@ -38,7 +38,7 @@ better handling, i.e. manual setup.
 BASE_COMPILING_PARAMS = {
                          'mode'                 : 'NN',
                          'lambda_operator'      : 1e1,
-                         'lambda_bound'         : 1e3,
+                         'lambda_bound'         : 1e4,
                          'normalized_loss_stop' : False,
                          'h'                    : 0.001,
                          'inner_order'          : '1',

@@ -114,7 +114,7 @@ def epde_discovery(t, y, z, angle, u, derivs = None, diff_method = 'FD', data_nn
 
     eps = 5e-7
     popsize = 10
-    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs = 15)
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs = 1)
 
     factors_max_number = {'factors_num' : [1, 2, 3,], 'probas' : [0.4, 0.5, 0.1]}
 
@@ -323,19 +323,22 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     bop_phi = get_ode_bop('phi', 0, [None], t[0, 0], phi_init)
     bop_dphi = get_ode_bop('phi', 0, [0,], t[0, 0], dphi_init)
 
-    optimizer.system = eq.system
+    try:
+        optimizer.system = eq.system
+    except AttributeError:
+        optimizer.system = eq
 
     # optimizer.set_control_optim_params()
 
     solver_params = {'full':     {'training_params': {'epochs': 1500,}, 'optimizer_params': {'params': {'lr': 1e-5}}}, 
                      'abridged': {'training_params': {'epochs': 300,}, 'optimizer_params': {'params': {'lr': 5e-5}}}}
     
-    state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_y(device=device), 0.1),
-                                                                               (bop_dy(device=device), 0.1),
-                                                                               (bop_z(device=device), 0.1),
-                                                                               (bop_dz(device=device), 0.1),
-                                                                               (bop_phi(device=device), 0.1),
-                                                                               (bop_dphi(device=device), 0.1)],
+    state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_y(), 0.1),
+                                                                               (bop_dy(), 0.1),
+                                                                               (bop_z(), 0.1),
+                                                                               (bop_dz(), 0.1),
+                                                                               (bop_phi(), 0.1),
+                                                                               (bop_dphi(), 0.1)],
                                                                grids = [t,], n_control = 2., 
                                                                state_net = state_nn_pretrained, 
                                                                opt_params = [0.005, 0.9, 0.999, 1e-8],

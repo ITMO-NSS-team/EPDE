@@ -227,8 +227,8 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
     # optimizer.set_control_optim_params()
 
-    solver_params = {'full':     {'training_params': {'epochs': 100000,}, 'optimizer_params': {'params': {'lr': 1e-5}}}, 
-                     'abridged': {'training_params': {'epochs': 200,}, 'optimizer_params': {'params': {'lr': 5e-5}}}}
+    solver_params = {'full':     {'training_params': {'epochs': 1000,}, 'optimizer_params': {'params': {'lr': 1e-5}}}, 
+                     'abridged': {'training_params': {'epochs': 300,}, 'optimizer_params': {'params': {'lr': 5e-5}}}}
     
     state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_y(), 0.1),
                                                                                (bop_dy(), 0.1),
@@ -537,7 +537,7 @@ if __name__ == '__main__':
             ctrl_args = [solution[:, 0], solution[:, 1], solution[:, 2], solution[:, 3]]
             ctrl_ann = epde.supplementary.train_ann(args=ctrl_args,
                                                     data = ctrl, 
-                                                    epochs_max = 5e6, 
+                                                    epochs_max = 5e7, 
                                                     dim = len(ctrl_args), 
                                                     model = nn_method(len(ctrl_args), 1, device=device),
                                                     device = device)
