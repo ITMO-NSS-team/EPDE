@@ -203,7 +203,7 @@ def translate_dummy_eqs(t: np.ndarray, u: np.ndarray, v: np.ndarray, control: np
 def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
                   u_tar: float, v_tar: float, u_init: float, v_init: float,
                   state_nn_pretrained: torch.nn.Sequential, ctrl_nn_pretrained: torch.nn.Sequential, 
-                  fig_folder: str, device = 'cpu'):
+                  fig_folder: str, device = 'cpu', eps: float = 1e0):
     
     from epde.supplementary import AutogradDeriv
     autograd = AutogradDeriv()
@@ -236,12 +236,12 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
                                                            power = 1, var = var, device = device)
         if isinstance(grid_loc, float):
             bop_grd_np = np.array([[grid_loc,]])
-            bop.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor)).to(device)
+            bop.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor))
         elif isinstance(grid_loc, torch.Tensor):
             bop.set_grid(grid_loc.reshape((1, 1)).type(torch.FloatTensor)) # What is the correct shape here?
         else:
             raise TypeError('Incorret value type, expected float or torch.Tensor.')
-        bop.values = torch.from_numpy(np.array([[value,]])).float().to(device)
+        bop.values = torch.from_numpy(np.array([[value,]])).float()
         return bop
 
     bop_u = get_ode_bop('u', 0, [None], t[0, 0], u_init)
@@ -249,16 +249,16 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
     optimizer.system = eq
 
-    solver_params = {'full':     {'training_params': {'epochs': 1000,}, 'optimizer_params': {'params': {'lr': 1e-5}}}, 
-                     'abridged': {'training_params': {'epochs': 500,}, 'optimizer_params': {'params': {'lr': 1e-5}}}}
+    solver_params = {'full':     {'training_params': {'epochs': 1500,}, 'optimizer_params': {'params': {'lr': 1e-5}}}, 
+                     'abridged': {'training_params': {'epochs': 700,}, 'optimizer_params': {'params': {'lr': 1e-5}}}}
 
     state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_u(), 0.3),
                                                                                (bop_v(), 0.3)],
                                                                grids = [t,], n_control = 1., 
                                                                state_net = state_nn_pretrained, 
-                                                               opt_params = [0.01, 0.9, 0.999, 1e-8],
+                                                               opt_params = [0.001, 0.9, 0.999, 1e-8],
                                                                control_net = ctrl_nn_pretrained, epochs = 100,
-                                                               fig_folder = fig_folder, eps = 1e0, 
+                                                               fig_folder = fig_folder, eps = eps, 
                                                                solver_params = solver_params)
 
     return state_nn, ctrl_net, ctrl_pred, hist
@@ -269,6 +269,7 @@ if __name__ == '__main__':
 
     experiment = 'LV'
     explicit_cpu = False
+    eps = 2e0
     device = 'cuda' if (torch.cuda.is_available and not explicit_cpu) else 'cpu'
     print(f'Working on {device}')
 
@@ -298,8 +299,6 @@ if __name__ == '__main__':
         print('No model located, ')
         data_nn = None
         save_nn = True
-    # print(f'next(data_nn.parameters()).is_cuda {next(data_nn.parameters()).is_cuda}')
-    # data_nn = None
 
     model = translate_dummy_eqs(t, solution[:, 0], solution[:, 1], ctrl, data_nn = data_nn, device = device) # , 
     example_sol = epde.globals.solution_guess_nn(torch.from_numpy(t).reshape((-1, 1)).float().to(device))
@@ -316,18 +315,18 @@ if __name__ == '__main__':
 
 
     def create_shallow_nn(arg_num: int = 1, output_num: int = 1, device = 'cpu') -> torch.nn.Sequential: # net: torch.nn.Sequential = None, 
-        hidden_neurons = 50
+        hidden_neurons = 75
         layers = [torch.nn.Linear(arg_num, hidden_neurons, device=device),
                   torch.nn.Tanh(), # ReLU(),
                   torch.nn.Linear(hidden_neurons, output_num, device=device)]
         return torch.nn.Sequential(*layers)
     
     def create_deep_nn(arg_num: int = 1, output_num: int = 1, device = 'cpu') -> torch.nn.Sequential: # net: torch.nn.Sequential = None, 
-        hidden_neurons = 25
+        hidden_neurons = 11
         layers = [torch.nn.Linear(arg_num, hidden_neurons, device=device),
                   torch.nn.Tanh(),
                   torch.nn.Linear(hidden_neurons, hidden_neurons, device=device),
-                  torch.nn.ReLU(),
+                  torch.nn.Tanh(),
                   torch.nn.Linear(hidden_neurons, output_num, device=device)]
         return torch.nn.Sequential(*layers)
     
@@ -336,9 +335,6 @@ if __name__ == '__main__':
     from epde.supplementary import define_derivatives
     from epde.preprocessing.preprocessor_setups import PreprocessorSetup
     from epde.preprocessing.preprocessor import ConcretePrepBuilder, PreprocessingPipe
-
-
-    # preprocessor_kwargs = {'epochs_max' : 10000}
     
     def prepare_derivs(var_name: str, var_array: np.ndarray, grid: np.ndarray, max_order: tuple = (1,)):
         default_preprocessor_type = 'FD'
@@ -374,24 +370,14 @@ if __name__ == '__main__':
     der_names_v, derivatives_v = prepare_derivs('v', var_array = solution[:, 1], grid = t)
     
     args = torch.from_numpy(solution).float().to(device)
-    # args = torch.cat([args, torch.from_numpy(derivatives_u).float().to(device), 
-                    #   torch.from_numpy(derivatives_v).float().to(device)], dim=1)
     print(f'args.shape is {args.shape}')
-    # print(f'derivatives_u.shape {derivatives_u.shape, type(derivatives_u)}')
-    # plt.plot(t, derivatives_u, color = 'k')
-    # plt.plot(t, derivatives_v, color = 'r')
-    # plt.plot(t, solution[:, 0], '*', color = 'k')
-    # plt.plot(t, solution[:, 1], '*', color = 'r')
-    # plt.show()
 
-    # raise NotImplementedError('Fin!')
 
     nn = 'deep' # nn = 'deep' 
     load_ctrl = False
 
     if device == 'cpu':
         ctrl_fname = os.path.join(res_folder, f"control_ann_{nn}_{experiment}_cpu.pickle")
-        # f"/home/mikemaslyaev/Documents/EPDE/projects/control/control_ann_{nn}_cpu.pickle"
     else:
         ctrl_fname = os.path.join(res_folder, f"control_ann_{nn}_{experiment}_cuda.pickle")
     if load_ctrl:
@@ -400,17 +386,12 @@ if __name__ == '__main__':
     else:
         nn_method = create_shallow_nn if nn == 'shallow' else create_deep_nn
         ctrl_ann = epde.supplementary.train_ann(args=[solution[:, 0], solution[:, 1]],#, 
-                                                    #   derivatives_u.reshape(-1), 
-                                                    #   derivatives_v.reshape(-1)], 
                                                 data = ctrl, epochs_max = 1e5, dim = 2, 
                                                 model = nn_method(2, 1, device=device),
                                                 device = device)
 
         with open(ctrl_fname, 'wb') as ctrl_output_file:
             pickle.dump(ctrl_ann, file = ctrl_output_file)
-
-    # ctrl_vals = ctrl_ann(example_sol)
-
 
     @torch.no_grad()
     def eps_increment_diff(input_params: OrderedDict, loc, forward: bool = True, eps = 1e-4):
@@ -423,7 +404,7 @@ if __name__ == '__main__':
     
     play_with_params = True
     if play_with_params:
-        eps = 1e0
+
         ctrl_alt_p = deepcopy(ctrl_ann)
         state_dict_alt = ctrl_alt_p.state_dict()
         print(f'state_dict_alt["0.weight"] {state_dict_alt["0.weight"].shape}, with value of {state_dict_alt["0.weight"][10, 0]}')        
@@ -458,7 +439,7 @@ if __name__ == '__main__':
     res = optimize_ctrl(model, torch.from_numpy(t).reshape((-1, 1)).float().to(device), u_tar = 1.5, v_tar = 0.5,
                         u_init=solution[0, 0], v_init=solution[0, 1],
                         state_nn_pretrained=epde.globals.solution_guess_nn, ctrl_nn_pretrained=ctrl_ann, 
-                        fig_folder=fig_folder, device=device)
+                        fig_folder=fig_folder, device=device, eps=eps)
 
     savename = f'res_{time_exp_start.month}_{time_exp_start.day}_at_{time_exp_start.hour}_{time_exp_start.minute}_{experiment}.pickle'
     # plt.savefig(os.path.join(fig_folder, frame_name))

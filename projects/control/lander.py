@@ -92,6 +92,18 @@ def get_additional_token_families(ctrl, device = 'cpu'):
     
     return [angle_trig_tokens, control_var_tokens]
 
+def epde_basic_globals(t, y, z, angle, u, derivs = None, diff_method = 'FD', data_nn: torch.nn.Sequential = None, 
+                       control_nn: torch.nn.Sequential = None, device: str = 'cpu'):
+    dimensionality = t.ndim - 1
+    
+    epde_search_obj = epde.EpdeSearch(use_solver = False, dimensionality = dimensionality, boundary = 30,
+                                      coordinate_tensors = [t,], verbose_params = {'show_iter_idx' : True}, device=device) 
+    epde_search_obj.create_pool(data = [y, z, angle], variable_names = ['y', 'z', 'phi'], max_deriv_order = (2,),
+                                derivs = derivs, additional_tokens = get_additional_token_families(ctrl = u, device = device),
+                                data_nn = data_nn)
+                                
+    return epde_search_obj.pool
+
 def epde_discovery(t, y, z, angle, u, derivs = None, diff_method = 'FD', data_nn: torch.nn.Sequential = None, 
                    device: str = 'cpu', use_solver = True):
     dimensionality = t.ndim - 1
@@ -239,8 +251,8 @@ def prepare_data(num_steps: int = 200, *args, **kwargs):
 def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
                   y_init: float, z_init: float, dy_init: float, dz_init: float, phi_init: float, dphi_init: float,
                   y_left: float, y_right: float, dy_max: float, dz_max: float, stab_der_ord: int, helipad: Tuple[int], # tuple as (y_left, y_right, z) 
-                  state_nn_pretrained: torch.nn.Sequential,
-                  ctrl_nn_pretrained: torch.nn.Sequential, fig_folder: str, device = 'cpu'):
+                  state_nn_pretrained: torch.nn.Sequential, ctrl_nn_pretrained: torch.nn.Sequential,
+                  fig_folder: str, device = 'cpu'):
     from epde.supplementary import AutogradDeriv
     autograd = AutogradDeriv()
 
@@ -301,27 +313,29 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     
     optimizer = ControlExp(loss=loss, device=device)
     
-    def get_ode_bop(key, var, term, grid_loc, value):
+    def get_ode_bop(key, var, term, grid_loc, value, device = 'cpu'):
+        print(f'In boundary operator declaration got device {device}')
         bop = epde.interface.solver_integration.BOPElement(axis = 0, key = key, term = term,
-                                                           power = 1, var = var)
+                                                           power = 1, var = var, device = device)
         if isinstance(grid_loc, float):
             bop_grd_np = np.array([[grid_loc,]])
-            bop.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor)).to(device)
+            bop.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor))  # .to(device)
         elif isinstance(grid_loc, torch.Tensor):
-            bop.set_grid(grid_loc.reshape((1, 1)).type(torch.FloatTensor))
+            bop.set_grid(grid_loc.reshape((1, 1)).type(torch.FloatTensor)) # TODO: fix issues .to(device)
         else:
             raise TypeError('Incorret value type, expected float or torch.Tensor.')
-        bop.values = torch.from_numpy(np.array([[value,]])).float().to(device)
+        bop.values = torch.from_numpy(np.array([[value,]])).float()   # .to(device)
         return bop
 
-    bop_y = get_ode_bop('y', 0, [None], t[0, 0], y_init)
-    bop_dy = get_ode_bop('y', 0, [0,], t[0, 0], dy_init)
+    bop_y = get_ode_bop('y', 0, [None], t[0, 0], y_init, device=device)
+    bop_dy = get_ode_bop('y', 0, [0,], t[0, 0], dy_init, device=device)
+    
 
-    bop_z = get_ode_bop('z', 0, [None], t[0, 0], z_init)
-    bop_dz = get_ode_bop('z', 0, [0,], t[0, 0], dz_init)
+    bop_z = get_ode_bop('z', 0, [None], t[0, 0], z_init, device=device)
+    bop_dz = get_ode_bop('z', 0, [0,], t[0, 0], dz_init, device=device)
 
-    bop_phi = get_ode_bop('phi', 0, [None], t[0, 0], phi_init)
-    bop_dphi = get_ode_bop('phi', 0, [0,], t[0, 0], dphi_init)
+    bop_phi = get_ode_bop('phi', 0, [None], t[0, 0], phi_init, device=device)
+    bop_dphi = get_ode_bop('phi', 0, [0,], t[0, 0], dphi_init, device=device)
 
     try:
         optimizer.system = eq.system
@@ -330,8 +344,8 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
     # optimizer.set_control_optim_params()
 
-    solver_params = {'full':     {'training_params': {'epochs': 1500,}, 'optimizer_params': {'params': {'lr': 1e-5}}}, 
-                     'abridged': {'training_params': {'epochs': 300,}, 'optimizer_params': {'params': {'lr': 5e-5}}}}
+    solver_params = {'full':     {'training_params': {'epochs': 1000,}, 'optimizer_params': {'params': {'lr': 1e-5}}}, 
+                     'abridged': {'training_params': {'epochs': 500,}, 'optimizer_params': {'params': {'lr': 1e-5}}}}
     
     state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_y(), 0.1),
                                                                                (bop_dy(), 0.1),
@@ -343,7 +357,7 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
                                                                state_net = state_nn_pretrained, 
                                                                opt_params = [0.005, 0.9, 0.999, 1e-8],
                                                                control_net = ctrl_nn_pretrained, epochs = 55,
-                                                               fig_folder = fig_folder, eps=2e0,
+                                                               fig_folder = fig_folder, eps=1e0,
                                                                solver_params = solver_params)
 
     return state_nn, ctrl_net, ctrl_pred, hist
@@ -355,6 +369,9 @@ if __name__ == '__main__':
 
     experiment = 'lander'
     explicit_cpu = False
+    use_solver = True
+    load_models = True
+
     device = 'cuda' if (torch.cuda.is_available and not explicit_cpu) else 'cpu'
     print(f'Working on {device}')
 
@@ -401,21 +418,36 @@ if __name__ == '__main__':
         data_nn = None
         save_nn = True
 
-    use_solver = True
-    models = epde_discovery(t = t[:-5], y = obs[0, :-5], z = obs[1, :-5], angle = obs[4, :-5], diff_method='poly',
-                            u = acts[..., :-5], device = 'cuda', data_nn=data_nn, use_solver = use_solver)
-    
-    # exp_comb = 
-    model = ExperimentCombiner(models.equations(False)[0]).create_best(models.pool)
 
     import epde.loader as Loader
-
     path_dir = os.path.join(os.path.dirname(os.path.abspath('')), 'EPDE', 'projects', 'control')
 
-    loader = Loader.EPDELoader()
-    loader.save(obj=model, filename=os.path.join(path_dir, f'{experiment}_solver_model.pickle')) # Pickle-saving an equation
-    loader.save(obj = models.pool, filename=os.path.join(path_dir, f'{experiment}_solver_pool.pickle')) # Pickle-saving the pool
-    # raise NotImplementedError()
+    if load_models:
+        loader = Loader.EPDELoader()
+        loading_assister = Loader.LoaderAssistant()
+
+        pool = epde_basic_globals(t = t[:-5], y = obs[0, :-5], z = obs[1, :-5], angle = obs[4, :-5], diff_method='poly',
+                                  u = acts[..., :-5], device = 'cuda', data_nn=data_nn,)
+
+        # pool = loader.load(filename = os.path.join(path_dir, f'{experiment}_solver_pool.pickle'), 
+        #                    **loading_assister.pool_preset())
+        model = loader.load(filename=os.path.join(path_dir, f'{experiment}_solver_model.pickle'),
+                            **loading_assister.pareto_levels_preset(pool = pool))
+        epde.globals.solution_guess_nn = data_nn
+
+        #TODO: Check correct loading procedures
+
+        # loader.load(obj=model, filename=os.path.join(path_dir, f'{experiment}_solver_model.pickle')) # Pickle-saving an equation
+        # loader.save(obj = models.pool, filename=os.path.join(path_dir, f'{experiment}_solver_pool.pickle')) # Pickle-saving the pool
+    else:
+        models = epde_discovery(t = t[:-5], y = obs[0, :-5], z = obs[1, :-5], angle = obs[4, :-5], diff_method='poly',
+                                u = acts[..., :-5], device = 'cuda', data_nn=data_nn, use_solver = use_solver)
+        
+        model = ExperimentCombiner(models.equations(False)[0]).create_best(models.pool)
+
+        loader = Loader.EPDELoader()
+        loader.save(obj = model, filename = os.path.join(path_dir, f'{experiment}_solver_model.pickle')) # Pickle-saving an equation
+        loader.save(obj = models.pool, filename = os.path.join(path_dir, f'{experiment}_solver_pool.pickle')) # Pickle-saving the pool
 
     if save_nn:
         if device == 'cpu':
@@ -425,8 +457,6 @@ if __name__ == '__main__':
         with open(fname, 'wb') as output_file:
             pickle.dump(epde.globals.solution_guess_nn, output_file)
 
-
-    # model.equations()
     
     example_sol = epde.globals.solution_guess_nn(torch.from_numpy(t).reshape((-1, 1)).float().to(device))
     epde.globals.solution_guess_nn.to(device)
@@ -487,7 +517,7 @@ if __name__ == '__main__':
 
 
     nn = 'shallow'
-    load_ctrl = False
+    load_ctrl = True
 
     if device == 'cpu':
         ctrl_fname = os.path.join(res_folder, f"control_ann_{nn}_{experiment}_cpu.pickle")
@@ -496,6 +526,12 @@ if __name__ == '__main__':
     if load_ctrl:
         with open(ctrl_fname, 'rb') as ctrl_input_file:  
             ctrl_ann = pickle.load(ctrl_input_file)
+        epde.globals.reset_control_nn(n_control=2, ann = ctrl_ann, ctrl_args=[(0, [None,]),
+                                                                              (1, [None,]),
+                                                                              (2, [None,]), 
+                                                                              (0, [0,]),
+                                                                              (1, [0,]),
+                                                                              (2, [0,])])
     else:
         nn_method = create_shallow_nn if nn == 'shallow' else create_deep_nn
         ctrl_args = [obs[0, :-5], obs[2, :-5], obs[1, :-5], obs[3, :-5], obs[4, :-5], obs[5, :-5]]
@@ -503,7 +539,7 @@ if __name__ == '__main__':
                                                 data = acts.T, 
                                                 epochs_max = 5e6, 
                                                 dim = len(ctrl_args), 
-                                                model = nn_method(len(ctrl_args), 1, device=device),
+                                                model = nn_method(len(ctrl_args), 2, device=device), # TODO: run with loaded equations 
                                                 device = device)
 
     with open(ctrl_fname, 'wb') as ctrl_output_file:  
@@ -518,8 +554,5 @@ if __name__ == '__main__':
 
     savename = f'res_{time_exp_start.month}_{time_exp_start.day}_at_{time_exp_start.hour}_{time_exp_start.minute}_{experiment}.pickle'
 
-    with open(os.path.join(res_folder, savename), 'wb') as output_file:  
-        pickle.dump(res, output_file)                
-    
-
-
+    with open(os.path.join(res_folder, savename), 'wb') as output_file:
+        pickle.dump(res, output_file)

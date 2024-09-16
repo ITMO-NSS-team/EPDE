@@ -228,7 +228,7 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     # optimizer.set_control_optim_params()
 
     solver_params = {'full':     {'training_params': {'epochs': 1000,}, 'optimizer_params': {'params': {'lr': 1e-5}}}, 
-                     'abridged': {'training_params': {'epochs': 300,}, 'optimizer_params': {'params': {'lr': 5e-5}}}}
+                     'abridged': {'training_params': {'epochs': 500,}, 'optimizer_params': {'params': {'lr': 1e-5}}}}
     
     state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_y(), 0.1),
                                                                                (bop_dy(), 0.1),
@@ -236,9 +236,9 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
                                                                                (bop_dphi(), 0.1)],
                                                                grids = [t,], n_control = 1., 
                                                                state_net = state_nn_pretrained, 
-                                                               opt_params = [0.0001, 0.9, 0.999, 1e-8],
+                                                               opt_params = [0.005, 0.9, 0.999, 1e-8],
                                                                control_net = ctrl_nn_pretrained, epochs = 55,
-                                                               fig_folder = fig_folder, eps=1e-1,
+                                                               fig_folder = fig_folder, eps = 1e0,
                                                                solver_params = solver_params)
 
     return state_nn, ctrl_net, ctrl_pred, hist

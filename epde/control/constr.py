@@ -178,7 +178,9 @@ class ControlConstrNEq(ControlConstraint):
         if not isinstance(self._val, torch.Tensor):
             val_transformed = torch.full_like(input = to_compare, fill_value=self._val)
         else:
-            assert to_compare.shape == self._val.shape, 'Incorrect shapes of constraint value tensor'
+            if not to_compare.shape == self._val.shape:
+                # wa'Incorrect shapes of constraint value tensor'
+                to_compare = torch.reshape(to_compare, shape=self._val.shape)
             val_transformed = self._val
         
         if self._estim_func is not None:
