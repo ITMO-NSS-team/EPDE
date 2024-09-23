@@ -11,7 +11,7 @@ import warnings
 import copy
 import os
 import pickle
-from typing import Union, Callable
+from typing import Union, Callable, List
 from functools import singledispatchmethod, reduce
 try:
     from collections.abc import Iterable
@@ -25,13 +25,15 @@ import torch
 import epde.globals as global_var
 import epde.optimizers.moeadd.solution_template as moeadd
 
-from epde.evaluators import simple_function_evaluator
-from epde.structure.encoding import Chromosome
-from epde.interface.token_family import TFPool
 from epde.decorators import HistoryExtender
-from epde.supplementary import filter_powers, normalize_ts, population_sort, flatten, rts, exp_form
+from epde.evaluators import simple_function_evaluator
+from epde.interface.token_family import TFPool
+from epde.preprocessing.domain_pruning import DomainPruner
+
+from epde.structure.encoding import Chromosome
 from epde.structure.factor import Factor
 from epde.structure.structure_template import ComplexStructure, check_uniqueness
+from epde.supplementary import filter_powers, normalize_ts, population_sort, flatten, rts, exp_form
 
 
 class Term(ComplexStructure):
@@ -1033,3 +1035,57 @@ class SoEqIterator(object):
             return res
         else:
             raise StopIteration
+        
+
+class Domain(object):
+    def __init__(self, grid: Union[Union[List[np.ndarray], np.ndarray]]):
+        pass
+
+    def set_pruner(self, pivotal_tensor_label = None, pruner: DomainPruner = None, 
+                             threshold : float = 1e-5, division_fractions = 3, 
+                             rectangular : bool = True):
+        """
+        Method for select only subdomains with variable dynamics.
+
+        Args:
+            pivotal_tensor_label (`np.ndarray`): 
+                Pattern that guides the domain pruning will be cutting areas, where values of the 
+                `pivotal_tensor` are closed to zero.
+            pruner (`DomainPruner`): 
+                Custom object for selecting domain region by pruning out areas with no dynamics.
+            threshold (`float`): optional, default - 1e-5
+                The boundary at which values are considered zero.
+            division_fractions (`int`): optional, default - 3
+                Number of fraction for each axis (if this is integer than all axis are dividing by same fractions).
+            rectangular (`bool`): default - True
+                Flag indecating that area is rectangle.
+                
+        Returns:
+            None
+        """
+        
+        if pruner is not None:
+            self.pruner = pruner
+        else:
+            self.pruner = DomainPruner(domain_selector_kwargs={'threshold': threshold})
+        if not self.pruner.bds_init:
+            if pivotal_tensor_label is None:
+                pivotal_tensor_label = ('du/dx'+str(global_var.time_axis + 1), (1.0,))
+            elif isinstance(pivotal_tensor_label, str):
+                pivotal_tensor_label = (pivotal_tensor_label, (1.0,))
+            elif not isinstance(pivotal_tensor_label, tuple):
+                raise TypeError('Label of the pivotal tensor shall be declared with str or tuple')
+
+            pivotal_tensor = global_var.tensor_cache.get(pivotal_tensor_label)
+            self.pruner.get_boundaries(pivotal_tensor, division_fractions=division_fractions,
+                                       rectangular=rectangular)
+
+        global_var.tensor_cache.prune_tensors(self.pruner)
+        if global_var.grid_cache is not None:
+            global_var.grid_cache.prune_tensors(self.pruner)
+
+    def set_boundaries(self, boundary_width: Union[int, list]):
+        """
+        Setting the number of unaccountable elements at the edges into cache with saved grid.
+        """
+        global_var.grid_cache.set_boundaries(boundary_width=boundary_width)

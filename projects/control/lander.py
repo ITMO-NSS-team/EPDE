@@ -125,8 +125,8 @@ def epde_discovery(t, y, z, angle, u, derivs = None, diff_method = 'FD', data_nn
         raise ValueError('Incorrect preprocessing tool selected.')
 
     eps = 5e-7
-    popsize = 10
-    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs = 1)
+    popsize = 12
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs = 60)
 
     factors_max_number = {'factors_num' : [1, 2, 3,], 'probas' : [0.4, 0.5, 0.1]}
 
@@ -370,7 +370,7 @@ if __name__ == '__main__':
     experiment = 'lander'
     explicit_cpu = False
     use_solver = True
-    load_models = True
+    load_models = False
 
     device = 'cuda' if (torch.cuda.is_available and not explicit_cpu) else 'cpu'
     print(f'Working on {device}')
@@ -381,7 +381,7 @@ if __name__ == '__main__':
     traj_filename = os.path.join(res_folder, f'training_traj_{experiment}.pickle')
 
     try:
-        with open(traj_filename, 'rb') as data_input_file:  
+        with open(traj_filename, 'rb') as data_input_file:
             traj_info = pickle.load(data_input_file)
             t, obs, acts, helipad = traj_info # , moon
     except FileNotFoundError:

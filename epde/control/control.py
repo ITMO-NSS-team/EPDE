@@ -114,19 +114,26 @@ class ControlExp():
         if solver_loss_backward > loss_max or solver_loss_forward > loss_max:
             warn(f'High solver loss occured: backward {solver_loss_backward} and forward {solver_loss_forward}.')
         loss_alpha = 1e1
+
         with torch.no_grad():
-            res = (loss_forward - loss_back)/(2*eps*(1+loss_alpha*(solver_loss_forward+solver_loss_backward)))
+            delta = loss_forward - loss_back
+            if torch.abs(delta) < solver_loss_forward+solver_loss_backward:
+                res = 0*delta
+            else:
+                res = delta/(2*eps*(1+loss_alpha*(solver_loss_forward+solver_loss_backward)))
+        # print(f'loss_forward {loss_forward, solver_loss_forward}, loss_backward {loss_back, solver_loss_backward}, res {res}')
+        # print(f'loss_alpha*(solver_loss_forward+solver_loss_backward) {loss_alpha*(solver_loss_forward+solver_loss_backward)}')
         return res
         
 
-    def train_pinn(self, bc_operators: List[Union[dict, float]], grids: List[Union[np.ndarray, torch.Tensor]], 
-                   n_control: int = 1, epochs: int = 1e2, state_net: torch.nn.Sequential = None, 
-                   opt_params: List[float] = [0.01, 0.9, 0.999, 1e-8],
-                   control_net: torch.nn.Sequential = None, fig_folder: str = None, 
-                   LV_exp: bool = True, eps: float = 1e-2, solver_params: dict = {}):
+    def feedback(self, bc_operators: List[Union[dict, float]], grids: List[Union[np.ndarray, torch.Tensor]], 
+                 n_control: int = 1, epochs: int = 1e2, state_net: torch.nn.Sequential = None, 
+                 opt_params: List[float] = [0.01, 0.9, 0.999, 1e-8],
+                 control_net: torch.nn.Sequential = None, fig_folder: str = None, 
+                 LV_exp: bool = True, eps: float = 1e-2, solver_params: dict = {}):
         def modify_bc(operator: dict, scale: Union[float, torch.Tensor]) -> dict:
             noised_operator = deepcopy(operator)
-            # noised_operator['bnd_val'] = torch.normal(operator['bnd_val'], scale).to(self._device)
+            noised_operator['bnd_val'] = torch.normal(operator['bnd_val'], scale).to(self._device)
             return noised_operator
 
         # Properly formulate training approach
@@ -175,9 +182,25 @@ class ControlExp():
         print('current loss is ', loss, 'model undertrained with loss of ', loss_pinn)
 
         while t < epochs and not stop_training:
-            self.set_solver_params(**solver_params['abridged'])
+            # self.set_solver_params(**solver_params['abridged'])
             adapter = self.get_solver_adapter(None)
             sampled_bc = [modify_bc(operator, noise_std) for operator, noise_std in bc_operators]
+
+            # self.set_solver_params(**solver_params['full'])
+            adapter = self.get_solver_adapter(None)
+            adapter.set_net(self._state_net)
+            loss_pinn, model = adapter.solve_epde_system(system = self.system, grids = grids, data = None,
+                                                         boundary_conditions = sampled_bc,
+                                                         mode = self._solver_params['mode'],
+                                                         use_cache = self._solver_params['use_cache'],
+                                                         use_fourier = self._solver_params['use_fourier'],
+                                                         fourier_params = self._solver_params['fourier_params'],
+                                                         use_adaptive_lambdas = self._solver_params['use_adaptive_lambdas'])
+
+            control_inputs = prepare_control_inputs(model, grids_merged, global_var.control_nn.net_args)
+            loss = self.loss([self._state_net, global_var.control_nn.net], [grids_merged, control_inputs])            
+            self._state_net = model
+            self.set_solver_params(**solver_params['abridged'])
 
             global_var.control_nn.net.load_state_dict(self._best_control_params)
             state_net  = deepcopy(self._state_net)
@@ -273,7 +296,13 @@ class ControlExp():
 
         return self._state_net, global_var.control_nn.net, ctrl_pred, loss_hist
 
-                            
+    def time_based(bc_operators: List[Union[dict, float]], grids: List[Union[np.ndarray, torch.Tensor]], 
+                   n_control: int = 1, epochs: int = 1e2, state_net: torch.nn.Sequential = None, 
+                   opt_params: List[float] = [0.01, 0.9, 0.999, 1e-8],
+                   control_net: torch.nn.Sequential = None, fig_folder: str = None, 
+                   LV_exp: bool = True, eps: float = 1e-2, solver_params: dict = {}):
+        pass
+                         
     def get_solver_adapter(self, net: torch.nn.Sequential):
         adapter = SolverAdapter(net = net, use_cache = False, device = self._device)
         # Edit solver forms of functions of dependent variable to Callable objects.

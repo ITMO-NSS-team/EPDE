@@ -41,11 +41,11 @@ def check_dominance(target, compared_with) -> bool:
         target (`src.moeadd.moeadd_solution_template.MOEADDSolution`):  case-specific subclass object
             The individual solution on the pareto levels, compared with the other element.
         compared_with (`src.moeadd.moeadd_solution_template.MOEADDSolution`):  case-specific subclass object
-            The individual solution on the pareto levels, with with the target is compared.
+            The individual solution on the pareto levels, with which the target is compared.
 
     Returns:
-        domiated (`bool`): Function returns True, if the **compared_with** dominates (has at least one objective
-            functions with less values, while the others are the same) the **target**; 
+        domiated (`bool`): Function returns True, if the **target** dominates (has at least one objective
+            functions with less values, while the others are the same) the **compared_with**; 
             False in all other cases.
 
     """

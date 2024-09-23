@@ -193,16 +193,13 @@ class ControlVarTokens(PreparedTokens):
         
         def nn_eval_torch(*args, **kwargs):
             if isinstance(args[0], torch.Tensor):
-                inp = torch.cat([torch.reshape(tensor, (-1, 1)) for tensor in args], dim = 1).to(device) # Validate correctness
+                inp = torch.cat([torch.reshape(tensor, (-1, 1)) for tensor in args], dim = 1).to(device)
             else:
                 inp = torch.cat([torch.reshape(torch.Tensor([elem,]), (-1, 1)) for elem in args], dim = 1).to(device)
-            # print(f'passing tensor, stored at {inp.get_device()}, nn is to be passed on {device}')
-            # print(f'inp shape is {inp.shape}, kwargs are {kwargs}')
-            # print(global_var.control_nn.net)
-            return global_var.control_nn.net(inp).to(device)#**kwargs['power']
+            return global_var.control_nn.net(inp).to(device)
 
         def nn_eval_np(*args, **kwargs):
-            return nn_eval_torch(*args, **kwargs).detach().cpu().numpy()#**kwargs['power']
+            return nn_eval_torch(*args, **kwargs).detach().cpu().numpy()
 
         if eval_np    is None: eval_np = nn_eval_np
         if eval_torch is None: eval_torch = nn_eval_torch
