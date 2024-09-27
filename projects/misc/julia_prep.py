@@ -61,7 +61,7 @@ if __name__ == "__main__":
                                                          max_order=max_order)
     data_tensor_n, derivatives_n = preprocessor_pipeline.run(u_n, grid=[x,],
                                                              max_order=max_order)   
-    
+    print(data_tensor.shape, derivatives.shape)
 # np.linalg.norm(u - data_tensor_n)/np.linalg.norm(u)
 # Out[40]: 0.04486079554885309
 

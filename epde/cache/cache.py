@@ -142,10 +142,10 @@ class Cache(object):
     """Class for keeping values of terms/factors of equations.
 
     Args:
-        max_allowed_tensors (`int`): limitation on the number of allowed tensors to load into rhe cache.
+        max_allowed_tensors (`int`): limitation on the number of allowed tensors to load into the cache.
         memory_default (`dict`): key - name of tensor (tuple - (name_of_term, params)), value - derivative. Objects without changes after evolutional step
         memory_normalized (`dict`): key - name of tensor (tuple - (name_of_term, params)), value - derivative. Objects with normalize
-        memory_structural (`dict`): key - name of tensor (tuple - (name_of_term, params)), value - derivative. NOT USED ДОПИСАТЬ ПРОСМОТРЯ КОД
+        memory_structural (`dict`): key - name of tensor (tuple - (name_of_term, params)), value - derivative. NOT USED ДОПИСАТЬ ПРОСМОТРЕВ КОД
     """
     def __init__(self, device = 'cpu'):
         self._device = device

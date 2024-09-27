@@ -137,7 +137,7 @@ class SolverBasedFitness(CompoundOperator):
         print(objective.text_form)
 
         loss_add, solution_nn = self.adapter.solve_epde_system(system = objective, grids = None, 
-                                                            boundary_conditions = None)
+                                                               boundary_conditions = None, use_fourier=True)
         _, grids = global_var.grid_cache.get_all(mode = 'torch')
         
         grids = torch.stack([grid.reshape(-1) for grid in grids], dim = 1).float()

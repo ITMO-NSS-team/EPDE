@@ -125,8 +125,8 @@ def epde_discovery(t, y, z, angle, u, derivs = None, diff_method = 'FD', data_nn
         raise ValueError('Incorrect preprocessing tool selected.')
 
     eps = 5e-7
-    popsize = 12
-    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs = 60)
+    popsize = 30
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs = 150)
 
     factors_max_number = {'factors_num' : [1, 2, 3,], 'probas' : [0.4, 0.5, 0.1]}
 
@@ -347,18 +347,18 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     solver_params = {'full':     {'training_params': {'epochs': 1000,}, 'optimizer_params': {'params': {'lr': 1e-5}}}, 
                      'abridged': {'training_params': {'epochs': 500,}, 'optimizer_params': {'params': {'lr': 1e-5}}}}
     
-    state_nn, ctrl_net, ctrl_pred, hist = optimizer.train_pinn(bc_operators = [(bop_y(), 0.1),
+    state_nn, ctrl_net, ctrl_pred, hist = optimizer.feedback(bc_operators = [(bop_y(), 0.1),
                                                                                (bop_dy(), 0.1),
                                                                                (bop_z(), 0.1),
                                                                                (bop_dz(), 0.1),
                                                                                (bop_phi(), 0.1),
                                                                                (bop_dphi(), 0.1)],
-                                                               grids = [t,], n_control = 2., 
-                                                               state_net = state_nn_pretrained, 
-                                                               opt_params = [0.005, 0.9, 0.999, 1e-8],
-                                                               control_net = ctrl_nn_pretrained, epochs = 55,
-                                                               fig_folder = fig_folder, eps=1e0,
-                                                               solver_params = solver_params)
+                                                             grids = [t,], n_control = 2., 
+                                                             state_net = state_nn_pretrained, 
+                                                             opt_params = [0.005, 0.9, 0.999, 1e-8],
+                                                             control_net = ctrl_nn_pretrained, epochs = 55,
+                                                             fig_folder = fig_folder, eps=1e0,
+                                                             solver_params = solver_params)
 
     return state_nn, ctrl_net, ctrl_pred, hist
 
@@ -369,7 +369,7 @@ if __name__ == '__main__':
 
     experiment = 'lander'
     explicit_cpu = False
-    use_solver = True
+    use_solver = False
     load_models = False
 
     device = 'cuda' if (torch.cuda.is_available and not explicit_cpu) else 'cpu'
@@ -440,7 +440,7 @@ if __name__ == '__main__':
         # loader.load(obj=model, filename=os.path.join(path_dir, f'{experiment}_solver_model.pickle')) # Pickle-saving an equation
         # loader.save(obj = models.pool, filename=os.path.join(path_dir, f'{experiment}_solver_pool.pickle')) # Pickle-saving the pool
     else:
-        models = epde_discovery(t = t[:-5], y = obs[0, :-5], z = obs[1, :-5], angle = obs[4, :-5], diff_method='poly',
+        models = epde_discovery(t = t[:-5], y = obs[0, :-5], z = obs[1, :-5], angle = obs[4, :-5], diff_method='FD',
                                 u = acts[..., :-5], device = 'cuda', data_nn=data_nn, use_solver = use_solver)
         
         model = ExperimentCombiner(models.equations(False)[0]).create_best(models.pool)
