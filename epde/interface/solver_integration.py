@@ -416,7 +416,8 @@ class SystemSolverInterface(object):
         self._device = device
 
     @staticmethod
-    def _term_solver_form(term, grids, default_domain, variables: List[str] = ['u',], device = 'cpu'):
+    def _term_solver_form(term, grids, default_domain, variables: List[str] = ['u',], 
+                          device = 'cpu') -> dict:
         deriv_orders = []
         deriv_powers = []
         deriv_vars = []
@@ -491,7 +492,7 @@ class SystemSolverInterface(object):
     def set_boundary_operator(self, operator_info):
         raise NotImplementedError()
 
-    def _equation_solver_form(self, equation, variables, grids=None, mode = 'NN'):
+    def _equation_solver_form(self, equation, variables, grids=None, mode = 'NN') -> dict:
         assert mode in ['NN', 'autograd', 'mat'], 'Incorrect mode passed. Form available only \
                                                    for "NN", "autograd "and "mat" methods'
         
@@ -748,14 +749,18 @@ class SolverAdapter(object):
             
         return domain
 
-    def solve_epde_system(self, system: SoEq, grids: list=None, boundary_conditions=None, 
+    def solve_epde_system(self, system: Union[SoEq, dict], grids: list=None, boundary_conditions=None,
                           mode='NN', data=None, use_cache: bool = False, use_fourier: bool = False,
                           fourier_params: dict = None, use_adaptive_lambdas: bool = False, to_numpy: bool = False):
         solver_device(device = self._device)
 
-        system_interface = SystemSolverInterface(system_to_adapt=system)
-
-        system_solver_forms = system_interface.form(grids = grids, mode = mode)
+        if isinstance(system, SoEq):
+            system_interface = SystemSolverInterface(system_to_adapt=system)
+            system_solver_forms = system_interface.form(grids = grids, mode = mode)
+        elif isinstance(system, dict):
+            system_interface = system
+        else:
+            raise TypeError(f'Incorrect type of the equations passed into solver. Expected dict or SoEq, got {type(system)}.')
         
         if boundary_conditions is None:
             op_gen = PregenBOperator(system=system,

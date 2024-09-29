@@ -107,8 +107,6 @@ class ControlExp():
         ctrl_nn_dict = eps_increment_diff(input_params=ctrl_nn_dict,
                                           loc = loc, forward=True, eps=eps)
         global_var.control_nn.net.load_state_dict(ctrl_nn_dict)
-        # state_dict = state_dict_prev = None
-        # print(f'param after: {ctrl_nn_dict[loc[0]][tuple(loc[1:])]}')  
 
         loss_max = 1e-3
         if solver_loss_backward > loss_max or solver_loss_forward > loss_max:
@@ -170,12 +168,12 @@ class ControlExp():
 
         sampled_bc = [modify_bc(operator, noise_std) for operator, noise_std in bc_operators]
         loss_pinn, model = adapter.solve_epde_system(system = self.system, grids = grids, data = None,
-                                                        boundary_conditions = sampled_bc,
-                                                        mode = self._solver_params['mode'],
-                                                        use_cache = self._solver_params['use_cache'],
-                                                        use_fourier = self._solver_params['use_fourier'],
-                                                        fourier_params = self._solver_params['fourier_params'],
-                                                        use_adaptive_lambdas = self._solver_params['use_adaptive_lambdas'])
+                                                     boundary_conditions = sampled_bc,
+                                                     mode = self._solver_params['mode'],
+                                                     use_cache = self._solver_params['use_cache'],
+                                                     use_fourier = self._solver_params['use_fourier'],
+                                                     fourier_params = self._solver_params['fourier_params'],
+                                                     use_adaptive_lambdas = self._solver_params['use_adaptive_lambdas'])
 
         control_inputs = prepare_control_inputs(model, grids_merged, global_var.control_nn.net_args)
         loss = self.loss([self._state_net, global_var.control_nn.net], [grids_merged, control_inputs])
@@ -296,13 +294,17 @@ class ControlExp():
 
         return self._state_net, global_var.control_nn.net, ctrl_pred, loss_hist
 
-    def time_based(bc_operators: List[Union[dict, float]], grids: List[Union[np.ndarray, torch.Tensor]], 
+    def time_based(self, bc_operators: List[Union[dict, float]], grids: List[Union[np.ndarray, torch.Tensor]], 
                    n_control: int = 1, epochs: int = 1e2, state_net: torch.nn.Sequential = None, 
                    opt_params: List[float] = [0.01, 0.9, 0.999, 1e-8],
                    control_net: torch.nn.Sequential = None, fig_folder: str = None, 
-                   LV_exp: bool = True, eps: float = 1e-2, solver_params: dict = {}):
-        pass
-                         
+                   LV_exp: bool = True, eps: float = 1e-2, solver_params: dict = {}):        
+        self.set_solver_params(**solver_params['full'])
+        adapter = self.get_solver_adapter(None)
+        solver_form = self.system
+
+        raise NotImplementedError()
+
     def get_solver_adapter(self, net: torch.nn.Sequential):
         adapter = SolverAdapter(net = net, use_cache = False, device = self._device)
         # Edit solver forms of functions of dependent variable to Callable objects.
