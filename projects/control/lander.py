@@ -126,7 +126,7 @@ def epde_discovery(t, y, z, angle, u, derivs = None, diff_method = 'FD', data_nn
 
     eps = 5e-7
     popsize = 30
-    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs = 150)
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs = 100)
 
     factors_max_number = {'factors_num' : [1, 2, 3,], 'probas' : [0.4, 0.5, 0.1]}
 
