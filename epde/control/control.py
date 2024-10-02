@@ -180,7 +180,7 @@ class ControlExp():
         print('current loss is ', loss, 'model undertrained with loss of ', loss_pinn)
 
         while t < epochs and not stop_training:
-            # self.set_solver_params(**solver_params['abridged'])
+            self.set_solver_params(**solver_params['abridged'])            
             adapter = self.get_solver_adapter(None)
             sampled_bc = [modify_bc(operator, noise_std) for operator, noise_std in bc_operators]
 

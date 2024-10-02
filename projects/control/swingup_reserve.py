@@ -7,7 +7,9 @@ import datetime
 from collections import OrderedDict
 from typing import List
 import faulthandler
-from scipy.fft import fft, fftfreq
+from scipy.fft import fft
+
+import epde.globals
 
 faulthandler.enable()
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../..')))
@@ -29,14 +31,13 @@ from projects.control.swingup_aux import DMCEnvWrapper, RandomPolicy, CosinePoli
                                          TwoCosinePolicy, rollout_env, VarTrigTokens # ,, DerivSignFunction
 from epde.interface.prepared_tokens import DerivSignFunction
 
-def detect_fourier_params(sample: np.ndarray, step: float, threshold = 0.5):
-    ampls = fft(sample)
-    freqs = fftfreq(n = sample.size, d = step)
-    return freqs[np.argmax(np.abs(ampls))], (np.abs(ampls) > threshold).sum()
+def detect_L(sample: np.ndarray, threshold = 0.5):
+    freqs = fft(sample)
+    return (np.abs(freqs) > threshold).sum()
 
 def get_additional_token_families(ctrl, ctrl_net: torch.nn.Sequential, device = 'cpu'):
     angle_trig_tokens = VarTrigTokens('phi', max_power=2, freq_center=1.)
-    sgn_tokens = DerivSignFunction(token_type = 'velocity_signum', var_name = 'y', token_labels=['sign(dy/dx1)',],
+    sgn_tokens = DerivSignFunction(token_type = 'speed_sign', var_name = 'y', token_labels=['sign(dy/dx1)',],
                                    deriv_solver_orders = [[0,],])
     control_var_tokens = epde.interface.prepared_tokens.ControlVarTokens(sample = ctrl, arg_var = [(0, [None,]), (1, [None,]), 
                                                                                                    (0, [0,]), (1, [0,])], 
@@ -116,7 +117,7 @@ def epde_multisample_discovery(t: List[np.ndarray], x: List[np.ndarray], angle: 
     return epde_search_obj
 
 def translate_equation(t, x, angle, u, derivs: dict, diff_method = 'FD', data_nn = None, device: str = 'cpu', 
-                       fourier_params: dict = {}, ctrl_net: torch.nn.Sequential = None):
+                       fourier_params: dict = {}):
     print('Shapes:', x.shape, angle.shape)
     dimensionality = x.ndim - 1
     
@@ -153,13 +154,11 @@ def translate_equation(t, x, angle, u, derivs: dict, diff_method = 'FD', data_nn
         raise ValueError('Incorrect preprocessing tool selected.')
 
     epde_search_obj.create_pool(data=[x, angle], variable_names=['y', 'phi'], max_deriv_order=(2,), derivs = [derivs['y'], derivs['phi']],
-                                additional_tokens = get_additional_token_families(ctrl = u, 
-                                                                                  ctrl_net = ctrl_net,
-                                                                                  device = device), data_nn = data_nn,
+                                additional_tokens = get_additional_token_families(ctrl=u, device = device), data_nn = data_nn, 
                                 fourier_layers=(fourier_params != {}), fourier_params=fourier_params)
 
     test = epde.interface.equation_translator.CoeffLessEquation(lp_terms = {'phi': lp_phi_terms, 'y': lp_y_terms},
-                                                                rp_term = {'phi': rp_phi_term, 'y': rp_y_term},
+                                                                rp_term = {'phi': rp_phi_term, 'y': rp_y_term}, 
                                                                 pool = epde_search_obj.pool, all_vars = ['y', 'phi'])
     
     def visualize_var(system, variable: str = 'u'):
@@ -250,10 +249,10 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
                                   'use_fourier' : use_fourier,
                                   'fourier_params': fourier_params}
     
-    state_nn, ctrl_net, ctrl_pred, hist = optimizer.feedback(bc_operators = [(bop_y(), 0.0001),
-                                                                             (bop_dy(), 0.0001),
-                                                                             (bop_phi(), 0.0001),
-                                                                             (bop_dphi(), 0.0001)],
+    state_nn, ctrl_net, ctrl_pred, hist = optimizer.feedback(bc_operators = [(bop_y(), 0.1),
+                                                                             (bop_dy(), 0.1),
+                                                                             (bop_phi(), 0.1),
+                                                                             (bop_dphi(), 0.1)],
                                                              grids = [t,], n_control = 1., 
                                                              state_net = state_nn_pretrained, 
                                                              opt_params = [0.005, 0.9, 0.999, 1e-8],
@@ -335,17 +334,17 @@ def general(experiment, res_folder, single_sample: bool = True, discover: bool =
             plt.title('Actions, taken as control.')
             plt.show()
 
-            plt.plot(t, angle, color = 'k', label = 'Pole angle, rad.')
-            plt.plot(t, derivs['phi'][:, 0], color = 'r', label = 'Angle deriv, rad./s')
-            plt.plot(t, derivs['phi'][:, 1], color = 'b', label = 'Angle deriv, rad./s')
+            plt.plot(angle, color = 'k', label = 'Pole angle, rad.')
+            plt.plot(derivs['phi'][:, 0], color = 'r', label = 'Angle deriv, rad./s')
+            plt.plot(derivs['phi'][:, 1], color = 'b', label = 'Angle deriv, rad./s')
             plt.legend()
             plt.grid()
             plt.title('Inputs, angle')
             plt.show()
 
-            plt.plot(t, x, color = 'k', label = 'Cart position.')
-            plt.plot(t, derivs['y'][:, 0], color = 'r', label = 'Cart pos deriv, rad./s')
-            plt.plot(t, derivs['y'][:, 1], color = 'b', label = 'Cart pos deriv, rad./s')
+            plt.plot(x, color = 'k', label = 'Cart position.')
+            plt.plot(derivs['y'][:, 0], color = 'r', label = 'Cart pos deriv, rad./s')
+            plt.plot(derivs['y'][:, 1], color = 'b', label = 'Cart pos deriv, rad./s')
             plt.legend()
             plt.grid()
             plt.title('Inputs, cart position')
@@ -379,8 +378,6 @@ def general(experiment, res_folder, single_sample: bool = True, discover: bool =
                 print(f'No model located, with name {fname}')
                 data_nn = None
                 save_nn = True
-            
-            solution = np.stack([x, x_d, angle, angle_d]).T
 
             def create_shallow_nn(arg_num: int = 1, output_num: int = 1, device = 'cpu') -> torch.nn.Sequential: # net: torch.nn.Sequential = None, 
                 hidden_neurons = 30
@@ -412,7 +409,7 @@ def general(experiment, res_folder, single_sample: bool = True, discover: bool =
                 nn_method = create_shallow_nn if nn == 'shallow' else create_deep_nn
                 ctrl_args = [solution[:, 0], solution[:, 1], solution[:, 2], solution[:, 3]]
                 ctrl_ann = epde.supplementary.train_ann(args=ctrl_args,
-                                                        data = u, 
+                                                        data = ctrl, 
                                                         epochs_max = 5e7, 
                                                         dim = len(ctrl_args), 
                                                         model = nn_method(len(ctrl_args), 1, device=device),
@@ -422,20 +419,16 @@ def general(experiment, res_folder, single_sample: bool = True, discover: bool =
                     pickle.dump(ctrl_ann, file = ctrl_output_file)            
             
             freq_threshold = 10
-            fourier_params_x = detect_fourier_params(x, step = t[1] - t[0], threshold=freq_threshold)
-            fourier_params_angles = detect_fourier_params(angle, step = t[1] - t[0], threshold=freq_threshold)
-            M_max = max(fourier_params_x[1], 
-                        fourier_params_angles[1])
-            L_mean = (fourier_params_x[0] + fourier_params_angles[0])/2.
-
-            fourier_params = {'L': [L_mean,], 'M': [M_max,]} # TODO: better init of L
+            M_max = max(detect_L(x, threshold=freq_threshold), 
+                        detect_L(angle, threshold=freq_threshold))
+            fourier_params = {'L': [2,], 'M': [M_max,]} # TODO: better init of L
 
             if discover:
                 res = epde_discovery(t, x, angle, u, derivs, 'FD', data_nn = data_nn, 
                                      device = device, ctrl_net=ctrl_ann)
             else:
                 res = translate_equation(t, x, angle, u, derivs, 'FD', data_nn = data_nn, 
-                                         device=device, fourier_params=fourier_params, ctrl_net=ctrl_ann)
+                                         device=device, fourier_params=fourier_params)
             if save_nn:
                 if device == 'cpu':
                     fname =  os.path.join(res_folder, f"data_ann_{experiment}_cpu.pickle")
@@ -444,7 +437,7 @@ def general(experiment, res_folder, single_sample: bool = True, discover: bool =
                 with open(fname, 'wb') as output_file:
                     pickle.dump(epde.globals.solution_guess_nn, output_file)
 
-            return t, u, solution, res
+            return t, u, np.stack([x, x_d, angle, angle_d]).T, res
     else:
         traj_obs_sc, traj_acts_sc, _ = rollout_env(cart_env, cosine_signum_policy, n_steps = 500, 
                                                    n_steps_reset=1000)
@@ -576,12 +569,12 @@ if __name__ == '__main__':
         args = torch.from_numpy(solution).float().to(device)
         print(f'args.shape is {args.shape}')
 
-        ctrl_net = global_var.control_nn.net
+        ctrl_net = global_var.control_nn[]
                 
         res = optimize_ctrl(res, torch.from_numpy(t).reshape((-1, 1)).float().to(device),
                             y_init=solution[0, 0], dy_init=solution[0, 1], phi_init=solution[0, 2], dphi_init=solution[0, 3],
                             ctrl_max = 1, stab_der_ord = 2, 
-                            state_nn_pretrained=epde.globals.solution_guess_nn, ctrl_nn_pretrained=ctrl_net, 
+                            state_nn_pretrained=epde.globals.solution_guess_nn, ctrl_nn_pretrained=ctrl_ann, 
                             fig_folder=fig_folder, device=device)
 
         savename = f'res_{time_exp_start.month}_{time_exp_start.day}_at_{time_exp_start.hour}_{time_exp_start.minute}_{experiment}.pickle'

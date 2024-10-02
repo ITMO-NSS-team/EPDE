@@ -26,14 +26,19 @@ from epde.interface.interface import ExperimentCombiner
 from epde.interface.prepared_tokens import DerivSignFunction
 
 import numpy as np
-import scipy
+# import scipy
+from scipy.fft import fft, fftfreq
 import matplotlib.pyplot as plt
 
 import time
 
-
 import gym
 import scipy.special
+
+def detect_fourier_params(sample: np.ndarray, step: float, threshold = 0.5):
+    ampls = fft(sample)
+    freqs = fftfreq(n = sample.size, d = step)
+    return freqs[np.argmax(np.abs(ampls))], (np.abs(ampls) > threshold).sum()
 
 def get_additional_token_families(ctrl, device = 'cpu'):
     angle_trig_tokens = VarTrigTokens('phi', max_power=1, freq_center=1.)
@@ -125,8 +130,8 @@ def epde_discovery(t, y, z, angle, u, derivs = None, diff_method = 'FD', data_nn
         raise ValueError('Incorrect preprocessing tool selected.')
 
     eps = 5e-7
-    popsize = 30
-    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs = 100)
+    popsize = 8
+    epde_search_obj.set_moeadd_params(population_size = popsize, training_epochs = 1)
 
     factors_max_number = {'factors_num' : [1, 2, 3,], 'probas' : [0.4, 0.5, 0.1]}
 
@@ -136,7 +141,7 @@ def epde_discovery(t, y, z, angle, u, derivs = None, diff_method = 'FD', data_nn
                         equation_terms_max_number = 9, data_fun_pow = 2, derivs = derivs,
                         additional_tokens = get_additional_token_families(ctrl = u, device = device),
                         equation_factors_max_number = factors_max_number,
-                        eq_sparsity_interval = (1e-5, 1e-0), data_nn = data_nn)
+                        eq_sparsity_interval = (1e-9, 1e-0), data_nn = data_nn)
     epde_search_obj.equations()
     return epde_search_obj
 
@@ -344,8 +349,8 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
     # optimizer.set_control_optim_params()
 
-    solver_params = {'full':     {'training_params': {'epochs': 1000,}, 'optimizer_params': {'params': {'lr': 1e-5}}}, 
-                     'abridged': {'training_params': {'epochs': 500,}, 'optimizer_params': {'params': {'lr': 1e-5}}}}
+    solver_params = {'full':     {'training_params': {'epochs': 5000,}, 'optimizer_params': {'params': {'lr': 1e-5}}}, 
+                     'abridged': {'training_params': {'epochs': 200,}, 'optimizer_params': {'params': {'lr': 1e-5}}}}
     
     state_nn, ctrl_net, ctrl_pred, hist = optimizer.feedback(bc_operators = [(bop_y(), 0.1),
                                                                                (bop_dy(), 0.1),
@@ -370,7 +375,7 @@ if __name__ == '__main__':
     experiment = 'lander'
     explicit_cpu = False
     use_solver = False
-    load_models = False
+    load_models = True
 
     device = 'cuda' if (torch.cuda.is_available and not explicit_cpu) else 'cpu'
     print(f'Working on {device}')
@@ -413,7 +418,7 @@ if __name__ == '__main__':
             data_nn = pickle.load(data_input_file)
         data_nn = data_nn.to(device)
         save_nn = False
-    except FileNotFoundError:
+    except:
         print(f'No model located, with name {fname}')
         data_nn = None
         save_nn = True
@@ -457,7 +462,7 @@ if __name__ == '__main__':
         with open(fname, 'wb') as output_file:
             pickle.dump(epde.globals.solution_guess_nn, output_file)
 
-    
+    global_var.solution_guess_nn = data_nn
     example_sol = epde.globals.solution_guess_nn(torch.from_numpy(t).reshape((-1, 1)).float().to(device))
     epde.globals.solution_guess_nn.to(device)
     print(f'example_sol: {type(example_sol)}, {example_sol.shape}, {example_sol.get_device()}')

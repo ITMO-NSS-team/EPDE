@@ -135,7 +135,8 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: b
                        derivs: List[Union[int, List, Union[np.ndarray]]] = None, 
                        penalised_derivs: List[Union[int, List]] = None,
                        epochs_max=1e5, predefined_ann: torch.nn.Sequential = None,
-                       batch_frac=0.5, learining_rate=1e-4, device = 'cpu'): # loss_mean=1000, 
+                       batch_frac=0.5, learining_rate=1e-4, device = 'cpu', 
+                       use_fourier: bool = True, fourier_params: dict = {'L' : [4,], 'M' : [3,]}): 
     '''
     Represent the data with ANN, suitable to be used as the initial guess of the candidate equations solutions 
     during the equation search, employing solver-based fitness function.
@@ -146,7 +147,8 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: b
     global solution_guess_nn
 
     if predefined_ann is None:
-        model = create_solution_net(equations_num=len(data), domain_dim=len(grids), device = device)
+        model = create_solution_net(equations_num=len(data), domain_dim=len(grids), device = device,
+                                    use_fourier=use_fourier, fourier_params=fourier_params)
     else:
         model = predefined_ann
 
@@ -157,9 +159,6 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: b
         data_tr = torch.from_numpy(np.array([data_var.reshape(-1) for data_var in data])).float().T
         grids_tr = grids_tr.to(device)
         data_tr = data_tr.to(device)
-
-        # print('device ', device)
-        # print(f'grds {grids_tr.get_device()} and data {data_tr.get_device()}')
 
         batch_size = int(data[0].size * batch_frac)
         optimizer = torch.optim.Adam(model.parameters(), lr = learining_rate)

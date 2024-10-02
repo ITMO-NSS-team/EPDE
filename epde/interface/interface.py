@@ -510,7 +510,7 @@ class EpdeSearch(object):
                 Test function, default using inverse polynomial with max in the domain center.
 
         Returns:
-            None 
+            None
         """
         if isinstance(function_form, (np.ndarray, list)):
             global_var.grid_cache.g_func = function_form
@@ -633,7 +633,8 @@ class EpdeSearch(object):
     def create_pool(self, data: Union[np.ndarray, list, tuple], variable_names=['u',],
                     derivs=None, max_deriv_order=1, additional_tokens=[],
                     data_fun_pow: int = 1, deriv_fun_pow: int = 1, grid: list = None,
-                    data_nn: torch.nn.Sequential = None):
+                    data_nn: torch.nn.Sequential = None, fourier_layers: bool = True,
+                    fourier_params: dict = {'L' : [4,], 'M' : [3,]}):
         '''
         Create pool of tokens to represent elementary functions, that can be included in equations.
         
@@ -691,7 +692,8 @@ class EpdeSearch(object):
                                               grids = grid, predefined_ann = data_nn, device = self._device)
             else:
                 global_var.reset_data_repr_nn(data = data, derivs = base_derivs, epochs_max=1e6,
-                                              grids = grid, predefined_ann=None, device = self._device)
+                                              grids = grid, predefined_ann = None, device = self._device, 
+                                              use_fourier = fourier_layers, fourier_params = fourier_params)
 
         if isinstance(additional_tokens, list):
             if not all([isinstance(tf, (TokenFamily, PreparedTokens)) for tf in additional_tokens]):
@@ -741,7 +743,8 @@ class EpdeSearch(object):
             equation_factors_max_number=1, variable_names=['u',], eq_sparsity_interval=(1e-4, 2.5), 
             derivs=None, max_deriv_order=1, additional_tokens=[], data_fun_pow: int = 1, deriv_fun_pow: int = 1,
             optimizer: Union[SimpleOptimizer, MOEADDOptimizer] = None, pool: TFPool = None,
-            population: Union[ParetoLevels, Population] = None, data_nn = None):
+            population: Union[ParetoLevels, Population] = None, data_nn = None, 
+            fourier_layers: bool = True, fourier_params: dict = {'L' : [4,], 'M' : [3,]}):
         """
         Fit epde search algorithm to obtain differential equations, describing passed data.
 
@@ -811,7 +814,7 @@ class EpdeSearch(object):
                                  derivs=derivs, max_deriv_order=max_deriv_order, 
                                  additional_tokens=additional_tokens, 
                                  data_fun_pow = data_fun_pow, deriv_fun_pow = deriv_fun_pow, 
-                                 data_nn = data_nn)
+                                 data_nn = data_nn, fourier_layers=fourier_layers, fourier_params=fourier_params)
         else:
             self.pool = pool; self.pool_params = cur_params
 

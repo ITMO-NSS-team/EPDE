@@ -54,21 +54,21 @@ class AutogradDeriv(BasicDeriv):
     
 
 def create_solution_net(equations_num: int, domain_dim: int, use_fourier = True, #  mode: str, domain: Domain 
-                        fft_params: dict = None, device = 'cpu'):
+                        fourier_params: dict = None, device = 'cpu'):
     '''
     fft_params have to be passed as dict with entries like: {'L' : [4,], 'M' : [3,]}
     '''
     L_default, M_default = 4, 10
     if use_fourier:
-        if fft_params is None:
+        if fourier_params is None:
             if domain_dim == 1:
-                fft_params = {'L' : [L_default],
+                fourier_params = {'L' : [L_default],
                               'M' : [M_default]}
             else:
-                fft_params = {'L' : [L_default] + [None,] * (domain_dim - 1), 
+                fourier_params = {'L' : [L_default] + [None,] * (domain_dim - 1), 
                               'M' : [M_default] + [None,] * (domain_dim - 1)}
-        fft_params['device'] = device
-        four_emb = Fourier_embedding(**fft_params)
+        fourier_params['device'] = device
+        four_emb = Fourier_embedding(**fourier_params)
         if device == 'cuda':
             four_emb = four_emb.cuda()
         net_default = [four_emb,]
