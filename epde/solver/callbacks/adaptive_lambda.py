@@ -92,7 +92,7 @@ class AdaptiveLambda(Callback):
         true_bval = sln_cls.true_bval
         bval_keys = sln_cls.bval_keys
         bval_length = sln_cls.bval_length
-        op = sln_cls.op
+        op = sln_cls.op if sln_cls.batch_size is None else sln_cls.save_op # if batch mod use accumulative loss else from single eval
         self.op_list = sln_cls.op_list
         self.bval_list = sln_cls.bval_list
         self.loss_list = sln_cls.loss_list

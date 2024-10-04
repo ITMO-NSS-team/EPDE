@@ -242,13 +242,15 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     # optimizer.set_control_optim_params()
 
     solver_params = {'full':     {'training_params': {'epochs': 10000,},
-                                  'optimizer_params': {'params': {'lr': 1e-5}},
+                                #   'optimizer_params': {'params': {'lr': 1e-5}},
+                                  'optimizer_params': {'optimizer': 'NGD'},
                                   'use_fourier' : use_fourier,
                                   'fourier_params': fourier_params},
                      'abridged': {'training_params': {'epochs': 400,}, 
-                                  'optimizer_params': {'params': {'lr': 1e-5}}}, 
+                                #   'optimizer_params': {'params': {'lr': 1e-5}},
+                                  'optimizer_params': {'optimizer': 'NGD'},
                                   'use_fourier' : use_fourier,
-                                  'fourier_params': fourier_params}
+                                  'fourier_params': fourier_params}}
     
     state_nn, ctrl_net, ctrl_pred, hist = optimizer.feedback(bc_operators = [(bop_y(), 0.0001),
                                                                              (bop_dy(), 0.0001),

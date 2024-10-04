@@ -94,9 +94,31 @@ class Closure():
         self.model.cur_loss = min(loss_swarm)
 
         return losses, gradients
+    
+    def _closure_ngd(self):
+        self.optimizer.zero_grad()
+        with torch.autocast(device_type=self.device,
+                            dtype=self.dtype,
+                            enabled=self.mixed_precision):
+            loss, loss_normalized = self.model.solution_cls.evaluate()
+        if self.cuda_flag:
+            self.scaler.scale(loss).backward(retain_graph=True)
+            self.scaler.step(self.optimizer)
+            self.scaler.update()
+        else:
+            loss.backward(retain_graph=True)
+
+        self.model.cur_loss = loss_normalized if self.normalized_loss_stop else loss
+
+        int_res = self.model.solution_cls.operator._pde_compute()
+        bval, true_bval, _, _ = self.model.solution_cls.boundary.apply_bcs()
+
+        return int_res, bval, true_bval, loss, self.model.solution_cls.evaluate
 
     def get_closure(self, _type: str):
         if _type == 'PSO':
             return self._closure_pso
+        elif _type == 'NGD':
+            return self._closure_ngd
         else:
             return self._closure

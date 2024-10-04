@@ -8,6 +8,7 @@ from epde.solver.derivative import Derivative
 from epde.solver.device import device_type, check_device
 from epde.solver.utils import PadTransform
 
+from torch.utils.data import DataLoader
 
 def integration(func: torch.Tensor,
                 grid: torch.Tensor,
@@ -95,8 +96,9 @@ class Operator():
                  prepared_operator: Union[list,dict],
                  model: Union[torch.nn.Sequential, torch.Tensor],
                  mode: str,
-                 weak_form: List[callable],
-                 derivative_points: int):
+                 weak_form: list[callable],
+                 derivative_points: int,
+                 batch_size: int = None):
         """
         Args:
             grid (torch.Tensor): grid (domain discretization).
@@ -106,6 +108,7 @@ class Operator():
             weak_form (List[callable]): list with basis functions (if the form is *weak*).
             derivative_points (int): points number for derivative calculation.
                                      For details to Derivative_mat class.
+            batch_size (int): size of batch.
         """
         self.grid = check_device(grid)
         self.prepared_operator = prepared_operator
@@ -118,8 +121,24 @@ class Operator():
             self.sorted_grid = torch.cat(list(self.grid_dict.values()))
         elif self.mode in ('autograd', 'mat'):
             self.sorted_grid = self.grid
+        self.batch_size = batch_size
+        if self.batch_size is not None:
+            self.grid_loader =  DataLoader(self.sorted_grid, batch_size=self.batch_size, shuffle=True,
+                                      generator=torch.Generator(device=device_type()))
+            self.n_batches = len(self.grid_loader)
+            del self.sorted_grid
+            torch.cuda.empty_cache()
+            self.init_mini_batches()
+            self.current_batch_i = 0
         self.derivative = Derivative(self.model,
-                                     self.derivative_points).set_strategy(self.mode).take_derivative
+                                self.derivative_points).set_strategy(self.mode).take_derivative
+    
+    def init_mini_batches(self):
+        """ Initialization of batch iterator.
+
+        """
+        self.grid_iter = iter(self.grid_loader)
+        self.grid_batch = next(self.grid_iter)
 
     def apply_operator(self,
                        operator: list,
@@ -152,15 +171,24 @@ class Operator():
             torch.Tensor: P/O DE residual.
         """
 
+        if self.batch_size is not None:
+            sorted_grid = self.grid_batch
+            try:
+                self.grid_batch = next(self.grid_iter)
+            except: # if no batches left then reinit
+                self.init_mini_batches()
+                self.current_batch_i = -1
+        else:
+            sorted_grid = self.sorted_grid
         num_of_eq = len(self.prepared_operator)
         if num_of_eq == 1:
             op = self.apply_operator(
-                self.prepared_operator[0], self.sorted_grid).reshape(-1,1)
+                self.prepared_operator[0], sorted_grid).reshape(-1,1)
         else:
             op_list = []
             for i in range(num_of_eq):
                 op_list.append(self.apply_operator(
-                    self.prepared_operator[i], self.sorted_grid).reshape(-1,1))
+                    self.prepared_operator[i], sorted_grid).reshape(-1,1))
             op = torch.cat(op_list, 1)
         return op
 

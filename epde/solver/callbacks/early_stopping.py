@@ -18,7 +18,8 @@ class EarlyStopping(Callback):
                  normalized_loss: bool = False,
                  randomize_parameter: float = 1e-5,
                  info_string_every: Union[int, None] = None,
-                 verbose: bool = True
+                 verbose: bool = True,
+                 save_best: bool = False
                  ):
         """_summary_
 
@@ -36,6 +37,7 @@ class EarlyStopping(Callback):
             info_string_every (Union[int, None], optional): prints the loss state after every *int*
                                                     step. Defaults to None.
             verbose (bool, optional): print or not info about loss and current state of stopping criteria. Defaults to True.
+            save_best (bool, optional): model with least loss is saved during the training and returned at the end as a result
         """
         super().__init__()
         self.eps = eps
@@ -49,6 +51,10 @@ class EarlyStopping(Callback):
         self._r = create_random_fn(randomize_parameter)
         self.info_string_every = info_string_every if info_string_every is not None else np.inf
         self.verbose = verbose
+        self.save_best=save_best
+        self.best_model=None
+
+
 
     def _line_create(self):
         """ Approximating last_loss list (len(last_loss)=loss_oscillation_window) by the line.
@@ -78,6 +84,8 @@ class EarlyStopping(Callback):
             self._stop_dings += 1
             self._t_imp_start = self.t
             if self.mode in ('NN', 'autograd'):
+                if self.save_best:
+                    self.model.net=self.best_model
                 self.model.net.apply(self._r)
             self._check = 'patience_check'
 
@@ -120,12 +128,16 @@ class EarlyStopping(Callback):
 
         if self.model.cur_loss < self.model.min_loss:
             self.model.min_loss = self.model.cur_loss
+            if self.save_best:
+                self.best_model=self.model.net
             self._t_imp_start = self.t
 
         if self.verbose:
             self.verbose_print()
         if self._stop_dings >= self.patience:
             self.model.stop_training = True
+            if self.save_best:
+                self.model.net=self.best_model
         self._check = None
 
     def on_epoch_begin(self, logs=None):

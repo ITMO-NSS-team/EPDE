@@ -114,8 +114,9 @@ class PSO(torch.optim.Optimizer):
         matrix = torch.cat(matrix)
         variance = torch.FloatTensor(self.pop_size, self.vec_shape).uniform_(
             -self.variance, self.variance).to(device_type())
-        swarm = (matrix + variance).clone().detach().requires_grad_(True)
-        return swarm
+        swarm = matrix + variance
+        swarm[0] = matrix[0]
+        return swarm.clone().detach().requires_grad_(True)
 
     def update_pso_params(self) -> None:
         """Method for updating pso parameters if c_decrease=True.
@@ -176,7 +177,10 @@ class PSO(torch.optim.Optimizer):
         self.m1 = self.beta1 * self.m1 + (1 - self.beta1) * self.grads_swarm
         self.m2 = self.beta2 * self.m2 + (1 - self.beta2) * torch.square(
             self.grads_swarm)
-        return self.lr * self.m1 / torch.sqrt(self.m2) + self.epsilon
+
+        update = self.lr * self.m1 / (torch.sqrt(torch.abs(self.m2)) + self.epsilon)
+
+        return update
 
     def step(self, closure=None) -> torch.Tensor:
         """ It runs ONE step on the particle swarm optimization.
@@ -186,6 +190,16 @@ class PSO(torch.optim.Optimizer):
         """
 
         self.loss_swarm, self.grads_swarm = closure()
+
+        fix_attempt=0
+
+        while torch.any(self.loss_swarm!=self.loss_swarm):
+            self.swarm=self.swarm+0.001*torch.rand(size=self.swarm.shape)
+            self.loss_swarm, self.grads_swarm = closure()
+            fix_attempt+=1
+            if fix_attempt>5:
+                break
+
         if self.indicator:
             self.f_p = copy(self.loss_swarm).detach()
             self.g_best = self.p[torch.argmin(self.f_p)]

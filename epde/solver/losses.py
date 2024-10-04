@@ -15,18 +15,21 @@ class Losses():
                  mode: str,
                  weak_form: Union[None, list],
                  n_t: int,
-                 tol: Union[int, float]):
+                 tol: Union[int, float],
+                 n_t_operation: callable = None):
         """
         Args:
             mode (str): calculation mode, *NN, autograd, mat*.
             weak_form (Union[None, list]): list of basis functions if form is weak.
-            n_t (int): number of unique points in time dinension.
+            n_t (int): number of unique points in time dimension.
             tol (Union[int, float])): penalty in *casual loss*.
+            n_t_operation (callable): function to calculate n_t for each batch
         """
 
         self.mode = mode
         self.weak_form = weak_form
         self.n_t = n_t
+        self.n_t_operation = n_t_operation
         self.tol = tol
         # TODO: refactor loss_op, loss_bcs into one function, carefully figure out when bval
         # is None + fix causal_loss operator crutch (line 76).
@@ -147,9 +150,13 @@ class Losses():
             loss (torch.Tensor): loss.
             loss_normalized (torch.Tensor): loss, where regularization parameters are 1.
         """
-
-        res = torch.sum(operator**2, dim=1).reshape(self.n_t, -1)
-        res = torch.mean(res, axis=1).reshape(self.n_t, 1)
+        if self.n_t_operation is not None: # calculate if batch mod
+            self.n_t = self.n_t_operation(operator)
+        try:
+            res = torch.sum(operator**2, dim=1).reshape(self.n_t, -1)
+        except: # if n_t_operation calculate bad n_t then change n_t to batch size
+            self.n_t = operator.size()[0]
+            res = torch.sum(operator**2, dim=1).reshape(self.n_t, -1)
         m = torch.triu(torch.ones((self.n_t, self.n_t), dtype=res.dtype), diagonal=1).T
         with torch.no_grad():
             w = torch.exp(- self.tol * (m @ res))

@@ -19,17 +19,18 @@ def create_random_fn(eps: float) -> callable:
         callable: creating random params function.
     """
     def randomize_params(m):
-        if isinstance(m, torch.nn.Linear) or isinstance(m, torch.nn.Conv2d):
+        if (isinstance(m, torch.nn.Linear) or isinstance(m, torch.nn.Conv2d)) and m.bias is not None:
             m.weight.data = m.weight.data + \
                             (2 * torch.randn(m.weight.size()) - 1) * eps
             m.bias.data = m.bias.data + (2 * torch.randn(m.bias.size()) - 1) * eps
 
     return randomize_params
 
+
 def samples_count(second_order_interactions: bool,
                   sampling_N: int,
                   op_length: list,
-                  bval_length:list) -> Tuple[int, int]:
+                  bval_length: list) -> Tuple[int, int]:
     """ Count samples for variance based sensitivity analysis.
 
     Args:
@@ -54,6 +55,7 @@ def samples_count(second_order_interactions: bool,
         sampling_amount = sampling_N * (sampling_D + 2)
     return sampling_amount, sampling_D
 
+
 def lambda_print(lam: torch.Tensor, keys: List) -> None:
     """ Print lambda value.
 
@@ -65,6 +67,7 @@ def lambda_print(lam: torch.Tensor, keys: List) -> None:
     lam = lam.reshape(-1)
     for val, key in zip(lam, keys):
         print('lambda_{}: {}'.format(key, val.item()))
+
 
 def bcs_reshape(
     bval: torch.Tensor,
@@ -90,6 +93,7 @@ def bcs_reshape(
 
     return bcs
 
+
 def remove_all_files(folder: str) -> None:
     """ Remove all files from folder.
 
@@ -105,6 +109,7 @@ def remove_all_files(folder: str) -> None:
                 shutil.rmtree(file_path)
         except Exception as e:
             print('Failed to delete %s. Reason: %s' % (file_path, e))
+
 
 def mat_op_coeff(equation: Any) -> Any:
     """ Preparation of coefficients in the operator of the *mat* method
@@ -126,6 +131,7 @@ def mat_op_coeff(equation: Any) -> Any:
                 print("Warning: coefficient is callable,\
                                 it may lead to wrong cache item choice")
     return equation
+
 
 def model_mat(model: torch.Tensor,
                     domain: Any,
@@ -159,6 +165,7 @@ def model_mat(model: torch.Tensor,
 
     return cache_model
 
+
 def save_model_nn(
     cache_dir: str,
     model: torch.nn.Module,
@@ -176,6 +183,7 @@ def save_model_nn(
         name = str(datetime.datetime.now().timestamp())
     if not os.path.isdir(cache_dir):
         os.mkdir(cache_dir)
+
     parameters_dict = {'model': model.to('cpu'),
                         'model_state_dict': model.state_dict()}
 
@@ -184,10 +192,11 @@ def save_model_nn(
         print(f'model is saved in cache dir: {cache_dir}')
     except RuntimeError:
         torch.save(parameters_dict, cache_dir + '\\' + name + '.tar',
-                    _use_new_zipfile_serialization=False)  # cyrrilic in path
+                    _use_new_zipfile_serialization=False)  # cyrillic in path
         print(f'model is saved in cache: {cache_dir}')
     except:
         print(f'Cannot save model in cache: {cache_dir}')
+
 
 def save_model_mat(cache_dir: str,
                     model: torch.Tensor,
@@ -225,6 +234,20 @@ def save_model_mat(cache_dir: str,
 
     save_model_nn(cache_dir, net_autograd, name=name)
 
+def replace_none_by_zero(tuple_data: tuple | None) -> torch.Tensor:
+    """ Make tensor from tuple (or None element) ad replace None elements to zero.
+
+    Args:
+        tuple_data (tuple): path to cache folder.
+    """
+    if isinstance(tuple_data, torch.Tensor):
+        tuple_data[tuple_data == None] = 0
+    elif tuple_data is None:
+        tuple_data = torch.tensor([0.])
+    elif isinstance(tuple_data, tuple):
+        new_tuple = tuple(replace_none_by_zero(item) for item in tuple_data)
+        return new_tuple
+    return tuple_data
 
 class PadTransform(Module):
     """Pad tensor to a fixed length with given padding value.
