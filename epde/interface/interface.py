@@ -691,7 +691,7 @@ class EpdeSearch(object):
                 global_var.reset_data_repr_nn(data = data, derivs = base_derivs, train = False, 
                                               grids = grid, predefined_ann = data_nn, device = self._device)
             else:
-                global_var.reset_data_repr_nn(data = data, derivs = base_derivs, epochs_max=1e6,
+                global_var.reset_data_repr_nn(data = data, derivs = base_derivs, epochs_max=1e4,
                                               grids = grid, predefined_ann = None, device = self._device, 
                                               use_fourier = fourier_layers, fourier_params = fourier_params)
 
@@ -915,11 +915,11 @@ class EpdeSearch(object):
             for level in self._resulting_population[:min(num, len(self._resulting_population))]:
                 temp = []
                 for sys in level: #self.resulting_population[idx]:
-                    temp.append(SystemSolverInterface(sys).form(grids=grids))
+                    temp.append(SystemSolverInterface(sys, device=self._device).form(grids=grids))
                 forms.append(temp)
         else:
             for sys in self._resulting_population[:min(num, len(self._resulting_population))]:
-                forms.append(SystemSolverInterface(sys).form(grids=grids))
+                forms.append(SystemSolverInterface(sys, device=self._device).form(grids=grids))
         return forms
 
     @property

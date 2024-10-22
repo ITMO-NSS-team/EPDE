@@ -63,6 +63,27 @@ class Closure():
         self.model.cur_loss = loss_normalized if self.normalized_loss_stop else loss
 
         return loss
+    
+    def _closure_nncg(self):
+        self.optimizer.zero_grad()
+        with torch.autocast(device_type=self.device,
+                            dtype=self.dtype,
+                            enabled=self.mixed_precision):
+            loss, loss_normalized = self.model.solution_cls.evaluate()
+        
+        # if self.optimizer.use_grad:
+        grads = self.optimizer.gradient(loss)
+        grads = torch.where(grads != grads, torch.zeros_like(grads), grads)
+        # else:
+        #     grads = torch.tensor([0.])
+        # if self.cuda_flag:
+        #     self.scaler.scale(loss).backward()
+        #     self.scaler.step(self.optimizer)
+        #     self.scaler.update()
+        # else:
+        #     loss.backward()
+        self.model.cur_loss = loss_normalized if self.normalized_loss_stop else loss
+        return loss, grads
 
     def _closure_pso(self):
         def loss_grads():
@@ -120,5 +141,7 @@ class Closure():
             return self._closure_pso
         elif _type == 'NGD':
             return self._closure_ngd
+        elif _type == 'NNCG':
+            return self._closure_nncg        
         else:
             return self._closure

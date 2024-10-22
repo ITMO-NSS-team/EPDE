@@ -165,7 +165,13 @@ class Model():
 
         while self.t < epochs and self.stop_training == False:
             callbacks.on_epoch_begin()
+
             self.optimizer.zero_grad()
+            if optimizer.optimizer == 'NNCG' and (self.t-1) % 20 == 0: #Hard-coded preconditional freq
+                grads = self.optimizer.gradient(self.cur_loss)
+                self.optimizer.update_preconditioner(grads)
+            
+
             iter_count = 1 if self.batch_size is None else self.solution_cls.operator.n_batches
             for _ in range(iter_count): # if batch mod then iter until end of batches else only once
                 if device_type() == 'cuda' and mixed_precision:

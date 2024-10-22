@@ -9,6 +9,7 @@ import os
 import numpy as np
 import torch
 
+from copy import deepcopy
 from typing import Callable, Union, Dict, List
 from types import FunctionType
 from functools import singledispatchmethod, singledispatch
@@ -37,11 +38,11 @@ better handling, i.e. manual setup.
 
 BASE_COMPILING_PARAMS = {
                          'mode'                 : 'NN',
-                         'lambda_operator'      : 10,
+                         'lambda_operator'      : 1,
                          'lambda_bound'         : 1000,
                          'normalized_loss_stop' : False,
                          'h'                    : 0.001,
-                         'inner_order'          : '1',
+                         'inner_order'          : '2',
                          'boundary_order'       : '2',
                          'weak_form'            : 'None',
                          'tol'                  : 0.005,
@@ -77,6 +78,15 @@ PSO_OPTIMIZER_PARAMS = {
 NGD_OPTIMIZER_PARAMS = {
                         }
 
+NYSNEWTON_OPTIMIZER_PARAMS = {
+                              'lr' : 1e-5,
+                              'rank' : 10,
+                              'mu' : 1e-4,
+                              'chunk_size' : 1,
+                              'cg_tol' : 1e-16,
+                              'cg_max_iters' : 1000
+                              }
+
 BASE_OPTIMIZER_PARAMS = {
                          'optimizer'   : 'Adam', # Alternatively, switch to PSO, if it proves to be effective.
                          'gamma'       : 'None',
@@ -84,11 +94,12 @@ BASE_OPTIMIZER_PARAMS = {
                          }
 
 OPTIMIZERS_MATCHED = {
-                      'Adam'  : ADAM_OPTIMIZER_PARAMS,
-                      'LBFGS' : LBFGS_OPTIMIZER_PARAMS,
-                      'PSO'   : PSO_OPTIMIZER_PARAMS,
-                      'SGD'   : SGD_OPTIMIZER_PARAMS,
-                      'NGD'   : NGD_OPTIMIZER_PARAMS
+                      'Adam'      : ADAM_OPTIMIZER_PARAMS,
+                      'LBFGS'     : LBFGS_OPTIMIZER_PARAMS,
+                      'PSO'       : PSO_OPTIMIZER_PARAMS,
+                      'SGD'       : SGD_OPTIMIZER_PARAMS,
+                      'NGD'       : NGD_OPTIMIZER_PARAMS,
+                      'NNCG'      : NYSNEWTON_OPTIMIZER_PARAMS
                       }
 
 BASE_CACHE_PARAMS = {
@@ -427,6 +438,7 @@ class SystemSolverInterface(object):
         deriv_vars = []
         derivs_detected = False
 
+        # print(f'Calling torch solver on device {device}')
         try:
             coeff_tensor = torch.ones_like(grids[0]).to(device)
             
@@ -468,10 +480,17 @@ class SystemSolverInterface(object):
                         f'Variable family of passed derivative {variables}, other than {factor.variable}')
                 derivs_detected = True
 
+                # print(f'cur_deriv_var {cur_deriv_var}')
                 deriv_vars.append(cur_deriv_var)
             else:
+                # print(f'cur_deriv_var {cur_deriv_var}')
                 grid_arg = None if default_domain else grids
-                coeff_tensor = coeff_tensor * factor.evaluate(grids=grid_arg, torch_mode = True)
+                try:
+                    coeff_tensor = coeff_tensor * factor.evaluate(grids=grid_arg, torch_mode = True)
+                except RuntimeError:
+                    print(f'Can not multiply tensors due to device mismatch: coeff tensor on {coeff_tensor.device}, while \
+                          {factor.name} on {factor.evaluate(grids=grid_arg, torch_mode = True).device}')
+                    raise RuntimeError('Ding!')
         if not derivs_detected:
             deriv_powers = [0,]
             deriv_orders = [[None,],]
@@ -480,10 +499,11 @@ class SystemSolverInterface(object):
             deriv_orders = [deriv_orders[0],]
 
         if deriv_vars == []:
-            if deriv_powers != 0:
-                raise Exception('Something went wrong with parsing an equation for solver')
-            else:
-                deriv_vars = [0,]
+            # if deriv_powers != 0:
+            #     print(f'for term {term.name, factor.is_deriv} deriv_vars {deriv_vars}, deriv_orders {deriv_powers}, deriv_powers {deriv_powers}')
+            #     raise Exception('Something went wrong with parsing an equation for solver')
+            # else:
+            deriv_vars = [0,]
         res = {'coeff': coeff_tensor,
                'term': deriv_orders,
                'pow': deriv_powers,
@@ -522,7 +542,8 @@ class SystemSolverInterface(object):
                 else:
                     weight = equation.weights_final[term_idx-1]
                 if not np.isclose(weight, 0, rtol = self.coeff_tol):
-                    _solver_form[term.name] = self._term_solver_form(term, grids, default_domain, variables)
+                    _solver_form[term.name] = self._term_solver_form(term, grids, default_domain, 
+                                                                     variables, device=self._device)
                     _solver_form[term.name]['coeff'] = _solver_form[term.name]['coeff'] * weight
                     _solver_form[term.name]['coeff'] = adjust_shape(_solver_form[term.name]['coeff'], mode = mode)
 
@@ -537,7 +558,8 @@ class SystemSolverInterface(object):
 
         target_weight = torch.full_like(input = grids[0], fill_value = -1.).to(self._device)
 
-        target_form = self._term_solver_form(equation.structure[equation.target_idx], grids, default_domain, variables)
+        target_form = self._term_solver_form(equation.structure[equation.target_idx], grids, 
+                                             default_domain, variables, device=self._device)
         target_form['coeff'] = target_form['coeff'] * target_weight
         target_form['coeff'] = adjust_shape(target_form['coeff'], mode = mode)
         # print(f'target_form shape is {target_form["coeff"].shape}')
@@ -574,22 +596,22 @@ class SolverAdapter(object):
         self._device = device
         self.set_net(net)
         
-        self._compiling_params = dict()
+        self._compiling_params = None
         self.set_compiling_params(**BASE_COMPILING_PARAMS)
         
-        self._optimizer_params = dict()
+        self._optimizer_params = None
         self.set_optimizer_params(**BASE_OPTIMIZER_PARAMS)
         
-        self._cache_params = dict()
+        self._cache_params = None
         self.set_cache_params(**BASE_CACHE_PARAMS)
         
-        self._early_stopping_params = dict()
+        self._early_stopping_params = None
         self.set_early_stopping_params(**BASE_EARLY_STOPPING_PARAMS)
         
-        self._ploter_params = dict()
+        self._ploter_params = None
         self.set_plotting_params(**BASE_PLOTTER_PARAMS)
         
-        self._training_params = dict()
+        self._training_params = None
         self.set_training_params(**BASE_TRAINING_PARAMS)
         
         self.use_cache = use_cache
@@ -599,7 +621,7 @@ class SolverAdapter(object):
 
     @property
     def mode(self):
-        return self._compiling_params['mode']
+        return self._compiling_params[0]['mode']
     
     def set_net(self, net: torch.nn.Sequential):
         # if self.net is not None and 
@@ -614,6 +636,33 @@ class SolverAdapter(object):
             return create_solution_net(equations_num=equations.num, domain_dim=domain.dim,
                                        use_fourier=use_fourier, fourier_params=fourier_params, device=device)
             
+    def optimizator_consistency_check(self):
+        # TODO: implement
+        pass
+        # len_opt = len(self._optimizer_params)
+        # if len_opt == len(self._compiling_params) and len(self._compiling_params) != 1:
+        #     raise RuntimeError('The sequence of optimizers is set incorrectly.')
+
+        # if len_opt == len(self._cache_params) and len(self._cache_params) != 1:
+        #     raise RuntimeError('The sequence of optimizers is set incorrectly.')
+
+        # if len_opt == len(self._early_stopping_params) and len(self._early_stopping_params) != 1:
+        #     raise RuntimeError('The sequence of optimizers is set incorrectly.')
+
+        # if len_opt == len(self._ploter_params) and len(self._ploter_params) != 1:
+        #     raise RuntimeError('The sequence of optimizers is set incorrectly.')
+
+        # if len_opt == len(self._training_params) and len(self._training_params) != 1:
+        #     raise RuntimeError('The sequence of optimizers is set incorrectly, {}.')
+        
+    @staticmethod
+    def sets_num(*params) -> int:
+        if all([not isinstance(param, List) for param in params]):
+            return 1
+        ref_list = [param for param in params if isinstance(param, list)]
+        if any([isinstance(param, List) and len(param) != len(ref_list[0]) for param in params]):
+            raise RuntimeError('Mismatched length of parameters for optimizers')
+        return len(ref_list[0])
 
     def set_compiling_params(self, mode: str = None, lambda_operator: float = None, 
                              lambda_bound : float = None, normalized_loss_stop: bool = None,
@@ -623,51 +672,140 @@ class SolverAdapter(object):
                             'normalized_loss_stop' : normalized_loss_stop, 'h' : h, 'inner_order' : inner_order,
                             'boundary_order' : boundary_order, 'weak_form' : weak_form, 'tol' : tol,
                             'derivative_points' : derivative_points}
-        
-        for param_key, param_vals in compiling_params.items():
-            if param_vals is not None:
-                try:
-                    if param_vals == 'None':
-                        self._compiling_params[param_key] = None
-                    else:
-                        self._compiling_params[param_key] = param_vals
-                except KeyError:
-                    print(f'Parameter {param_key} can not be passed into the solver.')
+        param_sets = self.sets_num(mode, lambda_operator, lambda_bound, normalized_loss_stop, h,
+                                   inner_order, boundary_order, weak_form, tol, derivative_points)
+        if self._compiling_params is None:
+            self._compiling_params = [dict() for _ in range(param_sets)]
+        elif len(self._compiling_params) == 1:
+            self._compiling_params = [deepcopy(self._compiling_params[0]) for _ in range(param_sets)]
+        else:
+            pass
+
+        if len(self._compiling_params) == 1:
+            for param_key, param_vals in compiling_params.items():
+                if param_vals is not None:
+                    try:
+                        if param_vals == 'None':
+                            self._compiling_params[0][param_key] = None
+                        else:
+                            self._compiling_params[0][param_key] = param_vals[0] \
+                                if isinstance(param_vals, list) else param_vals
+                    except KeyError:
+                        print(f'Parameter {param_key} can not be passed into the solver.')
+        else:
+            for params_dict_idx, _ in enumerate(self._compiling_params):
+                for param_key, param_vals in compiling_params.items():
+                    if param_vals[params_dict_idx] is not None:
+                        try:
+                            if param_vals == 'None':
+                                self._compiling_params[params_dict_idx][param_key] = None
+                            else:
+                                self._compiling_params[params_dict_idx][param_key] = param_vals[params_dict_idx] \
+                                    if isinstance(param_vals, list) else param_vals
+                        except KeyError:
+                            print(f'Parameter {param_key} can not be passed into the solver.')
+
 
     def set_optimizer_params(self, optimizer: str = None, params: Dict[str, float] = None,
                              gamma: float = None, decay_every: int = None):
         optim_params = {'optimizer' : optimizer, 'params' : params, 'gamma' : gamma, 
                         'decay_every' : decay_every}
-        
-        for param_key, param_vals in optim_params.items():
-            if param_vals is not None:
-                try:
-                    if param_vals == 'None':
-                        self._optimizer_params[param_key] = None
-                    else:
-                        self._optimizer_params[param_key] = param_vals
-                        if param_key == 'optimizer':
-                            if param_vals not in ['Adam', 'SGD', 'PSO', 'LBFGS', 'NGD']:
-                                raise ValueError(f'Unimplemented optimizer has been selected. Please, use {OPTIMIZERS_MATCHED.keys()}')
-                            self._optimizer_params['params'] = OPTIMIZERS_MATCHED[param_vals]
-                except KeyError:
-                    print(f'Parameter {param_key} can not be passed into the solver.')
+        param_sets = self.sets_num(optimizer, params, gamma, decay_every)     
+        if self._optimizer_params is None:
+            self._optimizer_params = [dict() for _ in range(param_sets)]          
+        elif len(self._optimizer_params) == 1:
+            self._optimizer_params = [deepcopy(self._optimizer_params[0]) for _ in range(param_sets)]
+        else:
+            pass
+
+
+
+        if len(self._optimizer_params) == 1:
+            for param_key, param_vals in optim_params.items():
+                # print(f'param_key {param_key}')
+                if param_vals is not None:
+                    try:
+                        if isinstance(param_vals, list):
+                            cur_param = param_vals[params_dict_idx]
+                        else:
+                            cur_param = param_vals
+                        if param_vals == 'None':
+                            self._optimizer_params[0][param_key] = None
+                        else:
+                            self._optimizer_params[0][param_key] = cur_param
+                            if param_key == 'optimizer':
+                                if cur_param not in ['Adam', 'SGD', 'PSO', 'LBFGS', 'NGD', 'NNCG']:
+                                    raise ValueError(f'Unimplemented optimizer {param_vals[0]} has been selected.\
+                                                        Please, use {OPTIMIZERS_MATCHED.keys()}')
+                                self._optimizer_params[0]['params'] = OPTIMIZERS_MATCHED[cur_param]
+                    except KeyError:
+                        print(f'Parameter {param_key} can not be passed into the solver.')
+        else:
+            for params_dict_idx, _ in enumerate(self._optimizer_params):
+                for param_key, param_vals in optim_params.items():
+                    # print(f'Using optimizer params of {param_key, param_vals}')
+                    if param_vals is not None:
+                        if isinstance(param_vals, list):
+                            cur_param = param_vals[params_dict_idx]
+                        else:
+                            cur_param = param_vals
+                        try:
+                            if param_vals == 'None':
+                                self._optimizer_params[params_dict_idx][param_key] = None
+                            else:
+                                # print(f'self._optimizer_params[params_dict_idx] {self._optimizer_params[params_dict_idx]}')
+                                self._optimizer_params[params_dict_idx][param_key] = cur_param
+                                if param_key == 'optimizer':
+                                    if cur_param not in ['Adam', 'SGD', 'PSO', 'LBFGS', 'NGD', 'NNCG']:
+                                        raise ValueError(f'Unimplemented optimizer has been selected.\
+                                                           Please, use {OPTIMIZERS_MATCHED.keys()}')
+                                    self._optimizer_params[params_dict_idx]['params'] = OPTIMIZERS_MATCHED[cur_param]
+                        except KeyError:
+                            print(f'Parameter {param_key} can not be passed into the solver.')
+                            raise KeyError()
+        print(f'len(self._optimizer_params) {len(self._optimizer_params)}')
     
     def set_cache_params(self, cache_verbose: bool = None, cache_model: Sequential = None, 
-                         model_randomize_parameter: Union[int, float] = None, clear_cache: bool = None): # use_cache: bool = None, 
-
-        cache_params = { 'cache_verbose' : cache_verbose, 'cache_model' : cache_model, # 'use_cache' : use_cache,
+                         model_randomize_parameter: Union[int, float] = None, clear_cache: bool = None):
+        cache_params = {'cache_verbose' : cache_verbose, 'cache_model' : cache_model,
                         'model_randomize_parameter' : model_randomize_parameter, 'clear_cache' : clear_cache}
+        param_sets = self.sets_num(cache_verbose, cache_model, model_randomize_parameter, clear_cache)    
+        if self._cache_params is None:
+            self._cache_params = [dict() for _ in range(param_sets)]
+        elif len(self._cache_params) == 1:
+            self._cache_params = [deepcopy(self._cache_params[0]) for _ in range(param_sets)]
+        else:
+            pass
 
-        for param_key, param_vals in cache_params.items():
-            if param_vals is not None:
-                try:
-                    if param_vals == 'None':
-                        self._cache_params[param_key] = None
+        if len(self._cache_params) == 1:
+            for param_key, param_vals in cache_params.items():
+                if param_vals is not None:
+                    if isinstance(param_vals, list):
+                        cur_param = param_vals[params_dict_idx]
                     else:
-                        self._cache_params[param_key] = param_vals
-                except KeyError:
-                    print(f'Parameter {param_key} can not be passed into the solver.')
+                        cur_param = param_vals
+                    try:
+                        if param_vals == 'None':
+                            self._cache_params[0][param_key] = None
+                        else:
+                            self._cache_params[0][param_key] = cur_param
+                    except KeyError:
+                        print(f'Parameter {param_key} can not be passed into the solver.')        
+        else:
+            for params_dict_idx, _ in enumerate(self._cache_params):
+                for param_key, param_vals in cache_params.items():
+                    if param_vals is not None:
+                        if isinstance(param_vals, list):
+                            cur_param = param_vals[params_dict_idx]
+                        else:
+                            cur_param = param_vals                        
+                        try:
+                            if param_vals == 'None':
+                                self._cache_params[params_dict_idx][param_key] = None
+                            else:
+                                self._cache_params[params_dict_idx][param_key] = cur_param
+                        except KeyError:
+                            print(f'Parameter {param_key} can not be passed into the solver.')
                     
     def set_early_stopping_params(self, eps: float = None, loss_window: int = None, no_improvement_patience: int = None,
                                   patience: int = None, abs_loss: float = None, normalized_loss: bool = None,
@@ -676,47 +814,132 @@ class SolverAdapter(object):
                                  'patience' : patience, 'abs_loss' : abs_loss, 'normalized_loss' : normalized_loss, 
                                  'randomize_parameter' : randomize_parameter, 'info_string_every' : info_string_every,
                                  'verbose' : verbose}
-    
-        for param_key, param_vals in early_stopping_params.items():
-            if param_vals is not None:
-                try:
-                    if param_vals == 'None':
-                        self._early_stopping_params[param_key] = None
+        param_sets = self.sets_num(eps, loss_window, no_improvement_patience, patience, abs_loss, normalized_loss, 
+                                   randomize_parameter, info_string_every, verbose)
+        if self._early_stopping_params is None:
+            self._early_stopping_params = [dict() for _ in range(param_sets)]
+        elif len(self._early_stopping_params) == 1:
+            self._early_stopping_params = [deepcopy(self._early_stopping_params[0]) for _ in range(param_sets)]
+        else:
+            pass
+
+
+        if len(self._early_stopping_params) == 1:
+            for param_key, param_vals in early_stopping_params.items():
+                if isinstance(param_vals, list):
+                    cur_param = param_vals[params_dict_idx]
+                else:
+                    cur_param = param_vals
+                if param_vals is not None:
+                    try:
+                        if param_vals == 'None':
+                            self._early_stopping_params[0][param_key] = None
+                        else:
+                            self._early_stopping_params[0][param_key] = cur_param
+                    except KeyError:
+                        print(f'Parameter {param_key} can not be passed into the solver.')
+        else:
+            for params_dict_idx, _ in enumerate(self._early_stopping_params):     
+                for param_key, param_vals in early_stopping_params.items():
+                    if isinstance(param_vals, list):
+                        cur_param = param_vals[params_dict_idx]
                     else:
-                        self._early_stopping_params[param_key] = param_vals
-                except KeyError:
-                    print(f'Parameter {param_key} can not be passed into the solver.')
+                        cur_param = param_vals
+                    if param_vals is not None:
+                        try:
+                            if param_vals == 'None':
+                                self._early_stopping_params[params_dict_idx][param_key] = None
+                            else:
+                                self._early_stopping_params[params_dict_idx][param_key] = cur_param
+                        except KeyError:
+                            print(f'Parameter {param_key} can not be passed into the solver.')
                     
     def set_plotting_params(self, save_every: int = None, print_every: int = None, title: str = None,
                             img_dir: str = None):
         plotting_params = {'save_every' : save_every, 'print_every' : print_every, 
                            'print_every' : print_every, 'img_dir' : img_dir}
-        for param_key, param_vals in plotting_params.items():
-            if param_vals is not None:
-                try:
-                    if param_vals == 'None':
-                        self._ploter_params[param_key] = None
+        param_sets = self.sets_num(save_every, print_every, title, img_dir)
+        if self._ploter_params is None:
+            self._ploter_params = [dict() for _ in range(param_sets)]
+        elif len(self._ploter_params) == 1:
+            self._ploter_params = [deepcopy(self._ploter_params[0]) for _ in range(param_sets)]
+        else:
+            pass
+
+        if len(self._ploter_params) == 1:        
+            for param_key, param_vals in plotting_params.items():
+                if isinstance(param_vals, list):
+                    cur_param = param_vals[params_dict_idx]
+                else:
+                    cur_param = param_vals
+                if param_vals is not None:
+                    try:
+                        if param_vals == 'None':
+                            self._ploter_params[0][param_key] = None
+                        else:
+                            self._ploter_params[0][param_key] = cur_param
+                    except KeyError:
+                        print(f'Parameter {param_key} can not be passed into the solver.')
+        else:
+            for params_dict_idx, _ in enumerate(self._ploter_params):
+                for param_key, param_vals in plotting_params.items():
+                    if isinstance(param_vals, list):
+                        cur_param = param_vals[params_dict_idx]
                     else:
-                        self._ploter_params[param_key] = param_vals
-                except KeyError:
-                    print(f'Parameter {param_key} can not be passed into the solver.')
-    
+                        cur_param = param_vals
+                    if param_vals is not None:
+                        try:
+                            if param_vals == 'None':
+                                self._ploter_params[params_dict_idx][param_key] = None
+                            else:
+                                self._ploter_params[params_dict_idx][param_key] = cur_param
+                        except KeyError:
+                            print(f'Parameter {param_key} can not be passed into the solver.')            
+
     def set_training_params(self, epochs: int = None, info_string_every: int = None, mixed_precision: bool = None,
                             save_model: bool = None, model_name: str = None):
         training_params = {'epochs' : epochs, 'info_string_every' : info_string_every, 
                            'mixed_precision' : mixed_precision, 'save_model' : save_model, 'model_name' : model_name}
+        param_sets = self.sets_num(epochs, info_string_every, mixed_precision, save_model, model_name)
+        if self._training_params is None:
+            self._training_params = [dict() for _ in range(param_sets)]
+        elif len(self._training_params) == 1:
+            self._training_params = [deepcopy(self._training_params[0]) for _ in range(param_sets)]
+        else:
+            pass
 
-        for param_key, param_vals in training_params.items():
-            if param_vals is not None:
-                try:
-                    if param_vals == 'None':
-                        self._training_params[param_key] = None
+        if len(self._training_params) == 1:  
+            for param_key, param_vals in training_params.items():
+                if isinstance(param_vals, list):
+                    cur_param = param_vals[params_dict_idx]
+                else:
+                    cur_param = param_vals
+                if param_vals is not None:
+                    try:
+                        if param_vals == 'None':
+                            self._training_params[0][param_key] = None
+                        else:
+                            self._training_params[0][param_key] = cur_param
+                    except KeyError:
+                        print(f'Parameter {param_key} can not be passed into the solver.')
+        else:
+            for params_dict_idx, _ in enumerate(self._training_params):                
+                for param_key, param_vals in training_params.items():
+                    if isinstance(param_vals, list):
+                        cur_param = param_vals[params_dict_idx]
                     else:
-                        self._training_params[param_key] = param_vals
-                except KeyError:
-                    print(f'Parameter {param_key} can not be passed into the solver.')
+                        cur_param = param_vals                    
+                    if param_vals is not None:
+                        try:
+                            if param_vals == 'None':
+                                self._training_params[params_dict_idx][param_key] = None
+                            else:
+                                self._training_params[params_dict_idx][param_key] = cur_param
+                        except KeyError:
+                            print(f'Parameter {param_key} can not be passed into the solver.')
                     
-    def change_parameter(self, parameter: str, value, param_dict_key: str = None):
+    def change_parameter(self, parameter: str, value, param_dict_key: str = None, opt_idx: int = 0):
+        # TODO: add change of a single parameter
         setters = {'compiling_params'      : (BASE_COMPILING_PARAMS, self.set_compiling_params), 
                    'optimizer_params'      : (BASE_OPTIMIZER_PARAMS, self.set_optimizer_params),
                    'cache_params'          : (BASE_CACHE_PARAMS, self.set_cache_params),
@@ -759,7 +982,7 @@ class SolverAdapter(object):
         solver_device(device = self._device)
 
         if isinstance(system, SoEq):
-            system_interface = SystemSolverInterface(system_to_adapt=system)
+            system_interface = SystemSolverInterface(system_to_adapt=system, device=self._device)
             system_solver_forms = system_interface.form(grids = grids, mode = mode)
         elif isinstance(system, dict):
             system_interface = system
@@ -792,7 +1015,10 @@ class SolverAdapter(object):
     def solve(self, equations, domain:Domain, boundary_conditions = None, mode = 'NN', 
               use_cache: bool = False, use_fourier: bool = False, fourier_params: dict = None, #  epochs = 1e3, 
               use_adaptive_lambdas: bool = False, to_numpy = False):
-    
+        self.optimizator_consistency_check()
+        def match_indices(index: int, ref_dict: dict) -> int:
+            return index if len(ref_dict) > 1 else 0
+
         if isinstance(equations, SolverEquation):
             equations_prepared = equations
         else:
@@ -803,28 +1029,32 @@ class SolverAdapter(object):
             self.net = self.get_net(equations_prepared, mode, domain, use_fourier,
                                     fourier_params, device=self._device)
         
-        
-        cb_early_stops = early_stopping.EarlyStopping(**self._early_stopping_params)
-        callbacks = [cb_early_stops,]
-        if use_cache:
-            callbacks.append(cache.Cache(**self._cache_params))
+        for optimizer_idx, optim_params in enumerate(self._optimizer_params):
+            cb_early_stops = early_stopping.EarlyStopping(**self._early_stopping_params[match_indices(optimizer_idx,
+                                                                                                      self._early_stopping_params)])
+            callbacks = [cb_early_stops,]
+            if use_cache:
+                callbacks.append(cache.Cache(**self._cache_params[match_indices(optimizer_idx,
+                                                                  self._cache_params)]))
 
-        if use_adaptive_lambdas:
-            callbacks.append(adaptive_lambda.AdaptiveLambda())
-        
-        optimizer = Optimizer(**self._optimizer_params)
+            if use_adaptive_lambdas:
+                callbacks.append(adaptive_lambda.AdaptiveLambda())
+            optimizer = Optimizer(**optim_params)
 
-        self.net.to(device = self._device) # self.net  =        
-        # print(f'self.net is on Cuda: {next(self.net.parameters()).is_cuda}')
-        # print(self._para)
-        model = Model(net = self.net, domain = domain, equation = equations_prepared, 
-                      conditions = boundary_conditions)
-        
-        model.compile(**self._compiling_params)
-        loss = model.train(optimizer, callbacks=callbacks, **self._training_params)
-        
+            self.net.to(device = self._device)
+            
+            model = Model(net = self.net, domain = domain, equation = equations_prepared, 
+                        conditions = boundary_conditions)
+            
+            model.compile(**self._compiling_params[match_indices(optimizer_idx,
+                                                                 self._compiling_params)])
+            loss = model.train(optimizer, callbacks=callbacks, **self._training_params[match_indices(optimizer_idx,
+                                                                                                     self._training_params)])
+            # print(f'Loss after training with {optim_params} is {loss}')
+            self.net = model.net
+            
         grid = domain.build(mode = self.mode)
- 
+
         grid = check_device(grid)
         
         if mode in ['NN', 'autograd'] and to_numpy:

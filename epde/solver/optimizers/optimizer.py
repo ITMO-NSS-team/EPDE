@@ -3,6 +3,7 @@ from abc import ABC
 from typing import Union, Any
 from epde.solver.optimizers.pso import PSO
 from epde.solver.optimizers.ngd import NGD
+from epde.solver.optimizers.nys_newton_cg import NysNewtonCG
 from torch.optim.lr_scheduler import ExponentialLR
 
 
@@ -45,6 +46,9 @@ class Optimizer():
             torch_optim = PSO
         elif self.optimizer == 'NGD':
             torch_optim = NGD
+        elif self.optimizer == 'NNCG':
+            torch_optim = NysNewtonCG
+
 
         if mode in ('NN', 'autograd'):
             optimizer = torch_optim(model.parameters(), **self.params)

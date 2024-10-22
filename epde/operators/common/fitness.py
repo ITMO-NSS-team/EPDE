@@ -105,7 +105,7 @@ class SolverBasedFitness(CompoundOperator):
     def set_adapter(self, net = None):
 
         if self.adapter is None or net is not None:
-            compiling_params = {'mode': 'autograd', 'tol':0.01, 'lambda_bound': 1e2} #  'h': 1e-1
+            compiling_params = {'mode': 'autograd', 'tol':0.01, 'lambda_bound': 100} #  'h': 1e-1
             optimizer_params = {}
             training_params = {'epochs': 4e3, 'info_string_every' : 1e3}
             early_stopping_params = {'patience': 4, 'no_improvement_patience' : 250}

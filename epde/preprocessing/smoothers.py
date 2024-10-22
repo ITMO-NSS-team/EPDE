@@ -35,13 +35,13 @@ class PlaceholderSmoother(AbstractSmoother):
 def baseline_ann(dim):
     model = torch.nn.Sequential(
         torch.nn.Linear(dim, 256),
-        torch.nn.Tanh(),
+        torch.nn.ReLU(),
         torch.nn.Linear(256, 64),
-        torch.nn.Tanh(),
-        torch.nn.Linear(64, 64),
-        torch.nn.Tanh(),
+        torch.nn.ReLU(),
+        # torch.nn.Linear(64, 64),
+        # torch.nn.Tanh(),
         torch.nn.Linear(64, 1024),
-        torch.nn.Tanh(),
+        torch.nn.ReLU(),
         torch.nn.Linear(1024, 1)
     )
     return model

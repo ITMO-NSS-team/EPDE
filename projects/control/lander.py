@@ -353,8 +353,16 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     # 'optimizer' 
     # solver_params = {'full':     {'training_params': {'epochs': 5000,}, 'optimizer_params': {'params': {'lr': 1e-5}}}, 
     #                  'abridged': {'training_params': {'epochs': 200,}, 'optimizer_params': {'params': {'lr': 1e-5}}}}
-    solver_params = {'full':     {'training_params': {'epochs': 2000,}, 'optimizer_params': {'optimizer': 'NGD'}}, 
-                     'abridged': {'training_params': {'epochs': 300,}, 'optimizer_params': {'optimizer': 'NGD'}}}    
+    solver_params = {'full':     {'training_params': {'epochs': 2000,}, 
+                                  'optimizer_params': {'optimizer': 'NNCG',
+                                                       'params': {'lr': 1e-5, 
+                                                                  'mu' : 1e-4,
+                                                                  'cg_max_iters' : 10000}}}, 
+                     'abridged': {'training_params': {'epochs': 500,}, 
+                                  'optimizer_params': {'optimizer': 'NNCG',
+                                                       'params': {'lr': 1e-5,
+                                                                  'mu' : 1e-4,
+                                                                  'cg_max_iters' : 10000}}}}    
     
     state_nn, ctrl_net, ctrl_pred, hist = optimizer.feedback(bc_operators = [(bop_y(), 0.1),
                                                                                (bop_dy(), 0.1),
@@ -378,8 +386,8 @@ if __name__ == '__main__':
 
     experiment = 'lander'
     explicit_cpu = False
-    use_solver = False
-    load_models = True
+    use_solver = True
+    load_models = False
 
     device = 'cuda' if (torch.cuda.is_available and not explicit_cpu) else 'cpu'
     print(f'Working on {device}')

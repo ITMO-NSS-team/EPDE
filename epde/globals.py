@@ -167,6 +167,7 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: b
         t = 0
         min_loss = np.inf
         loss_mean = np.inf
+        print(f'Training NN to represent data for {epochs_max} epochs')
         while loss_mean > 1e-6 and t < epochs_max:
 
             permutation = torch.randperm(grids_tr.size()[0])

@@ -241,27 +241,77 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
     # optimizer.set_control_optim_params()
 
-    solver_params = {'full':     {'training_params': {'epochs': 10000,},
-                                #   'optimizer_params': {'params': {'lr': 1e-5}},
-                                  'optimizer_params': {'optimizer': 'NGD'},
+    solver_params_default =   {'full':     {'training_params': {'epochs': [20000, 3000],},
+                                            'optimizer_params': {'optimizer': ['Adam', 'LBFGS'],
+                                                                'params': [{'lr': 5*1e-5}, 
+                                                                            {'history_size': 200, "line_search_fn": 'strong_wolfe', 
+                                                                            'lr': 1e-1}]},
+                                            'use_fourier' : use_fourier,
+                                            'fourier_params': fourier_params},
+                                'abridged': {'compiling_params': {},
+                                            'training_params' : {'epochs': [1000, 3000],},
+                                            'optimizer_params': {'optimizer': ['Adam', 'LBFGS'],
+                                                                'params': [{'lr': 5*1e-5}, 
+                                                                            {'history_size': 200, "line_search_fn": 'strong_wolfe', 
+                                                                            'lr': 1e-1}]},
+                                            'use_fourier' : use_fourier,
+                                            'fourier_params': fourier_params}}
+            
+
+    solver_params_nncg =   {'full':     {'training_params': {'epochs': [20000, 3000, 10],},
+                                        'optimizer_params': {'optimizer': ['Adam', 'LBFGS', 'NNCG'],
+                                                            'params': [{'lr': 2*1e-5}, 
+                                                                        {'history_size': 200, "line_search_fn": 'strong_wolfe', 
+                                                                        'lr': 2e0},
+                                                                        {'mu': 1e-2, "rank": 60, 'line_search_fn': "armijo",
+                                                                        'verbose': False}]},
+                                        'use_fourier' : use_fourier,
+                                        'fourier_params': fourier_params},
+                            'abridged': {'compiling_params': {},
+                                        'training_params' : {'epochs': [1000, 100, 10],},
+                                        'optimizer_params': {'optimizer': ['Adam', 'LBFGS', 'NNCG'],
+                                                            'params': [{'lr': 2*1e-5}, 
+                                                                        {'history_size': 200, "line_search_fn": 'strong_wolfe', 
+                                                                        'lr': 2e0},
+                                                                        {'mu': 1e-2, "rank": 60, 'line_search_fn': "armijo",
+                                                                        'verbose': False}]},
+                                        'use_fourier' : use_fourier,
+                                        'fourier_params': fourier_params}}
+            
+    solver_params_pso = {'full':  {'training_params': {'epochs': [5000, 100],},
+                                  'optimizer_params': {'optimizer': ['PSO', 'LBFGS'],
+                                                       'params': [{'pop_size'   : 50,},
+                                                                #   {'lr': 2*1e-5}, 
+                                                                  {'history_size': 200, "line_search_fn": 'strong_wolfe', 
+                                                                   'lr': 1e-2},
+                                                                #   {'mu': 1e-2, "rank": 60, 'line_search_fn': "armijo",
+                                                                #    'verbose': False}
+                                                                   ]},
                                   'use_fourier' : use_fourier,
                                   'fourier_params': fourier_params},
-                     'abridged': {'training_params': {'epochs': 400,}, 
-                                #   'optimizer_params': {'params': {'lr': 1e-5}},
-                                  'optimizer_params': {'optimizer': 'NGD'},
-                                  'use_fourier' : use_fourier,
-                                  'fourier_params': fourier_params}}
+                         'abridged': {'compiling_params': {},
+                                      'training_params' : {'epochs': [100, 60],},
+                                      'optimizer_params': {'optimizer': ['PSO', 'LBFGS'],
+                                                          'params': [{'pop_size'   : 40,},
+                                                                    #  {'lr': 2*1e-5}, 
+                                                                     {'history_size': 100, "line_search_fn": 'strong_wolfe', 
+                                                                     'lr': 1e-2},
+                                                                    #  {'mu': 1e-2, "rank": 60, 'line_search_fn': "armijo",
+                                                                    #  'verbose': False}
+                                                                     ]},
+                                      'use_fourier' : use_fourier,
+                                      'fourier_params': fourier_params}}
     
-    state_nn, ctrl_net, ctrl_pred, hist = optimizer.feedback(bc_operators = [(bop_y(), 0.0001),
-                                                                             (bop_dy(), 0.0001),
-                                                                             (bop_phi(), 0.0001),
-                                                                             (bop_dphi(), 0.0001)],
+    state_nn, ctrl_net, ctrl_pred, hist = optimizer.feedback(bc_operators = [(bop_y(), 0.0),
+                                                                             (bop_dy(), 0.0),
+                                                                             (bop_phi(), 0.0),
+                                                                             (bop_dphi(), 0.0)],
                                                              grids = [t,], n_control = 1., 
                                                              state_net = state_nn_pretrained, 
                                                              opt_params = [0.005, 0.9, 0.999, 1e-8],
                                                              control_net = ctrl_nn_pretrained, epochs = 55,
                                                              fig_folder = fig_folder, eps = 5e-1,
-                                                             solver_params = solver_params)
+                                                             solver_params = solver_params_pso)
 
     return state_nn, ctrl_net, ctrl_pred, hist
 
