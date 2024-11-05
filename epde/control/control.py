@@ -15,7 +15,7 @@ from copy import deepcopy
 import epde.globals as global_var
 from epde.interface.interface import ExperimentCombiner
 from epde.optimizers.moeadd.moeadd import ParetoLevels
-from epde.interface.solver_integration import SolverAdapter, BOPElement 
+from epde.integrate import SolverAdapter, OdeintAdapter, BOPElement 
 
 from epde.control.constr import ConditionalLoss
 from epde.control.utils import prepare_control_inputs, eps_increment_diff
@@ -40,10 +40,12 @@ class ControlExp():
         bop.values = torch.from_numpy(np.array([[value,]])).float().to(device)
         return bop
 
-    def set_solver_params(self, mode: str = 'autograd', compiling_params: dict = {}, optimizer_params: dict = {},
-                          cache_params: dict = {}, early_stopping_params: dict = {}, plotting_params: dict = {},
-                          training_params: dict = {'epochs': 150,}, use_cache: bool = False, use_fourier: bool = False, #  5*1e0
-                          fourier_params: dict = None, use_adaptive_lambdas: bool = False, device: str = 'cpu'):
+    def set_solver_params(self, use_pinn: bool = True, mode: str = 'autograd', compiling_params: dict = {}, 
+                          optimizer_params: dict = {}, cache_params: dict = {}, early_stopping_params: dict = {}, 
+                          plotting_params: dict = {}, training_params: dict = {'epochs': 150,}, 
+                          use_cache: bool = False, use_fourier: bool = False, #  5*1e0
+                          fourier_params: dict = None, use_adaptive_lambdas: bool = False): #  device: str = 'cpu'
+        self._use_pinn = use_pinn
         self._solver_params = {'mode': mode,
                                'compiling_params': compiling_params,
                                'optimizer_params': optimizer_params,
@@ -58,6 +60,26 @@ class ControlExp():
                                'device': torch.device(self._device)
                                }
 
+    def get_solver_adapter(self, net: torch.nn.Sequential = None):
+        if self._use_pinn:
+            adapter = SolverAdapter(net = net, use_cache = False, device = self._device)
+            # Edit solver forms of functions of dependent variable to Callable objects.
+            # Setting various adapater parameters
+            adapter.set_compiling_params(**self._solver_params['compiling_params'])
+            adapter.set_optimizer_params(**self._solver_params['optimizer_params'])
+            adapter.set_cache_params(**self._solver_params['cache_params'])
+            adapter.set_early_stopping_params(**self._solver_params['early_stopping_params'])
+            adapter.set_plotting_params(**self._solver_params['plotting_params'])
+            adapter.set_training_params(**self._solver_params['training_params'])
+            adapter.change_parameter('mode', self._solver_params['mode'], param_dict_key = 'compiling_params')
+        else:
+            try:
+                self._solver_params['method']
+            except KeyError:
+                self._solver_params['method'] = 'Radau'
+            adapter = OdeintAdapter(method = self._solver_params['method'])
+        return adapter
+
     @staticmethod
     def finite_diff_calculation(system, adapter, loc, control_loss, state_net: torch.nn.Sequential,
                                 bc_operators, grids: list, solver_params: dict, eps: float):
@@ -66,13 +88,13 @@ class ControlExp():
 
         '''
         # Calculating loss in p[i]+eps:
-        ctrl_dict_prev = global_var.control_nn.net.state_dict()
-        # print(f'param before: {ctrl_dict_prev[loc[0]][tuple(loc[1:])]}')        
+        ctrl_dict_prev = global_var.control_nn.net.state_dict()       
         ctrl_nn_dict = eps_increment_diff(input_params=ctrl_dict_prev,
                                           loc = loc, forward=True, eps=eps)
         global_var.control_nn.net.load_state_dict(ctrl_nn_dict)
 
-        adapter.set_net(deepcopy(state_net))
+        if isinstance(adapter, SolverAdapter):
+            adapter.set_net(deepcopy(state_net))
         solver_loss_forward, model = adapter.solve_epde_system(system = system, grids = grids[0], data = None,
                                              boundary_conditions = bc_operators,
                                              mode = solver_params['mode'],
@@ -90,7 +112,8 @@ class ControlExp():
                                           loc = loc, forward=False, eps=eps)
         global_var.control_nn.net.load_state_dict(ctrl_nn_dict)
 
-        adapter.set_net(deepcopy(state_net))
+        if isinstance(adapter, SolverAdapter):
+            adapter.set_net(deepcopy(state_net))
         solver_loss_backward, model = adapter.solve_epde_system(system = system, grids = grids[0], data = None,
                                                        boundary_conditions = bc_operators,
                                                        mode = solver_params['mode'],
@@ -164,7 +187,8 @@ class ControlExp():
 
         self.set_solver_params(**solver_params['full'])
         adapter = self.get_solver_adapter(None)
-        adapter.set_net(deepcopy(self._state_net))
+        if isinstance(adapter, SolverAdapter): 
+            adapter.set_net(deepcopy(self._state_net))
 
         sampled_bc = [modify_bc(operator, noise_std) for operator, noise_std in bc_operators]
         loss_pinn, model = adapter.solve_epde_system(system = self.system, grids = grids, data = None,
@@ -186,7 +210,8 @@ class ControlExp():
 
             # self.set_solver_params(**solver_params['full'])
             adapter = self.get_solver_adapter(None)
-            adapter.set_net(self._state_net)
+            if isinstance(adapter, SolverAdapter):            
+                adapter.set_net(self._state_net)
             loss_pinn, model = adapter.solve_epde_system(system = self.system, grids = grids, data = None,
                                                          boundary_conditions = sampled_bc,
                                                          mode = self._solver_params['mode'],
@@ -249,7 +274,8 @@ class ControlExp():
 
             self.set_solver_params(**solver_params['full'])
             adapter = self.get_solver_adapter(None)
-            adapter.set_net(self._state_net)
+            if isinstance(adapter, SolverAdapter):
+                adapter.set_net(self._state_net)
             loss_pinn, model = adapter.solve_epde_system(system = self.system, grids = grids, data = None,
                                                          boundary_conditions = sampled_bc,
                                                          mode = self._solver_params['mode'],
@@ -304,17 +330,3 @@ class ControlExp():
         solver_form = self.system
 
         raise NotImplementedError()
-
-    def get_solver_adapter(self, net: torch.nn.Sequential):
-        adapter = SolverAdapter(net = net, use_cache = False, device = self._device)
-        # Edit solver forms of functions of dependent variable to Callable objects.
-        # Setting various adapater parameters
-        adapter.set_compiling_params(**self._solver_params['compiling_params'])
-        adapter.set_optimizer_params(**self._solver_params['optimizer_params'])
-        adapter.set_cache_params(**self._solver_params['cache_params'])
-        adapter.set_early_stopping_params(**self._solver_params['early_stopping_params'])
-        adapter.set_plotting_params(**self._solver_params['plotting_params'])
-        adapter.set_training_params(**self._solver_params['training_params'])
-        adapter.change_parameter('mode', self._solver_params['mode'], param_dict_key = 'compiling_params')
-        
-        return adapter

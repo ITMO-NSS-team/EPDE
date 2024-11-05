@@ -206,9 +206,10 @@ class PregenBOperator(object):
         return get_max_deriv_orders(self.equation_sf, self.variables)
 
     def generate_default_bc(self, vals: Union[np.ndarray, dict] = None, grids: List[np.ndarray] = None,
-                            allow_high_ords: bool = False):
+                            allow_high_ords: bool = False, required_bc_ord: List[int] = None):
         # Implement allow_high_ords - selection of derivatives from
-        required_bc_ord = self.max_deriv_orders
+        if required_bc_ord is None:
+            required_bc_ord = self.max_deriv_orders
         assert set(self.variables) == set(required_bc_ord.keys()), 'Some conditions miss required orders.'
 
         grid_cache = global_var.initial_data_cache
@@ -260,6 +261,7 @@ class PregenBOperator(object):
                     operator.set_grid(grid=coords)
                     operator.values = bc_values
                     bconds.append(operator)
+        print('Types of conds:', [type(cond) for cond in bconds])
         self.conditions = bconds
 
 

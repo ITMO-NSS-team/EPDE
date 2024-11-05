@@ -51,7 +51,7 @@ from epde.structure.main_structures import Equation, SoEq
 from epde.interface.token_family import TFPool, TokenFamily
 from epde.interface.type_checks import *
 from epde.interface.prepared_tokens import PreparedTokens, CustomTokens, DataPolynomials
-from epde.interface.solver_integration import BoundaryConditions, SolverAdapter, SystemSolverInterface
+from epde.integrate import BoundaryConditions, SolverAdapter, SystemSolverInterface
 
 class InputDataEntry(object):
     """

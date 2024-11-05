@@ -85,6 +85,10 @@ class SystemSolverInterface(object):
                 raise Exception('Something went wrong with parsing an equation for solver')
             else:
                 deriv_vars = [0,]
+
+        if torch.all(torch.isclose(coeff_tensor[0], coeff_tensor)):
+            coeff_tensor = coeff_tensor[0].item()
+
         res = {'coeff': coeff_tensor,
                'term': deriv_orders,
                'pow': deriv_powers,
@@ -125,22 +129,23 @@ class SystemSolverInterface(object):
                 if not np.isclose(weight, 0, rtol = self.coeff_tol):
                     _solver_form[term.name] = self._term_solver_form(term, grids, default_domain, variables)
                     _solver_form[term.name]['coeff'] = _solver_form[term.name]['coeff'] * weight
-                    _solver_form[term.name]['coeff'] = adjust_shape(_solver_form[term.name]['coeff'], mode = mode)
+                    if isinstance(_solver_form[term.name]['coeff'], torch.Tensor):
+                        _solver_form[term.name]['coeff'] = adjust_shape(_solver_form[term.name]['coeff'], mode = mode)
 
-        free_coeff_weight = torch.full_like(input=grids[0], fill_value=equation.weights_final[-1]).to(self._device)
+        free_coeff_weight = equation.weights_final[-1] #torch.full_like(input=grids[0], fill_value=equation.weights_final[-1]).to(self._device)
 
-        free_coeff_weight = adjust_shape(free_coeff_weight, mode = mode)
+        # free_coeff_weight = adjust_shape(free_coeff_weight, mode = mode)
         free_coeff_term = {'coeff': free_coeff_weight,
                            'term': [None],
                            'pow': 0,
                            'var': [0,]}
         _solver_form['C'] = free_coeff_term
 
-        target_weight = torch.full_like(input = grids[0], fill_value = -1.).to(self._device)
+        target_weight = -1 # torch.full_like(input = grids[0], fill_value = -1.).to(self._device)
 
         target_form = self._term_solver_form(equation.structure[equation.target_idx], grids, default_domain, variables)
         target_form['coeff'] = target_form['coeff'] * target_weight
-        target_form['coeff'] = adjust_shape(target_form['coeff'], mode = mode)
+        # target_form['coeff'] = adjust_shape(target_form['coeff'], mode = mode)
         # print(f'target_form shape is {target_form["coeff"].shape}')
 
         _solver_form[equation.structure[equation.target_idx].name] = target_form

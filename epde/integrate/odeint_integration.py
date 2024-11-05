@@ -1,6 +1,7 @@
 from typing import Union, List, Dict, Tuple, Callable
 import copy
 from functools import reduce
+from warnings import warn
 
 import torch
 import numpy as np
@@ -16,6 +17,7 @@ def get_terms_der_order(equation: Dict, variable_idx: int) -> np.ndarray:
     Get the highest orders of the ``variable_idx``-th variable derivative in the equation terms.
     '''
     term_max_ord = np.zeros(len(equation))
+    print(equation)
     for term_idx, term_dict in enumerate(equation.values()):
         # print(term_dict['term'])
         if isinstance(term_dict['var'], list) and len(term_dict['var']) > 1:
@@ -91,37 +93,52 @@ class ImplicitEquation(object):
     def __init__(self, system: List, grid: np.ndarray, variables: List[str]):
         self.grid_dict = grid
 
+        # print(f'Solved system is {system}')
+
         self._dynamics_operators = []
-        var_order = []
+        self._var_order = []
         self._vars_with_eqs = {}
 
         for var, order in [get_eq_order(equation, variables) for equation in system]:
-            var_order.extend([(var, [None,])] + [(var, [0,]*(idx+1)) for idx in range(int(np.max(order))-1)])
+            self._var_order.extend([(var, [None,])] + [(var, [0,]*(idx+1)) for idx in range(int(np.max(order))-1)])
             if len(self._vars_with_eqs) == 0:
                 self._vars_with_eqs[int(np.max(order)) - 1] = (var, order)
             else:
                 self._vars_with_eqs[list(self._vars_with_eqs.keys())[-1] + int(np.max(order))] = (var, order)
 
-        for var_idx, var in enumerate(var_order):
+        for var_idx, var in enumerate(self._var_order):
             if var_idx in self._vars_with_eqs.keys():
                 operator = get_higher_order_coeff(equation = system[self._vars_with_eqs[var_idx][0]],
                                                   orders = self._vars_with_eqs[var_idx][1], 
-                                                  var = self.__vars_with_eqs[var_idx][0])
-                operator[0] = [replace_operator(denom_term, var_order) for denom_term in operator[0]]
-                operator[1] = [replace_operator(numer_term, var_order) for numer_term in operator[1]]
+                                                  var = self._vars_with_eqs[var_idx][0])
+                operator[0] = [replace_operator(denom_term, self._var_order) for denom_term in operator[0]]
+                operator[1] = [replace_operator(numer_term, self._var_order) for numer_term in operator[1]]
             else:
                 operator = [None, self.create_first_ord_eq(var_idx + 1)]
             self._dynamics_operators.append(operator)
 
-    def parse_cond(self, conditions: List[BOPElement]):
+    def parse_cond(self, conditions: List[Union[BOPElement, dict]]):
         cond_val = np.full(shape = len(self._dynamics_operators), fill_value=np.inf)
         for cond in conditions:
-            assert isinstance(cond.variables, int), 'Boundary operator has to contain only a single variable.'
-            try:
-                var = self._vars_with_eqs.index((cond.variables, cond.axis))
-            except ValueError:
-                print(f'Missing {cond.variables, cond.axis} from the list of variables {self._vars_with_eqs}')
-            cond_val[var] = cond.values
+            if isinstance(cond, BOPElement):
+                assert isinstance(cond.variables, int), 'Boundary operator has to contain only a single variable.'
+                try:
+                    var = self._var_order.index((cond.variables, cond.axis))
+                except ValueError:
+                    print(f'Missing {cond.variables, cond.axis} from the list of variables {self._var_order}')
+                    raise RuntimeError()
+                cond_val[var] = cond.values
+            else:
+                op_form = list(cond['bnd_op'].values())[0]
+                term_key = [op_key for op_key in list(op_form.keys()) if op_key not in ['coeff', 'pow', 'var']][0]
+                try:
+                    # print(f'term key {term_key}')
+                    var = self._var_order.index((op_form['var'], op_form[term_key]))
+                except ValueError:
+                    print(f'Missing {(op_form["var"], op_form[term_key])} from the list of variables {self._var_order}')
+                    raise RuntimeError()
+                cond_val[var] = cond['bnd_val']
+
         assert np.sum(np.inf == cond_val) == 0, 'Not enough initial conditions were passed.'
         return cond_val
 
@@ -135,7 +152,7 @@ class ImplicitEquation(object):
                 if np.isclose(denom, 0):
                     raise ZeroDivisionError('Denominator in the dynamics operator is close to zero.')
             numerator = [self.term_callable(term, t, y) for term in operator[1]]
-            values[idx] = np.sum(numerator)/np.sum(denom)
+            values[idx] = -1*np.sum(numerator)/np.sum(denom)
         return values
 
     @property
@@ -153,7 +170,7 @@ class ImplicitEquation(object):
         '''
         Example of order: np.array([3., 0., 0.]) for third ord eq. 
         '''
-        return [{'coeff' : 1., 
+        return [{'coeff' : -1., 
                  'term'  : [None,],
                  'pow'   : 1,
                  'var'   : var},] # TODO: validate
@@ -164,7 +181,7 @@ class ImplicitEquation(object):
         except KeyError:
             for grid_loc, grid_idx in self.grid_dict.items():
                 if grid_loc < t and grid_loc + self._grid_step > t:
-                    print('Search in ', grid_loc, grid_loc + self._grid_step)
+                    # print('Search in ', grid_loc, grid_loc + self._grid_step)
                     left_loc, right_loc = grid_loc, grid_loc + self._grid_step
                     left_idx, right_idx = grid_idx[0], grid_idx[0] + 1
                     break
@@ -211,9 +228,7 @@ class OdeintAdapter(object):
         pass # TODO: implement hyperparameters setup, according to the problem specifics
 
     def solve_epde_system(self, system: Union[SoEq, dict], grids: list=None, boundary_conditions=None,
-                          mode='NN', data=None, use_cache: bool = False, use_fourier: bool = False,
-                          fourier_params: dict = None, use_adaptive_lambdas: bool = False,
-                          to_numpy: bool = False, *args, **kwargs):
+                          mode='NN', data=None, *args, **kwargs):
         if isinstance(system, SoEq):
             system_interface = SystemSolverInterface(system_to_adapt=system)
             system_solver_forms = system_interface.form(grids = grids, mode = mode)
@@ -226,29 +241,32 @@ class OdeintAdapter(object):
                                                                      in system_solver_forms])
             op_gen.generate_default_bc(vals = data, grids = grids)
             boundary_conditions = op_gen.conditions
-            
-        bconds_combined = Conditions()
-        for cond in boundary_conditions:
-            bconds_combined.operator(bnd = cond['bnd_loc'], operator = cond['bnd_op'], 
-                                     value = cond['bnd_val'])        
+        print(f'BCONDS are {boundary_conditions}')
+        # bconds_combined = Conditions()
+        # for cond in boundary_conditions:
+        #     bconds_combined.operator(bnd = cond['bnd_loc'], operator = cond['bnd_op'], 
+        #                              value = cond['bnd_val'])        
 
-        return self.solve(equations = system_solver_forms, domain = grids[0], 
-                          boundary_conditions = bconds_combined, vars = system.vars_to_describe)
+        return self.solve(equations = [sf_labeled[1] for sf_labeled in system_solver_forms], domain = grids[0], 
+                          boundary_conditions = boundary_conditions, vars = system.vars_to_describe) # bconds_combined
 
         # Add condition parser and control function args parser
 
 
 
-    def solve(self, equations: SoEq, domain: Union[Domain, np.ndarray], boundary_conditions: List[BOPElement] = None,
-              mode = 'NN', use_cache: bool = False, use_fourier: bool = False, fourier_params: dict = None, 
-              use_adaptive_lambdas: bool = False, to_numpy = False, vars: List['str'] = ['x',], *args, **kwargs):
-        if not isinstance(equations, SoEq):
+    def solve(self, equations, domain: Union[Domain, np.ndarray],
+              boundary_conditions: List[BOPElement] = None, vars: List[str] = ['x',], *args, **kwargs):
+        if not isinstance(equations, list):
             raise RuntimeError('Incorrect type of equations passed into odeint solver.')
-        self._implicit_equation = ImplicitEquation(equations, domain, equations.vars)
-        grid = domain.build().detach().numpy().reshape(-1)
-        print(f'grid[0] {grid[0]}, grid[-1] {grid[-1]}')
+        self._implicit_equation = ImplicitEquation(equations, domain, vars)
+        if isinstance(domain, Domain): 
+            grid = domain.build().detach().numpy().reshape(-1)
+        else:
+            grid = domain.detach().numpy().reshape(-1)
 
         initial_cond = self._implicit_equation.parse_cond(boundary_conditions)
         solution = solve_ivp(fun = self._implicit_equation, t_span = (grid[0], grid[-1]), y0=initial_cond,
                              t_eval = grid, method = self._solve_method)
+        if not solution.success:
+            warn(f'Numerical solution of ODEs has did not converge. The error message is {solution.message}')
         return 0, solution

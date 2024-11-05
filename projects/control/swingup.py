@@ -219,8 +219,8 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     optimizer = ControlExp(loss=loss, device=device)
     
     def get_ode_bop(key, var, term, grid_loc, value):
-        bop = epde.interface.solver_integration.BOPElement(axis = 0, key = key, term = term,
-                                                           power = 1, var = var, device = device)
+        bop = epde.integrate.BOPElement(axis = 0, key = key, term = term,
+                                        power = 1, var = var, device = device)
         if isinstance(grid_loc, float):
             bop_grd_np = np.array([[grid_loc,]])
             bop.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor)).to(device)
@@ -278,7 +278,7 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
                                         'use_fourier' : use_fourier,
                                         'fourier_params': fourier_params}}
             
-    solver_params_pso = {'full':  {'training_params': {'epochs': [5000, 100],},
+    solver_params_pso = {'full':  {'training_params': {'epochs': [500, 50],},
                                   'optimizer_params': {'optimizer': ['PSO', 'LBFGS'],
                                                        'params': [{'pop_size'   : 50,},
                                                                 #   {'lr': 2*1e-5}, 
@@ -290,7 +290,7 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
                                   'use_fourier' : use_fourier,
                                   'fourier_params': fourier_params},
                          'abridged': {'compiling_params': {},
-                                      'training_params' : {'epochs': [100, 60],},
+                                      'training_params' : {'epochs': [100, 40],},
                                       'optimizer_params': {'optimizer': ['PSO', 'LBFGS'],
                                                           'params': [{'pop_size'   : 40,},
                                                                     #  {'lr': 2*1e-5}, 
@@ -302,6 +302,9 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
                                       'use_fourier' : use_fourier,
                                       'fourier_params': fourier_params}}
     
+    solver_params_odeint = {'full':  {'use_pinn': False},
+                         'abridged': {'use_pinn': False}}    
+    
     state_nn, ctrl_net, ctrl_pred, hist = optimizer.feedback(bc_operators = [(bop_y(), 0.0),
                                                                              (bop_dy(), 0.0),
                                                                              (bop_phi(), 0.0),
@@ -311,7 +314,7 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
                                                              opt_params = [0.005, 0.9, 0.999, 1e-8],
                                                              control_net = ctrl_nn_pretrained, epochs = 55,
                                                              fig_folder = fig_folder, eps = 5e-1,
-                                                             solver_params = solver_params_pso)
+                                                             solver_params = solver_params_odeint)
 
     return state_nn, ctrl_net, ctrl_pred, hist
 
@@ -561,7 +564,7 @@ if __name__ == '__main__':
     import pickle
 
     experiment = 'swingup'
-    explicit_cpu = False
+    explicit_cpu = True
     device = 'cuda' if (torch.cuda.is_available and not explicit_cpu) else 'cpu'
     print(f'Working on {device}')
 

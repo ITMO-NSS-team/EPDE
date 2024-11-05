@@ -13,7 +13,7 @@ import torch
 import matplotlib.pyplot as plt
 from matplotlib import cm
 
-from epde.interface.solver_integration import SolverAdapter
+from epde.integrate import SolverAdapter
 from epde.structure.main_structures import SoEq, Equation
 from epde.operators.utils.template import CompoundOperator
 import epde.globals as global_var
