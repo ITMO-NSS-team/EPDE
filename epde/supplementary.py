@@ -51,7 +51,23 @@ class AutogradDeriv(BasicDeriv):
             comp_sum = output_vals[:, axis].sum()
         output_vals = output_vals[:, axes[-1]].reshape(-1, 1)
         return output_vals
-    
+
+class FDDeriv(BasicDeriv):
+    def __init__(self):
+        pass
+
+    def take_derivative(self, u: np.ndarray, args: np.ndarray, 
+                        axes: list = [], component: int = 0):
+        
+        if not isinstance(args, torch.Tensor):
+            args = args.detach().cpu().numpy()
+
+        output_vals = u[..., component].reshape(args.shape)
+        if axes == [None,]:
+            return output_vals
+        for axis in axes:
+            output_vals = np.gradient(output_vals, args.reshape(-1)[1] - args.reshape(-1)[0], axis = axis, edge_order=2)  
+        return output_vals
 
 def create_solution_net(equations_num: int, domain_dim: int, use_fourier = True, #  mode: str, domain: Domain 
                         fourier_params: dict = None, device = 'cpu'):

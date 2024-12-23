@@ -21,6 +21,8 @@ from epde.control.constr import ConditionalLoss
 from epde.control.utils import prepare_control_inputs, eps_increment_diff
 from epde.control.optim import AdamOptimizer, CoordDescentOptimizer
 
+from epde.supplementary import FDDeriv, AutogradDeriv
+
 class ControlExp():
     def __init__(self, loss : ConditionalLoss, device: str = 'cpu'):
         self._device = device
@@ -95,6 +97,10 @@ class ControlExp():
 
         if isinstance(adapter, SolverAdapter):
             adapter.set_net(deepcopy(state_net))
+            diff_method = AutogradDeriv
+        else:
+            diff_method = FDDeriv
+
         solver_loss_forward, model = adapter.solve_epde_system(system = system, grids = grids[0], data = None,
                                              boundary_conditions = bc_operators,
                                              mode = solver_params['mode'],
@@ -103,7 +109,8 @@ class ControlExp():
                                              fourier_params = solver_params['fourier_params'],
                                              use_adaptive_lambdas = solver_params['use_adaptive_lambdas'])
         
-        control_inputs = prepare_control_inputs(model, grids[1], global_var.control_nn.net_args)
+        control_inputs = prepare_control_inputs(model, grids[1], global_var.control_nn.net_args,
+                                                diff_method = diff_method)
         loss_forward = control_loss([model, global_var.control_nn.net], [grids[1], control_inputs])
 
         # Calculating loss in p[i]-eps:
@@ -122,7 +129,8 @@ class ControlExp():
                                                        fourier_params = solver_params['fourier_params'],
                                                        use_adaptive_lambdas = solver_params['use_adaptive_lambdas'])
 
-        control_inputs = prepare_control_inputs(model, grids[1], global_var.control_nn.net_args)
+        control_inputs = prepare_control_inputs(model, grids[1], global_var.control_nn.net_args,
+                                                diff_method = diff_method)
         loss_back = control_loss([model, global_var.control_nn.net], [grids[1], control_inputs])
         
         # Restore values of the control NN parameters
@@ -189,6 +197,9 @@ class ControlExp():
         adapter = self.get_solver_adapter(None)
         if isinstance(adapter, SolverAdapter): 
             adapter.set_net(deepcopy(self._state_net))
+            diff_method = AutogradDeriv
+        else:
+            diff_method = FDDeriv
 
         sampled_bc = [modify_bc(operator, noise_std) for operator, noise_std in bc_operators]
         loss_pinn, model = adapter.solve_epde_system(system = self.system, grids = grids, data = None,
@@ -199,8 +210,11 @@ class ControlExp():
                                                      fourier_params = self._solver_params['fourier_params'],
                                                      use_adaptive_lambdas = self._solver_params['use_adaptive_lambdas'])
 
-        control_inputs = prepare_control_inputs(model, grids_merged, global_var.control_nn.net_args)
-        loss = self.loss([self._state_net, global_var.control_nn.net], [grids_merged, control_inputs])
+
+        print(f'Model is {type(model)}, while loss requires {[(cond, cond[1]._deriv_method) for cond in self.loss._cond]}')
+        control_inputs = prepare_control_inputs(model, grids_merged, global_var.control_nn.net_args,
+                                                diff_method = diff_method)
+        loss = self.loss([model, global_var.control_nn.net], [grids_merged, control_inputs])
         print('current loss is ', loss, 'model undertrained with loss of ', loss_pinn)
 
         while t < epochs and not stop_training:
@@ -210,8 +224,10 @@ class ControlExp():
 
             # self.set_solver_params(**solver_params['full'])
             adapter = self.get_solver_adapter(None)
+
             if isinstance(adapter, SolverAdapter):            
                 adapter.set_net(self._state_net)
+            
             loss_pinn, model = adapter.solve_epde_system(system = self.system, grids = grids, data = None,
                                                          boundary_conditions = sampled_bc,
                                                          mode = self._solver_params['mode'],
@@ -220,8 +236,9 @@ class ControlExp():
                                                          fourier_params = self._solver_params['fourier_params'],
                                                          use_adaptive_lambdas = self._solver_params['use_adaptive_lambdas'])
 
-            control_inputs = prepare_control_inputs(model, grids_merged, global_var.control_nn.net_args)
-            loss = self.loss([self._state_net, global_var.control_nn.net], [grids_merged, control_inputs])            
+            control_inputs = prepare_control_inputs(model, grids_merged, global_var.control_nn.net_args,
+                                                    diff_method = diff_method)
+            loss = self.loss([model, global_var.control_nn.net], [grids_merged, control_inputs])            
             self._state_net = model
             self.set_solver_params(**solver_params['abridged'])
 
@@ -284,14 +301,14 @@ class ControlExp():
                                                          fourier_params = self._solver_params['fourier_params'],
                                                          use_adaptive_lambdas = self._solver_params['use_adaptive_lambdas'])
 
-            var_prediction = model(grids_merged)
+            # var_prediction = model(grids_merged)
             self._state_net = model
 
-            control_inputs = prepare_control_inputs(model, grids_merged, global_var.control_nn.net_args)
-            loss = self.loss([self._state_net, global_var.control_nn.net], [grids_merged, control_inputs])
+            control_inputs = prepare_control_inputs(model, grids_merged, global_var.control_nn.net_args, 
+                                                    diff_method = diff_method)
+            loss = self.loss([model, global_var.control_nn.net], [grids_merged, control_inputs])
             print('current loss is ', loss, 'model undertrained with loss of ', loss_pinn)
-            # if loss < min_loss:
-            #     min_loss = loss
+
             self._best_control_params = global_var.control_nn.net.state_dict()
             loss_hist.append(loss)
             
@@ -315,7 +332,8 @@ class ControlExp():
             gc.collect()
             t += 1
 
-        control_inputs = prepare_control_inputs(model, grids_merged, global_var.control_nn.net_args)
+        control_inputs = prepare_control_inputs(model, grids_merged, global_var.control_nn.net_args,
+                                                diff_method = diff_method)
         ctrl_pred = global_var.control_nn.net(control_inputs)
 
         return self._state_net, global_var.control_nn.net, ctrl_pred, loss_hist

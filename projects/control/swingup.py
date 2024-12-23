@@ -38,8 +38,8 @@ def get_additional_token_families(ctrl, ctrl_net: torch.nn.Sequential, device = 
     angle_trig_tokens = VarTrigTokens('phi', max_power=2, freq_center=1.)
     sgn_tokens = DerivSignFunction(token_type = 'velocity_signum', var_name = 'y', token_labels=['sign(dy/dx1)',],
                                    deriv_solver_orders = [[0,],])
-    control_var_tokens = epde.interface.prepared_tokens.ControlVarTokens(sample = ctrl, arg_var = [(0, [None,]), (1, [None,]), 
-                                                                                                   (0, [0,]), (1, [0,])], 
+    control_var_tokens = epde.interface.prepared_tokens.ControlVarTokens(sample = ctrl, arg_var = [(0, [None,]), (1, [None,]),
+                                                                                                   (0, [0,]), (1, [0,])],
                                                                          device = device, ann = ctrl_net)
     return [angle_trig_tokens, sgn_tokens, control_var_tokens] #  
 
@@ -158,8 +158,8 @@ def translate_equation(t, x, angle, u, derivs: dict, diff_method = 'FD', data_nn
                                                                                   device = device), data_nn = data_nn,
                                 fourier_layers=(fourier_params != {}), fourier_params=fourier_params)
 
-    test = epde.interface.equation_translator.CoeffLessEquation(lp_terms = {'phi': lp_phi_terms, 'y': lp_y_terms},
-                                                                rp_term = {'phi': rp_phi_term, 'y': rp_y_term},
+    test = epde.interface.equation_translator.CoeffLessEquation(lp_terms = {'y': lp_y_terms, 'phi': lp_phi_terms},
+                                                                rp_term = {'y': rp_y_term, 'phi': rp_phi_term},
                                                                 pool = epde_search_obj.pool, all_vars = ['y', 'phi'])
     
     def visualize_var(system, variable: str = 'u'):
@@ -185,9 +185,9 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
                   ctrl_nn_pretrained: torch.nn.Sequential, fig_folder: str, device = 'cpu', 
                   fourier_params: dict = {'L' : [4,], 'M' : [3,]}, use_fourier = True):
     
-    from epde.supplementary import AutogradDeriv
+    from epde.supplementary import AutogradDeriv, FDDeriv
 
-    autograd = AutogradDeriv()
+    autograd = FDDeriv() # AutogradDeriv()
 
     loc_domain = ConstrLocation(domain_shape = (t.size()[0],), device=device) # Declaring const in the entire domain
     loc_end = ConstrLocation(domain_shape = (t.size()[0],), axis = 0, loc = -1, device=device) # Check format

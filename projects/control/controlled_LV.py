@@ -2,6 +2,7 @@ import os
 import sys
 import datetime
 from copy import deepcopy
+import time 
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../..')))
 
@@ -204,21 +205,23 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
                   state_nn_pretrained: torch.nn.Sequential, ctrl_nn_pretrained: torch.nn.Sequential, 
                   fig_folder: str, device = 'cpu', eps: float = 1e0):
     
-    from epde.supplementary import AutogradDeriv
+    from epde.supplementary import AutogradDeriv, FDDeriv
+
+    fdgrad = FDDeriv() # AutogradDeriv()
     autograd = AutogradDeriv()
 
     loc = ConstrLocation(domain_shape = (t.size()[0],), device=device) # Declaring const in the entire domain
     u_tar_constr = ControlConstrEq(val = torch.full_like(input = t, fill_value = u_tar, device=device),
-                                   indices = loc, deriv_method = autograd, nn_output=0, device=device)
+                                   indices = loc, deriv_method = fdgrad, nn_output=0, device=device)
     v_tar_constr = ControlConstrEq(val = torch.full_like(input = t, fill_value = v_tar, device=device),
-                                   indices = loc, deriv_method = autograd, nn_output=1, device=device)
+                                   indices = loc, deriv_method = fdgrad, nn_output=1, device=device)
     contr_constr = ControlConstrEq(val = torch.full_like(input = t, fill_value = 0., device=device),
                                    indices = loc, deriv_method = autograd, nn_output=0, device=device)
 
     u_var_non_neg = ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0., device=device), sign='>',
-                                     indices = loc, deriv_method = autograd, nn_output=0, device=device)
+                                     indices = loc, deriv_method = fdgrad, nn_output=0, device=device)
     v_var_non_neg = ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0., device=device), sign='>',
-                                     indices = loc, deriv_method = autograd, nn_output=1, device=device)
+                                     indices = loc, deriv_method = fdgrad, nn_output=1, device=device)
     contr_non_neg = ControlConstrNEq(val = torch.full_like(input = t, fill_value = 0., device=device), sign='>',
                                      indices = loc, deriv_method = autograd, nn_output=0, device=device)
 
@@ -231,8 +234,8 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
     optimizer = ControlExp(loss=loss, device=device)
     
     def get_ode_bop(key, var, term, grid_loc, value):
-        bop = epde.interface.solver_integration.BOPElement(axis = 0, key = key, term = term,
-                                                           power = 1, var = var, device = device)
+        bop = epde.integrate.BOPElement(axis = 0, key = key, term = term,
+                                        power = 1, var = var, device = device)
         if isinstance(grid_loc, float):
             bop_grd_np = np.array([[grid_loc,]])
             bop.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor))
@@ -248,17 +251,20 @@ def optimize_ctrl(eq: epde.structure.main_structures.SoEq, t: torch.tensor,
 
     optimizer.system = eq
 
-    solver_params = {'full':     {'training_params': {'epochs': 5000,}, 'optimizer_params': {'params': {'lr': 1e-5}}}, 
-                     'abridged': {'training_params': {'epochs': 800,}, 'optimizer_params': {'params': {'lr': 1e-5}}}}
+    # solver_params = {'full':     {'training_params': {'epochs': 5000,}, 'optimizer_params': {'params': {'lr': 1e-5}}}, 
+    #                  'abridged': {'training_params': {'epochs': 800,}, 'optimizer_params': {'params': {'lr': 1e-5}}}}
 
-    state_nn, ctrl_net, ctrl_pred, hist = optimizer.feedback(bc_operators = [(bop_u(), 0.3),
-                                                                             (bop_v(), 0.3)],
+    solver_params_odeint = {'full':  {'use_pinn': False},
+                         'abridged': {'use_pinn': False}} 
+
+    state_nn, ctrl_net, ctrl_pred, hist = optimizer.feedback(bc_operators = [(bop_u(), 0.5),
+                                                                             (bop_v(), 0.5)],
                                                              grids = [t,], n_control = 1.,
                                                              state_net = state_nn_pretrained,
-                                                             opt_params = [0.005, 0.9, 0.999, 1e-8],
-                                                             control_net = ctrl_nn_pretrained, epochs = 100,
+                                                             opt_params = [0.01, 0.9, 0.999, 1e-8],
+                                                             control_net = ctrl_nn_pretrained, epochs = 1000,
                                                              fig_folder = fig_folder, eps = eps, 
-                                                             solver_params = solver_params)
+                                                             solver_params = solver_params_odeint)
 
     return state_nn, ctrl_net, ctrl_pred, hist
 
@@ -267,8 +273,8 @@ if __name__ == '__main__':
     import pickle
 
     experiment = 'LV'
-    explicit_cpu = False
-    eps = 5e-1
+    explicit_cpu = True
+    eps = 5e-4
     device = 'cuda' if (torch.cuda.is_available and not explicit_cpu) else 'cpu'
     print(f'Working on {device}')
 
@@ -321,7 +327,7 @@ if __name__ == '__main__':
         return torch.nn.Sequential(*layers)
     
     def create_deep_nn(arg_num: int = 1, output_num: int = 1, device = 'cpu') -> torch.nn.Sequential: # net: torch.nn.Sequential = None, 
-        hidden_neurons = 15
+        hidden_neurons = 45
         layers = [torch.nn.Linear(arg_num, hidden_neurons, device=device),
                   torch.nn.Tanh(),
                   torch.nn.Linear(hidden_neurons, hidden_neurons, device=device),

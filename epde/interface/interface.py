@@ -648,7 +648,6 @@ class EpdeSearch(object):
                             'additional_tokens' : [family.token_family.ftype for family in additional_tokens]}
         # assert (isinstance(derivs, list) and isinstance(derivs[0], np.ndarray)) or derivs is None
         # TODO: add better checks
-        print('Do changes even work?')
         if isinstance(data, np.ndarray):
             data = [data,]
 

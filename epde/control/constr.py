@@ -1,9 +1,11 @@
 from typing import List, Union, Tuple, Callable
 from abc import ABC, abstractmethod
+from functools import singledispatchmethod
 
 import numpy as np
 import torch
 
+from epde.supplementary import AutogradDeriv, FDDeriv
 from epde.supplementary import BasicDeriv
 
 class ConstrLocation():
@@ -115,20 +117,62 @@ class ControlConstrEq(ControlConstraint):
     Class for equality constrints of type $c(u^(n)) = f(u) - val = 0$ .
     '''
     def __init__(self, val : Union[float, torch.Tensor], deriv_method: BasicDeriv, # grid: torch.Tensor, 
-                 indices: ConstrLocation, device: str = 'cpu', deriv_axes: List = [None,], 
+                 indices: ConstrLocation, device: str = 'cpu', deriv_axes: List = [None,],
                  nn_output: int = 0, tolerance: float = 1e-7, estim_func: Callable = None):
-        super().__init__(val, deriv_method, indices, device, deriv_axes, nn_output) # grid, 
+        print(f'Initializing condition with {deriv_method} method of differentiation.')
+        super().__init__(val, deriv_method, indices, device, deriv_axes, nn_output) # grid,
         self._eps = tolerance
         self._estim_func = estim_func
  
-    def __call__(self, fun_nn: Union[torch.nn.Sequential, torch.Tensor], 
-                 arg_tensor: torch.Tensor) -> Tuple[bool, torch.Tensor]:
+    # TODO: add singledispatch in relation to "fun_nn": rework to accept np.ndarrays as arguments
+
+    @singledispatchmethod
+    def __call__(self, function, arg_tensor) -> Tuple[bool, torch.Tensor]:
         '''
-        Calculate  
+        Calculate the fullfilment of the equality constraint condition and the discrepancy between 
+        the observed value of constraint and the desired value. 
         '''
-        to_compare = self._deriv_method.take_derivative(u = fun_nn, 
+        raise NotImplementedError(f'Incorrect type of arguments passed into the call method. \
+                                    Got {type(function)} instead of np.ndarrays of torch.nn.Sequentials.')
+    
+    @__call__.register
+    def _(self, function: np.ndarray, arg_tensor):
+        if isinstance(self._deriv_method, AutogradDeriv):
+            raise RuntimeError('Trying to call autograd differentiation of numpy npdarray. Use FDDeriv instead.')
+        
+        to_compare = self._deriv_method.take_derivative(u = function, 
                                                         args = self._indices.apply(arg_tensor, along_axis=0), # correct along_axis argument 
                                                         axes = self._axes)
+        to_compare = torch.from_numpy(to_compare)
+
+        if not isinstance(self._val, torch.Tensor):
+            val_transformed = torch.full_like(input = to_compare, 
+                                              fill_value=self._val).to(self._device)
+        else:
+            if to_compare.shape != self._val.shape:
+                try:
+                    to_compare = to_compare.view(self._val.size())
+                except:
+                    raise TypeError(f'Incorrect shapes of constraint value tensor: expected {self._val.shape}, got {to_compare.shape}.')
+            val_transformed = self._val
+        if self._estim_func is not None:
+            constr_enf = self._estim_func(to_compare, val_transformed)
+        else:
+            constr_enf = val_transformed - to_compare
+            
+        return (torch.isclose(constr_enf, torch.zeros_like(constr_enf).to(self._device), rtol = self._eps), 
+                constr_enf) # val_transformed - to_compare
+
+    @__call__.register
+    def _(self, function: torch.nn.Sequential, arg_tensor):
+        if isinstance(self._deriv_method, FDDeriv):
+            raise RuntimeError('Trying to call finite differences to get derivatives of ANN, while ANN eval is not supported.\
+                                Use Autograd instead.')
+        to_compare = self._deriv_method.take_derivative(u = function, 
+                                                        args = self._indices.apply(arg_tensor, along_axis=0), # correct along_axis argument 
+                                                        axes = self._axes)
+        
+
         if not isinstance(self._val, torch.Tensor):
             val_transformed = torch.full_like(input = to_compare, fill_value=self._val).to(self._device)
         else:
@@ -146,7 +190,7 @@ class ControlConstrEq(ControlConstraint):
         return (torch.isclose(constr_enf, torch.zeros_like(constr_enf).to(self._device), rtol = self._eps), 
                 constr_enf) # val_transformed - to_compare
         
-    def loss(self, fun_nn: torch.nn.Sequential, arg_tensor: torch.Tensor) -> torch.Tensor:
+    def loss(self, function: Union[torch.nn.Sequential, np.ndarray], arg_tensor: torch.Tensor) -> torch.Tensor:
         '''
         Return value of the loss function term, created by the condition. 
 
@@ -158,8 +202,9 @@ class ControlConstrEq(ControlConstraint):
         Returns:
             `torch.Tensor` with norm of the contraint discrepancy to be used in the combined loss.
         '''
-        _, discrepancy = self(fun_nn, arg_tensor)
+        _, discrepancy = self(function, arg_tensor)
         return torch.norm(discrepancy)
+
 
 class ControlConstrNEq(ControlConstraint):
     '''
@@ -168,13 +213,58 @@ class ControlConstrNEq(ControlConstraint):
     def __init__(self, val : Union[float, torch.Tensor], deriv_method: BasicDeriv, # grid: torch.Tensor, 
                  indices: ConstrLocation, device: str = 'cpu', sign: str = '>', deriv_axes: List = [None,], 
                  nn_output: int = 0, tolerance: float = 1e-7, estim_func: Callable = None):
+        print(f'Initializing condition with {deriv_method} method of differentiation.')
         super().__init__(val, deriv_method, indices, device, deriv_axes, nn_output) # grid, 
         self._sign = sign
         self._estim_func = estim_func
 
-    def __call__(self, fun_nn: torch.nn.Sequential, arg_tensor: torch.Tensor) -> Tuple[bool, torch.Tensor]:
-        to_compare = self._deriv_method.take_derivative(u = fun_nn, args=self._indices.apply(arg_tensor, along_axis=0), # correct along_axis argument 
+    @singledispatchmethod
+    def __call__(self, function, arg_tensor) -> Tuple[bool, torch.Tensor]:
+        '''
+        Calculate the fullfilment of the inequality constraint condition and the discrepancy between 
+        the observed value of constraint and the desired value. 
+        '''
+        raise NotImplementedError(f'Incorrect type of arguments passed into the call method. \
+                                    Got {type(function)} instead of np.ndarrays of torch.nn.Sequentials.')
+
+    @__call__.register
+    def _(self, function: np.ndarray, arg_tensor) -> Tuple[bool, torch.Tensor]:
+        if isinstance(self._deriv_method, AutogradDeriv):
+            raise RuntimeError('Trying to call autograd differentiation of numpy npdarray. Use FDDeriv instead.')
+
+        to_compare = self._deriv_method.take_derivative(u = function, 
+                                                        args=self._indices.apply(arg_tensor, along_axis = 0), # correct along_axis argument 
+                                                        axes=self._axes, component = self._nn_output)        
+                
+        to_compare = torch.from_numpy(to_compare)
+      
+        if not isinstance(self._val, torch.Tensor):
+            val_transformed = torch.full_like(input = to_compare, fill_value=self._val)
+        else:
+            if not to_compare.shape == self._val.shape:
+                to_compare = torch.reshape(to_compare, shape=self._val.shape)
+            val_transformed = self._val
+        
+        if self._estim_func is not None:
+            constr_enf = self._estim_func(val_transformed, to_compare)
+        else:
+            constr_enf = val_transformed - to_compare
+
+        if self._sign == '>':
+            return torch.greater(constr_enf, torch.zeros_like(constr_enf).to(self._device)), torch.nn.functional.relu(constr_enf)
+        elif self._sign == '<':
+            return (torch.less(constr_enf, torch.zeros_like(constr_enf).to(self._device)), 
+                    torch.nn.functional.relu(constr_enf))
+
+    @__call__.register
+    def _(self, function: torch.nn.Sequential, arg_tensor) -> Tuple[bool, torch.Tensor]:
+        to_compare = self._deriv_method.take_derivative(u = function, 
+                                                        args=self._indices.apply(arg_tensor, along_axis = 0), # correct along_axis argument 
                                                         axes=self._axes, component = self._nn_output)
+        
+        if isinstance(self._deriv_method, FDDeriv):
+            raise RuntimeError('Trying to call finite differences to get derivatives of ANN, while ANN eval is not supported.\
+                                Use Autograd instead.')        
         if not isinstance(self._val, torch.Tensor):
             val_transformed = torch.full_like(input = to_compare, fill_value=self._val)
         else:
@@ -194,8 +284,7 @@ class ControlConstrNEq(ControlConstraint):
                     torch.nn.functional.relu(constr_enf))
         #torch.less(val_transformed, to_compare), torch.nn.functional.relu(to_compare - val_transformed)            
 
-        
-    def loss(self, fun_nn: torch.nn.Sequential, arg_tensor: torch.Tensor) -> torch.Tensor:
+    def loss(self, function: Union[torch.nn.Sequential, np.ndarray], arg_tensor: torch.Tensor) -> torch.Tensor:
         '''
         Return value of the loss function term, created by the condition. 
 
@@ -207,8 +296,9 @@ class ControlConstrNEq(ControlConstraint):
         Returns:
             `torch.Tensor` with norm of the contraint discrepancy to be used in the combined loss.
         '''        
-        _, discrepancy = self(fun_nn, arg_tensor)
+        _, discrepancy = self(function, arg_tensor)
         return torch.norm(discrepancy)
+
 
 class ConditionalLoss():
     '''
@@ -232,5 +322,5 @@ class ConditionalLoss():
         temp = []
         for cond in self._cond:
             temp.append(cond[0] * cond[1].loss(models[cond[2]], args[cond[2]]))
-        # print('temp loss', temp)
+
         return torch.stack(temp, dim=0).sum(dim=0).sum(dim=0)

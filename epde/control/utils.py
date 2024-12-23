@@ -1,12 +1,13 @@
 from typing import List, Tuple, Union
 from collections import OrderedDict
 
+import numpy as np
 import torch
 
-from epde.supplementary import AutogradDeriv
+from epde.supplementary import BasicDeriv, AutogradDeriv
 
-def prepare_control_inputs(model: torch.nn.Sequential, grid: torch.Tensor, 
-                           args: List[Tuple[Union[int, List]]]) -> torch.Tensor:
+def prepare_control_inputs(model: Union[torch.nn.Sequential, List[np.ndarray]], grid: torch.Tensor, 
+                           args: List[Tuple[Union[int, List]]], diff_method: BasicDeriv = None) -> torch.Tensor:
     '''
     Recompute the control ANN arguments tensor from the solutions of 
     controlled equations $L \mathbf{u}(t, \mathbf{x}, \mathbf{c}) = 0$, 
@@ -22,9 +23,29 @@ def prepare_control_inputs(model: torch.nn.Sequential, grid: torch.Tensor,
     Returns:
         `torch.Tensor`: tensor of arguments for the control ANN.
     '''
-    differntiatior = AutogradDeriv()
-    ctrl_inputs = torch.cat([differntiatior.take_derivative(u = model, args = grid, axes = arg[1],
-                                                            component = arg[0]).reshape(-1, 1) for arg in args], dim = 1)
+    if diff_method is None:
+        diff_method = AutogradDeriv
+
+    differentiator = diff_method()
+    ctrl_inputs = [differentiator.take_derivative(u = model, args = grid,
+                                                  axes = arg[1], component = arg[0]).reshape(-1, 1) for arg in args]
+    if not isinstance(model, torch.nn.Sequential):
+        ctrl_inputs = [torch.from_numpy(inp).reshape((-1, 1)) for inp in ctrl_inputs]
+    ctrl_inputs = torch.cat(ctrl_inputs, dim = 1).float()
+    # print(f'ctrl_inputs shape is {ctrl_inputs.shape}')
+    return ctrl_inputs
+
+    # if isinstance(model, torch.nn.Sequential):
+    #     differentiator = AutogradDeriv()
+    #     ctrl_inputs = torch.cat([differentiator.take_derivative(u = model, args = grid, axes = arg[1],
+    #                                                             component = arg[0]).reshape(-1, 1) for arg in args], dim = 1).float()
+    # else:
+    #     assert isinstance(grid, torch.Tensor) and grid.ndim == 2 and grid.shape[-1] == 1
+    #     grid = grid.detach().cpu().numpy()
+    #     differentiator = FDDeriv()
+    #     ctrl_inputs = torch.cat([torch.from_numpy(differentiator.take_derivative(model, grid, axes = arg[1],
+    #                                                                              component = arg[0])).reshape(-1, 1) 
+    #                              for arg in args], dim = 1).float()
     return ctrl_inputs
 
 @torch.no_grad()

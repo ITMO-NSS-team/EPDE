@@ -17,21 +17,26 @@ def get_terms_der_order(equation: Dict, variable_idx: int) -> np.ndarray:
     Get the highest orders of the ``variable_idx``-th variable derivative in the equation terms.
     '''
     term_max_ord = np.zeros(len(equation))
-    print(equation)
     for term_idx, term_dict in enumerate(equation.values()):
-        # print(term_dict['term'])
+
         if isinstance(term_dict['var'], list) and len(term_dict['var']) > 1:
             max_ord = 0
             for arg_idx, deriv_ord in enumerate(term_dict['term']):
-                if isinstance(term_dict['pow'][arg_idx], int) and term_dict['var'][arg_idx] == variable_idx:
+                if isinstance(term_dict['pow'][arg_idx], (int, float)) and term_dict['var'][arg_idx] == variable_idx:
                     max_ord = max(max_ord, len([var for var in deriv_ord if var is not None]))
             term_max_ord[term_idx] = max_ord
         elif isinstance(term_dict['var'], int):
-            if isinstance(term_dict['pow'], int) and term_dict['var'] == variable_idx:
+            if isinstance(term_dict['pow'], (int, float)) and term_dict['var'] == variable_idx:
                 term_max_ord[term_idx] = max(0, len([var for var in term_dict['term'] if var is not None]))
         elif isinstance(term_dict['var'], list) and len(term_dict['var']) == 1:
-            if isinstance(term_dict['pow'], int) and term_dict['var'][0] == variable_idx:
-                term_max_ord[term_idx] = max(0, len([var for var in term_dict['term'] if var is not None]))
+            if isinstance(term_dict['var'][0], (int, float)):
+                term_var = term_dict['var'][0]
+            elif isinstance(term_dict['var'][0], (list, tuple)):
+                term_var = term_dict['var'][0][0]
+            if (isinstance(term_dict['pow'], (int, float)) or (isinstance(term_dict['pow'], (list, tuple)) 
+                                                               and len(term_dict['pow']) == 1)) and term_var == variable_idx:
+                term_max_ord[term_idx] = max(0, len([var for var in term_dict['term'] if var is not None and var != [None,]]))
+        pass
 
     return term_max_ord
 
@@ -77,6 +82,8 @@ def replace_operator(term: Dict, variables: List):
     term_ = copy.deepcopy(term)
     if isinstance(term_['var'], list) and len(term_['var']) > 1:
         for arg_idx, deriv_ord in enumerate(term_['term']):
+            if isinstance(term_['var'][arg_idx], (tuple, list)):
+                continue
             term_['var'][arg_idx]  = variables.index((term_['var'][arg_idx], deriv_ord))
             term_['term'][arg_idx] = [None,]
     elif isinstance(term['var'], int) or (isinstance(term_['var'], list) and len(term_['var']) == 1):
@@ -84,7 +91,7 @@ def replace_operator(term: Dict, variables: List):
             term_var = term_['var']
         else:
             term_var = term_['var'][0]
-        if isinstance(term['pow'], int):
+        if isinstance(term['pow'], (int, float)):
             term_['var']  = variables.index((term_var, term_['term']))
             term_['term'] = [None,]
     return term_
@@ -170,10 +177,10 @@ class ImplicitEquation(object):
         '''
         Example of order: np.array([3., 0., 0.]) for third ord eq. 
         '''
-        return [{'coeff' : -1., 
+        return [{'coeff' : -1.,
                  'term'  : [None,],
                  'pow'   : 1,
-                 'var'   : var},] # TODO: validate
+                 'var'   : var},]
 
     def merge_coeff(self, coeff: np.ndarray, t: float):
         try:
@@ -191,7 +198,7 @@ class ImplicitEquation(object):
     def term_callable(self, term: Dict, t, y):
         def call_ann_token(token_nn: torch.nn.Sequential, arguments: list,
                            t: float, y: np.ndarray):
-            return token_nn[torch.from_numpy(y[tuple(arguments)])].detach().numpy() # Hereby, the ANN does not explicitly depend on time
+            return token_nn[torch.from_numpy(y[tuple(arguments)]).reshape((-1, 1))].detach().numpy() # Hereby, the ANN does not explicitly depend on time
 
         if isinstance(term['coeff'], Callable):
             k = term['coeff'](t)
@@ -201,24 +208,42 @@ class ImplicitEquation(object):
             k = self.merge_coeff(term['coeff'], t)
         else:
             k = term['coeff']
-        if isinstance(term['var'], int):
-            if isinstance(term['pow'], int):
-                values = [y[term['var']]**term['pow'],]
-            elif isinstance(term['pow'], torch.nn.Sequential):
-                values = [call_ann_token(term['power'], term['var'], t, y),] #[term['power'](y[term['var']]).detach().numpy(),]
-            else:                
-                values = [term['pow'](y[term['var']]),]
-        elif isinstance(term['var'], list):
-            values = []
-            for var_idx, var in enumerate(term['var']):
-                if isinstance(term['pow'][var_idx], int):
-                    values.append(y[var]**term['pow'][var_idx])
-                elif isinstance(term['pow'][var_idx], torch.nn.Sequential):
-                    values.append(call_ann_token(term['power'][var_idx], term['var'][var_idx], t, y)) 
-                    # term['pow'][var_idx](y[var]).detach().numpy())
-                    # TODO: validate on LV eqs
+        
+        if not isinstance(term['var'], (list, tuple)) or len(term['pow']) == 1:
+            term_var = [term['var'],]
+        else:
+            term_var = term['var']
+        if isinstance(term['var'], (list, tuple)):
+            term_pow = term['pow']
+        else:
+            term_pow = [term['pow'],]
+        
+        values = []
+        for var_idx, var in enumerate(term_var):  
+            if isinstance(var, int):
+                if isinstance(term_pow[var_idx], (int, float)):
+                    val = y[var]**term_pow[var_idx]
+                elif isinstance(term_pow[var_idx], torch.nn.Sequential):
+                    val = call_ann_token(term_pow[var_idx], var, t, y)
                 else:                
-                    values.append(term['pow'][var_idx](y[var]))
+                    val = term_pow[var_idx](y[var])
+            elif isinstance(var, (tuple, list)):
+                if isinstance(term_pow[var_idx], torch.nn.Sequential):
+                    val = call_ann_token(term_pow[var_idx], var, t, y)
+                elif isinstance(term_pow[var_idx], (int, float)):
+                    assert len(var) == 1, 'Incorrect number of arguments'
+                    val = y[list(var)]**term_pow[var_idx]
+                    if isinstance(val, np.ndarray): val = val[0]
+                    
+                    # print(values[-1], type(values[-1]))
+                else:               
+                    val = term_pow[var_idx](*y[list(var)])
+                    if isinstance(val, torch.Tensor):
+                        val = val.item()
+
+            values.append(val)
+            pass
+
         return reduce(lambda x, z: x*z, values, k)
 
 
@@ -241,15 +266,9 @@ class OdeintAdapter(object):
                                                                      in system_solver_forms])
             op_gen.generate_default_bc(vals = data, grids = grids)
             boundary_conditions = op_gen.conditions
-        print(f'BCONDS are {boundary_conditions}')
-        # bconds_combined = Conditions()
-        # for cond in boundary_conditions:
-        #     bconds_combined.operator(bnd = cond['bnd_loc'], operator = cond['bnd_op'], 
-        #                              value = cond['bnd_val'])        
 
         return self.solve(equations = [sf_labeled[1] for sf_labeled in system_solver_forms], domain = grids[0], 
-                          boundary_conditions = boundary_conditions, vars = system.vars_to_describe) # bconds_combined
-
+                          boundary_conditions = boundary_conditions, vars = system.vars_to_describe)
         # Add condition parser and control function args parser
 
 
@@ -269,4 +288,4 @@ class OdeintAdapter(object):
                              t_eval = grid, method = self._solve_method)
         if not solution.success:
             warn(f'Numerical solution of ODEs has did not converge. The error message is {solution.message}')
-        return 0, solution
+        return 0, solution.y.T
