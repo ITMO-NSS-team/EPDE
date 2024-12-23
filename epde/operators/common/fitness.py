@@ -95,6 +95,7 @@ class L2Fitness(CompoundOperator):
 
 
 class SolverBasedFitness(CompoundOperator):
+    # To be modified to include physics-informed information criterion (PIC)
 
     key = 'SolverBasedFitness'
     
