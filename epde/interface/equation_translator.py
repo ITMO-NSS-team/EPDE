@@ -129,12 +129,12 @@ def parse_term_str(term_form):
 
 
 def parse_factor(factor_form, pool, all_vars):   # В проект: работы по обрезке сетки, на которых нулевые значения производных
-    print(factor_form)
+    # print(factor_form)
     label_str, params_str = tuple(factor_form.split('{'))
     if '}' not in params_str:
         raise ValueError('Missing brackets, denoting parameters part of factor text form. Possible explanation: passing wrong argument')
     params_str = parse_params_str(params_str.replace('}', ''))
-    print(label_str, params_str)
+    # print(label_str, params_str)
     factor_family = [family for family in pool.families if label_str in family.tokens][0]
     _, factor = factor_family.create(label=label_str, all_vars = all_vars, **params_str)
     factor.set_param(param = params_str['power'], name = 'power')
@@ -170,7 +170,7 @@ class CoeffLessEquation():
                 rp_value = rp_translated.evaluate(False).reshape(-1)
                 lr = LinearRegression()
                 lr.fit(lp_values.T, rp_value)
-                print(lr.coef_, lr.intercept_, type(lr.coef_))
+                # print(lr.coef_, lr.intercept_, type(lr.coef_))
                 terms_aggregated = lp_terms_translated + [rp_translated,]
                 max_factors = max([len(term.structure) for term in terms_aggregated])
                 equation = Equation(pool=pool, basic_structure=terms_aggregated,
@@ -199,7 +199,7 @@ class CoeffLessEquation():
             self.rp_value = self.rp_translated.evaluate(False).reshape(-1)
             lr = LinearRegression()
             lr.fit(self.lp_values.T, self.rp_value)
-            print(lr.coef_, lr.intercept_, type(lr.coef_))
+            # print(lr.coef_, lr.intercept_, type(lr.coef_))
             terms_aggregated = self.lp_terms_translated + [self.rp_translated,]
             max_factors = max([len(term.structure) for term in terms_aggregated])
             self.equation = Equation(pool=pool, basic_structure=terms_aggregated,
