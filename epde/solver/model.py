@@ -102,6 +102,8 @@ class Model():
         self.solution_cls = Solution(grid, self.equation_cls, self.net, mode, weak_form,
                                      lambda_operator, lambda_bound, tol, derivative_points,
                                      batch_size=self.batch_size)
+        print(self.solution_cls.grid)
+        print('boop!')
 
 
     def _model_save(
@@ -154,6 +156,7 @@ class Model():
 
         self.optimizer = optimizer.optimizer_choice(self.mode, self.net)
 
+        print()
         closure = Closure(mixed_precision, self).get_closure(optimizer.optimizer)
 
         self.min_loss, _ = self.solution_cls.evaluate()

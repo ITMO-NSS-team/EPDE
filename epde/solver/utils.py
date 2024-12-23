@@ -234,7 +234,7 @@ def save_model_mat(cache_dir: str,
 
     save_model_nn(cache_dir, net_autograd, name=name)
 
-def replace_none_by_zero(tuple_data: tuple | None) -> torch.Tensor:
+def replace_none_by_zero(tuple_data: tuple) -> torch.Tensor:
     """ Make tensor from tuple (or None element) ad replace None elements to zero.
 
     Args:

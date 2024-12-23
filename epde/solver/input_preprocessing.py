@@ -27,7 +27,7 @@ def lambda_prepare(val: torch.Tensor,
     if isinstance(lambda_, torch.Tensor):
         return lambda_
 
-    if isinstance(lambda_, int):
+    if isinstance(lambda_, (int, float)):
         try:
             lambdas = torch.ones(val.shape[-1], dtype=val.dtype) * lambda_
         except:

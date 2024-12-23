@@ -86,8 +86,8 @@ class SystemSolverInterface(object):
             else:
                 deriv_vars = [0,]
 
-        if torch.all(torch.isclose(coeff_tensor[0], coeff_tensor)):
-            coeff_tensor = coeff_tensor[0].item()
+        if torch.all(torch.isclose(coeff_tensor.reshape(-1)[0], coeff_tensor.reshape(-1))):
+            coeff_tensor = coeff_tensor.reshape(-1)[0].item()
 
         res = {'coeff': coeff_tensor,
                'term': deriv_orders,

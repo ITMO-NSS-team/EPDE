@@ -648,6 +648,7 @@ class EpdeSearch(object):
                             'additional_tokens' : [family.token_family.ftype for family in additional_tokens]}
         # assert (isinstance(derivs, list) and isinstance(derivs[0], np.ndarray)) or derivs is None
         # TODO: add better checks
+        print('Do changes even work?')
         if isinstance(data, np.ndarray):
             data = [data,]
 
@@ -685,13 +686,13 @@ class EpdeSearch(object):
             data_tokens.extend(entry.get_families())
 
         if self._mode_info['solver_fitness']:
-            # print(f'Base derivs are {base_derivs}')
             if data_nn is not None:
                 print('Using pre-trained ANN')
                 global_var.reset_data_repr_nn(data = data, derivs = base_derivs, train = False, 
                                               grids = grid, predefined_ann = data_nn, device = self._device)
             else:
-                global_var.reset_data_repr_nn(data = data, derivs = base_derivs, epochs_max=1e4,
+                epochs_max = 1e3
+                global_var.reset_data_repr_nn(data = data, derivs = base_derivs, epochs_max=epochs_max,
                                               grids = grid, predefined_ann = None, device = self._device, 
                                               use_fourier = fourier_layers, fourier_params = fourier_params)
 

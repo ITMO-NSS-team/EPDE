@@ -114,6 +114,7 @@ class Derivative_autograd(DerivativeInt):
         """
 
         points.requires_grad = True
+        
         fi = model(points)[:, var].sum(0)
         for ax in axis:
             grads, = torch.autograd.grad(fi, points, create_graph=True)

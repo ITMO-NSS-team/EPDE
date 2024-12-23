@@ -186,7 +186,8 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: b
                 if derivs is not None:
                     for var_idx, deriv_axes, deriv_tensor in derivs:
                         deriv_autograd = deriv_calc.take_derivative(model, batch_x, axes = deriv_axes, component = var_idx)
-                        batch_derivs = torch.from_numpy(deriv_tensor)[indices].reshape_as(deriv_autograd).to(device)
+                        batch_derivs = torch.from_numpy(deriv_tensor)[torch.unravel_index(indices, 
+                                                                                          deriv_tensor.shape)].reshape_as(deriv_autograd).to(device)
                         
                         loss_add = 1e2 * torch.mean(torch.abs(batch_derivs - deriv_autograd))
                         # print(loss, loss_add)
@@ -195,7 +196,8 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: b
                 if penalised_derivs is not None:
                     for var_idx, deriv_axes in derivs:
                         deriv_autograd = deriv_calc.take_derivative(model, batch_x, axes = deriv_axes, component = var_idx)
-                        batch_derivs = torch.from_numpy(deriv_tensor)[indices].reshape_as(deriv_autograd).to(device)
+                        batch_derivs = torch.from_numpy(deriv_tensor)[torch.unravel_index(indices, 
+                                                                                          deriv_tensor.shape)].reshape_as(deriv_autograd).to(device)
                         higher_ord_penalty = 1e3 * torch.mean(torch.abs(deriv_autograd))
 
                         loss += higher_ord_penalty
