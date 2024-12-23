@@ -12,7 +12,7 @@ import multiprocessing as mp
 from typing import Union
 
 import torch
-device = torch.device('cpu')
+# device = torch.device('cpu')
 
 import epde.globals as global_var
 from epde.preprocessing.cheb import process_point_cheb

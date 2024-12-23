@@ -10,24 +10,64 @@ import numpy as np
 import copy
 import torch
 from typing import Callable
-from collections import Iterable
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 
 import epde.globals as global_var
 from epde.structure.Tokens import TerminalToken
 from epde.supplementary import factor_params_to_str, train_ann, use_ann_to_predict, exp_form
+from epde.evaluators import simple_function_evaluator
+
+class EvaluatorContained(object):
+    """
+    Class for evaluator of token (factor of the term in the sought equation) values with arbitrary function
+
+    Attributes:
+        _evaluator (`callable`): a function, which returns the vector of token values, evaluated on the studied area;
+        params (`dict`): dictionary, containing parameters of the evaluator (like grid, on which the function is evaluated or matrices of pre-calculated function)
+
+    Methods:
+        set_params(**params)
+            set the parameters of the evaluator, using keyword arguments
+        apply(token, token_params)
+            apply the defined evaluator to evaluate the token with specific parameters
+    """
+
+    def __init__(self, eval_function): # , eval_kwargs_keys={}
+        self._evaluator = eval_function
+        # self.eval_kwargs_keys = eval_kwargs_keys
+
+    def apply(self, token, structural=False, func_args=None, torch_mode=False): # , **kwargs
+        """
+        Apply the defined evaluator to evaluate the token with specific parameters.
+
+        Args:
+            token (`epde.main_structures.factor.Factor`): symbolic label of the specific token, e.g. 'cos';
+        token_params (`dict`): dictionary with keys, naming the token parameters (such as frequency, axis and power for trigonometric function) 
+            and values - specific values of corresponding parameters.
+
+        Raises:
+            `TypeError`
+                If the evaluator could not be applied to the token.
+        """
+        # assert list(kwargs.keys()) == self.eval_kwargs_keys, f'Kwargs {kwargs.keys()} != {self.eval_kwargs_keys}'
+        return self._evaluator(token, structural, func_args, torch_mode = torch_mode)
 
 
 class Factor(TerminalToken):
-    __slots__ = ['_params', '_params_description', '_hash_val', '_latex_constructor',
-                 'label', 'ftype', '_variable', 'grid_set', 'grid_idx', 'is_deriv', 'deriv_code',
+    __slots__ = ['_params', '_params_description', '_hash_val', '_latex_constructor', 'label',
+                 'ftype', '_variable', '_all_vars', 'grid_set', 'grid_idx', 'is_deriv', 'deriv_code',
                  'cache_linked', '_status', 'equality_ranges', '_evaluator', 'saved']
 
     def __init__(self, token_name: str, status: dict, family_type: str, latex_constructor: Callable,
-                 variable: str = None, randomize: bool = False, params_description=None, deriv_code=None, 
-                 equality_ranges = None):
+                 variable: str = None, all_vars: list = None, randomize: bool = False, 
+                 params_description=None, deriv_code=None, equality_ranges = None):
         self.label = token_name
         self.ftype = family_type
         self._variable = variable
+        self._all_vars = all_vars
         
         self.status = status
         self.grid_set = False
@@ -112,7 +152,10 @@ class Factor(TerminalToken):
         _params_description = {}
         if not random:
             _params = np.empty(len(kwargs))
-            assert len(kwargs) == len(params_description), 'Not all parameters have been declared. Partial randomization TBD'
+            if len(kwargs) != len(params_description):
+                print('Not all parameters have been declared. Partial randomization TBD')
+                print(f'kwargs {kwargs}, while params_descr {params_description}')
+                raise ValueError('...')
             for param_idx, param_info in enumerate(kwargs.items()):
                 _params[param_idx] = param_info[1]
                 _params_description[param_idx] = {'name': param_info[0],
@@ -166,35 +209,63 @@ class Factor(TerminalToken):
 
     @evaluator.setter
     def evaluator(self, evaluator):
-        try:
-            factor_family = [family for family in evaluator if family.ftype == self.ftype][0]
-            self._evaluator = factor_family.evaluator
-        except TypeError:
+        if isinstance(evaluator, EvaluatorContained):
             self._evaluator = evaluator
+        else:
+            factor_family = [family for family in evaluator.families if family.ftype == self.ftype][0]
+            self._evaluator = factor_family._evaluator # TODO: fix calling private attribute
             
-    # Переработать/удалить __call__, т.к. его функции уже тут
-    def evaluate(self, structural=False, grids=None):
-        assert self.cache_linked
+    def evaluate(self, structural=False, grids=None, torch_mode: bool = False):
+        assert self.cache_linked, 'Missing linked cache.'
         if self.is_deriv and grids is not None:
             raise Exception(
                 'Derivatives have to evaluated on the initial grid')
 
         key = 'structural' if structural else 'base'
-        if self.saved[key] and grids is None:
+        if (self.cache_label, structural) in global_var.tensor_cache and grids is None:
+            # print(f'Asking for {self.cache_label} in tmode {torch_mode}')
+            # print(f'From numpy cache of {global_var.tensor_cache.memory_structural["numpy"].keys()}')
+            # print(f'And torch cache of {global_var.tensor_cache.memory_structural["torch"].keys()}')
+
             return global_var.tensor_cache.get(self.cache_label,
-                                               structural=structural)
+                                               structural=structural, torch_mode = torch_mode)
+ 
         else:
-            value = self._evaluator.apply(self, structural=structural, grids=grids)
+            if self.is_deriv and self.evaluator._evaluator != simple_function_evaluator:
+                if grids is not None:
+                    raise Exception('Data-reliant tokens shall not get grids as arguments for evaluation.')
+                if isinstance(self.variable, str):
+                    var = self._all_vars.index(self.variable)
+                    func_arg = [global_var.tensor_cache.get(label=None, torch_mode=torch_mode,
+                                                            deriv_code=(var, self.deriv_code)),]
+                elif isinstance(self.variable, (list, tuple)):
+                    func_arg = []
+                    for var_idx, code in enumerate(self.deriv_code):
+                        assert len(self.variable) == len(self.deriv_code)
+                        func_arg.append(global_var.tensor_cache.get(label=None, torch_mode=torch_mode,
+                                                                    deriv_code=(self.variable[var_idx], code)))
+
+                value = self.evaluator.apply(self, structural=structural, func_args=func_arg, torch_mode=torch_mode)
+            else:
+                value = self.evaluator.apply(self, structural=structural, func_args=grids, torch_mode=torch_mode)
             if grids is None:
+                if self.is_deriv and self.evaluator._evaluator == simple_function_evaluator:
+                    full_deriv_code = (self._all_vars.index(self.variable), self.deriv_code)
+                else:
+                    full_deriv_code = None      
+
                 if key == 'structural' and self.status['structural_and_defalut_merged']:
-                    global_var.tensor_cache.use_structural(use_base_data=True)
+                    self.saved[key] = global_var.tensor_cache.add(self.cache_label, value, structural=False, 
+                                                                  deriv_code=full_deriv_code)                    
+                    global_var.tensor_cache.use_structural(use_base_data=True,
+                                                           label=self.cache_label)
                 elif key == 'structural' and not self.status['structural_and_defalut_merged']:
                     global_var.tensor_cache.use_structural(use_base_data=False,
                                                            label=self.cache_label,
                                                            replacing_data=value)
                 else:
-                    self.saved[key] = global_var.tensor_cache.add(self.cache_label, value,
-                                                                  structural=False)
+                    self.saved[key] = global_var.tensor_cache.add(self.cache_label, value, structural=False, 
+                                                                  deriv_code=full_deriv_code)
             return value
 
     @property

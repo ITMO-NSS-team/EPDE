@@ -13,6 +13,26 @@ from typing import Union, Callable
 
 from epde.operators.utils.template import OPERATOR_LEVELS, CompoundOperator
 
+class OperatorCondition(CompoundOperator):
+    def __init__(self, operator: CompoundOperator, condition: Callable = None):
+        super().__init__()
+
+        self._conditioned_operator = operator
+        self.condition = condition
+        self._tags = operator.operator_tags
+
+    def apply(self, objective, arguments: dict):
+        if self.condition(objective):
+            if 'inplace' in self.operator_tags:
+                self._conditioned_operator.apply(objective, arguments)
+            elif 'standard' in self.operator_tags:
+                objective = self._conditioned_operator.apply(objective, arguments)
+            else:
+                raise TypeError('Incorrect type of mapping operator: not inplace nor returns similar object, as input.')
+                
+        if 'population level' in self._tags: # Edited 21.05.2024
+            return objective
+
 
 class OperatorMapper(CompoundOperator):
     def __init__(self, operator_to_map: CompoundOperator, objective_tag: str, source_tag: str, 
@@ -22,12 +42,13 @@ class OperatorMapper(CompoundOperator):
         self.set_suboperators({'to_map' : operator_to_map})
         self.objective_condition = objective_condition; self.element_condition = element_condition
         if not source_tag in operator_to_map.operator_tags:
-            raise ValueError(f'Only {source_tag}-level operators can be mapped to the elements of a {objective_tag}.')
+            raise ValueError(f'Only {source_tag}-level operators can be mapped to the elements of a {objective_tag}. \
+                               Recieved operator with tags: {operator_to_map.operator_tags}')
         self._tags = copy.copy(operator_to_map.operator_tags)
         self._tags.remove(source_tag)
         self._tags.add(objective_tag)
 
-    def apply(self, objective : CompoundOperator, arguments : dict):
+    def apply(self, objective, arguments: dict):
         if self.objective_condition is None or self.objective_condition(objective):
             if 'inplace' in self.operator_tags:
                 for elem in objective:
@@ -36,17 +57,16 @@ class OperatorMapper(CompoundOperator):
             elif 'standard' in self.operator_tags:
                 for idx, elem in enumerate(objective):
                     if self.element_condition is None or self.element_condition(elem):
-                        # print(objective[idx])
                         objective[idx] = self.suboperators['to_map'].apply(elem, arguments)
             else:
                 raise TypeError('Incorrect type of mapping operator: not inplace nor returns similar object, as input.')
 
-            if 'population level' in self._tags:
-                return objective
+        if 'population level' in self._tags: # Edited 21.05.2024
+            return objective
 
 
-def map_operator_between_levels(operator: CompoundOperator, original_level: Union[str, int], target_level: Union[str, int],
-                                objective_condition: Callable = None, element_condition: Callable = None):
+def map_operator_between_levels(operator, original_level: Union[str, int], target_level: Union[str, int],
+                                objective_condition: Callable = None, element_condition: Callable = None) -> CompoundOperator:
     if isinstance(original_level, str): original_level = OPERATOR_LEVELS.index(original_level)
     if isinstance(target_level, str): target_level = OPERATOR_LEVELS.index(target_level)
     

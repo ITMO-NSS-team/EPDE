@@ -8,51 +8,18 @@ Created on Mon Jul  6 15:39:18 2020
 
 import numpy as np
 import itertools
-from typing import Union, Callable
-from collections import Iterable
+from typing import Union, Callable, List
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 
 import epde.globals as global_var
-from epde.structure.factor import Factor
+from epde.structure.factor import Factor, EvaluatorContained
 
 
 def constancy_hard_equality(tensor, epsilon=1e-7):
     return np.abs(np.max(tensor) - np.min(tensor)) < epsilon
-
-
-class EvaluatorContained(object):
-    """
-    Class for evaluator of token (factor of the term in the sought equation) values with arbitrary function
-
-    Attributes:
-        _evaluator (`callable`): a function, which returns the vector of token values, evaluated on the studied area;
-        params (`dict`): dictionary, containing parameters of the evaluator (like grid, on which the function is evaluated or matrices of pre-calculated function)
-
-    Methods:
-        set_params(**params)
-            set the parameters of the evaluator, using keyword arguments
-        apply(token, token_params)
-            apply the defined evaluator to evaluate the token with specific parameters
-    """
-
-    def __init__(self, eval_function, eval_kwargs_keys={}):
-        self._evaluator = eval_function
-        self.eval_kwargs_keys = eval_kwargs_keys
-
-    def apply(self, token, structural=False, grids=None, **kwargs):
-        """
-        Apply the defined evaluator to evaluate the token with specific parameters.
-
-        Args:
-            token (`epde.main_structures.factor.Factor`): symbolic label of the specific token, e.g. 'cos';
-        token_params (`dict`): dictionary with keys, naming the token parameters (such as frequency, axis and power for trigonometric function) 
-            and values - specific values of corresponding parameters.
-
-        Raises:
-            `TypeError`
-                If the evaluator could not be applied to the token.
-        """
-        assert list(kwargs.keys()) == self.eval_kwargs_keys
-        return self._evaluator(token, structural, grids, **kwargs)
 
 
 class TokenFamily(object):
@@ -91,7 +58,7 @@ class TokenFamily(object):
         set_params(tokens, token_params)
             Method to set the list of tokens, present in the family, and their parameters;
 
-        set_evaluator(eval_function, **eval_params)
+        set_evaluator(eval_function)
             Method to set the evaluator for the token family & its parameters;
 
         test_evaluator()
@@ -182,13 +149,13 @@ class TokenFamily(object):
         self.params_set = True
         self.equality_ranges = equality_ranges
 
-        if self.family_of_derivs:
-            print(f'self.tokens is {self.tokens}')
-            print(f'Here, derivs order is {self.derivs_ords}')
+        # if self.family_of_derivs:
+        #     print(f'self.tokens is {self.tokens}')
+        #     print(f'Here, derivs order is {self.derivs_ords}')
         if self.evaluator_set:
             self.test_evaluator()
 
-    def set_evaluator(self, eval_function, eval_kwargs_keys=[], suppress_eval_test=True):
+    def set_evaluator(self, eval_function, suppress_eval_test=True):
         """
         Define the evaluator for the token family and its parameters
 
@@ -231,14 +198,14 @@ class TokenFamily(object):
             >>>     return value
             >>> 
             >>> der_eval_params = {'token_matrices':simple_functions, 'params_names':['power'], 'params_equality':{'power' : 0}}
-            >>> trig_eval_params = {'grid':grid, 'params_names':['power',  'freq', 'dim'], 'params_equality':{'power': 0, 'freq':0.05, 'dim':0}}
-            >>> trigonometric_tokens.set_evaluator(trigonometric_evaluator, **trig_eval_params)
+            # >>> trig_eval_params = {'grid':grid, 'params_names':['power',  'freq', 'dim'], 'params_equality':{'power': 0, 'freq':0.05, 'dim':0}}
+            >>> trigonometric_tokens.set_evaluator(trigonometric_evaluator,)
 
         """
         if isinstance(eval_function, EvaluatorContained):
             self._evaluator = eval_function
         else:
-            self._evaluator = EvaluatorContained(eval_function, eval_kwargs_keys)
+            self._evaluator = EvaluatorContained(eval_function)
         self.evaluator_set = True
         if self.params_set and not suppress_eval_test:
             self.test_evaluator()
@@ -325,7 +292,7 @@ class TokenFamily(object):
             raise TypeError(
                 'Evaluator function or its parameters not set before evaluator application.')
 
-    def create(self, label=None, token_status: dict = None,
+    def create(self, label=None, token_status: dict = None, all_vars: List[str] = None,
                create_derivs: bool = False, **factor_params):
         """
         Method for creating element of the token family
@@ -361,7 +328,7 @@ class TokenFamily(object):
         else:
             factor_deriv_code = None
         new_factor = Factor(token_name=label, deriv_code=factor_deriv_code, status=self.status,
-                            family_type=self.ftype, variable = self.variable,
+                            family_type=self.ftype, variable = self.variable, all_vars = all_vars,
                             latex_constructor = self.latex_constructor)
 
         if self.status['unique_token_type']:
@@ -399,7 +366,7 @@ class TokenFamily(object):
                             for label in self.tokens}
         return len([token for token in self.tokens if token_status[token][0] < token_status[token][1]])
 
-    def evaluate_all(self):
+    def evaluate_all(self, all_vars: List[str]):
         """
         Apply method of evaluation for all tokens in token family
         """
@@ -416,14 +383,14 @@ class TokenFamily(object):
             for params_selection in params_sets:
                 params_sets_labeled = dict(zip(list(self.token_params.keys()), params_selection))
 
-                _, generated_token = self.create(token_label, **params_sets_labeled)
+                _, generated_token = self.create(token_label, all_vars=all_vars, **params_sets_labeled)
                 generated_token.use_cache()
                 if self.status['requires_grid']:
                     generated_token.use_grids_cache()
                 generated_token.scaled = False
                 _ = generated_token.evaluate()
                 print(generated_token.cache_label)
-                if generated_token.cache_label not in global_var.tensor_cache.memory_default.keys():
+                if generated_token.cache_label not in global_var.tensor_cache.memory_default['numpy'].keys():
                     raise KeyError('Generated token somehow was not stored in cache.')
 
 
@@ -524,6 +491,8 @@ class TFPool(object):
                                         p=probabilities).create(label=None,
                                                                 token_status=token_status,
                                                                 create_derivs=create_derivs,
+                                                                all_vars = [family.variable for family in 
+                                                                            self.families_demand_equation], 
                                                                 **kwargs)
             else:
                 probabilities = (self.families_cardinality(False, token_status) /
@@ -532,6 +501,8 @@ class TFPool(object):
                                         p=probabilities).create(label=None,
                                                                 token_status=token_status,
                                                                 create_derivs=create_derivs,
+                                                                all_vars = [family.variable for family in 
+                                                                            self.families_demand_equation],                                                                 
                                                                 **kwargs)
         else:
             token_families = [family for family in self.families if label in family.tokens]
@@ -543,8 +514,8 @@ class TFPool(object):
                 raise Exception(
                     'Desired label does not match tokens in any family.')
             else:
-                return token_families[0].create(label=label,
-                                                token_status=token_status,
+                return token_families[0].create(label=label, token_status=token_status,
+                                                all_vars = [family.variable for family in self.families_demand_equation],
                                                 **kwargs)
 
     def create_from_family(self, family_label: str, token_status=None, **kwargs):
@@ -560,7 +531,9 @@ class TFPool(object):
         """
         # print([f.ftype for f in self.families], family_label)
         family = [f for f in self.families if family_label == f.ftype][0]
-        return family.create(label=None, token_status=token_status, **kwargs)
+        return family.create(label=None, token_status=token_status, 
+                             all_vars = [family.variable for family in self.families_demand_equation], 
+                             **kwargs)
 
     def create_with_var(self, variable: str, token_status=None, **kwargs):
         """
@@ -581,7 +554,9 @@ class TFPool(object):
             try:
                 probabilities = np.array([len(f.tokens) for f in families])
                 family = np.random.choice(families, p = probabilities/probabilities.sum())                
-                return family.create(label=None, token_status=token_status, **kwargs)
+                return family.create(label=None, token_status=token_status, 
+                                     all_vars = [family.variable for family in self.families_demand_equation],
+                                     **kwargs)
             except ValueError:
                 families.remove(family)
                 

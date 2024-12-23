@@ -72,3 +72,5 @@ class LASSOSparsity(CompoundOperator):
 
     def use_default_tags(self):
         self._tags = {'sparsity', 'gene level', 'no suboperators', 'inplace'}
+
+        

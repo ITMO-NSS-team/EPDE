@@ -8,14 +8,17 @@ Created on Fri Jun  4 13:20:59 2021
 
 import numpy as np
 from copy import deepcopy
+import torch
 
 import matplotlib.pyplot as plt
 from matplotlib import cm
 
-from epde.interface.solver_integration import SolverAdapter
+from epde.integrate import SolverAdapter
 from epde.structure.main_structures import SoEq, Equation
 from epde.operators.utils.template import CompoundOperator
 import epde.globals as global_var
+
+LOSS_NAN_VAL = 1e7
 
 class L2Fitness(CompoundOperator):
     """
@@ -68,7 +71,7 @@ class L2Fitness(CompoundOperator):
             if features is None:
                 discr_feats = 0
             else:
-                discr_feats = np.dot(features, objective.weights_final[:-1][objective.weights_internal != 0]) # weights_final -> weights_internal
+                discr_feats = np.dot(features, objective.weights_final[:-1][objective.weights_internal != 0])
 
             discr = (discr_feats + np.full(target.shape, objective.weights_final[-1]) - target)
             self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)
@@ -92,53 +95,77 @@ class L2Fitness(CompoundOperator):
 
 
 class SolverBasedFitness(CompoundOperator):
+
     key = 'SolverBasedFitness'
     
-    def __init__(self, param_keys: list, solver_kwargs: dict = {'model' : None, 'use_cache' : True}):
+    def __init__(self, param_keys: list):
         super().__init__(param_keys)
-        solver_kwargs['dim'] = len(global_var.grid_cache.get_all()[1])
-        
-        self.adapter = None # SolverAdapter(var_number = len(system.vars_to_describe))
+        self.adapter = None
 
-    def set_adapter(self, var_number):
-        if self.adapter is not None:
-            self.adapter = SolverAdapter(var_number = var_number)
+    def set_adapter(self, net = None):
+
+        if self.adapter is None or net is not None:
+            compiling_params = {'mode': 'autograd', 'tol':0.01, 'lambda_bound': 100} #  'h': 1e-1
+            optimizer_params = {}
+            training_params = {'epochs': 4e3, 'info_string_every' : 1e3}
+            early_stopping_params = {'patience': 4, 'no_improvement_patience' : 250}
+
+            explicit_cpu = True
+            device = 'cuda' if (torch.cuda.is_available and not explicit_cpu) else 'cpu'
+
+            self.adapter = SolverAdapter(net = net, use_cache = False, device=device)
+
+            self.adapter.set_compiling_params(**compiling_params)            
+            self.adapter.set_optimizer_params(**optimizer_params)
+            self.adapter.set_early_stopping_params(**early_stopping_params)
+            self.adapter.set_training_params(**training_params)
 
     def apply(self, objective : SoEq, arguments : dict):
-        self.set_adapter(len(objective.vars_to_describe))
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
+
+        try:
+            net = deepcopy(global_var.solution_guess_nn)
+        except NameError:
+            net = None
+
+        self.set_adapter(net=net)
 
         self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
         self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
 
-        # _, target, features = objective.evaluate(normalize = False, return_val = False)
+        print('solving equation:')
+        print(objective.text_form)
 
-        grid = global_var.grid_cache.get_all()[1]
-        solution_model = self.adapter.solve_epde_system(system = objective, grids = grid, 
-                                                        boundary_conditions = None)
-
-        self.g_fun_vals = global_var.grid_cache.g_func #.reshape(-1)
+        loss_add, solution_nn = self.adapter.solve_epde_system(system = objective, grids = None, 
+                                                               boundary_conditions = None, use_fourier=True)
+        _, grids = global_var.grid_cache.get_all(mode = 'torch')
         
-        solution = solution_model(self.adapter.convert_grid(grid)).detach().numpy()
-        for eq_idx, eq in enumerate(objective.structure):
-            referential_data = global_var.tensor_cache.get((eq.main_var_to_explain, (1.0,)))
+        grids = torch.stack([grid.reshape(-1) for grid in grids], dim = 1).float()
+        solution = solution_nn(grids).detach().cpu().numpy()
+        self.g_fun_vals = global_var.grid_cache.g_func
+        
+        for eq_idx, eq in enumerate(objective.vals):
+            if torch.isnan(loss_add):
+                fitness_value = 2*LOSS_NAN_VAL
+            else:
+                referential_data = global_var.tensor_cache.get((eq.main_var_to_explain, (1.0,)))
 
-            discr = (solution[eq_idx, ...] - referential_data.reshape(solution[eq_idx, ...].shape))
-
-            discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape))
-            rl_error = np.linalg.norm(discr, ord = 2)
-            
-            fitness_value = rl_error
-            if np.sum(eq.weights_final) == 0: 
-                fitness_value /= self.params['penalty_coeff']
+                print(f'solution shape {solution.shape}')
+                print(f'solution[..., eq_idx] {solution[..., eq_idx].shape}, eq_idx {eq_idx}')
+                discr = (solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape))
+                discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape))
+                rl_error = np.linalg.norm(discr, ord = 2) 
+                
+                print(f'fitness error is {rl_error}, while loss addition is {float(loss_add)}')            
+                fitness_value = rl_error + self.params['pinn_loss_mult'] * float(loss_add) # TODO: make pinn_loss_mult case dependent
+                if np.sum(eq.weights_final) == 0: 
+                    fitness_value /= self.params['penalty_coeff']
 
             eq.fitness_calculated = True
             eq.fitness_value = fitness_value
 
-            if global_var.verbose.plot_DE_solutions:
-                plot_data_vs_solution(self.adapter.convert_grid(grid),
-                                      data = referential_data.reshape(solution[eq_idx, ...].shape), 
-                                      solution = solution[eq_idx, ...])
+    def use_default_tags(self):
+        self._tags = {'fitness evaluation', 'chromosome level', 'contains suboperators', 'inplace'}
 
     
 def plot_data_vs_solution(grid, data, solution):

@@ -28,7 +28,7 @@ the population size, and *M* is the number of objective functions.
 
 from copy import deepcopy
 import numpy as np
-from abc import ABC, abstractproperty, abstractmethod
+from abc import ABC, abstractmethod
 
 from epde.supplementary import rts
 
@@ -41,11 +41,11 @@ def check_dominance(target, compared_with) -> bool:
         target (`src.moeadd.moeadd_solution_template.MOEADDSolution`):  case-specific subclass object
             The individual solution on the pareto levels, compared with the other element.
         compared_with (`src.moeadd.moeadd_solution_template.MOEADDSolution`):  case-specific subclass object
-            The individual solution on the pareto levels, with with the target is compared.
+            The individual solution on the pareto levels, with which the target is compared.
 
     Returns:
-        domiated (`bool`): Function returns True, if the **compared_with** dominates (has at least one objective
-            functions with less values, while the others are the same) the **target**; 
+        domiated (`bool`): Function returns True, if the **target** dominates (has at least one objective
+            functions with less values, while the others are the same) the **compared_with**; 
             False in all other cases.
 
     """
@@ -84,7 +84,7 @@ def ndl_update(new_solution, levels) -> list:   # efficient_ndl_update
     """
     moving_set = {new_solution}
     new_levels = deepcopy(levels)  # levels# CAUSES ERRORS DUE TO DEEPCOPY
-    # print(f'type(levels) is {type(levels)}')
+
     for level_idx in np.arange(len(levels)):
         moving_set_new = set()
         for ms_idx, moving_set_elem in enumerate(moving_set):
@@ -215,7 +215,10 @@ def slow_non_dominated_sorting(population) -> list:
 
 
 def acute_angle(vector_a, vector_b) -> float:
-    return np.arccos(np.dot(vector_a, vector_b)/(np.sqrt(np.dot(vector_a, vector_a))*np.sqrt(np.dot(vector_b, vector_b))))
+    cos_val = np.dot(vector_a, vector_b)/(np.sqrt(np.dot(vector_a, vector_a))*np.sqrt(np.dot(vector_b, vector_b)))
+    if np.abs(cos_val) > 1.:
+        cos_val = np.sign(cos_val)
+    return np.arccos(cos_val)
 
 
 class Constraint(ABC):

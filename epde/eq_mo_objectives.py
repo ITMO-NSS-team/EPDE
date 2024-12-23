@@ -28,8 +28,6 @@ def equation_fitness(system, equation_key):
         error : float.
         The value of the error metric.
     '''
-    # print(f'System, for which we evaluate fitness: {system.text_form}')
-    # print(f'For equation key {equation_key}, {system.vals[equation_key].fitness_calculated}')
     assert system.vals[equation_key].fitness_calculated, 'Trying to call fitness before its evaluation.'
     res = system.vals[equation_key].fitness_value
     return res

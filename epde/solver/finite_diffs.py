@@ -1,26 +1,28 @@
-from copy import deepcopy, copy
+"""Module for subgrid creation corresponding to numerical scheme. It's used only *NN* method."""
+
+from copy import  copy
 import numpy as np
-from typing import Tuple
+
 flatten_list = lambda t: [item for sublist in t for item in sublist]
 
 
 class First_order_scheme():
-    """
-    Class for numerical scheme construction. Central o(h^2) difference scheme
+    """Class for numerical scheme construction. Central o(h^2) difference scheme
     is used for 'central' points, forward ('f') and backward ('b') o(h) schemes
     are used for boundary points. 'central', and combination 'f','b' are
-    corresponding to points_type.   Args:
+    corresponding to points_type.
 
     """
 
     def __init__(self, term: list, nvars: int, axes_scheme_type: str):
         """
         Args:
-            term: differentiation direction. Example: [0,0]->d2u/dx2 if x is first
-                    direction in the grid.
-            nvars: task parameters. Example: if grid(x,t) -> nvars = 2.
-            axes_scheme_type: scheme type: 'central' or combination of 'f' and 'b'
+            term (list): differentiation direction. Example: [0,0]->d2u/dx2
+            if x is first direction in the grid.
+            nvars (int): task parameters. Example: if grid(x,t) -> nvars = 2.
+            axes_scheme_type (str): scheme type: 'central' or combination of 'f' and 'b'
         """
+
         self.term = term
         self.nvars = nvars
         if axes_scheme_type == 'central':
@@ -31,17 +33,18 @@ class First_order_scheme():
     # the idea is simple - central difference changes
     # [0]->([1]-[-1])/(2h) (in terms of grid nodes position)
     @staticmethod
-    def finite_diff_shift(diff: list, axis: int, mode: str) ->  list:
-        """
-        1st order points shift for the corresponding finite difference mode.
+    def _finite_diff_shift(diff: list, axis: int, mode: str) ->  list:
+        """ 1st order points shift for the corresponding finite difference mode.
 
         Args:
-            diff: values of finite differences.
-            axis: axis.
-            mode: the finite difference mode (i.e., forward, backward, central).
+            diff (list): values of finite differences.
+            axis (int): axis.
+            mode (str): the finite difference mode (i.e., forward, backward, central).
+
         Returns:
-            diff_list: list with shifted points.
+            list: list with shifted points.
         """
+ 
         diff_p = copy(diff)
         diff_m = copy(diff)
         if mode == 'central':
@@ -54,23 +57,22 @@ class First_order_scheme():
         return [diff_p, diff_m]
 
     def scheme_build(self) -> list:
-        """
-        Building first order (in terms of accuracy) finite-difference stencil.
-
+        """ Building first order (in terms of accuracy) finite-difference scheme.
         Start from list of zeros where them numbers equal nvars. After that we
-        move value in that axis which corresponding toterm. [0,0]->[[1,0],[-1,0]]
+        move value in that axis which corresponding to term. [0,0]->[[1,0],[-1,0]]
         it means that term was [0] (d/dx) and mode (scheme_type) is 'central'.
 
         Returns:
-            numerical scheme.
+            list: numerical scheme.
         """
+
         order = len(self.term)
         finite_diff = [[0 for _ in range(self.nvars)]]
         for i in range(order):
             diff_list = []
             for diff in finite_diff:
                 # we use [0,0]->[[1,0],[-1,0]] rule for the axis
-                f_diff = self.finite_diff_shift(
+                f_diff = self._finite_diff_shift(
                     diff, self.term[i], self.direction_list[i])
 
                 if len(diff_list) == 0:
@@ -85,8 +87,8 @@ class First_order_scheme():
         return finite_diff
 
     def sign_order(self, h: float = 1 / 2) -> list :
-        """
-        Determines the sign of the derivative for the corresponding transformation from Finite_diffs.scheme_build().
+        """ Determines the sign of the derivative for the corresponding transformation
+        from Finite_diffs.scheme_build().
 
         From transformations above, we always start from +1 (1)
         Every +1 changes to ->[+1,-1] when order of differential rises
@@ -95,13 +97,15 @@ class First_order_scheme():
         [[1,0],[-1,0]] ([+1,-1])->[[1,1],[1,-1],[-1,1],[-1,-1]] ([+1,-1,-1,+1])
 
         Args:
-            h: discretizing parameter in finite difference method (i.e., grid resolution for scheme).
+            h (float, optional): discretizing parameter in finite-
+            difference method. Defaults to 1/2.
 
         Returns:
-            list, with signs for corresponding points.
+            list: list, with signs for corresponding points.
         """
+
         sign_list = [1]
-        for i in range(len(self.term)):
+        for _ in range(len(self.term)):
             start_list = []
             for sign in sign_list:
                 if np.unique(self.direction_list)[0] == 'central':
@@ -120,11 +124,15 @@ class Second_order_scheme():
     def __init__(self, term: list, nvars: int, axes_scheme_type: str):
         """
         Args:
-            term: differentiation direction. Example: [0,0]->d2u/dx2 if x is first
+            term (list): differentiation direction. Example: [0,0]->d2u/dx2 if x is first
                     direction in the grid.
-            nvars: task parameters. Example: if grid(x,t) -> nvars = 2.
-            axes_scheme_type: scheme type: 'central' or combination of 'f' and 'b'
+            nvars (int): task parameters. Example: if grid(x,t) -> nvars = 2.
+            axes_scheme_type (str): scheme type: 'central' or combination of 'f' and 'b'
+
+        Raises:
+            ValueError: _description_
         """
+        
         self.term = term
         self.nvars = nvars
         try:
@@ -135,7 +143,17 @@ class Second_order_scheme():
         self.direction_list = [axes_scheme_type[i] for i in self.term]
 
     @staticmethod
-    def second_order_shift(diff, axis, mode):
+    def _second_order_shift(diff, axis, mode) -> list:
+        """ 2st order points shift for the corresponding finite difference mode.
+
+        Args:
+            diff (list): values of finite differences.
+            axis (int): axis.
+            mode (str): the finite difference mode (i.e., forward, backward).
+
+        Returns:
+            list: list with shifted points.
+        """
         diff_1 = copy(diff)
         diff_2 = copy(diff)
         diff_3 = copy(diff)
@@ -150,13 +168,12 @@ class Second_order_scheme():
         return [diff_3, diff_2, diff_1]
 
     def scheme_build(self) -> list:
-        """
-        Scheme building for Crank-Nicolson variant, it's identical to
+        """Scheme building for Crank-Nicolson variant, it's identical to
         'scheme_build' in first order method, but value is shifted by
         'second_order_shift'.
 
         Returns:
-            numerical scheme list.
+            list: numerical scheme list.
         """
 
         order = len(self.term)
@@ -164,10 +181,9 @@ class Second_order_scheme():
         # when we increase differential order
         for i in range(order):
             diff_list = []
-            direction_list = []
             for diff in finite_diff:
                 # we use [0,0]->[[1,0],[-1,0]] rule for the axis
-                f_diff = self.second_order_shift(
+                f_diff = self._second_order_shift(
                     diff, self.term[i], self.direction_list[i])
                 if len(diff_list) == 0:
                     # and put it to the pool of differentials if it is empty
@@ -181,13 +197,14 @@ class Second_order_scheme():
         return finite_diff
 
     def sign_order(self, h: float = 1/2) -> list:
-        """
-        Signs definition for second order schemes.
+        """ Signs definition for second order schemes.
 
         Args:
-            h: discretizing parameter in finite difference method (i.e., grid resolution for scheme).
+            h (float, optional): discretizing parameter in finite-
+            difference method (i.e., grid resolution for scheme). Defaults to 1/2.
+
         Returns:
-            list, with signs for corresponding points.
+            list: list, with signs for corresponding points.
         """
 
         sign_list = [1]
@@ -214,29 +231,29 @@ class Finite_diffs():
     def __init__(self, term: list, nvars: int, axes_scheme_type: str):
         """
         Args:
-            term: differentiation direction. Example: [0,0]->d2u/dx2 if x is first
+            term (list): differentiation direction. Example: [0,0]->d2u/dx2 if x is first
                     direction in the grid.
-            nvars: task parameters. Example: if grid(x,t) -> nvars = 2.
-            axes_scheme_type: scheme type: 'central' or combination of 'f' and 'b'
+            nvars (int): task parameters. Example: if grid(x,t) -> nvars = 2.
+            axes_scheme_type (str): scheme type: 'central' or combination of 'f' and 'b'
         """
+
         self.term = term
         self.nvars = nvars
         self.axes_scheme_type = axes_scheme_type
 
-    def scheme_choose(self, scheme_label: str, h:float = 1 / 2):
-        """
-        Method for numerical scheme choosing via realized above.
+    def scheme_choose(self, scheme_label: str, h:float = 1 / 2) -> list:
+        """ Method for numerical scheme choosing via realized above.
 
         Args:
-            scheme_label:
-                '2'- for second order scheme (only boundaries points),
+            scheme_label (str): '2'- for second order scheme (only boundaries points),
                 '1' - for first order scheme.
-
-            h: discretizing parameter in finite difference method (i.e., grid resolution for scheme).
+            h (float, optional): discretizing parameter in finite-
+            difference method (i.e., grid resolution for scheme). Defaults to 1/2.
 
         Returns:
-            list where list[0] is numerical scheme and list[1] is signs.
+            list: list where list[0] is numerical scheme and list[1] is signs.
         """
+
         if self.term == [None]:
             return [[None], [1]]
         elif scheme_label == '2':
