@@ -177,7 +177,7 @@ class PIC(CompoundOperator):
     def __init__(self, param_keys: list):
         super().__init__(param_keys)
         self.adapter = None
-        self.window_size = 2
+        self.window_size = 2   # Idk which one we need
 
     def set_adapter(self, net=None):
 
@@ -219,6 +219,15 @@ class PIC(CompoundOperator):
             predictions = feature_window @ params
             residuals = predictions - target_window
             return np.sum(residuals ** 2)
+
+
+        loss_add, solution_nn = self.adapter.solve_epde_system(system=objective, grids=None,
+                                                               boundary_conditions=None, use_fourier=True)
+        _, grids = global_var.grid_cache.get_all(mode='torch')
+
+        grids = torch.stack([grid.reshape(-1) for grid in grids], dim=1).float()
+        solution = solution_nn(grids).detach().cpu().numpy()
+        self.g_fun_vals = global_var.grid_cache.g_func
 
         for eq_idx, eq in enumerate(objective.vals):
             target_vals = eq.evaluate(False)
@@ -265,15 +274,6 @@ class PIC(CompoundOperator):
             eq_cv = [np.std(_) / np.mean(_) for _ in zip(*eq_window_weights)]
             lr = np.mean(eq_cv)
 
-        loss_add, solution_nn = self.adapter.solve_epde_system(system=objective, grids=None,
-                                                               boundary_conditions=None, use_fourier=True)
-        _, grids = global_var.grid_cache.get_all(mode='torch')
-
-        grids = torch.stack([grid.reshape(-1) for grid in grids], dim=1).float()
-        solution = solution_nn(grids).detach().cpu().numpy()
-        self.g_fun_vals = global_var.grid_cache.g_func
-
-        for eq_idx, eq in enumerate(objective.vals):
             if torch.isnan(loss_add):
                 lp = 2 * LOSS_NAN_VAL
             else:
