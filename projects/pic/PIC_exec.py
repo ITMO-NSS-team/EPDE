@@ -11,7 +11,7 @@ from epde.interface.prepared_tokens import CustomTokens, PhasedSine1DTokens, Con
 from epde.interface.equation_translator import translate_equation
 from epde.interface.interface import EpdeSearch
 
-from epde.operators.common.coeff_calculation import LinRegBasedCoeffsEquation
+from epde.operators.common.coeff_calculation import LinRegBasedCoeffsEquation, MovingHorizonsCoeffsEquation
 from epde.operators.common.sparsity import LASSOSparsity
 
 from epde.operators.utils.operator_mappers import map_operator_between_levels
@@ -44,7 +44,7 @@ def load_data(filename):
     return grids, data
 
 
-def loda_pretrained_PINN(ann_filename):
+def load_pretrained_PINN(ann_filename):
     try:
         with open(ann_filename, 'rb') as data_input_file:  
             data_nn = pickle.load(data_input_file)
@@ -55,7 +55,7 @@ def loda_pretrained_PINN(ann_filename):
 
 def prepare_suboperators(fitness_operator: CompoundOperator) -> CompoundOperator:
     sparsity = LASSOSparsity()
-    coeff_calc = LinRegBasedCoeffsEquation()        
+    coeff_calc = LinRegBasedCoeffsEquation()
 
     sparsity = map_operator_between_levels(sparsity, 'gene level', 'chromosome level')
     coeff_calc = map_operator_between_levels(coeff_calc, 'gene level', 'chromosome level')
@@ -66,7 +66,8 @@ def prepare_suboperators(fitness_operator: CompoundOperator) -> CompoundOperator
 
 
 if __name__ == "__main__":
-    Operator = fitness.SolverBasedFitness # Replace by the developed PIC-based operator.
+    # Operator = fitness.SolverBasedFitness # Replace by the developed PIC-based operator.
+    Operator = fitness.PIC  # Replace by the developed PIC-based operator.
     operator_params = {"penalty_coeff" : 0.2, "pinn_loss_mult" : 1e4}
     fit_operator = prepare_suboperators(Operator(list(operator_params.keys())))
     fit_operator.params = operator_params
@@ -78,36 +79,36 @@ if __name__ == "__main__":
     data_file_name = os.path.join(os.path.dirname( __file__ ), f'wave_sln_{shape}.csv')
 
     grid, data = load_data(data_file_name)
-    data_nn = loda_pretrained_PINN(pinn_file_name)
+    data_nn = load_pretrained_PINN(pinn_file_name)
 
     dimensionality = data.ndim - 1
-    
+
     epde_search_obj = EpdeSearch(use_solver = True, dimensionality = dimensionality, boundary = 10,
-                                      coordinate_tensors = (grid[..., 0], grid[..., 1]), verbose_params = {'show_iter_idx' : True}, 
-                                      device = 'cpu')    
+                                      coordinate_tensors = (grid[..., 0], grid[..., 1]), verbose_params = {'show_iter_idx' : True},
+                                      device = 'cpu')
 
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
-                                     preprocessor_kwargs={}) 
+                                     preprocessor_kwargs={})
 
     epde_search_obj.create_pool(data=data, variable_names=['u',], max_deriv_order=(2, 2),
                                 additional_tokens = [], data_nn = data_nn)
 
     # eq_wave_symbolic = '1. * d^2u/dx1^2{power: 1} + 0. = d^2u/dx0^2{power: 1}'
     eq_wave_symbolic = '0.04 * d^2u/dx1^2{power: 1} + 0. = d^2u/dx0^2{power: 1}'
-    wave_eq = translate_equation(eq_wave_symbolic, epde_search_obj.pool, all_vars = ['u',])   
+    wave_eq = translate_equation(eq_wave_symbolic, epde_search_obj.pool, all_vars = ['u',])
     wave_eq.vals['u'].main_var_to_explain = 'u'
     wave_eq.vals['u'].metaparameters = {('sparsity', 'u'): {'optimizable': False, 'value': 0.5}}
     print(wave_eq.text_form)
 
-    eq_incorrect_symbolic = '1. * d^2u/dx1^2{power: 1} * du/dx1{power: 1} + 2.3 * d^2u/dx0^2{power: 1} + 0. = du/dx0{power: 1}'    
+    eq_incorrect_symbolic = '1. * d^2u/dx1^2{power: 1} * du/dx1{power: 1} + 2.3 * d^2u/dx0^2{power: 1} + 0. = du/dx0{power: 1}'
     incorrect_eq = translate_equation(eq_incorrect_symbolic, epde_search_obj.pool, all_vars = ['u',])   #  , all_vars = ['u', 'v'])
     incorrect_eq.vals['u'].main_var_to_explain = 'u'
     incorrect_eq.vals['u'].metaparameters = {('sparsity', 'u'): {'optimizable': False, 'value': 0.5}}
     print(incorrect_eq.text_form)
 
-
     fit_operator.apply(wave_eq, {})
     fit_operator.apply(incorrect_eq, {})
 
-    print(wave_eq.vals['u'].fitness_value, incorrect_eq.vals['u'].fitness_value)
+    print(wave_eq.vals['u'].fitness_value)
+    print(incorrect_eq.vals['u'].fitness_value)
     assert wave_eq.vals['u'].fitness_value < incorrect_eq.vals['u'].fitness_value
