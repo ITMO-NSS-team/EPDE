@@ -229,6 +229,7 @@ class PIC(CompoundOperator):
         self.g_fun_vals = global_var.grid_cache.g_func
 
         for eq_idx, eq in enumerate(objective.vals):
+            # Calculate r-loss
             target = eq.structure[eq.target_idx]
             target_vals = target.evaluate(False)
             features_vals = []
@@ -273,9 +274,12 @@ class PIC(CompoundOperator):
                     window_weights = result.x
                     eq_window_weights.append(window_weights)
 
-            eq_cv = [np.abs(np.std(_) / np.mean(_)) for _ in zip(*eq_window_weights)]
+            # eq_cv = [np.std(_) / np.mean(_) for _ in zip(*eq_window_weights)]  # Default std
+            eq_cv = [np.abs(np.std(_) / np.mean(_)) for _ in zip(*eq_window_weights)]  # As in papers' repo
+            # eq_cv = [np.mean((_ - np.mean(_)) / np.mean(_)) for _ in zip(*eq_window_weights)]  # As in paper formula
             lr = np.mean(eq_cv)
 
+            # Calculate p-loss
             if torch.isnan(loss_add):
                 lp = 2 * LOSS_NAN_VAL
             else:
@@ -288,7 +292,7 @@ class PIC(CompoundOperator):
                 sol_pinn_normalized = (sol_pinn - min(sol_pinn)) / (max(sol_pinn) - min(sol_pinn))
                 sol_ann_normalized = (sol_ann - min(sol_ann)) / (max(sol_ann) - min(sol_ann))
                 discr = sol_pinn_normalized - sol_ann_normalized
-                # discr = (solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape))
+                # discr = (solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape))  # Default
                 discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape))
                 rl_error = np.linalg.norm(discr, ord=2)
 
@@ -297,6 +301,8 @@ class PIC(CompoundOperator):
                     loss_add)  # TODO: make pinn_loss_mult case dependent
                 if np.sum(eq.weights_final) == 0:
                     lp /= self.params['penalty_coeff']
+
+            # Fit
             eq.fitness_calculated = True
             eq.fitness_value = lr * lp
 
