@@ -169,15 +169,15 @@ class SolverBasedFitness(CompoundOperator):
     def use_default_tags(self):
         self._tags = {'fitness evaluation', 'chromosome level', 'contains suboperators', 'inplace'}
 
+
 class PIC(CompoundOperator):
-    # To be modified to include physics-informed information criterion (PIC)
 
     key = 'PIC'
 
     def __init__(self, param_keys: list):
         super().__init__(param_keys)
         self.adapter = None
-        self.window_size = 2   # Idk which one we need
+        self.window_size = 10   # Idk which one we need
 
     def set_adapter(self, net=None):
 
@@ -196,7 +196,6 @@ class PIC(CompoundOperator):
             self.adapter.set_optimizer_params(**optimizer_params)
             self.adapter.set_early_stopping_params(**early_stopping_params)
             self.adapter.set_training_params(**training_params)
-
 
     def apply(self, objective: SoEq, arguments: dict):
         self_args, subop_args = self.parse_suboperator_args(arguments=arguments)
@@ -220,9 +219,9 @@ class PIC(CompoundOperator):
             residuals = predictions - target_window
             return np.sum(residuals ** 2)
 
-
         loss_add, solution_nn = self.adapter.solve_epde_system(system=objective, grids=None,
                                                                boundary_conditions=None, use_fourier=True)
+
         _, grids = global_var.grid_cache.get_all(mode='torch')
 
         grids = torch.stack([grid.reshape(-1) for grid in grids], dim=1).float()
@@ -230,8 +229,8 @@ class PIC(CompoundOperator):
         self.g_fun_vals = global_var.grid_cache.g_func
 
         for eq_idx, eq in enumerate(objective.vals):
-            target_vals = eq.evaluate(False)
-            target_vals = list(target_vals)
+            target = eq.structure[eq.target_idx]
+            target_vals = target.evaluate(False)
             features_vals = []
             nonzero_features_indexes = []
 
@@ -252,12 +251,15 @@ class PIC(CompoundOperator):
             features = np.vstack([features, np.ones(features_vals[0].shape)])  # Add constant feature
             features = np.transpose(features)
 
+            self.window_size = len(target_vals) // 2
+            num_horizons = len(target_vals) - self.window_size + 1
             eq_window_weights = []
+
             # Perform optimization over sliding windows
-            for start_idx in range(0, len(target_vals[1]) - self.window_size + 1):
+            for start_idx in range(num_horizons):
                 end_idx = start_idx + self.window_size
 
-                target_window = target_vals[1][start_idx:end_idx]
+                target_window = target_vals[start_idx:end_idx]
                 feature_window = features[start_idx:end_idx, :]
 
                 # Initial guess for parameters

@@ -11,7 +11,7 @@ from epde.interface.prepared_tokens import CustomTokens, PhasedSine1DTokens, Con
 from epde.interface.equation_translator import translate_equation
 from epde.interface.interface import EpdeSearch
 
-from epde.operators.common.coeff_calculation import LinRegBasedCoeffsEquation, MovingHorizonsCoeffsEquation
+from epde.operators.common.coeff_calculation import LinRegBasedCoeffsEquation
 from epde.operators.common.sparsity import LASSOSparsity
 
 from epde.operators.utils.operator_mappers import map_operator_between_levels
