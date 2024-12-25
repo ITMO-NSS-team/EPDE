@@ -273,7 +273,7 @@ class PIC(CompoundOperator):
                     window_weights = result.x
                     eq_window_weights.append(window_weights)
 
-            eq_cv = [np.std(_) / np.mean(_) for _ in zip(*eq_window_weights)]
+            eq_cv = [np.abs(np.std(_) / np.mean(_)) for _ in zip(*eq_window_weights)]
             lr = np.mean(eq_cv)
 
             if torch.isnan(loss_add):
@@ -283,7 +283,12 @@ class PIC(CompoundOperator):
 
                 print(f'solution shape {solution.shape}')
                 print(f'solution[..., eq_idx] {solution[..., eq_idx].shape}, eq_idx {eq_idx}')
-                discr = (solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape))
+                sol_pinn = solution[..., eq_idx]
+                sol_ann = referential_data.reshape(solution[..., eq_idx].shape)
+                sol_pinn_normalized = (sol_pinn - min(sol_pinn)) / (max(sol_pinn) - min(sol_pinn))
+                sol_ann_normalized = (sol_ann - min(sol_ann)) / (max(sol_ann) - min(sol_ann))
+                discr = sol_pinn_normalized - sol_ann_normalized
+                # discr = (solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape))
                 discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape))
                 rl_error = np.linalg.norm(discr, ord=2)
 
