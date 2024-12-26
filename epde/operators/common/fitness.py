@@ -17,6 +17,7 @@ from epde.integrate import SolverAdapter
 from epde.structure.main_structures import SoEq, Equation
 from epde.operators.utils.template import CompoundOperator
 import epde.globals as global_var
+from sklearn.linear_model import LinearRegression
 from scipy.optimize import minimize
 
 LOSS_NAN_VAL = 1e7
@@ -263,21 +264,39 @@ class PIC(CompoundOperator):
                 target_window = target_vals[start_idx:end_idx]
                 feature_window = features[start_idx:end_idx, :]
 
-                # Initial guess for parameters
-                initial_params = np.zeros(feature_window.shape[1])
+                # # Initial guess for parameters
+                # initial_params = np.zeros(feature_window.shape[1])
+                #
+                # # Optimize weights for the current window
+                # result = minimize(cost_function, initial_params, args=(target_window, feature_window),
+                #                   method='L-BFGS-B')
+                #
+                # if result.success:
+                #     window_weights = result.x
+                #     eq_window_weights.append(window_weights)
 
-                # Optimize weights for the current window
-                result = minimize(cost_function, initial_params, args=(target_window, feature_window),
-                                  method='L-BFGS-B')
-
-                if result.success:
-                    window_weights = result.x
-                    eq_window_weights.append(window_weights)
+                # Linear Regression
+                estimator = LinearRegression(fit_intercept=False)
+                if feature_window.ndim == 1:
+                    feature_window = feature_window.reshape(-1, 1)
+                try:
+                    self.g_fun_vals_window = self.g_fun_vals.reshape(-1)[start_idx:end_idx]
+                except AttributeError:
+                    self.g_fun_vals_window = None
+                estimator.fit(feature_window, target_window, sample_weight=self.g_fun_vals_window)
+                valuable_weights = estimator.coef_
+                window_weights = np.zeros(len(eq.structure))
+                for weight_idx in range(len(window_weights) - 1):
+                    if weight_idx in nonzero_features_indexes:
+                        window_weights[weight_idx] = valuable_weights[nonzero_features_indexes.index(weight_idx)]
+                window_weights[-1] = valuable_weights[-1]
+                eq_window_weights.append(window_weights)
 
             # eq_cv = [np.std(_) / np.mean(_) for _ in zip(*eq_window_weights)]  # Default std
-            eq_cv = [np.abs(np.std(_) / np.mean(_)) for _ in zip(*eq_window_weights)]  # As in papers' repo
-            # eq_cv = [np.mean((_ - np.mean(_)) / np.mean(_)) for _ in zip(*eq_window_weights)]  # As in paper formula
+            eq_cv = [np.abs(np.std(_) / (np.mean(_) + 1e-8)) for _ in zip(*eq_window_weights)]  # As in papers' repo
+            # eq_cv = [np.mean((_ - np.mean(_)) / np.mean(_)) for _ in zip(*eq_window_weights)]  # As in paper formula (BUG)
             lr = np.mean(eq_cv)
+            print(eq_cv)
 
             # Calculate p-loss
             if torch.isnan(loss_add):
