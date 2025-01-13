@@ -264,16 +264,6 @@ class PIC(CompoundOperator):
                 target_window = target_vals[start_idx:end_idx]
                 feature_window = features[start_idx:end_idx, :]
 
-                #   # Initial guess for parameters
-                # initial_params = np.zeros(feature_window.shape[1])
-                #
-                # # Optimize weights for the current window
-                # result = minimize(cost_function, initial_params, args=(target_window, feature_window),
-                #                   method='L-BFGS-B')
-                #
-                # if result.success:
-                #     valuable_weights = result.x
-
                 # Linear Regression
                 estimator = LinearRegression(fit_intercept=False)
                 if feature_window.ndim == 1:

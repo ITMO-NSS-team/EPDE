@@ -66,8 +66,8 @@ def prepare_suboperators(fitness_operator: CompoundOperator) -> CompoundOperator
 
 
 if __name__ == "__main__":
-    # Operator = fitness.SolverBasedFitness # Replace by the developed PIC-based operator.
-    Operator = fitness.PIC  # Replace by the developed PIC-based operator.
+    Operator = fitness.SolverBasedFitness # Replace by the developed PIC-based operator.
+    # Operator = fitness.PIC  # Replace by the developed PIC-based operator.
     operator_params = {"penalty_coeff" : 0.2, "pinn_loss_mult" : 1e4}
     fit_operator = prepare_suboperators(Operator(list(operator_params.keys())))
     fit_operator.params = operator_params
