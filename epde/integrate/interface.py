@@ -81,8 +81,10 @@ class SystemSolverInterface(object):
             deriv_orders = [deriv_orders[0],]
 
         if deriv_vars == []:
-            if deriv_powers != 0:
+            if isinstance(deriv_powers, int) and deriv_powers != 0:
                 raise Exception('Something went wrong with parsing an equation for solver')
+            # elif isinstance(deriv_powers, list) and all([spec_power != 0 for spec_power in deriv_powers]):
+            #     raise Exception('Something went wrong with parsing an equation for solver')
             else:
                 deriv_vars = [0,]
 

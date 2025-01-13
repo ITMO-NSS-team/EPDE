@@ -33,15 +33,15 @@ def load_pretrained_PINN(ann_filename):
 
 def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str, 
                       search_obj: EpdeSearch, all_vars: List[str] = ['u',]) -> bool:
-    metaparams = {('sparsity', var): {'optimizable': False, 'value': 0.5} for var in all_vars}
+    metaparams = {('sparsity', var): {'optimizable': False, 'value': 1E-6} for var in all_vars}
 
     correct_eq = translate_equation(correct_symbolic, search_obj.pool, all_vars = all_vars)
     for var in all_vars:
         correct_eq.vals[var].main_var_to_explain = var
         correct_eq.vals[var].metaparameters = metaparams
-    print(wave_eq.text_form)
+    print(correct_eq.text_form)
  
-    incorrect_eq = translate_equation(eq_incorrect_symbolic, epde_search_obj.pool, all_vars = ['u',])   #  , all_vars = ['u', 'v'])
+    incorrect_eq = translate_equation(eq_incorrect_symbolic, search_obj.pool, all_vars = all_vars)   #  , all_vars = ['u', 'v'])
     for var in all_vars:
         incorrect_eq.vals[var].main_var_to_explain = var
         incorrect_eq.vals[var].metaparameters = metaparams
@@ -74,10 +74,10 @@ def ODE_test(operator: CompoundOperator, foldername: str):
     # g3 = lambda x: 4.
     # g4 = lambda x: 1.5*x
     
-    eq_ode_symbolic = '-1.0 * d^2u/dx0^2{power: 1.0} + 1.5 * t{power: 1.0, dim: 0.0} + -4.0 * u{power: 1.0} + -0.0 = \
-                       du/dx0{power: 1.0} * sin{power: 1.0, freq: 2.0, dim: 0.0}'
-    eq_ode_incorrect = '1.0 * du/dx0{power: 1.0} + 3.5 * t{power: 1.0, dim: 0.0} * u{power: 1.0} + -1.2 = \
-                        du/dx0{power: 1.0} * sin{power: 1.0, freq: 2.0, dim: 0.0}'
+    eq_ode_symbolic = '-1.0 * d^2u/dx0^2{power: 1.0} + 1.5 * x_0{power: 1.0, dim: 0.0} + -4.0 * u{power: 1.0} + -0.0 \
+                       = du/dx0{power: 1.0} * sin{power: 1.0, freq: 2.0, dim: 0.0}'
+    eq_ode_incorrect = '1.0 * du/dx0{power: 1.0} + 3.5 * x_0{power: 1.0, dim: 0.0} * u{power: 1.0} + -1.2 \
+                        = du/dx0{power: 1.0} * sin{power: 1.0, freq: 2.0, dim: 0.0}'
 
     step = 0.05; steps_num = 320
     t = np.arange(start = 0., stop = step * steps_num, step = step)
@@ -107,10 +107,10 @@ def ODE_test(operator: CompoundOperator, foldername: str):
 def VdP_test(operator: CompoundOperator, foldername: str):
     # u'' + E (u^2 - 1)u' + u = 0, where $\mathcal{E}$ is a positive constant (in the example we will use $\mathcal{E} = 0.2$)
     # Test scenario to evaluate performance on Van-der-Pol oscillator
-    eq_vdp_symbolic = '-0.2 * u{power: 2.0} * d^2u/dx0^2{power: 1.0} + 0.2 * d^2u/dx0^2{power: 1.0} + -1.0 * u{power: 1.0} + -0.0 = \
-                       d^2u/dx0^2{power: 1.0}'
-    eq_vdp_incorrect = '-1.0 * d^2u/dx0^2{power: 1.0} + 1.5 * t{power: 1.0, dim: 0.0} + -4.0 * u{power: 1.0} + -0.0 = \
-                        du/dx0{power: 1.0} * sin{power: 1.0, freq: 2.0, dim: 0.0}'
+    eq_vdp_symbolic = '-0.2 * u{power: 2.0} * d^2u/dx0^2{power: 1.0} + 0.2 * d^2u/dx0^2{power: 1.0} + -1.0 * u{power: 1.0} + -0.0 \
+                       = d^2u/dx0^2{power: 1.0}'
+    eq_vdp_incorrect = '-1.0 * d^2u/dx0^2{power: 1.0} + 1.5 * x_0{power: 1.0, dim: 0.0} + -4.0 * u{power: 1.0} + -0.0 \
+                        = du/dx0{power: 1.0} * sin{power: 1.0, freq: 2.0, dim: 0.0}'
 
     # grid, data = load_data(os.path.join(foldername, 'data.npy'))
 
@@ -143,23 +143,23 @@ def ac_data(filename: str):
     x = np.linspace(-1., 0.984375, 128)
     data = np.load(filename).T
     # t = np.linspace(0, 1, shape+1); x = np.linspace(0, 1, shape+1)
-    grids = np.stack(np.meshgrid(t, x, indexing = 'ij'), axis = 2)
+    grids = np.meshgrid(t, x, indexing = 'ij')  # np.stack(, axis = 2) , axis = 2)
     return grids, data    
 
 
 def AC_test(operator: CompoundOperator, foldername: str):
     # Test scenario to evaluate performance on Allen-Cahn equation
     eq_ac_symbolic = '0.0001 * d^2u/dx1^2{power: 1.0} + -5.0 * u{power: 1.0} + 5.0 * u{power: 1.0} + 0.0 = du/dx0{power: 1.0}'
-    eq_ac_incorrect = '-1.0 * d^2u/dx0^2{power: 1.0} + 1.5 * u{power: 1.0} -0.0 = \
-                       du/dx0{power: 1.0}'
+    eq_ac_incorrect = '-1.0 * d^2u/dx0^2{power: 1.0} + 1.5 * u{power: 1.0} -0.0 = du/dx0{power: 1.0}'
     
     grid, data = ac_data(os.path.join(foldername, 'ac_data.npy'))
     data_nn = load_pretrained_PINN(os.path.join(foldername, 'ac_ann_pretrained.pickle'))
 
+    print('Shapes:', data.shape, grid[0].shape)
     dimensionality = 1
 
     epde_search_obj = EpdeSearch(use_solver = True, dimensionality = dimensionality, boundary = 10,
-                                 coordinate_tensors = (grid), verbose_params = {'show_iter_idx' : True},
+                                 coordinate_tensors = ((grid[0], grid[1])), verbose_params = {'show_iter_idx' : True},
                                  device = 'cpu')
 
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
@@ -184,7 +184,7 @@ def kdv_data(filename, shape = 80):
     data = np.loadtxt(filename, delimiter = ',').T
 
     t = np.linspace(0, 1, shape+1); x = np.linspace(0, 1, shape+1)
-    grids = np.stack(np.meshgrid(t, x, indexing = 'ij'), axis = 2)
+    grids = np.meshgrid(t, x, indexing = 'ij') # np.stack(, axis = 2)
     return grids, data
 
 
@@ -197,7 +197,8 @@ def KdV_test(operator: CompoundOperator, foldername: str):
     
     grid, data = kdv_data(os.path.join(foldername, 'data.csv'))
     data_nn = load_pretrained_PINN(os.path.join(foldername, 'kdv_ann_pretrained.pickle'))
-
+    
+    print('Shapes:', data.shape, grid[0].shape)
     dimensionality = 1
 
     from epde import TrigonometricTokens
@@ -205,7 +206,7 @@ def KdV_test(operator: CompoundOperator, foldername: str):
                                       dimensionality = dimensionality)
 
     epde_search_obj = EpdeSearch(use_solver = True, dimensionality = dimensionality, boundary = 10,
-                                 coordinate_tensors = (grid), verbose_params = {'show_iter_idx' : True},
+                                 coordinate_tensors = (grid[0], grid[1]), verbose_params = {'show_iter_idx' : True},
                                  device = 'cpu')
 
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
@@ -225,17 +226,17 @@ if __name__ == "__main__":
     fit_operator = prepare_suboperators(Operator(list(operator_params.keys())))
     fit_operator.params = operator_params
 
-    ode_folder_name = r"C:\Users\Gromwud\PycharmProjects\NSS\EPDE\projects\pic\data\ode"
+    ode_folder_name = r"C:\\Users\\Mike\\Documents\\Work\\PIC\\EPDE\\projects\\pic\\data\\ode"
     # ODE_test(fit_operator, ode_folder_name)
 
-    vdp_folder_name = r"C:\Users\Gromwud\PycharmProjects\NSS\EPDE\projects\pic\data\vdp"
-    # VdP_test(fit_operator, vdp_folder_name)
+    vdp_folder_name = r"C:\\Users\\Mike\\Documents\\Work\\PIC\\EPDE\\projects\\pic\\data\\vdp"
+    VdP_test(fit_operator, vdp_folder_name)
 
-    ac_folder_name = r"C:\Users\Gromwud\PycharmProjects\NSS\EPDE\projects\pic\data\ac"
-    # AC_test(fit_operator, ac_folder_name)
+    ac_folder_name = r"C:\\Users\\Mike\\Documents\\Work\\PIC\\EPDE\\projects\\pic\\data\\ac"
+    AC_test(fit_operator, ac_folder_name)
 
     # wave_folder_name = ...
     # wave_test(fit_operator, wave_folder_name)
 
-    kdv_folder_name = r"C:\Users\Gromwud\PycharmProjects\NSS\EPDE\projects\pic\data\kdv"
+    kdv_folder_name = r"C:\\Users\\Mike\\Documents\\Work\\PIC\\EPDE\\projects\\pic\\data\\kdv"
     KdV_test(fit_operator, kdv_folder_name)
