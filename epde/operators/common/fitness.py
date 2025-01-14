@@ -214,12 +214,6 @@ class PIC(CompoundOperator):
         print('solving equation:')
         print(objective.text_form)
 
-        # Define cost function for the Moving Horizons method
-        def cost_function(params, target_window, feature_window):
-            predictions = feature_window @ params
-            residuals = predictions - target_window
-            return np.sum(residuals ** 2)
-
         loss_add, solution_nn = self.adapter.solve_epde_system(system=objective, grids=None,
                                                                boundary_conditions=None, use_fourier=True)
 
@@ -285,8 +279,9 @@ class PIC(CompoundOperator):
             # eq_cv = [np.std(_) / np.mean(_) for _ in zip(*eq_window_weights)]  # Default std
             eq_cv = [np.abs(np.std(_) / (np.mean(_))) for _ in zip(*eq_window_weights)]  # As in papers' repo
             # eq_cv = [np.mean((_ - np.mean(_)) / np.mean(_)) for _ in zip(*eq_window_weights)]  # As in paper formula (BUG)
-
             eq_cv_valuable = [x for x in eq_cv if not np.isnan(x)]
+            print('eq_cv: ', eq_cv)
+            print('eq_cv_valuable: ', eq_cv_valuable)
             lr = np.mean(eq_cv_valuable)
 
             # Calculate p-loss
@@ -302,18 +297,24 @@ class PIC(CompoundOperator):
                 sol_pinn_normalized = (sol_pinn - min(sol_pinn)) / (max(sol_pinn) - min(sol_pinn))
                 sol_ann_normalized = (sol_ann - min(sol_ann)) / (max(sol_ann) - min(sol_ann))
                 discr = sol_pinn_normalized - sol_ann_normalized
-                # discr = (solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape))  # Default
-                discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape))
-                rl_error = np.linalg.norm(discr, ord=2)
 
-                print(f'fitness error is {rl_error}, while loss addition is {float(loss_add)}')
-                lp = rl_error + self.params['pinn_loss_mult'] * float(
-                    loss_add)  # TODO: make pinn_loss_mult case dependent
-                if np.sum(eq.weights_final) == 0:
-                    lp /= self.params['penalty_coeff']
+                # discr = (solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape))  # Default
+                # discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape))
+                # rl_error = np.linalg.norm(discr, ord=2)
+                #
+                # print(f'fitness error is {rl_error}, while loss addition is {float(loss_add)}')
+                # lp = rl_error + self.params['pinn_loss_mult'] * float(
+                #     loss_add)  # TODO: make pinn_loss_mult case dependent
+                # if np.sum(eq.weights_final) == 0:
+                #     lp /= self.params['penalty_coeff']
+
+                lp = np.sqrt((discr ** 2).mean())
+
+
 
             # Fit
             eq.fitness_calculated = True
+            print('lr: ', lr, '\t lp: ', lp, '\t PIC: ', lr * lp)
             eq.fitness_value = lr * lp
 
     

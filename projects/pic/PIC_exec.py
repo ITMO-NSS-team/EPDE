@@ -73,7 +73,7 @@ if __name__ == "__main__":
     fit_operator.params = operator_params
 
     directory = os.path.dirname(os.path.realpath(__file__))
-    pinn_file_name = os.path.join(directory, 'ann_pretrained.pickle') # If neccessary, replace by other filename
+    pinn_file_name = os.path.join(directory, 'data/wave/ann_pretrained.pickle') # If neccessary, replace by other filename
 
     shape = 80
     data_file_name = os.path.join(os.path.dirname( __file__ ), f'wave_sln_{shape}.csv')

@@ -50,8 +50,8 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
     fit_operator.apply(correct_eq, {})
     fit_operator.apply(incorrect_eq, {})
 
-    print([correct_eq.vals[var].fitness < incorrect_eq.vals[var].fitness for var in all_vars])
-    return all([correct_eq.vals[var].fitness < incorrect_eq.vals[var].fitness for var in all_vars])     
+    print([correct_eq.vals[var].fitness_value < incorrect_eq.vals[var].fitness_value for var in all_vars])
+    return all([correct_eq.vals[var].fitness_value < incorrect_eq.vals[var].fitness_value for var in all_vars])
 
 
 def prepare_suboperators(fitness_operator: CompoundOperator) -> CompoundOperator:
@@ -226,17 +226,17 @@ if __name__ == "__main__":
     fit_operator = prepare_suboperators(Operator(list(operator_params.keys())))
     fit_operator.params = operator_params
 
-    ode_folder_name = r"C:\\Users\\Mike\\Documents\\Work\\PIC\\EPDE\\projects\\pic\\data\\ode"
+    ode_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\ode"
     # ODE_test(fit_operator, ode_folder_name)
 
-    vdp_folder_name = r"C:\\Users\\Mike\\Documents\\Work\\PIC\\EPDE\\projects\\pic\\data\\vdp"
-    VdP_test(fit_operator, vdp_folder_name)
+    vdp_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\vdp"
+    # VdP_test(fit_operator, vdp_folder_name)
 
-    ac_folder_name = r"C:\\Users\\Mike\\Documents\\Work\\PIC\\EPDE\\projects\\pic\\data\\ac"
-    AC_test(fit_operator, ac_folder_name)
+    ac_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\ac"
+    # AC_test(fit_operator, ac_folder_name)
 
-    # wave_folder_name = ...
+    wave_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\wave"
     # wave_test(fit_operator, wave_folder_name)
 
-    kdv_folder_name = r"C:\\Users\\Mike\\Documents\\Work\\PIC\\EPDE\\projects\\pic\\data\\kdv"
+    kdv_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\kdv"
     KdV_test(fit_operator, kdv_folder_name)
