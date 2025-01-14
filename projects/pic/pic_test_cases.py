@@ -264,7 +264,7 @@ if __name__ == "__main__":
     # AC_test(fit_operator, ac_folder_name)
 
     wave_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\wave"
-    wave_test(fit_operator, wave_folder_name)
+    # wave_test(fit_operator, wave_folder_name)
 
     kdv_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\kdv"
-    # KdV_test(fit_operator, kdv_folder_name)
+    KdV_test(fit_operator, kdv_folder_name) 

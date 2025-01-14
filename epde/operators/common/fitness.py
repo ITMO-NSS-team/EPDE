@@ -309,7 +309,7 @@ class PIC(CompoundOperator):
                 if np.sum(eq.weights_final) == 0:
                     lp /= self.params['penalty_coeff']
 
-                lp = np.sqrt((discr ** 2).mean())
+                # lp = np.sqrt((discr ** 2).mean())
 
             # Fit
             eq.fitness_calculated = True
