@@ -270,10 +270,11 @@ class PIC(CompoundOperator):
                 valuable_weights = estimator.coef_
 
                 window_weights = np.zeros(len(eq.structure))
-                for weight_idx in range(len(window_weights) - 1):
+                # for weight_idx in range(len(window_weights) - 1):
+                for weight_idx in range(len(window_weights)):
                     if weight_idx in nonzero_features_indexes:
                         window_weights[weight_idx] = valuable_weights[nonzero_features_indexes.index(weight_idx)]
-                window_weights[-1] = valuable_weights[-1]
+                # window_weights[-1] = valuable_weights[-1]
                 eq_window_weights.append(window_weights)
 
             # eq_cv = [np.std(_) / np.mean(_) for _ in zip(*eq_window_weights)]  # Default std
@@ -299,18 +300,16 @@ class PIC(CompoundOperator):
                 discr = sol_pinn_normalized - sol_ann_normalized
 
                 # discr = (solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape))  # Default
-                # discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape))
-                # rl_error = np.linalg.norm(discr, ord=2)
-                #
-                # print(f'fitness error is {rl_error}, while loss addition is {float(loss_add)}')
-                # lp = rl_error + self.params['pinn_loss_mult'] * float(
-                #     loss_add)  # TODO: make pinn_loss_mult case dependent
-                # if np.sum(eq.weights_final) == 0:
-                #     lp /= self.params['penalty_coeff']
+                discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape))
+                rl_error = np.linalg.norm(discr, ord=2)
+
+                print(f'fitness error is {rl_error}, while loss addition is {float(loss_add)}')
+                lp = rl_error + self.params['pinn_loss_mult'] * float(
+                    loss_add)  # TODO: make pinn_loss_mult case dependent
+                if np.sum(eq.weights_final) == 0:
+                    lp /= self.params['penalty_coeff']
 
                 lp = np.sqrt((discr ** 2).mean())
-
-
 
             # Fit
             eq.fitness_calculated = True

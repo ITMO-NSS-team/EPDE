@@ -168,13 +168,41 @@ def AC_test(operator: CompoundOperator, foldername: str):
     epde_search_obj.create_pool(data=data, variable_names=['u',], max_deriv_order=(2, 2),
                                 additional_tokens = [], data_nn = data_nn)
 
-    assert compare_equations(eq_ac_symbolic, eq_ac_incorrect, epde_search_obj) 
+    assert compare_equations(eq_ac_symbolic, eq_ac_incorrect, epde_search_obj)
 
+
+def wave_data(filename):
+    shape = 80
+
+    # print(os.path.dirname( __file__ ))
+    data = np.loadtxt(filename, delimiter=',').T
+    t = np.linspace(0, 1, shape + 1);
+    x = np.linspace(0, 1, shape + 1)
+    grids = np.stack(np.meshgrid(t, x, indexing='ij'), axis=2)
+    return grids, data
 
 def wave_test(operator: CompoundOperator, foldername: str):
-    # Test scenario to evaluate performance on wave equation
-    # Can be implemented from the proof-of-concept scenario
-    pass
+    # eq_wave_symbolic = '1. * d^2u/dx1^2{power: 1} + 0. = d^2u/dx0^2{power: 1}'
+    eq_wave_symbolic = '0.04 * d^2u/dx1^2{power: 1} + 0. = d^2u/dx0^2{power: 1}'
+    eq_wave_incorrect = '1. * d^2u/dx1^2{power: 1} * du/dx1{power: 1} + 2.3 * d^2u/dx0^2{power: 1} + 0. = du/dx0{power: 1}'
+
+    grid, data = wave_data(os.path.join(foldername, 'wave_sln_80.csv'))
+    data_nn = load_pretrained_PINN(os.path.join(foldername, 'ann_pretrained.pickle'))
+
+    dimensionality = data.ndim - 1
+
+    epde_search_obj = EpdeSearch(use_solver=True, dimensionality=dimensionality, boundary=10,
+                                 coordinate_tensors=(grid[..., 0], grid[..., 1]),
+                                 verbose_params={'show_iter_idx': True},
+                                 device='cpu')
+
+    epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+                                     preprocessor_kwargs={})
+
+    epde_search_obj.create_pool(data=data, variable_names=['u', ], max_deriv_order=(2, 2),
+                                additional_tokens=[], data_nn=data_nn)
+
+    assert compare_equations(eq_wave_symbolic, eq_wave_incorrect, epde_search_obj)
 
 
 def kdv_data(filename, shape = 80):
@@ -236,7 +264,7 @@ if __name__ == "__main__":
     # AC_test(fit_operator, ac_folder_name)
 
     wave_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\wave"
-    # wave_test(fit_operator, wave_folder_name)
+    wave_test(fit_operator, wave_folder_name)
 
     kdv_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\kdv"
-    KdV_test(fit_operator, kdv_folder_name)
+    # KdV_test(fit_operator, kdv_folder_name)
