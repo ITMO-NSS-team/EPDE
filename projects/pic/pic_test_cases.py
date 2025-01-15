@@ -141,7 +141,7 @@ def VdP_test(operator: CompoundOperator, foldername: str):
 def ac_data(filename: str):
     t = np.linspace(0., 1., 51)
     x = np.linspace(-1., 0.984375, 128)
-    data = np.load(filename).T
+    data = np.load(filename)
     # t = np.linspace(0, 1, shape+1); x = np.linspace(0, 1, shape+1)
     grids = np.meshgrid(t, x, indexing = 'ij')  # np.stack(, axis = 2) , axis = 2)
     return grids, data    
@@ -150,7 +150,7 @@ def ac_data(filename: str):
 def AC_test(operator: CompoundOperator, foldername: str):
     # Test scenario to evaluate performance on Allen-Cahn equation
     eq_ac_symbolic = '0.0001 * d^2u/dx1^2{power: 1.0} + -5.0 * u{power: 1.0} + 5.0 * u{power: 1.0} + 0.0 = du/dx0{power: 1.0}'
-    eq_ac_incorrect = '-1.0 * d^2u/dx0^2{power: 1.0} + 1.5 * u{power: 1.0} -0.0 = du/dx0{power: 1.0}'
+    eq_ac_incorrect = '-1.0 * d^2u/dx0^2{power: 1.0} + 1.5 * u{power: 1.0} + -0.0 = du/dx0{power: 1.0}'
     
     grid, data = ac_data(os.path.join(foldername, 'ac_data.npy'))
     data_nn = load_pretrained_PINN(os.path.join(foldername, 'ac_ann_pretrained.pickle'))
@@ -254,17 +254,17 @@ if __name__ == "__main__":
     fit_operator = prepare_suboperators(Operator(list(operator_params.keys())))
     fit_operator.params = operator_params
 
-    ode_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\ode"
+    ode_folder_name = r"/home/mikemaslyaev/Documents/EPDE_PIC_exp/EPDE/projects/pic/data/ode"
     # ODE_test(fit_operator, ode_folder_name)
 
-    vdp_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\vdp"
+    vdp_folder_name = r"/home/mikemaslyaev/Documents/EPDE_PIC_exp/EPDE/projects/pic/data/vdp"
     # VdP_test(fit_operator, vdp_folder_name)
 
-    ac_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\ac"
-    # AC_test(fit_operator, ac_folder_name)
+    ac_folder_name = r"/home/mikemaslyaev/Documents/EPDE_PIC_exp/EPDE/projects/pic/data/ac"
+    AC_test(fit_operator, ac_folder_name)
 
-    wave_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\wave"
+    wave_folder_name = r"/home/mikemaslyaev/Documents/EPDE_PIC_exp/EPDE/projects/pic/data/wave"
     # wave_test(fit_operator, wave_folder_name)
 
-    kdv_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\kdv"
-    KdV_test(fit_operator, kdv_folder_name) 
+    kdv_folder_name = r"/home/mikemaslyaev/Documents/EPDE_PIC_exp/EPDE/projects/pic/data/kdv"
+    # KdV_test(fit_operator, kdv_folder_name) 
