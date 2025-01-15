@@ -293,13 +293,13 @@ class PIC(CompoundOperator):
 
                 print(f'solution shape {solution.shape}')
                 print(f'solution[..., eq_idx] {solution[..., eq_idx].shape}, eq_idx {eq_idx}')
-                sol_pinn = solution[..., eq_idx]
-                sol_ann = referential_data.reshape(solution[..., eq_idx].shape)
-                sol_pinn_normalized = (sol_pinn - min(sol_pinn)) / (max(sol_pinn) - min(sol_pinn))
-                sol_ann_normalized = (sol_ann - min(sol_ann)) / (max(sol_ann) - min(sol_ann))
-                discr = sol_pinn_normalized - sol_ann_normalized
+                # sol_pinn = solution[..., eq_idx]
+                # sol_ann = referential_data.reshape(solution[..., eq_idx].shape)
+                # sol_pinn_normalized = (sol_pinn - min(sol_pinn)) / (max(sol_pinn) - min(sol_pinn))
+                # sol_ann_normalized = (sol_ann - min(sol_ann)) / (max(sol_ann) - min(sol_ann))
+                # discr = sol_pinn_normalized - sol_ann_normalized
 
-                # discr = (solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape))  # Default
+                discr = (solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape))  # Default
                 discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape))
                 rl_error = np.linalg.norm(discr, ord=2)
 
