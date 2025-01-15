@@ -318,7 +318,6 @@ class SolverAdapter(object):
 
         for idx, var_name in enumerate(variables):
             var_grid = grids[idx].to(device) if isinstance(grids[idx], torch.Tensor) else torch.tensor(grids[idx]).to(device)
-            # var_grid = var_grid.unique().reshape(-1)
             domain.variable(variable_name = var_name, variable_set = var_grid, 
                             n_points = None)
             
