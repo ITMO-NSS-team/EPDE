@@ -48,7 +48,6 @@ class MOEADDDirector(OptimizationPatternDirector):
 
         if use_solver:
             # fitness = SolverBasedFitness(['penalty_coeff'])
-
             fitness = PIC(['penalty_coeff'])
 
             sparsity = map_operator_between_levels(sparsity, 'gene level', 'chromosome level')

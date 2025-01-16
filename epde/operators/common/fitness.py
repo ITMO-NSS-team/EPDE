@@ -281,8 +281,6 @@ class PIC(CompoundOperator):
             eq_cv = [np.abs(np.std(_) / (np.mean(_))) for _ in zip(*eq_window_weights)]  # As in papers' repo
             # eq_cv = [np.mean((_ - np.mean(_)) / np.mean(_)) for _ in zip(*eq_window_weights)]  # As in paper formula (BUG)
             eq_cv_valuable = [x for x in eq_cv if not np.isnan(x)]
-            print('eq_cv: ', eq_cv)
-            print('eq_cv_valuable: ', eq_cv_valuable)
             lr = np.mean(eq_cv_valuable)
 
             # Calculate p-loss
@@ -315,6 +313,9 @@ class PIC(CompoundOperator):
             eq.fitness_calculated = True
             print('lr: ', lr, '\t lp: ', lp, '\t PIC: ', lr * lp)
             eq.fitness_value = lr * lp
+
+    def use_default_tags(self):
+        self._tags = {'fitness evaluation', 'chromosome level', 'contains suboperators', 'inplace'}
 
     
 def plot_data_vs_solution(grid, data, solution):
