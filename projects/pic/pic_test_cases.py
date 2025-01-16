@@ -309,7 +309,7 @@ if __name__ == "__main__":
     fit_operator.params = operator_params
 
     ode_folder_name = r"C:\Users\Gromwud\PycharmProjects\NSS\EPDE\projects\pic\data\ode"
-    ODE_test(fit_operator, ode_folder_name, 100)
+    # ODE_test(fit_operator, ode_folder_name, 100)
     epde_discovery(ode_folder_name)
 
     vdp_folder_name = r"C:\Users\Gromwud\PycharmProjects\NSS\EPDE\projects\pic\data\vdp"
