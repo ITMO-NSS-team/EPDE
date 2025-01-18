@@ -68,7 +68,7 @@ def prepare_suboperators(fitness_operator: CompoundOperator) -> CompoundOperator
 
 def noise_data(data, noise_level):
     # add noise level to the input data
-    return noise_level / 100 * np.std(data) * np.random.normal() + data
+    return noise_level * 0.01 * np.std(data) * np.random.normal(size=data.shape) + data
 
 
 def ODE_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
@@ -230,7 +230,12 @@ def KdV_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
     eq_kdv_symbolic = '-6.0 * du/dx1{power: 1.0} * u{power: 1.0} + -1.0 * d^3u/dx1^3{power: 1.0} + \
                            1.0 * sin{power: 1, freq: 1.0, dim: 1} * cos{power: 1, freq: 1.0, dim: 1} + \
                            0.0 = du/dx0{power: 1.0}'
+    # eq_kdv_incorrect = '-6.0 * du/dx1{power: 1.0} * u{power: 1.0} + -1.0 * d^2u/dx1^2{power: 1.0} + \
+    #                        1.0 * sin{power: 1, freq: 1.0, dim: 1} * cos{power: 1, freq: 1.0, dim: 1} + \
+    #                        0.0 = du/dx0{power: 1.0}'
+
     eq_kdv_incorrect = '0.04 * d^2u/dx1^2{power: 1} + 0. = d^2u/dx0^2{power: 1}'
+    # eq_kdv_symbolic = '0.04 * d^2u/dx1^2{power: 1} + 0. = d^2u/dx0^2{power: 1}'
     
     grid, data = kdv_data(os.path.join(foldername, 'data.csv'))
     noised_data = noise_data(data, noise_level)
@@ -308,18 +313,18 @@ if __name__ == "__main__":
     fit_operator = prepare_suboperators(Operator(list(operator_params.keys())))
     fit_operator.params = operator_params
 
-    ode_folder_name = r"C:\Users\Gromwud\PycharmProjects\NSS\EPDE\projects\pic\data\ode"
-    # ODE_test(fit_operator, ode_folder_name, 100)
-    epde_discovery(ode_folder_name)
+    ode_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\ode"
+    # ODE_test(fit_operator, ode_folder_name, 0)
+    # epde_discovery(ode_folder_name)
 
-    vdp_folder_name = r"C:\Users\Gromwud\PycharmProjects\NSS\EPDE\projects\pic\data\vdp"
-    # VdP_test(fit_operator, vdp_folder_name, 100)
+    vdp_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\vdp"
+    VdP_test(fit_operator, vdp_folder_name, 75)
 
-    ac_folder_name = r"C:\Users\Gromwud\PycharmProjects\NSS\EPDE\projects\pic\data\ac"
-    # AC_test(fit_operator, ac_folder_name, 100)
+    ac_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\ac"
+    # AC_test(fit_operator, ac_folder_name, 50)
 
-    wave_folder_name = r"C:\Users\Gromwud\PycharmProjects\NSS\EPDE\projects\pic\data\wave"
-    # wave_test(fit_operator, wave_folder_name, 100)
+    wave_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\wave"
+    # wave_test(fit_operator, wave_folder_name, 200)
 
-    kdv_folder_name = r"C:\Users\Gromwud\PycharmProjects\NSS\EPDE\projects\pic\data\kdv"
-    # KdV_test(fit_operator, kdv_folder_name, 100)
+    kdv_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\kdv"
+    # KdV_test(fit_operator, kdv_folder_name, 25)
