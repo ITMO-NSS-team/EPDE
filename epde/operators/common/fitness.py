@@ -239,49 +239,51 @@ class PIC(CompoundOperator):
                     features_vals.append(eq.structure[i].evaluate(False))
                     nonzero_features_indexes.append(idx)
 
-            # Stack features and add constant term for bias
-            features = features_vals[0]
-            if len(features_vals) > 1:
-                for i in range(1, len(features_vals)):
-                    features = np.vstack([features, features_vals[i]])
-            features = np.vstack([features, np.ones(features_vals[0].shape)])  # Add constant feature
-            features = np.transpose(features)
+            if len(features_vals) == 0:
+                objective.weights_final = np.zeros(len(objective.structure))
+            else:
+                features = features_vals[0]
+                if len(features_vals) > 1:
+                    for i in range(1, len(features_vals)):
+                        features = np.vstack([features, features_vals[i]])
+                features = np.vstack([features, np.ones(features_vals[0].shape)])  # Add constant feature
+                features = np.transpose(features)
 
-            self.window_size = len(target_vals) // 2
-            num_horizons = len(target_vals) - self.window_size + 1
-            eq_window_weights = []
+                self.window_size = len(target_vals) // 2
+                num_horizons = len(target_vals) - self.window_size + 1
+                eq_window_weights = []
 
-            # Perform optimization over sliding windows
-            for start_idx in range(num_horizons):
-                end_idx = start_idx + self.window_size
+                # Perform optimization over sliding windows
+                for start_idx in range(num_horizons):
+                    end_idx = start_idx + self.window_size
 
-                target_window = target_vals[start_idx:end_idx]
-                feature_window = features[start_idx:end_idx, :]
+                    target_window = target_vals[start_idx:end_idx]
+                    feature_window = features[start_idx:end_idx, :]
 
-                # Linear Regression
-                estimator = LinearRegression(fit_intercept=False)
-                if feature_window.ndim == 1:
-                    feature_window = feature_window.reshape(-1, 1)
-                try:
-                    self.g_fun_vals_window = self.g_fun_vals.reshape(-1)[start_idx:end_idx]
-                except AttributeError:
-                    self.g_fun_vals_window = None
-                estimator.fit(feature_window, target_window, sample_weight=self.g_fun_vals_window)
-                valuable_weights = estimator.coef_
+                    # Linear Regression
+                    estimator = LinearRegression(fit_intercept=False)
+                    if feature_window.ndim == 1:
+                        feature_window = feature_window.reshape(-1, 1)
+                    try:
+                        self.g_fun_vals_window = self.g_fun_vals.reshape(-1)[start_idx:end_idx]
+                    except AttributeError:
+                        self.g_fun_vals_window = None
+                    estimator.fit(feature_window, target_window, sample_weight=self.g_fun_vals_window)
+                    valuable_weights = estimator.coef_
 
-                window_weights = np.zeros(len(eq.structure))
-                # for weight_idx in range(len(window_weights) - 1):
-                for weight_idx in range(len(window_weights)):
-                    if weight_idx in nonzero_features_indexes:
-                        window_weights[weight_idx] = valuable_weights[nonzero_features_indexes.index(weight_idx)]
-                # window_weights[-1] = valuable_weights[-1]
-                eq_window_weights.append(window_weights)
+                    window_weights = np.zeros(len(eq.structure))
+                    # for weight_idx in range(len(window_weights) - 1):
+                    for weight_idx in range(len(window_weights)):
+                        if weight_idx in nonzero_features_indexes:
+                            window_weights[weight_idx] = valuable_weights[nonzero_features_indexes.index(weight_idx)]
+                    # window_weights[-1] = valuable_weights[-1]
+                    eq_window_weights.append(window_weights)
 
-            # eq_cv = [np.std(_) / np.mean(_) for _ in zip(*eq_window_weights)]  # Default std
-            eq_cv = [np.abs(np.std(_) / (np.mean(_))) for _ in zip(*eq_window_weights)]  # As in papers' repo
-            # eq_cv = [np.mean((_ - np.mean(_)) / np.mean(_)) for _ in zip(*eq_window_weights)]  # As in paper formula (BUG)
-            eq_cv_valuable = [x for x in eq_cv if not np.isnan(x)]
-            lr = np.mean(eq_cv_valuable)
+                # eq_cv = [np.std(_) / np.mean(_) for _ in zip(*eq_window_weights)]  # Default std
+                eq_cv = [np.abs(np.std(_) / (np.mean(_))) for _ in zip(*eq_window_weights)]  # As in papers' repo
+                # eq_cv = [np.mean((_ - np.mean(_)) / np.mean(_)) for _ in zip(*eq_window_weights)]  # As in paper formula (BUG)
+                eq_cv_valuable = [x for x in eq_cv if not np.isnan(x)]
+                lr = np.mean(eq_cv_valuable)
 
             # Calculate p-loss
             if torch.isnan(loss_add):
