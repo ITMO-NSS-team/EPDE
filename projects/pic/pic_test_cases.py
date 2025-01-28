@@ -313,18 +313,19 @@ if __name__ == "__main__":
     fit_operator = prepare_suboperators(Operator(list(operator_params.keys())))
     fit_operator.params = operator_params
 
-    ode_folder_name = r"/home/mikemaslyaev/Documents/EPDE_PIC_exp/EPDE/projects/pic/data/ode"
-    # ODE_test(fit_operator, ode_folder_name, 0)
-    epde_discovery(ode_folder_name)
+    directory = os.path.dirname(os.path.realpath(__file__))
+    ode_folder_name = os.path.join(directory, 'data\ode')
+    ODE_test(fit_operator, ode_folder_name, 0)
+    # epde_discovery(ode_folder_name)
 
-    # vdp_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\vdp"
+    vdp_folder_name = os.path.join(directory, 'data\vdp')
     # VdP_test(fit_operator, vdp_folder_name, 75)
 
-    ac_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\ac"
-    # AC_test(fit_operator, ac_folder_name, 50)
+    ac_folder_name = os.path.join(directory, 'data\ac')
+    # AC_test(fit_operator, ac_folder_name, 25)
 
-    wave_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\wave"
+    wave_folder_name = os.path.join(directory, 'data\wave')
     # wave_test(fit_operator, wave_folder_name, 200)
 
-    kdv_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\kdv"
+    ode_folder_name = os.path.join(directory, 'data\kdv')
     # KdV_test(fit_operator, kdv_folder_name, 25)

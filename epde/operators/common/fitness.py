@@ -178,7 +178,7 @@ class PIC(CompoundOperator):
     def __init__(self, param_keys: list):
         super().__init__(param_keys)
         self.adapter = None
-        self.window_size = 10   # Idk which one we need
+        self.window_size = None
 
     def set_adapter(self, net=None):
 
@@ -230,7 +230,6 @@ class PIC(CompoundOperator):
             features_vals = []
             nonzero_features_indexes = []
 
-            # Collect non-zero feature values and their indices
             for i in range(len(eq.structure)):
                 if i == eq.target_idx:
                     continue
@@ -253,14 +252,13 @@ class PIC(CompoundOperator):
                 num_horizons = len(target_vals) - self.window_size + 1
                 eq_window_weights = []
 
-                # Perform optimization over sliding windows
+                # Compute coefficients and collect statistics over horizons
                 for start_idx in range(num_horizons):
                     end_idx = start_idx + self.window_size
 
                     target_window = target_vals[start_idx:end_idx]
                     feature_window = features[start_idx:end_idx, :]
 
-                    # Linear Regression
                     estimator = LinearRegression(fit_intercept=False)
                     if feature_window.ndim == 1:
                         feature_window = feature_window.reshape(-1, 1)
@@ -272,16 +270,12 @@ class PIC(CompoundOperator):
                     valuable_weights = estimator.coef_
 
                     window_weights = np.zeros(len(eq.structure))
-                    # for weight_idx in range(len(window_weights) - 1):
                     for weight_idx in range(len(window_weights)):
                         if weight_idx in nonzero_features_indexes:
                             window_weights[weight_idx] = valuable_weights[nonzero_features_indexes.index(weight_idx)]
-                    # window_weights[-1] = valuable_weights[-1]
                     eq_window_weights.append(window_weights)
 
-                # eq_cv = [np.std(_) / np.mean(_) for _ in zip(*eq_window_weights)]  # Default std
-                eq_cv = [np.abs(np.std(_) / (np.mean(_))) for _ in zip(*eq_window_weights)]  # As in papers' repo
-                # eq_cv = [np.mean((_ - np.mean(_)) / np.mean(_)) for _ in zip(*eq_window_weights)]  # As in paper formula (BUG)
+                eq_cv = [np.abs(np.std(_) / (np.mean(_))) for _ in zip(*eq_window_weights)]  # As in paper's repo
                 eq_cv_valuable = [x for x in eq_cv if not np.isnan(x)]
                 lr = np.mean(eq_cv_valuable)
 
@@ -289,17 +283,16 @@ class PIC(CompoundOperator):
             if torch.isnan(loss_add):
                 lp = 2 * LOSS_NAN_VAL
             else:
-                referential_data = global_var.tensor_cache.get((eq.main_var_to_explain, (1.0,)))
-
                 print(f'solution shape {solution.shape}')
                 print(f'solution[..., eq_idx] {solution[..., eq_idx].shape}, eq_idx {eq_idx}')
-
+                referential_data = global_var.tensor_cache.get((eq.main_var_to_explain, (1.0,)))
                 initial_data = global_var.tensor_cache.get(('u', (1.0,))).reshape(solution[..., eq_idx].shape)
 
                 sol_pinn = solution[..., eq_idx]
                 sol_ann = referential_data.reshape(solution[..., eq_idx].shape)
                 sol_pinn_normalized = (sol_pinn - min(initial_data)) / (max(initial_data) - min(initial_data))
                 sol_ann_normalized = (sol_ann - min(initial_data)) / (max(initial_data) - min(initial_data))
+
                 discr = sol_pinn_normalized - sol_ann_normalized
                 # discr = (solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape))  # Default
                 discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape))
@@ -311,17 +304,14 @@ class PIC(CompoundOperator):
                 if np.sum(eq.weights_final) == 0:
                     lp /= self.params['penalty_coeff']
 
-                # lp = np.sqrt((discr ** 2).mean())
-
-            # Fit
             eq.fitness_calculated = True
-            print('lr: ', lr, '\t lp: ', lp, '\t PIC: ', lr * lp)
+            print('Lr: ', lr, '\t Lp: ', lp, '\t PIC: ', lr * lp)
             eq.fitness_value = lr * lp
 
     def use_default_tags(self):
         self._tags = {'fitness evaluation', 'chromosome level', 'contains suboperators', 'inplace'}
 
-    
+
 def plot_data_vs_solution(grid, data, solution):
     if grid.shape[1]==2:
         fig = plt.figure()
