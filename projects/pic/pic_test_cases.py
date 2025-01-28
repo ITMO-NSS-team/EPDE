@@ -262,7 +262,7 @@ def KdV_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
 
 # TODO: implement tests on noised data, corrupted by additive Gaussian noise & preform full-scale equation search experiments.
 def epde_discovery(foldername):
-    step = 0.05;
+    step = 0.05
     steps_num = 320
     t = np.arange(start=0., stop=step * steps_num, step=step)
     data = np.load(os.path.join(foldername, 'ode_data.npy'))
@@ -278,7 +278,7 @@ def epde_discovery(foldername):
 
     epde_search_obj = EpdeSearch(use_solver=True, dimensionality=dimensionality, boundary=10,
                                  coordinate_tensors=(t,), verbose_params={'show_iter_idx': True},
-                                 device='cpu')
+                                 device='cuda')
 
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
@@ -289,12 +289,12 @@ def epde_discovery(foldername):
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
     epde_search_obj.fit(data=[data, ], variable_names=['u', ], max_deriv_order=(2,),
-                        equation_terms_max_number=4, data_fun_pow=1,
+                        equation_terms_max_number=5, data_fun_pow=1,
                         additional_tokens=[trig_tokens, grid_tokens],
                         equation_factors_max_number=factors_max_number,
                         eq_sparsity_interval=(1e-12, 1e-4))
 
-    epde_search_obj.equation_search_results(only_print=True, num=1)
+    epde_search_obj.equations(only_print=True, num=1)
 
     # syss = epde_search_obj.equation_search_results(only_print = False, num = 1)
     '''
@@ -313,12 +313,12 @@ if __name__ == "__main__":
     fit_operator = prepare_suboperators(Operator(list(operator_params.keys())))
     fit_operator.params = operator_params
 
-    ode_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\ode"
+    ode_folder_name = r"/home/mikemaslyaev/Documents/EPDE_PIC_exp/EPDE/projects/pic/data/ode"
     # ODE_test(fit_operator, ode_folder_name, 0)
-    # epde_discovery(ode_folder_name)
+    epde_discovery(ode_folder_name)
 
-    vdp_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\vdp"
-    VdP_test(fit_operator, vdp_folder_name, 75)
+    # vdp_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\vdp"
+    # VdP_test(fit_operator, vdp_folder_name, 75)
 
     ac_folder_name = r"C:\Users\timur\PycharmProjects\EPDE\EPDE\projects\pic\data\ac"
     # AC_test(fit_operator, ac_folder_name, 50)

@@ -72,7 +72,7 @@ class SystemSolverInterface(object):
                 deriv_vars.append(cur_deriv_var)
             else:
                 grid_arg = None if default_domain else grids
-                coeff_tensor = coeff_tensor * factor.evaluate(grids=grid_arg, torch_mode = True)
+                coeff_tensor = coeff_tensor * factor.evaluate(grids=grid_arg, torch_mode = True).to(device)
         if not derivs_detected:
             deriv_powers = [0,]
             deriv_orders = [[None,],]

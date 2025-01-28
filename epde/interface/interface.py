@@ -690,7 +690,7 @@ class EpdeSearch(object):
                 global_var.reset_data_repr_nn(data = data, derivs = base_derivs, train = False, 
                                               grids = grid, predefined_ann = data_nn, device = self._device)
             else:
-                epochs_max = 1e3
+                epochs_max = 1e5
                 global_var.reset_data_repr_nn(data = data, derivs = base_derivs, epochs_max=epochs_max,
                                               grids = grid, predefined_ann = None, device = self._device, 
                                               use_fourier = fourier_layers, fourier_params = fourier_params)
