@@ -230,12 +230,8 @@ def KdV_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
     eq_kdv_symbolic = '-6.0 * du/dx1{power: 1.0} * u{power: 1.0} + -1.0 * d^3u/dx1^3{power: 1.0} + \
                            1.0 * sin{power: 1, freq: 1.0, dim: 1} * cos{power: 1, freq: 1.0, dim: 1} + \
                            0.0 = du/dx0{power: 1.0}'
-    # eq_kdv_incorrect = '-6.0 * du/dx1{power: 1.0} * u{power: 1.0} + -1.0 * d^2u/dx1^2{power: 1.0} + \
-    #                        1.0 * sin{power: 1, freq: 1.0, dim: 1} * cos{power: 1, freq: 1.0, dim: 1} + \
-    #                        0.0 = du/dx0{power: 1.0}'
 
     eq_kdv_incorrect = '0.04 * d^2u/dx1^2{power: 1} + 0. = d^2u/dx0^2{power: 1}'
-    # eq_kdv_symbolic = '0.04 * d^2u/dx1^2{power: 1} + 0. = d^2u/dx0^2{power: 1}'
     
     grid, data = kdv_data(os.path.join(foldername, 'data.csv'))
     noised_data = noise_data(data, noise_level)
