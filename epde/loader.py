@@ -8,10 +8,16 @@ Created on Fri Dec 22 13:27:53 2023
 
 import sys
 import os
+
+import tempfile
 import dill as pickle
 import time
 
-from collections import Iterable
+from typing import Union
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 
 from epde.structure.factor import Factor
 from epde.structure.main_structures import SoEq, Equation, Term 
@@ -32,7 +38,7 @@ TYPESPEC_ATTRS = {'SoEq' : (['tokens_for_eq', 'tokens_supp', 'latex_form'], ['va
                   'ParetoLevels' : (['levels'], ['population']), 'Population' : ([], [])}
                   
 
-LOADING_PRESETS = {'SoEq' : {'SoEq' : []}}
+# LOADING_PRESETS = {'SoEq' : {'SoEq' : []}}
 
 def get_size(obj, seen=None):
     size = sys.getsizeof(obj)
@@ -168,6 +174,17 @@ def attrs_from_dict(obj, attributes, except_attrs: dict = {}):
 
         obj.manual_reconst(man_attr, attributes[man_attr]['elements'], except_attrs)
 
+
+def temp_pickle_save(obj : Union[SoEq, Cache, TFPool, ParetoLevels, Population], 
+                     not_to_pickle = [], manual_pickle = []):
+    loader = EPDELoader()
+    pickled_obj = loader.saves(obj, not_to_pickle = [], manual_pickle = [])
+    
+    temp_file = tempfile.NamedTemporaryFile()
+    temp_file.write(pickled_obj)
+    return temp_file
+
+
 class LoaderAssistant(object):
     def __init__(self):
         pass
@@ -176,14 +193,14 @@ class LoaderAssistant(object):
     def system_preset(pool: TFPool): # Validate correctness of attribute definitions
         return {'SoEq' :     {'tokens_for_eq' : TFPool(pool.families_demand_equation),
                               'tokens_supp' : TFPool(pool.families_equationless), 
-                              'latex_form' : None}, # TBD, make better loading procedure
+                              'latex_form' : None},
                 'Equation' : {'pool' : pool, 
                               'latex_form' : None,
                               '_history' : None},
                 'Term'     : {'pool' : pool, 
                               'latex_form' : None},
-                'Factor'   : {'_latex_constructor' : None}} # 'latex_form' : None, 
-
+                'Factor'   : {'_latex_constructor' : None, 
+                              '_evaluator' : None}} 
     
     @staticmethod
     def pool_preset():
@@ -194,20 +211,32 @@ class LoaderAssistant(object):
         return {}
     
     @staticmethod
-    def population_preset():
-        return {}
+    def population_preset(pool: TFPool):
+        return {'Population' : {}, 
+                'SoEq' :     {'tokens_for_eq' : TFPool(pool.families_demand_equation),
+                              'tokens_supp' : TFPool(pool.families_equationless), 
+                              'latex_form' : None},
+                'Equation' : {'pool' : pool, 
+                              'latex_form' : None,
+                              '_history' : None},
+                'Term'     : {'pool' : pool, 
+                              'latex_form' : None},
+                'Factor'   : {'_latex_constructor' : None, 
+                              '_evaluator' : None}}
     
     @staticmethod
     def pareto_levels_preset(pool: TFPool):
-        return {
-                'SoEq'     : {'tokens_for_eq' : TFPool(pool.families_demand_equation), 
+        return {'ParetoLevels' : {}, 
+                'SoEq' :     {'tokens_for_eq' : TFPool(pool.families_demand_equation),
                               'tokens_supp' : TFPool(pool.families_equationless), 
-                              'latex_form' : None}, # TBD, make better loading procedure
-                'Equation' : {'pool' : pool, 
                               'latex_form' : None},
+                'Equation' : {'pool' : pool, 
+                              'latex_form' : None,
+                              '_history' : None},
                 'Term'     : {'pool' : pool, 
                               'latex_form' : None},
-                'Factor'   : {'_latex_constructor' : None}}
+                'Factor'   : {'_latex_constructor' : None, 
+                              '_evaluator' : None}}
         
 
 class EPDELoader(object):

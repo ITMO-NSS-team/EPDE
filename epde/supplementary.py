@@ -6,20 +6,110 @@ Created on Thu Feb 13 16:33:34 2020
 @author: mike_ubuntu
 """
 
+from abc import ABC
+from typing import Callable, Union
+
 import numpy as np
 from functools import reduce
 import copy
 import torch
-device = torch.device('cpu')
+# device = torch.device('cpu')
 
 import matplotlib.pyplot as plt
-import epde.globals as global_var
+
+from epde.solver.data import Domain
+from epde.solver.models import Fourier_embedding, mat_model
+
+
+class BasicDeriv(ABC):
+    def __init__(self, *args, **kwargs):
+        raise NotImplementedError('Trying to create abstract differentiation method')
+    
+    def take_derivative(self, u: torch.Tensor, args: torch.Tensor, axes: list):
+        raise NotImplementedError('Trying to differentiate with abstract differentiation method')
+
+
+class AutogradDeriv(BasicDeriv):
+    def __init__(self):
+        pass
+
+    def take_derivative(self, u: Union[torch.nn.Sequential, torch.Tensor], args: torch.Tensor, 
+                        axes: list = [], component: int = 0):
+        if not args.requires_grad:
+            args.requires_grad = True
+        if axes == [None,]:
+            return u(args)[..., component].reshape(-1, 1)
+        if isinstance(u, torch.nn.Sequential):
+            comp_sum = u(args)[..., component].sum(dim = 0)
+        elif isinstance(u, torch.Tensor):
+            raise TypeError('Autograd shall have torch.nn.Sequential as its inputs.')
+        else:
+            print(f'u.shape, {u.shape}')
+            comp_sum = u.sum(dim = 0)
+        for axis in axes:
+            output_vals = torch.autograd.grad(outputs = comp_sum, inputs = args, create_graph=True)[0]
+            comp_sum = output_vals[:, axis].sum()
+        output_vals = output_vals[:, axes[-1]].reshape(-1, 1)
+        return output_vals
+
+class FDDeriv(BasicDeriv):
+    def __init__(self):
+        pass
+
+    def take_derivative(self, u: np.ndarray, args: np.ndarray, 
+                        axes: list = [], component: int = 0):
+        
+        if not isinstance(args, torch.Tensor):
+            args = args.detach().cpu().numpy()
+
+        output_vals = u[..., component].reshape(args.shape)
+        if axes == [None,]:
+            return output_vals
+        for axis in axes:
+            output_vals = np.gradient(output_vals, args.reshape(-1)[1] - args.reshape(-1)[0], axis = axis, edge_order=2)  
+        return output_vals
+
+def create_solution_net(equations_num: int, domain_dim: int, use_fourier = True, #  mode: str, domain: Domain 
+                        fourier_params: dict = None, device = 'cpu'):
+    '''
+    fft_params have to be passed as dict with entries like: {'L' : [4,], 'M' : [3,]}
+    '''
+    L_default, M_default = 4, 10
+    if use_fourier:
+        if fourier_params is None:
+            if domain_dim == 1:
+                fourier_params = {'L' : [L_default],
+                              'M' : [M_default]}
+            else:
+                fourier_params = {'L' : [L_default] + [None,] * (domain_dim - 1), 
+                              'M' : [M_default] + [None,] * (domain_dim - 1)}
+        fourier_params['device'] = device
+        four_emb = Fourier_embedding(**fourier_params)
+        if device == 'cuda':
+            four_emb = four_emb.cuda()
+        net_default = [four_emb,]
+    else:
+        net_default = []        
+    linear_inputs = net_default[0].out_features if use_fourier else domain_dim
+    
+    if domain_dim == 1:            
+        hidden_neurons = 128 # 64 #
+    else:
+        hidden_neurons = 112 # 54 #
+
+    operators = net_default + [torch.nn.Linear(linear_inputs, hidden_neurons, device=device),
+                               torch.nn.Tanh(),
+                               torch.nn.Linear(hidden_neurons, hidden_neurons, device=device),
+                               torch.nn.Tanh(),
+                               torch.nn.Linear(hidden_neurons, equations_num, device=device)]
+    return torch.nn.Sequential(*operators)
 
 def exp_form(a, sign_num: int = 4):
     if np.isclose(a, 0):
         return 0.0, 0
     exp = np.floor(np.log10(np.abs(a)))
-    return np.around(a / 10**exp, sign_num), int(exp) # np.sign(a) * 
+    return np.around(a / 10**exp, sign_num), int(exp)
+
 
 def rts(value, sign_num: int = 5):
     """
@@ -33,40 +123,36 @@ def rts(value, sign_num: int = 5):
         idx -= 1
     return np.around(value, int(idx))
 
-def train_ann(grids: list, data: np.ndarray, epochs_max: int = 500):
-    dim = 1 if np.any([s == 1 for s in data.shape]) and data.ndim == 2 else data.ndim
-    assert len(grids) == dim, 'Dimensionality of data does not match with passed grids.'
+
+def train_ann(args: list, data: np.ndarray, epochs_max: int = 500, batch_frac = 0.5, 
+              dim = None, model = None, device = 'cpu'):
+    if dim is None:
+        dim = 1 if np.any([s == 1 for s in data.shape]) and data.ndim == 2 else data.ndim
+    # assert len(args) == dim, 'Dimensionality of data does not match with passed grids.'
     data_size = data.size
-
-    model = torch.nn.Sequential(
-                torch.nn.Linear(dim, 256),
-                torch.nn.Tanh(),
-                # torch.nn.Dropout(0.1),
-                # torch.nn.ReLU(),
-                torch.nn.Linear(256, 256),
-                torch.nn.Tanh(),
-                # torch.nn.Dropout(0.1),
-                # torch.nn.ReLU(),
-                torch.nn.Linear(256, 64),
-                # # torch.nn.Dropout(0.1),
-                torch.nn.Tanh(),
-                torch.nn.Linear(64, 1024),
-                # torch.nn.Dropout(0.1),
-                torch.nn.Tanh(),
-                torch.nn.Linear(1024, 1)
-                # torch.nn.Tanh()
-            )
-
-    data_grid = np.stack([grid.reshape(-1) for grid in grids])
-    grid_tensor = torch.from_numpy(data_grid).float().T
-    grid_tensor.to(device)
-    data = torch.from_numpy(data.reshape(-1, 1)).float()
-    print(data.size)
-    data.to(device)
+    if model is None:
+        model = torch.nn.Sequential(
+                                    torch.nn.Linear(dim, 256, device=device),
+                                    torch.nn.Tanh(),
+                                    torch.nn.Linear(256, 256, device=device),
+                                    torch.nn.Tanh(),
+                                    torch.nn.Linear(256, 64, device=device),
+                                    torch.nn.Tanh(),
+                                    torch.nn.Linear(64, 1024, device=device),
+                                    torch.nn.Tanh(),
+                                    torch.nn.Linear(1024, 1, device=device)
+                                    )
+    
+    model.to(device)
+    data_grid = np.stack([arg.reshape(-1) for arg in args])
+    grid_tensor = torch.from_numpy(data_grid).float().T.to(device)
+    # grid_tensor.to(device)
+    data = torch.from_numpy(data.reshape(-1, 1)).float().to(device)
+    # print(data.size)
+    # data.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 
-    batch_frac = 0.5
-    batch_size = int(data_size * batch_frac)  # or whatever
+    batch_size = int(data_size * batch_frac)
 
     t = 0
 
@@ -75,7 +161,7 @@ def train_ann(grids: list, data: np.ndarray, epochs_max: int = 500):
     loss_mean = 1000
     min_loss = np.inf
     losses = []
-    while loss_mean > 2e-3 and t < epochs_max:  # and t<epochs_max:
+    while loss_mean > 2e-3 and t < epochs_max:
 
         permutation = torch.randperm(grid_tensor.size()[0])
 
@@ -96,8 +182,8 @@ def train_ann(grids: list, data: np.ndarray, epochs_max: int = 500):
             best_model = model
             min_loss = loss_mean
         losses.append(loss_mean)
-        if global_var.verbose.show_ann_loss:
-            print('Surface training t={}, loss={}'.format(t, loss_mean))
+        # if global_var.verbose.show_ann_loss:
+        #     print('Surface training t={}, loss={}'.format(t, loss_mean))
         t += 1
     print_loss = True
     if print_loss:
@@ -106,25 +192,12 @@ def train_ann(grids: list, data: np.ndarray, epochs_max: int = 500):
         plt.show()
     return best_model
 
-
 def use_ann_to_predict(model, recalc_grids: list):
     data_grid = np.stack([grid.reshape(-1) for grid in recalc_grids])
     recalc_grid_tensor = torch.from_numpy(data_grid).float().T
-    recalc_grid_tensor.to(device)
+    recalc_grid_tensor = recalc_grid_tensor #.to(device)
 
     return model(recalc_grid_tensor).detach().numpy().reshape(recalc_grids[0].shape)
-
-
-
-def np_cartesian_product(*arrays):
-    print(arrays)
-    la = len(arrays)
-    dtype = np.result_type(*arrays)
-    arr = np.empty([len(a) for a in arrays] + [la], dtype=dtype)
-    for i, a in enumerate(np.ix_(*arrays)):
-        arr[..., i] = a
-    return arr.reshape(-1, la)
-
 
 def flatten(obj):
     '''
@@ -137,38 +210,15 @@ def flatten(obj):
             obj[idx] = [elem,]
     return reduce(lambda x, y: x+y, obj)
 
-
-
-def try_iterable(arg):
-    try:
-        _ = [elem for elem in arg]
-    except TypeError:
-        return False
-    return True
-
-
-
-def memory_assesment():
-    try:
-        h = hpy()
-    except NameError:
-        from guppy import hpy
-        h = hpy()
-    print(h.heap())
-    del h
-
-
 def factor_params_to_str(factor, set_default_power=False, power_idx=0):
     param_label = np.copy(factor.params)
     if set_default_power:
         param_label[power_idx] = 1.
     return (factor.label, tuple(param_label))
 
-
 def form_label(x, y):
     print(type(x), type(y.cache_label))
     return x + ' * ' + y.cache_label if len(x) > 0 else x + y.cache_label
-
 
 def detect_similar_terms(base_equation_1, base_equation_2):   # Переделать!
     same_terms_from_eq1 = []
@@ -211,7 +261,7 @@ def detect_similar_terms(base_equation_1, base_equation_2):   # Передела
     return [same_terms_from_eq1, similar_terms_from_eq1, different_terms_from_eq1], [same_terms_from_eq2, similar_terms_from_eq2, different_terms_from_eq2]
 
 
-def filter_powers(gene):    # Разобраться и переделать
+def filter_powers(gene):
     gene_filtered = []
 
     for token_idx in range(len(gene)):
@@ -230,30 +280,6 @@ def filter_powers(gene):    # Разобраться и переделать
             gene_filtered.append(powered_token)
     return gene_filtered
 
-def Bind_Params(zipped_params):
-    param_dict = {}
-    for token_props in zipped_params:
-        param_dict[token_props[0]] = token_props[1]
-    return param_dict
-
-
-
-def Slice_Data_3D(matrix, part=4, part_tuple=None):
-    """
-    Input matrix slicing for separate domain calculation
-    """
-
-    if part_tuple:
-        for i in range(part_tuple[0]):
-            for j in range(part_tuple[1]):
-                yield matrix[:, i*int(matrix.shape[1]/float(part_tuple[0])):(i+1)*int(matrix.shape[1]/float(part_tuple[0])),
-                             j*int(matrix.shape[2]/float(part_tuple[1])):(j+1)*int(matrix.shape[2]/float(part_tuple[1]))], i, j
-    part_dim = int(np.sqrt(part))
-    for i in range(part_dim):
-        for j in range(part_dim):
-            yield matrix[:, i*int(matrix.shape[1]/float(part_dim)):(i+1)*int(matrix.shape[1]/float(part_dim)),
-                         j*int(matrix.shape[2]/float(part_dim)):(j+1)*int(matrix.shape[2]/float(part_dim))], i, j
-
 
 def define_derivatives(var_name='u', dimensionality=1, max_order=2):
     """
@@ -268,8 +294,8 @@ def define_derivatives(var_name='u', dimensionality=1, max_order=2):
         deriv_names (`list` with `str` values): keys for epde
         var_deriv_orders (`list` with `int` values): keys for enter to solver
     """
-    deriv_names = []#[var_name,]
-    var_deriv_orders = []#[[None,],]
+    deriv_names = []
+    var_deriv_orders = []
     if isinstance(max_order, int):
         max_order = [max_order for dim in range(dimensionality)]
     for var_idx in range(dimensionality):
@@ -279,7 +305,6 @@ def define_derivatives(var_name='u', dimensionality=1, max_order=2):
                 deriv_names.append('d' + var_name + '/dx' + str(var_idx))
             else:
                 deriv_names.append(
-                    
                     'd^'+str(order+1) + var_name + '/dx'+str(var_idx)+'^'+str(order+1))
     print('Deriv orders after definition', var_deriv_orders)
     return deriv_names, var_deriv_orders
@@ -309,4 +334,3 @@ def normalize_ts(Input):
             else:
                 matrix[i] = 1
         return matrix
-

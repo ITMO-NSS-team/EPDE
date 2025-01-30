@@ -8,7 +8,10 @@ Created on Tue Jul 26 13:38:20 2022
 
 import numpy as np
 from functools import reduce
-from collections import Iterable
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 
 def check_uniqueness(obj, background):
     return not any([elem == obj for elem in background])
@@ -48,8 +51,12 @@ class ComplexStructure(object):
         if len(self.structure) == 1:
             return self.structure[0].evaluate(structural)
         else:
-            return reduce(lambda x, y: self.interelement_operator(x, y.evaluate(structural)),
-                          self.structure[1:], self.structure[0].evaluate(structural))
+            try:
+                return reduce(lambda x, y: self.interelement_operator(x, y.evaluate(structural)),
+                              self.structure[1:], self.structure[0].evaluate(structural))
+            except ValueError:
+                print([element.name for element in self.structure])
+                raise ValueError('operands could not be broadcast together with shapes')
 
     def reset_saved_state(self):
         self.saved = {True: False, False: False}

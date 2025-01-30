@@ -90,10 +90,11 @@ class EvolutionaryBlock(Block):
             self.arg_keys = self._operator.get_suboperator_args()
             extra = ['self', 'population_subset', 'population']
             for arg_key in extra:
-                try:
+                if arg_key in self.arg_keys:
+                # try:
                     self.arg_keys.remove(arg_key)
-                except:
-                    pass
+                # except:
+                #     pass
         elif parse_operator_args == 'use operator attribute':
             self.arg_keys = self._operator.arg_keys
         elif isinstance(parse_operator_args, (list, tuple)):

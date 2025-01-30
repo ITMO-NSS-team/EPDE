@@ -11,9 +11,12 @@ import warnings
 import copy
 import os
 import pickle
-from typing import Union, Callable
+from typing import Union, Callable, List
 from functools import singledispatchmethod, reduce
-from collections import Iterable
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 
 
 import numpy as np
@@ -22,12 +25,15 @@ import torch
 import epde.globals as global_var
 import epde.optimizers.moeadd.solution_template as moeadd
 
-from epde.structure.encoding import Chromosome
+from epde.decorators import HistoryExtender, BoundaryExclusion
+from epde.evaluators import simple_function_evaluator
 from epde.interface.token_family import TFPool
-from epde.decorators import HistoryExtender, ResetEquationStatus
-from epde.supplementary import filter_powers, normalize_ts, population_sort, flatten, rts, exp_form
+from epde.preprocessing.domain_pruning import DomainPruner
+
+from epde.structure.encoding import Chromosome
 from epde.structure.factor import Factor
 from epde.structure.structure_template import ComplexStructure, check_uniqueness
+from epde.supplementary import filter_powers, normalize_ts, population_sort, flatten, rts, exp_form
 
 
 class Term(ComplexStructure):
@@ -48,7 +54,6 @@ class Term(ComplexStructure):
     __slots__ = ['_history', 'structure', 'interelement_operator', 'saved', 'saved_as',
                  'pool', 'max_factors_in_term', 'cache_linked', 'occupied_tokens_labels',
                  '_descr_variable_marker']
-    # manual_reconst_attrs = ['structure']
 
     def __init__(self, pool, passed_term=None, mandatory_family=None, max_factors_in_term=1,
                  create_derivs: bool = False, interelement_operator=np.multiply, collapse_powers = True):
@@ -80,6 +85,7 @@ class Term(ComplexStructure):
                 factor = Factor.__new__(Factor)
                 
                 attrs_from_dict(factor, factor_elem, except_attrs)
+                factor.evaluator = self.pool
                 self.structure.append(factor)
     
     @property
@@ -296,9 +302,13 @@ class Term(ComplexStructure):
 
     def contains_deriv(self, variable=None):
         if variable is None:
-            return any([factor.is_deriv and factor.deriv_code != [None,] for factor in self.structure])
+            return any([factor.is_deriv and factor.deriv_code != [None,] and
+                        factor.evaluator._evaluator == simple_function_evaluator
+                        for factor in self.structure])
         else:
-            return any([factor.variable == variable and factor.deriv_code != [None,] for factor in self.structure])
+            return any([factor.variable == variable and factor.deriv_code != [None,] and
+                        factor.evaluator._evaluator == simple_function_evaluator
+                        for factor in self.structure])
 
     def contains_variable(self, variable):
         return any([factor.variable == variable for factor in self.structure])
@@ -553,15 +563,16 @@ class Equation(ComplexStructure):
                 value = np.add(elem1, - reduce(lambda x, y: np.add(x, y), [np.multiply(self.weights_internal[idx_full], temp_feats[:, idx_sparse])
                                                                            for idx_sparse, idx_full in enumerate(feature_indexes)]))
                                                                            # for feature_idx, weight in np.ndenumerate(self.weights_internal)]))
-            else:
+            else:           
                 elem1 = np.expand_dims(target, axis=1)
-                if features is None:
-                    feature_list = [np.multiply(self.weights_final[idx_full], temp_feats[:, idx_sparse])
-                                    for idx_sparse, idx_full in enumerate(feature_indexes)]
+                if features is not None:
+                    features_val = reduce(lambda x, y: np.add(x, y), [np.multiply(self.weights_final[idx_full], temp_feats[:, idx_sparse])
+                                                                      for idx_sparse, idx_full in enumerate(feature_indexes)]) # Possible mistake here
+                    features_val = np.expand_dims(features_val, axis=1)
                 else:
-                    feature_list = 0               
-                value = np.add(elem1, feature_list)
-                                               
+                    features_val = np.zeros_like(target)
+                value = np.add(elem1, - features_val)
+                # print(value.shape)
             return value, target, features
         else:
             return None, target, features
@@ -784,6 +795,7 @@ class Equation(ComplexStructure):
 
 
 def solver_formed_grid(training_grid=None):
+    raise NotImplementedError('solver_formed_grid function is to be depricated')
     if training_grid is None:
         keys, training_grid = global_var.grid_cache.get_all()
     else:
@@ -878,8 +890,12 @@ class SoEq(moeadd.MOEADDSolution):
         
         if not isinstance(complexity, list) or len(self.vars_to_describe) != len(complexity):
             raise ValueError('Incorrect list of complexities passed.')
+        adj_complexity = copy.copy(complexity)
+        for idx, compl in enumerate(adj_complexity):
+            if compl is None:
+                adj_complexity[idx] = self.obj_fun[-len(complexity) + idx]
         
-        return list(self.obj_fun[-len(complexity):]) == complexity        
+        return list(self.obj_fun[-len(adj_complexity):]) == adj_complexity
 
     def create(self, passed_equations: list = None):
         if passed_equations is None:
@@ -1004,13 +1020,6 @@ class SoEq(moeadd.MOEADDSolution):
     @property
     def fitness_calculated(self):
         return all([equation.fitness_calculated for equation in self.vals])
-
-    # def save(self, file_name='epde_systems.pickle'):
-    #     directory = os.getcwd()
-    #     with open(file_name, 'wb') as file:
-    #         to_save = ([equation.text_form for equation in self.vals],
-    #                    self.tokens_for_eq + self.tokens_supp)
-    #         pickle.dump(obj=to_save, file=file)
 
 
 class SoEqIterator(object):

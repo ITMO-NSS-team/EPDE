@@ -230,7 +230,12 @@ class TermParamCrossover(CompoundOperator):
                                if objective[1].structure[i].label == objective[0].structure[term1_token_idx].label][0]
             for param_idx, param_descr in objective[0].structure[term1_token_idx].params_description.items():
                 if param_descr['name'] == 'power': power_param_idx = param_idx
-                if param_descr['name'] == 'dim': dim_param_idx = param_idx                
+                if param_descr['name'] == 'dim': dim_param_idx = param_idx
+            
+            try:                # TODO: refactor logic
+                dim_param_idx
+            except:
+                dim_param_idx = power_param_idx
 
             for param_idx in np.arange(objective[0].structure[term1_token_idx].params.size):
                 if param_idx != power_param_idx and param_idx != dim_param_idx:

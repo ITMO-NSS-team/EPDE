@@ -12,7 +12,7 @@ from scipy.ndimage import gaussian_filter
 import numpy as np
 
 import torch
-device = torch.device('cpu')
+
 
 import epde.globals as global_var
 
@@ -35,13 +35,13 @@ class PlaceholderSmoother(AbstractSmoother):
 def baseline_ann(dim):
     model = torch.nn.Sequential(
         torch.nn.Linear(dim, 256),
-        torch.nn.Tanh(),
+        torch.nn.ReLU(),
         torch.nn.Linear(256, 64),
-        torch.nn.Tanh(),
-        torch.nn.Linear(64, 64),
-        torch.nn.Tanh(),
+        torch.nn.ReLU(),
+        # torch.nn.Linear(64, 64),
+        # torch.nn.Tanh(),
         torch.nn.Linear(64, 1024),
-        torch.nn.Tanh(),
+        torch.nn.ReLU(),
         torch.nn.Linear(1024, 1)
     )
     return model
@@ -52,7 +52,7 @@ class ANNSmoother(AbstractSmoother):
         pass
 
     def __call__(self, data, grid, epochs_max=1e3, loss_mean=1000, batch_frac=0.5,
-                 learining_rate=1e-4, return_ann: bool = False):
+                 learining_rate=1e-4, return_ann: bool = False, device = 'cpu'):
         dim = 1 if np.any([s == 1 for s in data.shape]) and data.ndim == 2 else data.ndim
         model = baseline_ann(dim)
         grid_flattened = torch.from_numpy(np.array([subgrid.reshape(-1) for subgrid in grid])).float().T
@@ -60,6 +60,8 @@ class ANNSmoother(AbstractSmoother):
         original_shape = data.shape
 
         field_ = torch.from_numpy(data.reshape(-1, 1)).float()
+
+        # device = torch.device(device)        
         grid_flattened.to(device)
         field_.to(device)
         optimizer = torch.optim.Adam(model.parameters(), lr=learining_rate)
@@ -90,8 +92,8 @@ class ANNSmoother(AbstractSmoother):
             if loss_mean < min_loss:
                 best_model = model
                 min_loss = loss_mean
-            if global_var.verbose.show_ann_loss:
-                print('Surface training t={}, loss={}'.format(t, loss_mean))
+            # if global_var.verbose.show_ann_loss:
+            print('Surface training t={}, loss={}'.format(t, loss_mean))
             t += 1
 
         data_approx = best_model(grid_flattened).detach().numpy().reshape(original_shape)

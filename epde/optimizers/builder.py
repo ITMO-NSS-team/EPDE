@@ -6,7 +6,7 @@ Created on Fri Feb  3 17:15:31 2023
 @author: maslyaev
 """
 
-from abc import ABC, abstractproperty
+from abc import ABC, abstractmethod
 
 from epde.optimizers.blocks import EvolutionaryBlock, InputBlock
 from epde.optimizers.strategy import Strategy
@@ -22,7 +22,7 @@ def link(op1, op2):
     op2.add_incoming(op1)
 
 
-class StrategyBuilder():     # OperatorBuilder  ABC
+class StrategyBuilder():
     """
     Class instance for building a strategy
 
@@ -55,9 +55,8 @@ class StrategyBuilder():     # OperatorBuilder  ABC
         self.reachable = dict()
         self.initial_label = None        
     
-    @abstractproperty
+    @property
     def processer(self):
-        # raise NotImplementedError('Tring to return a property of an abstract class.')
         return self._processer
 
     def add_init_operator(self, operator_label : str = 'initial'):

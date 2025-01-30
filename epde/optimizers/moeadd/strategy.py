@@ -9,12 +9,12 @@ Created on Wed Aug 10 12:54:02 2022
 import numpy as np
 from functools import partial
 
-from epde.operators.utils.operator_mappers import map_operator_between_levels
+from epde.operators.utils.operator_mappers import map_operator_between_levels, OperatorCondition
 from epde.operators.utils.template import add_base_param_to_operator
 
 from epde.operators.multiobjective.selections import MOEADDSelection
 from epde.operators.multiobjective.variation import get_basic_variation
-from epde.operators.common.fitness import L2Fitness
+from epde.operators.common.fitness import L2Fitness, SolverBasedFitness, PIC
 from epde.operators.common.right_part_selection import RandomRHPSelector
 from epde.operators.multiobjective.moeadd_specific import get_pareto_levels_updater, SimpleNeighborSelector, get_initial_sorter
 from epde.operators.common.sparsity import LASSOSparsity
@@ -27,9 +27,9 @@ class MOEADDDirector(OptimizationPatternDirector):
     """
     Class for creating strategy builder of multicriterian optimization
     """
-# class MOEADDDirector(OptimizationPatternDirector):
-    def use_baseline(self, variation_params : dict = {}, mutation_params : dict = {}, sorter_params : dict = {},
-                    pareto_combiner_params : dict = {}, pareto_updater_params : dict = {}, **kwargs):
+    def use_baseline(self, use_solver: bool = False, variation_params : dict = {}, mutation_params : dict = {},  
+                     sorter_params : dict = {}, pareto_combiner_params : dict = {},
+                     pareto_updater_params : dict = {}, **kwargs):
         add_kwarg_to_operator = partial(add_base_param_to_operator, target_dict = kwargs)
 
         neighborhood_selector = SimpleNeighborSelector(['number_of_neighbors'])
@@ -43,23 +43,35 @@ class MOEADDDirector(OptimizationPatternDirector):
 
         right_part_selector = RandomRHPSelector()
         
-        eq_fitness = L2Fitness(['penalty_coeff'])
-        add_kwarg_to_operator(operator = eq_fitness)
-        
         sparsity = LASSOSparsity()
-        coeff_calc = LinRegBasedCoeffsEquation()
+        coeff_calc = LinRegBasedCoeffsEquation()        
 
-        eq_fitness.set_suboperators({'sparsity' : sparsity, 'coeff_calc' : coeff_calc})
+        if use_solver:
+            # fitness = SolverBasedFitness(['penalty_coeff'])
+            fitness = PIC(['penalty_coeff'])
+
+            sparsity = map_operator_between_levels(sparsity, 'gene level', 'chromosome level')
+            coeff_calc = map_operator_between_levels(coeff_calc, 'gene level', 'chromosome level')
+        else:
+            fitness = L2Fitness(['penalty_coeff'])
+        add_kwarg_to_operator(operator = fitness)
+
+        fitness.set_suboperators({'sparsity' : sparsity, 'coeff_calc' : coeff_calc})
         fitness_cond = lambda x: not getattr(x, 'fitness_calculated')
-        sys_fitness = map_operator_between_levels(eq_fitness, 'gene level', 'chromosome level', fitness_cond)
+        if use_solver:
+            fitness = OperatorCondition(fitness, fitness_cond)
+        else:
+            fitness = map_operator_between_levels(fitness, 'gene level', 'chromosome level',
+                                                  objective_condition=fitness_cond)
 
         rps_cond = lambda x: any([not elem_eq.right_part_selected for elem_eq in x.vals])
-        sys_rps = map_operator_between_levels(right_part_selector, 'gene level', 'chromosome level', rps_cond)
+        sys_rps = map_operator_between_levels(right_part_selector, 'gene level', 'chromosome level', 
+                                              objective_condition=rps_cond)
 
         # Separate mutation from population updater for better customization.
-        initial_sorter = get_initial_sorter(right_part_selector = sys_rps, chromosome_fitness = sys_fitness, 
+        initial_sorter = get_initial_sorter(right_part_selector = sys_rps, chromosome_fitness = fitness, 
                                             sorter_params = sorter_params)
-        population_updater = get_pareto_levels_updater(right_part_selector = sys_rps, chromosome_fitness = sys_fitness,
+        population_updater = get_pareto_levels_updater(right_part_selector = sys_rps, chromosome_fitness = fitness,
                                                        constrained = False, mutation_params = mutation_params, 
                                                        pl_updater_params = pareto_updater_params, 
                                                        combiner_params = pareto_combiner_params)

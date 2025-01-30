@@ -8,14 +8,19 @@ Created on Fri Jun  4 13:20:59 2021
 
 import numpy as np
 from copy import deepcopy
+import torch
 
 import matplotlib.pyplot as plt
 from matplotlib import cm
 
-from epde.interface.solver_integration import SolverAdapter
+from epde.integrate import SolverAdapter
 from epde.structure.main_structures import SoEq, Equation
 from epde.operators.utils.template import CompoundOperator
 import epde.globals as global_var
+from sklearn.linear_model import LinearRegression
+from scipy.optimize import minimize
+
+LOSS_NAN_VAL = 1e7
 
 class L2Fitness(CompoundOperator):
     """
@@ -68,7 +73,7 @@ class L2Fitness(CompoundOperator):
             if features is None:
                 discr_feats = 0
             else:
-                discr_feats = np.dot(features, objective.weights_final[:-1][objective.weights_internal != 0]) # weights_final -> weights_internal
+                discr_feats = np.dot(features, objective.weights_final[:-1][objective.weights_internal != 0])
 
             discr = (discr_feats + np.full(target.shape, objective.weights_final[-1]) - target)
             self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)
@@ -92,55 +97,221 @@ class L2Fitness(CompoundOperator):
 
 
 class SolverBasedFitness(CompoundOperator):
+    # To be modified to include physics-informed information criterion (PIC)
+
     key = 'SolverBasedFitness'
     
-    def __init__(self, param_keys: list, solver_kwargs: dict = {'model' : None, 'use_cache' : True}):
+    def __init__(self, param_keys: list):
         super().__init__(param_keys)
-        solver_kwargs['dim'] = len(global_var.grid_cache.get_all()[1])
-        
-        self.adapter = None # SolverAdapter(var_number = len(system.vars_to_describe))
+        self.adapter = None
 
-    def set_adapter(self, var_number):
-        if self.adapter is not None:
-            self.adapter = SolverAdapter(var_number = var_number)
+    def set_adapter(self, net = None):
+
+        if self.adapter is None or net is not None:
+            compiling_params = {'mode': 'autograd', 'tol':0.01, 'lambda_bound': 100} #  'h': 1e-1
+            optimizer_params = {}
+            training_params = {'epochs': 4e3, 'info_string_every' : 1e3}
+            early_stopping_params = {'patience': 4, 'no_improvement_patience' : 250}
+
+            explicit_cpu = True
+            device = 'cuda' if (torch.cuda.is_available and not explicit_cpu) else 'cpu'
+
+            self.adapter = SolverAdapter(net = net, use_cache = False, device=device)
+
+            self.adapter.set_compiling_params(**compiling_params)            
+            self.adapter.set_optimizer_params(**optimizer_params)
+            self.adapter.set_early_stopping_params(**early_stopping_params)
+            self.adapter.set_training_params(**training_params)
 
     def apply(self, objective : SoEq, arguments : dict):
-        self.set_adapter(len(objective.vars_to_describe))
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
+
+        try:
+            net = deepcopy(global_var.solution_guess_nn)
+        except NameError:
+            net = None
+
+        self.set_adapter(net=net)
 
         self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
         self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
 
-        # _, target, features = objective.evaluate(normalize = False, return_val = False)
+        print('solving equation:')
+        print(objective.text_form)
 
-        grid = global_var.grid_cache.get_all()[1]
-        solution_model = self.adapter.solve_epde_system(system = objective, grids = grid, 
-                                                        boundary_conditions = None)
-
-        self.g_fun_vals = global_var.grid_cache.g_func #.reshape(-1)
+        loss_add, solution_nn = self.adapter.solve_epde_system(system = objective, grids = None, 
+                                                               boundary_conditions = None, use_fourier=True)
+        _, grids = global_var.grid_cache.get_all(mode = 'torch')
         
-        solution = solution_model(self.adapter.convert_grid(grid)).detach().numpy()
-        for eq_idx, eq in enumerate(objective.structure):
-            referential_data = global_var.tensor_cache.get((eq.main_var_to_explain, (1.0,)))
+        grids = torch.stack([grid.reshape(-1) for grid in grids], dim = 1).float()
+        solution = solution_nn(grids).detach().cpu().numpy()
+        self.g_fun_vals = global_var.grid_cache.g_func
+        
+        for eq_idx, eq in enumerate(objective.vals):
+            if torch.isnan(loss_add):
+                fitness_value = 2*LOSS_NAN_VAL
+            else:
+                referential_data = global_var.tensor_cache.get((eq.main_var_to_explain, (1.0,)))
 
-            discr = (solution[eq_idx, ...] - referential_data.reshape(solution[eq_idx, ...].shape))
-
-            discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape))
-            rl_error = np.linalg.norm(discr, ord = 2)
-            
-            fitness_value = rl_error
-            if np.sum(eq.weights_final) == 0: 
-                fitness_value /= self.params['penalty_coeff']
+                print(f'solution shape {solution.shape}')
+                print(f'solution[..., eq_idx] {solution[..., eq_idx].shape}, eq_idx {eq_idx}')
+                discr = (solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape))
+                discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape))
+                rl_error = np.linalg.norm(discr, ord = 2) 
+                
+                print(f'fitness error is {rl_error}, while loss addition is {float(loss_add)}')            
+                fitness_value = rl_error + self.params['pinn_loss_mult'] * float(loss_add) # TODO: make pinn_loss_mult case dependent
+                if np.sum(eq.weights_final) == 0: 
+                    fitness_value /= self.params['penalty_coeff']
 
             eq.fitness_calculated = True
             eq.fitness_value = fitness_value
 
-            if global_var.verbose.plot_DE_solutions:
-                plot_data_vs_solution(self.adapter.convert_grid(grid),
-                                      data = referential_data.reshape(solution[eq_idx, ...].shape), 
-                                      solution = solution[eq_idx, ...])
+    def use_default_tags(self):
+        self._tags = {'fitness evaluation', 'chromosome level', 'contains suboperators', 'inplace'}
 
-    
+
+class PIC(CompoundOperator):
+
+    key = 'PIC'
+
+    def __init__(self, param_keys: list):
+        super().__init__(param_keys)
+        self.adapter = None
+        self.window_size = None
+
+    def set_adapter(self, net=None):
+
+        if self.adapter is None or net is not None:
+            compiling_params = {'mode': 'autograd', 'tol': 0.01, 'lambda_bound': 100}  # 'h': 1e-1
+            optimizer_params = {}
+            training_params = {'epochs': 4e3, 'info_string_every': 1e3}
+            early_stopping_params = {'patience': 4, 'no_improvement_patience': 250}
+
+            explicit_cpu = False
+            device = 'cuda' if (torch.cuda.is_available and not explicit_cpu) else 'cpu'
+
+            self.adapter = SolverAdapter(net=net, use_cache=False, device=device)
+
+            self.adapter.set_compiling_params(**compiling_params)
+            self.adapter.set_optimizer_params(**optimizer_params)
+            self.adapter.set_early_stopping_params(**early_stopping_params)
+            self.adapter.set_training_params(**training_params)
+
+    def apply(self, objective: SoEq, arguments: dict):
+        self_args, subop_args = self.parse_suboperator_args(arguments=arguments)
+
+        try:
+            net = deepcopy(global_var.solution_guess_nn)
+        except NameError:
+            net = None
+
+        self.set_adapter(net=net)
+
+        self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
+        self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
+
+        print('solving equation:')
+        print(objective.text_form)
+
+        loss_add, solution_nn = self.adapter.solve_epde_system(system=objective, grids=None,
+                                                               boundary_conditions=None, use_fourier=True)
+
+        _, grids = global_var.grid_cache.get_all(mode='torch')
+
+        grids = torch.stack([grid.reshape(-1) for grid in grids], dim=1).float()
+        solution = solution_nn(grids).detach().cpu().numpy()
+        self.g_fun_vals = global_var.grid_cache.g_func
+
+        for eq_idx, eq in enumerate(objective.vals):
+            # Calculate r-loss
+            target = eq.structure[eq.target_idx]
+            target_vals = target.evaluate(False)
+            features_vals = []
+            nonzero_features_indexes = []
+
+            for i in range(len(eq.structure)):
+                if i == eq.target_idx:
+                    continue
+                idx = i if i < eq.target_idx else i - 1
+                if eq.weights_internal[idx] != 0:
+                    features_vals.append(eq.structure[i].evaluate(False))
+                    nonzero_features_indexes.append(idx)
+
+            if len(features_vals) == 0:
+                objective.weights_final = np.zeros(len(objective.structure))
+            else:
+                features = features_vals[0]
+                if len(features_vals) > 1:
+                    for i in range(1, len(features_vals)):
+                        features = np.vstack([features, features_vals[i]])
+                features = np.vstack([features, np.ones(features_vals[0].shape)])  # Add constant feature
+                features = np.transpose(features)
+
+                self.window_size = len(target_vals) // 2
+                num_horizons = len(target_vals) - self.window_size + 1
+                eq_window_weights = []
+
+                # Compute coefficients and collect statistics over horizons
+                for start_idx in range(num_horizons):
+                    end_idx = start_idx + self.window_size
+
+                    target_window = target_vals[start_idx:end_idx]
+                    feature_window = features[start_idx:end_idx, :]
+
+                    estimator = LinearRegression(fit_intercept=False)
+                    if feature_window.ndim == 1:
+                        feature_window = feature_window.reshape(-1, 1)
+                    try:
+                        self.g_fun_vals_window = self.g_fun_vals.reshape(-1)[start_idx:end_idx]
+                    except AttributeError:
+                        self.g_fun_vals_window = None
+                    estimator.fit(feature_window, target_window, sample_weight=self.g_fun_vals_window)
+                    valuable_weights = estimator.coef_
+
+                    window_weights = np.zeros(len(eq.structure))
+                    for weight_idx in range(len(window_weights)):
+                        if weight_idx in nonzero_features_indexes:
+                            window_weights[weight_idx] = valuable_weights[nonzero_features_indexes.index(weight_idx)]
+                    eq_window_weights.append(window_weights)
+
+                eq_cv = [np.abs(np.std(_) / (np.mean(_))) for _ in zip(*eq_window_weights)]  # As in paper's repo
+                eq_cv_valuable = [x for x in eq_cv if not np.isnan(x)]
+                lr = np.mean(eq_cv_valuable)
+
+            # Calculate p-loss
+            if torch.isnan(loss_add):
+                lp = 2 * LOSS_NAN_VAL
+            else:
+                print(f'solution shape {solution.shape}')
+                print(f'solution[..., eq_idx] {solution[..., eq_idx].shape}, eq_idx {eq_idx}')
+                referential_data = global_var.tensor_cache.get((eq.main_var_to_explain, (1.0,)))
+                initial_data = global_var.tensor_cache.get(('u', (1.0,))).reshape(solution[..., eq_idx].shape)
+
+                sol_pinn = solution[..., eq_idx]
+                sol_ann = referential_data.reshape(solution[..., eq_idx].shape)
+                sol_pinn_normalized = (sol_pinn - min(initial_data)) / (max(initial_data) - min(initial_data))
+                sol_ann_normalized = (sol_ann - min(initial_data)) / (max(initial_data) - min(initial_data))
+
+                discr = sol_pinn_normalized - sol_ann_normalized
+                # discr = (solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape))  # Default
+                discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape))
+                rl_error = np.linalg.norm(discr, ord=2)
+
+                print(f'fitness error is {rl_error}, while loss addition is {float(loss_add)}')
+                lp = rl_error + self.params['pinn_loss_mult'] * float(
+                    loss_add)  # TODO: make pinn_loss_mult case dependent
+                if np.sum(eq.weights_final) == 0:
+                    lp /= self.params['penalty_coeff']
+
+            eq.fitness_calculated = True
+            print('Lr: ', lr, '\t Lp: ', lp, '\t PIC: ', lr * lp)
+            eq.fitness_value = lr * lp
+
+    def use_default_tags(self):
+        self._tags = {'fitness evaluation', 'chromosome level', 'contains suboperators', 'inplace'}
+
+
 def plot_data_vs_solution(grid, data, solution):
     if grid.shape[1]==2:
         fig = plt.figure()
