@@ -253,13 +253,15 @@ class OdeintAdapter(object):
         pass # TODO: implement hyperparameters setup, according to the problem specifics
 
     def solve_epde_system(self, system: Union[SoEq, dict], grids: list=None, boundary_conditions=None,
-                          mode='NN', data=None, *args, **kwargs):
+                          mode='NN', data=None, vars_to_describe = ['u'], *args, **kwargs):
         if isinstance(system, SoEq):
             system_interface = SystemSolverInterface(system_to_adapt=system)
             system_solver_forms = system_interface.form(grids = grids, mode = mode)
-        elif isinstance(system, List[Dict]):
+        elif isinstance(system, list):
             system_solver_forms = system
-        
+        else:
+            raise TypeError('Incorrect input into the Odeint Adapter.')
+
         if boundary_conditions is None:
             op_gen = PregenBOperator(system=system,
                                      system_of_equation_solver_form=[sf_labeled[1] for sf_labeled
@@ -267,8 +269,11 @@ class OdeintAdapter(object):
             op_gen.generate_default_bc(vals = data, grids = grids)
             boundary_conditions = op_gen.conditions
 
+        if isinstance(system, SoEq):
+            vars_to_describe = system.vars_to_describe
+            
         return self.solve(equations = [sf_labeled[1] for sf_labeled in system_solver_forms], domain = grids[0], 
-                          boundary_conditions = boundary_conditions, vars = system.vars_to_describe)
+                          boundary_conditions = boundary_conditions, vars = vars_to_describe)
         # Add condition parser and control function args parser
 
 
