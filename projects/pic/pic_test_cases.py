@@ -18,6 +18,8 @@ from epde.operators.utils.operator_mappers import map_operator_between_levels
 import epde.operators.common.fitness as fitness
 from epde.operators.utils.template import CompoundOperator
 
+from epde import TrigonometricTokens, GridTokens
+
 # Introduce noise levels, test with complex setups
 # np.random.seed(0)
 
@@ -92,7 +94,6 @@ def ODE_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
 
     dimensionality = 0
 
-    from epde import TrigonometricTokens, GridTokens
     trig_tokens = TrigonometricTokens(freq = (2 - 1e-8, 2 + 1e-8), 
                                       dimensionality = dimensionality)
     grid_tokens = GridTokens(['x_0',], dimensionality = dimensionality, max_power = 2)
@@ -127,8 +128,7 @@ def VdP_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
     data_nn = load_pretrained_PINN(os.path.join(foldername, 'vdp_ann_pretrained.pickle'))
 
     dimensionality = 0
-    
-    from epde import TrigonometricTokens, GridTokens
+
     trig_tokens = TrigonometricTokens(freq = (2 - 1e-8, 2 + 1e-8), 
                                       dimensionality = dimensionality)
     grid_tokens = GridTokens(['x_0',], dimensionality = dimensionality, max_power = 2)
@@ -244,7 +244,6 @@ def KdV_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
     print('Shapes:', data.shape, grid[0].shape)
     dimensionality = 1
 
-    from epde import TrigonometricTokens
     trig_tokens = TrigonometricTokens(freq=(1 - 1e-8, 1 + 1e-8),
                                       dimensionality=dimensionality)
 
@@ -260,18 +259,17 @@ def KdV_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
 
     assert compare_equations(eq_kdv_symbolic, eq_kdv_incorrect, epde_search_obj) 
 
-# TODO: implement tests on noised data, corrupted by additive Gaussian noise & preform full-scale equation search experiments.
-def epde_discovery(foldername):
+
+def ODE_discovery(foldername, noise_level):
     step = 0.05
     steps_num = 320
     t = np.arange(start=0., stop=step * steps_num, step=step)
     data = np.load(os.path.join(foldername, 'ode_data.npy'))
-    # noised_data = noise_data(data, noise_level)
-    data_nn = load_pretrained_PINN(os.path.join(foldername, 'ode_ann_pretrained.pickle'))
+    noised_data = noise_data(data, noise_level)
+    # data_nn = load_pretrained_PINN(os.path.join(foldername, 'ode_ann_pretrained.pickle'))
 
     dimensionality = 0
 
-    from epde import TrigonometricTokens, GridTokens
     trig_tokens = TrigonometricTokens(freq=(2 - 1e-8, 2 + 1e-8),
                                       dimensionality=dimensionality)
     grid_tokens = GridTokens(['x_0', ], dimensionality=dimensionality, max_power=2)
@@ -288,44 +286,39 @@ def epde_discovery(foldername):
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
-    epde_search_obj.fit(data=[data, ], variable_names=['u', ], max_deriv_order=(2,),
+    epde_search_obj.fit(data=[noised_data, ], variable_names=['u', ], max_deriv_order=(2,),
                         equation_terms_max_number=5, data_fun_pow=1,
                         additional_tokens=[trig_tokens, grid_tokens],
                         equation_factors_max_number=factors_max_number,
                         eq_sparsity_interval=(1e-12, 1e-4))
 
     epde_search_obj.equations(only_print=True, num=1)
+    epde_search_obj.visualize_solutions()
+    return epde_search_obj
 
-    # syss = epde_search_obj.equation_search_results(only_print = False, num = 1)
-    '''
-    Having insight about the initial ODE structure, we are extracting the equation with complexity of 5
-
-    In other cases, you should call sys.equation_search_results(only_print = True),
-    where the algorithm presents Pareto frontier of optimal equations.
-    '''
-    sys = epde_search_obj.get_equations_by_complexity(5)[0]
-    return epde_search_obj, sys
 
 if __name__ == "__main__":
     # Operator = fitness.SolverBasedFitness # Replace by the developed PIC-based operator.
     Operator = fitness.PIC
-    operator_params = {"penalty_coeff" : 0.2, "pinn_loss_mult" : 1e4}
+    operator_params = {"penalty_coeff": 0.2, "pinn_loss_mult": 1e4}
     fit_operator = prepare_suboperators(Operator(list(operator_params.keys())))
     fit_operator.params = operator_params
 
+    # Paths
     directory = os.path.dirname(os.path.realpath(__file__))
-    ode_folder_name = os.path.join(directory, 'data\ode')
+    ode_folder_name = os.path.join(directory, 'data\\ode')
+    vdp_folder_name = os.path.join(directory, 'data\\vdp')
+    ac_folder_name = os.path.join(directory, 'data\\ac')
+    wave_folder_name = os.path.join(directory, 'data\\wave')
+    kdv_folder_name = os.path.join(directory, 'data\\kdv')
+
+    # Pair-wise tests
     ODE_test(fit_operator, ode_folder_name, 0)
-    # epde_discovery(ode_folder_name)
-
-    vdp_folder_name = os.path.join(directory, 'data\vdp')
     # VdP_test(fit_operator, vdp_folder_name, 75)
-
-    ac_folder_name = os.path.join(directory, 'data\ac')
     # AC_test(fit_operator, ac_folder_name, 25)
-
-    wave_folder_name = os.path.join(directory, 'data\wave')
     # wave_test(fit_operator, wave_folder_name, 200)
-
-    ode_folder_name = os.path.join(directory, 'data\kdv')
     # KdV_test(fit_operator, kdv_folder_name, 25)
+
+    # Full_scale test
+    eso = ODE_discovery(ode_folder_name, 0)
+
