@@ -239,7 +239,7 @@ class PIC(CompoundOperator):
                     nonzero_features_indexes.append(idx)
 
             if len(features_vals) == 0:
-                objective.weights_final = np.zeros(len(objective.structure))
+                eq.weights_final = np.zeros(len(eq.structure))
             else:
                 features = features_vals[0]
                 if len(features_vals) > 1:
