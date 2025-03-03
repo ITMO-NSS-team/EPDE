@@ -240,7 +240,7 @@ class PIC(CompoundOperator):
 
             if len(features_vals) == 0:
                 eq.weights_final = np.zeros(len(eq.structure))
-                lr = 0
+                lr = 1
             else:
                 features = features_vals[0]
                 if len(features_vals) > 1:
