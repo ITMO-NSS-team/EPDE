@@ -741,9 +741,9 @@ class EpdeSearch(object):
 
     def fit(self, data: Union[np.ndarray, list, tuple] = None, equation_terms_max_number=6,
             equation_factors_max_number=1, variable_names=['u',], eq_sparsity_interval=(1e-4, 2.5), 
-            derivs=None, max_deriv_order=1, additional_tokens=[], data_fun_pow: int = 1, deriv_fun_pow: int = 1,
+            derivs=None, max_deriv_order=1, additional_tokens = None, data_fun_pow: int = 1, deriv_fun_pow: int = 1,
             optimizer: Union[SimpleOptimizer, MOEADDOptimizer] = None, pool: TFPool = None,
-            population: Union[ParetoLevels, Population] = None, data_nn = None, 
+            population: List[SoEq] = None, data_nn = None, 
             fourier_layers: bool = True, fourier_params: dict = {'L' : [4,], 'M' : [3,]}):
         """
         Fit epde search algorithm to obtain differential equations, describing passed data.
@@ -807,6 +807,8 @@ class EpdeSearch(object):
                       'additional_tokens' : [family.token_family.ftype for family in additional_tokens]}
 
         if pool is None:
+            if additional_tokens is None:
+                additional_tokens = []
             if self.pool == None or self.pool_params != cur_params:
                 if data is None:
                     raise ValueError('Data has to be specified beforehand or passed in fit as an argument.')
@@ -824,7 +826,7 @@ class EpdeSearch(object):
         
         if optimizer is None:
             self.optimizer = self._create_optimizer(self.multiobjective_mode, self.optimizer_init_params, 
-                                                    self.director)
+                                                    self.director, population)
         else:
             self.optimizer = optimizer
             
@@ -837,8 +839,10 @@ class EpdeSearch(object):
 
     @staticmethod
     def _create_optimizer(multiobjective_mode:bool, optimizer_init_params:dict, 
-                          opt_strategy_director:OptimizationPatternDirector):
+                          opt_strategy_director:OptimizationPatternDirector, 
+                          population: List[SoEq] = None):
         if multiobjective_mode:
+            optimizer_init_params['passed_population'] = ParetoLevels(population=population)
             optimizer = MOEADDOptimizer(**optimizer_init_params)
                             
             best_obj = np.concatenate((np.zeros(shape=len([1 for token_family in optimizer_init_params['population_instruct']['pool'].families 
@@ -848,6 +852,7 @@ class EpdeSearch(object):
             print('best_obj', len(best_obj))
             optimizer.pass_best_objectives(*best_obj)            
         else:
+            optimizer_init_params['passed_population'] = Population(population=population)            
             optimizer = SimpleOptimizer(**optimizer_init_params)
         
         optimizer.set_strategy(opt_strategy_director)        
