@@ -228,7 +228,7 @@ def kdv_data(filename, shape = 80):
 def KdV_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
     # Test scenario to evaluate performance on Korteweg-de Vries equation
     eq_kdv_symbolic = '-6.0 * du/dx1{power: 1.0} * u{power: 1.0} + -1.0 * d^3u/dx1^3{power: 1.0} + \
-                           1.0 * sin{power: 1, freq: 1.0, dim: 1} * cos{power: 1, freq: 1.0, dim: 1} + \
+                           1.0 * sin{power: 1, freq: 1.0, dim: 1} * cos{power: 1, freq: 1.0, dim: 0} + \
                            0.0 = du/dx0{power: 1.0}'
 
     eq_kdv_incorrect = '0.04 * d^2u/dx1^2{power: 1} + 0. = d^2u/dx0^2{power: 1}'
@@ -247,8 +247,8 @@ def KdV_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
                                  coordinate_tensors = (grid[0], grid[1]), verbose_params = {'show_iter_idx' : True},
                                  device = 'cpu')
 
-    epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
-                                     preprocessor_kwargs={})
+    epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
+                                     preprocessor_kwargs={'epochs_max': 1e3})
 
     epde_search_obj.create_pool(data=noised_data, variable_names=['u',], max_deriv_order=(2, 3),
                                 additional_tokens = [trig_tokens,], data_nn = data_nn)
@@ -309,12 +309,12 @@ if __name__ == "__main__":
     kdv_folder_name = os.path.join(directory, 'data\\kdv')
 
     # Pair-wise tests
-    ODE_test(fit_operator, ode_folder_name, 0)
+    # ODE_test(fit_operator, ode_folder_name, 25)
     # VdP_test(fit_operator, vdp_folder_name, 75)
     # AC_test(fit_operator, ac_folder_name, 25)
     # wave_test(fit_operator, wave_folder_name, 200)
-    # KdV_test(fit_operator, kdv_folder_name, 25)
+    KdV_test(fit_operator, kdv_folder_name, 25)
 
     # Full_scale test
-    eso = ODE_discovery(ode_folder_name, 0)
+    # eso = ODE_discovery(ode_folder_name, 0)
 
