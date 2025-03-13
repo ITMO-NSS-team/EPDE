@@ -863,6 +863,17 @@ class SoEq(moeadd.MOEADDSolution):
         self.set_objective_functions(
             quality_objectives + complexity_objectives)
 
+    def use_pic_multiobjective_function(self):
+        from epde.eq_mo_objectives import generate_partial, equation_fitness, equation_complexity_by_factors, equation_terms_stability
+        complexity_objectives = [generate_partial(equation_complexity_by_factors, eq_key)
+                                 for eq_key in self.vars_to_describe]
+        quality_objectives = [generate_partial(
+            equation_fitness, eq_key) for eq_key in self.vars_to_describe]
+        stability_objectives = [generate_partial(
+            equation_terms_stability, eq_key) for eq_key in self.vars_to_describe]
+        self.set_objective_functions(
+            quality_objectives + complexity_objectives + stability_objectives)
+
     def use_default_singleobjective_function(self):
         from epde.eq_mo_objectives import generate_partial, equation_fitness
         quality_objectives = [generate_partial(equation_fitness, eq_key) for eq_key in self.vars_to_describe]#range(len(self.tokens_for_eq))]
