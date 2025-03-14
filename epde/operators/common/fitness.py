@@ -113,7 +113,7 @@ class SolverBasedFitness(CompoundOperator):
             training_params = {'epochs': 4e3, 'info_string_every' : 1e3}
             early_stopping_params = {'patience': 4, 'no_improvement_patience' : 250}
 
-            explicit_cpu = True
+            explicit_cpu = False
             device = 'cuda' if (torch.cuda.is_available and not explicit_cpu) else 'cpu'
 
             self.adapter = SolverAdapter(net = net, use_cache = False, device=device)
