@@ -47,8 +47,8 @@ class MOEADDDirector(OptimizationPatternDirector):
         coeff_calc = LinRegBasedCoeffsEquation()        
 
         if use_solver:
-            # fitness = SolverBasedFitness(['penalty_coeff'])
-            fitness = PIC(['penalty_coeff'])
+            fitness = SolverBasedFitness(['penalty_coeff'])
+            # fitness = PIC(['penalty_coeff'])
 
             sparsity = map_operator_between_levels(sparsity, 'gene level', 'chromosome level')
             coeff_calc = map_operator_between_levels(coeff_calc, 'gene level', 'chromosome level')

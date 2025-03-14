@@ -48,7 +48,8 @@ class SystemsPopulationConstructor(object):
         try:
             created_solution.set_objective_functions(kwargs['obj_funs'])
         except KeyError:
-            created_solution.use_default_multiobjective_function()
+            # created_solution.use_default_multiobjective_function()
+            created_solution.use_pic_multiobjective_function()
 
         created_solution.create()
 
