@@ -9,7 +9,7 @@ Created on Mon Jul  5 18:48:23 2021
 import numpy as np
 from functools import partial
 from sklearn.linear_model import LinearRegression
-import globals as global_var
+import epde.globals as global_var
 
 
 def generate_partial(obj_function, equation_key):
