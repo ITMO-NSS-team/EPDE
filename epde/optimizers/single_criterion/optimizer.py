@@ -6,7 +6,7 @@ Created on Tue Jan 31 20:17:30 2023
 @author: maslyaev
 """
 
-from typing import Iterable, Callable
+from typing import Iterable, Callable, Union, List
 import warnings
 
 import numpy as np
@@ -60,7 +60,7 @@ class Population(object):
         population (`list`): list of individs
         length (`int`): number of individs in population
     """
-    def __init__(self, elements: list, sorting_method: Callable):
+    def __init__(self, elements: list, sorting_method: Callable = simple_sorting):
         """
         Args:
             elements (`list`): list of individs
@@ -133,16 +133,17 @@ class SimpleOptimizer(object):
     
     """
     def __init__(self, population_instruct, pop_size, solution_params, sorting_method = simple_sorting, 
-                 passed_population: Population = None): 
+                 passed_population: Union[Population, List] = None): 
         soluton_creation_attempts_softmax = 10
         soluton_creation_attempts_hardmax = 100
 
         pop_constructor = SystemsPopulationConstructor(**population_instruct)
         
         assert type(solution_params) == type(None) or type(solution_params) == dict, 'The solution parameters, passed into population constructor must be in dictionary'
-        if passed_population is None:
-            initial_population = []
-            for solution_idx in range(pop_size):
+        if (passed_population is None) or isinstance(passed_population, list):
+            initial_population = [] if passed_population is None else passed_population
+
+            for _ in range(pop_size):
                 solution_gen_idx = 0
                 while True:
                     if type(solution_params) == type(None): solution_params = {}

@@ -8,7 +8,7 @@ import numpy as np
 import warnings
 from itertools import chain
 
-from typing import Union
+from typing import Union, List
 
 def flatten_chain(matrix):
     return list(chain.from_iterable(matrix))
@@ -260,7 +260,7 @@ class MOEADDOptimizer(object):
     """
     def __init__(self, population_instruct, weights_num, pop_size, solution_params, delta, neighbors_number, 
                  nds_method = fast_non_dominated_sorting, ndl_update = ndl_update, 
-                 passed_population: ParetoLevels = None): # logger: Logger = None, 
+                 passed_population: Union[List, ParetoLevels] = None): # logger: Logger = None, 
         """
         Initialization of the evolutionary optimizer is done with the introduction of 
         initial population of candidate solutions, divided into Pareto non-dominated 
@@ -302,14 +302,18 @@ class MOEADDOptimizer(object):
         pop_constructor = SystemsPopulationConstructor(**population_instruct)
         
         assert type(solution_params) == type(None) or type(solution_params) == dict, 'The solution parameters, passed into population constructor must be in dictionary'
-        if passed_population is None:
-            population = []
-            for solution_idx in range(pop_size):
+        if (passed_population is None) or isinstance(passed_population, list):
+            population = [] if passed_population is None else passed_population
+            psize = len(population)
+            for solution_idx in range(psize):
+                population[solution_idx].set_domain(solution_idx)
+
+            for solution_idx in range(pop_size - psize):
                 solution_gen_idx = 0
                 while True:
                     if type(solution_params) == type(None): solution_params = {}
                     temp_solution = pop_constructor.create(**solution_params)
-                    temp_solution.set_domain(solution_idx)
+                    temp_solution.set_domain(psize + solution_idx)
                     if not np.any([temp_solution == solution for solution in population]):
                         population.append(temp_solution)
                         print(f'New solution accepted, confirmed {len(population)}/{pop_size} solutions.')
