@@ -842,7 +842,7 @@ class EpdeSearch(object):
                           opt_strategy_director:OptimizationPatternDirector, 
                           population: List[SoEq] = None):
         if multiobjective_mode:
-            optimizer_init_params['passed_population'] = ParetoLevels(population=population)
+            # optimizer_init_params['passed_population'] = ParetoLevels(population=population)
             optimizer = MOEADDOptimizer(**optimizer_init_params)
                             
             best_obj = np.concatenate((np.zeros(shape=len([1 for token_family in optimizer_init_params['population_instruct']['pool'].families 
