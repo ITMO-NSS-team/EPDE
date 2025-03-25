@@ -253,7 +253,7 @@ class TokenFamily(object):
             for _deriv_evaluator in self._deriv_evaluators.values():
                 self.test_evaluation = _deriv_evaluator.apply(self.test_token)
         else:
-            print('Test in the evaluator:', self._evaluator.eval_kwargs_keys)
+            # print('Test in the evaluator:', self._evaluator.eval_kwargs_keys)
             self.test_evaluation = self._evaluator.apply(self.test_token)
         print('Test evaluation performed correctly')
 
