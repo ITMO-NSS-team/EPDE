@@ -262,7 +262,7 @@ def ODE_discovery(foldername, noise_level):
     t = np.arange(start=0., stop=step * steps_num, step=step)
     data = np.load(os.path.join(foldername, 'ode_data.npy'))
     noised_data = noise_data(data, noise_level)
-    # data_nn = load_pretrained_PINN(os.path.join(foldername, 'ode_ann_pretrained.pickle'))
+    data_nn = load_pretrained_PINN(os.path.join(foldername, 'ode_ann_pretrained.pickle'))
 
     dimensionality = 0
 
@@ -270,15 +270,15 @@ def ODE_discovery(foldername, noise_level):
                                       dimensionality=dimensionality)
     grid_tokens = GridTokens(['x_0', ], dimensionality=dimensionality, max_power=2)
 
-    epde_search_obj = EpdeSearch(use_solver=True, dimensionality=dimensionality, boundary=10,
+    epde_search_obj = EpdeSearch(use_solver=True, multiobjective_mode=True, dimensionality=dimensionality, boundary=10,
                                  coordinate_tensors=(t,), verbose_params={'show_iter_idx': True},
-                                 device='cuda')
+                                 device='cpu')
 
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
 
-    popsize = 8
-    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=55)
+    popsize = 2
+    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=1)
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
@@ -286,7 +286,7 @@ def ODE_discovery(foldername, noise_level):
                         equation_terms_max_number=5, data_fun_pow=1,
                         additional_tokens=[trig_tokens, grid_tokens],
                         equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-12, 1e-4))
+                        eq_sparsity_interval=(1e-12, 1e-4), data_nn=data_nn)
 
     epde_search_obj.equations(only_print=True, num=1)
     epde_search_obj.visualize_solutions()
@@ -313,8 +313,8 @@ if __name__ == "__main__":
     # VdP_test(fit_operator, vdp_folder_name, 75)
     # AC_test(fit_operator, ac_folder_name, 25)
     # wave_test(fit_operator, wave_folder_name, 200)
-    KdV_test(fit_operator, kdv_folder_name, 25)
+    # KdV_test(fit_operator, kdv_folder_name, 25)
 
     # Full_scale test
-    # eso = ODE_discovery(ode_folder_name, 0)
+    eso = ODE_discovery(ode_folder_name, 0)
 

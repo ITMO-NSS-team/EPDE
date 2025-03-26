@@ -348,8 +348,8 @@ class Equation(ComplexStructure):
     __slots__ = ['_history', 'structure', 'interelement_operator', 'n_immutable', 'pool',
                   # '_target', '_features', 'saved', 'saved_as','max_factors_in_term', 'operator',
                  'target_idx', 'right_part_selected', '_weights_final', 'weights_final_evald', 
-                 '_weights_internal', 'weights_internal_evald', 'fitness_calculated', 'solver_form_defined', 
-                 '_fitness_value', 'metaparameters', 'main_var_to_explain'] # , '_solver_form'
+                 '_weights_internal', 'weights_internal_evald', 'fitness_calculated', 'stability_calculated', 'solver_form_defined',
+                 '_fitness_value', '_coefficients_stability', 'metaparameters', 'main_var_to_explain'] # , '_solver_form'
                  
 
     def __init__(self, pool: TFPool, basic_structure: Union[list, tuple, set], var_to_explain: str = None,
@@ -583,6 +583,7 @@ class Equation(ComplexStructure):
         self.weights_internal_evald = False
         self.weights_final_evald = False
         self.fitness_calculated = False
+        self.stability_calculated = False
         self.solver_form_defined = False
 
     @HistoryExtender('\n -> was copied by deepcopy(self)', 'n')
@@ -614,10 +615,16 @@ class Equation(ComplexStructure):
         new_equation.weights_final_evald = self.weights_final_evald
         new_equation.right_part_selected = self.right_part_selected
         new_equation.fitness_calculated = self.fitness_calculated
+        new_equation.stability_calculated = self.stability_calculated
         new_equation.solver_form_defined = False
 
         try:
             new_equation._fitness_value = self._fitness_value
+        except AttributeError:
+            pass
+
+        try:
+            new_equation._coefficients_stability = self._coefficients_stability
         except AttributeError:
             pass
 
@@ -639,6 +646,14 @@ class Equation(ComplexStructure):
 
     def penalize_fitness(self, coeff=1.):
         self._fitness_value = self._fitness_value*coeff
+
+    @property
+    def coefficients_stability(self):
+        return self._coefficients_stability
+
+    @coefficients_stability.setter
+    def coefficients_stability(self, val):
+        self._coefficients_stability = val
 
     @property
     def weights_internal(self):
@@ -792,6 +807,10 @@ class Equation(ComplexStructure):
         del self._solver_form
         self.solver_form_defined = False
         gc.collect()
+
+    @coefficients_stability.setter
+    def coefficients_stability(self, value):
+        self._coefficients_stability = value
 
 
 def solver_formed_grid(training_grid=None):
