@@ -99,17 +99,17 @@ def prepare_var_tensor(var_tensor, derivs_tensor, time_axis):
     initial_shape = var_tensor.shape
     print('initial_shape', initial_shape, 'derivs_tensor.shape', derivs_tensor.shape)
     var_tensor = np.moveaxis(var_tensor, time_axis, 0)
-    result = np.ones((derivs_tensor.shape[-1], ) + tuple([shape for shape in var_tensor.shape]))  # - 2*boundary
+    result = np.ones((derivs_tensor.shape[-1], ) + tuple([shape for shape in var_tensor.shape]))
 
     increment = 0
     if derivs_tensor.ndim == 2:
         for i_outer in range(0, derivs_tensor.shape[1]):
-            result[i_outer+increment, ...] = np.moveaxis(derivs_tensor[:, i_outer].reshape(initial_shape), # np_ndarray_section( , boundary, cut_except)
+            result[i_outer+increment, ...] = np.moveaxis(derivs_tensor[:, i_outer].reshape(initial_shape),
                                                          source=time_axis, destination=0)
     else:
         for i_outer in range(0, derivs_tensor.shape[-1]):
-            assert derivs_tensor.ndim == var_tensor.ndim, 'The shape of tensor of derivatives does not correspond '
-            result[i_outer+increment, ...] = np.moveaxis(derivs_tensor[..., i_outer], # np_ndarray_section( -1, , boundary, [])
+            assert derivs_tensor.ndim == var_tensor.ndim + 1, 'The shape of tensor of derivatives does not correspond '
+            result[i_outer+increment, ...] = np.moveaxis(derivs_tensor[..., i_outer],
                                                          source=time_axis, destination=0)
     return result
 

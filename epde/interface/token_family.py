@@ -210,7 +210,7 @@ class TokenFamily(object):
         if self.params_set and not suppress_eval_test:
             self.test_evaluator()
 
-    def set_deriv_evaluator(self, eval_functions, eval_kwargs_keys=[], suppress_eval_test=True):
+    def set_deriv_evaluator(self, eval_functions, suppress_eval_test=True): # eval_kwargs_keys=[], 
         """
         Define the evaluator for the derivatives of the token family and its parameters
 
@@ -226,8 +226,8 @@ class TokenFamily(object):
             if isinstance(eval_function, EvaluatorContained):
                 _deriv_evaluator = eval_function
             else:
-                print('Setting evaluator kwargs:', eval_kwargs_keys)
-                _deriv_evaluator = EvaluatorContained(eval_function, eval_kwargs_keys)
+                # print('Setting evaluator kwargs:', eval_kwargs_keys)
+                _deriv_evaluator = EvaluatorContained(eval_function) # , eval_kwargs_keys
             self._deriv_evaluators[param_key] = _deriv_evaluator
         self.opt_param_labels = list(eval_functions.keys())
         self.deriv_evaluator_set = True
@@ -253,7 +253,7 @@ class TokenFamily(object):
             for _deriv_evaluator in self._deriv_evaluators.values():
                 self.test_evaluation = _deriv_evaluator.apply(self.test_token)
         else:
-            print('Test in the evaluator:', self._evaluator.eval_kwargs_keys)
+            # print('Test in the evaluator:', self._evaluator.eval_kwargs_keys)
             self.test_evaluation = self._evaluator.apply(self.test_token)
         print('Test evaluation performed correctly')
 

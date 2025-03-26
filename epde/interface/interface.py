@@ -803,12 +803,12 @@ class EpdeSearch(object):
         None.
         """
         # TODO: ADD EXPLICITLY SENT POPULATION PROCESSING
+        if additional_tokens is None:
+            additional_tokens = []        
         cur_params = {'variable_names' : variable_names, 'max_deriv_order' : max_deriv_order,
                       'additional_tokens' : [family.token_family.ftype for family in additional_tokens]}
 
         if pool is None:
-            if additional_tokens is None:
-                additional_tokens = []
             if self.pool == None or self.pool_params != cur_params:
                 if data is None:
                     raise ValueError('Data has to be specified beforehand or passed in fit as an argument.')
