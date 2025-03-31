@@ -113,7 +113,7 @@ class SolverBasedFitness(CompoundOperator):
             training_params = {'epochs': 4e3, 'info_string_every' : 1e3}
             early_stopping_params = {'patience': 4, 'no_improvement_patience' : 250}
 
-            explicit_cpu = True
+            explicit_cpu = False
             device = 'cuda' if (torch.cuda.is_available and not explicit_cpu) else 'cpu'
 
             self.adapter = SolverAdapter(net = net, use_cache = False, device=device)
@@ -188,7 +188,7 @@ class PIC(CompoundOperator):
             training_params = {'epochs': 4e3, 'info_string_every': 1e3}
             early_stopping_params = {'patience': 4, 'no_improvement_patience': 250}
 
-            explicit_cpu = False
+            explicit_cpu = True
             device = 'cuda' if (torch.cuda.is_available and not explicit_cpu) else 'cpu'
 
             self.adapter = SolverAdapter(net=net, use_cache=False, device=device)
@@ -281,7 +281,8 @@ class PIC(CompoundOperator):
                 # lr = np.mean(eq_cv_valuable)
                 eq_cv = np.array(
                     [np.abs(np.std(_) / (np.mean(_))) for _ in zip(*eq_window_weights)])  # As in paper's repo
-                lr = eq_cv.mean()
+                eq_cv_valuable = np.array([x for x in eq_cv if not np.isnan(x)])
+                lr = eq_cv_valuable.mean()
 
             # Calculate p-loss
             if torch.isnan(loss_add):
