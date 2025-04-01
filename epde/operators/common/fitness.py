@@ -283,6 +283,7 @@ class PIC(CompoundOperator):
                     [np.abs(np.std(_) / (np.mean(_))) for _ in zip(*eq_window_weights)])  # As in paper's repo
                 eq_cv_valuable = np.array([x for x in eq_cv if not np.isnan(x)])
                 lr = eq_cv_valuable.mean()
+                assert np.isnan(lr)
 
             # Calculate p-loss
             if torch.isnan(loss_add):
