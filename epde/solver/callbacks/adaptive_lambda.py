@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 from typing import Tuple, List
-from SALib import ProblemSpec
+# from SALib import ProblemSpec
 
 from epde.solver.callbacks.callback import Callback
 from epde.solver.utils import bcs_reshape, samples_count, lambda_print

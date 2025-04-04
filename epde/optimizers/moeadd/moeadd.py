@@ -299,14 +299,18 @@ class MOEADDOptimizer(object):
         soluton_creation_attempts_softmax = 10
         soluton_creation_attempts_hardmax = 100
 
-        pop_constructor = SystemsPopulationConstructor(**population_instruct)
-        
         assert type(solution_params) == type(None) or type(solution_params) == dict, 'The solution parameters, passed into population constructor must be in dictionary'
+
+        pop_constructor = SystemsPopulationConstructor(**population_instruct)
+
+        # for solution in passed_population:
+
         if (passed_population is None) or isinstance(passed_population, list):
             population = [] if passed_population is None else passed_population
             psize = len(population)
             for solution_idx in range(psize):
                 population[solution_idx].set_domain(solution_idx)
+                pop_constructor.applyToPassed(population[solution_idx], **solution_params)
 
             for solution_idx in range(pop_size - psize):
                 solution_gen_idx = 0
