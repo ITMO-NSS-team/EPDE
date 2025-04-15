@@ -30,6 +30,14 @@ class SystemsPopulationConstructor(object):
         self.sparsity_interval = sparsity_interval
         print('self.vars_demand_equation', self.vars_demand_equation)        
 
+    def applyToPassed(self, passed_solution: SoEq, **kwargs):
+        # If necessary, set additional properties to the passed solution 
+        # TODO: further investigate what needs to be done here
+        try:
+            passed_solution.set_objective_functions(kwargs['obj_funs'])
+        except KeyError:
+            passed_solution.use_default_multiobjective_function()        
+
     def create(self, **kwargs):
         sparsity = kwargs.get('sparsity', np.exp(np.random.uniform(low = np.log(self.sparsity_interval[0]),
                                                                       high = np.log(self.sparsity_interval[1]),
