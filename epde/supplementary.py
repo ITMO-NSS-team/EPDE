@@ -87,9 +87,9 @@ def create_solution_net(equations_num: int, domain_dim: int, use_fourier = True,
         four_emb = Fourier_embedding(**fourier_params)
         if device == 'cuda':
             four_emb = four_emb.cuda()
-        net_default = [four_emb,]
+        net_default = torch.nn.ModuleList([four_emb,])
     else:
-        net_default = []        
+        net_default = torch.nn.ModuleList([])
     linear_inputs = net_default[0].out_features if use_fourier else domain_dim
     
     if domain_dim == 1:            
@@ -97,11 +97,11 @@ def create_solution_net(equations_num: int, domain_dim: int, use_fourier = True,
     else:
         hidden_neurons = 112 # 54 #
 
-    operators = net_default + [torch.nn.Linear(linear_inputs, hidden_neurons, device=device),
+    operators = net_default + torch.nn.ModuleList([torch.nn.Linear(linear_inputs, hidden_neurons, device=device),
                                torch.nn.Tanh(),
                                torch.nn.Linear(hidden_neurons, hidden_neurons, device=device),
                                torch.nn.Tanh(),
-                               torch.nn.Linear(hidden_neurons, equations_num, device=device)]
+                               torch.nn.Linear(hidden_neurons, equations_num, device=device)])
     return torch.nn.Sequential(*operators)
 
 def exp_form(a, sign_num: int = 4):
