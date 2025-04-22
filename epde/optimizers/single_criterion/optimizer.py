@@ -171,7 +171,6 @@ class SimpleOptimizer(object):
         builder = strategy_director.builder
         builder.assemble(True)
         self.strategy = builder.processer
-        # self.strategy = strategy
         
     def optimize(self, EA_kwargs: dict = {},  epochs: int = None):
         scp = {'limit' : epochs} if epochs is not None else {'limit' : 50}

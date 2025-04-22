@@ -27,7 +27,7 @@ class MOEADDDirector(OptimizationPatternDirector):
     """
     Class for creating strategy builder of multicriterian optimization
     """
-    def use_baseline(self, use_solver: bool = False, variation_params : dict = {}, mutation_params : dict = {},  
+    def use_baseline(self, use_solver: bool = False, use_pic: bool = True, variation_params : dict = {}, mutation_params : dict = {},  
                      sorter_params : dict = {}, pareto_combiner_params : dict = {},
                      pareto_updater_params : dict = {}, **kwargs):
         add_kwarg_to_operator = partial(add_base_param_to_operator, target_dict = kwargs)
@@ -47,8 +47,8 @@ class MOEADDDirector(OptimizationPatternDirector):
         coeff_calc = LinRegBasedCoeffsEquation()        
 
         if use_solver:
-            # fitness = SolverBasedFitness(['penalty_coeff'])
-            fitness = PIC(['penalty_coeff'])
+            fitness = PIC(['penalty_coeff']) if use_pic else SolverBasedFitness(['penalty_coeff'])
+            # self.best_objectives = [0., 1., 0.] if use_pic else [0., 1.]
 
             sparsity = map_operator_between_levels(sparsity, 'gene level', 'chromosome level')
             coeff_calc = map_operator_between_levels(coeff_calc, 'gene level', 'chromosome level')

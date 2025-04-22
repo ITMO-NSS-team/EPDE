@@ -134,7 +134,7 @@ def reset_control_nn(n_control: int = 1, ann: torch.nn.Sequential = None,
 def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: bool = True,
                        derivs: List[Union[int, List, Union[np.ndarray]]] = None, 
                        penalised_derivs: List[Union[int, List]] = None,
-                       epochs_max=1e5, predefined_ann: torch.nn.Sequential = None,
+                       epochs_max=1e3, predefined_ann: torch.nn.Sequential = None,
                        batch_frac=0.5, learining_rate=1e-4, device = 'cpu', 
                        use_fourier: bool = True, fourier_params: dict = {'L' : [4,], 'M' : [3,]}): 
     '''

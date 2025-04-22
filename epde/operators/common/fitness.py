@@ -188,7 +188,7 @@ class PIC(CompoundOperator):
             training_params = {'epochs': 4e3, 'info_string_every': 1e3}
             early_stopping_params = {'patience': 4, 'no_improvement_patience': 250}
 
-            explicit_cpu = False
+            explicit_cpu = True
             device = 'cuda' if (torch.cuda.is_available and not explicit_cpu) else 'cpu'
 
             self.adapter = SolverAdapter(net=net, use_cache=False, device=device)
@@ -238,46 +238,40 @@ class PIC(CompoundOperator):
                     features_vals.append(eq.structure[i].evaluate(False))
                     nonzero_features_indexes.append(idx)
 
-            if len(features_vals) == 0:
-                objective.weights_final = np.zeros(len(objective.structure))
-            else:
-                features = features_vals[0]
-                if len(features_vals) > 1:
-                    for i in range(1, len(features_vals)):
-                        features = np.vstack([features, features_vals[i]])
-                features = np.vstack([features, np.ones(features_vals[0].shape)])  # Add constant feature
-                features = np.transpose(features)
+            self.window_size = len(target_vals) // 2
+            num_horizons = len(target_vals) - self.window_size + 1
+            eq_window_weights = []
 
-                self.window_size = len(target_vals) // 2
-                num_horizons = len(target_vals) - self.window_size + 1
-                eq_window_weights = []
+            # Compute coefficients and collect statistics over horizons
+            for start_idx in range(num_horizons):
+                end_idx = start_idx + self.window_size
+                target_window = target_vals[start_idx:end_idx]
 
-                # Compute coefficients and collect statistics over horizons
-                for start_idx in range(num_horizons):
-                    end_idx = start_idx + self.window_size
+                if len(features_vals) == 0:
+                    eq_window_weights.append(target_window)
 
-                    target_window = target_vals[start_idx:end_idx]
+                else:
+                    features = features_vals[0]
+                    if len(features_vals) > 1:
+                        for i in range(1, len(features_vals)):
+                            features = np.vstack([features, features_vals[i]])
+                    features = np.vstack([features, np.ones(features_vals[0].shape)])  # Add constant feature
+                    features = np.transpose(features)
+                    if features.ndim == 1:
+                        features = features.reshape(-1, 1)
+                    try:
+                        self.g_fun_vals = self.g_fun_vals.reshape(-1)
+                    except AttributeError:
+                        self.g_fun_vals = None
                     feature_window = features[start_idx:end_idx, :]
 
                     estimator = LinearRegression(fit_intercept=False)
-                    if feature_window.ndim == 1:
-                        feature_window = feature_window.reshape(-1, 1)
-                    try:
-                        self.g_fun_vals_window = self.g_fun_vals.reshape(-1)[start_idx:end_idx]
-                    except AttributeError:
-                        self.g_fun_vals_window = None
-                    estimator.fit(feature_window, target_window, sample_weight=self.g_fun_vals_window)
-                    valuable_weights = estimator.coef_
+                    estimator.fit(feature_window, target_window, sample_weight=self.g_fun_vals[start_idx:end_idx])
+                    valuable_weights = estimator.coef_[:-1]
+                    eq_window_weights.append(valuable_weights)
 
-                    window_weights = np.zeros(len(eq.structure))
-                    for weight_idx in range(len(window_weights)):
-                        if weight_idx in nonzero_features_indexes:
-                            window_weights[weight_idx] = valuable_weights[nonzero_features_indexes.index(weight_idx)]
-                    eq_window_weights.append(window_weights)
-
-                eq_cv = [np.abs(np.std(_) / (np.mean(_))) for _ in zip(*eq_window_weights)]  # As in paper's repo
-                eq_cv_valuable = [x for x in eq_cv if not np.isnan(x)]
-                lr = np.mean(eq_cv_valuable)
+            eq_cv = np.array([np.abs(np.std(_) / np.mean(_)) for _ in zip(*eq_window_weights)])
+            lr = eq_cv.mean()
 
             # Calculate p-loss
             if torch.isnan(loss_add):
@@ -286,15 +280,15 @@ class PIC(CompoundOperator):
                 print(f'solution shape {solution.shape}')
                 print(f'solution[..., eq_idx] {solution[..., eq_idx].shape}, eq_idx {eq_idx}')
                 referential_data = global_var.tensor_cache.get((eq.main_var_to_explain, (1.0,)))
-                initial_data = global_var.tensor_cache.get(('u', (1.0,))).reshape(solution[..., eq_idx].shape)
-
-                sol_pinn = solution[..., eq_idx]
-                sol_ann = referential_data.reshape(solution[..., eq_idx].shape)
-                sol_pinn_normalized = (sol_pinn - min(initial_data)) / (max(initial_data) - min(initial_data))
-                sol_ann_normalized = (sol_ann - min(initial_data)) / (max(initial_data) - min(initial_data))
-
-                discr = sol_pinn_normalized - sol_ann_normalized
-                # discr = (solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape))  # Default
+                # initial_data = global_var.tensor_cache.get(('u', (1.0,))).reshape(solution[..., eq_idx].shape)
+                #
+                # sol_pinn = solution[..., eq_idx]
+                # sol_ann = referential_data.reshape(solution[..., eq_idx].shape)
+                # sol_pinn_normalized = (sol_pinn - min(initial_data)) / (max(initial_data) - min(initial_data))
+                # sol_ann_normalized = (sol_ann - min(initial_data)) / (max(initial_data) - min(initial_data))
+                #
+                # discr = sol_pinn_normalized - sol_ann_normalized
+                discr = (solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape))  # Default
                 discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape))
                 rl_error = np.linalg.norm(discr, ord=2)
 
@@ -305,8 +299,10 @@ class PIC(CompoundOperator):
                     lp /= self.params['penalty_coeff']
 
             eq.fitness_calculated = True
-            print('Lr: ', lr, '\t Lp: ', lp, '\t PIC: ', lr * lp)
-            eq.fitness_value = lr * lp
+            eq.fitness_value = lp
+            eq.stability_calculated = True
+            eq.coefficients_stability = lr
+            print('Lr: ', lr, '\t Lp: ', lp)
 
     def use_default_tags(self):
         self._tags = {'fitness evaluation', 'chromosome level', 'contains suboperators', 'inplace'}
