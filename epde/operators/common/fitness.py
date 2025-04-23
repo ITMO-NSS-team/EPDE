@@ -96,6 +96,108 @@ class L2Fitness(CompoundOperator):
         self._tags = {'fitness evaluation', 'gene level', 'contains suboperators', 'inplace'}
 
 
+class L2LRFitness(CompoundOperator):
+    key = 'DiscrepancyBasedFitnessWithCV'
+
+    def apply(self, objective: Equation, arguments: dict):
+        """
+        Calculate the fitness function values. The result is not returned, but stored in the equation.fitness_value attribute.
+
+        Parameters:
+        ------------
+        equation : Equation object
+            the equation object, to that the fitness function is obtained.
+
+        Returns:
+        ------------
+
+        None
+        """
+        self_args, subop_args = self.parse_suboperator_args(arguments=arguments)
+
+        self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
+        self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
+
+        _, target, features = objective.evaluate(normalize=False, return_val=False)
+        try:
+            if features is None:
+                discr_feats = 0
+            else:
+                discr_feats = np.dot(features, objective.weights_final[:-1][objective.weights_internal != 0])
+
+            discr = (discr_feats + np.full(target.shape, objective.weights_final[-1]) - target)
+            self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)
+            discr = np.multiply(discr, self.g_fun_vals)
+            rl_error = np.linalg.norm(discr, ord=2)
+        except ValueError:
+            raise ValueError('An error in getting weights ')
+
+        if not (self.params['penalty_coeff'] > 0. and self.params['penalty_coeff'] < 1.):
+            raise ValueError('Incorrect penalty coefficient set, value shall be in (0, 1).')
+
+        fitness_value = rl_error
+        if np.sum(objective.weights_final) == 0:
+            fitness_value /= self.params['penalty_coeff']
+
+        objective.fitness_calculated = True
+        objective.fitness_value = fitness_value
+
+        self.g_fun_vals = global_var.grid_cache.g_func
+
+        # Calculate r-loss
+        target = objective.structure[objective.target_idx]
+        target_vals = target.evaluate(False)
+        features_vals = []
+        nonzero_features_indexes = []
+
+        for i in range(len(objective.structure)):
+            if i == objective.target_idx:
+                continue
+            idx = i if i < objective.target_idx else i - 1
+            if objective.weights_internal[idx] != 0:
+                features_vals.append(objective.structure[i].evaluate(False))
+                nonzero_features_indexes.append(idx)
+
+        self.window_size = len(target_vals) // 2
+        num_horizons = len(target_vals) - self.window_size + 1
+        eq_window_weights = []
+
+        # Compute coefficients and collect statistics over horizons
+        for start_idx in range(num_horizons):
+            end_idx = start_idx + self.window_size
+            target_window = target_vals[start_idx:end_idx]
+
+            if len(features_vals) == 0:
+                eq_window_weights.append(target_window)
+
+            else:
+                features = features_vals[0]
+                if len(features_vals) > 1:
+                    for i in range(1, len(features_vals)):
+                        features = np.vstack([features, features_vals[i]])
+                features = np.vstack([features, np.ones(features_vals[0].shape)])  # Add constant feature
+                features = np.transpose(features)
+                if features.ndim == 1:
+                    features = features.reshape(-1, 1)
+                try:
+                    self.g_fun_vals = self.g_fun_vals.reshape(-1)
+                except AttributeError:
+                    self.g_fun_vals = None
+                feature_window = features[start_idx:end_idx, :]
+
+                estimator = LinearRegression(fit_intercept=False)
+                estimator.fit(feature_window, target_window, sample_weight=self.g_fun_vals[start_idx:end_idx])
+                valuable_weights = estimator.coef_[:-1]
+                eq_window_weights.append(valuable_weights)
+
+        eq_cv = np.array([np.abs(np.std(_) / np.mean(_)) for _ in zip(*eq_window_weights)])
+        lr = eq_cv.mean()
+        objective.stability_calculated = True
+        objective.coefficients_stability = lr
+
+    def use_default_tags(self):
+        self._tags = {'fitness evaluation', 'gene level', 'contains suboperators', 'inplace'}
+
 class SolverBasedFitness(CompoundOperator):
     # To be modified to include physics-informed information criterion (PIC)
 
@@ -272,6 +374,8 @@ class PIC(CompoundOperator):
 
             eq_cv = np.array([np.abs(np.std(_) / np.mean(_)) for _ in zip(*eq_window_weights)])
             lr = eq_cv.mean()
+            eq.stability_calculated = True
+            eq.coefficients_stability = lr
 
             # Calculate p-loss
             if torch.isnan(loss_add):
@@ -300,8 +404,7 @@ class PIC(CompoundOperator):
 
             eq.fitness_calculated = True
             eq.fitness_value = lp
-            eq.stability_calculated = True
-            eq.coefficients_stability = lr
+
             print('Lr: ', lr, '\t Lp: ', lp)
 
     def use_default_tags(self):
@@ -324,3 +427,4 @@ def plot_data_vs_solution(grid, data, solution):
         plt.show()
     else:
         raise Exception('Infeasible dimensionality of the input dataset.')
+
