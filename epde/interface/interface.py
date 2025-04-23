@@ -847,8 +847,8 @@ class EpdeSearch(object):
                             
             best_obj = np.concatenate((np.zeros(shape=len([1 for token_family in optimizer_init_params['population_instruct']['pool'].families 
                                                            if token_family.status['demands_equation']])),
-                                       np.ones(shape=len([1 for token_family in optimizer_init_params['population_instruct']['pool'].families
-                                                          if token_family.status['demands_equation']])),
+                                       # np.ones(shape=len([1 for token_family in optimizer_init_params['population_instruct']['pool'].families
+                                       #                    if token_family.status['demands_equation']])),
                                        np.zeros(shape=len([1 for token_family in optimizer_init_params['population_instruct']['pool'].families
                                                            if token_family.status['demands_equation']]))
                                        ))
