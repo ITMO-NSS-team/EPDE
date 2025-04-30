@@ -854,7 +854,6 @@ class EpdeSearch(object):
             same_obj_count = sum([1 for token_family in optimizer_init_params['population_instruct']['pool'].families
                                   if token_family.status['demands_equation']])
             best_obj = np.concatenate([np.full(same_obj_count, fill_value = fval) for fval in best_sol_vals])
-
             print('best_obj', len(best_obj))
             optimizer.pass_best_objectives(*best_obj)
         else:
