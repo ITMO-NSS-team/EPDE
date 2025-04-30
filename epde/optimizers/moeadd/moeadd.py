@@ -258,9 +258,10 @@ class MOEADDOptimizer(object):
     and evolutionary operator contains mutation and crossover suboperators.
     
     """
-    def __init__(self, population_instruct, weights_num, pop_size, solution_params, delta, neighbors_number, 
+    def __init__(self, population_instruct, weights_num, pop_size, solution_params,
+                 delta: float, neighbors_number: int,
                  nds_method = fast_non_dominated_sorting, ndl_update = ndl_update, 
-                 passed_population: Union[List, ParetoLevels] = None): # logger: Logger = None, 
+                 passed_population: Union[List, ParetoLevels] = None):
         """
         Initialization of the evolutionary optimizer is done with the introduction of 
         initial population of candidate solutions, divided into Pareto non-dominated 
@@ -274,6 +275,8 @@ class MOEADDOptimizer(object):
             Parameters of the individual creation.
         weights_num : int
             Number of the weight vectors, dividing the objective function values space. Often, shall be same, as the population size.
+        best_obj : List[int]
+            List of best obtaiable values for each criteria in the optimization problem.
         pop_size : int 
             The size of the candidate solution population.
         solution_params : dict
@@ -296,14 +299,13 @@ class MOEADDOptimizer(object):
         """
         assert weights_num == pop_size, 'Each individual in population has to correspond to a sector'
         self.abbreviated_search_executed = False
-        soluton_creation_attempts_softmax = 10
-        soluton_creation_attempts_hardmax = 100
+        soluton_creation_attempts= {'softmax' : 10,
+                                    'hardmax' : 100}
 
-        assert type(solution_params) == type(None) or type(solution_params) == dict, 'The solution parameters, passed into population constructor must be in dictionary'
+        assert (type(solution_params) == type(None) or
+                 type(solution_params) == dict), 'The solution parameters, passed into population constructor must be in dictionary'
 
         pop_constructor = SystemsPopulationConstructor(**population_instruct)
-
-        # for solution in passed_population:
 
         if (passed_population is None) or isinstance(passed_population, list):
             population = [] if passed_population is None else passed_population
@@ -322,11 +324,11 @@ class MOEADDOptimizer(object):
                         population.append(temp_solution)
                         print(f'New solution accepted, confirmed {len(population)}/{pop_size} solutions.')
                         break
-                    if solution_gen_idx == soluton_creation_attempts_softmax and global_var.verbose.show_warnings:
+                    if solution_gen_idx == soluton_creation_attempts['softmax'] and global_var.verbose.show_warnings:
                         print('solutions tried:', solution_gen_idx)
                         warnings.warn('Too many failed attempts to create unique solutions for multiobjective optimization.\
                                       Change solution parameters to allow more diversity.')
-                    if solution_gen_idx == soluton_creation_attempts_hardmax:
+                    if solution_gen_idx == soluton_creation_attempts['hardmax']:
                         population.append(temp_solution)
                         print(f'New solution accepted, despite being a dublicate of another solution.\
                               Confirmed {len(population)}/{pop_size} solutions.')
@@ -439,6 +441,7 @@ class MOEADDOptimizer(object):
             processer (`MOEADDSectorProcesser`): The operator, which defines the evolutionary process
         """
         self.sector_processer = processer
+
 
     def set_strategy(self, strategy_director):
         builder = strategy_director.builder

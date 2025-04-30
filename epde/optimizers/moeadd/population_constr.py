@@ -22,17 +22,17 @@ class SystemsPopulationConstructor(object):
         vars_demand_equation (``):
         sparsity_internal (`tuple`): 
     """
-    def __init__(self, pool, terms_number : int = 8, max_factors_in_term : int = 2, 
+    def __init__(self, pool, use_pic: bool = True, terms_number : int = 8, max_factors_in_term : int = 2, 
                  obj_functions : Callable = None, sparsity_interval : tuple = (0, 1)):
-        self.pool = pool; self.terms_number = terms_number
+        self.pool = pool
+        self.use_pic = use_pic 
+        self.terms_number = terms_number
         self.max_factors_in_term = max_factors_in_term 
         self.vars_demand_equation = set([family.variable for family in self.pool.families_demand_equation])
         self.sparsity_interval = sparsity_interval
         print('self.vars_demand_equation', self.vars_demand_equation)        
 
     def applyToPassed(self, passed_solution: SoEq, **kwargs):
-        # If necessary, set additional properties to the passed solution 
-        # TODO: further investigate what needs to be done here
         try:
             passed_solution.set_objective_functions(kwargs['obj_funs'])
         except KeyError:
@@ -56,8 +56,9 @@ class SystemsPopulationConstructor(object):
         try:
             created_solution.set_objective_functions(kwargs['obj_funs'])
         except KeyError:
-            # created_solution.use_default_multiobjective_function()
-            created_solution.use_pic_multiobjective_function()
+            created_solution.use_default_multiobjective_function(use_pic=self.use_pic)
+
+
 
         created_solution.create()
 

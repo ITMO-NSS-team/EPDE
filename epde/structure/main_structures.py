@@ -812,7 +812,6 @@ class Equation(ComplexStructure):
     def coefficients_stability(self, value):
         self._coefficients_stability = value
 
-
 def solver_formed_grid(training_grid=None):
     raise NotImplementedError('solver_formed_grid function is to be depricated')
     if training_grid is None:
@@ -824,7 +823,6 @@ def solver_formed_grid(training_grid=None):
 
     training_grid = np.array(training_grid).reshape((len(training_grid), -1))
     return torch.from_numpy(training_grid).T.type(torch.FloatTensor)
-
 
 def check_metaparameters(metaparameters: dict):
     metaparam_labels = ['terms_number', 'max_factors_in_term', 'sparsity']
@@ -873,7 +871,13 @@ class SoEq(moeadd.MOEADDSolution):
             self.vals = Chromosome(equations, {key: val for key, val in self.metaparameters.items()
                                                if val['optimizable']})
                 
-    def use_default_multiobjective_function(self):
+    def use_default_multiobjective_function(self, use_pic: bool = False):
+        if use_pic:
+            self.use_pic_multiobjective_function()
+        else:
+            self.use_legacy_multiobjective_function()
+
+    def use_legacy_multiobjective_function(self):
         from epde.eq_mo_objectives import generate_partial, equation_fitness, equation_complexity_by_factors
         complexity_objectives = [generate_partial(equation_complexity_by_factors, eq_key)
                                  for eq_key in self.vars_to_describe]
@@ -890,9 +894,8 @@ class SoEq(moeadd.MOEADDSolution):
             equation_fitness, eq_key) for eq_key in self.vars_to_describe]
         stability_objectives = [generate_partial(
             equation_terms_stability, eq_key) for eq_key in self.vars_to_describe]
-        self.set_objective_functions(
-            # quality_objectives + complexity_objectives + stability_objectives)
-            quality_objectives + stability_objectives)
+        self.set_objective_functions(quality_objectives + stability_objectives)
+
 
     def use_default_singleobjective_function(self):
         from epde.eq_mo_objectives import generate_partial, equation_fitness

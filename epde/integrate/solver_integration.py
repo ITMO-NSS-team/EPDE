@@ -182,7 +182,7 @@ class SolverAdapter(object):
             return mat_model(domain, equations)
         elif mode in ['autograd', 'NN']:
             return create_solution_net(equations_num=equations.num, domain_dim=domain.dim,
-                                       use_fourier=use_fourier, fft_params=fft_params, device=device)
+                                       use_fourier=use_fourier, fourier_params=fft_params, device=device)
             
 
     def set_compiling_params(self, mode: str = None, lambda_operator: float = None, 

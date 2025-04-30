@@ -290,7 +290,7 @@ class PIC(CompoundOperator):
             training_params = {'epochs': 4e3, 'info_string_every': 1e3}
             early_stopping_params = {'patience': 4, 'no_improvement_patience': 250}
 
-            explicit_cpu = False
+            explicit_cpu = True
             device = 'cuda' if (torch.cuda.is_available and not explicit_cpu) else 'cpu'
 
             self.adapter = SolverAdapter(net=net, use_cache=False, device=device)
@@ -374,6 +374,7 @@ class PIC(CompoundOperator):
 
             eq_cv = np.array([np.abs(np.std(_) / np.mean(_)) for _ in zip(*eq_window_weights)])
             lr = eq_cv.mean()
+            
             eq.stability_calculated = True
             eq.coefficients_stability = lr
 
@@ -404,6 +405,9 @@ class PIC(CompoundOperator):
 
             eq.fitness_calculated = True
             eq.fitness_value = lp
+
+            eq.stability_calculated = True
+            eq.coefficients_stability = lr
 
             print('Lr: ', lr, '\t Lp: ', lp)
 
