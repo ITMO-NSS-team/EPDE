@@ -348,8 +348,8 @@ class Equation(ComplexStructure):
     __slots__ = ['_history', 'structure', 'interelement_operator', 'n_immutable', 'pool',
                   # '_target', '_features', 'saved', 'saved_as','max_factors_in_term', 'operator',
                  'target_idx', 'right_part_selected', '_weights_final', 'weights_final_evald', 
-                 '_weights_internal', 'weights_internal_evald', 'fitness_calculated', 'stability_calculated', 'solver_form_defined',
-                 '_fitness_value', '_coefficients_stability', 'metaparameters', 'main_var_to_explain'] # , '_solver_form'
+                 '_weights_internal', 'weights_internal_evald', 'fitness_calculated', 'stability_calculated', 'aic_calculated', 'solver_form_defined',
+                 '_fitness_value', '_coefficients_stability', '_aic', 'metaparameters', 'main_var_to_explain'] # , '_solver_form'
                  
 
     def __init__(self, pool: TFPool, basic_structure: Union[list, tuple, set], var_to_explain: str = None,
@@ -584,6 +584,7 @@ class Equation(ComplexStructure):
         self.weights_final_evald = False
         self.fitness_calculated = False
         self.stability_calculated = False
+        self.aic_calculated = False
         self.solver_form_defined = False
 
     @HistoryExtender('\n -> was copied by deepcopy(self)', 'n')
@@ -616,6 +617,7 @@ class Equation(ComplexStructure):
         new_equation.right_part_selected = self.right_part_selected
         new_equation.fitness_calculated = self.fitness_calculated
         new_equation.stability_calculated = self.stability_calculated
+        new_equation.aic_calculated = self.aic_calculated
         new_equation.solver_form_defined = False
 
         try:
@@ -625,6 +627,11 @@ class Equation(ComplexStructure):
 
         try:
             new_equation._coefficients_stability = self._coefficients_stability
+        except AttributeError:
+            pass
+
+        try:
+            new_equation._aic = self._aic
         except AttributeError:
             pass
 
@@ -654,6 +661,14 @@ class Equation(ComplexStructure):
     @coefficients_stability.setter
     def coefficients_stability(self, val):
         self._coefficients_stability = val
+
+    @property
+    def aic(self):
+        return self._aic
+
+    @aic.setter
+    def aic(self, val):
+        self._aic = val
 
     @property
     def weights_internal(self):
@@ -808,9 +823,6 @@ class Equation(ComplexStructure):
         self.solver_form_defined = False
         gc.collect()
 
-    @coefficients_stability.setter
-    def coefficients_stability(self, value):
-        self._coefficients_stability = value
 
 def solver_formed_grid(training_grid=None):
     raise NotImplementedError('solver_formed_grid function is to be depricated')
@@ -887,15 +899,19 @@ class SoEq(moeadd.MOEADDSolution):
             quality_objectives + complexity_objectives)
 
     def use_pic_multiobjective_function(self):
-        from epde.eq_mo_objectives import generate_partial, equation_fitness, equation_complexity_by_factors, equation_terms_stability
+        from epde.eq_mo_objectives import generate_partial, equation_fitness, equation_complexity_by_factors, equation_terms_stability, equation_aic
         complexity_objectives = [generate_partial(equation_complexity_by_factors, eq_key)
                                  for eq_key in self.vars_to_describe]
         quality_objectives = [generate_partial(
             equation_fitness, eq_key) for eq_key in self.vars_to_describe]
         stability_objectives = [generate_partial(
             equation_terms_stability, eq_key) for eq_key in self.vars_to_describe]
-        self.set_objective_functions(quality_objectives + stability_objectives)
-
+        aic_objectives = [generate_partial(
+            equation_aic, eq_key) for eq_key in self.vars_to_describe]
+        self.set_objective_functions(
+            # quality_objectives + complexity_objectives + stability_objectives)
+            # quality_objectives + stability_objectives + aic_objectives)
+            quality_objectives + stability_objectives)
 
     def use_default_singleobjective_function(self):
         from epde.eq_mo_objectives import generate_partial, equation_fitness

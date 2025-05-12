@@ -143,7 +143,7 @@ def VdP_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
                                       dimensionality = dimensionality)
     grid_tokens = GridTokens(['x_0',], dimensionality = dimensionality, max_power = 2)
 
-    epde_search_obj = EpdeSearch(use_solver = True, dimensionality = dimensionality, boundary = 10,
+    epde_search_obj = EpdeSearch(use_solver = False, use_pic=True, boundary = 10,
                                  coordinate_tensors = (t,), verbose_params = {'show_iter_idx' : True},
                                  device = 'cpu')
 
@@ -154,6 +154,83 @@ def VdP_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
                                 additional_tokens = [grid_tokens, trig_tokens], data_nn = data_nn)
 
     assert compare_equations(eq_vdp_symbolic, eq_vdp_incorrect, epde_search_obj)
+
+def lorenz_discovery(foldername, noise_level):
+    t_file = os.path.join(os.path.dirname( __file__ ), 'data\\lorenz\\t.npy')
+    t = np.load(t_file)
+    data_file = os.path.join(os.path.dirname(__file__), 'data\\lorenz\\lorenz.npy')
+    data = np.load(data_file)
+
+    end = 1000
+    t = t[:end]
+    x = data[:end, 0]
+    y = data[:end, 1]
+    z = data[:end, 2]
+
+    dimensionality = x.ndim - 1
+
+    trig_tokens = TrigonometricTokens(freq=(2 - 1e-8, 2 + 1e-8),
+                                      dimensionality=dimensionality)
+    grid_tokens = GridTokens(['x_0', ], dimensionality=dimensionality, max_power=2)
+
+    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True, use_pic=True, boundary=10,
+                                 coordinate_tensors=(t,), verbose_params={'show_iter_idx': True},
+                                 device='cuda')
+
+    epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+                                     preprocessor_kwargs={})
+
+    popsize = 8
+    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=100)
+
+    factors_max_number = {'factors_num': [1, 2], 'probas' : [0.8, 0.2]}
+
+    epde_search_obj.fit(data=[x, y, z], variable_names=['u', 'v', 'w'], max_deriv_order=(1,),
+                        equation_terms_max_number=5, data_fun_pow=1, additional_tokens=[trig_tokens, ],
+                        equation_factors_max_number=factors_max_number,
+                        eq_sparsity_interval=(1e-10, 1e-0))  #
+
+    epde_search_obj.equations(only_print=True, num=1)
+
+    return epde_search_obj
+
+def  lv_discovery(foldername, noise_level):
+    t_file = os.path.join(os.path.dirname( __file__ ), 'data\\lv\\t_20.npy')
+    t = np.load(t_file)
+    data_file = os.path.join(os.path.dirname(__file__), 'data\\lv\\data_20.npy')
+    data = np.load(data_file)
+
+    end = 150
+    t = t[:end]
+    x = data[:end, 0]
+    y = data[:end, 1]
+
+    dimensionality = x.ndim - 1
+
+    trig_tokens = TrigonometricTokens(freq=(2 - 1e-8, 2 + 1e-8),
+                                      dimensionality=dimensionality)
+    grid_tokens = GridTokens(['x_0', ], dimensionality=dimensionality, max_power=2)
+
+    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True, use_pic=True, boundary=10,
+                                 coordinate_tensors=(t,), verbose_params={'show_iter_idx': True},
+                                 device='cuda')
+
+    epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+                                     preprocessor_kwargs={})
+
+    popsize = 8
+    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=100)
+
+    factors_max_number = {'factors_num': [1, 2], 'probas' : [0.8, 0.2]}
+
+    epde_search_obj.fit(data=[x, y], variable_names=['u', 'v'], max_deriv_order=(1,),
+                        equation_terms_max_number=5, data_fun_pow=1, additional_tokens=[trig_tokens, ],
+                        equation_factors_max_number=factors_max_number,
+                        eq_sparsity_interval=(1e-4, 1e-0))  #
+
+    epde_search_obj.equations(only_print=True, num=1)
+
+    return epde_search_obj
 
 def ac_data(filename: str):
     t = np.linspace(0., 1., 51)
@@ -176,7 +253,7 @@ def AC_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
     print('Shapes:', data.shape, grid[0].shape)
     dimensionality = 1
 
-    epde_search_obj = EpdeSearch(use_solver = True, dimensionality = dimensionality, boundary = 10,
+    epde_search_obj = EpdeSearch(use_solver = False, use_pic=True, boundary = 10,
                                  coordinate_tensors = ((grid[0], grid[1])), verbose_params = {'show_iter_idx' : True},
                                  device = 'cpu')
 
@@ -210,7 +287,7 @@ def wave_test(operator: CompoundOperator, foldername: str, noise_level: int = 0)
 
     dimensionality = data.ndim - 1
 
-    epde_search_obj = EpdeSearch(use_solver=True, dimensionality=dimensionality, boundary=10,
+    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=10,
                                  coordinate_tensors=(grid[..., 0], grid[..., 1]),
                                  verbose_params={'show_iter_idx': True},
                                  device='cpu')
@@ -265,7 +342,7 @@ def KdV_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
     trig_tokens = TrigonometricTokens(freq=(1 - 1e-8, 1 + 1e-8),
                                       dimensionality=dimensionality)
 
-    epde_search_obj = EpdeSearch(use_solver = False, dimensionality = dimensionality, boundary = 10,
+    epde_search_obj = EpdeSearch(use_solver = False, use_pic=True, boundary = 10,
                                  coordinate_tensors = (grid[0], grid[1]), verbose_params = {'show_iter_idx' : True},
                                  device = 'cuda')
 
@@ -332,6 +409,62 @@ def darcy_data(filename: str):
     print(data.shape)
     return grids, data
 
+def darcy_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
+    # Test scenario to evaluate performance on darcy equation
+    eq_darcy_symbolic = '-1.0 * du/dx0{power: 1.0} * dnu/dy{power: 1.0} + -1.0 * nu{power: 1.0} * d^2u/dx0^2{power: 1} + \
+                          -2.0 * nu{power: 1.0} * d^2u/dxdy{power: 1} + \
+                          -1.0 * du/dx1{power: 1.0} * dnu/dx{power: 1.0} + -1.0 * du/dx1{power: 1.0} * dnu/dy{power: 1.0} + \
+                          -1.0 * nu{power: 1.0} * d^2u/dx1^2{power: 1} + -1.0 = du/dx0{power: 1.0} * dnu/dx{power: 1.0}'
+
+    # eq_darcy_symbolic = '-1.0 * du/dx1{power: 1.0} * dnu/dy{power: 1.0} + -1.0 * nu{power: 1.0} * d^2u/dx0^2{power: 1} + \
+    #                           -1.0 * nu{power: 1.0} * d^2u/dx1^2{power: 1} + -1.0 = du/dx0{power: 1.0} * dnu/dx{power: 1.0}'
+
+    eq_darcy_incorrect = '0.04 * d^2u/dx1^2{power: 1} + 0. = d^2u/dx0^2{power: 1}'
+
+    grid, data = darcy_data(os.path.join(foldername, 'darcy_1.0.npy'))
+    nu = np.load(r'C:\Users\user\PycharmProjects\EPDE\EPDE\projects\pic\data\darcy\darcy_nu_1.0.npy')
+    noised_data = noise_data(data, noise_level)
+    x = np.linspace(0., 1., 128)
+    y = np.linspace(0., 1., 128)
+    dx = x[1] - x[0]
+    dy = y[1] - y[0]
+
+    dimensionality = 1
+
+    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True, use_pic=True, boundary=20,
+                                 coordinate_tensors=grid, device='cuda')
+
+    # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
+    #                                     preprocessor_kwargs={'epochs_max' : 1e3})
+    epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+                                     preprocessor_kwargs={})
+
+    darcy_gradient_nux = np.gradient(nu[0], dx, axis=0, edge_order=2)
+    darcy_gradient_nuy = np.gradient(nu[0], dy, axis=1, edge_order=2)
+    darcy_gradient_xy = np.gradient(np.gradient(data, dx, axis=0, edge_order=2), dy, axis=1, edge_order=2)
+
+    custom_grid_tokens_nu = CacheStoredTokens(token_type='nu-tensors',
+                                              token_labels=['nu', 'dnu/dx', 'dnu/dy'],
+                                              token_tensors={'nu': nu[0], 'dnu/dx': darcy_gradient_nux,
+                                                             'dnu/dy': darcy_gradient_nuy},
+                                              params_ranges={'power': (1, 1)},
+                                              params_equality_ranges=None, )
+
+    custom_grid_tokens_xy = CacheStoredTokens(token_type='xy-tensor',
+                                              token_labels=['d^2u/dxdy'],
+                                              token_tensors={'d^2u/dxdy': darcy_gradient_xy},
+                                              params_ranges={'power': (1, 1)},
+                                              params_equality_ranges=None,
+                                              meaningful=True
+                                              )
+
+    epde_search_obj.create_pool(data=noised_data, variable_names=['u',], max_deriv_order=(2, 3),
+                                additional_tokens = [custom_grid_tokens_nu, custom_grid_tokens_xy]) # , data_nn = data_nn
+
+    # np.save(os.path.join(foldername, 'kdv_0_derivs.npy'), epde_search_obj.derivatives)
+
+    assert compare_equations(eq_darcy_symbolic, eq_darcy_incorrect, epde_search_obj)
+
 def darcy_discovery(foldername, noise_level):
     grid, data = darcy_data(os.path.join(foldername, 'darcy_1.0.npy'))
     nu = np.load(r'C:\Users\user\PycharmProjects\EPDE\EPDE\projects\pic\data\darcy\darcy_nu_1.0.npy')
@@ -344,8 +477,7 @@ def darcy_discovery(foldername, noise_level):
 
     dimensionality = data.ndim - 1
 
-    epde_search_obj = EpdeSearch(use_solver=True, multiobjective_mode=True,
-                                      dimensionality=dimensionality, boundary=20,
+    epde_search_obj = EpdeSearch(use_solver=True, multiobjective_mode=True, use_pic=True, boundary=20,
                                       coordinate_tensors=grid, device='cuda')
 
     # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
@@ -408,7 +540,7 @@ def ODE_discovery(foldername, noise_level):
                                       dimensionality=dimensionality)
     grid_tokens = GridTokens(['x_0', ], dimensionality=dimensionality, max_power=2)
 
-    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True, dimensionality=dimensionality, boundary=10,
+    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=10,
                                  coordinate_tensors=(t,), verbose_params={'show_iter_idx': True},
                                  device='cuda')
 
@@ -416,7 +548,7 @@ def ODE_discovery(foldername, noise_level):
                                      preprocessor_kwargs={})
 
     popsize = 8
-    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=5)
+    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=15)
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
@@ -449,7 +581,7 @@ def vdp_discovery(foldername, noise_level):
                                       dimensionality=dimensionality)
     grid_tokens = GridTokens(['x_0', ], dimensionality=dimensionality, max_power=2)
 
-    epde_search_obj = EpdeSearch(use_solver=False, dimensionality=dimensionality, boundary=10,
+    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=10,
                                  coordinate_tensors=(t,), verbose_params={'show_iter_idx': True},
                                  device='cuda')
 
@@ -479,14 +611,14 @@ def vdp_discovery(foldername, noise_level):
 
 def kdv_discovery(foldername, noise_level):
     grid, data = kdv_data(os.path.join(foldername, 'data.csv'))
-    # grid, data = kdv_data_h(os.path.join(foldername, 'data_kdv_homogen.npy'))
+    # grid, data = kdv_data(os.path.join(foldername, 'Kdv.mat'))
     # noised_data = noise_data(data, noise_level)
     # data_nn = load_pretrained_PINN(os.path.join(foldername, f'kdv_{noise_level}_ann.pickle'))
 
     dimensionality = data.ndim - 1
 
-    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True, use_pic=True,
-                                      dimensionality=dimensionality, boundary=5,
+    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True,
+                                      boundary=10,
                                       coordinate_tensors=grid, device='cuda')
 
     # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
@@ -496,14 +628,7 @@ def kdv_discovery(foldername, noise_level):
     popsize = 8
 
     epde_search_obj.set_moeadd_params(population_size=popsize,
-                                      training_epochs=20)
-
-
-    custom_grid_tokens = CacheStoredTokens(token_type='grid',
-                                                token_labels=['t', 'x'],
-                                                token_tensors={'t': grid[0], 'x': grid[1]},
-                                                params_ranges={'power': (1, 1)},
-                                                params_equality_ranges=None)
+                                      training_epochs=50)
 
     custom_trigonometric_eval_fun = {
         'cos(t)sin(x)': lambda *grids, **kwargs: (np.cos(grids[0]) * np.sin(grids[1])) ** kwargs['power']}
@@ -519,10 +644,12 @@ def kdv_discovery(foldername, noise_level):
                                          meaningful=True, unique_token_type=True)
 
     trig_tokens = TrigonometricTokens(dimensionality=dimensionality, freq = (0.999, 1.001))
+    trig_tokens._token_family.set_status(unique_specific_token=False, unique_token_type=False,
+                                  meaningful=True)
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
-    bounds = (1e-12, 1e-2)
+    bounds = (1e-12, 1e-0)
     epde_search_obj.fit(data=data, variable_names=['u', ], max_deriv_order=(2, 3), derivs=None,
                         equation_terms_max_number=5, data_fun_pow=1,
                         additional_tokens=[custom_trig_tokens],
@@ -541,8 +668,8 @@ def kdv_h_discovery(foldername, noise_level):
 
     dimensionality = data.ndim - 1
 
-    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True,
-                                      dimensionality=dimensionality, boundary=20,
+    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True,
+                                      boundary=20,
                                       coordinate_tensors=grid, device='cuda')
 
     # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
@@ -597,8 +724,8 @@ def wave_discovery(foldername, noise_level):
 
     dimensionality = data.ndim - 1
 
-    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True,
-                                      dimensionality=dimensionality, boundary=20,
+    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True,
+                                      boundary=20,
                                       coordinate_tensors=(grid[..., 0], grid[..., 1]), device='cuda')
 
     # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
@@ -644,7 +771,7 @@ def ac_discovery(foldername, noise_level):
     dimensionality = data.ndim - 1
 
     epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True,
-                                      dimensionality=dimensionality, boundary=20,
+                                      use_pic=True, boundary=20,
                                       coordinate_tensors=grid, device='cuda')
 
     # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
@@ -654,7 +781,7 @@ def ac_discovery(foldername, noise_level):
     popsize = 8
 
     epde_search_obj.set_moeadd_params(population_size=popsize,
-                                      training_epochs=10)
+                                      training_epochs=20)
 
 
     custom_grid_tokens = CacheStoredTokens(token_type='grid',
@@ -712,10 +839,13 @@ if __name__ == "__main__":
     # wave_test(fit_operator, wave_folder_name, 0)
     # KdV_test(fit_operator, kdv_folder_name, 0)
     # KdV_h_test(fit_operator, kdv_folder_name, 0)
+    # darcy_test(fit_operator, darcy_folder_name, 0)
 
     # Full_scale test
     # eso = ODE_discovery(ode_folder_name, 0)
     # eso = vdp_discovery(vdp_folder_name, 0)
+    # eso = lorenz_discovery(vdp_folder_name, 0)
+    # eso = lv_discovery(vdp_folder_name, 0)
     # eso = ac_discovery(ac_folder_name, 0)
     # eso = wave_discovery(wave_folder_name, 0)
     eso = kdv_discovery(kdv_folder_name, 0)

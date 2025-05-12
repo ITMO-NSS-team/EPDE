@@ -230,9 +230,9 @@ class EpdeSearch(object):
     def __init__(self, multiobjective_mode: bool = True, use_pic = False, use_default_strategy: bool = True, director=None, 
                  director_params: dict = {'variation_params': {}, 'mutation_params': {},
                                           'pareto_combiner_params': {}, 'pareto_updater_params': {}}, 
-                 time_axis: int = 0, define_domain: bool = True, function_form=None, boundary: int = 0, 
+                 time_axis: int = 0, define_domain: bool = True, function_form=None, boundary: int = 0,
                  use_solver: bool = False, verbose_params: dict = {'show_iter_idx' : True}, 
-                 coordinate_tensors=None, memory_for_cache=5, prune_domain: bool = False, 
+                 coordinate_tensors=None, memory_for_cache=15, prune_domain: bool = False,
                  pivotal_tensor_label=None, pruner=None, threshold: float = 1e-2, 
                  division_fractions=3, rectangular: bool = True, 
                  params_filename: str = None, device: str = 'cpu'):
@@ -691,7 +691,7 @@ class EpdeSearch(object):
                 global_var.reset_data_repr_nn(data = data, derivs = base_derivs, train = False, 
                                               grids = grid, predefined_ann = data_nn, device = self._device)
             else:
-                epochs_max = 1e4
+                epochs_max = 1e5
                 global_var.reset_data_repr_nn(data = data, derivs = base_derivs, epochs_max=epochs_max,
                                               grids = grid, predefined_ann = None, device = self._device, 
                                               use_fourier = fourier_layers, fourier_params = fourier_params)
@@ -821,10 +821,10 @@ class EpdeSearch(object):
         else:
             self.pool = pool; self.pool_params = cur_params
 
-        self.optimizer_init_params['population_instruct'] = {"pool": self.pool, 
+        self.optimizer_init_params['population_instruct'] = {"pool": self.pool,
                                                              "terms_number": equation_terms_max_number,
                                                              "max_factors_in_term": equation_factors_max_number,
-                                                             "sparsity_interval": eq_sparsity_interval, 
+                                                             "sparsity_interval": eq_sparsity_interval,
                                                              "use_pic": self._use_pic}
         
         if optimizer is None:
@@ -842,15 +842,16 @@ class EpdeSearch(object):
 
     @staticmethod
     def _create_optimizer(multiobjective_mode: bool, optimizer_init_params: dict,
-                          opt_strategy_director: OptimizationPatternDirector, 
+                          opt_strategy_director: OptimizationPatternDirector,
                           population: List[SoEq] = None, use_pic: bool = False):
         if multiobjective_mode:
             optimizer_init_params['passed_population'] = population
             optimizer = MOEADDOptimizer(**optimizer_init_params)
-            
+
             # if best_sol_vals is None:
-            best_sol_vals = [0., 1., 0.] if use_pic else [0., 1.]
-            
+            # best_sol_vals = [0., 1., 0.] if use_pic else [0., 1.]
+            best_sol_vals = [0., 0.] if use_pic else [0., 1.]
+
             same_obj_count = sum([1 for token_family in optimizer_init_params['population_instruct']['pool'].families
                                   if token_family.status['demands_equation']])
             best_obj = np.concatenate([np.full(same_obj_count, fill_value = fval) for fval in best_sol_vals])
@@ -1107,7 +1108,7 @@ class EpdeMultisample(EpdeSearch):
                  director_params: dict = {'variation_params': {}, 'mutation_params': {},
                                            'pareto_combiner_params': {}, 'pareto_updater_params': {}}, 
                  time_axis: int = 0, function_form=None, boundary: int = 0, 
-                 use_solver: bool = False, verbose_params: dict = {'show_iter_idx' : True}, 
+                 use_solver: bool = False, verbose_params: dict = {'show_iter_idx' : True},
                  memory_for_cache=5, prune_domain: bool = False, 
                  pivotal_tensor_label=None, pruner=None, threshold: float = 1e-2, 
                  division_fractions=3, rectangular: bool = True, params_filename: str = None):
@@ -1152,7 +1153,7 @@ class EpdeMultisample(EpdeSearch):
         super().__init__(multiobjective_mode = multiobjective_mode, use_default_strategy = use_default_strategy, 
                          director = director, director_params = director_params, time_axis = time_axis,
                          define_domain = False, function_form = function_form, boundary = boundary, 
-                         use_solver = use_solver, verbose_params = verbose_params, 
+                         use_solver = use_solver, verbose_params = verbose_params,
                          coordinate_tensors = None, memory_for_cache = memory_for_cache, prune_domain = prune_domain, 
                          pivotal_tensor_label = pivotal_tensor_label, pruner = pruner, threshold = threshold, 
                          division_fractions = division_fractions, rectangular = rectangular, 
