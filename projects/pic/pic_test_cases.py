@@ -401,25 +401,27 @@ def KdV_h_test(operator: CompoundOperator, foldername: str, noise_level: int = 0
     assert compare_equations(eq_kdv_symbolic, eq_kdv_incorrect, epde_search_obj)
 
 def darcy_data(filename: str):
+    t = np.linspace(0., 1., 2)
     x = np.linspace(0., 1., 128)
     y = np.linspace(0., 1., 128)
-    grids = np.meshgrid(x, y, indexing='ij')  # np.stack(, axis = 2)
+    grids = np.meshgrid(t, x, y, indexing='ij')  # np.stack(, axis = 2)
     data = np.load(filename)
     data = data[0]
+    data = np.stack([data]*2, axis=0)
     print(data.shape)
     return grids, data
 
 def darcy_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
     # Test scenario to evaluate performance on darcy equation
-    eq_darcy_symbolic = '-1.0 * du/dx0{power: 1.0} * dnu/dy{power: 1.0} + -1.0 * nu{power: 1.0} * d^2u/dx0^2{power: 1} + \
-                          -2.0 * nu{power: 1.0} * d^2u/dxdy{power: 1} + \
-                          -1.0 * du/dx1{power: 1.0} * dnu/dx{power: 1.0} + -1.0 * du/dx1{power: 1.0} * dnu/dy{power: 1.0} + \
-                          -1.0 * nu{power: 1.0} * d^2u/dx1^2{power: 1} + -1.0 = du/dx0{power: 1.0} * dnu/dx{power: 1.0}'
+    # eq_darcy_symbolic = '-1.0 * du/dx0{power: 1.0} * dnu/dy{power: 1.0} + -1.0 * nu{power: 1.0} * d^2u/dx0^2{power: 1} + \
+    #                       -2.0 * nu{power: 1.0} * d^2u/dxdy{power: 1} + \
+    #                       -1.0 * du/dx1{power: 1.0} * dnu/dx{power: 1.0} + -1.0 * du/dx1{power: 1.0} * dnu/dy{power: 1.0} + \
+    #                       -1.0 * nu{power: 1.0} * d^2u/dx1^2{power: 1} + -1.0 = du/dx0{power: 1.0} * dnu/dx{power: 1.0}'
 
-    # eq_darcy_symbolic = '-1.0 * du/dx1{power: 1.0} * dnu/dy{power: 1.0} + -1.0 * nu{power: 1.0} * d^2u/dx0^2{power: 1} + \
-    #                           -1.0 * nu{power: 1.0} * d^2u/dx1^2{power: 1} + -1.0 = du/dx0{power: 1.0} * dnu/dx{power: 1.0}'
+    eq_darcy_symbolic = '-1.0 * du/dx2{power: 1.0} * dnu/dy{power: 1.0} + -1.0 * nu{power: 1.0} * d^2u/dx1^2{power: 1} + \
+                              -1.0 * nu{power: 1.0} * d^2u/dx2^2{power: 1} + -1.0 = du/dx1{power: 1.0} * dnu/dx{power: 1.0}'
 
-    eq_darcy_incorrect = '0.04 * d^2u/dx1^2{power: 1} + 0. = d^2u/dx0^2{power: 1}'
+    eq_darcy_incorrect = '0.04 * d^2u/dx1^2{power: 1} + 0. = d^2u/dx2^2{power: 1}'
 
     grid, data = darcy_data(os.path.join(foldername, 'darcy_1.0.npy'))
     nu = np.load(r'C:\Users\user\PycharmProjects\EPDE\EPDE\projects\pic\data\darcy\darcy_nu_1.0.npy')
@@ -431,7 +433,7 @@ def darcy_test(operator: CompoundOperator, foldername: str, noise_level: int = 0
 
     dimensionality = 1
 
-    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True, use_pic=True, boundary=20,
+    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True, use_pic=True, boundary=0,
                                  coordinate_tensors=grid, device='cuda')
 
     # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
@@ -441,7 +443,7 @@ def darcy_test(operator: CompoundOperator, foldername: str, noise_level: int = 0
 
     darcy_gradient_nux = np.gradient(nu[0], dx, axis=0, edge_order=2)
     darcy_gradient_nuy = np.gradient(nu[0], dy, axis=1, edge_order=2)
-    darcy_gradient_xy = np.gradient(np.gradient(data, dx, axis=0, edge_order=2), dy, axis=1, edge_order=2)
+    darcy_gradient_xy = np.gradient(np.gradient(data, dx, axis=1, edge_order=2), dy, axis=2, edge_order=2)
 
     custom_grid_tokens_nu = CacheStoredTokens(token_type='nu-tensors',
                                               token_labels=['nu', 'dnu/dx', 'dnu/dy'],
@@ -458,7 +460,7 @@ def darcy_test(operator: CompoundOperator, foldername: str, noise_level: int = 0
                                               meaningful=True
                                               )
 
-    epde_search_obj.create_pool(data=noised_data, variable_names=['u',], max_deriv_order=(2, 3),
+    epde_search_obj.create_pool(data=noised_data, variable_names=['u',], max_deriv_order=(0, 2, 3),
                                 additional_tokens = [custom_grid_tokens_nu, custom_grid_tokens_xy]) # , data_nn = data_nn
 
     # np.save(os.path.join(foldername, 'kdv_0_derivs.npy'), epde_search_obj.derivatives)
@@ -628,7 +630,7 @@ def kdv_discovery(foldername, noise_level):
     popsize = 8
 
     epde_search_obj.set_moeadd_params(population_size=popsize,
-                                      training_epochs=50)
+                                      training_epochs=30)
 
     custom_trigonometric_eval_fun = {
         'cos(t)sin(x)': lambda *grids, **kwargs: (np.cos(grids[0]) * np.sin(grids[1])) ** kwargs['power']}
@@ -781,7 +783,7 @@ def ac_discovery(foldername, noise_level):
     popsize = 8
 
     epde_search_obj.set_moeadd_params(population_size=popsize,
-                                      training_epochs=20)
+                                      training_epochs=100)
 
 
     custom_grid_tokens = CacheStoredTokens(token_type='grid',
