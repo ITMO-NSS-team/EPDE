@@ -214,6 +214,37 @@ class L2LRFitness(CompoundOperator):
                 eq_cv = np.array([np.abs(np.std(_) / np.mean(_)) for _ in zip(*eq_window_weights)])
                 lr *= eq_cv.mean()
 
+        elif target_vals.ndim == 3:
+            lr = 1
+            for dim in range(target_vals.ndim):
+                eq_window_weights = []
+                window_size = target_vals.shape[dim] // 2
+                num_horizons = target_vals.shape[dim] - window_size + 1
+                features = self.feature_reshape(features_vals)
+                # Compute coefficients and collect statistics over horizons
+                for start_idx in range(num_horizons):
+                    end_idx = start_idx + window_size
+                    estimator = LinearRegression(fit_intercept=False)
+                    if dim == 0:
+                        target_window = target_vals[start_idx:end_idx, :, :].reshape(-1)
+                        feature_window = features.reshape(*data_shape, -1)[start_idx:end_idx, :, :].reshape(-1, features.shape[-1])
+                        estimator.fit(feature_window, target_window, sample_weight=self.g_fun_vals.reshape(*data_shape, -1)[start_idx:end_idx, :, :].reshape(-1))
+                    elif dim == 1:
+                        target_window = target_vals[:, start_idx:end_idx, :].reshape(-1)
+                        feature_window = features.reshape(*data_shape, -1)[:, start_idx:end_idx, :].reshape(-1, features.shape[-1])
+                        estimator.fit(feature_window, target_window, sample_weight=self.g_fun_vals.reshape(*data_shape, -1)[:, start_idx:end_idx, :].reshape(-1))
+                    elif dim == 2:
+                        target_window = target_vals[:, :, start_idx:end_idx].reshape(-1)
+                        feature_window = features.reshape(*data_shape, -1)[:, :, start_idx:end_idx].reshape(-1, features.shape[-1])
+                        estimator.fit(feature_window, target_window, sample_weight=self.g_fun_vals.reshape(*data_shape, -1)[:, :, start_idx:end_idx].reshape(-1))
+                    valuable_weights = estimator.coef_[:-1]
+                    eq_window_weights.append(valuable_weights)
+                eq_cv = np.array([np.abs(np.std(_) / np.mean(_)) for _ in zip(*eq_window_weights)])
+                # if eq_cv.mean() == 0 or len(eq_cv) == 0:
+                #     continue
+                # else:
+                lr *= eq_cv.mean()
+
         objective.stability_calculated = True
         objective.coefficients_stability = lr
 
