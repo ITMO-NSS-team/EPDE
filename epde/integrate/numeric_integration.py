@@ -2,6 +2,9 @@ from typing import Union, List, Dict, Tuple, Callable
 import copy
 from functools import reduce
 from warnings import warn
+import os
+
+from ctypes import PyDLL, py_object
 
 import torch
 import numpy as np
@@ -281,8 +284,8 @@ class OdeintAdapter(object):
     def solve(self, equations, domain: Union[Domain, np.ndarray],
               boundary_conditions: List[BOPElement] = None, vars: List[str] = ['x',], *args, **kwargs):
         if not isinstance(equations, list):
-            raise RuntimeError('Incorrect type of equations passed into odeint solver.')
-        self._implicit_equation = ImplicitEquation(equations, domain, vars)
+            raise RuntimeError('Equations have to be passed as a list.')
+        # self._implicit_equation = ImplicitEquation(equations, domain, vars)
         if isinstance(domain, Domain): 
             grid = domain.build().detach().numpy().reshape(-1)
         else:
@@ -294,3 +297,63 @@ class OdeintAdapter(object):
         if not solution.success:
             warn(f'Numerical solution of ODEs has did not converge. The error message is {solution.message}')
         return 0, solution.y.T
+
+def loadSpectralSolver(path_to_so: str):
+    try:
+        # TODO:
+        # Using PyDLL (particularly .so file), that is inported via ctypes is a kludge 
+        # and shall be refactored ASAP.
+        solverlib = PyDLL(path_to_so)
+        solverlib.argtypes = [py_object, py_object, py_object, py_object]
+        solverlib.restype  =  py_object
+        return solverlib
+    except:
+        return None
+
+class SpectralAdapter(object):
+    def __init__(self, path_to_so: str = None, **kwargs):
+        self.params = kwargs
+
+        if path_to_so is None:
+            path_to_so = os.path.abspath(os.getcwd())
+        
+        self.spectral_solver = loadSpectralSolver(path_to_so)
+        if self.spectral_solver is None:
+            raise RuntimeError("Failed to load spectral solver.")
+        
+    def solve_epde_system(self, system: Union[SoEq, dict], grids: list=None, boundary_conditions=None,
+                          mode='NN', data=None, vars_to_describe = ['u'], *args, **kwargs):
+        if isinstance(system, SoEq):
+            system_interface = SystemSolverInterface(system_to_adapt=system)
+            system_solver_forms = system_interface.form(grids = grids, mode = mode)
+        elif isinstance(system, list):
+            system_solver_forms = system
+        else:
+            raise TypeError('Incorrect input into the Odeint Adapter.')
+
+        if boundary_conditions is None:
+            op_gen = PregenBOperator(system=system,
+                                     system_of_equation_solver_form=[sf_labeled[1] for sf_labeled
+                                                                     in system_solver_forms])
+            op_gen.generate_default_bc(vals = data, grids = grids)
+            boundary_conditions = op_gen.conditions
+
+        if isinstance(system, SoEq):
+            vars_to_describe = system.vars_to_describe
+            
+        return self.solve(equations = [sf_labeled[1] for sf_labeled in system_solver_forms], domain = grids[0], 
+                          boundary_conditions = boundary_conditions, vars = vars_to_describe)
+    
+    def solve(self, equations, domain: Union[Domain, np.ndarray],
+              boundary_conditions: List[BOPElement] = None, vars: List[str] = ['x',], *args, **kwargs):
+        if not isinstance(equations, list):
+            raise RuntimeError('Incorrect type of equations passed into odeint solver.')
+
+        if isinstance(domain, Domain): 
+            grid = domain.build().detach().numpy().reshape(-1) # todo: verify torch tensor application
+        else:
+            grid = domain.detach().numpy().reshape(-1) # todo: verify torch tensor application
+
+        solution = self.spectral_solver(equations, grid, boundary_conditions, self.params)
+
+        return 0, solution 

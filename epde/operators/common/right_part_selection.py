@@ -57,23 +57,26 @@ class EqRightPartSelector(CompoundOperator):
             
                 
             for target_idx, target_term in enumerate(objective.structure):
-                if target_term.contains_variable(objective.main_var_to_explain): #target_term.descr_variable_marker:
-                    # target_term.contains_family(equation.main_var_to_explain)
-                    if not objective.structure[target_idx].contains_deriv:
-                        continue
-                    objective.target_idx = target_idx
-                    self.suboperators['fitness_calculation'].apply(objective, arguments = subop_args['fitness_calculation'])
-                    if objective.fitness_value > max_fitness:
-                        max_fitness = objective.fitness_value
-                        max_idx = target_idx
-                    else:
-                        pass
+                if not (objective.structure[target_idx].contains_deriv and 
+                        target_term.contains_variable(objective.main_var_to_explain)):
+                    continue
+                objective.target_idx = target_idx
+                # self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
+                # self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
+                fitness = self.suboperators['fitness_calculation'].apply(objective,
+                                                                            arguments = subop_args['fitness_calculation'],
+                                                                            force_out_of_place = True)
+                if fitness > max_fitness:
+                    max_fitness = fitness
+                    max_idx = target_idx
+                else:
+                    pass
 
             objective.target_idx = max_idx
             objective.reset_explaining_term(objective.target_idx)
-            self.suboperators['fitness_calculation'].apply(objective, arguments = subop_args['fitness_calculation'])
-            if not np.isclose(objective.fitness_value, max_fitness) and global_var.verbose.show_warnings:
-                warnings.warn('Reevaluation of fitness function for equation has obtained different result. Not an error, if ANN DE solver is used.')
+            # self.suboperators['fitness_calculation'].apply(objective, arguments = subop_args['fitness_calculation'])
+            # if not np.isclose(objective.fitness_value, max_fitness) and global_var.verbose.show_warnings:
+            #     warnings.warn('Reevaluation of fitness function for equation has obtained different result. Not an error, if ANN DE solver is used.')
             objective.right_part_selected = True
 
     def use_default_tags(self):

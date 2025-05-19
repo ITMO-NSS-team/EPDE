@@ -428,6 +428,7 @@ class Equation(ComplexStructure):
 
         for idx, _ in enumerate(self.structure):
             self.structure[idx].use_cache()
+#        self.coefficients_stability = np.inf
     
     def manual_reconst(self, attribute:str, value, except_attrs:dict):
         from epde.loader import attrs_from_dict, get_typespec_attrs      
@@ -822,7 +823,6 @@ class Equation(ComplexStructure):
         del self._solver_form
         self.solver_form_defined = False
         gc.collect()
-
 
 def solver_formed_grid(training_grid=None):
     raise NotImplementedError('solver_formed_grid function is to be depricated')

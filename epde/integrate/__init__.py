@@ -1,4 +1,4 @@
 from .interface import SystemSolverInterface
 from .bop import BOPElement, BoundaryConditions
-from .solver_integration import SolverAdapter
-from .odeint_integration import OdeintAdapter
+from .pinn_integration import SolverAdapter
+from .numeric_integration import OdeintAdapter

@@ -49,7 +49,7 @@ class L2Fitness(CompoundOperator):
     
     key = 'DiscrepancyBasedFitness'
 
-    def apply(self, objective: Equation, arguments: dict):
+    def apply(self, objective: Equation, arguments: dict, force_out_of_place: bool = False):
         """
         Calculate the fitness function values. The result is not returned, but stored in the equation.fitness_value attribute.
         
@@ -88,9 +88,12 @@ class L2Fitness(CompoundOperator):
         fitness_value = rl_error
         if np.sum(objective.weights_final) == 0:
             fitness_value /= self.params['penalty_coeff']
-            
-        objective.fitness_calculated = True
-        objective.fitness_value = fitness_value
+        
+        if force_out_of_place:
+            return fitness_value
+        else:
+            objective.fitness_calculated = True
+            objective.fitness_value = fitness_value
 
     def use_default_tags(self):
         self._tags = {'fitness evaluation', 'gene level', 'contains suboperators', 'inplace'}
@@ -99,7 +102,7 @@ class L2Fitness(CompoundOperator):
 class L2LRFitness(CompoundOperator):
     key = 'DiscrepancyBasedFitnessWithCV'
 
-    def apply(self, objective: Equation, arguments: dict):
+    def apply(self, objective: Equation, arguments: dict, force_out_of_place: bool = False):
         """
         Calculate the fitness function values. The result is not returned, but stored in the equation.fitness_value attribute.
 
@@ -140,9 +143,6 @@ class L2LRFitness(CompoundOperator):
         fitness_value = rl_error
         if np.sum(objective.weights_final) == 0:
             fitness_value /= self.params['penalty_coeff']
-
-        objective.fitness_calculated = True
-        objective.fitness_value = fitness_value
 
         # n = len(discr)
         # ss = np.var(discr)
@@ -245,8 +245,14 @@ class L2LRFitness(CompoundOperator):
                 # else:
                 lr *= eq_cv.mean()
 
-        objective.stability_calculated = True
-        objective.coefficients_stability = lr
+
+        if force_out_of_place:
+            return fitness_value
+        else:
+            objective.fitness_calculated = True
+            objective.fitness_value = fitness_value
+            objective.stability_calculated = True
+            objective.coefficients_stability = lr
 
     def feature_reshape(self, features_vals):
         features = features_vals[0]
@@ -295,7 +301,7 @@ class SolverBasedFitness(CompoundOperator):
             self.adapter.set_early_stopping_params(**early_stopping_params)
             self.adapter.set_training_params(**training_params)
 
-    def apply(self, objective : SoEq, arguments : dict):
+    def apply(self, objective : SoEq, arguments : dict, force_out_of_place: bool = False):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
         try:
@@ -319,6 +325,9 @@ class SolverBasedFitness(CompoundOperator):
         solution = solution_nn(grids).detach().cpu().numpy()
         self.g_fun_vals = global_var.grid_cache.g_func
         
+        if force_out_of_place:
+            sum_err = 0
+
         for eq_idx, eq in enumerate(objective.vals):
             if torch.isnan(loss_add):
                 fitness_value = 2*LOSS_NAN_VAL
@@ -336,8 +345,11 @@ class SolverBasedFitness(CompoundOperator):
                 if np.sum(eq.weights_final) == 0: 
                     fitness_value /= self.params['penalty_coeff']
 
-            eq.fitness_calculated = True
-            eq.fitness_value = fitness_value
+                if force_out_of_place:
+                    sum_err += fitness_value
+                else:
+                    eq.fitness_calculated = True
+                    eq.fitness_value = fitness_value
 
     def use_default_tags(self):
         self._tags = {'fitness evaluation', 'chromosome level', 'contains suboperators', 'inplace'}
@@ -370,7 +382,7 @@ class PIC(CompoundOperator):
             self.adapter.set_early_stopping_params(**early_stopping_params)
             self.adapter.set_training_params(**training_params)
 
-    def apply(self, objective: SoEq, arguments: dict):
+    def apply(self, objective: SoEq, arguments: dict, force_out_of_place: bool = False):
         self_args, subop_args = self.parse_suboperator_args(arguments=arguments)
 
         try:
@@ -394,6 +406,9 @@ class PIC(CompoundOperator):
         grids = torch.stack([grid.reshape(-1) for grid in grids], dim=1).float()
         solution = solution_nn(grids).detach().cpu().numpy()
         self.g_fun_vals = global_var.grid_cache.g_func
+
+        if force_out_of_place:
+            sum_err = 0
 
         for eq_idx, eq in enumerate(objective.vals):
             # Calculate r-loss
@@ -445,9 +460,6 @@ class PIC(CompoundOperator):
             eq_cv = np.array([np.abs(np.std(_) / np.mean(_)) for _ in zip(*eq_window_weights)])
             lr = eq_cv.mean()
 
-            eq.stability_calculated = True
-            eq.coefficients_stability = lr
-
             # Calculate p-loss
             if torch.isnan(loss_add):
                 lp = 2 * LOSS_NAN_VAL
@@ -473,14 +485,18 @@ class PIC(CompoundOperator):
                 if np.sum(eq.weights_final) == 0:
                     lp /= self.params['penalty_coeff']
 
-            eq.fitness_calculated = True
-            eq.fitness_value = lp
+            if force_out_of_place:
+                sum_err += lp
+            else:
+                eq.fitness_calculated = True
+                eq.fitness_value = lp
 
-            eq.stability_calculated = True
-            eq.coefficients_stability = lr
+                eq.stability_calculated = True
+                eq.coefficients_stability = lr
 
-            print('Lr: ', lr, '\t Lp: ', lp)
+                print('Lr: ', lr, '\t Lp: ', lp)
 
+                
     def use_default_tags(self):
         self._tags = {'fitness evaluation', 'chromosome level', 'contains suboperators', 'inplace'}
 
