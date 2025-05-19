@@ -102,6 +102,10 @@ def equation_terms_stability(system, equation_key):
     res = system.vals[equation_key].coefficients_stability
     return res
 
+def equation_aic(system, equation_key):
+    assert system.vals[equation_key].aic_calculated
+    res = system.vals[equation_key].aic
+    return res
 
 def complexity_deriv(term_list: list):
     total = 0

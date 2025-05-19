@@ -821,10 +821,10 @@ class EpdeSearch(object):
         else:
             self.pool = pool; self.pool_params = cur_params
 
-        self.optimizer_init_params['population_instruct'] = {"pool": self.pool, 
+        self.optimizer_init_params['population_instruct'] = {"pool": self.pool,
                                                              "terms_number": equation_terms_max_number,
                                                              "max_factors_in_term": equation_factors_max_number,
-                                                             "sparsity_interval": eq_sparsity_interval, 
+                                                             "sparsity_interval": eq_sparsity_interval,
                                                              "use_pic": self._use_pic}
         
         if optimizer is None:
@@ -842,15 +842,16 @@ class EpdeSearch(object):
 
     @staticmethod
     def _create_optimizer(multiobjective_mode: bool, optimizer_init_params: dict,
-                          opt_strategy_director: OptimizationPatternDirector, 
+                          opt_strategy_director: OptimizationPatternDirector,
                           population: List[SoEq] = None, use_pic: bool = False):
         if multiobjective_mode:
             optimizer_init_params['passed_population'] = population
             optimizer = MOEADDOptimizer(**optimizer_init_params)
-            
+
             # if best_sol_vals is None:
-            best_sol_vals = [0., 1., 0.] if use_pic else [0., 1.]
-            
+            # best_sol_vals = [0., 1., 0.] if use_pic else [0., 1.]
+            best_sol_vals = [0., 0.] if use_pic else [0., 1.]
+
             same_obj_count = sum([1 for token_family in optimizer_init_params['population_instruct']['pool'].families
                                   if token_family.status['demands_equation']])
             best_obj = np.concatenate([np.full(same_obj_count, fill_value = fval) for fval in best_sol_vals])

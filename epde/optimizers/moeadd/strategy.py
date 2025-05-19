@@ -14,8 +14,8 @@ from epde.operators.utils.template import add_base_param_to_operator
 
 from epde.operators.multiobjective.selections import MOEADDSelection
 from epde.operators.multiobjective.variation import get_basic_variation
-from epde.operators.common.fitness import L2Fitness, SolverBasedFitness, PIC
-from epde.operators.common.right_part_selection import RandomRHPSelector
+from epde.operators.common.fitness import L2Fitness, L2LRFitness, SolverBasedFitness, PIC
+from epde.operators.common.right_part_selection import RandomRHPSelector, EqRightPartSelector
 from epde.operators.multiobjective.moeadd_specific import get_pareto_levels_updater, SimpleNeighborSelector, get_initial_sorter
 from epde.operators.common.sparsity import LASSOSparsity
 from epde.operators.common.coeff_calculation import LinRegBasedCoeffsEquation
@@ -41,28 +41,38 @@ class MOEADDDirector(OptimizationPatternDirector):
 
         variation = get_basic_variation(variation_params)
 
-        right_part_selector = RandomRHPSelector()
+        # right_part_selector = RandomRHPSelector()
+        right_part_selector = EqRightPartSelector()
         
         sparsity = LASSOSparsity()
-        coeff_calc = LinRegBasedCoeffsEquation()        
+        coeff_calc = LinRegBasedCoeffsEquation()
 
         if use_solver:
             fitness = PIC(['penalty_coeff']) if use_pic else SolverBasedFitness(['penalty_coeff'])
             # self.best_objectives = [0., 1., 0.] if use_pic else [0., 1.]
 
-            sparsity = map_operator_between_levels(sparsity, 'gene level', 'chromosome level')
-            coeff_calc = map_operator_between_levels(coeff_calc, 'gene level', 'chromosome level')
+            sparsity_c = map_operator_between_levels(sparsity, 'gene level', 'chromosome level')
+            coeff_calc_c = map_operator_between_levels(coeff_calc, 'gene level', 'chromosome level')
         else:
-            fitness = L2Fitness(['penalty_coeff'])
+            sparsity_c = sparsity; coeff_calc_c = coeff_calc 
+            fitness = L2LRFitness(['penalty_coeff'])
         add_kwarg_to_operator(operator = fitness)
 
-        fitness.set_suboperators({'sparsity' : sparsity, 'coeff_calc' : coeff_calc})
+        fitness.set_suboperators({'sparsity' : sparsity_c, 'coeff_calc' : coeff_calc_c})
         fitness_cond = lambda x: not getattr(x, 'fitness_calculated')
         if use_solver:
+            fitness_lightweight = L2LRFitness(['penalty_coeff'])
+            fitness_lightweight.set_suboperators({'sparsity' : sparsity, 'coeff_calc' : coeff_calc})
+            right_part_selector.set_suboperators({'fitness_calculation' : fitness_lightweight})
+
             fitness = OperatorCondition(fitness, fitness_cond)
         else:
+            right_part_selector.set_suboperators({'fitness_calculation' : fitness})
             fitness = map_operator_between_levels(fitness, 'gene level', 'chromosome level',
                                                   objective_condition=fitness_cond)
+
+
+
 
         rps_cond = lambda x: any([not elem_eq.right_part_selected for elem_eq in x.vals])
         sys_rps = map_operator_between_levels(right_part_selector, 'gene level', 'chromosome level', 

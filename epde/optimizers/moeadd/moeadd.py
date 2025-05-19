@@ -498,5 +498,5 @@ class MOEADDOptimizer(object):
     def plot_pareto(self, dimensions:list, **visualizer_kwargs):
         assert len(dimensions) == 2, 'Current approach supports only two dimensional plots'
         visualizer = ParetoVisualizer(self.pareto_levels)
-        visualizer.plot_pareto(dimensions = dimensions, **visualizer_kwargs)
-        
+        # visualizer.plot_pareto(dimensions = dimensions, **visualizer_kwargs)
+        visualizer.plot_pareto_mt(dimensions = dimensions, **visualizer_kwargs)
