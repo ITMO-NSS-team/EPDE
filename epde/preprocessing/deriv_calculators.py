@@ -73,6 +73,8 @@ class AdaptiveFiniteDeriv(AbstractDeriv):
             derivs = []
             if axis == None:
                 for dim_idx in np.arange(data.ndim):
+                    if max_order[dim_idx] == 0:
+                        continue
                     grad = np.gradient(data, grids[dim_idx], axis=dim_idx)
                     derivs.append(grad)
                     ord_marker = max_order[dim_idx] if axis is None else max_order[axis]
