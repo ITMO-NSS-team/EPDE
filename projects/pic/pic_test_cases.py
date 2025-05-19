@@ -1,3 +1,6 @@
+'''
+OLD FILE FOR TESTS. ALL TESTS ARE IN THEIR OWN FILES NOW!
+'''
 import sys
 import os 
 
@@ -7,7 +10,7 @@ import pickle
 from typing import Tuple, List
 import numpy as np
 
-from epde.interface.prepared_tokens import CustomTokens, PhasedSine1DTokens, ConstantToken
+from epde.interface.prepared_tokens import CustomTokens, PhasedSine1DTokens, ConstantToken, CustomEvaluator
 from epde.interface.equation_translator import translate_equation
 from epde.interface.interface import EpdeSearch
 
@@ -17,6 +20,11 @@ from epde.operators.common.sparsity import LASSOSparsity
 from epde.operators.utils.operator_mappers import map_operator_between_levels
 import epde.operators.common.fitness as fitness
 from epde.operators.utils.template import CompoundOperator
+
+from epde import TrigonometricTokens, GridTokens, CacheStoredTokens
+import epde.globals as global_var
+
+import scipy.io as scio
 
 # Introduce noise levels, test with complex setups
 # np.random.seed(0)
@@ -49,20 +57,27 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
 
     fit_operator.apply(correct_eq, {})
     fit_operator.apply(incorrect_eq, {})
+    print([[correct_eq.vals[var].fitness_value, incorrect_eq.vals[var].fitness_value] for var in all_vars])
+    print([[correct_eq.vals[var].coefficients_stability, incorrect_eq.vals[var].coefficients_stability] for var in all_vars])
+    print([[correct_eq.vals[var].aic, incorrect_eq.vals[var].aic] for var in all_vars])
 
-    print([correct_eq.vals[var].fitness_value < incorrect_eq.vals[var].fitness_value for var in all_vars])
-    return all([correct_eq.vals[var].fitness_value < incorrect_eq.vals[var].fitness_value for var in all_vars])
+    # print([correct_eq.vals[var].coefficients_stability < incorrect_eq.vals[var].coefficients_stability for var in all_vars])
+    return all([correct_eq.vals[var].coefficients_stability < incorrect_eq.vals[var].coefficients_stability for var in all_vars])
 
 
-def prepare_suboperators(fitness_operator: CompoundOperator) -> CompoundOperator:
+def prepare_suboperators(fitness_operator: CompoundOperator, operator_params: dict) -> CompoundOperator:
     sparsity = LASSOSparsity()
     coeff_calc = LinRegBasedCoeffsEquation()
 
-    sparsity = map_operator_between_levels(sparsity, 'gene level', 'chromosome level')
-    coeff_calc = map_operator_between_levels(coeff_calc, 'gene level', 'chromosome level')
+    # sparsity = map_operator_between_levels(sparsity, 'gene level', 'chromosome level')
+    # coeff_calc = map_operator_between_levels(coeff_calc, 'gene level', 'chromosome level')
 
     fitness_operator.set_suboperators({'sparsity' : sparsity,
                                        'coeff_calc' : coeff_calc})
+    fitness_cond = lambda x: not getattr(x, 'fitness_calculated')
+    fitness_operator.params = operator_params
+    fitness_operator = map_operator_between_levels(fitness_operator, 'gene level', 'chromosome level',
+                                                  objective_condition=fitness_cond)
     return fitness_operator
 
 
@@ -78,7 +93,7 @@ def ODE_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
     # g2 = lambda x: np.sin(2*x)
     # g3 = lambda x: 4.
     # g4 = lambda x: 1.5*x
-    
+
     eq_ode_symbolic = '-1.0 * d^2u/dx0^2{power: 1.0} + 1.5 * x_0{power: 1.0, dim: 0.0} + -4.0 * u{power: 1.0} + -0.0 \
                        = du/dx0{power: 1.0} * sin{power: 1.0, freq: 2.0, dim: 0.0}'
     eq_ode_incorrect = '1.0 * du/dx0{power: 1.0} + 3.5 * x_0{power: 1.0, dim: 0.0} * u{power: 1.0} + -1.2 \
@@ -88,18 +103,17 @@ def ODE_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
     t = np.arange(start = 0., stop = step * steps_num, step = step)
     data = np.load(os.path.join(foldername, 'ode_data.npy'))
     noised_data = noise_data(data, noise_level)
-    data_nn = load_pretrained_PINN(os.path.join(foldername, 'ode_ann_pretrained.pickle'))
+    data_nn = load_pretrained_PINN(os.path.join(foldername, 'ode_0_ann.pickle')).cuda()
 
     dimensionality = 0
 
-    from epde import TrigonometricTokens, GridTokens
-    trig_tokens = TrigonometricTokens(freq = (2 - 1e-8, 2 + 1e-8), 
+    trig_tokens = TrigonometricTokens(freq = (2 - 1e-8, 2 + 1e-8),
                                       dimensionality = dimensionality)
     grid_tokens = GridTokens(['x_0',], dimensionality = dimensionality, max_power = 2)
-    
-    epde_search_obj = EpdeSearch(use_solver = True, dimensionality = dimensionality, boundary = 10,
+
+    epde_search_obj = EpdeSearch(use_solver = False, dimensionality = dimensionality, boundary = 10,
                                  coordinate_tensors = (t,), verbose_params = {'show_iter_idx' : True},
-                                 device = 'cpu')
+                                 device = 'cuda')
 
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
@@ -127,13 +141,12 @@ def VdP_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
     data_nn = load_pretrained_PINN(os.path.join(foldername, 'vdp_ann_pretrained.pickle'))
 
     dimensionality = 0
-    
-    from epde import TrigonometricTokens, GridTokens
+
     trig_tokens = TrigonometricTokens(freq = (2 - 1e-8, 2 + 1e-8), 
                                       dimensionality = dimensionality)
     grid_tokens = GridTokens(['x_0',], dimensionality = dimensionality, max_power = 2)
 
-    epde_search_obj = EpdeSearch(use_solver = True, dimensionality = dimensionality, boundary = 10,
+    epde_search_obj = EpdeSearch(use_solver = False, use_pic=True, boundary = 10,
                                  coordinate_tensors = (t,), verbose_params = {'show_iter_idx' : True},
                                  device = 'cpu')
 
@@ -144,6 +157,86 @@ def VdP_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
                                 additional_tokens = [grid_tokens, trig_tokens], data_nn = data_nn)
 
     assert compare_equations(eq_vdp_symbolic, eq_vdp_incorrect, epde_search_obj)
+
+
+def lorenz_discovery(foldername, noise_level):
+    t_file = os.path.join(os.path.dirname( __file__ ), 'data\\lorenz\\t.npy')
+    t = np.load(t_file)
+    data_file = os.path.join(os.path.dirname(__file__), 'data\\lorenz\\lorenz.npy')
+    data = np.load(data_file)
+
+    end = 1000
+    t = t[:end]
+    x = data[:end, 0]
+    y = data[:end, 1]
+    z = data[:end, 2]
+
+    dimensionality = x.ndim - 1
+
+    trig_tokens = TrigonometricTokens(freq=(2 - 1e-8, 2 + 1e-8),
+                                      dimensionality=dimensionality)
+    grid_tokens = GridTokens(['x_0', ], dimensionality=dimensionality, max_power=2)
+
+    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True, use_pic=True, boundary=10,
+                                 coordinate_tensors=(t,), verbose_params={'show_iter_idx': True},
+                                 device='cuda')
+
+    epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+                                     preprocessor_kwargs={})
+
+    popsize = 8
+    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=100)
+
+    factors_max_number = {'factors_num': [1, 2], 'probas' : [0.8, 0.2]}
+
+    epde_search_obj.fit(data=[x, y, z], variable_names=['u', 'v', 'w'], max_deriv_order=(1,),
+                        equation_terms_max_number=5, data_fun_pow=1, additional_tokens=[trig_tokens, ],
+                        equation_factors_max_number=factors_max_number,
+                        eq_sparsity_interval=(1e-10, 1e-0))  #
+
+    epde_search_obj.equations(only_print=True, num=1)
+
+    return epde_search_obj
+
+
+def  lv_discovery(foldername, noise_level):
+    t_file = os.path.join(os.path.dirname( __file__ ), 'data\\lv\\t_20.npy')
+    t = np.load(t_file)
+    data_file = os.path.join(os.path.dirname(__file__), 'data\\lv\\data_20.npy')
+    data = np.load(data_file)
+
+    end = 150
+    t = t[:end]
+    x = data[:end, 0]
+    y = data[:end, 1]
+
+    dimensionality = x.ndim - 1
+
+    trig_tokens = TrigonometricTokens(freq=(2 - 1e-8, 2 + 1e-8),
+                                      dimensionality=dimensionality)
+    grid_tokens = GridTokens(['x_0', ], dimensionality=dimensionality, max_power=2)
+
+    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True, use_pic=True, boundary=10,
+                                 coordinate_tensors=(t,), verbose_params={'show_iter_idx': True},
+                                 device='cuda')
+
+    epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+                                     preprocessor_kwargs={})
+
+    popsize = 8
+    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=100)
+
+    factors_max_number = {'factors_num': [1, 2], 'probas' : [0.8, 0.2]}
+
+    epde_search_obj.fit(data=[x, y], variable_names=['u', 'v'], max_deriv_order=(1,),
+                        equation_terms_max_number=5, data_fun_pow=1, additional_tokens=[trig_tokens, ],
+                        equation_factors_max_number=factors_max_number,
+                        eq_sparsity_interval=(1e-4, 1e-0))  #
+
+    epde_search_obj.equations(only_print=True, num=1)
+
+    return epde_search_obj
+
 
 def ac_data(filename: str):
     t = np.linspace(0., 1., 51)
@@ -166,7 +259,7 @@ def AC_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
     print('Shapes:', data.shape, grid[0].shape)
     dimensionality = 1
 
-    epde_search_obj = EpdeSearch(use_solver = True, dimensionality = dimensionality, boundary = 10,
+    epde_search_obj = EpdeSearch(use_solver = False, use_pic=True, boundary = 10,
                                  coordinate_tensors = ((grid[0], grid[1])), verbose_params = {'show_iter_idx' : True},
                                  device = 'cpu')
 
@@ -189,6 +282,7 @@ def wave_data(filename):
     grids = np.stack(np.meshgrid(t, x, indexing='ij'), axis=2)
     return grids, data
 
+
 def wave_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
     # eq_wave_symbolic = '1. * d^2u/dx1^2{power: 1} + 0. = d^2u/dx0^2{power: 1}'
     eq_wave_symbolic = '0.04 * d^2u/dx1^2{power: 1} + 0. = d^2u/dx0^2{power: 1}'
@@ -200,7 +294,7 @@ def wave_test(operator: CompoundOperator, foldername: str, noise_level: int = 0)
 
     dimensionality = data.ndim - 1
 
-    epde_search_obj = EpdeSearch(use_solver=True, dimensionality=dimensionality, boundary=10,
+    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=10,
                                  coordinate_tensors=(grid[..., 0], grid[..., 1]),
                                  verbose_params={'show_iter_idx': True},
                                  device='cpu')
@@ -219,60 +313,277 @@ def kdv_data(filename, shape = 80):
     
     print(os.path.dirname( __file__ ))
     data = np.loadtxt(filename, delimiter = ',').T
-
-    t = np.linspace(0, 1, shape+1); x = np.linspace(0, 1, shape+1)
+    t = np.linspace(0, 1, shape+1)
+    x = np.linspace(0, 1, shape+1)
     grids = np.meshgrid(t, x, indexing = 'ij') # np.stack(, axis = 2)
     return grids, data
+
+
+def kdv_data_sga(filename):
+    data = scio.loadmat(filename)
+    u = data.get("uu").T
+    n, m = u.shape
+    x = np.squeeze(data.get("x")).reshape(-1, 1)
+    t = np.squeeze(data.get("tt").reshape(-1, 1))
+    grids = np.meshgrid(t, x, indexing='ij')  # np.stack(, axis = 2)
+    return grids, u
 
 
 def KdV_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
     # Test scenario to evaluate performance on Korteweg-de Vries equation
     eq_kdv_symbolic = '-6.0 * du/dx1{power: 1.0} * u{power: 1.0} + -1.0 * d^3u/dx1^3{power: 1.0} + \
-                           1.0 * sin{power: 1, freq: 1.0, dim: 1} * cos{power: 1, freq: 1.0, dim: 1} + \
+                           1.0 * sin{power: 1, freq: 1.0, dim: 1} * cos{power: 1, freq: 1.0, dim: 0} + \
                            0.0 = du/dx0{power: 1.0}'
 
+    # eq_kdv_symbolic = '-1.0 * du/dx1{power: 1.0} * u{power: 1.0} + -0.0025 * d^3u/dx1^3{power: 1.0} + \
+    #                        0.0 = du/dx0{power: 1.0}'
+
     eq_kdv_incorrect = '0.04 * d^2u/dx1^2{power: 1} + 0. = d^2u/dx0^2{power: 1}'
-    
+
     grid, data = kdv_data(os.path.join(foldername, 'data.csv'))
+    # grid, data = kdv_data(os.path.join(foldername, 'Kdv.mat'))
     noised_data = noise_data(data, noise_level)
-    data_nn = load_pretrained_PINN(os.path.join(foldername, 'kdv_ann_pretrained.pickle'))
-    
+    data_nn = load_pretrained_PINN(os.path.join(foldername, 'kdv_0_ann.pickle'))
+
     print('Shapes:', data.shape, grid[0].shape)
     dimensionality = 1
 
-    from epde import TrigonometricTokens
     trig_tokens = TrigonometricTokens(freq=(1 - 1e-8, 1 + 1e-8),
                                       dimensionality=dimensionality)
 
-    epde_search_obj = EpdeSearch(use_solver = True, dimensionality = dimensionality, boundary = 10,
+    epde_search_obj = EpdeSearch(use_solver = False, use_pic=True, boundary = 10,
                                  coordinate_tensors = (grid[0], grid[1]), verbose_params = {'show_iter_idx' : True},
-                                 device = 'cpu')
+                                 device = 'cuda')
 
+    epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+                                     preprocessor_kwargs={}) #'epochs_max': 5e4
+
+    epde_search_obj.create_pool(data=noised_data, variable_names=['u',], max_deriv_order=(2, 3),
+                                additional_tokens = [trig_tokens,]) # data_nn
+
+    # np.save(os.path.join(foldername, 'kdv_0_derivs.npy'), epde_search_obj.derivatives)
+
+    assert compare_equations(eq_kdv_symbolic, eq_kdv_incorrect, epde_search_obj)
+
+
+def kdv_data_h(filename, shape=80):
+    shape = 119
+
+    print(os.path.dirname(__file__))
+    data = np.load(filename)
+
+    t = np.linspace(0, 1, 120)
+    x = np.linspace(-3, 3, 480)
+    grids = np.meshgrid(t, x, indexing='ij')  # np.stack(, axis = 2)
+    return grids, data
+
+
+def KdV_h_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
+    # Test scenario to evaluate performance on Korteweg-de Vries equation
+    eq_kdv_symbolic = '-6.0 * du/dx1{power: 1.0} * u{power: 1.0} + -1.0 * d^3u/dx1^3{power: 1.0} + \
+                           0.0 = du/dx0{power: 1.0}'
+
+    eq_kdv_incorrect = '0.04 * d^2u/dx1^2{power: 1} + 0. = d^2u/dx0^2{power: 1}'
+
+    grid, data = kdv_data_h(os.path.join(foldername, 'data_kdv_homogen.npy'))
+    noised_data = noise_data(data, noise_level)
+    data_nn = load_pretrained_PINN(os.path.join(foldername, 'kdv_0_ann.pickle'))
+
+    print('Shapes:', data.shape, grid[0].shape)
+    dimensionality = 1
+
+    trig_tokens = TrigonometricTokens(freq=(1 - 1e-8, 1 + 1e-8),
+                                      dimensionality=dimensionality)
+
+    epde_search_obj = EpdeSearch(use_solver = False, use_pic=True, boundary = 20,
+                                 coordinate_tensors = (grid[0], grid[1]), verbose_params = {'show_iter_idx' : True},
+                                 device = 'cuda')
+
+    epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+                                     preprocessor_kwargs={}) #'epochs_max': 5e4
+
+    epde_search_obj.create_pool(data=noised_data, variable_names=['u',], max_deriv_order=(2, 3),
+                                additional_tokens = []) # , data_nn = data_nn
+
+    # np.save(os.path.join(foldername, 'kdv_0_derivs.npy'), epde_search_obj.derivatives)
+
+    assert compare_equations(eq_kdv_symbolic, eq_kdv_incorrect, epde_search_obj)
+
+
+def KdV_sga_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
+    # Test scenario to evaluate performance on Korteweg-de Vries equation
+    eq_kdv_symbolic = '-1 * du/dx1{power: 1.0} * u{power: 1.0} + -0.0025 * d^3u/dx1^3{power: 1.0} + \
+                           0.0 = du/dx0{power: 1.0}'
+
+    eq_kdv_incorrect = '0.04 * d^2u/dx1^2{power: 1} + 0. = d^2u/dx0^2{power: 1}'
+
+    grid, data = kdv_data_sga(os.path.join(foldername, 'Kdv.mat'))
+    noised_data = noise_data(data, noise_level)
+    data_nn = load_pretrained_PINN(os.path.join(foldername, 'kdv_0_ann.pickle'))
+
+    print('Shapes:', data.shape, grid[0].shape)
+    dimensionality = 1
+
+    trig_tokens = TrigonometricTokens(freq=(1 - 1e-8, 1 + 1e-8),
+                                      dimensionality=dimensionality)
+
+    epde_search_obj = EpdeSearch(use_solver = False, use_pic=True, boundary = 10,
+                                 coordinate_tensors = (grid[0], grid[1]), verbose_params = {'show_iter_idx' : True},
+                                 device = 'cuda')
+
+    epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+                                     preprocessor_kwargs={}) #'epochs_max': 5e4
+
+    epde_search_obj.create_pool(data=noised_data, variable_names=['u',], max_deriv_order=(2, 3),
+                                additional_tokens = []) # , data_nn = data_nn
+
+    # np.save(os.path.join(foldername, 'kdv_0_derivs.npy'), epde_search_obj.derivatives)
+
+    assert compare_equations(eq_kdv_symbolic, eq_kdv_incorrect, epde_search_obj)
+
+def darcy_data(filename: str):
+    t = np.linspace(0., 1., 2)
+    x = np.linspace(0., 1., 128)
+    y = np.linspace(0., 1., 128)
+    grids = np.meshgrid(t, x, y, indexing='ij')  # np.stack(, axis = 2)
+    data = np.load(filename)
+    data = data[0]
+    data = np.stack([data]*2, axis=0)
+    print(data.shape)
+    return grids, data
+
+def darcy_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
+    # Test scenario to evaluate performance on darcy equation
+    # eq_darcy_symbolic = '-1.0 * du/dx1{power: 1.0} * dnu/dy{power: 1.0} + -1.0 * nu{power: 1.0} * d^2u/dx1^2{power: 1} + \
+    #                       -2.0 * nu{power: 1.0} * d^2u/dxdy{power: 1} + \
+    #                       -1.0 * du/dx2{power: 1.0} * dnu/dx{power: 1.0} + -1.0 * du/dx2{power: 1.0} * dnu/dy{power: 1.0} + \
+    #                       -1.0 * nu{power: 1.0} * d^2u/dx2^2{power: 1} + -1.0 = du/dx1{power: 1.0} * dnu/dx{power: 1.0}'
+
+    eq_darcy_symbolic = '-1.0 * du/dx2{power: 1.0} * dnu/dy{power: 1.0} + -1.0 * nu{power: 1.0} * d^2u/dx1^2{power: 1} + \
+                              -1.0 * nu{power: 1.0} * d^2u/dx2^2{power: 1} + -1.0 = du/dx1{power: 1.0} * dnu/dx{power: 1.0}'
+
+    eq_darcy_incorrect = '0.04 * d^2u/dx1^2{power: 1} + 0. = d^2u/dx2^2{power: 1}'
+
+    grid, data = darcy_data(os.path.join(foldername, 'darcy_1.0.npy'))
+    nu = np.load(r'C:\Users\user\PycharmProjects\EPDE\EPDE\projects\pic\data\darcy\darcy_nu_1.0.npy')
+    noised_data = noise_data(data, noise_level)
+    x = np.linspace(0., 1., 128)
+    y = np.linspace(0., 1., 128)
+    dx = x[1] - x[0]
+    dy = y[1] - y[0]
+
+    dimensionality = 1
+
+    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True, use_pic=True, boundary=0,
+                                 coordinate_tensors=grid, device='cuda')
+
+    # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
+    #                                     preprocessor_kwargs={'epochs_max' : 1e3})
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
 
-    epde_search_obj.create_pool(data=noised_data, variable_names=['u',], max_deriv_order=(2, 3),
-                                additional_tokens = [trig_tokens,], data_nn = data_nn)
+    darcy_gradient_nux = np.gradient(nu[0], dx, axis=0, edge_order=2)
+    darcy_gradient_nuy = np.gradient(nu[0], dy, axis=1, edge_order=2)
+    darcy_gradient_xy = np.gradient(np.gradient(data, dx, axis=1, edge_order=2), dy, axis=2, edge_order=2)
 
-    assert compare_equations(eq_kdv_symbolic, eq_kdv_incorrect, epde_search_obj) 
+    custom_grid_tokens_nu = CacheStoredTokens(token_type='nu-tensors',
+                                              token_labels=['nu', 'dnu/dx', 'dnu/dy'],
+                                              token_tensors={'nu': nu[0], 'dnu/dx': darcy_gradient_nux,
+                                                             'dnu/dy': darcy_gradient_nuy},
+                                              params_ranges={'power': (1, 1)},
+                                              params_equality_ranges=None, )
 
-# TODO: implement tests on noised data, corrupted by additive Gaussian noise & preform full-scale equation search experiments.
-def epde_discovery(foldername):
+    custom_grid_tokens_xy = CacheStoredTokens(token_type='xy-tensor',
+                                              token_labels=['d^2u/dxdy'],
+                                              token_tensors={'d^2u/dxdy': darcy_gradient_xy},
+                                              params_ranges={'power': (1, 1)},
+                                              params_equality_ranges=None,
+                                              meaningful=True
+                                              )
+
+    epde_search_obj.create_pool(data=noised_data, variable_names=['u',], max_deriv_order=(0, 2, 2),
+                                additional_tokens = [custom_grid_tokens_nu, custom_grid_tokens_xy]) # , data_nn = data_nn
+
+    # np.save(os.path.join(foldername, 'kdv_0_derivs.npy'), epde_search_obj.derivatives)
+
+    assert compare_equations(eq_darcy_symbolic, eq_darcy_incorrect, epde_search_obj)
+
+def darcy_discovery(foldername, noise_level):
+    grid, data = darcy_data(os.path.join(foldername, 'darcy_1.0.npy'))
+    nu = np.load(r'C:\Users\user\PycharmProjects\EPDE\EPDE\projects\pic\data\darcy\darcy_nu_1.0.npy')
+    noised_data = noise_data(data, noise_level)
+    x = np.linspace(0., 1., 128)
+    y = np.linspace(0., 1., 128)
+    dx = x[1] - x[0]
+    dy = y[1] - y[0]
+    # data_nn = load_pretrained_PINN(os.path.join(foldername, 'ann_pretrained.pickle'))
+
+    dimensionality = data.ndim - 1
+
+    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=0,
+                                      coordinate_tensors=grid, device='cuda')
+
+    # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
+    #                                     preprocessor_kwargs={'epochs_max' : 1e3})
+    epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+                                     preprocessor_kwargs={})
+    popsize = 8
+
+    epde_search_obj.set_moeadd_params(population_size=popsize,
+                                      training_epochs=30)
+
+    darcy_gradient_nux = np.gradient(nu[0], dx, axis=0, edge_order=2)
+    darcy_gradient_nuy = np.gradient(nu[0], dy, axis=1, edge_order=2)
+    darcy_gradient_xy = np.gradient(np.gradient(data, dx, axis=1, edge_order=2), dy, axis=2, edge_order=2)
+
+    custom_grid_tokens_nu = CacheStoredTokens(token_type='nu-tensors',
+                                                token_labels=['nu', 'dnu/dx', 'dnu/dy'],
+                                                token_tensors={'nu': nu[0], 'dnu/dx': darcy_gradient_nux, 'dnu/dy': darcy_gradient_nuy},
+                                                params_ranges={'power': (1, 1)},
+                                                params_equality_ranges=None,)
+
+    custom_grid_tokens_xy = CacheStoredTokens(token_type='xy-tensor',
+                                               token_labels=['d^2u/dxdy'],
+                                               token_tensors={'d^2u/dxdy': darcy_gradient_xy},
+                                               params_ranges={'power': (1, 1)},
+                                               params_equality_ranges=None,
+                                               meaningful=True
+                                              )
+
+    trig_params_ranges = {'power': (1, 1)}
+    trig_params_equal_ranges = {}
+
+    trig_tokens = TrigonometricTokens(dimensionality=dimensionality, freq = (0.999, 1.001))
+
+    factors_max_number = {'factors_num': [1, 2], 'probas': [0.5, 0.5]}
+
+    bounds = (1e-12, 1e-2)
+    epde_search_obj.fit(data=noised_data, variable_names=['u', ], max_deriv_order=(0, 2, 2), derivs=None,
+                        equation_terms_max_number=5, data_fun_pow=1,
+                        additional_tokens=[custom_grid_tokens_nu, custom_grid_tokens_xy],
+                        equation_factors_max_number=factors_max_number,
+                        eq_sparsity_interval=bounds, fourier_layers=False) #, data_nn=data_nn
+
+    epde_search_obj.equations(only_print=True, num=1)
+    epde_search_obj.visualize_solutions()
+
+    return epde_search_obj
+
+def ODE_discovery(foldername, noise_level):
     step = 0.05
     steps_num = 320
     t = np.arange(start=0., stop=step * steps_num, step=step)
     data = np.load(os.path.join(foldername, 'ode_data.npy'))
-    # noised_data = noise_data(data, noise_level)
-    data_nn = load_pretrained_PINN(os.path.join(foldername, 'ode_ann_pretrained.pickle'))
+    noised_data = noise_data(data, noise_level)
+    data_nn = load_pretrained_PINN(os.path.join(foldername, 'ode_0_ann.pickle')).cpu()
 
     dimensionality = 0
 
-    from epde import TrigonometricTokens, GridTokens
     trig_tokens = TrigonometricTokens(freq=(2 - 1e-8, 2 + 1e-8),
                                       dimensionality=dimensionality)
     grid_tokens = GridTokens(['x_0', ], dimensionality=dimensionality, max_power=2)
 
-    epde_search_obj = EpdeSearch(use_solver=True, dimensionality=dimensionality, boundary=10,
+    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=10,
                                  coordinate_tensors=(t,), verbose_params={'show_iter_idx': True},
                                  device='cuda')
 
@@ -280,48 +591,364 @@ def epde_discovery(foldername):
                                      preprocessor_kwargs={})
 
     popsize = 8
-    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=55)
+    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=15)
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
-    epde_search_obj.fit(data=[data, ], variable_names=['u', ], max_deriv_order=(2,),
+    epde_search_obj.fit(data=[noised_data, ], variable_names=['u', ], max_deriv_order=(2, 2),
                         equation_terms_max_number=5, data_fun_pow=1,
                         additional_tokens=[trig_tokens, grid_tokens],
                         equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-12, 1e-4))
+                        eq_sparsity_interval=(1e-12, 1e-4), data_nn=data_nn) #
 
     epde_search_obj.equations(only_print=True, num=1)
 
-    # syss = epde_search_obj.equation_search_results(only_print = False, num = 1)
-    '''
-    Having insight about the initial ODE structure, we are extracting the equation with complexity of 5
+    # import pickle
+    # fname = os.path.join(r'C:\Users\user\EPDE_tests\models', 'ode_0_ann.pickle')
+    # with open(fname, 'wb') as output_file:
+    #     pickle.dump(global_var.solution_guess_nn, output_file)
+    # epde_search_obj.visualize_solutions()
+    return epde_search_obj
 
-    In other cases, you should call sys.equation_search_results(only_print = True),
-    where the algorithm presents Pareto frontier of optimal equations.
-    '''
-    sys = epde_search_obj.get_equations_by_complexity(5)[0]
-    return epde_search_obj, sys
+def vdp_discovery(foldername, noise_level):
+    step = 0.05;
+    steps_num = 320
+    t = np.arange(start=0., stop=step * steps_num, step=step)
+    data = np.load(os.path.join(foldername, 'vdp_data.npy'))
+    noised_data = noise_data(data, noise_level)
+    data_nn = load_pretrained_PINN(os.path.join(foldername, 'vdp_ann_pretrained.pickle'))
+
+    dimensionality = 0
+
+    trig_tokens = TrigonometricTokens(freq=(2 - 1e-8, 2 + 1e-8),
+                                      dimensionality=dimensionality)
+    grid_tokens = GridTokens(['x_0', ], dimensionality=dimensionality, max_power=2)
+
+    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=10,
+                                 coordinate_tensors=(t,), verbose_params={'show_iter_idx': True},
+                                 device='cuda')
+
+    epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+                                     preprocessor_kwargs={})
+
+    popsize = 8
+    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=5)
+
+    factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
+
+    epde_search_obj.fit(data=[noised_data, ], variable_names=['u', ], max_deriv_order=(2, 2),
+                        equation_terms_max_number=5, data_fun_pow=2,
+                        additional_tokens=[trig_tokens, grid_tokens],
+                        equation_factors_max_number=factors_max_number,
+                        eq_sparsity_interval=(1e-12, 1e-4), data_nn=data_nn) #
+
+    epde_search_obj.equations(only_print=True, num=1)
+
+    # import pickle
+    # fname = os.path.join(r'C:\Users\user\EPDE_tests\models', 'ode_0_ann.pickle')
+    # with open(fname, 'wb') as output_file:
+    #     pickle.dump(global_var.solution_guess_nn, output_file)
+    # epde_search_obj.visualize_solutions()
+    return epde_search_obj
+
+
+def kdv_discovery(foldername, noise_level):
+    grid, data = kdv_data(os.path.join(foldername, 'data.csv'))
+    # grid, data = kdv_data(os.path.join(foldername, 'Kdv.mat'))
+    # noised_data = noise_data(data, noise_level)
+    # data_nn = load_pretrained_PINN(os.path.join(foldername, f'kdv_{noise_level}_ann.pickle'))
+
+    dimensionality = data.ndim - 1
+
+    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True,
+                                      boundary=10,
+                                      coordinate_tensors=grid, device='cuda')
+
+    # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
+    #                                     preprocessor_kwargs={'epochs_max' : 1e3})
+    epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+                                     preprocessor_kwargs={})
+    popsize = 8
+
+    epde_search_obj.set_moeadd_params(population_size=popsize,
+                                      training_epochs=15)
+
+    custom_trigonometric_eval_fun = {
+        'cos(t)sin(x)': lambda *grids, **kwargs: (np.cos(grids[0]) * np.sin(grids[1])) ** kwargs['power']}
+    custom_trig_evaluator = CustomEvaluator(custom_trigonometric_eval_fun, eval_fun_params_labels=['power'])
+    trig_params_ranges = {'power': (1, 1)}
+    trig_params_equal_ranges = {}
+
+    custom_trig_tokens = CustomTokens(token_type='trigonometric',
+                                         token_labels=['cos(t)sin(x)'],
+                                         evaluator=custom_trig_evaluator,
+                                         params_ranges=trig_params_ranges,
+                                         params_equality_ranges=trig_params_equal_ranges,
+                                         meaningful=True, unique_token_type=True)
+
+    trig_tokens = TrigonometricTokens(dimensionality=dimensionality, freq = (0.999, 1.001))
+    trig_tokens._token_family.set_status(unique_specific_token=False, unique_token_type=False,
+                                  meaningful=True)
+
+    factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
+
+    bounds = (1e-9, 1e-4)
+    epde_search_obj.fit(data=data, variable_names=['u', ], max_deriv_order=(2, 3), derivs=None,
+                        equation_terms_max_number=5, data_fun_pow=1,
+                        additional_tokens=[custom_trig_tokens],
+                        equation_factors_max_number=factors_max_number,
+                        eq_sparsity_interval=bounds, fourier_layers=False) # , data_nn=data_nn
+
+    epde_search_obj.equations(only_print=True, num=1)
+    epde_search_obj.visualize_solutions()
+
+    return epde_search_obj
+
+def kdv_h_discovery(foldername, noise_level):
+    grid, data = kdv_data_h(os.path.join(foldername, 'data_kdv_homogen.npy'))
+    noised_data = noise_data(data, noise_level)
+    data_nn = load_pretrained_PINN(os.path.join(foldername, f'kdv_{noise_level}_ann.pickle'))
+
+    dimensionality = data.ndim - 1
+
+    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True,
+                                      boundary=20,
+                                      coordinate_tensors=grid, device='cuda')
+
+    # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
+    #                                     preprocessor_kwargs={'epochs_max' : 1e3})
+    epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+                                     preprocessor_kwargs={})
+    popsize = 8
+
+    epde_search_obj.set_moeadd_params(population_size=popsize,
+                                      training_epochs=5)
+
+
+    custom_grid_tokens = CacheStoredTokens(token_type='grid',
+                                                token_labels=['t', 'x'],
+                                                token_tensors={'t': grid[0], 'x': grid[1]},
+                                                params_ranges={'power': (1, 1)},
+                                                params_equality_ranges=None)
+
+    custom_trigonometric_eval_fun = {
+        'cos(t)sin(x)': lambda *grids, **kwargs: (np.cos(grids[0]) * np.sin(grids[1])) ** kwargs['power']}
+    custom_trig_evaluator = CustomEvaluator(custom_trigonometric_eval_fun, eval_fun_params_labels=['power'])
+    trig_params_ranges = {'power': (1, 1)}
+    trig_params_equal_ranges = {}
+
+    custom_trig_tokens = CustomTokens(token_type='trigonometric',
+                                         token_labels=['cos(t)sin(x)'],
+                                         evaluator=custom_trig_evaluator,
+                                         params_ranges=trig_params_ranges,
+                                         params_equality_ranges=trig_params_equal_ranges,
+                                         meaningful=True, unique_token_type=True)
+
+    trig_tokens = TrigonometricTokens(dimensionality=dimensionality, freq = (0.999, 1.001))
+
+    factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
+
+    bounds = (1e-9, 1e-4)
+    epde_search_obj.fit(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 3), derivs=None,
+                        equation_terms_max_number=5, data_fun_pow=1,
+                        additional_tokens=[],
+                        equation_factors_max_number=factors_max_number,
+                        eq_sparsity_interval=bounds, fourier_layers=False) # , data_nn=data_nn
+
+    epde_search_obj.equations(only_print=True, num=1)
+    epde_search_obj.visualize_solutions()
+
+    return epde_search_obj
+
+def kdv_sga_discovery(foldername, noise_level):
+    grid, data = kdv_data_sga(os.path.join(foldername, 'Kdv.mat'))
+    noised_data = noise_data(data, noise_level)
+    data_nn = load_pretrained_PINN(os.path.join(foldername, f'kdv_{noise_level}_ann.pickle'))
+
+    dimensionality = data.ndim - 1
+
+    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True,
+                                      boundary=20,
+                                      coordinate_tensors=grid, device='cuda')
+
+    # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
+    #                                     preprocessor_kwargs={'epochs_max' : 1e3})
+    epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+                                     preprocessor_kwargs={})
+    popsize = 8
+
+    epde_search_obj.set_moeadd_params(population_size=popsize,
+                                      training_epochs=5)
+
+
+    custom_grid_tokens = CacheStoredTokens(token_type='grid',
+                                                token_labels=['t', 'x'],
+                                                token_tensors={'t': grid[0], 'x': grid[1]},
+                                                params_ranges={'power': (1, 1)},
+                                                params_equality_ranges=None)
+
+    custom_trigonometric_eval_fun = {
+        'cos(t)sin(x)': lambda *grids, **kwargs: (np.cos(grids[0]) * np.sin(grids[1])) ** kwargs['power']}
+    custom_trig_evaluator = CustomEvaluator(custom_trigonometric_eval_fun, eval_fun_params_labels=['power'])
+    trig_params_ranges = {'power': (1, 1)}
+    trig_params_equal_ranges = {}
+
+    custom_trig_tokens = CustomTokens(token_type='trigonometric',
+                                         token_labels=['cos(t)sin(x)'],
+                                         evaluator=custom_trig_evaluator,
+                                         params_ranges=trig_params_ranges,
+                                         params_equality_ranges=trig_params_equal_ranges,
+                                         meaningful=True, unique_token_type=True)
+
+    trig_tokens = TrigonometricTokens(dimensionality=dimensionality, freq = (0.999, 1.001))
+
+    factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
+
+    bounds = (1e-9, 1e-2)
+    epde_search_obj.fit(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 3), derivs=None,
+                        equation_terms_max_number=5, data_fun_pow=1,
+                        additional_tokens=[],
+                        equation_factors_max_number=factors_max_number,
+                        eq_sparsity_interval=bounds, fourier_layers=False) # , data_nn=data_nn
+
+    epde_search_obj.equations(only_print=True, num=1)
+    epde_search_obj.visualize_solutions()
+
+    return epde_search_obj
+
+def wave_discovery(foldername, noise_level):
+    grid, data = wave_data(os.path.join(foldername, 'wave_sln_80.csv'))
+    noised_data = noise_data(data, noise_level)
+    data_nn = load_pretrained_PINN(os.path.join(foldername, 'ann_pretrained.pickle'))
+
+    dimensionality = data.ndim - 1
+
+    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True,
+                                      boundary=20,
+                                      coordinate_tensors=(grid[..., 0], grid[..., 1]), device='cuda')
+
+    # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
+    #                                     preprocessor_kwargs={'epochs_max' : 1e3})
+    epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+                                     preprocessor_kwargs={})
+    popsize = 8
+
+    epde_search_obj.set_moeadd_params(population_size=popsize,
+                                      training_epochs=10)
+
+
+    custom_grid_tokens = CacheStoredTokens(token_type='grid',
+                                                token_labels=['t', 'x'],
+                                                token_tensors={'t': grid[0], 'x': grid[1]},
+                                                params_ranges={'power': (1, 1)},
+                                                params_equality_ranges=None)
+
+    trig_params_ranges = {'power': (1, 1)}
+    trig_params_equal_ranges = {}
+
+    trig_tokens = TrigonometricTokens(dimensionality=dimensionality, freq = (0.999, 1.001))
+
+    factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
+
+    bounds = (1e-12, 1e-4)
+    epde_search_obj.fit(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 3), derivs=None,
+                        equation_terms_max_number=5, data_fun_pow=3,
+                        additional_tokens=[],
+                        equation_factors_max_number=factors_max_number,
+                        eq_sparsity_interval=bounds, fourier_layers=False, data_nn=data_nn) #
+
+    epde_search_obj.equations(only_print=True, num=1)
+    epde_search_obj.visualize_solutions()
+
+    return epde_search_obj
+
+def ac_discovery(foldername, noise_level):
+    grid, data = ac_data(os.path.join(foldername, 'ac_data.npy'))
+    noised_data = noise_data(data, noise_level)
+    data_nn = load_pretrained_PINN(os.path.join(foldername, f'kdv_{noise_level}_ann.pickle'))
+
+    dimensionality = data.ndim - 1
+
+    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True,
+                                      use_pic=True, boundary=20,
+                                      coordinate_tensors=grid, device='cuda')
+
+    # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
+    #                                     preprocessor_kwargs={'epochs_max' : 1e3})
+    epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+                                     preprocessor_kwargs={})
+    popsize = 8
+
+    epde_search_obj.set_moeadd_params(population_size=popsize,
+                                      training_epochs=30)
+
+    custom_grid_tokens = CacheStoredTokens(token_type='grid',
+                                                token_labels=['t', 'x'],
+                                                token_tensors={'t': grid[0], 'x': grid[1]},
+                                                params_ranges={'power': (1, 1)},
+                                                params_equality_ranges=None)
+
+    trig_params_ranges = {'power': (1, 1)}
+    trig_params_equal_ranges = {}
+
+    trig_tokens = TrigonometricTokens(dimensionality=dimensionality, freq = (0.999, 1.001))
+
+    factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
+
+    bounds = (1e-9, 1e-4)
+    epde_search_obj.fit(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 3), derivs=None,
+                        equation_terms_max_number=5, data_fun_pow=3,
+                        additional_tokens=[],
+                        equation_factors_max_number=factors_max_number,
+                        eq_sparsity_interval=bounds, fourier_layers=False, data_nn=data_nn) #
+
+    epde_search_obj.equations(only_print=True, num=1)
+    epde_search_obj.visualize_solutions()
+
+    return epde_search_obj
+
 
 if __name__ == "__main__":
+    import torch
+    from epde.operators.utils.default_parameter_loader import EvolutionaryParams
+    print(torch.cuda.is_available())
     # Operator = fitness.SolverBasedFitness # Replace by the developed PIC-based operator.
-    Operator = fitness.PIC
-    operator_params = {"penalty_coeff" : 0.2, "pinn_loss_mult" : 1e4}
-    fit_operator = prepare_suboperators(Operator(list(operator_params.keys())))
-    fit_operator.params = operator_params
+    # Operator = fitness.PIC
+    Operator = fitness.L2LRFitness
+    params = EvolutionaryParams()
+    operator_params = params.get_default_params_for_operator('DiscrepancyBasedFitnessWithCV') #{"penalty_coeff": 0.2, "pinn_loss_mult": 1e4}
+    print('operator_params ', operator_params)
+    fit_operator = prepare_suboperators(Operator(list(operator_params.keys())), operator_params)
 
+
+    # Paths
     directory = os.path.dirname(os.path.realpath(__file__))
-    ode_folder_name = os.path.join(directory, 'data\ode')
-    ODE_test(fit_operator, ode_folder_name, 0)
-    # epde_discovery(ode_folder_name)
+    ode_folder_name = os.path.join(directory, 'data\\ode')
+    vdp_folder_name = os.path.join(directory, 'data\\vdp')
+    ac_folder_name = os.path.join(directory, 'data\\ac')
+    wave_folder_name = os.path.join(directory, 'data\\wave')
+    kdv_folder_name = os.path.join(directory, 'data\\kdv')
+    darcy_folder_name = os.path.join(directory, 'data\\darcy')
 
-    vdp_folder_name = os.path.join(directory, 'data\vdp')
-    # VdP_test(fit_operator, vdp_folder_name, 75)
+    # Pair-wise tests
+    # ODE_test(fit_operator, ode_folder_name, 0)
+    # VdP_test(fit_operator, vdp_folder_name, 0)
+    # AC_test(fit_operator, ac_folder_name, 0)
+    # wave_test(fit_operator, wave_folder_name, 0)
+    # KdV_test(fit_operator, kdv_folder_name, 0)
+    # KdV_h_test(fit_operator, kdv_folder_name, 0)
+    # KdV_sga_test(fit_operator, kdv_folder_name, 0)
+    # darcy_test(fit_operator, darcy_folder_name, 0)
 
-    ac_folder_name = os.path.join(directory, 'data\ac')
-    # AC_test(fit_operator, ac_folder_name, 25)
+    # Full_scale test
+    # eso = ODE_discovery(ode_folder_name, 0)
+    # eso = vdp_discovery(vdp_folder_name, 0)
+    # eso = lorenz_discovery(vdp_folder_name, 0)
+    # eso = lv_discovery(vdp_folder_name, 0)
+    # eso = ac_discovery(ac_folder_name, 0)
+    # eso = wave_discovery(wave_folder_name, 0)
+    # eso = kdv_discovery(kdv_folder_name, 0)
+    # eso = kdv_h_discovery(kdv_folder_name, 0)
+    # eso = kdv_sga_discovery(kdv_folder_name, 0)
+    # eso = darcy_discovery(darcy_folder_name, 0)
 
-    wave_folder_name = os.path.join(directory, 'data\wave')
-    # wave_test(fit_operator, wave_folder_name, 200)
-
-    ode_folder_name = os.path.join(directory, 'data\kdv')
-    # KdV_test(fit_operator, kdv_folder_name, 25)

@@ -824,10 +824,6 @@ class Equation(ComplexStructure):
         self.solver_form_defined = False
         gc.collect()
 
-#    @coefficients_stability.setter
-#    def coefficients_stability(self, value):
-#        self._coefficients_stability = value
-
 def solver_formed_grid(training_grid=None):
     raise NotImplementedError('solver_formed_grid function is to be depricated')
     if training_grid is None:
