@@ -49,7 +49,7 @@ class EqRightPartSelector(CompoundOperator):
         if not objective.right_part_selected:
             min_fitness = np.inf
             min_idx = 0
-            if not objective.contains_deriv():
+            if not objective.contains_deriv(objective.main_var_to_explain):
                 objective.restore_property(deriv = True)
             if not objective.contains_variable(objective.main_var_to_explain):
                 objective.restore_property(mandatory_family = True)
@@ -57,8 +57,7 @@ class EqRightPartSelector(CompoundOperator):
             
                 
             for target_idx, target_term in enumerate(objective.structure):
-                if not (objective.structure[target_idx].contains_deriv() and
-                        target_term.contains_variable(objective.main_var_to_explain)):
+                if not objective.structure[target_idx].contains_deriv(objective.main_var_to_explain):
                     continue
                 objective.target_idx = target_idx
                 # self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
