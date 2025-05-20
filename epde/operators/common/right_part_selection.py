@@ -47,8 +47,8 @@ class EqRightPartSelector(CompoundOperator):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
         if not objective.right_part_selected:
-            max_fitness = 0
-            max_idx = 0
+            min_fitness = np.inf
+            min_idx = 0
             if not objective.contains_deriv():
                 objective.restore_property(deriv = True)
             if not objective.contains_variable(objective.main_var_to_explain):
@@ -57,7 +57,7 @@ class EqRightPartSelector(CompoundOperator):
             
                 
             for target_idx, target_term in enumerate(objective.structure):
-                if not (objective.structure[target_idx].contains_deriv and 
+                if not (objective.structure[target_idx].contains_deriv() and
                         target_term.contains_variable(objective.main_var_to_explain)):
                     continue
                 objective.target_idx = target_idx
@@ -66,13 +66,13 @@ class EqRightPartSelector(CompoundOperator):
                 fitness = self.suboperators['fitness_calculation'].apply(objective,
                                                                             arguments = subop_args['fitness_calculation'],
                                                                             force_out_of_place = True)
-                if fitness > max_fitness:
-                    max_fitness = fitness
-                    max_idx = target_idx
+                if fitness < min_fitness:
+                    min_fitness = fitness
+                    min_idx = target_idx
                 else:
                     pass
 
-            objective.target_idx = max_idx
+            objective.target_idx = min_idx
             objective.reset_explaining_term(objective.target_idx)
             # self.suboperators['fitness_calculation'].apply(objective, arguments = subop_args['fitness_calculation'])
             # if not np.isclose(objective.fitness_value, max_fitness) and global_var.verbose.show_warnings:
