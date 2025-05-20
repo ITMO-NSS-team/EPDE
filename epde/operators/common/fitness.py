@@ -144,6 +144,9 @@ class L2LRFitness(CompoundOperator):
         if np.sum(objective.weights_final) == 0:
             fitness_value /= self.params['penalty_coeff']
 
+        if force_out_of_place:
+            return fitness_value
+
         # n = len(discr)
         # ss = np.var(discr)
         # ll = 0.5 * n * (np.log(2 * np.pi * ss) + 1)
@@ -245,14 +248,10 @@ class L2LRFitness(CompoundOperator):
                 # else:
                 lr *= eq_cv.mean()
 
-
-        if force_out_of_place:
-            return fitness_value
-        else:
-            objective.fitness_calculated = True
-            objective.fitness_value = fitness_value
-            objective.stability_calculated = True
-            objective.coefficients_stability = lr
+        objective.fitness_calculated = True
+        objective.fitness_value = fitness_value
+        objective.stability_calculated = True
+        objective.coefficients_stability = lr
 
     def feature_reshape(self, features_vals):
         features = features_vals[0]
