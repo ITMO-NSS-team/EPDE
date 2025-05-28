@@ -909,9 +909,9 @@ class SoEq(moeadd.MOEADDSolution):
         aic_objectives = [generate_partial(
             equation_aic, eq_key) for eq_key in self.vars_to_describe]
         self.set_objective_functions(
-            # quality_objectives + complexity_objectives + stability_objectives)
+            # quality_objectives + stability_objectives + complexity_objectives)
             # quality_objectives + stability_objectives + aic_objectives)
-            quality_objectives + stability_objectives)
+            aic_objectives + stability_objectives)
 
     def use_default_singleobjective_function(self):
         from epde.eq_mo_objectives import generate_partial, equation_fitness
