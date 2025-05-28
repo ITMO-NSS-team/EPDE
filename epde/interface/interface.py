@@ -182,7 +182,7 @@ class InputDataEntry(object):
         
         self._derivs_family.set_latex_form_constructor(self.latex_form)
         self._derivs_family.set_status(demands_equation=True, unique_specific_token=False,
-                                       unique_token_type=True, s_and_d_merged=False,
+                                       unique_token_type=False, s_and_d_merged=False,
                                        meaningful=True)
         self._derivs_family.set_params(self.names, OrderedDict([('power', (1, max_deriv_power))]),
                                       {'power': 0}, self.d_orders)
