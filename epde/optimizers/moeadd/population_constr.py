@@ -39,8 +39,8 @@ class SystemsPopulationConstructor(object):
             passed_solution.use_default_multiobjective_function()        
 
     def create(self, **kwargs):
-        sparsity = kwargs.get('sparsity', np.exp(np.random.uniform(low = np.log(self.sparsity_interval[0]),
-                                                                      high = np.log(self.sparsity_interval[1]),
+        sparsity = kwargs.get('sparsity', 10 ** (np.random.uniform(low = np.log10(self.sparsity_interval[0]),
+                                                                      high = np.log10(self.sparsity_interval[1]),
                                                                       size = len(self.vars_demand_equation))))
         terms_number = kwargs.get('terms_number', self.terms_number)
         max_factors_in_term = kwargs.get('max_factors_in_term', self.max_factors_in_term)
