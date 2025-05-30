@@ -147,15 +147,20 @@ class L2LRFitness(CompoundOperator):
         if force_out_of_place:
             return fitness_value
 
-        # n = len(discr)
-        # ss = np.var(discr)
-        # ll = 0.5 * n * (np.log(2 * np.pi * ss) + 1)
-        discr = np.mean(discr ** 2)
-        ll = np.log(discr)
-        # print(ll)
+        # discr = np.mean(discr ** 2)
+        # ll = np.log(discr)
+        # aic = 2 * len(objective.weights_final) - 2 * ll
+        ssr = np.sum(discr ** 2)
+        n = len(target)
+        llf = - n / 2 * np.log(2 * np.pi) - n / 2 * np.log(ssr / n) - n / 2
+        aic = 2 * len([_ for _ in objective.weights_final if _ != 0]) - 2 * llf
+        # aic = np.log(n) * len([_ for _ in objective.weights_final if _ != 0]) - 2 * llf
+        # objective.aic = 1/(1 + np.exp(- 1e-4 * ll))
+        objective.aic = 1/(1 + np.exp(- aic / 1e5))
+        # objective.aic = aic
         objective.aic_calculated = True
-        # objective.aic = ll
-        objective.aic = 1/(1 + np.exp(- 1e-4 * ll))
+        # print(aic)
+        # print(len([_ for _ in objective.weights_final if _ !=0]))
         # print(objective.aic)
 
         # Calculate r-loss

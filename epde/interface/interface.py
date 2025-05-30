@@ -849,8 +849,8 @@ class EpdeSearch(object):
             optimizer = MOEADDOptimizer(**optimizer_init_params)
 
             # if best_sol_vals is None:
-            # best_sol_vals = [0., 1., 0.] if use_pic else [0., 1.]
             best_sol_vals = [0., 0.] if use_pic else [0., 1.]
+            # best_sol_vals = [0., 0.] if use_pic else [0., 1.]
 
             same_obj_count = sum([1 for token_family in optimizer_init_params['population_instruct']['pool'].families
                                   if token_family.status['demands_equation']])
