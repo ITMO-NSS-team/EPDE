@@ -61,7 +61,7 @@ class LASSOSparsity(CompoundOperator):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
         estimator = Lasso(alpha = objective.metaparameters[('sparsity', objective.main_var_to_explain)]['value'],
-                          copy_X=True, fit_intercept=True, max_iter=100,
+                          copy_X=True, fit_intercept=True, max_iter=1000,
                           positive=False, precompute=False, random_state=None,
                           selection='random', tol=0.0001, warm_start=False)
         _, target, features = objective.evaluate(normalize = True, return_val = False)
