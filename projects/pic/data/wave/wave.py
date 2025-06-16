@@ -138,7 +138,7 @@ def wave_discovery(foldername, noise_level):
     popsize = 8
 
     epde_search_obj.set_moeadd_params(population_size=popsize,
-                                      training_epochs=10)
+                                      training_epochs=5)
 
 
     custom_grid_tokens = CacheStoredTokens(token_type='grid',
@@ -154,7 +154,7 @@ def wave_discovery(foldername, noise_level):
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
-    bounds = (1e-12, 1e-4)
+    bounds = (1e-12, 1e-2)
     epde_search_obj.fit(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 3), derivs=None,
                         equation_terms_max_number=5, data_fun_pow=3,
                         additional_tokens=[],
@@ -183,5 +183,5 @@ if __name__ == "__main__":
     directory = os.path.dirname(os.path.realpath(__file__))
     wave_folder_name = os.path.join(directory)
 
-    wave_test(fit_operator, wave_folder_name, 0)
+    # wave_test(fit_operator, wave_folder_name, 0)
     wave_discovery(wave_folder_name, 0)

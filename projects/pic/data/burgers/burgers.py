@@ -17,6 +17,7 @@ from epde.operators.common.sparsity import LASSOSparsity
 from epde.operators.utils.operator_mappers import map_operator_between_levels
 import epde.operators.common.fitness as fitness
 from epde.operators.utils.template import CompoundOperator
+from scipy.io import loadmat
 
 from epde import TrigonometricTokens, GridTokens, CacheStoredTokens
 import epde.globals as global_var
@@ -83,126 +84,84 @@ def prepare_suboperators(fitness_operator: CompoundOperator, operator_params: di
                                                    objective_condition=fitness_cond)
     return fitness_operator
 
+def burgers_data(filename: str):
+    burg = loadmat(filename)
+    t = np.ravel(burg['t'])
+    x = np.ravel(burg['x'])
+    data = np.real(burg['usol'])
+    data = np.transpose(data)
+    grids = np.meshgrid(t, x, indexing = 'ij')  # np.stack(, axis = 2) , axis = 2)
+    return grids, data
 
-def ODE_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
-    # Test scenario to evaluate performance on simple 2nd order ODE
-    # x'' + sin(2t) x' + 4 x = 1.5 t,  written as $g_{1} x'' + g_{2} x' + g_{3} x = g_{4}
-    # g1 = lambda x: 1.
-    # g2 = lambda x: np.sin(2*x)
-    # g3 = lambda x: 4.
-    # g4 = lambda x: 1.5*x
 
-    eq_ode_symbolic = '-1.0 * d^2u/dx0^2{power: 1.0} + 1.5 * x_0{power: 1.0, dim: 0.0} + -4.0 * u{power: 1.0} + -0.0 \
-                       = du/dx0{power: 1.0} * sin{power: 1.0, freq: 2.0, dim: 0.0}'
-    eq_ode_incorrect = '1.0 * du/dx0{power: 1.0} + 3.5 * x_0{power: 1.0, dim: 0.0} * u{power: 1.0} + -1.2 \
-                        = du/dx0{power: 1.0} * sin{power: 1.0, freq: 2.0, dim: 0.0}'
+def burgers_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
+    # Test scenario to evaluate performance on Allen-Cahn equation
+    eq_burgers_symbolic = '0.0001 * d^2u/dx1^2{power: 1.0} + -5.0 * u{power: 3.0} + 5.0 * u{power: 1.0} + 0.0 = du/dx0{power: 1.0}'
+    eq_burgers_incorrect = '-1.0 * d^2u/dx0^2{power: 1.0} + 1.5 * u{power: 1.0} + -0.0 = du/dx0{power: 1.0}'
 
-    step = 0.05;
-    steps_num = 320
-    t = np.arange(start=0., stop=step * steps_num, step=step)
-    data = np.load(os.path.join(foldername, 'ode_data.npy'))
+    grid, data = burgers_data(os.path.join(foldername, 'burgers.mat'))
     noised_data = noise_data(data, noise_level)
-    data_nn = load_pretrained_PINN(os.path.join(foldername, 'ode_0_ann.pickle')).cuda()
+    # data_nn = load_pretrained_PINN(os.path.join(foldername, 'ac_ann_pretrained.pickle'))
 
-    dimensionality = 0
-
-    trig_tokens = TrigonometricTokens(freq=(2 - 1e-8, 2 + 1e-8),
-                                      dimensionality=dimensionality)
-    grid_tokens = GridTokens(['x_0', ], dimensionality=dimensionality, max_power=2)
+    print('Shapes:', data.shape, grid[0].shape)
+    dimensionality = 1
 
     epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=10,
-                                 coordinate_tensors=[t,], verbose_params={'show_iter_idx': True},
-                                 device='cuda')
+                                 coordinate_tensors=((grid[0], grid[1])), verbose_params={'show_iter_idx': True},
+                                 device='cpu')
 
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
 
-    epde_search_obj.create_pool(data=noised_data, variable_names=['u', ], max_deriv_order=(2,),
-                                additional_tokens=[grid_tokens, trig_tokens], data_nn=data_nn)
+    epde_search_obj.create_pool(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 2),
+                                additional_tokens=[])
 
-    assert compare_equations(eq_ode_symbolic, eq_ode_incorrect, epde_search_obj)
+    assert compare_equations(eq_burgers_symbolic, eq_burgers_incorrect, epde_search_obj)
 
 
-def ODE_discovery(foldername, noise_level):
-    step = 0.05
-    steps_num = 320
-    t = np.arange(start=0., stop=step * steps_num, step=step)
-    data = np.load(os.path.join(foldername, 'ode_data.npy'))
+def burgers_discovery(foldername, noise_level):
+    grid, data = burgers_data(os.path.join(foldername, 'burgers.mat'))
     noised_data = noise_data(data, noise_level)
-    data_nn = load_pretrained_PINN(os.path.join(foldername, 'ode_0_ann.pickle')).cpu()
+    data_nn = load_pretrained_PINN(os.path.join(foldername, f'kdv_{noise_level}_ann.pickle'))
 
-    dimensionality = 0
+    dimensionality = data.ndim - 1
 
-    trig_tokens = TrigonometricTokens(freq=(2 - 1e-8, 2 + 1e-8),
-                                      dimensionality=dimensionality)
-    grid_tokens = GridTokens(['x_0', ], dimensionality=dimensionality, max_power=2)
+    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True,
+                                      use_pic=True, boundary=20,
+                                      coordinate_tensors=grid, device='cuda')
 
-    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=10,
-                                 coordinate_tensors=[t,], verbose_params={'show_iter_idx': True},
-                                 device='cuda')
-
+    # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
+    #                                     preprocessor_kwargs={'epochs_max' : 1e3})
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
-
     popsize = 8
-    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=15)
+
+    epde_search_obj.set_moeadd_params(population_size=popsize,
+                                      training_epochs=15)
+
+    custom_grid_tokens = CacheStoredTokens(token_type='grid',
+                                                token_labels=['t', 'x'],
+                                                token_tensors={'t': grid[0], 'x': grid[1]},
+                                                params_ranges={'power': (1, 1)},
+                                                params_equality_ranges=None)
+
+    trig_params_ranges = {'power': (1, 1)}
+    trig_params_equal_ranges = {}
+
+    trig_tokens = TrigonometricTokens(dimensionality=dimensionality, freq = (0.999, 1.001))
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
-    epde_search_obj.fit(data=[noised_data, ], variable_names=['u', ], max_deriv_order=(2, 2),
-                        equation_terms_max_number=5, data_fun_pow=1,
-                        additional_tokens=[trig_tokens, grid_tokens],
+    bounds = (1e-5, 1e-0)
+    epde_search_obj.fit(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 3), derivs=None,
+                        equation_terms_max_number=5, data_fun_pow=3,
+                        additional_tokens=[],
                         equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-12, 1e-4), data_nn=data_nn) #
+                        eq_sparsity_interval=bounds, fourier_layers=False) #
 
     epde_search_obj.equations(only_print=True, num=1)
-
-    # import pickle
-    # fname = os.path.join(r'C:\Users\user\EPDE_tests\models', 'ode_0_ann.pickle')
-    # with open(fname, 'wb') as output_file:
-    #     pickle.dump(global_var.solution_guess_nn, output_file)
     epde_search_obj.visualize_solutions()
-    return epde_search_obj
 
-def ODE_simple_discovery(foldername, noise_level):
-    C = 1.3
-    t = np.linspace(0, 4 * np.pi, 200)
-    x = np.sin(t) + C * np.cos(t)
-    x_dot = np.cos(t) - C * np.sin(t)
-    x_dot_dot = -np.sin(t) - C * np.cos(t)
-    x_dot_dot_dot = -np.cos(t) + C * np.sin(t)
-
-    dimensionality = x.ndim - 1
-
-    trig_tokens = TrigonometricTokens(freq = (0.999, 1.001),
-                                      dimensionality=dimensionality)
-    grid_tokens = GridTokens(['x_0', ], dimensionality=dimensionality, max_power=2)
-
-    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=10,
-                                 coordinate_tensors=[t,], verbose_params={'show_iter_idx': True},
-                                 device='cuda')
-
-    epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
-                                     preprocessor_kwargs={})
-
-    popsize = 8
-    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=15)
-
-    factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
-
-    epde_search_obj.fit(data=[x, ], variable_names=['u', ], max_deriv_order=(1, 2),
-                        equation_terms_max_number=5, data_fun_pow=1,
-                        additional_tokens=[trig_tokens, grid_tokens],
-                        equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-6, 1e-0)) #
-
-    epde_search_obj.equations(only_print=True, num=1)
-
-    # import pickle
-    # fname = os.path.join(r'C:\Users\user\EPDE_tests\models', 'ode_0_ann.pickle')
-    # with open(fname, 'wb') as output_file:
-    #     pickle.dump(global_var.solution_guess_nn, output_file)
-    epde_search_obj.visualize_solutions()
     return epde_search_obj
 
 
@@ -220,9 +179,7 @@ if __name__ == "__main__":
 
     # Paths
     directory = os.path.dirname(os.path.realpath(__file__))
-    ode_folder_name = os.path.join(directory)
+    burgers_folder_name = os.path.join(directory)
 
-    # ODE_test(fit_operator, ode_folder_name, 0)
-    # ODE_discovery(ode_folder_name, 0)
-    ODE_simple_discovery(ode_folder_name, 0)
-
+    # burgers_test(fit_operator, burgers_folder_name, 0)
+    burgers_discovery(burgers_folder_name, 0)

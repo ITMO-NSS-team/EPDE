@@ -108,7 +108,7 @@ def lv_discovery(noise_level):
                                      preprocessor_kwargs={})
 
     popsize = 8
-    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=100)
+    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=30)
 
     factors_max_number = {'factors_num': [1, 2], 'probas' : [0.8, 0.2]}
 
