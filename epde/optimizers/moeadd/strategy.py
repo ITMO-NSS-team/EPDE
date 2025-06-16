@@ -64,6 +64,7 @@ class MOEADDDirector(OptimizationPatternDirector):
         fitness_cond = lambda x: not getattr(x, 'fitness_calculated')
         if use_solver:
             fitness_lightweight = L2LRFitness(['penalty_coeff'])
+            add_kwarg_to_operator(operator = fitness_lightweight)
             fitness_lightweight.set_suboperators({'sparsity' : sparsity, 'coeff_calc' : coeff_calc})
             right_part_selector.set_suboperators({'fitness_calculation' : fitness_lightweight})
 

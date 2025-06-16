@@ -141,7 +141,7 @@ def vdp_discovery(foldername, noise_level):
                                      preprocessor_kwargs={})
 
     popsize = 8
-    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=5)
+    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=15)
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
@@ -149,7 +149,7 @@ def vdp_discovery(foldername, noise_level):
                         equation_terms_max_number=5, data_fun_pow=2,
                         additional_tokens=[trig_tokens, grid_tokens],
                         equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-12, 1e-4), data_nn=data_nn) #
+                        eq_sparsity_interval=(1e-8, 1e-0), data_nn=data_nn) #
 
     epde_search_obj.equations(only_print=True, num=1)
 
@@ -157,7 +157,7 @@ def vdp_discovery(foldername, noise_level):
     # fname = os.path.join(r'C:\Users\user\EPDE_tests\models', 'ode_0_ann.pickle')
     # with open(fname, 'wb') as output_file:
     #     pickle.dump(global_var.solution_guess_nn, output_file)
-    # epde_search_obj.visualize_solutions()
+    epde_search_obj.visualize_solutions()
     return epde_search_obj
 
 
@@ -179,5 +179,5 @@ if __name__ == "__main__":
 
     vdp_folder_name = os.path.join(directory)
 
-    VdP_test(fit_operator, vdp_folder_name, 0)
-    # vdp_discovery(vdp_folder_name, 0)
+    # VdP_test(fit_operator, vdp_folder_name, 0)
+    vdp_discovery(vdp_folder_name, 0)
