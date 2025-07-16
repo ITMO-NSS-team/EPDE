@@ -860,6 +860,8 @@ class SoEq(moeadd.MOEADDSolution):
         '''
         check_metaparameters(metaparameters)
 
+        self.obj_funs = None
+
         self.metaparameters = metaparameters
         self.tokens_for_eq = TFPool(pool.families_demand_equation)
         self.tokens_supp = TFPool(pool.families_equationless)
