@@ -129,7 +129,7 @@ def wave_discovery(foldername, noise_level):
 
     epde_search_obj = EpdeSearch(use_solver=True, use_pic=True,
                                       boundary=20,
-                                      coordinate_tensors=(grid[..., 0], grid[..., 1]), device='cpu')
+                                      coordinate_tensors=(grid[..., 0], grid[..., 1]), device='cuda')
 
     # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
     #                                     preprocessor_kwargs={'epochs_max' : 1e3})
@@ -184,4 +184,4 @@ if __name__ == "__main__":
     wave_folder_name = os.path.join(directory)
 
     # wave_test(fit_operator, wave_folder_name, 0)
-    wave_discovery(wave_folder_name, 5)
+    wave_discovery(wave_folder_name, 15)
