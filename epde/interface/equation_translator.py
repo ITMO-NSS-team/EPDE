@@ -5,7 +5,7 @@ Created on Fri Aug 20 17:05:58 2021
 
 @author: mike_ubuntu
 """
-from typing import Union
+from typing import Union, List
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
@@ -26,7 +26,7 @@ def translate_equation(text_form, pool, all_vars):
     raise NotImplementedError(f'Equation shall be translated from {type(text_form)}')
 
 @translate_equation.register
-def _(text_form : str, pool, all_vars):
+def _(text_form : str, pool, all_vars: List[str], use_pic: bool = False):
     parsed_text_form = parse_equation_str(text_form)
     term_list = []
     weights = np.empty(len(parsed_text_form) - 1)
@@ -47,26 +47,30 @@ def _(text_form : str, pool, all_vars):
                 max_factors = len(factors)
             term_list.append(Term(pool, passed_term=factors, collapse_powers=False))
 
-    equation = Equation(pool=pool, basic_structure=term_list,
-                        metaparameters={'sparsity': {'optimizable': True, 'value': 1.},
-                                          'terms_number': {'optimizable': False, 'value': len(term_list)},
-                                          'max_factors_in_term': {'optimizable': False, 'value': max_factors}})
+    metaparameters={'terms_number': {'optimizable': False, 'value': len(term_list)},
+                    'max_factors_in_term': {'optimizable': False, 'value': max_factors}}
+    for var_key in all_vars:
+        metaparameters[('sparsity', var_key)] = {'optimizable': True, 'value': 1.}
+
+
+    equation = Equation(pool=pool, basic_structure=term_list, var_to_explain = all_vars[0],
+                        metaparameters=metaparameters)
     equation.target_idx = len(term_list) - 1
     equation.weights_internal = weights
-    equation.weights_final = weights
-    system = SoEq(pool = pool, metaparameters={'sparsity': {'optimizable': True, 'value': 1.},
-                                               'terms_number': {'optimizable': False, 'value': len(term_list)},
-                                               'max_factors_in_term': {'optimizable': False, 'value': max_factors}})
+    equation.weights_final = weights    
     
-    structure = {'u' : equation}
-    system.vals = Chromosome(structure, params={key: val for key, val in system.metaparameters.items()
-                                                if val['optimizable']})
+    system = SoEq(pool = pool, metaparameters=metaparameters)
+    system.use_default_multiobjective_function(use_pic = use_pic)
+    system.create(passed_equations = [equation,])
+    # structure = {'u' : equation}
+    # system.vals = Chromosome(structure, params={key: val for key, val in system.metaparameters.items()
+    #                                             if val['optimizable']})
     
     return system
 
 @translate_equation.register
-def _(text_form : dict, pool, all_vars):
-    structure = {}
+def _(text_form : dict, pool, all_vars: List[str], use_pic: bool = False):
+    equations = []
     for var_key, eq_text_form in text_form.items(): 
         parsed_text_form = parse_equation_str(eq_text_form)
         term_list = []
@@ -88,22 +92,25 @@ def _(text_form : dict, pool, all_vars):
                     max_factors = len(factors)
                 term_list.append(Term(pool, passed_term=factors, collapse_powers=False))
     
-        equation = Equation(pool=pool, basic_structure=term_list,
-                            metaparameters={'sparsity': {'optimizable': True, 'value': 1.},
-                                              'terms_number': {'optimizable': False, 'value': len(term_list)},
-                                              'max_factors_in_term': {'optimizable': False, 'value': max_factors}})
+        metaparameters={'terms_number': {'optimizable': False, 'value': len(term_list)},
+                        'max_factors_in_term': {'optimizable': False, 'value': max_factors}}
+        for var_key in all_vars:
+            metaparameters[('sparsity', var_key)] = {'optimizable': True, 'value': 1.}
+
+        equation = Equation(pool = pool, basic_structure = term_list, var_to_explain = var_key,
+                            metaparameters = metaparameters)
         equation.target_idx = len(term_list) - 1
         equation.weights_internal = weights
         equation.weights_final = weights
-        structure[var_key] = equation
+        equations.append(equation)
     
     # structure = {'u' : equation}
 
-    system = SoEq(pool = pool, metaparameters={'sparsity': {'optimizable': True, 'value': 1.},
-                                               'terms_number': {'optimizable': False, 'value': len(term_list)},
-                                               'max_factors_in_term': {'optimizable': False, 'value': max_factors}})
-    system.vals = Chromosome(structure, params={key: val for key, val in system.metaparameters.items()
-                                                if val['optimizable']})
+    system = SoEq(pool = pool, metaparameters=metaparameters)
+    system.use_default_multiobjective_function(use_pic = use_pic)
+    system.create(passed_equations = equations)
+    # system.vals = Chromosome(structure, params={key: val for key, val in system.metaparameters.items()
+    #                                             if val['optimizable']})
     
     return system
 
@@ -152,14 +159,15 @@ def parse_params_str(param_str):
     return params_parsed
 
 class CoeffLessEquation():
-    def __init__(self, lp_terms : Union[list, tuple, dict], rp_term : Union[list, tuple, dict], pool, all_vars):
+    def __init__(self, lp_terms : Union[list, tuple, dict], rp_term : Union[list, tuple, dict], 
+                 pool, all_vars, use_pic: bool = False):
         '''
         ``lp_terms''
         '''
         if isinstance(lp_terms, dict):
             if not len(lp_terms.keys()) == len(rp_term.keys()):
                 raise KeyError(f'Number of left parts {lp_terms.keys()} mismatches right parts {rp_term.keys()}.')
-            structure = {}
+            equations = []
             for variable in rp_term.keys():
                 lp_terms_translated = [Term(pool, passed_term = [parse_factor(factor, pool, all_vars) for factor in term],
                                             collapse_powers=False) for term in lp_terms[variable]]
@@ -173,21 +181,23 @@ class CoeffLessEquation():
                 # print(lr.coef_, lr.intercept_, type(lr.coef_))
                 terms_aggregated = lp_terms_translated + [rp_translated,]
                 max_factors = max([len(term.structure) for term in terms_aggregated])
+
+                metaparameters={'terms_number': {'optimizable': False, 'value': len(term_list)},
+                                'max_factors_in_term': {'optimizable': False, 'value': max_factors}}
+                for var_key in all_vars:
+                    metaparameters[('sparsity', var_key)] = {'optimizable': True, 'value': 1.}
+
                 equation = Equation(pool=pool, basic_structure=terms_aggregated,
-                                    metaparameters={'sparsity'           : {'optimizable': True, 'value': 1.},
-                                                    'terms_number'       : {'optimizable': False, 'value': len(lp_terms[variable]) + 1},
-                                                    'max_factors_in_term': {'optimizable': False, 'value': max_factors}})
+                                    metaparameters=metaparameters)
                                     # terms_number=len(lp_terms) + 1, max_factors_in_term=max_factors)
                 equation.target_idx = len(terms_aggregated) - 1
                 equation.weights_internal = np.append(lr.coef_, lr.intercept_)
                 equation.weights_final = np.append(lr.coef_, lr.intercept_)
-                structure[variable] = equation
-            self.system = SoEq(pool = pool, metaparameters={'sparsity': {'optimizable': True, 'value': 1.},
-                               'terms_number': {'optimizable': False, 'value': 1}, # TODO: better terms number init
-                               'max_factors_in_term': {'optimizable': False, 'value': max_factors}})
-            self.system.vals = Chromosome(structure, params={key: val for key, val in self.system.metaparameters.items()
-                                          if val['optimizable']})
+                equations.append(equation)
 
+            self.system = SoEq(pool = pool, metaparameters=metaparameters)
+            self.system.use_default_multiobjective_function(use_pic = use_pic)
+            self.system.create(equations)
 
         else:
             self.lp_terms_translated = [Term(pool, passed_term = [parse_factor(factor, pool, all_vars) for factor in term],
@@ -202,17 +212,19 @@ class CoeffLessEquation():
             # print(lr.coef_, lr.intercept_, type(lr.coef_))
             terms_aggregated = self.lp_terms_translated + [self.rp_translated,]
             max_factors = max([len(term.structure) for term in terms_aggregated])
+
+            metaparameters={'terms_number': {'optimizable': False, 'value': len(term_list)},
+                            'max_factors_in_term': {'optimizable': False, 'value': max_factors}}
+            for var_key in all_vars:
+                metaparameters[('sparsity', var_key)] = {'optimizable': True, 'value': 1.}
+
+
             self.equation = Equation(pool=pool, basic_structure=terms_aggregated,
-                                     metaparameters={'sparsity'           : {'optimizable': True,  'value': 1.},
-                                                     'terms_number'       : {'optimizable': False, 'value': len(lp_terms) + 1},
-                                                     'max_factors_in_term': {'optimizable': False, 'value': max_factors}})
+                                     metaparameters=metaparameters)
                                     # terms_number=len(lp_terms) + 1, max_factors_in_term=max_factors)
             self.equation.target_idx = len(terms_aggregated) - 1
             self.equation.weights_internal = np.append(lr.coef_, lr.intercept_)
             self.equation.weights_final = np.append(lr.coef_, lr.intercept_)
-            self.system = SoEq(pool = pool, metaparameters={'sparsity': {'optimizable': True, 'value': 1.},
-                              'terms_number': {'optimizable': False, 'value': len(max())},
-                              'max_factors_in_term': {'optimizable': False, 'value': max_factors}})
-            self.system.vals = Chromosome({'u': self.equation},
-                                          params={key: val for key, val in self.system.metaparameters.items()
-                                          if val['optimizable']})
+            self.system = SoEq(pool = pool, metaparameters=metaparameters)
+            self.system.use_default_multiobjective_function(use_pic = use_pic)
+            self.system.create(equations)

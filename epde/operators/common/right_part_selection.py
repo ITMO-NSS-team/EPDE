@@ -52,7 +52,7 @@ class EqRightPartSelector(CompoundOperator):
             if not objective.contains_deriv(objective.main_var_to_explain):
                 objective.restore_property(deriv = True)
             if not objective.contains_variable(objective.main_var_to_explain):
-                objective.restore_property(mandatory_family = True)
+                objective.restore_property(mandatory_family = objective.main_var_to_explain)
                 
             
                 
