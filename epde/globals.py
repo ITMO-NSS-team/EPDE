@@ -17,6 +17,7 @@ import torch
 from epde.cache.cache import Cache
 from epde.cache.ctrl_cache import ControlNNContainer
 from epde.supplementary import create_solution_net, AutogradDeriv
+from epde.preprocessing.smoothers import NN
 
 
 def init_caches(set_grids: bool = False, device = 'cpu'):
@@ -135,7 +136,7 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: b
                        derivs: List[Union[int, List, Union[np.ndarray]]] = None, 
                        penalised_derivs: List[Union[int, List]] = None,
                        epochs_max=1e3, predefined_ann: torch.nn.Sequential = None,
-                       batch_frac=0.5, learining_rate=1e-4, device = 'cpu', 
+                       batch_frac=0.5, learining_rate=1e-6, device = 'cpu',
                        use_fourier: bool = True, fourier_params: dict = {'L' : [4,], 'M' : [3,]}): 
     '''
     Represent the data with ANN, suitable to be used as the initial guess of the candidate equations solutions 
@@ -149,6 +150,8 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: b
     if predefined_ann is None:
         model = create_solution_net(equations_num=len(data), domain_dim=len(grids), device = device,
                                     use_fourier=use_fourier, fourier_params=fourier_params)
+        # model = NN(Num_Hidden_Layers=5, Neurons_Per_Layer=50, Input_Dim=len(grids), Activation_Function='Tanh')
+
     else:
         model = predefined_ann
 
@@ -162,6 +165,7 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: b
 
         batch_size = int(data[0].size * batch_frac)
         optimizer = torch.optim.Adam(model.parameters(), lr = learining_rate)
+        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 2000, gamma=0.5)
         deriv_calc = AutogradDeriv()
 
         t = 0
@@ -205,6 +209,7 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: b
                 loss.backward()
                 optimizer.step()
                 loss_list.append(loss.item())
+            scheduler.step()
             loss_mean = np.mean(loss_list)
             if loss_mean < min_loss:
                 best_model = model

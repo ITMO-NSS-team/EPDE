@@ -127,7 +127,7 @@ def wave_discovery(foldername, noise_level):
 
     dimensionality = data.ndim - 1
 
-    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True,
+    epde_search_obj = EpdeSearch(use_solver=True, use_pic=True,
                                       boundary=20,
                                       coordinate_tensors=(grid[..., 0], grid[..., 1]), device='cuda')
 
@@ -159,7 +159,7 @@ def wave_discovery(foldername, noise_level):
                         equation_terms_max_number=5, data_fun_pow=3,
                         additional_tokens=[],
                         equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=bounds, fourier_layers=False, data_nn=data_nn) #
+                        eq_sparsity_interval=bounds, fourier_layers=False) # , data_nn=data_nn
 
     epde_search_obj.equations(only_print=True, num=1)
     epde_search_obj.visualize_solutions()
@@ -184,4 +184,4 @@ if __name__ == "__main__":
     wave_folder_name = os.path.join(directory)
 
     # wave_test(fit_operator, wave_folder_name, 0)
-    wave_discovery(wave_folder_name, 0)
+    wave_discovery(wave_folder_name, 15)
