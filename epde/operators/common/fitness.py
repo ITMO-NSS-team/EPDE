@@ -471,25 +471,29 @@ class PIC(CompoundOperator):
                     features_vals.append(eq.structure[i].evaluate(False))
                     nonzero_features_indexes.append(idx)
 
-            if len(features_vals) == 0:
-                lr = 0
-
-            elif target_vals.ndim == 1:
+            if target_vals.ndim == 1:
                 window_size = len(target_vals) // 2
                 num_horizons = len(target_vals) - window_size + 1
                 eq_window_weights = []
                 features = self.feature_reshape(features_vals)
                 # Compute coefficients and collect statistics over horizons
-                for start_idx in range(num_horizons):
-                    end_idx = start_idx + window_size
-                    target_window = target_vals[start_idx:end_idx]
-                    feature_window = features[start_idx:end_idx, :]
-                    estimator = LinearRegression(fit_intercept=False)
-                    estimator.fit(feature_window, target_window, sample_weight=self.g_fun_vals[start_idx:end_idx])
-                    valuable_weights = estimator.coef_[:-1]
-                    eq_window_weights.append(valuable_weights)
-                eq_cv = np.array([np.abs(np.std(_) / np.mean(_)) for _ in zip(*eq_window_weights)])
-                lr = eq_cv.mean()
+                if len(features_vals) == 0:
+                    for start_idx in range(num_horizons):
+                        end_idx = start_idx + window_size
+                        target_window = target_vals[start_idx:end_idx]
+                        eq_window_weights.append(np.abs(np.std(target_window) / np.mean(target_window)))
+                    lr = np.mean(eq_window_weights)
+                else:
+                    for start_idx in range(num_horizons):
+                        end_idx = start_idx + window_size
+                        target_window = target_vals[start_idx:end_idx]
+                        feature_window = features[start_idx:end_idx, :]
+                        estimator = LinearRegression(fit_intercept=False)
+                        estimator.fit(feature_window, target_window, sample_weight=self.g_fun_vals[start_idx:end_idx])
+                        valuable_weights = estimator.coef_[:-1]
+                        eq_window_weights.append(valuable_weights)
+                    eq_cv = np.array([np.abs(np.std(_) / np.mean(_)) for _ in zip(*eq_window_weights)])
+                    lr = eq_cv.mean()
 
             elif target_vals.ndim == 2:
                 lr = 0
@@ -499,6 +503,15 @@ class PIC(CompoundOperator):
                     num_horizons = target_vals.shape[dim] - window_size + 1
                     features = self.feature_reshape(features_vals)
                     # Compute coefficients and collect statistics over horizons
+                    if len(features_vals) == 0:
+                        for start_idx in range(num_horizons):
+                            end_idx = start_idx + window_size
+                            if dim == 0:
+                                target_window = target_vals[start_idx:end_idx, :].reshape(-1)
+                            else:
+                                target_window = target_vals[:, start_idx:end_idx].reshape(-1)
+                            eq_window_weights.append(np.abs(np.std(target_window) / np.mean(target_window)))
+                        lr += np.mean(eq_window_weights)
                     for start_idx in range(num_horizons):
                         end_idx = start_idx + window_size
                         estimator = LinearRegression(fit_intercept=False)
@@ -531,6 +544,17 @@ class PIC(CompoundOperator):
                     num_horizons = target_vals.shape[dim] - window_size + 1
                     features = self.feature_reshape(features_vals)
                     # Compute coefficients and collect statistics over horizons
+                    if len(features_vals) == 0:
+                        for start_idx in range(num_horizons):
+                            end_idx = start_idx + window_size
+                            if dim == 0:
+                                target_window = target_vals[start_idx:end_idx, :, :].reshape(-1)
+                            elif dim == 1:
+                                target_window = target_vals[:, start_idx:end_idx, :].reshape(-1)
+                            else:
+                                target_window = target_vals[:, :, start_idx:end_idx].reshape(-1)
+                            eq_window_weights.append(np.abs(np.std(target_window) / np.mean(target_window)))
+                        lr += np.mean(eq_window_weights)
                     for start_idx in range(num_horizons):
                         end_idx = start_idx + window_size
                         estimator = LinearRegression(fit_intercept=False)
