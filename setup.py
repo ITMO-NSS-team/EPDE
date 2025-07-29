@@ -36,7 +36,7 @@ def get_requirements():
 
 setup(
       name = 'epde',
-      version = '1.2.17',
+      version = '1.2.19',
       description = SHORT_DESCRIPTION,
       long_description="PLACEHOLDER",
 #      long_description_content_type='text/x-rst',
@@ -48,14 +48,16 @@ setup(
               'License :: OSI Approved :: MIT License',
               'Operating System :: OS Independent',
       ],
-      packages = find_packages(include = ['epde', 'epde.cache', 'epde.interface', 
+      packages = find_packages(include = ['epde', 'epde.cache', 'epde.control', 
+                                          'epde.interface', 'epde.integrate',
                                           'epde.optimizers', 'epde.optimizers.moeadd', 
                                           'epde.optimizers.single_criterion', 'epde.operators.common',
                                           'epde.operators', 'epde.operators.utils',
                                           'epde.operators.utils.parameters',
                                           'epde.operators.multiobjective', 
                                           'epde.operators.singleobjective', 'epde.preprocessing', 
-                                          'epde.parametric', 'epde.structure', 'epde.solver']),
+                                          'epde.parametric', 'epde.structure', 
+                                          'epde.solver', 'epde.solver.callbacks', 'epde.solver.optimizers']),
       include_package_data = True,                               
       python_requires =' >=3.8',
       )

@@ -60,10 +60,10 @@ class LASSOSparsity(CompoundOperator):
         # print(f'Metaparameter: {objective.metaparameters}, objective.metaparameters[("sparsity", objective.main_var_to_explain)]')
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
-        estimator = Lasso(alpha = objective.metaparameters[('sparsity', objective.main_var_to_explain)]['value'], 
-                          copy_X=True, fit_intercept=True, max_iter=1000, 
+        estimator = Lasso(alpha = objective.metaparameters[('sparsity', objective.main_var_to_explain)]['value'],
+                          copy_X=True, fit_intercept=True, max_iter=1000,
                           positive=False, precompute=False, random_state=None,
-                          selection='cyclic', tol=0.0001, warm_start=False)
+                          selection='random', tol=0.0001, warm_start=False)
         _, target, features = objective.evaluate(normalize = True, return_val = False)
         self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)
 
@@ -72,3 +72,5 @@ class LASSOSparsity(CompoundOperator):
 
     def use_default_tags(self):
         self._tags = {'sparsity', 'gene level', 'no suboperators', 'inplace'}
+
+        

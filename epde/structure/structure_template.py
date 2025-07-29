@@ -8,7 +8,10 @@ Created on Tue Jul 26 13:38:20 2022
 
 import numpy as np
 from functools import reduce
-
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 
 def check_uniqueness(obj, background):
     return not any([elem == obj for elem in background])
@@ -19,7 +22,13 @@ class ComplexStructure(object):
         self._history = ''
         self.structure = None
         self.interelement_operator = interelement_operator
-
+    
+    def manual_reconst(self, attribute:str, value, except_attrs:dict):
+        from epde.loader import obj_to_pickle, attrs_from_dict        
+        supported_attrs = []
+        if attribute not in supported_attrs:
+            raise ValueError(f'Attribute {attribute} is not supported by manual_reconst method.')
+    
     def __eq__(self, other):
         if type(other) != type(self):
             raise ValueError('Type of self and other are different')
@@ -42,8 +51,12 @@ class ComplexStructure(object):
         if len(self.structure) == 1:
             return self.structure[0].evaluate(structural)
         else:
-            return reduce(lambda x, y: self.interelement_operator(x, y.evaluate(structural)),
-                          self.structure[1:], self.structure[0].evaluate(structural))
+            try:
+                return reduce(lambda x, y: self.interelement_operator(x, y.evaluate(structural)),
+                              self.structure[1:], self.structure[0].evaluate(structural))
+            except ValueError:
+                print([element.name for element in self.structure])
+                raise ValueError('operands could not be broadcast together with shapes')
 
     def reset_saved_state(self):
         self.saved = {True: False, False: False}

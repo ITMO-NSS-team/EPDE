@@ -8,6 +8,8 @@ Created on Mon Jul  5 18:48:23 2021
 
 import numpy as np
 from functools import partial
+from sklearn.linear_model import LinearRegression
+import epde.globals as global_var
 
 
 def generate_partial(obj_function, equation_key):
@@ -28,8 +30,6 @@ def equation_fitness(system, equation_key):
         error : float.
         The value of the error metric.
     '''
-    # print(f'System, for which we evaluate fitness: {system.text_form}')
-    # print(f'For equation key {equation_key}, {system.vals[equation_key].fitness_calculated}')
     assert system.vals[equation_key].fitness_calculated, 'Trying to call fitness before its evaluation.'
     res = system.vals[equation_key].fitness_value
     return res
@@ -95,6 +95,17 @@ def equation_complexity_by_factors(system, equation_key):
         else:
             eq_compl += complexity_deriv(term.structure)
     return eq_compl
+
+
+def equation_terms_stability(system, equation_key):
+    assert system.vals[equation_key].stability_calculated
+    res = system.vals[equation_key].coefficients_stability
+    return res
+
+def equation_aic(system, equation_key):
+    assert system.vals[equation_key].aic_calculated
+    res = system.vals[equation_key].aic
+    return res
 
 def complexity_deriv(term_list: list):
     total = 0

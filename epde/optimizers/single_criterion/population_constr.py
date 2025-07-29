@@ -21,7 +21,8 @@ class SystemsPopulationConstructor(object):
         
         self.pool = pool; self.terms_number = terms_number
         self.max_factors_in_term = max_factors_in_term 
-        self.vars_demand_equation = [family.ftype for family in self.pool.families_demand_equation]
+        self.vars_demand_equation = set([family.variable for family in self.pool.families_demand_equation])
+        print('self.vars_demand_equation', self.vars_demand_equation)
         if len(self.vars_demand_equation) > 1:
             raise ValueError('Trying to use single criterion optimization to discover a system of equations.')
         
@@ -45,5 +46,5 @@ class SystemsPopulationConstructor(object):
         except KeyError:
             created_solution.use_default_singleobjective_function()
 
-        created_solution.create_equations()
+        created_solution.create()
         return created_solution

@@ -47,33 +47,35 @@ class EqRightPartSelector(CompoundOperator):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
         if not objective.right_part_selected:
-            max_fitness = 0
-            max_idx = 0
-            if not objective.contains_deriv():
+            min_fitness = np.inf
+            min_idx = 0
+            if not objective.contains_deriv(objective.main_var_to_explain):
                 objective.restore_property(deriv = True)
-            if not objective.contains_family(objective.main_var_to_explain):
-                objective.restore_property(mandatory_family = True)
+            if not objective.contains_variable(objective.main_var_to_explain):
+                objective.restore_property(mandatory_family = objective.main_var_to_explain)
                 
             
                 
             for target_idx, target_term in enumerate(objective.structure):
-                if target_term.contains_family(objective.main_var_to_explain): #target_term.descr_variable_marker:
-                    # target_term.contains_family(equation.main_var_to_explain)
-                    if not objective.structure[target_idx].contains_deriv:
-                        continue
-                    objective.target_idx = target_idx
-                    self.suboperators['fitness_calculation'].apply(objective, arguments = subop_args['fitness_calculation'])
-                    if objective.fitness_value > max_fitness:
-                        max_fitness = objective.fitness_value
-                        max_idx = target_idx
-                    else:
-                        pass
+                if not objective.structure[target_idx].contains_deriv(objective.main_var_to_explain):
+                    continue
+                objective.target_idx = target_idx
+                # self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
+                # self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
+                fitness = self.suboperators['fitness_calculation'].apply(objective,
+                                                                            arguments = subop_args['fitness_calculation'],
+                                                                            force_out_of_place = True)
+                if fitness < min_fitness:
+                    min_fitness = fitness
+                    min_idx = target_idx
+                else:
+                    pass
 
-            objective.target_idx = max_idx
+            objective.target_idx = min_idx
             objective.reset_explaining_term(objective.target_idx)
-            self.suboperators['fitness_calculation'].apply(objective, arguments = subop_args['fitness_calculation'])
-            if not np.isclose(objective.fitness_value, max_fitness) and global_var.verbose.show_warnings:
-                warnings.warn('Reevaluation of fitness function for equation has obtained different result. Not an error, if ANN DE solver is used.')
+            # self.suboperators['fitness_calculation'].apply(objective, arguments = subop_args['fitness_calculation'])
+            # if not np.isclose(objective.fitness_value, max_fitness) and global_var.verbose.show_warnings:
+            #     warnings.warn('Reevaluation of fitness function for equation has obtained different result. Not an error, if ANN DE solver is used.')
             objective.right_part_selected = True
 
     def use_default_tags(self):
@@ -112,7 +114,7 @@ class RandomRHPSelector(CompoundOperator):
 
         if not objective.right_part_selected:
             term_selection = [term_idx for term_idx, term in enumerate(objective.structure)
-                              if term.contains_deriv(family = objective.main_var_to_explain)]
+                              if term.contains_deriv(variable = objective.main_var_to_explain)]
             
             if len(term_selection) == 0:
                 idx = np.random.choice([term_idx for term_idx, _ in enumerate(objective.structure)])
@@ -121,7 +123,7 @@ class RandomRHPSelector(CompoundOperator):
                     candidate_term = Term(pool = prev_term.pool, mandatory_family = objective.main_var_to_explain,
                                           max_factors_in_term = len(prev_term.structure), 
                                           create_derivs = True)
-                    if candidate_term.contains_deriv(family = objective.main_var_to_explain):
+                    if candidate_term.contains_deriv(variable = objective.main_var_to_explain):
                         break
                 
                 objective.structure[idx] = candidate_term

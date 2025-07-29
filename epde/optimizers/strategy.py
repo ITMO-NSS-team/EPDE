@@ -18,13 +18,20 @@ class Strategy():
 
     Attributes:
         suppress_structure_check (`boolean`): flag about checking of structure
-        blocks (`dict`): ductuonary with operators for the strategy
-        linked_blocks (`LinkedBlocks`): the sequence (not necessarily chain: divergencies can be present) of blocks with evolutionary operators
-        run_performed (`boolean`): flag, that strategy was running (exclude the possibility of taking a result from a strategy that has not been applied)        
+        blocks (`dict`): dictionary with operators for the strategy
+        linked_blocks (`LinkedBlocks`): the sequence (not necessarily chain: divergencies can be present)
+                                        of blocks with evolutionary operators
+        run_performed (`boolean`): flag, that strategy was running (exclude the possibility of taking a 
+                                   result from a strategy that has not been applied)        
+
     """
     def __init__(self):
         self._blocks = dict()
         self._linked_blocks = None
+        self.suppress_structure_check = True
+        self.run_performed = False
+        # self.best_objectives = [0.,]
+        # best_objectives (`float`): best objectives for each criteria, employed in optimization.        
         
     def create_linked_blocks(self, blocks = None, suppress_structure_check = False):
         """

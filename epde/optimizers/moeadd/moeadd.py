@@ -8,7 +8,7 @@ import numpy as np
 import warnings
 from itertools import chain
 
-from typing import Union
+from typing import Union, List
 
 def flatten_chain(matrix):
     return list(chain.from_iterable(matrix))
@@ -17,6 +17,7 @@ def flatten_chain(matrix):
 # from functools import reduce
 
 import epde.globals as global_var
+from epde.structure.main_structures import SoEq
 from epde.optimizers.moeadd.population_constr import SystemsPopulationConstructor
 from epde.optimizers.moeadd.vis import ParetoVisualizer
 
@@ -52,7 +53,7 @@ class ParetoLevels(object):
     
     '''
     def __init__(self, population, sorting_method = fast_non_dominated_sorting, 
-                 update_method = ndl_update, initial_sort : bool = False):
+                 update_method = ndl_update, initial_sort = False):
         """
         Args:
             population (`list`): List with the elements - canidate solutions of the case-specific subclass of 
@@ -63,13 +64,31 @@ class ParetoLevels(object):
                 The method of point addition into the population and onto the non-dominated levels.
         """
         self._sorting_method = sorting_method
-        self.population = [] #population
+        self.population = []
         self._update_method = update_method
-        self.unplaced_candidates = population # tabulation deleted
-        
+        self.unplaced_candidates = population
+    
+    def manual_reconst(self, attribute:str, value, except_attrs:dict):
+        from epde.loader import attrs_from_dict
+        supported_attrs = ['population']
+        if attribute not in supported_attrs:
+            raise ValueError(f'Attribute {attribute} is not supported by manual_reconst method.')
+            
+        if attribute == 'population':
+            self.population = []
+            for system_elem in value:
+                system = SoEq.__new__(SoEq)
+                attrs_from_dict(system, system_elem, except_attrs)
+                self.population.append(system)
+        self.levels = self.sort()
+    
+    def attrs_from_dict(self, attributes, except_keys = ['obj_type']):
+        self.__dict__ = {key : item for key, item in attributes.items()
+                         if key not in except_keys}
+    
     @property
     def levels(self):
-        return self._levels     #sort(self.population)
+        return self._levels
     
     @levels.setter
     def levels(self, value : list):
@@ -87,10 +106,10 @@ class ParetoLevels(object):
         """
         while self._unplaced_candidates:
             self.population.append(self._unplaced_candidates.pop())
-        if any([any([candidate == other_candidate for other_candidate in self.population[:idx] + self.population[idx+1:]])
-                for idx, candidate in enumerate(self.population)]):
-            print([candidate.text_form for candidate in self.population])
-            raise Exception('Duplicating initial candidates')
+        # if any([any([candidate == other_candidate for other_candidate in self.population[:idx] + self.population[idx+1:]])
+                # for idx, candidate in enumerate(self.population)]):
+            # print([candidate.text_form for candidate in self.population])
+            # raise Exception('Duplicating initial candidates')
         self.levels = self.sort()
 
     def sort(self):
@@ -120,7 +139,6 @@ class ParetoLevels(object):
         Returns:
             None
         """
-        # print(f'IN MOEADD UPDATE {point.text_form}')        
         self.levels = self._update_method(point, self.levels)
         self.population.append(point)
  
@@ -133,12 +151,14 @@ class ParetoLevels(object):
 
         Returns:
             None
-        """        
+        """
+        duplcates_count = {i: self.population.count(i) for i in self.population}
+
         new_levels = []
         for level in self.levels:
             temp = []
             for element in level:
-                if element != point:
+                if element != point or duplcates_count.get(element) == 2 and element not in temp:
                     temp.append(element)
             if not len(temp) == 0:
                 new_levels.append(temp)
@@ -146,7 +166,7 @@ class ParetoLevels(object):
         population_cleared = []
 
         for elem in self.population:
-            if elem != point:
+            if elem != point or duplcates_count.get(elem) == 2 and elem not in population_cleared:
                 population_cleared.append(elem)
                 
         if len(population_cleared) != sum([len(level) for level in new_levels]):
@@ -240,8 +260,10 @@ class MOEADDOptimizer(object):
     and evolutionary operator contains mutation and crossover suboperators.
     
     """
-    def __init__(self, population_instruct, weights_num, pop_size, solution_params, delta, neighbors_number, 
-                 nds_method = fast_non_dominated_sorting, ndl_update = ndl_update): # logger: Logger = None, 
+    def __init__(self, population_instruct, weights_num, pop_size, solution_params,
+                 delta: float, neighbors_number: int,
+                 nds_method = fast_non_dominated_sorting, ndl_update = ndl_update, 
+                 passed_population: Union[List, ParetoLevels] = None):
         """
         Initialization of the evolutionary optimizer is done with the introduction of 
         initial population of candidate solutions, divided into Pareto non-dominated 
@@ -249,60 +271,79 @@ class MOEADDOptimizer(object):
         another on the same level), and creation of set of weights with a proximity list 
         defined for each of them.
         
-        Args:
-            pop_constructor (``):
-            weights_num (`int`): Number of the weight vectors, dividing the objective function values space. Often, shall be same, as the population size.
-            pop_size (`int`): The size of the candidate solution population.
-            solution_params (`dict`): The dicitionary with the solution parameters, passed into each new created solution during the initialization.
-            delta (`float`): parameter of uniform spacing between the weight vectors; *H = 1 / delta* should be integer - a number of divisions along an objective coordinate axis.
-            neighbors_number (`int`): number of neighboring weight vectors to be considered during the operation of evolutionary operators as the "neighbors" of the processed sectors.
-            nds_method (`callable`): default - ``moeadd.moeadd_supplementary.fast_non_dominated_sorting``
-                Method of non-dominated sorting of the candidate solutions. The default method is implemented according to the article 
-                *K. Deb, A. Pratap, S. Agarwal, and T. Meyarivan, “A fast and elitist multiobjective genetic algorithm: NSGA-II,” IEEE Trans. Evol. Comput.,
-                vol. 6, no. 2, pp. 182–197, Apr. 2002.*
-            ndl_update (`callable`): default - ``moeadd.moeadd_supplementary.ndl_update``
+        Parameters
+        ----------
+        population_instruct : dict
+            Parameters of the individual creation.
+        weights_num : int
+            Number of the weight vectors, dividing the objective function values space. Often, shall be same, as the population size.
+        best_obj : List[int]
+            List of best obtaiable values for each criteria in the optimization problem.
+        pop_size : int 
+            The size of the candidate solution population.
+        solution_params : dict
+            The dicitionary with the solution parameters, passed into each new created solution during the initialization.
+        delta : float
+            The parameter of uniform spacing between the weight vectors; *H = 1 / delta* should be integer - a number of divisions along an objective coordinate axis.
+        neighbors_number : int 
+            The number of neighboring weight vectors to be considered during the operation of evolutionary operators as the "neighbors" of the processed sectors.
+        nds_method : callable, optional
+            Method of non-dominated sorting of the candidate solutions. The default method is implemented according to the article 
+            *K. Deb, A. Pratap, S. Agarwal, and T. Meyarivan, “A fast and elitist multiobjective genetic algorithm: NSGA-II,” IEEE Trans. Evol. Comput.,
+            vol. 6, no. 2, pp. 182–197, Apr. 2002.* The default is ``moeadd.moeadd_supplementary.fast_non_dominated_sorting``
+        ndl_update : callable, optional
                 Method of adding a new solution point into the objective functions space, introduced 
                 to minimize the recalculation of the non-dominated levels for the entire population. 
                 The default method was taken from the *K. Li, K. Deb, Q. Zhang, and S. Kwong, “Efficient non-domination level
                 update approach for steady-state evolutionary multiobjective optimization,” 
                 Dept. Electr. Comput. Eng., Michigan State Univ., East Lansing,
-                MI, USA, Tech. Rep. COIN No. 2014014, 2014.*
+                MI, USA, Tech. Rep. COIN No. 2014014, 2014.* The default - ``moeadd.moeadd_supplementary.ndl_update``
         """
         assert weights_num == pop_size, 'Each individual in population has to correspond to a sector'
         self.abbreviated_search_executed = False
-        soluton_creation_attempts_softmax = 10
-        soluton_creation_attempts_hardmax = 100
+        soluton_creation_attempts= {'softmax' : 10,
+                                    'hardmax' : 100}
+
+        assert (type(solution_params) == type(None) or
+                 type(solution_params) == dict), 'The solution parameters, passed into population constructor must be in dictionary'
 
         pop_constructor = SystemsPopulationConstructor(**population_instruct)
-        
-        assert type(solution_params) == type(None) or type(solution_params) == dict, 'The solution parameters, passed into population constructor must be in dictionary'
-        population = []
-        for solution_idx in range(pop_size):
-            solution_gen_idx = 0
-            while True:
-                if type(solution_params) == type(None): solution_params = {}
-                temp_solution = pop_constructor.create(**solution_params)
-                #TODO: check domain belonging
-                temp_solution.set_domain(solution_idx)
-                if not np.any([temp_solution == solution for solution in population]):
-                    population.append(temp_solution)
-                    print(f'New solution accepted, confirmed {len(population)}/{pop_size} solutions.')
-                    break
-                if solution_gen_idx == soluton_creation_attempts_softmax and global_var.verbose.show_warnings:
-                    print('solutions tried:', solution_gen_idx)
-                    warnings.warn('Too many failed attempts to create unique solutions for multiobjective optimization.\
-                                  Change solution parameters to allow more diversity.')
-                if solution_gen_idx == soluton_creation_attempts_hardmax:
-                    # self.abbreviated_search(population, sorting_method = nds_method, update_method = ndl_update)
-                    # return None
-                    population.append(temp_solution)
-                    print(f'New solution accepted, despite being a dublicate of another solution.\
-                          Confirmed {len(population)}/{pop_size} solutions.')
-                    break                    
-                solution_gen_idx += 1
-        self.pareto_levels = ParetoLevels(population, sorting_method = nds_method, update_method = ndl_update,
-                                          initial_sort = False)
-        
+
+        if (passed_population is None) or isinstance(passed_population, list):
+            population = [] if passed_population is None else passed_population
+            psize = len(population)
+            for solution_idx in range(psize):
+                population[solution_idx].set_domain(solution_idx)
+                pop_constructor.applyToPassed(population[solution_idx], **solution_params)
+
+            for solution_idx in range(pop_size - psize):
+                solution_gen_idx = 0
+                while True:
+                    if type(solution_params) == type(None): solution_params = {}
+                    temp_solution = pop_constructor.create(**solution_params)
+                    temp_solution.set_domain(psize + solution_idx)
+                    if not np.any([temp_solution == solution for solution in population]):
+                        population.append(temp_solution)
+                        print(f'New solution accepted, confirmed {len(population)}/{pop_size} solutions.')
+                        break
+                    if solution_gen_idx == soluton_creation_attempts['softmax'] and global_var.verbose.show_warnings:
+                        print('solutions tried:', solution_gen_idx)
+                        warnings.warn('Too many failed attempts to create unique solutions for multiobjective optimization.\
+                                      Change solution parameters to allow more diversity.')
+                    if solution_gen_idx == soluton_creation_attempts['hardmax']:
+                        population.append(temp_solution)
+                        print(f'New solution accepted, despite being a dublicate of another solution.\
+                              Confirmed {len(population)}/{pop_size} solutions.')
+                        break
+                    solution_gen_idx += 1
+            self.pareto_levels = ParetoLevels(population, sorting_method = nds_method, update_method = ndl_update,
+                                              initial_sort = False)
+        else:
+            if not isinstance(passed_population, ParetoLevels):
+                raise TypeError(f'Incorrect type of the population passed. Expected ParetoLevels object, instead got \
+                                 {type(passed_population)}')
+            self.pareto_levels = passed_population
+                                 
         self.weights = []; weights_size = len(population[0].obj_funs) #np.empty((pop_size, len(optimized_functionals)))
         for weights_idx in range(weights_num):
             while True:
@@ -403,6 +444,7 @@ class MOEADDOptimizer(object):
         """
         self.sector_processer = processer
 
+
     def set_strategy(self, strategy_director):
         builder = strategy_director.builder
         builder.assemble(True)
@@ -458,5 +500,5 @@ class MOEADDOptimizer(object):
     def plot_pareto(self, dimensions:list, **visualizer_kwargs):
         assert len(dimensions) == 2, 'Current approach supports only two dimensional plots'
         visualizer = ParetoVisualizer(self.pareto_levels)
-        visualizer.plot_pareto(dimensions = dimensions, **visualizer_kwargs)
-        
+        # visualizer.plot_pareto(dimensions = dimensions, **visualizer_kwargs)
+        visualizer.plot_pareto_mt(dimensions = dimensions, **visualizer_kwargs)

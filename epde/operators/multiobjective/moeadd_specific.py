@@ -418,14 +418,15 @@ class InitialParetoLevelSorting(CompoundOperator):
         
         if len(objective.population) == 0:
             for idx, candidate in enumerate(objective.unplaced_candidates):
-                while True:
-                    temp_candidate = copy.deepcopy(candidate)
-                    self.suboperators['right_part_selector'].apply(objective = temp_candidate,
-                                                                   arguments = subop_args['right_part_selector'])                
-                    if all([temp_candidate != solution for solution in objective.unplaced_candidates[:idx] + 
-                            objective.unplaced_candidates[idx+1:]]):
-                        objective.unplaced_candidates[idx] = temp_candidate
-                        break
+                # while True:
+                    # temp_candidate = copy.deepcopy(candidate)
+                self.suboperators['right_part_selector'].apply(objective = candidate,
+                                                                arguments = subop_args['right_part_selector'])                
+                    # print('Hah, got ya!')
+                    # if all([temp_candidate != solution for solution in objective.unplaced_candidates[:idx] + 
+                    #         objective.unplaced_candidates[idx+1:]]):
+                    #     objective.unplaced_candidates[idx] = temp_candidate
+                    #     break
                         
                 self.suboperators['chromosome_fitness'].apply(objective = objective.unplaced_candidates[idx],
                                                               arguments = subop_args['chromosome_fitness'])

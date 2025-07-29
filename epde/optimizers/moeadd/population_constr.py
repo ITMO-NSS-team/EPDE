@@ -22,16 +22,25 @@ class SystemsPopulationConstructor(object):
         vars_demand_equation (``):
         sparsity_internal (`tuple`): 
     """
-    def __init__(self, pool, terms_number : int = 8, max_factors_in_term : int = 2, 
+    def __init__(self, pool, use_pic: bool = True, terms_number : int = 8, max_factors_in_term : int = 2, 
                  obj_functions : Callable = None, sparsity_interval : tuple = (0, 1)):
-        self.pool = pool; self.terms_number = terms_number
+        self.pool = pool
+        self.use_pic = use_pic 
+        self.terms_number = terms_number
         self.max_factors_in_term = max_factors_in_term 
-        self.vars_demand_equation = [family.ftype for family in self.pool.families_demand_equation]
+        self.vars_demand_equation = set([family.variable for family in self.pool.families_demand_equation])
         self.sparsity_interval = sparsity_interval
+        print('self.vars_demand_equation', self.vars_demand_equation)        
+
+    def applyToPassed(self, passed_solution: SoEq, **kwargs):
+        try:
+            passed_solution.set_objective_functions(kwargs['obj_funs'])
+        except KeyError:
+            passed_solution.use_default_multiobjective_function()        
 
     def create(self, **kwargs):
-        sparsity = kwargs.get('sparsity', np.exp(np.random.uniform(low = np.log(self.sparsity_interval[0]),
-                                                                      high = np.log(self.sparsity_interval[1]),
+        sparsity = kwargs.get('sparsity', 10 ** (np.random.uniform(low = np.log10(self.sparsity_interval[0]),
+                                                                      high = np.log10(self.sparsity_interval[1]),
                                                                       size = len(self.vars_demand_equation))))
         terms_number = kwargs.get('terms_number', self.terms_number)
         max_factors_in_term = kwargs.get('max_factors_in_term', self.max_factors_in_term)
@@ -47,8 +56,10 @@ class SystemsPopulationConstructor(object):
         try:
             created_solution.set_objective_functions(kwargs['obj_funs'])
         except KeyError:
-            created_solution.use_default_multiobjective_function()
+            created_solution.use_default_multiobjective_function(use_pic=self.use_pic)
 
-        created_solution.create_equations()
+
+
+        created_solution.create()
 
         return created_solution

@@ -196,5 +196,3 @@ class LogLoader(object):
             
             metric_frames.append(pd.DataFrame(data, index = row_labels))
         return metric_frames
-            
-            

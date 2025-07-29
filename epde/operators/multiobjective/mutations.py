@@ -15,7 +15,7 @@ from epde.optimizers.moeadd.moeadd import ParetoLevels
 
 from epde.structure.main_structures import Equation, SoEq, Term
 from epde.structure.structure_template import check_uniqueness
-from epde.supplementary import filter_powers, try_iterable
+from epde.supplementary import filter_powers
 from epde.operators.utils.template import CompoundOperator, add_base_param_to_operator
 
 
