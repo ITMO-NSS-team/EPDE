@@ -745,7 +745,7 @@ class EpdeSearch(object):
             derivs=None, max_deriv_order=1, additional_tokens = None, data_fun_pow: int = 1, deriv_fun_pow: int = 1,
             optimizer: Union[SimpleOptimizer, MOEADDOptimizer] = None, pool: TFPool = None,
             population: List[SoEq] = None, data_nn = None, 
-            fourier_layers: bool = True, fourier_params: dict = {'L' : [4,], 'M' : [3,]}):
+            fourier_layers: bool = False, fourier_params: dict = {'L' : [4,], 'M' : [3,]}):
         """
         Fit epde search algorithm to obtain differential equations, describing passed data.
 

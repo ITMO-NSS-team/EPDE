@@ -151,12 +151,14 @@ class ParetoLevels(object):
 
         Returns:
             None
-        """        
+        """
+        duplcates_count = {i: self.population.count(i) for i in self.population}
+
         new_levels = []
         for level in self.levels:
             temp = []
             for element in level:
-                if element != point:
+                if element != point or duplcates_count.get(element) == 2 and element not in temp:
                     temp.append(element)
             if not len(temp) == 0:
                 new_levels.append(temp)
@@ -164,7 +166,7 @@ class ParetoLevels(object):
         population_cleared = []
 
         for elem in self.population:
-            if elem != point:
+            if elem != point or duplcates_count.get(elem) == 2 and elem not in population_cleared:
                 population_cleared.append(elem)
                 
         if len(population_cleared) != sum([len(level) for level in new_levels]):
