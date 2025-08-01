@@ -485,15 +485,26 @@ class TFPool(object):
                     raise ValueError(
                         'Tring to create a term from an empty pool')
 
-                probabilities = (self.families_cardinality(True, token_status) /
-                                 np.sum(self.families_cardinality(True, token_status)))
-                return np.random.choice(a=self.families_meaningful,
-                                        p=probabilities).create(label=None,
-                                                                token_status=token_status,
-                                                                create_derivs=create_derivs,
-                                                                all_vars = [family.variable for family in 
-                                                                            self.families_demand_equation], 
-                                                                **kwargs)
+                probabilities = (self.families_cardinality(True, token_status)[:-1] /
+                                 np.sum(self.families_cardinality(True, token_status)[:-1]))
+
+                if create_derivs:
+                    obj = self.families_meaningful[-1]
+
+                else:
+                    if len(self.families_meaningful) > 2:
+                        obj = np.random.choice(a=self.families_meaningful[:-1],
+                                         p=probabilities)
+                    else:
+                        obj = self.families_meaningful[0]
+
+                new_obj = obj.create(label=None,
+                                    token_status=token_status,
+                                    create_derivs=create_derivs,
+                                    all_vars = [family.variable for family in
+                                                self.families_demand_equation],
+                                    **kwargs)
+                return new_obj
             else:
                 probabilities = (self.families_cardinality(False, token_status) /
                                  np.sum(self.families_cardinality(False, token_status)))
