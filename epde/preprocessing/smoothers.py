@@ -239,18 +239,14 @@ class NN(torch.nn.Module):
 #
 #     def __call__(self, data, grid, epochs_max=1e3, loss_mean=1000, batch_frac=0.5, learining_rate=1e-2, return_ann: bool = False, device = 'cpu'):
 #         dim = 1 if np.any([s == 1 for s in data.shape]) and data.ndim == 2 else data.ndim
-#         model = baseline_ann(dim)
-#         # model = NN(Num_Hidden_Layers=1, Neurons_Per_Layer=1024, Input_Dim=dim, Activation_Function='Rational')
-#         # model = NN(Num_Hidden_Layers=4, Neurons_Per_Layer=256, Input_Dim=dim, Activation_Function='Sin')
-#         grid_flattened = torch.from_numpy(np.array([subgrid.reshape(-1) for subgrid in grid])).float().T
+#         model = baseline_ann(dim).to(device)
+#         # model = NN(Num_Hidden_Layers=1, Neurons_Per_Layer=1024, Input_Dim=dim, Activation_Function='Rational').to(device)
+#         # model = NN(Num_Hidden_Layers=4, Neurons_Per_Layer=256, Input_Dim=dim, Activation_Function='Sin').to(device)
+#         grid_flattened = torch.from_numpy(np.array([subgrid.reshape(-1) for subgrid in grid])).float().T.to(device)
 #
 #         original_shape = data.shape
 #
-#         field_ = torch.from_numpy(data.reshape(-1, 1)).float()
-#
-#         # device = torch.device(device)
-#         grid_flattened.to(device)
-#         field_.to(device)
+#         field_ = torch.from_numpy(data.reshape(-1, 1)).float().to(device)
 #         optimizer = torch.optim.Adam(model.parameters(), lr=learining_rate)
 #         scheduler = torch.optim.lr_scheduler.StepLR(optimizer, epochs_max//10, gamma=0.5)
 #         # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=1000)
@@ -281,6 +277,10 @@ class NN(torch.nn.Module):
 #             if loss_mean < min_loss:
 #                 best_model = model
 #                 min_loss = loss_mean
+#             # if t % 1000 == 0 and t != 0:
+#             #     print(f"Epoch {t:4d} | Loss: {min_loss:.6e}")
+#             print(f"Epoch {t:4d} | Loss: {min_loss:.6e}")
+#             t += 1
 #
 #         model.load_state_dict(best_model)
 #         model.eval()
@@ -369,7 +369,8 @@ class ANNSmoother(AbstractSmoother):
                 val_pred = model(val_x)
                 val_loss = loss_fn(val_pred, val_y).item()
 
-            print(f"Epoch {epoch:4d} | Loss: {val_loss:.6e}")
+            if epoch % 500 == 0:
+                print(f"Epoch {epoch:4d} | Loss: {val_loss:.6e}")
 
             if val_loss < min_val_loss:
                 min_val_loss = val_loss
