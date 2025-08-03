@@ -119,9 +119,9 @@ class L2LRFitness(CompoundOperator):
         self_args, subop_args = self.parse_suboperator_args(arguments=arguments)
 
         self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
+        self.simplify_equation(objective, subop_args['sparsity'])
         self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
-        print(objective.weights_internal)
-        print(objective.weights_final)
+
         _, target, features = objective.evaluate(normalize=False, return_val=False)
 
         self.get_g_fun_vals()
@@ -302,6 +302,46 @@ class L2LRFitness(CompoundOperator):
             self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)
         except AttributeError:
             self.g_fun_vals = None
+
+    def simplify_equation(self, objective: Equation, arguments: dict):
+        # Remove common terms
+        nonzero_terms_mask = np.array([False if weight == 0 else True for weight in objective.weights_internal],
+                                      dtype=np.integer)
+        nonzero_terms_mask = np.append(nonzero_terms_mask, True)  # Include right side
+        nonzero_terms = [item for item, keep in zip(objective.structure, nonzero_terms_mask) if keep]
+        nonzero_terms_labels = [
+            list(term.cache_label) if not isinstance(term.cache_label[0], tuple) else term.cache_label for term in
+            nonzero_terms]
+        for i in range(len(nonzero_terms_labels)):
+            if isinstance(nonzero_terms_labels[i][0], tuple):
+                nonzero_terms_labels[i] = [list(_) for _ in nonzero_terms_labels[i]]
+            else:
+                nonzero_terms_labels[i] = [nonzero_terms_labels[i]]
+        if len(nonzero_terms_labels) > 1:
+            common_factors = nonzero_terms_labels[0]
+            for common_factor in common_factors:
+                if all([common_factor in term for term in nonzero_terms_labels[1:]]):
+                    for term in nonzero_terms:
+                        common_factor_idx = []
+                        for factor_idx in range(len(term.structure)):
+                            if term.structure[factor_idx].cache_label == tuple(common_factor):
+                                last_removed_mandatory = term.structure[factor_idx].mandatory
+                                last_removed_deriv = term.structure[factor_idx].is_deriv
+                                common_factor_idx.append(factor_idx)
+                        if len(term.structure) == len(common_factor_idx):
+                            term.randomize(mandatory_family=last_removed_mandatory, create_derivs=last_removed_deriv)
+                            term.reset_saved_state()
+                        else:
+                            term.structure = [value for index, value in enumerate(term.structure) if
+                                              index not in common_factor_idx]
+                            term.reset_saved_state()
+                        while objective.structure.count(term) > 1:
+                            term.randomize(mandatory_family=last_removed_mandatory,
+                                           create_derivs=last_removed_deriv)
+                            term.reset_saved_state()
+                    objective.reset_state(reset_right_part=True)
+                    self.apply(objective, arguments)
+                    self.suboperators['sparsity'].apply(objective, arguments)
 
     def use_default_tags(self):
         self._tags = {'fitness evaluation', 'gene level', 'contains suboperators', 'inplace'}
