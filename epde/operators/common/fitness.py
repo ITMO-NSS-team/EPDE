@@ -120,7 +120,8 @@ class L2LRFitness(CompoundOperator):
 
         self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
         self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
-
+        print(objective.weights_internal)
+        print(objective.weights_final)
         _, target, features = objective.evaluate(normalize=False, return_val=False)
 
         self.get_g_fun_vals()
