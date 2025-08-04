@@ -8,8 +8,7 @@ Created on Fri Jun  4 13:35:18 2021
 
 from typing import Union, Callable
 import numpy as np
-from sklearn.linear_model import Lasso, ElasticNet
-from sklearn.preprocessing import normalize
+from sklearn.linear_model import Lasso
 
 import epde.globals as global_var
 from epde.operators.utils.template import CompoundOperator
@@ -65,19 +64,13 @@ class LASSOSparsity(CompoundOperator):
                           copy_X=True, fit_intercept=True, max_iter=1000,
                           positive=False, precompute=False, random_state=None,
                           selection='random', tol=0.0001, warm_start=False)
-
-        # estimator = ElasticNet(alpha=objective.metaparameters[('sparsity', objective.main_var_to_explain)]['value'],
-        #                   copy_X=True, fit_intercept=True, max_iter=1000,
-        #                   positive=False, precompute=False, random_state=None,
-        #                   selection='random', tol=0.0001, warm_start=False)
-
         _, target, features = objective.evaluate(normalize = True, return_val = False)
-        # features = normalize(features)
         self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)
 
         estimator.fit(features, target, sample_weight = self.g_fun_vals)
         objective.weights_internal = estimator.coef_
 
-
     def use_default_tags(self):
         self._tags = {'sparsity', 'gene level', 'no suboperators', 'inplace'}
+
+        

@@ -26,10 +26,10 @@ class PreprocessorSetup:
         self._builder = builder
 
     def build_ANN_preprocessing(self, test_output=False, epochs_max=1e5,
-                                loss_mean=1000, batch_frac=0.8, device='cpu'):
+                                loss_mean=1000, batch_frac=0.8):
         smoother_args = ()
         smoother_kwargs = {'grid': None, 'epochs_max': epochs_max,
-                           'loss_mean': loss_mean, 'batch_frac': batch_frac, 'device': device}
+                           'loss_mean': loss_mean, 'batch_frac': batch_frac}
 
         deriv_calculator_args = ()
         deriv_calculator_kwargs = {'grid': None}
