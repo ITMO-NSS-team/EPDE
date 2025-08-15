@@ -303,45 +303,52 @@ class L2LRFitness(CompoundOperator):
         except AttributeError:
             self.g_fun_vals = None
 
-    def simplify_equation(self, objective: Equation, arguments: dict):
+    def simplify_equation(self, objective: Equation, arguments):
         # Remove common terms
         nonzero_terms_mask = np.array([False if weight == 0 else True for weight in objective.weights_internal],
                                       dtype=np.integer)
         nonzero_terms_mask = np.append(nonzero_terms_mask, True)  # Include right side
         nonzero_terms = [item for item, keep in zip(objective.structure, nonzero_terms_mask) if keep]
-        nonzero_terms_labels = [
-            list(term.cache_label) if not isinstance(term.cache_label[0], tuple) else term.cache_label for term in
-            nonzero_terms]
-        for i in range(len(nonzero_terms_labels)):
-            if isinstance(nonzero_terms_labels[i][0], tuple):
-                nonzero_terms_labels[i] = [list(_) for _ in nonzero_terms_labels[i]]
-            else:
-                nonzero_terms_labels[i] = [nonzero_terms_labels[i]]
-        if len(nonzero_terms_labels) > 1:
-            common_factors = nonzero_terms_labels[0]
-            for common_factor in common_factors:
-                if all([common_factor in term for term in nonzero_terms_labels[1:]]):
-                    for term in nonzero_terms:
-                        common_factor_idx = []
-                        for factor_idx in range(len(term.structure)):
-                            if term.structure[factor_idx].cache_label == tuple(common_factor):
-                                last_removed_mandatory = term.structure[factor_idx].mandatory
-                                last_removed_deriv = term.structure[factor_idx].is_deriv
-                                common_factor_idx.append(factor_idx)
-                        if len(term.structure) == len(common_factor_idx):
-                            term.randomize(mandatory_family=last_removed_mandatory, create_derivs=last_removed_deriv)
-                            term.reset_saved_state()
-                        else:
-                            term.structure = [value for index, value in enumerate(term.structure) if
-                                              index not in common_factor_idx]
-                            term.reset_saved_state()
-                        while objective.structure.count(term) > 1:
-                            term.randomize(mandatory_family=last_removed_mandatory,
-                                           create_derivs=last_removed_deriv)
-                            term.reset_saved_state()
-                    objective.reset_state(reset_right_part=True)
-                    self.apply(objective, arguments)
-                    self.suboperators['sparsity'].apply(objective, arguments)
+        nonzero_terms_labels = [[term.cache_label[0]] if not isinstance(term.cache_label[0], tuple) else list(next(zip(*term.cache_label))) for term in nonzero_terms]
+
+        common_factor = list(set.intersection(*map(set, nonzero_terms_labels)))
+        common_dim = []
+        if common_factor and len(nonzero_terms) > 1:
+            min_order = np.inf
+            for term in nonzero_terms:
+                for factor in term.structure:
+                    if factor.cache_label[0] == common_factor[0]:
+                        if len(factor.params) > 1:
+                            common_dim.append(factor.params[-1])
+                        if factor.cache_label[1][0] < min_order:
+                            min_order = factor.cache_label[1][0]
+
+            if len(set(common_dim)) < 2:
+                for term in nonzero_terms:
+                    factors_simplified = []
+                    for factor in term.structure:
+                        if factor.cache_label[0] == common_factor[0]:
+                            for i, value in enumerate(factor.params_description):
+                                if factor.params_description[i]["name"] == "power":
+                                    factor.params[i] -= min_order
+                            if factor.cache_label[1][0] == 0:
+                                factors_simplified.append(factor)
+                                last_removed_mandatory = factor.mandatory
+                                last_removed_deriv = factor.is_deriv
+                                continue
+                    term.structure = [factor for factor in term.structure if factor not in factors_simplified]
+                    term.reset_saved_state()
+                    if len(term.structure) == 0:
+                        term.randomize()
+                        term.reset_saved_state()
+                        # term.randomize(mandatory_family=last_removed_mandatory, create_derivs=last_removed_deriv)
+                    while objective.structure.count(term) > 1:
+                        term.randomize()
+                        # term.randomize(mandatory_family=term.structure[0].mandatory, create_derivs=term.structure[0].is_deriv)
+                        term.reset_saved_state()
+                objective.reset_state(reset_right_part=True)
+                self.suboperators['right_part_selector'].apply(objective, arguments)
+                # self.simplify_equation(objective, arguments)
 
     def use_default_tags(self):
         self._tags = {'fitness evaluation', 'gene level', 'contains suboperators', 'inplace'}
