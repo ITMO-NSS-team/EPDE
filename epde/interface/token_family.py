@@ -270,16 +270,18 @@ class TokenFamily(object):
         assert self.params_set
         constant_tokens_labels = []
         for label in self.tokens:
-            print(type(global_var.tensor_cache.memory[label + ' power 1']))
-            constancy = test_function(global_var.tensor_cache.memory[label + ' power 1'], **tfkwargs)
+            data_label = (label, (1.0,))
+            data = global_var.tensor_cache.memory_default["numpy"].get(data_label)
+            constancy = np.isclose(np.min(data), np.max(data))
             if constancy:
                 constant_tokens_labels.append(label)
 
         for label in constant_tokens_labels:
             print(f'Function {label} is assumed to be constant in the studied domain. \
-                  Removed from the equaton search.')
+                          Removed from the equaton search.')
+            data_label = (label, (1.0,))
             self.tokens.remove(label)
-            global_var.tensor_cache.delete_entry(label + ' power 1')
+            global_var.tensor_cache.delete_entry(data_label)
 
     def evaluate(self, token):
         """

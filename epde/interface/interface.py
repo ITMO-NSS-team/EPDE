@@ -708,6 +708,8 @@ class EpdeSearch(object):
                                           for tf in additional_tokens])
         print(f'The cardinality of defined token pool is {self.pool.families_cardinality()}')
         print(f'Among them, the pool contains {self.pool.families_cardinality(meaningful_only=True)}')
+        for family in self.pool.families:
+            family.chech_constancy()
         
     def save_derivatives(self, variable:str, deriv:np.ndarray):
         '''
