@@ -361,15 +361,15 @@ class Cache(object):
 
     def delete_entry(self, entry_label):
         print(f'Deleting {entry_label} from cache!')
-        if entry_label not in self.memory_default.keys():
+        if entry_label not in self.memory_default["numpy"].keys():
             raise ValueError('deleted element already not in memory')
-        del self.memory_default[entry_label]
+        del self.memory_default["numpy"][entry_label]
         try:
-            del self.memory_structural[entry_label]
+            del self.memory_structural["numpy"][entry_label]
         except KeyError:
             pass
         try:
-            del self.memory_normalized[entry_label]
+            del self.memory_normalized["numpy"][entry_label]
         except KeyError:
             pass
 

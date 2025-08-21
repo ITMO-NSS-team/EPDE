@@ -201,7 +201,7 @@ class L2LRFitness(CompoundOperator):
                     feature_window = features[start_idx:end_idx, :]
                     estimator = LinearRegression(fit_intercept=False)
                     estimator.fit(feature_window, target_window, sample_weight=self.g_fun_vals[start_idx:end_idx])
-                    valuable_weights = estimator.coef_[:-1]
+                    valuable_weights = estimator.coef_
                     eq_window_weights.append(valuable_weights)
                 eq_cv = np.array([np.abs(np.std(_) / np.mean(_)) for _ in zip(*eq_window_weights)])
                 lr = eq_cv.mean()
@@ -235,7 +235,7 @@ class L2LRFitness(CompoundOperator):
                             target_window = target_vals[:, start_idx:end_idx].reshape(-1)
                             feature_window = features.reshape(*data_shape, -1)[:, start_idx:end_idx].reshape(-1, features.shape[-1])
                             estimator.fit(feature_window, target_window, sample_weight=self.g_fun_vals.reshape(*data_shape, -1)[:, start_idx:end_idx].reshape(-1))
-                        valuable_weights = estimator.coef_[:-1]
+                        valuable_weights = estimator.coef_
                         eq_window_weights.append(valuable_weights)
                     eq_cv = np.array([np.abs(np.std(_) / np.mean(_)) for _ in zip(*eq_window_weights)])
                     lr += eq_cv.mean()
@@ -275,7 +275,7 @@ class L2LRFitness(CompoundOperator):
                             target_window = target_vals[:, :, start_idx:end_idx].reshape(-1)
                             feature_window = features.reshape(*data_shape, -1)[:, :, start_idx:end_idx].reshape(-1, features.shape[-1])
                             estimator.fit(feature_window, target_window, sample_weight=self.g_fun_vals.reshape(*data_shape, -1)[:, :, start_idx:end_idx].reshape(-1))
-                        valuable_weights = estimator.coef_[:-1]
+                        valuable_weights = estimator.coef_
                         eq_window_weights.append(valuable_weights)
                     eq_cv = np.array([np.abs(np.std(_) / np.mean(_)) for _ in zip(*eq_window_weights)])
                     lr += eq_cv.mean()
