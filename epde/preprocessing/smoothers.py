@@ -235,54 +235,93 @@ class NN(torch.nn.Module):
 
 class ANNSmoother(AbstractSmoother):
     def __init__(self):
-        pass
+        super().__init__()  # Optional depending on AbstractSmoother
+        self.model = None
 
-    def __call__(self, data, grid, epochs_max=1e3, loss_mean=1000, batch_frac=0.5, learining_rate=1e-2, return_ann: bool = False, device = 'cpu'):
+    def __call__(self, data, grid, epochs_max=1000, loss_mean=1000, loss_threshold=1e-8,
+                 batch_frac=0.5, val_frac=0.1, learning_rate=1e-3, return_ann=False, device='cpu'):
+        if torch.cuda.is_available():
+            device = "cuda"
+        # Convert to int if passed as float
+        epochs_max = int(epochs_max)
+
+        # Infer input dimension
         dim = 1 if np.any([s == 1 for s in data.shape]) and data.ndim == 2 else data.ndim
-        # model = baseline_ann(dim)
-        # model = NN(Num_Hidden_Layers=1, Neurons_Per_Layer=1024, Input_Dim=dim, Activation_Function='Rational')
-        model = NN(Num_Hidden_Layers=4, Neurons_Per_Layer=256, Input_Dim=dim, Activation_Function='Sin')
-        grid_flattened = torch.from_numpy(np.array([subgrid.reshape(-1) for subgrid in grid])).float().T
 
+        # Initialize model
+        # model = baseline_ann(dim).to(device)
+        model = NN(Num_Hidden_Layers=5, Neurons_Per_Layer=50, Input_Dim=dim, Activation_Function='Sin').to(device)
+        self.model = model
+
+        # Flatten grid and reshape field
+        grid_flattened = torch.from_numpy(np.array([subgrid.reshape(-1) for subgrid in grid])).float().T.to(device)
+        field_ = torch.from_numpy(data.reshape(-1, 1)).float().to(device)
         original_shape = data.shape
 
-        field_ = torch.from_numpy(data.reshape(-1, 1)).float()
+        # Train/val split
+        N = grid_flattened.size(0)
+        val_size = int(N * val_frac)
+        train_size = N - val_size
+        indices = torch.randperm(N)
+        train_idx, val_idx = indices[:train_size], indices[train_size:]
 
-        # device = torch.device(device)
-        grid_flattened.to(device)
-        field_.to(device)
-        optimizer = torch.optim.Adam(model.parameters(), lr=learining_rate)
-        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, epochs_max//10, gamma=0.5)
-        # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=1000)
-        batch_size = int(data.size * batch_frac)
+        train_x, train_y = grid_flattened[train_idx], field_[train_idx]
+        val_x, val_y = grid_flattened[val_idx], field_[val_idx]
 
-        t = 0
+        # Optimizer and scheduler
+        optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=epochs_max // 10, gamma=0.5)
+        # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=0.5)
+        # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs_max // 10)
 
-        min_loss = np.inf
-        while loss_mean > 1e-5 and t < epochs_max:
+        # Loss function
+        loss_fn = torch.nn.MSELoss()
 
-            permutation = torch.randperm(grid_flattened.size()[0])
+        # Batch size
+        batch_size = max(1, int(data.size * batch_frac))
 
-            loss_list = []
+        # Training loop
+        min_val_loss = np.inf
+        best_model_state = None
 
-            for i in range(0, grid_flattened.size()[0]-1, batch_size):
+        model.train()
+        for epoch in range(epochs_max):
+            permutation = torch.randperm(train_x.size(0))
+            train_loss_list = []
+
+            for i in range(0, train_x.size(0)-1, batch_size):
+                indices = permutation[i:i + batch_size]
+                batch_x = train_x[indices]
+                batch_y = train_y[indices]
+
                 optimizer.zero_grad()
-
-                indices = permutation[i:i+batch_size]
-                batch_x, batch_y = grid_flattened[indices], field_[indices]
-
-                loss = torch.mean(torch.abs(batch_y-model(batch_x)))
-
+                pred = model(batch_x)
+                loss = loss_fn(pred, batch_y)
+                # loss = torch.mean(torch.abs(batch_y - pred))
                 loss.backward()
                 optimizer.step()
-                loss_list.append(loss.item())
-            scheduler.step()
-            loss_mean = np.mean(loss_list)
-            if loss_mean < min_loss:
-                best_model = model
-                min_loss = loss_mean
+                train_loss_list.append(loss.item())
 
-        model.load_state_dict(best_model)
+            train_loss = np.mean(train_loss_list)
+            scheduler.step(train_loss)
+
+            with torch.no_grad():
+                val_pred = model(val_x)
+                val_loss = loss_fn(val_pred, val_y).item()
+
+            if epoch % 100 == 0:
+                print(f"Epoch {epoch:4d} | Loss: {val_loss:.6e}")
+
+            if val_loss < min_val_loss:
+                min_val_loss = val_loss
+                best_model_state = model.state_dict()
+
+            if val_loss <= loss_threshold:
+                print(f"Early stopping at epoch {epoch}, loss = {val_loss:.4e}")
+                break
+
+        # Load best model and evaluate
+        model.load_state_dict(best_model_state)
         model.eval()
 
         with torch.no_grad():
@@ -293,104 +332,6 @@ class ANNSmoother(AbstractSmoother):
             return prediction, model
         else:
             return prediction
-
-# class ANNSmoother(AbstractSmoother):
-#     def __init__(self):
-#         super().__init__()  # Optional depending on AbstractSmoother
-#         self.model = None
-#
-#     def __call__(self, data, grid, epochs_max=1000, loss_mean=1000, loss_threshold=1e-8,
-#                  batch_frac=0.5, val_frac=0.2, learning_rate=1e-3, return_ann=False, device='cpu'):
-#
-#         # Convert to int if passed as float
-#         epochs_max = int(epochs_max)
-#
-#         # Infer input dimension
-#         dim = 1 if np.any([s == 1 for s in data.shape]) and data.ndim == 2 else data.ndim
-#
-#         # Initialize model
-#         # model = baseline_ann(dim).to(device)
-#         model = NN(Num_Hidden_Layers=5, Neurons_Per_Layer=50, Input_Dim=dim, Activation_Function='Rational').to(device)
-#         self.model = model
-#
-#         # Flatten grid and reshape field
-#         grid_flattened = torch.from_numpy(np.array([subgrid.reshape(-1) for subgrid in grid])).float().T.to(device)
-#         field_ = torch.from_numpy(data.reshape(-1, 1)).float().to(device)
-#         original_shape = data.shape
-#
-#         # Train/val split
-#         N = grid_flattened.size(0)
-#         val_size = int(N * val_frac)
-#         train_size = N - val_size
-#         indices = torch.randperm(N)
-#         train_idx, val_idx = indices[:train_size], indices[train_size:]
-#
-#         train_x, train_y = grid_flattened[train_idx], field_[train_idx]
-#         val_x, val_y = grid_flattened[val_idx], field_[val_idx]
-#
-#         # Optimizer and scheduler
-#         optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-#         # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=epochs_max // 10, gamma=0.5)
-#         # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=0.5)
-#         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs_max // 10)
-#
-#         # Loss function
-#         loss_fn = torch.nn.MSELoss()
-#
-#         # Batch size
-#         batch_size = max(1, int(data.size * batch_frac))
-#
-#         # Training loop
-#         min_val_loss = np.inf
-#         best_model_state = None
-#
-#         model.train()
-#         for epoch in range(epochs_max):
-#             permutation = torch.randperm(train_x.size(0))
-#             train_loss_list = []
-#
-#             for i in range(0, train_x.size(0)-1, batch_size):
-#                 indices = permutation[i:i + batch_size]
-#                 batch_x = train_x[indices]
-#                 batch_y = train_y[indices]
-#
-#                 optimizer.zero_grad()
-#                 # pred = model(batch_x)
-#                 # loss = loss_fn(pred, batch_y)
-#                 loss = torch.mean(torch.abs(batch_y - model(batch_x)))
-#                 loss.backward()
-#                 optimizer.step()
-#                 train_loss_list.append(loss.item())
-#
-#             train_loss = np.mean(train_loss_list)
-#             scheduler.step(train_loss)
-#
-#             with torch.no_grad():
-#                 val_pred = model(val_x)
-#                 val_loss = loss_fn(val_pred, val_y).item()
-#
-#             print(f"Epoch {epoch:4d} | Loss: {val_loss:.6e}")
-#
-#             if val_loss < min_val_loss:
-#                 min_val_loss = val_loss
-#                 best_model_state = model.state_dict()
-#
-#             if val_loss <= loss_threshold:
-#                 print(f"Early stopping at epoch {epoch}, loss = {val_loss:.4e}")
-#                 break
-#
-#         # Load best model and evaluate
-#         model.load_state_dict(best_model_state)
-#         model.eval()
-#
-#         with torch.no_grad():
-#             prediction = model(grid_flattened).cpu().numpy().reshape(original_shape)
-#
-#         if return_ann:
-#             warn('Returning ANN from smoother. This should only happen in selected experiments.')
-#             return prediction, model
-#         else:
-#             return prediction
 
 
 class GaussianSmoother(AbstractSmoother):
