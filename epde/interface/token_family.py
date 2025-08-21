@@ -257,7 +257,7 @@ class TokenFamily(object):
             self.test_evaluation = self._evaluator.apply(self.test_token)
         print('Test evaluation performed correctly')
 
-    def chech_constancy(self, test_function, **tfkwargs):
+    def chech_constancy(self, **tfkwargs):
         '''
         Method to check, if any single simple token in the studied domain is constant, or close to it. The constant token is to be displayed and deleted from tokens and cache.
 
@@ -272,7 +272,11 @@ class TokenFamily(object):
         for label in self.tokens:
             data_label = (label, (1.0,))
             data = global_var.tensor_cache.memory_default["numpy"].get(data_label)
-            constancy = np.isclose(np.min(data), np.max(data))
+            try:
+                constancy = np.isclose(np.min(data), np.max(data))
+            except TypeError:
+                print(f"No {label} data in cache!")
+                continue
             if constancy:
                 constant_tokens_labels.append(label)
 
