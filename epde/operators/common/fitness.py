@@ -127,11 +127,15 @@ class L2LRFitness(CompoundOperator):
 
         try:
             if features is None:
-                discr_feats = 0
+                maximum = target.max(axis=0)
+                minimum = target.min(axis=0)
+                discr = (target - target.mean(axis=0) - minimum) / (maximum - minimum)
             else:
                 discr_feats = np.dot(features, objective.weights_final[:-1][objective.weights_internal != 0])
-
-            discr = (discr_feats + np.full(target.shape, objective.weights_final[-1]) - target)
+                discr_feats = discr_feats + np.full(target.shape, objective.weights_final[-1])
+                maximum = np.max([discr_feats.max(axis=0), target.max(axis=0)])
+                minimum = np.min([discr_feats.min(axis=0), target.min(axis=0)])
+                discr = ((discr_feats - minimum) - (target - minimum)) / (maximum - minimum)
             discr = np.multiply(discr, self.g_fun_vals)
             rl_error = np.linalg.norm(discr, ord=2)
         except ValueError:
@@ -141,27 +145,27 @@ class L2LRFitness(CompoundOperator):
             raise ValueError('Incorrect penalty coefficient set, value shall be in (0, 1).')
 
         fitness_value = rl_error
-        if np.sum(objective.weights_final) == 0:
-            fitness_value /= self.params['penalty_coeff']
+        # if np.sum(objective.weights_final) == 0:
+        #     fitness_value /= self.params['penalty_coeff']
 
-        # if force_out_of_place:
-        #     return fitness_value
+        if force_out_of_place:
+            return fitness_value
 
         # discr = np.mean(discr ** 2)
         # ll = np.log(discr)
         # aic = 2 * len(objective.weights_final) - 2 * ll
-        ssr = np.sum(discr ** 2)
-        n = len(target)
-        llf = - n / 2 * np.log(2 * np.pi) - n / 2 * np.log(ssr / n) - n / 2
+        # ssr = np.sum(discr ** 2)
+        # n = len(target)
+        # llf = - n / 2 * np.log(2 * np.pi) - n / 2 * np.log(ssr / n) - n / 2
         # aic = 2 * len([_ for _ in objective.weights_final if _ != 0]) - 2 * llf
-        aic = np.log(n) * len([_ for _ in objective.weights_final if _ != 0]) - 2 * llf
+        # aic = np.log(n) * len([_ for _ in objective.weights_final if _ != 0]) - 2 * llf
         # objective.aic = 1/(1 + np.exp(- 1e-4 * ll))
 
-        if force_out_of_place:
-            return 1 / (np.exp(-aic / 3e5))
+        # if force_out_of_place:
+        #     return 1 / (np.exp(-aic / 3e5))
 
-        objective.aic = 1 / (np.exp(-aic / 3e5))
-        # objective.aic = aic
+        # objective.aic = 1 / (np.exp(-aic / 3e5))
+        objective.aic = None
         objective.aic_calculated = True
         # print(aic)
         # print(len([_ for _ in objective.weights_final if _ !=0]))
@@ -201,9 +205,9 @@ class L2LRFitness(CompoundOperator):
                     feature_window = features[start_idx:end_idx, :]
                     estimator = LinearRegression(fit_intercept=False)
                     estimator.fit(feature_window, target_window, sample_weight=self.g_fun_vals[start_idx:end_idx])
-                    valuable_weights = estimator.coef_
+                    valuable_weights = estimator.coef_[:-1]
                     eq_window_weights.append(valuable_weights)
-                eq_cv = np.array([np.abs(np.std(_) / np.mean(_)) for _ in zip(*eq_window_weights)])
+                eq_cv = np.array([np.abs(np.std(_) / (np.mean(_) + 1e-12)) for _ in zip(*eq_window_weights)])
                 lr = eq_cv.mean()
 
         elif target_vals.ndim == 2:
@@ -235,9 +239,9 @@ class L2LRFitness(CompoundOperator):
                             target_window = target_vals[:, start_idx:end_idx].reshape(-1)
                             feature_window = features.reshape(*data_shape, -1)[:, start_idx:end_idx].reshape(-1, features.shape[-1])
                             estimator.fit(feature_window, target_window, sample_weight=self.g_fun_vals.reshape(*data_shape, -1)[:, start_idx:end_idx].reshape(-1))
-                        valuable_weights = estimator.coef_
+                        valuable_weights = estimator.coef_[:-1]
                         eq_window_weights.append(valuable_weights)
-                    eq_cv = np.array([np.abs(np.std(_) / np.mean(_)) for _ in zip(*eq_window_weights)])
+                    eq_cv = np.array([np.abs(np.std(_) / (np.mean(_) + 1e-12)) for _ in zip(*eq_window_weights)])
                     lr += eq_cv.mean()
 
         elif target_vals.ndim == 3:
@@ -275,9 +279,9 @@ class L2LRFitness(CompoundOperator):
                             target_window = target_vals[:, :, start_idx:end_idx].reshape(-1)
                             feature_window = features.reshape(*data_shape, -1)[:, :, start_idx:end_idx].reshape(-1, features.shape[-1])
                             estimator.fit(feature_window, target_window, sample_weight=self.g_fun_vals.reshape(*data_shape, -1)[:, :, start_idx:end_idx].reshape(-1))
-                        valuable_weights = estimator.coef_
+                        valuable_weights = estimator.coef_[:-1]
                         eq_window_weights.append(valuable_weights)
-                    eq_cv = np.array([np.abs(np.std(_) / np.mean(_)) for _ in zip(*eq_window_weights)])
+                    eq_cv = np.array([np.abs(np.std(_) / (np.mean(_) + 1e-12)) for _ in zip(*eq_window_weights)])
                     lr += eq_cv.mean()
 
         objective.fitness_calculated = True

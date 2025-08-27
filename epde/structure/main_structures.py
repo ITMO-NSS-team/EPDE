@@ -913,7 +913,7 @@ class SoEq(moeadd.MOEADDSolution):
         self.set_objective_functions(
             # quality_objectives + stability_objectives + complexity_objectives)
             # quality_objectives + stability_objectives + aic_objectives)
-            aic_objectives + stability_objectives)
+            quality_objectives + stability_objectives)
 
     def use_default_singleobjective_function(self):
         from epde.eq_mo_objectives import generate_partial, equation_fitness

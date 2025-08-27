@@ -72,15 +72,15 @@ def prepare_suboperators(fitness_operator: CompoundOperator, operator_params: di
     sparsity = LASSOSparsity()
     coeff_calc = LinRegBasedCoeffsEquation()
 
-    sparsity = map_operator_between_levels(sparsity, 'gene level', 'chromosome level')
-    coeff_calc = map_operator_between_levels(coeff_calc, 'gene level', 'chromosome level')
+    # sparsity = map_operator_between_levels(sparsity, 'gene level', 'chromosome level')
+    # coeff_calc = map_operator_between_levels(coeff_calc, 'gene level', 'chromosome level')
 
     fitness_operator.set_suboperators({'sparsity': sparsity,
                                        'coeff_calc': coeff_calc})
     fitness_cond = lambda x: not getattr(x, 'fitness_calculated')
     fitness_operator.params = operator_params
-    # fitness_operator = map_operator_between_levels(fitness_operator, 'gene level', 'chromosome level',
-    #                                                objective_condition=fitness_cond)
+    fitness_operator = map_operator_between_levels(fitness_operator, 'gene level', 'chromosome level',
+                                                   objective_condition=fitness_cond)
     return fitness_operator
 
 
@@ -168,8 +168,10 @@ def KdV_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
                                       params_equality_ranges=trig_params_equal_ranges,
                                       meaningful=True, unique_token_type=True)
 
-    epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
-                                     preprocessor_kwargs={'epochs_max': 1e4}) #'epochs_max': 5e4
+    # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
+    #                                  preprocessor_kwargs={'epochs_max': 1e4}) #'epochs_max': 5e4
+    epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+                                     preprocessor_kwargs={})  # 'epochs_max': 5e4
 
     epde_search_obj.create_pool(data=noised_data, variable_names=['u',], max_deriv_order=(2, 3),
                                 additional_tokens = [custom_trig_tokens,]) # data_nn
@@ -250,18 +252,18 @@ def kdv_discovery(foldername, noise_level):
 
     dimensionality = data.ndim - 1
 
-    epde_search_obj = EpdeSearch(use_solver=True, use_pic=True,
-                                      boundary=10,
+    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True,
+                                      boundary=5,
                                       coordinate_tensors=grid, device='cuda')
 
-    epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
-                                        preprocessor_kwargs={'epochs_max' : 1e3})
-    # epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
-    #                                  preprocessor_kwargs={})
-    popsize = 8
+    # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
+    #                                     preprocessor_kwargs={'epochs_max' : 1e3})
+    epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+                                     preprocessor_kwargs={})
+    popsize = 30
 
     epde_search_obj.set_moeadd_params(population_size=popsize,
-                                      training_epochs=30)
+                                      training_epochs=20)
 
     custom_trigonometric_eval_fun = {
         'cos(t)sin(x)': lambda *grids, **kwargs: (np.cos(grids[0]) * np.sin(grids[1])) ** kwargs['power']}
@@ -283,9 +285,9 @@ def kdv_discovery(foldername, noise_level):
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
     bounds = (1e-5, 1e-2)
-    epde_search_obj.fit(data=noised_data, variable_names=['u', ], max_deriv_order=(1, 3), derivs=None,
-                        equation_terms_max_number=5, data_fun_pow=1,
-                        additional_tokens=[custom_trig_tokens],
+    epde_search_obj.fit(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 3), derivs=None,
+                        equation_terms_max_number=5, data_fun_pow=3,
+                        additional_tokens=[trig_tokens], #custom_trig_tokens
                         equation_factors_max_number=factors_max_number,
                         eq_sparsity_interval=bounds, fourier_layers=False) # , data_nn=data_nn
 
@@ -449,9 +451,9 @@ def kdv_sindy_discovery(foldername, noise_level):
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
-    bounds = (1e-5, 1e-2)
-    epde_search_obj.fit(data=noised_data, variable_names=['u', ], max_deriv_order=(1, 3), derivs=None,
-                        equation_terms_max_number=5, data_fun_pow=1,
+    bounds = (1e-8, 1e0)
+    epde_search_obj.fit(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 3), derivs=None,
+                        equation_terms_max_number=5, data_fun_pow=3,
                         additional_tokens=[custom_trig_tokens],
                         equation_factors_max_number=factors_max_number,
                         eq_sparsity_interval=bounds, fourier_layers=False) # , data_nn=data_nn
@@ -469,22 +471,22 @@ if __name__ == "__main__":
     print("CUDA available:", torch.cuda.is_available())
     # Operator = fitness.SolverBasedFitness # Replace by the developed PIC-based operator.
     # Operator = fitness.PIC
-    # Operator = fitness.L2LRFitness
-    # params = EvolutionaryParams()
-    # operator_params = params.get_default_params_for_operator('DiscrepancyBasedFitnessWithCV') #{"penalty_coeff": 0.2, "pinn_loss_mult": 1e4}
+    Operator = fitness.L2LRFitness
+    params = EvolutionaryParams()
+    operator_params = params.get_default_params_for_operator('DiscrepancyBasedFitnessWithCV') #{"penalty_coeff": 0.2, "pinn_loss_mult": 1e4}
     # operator_params = {"penalty_coeff": 0.2, "pinn_loss_mult": 1e4}
-    # print('operator_params ', operator_params)
-    # fit_operator = prepare_suboperators(Operator(list(operator_params.keys())), operator_params)
+    print('operator_params ', operator_params)
+    fit_operator = prepare_suboperators(Operator(list(operator_params.keys())), operator_params)
 
     # Paths
     directory = os.path.dirname(os.path.realpath(__file__))
     kdv_folder_name = os.path.join(directory)
 
-    # KdV_test(fit_operator, kdv_folder_name, 5)
+    # KdV_test(fit_operator, kdv_folder_name, 0)
     # KdV_h_test(fit_operator, kdv_folder_name, 0)
     # KdV_sga_test(fit_operator, kdv_folder_name, 0)
 
-    # kdv_discovery(kdv_folder_name, 5)
+    kdv_discovery(kdv_folder_name, 0)
     # kdv_h_discovery(kdv_folder_name, 0)
     # kdv_sga_discovery(kdv_folder_name, 5)
-    kdv_sindy_discovery(kdv_folder_name, 0)
+    # kdv_sindy_discovery(kdv_folder_name, 0)

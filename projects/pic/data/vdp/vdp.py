@@ -106,7 +106,7 @@ def VdP_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
                                       dimensionality = dimensionality)
     grid_tokens = GridTokens(['x_0',], dimensionality = dimensionality, max_power = 2)
 
-    epde_search_obj = EpdeSearch(use_solver = False, use_pic=True, boundary = 10,
+    epde_search_obj = EpdeSearch(use_solver = False, use_pic=True, boundary = 2,
                                  coordinate_tensors = [t,], verbose_params = {'show_iter_idx' : True},
                                  device = 'cpu')
 
@@ -133,7 +133,7 @@ def vdp_discovery(foldername, noise_level):
                                       dimensionality=dimensionality)
     grid_tokens = GridTokens(['x_0', ], dimensionality=dimensionality, max_power=2)
 
-    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=10,
+    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=1,
                                  coordinate_tensors=(t,), verbose_params={'show_iter_idx': True},
                                  device='cuda')
 
@@ -141,15 +141,15 @@ def vdp_discovery(foldername, noise_level):
                                      preprocessor_kwargs={})
 
     popsize = 8
-    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=15)
+    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=30)
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
-    epde_search_obj.fit(data=[noised_data, ], variable_names=['u', ], max_deriv_order=(2, 2),
-                        equation_terms_max_number=5, data_fun_pow=2,
+    epde_search_obj.fit(data=[noised_data, ], variable_names=['u', ], max_deriv_order=(2, 3),
+                        equation_terms_max_number=5, data_fun_pow=3,
                         additional_tokens=[trig_tokens, grid_tokens],
                         equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-8, 1e-0), data_nn=data_nn) #
+                        eq_sparsity_interval=(1e-5, 1e-0)) #
 
     epde_search_obj.equations(only_print=True, num=1)
 
