@@ -278,7 +278,7 @@ class ANNSmoother(AbstractSmoother):
         loss_fn = torch.nn.MSELoss()
 
         # Batch size
-        batch_size = max(1, int(data.size * batch_frac))
+        batch_size = max(1, int(train_size))
 
         # Training loop
         min_val_loss = np.inf
@@ -296,8 +296,8 @@ class ANNSmoother(AbstractSmoother):
 
                 optimizer.zero_grad()
                 pred = model(batch_x)
-                loss = loss_fn(pred, batch_y)
-                # loss = torch.mean(torch.abs(batch_y - pred))
+                # loss = loss_fn(pred, batch_y)
+                loss = torch.mean(torch.abs(batch_y - pred))
                 loss.backward()
                 optimizer.step()
                 train_loss_list.append(loss.item())
@@ -307,7 +307,8 @@ class ANNSmoother(AbstractSmoother):
 
             with torch.no_grad():
                 val_pred = model(val_x)
-                val_loss = loss_fn(val_pred, val_y).item()
+                val_loss = torch.mean(torch.abs(val_y - val_pred))
+                # val_loss = loss_fn(val_pred, val_y).item()
 
             if epoch % 100 == 0:
                 print(f"Epoch {epoch:4d} | Loss: {val_loss:.6e}")
@@ -323,6 +324,7 @@ class ANNSmoother(AbstractSmoother):
         # Load best model and evaluate
         model.load_state_dict(best_model_state)
         model.eval()
+        self.model = model
 
         with torch.no_grad():
             prediction = model(grid_flattened).cpu().numpy().reshape(original_shape)
