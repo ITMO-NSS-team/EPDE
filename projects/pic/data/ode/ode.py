@@ -149,11 +149,11 @@ def ODE_discovery(foldername, noise_level):
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
-    epde_search_obj.fit(data=[noised_data, ], variable_names=['u', ], max_deriv_order=(2, 2),
-                        equation_terms_max_number=5, data_fun_pow=1,
+    epde_search_obj.fit(data=[noised_data, ], variable_names=['u', ], max_deriv_order=(2, 3),
+                        equation_terms_max_number=5, data_fun_pow=3,
                         additional_tokens=[trig_tokens, grid_tokens],
                         equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-12, 1e-4), data_nn=data_nn) #
+                        eq_sparsity_interval=(1e-10, 1e-0)) # , data_nn=data_nn
 
     epde_search_obj.equations(only_print=True, num=1)
 
@@ -186,15 +186,15 @@ def ODE_simple_discovery(foldername, noise_level):
                                      preprocessor_kwargs={})
 
     popsize = 8
-    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=15)
+    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=5)
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
-    epde_search_obj.fit(data=[x, ], variable_names=['u', ], max_deriv_order=(1, 2),
-                        equation_terms_max_number=5, data_fun_pow=1,
+    epde_search_obj.fit(data=[x, ], variable_names=['u', ], max_deriv_order=(2, 3),
+                        equation_terms_max_number=5, data_fun_pow=3,
                         additional_tokens=[trig_tokens, grid_tokens],
                         equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-6, 1e-0)) #
+                        eq_sparsity_interval=(1e-6, 1e0)) #
 
     epde_search_obj.equations(only_print=True, num=1)
 

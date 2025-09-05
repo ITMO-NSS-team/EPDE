@@ -152,22 +152,23 @@ class ParetoLevels(object):
         Returns:
             None
         """
-        duplcates_count = {i: self.population.count(i) for i in self.population}
-
         new_levels = []
+        history = []
         for level in self.levels:
             temp = []
             for element in level:
-                if element != point or duplcates_count.get(element) == 2 and element not in temp:
+                if element != point or element in history:
                     temp.append(element)
+                history.append(element)
             if not len(temp) == 0:
                 new_levels.append(temp)
 
         population_cleared = []
-
+        history = []
         for elem in self.population:
-            if elem != point or duplcates_count.get(elem) == 2 and elem not in population_cleared:
+            if elem != point or elem in history:
                 population_cleared.append(elem)
+            history.append(elem)
                 
         if len(population_cleared) != sum([len(level) for level in new_levels]):
             print(len(population_cleared), len(self.population), sum([len(level) for level in new_levels]))
@@ -346,13 +347,10 @@ class MOEADDOptimizer(object):
                                  
         self.weights = []; weights_size = len(population[0].obj_funs) #np.empty((pop_size, len(optimized_functionals)))
         for weights_idx in range(weights_num):
-            while True:
+            temp_weights = self.weights_generation(weights_size, delta)
+            while temp_weights in self.weights:
                 temp_weights = self.weights_generation(weights_size, delta)
-                if temp_weights not in self.weights:
-                    self.weights.append(temp_weights)
-                    break
-                else:
-                    print(temp_weights, self.weights) # Ошибка в задании obj_fun для системы уравнений
+            self.weights.append(temp_weights)
         self.weights = np.array(self.weights)
 
         self.neighborhood_lists = []
@@ -405,9 +403,9 @@ class MOEADDOptimizer(object):
         assert 1./delta == round(1./delta) # check, if 1/delta is integer number
         m = np.zeros(weights_num)
         for weight_idx in np.arange(weights_num):
-            weights[weight_idx] = np.random.choice([div_idx * delta for div_idx in np.arange(1./delta + 1e-8 - np.sum(m[:weight_idx + 1]))])
+            weights[weight_idx] = np.around(np.random.choice([div_idx * delta for div_idx in np.arange(1./delta + 1e-8 - np.sum(m[:weight_idx + 1]))]), 2)
             m[weight_idx] = weights[weight_idx]/delta
-        weights[-1] = 1 - np.sum(weights[:-1])
+        weights[-1] = np.around(1 - np.sum(weights[:-1]), 2)
         
         weights = np.abs(weights)
         return list(weights)

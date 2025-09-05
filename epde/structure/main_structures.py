@@ -214,12 +214,20 @@ class Term(ComplexStructure):
         else:
             self.prev_normalized = normalize
             value = super().evaluate(structural)
-            if normalize and np.ndim(value) != 1:
-                value = normalize_ts(value)
-            elif normalize and np.ndim(value) == 1 and np.std(value) != 0:
-                value = (value - np.mean(value))/np.std(value)
-            elif normalize and np.ndim(value) == 1 and np.std(value) == 0:
-                value = (value - np.mean(value))
+            if normalize:
+                if np.ndim(value) != 1:
+                    if len(self.structure) > 1:
+                        value = np.ones_like(value)
+                        for factor in self.structure:
+                            temp = factor.evaluate()
+                            value *= normalize_ts(temp)
+                    else:
+                        value = normalize_ts(value)
+                else:
+                    if np.std(value) != 0:
+                        value = (value - np.mean(value)) / np.std(value)
+                    else:
+                        value = (value - np.mean(value))
             if np.all([len(factor.params) == 1 for factor in self.structure]) and grids is None:
                 # Место возможных проблем: сохранение/загрузка нормализованных данных
                 self.saved[normalize] = global_var.tensor_cache.add(self.cache_label, value, normalized=normalize)
@@ -913,7 +921,6 @@ class SoEq(moeadd.MOEADDSolution):
         self.set_objective_functions(
             # quality_objectives + stability_objectives + complexity_objectives)
             # quality_objectives + stability_objectives + aic_objectives)
-            # aic_objectives + stability_objectives)
             quality_objectives + stability_objectives)
 
     def use_default_singleobjective_function(self):

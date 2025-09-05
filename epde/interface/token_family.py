@@ -257,7 +257,7 @@ class TokenFamily(object):
             self.test_evaluation = self._evaluator.apply(self.test_token)
         print('Test evaluation performed correctly')
 
-    def chech_constancy(self, test_function, **tfkwargs):
+    def chech_constancy(self, **tfkwargs):
         '''
         Method to check, if any single simple token in the studied domain is constant, or close to it. The constant token is to be displayed and deleted from tokens and cache.
 
@@ -270,16 +270,22 @@ class TokenFamily(object):
         assert self.params_set
         constant_tokens_labels = []
         for label in self.tokens:
-            print(type(global_var.tensor_cache.memory[label + ' power 1']))
-            constancy = test_function(global_var.tensor_cache.memory[label + ' power 1'], **tfkwargs)
+            data_label = (label, (1.0,))
+            data = global_var.tensor_cache.memory_default["numpy"].get(data_label)
+            try:
+                constancy = np.isclose(np.min(data), np.max(data))
+            except TypeError:
+                print(f"No {label} data in cache!")
+                continue
             if constancy:
                 constant_tokens_labels.append(label)
 
         for label in constant_tokens_labels:
             print(f'Function {label} is assumed to be constant in the studied domain. \
-                  Removed from the equaton search.')
+                          Removed from the equaton search.')
+            data_label = (label, (1.0,))
             self.tokens.remove(label)
-            global_var.tensor_cache.delete_entry(label + ' power 1')
+            global_var.tensor_cache.delete_entry(data_label)
 
     def evaluate(self, token):
         """
@@ -491,8 +497,8 @@ class TFPool(object):
                                         p=probabilities).create(label=None,
                                                                 token_status=token_status,
                                                                 create_derivs=create_derivs,
-                                                                all_vars=[family.variable for family in
-                                                                          self.families_demand_equation],
+                                                                all_vars = [family.variable for family in 
+                                                                            self.families_demand_equation], 
                                                                 **kwargs)
             else:
                 probabilities = (self.families_cardinality(False, token_status) /

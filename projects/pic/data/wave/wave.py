@@ -98,7 +98,7 @@ def wave_data(filename):
 def wave_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
     # eq_wave_symbolic = '1. * d^2u/dx1^2{power: 1} + 0. = d^2u/dx0^2{power: 1}'
     eq_wave_symbolic = '0.04 * d^2u/dx1^2{power: 1} + 0. = d^2u/dx0^2{power: 1}'
-    eq_wave_incorrect = '1. * d^2u/dx1^2{power: 1} * du/dx1{power: 1} + 2.3 * d^2u/dx0^2{power: 1} + 0. = du/dx0{power: 1}'
+    eq_wave_incorrect = '0.04 * d^2u/dx1^2{power: 1} * du/dx0{power: 1} + 0. = d^2u/dx0^2{power: 1} * du/dx0{power: 1}'
 
     grid, data = wave_data(os.path.join(foldername, 'wave_sln_80.csv'))
     noised_data = noise_data(data, noise_level)
@@ -106,16 +106,18 @@ def wave_test(operator: CompoundOperator, foldername: str, noise_level: int = 0)
 
     dimensionality = data.ndim - 1
 
-    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=10,
+    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=5,
                                  coordinate_tensors=(grid[..., 0], grid[..., 1]),
                                  verbose_params={'show_iter_idx': True},
                                  device='cpu')
 
-    epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
-                                     preprocessor_kwargs={})
+    # epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+    #                                  preprocessor_kwargs={})
+    epde_search_obj.set_preprocessor(default_preprocessor_type='spectral',
+                                     preprocessor_kwargs={"n":80})
 
     epde_search_obj.create_pool(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 2),
-                                additional_tokens=[], data_nn=data_nn)
+                                additional_tokens=[])
 
     assert compare_equations(eq_wave_symbolic, eq_wave_incorrect, epde_search_obj)
 
@@ -127,12 +129,14 @@ def wave_discovery(foldername, noise_level):
 
     dimensionality = data.ndim - 1
 
-    epde_search_obj = EpdeSearch(use_solver=True, use_pic=True,
+    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True,
                                       boundary=20,
                                       coordinate_tensors=(grid[..., 0], grid[..., 1]), device='cuda')
 
     # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
-    #                                     preprocessor_kwargs={'epochs_max' : 1e3})
+    #                                     preprocessor_kwargs={'epochs_max' : 1e4})
+    # epde_search_obj.set_preprocessor(default_preprocessor_type='spectral',
+    #                                  preprocessor_kwargs={"n": 80})
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
     popsize = 8
@@ -154,7 +158,7 @@ def wave_discovery(foldername, noise_level):
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
-    bounds = (1e-12, 1e-2)
+    bounds = (1e-5, 1e2)
     epde_search_obj.fit(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 3), derivs=None,
                         equation_terms_max_number=5, data_fun_pow=3,
                         additional_tokens=[],
@@ -183,5 +187,5 @@ if __name__ == "__main__":
     directory = os.path.dirname(os.path.realpath(__file__))
     wave_folder_name = os.path.join(directory)
 
-    # wave_test(fit_operator, wave_folder_name, 0)
-    wave_discovery(wave_folder_name, 15)
+    wave_test(fit_operator, wave_folder_name, 0)
+    # wave_discovery(wave_folder_name, 0)

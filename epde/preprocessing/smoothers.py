@@ -233,75 +233,15 @@ class NN(torch.nn.Module):
         # Pass through the last layer (with no activation function) and return.
         return self.Layers[self.Num_Hidden_Layers](X);
 
-# class ANNSmoother(AbstractSmoother):
-#     def __init__(self):
-#         pass
-#
-#     def __call__(self, data, grid, epochs_max=1e3, loss_mean=1000, batch_frac=0.5, learining_rate=1e-2, return_ann: bool = False, device = 'cpu'):
-#         dim = 1 if np.any([s == 1 for s in data.shape]) and data.ndim == 2 else data.ndim
-#         model = baseline_ann(dim).to(device)
-#         # model = NN(Num_Hidden_Layers=1, Neurons_Per_Layer=1024, Input_Dim=dim, Activation_Function='Rational').to(device)
-#         # model = NN(Num_Hidden_Layers=4, Neurons_Per_Layer=256, Input_Dim=dim, Activation_Function='Sin').to(device)
-#         grid_flattened = torch.from_numpy(np.array([subgrid.reshape(-1) for subgrid in grid])).float().T.to(device)
-#
-#         original_shape = data.shape
-#
-#         field_ = torch.from_numpy(data.reshape(-1, 1)).float().to(device)
-#         optimizer = torch.optim.Adam(model.parameters(), lr=learining_rate)
-#         scheduler = torch.optim.lr_scheduler.StepLR(optimizer, epochs_max//10, gamma=0.5)
-#         # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=1000)
-#         batch_size = int(data.size * batch_frac)
-#
-#         t = 0
-#
-#         min_loss = np.inf
-#         while loss_mean > 1e-5 and t < epochs_max:
-#
-#             permutation = torch.randperm(grid_flattened.size()[0])
-#
-#             loss_list = []
-#
-#             for i in range(0, grid_flattened.size()[0]-1, batch_size):
-#                 optimizer.zero_grad()
-#
-#                 indices = permutation[i:i+batch_size]
-#                 batch_x, batch_y = grid_flattened[indices], field_[indices]
-#
-#                 loss = torch.mean(torch.abs(batch_y-model(batch_x)))
-#
-#                 loss.backward()
-#                 optimizer.step()
-#                 loss_list.append(loss.item())
-#             scheduler.step()
-#             loss_mean = np.mean(loss_list)
-#             if loss_mean < min_loss:
-#                 best_model = model
-#                 min_loss = loss_mean
-#             # if t % 1000 == 0 and t != 0:
-#             #     print(f"Epoch {t:4d} | Loss: {min_loss:.6e}")
-#             print(f"Epoch {t:4d} | Loss: {min_loss:.6e}")
-#             t += 1
-#
-#         model.load_state_dict(best_model)
-#         model.eval()
-#
-#         with torch.no_grad():
-#             prediction = model(grid_flattened).cpu().numpy().reshape(original_shape)
-#
-#         if return_ann:
-#             warn('Returning ANN from smoother. This should only happen in selected experiments.')
-#             return prediction, model
-#         else:
-#             return prediction
-
 class ANNSmoother(AbstractSmoother):
     def __init__(self):
         super().__init__()  # Optional depending on AbstractSmoother
         self.model = None
 
     def __call__(self, data, grid, epochs_max=1000, loss_mean=1000, loss_threshold=1e-8,
-                 batch_frac=0.5, val_frac=0.2, learning_rate=1e-3, return_ann=False, device='cpu'):
-
+                 batch_frac=0.5, val_frac=0.1, learning_rate=1e-3, return_ann=False, device='cpu'):
+        if torch.cuda.is_available():
+            device = "cuda"
         # Convert to int if passed as float
         epochs_max = int(epochs_max)
 
@@ -310,7 +250,7 @@ class ANNSmoother(AbstractSmoother):
 
         # Initialize model
         # model = baseline_ann(dim).to(device)
-        model = NN(Num_Hidden_Layers=5, Neurons_Per_Layer=50, Input_Dim=dim, Activation_Function='Rational').to(device)
+        model = NN(Num_Hidden_Layers=5, Neurons_Per_Layer=50, Input_Dim=dim, Activation_Function='Sin').to(device)
         self.model = model
 
         # Flatten grid and reshape field
@@ -330,15 +270,15 @@ class ANNSmoother(AbstractSmoother):
 
         # Optimizer and scheduler
         optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-        # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=epochs_max // 10, gamma=0.5)
+        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=epochs_max // 10, gamma=0.5)
         # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=0.5)
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs_max // 10)
+        # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs_max // 10)
 
         # Loss function
         loss_fn = torch.nn.MSELoss()
 
         # Batch size
-        batch_size = max(1, int(data.size * batch_frac))
+        batch_size = max(1, int(train_size))
 
         # Training loop
         min_val_loss = np.inf
@@ -355,9 +295,9 @@ class ANNSmoother(AbstractSmoother):
                 batch_y = train_y[indices]
 
                 optimizer.zero_grad()
-                # pred = model(batch_x)
+                pred = model(batch_x)
                 # loss = loss_fn(pred, batch_y)
-                loss = torch.mean(torch.abs(batch_y - model(batch_x)))
+                loss = torch.mean(torch.abs(batch_y - pred))
                 loss.backward()
                 optimizer.step()
                 train_loss_list.append(loss.item())
@@ -367,9 +307,10 @@ class ANNSmoother(AbstractSmoother):
 
             with torch.no_grad():
                 val_pred = model(val_x)
-                val_loss = loss_fn(val_pred, val_y).item()
+                val_loss = torch.mean(torch.abs(val_y - val_pred))
+                # val_loss = loss_fn(val_pred, val_y).item()
 
-            if epoch % 500 == 0:
+            if epoch % 100 == 0:
                 print(f"Epoch {epoch:4d} | Loss: {val_loss:.6e}")
 
             if val_loss < min_val_loss:
@@ -383,6 +324,7 @@ class ANNSmoother(AbstractSmoother):
         # Load best model and evaluate
         model.load_state_dict(best_model_state)
         model.eval()
+        self.model = model
 
         with torch.no_grad():
             prediction = model(grid_flattened).cpu().numpy().reshape(original_shape)

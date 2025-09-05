@@ -152,7 +152,7 @@ def burgers_discovery(foldername, noise_level):
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
-    bounds = (1e-5, 1e-0)
+    bounds = (1e-5, 1e2)
     epde_search_obj.fit(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 3), derivs=None,
                         equation_terms_max_number=5, data_fun_pow=3,
                         additional_tokens=[],
