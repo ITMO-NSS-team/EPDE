@@ -33,7 +33,7 @@ from epde.preprocessing.domain_pruning import DomainPruner
 from epde.structure.encoding import Chromosome
 from epde.structure.factor import Factor
 from epde.structure.structure_template import ComplexStructure, check_uniqueness
-from epde.supplementary import filter_powers, normalize_ts, population_sort, flatten, rts, exp_form
+from epde.supplementary import filter_powers, normalize_ts, population_sort, flatten, rts, exp_form, minmax_normalize
 
 
 class Term(ComplexStructure):
@@ -71,23 +71,23 @@ class Term(ComplexStructure):
             self.use_cache()
         # key - state of normalization, value - if the variable is saved in cache
         self.reset_saved_state()
-    
+
     def manual_reconst(self, attribute:str, value, except_attrs:dict):
-        from epde.loader import attrs_from_dict, get_typespec_attrs      
+        from epde.loader import attrs_from_dict, get_typespec_attrs
         supported_attrs = ['structure']
         if attribute not in supported_attrs:
             raise ValueError(f'Attribute {attribute} is not supported by manual_reconst method.')
-    
+
         if attribute == supported_attrs[0]:
             # Validate correctness of a term definition
             self.structure = []
             for factor_elem in value:
                 factor = Factor.__new__(Factor)
-                
+
                 attrs_from_dict(factor, factor_elem, except_attrs)
                 factor.evaluator = self.pool
                 self.structure.append(factor)
-    
+
     @property
     def cache_label(self):
         if len(self.structure) > 1:
@@ -171,7 +171,7 @@ class Term(ComplexStructure):
 
         self.descr_variable_marker = mandatory_family if mandatory_family is not None else False
 
-        if not mandatory_family:      
+        if not mandatory_family:
             occupied_by_factor, factor = self.pool.create(label=None, create_meaningful=True,
                                                           token_status=self.occupied_tokens_labels,
                                                           create_derivs=create_derivs, **kwargs)
@@ -216,13 +216,15 @@ class Term(ComplexStructure):
             value = super().evaluate(structural)
             if normalize:
                 if np.ndim(value) != 1:
-                    if len(self.structure) > 1:
-                        value = np.ones_like(value)
-                        for factor in self.structure:
-                            temp = factor.evaluate()
-                            value *= normalize_ts(temp)
-                    else:
-                        value = normalize_ts(value)
+                    value = np.ones_like(value)
+                    for factor in self.structure:
+                        temp = factor.evaluate()
+                        # value *= normalize_ts(temp)
+                        value *= minmax_normalize(temp)
+                        # value *= factor.evaluate(structural)
+                    # else:
+                    #     # value = normalize_ts(value)
+                    #     value = minmax_normalize(value)
                 else:
                     if np.std(value) != 0:
                         value = (value - np.mean(value)) / np.std(value)
@@ -239,7 +241,7 @@ class Term(ComplexStructure):
     def filter_tokens_by_right_part(self, reference_target, equation, equation_position):
         warnings.warn(message='Tokens can no longer be set as right-part-unique',
                       category=DeprecationWarning)
-        taken_tokens = [factor.label for factor in reference_target.structure 
+        taken_tokens = [factor.label for factor in reference_target.structure
 			 if factor.status['unique_for_right_part']]
         meaningful_taken = any([factor.status['meaningful'] for factor in reference_target.structure
                                 if factor.status['unique_for_right_part']])
@@ -355,10 +357,10 @@ class Term(ComplexStructure):
 class Equation(ComplexStructure):
     __slots__ = ['_history', 'structure', 'interelement_operator', 'n_immutable', 'pool',
                   # '_target', '_features', 'saved', 'saved_as','max_factors_in_term', 'operator',
-                 'target_idx', 'right_part_selected', '_weights_final', 'weights_final_evald', 
+                 'target_idx', 'right_part_selected', '_weights_final', 'weights_final_evald',
                  '_weights_internal', 'weights_internal_evald', 'fitness_calculated', 'stability_calculated', 'aic_calculated', 'solver_form_defined',
                  '_fitness_value', '_coefficients_stability', '_aic', 'metaparameters', 'main_var_to_explain'] # , '_solver_form'
-                 
+
 
     def __init__(self, pool: TFPool, basic_structure: Union[list, tuple, set], var_to_explain: str = None,
                  metaparameters: dict = {'sparsity': {'optimizable': True, 'value': 1.},
@@ -383,7 +385,7 @@ class Equation(ComplexStructure):
             matrix, composed of terms, not included in target, value columns, designated as features for application in sparse regression;
 
             fitness_value : float \r\n
-            Inverse value of squared error for the selected target 2function and features and discovered weights; 
+            Inverse value of squared error for the selected target 2function and features and discovered weights;
 
             estimator : sklearn estimator of selected type \r\n
 
@@ -431,29 +433,29 @@ class Equation(ComplexStructure):
                 if check_uniqueness(new_term, self.structure):
                     force_var_to_explain = False
                     break
-            
+
             self.structure.append(new_term)
 
         for idx, _ in enumerate(self.structure):
             self.structure[idx].use_cache()
 #        self.coefficients_stability = np.inf
-    
+
     def manual_reconst(self, attribute:str, value, except_attrs:dict):
-        from epde.loader import attrs_from_dict, get_typespec_attrs      
+        from epde.loader import attrs_from_dict, get_typespec_attrs
         supported_attrs = ['structure']
         if attribute not in supported_attrs:
             raise ValueError(f'Attribute {attribute} is not supported by manual_reconst method.')
-    
+
         if attribute == supported_attrs[0]:
             # Validate correctness of a term definition
             self.structure = []
             for term_elem in value:
                 term = Term.__new__(Term)
                 # except_attr, _ = get_typespec_attrs(term)
-                
+
                 attrs_from_dict(term, term_elem, except_attrs)
                 self.structure.append(term)
-    
+
     def reset_explaining_term(self, term_idx=0):
         for idx, term in enumerate(self.structure):
             if idx == term_idx:
@@ -533,21 +535,21 @@ class Equation(ComplexStructure):
 
     def evaluate(self, normalize=True, return_val=False, grids=None):
         target = self.structure[self.target_idx].evaluate(normalize, grids=grids)
-        
+
         # Place for improvent: introduce shifted_idx where necessary
         def shifted_idx(idx):
             if idx < self.target_idx:
-                return idx  
+                return idx
             elif idx > self.target_idx:
                 return idx - 1
             else:
                 return -1
-        
+
         if normalize:
             feature_indexes = list(range(len(self.structure)))
             feature_indexes.remove(self.target_idx)
         else:
-            feature_indexes = [idx for idx in range(len(self.structure)) 
+            feature_indexes = [idx for idx in range(len(self.structure))
                                if self.weights_internal[shifted_idx(idx)] != 0 and idx != self.target_idx]
         if len(feature_indexes) > 0:
             for feat_idx in range(len(feature_indexes)):
@@ -564,7 +566,7 @@ class Equation(ComplexStructure):
             temp_feats = np.transpose(temp_feats)
         else:
             features = None
-            
+
         if return_val:
             self.prev_normalized = normalize
             if normalize:
@@ -572,7 +574,7 @@ class Equation(ComplexStructure):
                 value = np.add(elem1, - reduce(lambda x, y: np.add(x, y), [np.multiply(self.weights_internal[idx_full], temp_feats[:, idx_sparse])
                                                                            for idx_sparse, idx_full in enumerate(feature_indexes)]))
                                                                            # for feature_idx, weight in np.ndenumerate(self.weights_internal)]))
-            else:           
+            else:
                 elem1 = np.expand_dims(target, axis=1)
                 if features is not None:
                     features_val = reduce(lambda x, y: np.add(x, y), [np.multiply(self.weights_final[idx_full], temp_feats[:, idx_sparse])
@@ -723,7 +725,7 @@ class Equation(ComplexStructure):
                     self.structure[term_idx].name + ' + '
             form += 'k_' + str(len(self.structure)) + ' = 0'
         return form
-    
+
     @property
     def latex_form(self):
         form = self.structure[self.target_idx].latex_form + r' = '
@@ -736,13 +738,13 @@ class Equation(ComplexStructure):
             mnt, exp = exp_form(self.weights_final[idx_corrected], digits_rounding_max)
             exp_str = r'\cdot 10^{{{0}}} '.format(str(exp)) if exp != 0 else ''
             form += str(mnt) + exp_str + term.latex_form + r' + '
-        
+
         mnt, exp = exp_form(self.weights_final[-1], digits_rounding_max)
         exp_str = r'\cdot 10^{{{0}}} '.format(str(exp)) if exp != 0 else ''
-        
+
         form += str(mnt) + exp_str
         return form
-    
+
     @property
     def state(self):
         return self.text_form
@@ -786,26 +788,26 @@ class Equation(ComplexStructure):
         if np.max(max_orders) > 4:
             raise NotImplementedError('The current implementation allows does not allow higher orders of equation, than 2.')
         return max_orders
-    
+
     def boundary_conditions(self, max_deriv_orders=(1,), main_var_key=('u', (1.0,)), full_domain: bool = False,
                                 grids : list = None):
             required_bc_ord = max_deriv_orders   # We assume, that the maximum order of the equation here is 2
             if global_var.grid_cache is None:
                 raise NameError('Grid cache has not been initialized yet.')
-    
+
             bconds = []
             hardcoded_bc_relative_locations = {0: (), 1: (0,), 2: (0, 1),
                                                3: (0., 0.5, 1.), 4: (0., 1/3., 2/3., 1.)}
-    
+
             if full_domain:
                 grid_cache = global_var.initial_data_cache
                 tensor_cache = global_var.initial_data_cache
             else:
                 grid_cache = global_var.grid_cache
                 tensor_cache = global_var.tensor_cache
-    
+
             tensor_shape = grid_cache.get('0').shape
-    
+
             def get_boundary_ind(tensor_shape, axis, rel_loc):
                 return tuple(np.meshgrid(*[np.arange(shape) if dim_idx != axis else min(int(rel_loc * shape), shape-1)
                                            for dim_idx, shape in enumerate(tensor_shape)], indexing='ij'))
@@ -818,12 +820,12 @@ class Equation(ComplexStructure):
                     if coords.ndim > 2:
                         coords = coords.squeeze()
                     vals = np.expand_dims(tensor_cache.get(main_var_key)[indexes], axis=0).T
-    
+
                     coords = torch.from_numpy(coords).type(torch.FloatTensor)
-    
+
                     vals = torch.from_numpy(vals).type(torch.FloatTensor)
-                    bconds.append([coords, vals, 'dirichlet'])    
-    
+                    bconds.append([coords, vals, 'dirichlet'])
+
             return bconds
 
     def clear_after_solver(self):
@@ -876,13 +878,13 @@ class SoEq(moeadd.MOEADDSolution):
         self.moeadd_set = False
 
         self.vars_to_describe = [token_family.variable for token_family in self.tokens_for_eq.families]
-        
+
     def manual_reconst(self, attribute:str, value, except_attrs:dict):
         from epde.loader import attrs_from_dict, get_typespec_attrs
         supported_attrs = ['vals']
         if attribute not in supported_attrs:
             raise ValueError(f'Attribute {attribute} is not supported by manual_reconst method.')
-    
+
         if attribute == supported_attrs[0]:
             # Validate correctness of a term definition
             equations = {}
@@ -892,7 +894,7 @@ class SoEq(moeadd.MOEADDSolution):
                 equations[self.vars_to_describe[idx]] = eq
             self.vals = Chromosome(equations, {key: val for key, val in self.metaparameters.items()
                                                if val['optimizable']})
-                
+
     def use_default_multiobjective_function(self, use_pic: bool = False):
         if use_pic:
             self.use_pic_multiobjective_function()
@@ -935,35 +937,35 @@ class SoEq(moeadd.MOEADDSolution):
         Parameters:
         -----------
             obj_funs - callable or list of callables;
-            function/functions to evaluate quality metrics of system of equations. Can return a single 
-            metric (for example, quality of the process modelling with specific system), or 
+            function/functions to evaluate quality metrics of system of equations. Can return a single
+            metric (for example, quality of the process modelling with specific system), or
             a list of metrics (for example, number of terms for each equation in the system).
-            The function results will be flattened after their application. 
+            The function results will be flattened after their application.
 
         '''
         assert callable(obj_funs) or all([callable(fun) for fun in obj_funs])
         self.obj_funs = obj_funs
 
     def matches_complexitiy(self, complexity : Union[int, list]):
-        if isinstance(complexity, (int, float)):    
+        if isinstance(complexity, (int, float)):
             complexity = [complexity,]
-        
+
         if not isinstance(complexity, list) or len(self.vars_to_describe) != len(complexity):
             raise ValueError('Incorrect list of complexities passed.')
         adj_complexity = copy.copy(complexity)
         for idx, compl in enumerate(adj_complexity):
             if compl is None:
                 adj_complexity[idx] = self.obj_fun[-len(complexity) + idx]
-        
+
         return list(self.obj_fun[-len(adj_complexity):]) == adj_complexity
 
     def create(self, passed_equations: list = None):
         if passed_equations is None:
             structure = {}
-    
+
             token_selection = self.tokens_supp
             current_tokens_pool = token_selection + self.tokens_for_eq
-    
+
             for eq_idx, variable in enumerate(self.vars_to_describe):
                 structure[variable] = Equation(current_tokens_pool, basic_structure=[],
                                                var_to_explain=variable,
@@ -988,7 +990,7 @@ class SoEq(moeadd.MOEADDSolution):
         gc.collect()
         population = evol_operator.apply(population, unexplained_vars)
         return population
-    
+
     @property
     def obj_fun(self):
         return np.array(flatten([func(self) for func in self.obj_funs]))
