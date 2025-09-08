@@ -334,3 +334,34 @@ def normalize_ts(Input):
             else:
                 matrix[i] = 1
         return matrix
+
+def minmax_normalize(matrix):
+    """
+    Apply min-max normalization to a matrix.
+    For 1D arrays: returns as-is
+    For 2D+ arrays: normalizes each row to [0, 1] range
+    """
+    matrix = np.copy(matrix)
+
+    if np.ndim(matrix) == 0:
+        raise ValueError('Incorrect input to the normalization: the data has 0 dimensions')
+    elif np.ndim(matrix) == 1:
+        return matrix
+    else:
+        domain_min = np.min(matrix)
+        domain_max = np.max(matrix)
+        domain_mean = np.mean(matrix)
+        if domain_max != domain_min:
+            matrix = (matrix - domain_mean - domain_min) / (domain_max - domain_min)
+        # for i in np.arange(matrix.shape[0]):
+        #     row_min = np.min(matrix[i])
+        #     row_max = np.max(matrix[i])
+        #
+        #     # Only normalize if the row has variation
+        #     if domain_max != domain_min:
+        #         matrix[i] = (matrix[i] - domain_mean - domain_min) / (domain_max - domain_min)
+        #     else:
+        #         # If all values are the same, set to 0.5 or keep original (0.5 is midpoint)
+        #         matrix[i] = 0.5
+
+        return matrix
