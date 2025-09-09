@@ -46,11 +46,11 @@ class EqRightPartSelector(CompoundOperator):
     def apply(self, objective : Equation, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
-        if objective.weights_internal_evald:
-            self.simplify_equation(objective)
+        objective.reset_state(True)
 
-        while not objective.right_part_selected:
+        while not (objective.right_part_selected and objective.simplified):
             min_fitness = np.inf
+            weights_internal = np.zeros_like(objective.structure)
             min_idx = 0
             if not objective.contains_deriv(objective.main_var_to_explain):
                 objective.restore_property(deriv = True)
@@ -67,60 +67,67 @@ class EqRightPartSelector(CompoundOperator):
                 if fitness < min_fitness:
                     min_fitness = fitness
                     min_idx = target_idx
+                    weights_internal = objective.weights_internal
                 else:
                     pass
 
+            objective.weights_internal = weights_internal
             objective.target_idx = min_idx
-            objective.reset_explaining_term(objective.target_idx)
             # self.suboperators['fitness_calculation'].apply(objective, arguments = subop_args['fitness_calculation'])
             # if not np.isclose(objective.fitness_value, max_fitness) and global_var.verbose.show_warnings:
             #     warnings.warn('Reevaluation of fitness function for equation has obtained different result. Not an error, if ANN DE solver is used.')
-            while objective.weights_internal_evald and not objective.simplified:
-                self.simplify_equation(objective)
-            objective.right_part_selected = True
+            self.simplify_equation(objective)
+        else:
+            objective.reset_explaining_term(objective.target_idx)
 
     def simplify_equation(self, objective: Equation):
-        # Remove common terms
-        nonzero_terms_mask = np.array([False if weight == 0 else True for weight in objective.weights_internal],
-                                      dtype=np.integer)
-        nonzero_terms_mask = np.append(nonzero_terms_mask, True)  # Include right side
-        nonzero_terms = [item for item, keep in zip(objective.structure, nonzero_terms_mask) if keep]
-        nonzero_terms_labels = [[term.cache_label[0]] if not isinstance(term.cache_label[0], tuple) else list(
-            next(zip(*term.cache_label))) for term in nonzero_terms]
+        # Get nonzero terms
+        nonzero_terms_mask = np.array([False if weight == 0 else True for weight in objective.weights_internal], dtype=np.integer)
+        nonrs_terms = [term for i, term in enumerate(objective.structure) if i != objective.target_idx]
+        nonzero_terms = [item for item, keep in zip(nonrs_terms, nonzero_terms_mask) if keep]
+        nonzero_terms.append(objective.structure[objective.target_idx])
+        nonzero_terms_labels = [[term.cache_label[0]] if not isinstance(term.cache_label[0], tuple) else list(next(zip(*term.cache_label))) for term in nonzero_terms]
 
-        common_factor = list(set.intersection(*map(set, nonzero_terms_labels)))
-        common_dim = []
-        if common_factor and len(nonzero_terms) > 1:
-            min_order = np.inf
-            for term in nonzero_terms:
-                for factor in term.structure:
-                    if factor.cache_label[0] == common_factor[0]:
-                        if len(factor.params) > 1:
-                            common_dim.append(factor.params[-1])
-                        if factor.cache_label[1][0] < min_order:
-                            min_order = factor.cache_label[1][0]
-
-            if len(set(common_dim)) < 2:
+        # If amount nonzero terms is more than one -- get their intersection
+        if len(nonzero_terms) > 1:
+            common_factor = np.array(set.intersection(*map(set, nonzero_terms_labels))).flatten()
+            common_dim = []
+            if common_factor:
+                # Find if this intersection in the same dimension (i.e. trigonometry functions) + it's minimal order
+                min_order = np.inf
                 for term in nonzero_terms:
-                    temp = deepcopy(term)
-                    factors_simplified = []
                     for factor in term.structure:
                         if factor.cache_label[0] == common_factor[0]:
-                            for i, value in enumerate(factor.params_description):
-                                if factor.params_description[i]["name"] == "power":
-                                    factor.params[i] -= min_order
-                            if factor.cache_label[1][0] == 0:
-                                factors_simplified.append(factor)
-                    term.structure = [factor for factor in term.structure if factor not in factors_simplified]
-                    term.reset_saved_state()
-                    if len(term.structure) == 0:
-                        term.randomize()
+                            if len(factor.params) > 1:
+                                common_dim.append(factor.params[-1])
+                            if factor.cache_label[1][0] < min_order:
+                                min_order = factor.cache_label[1][0]
+                if len(set(common_dim)) < 2:
+                    # If dimension is the same -- reduce order of terms' factor
+                    for term in nonzero_terms:
+                        temp = deepcopy(term)
+                        factors_simplified = []
+                        for factor in term.structure:
+                            if factor.cache_label[0] == common_factor[0]:
+                                for i, value in enumerate(factor.params_description):
+                                    if factor.params_description[i]["name"] == "power":
+                                        factor.params[i] -= min_order
+                                        if factor.params[i] == 0:
+                                            factors_simplified.append(factor)
+                        term.structure = [factor for factor in term.structure if factor not in factors_simplified]
                         term.reset_saved_state()
-                    while objective.structure.count(term) > 1 or term == temp:
-                        term.randomize()
-                        term.reset_saved_state()
-                objective.reset_state(reset_right_part=True)
+                        # If term's order became zero -- replace term
+                        if len(term.structure) == 0:
+                            term.randomize()
+                            term.reset_saved_state()
+                        while objective.structure.count(term) > 1 or term == temp:
+                            term.randomize()
+                            term.reset_saved_state()
+                        objective.simplified = False
+                        objective.right_part_selected = False
+                        break
         objective.simplified = True
+        objective.right_part_selected = True
 
     def use_default_tags(self):
         self._tags = {'equation right part selection', 'gene level', 'contains suboperators', 'inplace'}
