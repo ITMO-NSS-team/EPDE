@@ -45,8 +45,11 @@ class EqRightPartSelector(CompoundOperator):
     @HistoryExtender('\n -> The equation structure was detected: ', 'a')        
     def apply(self, objective : Equation, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
-        
-        if not objective.right_part_selected:
+
+        if objective.weights_internal_evald:
+            self.simplify_equation(objective)
+
+        while not objective.right_part_selected:
             min_fitness = np.inf
             min_idx = 0
             if not objective.contains_deriv(objective.main_var_to_explain):
@@ -58,8 +61,6 @@ class EqRightPartSelector(CompoundOperator):
                 if not objective.structure[target_idx].contains_deriv(objective.main_var_to_explain):
                     continue
                 objective.target_idx = target_idx
-                # self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
-                # self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
                 fitness = self.suboperators['fitness_calculation'].apply(objective,
                                                                             arguments = subop_args['fitness_calculation'],
                                                                             force_out_of_place = True)
@@ -74,15 +75,11 @@ class EqRightPartSelector(CompoundOperator):
             # self.suboperators['fitness_calculation'].apply(objective, arguments = subop_args['fitness_calculation'])
             # if not np.isclose(objective.fitness_value, max_fitness) and global_var.verbose.show_warnings:
             #     warnings.warn('Reevaluation of fitness function for equation has obtained different result. Not an error, if ANN DE solver is used.')
+            while objective.weights_internal_evald and not objective.simplified:
+                self.simplify_equation(objective)
             objective.right_part_selected = True
 
-        self.simplify_equation(objective, subop_args)
-
-
-    def use_default_tags(self):
-        self._tags = {'equation right part selection', 'gene level', 'contains suboperators', 'inplace'}
-
-    def simplify_equation(self, objective: Equation, arguments):
+    def simplify_equation(self, objective: Equation):
         # Remove common terms
         nonzero_terms_mask = np.array([False if weight == 0 else True for weight in objective.weights_internal],
                                       dtype=np.integer)
@@ -105,6 +102,7 @@ class EqRightPartSelector(CompoundOperator):
 
             if len(set(common_dim)) < 2:
                 for term in nonzero_terms:
+                    temp = deepcopy(term)
                     factors_simplified = []
                     for factor in term.structure:
                         if factor.cache_label[0] == common_factor[0]:
@@ -113,26 +111,20 @@ class EqRightPartSelector(CompoundOperator):
                                     factor.params[i] -= min_order
                             if factor.cache_label[1][0] == 0:
                                 factors_simplified.append(factor)
-                                last_removed_mandatory = factor.mandatory
-                                last_removed_deriv = factor.is_deriv
-                                continue
                     term.structure = [factor for factor in term.structure if factor not in factors_simplified]
                     term.reset_saved_state()
                     if len(term.structure) == 0:
                         term.randomize()
-                        # term.randomize(mandatory_family=last_removed_mandatory, create_derivs=last_removed_deriv)
                         term.reset_saved_state()
-                    while objective.structure.count(term) > 1:
+                    while objective.structure.count(term) > 1 or term == temp:
                         term.randomize()
-                        # term.randomize(mandatory_family=term.structure[0].mandatory, create_derivs=term.structure[0].is_deriv)
                         term.reset_saved_state()
-                # if not objective.contains_deriv(objective.main_var_to_explain):
-                #     objective.restore_property(deriv=True)
-                # if not objective.contains_variable(objective.main_var_to_explain):
-                #     objective.restore_property(mandatory_family=objective.main_var_to_explain)
                 objective.reset_state(reset_right_part=True)
-                self.apply(objective, arguments)
-                # self.simplify_equation(objective, arguments)
+        objective.simplified = True
+
+    def use_default_tags(self):
+        self._tags = {'equation right part selection', 'gene level', 'contains suboperators', 'inplace'}
+
         
 class RandomRHPSelector(CompoundOperator):
     '''

@@ -355,7 +355,7 @@ class Term(ComplexStructure):
 class Equation(ComplexStructure):
     __slots__ = ['_history', 'structure', 'interelement_operator', 'n_immutable', 'pool',
                   # '_target', '_features', 'saved', 'saved_as','max_factors_in_term', 'operator',
-                 'target_idx', 'right_part_selected', '_weights_final', 'weights_final_evald', 
+                 'target_idx', 'right_part_selected', '_weights_final', 'weights_final_evald', 'simplified',
                  '_weights_internal', 'weights_internal_evald', 'fitness_calculated', 'stability_calculated', 'aic_calculated', 'solver_form_defined',
                  '_fitness_value', '_coefficients_stability', '_aic', 'metaparameters', 'main_var_to_explain'] # , '_solver_form'
                  
@@ -595,6 +595,7 @@ class Equation(ComplexStructure):
         self.stability_calculated = False
         self.aic_calculated = False
         self.solver_form_defined = False
+        self.simplified = False
 
     @HistoryExtender('\n -> was copied by deepcopy(self)', 'n')
     def __deepcopy__(self, memo=None):
@@ -627,6 +628,7 @@ class Equation(ComplexStructure):
         new_equation.fitness_calculated = self.fitness_calculated
         new_equation.stability_calculated = self.stability_calculated
         new_equation.aic_calculated = self.aic_calculated
+        new_equation.simplified = self.simplified
         new_equation.solver_form_defined = False
 
         try:
