@@ -45,8 +45,11 @@ class EqRightPartSelector(CompoundOperator):
     @HistoryExtender('\n -> The equation structure was detected: ', 'a')        
     def apply(self, objective : Equation, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
-        
-        if not objective.right_part_selected:
+
+        if objective.weights_internal_evald:
+            self.simplify_equation(objective)
+
+        while not objective.right_part_selected:
             min_fitness = np.inf
             min_idx = 0
             if not objective.contains_deriv(objective.main_var_to_explain):
@@ -54,14 +57,10 @@ class EqRightPartSelector(CompoundOperator):
             if not objective.contains_variable(objective.main_var_to_explain):
                 objective.restore_property(mandatory_family = objective.main_var_to_explain)
                 
-            
-                
             for target_idx, target_term in enumerate(objective.structure):
                 if not objective.structure[target_idx].contains_deriv(objective.main_var_to_explain):
                     continue
                 objective.target_idx = target_idx
-                # self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
-                # self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
                 fitness = self.suboperators['fitness_calculation'].apply(objective,
                                                                             arguments = subop_args['fitness_calculation'],
                                                                             force_out_of_place = True)
@@ -76,10 +75,56 @@ class EqRightPartSelector(CompoundOperator):
             # self.suboperators['fitness_calculation'].apply(objective, arguments = subop_args['fitness_calculation'])
             # if not np.isclose(objective.fitness_value, max_fitness) and global_var.verbose.show_warnings:
             #     warnings.warn('Reevaluation of fitness function for equation has obtained different result. Not an error, if ANN DE solver is used.')
+            while objective.weights_internal_evald and not objective.simplified:
+                self.simplify_equation(objective)
             objective.right_part_selected = True
+
+    def simplify_equation(self, objective: Equation):
+        # Remove common terms
+        nonzero_terms_mask = np.array([False if weight == 0 else True for weight in objective.weights_internal],
+                                      dtype=np.integer)
+        nonzero_terms_mask = np.append(nonzero_terms_mask, True)  # Include right side
+        nonzero_terms = [item for item, keep in zip(objective.structure, nonzero_terms_mask) if keep]
+        nonzero_terms_labels = [[term.cache_label[0]] if not isinstance(term.cache_label[0], tuple) else list(
+            next(zip(*term.cache_label))) for term in nonzero_terms]
+
+        common_factor = list(set.intersection(*map(set, nonzero_terms_labels)))
+        common_dim = []
+        if common_factor and len(nonzero_terms) > 1:
+            min_order = np.inf
+            for term in nonzero_terms:
+                for factor in term.structure:
+                    if factor.cache_label[0] == common_factor[0]:
+                        if len(factor.params) > 1:
+                            common_dim.append(factor.params[-1])
+                        if factor.cache_label[1][0] < min_order:
+                            min_order = factor.cache_label[1][0]
+
+            if len(set(common_dim)) < 2:
+                for term in nonzero_terms:
+                    temp = deepcopy(term)
+                    factors_simplified = []
+                    for factor in term.structure:
+                        if factor.cache_label[0] == common_factor[0]:
+                            for i, value in enumerate(factor.params_description):
+                                if factor.params_description[i]["name"] == "power":
+                                    factor.params[i] -= min_order
+                            if factor.cache_label[1][0] == 0:
+                                factors_simplified.append(factor)
+                    term.structure = [factor for factor in term.structure if factor not in factors_simplified]
+                    term.reset_saved_state()
+                    if len(term.structure) == 0:
+                        term.randomize()
+                        term.reset_saved_state()
+                    while objective.structure.count(term) > 1 or term == temp:
+                        term.randomize()
+                        term.reset_saved_state()
+                objective.reset_state(reset_right_part=True)
+        objective.simplified = True
 
     def use_default_tags(self):
         self._tags = {'equation right part selection', 'gene level', 'contains suboperators', 'inplace'}
+
         
 class RandomRHPSelector(CompoundOperator):
     '''
