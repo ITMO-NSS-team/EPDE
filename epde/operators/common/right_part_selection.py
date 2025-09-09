@@ -90,9 +90,9 @@ class EqRightPartSelector(CompoundOperator):
 
         # If amount nonzero terms is more than one -- get their intersection
         if len(nonzero_terms) > 1:
-            common_factor = np.array(set.intersection(*map(set, nonzero_terms_labels))).flatten()
+            common_factor = np.array(list(set.intersection(*map(set, nonzero_terms_labels)))).flatten()
             common_dim = []
-            if common_factor:
+            if len(common_factor) > 0:
                 # Find if this intersection in the same dimension (i.e. trigonometry functions) + it's minimal order
                 min_order = np.inf
                 for term in nonzero_terms:
@@ -125,7 +125,7 @@ class EqRightPartSelector(CompoundOperator):
                             term.reset_saved_state()
                         objective.simplified = False
                         objective.right_part_selected = False
-                        break
+                        return
         objective.simplified = True
         objective.right_part_selected = True
 
