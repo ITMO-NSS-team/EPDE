@@ -133,9 +133,9 @@ class ImplicitEquation(object):
             if isinstance(cond, BOPElement):
                 assert isinstance(cond.variables, int), 'Boundary operator has to contain only a single variable.'
                 try:
-                    var = self._var_order.index((cond.variables, cond.axis))
+                    var = self._var_order.index((cond.variables, cond.term))
                 except ValueError:
-                    print(f'Missing {cond.variables, cond.axis} from the list of variables {self._var_order}')
+                    print(f'Missing {cond.variables, cond.term} from the list of variables {self._var_order}')
                     raise RuntimeError()
                 cond_val[var] = cond.values
             else:
@@ -285,7 +285,7 @@ class OdeintAdapter(object):
               boundary_conditions: List[BOPElement] = None, vars: List[str] = ['x',], *args, **kwargs):
         if not isinstance(equations, list):
             raise RuntimeError('Equations have to be passed as a list.')
-        # self._implicit_equation = ImplicitEquation(equations, domain, vars)
+        self._implicit_equation = ImplicitEquation(equations, domain, vars)
         if isinstance(domain, Domain): 
             grid = domain.build().detach().numpy().reshape(-1)
         else:
