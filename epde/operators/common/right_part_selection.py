@@ -52,13 +52,11 @@ class EqRightPartSelector(CompoundOperator):
             min_fitness = np.inf
             weights_internal = np.zeros_like(objective.structure)
             min_idx = 0
-            if not objective.contains_deriv(objective.main_var_to_explain):
-                objective.restore_property(deriv = True)
-            if not objective.contains_variable(objective.main_var_to_explain):
-                objective.restore_property(mandatory_family = objective.main_var_to_explain)
+            if not any(term.contains_variable(objective.main_var_to_explain) and term.contains_deriv(objective.main_var_to_explain) for term in objective.structure):
+                objective.restore_property(mandatory_family=objective.main_var_to_explain, deriv=True)
                 
             for target_idx, target_term in enumerate(objective.structure):
-                if not objective.structure[target_idx].contains_deriv(objective.main_var_to_explain):
+                if not (objective.structure[target_idx].contains_variable(objective.main_var_to_explain) and objective.structure[target_idx].contains_deriv(objective.main_var_to_explain)):
                     continue
                 objective.target_idx = target_idx
                 fitness = self.suboperators['fitness_calculation'].apply(objective,
