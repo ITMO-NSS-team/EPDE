@@ -215,8 +215,8 @@ class Term(ComplexStructure):
             self.prev_normalized = normalize
             value = super().evaluate(structural)
             if normalize:
+                value = np.ones_like(value)
                 if np.ndim(value) != 1:
-                    value = np.ones_like(value)
                     for factor in self.structure:
                         temp = factor.evaluate()
                         # value *= normalize_ts(temp)
@@ -226,10 +226,14 @@ class Term(ComplexStructure):
                     #     # value = normalize_ts(value)
                     #     value = minmax_normalize(value)
                 else:
-                    if np.std(value) != 0:
-                        value = (value - np.mean(value)) / np.std(value)
-                    else:
-                        value = (value - np.mean(value))
+                    # if np.std(value) != 0:
+                    #     value = (value - np.mean(value)) / np.std(value)
+                    # else:
+                    #     value = (value - np.mean(value))
+                    for factor in self.structure:
+                        temp = factor.evaluate()
+                        # value *= normalize_ts(temp)
+                        value *= (temp - np.mean(temp) - np.min(temp)) / (np.max(temp) - np.min(temp))
             if np.all([len(factor.params) == 1 for factor in self.structure]) and grids is None:
                 # Место возможных проблем: сохранение/загрузка нормализованных данных
                 self.saved[normalize] = global_var.tensor_cache.add(self.cache_label, value, normalized=normalize)
@@ -508,10 +512,13 @@ class Equation(ComplexStructure):
             mf_marker = mandatory_family if mandatory_family else None
             temp = Term(self.pool, mandatory_family=mf_marker,
                         max_factors_in_term=self.metaparameters['max_factors_in_term']['value'])
-            if deriv and temp.contains_deriv():
+            if deriv and mandatory_family and temp.contains_deriv() and temp.contains_variable(self.main_var_to_explain):
                 self.structure[replacement_idx] = temp
                 break
-            elif mandatory_family and temp.contains_variable(self.main_var_to_explain):
+            elif deriv and temp.contains_deriv() and not mandatory_family:
+                self.structure[replacement_idx] = temp
+                break
+            elif mandatory_family and temp.contains_variable(self.main_var_to_explain) and not deriv:
                 self.structure[replacement_idx] = temp
                 break
             else:
