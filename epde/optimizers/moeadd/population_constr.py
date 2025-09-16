@@ -36,7 +36,7 @@ class SystemsPopulationConstructor(object):
         try:
             passed_solution.set_objective_functions(kwargs['obj_funs'])
         except KeyError:
-            passed_solution.use_default_multiobjective_function()        
+            passed_solution.use_default_multiobjective_function(self.use_pic)
 
     def create(self, **kwargs):
         sparsity = kwargs.get('sparsity', 10 ** (np.random.uniform(low = np.log10(self.sparsity_interval[0]),
