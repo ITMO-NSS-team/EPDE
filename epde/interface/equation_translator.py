@@ -216,7 +216,7 @@ class CoeffLessEquation():
             metaparameters={'terms_number': {'optimizable': False, 'value': len(term_list)},
                             'max_factors_in_term': {'optimizable': False, 'value': max_factors}}
             for var_key in all_vars:
-                metaparameters[('sparsity', var_key)] = {'optimizable': True, 'value': 1.}
+                metaparameters[('sparsity', var_key)] = {'optimizable': True, 'value': 0.}
 
 
             self.equation = Equation(pool=pool, basic_structure=terms_aggregated,
