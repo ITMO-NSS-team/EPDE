@@ -11,7 +11,7 @@ import warnings
 import copy
 import os
 import pickle
-from typing import Union, Callable, List
+from typing import Union, Callable, Tuple
 from functools import singledispatchmethod, reduce
 try:
     from collections.abc import Iterable
@@ -842,6 +842,40 @@ class Equation(ComplexStructure):
         del self._solver_form
         self.solver_form_defined = False
         gc.collect()
+
+    def __iter__(self):
+        return EquationIterator(self)        
+
+class EquationIterator(object):
+    def __init__(self, equation: Equation):
+        self._internal_idx = 0
+        self._equation = equation
+
+    def __next__(self) -> Tuple[Union[None, float], Term]:
+        if self._internal_idx < len(self._equation.structure):
+            if self._equation.weights_final_evald:
+                while True:
+                    idx_in_weights = self._internal_idx if self._internal_idx <= self._equation.target_idx \
+                        else self._internal_idx - 1
+
+                    if self._internal_idx == self._equation.target_idx:
+                        coeff = -1.
+                        break
+                    elif self._equation.weights_final[idx_in_weights] == 0:
+                        self._internal_idx += 1
+                        if self._internal_idx >= len(self._equation.structure):
+                            raise StopIteration
+                    else:
+                        coeff = self._equation.weights_final[idx_in_weights]
+                        break
+            else:                    
+                coeff = None
+            
+            term = self._equation.structure[self._internal_idx]
+            self._internal_idx += 1
+            return (coeff, term)
+        else:
+            raise StopIteration
 
 def solver_formed_grid(training_grid=None):
     raise NotImplementedError('solver_formed_grid function is to be depricated')
