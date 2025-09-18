@@ -120,17 +120,17 @@ BASE_PLOTTER_PARAMS = {
 
 
 BASE_TRAINING_PARAMS = {
-                        'epochs'            : 3e4,  # 1e5
+                        'epochs'            : 1e2,  # 1e5
                         'info_string_every' : 'None', #1e4,
                         'mixed_precision'   : False,
                         'save_model'        : False,
                         'model_name'        : 'None'
                         }
 
-def solver_formed_grid(training_grid=None, device = 'cpu'):
+def solver_formed_grid(training_grid=None, grid_var_keys=None, device = 'cpu'):
     if training_grid is None:
         keys, training_grid = global_var.grid_cache.get_all(mode = 'torch')
-    else:
+    elif grid_var_keys is None:
         keys, _ = global_var.grid_cache.get_all(mode = 'torch')
 
     assert len(keys) == training_grid[0].ndim, 'Mismatching dimensionalities'
@@ -327,21 +327,24 @@ class SolverAdapter(object):
     def solve_epde_system(self, system: Union[SoEq, dict], grids: list=None, boundary_conditions=None,
                           mode='NN', data=None, use_cache: bool = False, use_fourier: bool = False,
                           fourier_params: dict = None, use_adaptive_lambdas: bool = False,
-                          to_numpy: bool = False, *args, **kwargs):
+                          to_numpy: bool = False, grid_var_keys = None, *args, **kwargs):
         solver_device(device = self._device)
 
         if isinstance(system, SoEq):
             system_interface = SystemSolverInterface(system_to_adapt=system)
             system_solver_forms = system_interface.form(grids = grids, mode = mode)
         elif isinstance(system, dict):
+            system_solver_forms = list(system.values())
+        elif isinstance(system, list):
             system_solver_forms = system
         else:
             raise TypeError(f'Incorrect type of the equations passed into solver. Expected dict or SoEq, got {type(system)}.')
         
         if boundary_conditions is None:
+            raise NotImplementedError('TBD')
             op_gen = PregenBOperator(system=system,
                                      system_of_equation_solver_form=[sf_labeled[1] for sf_labeled
-                                                                     in system_solver_forms])
+                                                                     in system.values()])
             op_gen.generate_default_bc(vals = data, grids = grids)
             boundary_conditions = op_gen.conditions
             
@@ -352,11 +355,12 @@ class SolverAdapter(object):
 
         if grids is None:
             grid_var_keys, grids = global_var.grid_cache.get_all(mode = 'torch')
-        else:
+        elif grid_var_keys is None:
             grid_var_keys, _ = global_var.grid_cache.get_all(mode = 'torch')
+
         domain = self.create_domain(grid_var_keys, grids, self._device)
 
-        return self.solve(equations=[form[1] for form in system_solver_forms], domain = domain,
+        return self.solve(equations=system_solver_forms, domain = domain,
                           boundary_conditions = bconds_combined, mode = mode, use_cache = use_cache,
                           use_fourier = use_fourier, fourier_params = fourier_params, 
                           use_adaptive_lambdas = use_adaptive_lambdas, to_numpy = to_numpy)
