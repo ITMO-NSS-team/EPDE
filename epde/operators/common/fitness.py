@@ -200,7 +200,7 @@ class L2LRFitness(CompoundOperator):
                 for start_idx in range(0, num_horizons, step_size):
                     end_idx = start_idx + window_size
                     target_window = target_vals[start_idx:end_idx]
-                    if np.isclose(np.sqrt(np.mean(np.power(_, 2))), 0, atol=1e-10):
+                    if np.isclose(np.sqrt(np.mean(np.power(target_window, 2))), 0, atol=1e-10):
                         window_stability = np.abs(np.std(target_window))
                     else:
                         window_stability = np.abs(np.std(target_window) / np.sqrt(np.mean(np.power(target_window, 2))))
@@ -241,7 +241,7 @@ class L2LRFitness(CompoundOperator):
                             target_window = target_vals[start_idx:end_idx, :].reshape(-1)
                         else:
                             target_window = target_vals[:, start_idx:end_idx].reshape(-1)
-                        if np.isclose(np.sqrt(np.mean(np.power(_, 2))), 0, atol=1e-10):
+                        if np.isclose(np.sqrt(np.mean(np.power(target_window, 2))), 0, atol=1e-10):
                             window_stability = np.abs(np.std(target_window))
                         else:
                             window_stability = np.abs(np.std(target_window) / np.sqrt(np.mean(np.power(target_window, 2))))
@@ -285,7 +285,7 @@ class L2LRFitness(CompoundOperator):
                             target_window = target_vals[:, start_idx:end_idx, :].reshape(-1)
                         else:
                             target_window = target_vals[:, :, start_idx:end_idx].reshape(-1)
-                        if np.isclose(np.sqrt(np.mean(np.power(_, 2))), 0, atol=1e-10):
+                        if np.isclose(np.sqrt(np.mean(np.power(target_window, 2))), 0, atol=1e-10):
                             window_stability = np.abs(np.std(target_window))
                         else:
                             window_stability = np.abs(np.std(target_window) / np.sqrt(np.mean(np.power(target_window, 2))))

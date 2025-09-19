@@ -51,8 +51,8 @@
         "term_param_proportion" : 0.4
 	},
 	"SystemMutation" : {
-
-    	},
+		"indiv_mutation_prob" : 0.7
+    },
 	"EquationMutation" : {
         "r_mutation" : 0.6
 	},
