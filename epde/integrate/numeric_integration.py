@@ -51,8 +51,8 @@ def get_higher_order_coeff(equation: Dict, orders: np.ndarray, var: int) -> Tupl
             term_filtered['term'] = [None,]
             term_filtered['pow'] = 0
         else:
-            term_idx = [der_var for idx, der_var in enumerate(term_filtered['term']) 
-                        if der_var == deriv_key and term_filtered['pow'][idx] == var][0]
+            term_idx = [idx for idx, der_var in enumerate(term_filtered['term'])
+                        if der_var == deriv_key and term_filtered['var'][idx] == var][0]
             term_filtered['term'][term_idx] = [None,]
             term_filtered['pow'][term_idx] = 0
         return term_filtered            
