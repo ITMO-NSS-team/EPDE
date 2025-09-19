@@ -200,7 +200,11 @@ class L2LRFitness(CompoundOperator):
                 for start_idx in range(0, num_horizons, step_size):
                     end_idx = start_idx + window_size
                     target_window = target_vals[start_idx:end_idx]
-                    eq_window_weights.append(np.abs(np.std(target_window) / np.sqrt(np.mean(np.power(target_window, 2)))))
+                    if np.isclose(np.sqrt(np.mean(np.power(_, 2))), 0, atol=1e-10):
+                        window_stability = np.abs(np.std(target_window))
+                    else:
+                        window_stability = np.abs(np.std(target_window) / np.sqrt(np.mean(np.power(target_window, 2))))
+                    eq_window_weights.append(window_stability)
                 lr = np.mean(eq_window_weights)
             else:
                 features = self.feature_reshape(features_vals)
@@ -212,7 +216,11 @@ class L2LRFitness(CompoundOperator):
                     estimator.fit(feature_window, target_window, sample_weight=self.g_fun_vals[start_idx:end_idx])
                     valuable_weights = estimator.coef_[:-1]
                     eq_window_weights.append(valuable_weights)
-                eq_cv = np.array([np.abs(np.std(_) / np.sqrt(np.mean(np.power(_, 2)))) for _ in zip(*eq_window_weights)])
+                eq_cv = np.array([
+                    np.abs(np.std(_)) if np.isclose(np.sqrt(np.mean(np.power(_, 2))), 0, atol=1e-10)
+                    else np.abs(np.std(_) / np.sqrt(np.mean(np.power(_, 2))))
+                    for _ in zip(*eq_window_weights)
+                ])
                 lr = eq_cv.mean()
 
         elif target_vals.ndim == 2:
@@ -233,7 +241,11 @@ class L2LRFitness(CompoundOperator):
                             target_window = target_vals[start_idx:end_idx, :].reshape(-1)
                         else:
                             target_window = target_vals[:, start_idx:end_idx].reshape(-1)
-                        eq_window_weights.append(np.abs(np.std(target_window) / np.sqrt(np.mean(np.power(target_window, 2)))))
+                        if np.isclose(np.sqrt(np.mean(np.power(_, 2))), 0, atol=1e-10):
+                            window_stability = np.abs(np.std(target_window))
+                        else:
+                            window_stability = np.abs(np.std(target_window) / np.sqrt(np.mean(np.power(target_window, 2))))
+                        eq_window_weights.append(window_stability)
                     lr += np.mean(eq_window_weights)
                 else:
                     features = self.feature_reshape(features_vals)
@@ -250,7 +262,11 @@ class L2LRFitness(CompoundOperator):
                             estimator.fit(feature_window, target_window, sample_weight=self.g_fun_vals.reshape(*data_shape, -1)[:, start_idx:end_idx].reshape(-1))
                         valuable_weights = estimator.coef_[:-1]
                         eq_window_weights.append(valuable_weights)
-                    eq_cv = np.array([np.abs(np.std(_) / np.sqrt(np.mean(np.power(_, 2)))) for _ in zip(*eq_window_weights)])
+                    eq_cv = np.array([
+                        np.abs(np.std(_)) if np.isclose(np.sqrt(np.mean(np.power(_, 2))), 0, atol=1e-10)
+                        else np.abs(np.std(_) / np.sqrt(np.mean(np.power(_, 2))))
+                        for _ in zip(*eq_window_weights)
+                    ])
                     lr += eq_cv.mean()
 
         elif target_vals.ndim == 3:
@@ -269,7 +285,11 @@ class L2LRFitness(CompoundOperator):
                             target_window = target_vals[:, start_idx:end_idx, :].reshape(-1)
                         else:
                             target_window = target_vals[:, :, start_idx:end_idx].reshape(-1)
-                        eq_window_weights.append(np.abs(np.std(target_window) / np.sqrt(np.mean(np.power(target_window, 2)))))
+                        if np.isclose(np.sqrt(np.mean(np.power(_, 2))), 0, atol=1e-10):
+                            window_stability = np.abs(np.std(target_window))
+                        else:
+                            window_stability = np.abs(np.std(target_window) / np.sqrt(np.mean(np.power(target_window, 2))))
+                        eq_window_weights.append(window_stability)
                     lr += np.mean(eq_window_weights)
                 else:
                     features = self.feature_reshape(features_vals)
@@ -290,7 +310,12 @@ class L2LRFitness(CompoundOperator):
                             estimator.fit(feature_window, target_window, sample_weight=self.g_fun_vals.reshape(*data_shape, -1)[:, :, start_idx:end_idx].reshape(-1))
                         valuable_weights = estimator.coef_[:-1]
                         eq_window_weights.append(valuable_weights)
-                    eq_cv = np.array([np.abs(np.std(_) / np.sqrt(np.mean(np.power(_, 2)))) for _ in zip(*eq_window_weights)])
+                    eq_cv = np.array([
+                        np.abs(np.std(_)) if np.isclose(np.sqrt(np.mean(np.power(_, 2))), 0, atol=1e-10)
+                        else np.abs(np.std(_) / np.sqrt(np.mean(np.power(_, 2))))
+                        for _ in zip(*eq_window_weights)
+                    ])
+
                     lr += eq_cv.mean()
 
         objective.fitness_calculated = True
