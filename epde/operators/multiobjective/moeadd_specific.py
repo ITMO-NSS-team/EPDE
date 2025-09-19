@@ -343,38 +343,33 @@ def best_obj_values(levels : ParetoLevels):
 
 class OffspringUpdater(CompoundOperator):
     key = 'ParetoLevelUpdater'
-    
-    def apply(self, objective : ParetoLevels, arguments : dict):
-        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
+
+    def apply(self, objective: ParetoLevels, arguments: dict):
+        self_args, subop_args = self.parse_suboperator_args(arguments=arguments)
 
         while objective.unplaced_candidates:
             offspring = objective.unplaced_candidates.pop()
-            attempt = 1; attempt_limit = self.params['attempt_limit']
+            attempt = 1;
+            attempt_limit = self.params['attempt_limit']
+            temp_offspring = self.suboperators['chromosome_mutation'].apply(objective=offspring,
+                                                                            arguments=subop_args['chromosome_mutation'])
             while True:
-                temp_offspring = self.suboperators['chromosome_mutation'].apply(objective = offspring,
-                                                                                arguments = subop_args['chromosome_mutation'])
-                self.suboperators['right_part_selector'].apply(objective = temp_offspring,
-                                                               arguments = subop_args['right_part_selector'])                
-                self.suboperators['chromosome_fitness'].apply(objective = temp_offspring,
-                                                              arguments = subop_args['chromosome_fitness'])
+                self.suboperators['right_part_selector'].apply(objective=temp_offspring,
+                                                               arguments=subop_args['right_part_selector'])
+                self.suboperators['chromosome_fitness'].apply(objective=temp_offspring,
+                                                              arguments=subop_args['chromosome_fitness'])
 
-                if all([temp_offspring != solution for solution in objective.population]):
-                    self.suboperators['pareto_level_updater'].apply(objective = (temp_offspring, objective),
-                                                                    arguments = subop_args['pareto_level_updater'])
+                if all([not np.allclose(temp_offspring.obj_fun, solution.obj_fun) for solution in objective.population]):
+                    self.suboperators['pareto_level_updater'].apply(objective=(temp_offspring, objective),
+                                                                    arguments=subop_args['pareto_level_updater'])
                     break
                 elif attempt >= attempt_limit:
-                    # print(temp_offspring.text_form)
-                    # print('-----------------------')
-                    # for idx, individual in enumerate(objective.population):
-                    #     print(f'Individual {idx}')
-                    #     print(individual.text_form)
-                    #     print('-----------------------')
-                    # raise Exception('Can not place individual into the population. Try decreasing population size or increasing token variety. ')
-                    print('The algorithm had issues with generating unique offsprings, allowed replication.')
-                    self.suboperators['pareto_level_updater'].apply(objective = (temp_offspring, objective),
-                                                                    arguments = subop_args['pareto_level_updater'])
-
-                    break
+                    # print('The algorithm had issues with generating unique offsprings.')
+                    temp_offspring.create()
+                    # temp_offspring.reset_state()
+                    attempt = 1
+                self.suboperators['chromosome_mutation'].apply(objective=temp_offspring,
+                                                               arguments=subop_args['chromosome_mutation'])
                 attempt += 1
         return objective
     
