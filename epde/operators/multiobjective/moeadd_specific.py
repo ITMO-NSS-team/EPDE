@@ -360,18 +360,22 @@ class OffspringUpdater(CompoundOperator):
                 self.suboperators['chromosome_fitness'].apply(objective=temp_offspring,
                                                               arguments=subop_args['chromosome_fitness'])
 
-                if all([not np.allclose(temp_offspring.obj_fun, solution.obj_fun) for solution in objective.population]):
+                if (all([not np.allclose(temp_offspring.obj_fun, solution.obj_fun) for solution in objective.population])
+                        and tuple(temp_offspring.obj_fun) not in objective.history):
+                        # and all([not np.allclose(temp_offspring.obj_fun, obj_fun) for obj_fun in objective.history]):
+
+                    self.suboperators['pareto_level_updater'].apply(objective=(temp_offspring, objective),
+                                                                    arguments=subop_args['pareto_level_updater'])
+                    objective.history.add(tuple(temp_offspring.obj_fun))
+                    break
+                elif replaced >= attempt_limit:
+                    print("Allowed replication")
                     self.suboperators['pareto_level_updater'].apply(objective=(temp_offspring, objective),
                                                                     arguments=subop_args['pareto_level_updater'])
                     break
-                # elif attempt >= attempt_limit and replaced:
-                #     print("Allowed replication")
-                #     self.suboperators['pareto_level_updater'].apply(objective=(temp_offspring, objective),
-                #                                                     arguments=subop_args['pareto_level_updater'])
-                #     break
                 elif attempt >= attempt_limit:
                     temp_offspring.create()
-                    replaced = True
+                    replaced += 1
                     attempt = 1
                 self.suboperators['chromosome_mutation'].apply(objective=temp_offspring,
                                                                arguments=subop_args['chromosome_mutation'])
@@ -430,6 +434,7 @@ class InitialParetoLevelSorting(CompoundOperator):
                         
                 self.suboperators['chromosome_fitness'].apply(objective = objective.unplaced_candidates[idx],
                                                               arguments = subop_args['chromosome_fitness'])
+                objective.history.add(tuple(candidate.obj_fun))
             objective.initial_placing()
         return objective
     
