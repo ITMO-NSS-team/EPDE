@@ -157,18 +157,18 @@ class ParetoLevels(object):
         for level in self.levels:
             temp = []
             for element in level:
-                if element.obj_fun != point.obj_fun or element in history:
+                if not np.array_equal(element.obj_fun, point.obj_fun) or any(np.array_equal(element.obj_fun, h) for h in history):
                     temp.append(element)
-                history.append(element)
+                history.append(element.obj_fun)
             if not len(temp) == 0:
                 new_levels.append(temp)
 
         population_cleared = []
         history = []
         for elem in self.population:
-            if elem.obj_fun != point.obj_fun or elem in history:
+            if not np.array_equal(elem.obj_fun, point.obj_fun) or any(np.array_equal(elem.obj_fun, h) for h in history):
                 population_cleared.append(elem)
-            history.append(elem)
+            history.append(elem.obj_fun)
                 
         if len(population_cleared) != sum([len(level) for level in new_levels]):
             print(len(population_cleared), len(self.population), sum([len(level) for level in new_levels]))
