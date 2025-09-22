@@ -122,7 +122,7 @@ def locate_pareto_worst(levels, weights, best_obj, penalty_factor = 1.):
     domain_solution_NDL_idxs = np.empty(most_crowded_count)
     for solution_idx, solution in enumerate(domain_solutions[most_crowded_domain]):
         domain_solution_NDL_idxs[solution_idx] = [level_idx for level_idx in np.arange(len(levels.levels)) 
-                                                    if any([solution == level_solution for level_solution in levels.levels[level_idx]])][0]
+                                                    if any([np.allclose(solution.obj_fun, level_solution.obj_fun) for level_solution in levels.levels[level_idx]])][0]
         
     max_level = np.max(domain_solution_NDL_idxs)
     worst_NDL_section = [domain_solutions[most_crowded_domain][sol_idx] for sol_idx in np.arange(len(domain_solutions[most_crowded_domain])) 
@@ -364,11 +364,11 @@ class OffspringUpdater(CompoundOperator):
                     self.suboperators['pareto_level_updater'].apply(objective=(temp_offspring, objective),
                                                                     arguments=subop_args['pareto_level_updater'])
                     break
-                elif attempt >= attempt_limit and replaced:
-                    print("Allowed replication")
-                    self.suboperators['pareto_level_updater'].apply(objective=(temp_offspring, objective),
-                                                                    arguments=subop_args['pareto_level_updater'])
-                    break
+                # elif attempt >= attempt_limit and replaced:
+                #     print("Allowed replication")
+                #     self.suboperators['pareto_level_updater'].apply(objective=(temp_offspring, objective),
+                #                                                     arguments=subop_args['pareto_level_updater'])
+                #     break
                 elif attempt >= attempt_limit:
                     temp_offspring.create()
                     replaced = True
