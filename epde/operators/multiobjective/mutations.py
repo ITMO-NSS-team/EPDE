@@ -39,11 +39,11 @@ class SystemMutation(CompoundOperator):
 
                 altered_objective.vals.replace_gene(gene_key = eq_key, value = altered_eq)
 
-            for param_key in params_keys:
-                altered_param = self.suboperators['param_mutation'].apply(altered_objective.vals[param_key],
-                                                                          subop_args['param_mutation'])
-                altered_objective.vals.replace_gene(gene_key = param_key, value = altered_param)
-                altered_objective.vals.pass_parametric_gene(key = param_key, value = altered_param)
+        for param_key in params_keys:
+            altered_param = self.suboperators['param_mutation'].apply(altered_objective.vals[param_key],
+                                                                      subop_args['param_mutation'])
+            altered_objective.vals.replace_gene(gene_key = param_key, value = altered_param)
+            altered_objective.vals.pass_parametric_gene(key = param_key, value = altered_param)
         
         altered_objective.reset_state() # Использовать ли reset_right_part
         return altered_objective
