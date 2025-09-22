@@ -351,23 +351,20 @@ class OffspringUpdater(CompoundOperator):
             offspring = objective.unplaced_candidates.pop()
             attempt = 1
             attempt_limit = self.params['attempt_limit']
-            # temp_offspring = self.suboperators['chromosome_mutation'].apply(objective=offspring,
-            #                                                                 arguments=subop_args['chromosome_mutation'])
-            temp_offspring = offspring
+            temp_offspring = self.suboperators['chromosome_mutation'].apply(objective=offspring,
+                                                                            arguments=subop_args['chromosome_mutation'])
             while True:
                 self.suboperators['right_part_selector'].apply(objective=temp_offspring,
                                                                arguments=subop_args['right_part_selector'])
                 self.suboperators['chromosome_fitness'].apply(objective=temp_offspring,
                                                               arguments=subop_args['chromosome_fitness'])
 
-                if all([not np.allclose(temp_offspring.obj_fun, solution.obj_fun) for solution in objective.population]):
+                if all([not np.array_equal(temp_offspring.obj_fun, solution.obj_fun) for solution in objective.population]):
                     self.suboperators['pareto_level_updater'].apply(objective=(temp_offspring, objective),
                                                                     arguments=subop_args['pareto_level_updater'])
                     break
                 elif attempt >= attempt_limit:
-                    # print('The algorithm had issues with generating unique offsprings.')
                     temp_offspring.create()
-                    # temp_offspring.reset_state()
                     attempt = 1
                 self.suboperators['chromosome_mutation'].apply(objective=temp_offspring,
                                                                arguments=subop_args['chromosome_mutation'])
