@@ -67,6 +67,7 @@ class ParetoLevels(object):
         self.population = []
         self._update_method = update_method
         self.unplaced_candidates = population
+        self.history = set()
     
     def manual_reconst(self, attribute:str, value, except_attrs:dict):
         from epde.loader import attrs_from_dict
