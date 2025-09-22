@@ -221,6 +221,7 @@ def get_multiobjective_mutation(mutation_params): # TODO: rename function calls 
     add_kwarg_to_operator(operator = metaparameter_mutation)
 
     chromosome_mutation = SystemMutation(['indiv_mutation_prob'])
+    add_kwarg_to_operator(operator = chromosome_mutation)
 
     equation_mutation.set_suboperators(operators = {'mutation' : term_mutation})
 
@@ -239,7 +240,8 @@ def get_singleobjective_mutation(mutation_params):
     add_kwarg_to_operator(operator = equation_mutation)
     
     chromosome_mutation = SystemMutation(['indiv_mutation_prob'])
-    
+    add_kwarg_to_operator(operator = chromosome_mutation)
+
     equation_mutation.set_suboperators(operators = {'mutation' : term_mutation})
 
     chromosome_mutation.set_suboperators(operators = {'equation_mutation' : equation_mutation})

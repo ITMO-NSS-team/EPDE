@@ -30,7 +30,7 @@ class SystemMutation(CompoundOperator):
         altered_objective = deepcopy(objective)
         
         eqs_keys = altered_objective.vals.equation_keys; params_keys = altered_objective.vals.params_keys
-        affected_by_mutation = True
+        affected_by_mutation = np.random.random() < self.params['indiv_mutation_prob']
 
         if affected_by_mutation:
             for eq_key in eqs_keys:
@@ -56,7 +56,7 @@ class EquationMutation(CompoundOperator):
     key = 'EquationMutation'
     @HistoryExtender(f'\n -> mutating equation', 'ba')
     def apply(self, objective : Equation, arguments : dict):
-        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)  
+        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
         for term_idx in range(objective.n_immutable, len(objective.structure)):
             if np.random.uniform(0, 1) <= self.params['r_mutation']:
@@ -213,7 +213,8 @@ def get_basic_mutation(mutation_params):
     metaparameter_mutation = MetaparameterMutation(['std', 'mean'])
     add_kwarg_to_operator(operator = metaparameter_mutation)
 
-    chromosome_mutation = SystemMutation([])
+    chromosome_mutation = SystemMutation(['indiv_mutation_prob'])
+    add_kwarg_to_operator(operator = chromosome_mutation)
 
     equation_mutation.set_suboperators(operators = {'mutation' : term_mutation})#, [term_param_mutation, ]
                                        # probas = {'equation_crossover' : [0.0, 1.0]})
