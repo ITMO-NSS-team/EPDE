@@ -353,18 +353,25 @@ class OffspringUpdater(CompoundOperator):
             attempt_limit = self.params['attempt_limit']
             temp_offspring = self.suboperators['chromosome_mutation'].apply(objective=offspring,
                                                                             arguments=subop_args['chromosome_mutation'])
+            replaced = False
             while True:
                 self.suboperators['right_part_selector'].apply(objective=temp_offspring,
                                                                arguments=subop_args['right_part_selector'])
                 self.suboperators['chromosome_fitness'].apply(objective=temp_offspring,
                                                               arguments=subop_args['chromosome_fitness'])
 
-                if all([not np.array_equal(temp_offspring.obj_fun, solution.obj_fun) for solution in objective.population]):
+                if all([not np.allclose(temp_offspring.obj_fun, solution.obj_fun) for solution in objective.population]):
+                    self.suboperators['pareto_level_updater'].apply(objective=(temp_offspring, objective),
+                                                                    arguments=subop_args['pareto_level_updater'])
+                    break
+                elif attempt >= attempt_limit and replaced:
+                    print("Allowed replication")
                     self.suboperators['pareto_level_updater'].apply(objective=(temp_offspring, objective),
                                                                     arguments=subop_args['pareto_level_updater'])
                     break
                 elif attempt >= attempt_limit:
                     temp_offspring.create()
+                    replaced = True
                     attempt = 1
                 self.suboperators['chromosome_mutation'].apply(objective=temp_offspring,
                                                                arguments=subop_args['chromosome_mutation'])
