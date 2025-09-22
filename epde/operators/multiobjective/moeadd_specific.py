@@ -349,10 +349,11 @@ class OffspringUpdater(CompoundOperator):
 
         while objective.unplaced_candidates:
             offspring = objective.unplaced_candidates.pop()
-            attempt = 1;
+            attempt = 1
             attempt_limit = self.params['attempt_limit']
-            temp_offspring = self.suboperators['chromosome_mutation'].apply(objective=offspring,
-                                                                            arguments=subop_args['chromosome_mutation'])
+            # temp_offspring = self.suboperators['chromosome_mutation'].apply(objective=offspring,
+            #                                                                 arguments=subop_args['chromosome_mutation'])
+            temp_offspring = offspring
             while True:
                 self.suboperators['right_part_selector'].apply(objective=temp_offspring,
                                                                arguments=subop_args['right_part_selector'])
