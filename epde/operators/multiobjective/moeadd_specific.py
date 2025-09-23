@@ -353,17 +353,14 @@ class OffspringUpdater(CompoundOperator):
             attempt_limit = self.params['attempt_limit']
             temp_offspring = self.suboperators['chromosome_mutation'].apply(objective=offspring,
                                                                             arguments=subop_args['chromosome_mutation'])
-            replaced = False
+            replaced = 0
             while True:
                 self.suboperators['right_part_selector'].apply(objective=temp_offspring,
                                                                arguments=subop_args['right_part_selector'])
                 self.suboperators['chromosome_fitness'].apply(objective=temp_offspring,
                                                               arguments=subop_args['chromosome_fitness'])
 
-                if (all([not np.allclose(temp_offspring.obj_fun, solution.obj_fun) for solution in objective.population])
-                        and tuple(temp_offspring.obj_fun) not in objective.history):
-                        # and all([not np.allclose(temp_offspring.obj_fun, obj_fun) for obj_fun in objective.history]):
-
+                if tuple(temp_offspring.obj_fun) not in objective.history:
                     self.suboperators['pareto_level_updater'].apply(objective=(temp_offspring, objective),
                                                                     arguments=subop_args['pareto_level_updater'])
                     objective.history.add(tuple(temp_offspring.obj_fun))
@@ -377,6 +374,7 @@ class OffspringUpdater(CompoundOperator):
                     temp_offspring.create()
                     replaced += 1
                     attempt = 1
+
                 self.suboperators['chromosome_mutation'].apply(objective=temp_offspring,
                                                                arguments=subop_args['chromosome_mutation'])
                 attempt += 1
@@ -422,18 +420,16 @@ class InitialParetoLevelSorting(CompoundOperator):
         
         if len(objective.population) == 0:
             for idx, candidate in enumerate(objective.unplaced_candidates):
-                # while True:
-                    # temp_candidate = copy.deepcopy(candidate)
                 self.suboperators['right_part_selector'].apply(objective = candidate,
-                                                                arguments = subop_args['right_part_selector'])                
-                    # print('Hah, got ya!')
-                    # if all([temp_candidate != solution for solution in objective.unplaced_candidates[:idx] + 
-                    #         objective.unplaced_candidates[idx+1:]]):
-                    #     objective.unplaced_candidates[idx] = temp_candidate
-                    #     break
-                        
+                                                                arguments = subop_args['right_part_selector'])
                 self.suboperators['chromosome_fitness'].apply(objective = objective.unplaced_candidates[idx],
                                                               arguments = subop_args['chromosome_fitness'])
+                while tuple(candidate.obj_fun) in objective.history:
+                    candidate.create()
+                    self.suboperators['right_part_selector'].apply(objective=candidate,
+                                                                   arguments=subop_args['right_part_selector'])
+                    self.suboperators['chromosome_fitness'].apply(objective=objective.unplaced_candidates[idx],
+                                                                  arguments=subop_args['chromosome_fitness'])
                 objective.history.add(tuple(candidate.obj_fun))
             objective.initial_placing()
         return objective
