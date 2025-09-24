@@ -11,6 +11,7 @@ class Losses():
     """
     Class which contains all losses.
     """
+
     def __init__(self,
                  mode: str,
                  weak_form: Union[None, list],
@@ -18,12 +19,19 @@ class Losses():
                  tol: Union[int, float],
                  n_t_operation: callable = None):
         """
-        Args:
-            mode (str): calculation mode, *NN, autograd, mat*.
-            weak_form (Union[None, list]): list of basis functions if form is weak.
-            n_t (int): number of unique points in time dimension.
-            tol (Union[int, float])): penalty in *casual loss*.
-            n_t_operation (callable): function to calculate n_t for each batch
+        Initializes the Losses class with parameters defining the loss calculation.
+        
+                This setup configures how the loss will be computed based on the chosen mode,
+                basis functions (if applicable), temporal discretization, and tolerance levels.
+                These parameters are essential for tailoring the loss function to the specific
+                characteristics of the differential equation being discovered and the data used for training.
+        
+                Args:
+                    mode (str): Calculation mode (*NN*, *autograd*, or *mat*), determining the method for loss computation.
+                    weak_form (Union[None, list]): List of basis functions if using a weak formulation of the loss.
+                    n_t (int): Number of unique points in the time dimension, influencing the temporal discretization.
+                    tol (Union[int, float]): Tolerance value used as a penalty in the causal loss calculation.
+                    n_t_operation (callable): Function to calculate `n_t` for each batch, allowing dynamic adjustment of temporal discretization.
         """
 
         self.mode = mode
@@ -37,17 +45,26 @@ class Losses():
     def _loss_op(self,
                 operator: torch.Tensor,
                 lambda_op: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
-        """ Operator term in loss calc-n.
-
+        """
+        Computes the operator loss term, penalizing deviations from the governing equation.
+        
+        This loss encourages the discovered equation to accurately represent the
+        relationships present in the data.  It measures how well the learned
+        operator satisfies the equation across the domain.
+        
         Args:
-            operator (torch.Tensor): operator calc-n result.
-            For more details to eval module -> operator_compute().
-
-            lambda_op (torch.Tensor): regularization parameter for operator term in loss.
-
+            operator (torch.Tensor): The result of applying the discovered operator.
+                This represents the equation's residual at each point.
+                See `eval` module -> `operator_compute()` for details.
+            lambda_op (torch.Tensor): Regularization parameter controlling the
+                strength of the operator loss.  This balances the trade-off
+                between equation fit and complexity.
+        
         Returns:
-            loss_operator (torch.Tensor): operator term in loss.
-            op (torch.Tensor): MSE of operator on the whole grid.
+            Tuple[torch.Tensor, torch.Tensor]:
+                - loss_operator (torch.Tensor): The operator loss term, a scalar value.
+                - op (torch.Tensor): The mean squared error of the operator on the grid,
+                  providing a measure of equation satisfaction.
         """
         if self.weak_form is not None and self.weak_form != []:
             op = operator
@@ -62,16 +79,17 @@ class Losses():
                  bval: torch.Tensor,
                  true_bval: torch.Tensor,
                  lambda_bound: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
-        """ Computes boundary loss for corresponding type.
-
+        """
+        Computes the loss associated with boundary conditions, penalizing deviations from the true boundary values. This ensures that the discovered equation accurately reflects the system's behavior at its boundaries.
+        
         Args:
-            bval (torch.Tensor): calculated values of boundary conditions.
-            true_bval (torch.Tensor): true values of boundary conditions.
-            lambda_bound (torch.Tensor): regularization parameter for boundary term in loss.
-
+            bval (torch.Tensor): Calculated values of boundary conditions.
+            true_bval (torch.Tensor): True values of boundary conditions.
+            lambda_bound (torch.Tensor): Regularization parameter for the boundary term in the loss.
+        
         Returns:
-            loss_bnd (torch.Tensor): boundary term in loss.
-            bval_diff (torch.Tensor): MSE of all boundary con-s.
+            loss_bnd (torch.Tensor): Boundary term in the loss.
+            bval_diff (torch.Tensor): Mean squared error of all boundary conditions.
         """
 
         bval_diff = torch.mean((bval - true_bval)**2, 0)
@@ -87,20 +105,20 @@ class Losses():
                      lambda_op: torch.Tensor,
                      lambda_bound: torch.Tensor,
                      save_graph: bool = True) -> Tuple[torch.Tensor, torch.Tensor]:
-        """ Compute l2 loss.
-
-        Args:
-            operator (torch.Tensor): operator calc-n result.
-            For more details to eval module -> operator_compute().
-            bval (torch.Tensor): calculated values of boundary conditions.
-            true_bval (torch.Tensor): true values of boundary conditions.
-            lambda_op (torch.Tensor): regularization parameter for operator term in loss.
-            lambda_bound (torch.Tensor): regularization parameter for boundary term in loss.
-            save_graph (bool, optional): saving computational graph. Defaults to True.
-
-        Returns:
-            loss (torch.Tensor): loss.
-            loss_normalized (torch.Tensor): loss, where regularization parameters are 1.
+        """
+        Compute the overall loss based on the discrepancy between the predicted and true values, considering both the governing equation and boundary conditions. This loss function guides the optimization process to find the equation that best fits the data.
+        
+                Args:
+                    operator (torch.Tensor): The result of applying the discovered differential operator to the input data.
+                    bval (torch.Tensor): The predicted values at the boundaries of the domain.
+                    true_bval (torch.Tensor): The true (observed) values at the boundaries of the domain.
+                    lambda_op (torch.Tensor): A weighting factor to balance the importance of the operator loss.
+                    lambda_bound (torch.Tensor): A weighting factor to balance the importance of the boundary condition loss.
+                    save_graph (bool, optional): Whether to save the computational graph for backpropagation. Defaults to True.
+        
+                Returns:
+                    loss (torch.Tensor): The total loss, combining the operator and boundary condition losses.
+                    loss_normalized (torch.Tensor): The total loss with regularization parameters set to 1, providing a baseline for comparison.
         """
 
         if bval is None:
@@ -133,22 +151,25 @@ class Losses():
                     true_bval: torch.Tensor,
                     lambda_op: torch.Tensor,
                     lambda_bound: torch.Tensor)-> Tuple[torch.Tensor, torch.Tensor]:
-        """ Computes causal loss, which is calculated with weights matrix:
-        W = exp(-tol*(Loss_i)) where Loss_i is sum of the L2 loss from 0
-        to t_i moment of time. This loss function should be used when one
-        of the DE independent parameter is time.
-
-        Args:
-            operator (torch.Tensor): operator calc-n result.
-            For more details to eval module -> operator_compute().
-            bval (torch.Tensor): calculated values of boundary conditions.
-            true_bval (torch.Tensor): true values of boundary conditions.
-            lambda_op (torch.Tensor): regularization parameter for operator term in loss.
-            lambda_bound (torch.Tensor): regularization parameter for boundary term in loss.
-
-        Returns:
-            loss (torch.Tensor): loss.
-            loss_normalized (torch.Tensor): loss, where regularization parameters are 1.
+        """
+        Computes a weighted loss, emphasizing earlier time points in the data.
+        
+                This loss function is designed to address the challenges of time-dependent
+                differential equations, where the influence of initial states on the solution
+                decreases over time. By weighting the loss at each time step, the method
+                prioritizes accurate modeling of the initial dynamics.
+        
+                Args:
+                    operator (torch.Tensor): The result of applying the differential operator.
+                        See `eval module -> operator_compute()` for details.
+                    bval (torch.Tensor): Calculated values of boundary conditions.
+                    true_bval (torch.Tensor): True values of boundary conditions.
+                    lambda_op (torch.Tensor): Regularization parameter for the operator term in the loss.
+                    lambda_bound (torch.Tensor): Regularization parameter for the boundary term in the loss.
+        
+                Returns:
+                    loss (torch.Tensor): The total loss, combining operator and boundary losses.
+                    loss_normalized (torch.Tensor): The total loss with regularization parameters set to 1.
         """
         if self.n_t_operation is not None: # calculate if batch mod
             self.n_t = self.n_t_operation(operator)
@@ -180,19 +201,21 @@ class Losses():
                   true_bval: torch.Tensor,
                   lambda_op: torch.Tensor,
                   lambda_bound: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
-        """ Weak solution of O/PDE problem.
-
-        Args:
-            operator (torch.Tensor): operator calc-n result.
-            For more details to eval module -> operator_compute().
-            bval (torch.Tensor): calculated values of boundary conditions.
-            true_bval (torch.Tensor): true values of boundary conditions.
-            lambda_op (torch.Tensor): regularization parameter for operator term in loss.
-            lambda_bound (torch.Tensor): regularization parameter for boundary term in loss.
-
-        Returns:
-            loss (torch.Tensor): loss.
-            loss_normalized (torch.Tensor): loss, where regularization parameters are 1.
+        """
+        Computes the loss function for a weak solution of a differential equation, considering both the equation itself and boundary conditions.
+        
+                Args:
+                    operator (torch.Tensor): The result of applying the differential operator to the predicted solution.  See `eval` module -> `operator_compute()` for details.
+                    bval (torch.Tensor): The predicted values at the boundaries of the domain.
+                    true_bval (torch.Tensor): The true (target) values at the boundaries of the domain.
+                    lambda_op (torch.Tensor): Regularization parameter to weight the importance of satisfying the differential equation.
+                    lambda_bound (torch.Tensor): Regularization parameter to weight the importance of satisfying the boundary conditions.
+        
+                Returns:
+                    loss (torch.Tensor): The total loss, combining the equation and boundary condition losses.
+                    loss_normalized (torch.Tensor): The total loss with regularization parameters set to 1, providing a baseline loss value.
+        
+                Why: This function calculates the loss, guiding the optimization process to find a solution that minimizes the error in both satisfying the differential equation and adhering to the specified boundary conditions. The regularization parameters allow weighting the relative importance of these two aspects.
         """
 
         if bval is None:
@@ -219,19 +242,28 @@ class Losses():
                 lambda_op: torch.Tensor,
                 lambda_bound: torch.Tensor,
                 save_graph: bool = True) -> Union[_default_loss, _weak_loss, _causal_loss]:
-        """ Setting the required loss calculation method.
-
+        """
+        Selects and applies the appropriate loss calculation method based on the specified mode and tolerances.
+        
+        This method acts as a dispatcher, choosing between different loss calculation strategies
+        depending on whether a weak form is specified or a tolerance level is set. This allows the framework
+        to adapt the loss calculation to different problem settings and solution requirements.
+        
         Args:
-            operator (torch.Tensor): operator calc-n result.
-            For more details to eval module -> operator_compute().
-            bval (torch.Tensor): calculated values of boundary conditions.
-            true_bval (torch.Tensor): true values of boundary conditions.
-            lambda_op (torch.Tensor): regularization parameter for operator term in loss.
-            lambda_bound (torch.Tensor): regularization parameter for boundary term in loss.
-            save_graph (bool, optional): saving computational graph. Defaults to True.
-
+            operator (torch.Tensor): The result of the operator calculation. See `eval module -> operator_compute()` for details.
+            bval (torch.Tensor): Calculated values of boundary conditions.
+            true_bval (torch.Tensor): True values of boundary conditions.
+            lambda_op (torch.Tensor): Regularization parameter for the operator term in the loss.
+            lambda_bound (torch.Tensor): Regularization parameter for the boundary term in the loss.
+            save_graph (bool, optional): Whether to save the computational graph. Defaults to True.
+        
         Returns:
-            Union[default_loss, weak_loss, causal_loss]: A given calculation method.
+            Union[_default_loss, _weak_loss, _causal_loss]: The calculated loss based on the chosen method.
+        
+        Why:
+            This method centralizes the selection of the appropriate loss calculation strategy,
+            allowing the framework to handle different problem formulations (e.g., with or without
+            weak forms, with different tolerance requirements) in a modular and adaptable way.
         """
 
         if self.mode in ('mat', 'autograd'):

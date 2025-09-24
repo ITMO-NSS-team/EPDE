@@ -12,6 +12,28 @@ from epde.preprocessing.fin_der import FDderivatives
 
 
 def get_cheb_for_point(matrix, axis, idx, grid, max_der_order=3, points=9, poly_order=None):
+    """
+    Computes a Chebyshev polynomial fit at a specific location within a multi-dimensional array.
+    
+        This method isolates a subset of data points along a given axis centered on a specified index,
+        and subsequently fits a Chebyshev polynomial to these points. This provides a smooth,
+        continuous representation of the data in the neighborhood of the point, which can be used
+        for tasks such as estimating derivatives or interpolating values.
+    
+        Args:
+            matrix (numpy.ndarray): The multi-dimensional array containing the data.
+            axis (int): The axis along which to extract the data points.
+            idx (tuple or array-like): A tuple or array of indices specifying the location of the point.
+            grid (list of numpy.ndarray): A list of arrays, where each array represents the coordinate grid for each axis.
+            max_der_order (int, optional): The maximum derivative order to consider when automatically determining the polynomial order. Defaults to 3.
+            points (int, optional): The number of points to use for the Chebyshev fit. Defaults to 9.
+            poly_order (int, optional): The order of the Chebyshev polynomial. If None, it is determined based on max_der_order. Defaults to None.
+    
+        Returns:
+            tuple: A tuple containing:
+                - The x-coordinate of the central point (float).
+                - The Chebyshev polynomial object (numpy.polynomial.chebyshev.Chebyshev) fitted to the data.
+    """
     if poly_order is None:
         max_power = max_der_order + 1
     else:
@@ -38,6 +60,29 @@ def get_cheb_for_point(matrix, axis, idx, grid, max_der_order=3, points=9, poly_
 
 
 def process_point_cheb(args):
+    """
+    Processes a single point to calculate derivatives using Chebyshev polynomials or finite differences.
+    
+        This method strategically chooses between Chebyshev polynomials and finite difference approximations
+        to compute derivatives at a specific point within a multi-dimensional data tensor. It prioritizes
+        Chebyshev polynomials for points within a defined boundary to leverage their accuracy and efficiency,
+        reverting to finite differences for points outside this boundary. This hybrid approach ensures
+        accurate derivative calculations across the entire data domain.
+    
+        Args:
+            args: A list containing the following elements:
+                idx (numpy.ndarray): The index of the point in the matrix.
+                matrix (numpy.ndarray): The multi-dimensional data tensor.
+                grid (numpy.ndarray): The grid spacing for each dimension.
+                points (numpy.ndarray): The points at which to evaluate the Chebyshev polynomials.
+                n_der (int or tuple/list of int): The order of derivatives to calculate for each dimension.
+                poly_bound (int): The boundary within which to use Chebyshev polynomials.
+                poly_order (int): The order of the Chebyshev polynomials to use.
+    
+        Returns:
+            numpy.ndarray: An array containing the calculated derivatives. The length of the array is the sum of the
+                derivative orders for each dimension.
+    """
     global PolyBoundary
     idx = np.array(args[0])
     matrix = args[1]

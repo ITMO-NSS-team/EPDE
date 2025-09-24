@@ -12,6 +12,31 @@ matplotlib.rc('axes', titlesize=SMALL_SIZE)
 
 def Lotka_Volterra_by_RK(initial : tuple, timestep : float, steps : int, alpha : float, 
                          beta : float, delta : float, gamma : float):
+    """
+    Calculates the Lotka-Volterra model using the Runge-Kutta method.
+    
+        This method simulates the Lotka-Volterra equations, a mathematical model
+        describing the dynamics of biological systems in which two species interact,
+        one as a predator and the other as prey, using the 4th order Runge-Kutta
+        method. It is used to generate synthetic data of interacting populations,
+        which can then be used to test equation discovery algorithms. By simulating
+        known dynamics, the accuracy and efficiency of these algorithms can be
+        evaluated.
+    
+        Args:
+            initial: Initial population sizes of prey and predator.
+            timestep: The size of the time step used in the Runge-Kutta method.
+            steps: The number of time steps to simulate.
+            alpha: The natural growth rate of prey.
+            beta: The death rate of prey due to predation.
+            delta: The growth rate of predators due to eating prey.
+            gamma: The natural death rate of predators.
+    
+        Returns:
+            np.ndarray: A 2D array where each row represents a time step and the
+                two columns represent the prey and predator population sizes,
+                respectively.
+    """
     res = np.full(shape = (steps, 2), fill_value = initial, dtype=np.float64)
     for step in range(steps-1):
         # print(res[step, :])
@@ -34,6 +59,21 @@ def Lotka_Volterra_by_RK(initial : tuple, timestep : float, steps : int, alpha :
     return res
         
 def dxdt(x, t):
+    """
+    Calculates the time derivative of the Lorenz system.
+    
+        This function is a crucial component for simulating the Lorenz attractor,
+        as it defines the system's dynamics. It computes the rate of change of the
+        system's state variables (x, y, z) at a given time, which is essential
+        for numerical integration and visualization of the chaotic behavior.
+    
+        Args:
+            x (np.ndarray): A 3D vector representing the current state of the system (x, y, z).
+            t (float): The current time. While not directly used in the calculation, it's a required argument for ODE solvers.
+    
+        Returns:
+            np.ndarray: A 3D vector representing the derivative of the system's state at the given time (dx/dt, dy/dt, dz/dt).
+    """
     sigma = 10.; rho = 28.; beta = 8./3.
     res = np.empty(3)
     res[0] = sigma * (x[1] - x[0])
@@ -42,6 +82,25 @@ def dxdt(x, t):
     return res
 
 def solve(initial : tuple, timestep : float, steps : int):
+    """
+    Solves a system of differential equations using the Runge-Kutta 4th order method to model the system's evolution.
+    
+        This method is crucial for simulating the behavior of a system over time,
+        given its initial state and the differential equations that govern its dynamics.
+        It iteratively approximates the system's state at discrete time steps,
+        allowing us to observe how the system evolves from its initial conditions.
+    
+        Args:
+            initial (tuple): The initial conditions for the system's variables.
+            timestep (float): The size of each time step.
+            steps (int): The number of steps to take.
+    
+        Returns:
+            np.ndarray: A 2D array where each row represents the state of the system
+                at a given time step. The shape of the array is (steps, len(initial)).
+                This array represents the trajectory of the system through time,
+                allowing for analysis of its behavior and characteristics.
+    """
     res = np.full(shape = (steps, len(initial)), fill_value = initial, dtype=np.float64)
     for step in range(steps-1):
         k1s = dxdt(res[step, :], timestep * step)
@@ -53,6 +112,21 @@ def solve(initial : tuple, timestep : float, steps : int):
     return res
 
 def plot3d(solution):
+    """
+    Plots the discovered equation in 3D space to visualize its behavior.
+    
+        Args:
+            solution (np.ndarray): A NumPy array representing the solution to be plotted.
+                It is expected to have shape (N, 3), where N is the number of points
+                and each point has X, Y, and Z coordinates.
+    
+        Returns:
+            None. Displays the 3D plot using matplotlib.
+    
+        Why: Visualizing the solution in 3D helps in understanding the behavior of the
+        discovered equation and verifying if it accurately represents the underlying dynamics
+        of the system.
+    """
     ax = plt.figure().add_subplot(projection='3d')
     # ax = plt.axes(projection='3d')
     ax.plot(*solution.T, 'black', lw = 0.3)#[:, 0], solution[:, 1], solution[:, 2], )
@@ -64,6 +138,24 @@ def plot3d(solution):
     
 
 def classical_plot(solution, time, time_max = -1, step = 1):    
+    """
+    Generates a classical plot of the solution over time to visualize the identified system dynamics.
+        
+        This method iterates through each variable in the solution, plotting its
+        values against the given time points. It enhances understanding of the system's behavior
+        by providing a visual representation of variable interactions over time.
+        It then adds a grid, legend, and axis labels to the plot before saving it to a file and displaying it.
+        
+        Args:
+            solution: The solution array, where each column represents a variable
+                and each row represents a time point.
+            time: The time array corresponding to the rows in the solution array.
+            time_max: The maximum time index to plot up to. If -1, plots all time points. Defaults to -1.
+            step: The step size for plotting time points. Defaults to 1.
+        
+        Returns:
+            None. The method saves the plot to a file and displays it.
+    """
     colors = ['k', 'r', 'b']
     for var_idx in range(solution.shape[1]):
         plt.scatter(time[:time_max:step], solution[:time_max:step, var_idx], color = colors[var_idx], 

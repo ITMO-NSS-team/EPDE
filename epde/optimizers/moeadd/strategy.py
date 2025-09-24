@@ -28,9 +28,32 @@ class MOEADDDirector(OptimizationPatternDirector):
     """
     Class for creating strategy builder of multicriterian optimization
     """
+
     def use_baseline(self, use_solver: bool = False, use_pic: bool = True, variation_params : dict = {}, mutation_params : dict = {},  
                      sorter_params : dict = {}, pareto_combiner_params : dict = {},
                      pareto_updater_params : dict = {}, **kwargs):
+        """
+        Configures the evolutionary strategy builder with a pre-defined, general-purpose setup.
+        
+                This method establishes a foundational evolutionary strategy by integrating selection,
+                variation, and population updating mechanisms. It offers flexibility through adjustable
+                parameters and the choice between solver-based and L2-based fitness evaluations.
+                This baseline configuration provides a starting point for discovering differential equations
+                from data by evolving equation structures that effectively model the underlying dynamics.
+                
+                Args:
+                 use_solver: Flag indicating whether to use a solver-based fitness evaluation.
+                 use_pic: Flag indicating whether to use the PIC solver-based fitness evaluation.
+                 variation_params: Parameters for the variation operator.
+                 mutation_params: Parameters for the mutation operator.
+                 sorter_params: Parameters for the initial sorter.
+                 pareto_combiner_params: Parameters for the Pareto levels combiner.
+                 pareto_updater_params: Parameters for the Pareto levels updater.
+                 **kwargs: Additional keyword arguments to be passed to operators.
+                
+                Returns:
+                 None
+        """
         add_kwarg_to_operator = partial(add_base_param_to_operator, target_dict = kwargs)
 
         neighborhood_selector = SimpleNeighborSelector(['number_of_neighbors'])
@@ -96,4 +119,20 @@ class MOEADDDirector(OptimizationPatternDirector):
                                                                ('pareto_updater_compl', population_updater)])
     
     def use_constrained_eq_search(self):
+        """
+        Raises a NotImplementedError, indicating that constrained equation search is not yet implemented.
+        
+        This functionality is intended to allow the search for differential equations to be guided by constraints,
+        improving the efficiency and accuracy of the equation discovery process. Currently, this feature is not
+        available.
+        
+        Args:
+            self: The instance of the class.
+        
+        Raises:
+            NotImplementedError: Always raised, as the functionality is not implemented.
+        
+        Returns:
+            None.
+        """
         raise NotImplementedError('No constraints have been implemented yest')

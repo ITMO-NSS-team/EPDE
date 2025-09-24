@@ -6,12 +6,25 @@ import torch
 verbose = False
 
 def solver_device(device: str):
-    """ Corresponding to chosen device, all futher
-        created tensors will be with the same device
-
+    """
+    Sets the default device for subsequent tensor operations.
+    
+    This function configures the global default device (CPU or CUDA)
+    for all newly created tensors. It checks for CUDA availability
+    if a CUDA device is requested and falls back to CPU if CUDA is
+    unavailable.
+    
     Args:
-        device (str): device mode, **cuda, gpu, cpu*.
-
+        device (str): The desired device ('cuda', 'gpu', or 'cpu').
+    
+    Returns:
+        None: This function modifies the global PyTorch state.
+    
+    Why:
+        This ensures consistency in device placement for all tensors
+        created during the equation discovery process, which is
+        crucial for efficient computation and compatibility with
+        available hardware.
     """
     if device in ['cuda','gpu'] and torch.cuda.is_available():
         if verbose:
@@ -27,14 +40,21 @@ def solver_device(device: str):
         return torch.set_default_device('cpu')
 
 def check_device(data: Any):
-    """ checking the device of the data.
-        If the data.device is not same with torch.set_default_device,
-        change one.
+    """
+    Ensures that the input data (model or tensor) resides on the correct device.
+    
+    This function checks if the device of the input data matches the currently
+    configured default device. If they differ, the data is moved to the
+    default device to ensure compatibility and proper execution within the
+    framework. This is crucial for maintaining consistency across different
+    hardware configurations (CPU/GPU) and preventing device-related errors
+    during computations.
+    
     Args:
-        data (Any): it could be model or torch.Tensors
-
+        data (Any): The input data, which can be a model or a PyTorch tensor.
+    
     Returns:
-        data (Any): data with correct device
+        Any: The input data, moved to the default device if necessary.
     """
     device = torch.tensor([0.]).device.type
     if data.device.type != device:
@@ -43,6 +63,16 @@ def check_device(data: Any):
         return data
 
 def device_type():
-    """ Return the default device.
+    """
+    Return the default device type used by PyTorch.
+    
+    This is useful for ensuring that operations are performed on the correct device,
+    especially when working with hardware accelerators like GPUs.
+    
+    Args:
+        None
+    
+    Returns:
+        str: A string representing the device type (e.g., 'cpu' or 'cuda').
     """
     return torch.tensor([0.]).device.type

@@ -20,6 +20,24 @@ sys.path.pop()
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')))
 
 def run_wave_eq_search(multiobjective_mode, derivs = None):
+    """
+    Runs the EPDE search for the wave equation.
+        
+        This method configures and executes the EPDE search algorithm to identify
+        the wave equation from the provided data. It sets up the search space by defining custom tokens and specifying the optimization parameters,
+        allowing the algorithm to explore potential equation structures. This automated search helps in discovering the underlying differential equation
+        that best describes the observed wave phenomena.
+        
+        Args:
+            multiobjective_mode (bool): A boolean indicating whether to use multiobjective
+                optimization.
+            derivs (None): Derivatives (not used).
+        
+        Returns:
+            tuple: A tuple containing the equation search results and the metric value.
+                The first element is a list of equation search results.
+                The second element is the metric value obtained during the search.
+    """
     epde_search_obj = epde_alg.epde_search(multiobjective_mode=multiobjective_mode, use_solver = False, 
                                            dimensionality = dimensionality, boundary = 10,
                                            coordinate_tensors = grids, verbose_params = {'show_moeadd_epochs' : True})    

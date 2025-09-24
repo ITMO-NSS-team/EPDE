@@ -25,6 +25,19 @@ import scipy.io as scio
 
 
 def load_pretrained_PINN(ann_filename):
+    """
+    Loads a pre-trained Physics-Informed Neural Network (PINN) model from a file.
+    
+    This function attempts to load a previously trained PINN model from disk.
+    Loading a pre-trained model can save significant time by avoiding retraining,
+    especially when exploring different equation structures or refining existing models.
+    
+    Args:
+        ann_filename: The filename of the pickled ANN model.
+    
+    Returns:
+        The loaded ANN model, or None if the file is not found.
+    """
     try:
         with open(ann_filename, 'rb') as data_input_file:
             data_nn = pickle.load(data_input_file)
@@ -35,12 +48,43 @@ def load_pretrained_PINN(ann_filename):
 
 
 def noise_data(data, noise_level):
+    """
+    Adds random noise to the input data based on its standard deviation.
+    
+    This function perturbs the data by adding Gaussian noise scaled by the data's standard deviation and a specified noise level.
+    This helps to evaluate the robustness of equation discovery algorithms when dealing with imperfect or noisy data.
+    
+    Args:
+        data (np.ndarray): The input data to which noise will be added.
+        noise_level (float): The standard deviation of the noise, expressed as a percentage of the data's standard deviation.
+    
+    Returns:
+        np.ndarray: The data with added noise.
+    """
     # add noise level to the input data
     return noise_level * 0.01 * np.std(data) * np.random.normal(size=data.shape) + data
 
 
 def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
                       search_obj: EpdeSearch, all_vars: List[str] = ['u', ]) -> bool:
+    """
+    Compares two symbolic equations to determine which better represents the underlying dynamics.
+    
+        This method translates both equations into a comparable format, applies a fitting procedure,
+        and then assesses their coefficient stability. The comparison helps identify equations that
+        are more robust and reliable in capturing the system's behavior.
+    
+        Args:
+            correct_symbolic: The correct symbolic equation as a string.
+            eq_incorrect_symbolic: The incorrect symbolic equation as a string.
+            search_obj: An EpdeSearch object containing the search pool.
+            all_vars: A list of variable names to consider (default: ['u']).
+    
+        Returns:
+            bool: True if the correct equation exhibits better coefficient stability
+                than the incorrect equation across all variables, indicating a superior
+                representation of the system's dynamics; False otherwise.
+    """
     metaparams = {('sparsity', var): {'optimizable': False, 'value': 1E-6} for var in all_vars}
 
     correct_eq = translate_equation(correct_symbolic, search_obj.pool, all_vars=all_vars)
@@ -69,6 +113,25 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
 
 
 def prepare_suboperators(fitness_operator: CompoundOperator, operator_params: dict) -> CompoundOperator:
+    """
+    Prepares the compound fitness operator with necessary sub-operators.
+    
+        This method configures the provided compound operator by setting its
+        sub-operators for sparsity and coefficient calculation. These sub-operators
+        are essential for constructing the overall fitness evaluation process, ensuring
+        that the evolutionary algorithm can effectively explore the search space of
+        potential equation structures. The operator is then mapped between gene and
+        chromosome levels based on a fitness calculation condition to ensure proper
+        evaluation during the evolutionary process. This setup is crucial for
+        evaluating the fitness of candidate equations within the evolutionary process.
+    
+        Args:
+            fitness_operator (CompoundOperator): The compound fitness operator to prepare.
+            operator_params (dict): A dictionary of parameters for the fitness operator.
+    
+        Returns:
+            CompoundOperator: The prepared compound fitness operator.
+    """
     sparsity = LASSOSparsity()
     coeff_calc = LinRegBasedCoeffsEquation()
 
@@ -85,6 +148,24 @@ def prepare_suboperators(fitness_operator: CompoundOperator, operator_params: di
 
 
 def darcy_data(filename: str):
+    """
+    Loads Darcy flow data, creating necessary grids and reshaping the data for EPDE analysis.
+    
+    This function loads a NumPy array representing a Darcy flow solution from a specified file,
+    reshapes it to a suitable format, and generates corresponding coordinate grids. The data is duplicated
+    along the time axis to simulate a time-dependent process, which is a common requirement
+    when modeling dynamical systems with EPDE. This duplication allows the framework to analyze
+    how the system evolves over time, even if the original data represents a steady-state solution.
+    
+    Args:
+        filename (str): The path to the NumPy file (.npy) containing the Darcy flow data.
+    
+    Returns:
+        tuple: A tuple containing:
+            - grids (tuple): A tuple of NumPy arrays representing the coordinate grids (t, x, y).
+            - data (np.ndarray): A NumPy array containing the processed Darcy flow data, reshaped and
+              duplicated along the time axis. The shape of the data is (2, 128, 128).
+    """
     t = np.linspace(0., 1., 2)
     x = np.linspace(0., 1., 128)
     y = np.linspace(0., 1., 128)
@@ -96,6 +177,22 @@ def darcy_data(filename: str):
     return grids, data
 
 def darcy_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
+    """
+    Tests the performance of the EPDE search on the Darcy equation.
+        
+        This method evaluates the EPDE framework's ability to identify the Darcy equation from noisy data. 
+        It sets up an EPDE search with specific configurations, including data loading, preprocessing, 
+        custom token definitions, and equation comparison. The goal is to assess whether the framework 
+        can accurately rediscover the underlying equation despite the presence of noise and other challenges.
+        
+        Args:
+            operator: CompoundOperator instance for equation comparison.
+            foldername: Path to the folder containing the Darcy data.
+            noise_level: Level of noise to add to the data (default: 0).
+        
+        Returns:
+            bool: True if the identified equation matches the expected Darcy equation, False otherwise.
+    """
     # Test scenario to evaluate performance on darcy equation
     # eq_darcy_symbolic = '-1.0 * du/dx1{power: 1.0} * dnu/dy{power: 1.0} + -1.0 * nu{power: 1.0} * d^2u/dx1^2{power: 1} + \
     #                       -2.0 * nu{power: 1.0} * d^2u/dxdy{power: 1} + \
@@ -153,6 +250,24 @@ def darcy_test(operator: CompoundOperator, foldername: str, noise_level: int = 0
 
 
 def darcy_discovery(foldername, noise_level):
+    """
+    Discovers a differential equation governing Darcy flow from data.
+    
+        This method automates the identification of the underlying equation
+        describing Darcy flow by searching through possible equation structures.
+        It incorporates domain knowledge through custom tokens representing
+        permeability and its derivatives, and uses the EPDE framework to
+        efficiently explore the solution space. By finding the best equation
+        that fits the provided data, this method helps to understand and model
+        fluid flow in porous media.
+    
+        Args:
+            foldername: The name of the folder containing the Darcy flow data ('darcy_1.0.npy') and permeability data ('darcy_nu_1.0.npy').
+            noise_level: The level of noise to add to the Darcy flow data.
+    
+        Returns:
+            EpdeSearch: The EPDE search object containing the results of the equation discovery process.
+    """
     grid, data = darcy_data(os.path.join(foldername, 'darcy_1.0.npy'))
     nu = np.load('darcy_nu_1.0.npy')
     noised_data = noise_data(data, noise_level)

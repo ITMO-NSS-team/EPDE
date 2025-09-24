@@ -37,6 +37,23 @@ from epde.interface.prepared_tokens import TrigonometricTokens, CacheStoredToken
 from epde.interface.solver_integration import BoundaryConditions, BOPElement
 
 def epde_discovery(grids, data, derivs, use_ann = False):
+    """
+    Performs equation discovery using the EPDE algorithm.
+        
+        This method orchestrates the search for governing equations by configuring and executing an EPDE search. 
+        It leverages the provided data and derivative information to explore the space of possible equations, 
+        aiming to identify the equation structures that best represent the underlying dynamics of the system. 
+        The method configures the search space, optimization parameters, and token library before executing the search.
+        
+        Args:
+            grids: Spatial and temporal grid coordinates.
+            data: The data to fit the equation to.
+            derivs: Precomputed derivatives of the data.
+            use_ann: Flag to use artificial neural networks. Defaults to False.
+        
+        Returns:
+            EpdeSearch: The fitted EPDE search object containing the discovered equations.
+    """
     multiobjective_mode = True
     dimensionality = data.ndim - 1
     
@@ -74,6 +91,21 @@ def epde_discovery(grids, data, derivs, use_ann = False):
     
 
 def sindy_discovery(grids, u):#, u_dot):
+    """
+    Performs sparse identification of differential equations (SINDy) to discover governing equations from data.
+        
+        This method takes spatial and temporal grids and corresponding data 'u',
+        constructs a library of candidate functions using `PDELibrary`, and then
+        uses SINDy to identify a sparse model that describes the dynamics of the data.
+        It automates the process of identifying governing differential equations from data.
+        
+        Args:
+            grids (tuple): A tuple containing the temporal and spatial grids.
+            u (numpy.ndarray): The data to be modeled.
+        
+        Returns:
+            sindy.SINDy: The fitted SINDy model, representing the discovered differential equation.
+    """
     t = np.unique(grids[0])
     x = np.unique(grids[1])    
     dt = t[1] - t[0]
@@ -105,6 +137,21 @@ def sindy_discovery(grids, u):#, u_dot):
     return model
 
 def translate_sindy_eq(equation: str):
+    """
+    Translates a SINDy equation into a human-readable format suitable for further processing within the EPDE framework.
+        
+        This method takes a SINDy equation string as input, replaces the
+        shorthand notation with a more descriptive form, and appends " = du/dx1{power: 1.0}"
+        to the end of the translated equation. It relies on a predefined
+        correspondence dictionary to map the shorthand notations to their
+        corresponding representations. This translation is crucial for ensuring that the discovered equations are interpretable and can be seamlessly integrated into subsequent analysis or simulation steps within the EPDE workflow.
+    
+        Args:
+            equation (str): The SINDy equation string to translate.
+    
+        Returns:
+            str: The translated SINDy equation.
+    """
     correspondence = {"0" : "u{power: 1.0}",
                       "0_1" : "du/dx2{power: 1.0}",
                       "0_11" : "d^2u/dx2^2{power: 1.0}"}
@@ -126,6 +173,24 @@ def translate_sindy_eq(equation: str):
     return terms_comb
     
 def sindy_examplar_search(x, t, u, u_dot = None):
+    """
+    Identifies governing equations using SINDy exemplar search.
+    
+    This method employs the SINDy algorithm with a PDE library to discover
+    the underlying differential equations that describe the provided data.
+    It constructs a library of candidate functions and uses sparse regression
+    to select the most relevant terms, effectively identifying the equation's structure.
+    This approach helps automate the process of identifying governing differential equations from data.
+    
+    Args:
+        x (np.ndarray): Spatial grid points.
+        t (np.ndarray): Time points.
+        u (np.ndarray): Input data representing the system's state.
+        u_dot (np.ndarray, optional): Time derivatives of the input data. If None, it will be calculated using finite differences. Defaults to None.
+    
+    Returns:
+        ps.SINDy: The fitted SINDy model, representing the identified governing equations.
+    """
     dt = t[1] - t[0]
     dx = x[1] - x[0]
     

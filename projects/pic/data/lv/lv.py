@@ -24,6 +24,18 @@ import epde.globals as global_var
 import scipy.io as scio
 
 def load_pretrained_PINN(ann_filename):
+    """
+    Loads a pre-trained Physics-Informed Neural Network (PINN) from a file.
+    
+    This function attempts to load a previously trained PINN model, allowing the evolutionary process to start from a potentially good initial guess,
+    reducing the computational cost of training from scratch. If no pre-trained model is found, the process continues by retraining the ANN approximation.
+    
+    Args:
+        ann_filename: The filename of the pickled ANN data.
+    
+    Returns:
+        The loaded ANN data if the file exists, otherwise None.
+    """
     try:
         with open(ann_filename, 'rb') as data_input_file:
             data_nn = pickle.load(data_input_file)
@@ -34,12 +46,42 @@ def load_pretrained_PINN(ann_filename):
 
 
 def noise_data(data, noise_level):
+    """
+    Adds random noise to the input data based on its standard deviation.
+    
+    This helps to evaluate the robustness of discovered differential equations when data is imperfect.
+    
+    Args:
+        data (np.ndarray): The input data to add noise to.
+        noise_level (float): The level of noise to add, as a percentage of the data's standard deviation.
+    
+    Returns:
+        np.ndarray: The data with added noise.
+    """
     # add noise level to the input data
     return noise_level * 0.01 * np.std(data) * np.random.normal(size=data.shape) + data
 
 
 def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
                       search_obj: EpdeSearch, all_vars: List[str] = ['u', ]) -> bool:
+    """
+    Compares two symbolic equations to assess which one better represents the underlying dynamics.
+    
+        This method translates symbolic equations into a comparable format, applies a fitting procedure,
+        and then evaluates their coefficient stability. The comparison helps determine which equation
+        more accurately captures the system's behavior.
+    
+        Args:
+            correct_symbolic: The correct symbolic equation as a string.
+            eq_incorrect_symbolic: The incorrect symbolic equation as a string.
+            search_obj: An EpdeSearch object containing the search pool.
+            all_vars: A list of variable names to consider (default: ['u']).
+    
+        Returns:
+            bool: True if the coefficient stability of the correct equation is
+                less than that of the incorrect equation for all variables,
+                False otherwise.
+    """
     metaparams = {('sparsity', var): {'optimizable': False, 'value': 1E-6} for var in all_vars}
 
     correct_eq = translate_equation(correct_symbolic, search_obj.pool, all_vars=all_vars)
@@ -68,6 +110,23 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
 
 
 def prepare_suboperators(fitness_operator: CompoundOperator, operator_params: dict) -> CompoundOperator:
+    """
+    Prepares the compound fitness operator with necessary sub-operators.
+    
+        This method configures the sparsity and coefficient calculation sub-operators,
+        and sets them within the provided fitness operator. It also maps the operator
+        between gene and chromosome levels based on a fitness calculation condition.
+        This step is crucial for ensuring that the evolutionary process can effectively
+        evaluate the fitness of candidate equations by considering both their sparsity
+        and the accuracy of their coefficients.
+    
+        Args:
+          fitness_operator (CompoundOperator): The compound fitness operator to prepare.
+          operator_params (dict): A dictionary of parameters for the fitness operator.
+    
+        Returns:
+          CompoundOperator: The modified fitness operator with prepared sub-operators.
+    """
     sparsity = LASSOSparsity()
     coeff_calc = LinRegBasedCoeffsEquation()
 
@@ -84,6 +143,23 @@ def prepare_suboperators(fitness_operator: CompoundOperator, operator_params: di
 
 
 def lv_discovery(noise_level):
+    """
+    Discovers the Lotka-Volterra system's governing equations using the EPDE framework.
+    
+        This method automates the identification of differential equations that describe the dynamics
+        of the Lotka-Volterra system. By loading system data and configuring the EPDE search object
+        with specific parameters, it performs an equation discovery process, aiming to find the
+        equations that best represent the system's behavior. The discovered equations are then printed
+        to provide insights into the underlying dynamics. This approach allows for automated modeling
+        and analysis of the system's behavior directly from data.
+    
+        Args:
+            noise_level: This parameter is not used in the method.
+    
+        Returns:
+            EpdeSearch: The configured EpdeSearch object after the fitting process, containing the
+                discovered equations and related information.
+    """
     t_file = os.path.join(os.path.dirname( __file__ ), 't_20.npy')
     t = np.load(t_file)
     data_file = os.path.join(os.path.dirname(__file__), 'data_20.npy')

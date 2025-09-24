@@ -36,6 +36,24 @@ from epde.interface.prepared_tokens import TrigonometricTokens, CacheStoredToken
 from epde.interface.solver_integration import BoundaryConditions, BOPElement
 
 def write_pareto(dict_of_exp):
+    """
+    Writes Pareto front solutions to text files for each experiment.
+    
+        This function iterates through a dictionary of experimental results, extracting
+        Pareto front solutions and writing them to separate text files. The filename
+        is derived from the experiment parameters (dictionary key), and each iteration's
+        Pareto front is written with equation strings separated by newlines. This
+        facilitates the analysis and comparison of discovered equation structures
+        across different experimental settings, aiding in the identification of robust
+        and generalizable models.
+    
+        Args:
+            dict_of_exp: Dictionary where keys are tuples representing experiment
+                parameters and values are lists of lists of Pareto front objects.
+    
+        Returns:
+            None. This method writes data to files and does not return any value.
+    """
     for key, item in dict_of_exp.items():
         test_key = str(key[0]).replace('.', '_') + '__' + str(key[1]).replace('.', '_')
         with open('/home/maslyaev/epde/EPDE_main/projects/hunter-prey/param_var/'+test_key+'.txt', 'w') as f:
@@ -45,6 +63,24 @@ def write_pareto(dict_of_exp):
                     f.write(ind + '\n\n')
 
 def epde_discovery(grids, data, derivs, use_ann = False):
+    """
+    Performs symbolic regression to identify governing equations from data using an evolutionary algorithm.
+        
+        This method sets up and executes the search algorithm to discover
+        equations that describe the provided data. It configures the search space,
+        defines token types, and fits the model to the data by searching for the best equation structure.
+        
+        Args:
+            grids: Spatial and temporal grid coordinates. These coordinates provide the independent variable values for the data.
+            data: The data to fit the equations to. This is the dependent variable data that the algorithm attempts to model.
+            derivs: Precomputed derivatives of the data. (Not used in the current implementation)
+        
+        Returns:
+            tuple: A tuple containing:
+                - The EPDE search object, which holds the state and results of the search.
+                - The discovered equations with complexity 2, representing the simplest identified relationships.
+                - The saved derivatives from the EPDE search object. These derivatives can be used for further analysis or validation.
+    """
     multiobjective_mode = True
     dimensionality = data.ndim - 1
     
@@ -120,6 +156,21 @@ def epde_discovery(grids, data, derivs, use_ann = False):
 #     return model
 
 def sindy_discovery(grids, u):
+    """
+    Discovers a sparse representation of the governing PDE from the given data using SINDy.
+    
+    This method constructs a SINDy model, fits it to the provided spatio-temporal data,
+    and returns the fitted model. It leverages a PDELibrary for feature engineering,
+    allowing for custom basis functions and derivative calculations, and SR3 for sparse
+    regression. This enables the identification of the most relevant terms in the PDE.
+    
+    Args:
+        grids: Grid points for the data. Assumed to contain time and space grids.
+        u: Solution data to be modeled.
+    
+    Returns:
+        The fitted SINDy model, representing the discovered PDE.
+    """
     t = np.unique(grids[0])
     x = np.unique(grids[1])    
     dt = t[1] - t[0]

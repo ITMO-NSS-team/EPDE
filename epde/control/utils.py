@@ -8,21 +8,33 @@ from epde.supplementary import BasicDeriv, AutogradDeriv
 
 def prepare_control_inputs(model: Union[torch.nn.Sequential, List[np.ndarray]], grid: torch.Tensor, 
                            args: List[Tuple[Union[int, List]]], diff_method: BasicDeriv = None) -> torch.Tensor:
-    '''
-    Recompute the control ANN arguments tensor from the solutions of 
-    controlled equations $L \mathbf{u}(t, \mathbf{x}, \mathbf{c}) = 0$, 
-    calculating necessary derivatives, as `args` 
-
-    Args:
-        model (`torch.nn.Sequential`): solution of the controlled equation $\mathbf{u}(\mathbf{u})$.
-        
-        grid (`torch.Tensor`): tensor of the grids m x n, where m - number of points in the domain, n - number of NN inputs.
-
-        args (`List[Tuple[Union[int, List]]]`) - list of arguments of derivative operators.
-
-    Returns:
-        `torch.Tensor`: tensor of arguments for the control ANN.
-    '''
+    """
+    Recompute the arguments for the control ANN by evaluating derivatives of the solution with respect to the input grid.
+    
+        This function calculates the necessary derivatives of the solution `model` on the given `grid`
+        according to the specifications in `args`. These derivatives then form the input to the control ANN.
+        This process allows the control ANN to learn the relationship between the solution and its derivatives,
+        enabling the discovery of the underlying differential equation.
+    
+        Args:
+            model (`torch.nn.Sequential` or `List[np.ndarray]`): The solution of the controlled equation.
+                Can be a neural network or a list of numpy arrays.
+    
+            grid (`torch.Tensor`): A tensor representing the grid points where the solution is evaluated.
+                Shape: (m, n), where m is the number of points and n is the number of input dimensions.
+    
+            args (`List[Tuple[Union[int, List]]]`): A list of tuples specifying the derivative operators.
+                Each tuple contains the component index (int) and the axes (list of ints) with respect to which
+                the derivative is taken.
+    
+            diff_method (`BasicDeriv`, optional): The method used for calculating derivatives.
+                Defaults to `AutogradDeriv`.
+    
+        Returns:
+            `torch.Tensor`: A tensor containing the arguments for the control ANN.
+                Each column represents a different derivative, and each row corresponds to a grid point.
+                Shape: (m, k), where m is the number of grid points and k is the number of derivatives.
+    """
     if diff_method is None:
         diff_method = AutogradDeriv
 
@@ -52,6 +64,20 @@ def prepare_control_inputs(model: Union[torch.nn.Sequential, List[np.ndarray]], 
 def eps_increment_diff(input_params: OrderedDict, loc: List[Union[str, Tuple[int]]], 
                        forward: bool = True, eps = 1e-4): # input_keys: list,  prev_loc: List = None, 
     if forward:
+    """
+    Incrementally modifies a parameter in the input dictionary by a small value (epsilon).
+    
+        This method perturbs a specific parameter within a nested dictionary structure by either adding or subtracting a small value (epsilon). The modification is done in-place. This perturbation is crucial for exploring the parameter space and evaluating the sensitivity of the discovered equations to slight variations in parameter values. By making these small adjustments, the algorithm can refine its search for the optimal equation structure and parameterization that best fits the observed data.
+    
+        Args:
+            input_params: The input dictionary containing the parameters to be modified.
+            loc: A list specifying the location of the parameter to be modified within the input dictionary. The first element is the key for the outer dictionary, and the remaining elements form a tuple used as a key for the inner dictionary.
+            forward: A boolean indicating whether to increment (True) or decrement (False) the parameter. Defaults to True.
+            eps: The small value (epsilon) to add or subtract. Defaults to 1e-4.
+    
+        Returns:
+            OrderedDict: The modified input dictionary with the parameter at the specified location incremented or decremented.
+    """
         input_params[loc[0]][tuple(loc[1:])] += eps  
     else:     
         input_params[loc[0]][tuple(loc[1:])] -= 2*eps

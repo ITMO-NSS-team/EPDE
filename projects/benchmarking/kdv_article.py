@@ -28,6 +28,27 @@ sys.path.pop()
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')))
 
 def run_KdV_eq_search(multiobjective_mode, derivs):
+    """
+    Runs the KdV equation search using the EPDE algorithm.
+        
+        This method orchestrates the equation discovery process for the KdV equation.
+        It configures the search space, evolutionary algorithm parameters, and custom tokens
+        to effectively explore potential equation candidates. The goal is to identify the
+        equation that best describes the relationship between the provided data and its derivatives.
+        
+        Args:
+            multiobjective_mode: A boolean indicating whether to use multiobjective optimization,
+                                 allowing for trade-offs between different objectives such as accuracy
+                                 and equation complexity.
+            derivs: The derivatives of the data, precomputed and provided as input for the equation search.
+        
+        Returns:
+            tuple: A tuple containing the equation search results and the metric value.
+                   The equation search results are a list of found equations, ranked by their
+                   ability to fit the data and satisfy the search criteria.
+                   The metric is a float representing the objective function value
+                   for the best equation, quantifying its fitness based on the chosen optimization strategy.
+    """
     epde_search_obj = epde_alg.EpdeSearch(multiobjective_mode=multiobjective_mode, use_solver=False, 
                                            dimensionality=dimensionality, boundary=boundary, 
                                            coordinate_tensors = grids)    

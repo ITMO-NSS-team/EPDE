@@ -12,6 +12,23 @@ VAL_TYPES = Union[FunctionType, int, float, torch.Tensor, np.ndarray]
 
 
 def get_max_deriv_orders(system_sf: List[Union[Dict[str, Dict]]], variables: List[str] = ['u',]) -> dict:
+    """
+    Computes the maximum derivative orders for each variable in a system of equations.
+    
+        This method analyzes a system of symbolic forms representing equations to determine the highest derivative order present for each variable with respect to each axis. This information is crucial for constructing suitable numerical schemes and discretizations when solving or analyzing the identified differential equations.
+    
+        Args:
+            system_sf: A list of symbolic forms, where each element represents an equation.
+                Each equation can be a dictionary or a list.
+            variables: A list of variable names to analyze. Defaults to ['u'].
+    
+        Returns:
+            dict: A dictionary where keys are variable names and values are NumPy arrays
+                representing the maximum derivative orders for each axis.
+                For example, {'u': array([2., 0.])} indicates that the maximum
+                derivative order of variable 'u' is 2 along the first axis and 0
+                along the second axis.
+    """
     def count_factor_order(factor_code, deriv_ax):
         if factor_code is None or isinstance(factor_code, tuple):
             return 0
@@ -84,9 +101,64 @@ def get_max_deriv_orders(system_sf: List[Union[Dict[str, Dict]]], variables: Lis
     return max_orders
 
 class BOPElement(object):
+    """
+    Represents a boundary operator element.
+    
+        This class defines a boundary operator element, encapsulating its properties
+        and methods for application and manipulation within a boundary value problem.
+    
+        Methods:
+        - __init__
+        - set_grid
+        - operator_form
+        - values
+        - __call__
+    """
+
     def __init__(self, axis: int, key: str, coeff: float = 1., term: list = [None], 
                  power: Union[Union[List[int], int]] = 1, var: Union[List[int], int] = 1,
                  rel_location: float = 0., device = 'cpu'):
+        """
+        Initializes a Constraint object for equation discovery.
+        
+        This method sets up a constraint within the equation search space,
+        guiding the evolutionary algorithm towards solutions that satisfy
+        specific conditions. These constraints help to narrow down the search
+        and ensure that the discovered equations adhere to known physical laws
+        or domain-specific knowledge.
+        
+        Args:
+            axis: The axis along which the constraint is applied.
+            key: A string identifier for the constraint.
+            coeff: The coefficient of the constraint term (default: 1.0).
+            term: A list representing the terms in the constraint (default: [None]).
+            power: The power of the constraint term (default: 1). It can be either a list of integers or a single integer.
+            var: The variable associated with the constraint (default: 1). It can be either a list of integers or a single integer.
+            rel_location: The relative location of the constraint (default: 0.0).
+            device: The device to use for computation (default: 'cpu').
+        
+        Fields:
+            axis: The axis along which the constraint is applied (int).
+            key: A string identifier for the constraint (str).
+            coefficient: The coefficient of the constraint term (float).
+            term: A list representing the terms in the constraint (list).
+            power: The power of the constraint term (Union[Union[List[int], int]]).
+            variables: The variable associated with the constraint (Union[List[int], int]).
+            location: The relative location of the constraint (float).
+            grid: Placeholder for grid information, initialized to None.
+            status: A dictionary tracking the status of boundary condition setup,
+                initialized with 'boundary_location_set' and 'boundary_values_set'
+                both set to False.
+            _device: The device to use for computation (str).
+        
+        Returns:
+            None.
+        
+        Why:
+            Constraints are essential for guiding the equation discovery process.
+            They allow incorporating prior knowledge and physical laws, leading
+            to more accurate and physically meaningful discovered equations.
+        """
         self.axis = axis
         self.key = key
         self.coefficient = coeff
@@ -102,11 +174,52 @@ class BOPElement(object):
         self._device = device
 
     def set_grid(self, grid: torch.Tensor):
+        """
+        Sets the spatial grid for the element.
+        
+        This method updates the internal grid representation, which defines the
+        spatial domain over which the element is defined. Setting the grid also
+        marks the boundary location as set, indicating that the element's
+        spatial context is fully defined. This is a crucial step for subsequent
+        operations that rely on spatial information.
+        
+        Args:
+            grid (torch.Tensor): The new grid to be used.
+        
+        Returns:
+            None.
+        
+        Class Fields:
+            grid (torch.Tensor): The grid representing the spatial domain.
+            status (dict): A dictionary storing the status of various flags,
+                including 'boundary_location_set'.
+        """
         self.grid = grid
         self.status['boundary_location_set'] = True
 
     @property
     def operator_form(self):
+        """
+        Represents the term in a structured format suitable for equation discovery.
+        
+        This representation facilitates the application of evolutionary algorithms
+        by organizing the term's components (coefficient, term itself, power, and variables)
+        into a dictionary. This structured format is essential for evaluating and
+        manipulating equation candidates during the search process.
+        
+        Returns:
+            tuple: A tuple containing the key and a dictionary representing the operator form.
+                The dictionary includes the coefficient ('coeff'), term, power ('pow'),
+                and variables ('var') of this element.
+        
+        Args:
+            None
+        
+        Returns:
+            tuple: A tuple where the first element is the key of the term and the second
+                element is a dictionary containing the 'coeff', term, 'pow', and 'var'
+                representing the operator form of the term.
+        """
         form = {
             'coeff': self.coefficient,
             self.key: self.term,
@@ -117,6 +230,22 @@ class BOPElement(object):
 
     @property
     def values(self):
+        """
+        Returns the coefficient values, evaluating them on the grid if necessary.
+        
+                This property provides a way to access the coefficient values, ensuring they are
+                evaluated on the spatial grid if the coefficient is defined as a function. This
+                dynamic evaluation is crucial for representing spatially varying coefficients
+                within the discovered differential equations.
+        
+                Args:
+                    self: The object instance.
+        
+                Returns:
+                    torch.Tensor: The value of the coefficient, as a PyTorch tensor. If the coefficient
+                        is a function, the tensor represents the function evaluated on the grid.
+                        Otherwise, it returns the pre-computed value.
+        """
         if isinstance(self._values, FunctionType):
             assert self.grid_set, 'Tring to evaluate variable coefficent without a proper grid.'
             res = self._values(self.grids)
@@ -127,6 +256,24 @@ class BOPElement(object):
 
     @values.setter
     def values(self, vals):
+        """
+        Sets the coefficient values for the basis function. These values determine the contribution of this basis function to the overall equation.
+        
+                The input is processed to ensure compatibility with the computational backend. Specifically, if the input is a NumPy array, it's converted to a PyTorch tensor and moved to the appropriate device for efficient computation. This ensures that all coefficients are in a consistent format for equation evaluation and optimization.
+        
+                Args:
+                    vals (Union[Callable, int, float, torch.Tensor, np.ndarray]): The values to set for the coefficients. Can be a function, integer, float, PyTorch tensor, or NumPy array.
+        
+                Returns:
+                    None
+        
+                Raises:
+                    TypeError: If the input `vals` is not of a supported type.
+        
+                Class Fields Initialized:
+                    _values (torch.Tensor or function): The values of the coefficients, stored as a PyTorch tensor or a function.
+                    vals_set (bool): A flag indicating whether the values have been set.
+        """
         if isinstance(vals, (FunctionType, int, float, torch.Tensor)):
             self._values = vals
             self.vals_set = True
@@ -138,6 +285,24 @@ class BOPElement(object):
                 f'Incorrect type of coefficients. Must be a type from list {VAL_TYPES}.')
 
     def __call__(self, values: VAL_TYPES = None) -> dict:
+        """
+        Applies the boundary operator to construct a boundary condition for the problem.
+        
+                This method prepares the boundary condition by either using provided values or
+                setting them internally. It determines the boundary's spatial configuration
+                based on the grid or location information, then formulates the boundary
+                operator and value. This is crucial for defining the constraints of the
+                differential equation being solved.
+        
+                Args:
+                    values: The boundary values. If None and boundary values have not been
+                        previously set, a ValueError is raised.
+        
+                Returns:
+                    dict: A dictionary containing the boundary location ('bnd_loc'),
+                        boundary operator ('bnd_op'), boundary value ('bnd_val'),
+                        variables ('variables'), and type ('type').
+        """
         if not self.vals_set and values is not None:
             self.values = values
             self.status['boundary_values_set'] = True
@@ -174,21 +339,69 @@ class BOPElement(object):
                 'variables' : self.variables, 'type' : 'operator'}
 
 class PregenBOperator(object):
+    """
+    Represents a boundary operator (BOperator) that pre-generates boundary conditions.
+    
+             Class Methods:
+             - demonstrate_required_ords
+             - conditions
+             - max_deriv_orders
+             - generate_default_bc
+    """
+
     def __init__(self, system: SoEq, system_of_equation_solver_form: list): #, device = 'cpu'
         self.system = system
         self.equation_sf = [eq for eq in system_of_equation_solver_form]
         self.variables = list(system.vars_to_describe)
 
     def demonstrate_required_ords(self):
+        """
+        Demonstrates how to specify the maximum derivative orders for each equation in the system.
+        
+                This method prepares a list associating each main variable with its corresponding maximum derivative order. This information is crucial for the evolutionary process to explore suitable equation structures by limiting the order of derivatives considered for each variable, thereby guiding the search for governing differential equations.
+        
+                Args:
+                    self: The instance of the class.
+        
+                Returns:
+                    list: A list of tuples, where each tuple contains a main variable and its maximum derivative order.
+        """
         linked_ords = list(zip([eq.main_var_to_explain for eq in self.system],
                                 self.max_deriv_orders))
 
     @property
     def conditions(self):
+        """
+        Returns the boolean conditions used to define the search space.
+        
+                These conditions constrain the possible forms of the equation, 
+                guiding the search towards more plausible or physically meaningful solutions.
+        
+                Returns:
+                    list: The list of boolean conditions.
+        """
         return self._bconds
 
     @conditions.setter
     def conditions(self, conds: List[BOPElement]):
+        """
+        Initializes the boundary conditions required for solving the discovered differential equation.
+        
+                This method sets up the boundary conditions necessary for numerical solvers to accurately compute solutions. It ensures that the provided boundary conditions are of the correct type and number, matching the order of derivatives present in the discovered equation.
+        
+                Args:
+                    conds: A list of BOPElement objects, each representing a boundary condition. The order of these conditions must align with the derivative orders of the equation.
+        
+                Returns:
+                    None
+        
+                Raises:
+                    ValueError: If the number of provided boundary conditions does not match the expected number based on the equation's derivative orders.
+                    NotImplementedError: If an attempt is made to initialize a boundary operator in-place, as this functionality is not yet implemented.
+        
+                Class Fields Initialized:
+                    _bconds (list): A list of initialized boundary condition objects, ready for use by the numerical solver.
+        """
         self._bconds = []
         if len(conds) != int(sum([value.sum() for value in self.max_deriv_orders.values()])):
             raise ValueError(
@@ -203,10 +416,42 @@ class PregenBOperator(object):
 
     @property
     def max_deriv_orders(self):
+        """
+        Gets the maximum derivative orders for each variable in the equation.
+        
+                This property determines the highest derivative order present for each variable within the symbolic equation, which is crucial for understanding the complexity and structure of the identified differential equation. Knowing the maximum derivative orders helps in selecting appropriate numerical solvers and interpreting the equation's behavior.
+        
+                Args:
+                    self: The instance of the class.
+        
+                Returns:
+                    dict: A dictionary where keys are the variables and values are their
+                        maximum derivative orders.
+        """
         return get_max_deriv_orders(self.equation_sf, self.variables)
 
     def generate_default_bc(self, vals: Union[np.ndarray, dict] = None, grids: List[np.ndarray] = None,
                             allow_high_ords: bool = False, required_bc_ord: List[int] = None):
+        """
+        Generates default boundary conditions based on the provided parameters.
+        
+                This method constructs boundary condition operators (BOPElement) to enforce constraints on the solution at the domain boundaries.
+                It determines the location and derivative order of these conditions based on the provided parameters and the underlying grid.
+                This ensures that the discovered differential equations adhere to the physical constraints of the problem.
+        
+                Args:
+                    vals: Values for the boundary conditions. If None, default values are used.
+                    grids: List of grid tensors. If None, grids are retrieved from the cache.
+                    allow_high_ords: A boolean flag to allow higher order derivatives. (Not fully implemented)
+                    required_bc_ord: A dictionary specifying the required derivative orders for each variable.
+                        If None, the `max_deriv_orders` attribute is used.
+        
+                Returns:
+                    list: A list of BOPElement objects representing the generated boundary conditions.
+        
+                Initializes:
+                    conditions (list): A list of BOPElement objects representing the generated boundary conditions.
+        """
         # Implement allow_high_ords - selection of derivatives from
         if required_bc_ord is None:
             required_bc_ord = self.max_deriv_orders
@@ -266,11 +511,54 @@ class PregenBOperator(object):
 
 
 class BoundaryConditions(object):
+    """
+    Represents boundary conditions for a physical simulation.
+    
+        Attributes:
+            dirichlet (dict): Dirichlet boundary conditions.
+            neumann (dict): Neumann boundary conditions.
+            robin (dict): Robin boundary conditions.
+    """
+
     def __init__(self, grids=None, partial_operators: dict = []):
+        """
+        Initializes the OperatorCollection object.
+        
+        The OperatorCollection stores spatial information and precomputed operators
+        required for efficient boundary condition application. This precomputation
+        is done once and used many times during the PDE approximation.
+        
+        Args:
+            grids: The grids to store.
+            partial_operators (dict): A dictionary of partial operators.
+        
+        Fields:
+            grids_set (bool): A boolean indicating whether grids are set.
+            grids: The grids stored, if provided.
+            operators (dict): The partial operators stored.
+        
+        Returns:
+            None.
+        """
         self.grids_set = (grids is not None)
         if grids is not None:
             self.grids = grids
         self.operators = partial_operators
 
     def form_operator(self):
+        """
+        Forms a list of boundary conditions for each operator.
+        
+                This method retrieves boundary conditions associated with each operator
+                defined in the system. These conditions are essential for solving the discovered
+                differential equations numerically.
+        
+                Args:
+                    None
+        
+                Returns:
+                    list[list]: A list of lists, where each inner list represents the boundary
+                    conditions for a specific operator. The operators and their associated
+                    boundary conditions are obtained from the `self.operators` dictionary.
+        """
         return [list(bcond()) for bcond in self.operators.values()]

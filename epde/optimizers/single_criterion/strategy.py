@@ -15,11 +15,56 @@ from epde.operators.singleobjective.selections import RouletteWheelSelection
 from epde.operators.singleobjective.so_specific import SizeRestriction, FractionElitism
 
 class BaselineDirector(OptimizationPatternDirector):
+    """
+    Directs the construction of a baseline evolutionary strategy.
+    
+        This class uses a StrategyBuilder to assemble a basic evolutionary algorithm
+        pipeline with selection, variation, mutation, fitness evaluation, and elitism.
+    
+        Methods:
+        - use_baseline
+    """
+
     def __init__(self) -> None:
+        """
+        Initializes the BaselineDirector, preparing it to construct evolutionary strategies.
+        
+                This method sets up the director by initializing a `StrategyBuilder`
+                with the `EvolutionaryStrategy` class. This configuration ensures that
+                the director is ready to guide the construction of specific evolutionary
+                strategies tailored for equation discovery.
+        
+                Args:
+                    self: The object instance.
+        
+                Returns:
+                    None.
+        """
         super().__init__()
         self.builder = StrategyBuilder(EvolutionaryStrategy)
 
     def use_baseline(self, params: dict, **kwargs):
+        """
+        Configures the evolutionary strategy builder with a set of core operators for equation discovery.
+        
+                This method establishes a foundational sequence of operators essential for evolving equation structures.
+                It includes selection, variation, mutation, fitness evaluation, and elitism, configuring the `self.builder`
+                to form an evolutionary pipeline. Parameters for these operators are drawn from the input `params` dictionary.
+                This baseline configuration provides a solid starting point for the evolutionary search process, ensuring
+                that key steps for generating and evaluating candidate equations are in place.
+        
+                Args:
+                    params: A dictionary containing parameters for the operators. It expects
+                        'variation_params' and 'mutation_params' keys, which are dictionaries
+                        themselves, holding parameters for the variation and mutation operators,
+                        respectively.
+                    **kwargs: Arbitrary keyword arguments. These arguments are passed to the
+                        `add_base_param_to_operator` function via `add_kwarg_to_operator` partial
+                        function, which adds them as default parameters to the operators.
+        
+                Returns:
+                    None. The method modifies the `self.builder` attribute in place.
+        """
         variation_params = params.get('variation_params', {})
         mutation_params = params.get('mutation_params', {})
 

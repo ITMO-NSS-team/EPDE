@@ -14,34 +14,40 @@ from epde.operators.utils.template import CompoundOperator
 from epde.structure.main_structures import Equation
 
 class LinRegBasedCoeffsEquation(CompoundOperator):
-    '''
+    """
+    The operator dedicated to calculating the coefficients of a linear regression-based equation. It determines the optimal weights for each term in the equation, excluding the target term, and includes a free coefficient.
     
-    The operatror, dedicated to the calculation of the weights of the equation (for the free coefficient and 
-    each of its terms except the target one).
+    
+        Attributes:
+            _tags (`set`): 
+            g_fun_vals (`numpy.ndarray`): 
+    
+        Methods:
+            apply(equation)
+                Calculate the coefficients of the equation, using the linear regression. The result is stored in the 
+                equation.weights_final attribute
+        '''
+    """
 
-    Attributes:
-        _tags (`set`): 
-        g_fun_vals (`numpy.ndarray`): 
-    
-    Methods:
-        apply(equation)
-            Calculate the coefficients of the equation, using the linear regression. The result is stored in the 
-            equation.weights_final attribute
-    '''
     key = 'LinRegCoeffCalc'
     
     def apply(self, objective : Equation, arguments : dict = None):
         """
-        Calculate the coefficients of the equation, using the linear regression.The result is stored in the 
-        objective.weights_final attribute
-
-        Args:
-            objective (`Equation`): the equation object, to that the fitness function is obtained.
-            arguments (`dict`): 
-            
-        Returns:
-            None
-        """        
+        Calculates the final equation coefficients using linear regression, leveraging the intermediate weights to refine the equation's structure.
+        
+                This method refines the equation by determining the optimal coefficients for each term,
+                considering the previously established intermediate weights. This step is crucial for
+                achieving a balance between model complexity and accuracy, ensuring that the final equation
+                accurately represents the underlying dynamics of the system. The calculated coefficients
+                are stored in the `objective.weights_final` attribute.
+        
+                Args:
+                    objective (`Equation`): The equation object containing the structure and intermediate weights.
+                    arguments (`dict`, optional): Additional arguments (not used in the current implementation). Defaults to None.
+        
+                Returns:
+                    None: The result is stored directly within the `objective` object.
+        """
         # self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
         assert objective.weights_internal_evald, 'Trying to calculate final weights before evaluating intermeidate ones (no sparsity).'
@@ -89,4 +95,16 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
             objective.weights_final = weights
             
     def use_default_tags(self):
+        """
+        Sets the operator's tags to a predefined default. This configuration ensures that the operator is correctly identified and handled within the equation discovery process, particularly with respect to coefficient calculation at the gene level, its standalone nature, and its in-place operation.
+        
+                Args:
+                    self: The object instance.
+        
+                Returns:
+                    None.
+        
+                Class Fields Initialized:
+                    _tags (set): A set containing default tags: 'coefficient calculation', 'gene level', 'no suboperators', and 'inplace'.
+        """
         self._tags = {'coefficient calculation', 'gene level', 'no suboperators', 'inplace'}

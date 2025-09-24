@@ -7,8 +7,10 @@ from epde.solver.utils import create_random_fn
 
 
 class EarlyStopping(Callback):
-    """ Class for using adaptive stop criterias at training process.
     """
+    Class for using adaptive stop criterias at training process.
+    """
+
     def __init__(self,
                  eps: float = 1e-5,
                  loss_window: int = 100,
@@ -21,23 +23,24 @@ class EarlyStopping(Callback):
                  verbose: bool = True,
                  save_best: bool = False
                  ):
-        """_summary_
-
-        Args:
-            eps (float, optional): arbitrarily small number that uses for loss comparison criterion. Defaults to 1e-5.
-            loss_window (int, optional): width of losses window which is used for average loss estimation. Defaults to 100.
-            no_improvement_patience (int, optional):  number of iterations during which
-                    the loss may not improve.. Defaults to 1000.
-            patience (int, optional): maximum number of times the stopping criterion
-                                      can be satisfied.. Defaults to 5.
-            abs_loss (Union[float, None], optional): absolute loss value using in _absloss_check().. Defaults to None.
-            normalized_loss (bool, optional): calculate loss with all lambdas=1. Defaults to False.
-            randomize_parameter (float, optional): some error for resulting
-                                        model weights to to avoid local optima. Defaults to 1e-5.
-            info_string_every (Union[int, None], optional): prints the loss state after every *int*
-                                                    step. Defaults to None.
-            verbose (bool, optional): print or not info about loss and current state of stopping criteria. Defaults to True.
-            save_best (bool, optional): model with least loss is saved during the training and returned at the end as a result
+        """
+        Initializes the EarlyStopping callback.
+        
+                This callback monitors the loss function during training and stops the training process when the loss stops improving,
+                potentially saving the best model encountered during training. This prevents overfitting and saves computational resources
+                by avoiding unnecessary iterations.
+        
+                Args:
+                    eps (float, optional): A small threshold to consider an improvement in loss. Defaults to 1e-5.
+                    loss_window (int, optional): The number of recent losses to average for trend estimation. Defaults to 100.
+                    no_improvement_patience (int, optional): How many iterations to wait after the best loss before stopping. Defaults to 1000.
+                    patience (int, optional): How many times the `no_improvement_patience` can be reached before stopping. Defaults to 5.
+                    abs_loss (Union[float, None], optional): An absolute target loss value. Training stops if this loss is reached. Defaults to None.
+                    normalized_loss (bool, optional): Whether to use a normalized loss function (all lambdas=1) for early stopping. Defaults to False.
+                    randomize_parameter (float, optional): A small value to randomize model weights to escape local optima. Defaults to 1e-5.
+                    info_string_every (Union[int, None], optional): How often (in iterations) to print the current loss and early stopping status. Defaults to None.
+                    verbose (bool, optional): Whether to print information about the loss and early stopping status. Defaults to True.
+                    save_best (bool, optional): Whether to save the model with the best loss encountered during training. Defaults to False.
         """
         super().__init__()
         self.eps = eps
@@ -57,14 +60,33 @@ class EarlyStopping(Callback):
 
 
     def _line_create(self):
-        """ Approximating last_loss list (len(last_loss)=loss_oscillation_window) by the line.
-
+        """
+        Approximates the trend of recent loss values using linear regression.
+        
+        This helps to identify whether the loss is consistently decreasing, increasing, or oscillating,
+        which is used to determine when to stop training to prevent overfitting.
+        
+        Args:
+            None
+        
+        Returns:
+            None
         """
         self._line = np.polyfit(range(self.loss_window), self.last_loss, 1)
 
     def _window_check(self):
-        """ Stopping criteria. We divide angle coeff of the approximating
-        line (line_create()) on current loss value and compare one with *eps*
+        """
+        Checks for early stopping based on the trend of the loss function within a window.
+        
+        This method assesses whether the rate of change of the loss, normalized by the current loss value,
+        falls below a specified threshold (*eps*). If this condition is met, it indicates that the training
+        is no longer significantly improving the model's performance and may be converging.
+        
+        Args:
+            None
+        
+        Returns:
+            None
         """
         if self.t % self.loss_window == 0 and self._check is None:
             self._line_create()
@@ -75,10 +97,21 @@ class EarlyStopping(Callback):
                 self._check = 'window_check'
 
     def _patience_check(self):
-        """ Stopping criteria. We control the minimum loss and count steps
-        when the current loss is bigger then min_loss. If these steps equal to
-        no_improvement_patience parameter, the stopping criteria will be achieved.
-
+        """
+        Checks if the training should be stopped based on the patience criterion.
+        
+        The patience mechanism monitors the training loss and stops the training process if the loss
+        does not improve for a specified number of epochs. This helps to prevent overfitting and
+        improve the generalization ability of the discovered equations. The method checks if the
+        number of epochs since the last improvement exceeds the `no_improvement_patience` threshold.
+        If it does, and a check hasn't already been triggered, it increments the stop counter, resets
+        the improvement start time, and potentially restores the best model found so far.
+        
+        Args:
+            None
+        
+        Returns:
+            None
         """
         if (self.t - self._t_imp_start) == self.no_improvement_patience and self._check is None:
             self._stop_dings += 1
@@ -90,15 +123,31 @@ class EarlyStopping(Callback):
             self._check = 'patience_check'
 
     def _absloss_check(self):
-        """ Stopping criteria. If current loss absolute value is lower then *abs_loss* param,
-        the stopping criteria will be achieved.
+        """
+        Check if the absolute loss is below the specified threshold.
+        
+        This check is part of the early stopping mechanism, which aims to prevent overfitting by monitoring the loss function and stopping the training process when the loss reaches a satisfactory level.
+        The training stops to avoid unnecessary computations when the model performance, measured by the loss function, is already good enough.
+        
+        Args:
+            self (EarlyStopping): The EarlyStopping instance.
+        
+        Returns:
+            None
         """
         if self.abs_loss is not None and self.model.cur_loss < self.abs_loss and self._check is None:
             self._stop_dings += 1
             self._check = 'absloss_check'
 
     def verbose_print(self):
-        """ print info about loss and stopping criteria.
+        """
+        Prints information about the current loss, stopping criteria, and normalized loss line to monitor the training process and understand the behavior of the equation discovery.
+        
+                Args:
+                    None
+        
+                Returns:
+                    None
         """
 
         if self._check == 'window_check':
@@ -122,6 +171,21 @@ class EarlyStopping(Callback):
             print(info)
 
     def on_epoch_end(self, logs=None):
+        """
+        Handles end-of-epoch actions, focusing on early stopping to optimize equation discovery.
+        
+                This method orchestrates checks for early stopping based on loss trends,
+                patience criteria, and absolute loss thresholds. It saves the best model
+                encountered so far and provides verbose output for monitoring progress.
+                The goal is to efficiently identify the most promising equation structures
+                during the evolutionary search process.
+        
+                Args:
+                    logs: Metric results for the current epoch, used to evaluate model performance.
+        
+                Returns:
+                    None
+        """
         self._window_check()
         self._patience_check()
         self._absloss_check()
@@ -141,6 +205,20 @@ class EarlyStopping(Callback):
         self._check = None
 
     def on_epoch_begin(self, logs=None):
+        """
+        Updates the callback's internal state at the start of each epoch.
+        
+                This method retrieves the current training step, mode, and check flag from the model to track the training progress.
+                It also maintains a history of recent loss values, which is used to determine when early stopping criteria are met.
+                By tracking these values, the callback can make informed decisions about when to terminate training,
+                preventing overfitting and saving computational resources.
+        
+                Args:
+                    logs: Optional dictionary of logs. Will be passed to all callbacks.
+        
+                Returns:
+                    None
+        """
         self.t = self.model.t
         self.mode = self.model.mode
         self._check = self.model._check

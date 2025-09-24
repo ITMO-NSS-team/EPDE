@@ -7,14 +7,48 @@ import matplotlib as mpl
 
 
 class ParetoVisualizer(object):
+    """
+    Visualizes Pareto frontiers obtained from multi-objective optimization.
+    
+        This class provides methods to plot Pareto levels in 2D, allowing for
+        visualization and analysis of trade-offs between different objectives.
+    
+        Methods:
+        - plot_pareto
+        - plot_pareto_mt
+    """
+
     def __init__(self, eq_pareto_levels):
         """
-        Проще всего получить pareto_levels из атрибута optimizer.pareto_levels
+        Initializes the ParetoVisualizer with a set of Pareto levels. These levels represent the trade-offs between different objectives in the equation discovery process, allowing for the selection of models that balance accuracy and complexity.
+        
+                Args:
+                    eq_pareto_levels: A list of Pareto levels obtained from the optimizer, representing the non-dominated solutions in the search space.
+        
+                Returns:
+                    None
         """
         self.pareto_frontier = eq_pareto_levels
 
     def plot_pareto(self, dimensions: tuple = (0, 1), annotate_best=True, plot_level=1,
                     filename=None, save_format='eps'):
+        """
+        Plots the Pareto frontier in a 2D plane to visualize trade-offs between objectives.
+        
+                This method projects the Pareto levels onto a 2D plane, enabling the user to analyze the solutions and understand the relationships between different objective function values.
+                It uses matplotlib to create a scatter plot of the Pareto frontier, with options to annotate the best solutions for better interpretability.
+                The plot helps in understanding the distribution and density of solutions along the Pareto frontier.
+        
+                Args:
+                    dimensions: A tuple indicating the indices of the two objective functions to be plotted.
+                    annotate_best: A boolean indicating whether to annotate the best solutions on the plot.
+                    plot_level: An integer indicating the number of Pareto levels to plot.
+                    filename: The name of the file to save the plot to. If None, the plot is not saved.
+                    save_format: The format to save the plot in (e.g., 'eps', 'png', 'pdf').
+        
+                Returns:
+                    None. The method displays the plot and optionally saves it to a file.
+        """
 
         #TODO replace latex with Mathtext
         mpl.rcParams.update(mpl.rcParamsDefault)
@@ -93,6 +127,27 @@ class ParetoVisualizer(object):
 
     def plot_pareto_mt(self, dimensions: tuple = (0, 1), annotate_best=True, plot_level=1,
                     filename=None, save_format='eps'):
+        """
+        Plots the Pareto frontier for multi-objective optimization results.
+        
+                This method visualizes the Pareto frontier levels on a 2D plane,
+                allowing for analysis of trade-offs between two objectives. It supports
+                annotating the best solutions and saving the plot to a file. This helps to understand the trade-offs between different objectives when searching for the best equation structure.
+        
+                Args:
+                    dimensions: A tuple specifying the indices of the two objective
+                        functions to plot.
+                    annotate_best: A boolean indicating whether to annotate the best
+                        solutions on the plot.
+                    plot_level: An integer specifying the number of Pareto frontier levels
+                        to plot.
+                    filename: A string specifying the filename to save the plot to. If
+                        None, the plot is not saved.
+                    save_format: A string specifying the format to save the plot in.
+        
+                Returns:
+                    None. Displays the plot.
+        """
         # Reset to default matplotlib settings
         mpl.rcParams.update(mpl.rcParamsDefault)
         plt.rcParams['text.usetex'] = False  # Disable LaTeX rendering

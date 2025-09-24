@@ -23,6 +23,13 @@ from epde.decorators import HistoryExtender, ResetEquationStatus
 
 
 class SystemMutation(CompoundOperator):
+    """
+    Applies mutation suboperators to an objective function.
+    
+        This class orchestrates the application of mutation suboperators to a
+        given objective function, facilitating the evolution of the system.
+    """
+
     key = 'SystemMutation'
     def apply(self, objective : SoEq, arguments : dict): # TODO: add setter for best_individuals & worst individuals 
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)    
@@ -33,6 +40,22 @@ class SystemMutation(CompoundOperator):
         affected_by_mutation = np.random.random() < self.params['indiv_mutation_prob']
 
         if affected_by_mutation:
+        """
+        Applies equation and parameter mutation suboperators to an objective function.
+        
+                This method orchestrates the mutation of an objective function by applying
+                equation and parameter mutation suboperators. The mutation is applied probabilistically,
+                allowing for exploration of the search space by introducing variations into the
+                objective function's equations and parameters. This is a crucial step in the evolutionary
+                process, enabling the algorithm to discover new and potentially better-fitting equation structures.
+        
+                Args:
+                    objective (SoEq): The objective function to be mutated.
+                    arguments (dict): A dictionary of arguments for the suboperators.
+        
+                Returns:
+                    SoEq: The mutated objective function.
+        """
             for eq_key in eqs_keys:
                 altered_eq = self.suboperators['equation_mutation'].apply(altered_objective.vals[eq_key],
                                                                           subop_args['equation_mutation'])
@@ -49,13 +72,51 @@ class SystemMutation(CompoundOperator):
         return altered_objective
 
     def use_default_tags(self):
+        """
+        Uses a predefined set of tags to categorize the mutation operator.
+        
+                This method overwrites any existing tags, ensuring the operator is correctly identified for downstream processing and analysis within the EPDE framework. This ensures consistent categorization and facilitates proper handling during the equation discovery process.
+        
+                Args:
+                    self: The object instance.
+        
+                Returns:
+                    None.
+        
+                Class Fields:
+                    _tags (set): A set containing the tags 'mutation', 'chromosome level', and 'contains suboperators'.
+        """
         self._tags = {'mutation', 'chromosome level', 'contains suboperators'}
     
 
 class EquationMutation(CompoundOperator):
+    """
+    Applies mutation to the equation's structure based on a mutation rate.
+    
+        Class Attributes:
+        - mutation_rate: The probability of applying a mutation sub-operator to a term.
+        - sub_operators: A list of mutation sub-operators to apply.
+    """
+
     key = 'EquationMutation'
     @HistoryExtender(f'\n -> mutating equation', 'ba')
     def apply(self, objective : Equation, arguments : dict):
+        """
+        Applies mutation to the equation's structure based on a mutation rate.
+        
+                It iterates through the mutable terms of the equation's structure,
+                and for each term, it applies a mutation sub-operator with a certain probability
+                defined by the mutation rate. This process refines the equation's structure
+                to better fit the observed data by exploring alternative mathematical
+                relationships.
+        
+                Args:
+                    objective (Equation): The equation to be mutated.
+                    arguments (dict): A dictionary of arguments for the sub-operators.
+        
+                Returns:
+                    Equation: The mutated equation.
+        """
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
         for term_idx in range(objective.n_immutable, len(objective.structure)):
@@ -65,13 +126,49 @@ class EquationMutation(CompoundOperator):
         return objective
 
     def use_default_tags(self):
+        """
+        Applies a predefined set of tags to categorize and characterize the equation mutation operation.
+        
+        This method assigns default tags to the mutation, providing a standardized way to identify and group mutations based on their characteristics. This facilitates analysis and comparison of different mutation strategies within the evolutionary process.
+        
+        Args:
+            self: The EquationMutation object instance.
+        
+        Returns:
+            None.
+        
+        This method initializes the following object properties:
+          - _tags (set): A set containing the default tags: 'mutation', 'gene level', and 'contains suboperators'.
+        """
         self._tags = {'mutation', 'gene level', 'contains suboperators'}
 
 
 class MetaparameterMutation(CompoundOperator):
+    """
+    Represents a mutation operation that modifies metaparameters.
+    
+        This class provides a base for implementing mutation strategies that
+        alter the values of metaparameters within a search space.
+    
+        Attributes:
+            params: A dictionary containing parameters for the mutation.
+    """
+
     key = 'MetaparameterMutation'
 
     def apply(self, objective : Union[int, float], arguments : dict):
+        """
+        Applies a random perturbation to the objective value.
+        
+                This method introduces slight variations to the objective value, simulating the inherent noise and uncertainty present in real-world data. By adding a normally distributed random value (defined by the `mean` and `std` parameters), the method explores the solution space more broadly, potentially escaping local optima and promoting the discovery of more robust and generalizable equation structures. The non-negativity constraint ensures that the objective value remains physically meaningful within the context of equation discovery.
+        
+                Args:
+                    objective (Union[int, float]): The original objective value.
+                    arguments (dict): A dictionary of arguments that can be used to configure the perturbation.
+        
+                Returns:
+                    float: The perturbed objective value, guaranteed to be non-negative.
+        """
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
         altered_objective = objective + np.random.normal(loc = self.params['mean'], scale = self.params['std'])        
@@ -81,6 +178,15 @@ class MetaparameterMutation(CompoundOperator):
         return altered_objective
 
     def use_default_tags(self):
+        """
+        Sets the object's tags to a predefined set, ensuring consistency in identifying the type and characteristics of the mutation being applied. This standardization is crucial for the evolutionary process, allowing the system to effectively track and manage different mutation strategies.
+        
+                Args:
+                    self: The object instance.
+        
+                Returns:
+                    None.
+        """
         self._tags = {'mutation', 'gene level', 'no suboperators'}
 
     
@@ -88,26 +194,22 @@ class TermMutation(CompoundOperator):
     """
     Specific operator of the term mutation, where the term is replaced with a randomly created new one.
     """
+
     key = 'TermMutation'
     
     def apply(self, objective : tuple, arguments : dict): #term_idx, equation):
         """
-        Return a new term, randomly created to be unique from other terms of this particular equation.
+        Return a new, randomly generated term to replace an existing one within an equation.
         
-        Parameters:
-        -----------
-        term_idx : integer
-            The index of the mutating term in the equation.
-            
-        equation : Equation object
-            The equation object, in which the term is present.
+                This ensures diversity in the equation population during the evolutionary search process. The new term is created based on the equation's pool of available operators and variables, and it is checked for uniqueness to maintain the integrity of the equation structure.
         
-        Returns:
-        ----------
-        new_term : Term object
-            A new, randomly created, term.
-            
-        """       
+                Args:
+                    objective (tuple): A tuple containing the index of the term to be mutated and the equation object.
+                    arguments (dict): A dictionary containing additional arguments (not directly used in this method, but potentially used in sub-methods).
+        
+                Returns:
+                    Term: A new, randomly created term that is unique within the equation.
+        """
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
         create_derivs = bool(objective[1].structure[objective[0]].descr_variable_marker)
@@ -124,6 +226,24 @@ class TermMutation(CompoundOperator):
         return new_term
 
     def use_default_tags(self):
+        """
+        Sets the default tags for this term mutation operator. These tags categorize the operator's behavior and capabilities within the equation discovery process.
+        
+                Args:
+                    self: The object instance.
+        
+                Returns:
+                    None.
+        
+                Class Fields Initialized:
+                    _tags (set): A set containing the default tags: 'mutation', 'term level', 'exploration', and 'no suboperators'.
+        
+                Why:
+                    These tags help the system understand the nature of this mutation operator, 
+                    allowing for informed decisions during the equation search process, such as 
+                    whether it introduces new terms ('exploration'), modifies existing ones ('term level'), 
+                    or avoids creating sub-operators ('no suboperators').
+        """
         self._tags = {'mutation', 'term level', 'exploration', 'no suboperators'}
 
 
@@ -131,6 +251,7 @@ class TermParameterMutation(CompoundOperator):
     """
     Specific operator of the term mutation, where the term parameters are changed with a random increment.
     """
+
     key = 'TermParameterMutation'    
     
     def apply(self, objective : tuple, arguments : dict): # term_idx, objective
@@ -138,6 +259,18 @@ class TermParameterMutation(CompoundOperator):
         Specific operator of the term mutation, where the term parameters are changed with a random increment.
         
         Parameters:
+        """
+        Specific operator for refining equation terms by randomly adjusting their parameters.
+        
+                This method fine-tunes the parameters of a selected term within an equation to improve the overall fit and accuracy of the model. By introducing small, random increments to the parameters, the algorithm explores the solution space and seeks to minimize the error between the equation's predictions and the observed data. This process helps to discover the optimal parameter values that best describe the underlying dynamics of the system.
+        
+                Args:
+                    objective (tuple): A tuple containing the index of the term to be mutated and the equation object.
+                    arguments (dict): A dictionary containing additional arguments required for the mutation process.
+        
+                Returns:
+                    Term: The modified term with updated parameter values.
+        """
         -----------
         term_idx : integer
             The index of the mutating term in the equation.
@@ -199,10 +332,37 @@ class TermParameterMutation(CompoundOperator):
         return term
     
     def use_default_tags(self):
+        """
+        Sets the operator's tags to a predefined default. This ensures that the operator is correctly categorized with respect to its function within the equation discovery process.
+        
+                Args:
+                    self: The object instance.
+        
+                Returns:
+                    None. The operator's tags are updated in place.
+        """
         self._tags = {'mutation', 'term level', 'exploitation', 'no suboperators'}
 
 
 def get_basic_mutation(mutation_params):
+    """
+    Generates a basic mutation operator for evolving equation systems.
+    
+    This method creates and configures a system mutation operator composed
+    of equation and metaparameter mutation sub-operators. Term mutation is
+    nested under equation mutation to modify individual terms within equations.
+    This hierarchical structure allows for fine-grained control over the
+    evolutionary process, enabling the discovery of increasingly accurate
+    and parsimonious equation models.
+    
+    Args:
+        mutation_params: A dictionary containing mutation parameters that
+            control the behavior of the mutation operators.
+    
+    Returns:
+        SystemMutation: A configured system mutation operator ready to be
+            used in the evolutionary process.
+    """
     add_kwarg_to_operator = partial(add_base_param_to_operator, target_dict = mutation_params)
 
     term_mutation = TermMutation([])

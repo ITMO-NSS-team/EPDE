@@ -14,6 +14,15 @@ from epde.evaluators import CustomEvaluator
 
 # if __name__ == '__main__':
 def old_main():
+    """
+    Extends the pool of available tokens by adding functions that represent the inverse of coordinate values (e.g., 1/x, 1/t). This is achieved by defining a lambda function, `custom_inverse_eval_fun`, to evaluate these tokens and then creating a corresponding family of tokens. This allows the algorithm to explore a wider range of potential equation structures, including those with inverse relationships to the independent variables.
+    
+        Args:
+            None
+    
+        Returns:
+            None
+    """
     t = np.linspace(0, 4*np.pi, 1000)
     u = np.load('/home/maslyaev/epde/EPDE/tests/system/Test_data/fill366.npy') # loading data with the solution of ODE
     # Trying to create population for mulit-objective optimization with only 
@@ -125,6 +134,19 @@ def old_main():
     epde_search_obj.equation_search_results(only_print = True, level_num = 1) # showing the Pareto-optimal set of discovered equations 
 
 def new_main():
+    """
+    Performs an EPDE search to identify a differential equation that describes the given data.
+    
+        This method automates the process of discovering a differential equation from a given dataset. 
+        It initializes the search space, configures the evolutionary algorithm, and executes the search. 
+        The goal is to find the equation that best represents the underlying dynamics of the data.
+    
+        Args:
+            None
+    
+        Returns:
+            None
+    """
     t = np.linspace(0, 4*np.pi, 1000)
     u = np.load('/home/maslyaev/epde/EPDE_rework/projects/ODE/data/fill366.npy') # loading data with the solution of ODE
     
@@ -145,6 +167,17 @@ def new_main():
     epde_search_obj.equation_search_results(only_print = True, level_num = 1)
     
 def new_main_with_custom_tokens():
+    """
+    Performs an EPDE search with custom trigonometric tokens to identify governing equations.
+        
+        This method configures and executes an EPDE search, leveraging custom trigonometric functions to enhance the discovery of differential equations from data. It involves loading data, defining the search space, setting up the MOEAD/D algorithm, and integrating custom trigonometric tokens with their evaluation functions and parameter ranges. The search is then initiated, and the resulting equations are displayed. This approach allows the framework to explore a broader range of potential equation structures, potentially leading to more accurate and insightful models.
+        
+        Args:
+            None
+        
+        Returns:
+            None
+    """
     t = np.linspace(0, 4*np.pi, 1000)
     u = np.load('/home/maslyaev/epde/EPDE_rework/projects/ODE/data/fill366.npy') # loading data with the solution of ODE
     

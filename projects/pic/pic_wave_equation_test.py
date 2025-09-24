@@ -35,6 +35,22 @@ from epde.operators.utils.template import CompoundOperator
 #     return (data, grid)
 
 def load_data(filename):
+    """
+    Loads data representing a physical field from a file and creates a corresponding grid.
+    
+        This function reads data from the specified file, assuming comma-separated values,
+        and constructs a grid of coordinates that represents the spatial or temporal domain
+        over which the data is defined. This is a preliminary step for discovering
+        the underlying differential equation.
+    
+        Args:
+            filename: The name of the file containing the data.
+    
+        Returns:
+            A tuple containing:
+              - grids: A NumPy array representing the grid coordinates.
+              - data: A NumPy array containing the loaded data.
+    """
     shape = 80
     
     # print(os.path.dirname( __file__ ))
@@ -45,6 +61,19 @@ def load_data(filename):
 
 
 def load_pretrained_PINN(ann_filename):
+    """
+    Loads a pre-trained Physics-Informed Neural Network (PINN) from a file to accelerate the equation discovery process.
+    
+        This method attempts to load a pickled PINN model from the specified file.
+        If the file is not found, it prints a message indicating that the model
+        will be retrained and returns None. Loading a pre-trained model can significantly reduce the computational cost of identifying the underlying differential equation, especially when starting from scratch.
+    
+        Args:
+            ann_filename (str): The filename of the pickled PINN model.
+    
+        Returns:
+            object: The loaded PINN model if the file is found, otherwise None.
+    """
     try:
         with open(ann_filename, 'rb') as data_input_file:  
             data_nn = pickle.load(data_input_file)
@@ -54,6 +83,20 @@ def load_pretrained_PINN(ann_filename):
     return data_nn
 
 def prepare_suboperators(fitness_operator: CompoundOperator) -> CompoundOperator:
+    """
+    Prepares sub-operators required to calculate the fitness of an equation.
+    
+        This method configures and assigns sparsity and coefficient calculation
+        sub-operators to the provided fitness operator. It maps these sub-operators
+        between 'gene level' and 'chromosome level' and then sets them as
+        sub-operators within the fitness operator. This setup is crucial for evaluating the equation's performance by considering both its complexity (sparsity) and accuracy (coefficient calculation) when fitting the data.
+    
+        Args:
+            fitness_operator (CompoundOperator): The compound operator to prepare.
+    
+        Returns:
+            CompoundOperator: The modified fitness operator with the prepared sub-operators.
+    """
     sparsity = LASSOSparsity()
     coeff_calc = LinRegBasedCoeffsEquation()
 

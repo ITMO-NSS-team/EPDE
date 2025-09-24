@@ -25,6 +25,18 @@ import scipy.io as scio
 
 
 def load_pretrained_PINN(ann_filename):
+    """
+    Loads a pre-trained Physics-Informed Neural Network (PINN) from a file.
+    
+    This function attempts to load a previously trained PINN model, allowing the evolutionary process to start from a potentially good initial guess,
+    reducing the computational cost of training from scratch. If no pre-trained model is found, the process continues by retraining the ANN approximation.
+    
+    Args:
+        ann_filename: The filename of the pickled ANN data.
+    
+    Returns:
+        The loaded ANN data if the file exists, otherwise None.
+    """
     try:
         with open(ann_filename, 'rb') as data_input_file:
             data_nn = pickle.load(data_input_file)
@@ -35,12 +47,44 @@ def load_pretrained_PINN(ann_filename):
 
 
 def noise_data(data, noise_level):
+    """
+    Adds random noise to the input data based on its standard deviation.
+    
+    This function perturbs the data by adding Gaussian noise scaled by the data's standard deviation and a specified noise level.
+    This helps to evaluate the robustness of equation discovery algorithms when dealing with imperfect or noisy data.
+    
+    Args:
+        data (np.ndarray): The input data to which noise will be added.
+        noise_level (float): The standard deviation of the noise, expressed as a percentage of the data's standard deviation.
+    
+    Returns:
+        np.ndarray: The data with added noise.
+    """
     # add noise level to the input data
     return noise_level * 0.01 * np.std(data) * np.random.normal(size=data.shape) + data
 
 
 def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
                       search_obj: EpdeSearch, all_vars: List[str] = ['u', ]) -> bool:
+    """
+    Compares two symbolic equations to determine which one better represents the underlying dynamics of the system.
+        
+        It translates both the correct and incorrect symbolic equations into a
+        form suitable for comparison, applies a fitting operator to estimate the coefficients, and then
+        assesses their stability. The equation with more stable coefficients is considered a better
+        representation of the system's dynamics.
+        
+        Args:
+            correct_symbolic: The correct symbolic equation as a string.
+            eq_incorrect_symbolic: The incorrect symbolic equation as a string.
+            search_obj: An EpdeSearch object containing the search pool.
+            all_vars: A list of variable names to consider (default: ['u']).
+        
+        Returns:
+            bool: True if the coefficient stability of the correct equation is
+                less than that of the incorrect equation for all variables,
+                False otherwise.
+    """
     metaparams = {('sparsity', var): {'optimizable': False, 'value': 1E-6} for var in all_vars}
 
     correct_eq = translate_equation(correct_symbolic, search_obj.pool, all_vars=all_vars)
@@ -69,6 +113,24 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
 
 
 def prepare_suboperators(fitness_operator: CompoundOperator, operator_params: dict) -> CompoundOperator:
+    """
+    Prepares the compound operator by setting sub-operators for sparsity and coefficient calculation.
+    
+        This method configures the provided compound operator by setting its
+        sub-operators, which are essential for determining the equation's structure
+        and coefficients. It then maps the operator between gene and chromosome levels
+        based on a fitness calculation condition, ensuring that the equation discovery
+        process is aligned with the evolutionary algorithm's search strategy. This
+        preparation is crucial for effectively exploring the space of possible equations
+        and identifying those that best fit the observed data.
+    
+        Args:
+            fitness_operator (CompoundOperator): The compound operator to prepare.
+            operator_params (dict): Parameters to be set for the fitness operator.
+    
+        Returns:
+            CompoundOperator: The modified fitness operator with prepared sub-operators and level mapping.
+    """
     sparsity = LASSOSparsity()
     coeff_calc = LinRegBasedCoeffsEquation()
 
@@ -85,6 +147,20 @@ def prepare_suboperators(fitness_operator: CompoundOperator, operator_params: di
 
 
 def lorenz_discovery(noise_level):
+    """
+    Discovers the Lorenz system equations using the EPDE framework.
+    
+    This method leverages the EPDE search algorithm to identify the governing equations of the Lorenz attractor directly from data. 
+    It automates the equation discovery process by exploring a space of potential equation structures defined by trigonometric and grid tokens.
+    The method preprocesses the data, configures the search space, sets up the EPDE search object with specific parameters, and then performs the search.
+    The goal is to find a balance between model complexity and accuracy in representing the underlying dynamics.
+    
+    Args:
+      noise_level: This parameter is not used in the function.
+    
+    Returns:
+      EpdeSearch: The trained EPDE search object, containing the discovered equations.
+    """
     t_file = os.path.join(os.path.dirname( __file__ ), 't.npy')
     t = np.load(t_file)
     data_file = os.path.join(os.path.dirname(__file__), 'lorenz.npy')

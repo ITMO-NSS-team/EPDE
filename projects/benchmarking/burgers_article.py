@@ -33,6 +33,20 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
 # TODO^ caching of the pre-calculated derivatives
     
 def run_burg_eq_search(multiobjective_mode, derivs):
+    """
+    Discovers the Burgers' equation from provided data derivatives using an evolutionary algorithm.
+    
+    This method sets up and executes the equation search process, configuring the evolutionary algorithm 
+    with appropriate parameters and custom tokens to explore the solution space effectively. The goal 
+    is to identify the equation that best describes the relationship between the input data and its derivatives.
+    
+    Args:
+        multiobjective_mode: A boolean flag that enables multiobjective optimization, balancing equation complexity and accuracy.
+        derivs: Derivatives of the input data, precomputed to facilitate the equation search.
+    
+    Returns:
+        tuple: A tuple containing the EPDE search object, which holds the search results, and the optimization metric obtained during the search.
+    """
     print(u.shape, grids[0].shape, grids[1].shape)
     epde_search_obj = epde_alg.EpdeSearch(multiobjective_mode=multiobjective_mode, use_solver=False, 
                                            dimensionality=dimensionality, boundary=boundary, 

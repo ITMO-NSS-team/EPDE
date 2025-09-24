@@ -21,6 +21,25 @@ sys.path.pop()
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')))
 
 def write_pareto(dict_of_exp):
+    """
+    Writes Pareto front solutions to text files for each experiment.
+    
+        This function iterates through a dictionary of experimental results, extracting
+        Pareto front solutions and writing them to separate text files. The filename
+        is derived from the experiment parameters. Each iteration's Pareto front is
+        written with equation strings to the file. This is done to store the discovered
+        equation structures representing the best trade-offs between different objectives
+        at each stage of the evolutionary process, enabling further analysis and selection
+        of the most suitable models.
+    
+        Args:
+            dict_of_exp: Dictionary where keys are tuples representing experiment
+                parameters and values are lists of Pareto front solutions for each
+                iteration of the experiment.
+    
+        Returns:
+            None. This method writes data to files and does not return any value.
+    """
     for key, item in dict_of_exp.items():
         test_key = str(key[0]).replace('.', '_') + '__' + str(key[1]).replace('.', '_')
         with open('/home/maslyaev/epde/EPDE_main/projects/hunter-prey/param_var/'+test_key+'.txt', 'w') as f:

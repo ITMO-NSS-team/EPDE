@@ -25,6 +25,18 @@ import scipy.io as scio
 
 
 def load_pretrained_PINN(ann_filename):
+    """
+    Loads a pre-trained Physics-Informed Neural Network (PINN) from a file.
+    
+    This function attempts to load a previously trained PINN model, allowing the evolutionary process to start from a potentially good initial guess,
+    reducing the computational cost of training from scratch. If no pre-trained model is found, the process continues by retraining the ANN approximation.
+    
+    Args:
+        ann_filename: The filename of the pickled ANN data.
+    
+    Returns:
+        The loaded ANN data if the file exists, otherwise None.
+    """
     try:
         with open(ann_filename, 'rb') as data_input_file:
             data_nn = pickle.load(data_input_file)
@@ -35,12 +47,44 @@ def load_pretrained_PINN(ann_filename):
 
 
 def noise_data(data, noise_level):
+    """
+    Adds random noise to the input data based on its standard deviation.
+    
+    This helps to evaluate the robustness of discovered differential equations when data is imperfect.
+    
+    Args:
+        data (np.ndarray): The input data to add noise to.
+        noise_level (float): The level of noise to add, as a percentage of the data's standard deviation.
+    
+    Returns:
+        np.ndarray: The data with added noise.
+    """
     # add noise level to the input data
     return noise_level * 0.01 * np.std(data) * np.random.normal(size=data.shape) + data
 
 
 def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
                       search_obj: EpdeSearch, all_vars: List[str] = ['u', ]) -> bool:
+    """
+    Compares two symbolic equations to determine which better represents the underlying dynamics.
+    
+        This method translates both equations into a comparable form, applies a fitting
+        operator to assess their accuracy, and then evaluates their coefficient stability.
+        The comparison helps in identifying the equation that more robustly captures the
+        system's behavior.
+    
+        Args:
+            correct_symbolic (str): The correct symbolic equation as a string.
+            eq_incorrect_symbolic (str): The incorrect symbolic equation as a string.
+            search_obj (EpdeSearch): An EpdeSearch object containing the search pool and
+                necessary data for equation fitting.
+            all_vars (List[str], optional): A list of variable names to consider. Defaults to ['u'].
+    
+        Returns:
+            bool: True if the correct equation exhibits better coefficient stability
+                than the incorrect equation across all variables, indicating a superior
+                representation of the system's dynamics. False otherwise.
+    """
     metaparams = {('sparsity', var): {'optimizable': False, 'value': 1E-6} for var in all_vars}
 
     correct_eq = translate_equation(correct_symbolic, search_obj.pool, all_vars=all_vars)
@@ -69,6 +113,22 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
 
 
 def prepare_suboperators(fitness_operator: CompoundOperator, operator_params: dict) -> CompoundOperator:
+    """
+    Prepares the compound fitness operator with necessary sub-operators for equation discovery.
+        
+        This method initializes and configures the sparsity and coefficient calculation sub-operators,
+        then integrates them into the provided compound fitness operator. The operator is mapped
+        between gene and chromosome levels based on a condition that checks if the fitness has
+        already been calculated. This ensures that the fitness calculation is performed only when
+        necessary during the evolutionary process of discovering differential equations.
+        
+        Args:
+          fitness_operator: The compound fitness operator to prepare.
+          operator_params: A dictionary of parameters for the fitness operator.
+        
+        Returns:
+          CompoundOperator: The prepared compound fitness operator, ready for use in the equation discovery process.
+    """
     sparsity = LASSOSparsity()
     coeff_calc = LinRegBasedCoeffsEquation()
 
@@ -85,6 +145,23 @@ def prepare_suboperators(fitness_operator: CompoundOperator, operator_params: di
 
 
 def VdP_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
+    """
+    Tests the performance on the Van-der-Pol oscillator.
+        
+        This method evaluates the ability to identify the Van-der-Pol oscillator equation from data.
+        It sets up a test scenario by loading data, adding noise, defining symbolic and incorrect equations,
+        creating tokens representing potential equation terms, and then runs a search to compare identified equations
+        against the known symbolic form. This helps assess the framework's capability to rediscover governing equations
+        from noisy data.
+        
+        Args:
+            operator: The compound operator to be tested.
+            foldername: The name of the folder containing the data files.
+            noise_level: The level of noise to add to the data. Defaults to 0.
+        
+        Returns:
+            bool: True if the comparison of equations passes, False otherwise.
+    """
     # u'' + E (u^2 - 1)u' + u = 0, where $\mathcal{E}$ is a positive constant (in the example we will use $\mathcal{E} = 0.2$)
     # Test scenario to evaluate performance on Van-der-Pol oscillator
     eq_vdp_symbolic = '-0.2 * u{power: 2.0} * du/dx0{power: 1.0} + 0.2 * du/dx0{power: 1.0} + -1.0 * u{power: 1.0} + -0.0 \
@@ -120,6 +197,18 @@ def VdP_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
 
 
 def vdp_discovery(foldername, noise_level):
+    """
+    Discovers the governing equation of the Van der Pol oscillator from noisy data.
+    
+    This method automates the process of identifying the underlying differential equation by employing evolutionary algorithms and multi-objective optimization to find equation structures that best fit the provided data. It leverages data preprocessing, custom token definitions, and numerical solvers to achieve accurate discovery. The method is applied to the Van der Pol oscillator to demonstrate its capability in uncovering governing equations from complex systems.
+    
+    Args:
+        foldername: The name of the folder containing the data and pretrained model.
+        noise_level: The level of noise to add to the data.
+    
+    Returns:
+        EpdeSearch: The EPDE search object containing the discovered equations and solutions.
+    """
     step = 0.05;
     steps_num = 320
     t = np.arange(start=0., stop=step * steps_num, step=step)

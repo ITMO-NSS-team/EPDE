@@ -24,18 +24,90 @@ from epde.control.optim import AdamOptimizer, CoordDescentOptimizer
 from epde.supplementary import FDDeriv, AutogradDeriv
 
 class ControlExp():
+    '''
+    Represents a control experiment.
+    
+        This class provides a framework for conducting control experiments,
+        allowing for different control strategies and optimization methods.
+    
+        Class Methods:
+        - __init__: Initializes the ConditionalControlNetTrainer.
+        - create_best_equations: Creates the best equations based on the provided optimal equations.
+        - create_ode_bop: Creates a BOPElement for ODE integration.
+        - set_solver_params: None
+        - get_solver_adapter: Returns the appropriate solver adapter based on the configuration.
+        - finite_diff_calculation: Calculate finite-differecnce approximation of gradient in respect to the specified parameter.
+        - feedback: Performs feedback control to optimize a system.
+        - time_based: Performs a time-based simulation or optimization.
+    '''
+
     def __init__(self, loss : ConditionalLoss, device: str = 'cpu'):
+        """
+        Initializes the ConditionalControlNetTrainer.
+        
+        This class prepares the training environment for discovering differential equations. It sets up the necessary components,
+        including the loss function and the device for computation, to optimize the control network.
+        
+        Args:
+            loss: The conditional loss function to be minimized during the equation discovery process.
+            device: The device to run the training on (e.g., 'cpu', 'cuda'). Defaults to 'cpu'.
+        
+        Fields:
+            _device: The device used for training.
+            _state_net: The state network (initialized to None).
+            _best_control_net: The best control network found during training (initialized to None).
+            loss: The conditional loss function.
+        
+        Returns:
+            None.
+        
+        Why: This initialization is a crucial step in setting up the training process for the control network, which is used to identify the underlying differential equations from the given data by minimizing the specified loss function.
+        """
         self._device = device
         self._state_net = None
         self._best_control_net = None
         self.loss = loss
 
     def create_best_equations(self, optimal_equations: Union[list, ParetoLevels]):
+        """
+        Creates the best equation by combining optimal equations using an evolutionary algorithm.
+        
+                This method refines a set of optimal equations by combining them and
+                evaluating their performance, ultimately aiming to identify the equation
+                that best balances accuracy and complexity. It uses parallel processing
+                to efficiently explore the search space of possible combinations.
+        
+                Args:
+                    optimal_equations: A list or ParetoLevels object containing the optimal
+                        equations to combine.
+        
+                Returns:
+                    The result of calling `create_best` method on the
+                    `ExperimentCombiner` instance, after initialization with provided equations and passing the `pool` to it.
+                    The `create_best` method selects the highest complexity values and creates the best equation variant.
+        """
         res_combiner = ExperimentCombiner(optimal_equations)
         return res_combiner.create_best(self._pool)
 
     @staticmethod
     def create_ode_bop(key, var, term, grid_loc, value, device: str = 'cpu'):
+        """
+        Creates a BOPElement, sets its grid location, and assigns a value to it, preparing it for integration within the equation discovery process.
+        
+                This method constructs a BOPElement, sets its grid location, and assigns a value to it.
+                The BOPElement is configured for use in ODE integration. This is a crucial step in representing the equation terms at specific grid points, enabling the framework to evaluate the equation's fitness against the observed data.
+        
+                Args:
+                    key: The key associated with the BOPElement.
+                    var: The variable associated with the BOPElement.
+                    term: The term associated with the BOPElement.
+                    grid_loc: The grid location for the BOPElement.
+                    value: The value to be assigned to the BOPElement.
+                    device: The device to which the BOPElement's tensors will be moved (default: 'cpu').
+        
+                Returns:
+                    BOPElement: The created and configured BOPElement.
+        """
         bop = BOPElement(axis = 0, key = key, term = term, power = 1, var = var, device = device)
         bop_grd_np = np.array([[grid_loc,]])
         bop.set_grid(torch.from_numpy(bop_grd_np).type(torch.FloatTensor).to(device))
@@ -63,6 +135,20 @@ class ControlExp():
                                }
 
     def get_solver_adapter(self, net: torch.nn.Sequential = None):
+        """
+        Returns the appropriate solver adapter based on the configuration.
+        
+                This method determines which solver adapter to use for simulating the system's dynamics. If `use_pinn` is True, a `SolverAdapter` is returned, configured with parameters from `solver_params`. Otherwise, an `OdeintAdapter` is returned, using the specified ODE solving method. The choice depends on whether a neural network-based solver is employed or a traditional ODE solver is preferred.
+        
+                Args:
+                    net: The neural network to be used by the SolverAdapter.
+        
+                Returns:
+                    The solver adapter, either a SolverAdapter or an OdeintAdapter.
+        
+                Why:
+                    This method allows the framework to switch between different numerical integration approaches based on user configuration. The `SolverAdapter` leverages neural networks, while the `OdeintAdapter` relies on traditional ODE solvers. This flexibility enables the framework to handle a wider range of problems and leverage different computational resources.
+        """
         if self._use_pinn:
             adapter = SolverAdapter(net = net, use_cache = False, device = self._device)
             # Edit solver forms of functions of dependent variable to Callable objects.
@@ -85,10 +171,27 @@ class ControlExp():
     @staticmethod
     def finite_diff_calculation(system, adapter, loc, control_loss, state_net: torch.nn.Sequential,
                                 bc_operators, grids: list, solver_params: dict, eps: float):
-        '''
-        Calculate finite-differecnce approximation of gradient in respect to the specified parameter.
-
-        '''
+        """
+        Calculates the finite difference approximation of the gradient with respect to a specified parameter of the control neural network.
+        
+                This method perturbs a parameter of the control neural network by a small amount `eps` and calculates the corresponding change in the loss function.
+                This approximation is used to estimate the sensitivity of the loss function to changes in the control parameters,
+                which is essential for optimizing the control strategy.
+        
+                Args:
+                    system: The EPDE system to be solved.
+                    adapter: The solver adapter used to solve the EPDE system.
+                    loc (List[Union[str, Tuple[int]]]): A list specifying the location of the parameter to be modified within the control NN's state dictionary.
+                    control_loss: The loss function used to evaluate the performance of the control strategy.
+                    state_net (torch.nn.Sequential): The state neural network.
+                    bc_operators: The boundary condition operators.
+                    grids (list): The grids used for solving the EPDE system and evaluating the control loss.
+                    solver_params (dict): The parameters for the EPDE solver.
+                    eps (float): The perturbation size used for finite difference approximation.
+        
+                Returns:
+                    torch.Tensor: The finite difference approximation of the gradient.
+        """
         # Calculating loss in p[i]+eps:
         ctrl_dict_prev = global_var.control_nn.net.state_dict()       
         ctrl_nn_dict = eps_increment_diff(input_params=ctrl_dict_prev,
@@ -160,6 +263,31 @@ class ControlExp():
                  opt_params: List[float] = [0.01, 0.9, 0.999, 1e-8],
                  control_net: torch.nn.Sequential = None, fig_folder: str = None, 
                  LV_exp: bool = True, eps: float = 1e-2, solver_params: dict = {}):
+        """
+        Performs feedback control to optimize a system by iteratively solving a differential equation and refining a control strategy.
+        
+                This method alternates between solving the full system and an abridged version to efficiently adjust control parameters based on finite differences. It aims to find the optimal control strategy that minimizes a defined loss function, effectively steering the system towards a desired behavior. The iterative refinement leverages both the full system dynamics and a simplified representation to balance accuracy and computational cost.
+        
+                Args:
+                    bc_operators: List of boundary condition operators, each a dict or float. These define the constraints on the solution at the boundaries of the domain.
+                    grids: List of grids (np.ndarray or torch.Tensor) on which to solve the system. These represent the spatial or temporal discretization of the problem domain.
+                    n_control: Number of control variables. Defaults to 1. This specifies the dimensionality of the control input.
+                    epochs: Number of training epochs. Defaults to 1e2. This determines the number of iterations for the optimization process.
+                    state_net: Initial state network (torch.nn.Sequential). Defaults to None. This provides an initial guess for the solution of the differential equation.
+                    opt_params: Optimization parameters (learning rate, beta1, beta2, epsilon). Defaults to [0.01, 0.9, 0.999, 1e-8]. These control the behavior of the optimizer used to update the control parameters.
+                    control_net: Initial control network (torch.nn.Sequential). Defaults to None. This represents the initial control strategy.
+                    fig_folder: Folder to save figures. Defaults to None. If provided, visualizations of the training process will be saved here.
+                    LV_exp: Flag to indicate if it is a Lotka-Volterra experiment. Defaults to True. This is a specific flag for a particular type of experiment.
+                    eps: Epsilon value for finite difference calculations. Defaults to 1e-2. This determines the step size used to approximate derivatives.
+                    solver_params: Dictionary of solver parameters for full and abridged solves. Defaults to {}. These parameters configure the numerical solver used to solve the differential equation.
+        
+                Returns:
+                    tuple: A tuple containing:
+                        - The optimized state network (torch.nn.Sequential). This is the refined solution to the differential equation.
+                        - The optimized control network (torch.nn.Sequential). This is the refined control strategy.
+                        - The control predictions (torch.Tensor). These are the control actions predicted by the optimized control network.
+                        - A list of loss values over training history (list). This provides insight into the convergence of the optimization process.
+        """
         def modify_bc(operator: dict, scale: Union[float, torch.Tensor]) -> dict:
             noised_operator = deepcopy(operator)
             noised_operator['bnd_val'] = torch.normal(operator['bnd_val'], scale).to(self._device)
@@ -343,6 +471,33 @@ class ControlExp():
                    opt_params: List[float] = [0.01, 0.9, 0.999, 1e-8],
                    control_net: torch.nn.Sequential = None, fig_folder: str = None, 
                    LV_exp: bool = True, eps: float = 1e-2, solver_params: dict = {}):        
+        """
+        Performs a time-based simulation or optimization.
+        
+                This method is intended to perform a time-based simulation or
+                optimization of a system, but the implementation is not yet
+                available. It sets solver parameters, gets a solver adapter,
+                and then raises a NotImplementedError. This method would be used to simulate the system's behavior over time, potentially optimizing control parameters to achieve desired outcomes based on the discovered equations.
+        
+                Args:
+                    bc_operators: Boundary condition operators.
+                    grids: Spatial grids for the simulation.
+                    n_control: Number of control variables. Defaults to 1.
+                    epochs: Number of training epochs. Defaults to 1e2.
+                    state_net: Neural network for the state. Defaults to None.
+                    opt_params: Optimization parameters. Defaults to [0.01, 0.9, 0.999, 1e-8].
+                    control_net: Neural network for the control. Defaults to None.
+                    fig_folder: Folder to save figures. Defaults to None.
+                    LV_exp: Flag for Lotka-Volterra experiment. Defaults to True.
+                    eps: A small constant. Defaults to 1e-2.
+                    solver_params: Parameters for the solver. Defaults to {}.
+        
+                Returns:
+                    None.
+        
+                Raises:
+                    NotImplementedError: This method is not yet implemented.
+        """
         self.set_solver_params(**solver_params['full'])
         adapter = self.get_solver_adapter(None)
         solver_form = self.system

@@ -11,6 +11,29 @@ import matplotlib.pyplot as plt
 
 def Lotka_Volterra_by_RK(initial : tuple, timestep : float, steps : int, alpha : float, 
                          beta : float, delta : float, gamma : float):
+    """
+    Calculates the Lotka-Volterra model using the Runge-Kutta method.
+    
+        This method simulates the Lotka-Volterra equations, a mathematical model
+        describing the dynamics of biological systems in which two species interact,
+        one as a predator and the other as prey, using the 4th order Runge-Kutta
+        method. It is used to generate synthetic data of interacting populations
+        that can be used to test equation discovery algorithms.
+    
+        Args:
+            initial: Initial population sizes of prey and predator.
+            timestep: The size of the time step used in the Runge-Kutta method.
+            steps: The number of time steps to simulate.
+            alpha: The natural growth rate of prey.
+            beta: The death rate of prey due to predation.
+            delta: The growth rate of predators due to eating prey.
+            gamma: The natural death rate of predators.
+    
+        Returns:
+            np.ndarray: A 2D array where each row represents a time step and the
+                two columns represent the prey and predator population sizes,
+                respectively.
+    """
     res = np.full(shape = (steps, 2), fill_value = initial, dtype=np.float64)
     for step in range(steps-1):
         # print(res[step, :])

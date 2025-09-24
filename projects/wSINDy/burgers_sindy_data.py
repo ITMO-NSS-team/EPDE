@@ -36,6 +36,22 @@ from epde.interface.prepared_tokens import TrigonometricTokens, CacheStoredToken
 from epde.interface.solver_integration import BoundaryConditions, BOPElement
 
 def epde_discovery(x, t, u, use_ann = False): #(grids, data, use_ann = False):
+    """
+    Performs EPDE to find governing equations from data.
+        
+        This method sets up and executes the EPDE algorithm to identify the underlying equation that best describes the provided data. 
+        It involves preprocessing, defining custom tokens, and fitting the EPDE search object to the data.
+        The method aims to find a balance between model complexity and accuracy by searching for the most concise equation that adequately represents the data.
+        
+        Args:
+            x: Spatial grid.
+            t: Temporal grid.
+            u: Data corresponding to the spatial and temporal grids.
+            use_ann: Flag indicating whether to use an artificial neural network (ANN) preprocessor. Defaults to False.
+        
+        Returns:
+            epde_search_obj: The fitted EPDE search object containing the discovered equations.
+    """
     u = u.T
     grids = np.meshgrid(t, x, indexing = 'ij')
     print(u.shape, grids[0].shape, grids[1].shape)
@@ -78,6 +94,23 @@ def epde_discovery(x, t, u, use_ann = False): #(grids, data, use_ann = False):
 
 
 def sindy_examplar_search(x, t, u):
+    """
+    Performs SINDy exemplar search to identify governing equations.
+    
+        This method applies the SINDy algorithm to discover the underlying equations from the provided data.
+        It leverages finite differences to estimate derivatives, constructs a library of potential terms
+        using a PDE library, and then employs sparse regression to identify the most significant terms.
+        This approach automates the identification of governing differential equations from data,
+        allowing users to gain insights into the dynamics of the system.
+    
+        Args:
+            x (np.ndarray): Spatial coordinates.
+            t (np.ndarray): Time coordinates.
+            u (np.ndarray): Input data representing the system's state.
+    
+        Returns:
+            None. The method prints the identified model to the console.
+    """
     dt = t[1] - t[0]
     dx = x[1] - x[0]
     

@@ -5,14 +5,18 @@ import json
 
 def read_config(name: str) -> json:
     """
-    Read some config
-
+    Reads a configuration file containing settings for the equation discovery process.
+    
+    This function is essential for setting up and customizing the search for differential equations.
+    It allows users to define parameters such as evolutionary algorithm settings, data preprocessing 
+    options, and custom token definitions, ensuring that the equation discovery process is tailored 
+    to the specific problem and dataset.
+    
     Args:
-        name: config name.
-
+        name (str): The path to the JSON configuration file.
+    
     Returns:
-        json config.
-
+        json: A dictionary containing the configuration parameters loaded from the file.
     """
     with open(name, 'r') as config_file:
         config_data = json.load(config_file)
@@ -62,14 +66,18 @@ default_config = json.loads(DEFAULT_CONFIG)
 
 def check_module_name(module_name: str) -> bool:
     """
-    Check correctness of the 'first' level of config parameter name
-    we call it module.
-
+    Validates the module name against a predefined configuration.
+    
+    This function ensures that the provided module name is a valid top-level
+    configuration element, which is crucial for correct configuration processing.
+    By verifying the module name, the system can properly route and apply
+    configuration settings, preventing errors and ensuring consistent behavior.
+    
     Args:
-        module_name: first level of a parameter of a custom config.
-
+        module_name: The module name to validate (first level config parameter).
+    
     Returns:
-        if module presents in 'default' config.
+        True if the module name is found in the default configuration, False otherwise.
     """
     if module_name in default_config.keys():
         return True
@@ -79,15 +87,16 @@ def check_module_name(module_name: str) -> bool:
 
 def check_param_name(module_name: str, param_name: str) -> bool:
     """
-    Check correctness of the 'first' level of config parameter name
-    we call it module.
-
+    Checks if a given parameter name exists within a specified module in the default configuration.
+    
+    This function verifies that a parameter is valid for a particular module, ensuring that only recognized parameters are used during the equation discovery process.
+    
     Args:
-        module_name: first level of a parameter of a custom config.
-        param_name: specific parameter name.
-
+        module_name (str): The name of the module to check within the default configuration.
+        param_name (str): The name of the parameter to validate.
+    
     Returns:
-       true if module presents in 'default' config.
+        bool: True if the parameter name is found within the specified module in the default configuration, False otherwise.
     """
     if param_name in default_config[module_name].keys():
         return True
@@ -95,19 +104,31 @@ def check_param_name(module_name: str, param_name: str) -> bool:
         return False
 
 class Config:
+    """
+    Represents a configuration object for the solver.
+    
+        The configuration can be initialized with default values and updated
+        from a custom configuration file.
+    
+        Attributes:
+            config_path: Path to a custom configuration file.
+    """
+
     def __init__(self, *args):
         """
-        We initialize config with default one
-
-        If there is passed path to a custom config, we try to load it and change
-        default parameters
-
+        Initializes the configuration, prioritizing user-defined settings.
+        
+        The configuration is initialized with default parameters. If a path to a
+        custom configuration file is provided, the method attempts to load it and
+        override the default settings. This allows users to tailor the equation
+        discovery process to their specific problem and dataset. The method validates
+        the structure of the custom configuration to ensure compatibility.
+        
         Args:
-            config_path: path to a custom config
-
+            config_path (str, optional): Path to a custom configuration file. If None, the default configuration is used.
+        
         Returns:
-            config used in solver.optimization_solver function
-
+            dict: The configuration dictionary used by the equation discovery process.
         """
 
         self.params = default_config
@@ -134,15 +155,17 @@ class Config:
 
     def set_parameter(self, parameter_string: str, value: Union[bool, float, int, None]):
         """
-        We may want to just change default config parameters manually, without loading
-        the .json
-
-        We run checks to see we set them correctly
-
-        Args:
-            parameter_string: string in format 'module.parameter'.
-            value: value for the parameter.
-
+        Modifies a specific configuration parameter directly.
+        
+                This allows for fine-grained control over the configuration without needing to load a complete configuration file.
+                Input is validated to ensure that only existing modules and parameters are modified, preventing unintended configuration errors.
+        
+                Args:
+                    parameter_string: A string specifying the parameter to modify, in the format 'module.parameter'.
+                    value: The new value for the specified parameter.  Can be a boolean, float, integer, or None.
+        
+                Returns:
+                    None. The method modifies the configuration in place.
         """
 
         module_name, param = parameter_string.split('.')
