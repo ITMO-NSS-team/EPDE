@@ -20,13 +20,18 @@ from epde.solver.model import Model
 
 
 def count_output(model: torch.Tensor) -> int:
-    """ Determine the out features of the model.
-
+    """
+    Determine the number of output features of the model's final layer.
+    
+    This is crucial for adapting the discovered equation to the specific data being modeled.
+    By identifying the output features, the framework ensures that the equation's structure aligns
+    with the dimensionality of the target variables.
+    
     Args:
-        model (torch.Tensor): torch neural network.
-
+        model (torch.Tensor): The neural network model.
+    
     Returns:
-        int: number of out features.
+        int: The number of output features in the final layer.
     """
     modules, output_layer = list(model.modules()), None
     for layer in reversed(modules):
@@ -37,28 +42,38 @@ def count_output(model: torch.Tensor) -> int:
 
 
 class CachePreprocessing:
-    """class for preprocessing cache files.
     """
+    class for preprocessing cache files.
+    """
+
     def __init__(self,
                  model: Model
                  ):
         """
-        Args:
-            model (Model): object of Model class
+        Initializes the CachePreprocessing object with a model.
+        
+                This ensures that the preprocessing steps are aligned with the specific solution class
+                defined within the provided model, facilitating consistent data handling throughout the equation discovery process.
+        
+                Args:
+                    model (Model): The model containing the solution class to be used for preprocessing.
+        
+                Returns:
+                    None
         """
         self.solution_cls = model.solution_cls
 
     @staticmethod
     def _cache_files(files: list, nmodels: Union[int, None]=None) -> np.ndarray:
-        """ At some point we may want to reduce the number of models that are
-            checked for the best in the cache.
-
-        Args:
-            files (list): list with all model names in cache.
-            nmodels (Union[int, None], optional): models quantity for checking. Defaults to None.
-
-        Returns:
-            cache_n (np.ndarray): array with random cache files names.
+        """
+        Reduces the number of cached models to be evaluated, potentially improving the efficiency of the equation discovery process. By limiting the number of models considered, the search for the best equation can be accelerated.
+        
+                Args:
+                    files (list): A list of all model names available in the cache.
+                    nmodels (Union[int, None], optional): The desired number of models to select for evaluation. If None, all models are selected. Defaults to None.
+        
+                Returns:
+                    np.ndarray: An array containing the indices of the selected cache files. These indices can be used to access the corresponding model data.
         """
 
         if nmodels is None:
@@ -74,16 +89,17 @@ class CachePreprocessing:
     def _model_reform(init_model: Union[torch.nn.Sequential, torch.nn.ModuleList],
                      model: Union[torch.nn.Sequential, torch.nn.ModuleList]):
         """
-        As some models are nn.Sequential class objects,
-        but another models are nn.Module class objects.
-        This method does checking the solver model (init_model)
-        and the cache model (model).
-        Args:
-            init_model (nn.Sequential or nn.ModuleList): solver model.
-            model (nn.Sequential or nn.ModuleList): cache model.
-        Returns:
-            init_model (nn.Sequential or nn.ModuleList): checked init_model.
-            model (nn.Sequential or nn.ModuleList): checked model.
+        Checks and adjusts the structure of the initial and cached models to ensure compatibility.
+        
+                This function verifies if the provided models are directly indexable (e.g., `nn.Sequential`) or if they are nested within a `model` attribute. If a model is nested, it extracts the underlying model. This ensures that subsequent operations can correctly access the model's layers, regardless of its initial structure. This adjustment is crucial for consistent handling of different model types within the caching mechanism.
+        
+                Args:
+                    init_model (nn.Sequential or nn.ModuleList): The initial model used by the solver.
+                    model (nn.Sequential or nn.ModuleList): The cached model to be checked.
+        
+                Returns:
+                    init_model (nn.Sequential or nn.ModuleList): The adjusted initial model.
+                    model (nn.Sequential or nn.ModuleList): The adjusted cached model.
         """
         try:
             model[0]
@@ -102,16 +118,21 @@ class CachePreprocessing:
                      nmodels: Union[int, None] = None,
                      save_graph: bool = False,
                      cache_verbose: bool = False) -> Union[None, dict, torch.nn.Module]:
-        """Looking for the best model (min loss) model from the cache files.
-
-        Args:
-            cache_dir (str): folder where system looks for cached models.
-            nmodels (Union[int, None], optional): maximal number of models that are taken from cache dir. Defaults to None.
-            save_graph (bool, optional): responsible for saving the computational graph. Defaults to False.
-            cache_verbose (bool, optional): verbose cache operations. Defaults to False.
-
-        Returns:
-            Union[None, dict, torch.Tensor]: best model with optimizator state.
+        """
+        Looks for the best performing model within the cached models based on validation loss.
+        
+                This method iterates through the cached models, evaluates their performance, and selects the one with the lowest validation loss.
+                It ensures compatibility between the cached model and the current solver's model before evaluation.
+                This is done to efficiently reuse previously trained models and accelerate the equation discovery process.
+        
+                Args:
+                    cache_dir (str): Folder where the system looks for cached models.
+                    nmodels (Union[int, None], optional): Maximal number of models to consider from the cache directory. Defaults to None, meaning all models are considered.
+                    save_graph (bool, optional): Whether to save the computational graph during evaluation. Defaults to False.
+                    cache_verbose (bool, optional): Enables verbose output for cache operations. Defaults to False.
+        
+                Returns:
+                    Union[None, dict, torch.nn.Module]: The best model found in the cache, along with its optimizer state, or None if no suitable model is found.
         """
 
         files = glob.glob(cache_dir + '\*.tar')
@@ -183,14 +204,15 @@ class CachePreprocessing:
     def scheme_interp(self,
                       trained_model: torch.nn.Module,
                       cache_verbose: bool = False) -> torch.nn.Module:
-        """ If the cache model has another arcitechure to user's model,
-            we will not be able to use it. So we train user's model on the
-            outputs of cache model.
-
-        Args:
-            trained_model (torch.nn.Module): the best model (min loss) from cache.
-            cache_verbose (bool, optional): verbose on/off of cache operations. Defaults to False.
-
+        """
+        Trains the user's model to mimic the behavior of a pre-trained model from the cache, effectively transferring knowledge and adapting to potential architectural differences. This ensures compatibility and leverages prior learning when the cache model's structure differs from the user's specified model.
+        
+                Args:
+                    trained_model (torch.nn.Module): The pre-trained model from the cache whose behavior will be mimicked.
+                    cache_verbose (bool, optional): Enables verbose output during the training process. Defaults to False.
+        
+                Returns:
+                    torch.nn.Module: The user's model, fine-tuned to approximate the behavior of the `trained_model`.
         """
 
         grid = self.solution_cls.grid
@@ -223,14 +245,18 @@ class CachePreprocessing:
     def cache_retrain(self,
                       cache_checkpoint: dict,
                       cache_verbose: bool = False) -> torch.nn.Module:
-        """ The comparison of the user's model and cache model architecture.
-            If they are same, we will use model from cache. In the other case
-            we use interpolation (scheme_interp method)
-
-        Args:
-            cache_checkpoint (dict): checkpoint of the cache model
-            cache_verbose (bool, optional): on/off printing cache operations. Defaults to False.
-
+        """
+        Compares the user-provided model architecture with the cached model architecture to determine if the cached model can be directly used or if interpolation is required to transfer knowledge.
+        
+                Args:
+                    cache_checkpoint (dict): Checkpoint containing the cached model's architecture and state.
+                    cache_verbose (bool, optional): Enables verbose logging of cache operations. Defaults to False.
+        
+                Returns:
+                    torch.nn.Module: Returns the model. It returns None if the cache is empty, returns cache model if architectures are the same, and returns the user defined model after interpolation in other cases.
+        
+                Why:
+                    This method aims to accelerate the model training process by reusing previously learned knowledge from similar models. If the architectures match, the cached model's state is directly loaded. Otherwise, interpolation is used to adapt the cached knowledge to the current model, leveraging prior learning to guide the training process.
         """
 
         model = self.solution_cls.model
@@ -261,10 +287,11 @@ class CachePreprocessing:
 class Cache(Callback):
     """
     Prepares user's model. Serves for computing acceleration.\n
-    Saves the trained model to the cache, and subsequently it is possible to use pre-trained model
-    (if it saved and if the new model is structurally similar) to sped up computing.\n
-    If there isn't pre-trained model in cache, the training process will start from the beginning.
+        Saves the trained model to the cache, and subsequently it is possible to use pre-trained model
+        (if it saved and if the new model is structurally similar) to sped up computing.\n
+        If there isn't pre-trained model in cache, the training process will start from the beginning.
     """
+
 
     def __init__(self,
                  nmodels: Union[int, None] = None,
@@ -275,15 +302,17 @@ class Cache(Callback):
                  clear_cache: bool = False
                 ):
         """
-        Args:
-            nmodels (Union[int, None], optional): maximal number of models that are taken from cache dir. Defaults to None. Defaults to None.
-            cache_dir (str, optional): directory with cached models. Defaults to '../tedeous_cache/' in temporary directoy of user system.
-                If cache_dir is custom, then file will be searched in *torch_de_solver* directory.
-            cache_verbose (bool, optional): printing cache operations. Defaults to False.
-            cache_model (Union[torch.nn.Sequential, None], optional): model for mat method, which will be saved in cache. Defaults to None.
-            model_randomize_parameter (Union[int, float], optional): creates a random model parameters (weights, biases)
-                multiplied with a given randomize parameter.. Defaults to 0.
-            clear_cache (bool, optional): clear cache directory. Defaults to False.
+        Initializes the Cache object for managing pre-trained models.
+        
+                The cache facilitates the reuse of previously trained models, potentially reducing the computational cost of solving similar problems.
+        
+                Args:
+                    nmodels (Union[int, None], optional): The maximum number of models to keep in the cache directory. If None, all models are kept. Defaults to None.
+                    cache_dir (str, optional): The directory where cached models are stored. Defaults to 'tedeous_cache', which resolves to a subdirectory within the system's temporary directory. If a custom directory is specified, it is resolved relative to the *torch_de_solver* directory.
+                    cache_verbose (bool, optional): Enables verbose output for cache operations, providing more detailed information about loading and saving models. Defaults to False.
+                    cache_model (Union[torch.nn.Sequential, None], optional): A PyTorch model to be immediately saved to the cache. Defaults to None.
+                    model_randomize_parameter (Union[int, float], optional): A factor to randomize the model's initial parameters (weights and biases) before saving it to the cache. This can help explore different regions of the solution space. Defaults to 0.
+                    clear_cache (bool, optional): If True, the cache directory is emptied upon initialization. Defaults to False.
         """
 
         self.nmodels = nmodels
@@ -308,7 +337,14 @@ class Cache(Callback):
             remove_all_files(self.cache_dir)
 
     def _cache_nn(self):
-        """  take model from cache as initial guess for *NN, autograd* modes.
+        """
+        Utilizes a model from the cache as an initial starting point for neural network-based equation discovery. This approach leverages previously learned information to accelerate the search process and potentially improve the quality of the discovered equations by initializing the model with a promising configuration.
+        
+                Args:
+                    self: Instance of the Cache class.
+        
+                Returns:
+                    None
         """
 
         cache_preproc = CachePreprocessing(self.model)
@@ -324,7 +360,14 @@ class Cache(Callback):
         self.model.solution_cls.model.apply(r)
 
     def _cache_mat(self) -> torch.Tensor:
-        """  take model from cache as initial guess for *mat* mode.
+        """
+        Refines the initial guess for the *mat* mode solution by leveraging a cache of previously trained models. It retrieves a suitable model from the cache, retrains it to better align with the current problem, and uses its output as a starting point for the *mat* mode solution. This approach accelerates the solution process by providing a pre-trained model that captures general solution characteristics.
+        
+                Args:
+                    self: The Cache instance.
+        
+                Returns:
+                    torch.Tensor: A refined initial guess for the *mat* mode solution, obtained from the cache and adapted to the current problem.
         """
 
         net = self.model.net
@@ -364,7 +407,20 @@ class Cache(Callback):
             self.model.solution_cls._model_change(model.requires_grad_())
 
     def cache(self):
-        """ Wrap for cache_mat and cache_nn methods.
+        """
+        Caches the model's computations based on its mode.
+        
+        This method acts as a dispatcher, selecting the appropriate caching strategy
+        based on whether the model is operating in 'mat' mode or another mode (presumably 'nn').
+        It ensures that the computationally intensive parts of the model are cached for later use,
+        potentially speeding up subsequent calculations or analyses.
+        
+        Args:
+            self: The Cache instance.
+        
+        Returns:
+            The result of either `self._cache_mat()` if the model is in 'mat' mode,
+            or `self._cache_nn()` otherwise.
         """
 
         if self.model.mode != 'mat':
@@ -373,5 +429,16 @@ class Cache(Callback):
             return self._cache_mat()
 
     def on_train_begin(self, logs=None):
+        """
+        Called at the beginning of training.
+        
+        Caches the model and sets the save directory. This ensures that the discovered equation and its associated parameters can be efficiently stored and retrieved during the evolutionary search process, facilitating faster exploration of the solution space.
+        
+        Args:
+            logs: Contains the logs.
+        
+        Returns:
+            None
+        """
         self.cache()
         self.model._save_dir = self.cache_dir

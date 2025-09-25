@@ -9,10 +9,46 @@ from epde.structure.main_structures import SoEq
 import epde.globals as global_var
 
 def make_eval_func(eval_func, eval_func_kwargs):
+    """
+    Creates a wrapper function for evaluation.
+    
+    This method generates a lambda function that calls the provided
+    evaluation function with the given keyword arguments. This allows
+    for pre-configuring the evaluation function with specific settings
+    without modifying its original signature.
+    
+    Args:
+      eval_func: The evaluation function to be wrapped.
+      eval_func_kwargs: Keyword arguments to be passed to the evaluation function.
+    
+    Returns:
+      A lambda function that calls `eval_func` with the provided keyword arguments.
+    """
     return lambda *args: eval_func(*args, **eval_func_kwargs)
 
 class SystemSolverInterface(object):
     def __init__(self, system_to_adapt: SoEq, coeff_tol: float = 1.e-9, device = 'cpu'):
+        """
+        Initializes the SystemDescription object.
+        
+        This method prepares the SystemDescription object for describing a system,
+        extracting its variables and setting up necessary parameters.
+        
+        Args:
+            system_to_adapt: The system to be adapted and described.
+            coeff_tol: Tolerance for coefficients.
+            device: The device to use for computation (e.g., 'cpu', 'cuda').
+        
+        Fields:
+            variables (list): A list of variables to describe, extracted from the input system.
+            adaptee (SoEq): The system to be adapted, stored for later use.
+            grids (None): Placeholder for grids, initialized to None.
+            coeff_tol (float): Tolerance for coefficients, used in various calculations.
+            _device (str): The device to use for computation.
+        
+        Returns:
+            None.
+        """
         self.variables = list(system_to_adapt.vars_to_describe)
         self.adaptee = system_to_adapt
         self.grids = None
@@ -23,6 +59,26 @@ class SystemSolverInterface(object):
     @staticmethod
     def _term_solver_form(term, grids, default_domain, variables: List[str] = ['u',], 
                           device = 'cpu') -> dict:
+        """
+        Transforms a symbolic term into a solver-compatible dictionary format.
+        
+        This method processes a symbolic term, extracting derivative information
+        and coefficient values to create a dictionary suitable for use by a numerical solver.
+        It handles both constant coefficients and coefficients that are functions of the grid.
+        
+        Args:
+            term: The symbolic term to be transformed.
+            grids: The grid points on which the term is evaluated.
+            default_domain: A boolean indicating whether to use the default domain.
+            variables: A list of variable names. Defaults to ['u'].
+        
+        Returns:
+            dict: A dictionary containing the transformed term information, with the following keys:
+                - 'coeff': The coefficient tensor or scalar value.
+                - 'term': A list of derivative orders.
+                - 'pow': A list of derivative powers.
+                - 'var': A list of derivative variable indices.
+        """
         deriv_orders = []
         deriv_powers = []
         deriv_vars = []
@@ -101,9 +157,42 @@ class SystemSolverInterface(object):
 
     @singledispatchmethod
     def set_boundary_operator(self, operator_info):
+        """
+        Sets the boundary operator.
+        
+        Args:
+            operator_info: Information about the boundary operator.
+        
+        Returns:
+            None.
+        
+        Raises:
+            NotImplementedError: This method is not implemented.
+        """
         raise NotImplementedError()
 
     def _equation_solver_form(self, equation, variables, grids=None, mode = 'NN') -> dict:
+        """
+        Forms the equation for the solver.
+        
+        This method takes an equation, variables, and grids, and transforms
+        them into a dictionary suitable for the solver. It iterates through
+        the terms of the equation, calculates their contributions, and
+        organizes them into a structured format.
+        
+        Args:
+            equation: The equation to be solved.
+            variables: The variables involved in the equation.
+            grids: The grids on which the equation is defined. Defaults to None,
+                in which case the grids from the `self` object are used.
+            mode: The mode of operation ('NN', 'autograd', or 'mat'). Defaults to 'NN'.
+        
+        Returns:
+            dict: A dictionary representing the equation in a solver-friendly format.
+                The dictionary contains terms of the equation as keys, and each term
+                is represented by a dictionary containing its coefficient, term
+                structure, power, and variable information.
+        """
         assert mode in ['NN', 'autograd', 'mat'], 'Incorrect mode passed. Form available only \
                                                    for "NN", "autograd "and "mat" methods'
         
@@ -156,6 +245,28 @@ class SystemSolverInterface(object):
 
     def use_grids(self, grids=None): # 
         if grids is None and self.grids is None:
+        """
+        Uses provided grids or retrieves them from the global grid cache.
+        
+        If grids are not provided and the instance's grids are also None,
+        it retrieves all grids from the global grid cache. If grids are
+        provided, it checks if the number of provided grids matches the
+        number of grids in the global grid cache. If the provided grids
+        are NumPy arrays, they are converted to PyTorch tensors and moved
+        to the device specified by `self._device`.
+        
+        Args:
+            grids: A list of grids to use. If None, grids are retrieved from
+                the global grid cache.
+        
+        Returns:
+            None.
+        
+        Class Fields Initialized:
+            grids (list of torch.Tensor): The grids used by the instance.
+                Initialized with the provided grids or retrieved from the
+                global grid cache.
+        """
             _, self.grids = global_var.grid_cache.get_all(mode = 'torch')
         elif grids is not None:
             if len(grids) != len(global_var.grid_cache.get_all(mode = 'torch')[1]):
@@ -167,6 +278,21 @@ class SystemSolverInterface(object):
             
 
     def form(self, grids=None, mode = 'NN'):
+        """
+        Forms the equations into a solver-friendly format.
+        
+        Transforms the equations stored in the adaptee into a format suitable
+        for a numerical solver, associating each main variable with its
+        corresponding equation form.
+        
+        Args:
+          grids: Optional grid data to be used in the equation solving process.
+          mode: String indicating the solving mode, defaults to 'NN'.
+        
+        Returns:
+          A list of tuples, where each tuple contains the main variable to
+          explain and its corresponding equation form ready for the solver.
+        """
         self.use_grids(grids=grids)
         equation_forms = []
 

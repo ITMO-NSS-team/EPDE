@@ -1,0 +1,5 @@
+# Burgers
+
+
+
+::: projects.wSINDy.burgers

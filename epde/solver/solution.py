@@ -20,6 +20,7 @@ class Solution():
     """
     class for different loss functions calculation.
     """
+
     def __init__(
         self,
         grid: torch.Tensor,
@@ -33,18 +34,26 @@ class Solution():
         derivative_points: int = 2,
         batch_size: int = None):
         """
-        Args:
-            grid (torch.Tensor): discretization of comp-l domain.
-            equal_cls (Union[Equation_NN, Equation_mat, Equation_autograd]): Equation_{NN, mat, autograd} object.
-            model (Union[torch.nn.Sequential, torch.Tensor]): model of *mat or NN or autograd* mode.
-            mode (str): *mat or NN or autograd*
-            weak_form (Union[None, List[callable]]): list with basis functions, if the form is *weak*.
-            lambda_operator (_type_): regularization parameter for operator term in loss.
-            lambda_bound (_type_): regularization parameter for boundary term in loss.
-            tol (float, optional): penalty in *casual loss*. Defaults to 0.
-            derivative_points (int, optional): points number for derivative calculation.
-            batch_size (int): size of batch.
-            For details to Derivative_mat class.. Defaults to 2.
+        Initializes the Solution object, setting up the problem domain, equation, model, and loss functions.
+        
+                This method prepares the necessary components for solving a differential equation,
+                including the domain discretization, equation definition, model setup, and boundary conditions.
+                It also initializes the loss functions used to train the model.
+        
+                Args:
+                    grid (torch.Tensor): Discretization of the computational domain.
+                    equal_cls (Union[Equation_NN, Equation_mat, Equation_autograd]): Equation object defining the differential equation.
+                    model (Union[torch.nn.Sequential, torch.Tensor]): Model representing the solution to the differential equation.
+                    mode (str): Specifies the calculation mode (*mat*, *NN*, or *autograd*).
+                    weak_form (Union[None, List[callable]]): List of basis functions for the weak formulation, if applicable.
+                    lambda_operator: Regularization parameter for the operator term in the loss function.
+                    lambda_bound: Regularization parameter for the boundary term in the loss function.
+                    tol (float, optional): Penalty value used in the *casual loss* calculation. Defaults to 0.
+                    derivative_points (int, optional): Number of points used for derivative calculation. Defaults to 2.
+                    batch_size (int, optional): Size of the batch used for training. Defaults to None.
+        
+                Returns:
+                    None
         """
 
         self.grid = check_device(grid)
@@ -90,11 +99,20 @@ class Solution():
 
     @staticmethod
     def _operator_coeff(equal_cls: Any, operator: list):
-        """ Coefficient checking in operator.
-
-        Args:
-            equal_cls (Any): Equation_{NN, mat, autograd} object.
-            operator (list): prepared operator (result of operator_prepare())
+        """
+        Updates the operator coefficients, transferring them to the appropriate device.
+        
+                This ensures that the coefficients within the operator are compatible
+                with the computational device (CPU or GPU) being used for the equation
+                solving process. This is crucial for efficient and accurate calculations
+                during the equation discovery and modeling process.
+        
+                Args:
+                    equal_cls (Any): Equation object containing the equation definition and coefficients.
+                    operator (list): Prepared operator (result of operator_prepare()) to be updated.
+        
+                Returns:
+                    None. The operator list is modified in place.
         """
         for i, _ in enumerate(equal_cls.operator):
             eq = equal_cls.operator[i]
@@ -108,11 +126,17 @@ class Solution():
                     eq[key]['coeff'] = eq[key]['coeff'].to(device_type())
 
     def _model_change(self, new_model: torch.nn.Module) -> None:
-        """Change self.model for class and *operator, boundary* object.
-            It should be used in cache_lookup and cache_retrain method.
-
-        Args:
-            new_model (torch.nn.Module): new self model.
+        """
+        Updates the internal model and related components with a new model. This ensures consistency across the solution components when a new model is selected, either from the cache or after retraining.
+        
+                Args:
+                    new_model (torch.nn.Module): The new PyTorch model to be used.
+        
+                Returns:
+                    None
+        
+                Why:
+                This method is crucial for updating the model within the solution and ensuring that all dependent components, such as the operator (PDE definition) and boundary conditions, use the same model. This synchronization is essential for the correct evaluation and optimization of the solution.
         """
         self.model = new_model
         self.operator.model = new_model
@@ -129,19 +153,18 @@ class Solution():
 
     def evaluate(self,
                  save_graph: bool = True) -> Tuple[torch.Tensor, torch.Tensor]:
-        """ Computes loss.
-
-        Args:
-            second_order_interactions (bool, optional): optimizer iteration
-            (serves only for computing adaptive lambdas). Defaults to True.
-            sampling_N (int, optional): parameter for accumulation of
-            solutions (op, bcs). The more sampling_N, the more accurate the
-            estimation of the variance (only for computing adaptive lambdas). Defaults to 1.
-            lambda_update (bool, optional): update lambda or not. Defaults to False.
-            save_graph (bool, optional): responsible for saving the computational graph. Defaults to True.
-
-        Returns:
-            Tuple[torch.Tensor, torch.Tensor]: loss
+        """
+        Computes the loss function based on the current state of the operator and boundary conditions.
+        
+                This method orchestrates the computation of the loss, incorporating adaptive lambda parameters for regularization.
+                It prepares the operator and boundary conditions, applies boundary conditions, and then calculates the loss using the configured loss class.
+                The method also handles batching of the operator output, accumulating results across batches when applicable.
+        
+                Args:
+                    save_graph (bool, optional): Determines whether to save the computational graph for visualization or debugging. Defaults to True.
+        
+                Returns:
+                    Tuple[torch.Tensor, torch.Tensor]: A tuple containing the computed loss and the normalized loss.
         """
 
         self.op = self.operator.operator_compute()

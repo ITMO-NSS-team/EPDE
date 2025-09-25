@@ -25,6 +25,19 @@ import scipy.io as scio
 
 
 def load_pretrained_PINN(ann_filename):
+    """
+    Loads a pre-trained neural network model from a file.
+    
+    This function attempts to load a previously trained Physics-Informed Neural Network (PINN)
+    from the specified file. This allows to reuse already trained models, avoiding retraining
+    and saving computational resources when exploring different equation candidates.
+    
+    Args:
+        ann_filename (str): The filename of the pickled ANN data.
+    
+    Returns:
+        object: The loaded ANN data if the file exists; otherwise, None.
+    """
     try:
         with open(ann_filename, 'rb') as data_input_file:
             data_nn = pickle.load(data_input_file)
@@ -35,12 +48,43 @@ def load_pretrained_PINN(ann_filename):
 
 
 def noise_data(data, noise_level):
+    """
+    Adds random noise to the input data, scaling it based on the data's standard deviation and a specified noise level.
+    
+    This helps to evaluate the robustness of discovered differential equations by simulating real-world measurement errors.
+    
+    Args:
+        data (np.ndarray): The input data (e.g., a time series) to which noise will be added.
+        noise_level (float):  A percentage determining the magnitude of the noise relative to the data's standard deviation.
+    
+    Returns:
+        np.ndarray: The data with added Gaussian noise, having the same shape as the input data.
+    """
     # add noise level to the input data
     return noise_level * 0.01 * np.std(data) * np.random.normal(size=data.shape) + data
 
 
 def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
                       search_obj: EpdeSearch, all_vars: List[str] = ['u', ]) -> bool:
+    """
+    Compares two symbolic equations to determine which one better represents the underlying dynamics of the system.
+        
+        It translates both the correct and incorrect symbolic equations into a form suitable
+        for comparison, applies a fitting operator to estimate the coefficients, and then
+        assesses their stability. The equation with more stable coefficients is considered
+        a better representation of the system's dynamics.
+        
+        Args:
+            correct_symbolic: The correct symbolic equation as a string.
+            eq_incorrect_symbolic: The incorrect symbolic equation as a string.
+            search_obj: An EpdeSearch object containing the search pool.
+            all_vars: A list of variable names to consider (default: ['u']).
+        
+        Returns:
+            bool: True if the coefficient stability of the correct equation is
+                less than that of the incorrect equation for all variables,
+                False otherwise.
+    """
     metaparams = {('sparsity', var): {'optimizable': False, 'value': 1E-6} for var in all_vars}
 
     correct_eq = translate_equation(correct_symbolic, search_obj.pool, all_vars=all_vars)
@@ -69,6 +113,25 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
 
 
 def prepare_suboperators(fitness_operator: CompoundOperator, operator_params: dict) -> CompoundOperator:
+    """
+    Prepares the compound fitness operator with necessary sub-operators.
+    
+        This method configures the provided compound operator by setting its
+        sub-operators for sparsity and coefficient calculation. These sub-operators
+        are essential for constructing the overall fitness evaluation process, ensuring
+        that the evolutionary algorithm can effectively explore the search space of
+        potential equation structures. The operator is then mapped between gene and
+        chromosome levels based on a fitness calculation condition to ensure proper
+        evaluation during the evolutionary process. This setup is crucial for
+        evaluating the fitness of candidate equations within the evolutionary process.
+    
+        Args:
+            fitness_operator (CompoundOperator): The compound fitness operator to prepare.
+            operator_params (dict): A dictionary of parameters for the fitness operator.
+    
+        Returns:
+            CompoundOperator: The prepared compound fitness operator.
+    """
     sparsity = LASSOSparsity()
     coeff_calc = LinRegBasedCoeffsEquation()
 
@@ -85,6 +148,23 @@ def prepare_suboperators(fitness_operator: CompoundOperator, operator_params: di
 
 
 def wave_data(filename):
+    """
+    Generates spatio-temporal data from a file.
+    
+    This method loads data representing a physical system from a specified file, 
+    creates corresponding time and space grids, and returns both the grids and the loaded data.  
+    The data is assumed to be comma-separated values. This is a crucial step 
+    in preparing the data for equation discovery, as it establishes the domain 
+    over which the differential equations will be defined and evaluated.
+    
+    Args:
+        filename: The name of the file containing the wave data.
+    
+    Returns:
+        tuple: A tuple containing the grids and the data. The grids are a
+            numpy array representing the time and space coordinates, and the
+            data is a numpy array loaded from the file.
+    """
     shape = 80
 
     # print(os.path.dirname( __file__ ))
@@ -96,6 +176,24 @@ def wave_data(filename):
 
 
 def wave_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
+    """
+    Tests the equation discovery process for the wave equation.
+        
+        This method validates the equation discovery pipeline on the wave equation.
+        It sets up an EPDE search, preprocesses data, and checks if the discovered
+        equation matches the expected symbolic form. This ensures the framework
+        can accurately identify known relationships within a given dataset.
+        
+        Args:
+            operator: CompoundOperator object for equation comparison.
+            foldername: Path to the folder containing the data files
+                ('wave_sln_80.csv' and 'ann_pretrained.pickle').
+            noise_level: Level of noise to add to the data. Defaults to 0.
+        
+        Returns:
+            bool: True if the discovered equation matches the expected symbolic
+                representation, False otherwise.
+    """
     # eq_wave_symbolic = '1. * d^2u/dx1^2{power: 1} + 0. = d^2u/dx0^2{power: 1}'
     eq_wave_symbolic = '0.04 * d^2u/dx1^2{power: 1} + 0. = d^2u/dx0^2{power: 1}'
     eq_wave_incorrect = '0.04 * d^2u/dx1^2{power: 1} * du/dx0{power: 1} + 0. = d^2u/dx0^2{power: 1} * du/dx0{power: 1}'
@@ -123,6 +221,23 @@ def wave_test(operator: CompoundOperator, foldername: str, noise_level: int = 0)
 
 
 def wave_discovery(foldername, noise_level):
+    """
+    Performs wave equation discovery using an evolutionary search.
+        
+        This method orchestrates the search for a differential equation that describes
+        wave propagation. It involves loading data, adding noise to simulate real-world
+        conditions, setting up a preprocessor for data conditioning, and then
+        fitting the evolutionary search object to the prepared data. The goal is to
+        find the equation that best represents the underlying dynamics of the wave.
+        
+        Args:
+            foldername (str): The name of the folder containing the data files
+                ('wave_sln_80.csv' and 'ann_pretrained.pickle').
+            noise_level (float): The level of noise to add to the data.
+        
+        Returns:
+            EpdeSearch: The trained EPDE search object, containing the discovered equation.
+    """
     grid, data = wave_data(os.path.join(foldername, 'wave_sln_80.csv'))
     noised_data = noise_data(data, noise_level)
     data_nn = load_pretrained_PINN(os.path.join(foldername, 'ann_pretrained.pickle'))

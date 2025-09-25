@@ -16,8 +16,36 @@ from epde.operators.utils.template import CompoundOperator
 
 
 class RouletteWheelSelection(CompoundOperator):
+    """
+    Implements roulette wheel selection, a fitness-proportionate selection method.
+    
+        This class selects individuals from a population with probabilities proportional
+        to their fitness, simulating a roulette wheel where each individual occupies
+        a slot sized according to its fitness.
+    
+        Methods:
+        - apply
+        - use_default_tags
+    """
+
     key = 'RouletteWheelSelection'
     def apply(self, objective : Population, arguments: dict):
+        """
+        Applies a selection operator to a population based on fitness.
+        
+                This method selects parent candidates from a population based on their fitness
+                scores, using a roulette wheel selection approach. It increments a counter for
+                each selected candidate. This selection mechanism favors individuals with better
+                fitness, increasing their chance to be chosen as parents for the next generation,
+                driving the evolutionary process towards identifying better equation structures.
+        
+                Args:
+                    objective (Population): The population to select from.
+                    arguments (dict): A dictionary of arguments for the selection process.
+        
+                Returns:
+                    Population: The updated population with incremented counters for selected candidates.
+        """
         # TODO: add docstring
         if isinstance(objective, ParetoLevels):
             raise TypeError('Tring to call method, implemented for Population class objects, to a ParetoLevels object. Must be a wrong type of evolution.')
@@ -40,4 +68,15 @@ class RouletteWheelSelection(CompoundOperator):
         return objective
     
     def use_default_tags(self):
+        """
+        Applies a predefined set of tags to the object.
+        
+        This method resets the object's tags to a default configuration, ensuring consistency in how the object is categorized within the evolutionary process. This is useful for standardizing the object's role and properties, especially during initialization or after modifications that might have altered its tagging.
+        
+        Args:
+            self: The object instance.
+        
+        Returns:
+            None.
+        """
         self._tags = {'selection', 'population level', 'auxilary', 'suboperators', 'standard'}

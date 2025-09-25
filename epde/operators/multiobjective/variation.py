@@ -26,40 +26,28 @@ from epde.operators.multiobjective.mutations import get_basic_mutation
 
 class ParetoLevelsCrossover(CompoundOperator):
     """
-    The crossover operator, combining parameter crossover for terms with same 
-    factors but different parameters & full exchange of terms between the 
-    completely different ones.
+    This crossover operator combines parameter crossover for terms sharing the same factors but differing in parameters, and exchanges entire terms between dissimilar equations. It leverages sub-operators for parent selection, parameter crossover, term crossover, coefficient calculation, and fitness evaluation.
     
-    Noteable attributes:
-    -----------
-    suboperators : dict
-        Inhereted from the Specific_Operator class. 
-        Suboperators, performing tasks of parent selection, parameter crossover, full terms crossover, calculation of weights for each terms & 
-        fitness function calculation. Dictionary: keys - strings from 'Selection', 'Param_crossover', 'Term_crossover', 'Coeff_calc', 'Fitness_eval'.
-        values - corresponding operators (objects of Specific_Operator class).
-
-    Methods:
-    -----------
-    apply(population)
-        return the new population, created with the noted operators and containing both parent individuals and their offsprings.    
-    copy_properties_to
+    
+        Methods:
+        -----------
+        apply(population)
+            return the new population, created with the noted operators and containing both parent individuals and their offsprings.    
+        copy_properties_to
     """
+
     key = 'ParetoLevelsCrossover'
     
     def apply(self, objective : ParetoLevels, arguments : dict):
         """
-        Method to obtain a new population by selection of parent individuals (equations) and performing a crossover between them to get the offsprings.
+        Method to generate new candidate solutions (offsprings) by combining existing solutions from the population using crossover. This process aims to explore the solution space and discover novel equation structures that better fit the data.
         
-        Attributes:
-        -----------
-        population : list of Equation objects
-            the population, to that the operator is applied;
-            
-        Returns:
-        -----------
-        population : list of Equation objects
-            the new population, containing both parents and offsprings;
+                Args:
+                    objective (ParetoLevels): An object containing the population of equations, organized by Pareto levels, and unplaced candidates.
+                    arguments (dict): A dictionary containing arguments for the crossover operator and its sub-operators.
         
+                Returns:
+                    ParetoLevels: The updated ParetoLevels object, now containing the generated offsprings in the `unplaced_candidates` attribute. The offsprings are equations created by crossing over parent equations selected based on their Pareto level.
         """
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)        
         
@@ -91,13 +79,53 @@ class ParetoLevelsCrossover(CompoundOperator):
         return objective
 
     def use_default_tags(self):
+        """
+        Applies a predefined set of tags to categorize the crossover operator. These tags provide a concise description of the operator's characteristics, such as its type, level of operation, and structural properties.
+        
+                Args:
+                    self: The object instance.
+        
+                Returns:
+                    None. The method modifies the object's tags in place to reflect its default categorization.
+        
+                Why:
+                    Tagging operators facilitates their organization and selection within the evolutionary process, enabling the framework to effectively manage and explore diverse search strategies for identifying differential equations.
+        """
         self._tags = {'crossover', 'population level', 'contains suboperators', 'standard'}
 
 
 class ChromosomeCrossover(CompoundOperator):
+    """
+    Applies crossover at the chromosome level using sub-operators.
+    
+        This class facilitates crossover between two chromosomes (offspring) by
+        applying specialized sub-operators to their constituent genes. It manages
+        the application of these sub-operators for both equation and parameter
+        genes, effectively recombining genetic material to create new offspring.
+    
+        Class Methods:
+        - apply: Applies crossover to the equation and parameter genes of two offspring.
+        - use_default_tags: Uses default tags for the object.
+    """
+
     key = 'ChromosomeCrossover'
     
     def apply(self, objective : tuple, arguments : dict):
+        """
+        Applies crossover to the equation and parameter genes of two offspring.
+        
+                This method exchanges genetic material between two offspring to create new candidate solutions.
+                It iterates through the equation and parameter keys, applying specialized sub-operators for each.
+                The resulting genes are then used to replace the original genes in the offspring.
+        
+                Args:
+                    objective (tuple): A tuple containing two offspring objects to be crossed over.
+                    arguments (dict): A dictionary containing arguments for the sub-operators.
+        
+                Returns:
+                    tuple: A tuple containing the two modified offspring after crossover. This ensures diversity
+                           in the population, which is crucial for effective equation discovery.
+        """
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
    
         assert objective[0].vals.same_encoding(objective[1].vals)
@@ -124,13 +152,51 @@ class ChromosomeCrossover(CompoundOperator):
         return objective[0], objective[1]
 
     def use_default_tags(self):
+        """
+        Applies a predefined set of tags to categorize the crossover operation.
+        
+        This method assigns default tags to the crossover object, providing a standardized way to identify and classify its characteristics. This tagging facilitates filtering and selection of appropriate crossover operators during the evolutionary search process.
+        
+        Args:
+            self: The ChromosomeCrossover instance.
+        
+        Returns:
+            None. The method modifies the object's internal `_tags` attribute.
+        """
         self._tags = {'crossover', 'chromosome level', 'contains suboperators', 'standard'}
 
 
 class MetaparamerCrossover(CompoundOperator):
+    """
+    Applies a metaparameter-controlled crossover operation on two parent solutions.
+    
+        This class implements a crossover operator that uses a metaparameter
+        to blend the genetic material of two parent solutions, creating two offspring.
+    
+        Class Attributes:
+            - metaparameter: The metaparameter that controls the blend of the parents' genetic material.
+    """
+
     key = 'MetaparamerCrossover'
     
     def apply(self, objective : tuple, arguments : dict):
+        """
+        Applies the blend crossover operator to generate two offspring.
+        
+                This method refines the search for differential equation structures by
+                creating new candidate solutions (offspring) through a linear combination
+                of existing solutions (parents). The `metaparam_proportion` controls the
+                balance between the parent solutions, influencing the exploration of the
+                solution space. This exploration is crucial for discovering equations that
+                accurately represent the underlying dynamics of the data.
+        
+                Args:
+                    objective: A tuple containing the objective values of two parent solutions.
+                    arguments: A dictionary containing additional arguments for the operator.
+        
+                Returns:
+                    tuple: A tuple containing the objective values of the two offspring.
+        """
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
         offspring_1 = objective[0] + self.params['metaparam_proportion'] * (objective[1] - objective[0])
@@ -138,14 +204,67 @@ class MetaparamerCrossover(CompoundOperator):
         return offspring_1, offspring_2
 
     def use_default_tags(self):
+        """
+        Sets a predefined set of tags for the crossover operator.
+        
+        This method assigns a default set of tags to the crossover operator, 
+        characterizing its behavior and properties within the evolutionary process.
+        These tags help in categorizing and selecting appropriate operators 
+        during the equation discovery process.
+        
+        Args:
+            self: The MetaparamerCrossover instance.
+        
+        Returns:
+            None.
+        
+        Initializes:
+            _tags (set): A set containing the default tags: 'crossover', 'gene level', and 'no suboperators'.
+        """
         self._tags = {'crossover', 'gene level', 'no suboperators'}
 
 
 class EquationCrossover(CompoundOperator):
+    """
+    Applies equation crossover to a pair of equations within an objective.
+    
+        This class performs equation crossover between two equations within a
+        given objective. It identifies similar terms in both equations and applies
+        different sub-operators ('term_param_crossover' and 'term_crossover') to
+        these terms to generate new equation structures. The method also ensures
+        the uniqueness of the generated terms within their respective equations.
+    
+        Class Methods:
+        - apply: Applies equation crossover to the given objective using sub-operators.
+        - use_default_tags: Uses the default set of tags for this object.
+    """
+
     key = 'EquationCrossover'
     
     @HistoryExtender(f'\n -> performing equation crossover', 'ba')
     def apply(self, objective : tuple, arguments : dict):
+        """
+        Applies equation crossover to a pair of equations, exploring the space of possible equation structures.
+        
+                This method aims to evolve more accurate and generalizable equation models
+                by recombining building blocks from existing equations. It identifies
+                and exchanges both similar and dissimilar terms between two equations,
+                leveraging sub-operators to modify and refine the equation structures.
+                The method prioritizes the creation of unique and valid equation terms
+                to maintain diversity and prevent redundancy in the search process.
+                This crossover operation facilitates the discovery of novel equation forms
+                that better capture the underlying dynamics of the system.
+        
+                Args:
+                    objective (tuple): A tuple containing two equation objects to be crossed over.
+                    arguments (dict): A dictionary containing arguments for the sub-operators,
+                                      organized by sub-operator name (e.g., 'term_param_crossover', 'term_crossover').
+        
+                Returns:
+                    tuple: A tuple containing the two modified equation objects after crossover.
+                           These equations now have potentially different structures resulting
+                           from the exchange and modification of terms.
+        """
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
         equation1_terms, equation2_terms = detect_similar_terms(objective[0], objective[1])
@@ -170,53 +289,96 @@ class EquationCrossover(CompoundOperator):
         return objective[0], objective[1]
 
     def use_default_tags(self):
+        """
+        Applies a pre-defined set of tags to the operator.
+        
+        This method resets the operator's tags to a default configuration, ensuring consistency in identifying its characteristics. This is useful for standardizing the representation of operators within the evolutionary process.
+        
+        Args:
+            self: The object instance.
+        
+        Returns:
+            None.
+        """
         self._tags = {'crossover', 'gene level', 'contains suboperators', 'standard'}
 
 class EquationExchangeCrossover(CompoundOperator):
+    """
+    Applies equation exchange crossover to a pair of objectives.
+    
+        Class Methods:
+        - apply: Applies equation exchange crossover to a pair of objectives.
+        - use_default_tags: Uses the default set of tags for this object.
+    """
+
     key = 'EquationExchangeCrossover'
     
     @HistoryExtender(f'\n -> performing equation exchange crossover', 'ba')
     def apply(self, objective : tuple, arguments : dict):
+        """
+        Applies equation exchange crossover to a pair of objectives.
+        
+                This method facilitates the exploration of the search space by recombining equation structures. It swaps the 'structure' attributes of the two objective functions, effectively exchanging building blocks between them. This allows the evolutionary algorithm to explore new combinations of equation terms and potentially discover better-fitting models.
+        
+                Args:
+                    objective (tuple): A tuple containing two objective objects, whose equation structures will be exchanged.
+                    arguments (dict): A dictionary containing arguments for the operator and its sub-operators.
+        
+                Returns:
+                    tuple: A tuple containing the two objective objects with their structures swapped, enabling the exploration of new equation combinations.
+        """
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
         objective[0].structure, objective[1].structure = objective[1].structure, objective[0].structure
         return objective[0], objective[1]
 
     def use_default_tags(self):
+        """
+        Resets the operator's tags to the default set.
+        
+        This ensures the operator is correctly categorized with its fundamental properties. This is important for proper identification and selection of operators within the evolutionary process.
+        
+        Args:
+            self: The object instance.
+        
+        Returns:
+            None.
+        """
         self._tags = {'crossover', 'gene level', 'contains suboperators', 'standard'}
 
 
 class TermParamCrossover(CompoundOperator):
     """
-    The crossover exchange between parent terms with the same factor functions, that differ only in the factor parameters. 
-
-    Noteable attributes:
-    -----------
-    params : dict
-        Inhereted from the Specific_Operator class. 
-        Main key - 'proportion', value - proportion, in which the offsprings' parameter values are chosen.
-        
-    Methods:
-    -----------
-    apply(population)
-        return the offspring terms, constructed as the parents' factors with parameter values, selected between the parents' ones.        
+    Performs crossover by exchanging parameters between parent terms that share the same factor functions but differ in their parameter values.
+    
+    
+        Noteable attributes:
+        -----------
+        params : dict
+            Inhereted from the Specific_Operator class. 
+            Main key - 'proportion', value - proportion, in which the offsprings' parameter values are chosen.
+    
+        Methods:
+        -----------
+        apply(population)
+            return the offspring terms, constructed as the parents' factors with parameter values, selected between the parents' ones.
     """
+
     key = 'TermParamCrossover'
         
     def apply(self, objective : tuple, arguments : dict):
         """
-        Get the offspring terms, constructed as the parents' factors with parameter values, selected between the parents' ones.
+        Applies crossover to the parameters of two parent terms, creating two offspring terms with a blend of their parents' characteristics.
         
-        Attributes:
-        ------------
-        term_1, term_2 : Term objects
-            The parent terms.
+                This method iterates through the tokens of the parent terms, adjusting the numerical parameter values of each token based on a defined proportion.
+                The goal is to explore the space of possible parameter combinations, potentially leading to improved equation discovery.
         
-        Returns:
-        ------------
-        offspring_1, offspring_2 : Term objects
-            The offspring terms.
+                Args:
+                    objective (tuple): A tuple containing two `Term` objects, representing the parent terms to be crossed over.
+                    arguments (dict): A dictionary containing arguments required for the sub-operators.
         
+                Returns:
+                    tuple: A tuple containing two `Term` objects, representing the offspring terms resulting from the crossover operation.
         """
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
@@ -255,40 +417,60 @@ class TermParamCrossover(CompoundOperator):
         return objective[0], objective[1]
 
     def use_default_tags(self):
+        """
+        Uses a predefined set of tags to categorize the crossover operator.
+        
+                This method overwrites any existing tags with a predefined set of default tags. This ensures consistency and allows the system to quickly identify the operator's characteristics during the equation discovery process. By using a standard set of tags, the framework can efficiently filter and select appropriate operators based on the desired search criteria.
+        
+                Args:
+                    self: The object instance.
+        
+                Returns:
+                    None.
+        """
         self._tags = {'crossover', 'term level', 'exploitation', 'no suboperators', 'standard'}
 
 class TermCrossover(CompoundOperator):
     """
-    The crossover exchange between parent terms, done by complete exchange of terms. 
-
-    Noteable attributes:
-    -----------
-    params : dict
-        Inhereted from the Specific_Operator class. 
-        Main key - 'crossover_probability', value - probabilty of the term exchange.
-        
-    Methods:
-    -----------
-    apply(population)
-        return the offspring terms, which are the same parents' ones, but in different order, if the crossover occured.
-        .        
-    """    
+    Performs crossover by exchanging complete terms between parent equations.
+    
+    
+        Noteable attributes:
+        -----------
+        params : dict
+            Inhereted from the Specific_Operator class. 
+            Main key - 'crossover_probability', value - probabilty of the term exchange.
+    
+        Methods:
+        -----------
+        apply(population)
+            return the offspring terms, which are the same parents' ones, but in different order, if the crossover occured.
+            .
+    """
+    
     key = 'TermCrossover'
 
     def apply(self, objective : tuple, arguments : dict):
         """
-        Get the offspring terms, which are the same parents' ones, but in different order, if the crossover occured.
+        Performs crossover between two terms based on a defined probability.
         
-        Attributes:
-        ------------
-        term_1, term_2 : Term objects
-            The parent terms.
-            
-        Returns:
-        ------------
-        offspring_1, offspring_2 : Term objects
-            The offspring terms.
+                This method determines whether to swap the order of two parent terms
+                to produce offspring. The decision is based on a crossover probability
+                and whether the parent terms share a common variable marker.
         
+                Args:
+                    objective (tuple): A tuple containing two Term objects (the parent terms).
+                    arguments (dict): A dictionary containing arguments needed for the sub-operators.
+        
+                Returns:
+                    tuple: A tuple containing two Term objects (the offspring terms). The order
+                           of the terms may be swapped depending on the crossover probability
+                           and variable marker condition.
+        
+                Why:
+                This crossover operation helps explore different combinations of terms
+                within the equation search space, potentially leading to the discovery
+                of more accurate or parsimonious models.
         """
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
@@ -299,10 +481,37 @@ class TermCrossover(CompoundOperator):
                 return objective[0], objective[1]
         
     def use_default_tags(self):
+        """
+        Resets the operator's tags to the default set. This ensures that the operator is correctly categorized with its fundamental properties, such as being a crossover operator that operates at the term level, encouraging exploration, not using sub-operators and being a standard operator. This is important for maintaining consistency in the search process and ensuring that the evolutionary algorithm explores the space of possible operators effectively.
+        
+                Args:
+                    self: The object instance.
+        
+                Returns:
+                    None.
+        """
         self._tags = {'crossover', 'term level', 'exploration', 'no suboperators', 'standard'}
 
 
 def get_basic_variation(variation_params : dict = {}):
+    """
+    Creates a basic variation operator setup for equation discovery.
+    
+        This method initializes a Pareto Levels Crossover operator, configuring it with
+        sub-operators like term parameter crossover, term crossover, equation crossover,
+        metaparameter crossover, equation exchange crossover, and chromosome crossover.
+        These sub-operators are structured to explore diverse equation structures during
+        the evolutionary search process. The relationships and probabilities between these
+        sub-operators are carefully set to guide the variation process towards potentially
+        better-fitting equations. This setup facilitates the exploration of the equation
+        search space by combining different genetic operators at various levels of granularity.
+    
+        Args:
+            variation_params: A dictionary to store base parameters for operators.
+    
+        Returns:
+            ParetoLevelsCrossover: A ParetoLevelsCrossover operator configured with the basic variation setup.
+    """
     # TODO: generalize initiation with test runs and simultaneous parameter and object initiation.
     add_kwarg_to_operator = partial(add_base_param_to_operator, target_dict = variation_params)    
 

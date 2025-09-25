@@ -35,15 +35,17 @@ from epde.operators.ea_stop_criteria import Iteration_limit
 
 #if __name__ == '__main__':
 def test_ode_auto():
-    '''
+    """
+    Discovers a differential equation of the form u sin(x) + u' cos(x) = 1, given its solution u = sin(x) + C cos(x) with a particular solution where C = 1.3.
     
-    В этой задаче мы ищем уравнение u sin(x) + u' cos(x) = 1 по его решению: u = sin(x) + C cos(x), 
-    где у частного решения C = 1.3.
+        The method sets up a search space of possible equations and uses multi-objective optimization to find the equation that best fits the provided data. The search prioritizes simplicity and accuracy, aiming to identify the underlying relationship between the function and its derivatives.
     
-    Задаём x - координатную ось по времени; ts - временной ряд условных измерений
-    ff_filename - имя файла, куда сохраняется временной ряд; output_file_name - имя файла для производных
-    step - шаг по времени
-    '''
+        Args:
+            None
+    
+        Returns:
+            None
+    """
     
 #    delim = '/' if sys.platform == 'linux' else '\\'
     

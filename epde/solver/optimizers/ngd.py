@@ -6,16 +6,26 @@ from epde.solver.device import check_device
 
 
 class NGD(torch.optim.Optimizer):
+    """
+    NGD implementation (https://arxiv.org/abs/2302.13163).
+    """
 
     """NGD implementation (https://arxiv.org/abs/2302.13163).
     """
 
     def __init__(self, params,
                  grid_steps_number: int = 30):
-        """The Natural Gradient Descent class.
-
+        """
+        Initializes the Natural Gradient Descent optimizer.
+        
+        This class sets up the optimizer with necessary parameters,
+        including the grid resolution for exploration of potential step sizes.
+        The grid is constructed in a log scale.
+        
         Args:
-            grid_steps_number (int, optional): Grid steps number. Defaults to 30.
+            params (iterable): Iterable of parameters to optimize.
+            grid_steps_number (int, optional): Number of steps in the grid for step size selection.
+                A finer grid allows for a more precise step size selection. Defaults to 30.
         """
         defaults = {'grid_steps_number': grid_steps_number}
         super(NGD, self).__init__(params, defaults)
@@ -27,13 +37,17 @@ class NGD(torch.optim.Optimizer):
         self.cuda_empty_once_for_test=True
 
     def grid_line_search_update(self, loss_function: callable, f_nat_grad: torch.Tensor) -> None:
-        """ Update models paramters by natural gradient.
-
-        Args:
-            loss (callable): function to calculate loss.
-
-        Returns:
-            None.
+        """
+        Update model parameters using a grid line search along the natural gradient direction to minimize the loss.
+        
+                This method explores different step sizes along the natural gradient to find the one that results in the lowest loss. This ensures a more stable and efficient update compared to using a fixed step size, which is crucial for discovering accurate differential equation models.
+        
+                Args:
+                    loss_function (callable): A callable that computes the loss value. It should return a tuple containing the loss tensor and any auxiliary information.
+                    f_nat_grad (torch.Tensor): The natural gradient, a tensor representing the direction of steepest descent in the parameter space, preconditioned by the Fisher information matrix.
+        
+                Returns:
+                    None. The model parameters are updated in place.
         """
         # function to update models paramters at each step
         def loss_at_step(step, loss_function: callable, f_nat_grad: torch.Tensor) -> torch.Tensor:
@@ -55,13 +69,18 @@ class NGD(torch.optim.Optimizer):
         vector_to_parameters(new_params, self.params)
     
     def gram_factory(self, residuals: torch.Tensor) -> torch.Tensor:
-        """ Make Gram matrice.
-
+        """
+        Computes the Gram matrix of the Jacobian of the residuals with respect to the model parameters.
+        
+        This matrix is used to estimate the inverse of the Fisher Information Matrix,
+        which is crucial for preconditioning the gradient during optimization.
+        The preconditioning enhances the convergence and stability of the training process.
+        
         Args:
-            residuals (callable): PDE residual.
-
+            residuals (torch.Tensor): The PDE residuals evaluated at different points.
+        
         Returns:
-            torch.Tensor: Gram matrice.
+            torch.Tensor: The Gram matrix, a symmetric positive semi-definite matrix.
         """
         # Make Gram matrice.
         def jacobian() -> torch.Tensor:
@@ -78,13 +97,18 @@ class NGD(torch.optim.Optimizer):
 
 
     def gram_factory_cpu(self, residuals: torch.Tensor) -> torch.Tensor:
-        """ Make Gram matrice.
-
+        """
+        Computes the Gram matrix of the Jacobian of the residuals with respect to the model parameters.
+        
+        This matrix is used to quantify the linear dependencies between the gradients of the residuals,
+        providing insights into the sensitivity of the model to parameter changes and the identifiability
+        of the parameters themselves. It is calculated on the CPU.
+        
         Args:
-            residuals (callable): PDE residual.
-
+            residuals (torch.Tensor): A tensor containing the PDE residuals.
+        
         Returns:
-            torch.Tensor: Gram matrice.
+            torch.Tensor: The Gram matrix, a measure of the linear dependence between parameter gradients.
         """
         # Make Gram matrice.
         def jacobian() -> torch.Tensor:
@@ -102,15 +126,16 @@ class NGD(torch.optim.Optimizer):
 
     
     def torch_cuda_lstsq(self, A: torch.Tensor, B: torch.Tensor, tol: float = None) -> torch.Tensor:
-        """ Find lstsq (least-squares solution) for torch.tensor cuda.
-
-        Args:
-            A (torch.Tensor): lhs tensor of shape (*, m, n) where * is zero or more batch dimensions.
-            B (torch.Tensor): rhs tensor of shape (*, m, k) where * is zero or more batch dimensions.
-            tol (float):  used to determine the effective rank of A. By default set to the machine precision of the dtype of A.
-
-        Returns:
-            torch.Tensor: solution for A and B.
+        """
+        Finds the least-squares solution for a system of linear equations represented by CUDA tensors. This is a crucial step in identifying the underlying differential equations from data by minimizing the error between the model's predictions and the observed data.
+        
+                Args:
+                    A (torch.Tensor): The left-hand side tensor of shape (*, m, n), where * represents zero or more batch dimensions.
+                    B (torch.Tensor): The right-hand side tensor of shape (*, m, k), where * represents zero or more batch dimensions.
+                    tol (float, optional): Tolerance value used to determine the effective rank of A. Defaults to the machine precision of the dtype of A.
+        
+                Returns:
+                    torch.Tensor: The least-squares solution for A and B.
         """
         tol = torch.finfo(A.dtype).eps if tol is None else tol
         U, S, Vh = torch.linalg.svd(A, full_matrices=False)
@@ -125,6 +150,30 @@ class NGD(torch.optim.Optimizer):
 
 
     def numpy_lstsq(self, A: torch.Tensor, B: torch.Tensor, rcond: float = None) -> torch.Tensor:
+        """
+        Solves a linear least squares problem using NumPy to estimate natural gradients.
+        
+                This method leverages NumPy's least squares solver to efficiently compute
+                the solution to a linear system, which is then used to approximate the
+                natural gradient. By solving this system, the method aims to find the
+                optimal update direction for parameters, facilitating efficient learning.
+                The input tensors `A` and `B` are detached from the computation graph
+                and moved to the CPU as NumPy arrays for compatibility with the solver.
+                The solution is then converted back to a PyTorch tensor and placed on
+                the appropriate device.
+        
+                Args:
+                    A: The "coefficient" matrix (left-hand side of the equation).
+                    B: The "dependent variable" matrix (right-hand side of the equation).
+                    rcond:  Cutoff ratio for small singular values of a.
+                        For the purposes of rank determination, singular values are treated
+                        as zero if they are smaller than rcond times the largest singular
+                        value of a.
+        
+                Returns:
+                    torch.Tensor: The least squares solution, as a PyTorch tensor on the
+                        correct device.
+        """
 
         A = A.detach().cpu().numpy()
         B = B.detach().cpu().numpy()
@@ -139,10 +188,19 @@ class NGD(torch.optim.Optimizer):
 
 
     def step(self, closure=None) -> torch.Tensor:
-        """ It runs ONE step on the natural gradient descent.
-
-        Returns:
-            torch.Tensor: loss value for NGD step.
+        """
+        Performs a single natural gradient descent update step, adjusting model parameters based on the computed natural gradient. This involves assembling the Gramian matrix, solving a least squares problem to obtain the natural gradient, and updating the parameters using a line search to ensure stable convergence.
+        
+                Args:
+                    closure (callable, optional): A closure that reevaluates the model and returns a tuple containing:
+                        - int_res (torch.Tensor): Interior residual values.
+                        - bval (torch.Tensor): Boundary values.
+                        - true_bval (torch.Tensor): True boundary values.
+                        - loss (torch.Tensor): The loss value.
+                        - loss_function (callable): The loss function itself.
+        
+                Returns:
+                    torch.Tensor: The loss value after the NGD step.
         """
 
         int_res, bval, true_bval, loss, loss_function = closure()

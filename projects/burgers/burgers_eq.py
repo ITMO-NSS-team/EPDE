@@ -14,6 +14,21 @@ from epde.interface.prepared_tokens import CacheStoredTokens, CustomTokens, Trig
 
 
 def out_formatting(string):
+    """
+    Formats a string to improve readability of discovered equations by replacing symbolic representations and rounding numerical values.
+    
+        This function specifically targets the output format of the equation discovery process,
+        making it easier to interpret the resulting mathematical expressions. It performs
+        substitutions for common derivative notations and ensures that floating-point numbers
+        are displayed with a reasonable level of precision.
+    
+        Args:
+            string: The input string representing the discovered equation.
+    
+        Returns:
+            str: The formatted string with replaced patterns and rounded numbers,
+                 suitable for human interpretation.
+    """
     string1 = str.split(string, '\n')
     string = string1[0]
     string = string.replace("u{power: 1.0}", "u")

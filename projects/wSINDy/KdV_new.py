@@ -12,6 +12,18 @@ import re
 
 
 def sindy_out_format(model, max_deriv_order):
+    """
+    Formats the SINDy output equation for enhanced readability, focusing on derivative representation.
+    
+        This method refines the SINDy model equation's presentation by converting derivative notations into a more human-readable format, inserting spaces, and adding multiplication symbols where appropriate. This improves the interpretability of the discovered equations.
+    
+        Args:
+            model: The SINDy model object containing the equation to format.
+            max_deriv_order: The maximum derivative order to consider during formatting.
+    
+        Returns:
+            str: The formatted SINDy equation as a string.
+    """
     def pure_derivs_format(string, max_deriv_order, deriv_symbol='\d'):
         # производная переменной x2 или x1
         if deriv_symbol == '\d':

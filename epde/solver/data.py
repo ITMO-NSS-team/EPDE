@@ -11,13 +11,17 @@ from epde.solver.input_preprocessing import EquationMixin
 
 
 def tensor_dtype(dtype: str):
-    """convert tensor to dtype format
-
+    """
+    Converts a string representation of a data type to its corresponding PyTorch data type.
+    
+    This function ensures that the data type used within the equation discovery process is correctly interpreted by the PyTorch backend, 
+    allowing for seamless integration with tensor operations and numerical solvers.
+    
     Args:
-        dtype (str): dtype
-
+        dtype (str): A string representing the desired data type (e.g., 'float32', 'float64', 'float16').
+    
     Returns:
-        dtype: torch.dtype
+        torch.dtype: The corresponding PyTorch data type.
     """
     if dtype == 'float32':
         dtype = torch.float32
@@ -30,14 +34,43 @@ def tensor_dtype(dtype: str):
 
 
 class Domain():
-    """class for grid building
     """
+    class for grid building
+    """
+
     def __init__(self, type='uniform'):
+        """
+        Initializes a new Domain instance.
+        
+        This method sets the domain type and prepares a dictionary to hold symbolic variables.
+        The domain type influences how variables are sampled and used during the equation discovery process.
+        The variable dictionary will store symbolic representations of variables used in the discovered equations.
+        
+        Args:
+            type (str): The type of the domain, influencing variable sampling (default: 'uniform').
+        
+        Returns:
+            None.
+        """
         self.type = type
         self.variable_dict = {}
     
     @property
     def dim(self):
+        """
+        Returns the dimensionality of the domain.
+        
+                This property returns the number of variables associated with the domain,
+                effectively representing the dimensionality of the search space for
+                equation discovery. This is crucial for understanding the complexity
+                of potential differential equations that can be constructed within this domain.
+        
+                Args:
+                    self: The Domain instance.
+        
+                Returns:
+                    int: The number of variables in the domain's variable dictionary.
+        """
         return len(self.variable_dict)
     
     def variable(
@@ -46,14 +79,22 @@ class Domain():
             variable_set: Union[List, torch.Tensor],
             n_points: Union[None, int],
             dtype: str = 'float32') -> None:
-        """ determine varibles for grid building.
-
+        """
+        Initializes a spatial variable within the domain.
+        
+        This method creates a tensor representing the spatial discretization of a given variable.
+        It supports both uniform sampling between specified bounds and the use of pre-defined tensor values.
+        This is a crucial step in setting up the computational domain for solving differential equations.
+        
         Args:
-            varible_name (str): varible name.
-            variable_set (Union[List, torch.Tensor]): [start, stop] list for spatial variable or torch.Tensor with points for variable.
-            n_points (int): number of points in discretization for variable.
-            dtype (str, optional): dtype of result vector. Defaults to 'float32'.
-
+            variable_name (str): Name of the spatial variable.
+            variable_set (Union[List, torch.Tensor]): Either a list [start, stop] defining the interval for uniform discretization,
+                                                    or a torch.Tensor containing the pre-defined variable values.
+            n_points (Union[None, int]): Number of points to use for uniform discretization. Required if `variable_set` is a list.
+            dtype (str, optional): Data type of the resulting tensor. Defaults to 'float32'.
+        
+        Returns:
+            None: The method updates the internal `variable_dict` with the created tensor.
         """
         dtype = tensor_dtype(dtype)
 
@@ -69,13 +110,21 @@ class Domain():
                 self.variable_dict[variable_name] = variable_tensor
     
     def build(self, mode: str) -> torch.Tensor:
-        """ building the grid for algorithm
-
+        """
+        Generates a computational grid based on the specified mode.
+        
+        This grid serves as the foundation for representing the problem domain,
+        enabling the application of various numerical techniques to solve
+        differential equations. The grid is constructed from the domain's
+        variables, and its structure depends on the chosen solution mode.
+        
         Args:
-            mode (str): mode for equation solution, *mat, autograd, NN*
-
+            mode (str): Specifies the solution approach ('mat', 'autograd', or 'NN').
+                         Determines how the grid is generated and used in subsequent calculations.
+        
         Returns:
-            torch.Tensor: resulting grid.
+            torch.Tensor: A tensor representing the computational grid. Its shape and
+                          values are determined by the domain variables and the selected mode.
         """
         var_lst = list(self.variable_dict.values())
         var_lst = [i.cpu() for i in var_lst]
@@ -91,9 +140,25 @@ class Domain():
 
 
 class Conditions():
-    """class for adding the conditions: initial, boundary, and data.
     """
+    class for adding the conditions: initial, boundary, and data.
+    """
+
     def __init__(self):
+        """
+        Initializes a new instance of the Conditions class.
+        
+        The Conditions class manages a list of symbolic conditions that are used to filter and select equation candidates during the equation discovery process. This method initializes the list to store these conditions.
+        
+        Args:
+            self: The object instance.
+        
+        Returns:
+            None.
+        
+        Class Fields:
+            conditions_lst (list): A list to store conditions.
+        """
         self.conditions_lst = []
 
     def dirichlet(
@@ -101,14 +166,22 @@ class Conditions():
             bnd: Union[torch.Tensor, dict],
             value: Union[callable, torch.Tensor, float],
             var: int = 0):
-        """ determine dirichlet boundary condition.
-
+        """
+        Applies a Dirichlet boundary condition to the problem.
+        
+        This method specifies fixed values for the solution at the given boundary points.
+        It's used to constrain the solution space and ensure that the identified equation
+        satisfies the known boundary behavior.
+        
         Args:
-            bnd (Union[torch.Tensor, dict]): boundary points can be torch.Tensor
-            or dict with keys as coordinates names and values as coordinates values.
-            value (Union[callable, torch.Tensor, float]): values at the boundary (bnd)
-            if callable: value = function(bnd)
-            var (int, optional): variable for system case, for single equation is 0. Defaults to 0.
+            bnd (Union[torch.Tensor, dict]): Boundary points where the Dirichlet condition is applied.
+                Can be a torch.Tensor or a dictionary with coordinate names as keys and their values as values.
+            value (Union[callable, torch.Tensor, float]): The value(s) of the solution at the boundary points.
+                If a callable is provided, it will be evaluated at the boundary points to determine the values.
+            var (int, optional): The variable index for systems of equations. Defaults to 0, representing a single equation.
+        
+        Returns:
+            None: The method updates the internal list of boundary conditions (`self.conditions_lst`) with the specified Dirichlet condition.
         """
 
         self.conditions_lst.append({'bnd': bnd,
@@ -121,14 +194,19 @@ class Conditions():
                  bnd: Union[torch.Tensor, dict],
                  operator: dict,
                  value: Union[callable, torch.Tensor, float]):
-        """ determine operator boundary condition
-
-        Args:
-            bnd (Union[torch.Tensor, dict]): boundary points can be torch.Tensor
-            or dict with keys as coordinates names and values as coordinates values
-            operator (dict): dictionary with opertor terms: {'operator name':{coeff, term, pow, var}}
-            value (Union[callable, torch.Tensor, float]): value on the boundary (bnd).
-            if callable: value = function(bnd)
+        """
+        Adds an operator boundary condition to the list of conditions. This condition constrains the solution based on a differential operator applied at the boundary.
+        
+                Args:
+                    bnd (Union[torch.Tensor, dict]): Boundary points where the condition is applied. Can be a tensor or a dictionary with coordinate names as keys and coordinate values as values.
+                    operator (dict): A dictionary defining the differential operator. It specifies the terms, coefficients, powers, and variables involved in the operator.
+                    value (Union[callable, torch.Tensor, float]): The value of the operator at the boundary. Can be a constant, a tensor, or a callable function that takes the boundary points as input.
+        
+                Returns:
+                    None: This method adds the boundary condition to an internal list (`self.conditions_lst`) for later use in the equation discovery process.
+        
+                Why:
+                    This method is crucial for incorporating boundary conditions into the equation discovery process. By specifying constraints on the solution at the boundaries, we can guide the search towards equations that not only fit the data but also satisfy known physical or mathematical constraints. This helps to refine the search space and improve the accuracy and reliability of the discovered equations.
         """
         try:
             var = operator[operator.keys()[0]]['var']
@@ -145,17 +223,16 @@ class Conditions():
                  bnd: Union[List[torch.Tensor], List[dict]],
                  operator: dict = None,
                  var: int = 0):
-        """Periodic can be: periodic dirichlet (example u(x,t)=u(-x,t))
-        if form with bnd and var for system case.
-        or periodic operator (example du(x,t)/dx=du(-x,t)/dx)
-        in form with bnd and operator.
-        Parameter 'bnd' is list: [b_coord1:torch.Tensor, b_coord2:torch.Tensor,..] or
-        bnd = [{'x': 1, 't': [0,1]},{'x': -1, 't':[0,1]}]
-
-        Args:
-            bnd (Union[List[torch.Tensor], List[dict]]): list with dicionaries or torch.Tensors
-            operator (dict, optional): operator dict. Defaults to None.
-            var (int, optional): variable for system case and periodic dirichlet. Defaults to 0.
+        """
+        Adds a periodic boundary condition to the problem definition. This ensures that the solution exhibits a repeating pattern across the specified boundaries. This is useful when modeling systems where the behavior at one boundary is directly related to the behavior at another, such as in wave propagation or fluid dynamics.
+        
+                Args:
+                    bnd (Union[List[torch.Tensor], List[dict]]): A list defining the boundaries for the periodic condition.  Each element can be a tensor representing a coordinate or a dictionary specifying coordinate values (e.g., `{'x': 1, 't': [0,1]}`).
+                    operator (dict, optional): A dictionary defining the operator for the periodic condition. This is used when enforcing periodicity on derivatives or other operators. Defaults to None, which implies a Dirichlet-type periodic condition (i.e., the function values are periodic).
+                    var (int, optional): The index of the variable to which the periodic condition applies. This is relevant for systems of equations. Defaults to 0.
+        
+                Returns:
+                    None: This method modifies the internal list of conditions (`self.conditions_lst`) by appending a dictionary representing the periodic boundary condition.
         """
         value = torch.tensor([0.])
         if operator is None:
@@ -182,14 +259,17 @@ class Conditions():
         operator: Union[dict, None],
         value: torch.Tensor,
         var: int = 0):
-        """ conditions for available solution data
-
-        Args:
-            bnd (Union[torch.Tensor, dict]): boundary points can be torch.Tensor
-            or dict with keys as coordinates names and values as coordinates values
-            operator (Union[dict, None]): dictionary with opertor terms: {'operator name':{coeff, term, pow, var}}
-            value (Union[torch.Tensor, float]): values at the boundary (bnd)
-            var (int, optional): variable for system case and periodic dirichlet. Defaults to 0.
+        """
+        Adds data conditions to the list of conditions. These conditions represent known values of the solution at specific locations, potentially influenced by differential operators. This information is crucial for guiding the equation discovery process by providing constraints that candidate equations must satisfy.
+        
+                Args:
+                    bnd (Union[torch.Tensor, dict]): Boundary points where the solution's value is known. Can be a tensor or a dictionary mapping coordinate names to values.
+                    operator (Union[dict, None]): Differential operator(s) associated with the data condition. Specifies how the solution's derivatives relate to the known value. Can be None if the value is directly known.
+                    value (torch.Tensor): The known value of the solution (or the result of the operator acting on the solution) at the boundary points.
+                    var (int, optional): Index of the variable if dealing with a system of equations. Defaults to 0.
+        
+                Returns:
+                    None
         """
         if operator is not None:
             operator = EquationMixin.equation_unify(operator)
@@ -203,16 +283,30 @@ class Conditions():
                   bnd: Union[torch.Tensor, dict],
                   variable_dict: dict,
                   dtype) -> torch.Tensor:
-        """ build subgrid for every condition.
-
-        Args:
-            bnd (Union[torch.Tensor, dict]):oundary points can be torch.Tensor
-            or dict with keys as coordinates names and values as coordinates values
-            variable_dict (dict): dictionary with torch.Tensors for each domain variable
-            dtype (dtype): dtype
-
-        Returns:
-            torch.Tensor: subgrid for boundary cond-s.
+        """
+        Builds a subgrid representing the boundary conditions for the problem.
+        
+                This method constructs a grid of points that satisfy the specified boundary conditions.
+                It handles different types of boundary specifications, including direct tensor inputs,
+                fixed coordinate values, and interval constraints on coordinate values. The resulting
+                grid is used to evaluate the solution at the boundaries and enforce the boundary conditions
+                during the training process.
+        
+                Args:
+                    bnd (Union[torch.Tensor, dict]): Boundary conditions. Can be a torch.Tensor
+                        representing the boundary points directly, or a dictionary where keys are
+                        coordinate names and values are either:
+                        - torch.Tensor: Tensor of boundary points for that coordinate.
+                        - float or int: Fixed value for that coordinate.
+                        - list: Interval [lower_bound, upper_bound] specifying the range for that coordinate.
+                    variable_dict (dict): Dictionary containing torch.Tensors for each domain variable,
+                        representing the grid coordinates.
+                    dtype (dtype): The desired data type for the resulting grid.
+        
+                Returns:
+                    torch.Tensor: A tensor representing the subgrid of points that satisfy the specified
+                        boundary conditions. The shape of the tensor is (N, D), where N is the number of
+                        boundary points and D is the number of dimensions.
         """
 
         dtype = variable_dict[list(variable_dict.keys())[0]].dtype
@@ -239,13 +333,20 @@ class Conditions():
 
     def build(self,
               variable_dict: dict) -> List[dict]:
-        """ preprocessing of initial boundaries data.
-
+        """
+        Processes boundary conditions to prepare them for equation discovery.
+        
+        This method prepares boundary conditions by converting them into a usable format,
+        ensuring compatibility with the data and specified device. It handles different
+        types of boundary conditions, including periodic ones, and ensures that boundary
+        values are correctly formatted as tensors with the appropriate data type and device.
+        This preprocessing step is crucial for the subsequent equation discovery process.
+        
         Args:
-            variable_dict (dict): dictionary with torch.Tensors for each domain variable
-
+            variable_dict (dict): A dictionary containing torch.Tensors representing the domain variables.
+        
         Returns:
-            List[dict]: list with dicts (where is all info obaut bconds)
+            List[dict]: A list of dictionaries, where each dictionary contains preprocessed information about a boundary condition.
         """
         if self.conditions_lst == []:
             return None
@@ -276,19 +377,51 @@ class Conditions():
 
 
 class Equation():
-    """class for adding eqution.
     """
+    class for adding eqution.
+    """
+
     def __init__(self):
+        """
+        Initializes the EquationList object.
+        
+        The EquationList is used to store and manage a collection of equation objects.
+        This initialization creates an empty list ready to be populated with equations discovered or created during the equation discovery process.
+        
+        Args:
+            self: The object instance.
+        
+        Returns:
+            None
+        """
         self.equation_lst = []
     
     @property
     def num(self):
+        """
+        Returns the number of equations.
+        
+        This property provides a convenient way to access the size of the equation list,
+        reflecting the complexity of the discovered equation system.
+        
+        Args:
+            self: The Equation object instance.
+        
+        Returns:
+            int: The number of equations currently stored.
+        """
         return len(self.equation_lst)
     
     def add(self, eq: dict):
-        """ add equation
-
+        """
+        Adds a new equation to the system of equations.
+        
+        This allows the system to represent more complex relationships and dependencies between variables.
+        
         Args:
-            eq (dict): equation in operator form.
+            eq (dict): A dictionary representing the equation in operator form.
+        
+        Returns:
+            None
         """
         self.equation_lst.append(eq)

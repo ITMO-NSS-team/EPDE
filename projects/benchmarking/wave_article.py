@@ -24,6 +24,23 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
 # TODO^ caching of the pre-calculated derivatives
 
 def translate_eq():
+    """
+    Translates and evaluates a partial differential equation (PDE) by constructing candidate equations and evaluating their fitness against the provided data.
+        
+        This method sets up the coordinate grid, defines the left-hand side (LHS) and right-hand side
+        (RHS) terms of the PDE, and then uses the EPDE algorithm to search for a solution by
+        exploring combinations of terms and coefficients. Finally, it evaluates the identified
+        equation and prints the equation's text form and the mean of the evaluated result,
+        demonstrating the equation discovery process.
+        
+        Args:
+            None
+        
+        Returns:
+            None. Prints the equation's text form and the mean of the evaluated result. The equation
+            represents the discovered relationship between the terms, and the mean provides a measure
+            of how well the equation fits the data.
+    """
     u = np.loadtxt('/home/maslyaev/epde/EPDE_main/projects/wave/data.csv').reshape((101, 101, 101))
     u = np.moveaxis(u, 2, 0)
 
@@ -53,6 +70,17 @@ def translate_eq():
     print(map_to_equation(test1.equation, np.mean))
     
 def run_wave_eq_search(multiobjective_mode):
+    """
+    Runs the equation search for the wave equation using the EPDE framework.
+        
+        This method leverages the EPDE (Equation Parameter Discovery and Estimation) search algorithm to automatically identify the mathematical equation that best describes the wave phenomenon, given the provided data and configuration. It defines the search space of possible equation terms, preprocesses the input data to enhance the search, and optimizes the equation parameters to achieve the best fit. This automated approach helps in understanding the underlying physics of wave propagation by discovering the governing equation directly from data.
+        
+        Args:
+            multiobjective_mode (bool): A boolean flag indicating whether to use multiobjective optimization. When True, the search aims to balance multiple objectives, such as accuracy and equation complexity.
+        
+        Returns:
+            list: A list of the best identified equations, ranked according to their fitness. Each equation represents a potential mathematical model for the wave equation.
+    """
     epde_search_obj = epde_alg.EpdeSearch(multiobjective_mode=multiobjective_mode, use_solver=False, 
                                            dimensionality=dimensionality, boundary=boundary, 
                                            coordinate_tensors = grids, 

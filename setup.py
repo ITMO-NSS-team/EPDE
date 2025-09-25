@@ -19,6 +19,19 @@ SHORT_DESCRIPTION = 'Data-driven dynamical system and differential equations dis
 
 
 def read(*names, **kwargs):
+    """
+    Reads the content of a file, ensuring proper handling of character encoding.
+    
+    This is essential for reliably loading equation definitions, data, or
+    configuration files used within the EPDE framework.
+    
+    Args:
+      *names: Path segments to the file, relative to the directory of the current file.
+      **kwargs: Keyword arguments. May include 'encoding' to specify the file encoding.
+    
+    Returns:
+      str: The content of the file as a string.
+    """
     with open(
             join(dirname(__file__), *names),
             encoding=kwargs.get('encoding', 'utf8')
@@ -27,10 +40,37 @@ def read(*names, **kwargs):
 
 
 def extract_requirements(file_name):
+    """
+    Extracts and filters lines from a file, treating each line as a potential requirement.
+    
+    This function is used to prepare a list of requirements from a specified file,
+    which is a preliminary step for the equation discovery process. By removing
+    empty lines and comments, it ensures that only valid requirements are considered
+    during the search for governing equations.
+    
+    Args:
+        file_name (str): The name of the file containing the requirements.
+    
+    Returns:
+        list[str]: A list of strings, where each string represents a valid requirement
+                   extracted from the file. Empty lines and comments are excluded.
+    """
     return [r for r in read(file_name).split('\n') if r and not r.startswith('#')]
 
 
 def get_requirements():
+    """
+    Extracts and returns the requirements from a file.
+    
+    This function is crucial for setting up the necessary environment
+    by identifying and listing the required Python packages.
+    
+    Args:
+        None
+    
+    Returns:
+        list: A list of strings, where each string is a requirement.
+    """
     requirements = extract_requirements('requirements.txt')
     return requirements
 

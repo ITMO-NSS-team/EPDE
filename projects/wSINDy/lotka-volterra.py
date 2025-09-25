@@ -38,6 +38,22 @@ from epde.interface.solver_integration import BoundaryConditions, BOPElement
 SOLVER_STRATEGY = 'autograd'
 
 def write_pareto(dict_of_exp):
+    """
+    Writes Pareto front solutions to text files for each experiment.
+    
+        This function iterates through a dictionary of experimental results, extracting
+        Pareto front solutions and writing them to separate text files. The filename
+        is derived from the experiment's key. Each iteration's Pareto front is
+        written with equation strings separated by newlines. This is done to store the discovered equations
+        in a readable format for further analysis and validation.
+    
+        Args:
+            dict_of_exp: Dictionary where keys are tuples representing experiment
+                parameters and values are lists of lists of Pareto front objects.
+    
+        Returns:
+            None. This method writes data to files and does not return any value.
+    """
     for key, item in dict_of_exp.items():
         test_key = str(key[0]).replace('.', '_') + '__' + str(key[1]).replace('.', '_')
         with open('/home/maslyaev/epde/EPDE_main/projects/hunter-prey/param_var/'+test_key+'.txt', 'w') as f:
@@ -47,6 +63,26 @@ def write_pareto(dict_of_exp):
                     f.write(ind + '\n\n')
 
 def epde_discovery(t, x, y, use_ann = False):
+    """
+    Discovers a Pareto set of differential equation systems that fit the provided data.
+    
+        This method leverages evolutionary algorithms and multi-objective optimization to explore the space of possible equation structures.
+        The goal is to identify a set of equations that accurately describe the relationships between the input variables and their derivatives,
+        balancing model complexity and accuracy. The method preprocesses the input data, defines the search space using tokens and constraints,
+        and then iteratively refines the equation candidates based on their ability to fit the data. The Pareto set represents a collection of
+        equation systems that offer different trade-offs between model complexity and accuracy.
+    
+        Args:
+            t (np.ndarray): Time coordinate tensor.
+            x (np.ndarray): Independent variable data.
+            y (np.ndarray): Dependent variable data.
+            use_ann (bool, optional): Whether to use an Artificial Neural Network (ANN) preprocessor. Defaults to False.
+    
+        Returns:
+            tuple: A tuple containing:
+                - epde_search_obj (EpdeSearch): The EpdeSearch object containing the search results.
+                - sys (list): The discovered system of equations with specified complexity.
+    """
     dimensionality = x.ndim - 1
     
     '''
@@ -86,6 +122,21 @@ def epde_discovery(t, x, y, use_ann = False):
     
 
 def sindy_discovery(t, x, y):
+    """
+    Performs sparse identification of nonlinear dynamics using the SINDy algorithm.
+    
+        This method identifies a dynamical system from time series data by constructing a polynomial feature library and applying sparse regression.
+        It aims to find a parsimonious model that accurately describes the system's evolution, effectively discovering the underlying equations governing the observed dynamics.
+        This is crucial for automating the process of identifying governing differential equations from data, a core objective of the EPDE project.
+    
+        Args:
+            t (np.ndarray): Time vector corresponding to the data samples.
+            x (np.ndarray): First state variable's time series data.
+            y (np.ndarray): Second state variable's time series data.
+    
+        Returns:
+            ps.SINDy: The fitted SINDy model.
+    """
     poly_order = 5
     threshold = 0.05
     

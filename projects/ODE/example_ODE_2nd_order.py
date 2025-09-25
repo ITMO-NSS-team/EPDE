@@ -111,11 +111,33 @@ None is for function without derivatives
     
 # 1-t^2
 def c1(grid):
+    """
+    Computes a component of the equation based on the input grid.
+    
+    This function calculates the sine of twice the input grid, 
+    representing a specific term or feature within a broader differential equation.
+    It helps to explore potential relationships and dependencies within the data.
+    
+    Args:
+        grid (torch.Tensor): The input grid representing the independent variable(s).
+    
+    Returns:
+        torch.Tensor: The sine of twice the input grid, a component of the equation.
+    """
     return torch.sin(2*grid)
     
     
 # -2t
 def c2(grid):
+    """
+    Scales the input grid, adjusting the balance and influence of different components within the equation discovery process.
+    
+        Args:
+            grid: The input grid representing a set of candidate equation terms.
+    
+        Returns:
+            The scaled grid, where each element's magnitude is adjusted, effectively prioritizing or diminishing the contribution of corresponding terms during equation construction. This scaling helps refine the search for the optimal equation structure.
+    """
     return -1.5 * grid
     
     

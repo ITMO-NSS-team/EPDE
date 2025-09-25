@@ -18,6 +18,23 @@ from epde.evaluators import CustomEvaluator, simple_function_evaluator, inverse_
 # TODO^ caching of the pre-calculated derivatives
 
 def translate_eq():
+    """
+    Translates and evaluates a differential equation to assess its fitness.
+    
+        This method orchestrates the process of loading data representing a physical system,
+        defining the search space of potential differential equations, and evaluating how well
+        a candidate equation describes the observed data. It involves setting up coordinate
+        grids, defining equation terms, searching for the best equation structure, and
+        quantifying the equation's accuracy using a specified evaluation function. The goal
+        is to find a differential equation that accurately captures the underlying dynamics
+        of the system represented by the input data.
+    
+        Args:
+            None
+    
+        Returns:
+            None
+    """
     u = np.loadtxt('/home/maslyaev/epde/EPDE_main/projects/wave/data.csv').reshape((101, 101, 101))
     u = np.moveaxis(u, 2, 0)
 

@@ -10,26 +10,38 @@ class Points_type():
     """
     Discretizing the grid and allocating subsets for Finite Difference method.
     """
+
     def __init__(self, grid: torch.Tensor):
         """
-        Args:
-            grid (torch.Tensor): discretization points of comp-l domain.
+        Initializes the `Points_type` object with a grid of discretization points.
+        
+                This grid represents the spatial or temporal domain over which the differential equation is defined.
+                It's crucial for evaluating equation terms and calculating residuals, which are then used to assess the fitness of candidate equations.
+        
+                Args:
+                    grid (torch.Tensor): Discretization points of the domain.
+        
+                Returns:
+                    None
         """
 
         self.grid = grid
 
     @staticmethod
     def shift_points(grid: torch.Tensor, axis: int, shift: float) -> torch.Tensor:
-        """ Shifts all values of an array 'grid' on a value 'shift' in a direction of
-        axis 'axis', somewhat is equivalent to a np.roll.
-
-        Args:
-            grid (torch.Tensor): discretization of comp-l domain.
-            axis (int): axis to which the shift is applied.
-            shift (float): shift value.
-
-        Returns:
-            torch.Tensor: shifted array of a n-D points.
+        """
+        Shifts the grid points along a specified axis by a given amount.
+        
+                This function modifies the grid to explore alternative configurations in the search space.
+                By shifting points, the algorithm can evaluate different arrangements and identify solutions that better fit the observed data.
+        
+                Args:
+                    grid (torch.Tensor): Discretization of the computational domain.
+                    axis (int): The axis along which to apply the shift.
+                    shift (float): The amount by which to shift the points.
+        
+                Returns:
+                    torch.Tensor: A new tensor with the shifted grid points.
         """
 
         grid_shift = grid.clone()
@@ -38,17 +50,22 @@ class Points_type():
 
     @staticmethod
     def _in_hull(p: torch.Tensor, hull: torch.Tensor) -> np.ndarray:
-        """ Test if points in `p` are in `hull`
-        `p` should be a `NxK` coordinates of `N` points in `K` dimensions
-        `hull` is either a scipy.spatial.Delaunay object or the `MxK` array of the
-        coordinates of `M` points in `K`dimensions for which Delaunay triangulation
-        will be computed.
+        """
+        Test if points in `p` are within the convex hull defined by `hull`.
+        
+        This function determines whether a given set of points lies within the
+        convex hull formed by another set of points. It leverages Delaunay
+        triangulation for efficient spatial partitioning and point location
+        in multi-dimensional spaces. This check is crucial for validating
+        the physical plausibility of discovered equations by ensuring that
+        solutions remain within the bounds defined by the observed data.
+        
         Args:
-            p (torch.Tensor): shifted array of a n-D points.
-            hull (torch.Tensor): initial array of a n-D points.
+            p (torch.Tensor): A `NxK` tensor representing the coordinates of `N` points in `K` dimensions. These are the points to be tested for inclusion in the hull.
+            hull (torch.Tensor): A `MxK` tensor representing the coordinates of `M` points in `K` dimensions. These points define the convex hull. Can also be a precomputed `scipy.spatial.Delaunay` object.
+        
         Returns:
-            np.ndarray: array of a n-D boolean type points.
-            True - if 'p' in 'hull', False - otherwise.
+            np.ndarray: A boolean array of length `N`. Each element indicates whether the corresponding point in `p` is inside the convex hull defined by `hull`. `True` indicates that the point is inside, `False` otherwise.
         """
 
         if p.shape[1] > 1:
@@ -64,13 +81,22 @@ class Points_type():
             return np.array(((p.cpu() <= upbound) & (p.cpu() >= lowbound)).reshape(-1))
 
     def point_typization(self) -> dict:
-        """ Allocating subsets for FD (i.e., 'f', 'b', 'central').
-
-        Returns:
-            dict: type with a points in a 'grid' above. Type may be 'central' - inner point
-            and string of 'f' and 'b', where the length of the string is a dimension n. 'f' means that if we add
-            small number to a position of corresponding coordinate we stay in the 'hull'. 'b' means that if we
-            subtract small number from o a position of corresponding coordinate we stay in the 'hull'.
+        """
+        Identifies the type of each point in the grid based on its proximity to the boundary.
+        
+                This method classifies each point in the grid as either 'central' (lying strictly inside the domain) or
+                assigns it a string of 'f' and 'b' characters representing the directions in which small perturbations
+                would keep the point within the domain. This information is crucial for understanding the point's
+                location relative to the domain's boundaries and is used in subsequent calculations.
+        
+                Args:
+                    self: An instance of the Points_type class containing the grid of points.
+        
+                Returns:
+                    dict: A dictionary where keys are the points in the grid (represented as NumPy arrays) and values
+                          are either 'central' or a string of 'f' and 'b' characters. 'f' indicates that moving the
+                          point slightly in the positive direction along the corresponding axis keeps it inside the domain,
+                          while 'b' indicates the same for the negative direction.
         """
 
         direction_list = []
@@ -106,10 +132,19 @@ class Points_type():
         return point_type
 
     def grid_sort(self) -> dict:
-        """ Sorting grid points for each subset from result Points_type.point_typization.
-
+        """
+        Sorts grid points into subsets based on their typization, preparing them for equation discovery.
+        
+        The method groups points based on a prior typization, organizing them into subsets 
+        associated with distinct types. This organization facilitates subsequent processing 
+        steps in identifying governing differential equations.
+        
+        Args:
+            self: An instance of the Points_type class containing the grid points and typization information.
+        
         Returns:
-            dict: sorted grid in each subset (see Points_type.point_typization).
+            dict: A dictionary where keys are point types and values are tensors containing the 
+                  corresponding grid points, enabling type-specific analysis.
         """
 
         point_type = self.point_typization()
@@ -125,16 +160,18 @@ class Points_type():
         return grid_dict
 
     def bnd_sort(self, grid_dict: dict, b_coord: Union[torch.Tensor, list]) -> list:
-        """ Sorting boundary points
-
-        Args:
-            grid_dict (dict): _description_
-            b_coord (Union[torch.Tensor, list]): boundary points of grid.
-            It will be list if periodic condition is.
+        """
+        Sorts boundary points into dictionaries based on their correspondence to grid partitions.
         
-        Returns:
-            list: bnd_dict is similar to grid_dict but with b_coord values. It
-            will be list of 'bnd_dict's if 'b_coord' is list too.
+                This function organizes boundary points by associating them with specific grid partitions.
+                This is useful for applying boundary conditions or constraints specific to each partition when solving differential equations.
+        
+                Args:
+                    grid_dict (dict): A dictionary where keys represent grid partition identifiers and values are tensors representing the coordinates of points within that partition.
+                    b_coord (Union[torch.Tensor, list]): A tensor or list of tensors containing the coordinates of boundary points. If a list is provided, it implies a periodic boundary condition with multiple boundary segments.
+        
+                Returns:
+                    list: A list of dictionaries. Each dictionary corresponds to a boundary segment (if `b_coord` is a list) and contains keys matching `grid_dict`. The values are tensors of boundary points that fall within the corresponding grid partition. If `b_coord` is a single tensor, a single dictionary is returned instead of a list.
         """
 
         def bnd_to_dict(grid_dict, b_coord):

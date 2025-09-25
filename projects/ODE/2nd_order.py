@@ -30,6 +30,21 @@ from epde.interface.solver_integration import BoundaryConditions, BOPElement
 
 
 def epde_discovery(t, x, use_ann = False):
+    """
+    Discovers a differential equation model from the provided data using an evolutionary algorithm.
+    
+        This method sets up and executes the EPDE search process to identify a governing differential equation that best describes the relationship between the input variables. It leverages multi-objective optimization to balance model complexity and accuracy. The method prioritizes finding a single equation with a complexity of 5. If a more comprehensive exploration of the solution space is needed, the `equation_search_results` method can be used to examine the Pareto frontier of optimal equations.
+    
+        Args:
+            t (np.ndarray): The time variable data.
+            x (np.ndarray): The dependent variable data.
+            use_ann (bool, optional): A flag to use an Artificial Neural Network (ANN) preprocessor. Defaults to False, which uses polynomial preprocessor.
+    
+        Returns:
+            tuple: A tuple containing:
+                - epde_search_obj (EpdeSearch): The `EpdeSearch` object used for the equation discovery process.
+                - sys (Equation): The discovered equation with complexity 5.
+    """
     dimensionality = x.ndim - 1
     
 

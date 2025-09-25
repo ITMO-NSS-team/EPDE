@@ -32,6 +32,19 @@ import pandas as pd
 
 
 def equation_fit(grid,data):
+    """
+    Defines the parameter value ranges within which functions are considered identical.
+    
+            This is crucial for constructing unique equation structures and their components. For instance, in the context of equation discovery,
+            the difference between `sin(3.135 * x)` and `sin(3.145 * x)` might be deemed negligible, treating them as equivalent. This allows to reduce number of similar equations.
+    
+            Args:
+                grid (np.ndarray): The grid on which the data is defined.
+                data (np.ndarray): The data to fit the equation to.
+    
+            Returns:
+                list: A list of tuples, where each tuple contains the solver form of an equation and its boundary conditions.
+    """
        
         dimensionality = data.ndim # - 1
     

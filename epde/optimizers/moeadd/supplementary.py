@@ -34,20 +34,18 @@ from epde.supplementary import rts
 
 def check_dominance(target, compared_with) -> bool:
     """
-
-    Function to check, if one solution is dominated by another.
-
+    Determines if one solution dominates another based on their objective function values.
+    
+    This function is crucial for identifying Pareto-optimal solutions within the evolutionary process.
+    By comparing objective values, the algorithm can effectively navigate the search space towards
+    solutions that represent the best trade-offs between different objectives.
+    
     Args:
-        target (`src.moeadd.moeadd_solution_template.MOEADDSolution`):  case-specific subclass object
-            The individual solution on the pareto levels, compared with the other element.
-        compared_with (`src.moeadd.moeadd_solution_template.MOEADDSolution`):  case-specific subclass object
-            The individual solution on the pareto levels, with which the target is compared.
-
+        target (`src.moeadd.moeadd_solution_template.MOEADDSolution`): A solution to be evaluated for dominance.
+        compared_with (`src.moeadd.moeadd_solution_template.MOEADDSolution`): The solution against which the target is compared.
+    
     Returns:
-        domiated (`bool`): Function returns True, if the **target** dominates (has at least one objective
-            functions with less values, while the others are the same) the **compared_with**; 
-            False in all other cases.
-
+        `bool`: True if the `target` solution dominates the `compared_with` solution (i.e., it is at least as good in all objectives and strictly better in at least one), False otherwise.
     """
     flag = False
 
@@ -66,6 +64,28 @@ def ndl_update(new_solution, levels) -> list:   # efficient_ndl_update
     Computationally-cheap method of adding new solution into the existing Pareto levels.
 
     Args:
+    """
+    Efficiently integrates a new solution into existing Pareto levels by considering dominance relationships.
+    
+        This method strategically places a new solution within the non-dominated levels, 
+        ensuring the Pareto optimality is maintained. It identifies where the new solution 
+        fits best based on dominance checks with existing solutions in each level.
+    
+        Args:
+            new_solution (`src.moeadd.moeadd_solution_template.MOEADDSolution`): The solution to be added.
+            levels (`list`): A list of lists, where each sublist represents a non-dominated level containing
+                `src.moeadd.moeadd_solution_template.MOEADDSolution` objects.
+    
+        Returns:
+            `list`: A new list of lists representing the updated non-dominated levels, with the `new_solution`
+            integrated appropriately. The structure mirrors the input `levels` argument.
+    
+        Notes:
+            The idea for this method was introduced in *K. Li, K. Deb, Q. Zhang, and S. Kwong, 
+            “Efficient non-domination level update approach for steady-state evolutionary 
+            multiobjective optimization,” Dept. Electr. Comput. Eng., Michigan State Univ., 
+            East Lansing, MI, USA, Tech. Rep. COIN No. 2014014, 2014.*
+    """
         new_solution (`src.moeadd.moeadd_solution_template.MOEADDSolution`):  case-specific subclass object
             The solution, that is to be added onto the non-dominated levels.
         levels (`list`): List of lists of ``src.moeadd.moeadd_solution_template.MOEADDSolution`` case-specific subclass 
@@ -120,23 +140,24 @@ def ndl_update(new_solution, levels) -> list:   # efficient_ndl_update
 
 def fast_non_dominated_sorting(population) -> list:
     """
-    Procedure of separating points from the general population into non-dominated levels.
-    This function is a faster alternative to the ``slow_non_dominated_sorting``, but requires 
-    a little more memory to store indexes of elements, dominated by every solution. This 
-    method was introduced in *K. Deb, A. Pratap, S. Agarwal, and T. Meyarivan, “A fast 
-    and elitist multiobjective genetic algorithm: NSGA-II,” IEEE Trans. Evol. Comput.,
-    vol. 6, no. 2, pp. 182–197, Apr. 2002.* The computational complexity of the method is 
-    :math:`O(MN^2)`, where *N* is the population size, and *M* is the number of objective 
-    functions in comparisson with :math:`O(MN^3)` of the straightforward way.
-
-
-    Args:
-        population (`list`): The input population, represented as a list of individuals.
-
-    Returns:
-        levels (`list`): List of lists of population elements. The outer index is the number of a layer 
-            (e.g. 0-th is the current Pareto frontier), while the inner is the index of an element on a level.
-
+    Procedure to classify solutions into distinct non-dominated sets based on their objective values.
+    
+        This method efficiently identifies Pareto-optimal solutions by iteratively assigning individuals to different fronts.
+        It maintains a count of dominating solutions for each individual and a list of solutions dominated by each individual.
+        This approach reduces computational complexity compared to naive methods, making it suitable for larger populations.
+        This function is a faster alternative to the ``slow_non_dominated_sorting``, but requires 
+        a little more memory to store indexes of elements, dominated by every solution. This 
+        method was introduced in *K. Deb, A. Pratap, S. Agarwal, and T. Meyarivan, “A fast 
+        and elitist multiobjective genetic algorithm: NSGA-II,” IEEE Trans. Evol. Comput.,
+        vol. 6, no. 2, pp. 182–197, Apr. 2002.* The computational complexity of the method is 
+        :math:`O(MN^2)`, where *N* is the population size, and *M* is the number of objective 
+        functions in comparisson with :math:`O(MN^3)` of the straightforward way.
+    
+        Args:
+            population (list): A list of individuals, where each individual is represented by its objective values.
+    
+        Returns:
+            list: A list of lists, where each inner list represents a non-dominated front. The first front (index 0) contains the Pareto-optimal solutions.
     """
 
     levels = []
@@ -179,19 +200,25 @@ def fast_non_dominated_sorting(population) -> list:
 
 def slow_non_dominated_sorting(population) -> list:
     """
-    Procedure of separating points from the general population into non-dominated levels.
-    Operates in the straightforward way: each layer is comprised of elements, that are 
-    not dominated by any other element in the population, except the ones, already put into
-    the output levels. Computational complexity of this variant of sorting in worst scenario is
-    :math:`O(MN^3)`, where *N* is the population size, and *M* is the number of objective functions.
-
-    Args:
-        population (`list`): The input population, represented as a list of individuals.
-
-    Returns:
-        levels (`list`): List of lists of population elements. The outer index is the number of a layer 
-            (e.g. 0-th is the current Pareto frontier), while the inner is the index of an element on a level.
-
+    Procedure to classify a population into non-dominated levels, identifying Pareto fronts.
+    
+        This function iteratively identifies and separates individuals into distinct non-dominated levels.
+        Each level represents a Pareto front, containing solutions that are not dominated by any other
+        solution in the population (excluding those already assigned to previous levels).
+        This process continues until all individuals are assigned to a level.
+        The computational complexity of this sorting algorithm is :math:`O(MN^3)` in the worst case,
+        where *N* is the population size and *M* is the number of objective functions.
+        This classification helps to identify the best trade-offs within the population,
+        which is crucial for constructing equation structures that accurately represent the underlying dynamics
+        of the system being modeled.
+    
+        Args:
+            population (`list`): The input population, represented as a list of individuals.
+    
+        Returns:
+            levels (`list`): List of lists of population elements. The outer index represents the Pareto front
+                number (e.g., 0-th is the current Pareto frontier), while the inner index indicates the
+                position of an element within that level.
     """
     locked_idxs = []
     levels = []
@@ -215,6 +242,18 @@ def slow_non_dominated_sorting(population) -> list:
 
 
 def acute_angle(vector_a, vector_b) -> float:
+    """
+    Calculates the acute angle between two vectors.
+    
+        This function is crucial for determining the relationships between different terms and vectors within the equation discovery process. By calculating the angles, the algorithm can assess the similarity and independence of various components, aiding in the selection of the most relevant terms for the final equation.
+    
+        Args:
+            vector_a (np.ndarray): The first vector, representing a term or component in the equation.
+            vector_b (np.ndarray): The second vector, representing another term or component in the equation.
+    
+        Returns:
+            float: The acute angle in radians between the two vectors. This value is used to evaluate the correlation and redundancy between terms.
+    """
     cos_val = np.dot(vector_a, vector_b)/(np.sqrt(np.dot(vector_a, vector_a))*np.sqrt(np.dot(vector_b, vector_b)))
     if np.abs(cos_val) > 1.:
         cos_val = np.sign(cos_val)
@@ -223,80 +262,157 @@ def acute_angle(vector_a, vector_b) -> float:
 
 class Constraint(ABC):
     """
-
-    The abstract class for the constraint. Noteable subclasses: Inequality & Equality.
-
+    Represents a constraint on the search space for equation discovery. It defines conditions that candidate equations must satisfy to be considered valid. This class serves as a base for implementing various types of constraints, such as limiting the number of terms, restricting the types of operations, or enforcing specific structural properties.
+    
+    
+        The abstract class for the constraint. Noteable subclasses: Inequality & Equality.
     """
+
     @abstractmethod
     def __init__(self, *args):
+        """
+        Initializes the constraint object.
+        
+        This abstract method serves as a blueprint for initializing specific constraint types
+        within the equation discovery process. Subclasses should override this method to
+        define the constraint's parameters and behavior.
+        
+        Args:
+            *args: Variable length argument list. Arguments passed to the constraint.
+        
+        Returns:
+            None.
+        
+        Why:
+        This initialization is a part of defining constraints on the discovered equations.
+        Constraints are used to guide the search process towards more physically meaningful
+        or mathematically stable solutions.
+        """
         pass
 
     @abstractmethod
     def __call__(self, *args):
+        """
+        Applies the constraint to the provided arguments.
+        
+        This abstract method serves as the core logic for evaluating the constraint
+        defined by a subclass against a given set of arguments. Subclasses must
+        implement this method to define the specific constraint behavior.
+        
+        Args:
+            *args: Variable-length argument list representing the values to which
+                the constraint is applied.
+        
+        Returns:
+            None. This method's behavior is defined by its side effects within
+            subclasses, such as modifying internal state or raising exceptions
+            if the constraint is violated.
+        
+        Why:
+        This method enables the framework to evaluate candidate equation structures
+        by checking if they satisfy specific conditions or limitations imposed
+        during the equation discovery process.
+        """
         pass
 
 
 class Inequality(Constraint):
     """
-    The class of the constrain (subclass of Constraint), representing the inequality. 
-    The format of inequality is assumed in format :math:`g(x) >= 0`.
-
+    Represents an inequality constraint. Assumes the format :math:`g(x) >= 0`. Subclass of Constraint.
+    
+    
     Args:
         g (`function (lambda function)`): The constraint function, which shall penalize the candidate solution, if the value of
             :math:`g(x) >= 0` is not fulfilled (is less, than 0). The penalty is equal to 
             the absolute value of constraint violation.
-
+    
     Methods:
         __call__(self, x) : returns float
             Overloaded call operator returns the value of constaint violation.
-
     """
 
+
     def __init__(self, g):
+        """
+        Initializes the Inequality object with a graph representing inequality relationships.
+        
+        This graph is used to efficiently manage and traverse inequality constraints
+        during the equation discovery process, ensuring that discovered equations
+        adhere to the specified relationships.
+        
+        Args:
+            g: A graph object representing inequality relationships between terms.
+        
+        Returns:
+            None.
+        
+        Class Fields:
+            _g (object): The graph object associated with this instance,
+                         representing inequality constraints.
+        """
         self._g = g
 
     def __call__(self, x) -> float:
         """
-        Method to evaluate the constraint violation of the candidate solution.
-
+        Evaluates the constraint violation for a given candidate solution.
+        
+        This method determines the degree to which a candidate solution violates the defined inequality constraint. It returns a non-zero value only when the constraint is not satisfied, quantifying the extent of the violation. This is crucial for the evolutionary algorithm to penalize solutions that do not adhere to the problem's constraints, guiding the search towards feasible regions.
+        
         Args:
-            x (`np.ndarray`): Values (.vals attribute) of the candidate solution, that represent its gene.
-
+            x (`np.ndarray`): The candidate solution's values (gene representation).
+        
         Returns:
-            cv (`float`): Constraint violation value. If the value of :math:`g(x) >= 0` is not 
-                fulfilled (is less, than 0), than returns :math:`|g(x)|`, else 0.
+            `float`: The constraint violation value. Returns the absolute value of g(x) if g(x) < 0, otherwise 0.
         """
         return - self._g(x) if self._g(x) < 0 else 0
 
 
 class Equality(Constraint):
     """
-    The class of the constrain (subclass of Constraint), representing the inequality. 
-    The format of inequality is assumed in format :math:`h(x) = 0`.
-
+    Represents an equality constraint. Assumes the format :math:`h(x) = 0`. Subclass of Constraint.
+    
+    
     Args:
         h (`function (lambda function)`): The constraint function, which shall be penalized, if the value does not match with
             the const
-
+    
     Methods:
         __call__(self, x) : returns float
             Overloaded call operator returns the value of constaint violation.
-
     """
 
+
     def __init__(self, h):
+        """
+        Initializes the object's height, a crucial parameter for comparing instances within the equation discovery process.
+        
+        The height attribute influences how the evolutionary algorithm evaluates and selects equation candidates.
+        
+        Args:
+            h (float): The height value to be stored.
+        
+        Returns:
+            None.
+        
+        Class Fields:
+            _h (float): The height of the object.
+        """
         self._h = h
 
     def __call__(self, x) -> float:
         """
-        Method to evaluate the constraint violation of the candidate solution.
-
+        Evaluates the constraint violation of a candidate solution for equality constraints.
+        
+        This method quantifies how well a candidate solution satisfies the equality constraint 
+        defined by :math:`h(x) = 0`. It returns the absolute value of :math:`h(x)`, 
+        representing the magnitude of the violation. This value is used by the evolutionary 
+        algorithm to guide the search towards solutions that better satisfy the constraint.
+        
         Args:
-            x (`np.ndarray`): Values (.vals attribute) of the candidate solution, that represent its gene.
-
+            x (`np.ndarray`): Values of the candidate solution, representing its gene.
+        
         Returns:
-            cv (`float`): Constraint violation value. If the value of :math:`h(x) = 0` is not 
-                fulfilled, than returns :math:`|g(x)|`, else 0.
-
+            `float`: The constraint violation value, which is the absolute value of :math:`h(x)`.
+                     A value of 0 indicates that the constraint is perfectly satisfied.
         """
         return np.abs(self._h(x))

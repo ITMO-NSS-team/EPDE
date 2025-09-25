@@ -15,22 +15,42 @@ import epde.globals as global_var
 
 def scale_values(tensor):
     """
-    Method for normalization of data
+    Scales the input tensor by dividing it by its maximum value.
+    
+    This ensures that all values in the tensor are normalized to the range [0, 1].
+    
+    Args:
+        tensor (np.ndarray): The input tensor to be scaled.
+    
+    Returns:
+        np.ndarray: The scaled tensor with values in the range [0, 1].
+    
+    Why:
+    This scaling is crucial for ensuring stable and efficient equation discovery.
+    By normalizing the data, we prevent any single variable from dominating the equation search process due to its magnitude.
     """
     return tensor/np.max(tensor)
 
 
 def split_tensor(tensor, fraction_along_axis: Union[int, list, tuple]):
     """
-    Method for splitting input data into blocks for further examenation
-
-    Args:
-        tensor (`np.ndarray`): input data
-        fraction_along_axis (`int|list|tuple): number of fraction for each axis (if this is integer than all axis are dividing by same fractions)
-
-    Returns:
-        aplit_indexes_along_axis (`list`): indexes of place where tensor were divided
-        block_matrix (`np.ndarray`): resulting devided tensor
+    Method for splitting a tensor into smaller blocks along specified axes.
+    
+        This function divides the input tensor into a grid of sub-tensors (blocks) based on the provided fractions for each axis.
+        This is a preliminary step for parallel or distributed processing of the tensor, enabling the framework to analyze different
+        sections of the data independently.
+    
+        Args:
+            tensor (`np.ndarray`): The input tensor to be split.
+            fraction_along_axis (`int|list|tuple`):  The number of fractions to divide each axis into.
+                If an integer is provided, all axes will be split into the same number of fractions.
+                If a list or tuple is provided, each element specifies the number of fractions for the corresponding axis.
+    
+        Returns:
+            split_indexes_along_axis (`list`): A list of lists, where each inner list contains the indices along each axis where the tensor was split.
+                These indices define the boundaries of the resulting blocks.
+            block_matrix (`np.ndarray`): A NumPy array (object dtype) containing the split tensor blocks. The shape of this array
+                corresponds to the fractions specified for each axis. Each element of this array holds a sub-tensor (block) of the original tensor.
     """
     assert isinstance(tensor, np.ndarray)
     fragments = [tensor,]
@@ -72,6 +92,22 @@ def split_tensor(tensor, fraction_along_axis: Union[int, list, tuple]):
 
 
 def majority_rule(tensors: Union[list, np.ndarray], threshold: float = 1e-2):
+    """
+    Applies majority rule to a list of tensors based on a non-constancy condition.
+    
+    This method checks if a majority of the input tensors exhibit sufficient variation,
+    indicating they are not constant. This is crucial for identifying active terms
+    in a differential equation. The non-constancy condition checks if the norm
+    of a tensor is greater than a threshold times its size.
+    
+    Args:
+      tensors: A list or numpy array of tensors to evaluate.
+      threshold: A threshold value used to determine non-constancy.
+    
+    Returns:
+      bool: True if the majority of tensors satisfy the non-constancy condition,
+        False otherwise.
+    """
     def non_constancy_cond(x): return np.linalg.norm(x) > (threshold * x.size)
     return sum([non_constancy_cond(x_elem) for x_elem in tensors])/len(tensors) >= 0.5
 
@@ -79,18 +115,20 @@ def majority_rule(tensors: Union[list, np.ndarray], threshold: float = 1e-2):
 def get_subdomains_mask(tensor, division_fractions: Union[int, list, tuple], domain_selector: Callable,
                         domain_selector_kwargs: dict, time_axis: int):
     """
-    Method for getting mask for further cutting
-
-    Args:
-        tensor (`np.ndarray`): input data
-        division_fractions (`int|list|tuple): number of fraction for each axis (if this is integer than all axis are dividing by same fractions)
-        domain_selector (`callable`): method for select domain
-        domain_selector_kwargs (`dict`): args for method `domain_selector`
-        time_axis (`int`): index of place axis with time
-
-    Returns:
-        split_idxs (`list`): indexes of place where tensor were divided
-        accepted_spatial_domains (`np.ndarray with boolen values`): mask with values of True in valuable subdomains
+    Method for creating a mask that identifies valuable subdomains within the input tensor, which are then used for equation discovery.
+    
+        Args:
+            tensor (`np.ndarray`): The input data tensor.
+            division_fractions (`int|list|tuple`): The number of divisions for each axis (or a single number for all non-time axes).
+            domain_selector (`callable`): A function to select valuable subdomains.
+            domain_selector_kwargs (`dict`): Keyword arguments for the `domain_selector` function.
+            time_axis (`int`): The index of the time axis in the tensor.
+    
+        Returns:
+            split_idxs (`list`): The indices where the tensor was split.
+            accepted_spatial_domains (`np.ndarray with boolen values`): A boolean mask indicating the valuable subdomains.
+    
+        WHY: This method divides the input tensor into smaller subdomains and uses a domain selector function to identify those subdomains that are most informative for discovering the underlying differential equations. The mask is then used to focus the equation discovery process on the most relevant parts of the data.
     """
     if isinstance(division_fractions, int):
         sd_shape = tuple([division_fractions for idx in range(
@@ -125,6 +163,23 @@ def pruned_domain_boundaries(mask: np.ndarray, split_idxs: list, time_axis: int,
     Method for finding boundaries by mask
 
     Args:
+    """
+    Method for determining the spatial and temporal boundaries of a subdomain based on a significance mask.
+    
+        This method identifies the extent of a region where the dynamics are considered significant,
+        effectively pruning the domain to focus on areas of interest. This is achieved by filtering
+        slices along each axis based on the density of significant points within them.
+    
+        Args:
+            mask (`np.ndarray`): Boolean mask indicating the significance of dynamics within the subdomain.
+            split_idxs (`list`): Indices defining the divisions along each axis.
+            time_axis (`int`): Index of the time axis.
+            rectangular (`bool`): Flag indicating whether the area is rectangular (default: True).
+            threshold (`float`): Percentage of significant data required in a slice to be considered part of the boundary (default: 0.5).
+    
+        Returns:
+            boundaries (`list`): A list of tuples, where each tuple represents the start and end indices of the significant region along each axis.
+    """
         mask (`np.ndarray`): boolean mask containg flags about significance all the dynamics in subdomain
         split_idxs (`list`): indexs of place of division into fraction
         time_axis (`int`): number of time axis
@@ -159,15 +214,34 @@ def pruned_domain_boundaries(mask: np.ndarray, split_idxs: list, time_axis: int,
 
 class DomainPruner(object):
     """
-    Class with methods for selecting domain region.
-
-    Attribites:
-        domain_selector (`callable`): default - majority_rule. 
-            Rule for selecting region.
-        domain_selector_kwargs (`dict`): parameters for method in `domain_selector`.
-        bds_init (`int`): flag for marking execution of the selector
+    Class for pruning the domain based on specified criteria, focusing on data selection and preparation for equation discovery.
+    
+    
+        Attribites:
+            domain_selector (`callable`): default - majority_rule. 
+                Rule for selecting region.
+            domain_selector_kwargs (`dict`): parameters for method in `domain_selector`.
+            bds_init (`int`): flag for marking execution of the selector
     """
+
     def __init__(self, domain_selector: Callable = majority_rule, domain_selector_kwargs: dict = dict()):
+        """
+        Initializes the SimpleDomainSelector with a specific domain selection strategy.
+        
+                This class sets up the domain selection mechanism used to refine the search space
+                during the equation discovery process. By storing the provided domain selector
+                function and its associated keyword arguments, it prepares for subsequent
+                domain pruning operations. This initialization is crucial for focusing the search
+                on the most promising areas of the solution space, thereby improving the
+                efficiency and accuracy of the equation discovery process.
+        
+                Args:
+                    domain_selector: The function to use for selecting the domain. Defaults to majority_rule.
+                    domain_selector_kwargs: Keyword arguments to pass to the domain selector function. Defaults to an empty dictionary.
+        
+                Returns:
+                    None
+        """
         self.domain_selector = domain_selector
         self.domain_selector_kwargs = domain_selector_kwargs
         self.bds_init = False
@@ -175,15 +249,29 @@ class DomainPruner(object):
     def get_boundaries(self, pivotal_tensor: np.ndarray, division_fractions: Union[int, list, tuple] = 3,
                        time_axis=None, rectangular: bool = True):
         """
-        Method for getting a boundaries of the pruned domain
+        Method for determining the boundaries of the refined domain based on significant regions in the data.
         
-        Args:
-            pivotal_tensor (`np.ndarray`): pattern that guides the domain pruning
-                will be cutting areas, where values of the `pivotal_tensor` are closed to zero
-            division_fractions (`int|list|tuple`): optional, default - 3
-                number of section in domain area (when type `int` all section fractions will be the same)
-            time_axis (`int`): index of axis with time, default - None
-            rectangular (`bool`): flag indecating that area is rectangle
+                This method identifies and defines the boundaries of the most relevant areas within the data
+                by analyzing a given tensor and dividing the domain into subregions.
+                It focuses on isolating the portions of the data that exhibit the most prominent features,
+                effectively narrowing down the search space for equation discovery.
+                This is done to improve the efficiency and accuracy of the equation discovery process
+                by focusing on the most informative parts of the data.
+                
+                Args:
+                    pivotal_tensor (`np.ndarray`): A tensor highlighting important areas within the data,
+                        guiding the domain refinement process by emphasizing regions with significant values.
+                    division_fractions (`int|list|tuple`): Specifies the number of subregions to divide the domain into.
+                        If an integer is provided, the domain is divided equally along each dimension.
+                        A list or tuple allows for specifying different division fractions for each dimension. Defaults to 3.
+                    time_axis (`int`): The index of the axis representing time. If None, it attempts to retrieve
+                        the time axis from a global variable. Defaults to None.
+                    rectangular (`bool`): A flag indicating whether the refined domain should be constrained to a rectangular shape.
+                        Defaults to True.
+        
+                Returns:
+                    None. The method updates the internal state of the `DomainPruner` object,
+                    specifically `self.bds` with the calculated boundaries.
         """
         if time_axis is None:
             try:
@@ -200,13 +288,17 @@ class DomainPruner(object):
 
     def prune(self, tensor):
         """
-        Method for applying detected bounds to tensor
-
-        Args:
-            tensor (`np.ndarray`): input data for pruning
-
-        Returns:
-            tensor_new (`np.ndarray`): tensor without areas with no dynamics
+        Applies the detected domain boundaries to the input tensor, effectively focusing on the dynamically relevant regions.
+        
+                This method refines the input tensor by removing data points outside the identified domain boundaries.
+                This ensures that subsequent equation discovery focuses on the areas where the system exhibits meaningful dynamics,
+                avoiding regions with minimal or no change.
+        
+                Args:
+                    tensor (`np.ndarray`): Input data for pruning.
+        
+                Returns:
+                    `np.ndarray`: The tensor with areas outside the learned domain boundaries removed.
         """
         if not self.bds_init:
             raise AttributeError(

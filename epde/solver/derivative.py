@@ -8,10 +8,27 @@ import torch
 
 
 class DerivativeInt():
-    """Interface class
     """
+    Interface class
+    """
+
     def take_derivative(self, value):
-        """Method that should be built in every child class"""
+        """
+        Calculates the derivative of the expression with respect to a given variable.
+        
+        This method must be implemented by subclasses to provide specific derivative calculation logic
+        based on the expression's structure. It ensures that all expression types support derivative
+        calculation, which is a core requirement for equation discovery within the EPDE framework.
+        
+        Args:
+            value (str): The variable with respect to which the derivative is calculated.
+        
+        Returns:
+            NotImplementedError: Always raises an exception, as the method must be implemented in a subclass.
+        
+        Raises:
+            NotImplementedError: If the subclass does not implement this method.
+        """
         raise NotImplementedError
 
 
@@ -20,21 +37,37 @@ class Derivative_NN(DerivativeInt):
     Taking numerical derivative for 'NN' method.
     """
 
+
     def __init__(self, model: Any):
         """
-        Args:
-            model: neural network.
+        Initializes the Derivative_NN with a neural network model. This model will be used to approximate derivatives, which are then used to construct and evaluate potential differential equations.
+        
+                Args:
+                    model: A neural network used for derivative approximation.
+        
+                Returns:
+                    None
         """
         self.model = model
 
     def take_derivative(self, term: Union[list, int, torch.Tensor], *args) -> torch.Tensor:
-        """ Auxiliary function serves for single differential operator resulting field
-        derivation.
-
-        Args:
-            term (Union[list, int, torch.Tensor]): differential operator in conventional form.
-        Returns:
-            torch.Tensor: resulting field, computed on a grid.
+        """
+        Computes the contribution of a single differential operator term to the overall equation.
+        
+                This function evaluates a term in the differential equation by applying the specified
+                derivative scheme to the neural network's output and multiplying by the coefficient.
+                It effectively calculates one component of the equation's residual, which is then
+                used to optimize the neural network's parameters to satisfy the differential equation.
+        
+                Args:
+                    term (Union[list, int, torch.Tensor]): A dictionary representing a single term
+                        in the differential equation. It contains the coefficient, derivative direction,
+                        variable dependencies, and power of the term.
+        
+                Returns:
+                    torch.Tensor: The computed value of the differential operator term, evaluated
+                        on the grid points. This represents the contribution of this specific term
+                        to the overall differential equation at each point in the domain.
         """
 
         dif_dir = list(term.keys())[1]
@@ -87,10 +120,18 @@ class Derivative_autograd(DerivativeInt):
     Taking numerical derivative for 'autograd' method.
     """
 
+
     def __init__(self, model: torch.nn.Module):
         """
-        Args:
-            model (torch.nn.Module): model of *autograd* mode.
+        Initializes the Derivative_autograd class.
+        
+                This class prepares a given neural network model for subsequent symbolic differentiation, enabling the identification of potential differential equation terms.
+        
+                Args:
+                    model (torch.nn.Module): The neural network model to be differentiated.
+        
+                Returns:
+                    None
         """
         self.model = model
 
@@ -99,18 +140,17 @@ class Derivative_autograd(DerivativeInt):
                      points: torch.Tensor,
                      var: int,
                      axis: List[int] = [0]):
-        """ Computes derivative on the grid using autograd method.
-
-        Args:
-            model (torch.nn.Module): torch neural network.
-            points (torch.Tensor): points, where numerical derivative is calculated.
-            var (int): number of dependent variables (for single equation is *0*)
-            axis (list, optional): term of differentiation, example [0,0]->d2/dx2
-                                   if grid_points(x,y). Defaults to [0].
-
-        Returns:
-            gradient_full (torch.Tensor): the result of desired function differentiation
-                in corresponding axis.
+        """
+        Computes the derivative of a neural network model's output with respect to its input using PyTorch's automatic differentiation. This function is a core component for calculating the residuals required to evaluate candidate differential equations.
+        
+                Args:
+                    model (torch.nn.Module): The neural network model.
+                    points (torch.Tensor): The input points at which to compute the derivative.
+                    var (int): The index of the output variable to differentiate (for systems of equations).
+                    axis (List[int], optional): The axes with respect to which to differentiate. Defaults to [0].
+        
+                Returns:
+                    torch.Tensor: The computed derivative at the given points.
         """
 
         points.requires_grad = True
@@ -123,15 +163,30 @@ class Derivative_autograd(DerivativeInt):
         return gradient_full
 
     def take_derivative(self, term: dict, grid_points:  torch.Tensor) -> torch.Tensor:
-        """ Auxiliary function serves for single differential operator resulting field
-        derivation.
-
+        """
+        Computes the contribution of a single term in the differential operator.
+        
+        This function calculates the value of a single term within a larger differential operator,
+        effectively evaluating a component of the equation on the given grid points. It handles
+        various forms of coefficients and derivatives, including those defined by neural networks
+        or other callable functions.
+        
         Args:
-            term (dict): differential operator in conventional form.
-            grid_points (torch.Tensor): points, where numerical derivative is calculated.
-
+            term (dict): A dictionary representing a single term in the differential operator.
+                         It contains information about the coefficient, derivative direction,
+                         variables, and powers involved in the term.
+            grid_points (torch.Tensor): The points on which the derivative is evaluated.
+                                         Shape: (N, D), where N is the number of points and D is the
+                                         dimensionality of the grid.
+        
         Returns:
-            der_term (torch.Tensor): resulting field, computed on a grid.
+            torch.Tensor: The value of the term evaluated at the given grid points.
+                          Shape: (N, 1), where N is the number of points.
+        
+        Why:
+            This function is a crucial part of constructing the overall differential operator.
+            By computing each term individually, the method allows for flexible and modular
+            representation of complex differential equations.
         """
         dif_dir = list(term.keys())[1]
         # it is may be int, function of grid or torch.Tensor
@@ -174,11 +229,25 @@ class Derivative_mat(DerivativeInt):
     """
     Taking numerical derivative for 'mat' method.
     """
+
     def __init__(self, model: torch.Tensor, derivative_points: int):
         """
+        Initializes the Derivative_mat object.
+        
+        This class precomputes coefficients used for approximating derivatives 
+        based on a given model and number of derivative points. These coefficients 
+        are then used to efficiently calculate derivatives during the equation 
+        discovery process.
+        
         Args:
-            model (torch.Tensor): model of *mat* mode.
-            derivative_points (int): points number for derivative calculation.
+            model (torch.Tensor): The model in *mat* mode, representing the data 
+                from which derivatives will be estimated.
+            derivative_points (int): The number of points used in the derivative 
+                calculation.  A higher number of points can lead to more accurate 
+                derivative estimates, but also increases computational cost.
+        
+        Returns:
+            None
         """
         self.model = model
         self.backward, self.farward = Derivative_mat._labels(derivative_points)
@@ -194,15 +263,20 @@ class Derivative_mat(DerivativeInt):
 
     @staticmethod
     def _labels(derivative_points: int) -> Tuple[List, List]:
-        """ Determine which points are used in derivative calc-n.
-            If derivative_points = 2, it return ([-1, 0], [0, 1])
-
+        """
+        Determines the indices of neighboring points used to approximate derivatives.
+        
+        This function generates index offsets for both backward and forward finite difference schemes,
+        defining which neighboring points are used in the derivative calculation. These indices are
+        essential for constructing derivative matrices that approximate differential operators on a discrete grid.
+        
         Args:
-            derivative_points (int): points number for derivative calculation.
-
+            derivative_points (int): The number of points used in the derivative calculation.
+        
         Returns:
-            labels_backward (list): points labels for backward scheme.
-            labels_forward (list): points labels for forward scheme.
+            Tuple[List[int], List[int]]: A tuple containing two lists:
+                - labels_backward: Index offsets for the backward difference scheme.
+                - labels_forward: Index offsets for the forward difference scheme.
         """
         labels_backward = list(i for i in range(-derivative_points + 1, 1))
         labels_farward = list(i for i in range(derivative_points))
@@ -210,15 +284,18 @@ class Derivative_mat(DerivativeInt):
 
     @staticmethod
     def _linear_system(labels: list) -> np.ndarray:
-        """ To caclulate coeeficints in numerical scheme,
-            we have to solve the linear system of algebraic equations.
-            A*alpha=b
-
-        Args:
-            labels (list): points labels for backward/foraward scheme.
-
-        Returns:
-            alpha (np.ndarray): coefficints for numerical scheme.
+        """
+        Solves a linear system to determine the coefficients for a numerical differentiation scheme.
+        
+                The coefficients are calculated by solving a linear system derived from a Vandermonde matrix.
+                This approach ensures that the resulting differentiation scheme accurately approximates the derivative
+                based on the provided stencil points.
+        
+                Args:
+                    labels (list): The stencil points (x-coordinates) used in the differentiation scheme.
+        
+                Returns:
+                    np.ndarray: The coefficients for the numerical differentiation scheme, obtained by solving the linear system.
         """
         points_num = len(labels) # num_points=number of equations
         labels = np.array(labels)
@@ -235,15 +312,15 @@ class Derivative_mat(DerivativeInt):
         return alpha
 
     def _derivative_1d(self, u_tensor: torch.Tensor, h: torch.Tensor) -> torch.Tensor:
-        """ Computes derivative in one dimension for matrix method.
-
-        Args:
-            u_tensor (torch.Tensor): dependenet varible of equation,
-                                     some part of model.
-            h (torch.Tensor): increment of numerical scheme.
-
-        Returns:
-            du (torch.Tensor): computed derivative along one dimension.
+        """
+        Computes the numerical derivative of a tensor along one dimension using a finite difference scheme. This is a core component for estimating derivatives within the equation discovery process.
+        
+                Args:
+                    u_tensor (torch.Tensor): The input tensor for which the derivative is computed. Represents the dependent variable in the equation.
+                    h (torch.Tensor): The step size or increment used in the finite difference approximation.
+        
+                Returns:
+                    du (torch.Tensor): The computed derivative of the input tensor along the specified dimension.
         """
 
         shape = u_tensor.shape
@@ -267,14 +344,21 @@ class Derivative_mat(DerivativeInt):
 
 
     def _step_h(self, h_tensor: torch.Tensor) -> List[torch.Tensor]:
-        """ Calculate increment along each axis of the grid.
-
+        """
+        Calculate the grid increments along each axis.
+        
+        This function computes the step size (h) along each axis of the grid,
+        which represents the resolution of the grid in each dimension.
+        These increments are crucial for calculating derivatives on the grid.
+        
         Args:
-            h_tensor (torch.Tensor): grid of *mat* mode.
-
+            h_tensor (torch.Tensor): Grid of points in *mat* mode.
+                Shape: (num_axes, num_points_along_axis).
+        
         Returns:
-            h (List[torch.Tensor]): lsit with increment
-                                    along each axis of the grid.
+            List[torch.Tensor]: A list containing the increment (step size)
+            along each axis of the grid. The length of the list corresponds
+            to the number of axes.
         """
         h = []
 
@@ -290,16 +374,16 @@ class Derivative_mat(DerivativeInt):
                     u_tensor: torch.Tensor,
                     h: torch.Tensor,
                     axis: int) -> torch.Tensor:
-        """ Computing derivative for 'mat' method.
-
-        Args:
-            u_tensor (torch.Tensor): dependenet varible of equation,
-                                     some part of model.
-            h (torch.Tensor): increment of numerical scheme.
-            axis (int): axis along which the derivative is calculated.
-
-        Returns:
-            du (torch.Tensor): computed derivative.
+        """
+        Computes the numerical derivative of a tensor along a specified axis using a finite difference scheme. This is a core component for estimating equation terms from data.
+        
+                Args:
+                    u_tensor (torch.Tensor): The tensor for which the derivative is computed. Represents a dependent variable in the equation.
+                    h (torch.Tensor): The step size (increment) used in the finite difference approximation.
+                    axis (int): The axis along which the derivative is calculated.
+        
+                Returns:
+                    du (torch.Tensor): The computed derivative of the input tensor.
         """
 
         if len(u_tensor.shape)==1 or u_tensor.shape[0]==1:
@@ -331,15 +415,17 @@ class Derivative_mat(DerivativeInt):
         return du
 
     def take_derivative(self, term: torch.Tensor, grid_points: torch.Tensor) -> torch.Tensor:
-        """ Auxiliary function serves for single differential operator resulting field
-        derivation.
-
-        Args:
-            term (torch.Tensor): differential operator in conventional form.
-            grid_points (torch.Tensor): grid points.
-
-        Returns:
-            der_term (torch.Tensor): resulting field, computed on a grid.
+        """
+        Auxiliary function to compute the contribution of a single term in the differential operator. This involves calculating derivatives of the dependent variables based on the specified scheme and grid points, and then combining them according to the term's structure.
+        
+                Args:
+                    term (torch.Tensor): A dictionary representing a single term in the differential operator, containing information about the variable, derivative order, and coefficient.
+                    grid_points (torch.Tensor): The coordinates at which the derivatives are evaluated.
+        
+                Returns:
+                    der_term (torch.Tensor): The computed value of the term at each grid point. This represents the contribution of this specific term to the overall differential equation.
+        
+                WHY: This function is a crucial step in evaluating the differential operator on the grid. By computing each term's contribution individually, the method allows for flexible and modular equation discovery.
         """
 
         dif_dir = list(term.keys())[1]
@@ -362,20 +448,33 @@ class Derivative_mat(DerivativeInt):
 
 class Derivative():
     """
-   Interface for taking numerical derivative due to chosen calculation mode.
+    Interface for calculating numerical derivatives. It supports different calculation modes to provide flexibility and accuracy in derivative estimation.
+    """
 
-   """
     def __init__(self, 
                  model: Union[torch.nn.Module, torch.Tensor],
                  derivative_points: int):
-        """_summary_
-
+        """
+        Initializes the Derivative class.
+        
+        This class prepares the model for derivative calculations,
+        setting the stage for subsequent equation discovery. The number of
+        derivative points influences the accuracy and computational cost of
+        approximating derivatives, which are crucial for identifying the
+        underlying differential equations.
+        
         Args:
-            model (Union[torch.nn.Module, torch.Tensor]): neural network or
-                                        matrix depending on the selected mode.
-            derivative_points (int): points number for derivative calculation.
-            If derivative_points=2, numerical scheme will be ([-1,0],[0,1]),
-            parameter determine number of poins in each forward and backward scheme.
+            model (Union[torch.nn.Module, torch.Tensor]): The neural network or
+                matrix representing the system's behavior. This is the model
+                from which derivatives will be computed.
+            derivative_points (int): The number of points to use in the
+                numerical derivative calculation.  A higher number of points
+                can increase accuracy but also computational complexity.
+                For example, if derivative_points=2, a simple two-point
+                numerical scheme like ([-1,0],[0,1]) will be used.
+        
+        Returns:
+            None
         """
 
         self.model = model
@@ -384,11 +483,25 @@ class Derivative():
     def set_strategy(self,
                      strategy: str) -> Union[Derivative_NN, Derivative_autograd, Derivative_mat]:
         """
-        Setting the calculation method.
+        Sets the differentiation strategy.
+        
+        This method configures the approach used to calculate derivatives, 
+        allowing the user to select the most appropriate technique based on 
+        the problem and available resources. Different strategies offer trade-offs 
+        between computational cost, accuracy, and the need for analytical 
+        derivatives. The choice of strategy impacts how the derivatives 
+        required for equation discovery are computed.
+        
         Args:
-            strategy: Calculation method. (i.e., "NN", "autograd", "mat").
+            strategy (str): The name of the differentiation strategy to use. 
+                            Valid options are "NN" (neural network-based), 
+                            "autograd" (automatic differentiation), and "mat" 
+                            (matrix-based).
+        
         Returns:
-            equation in input form for a given calculation method.
+            Union[Derivative_NN, Derivative_autograd, Derivative_mat]: An instance of the class 
+            corresponding to the selected differentiation strategy, initialized 
+            with the provided model and derivative points (if applicable).
         """
         if strategy == 'NN':
             return Derivative_NN(self.model)

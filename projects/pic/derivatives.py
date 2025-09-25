@@ -4,6 +4,32 @@ import matplotlib.pyplot as plt
 
 
 def kdv_data(filename):
+    """
+    Loads data, computes time and space steps for differential equation discovery.
+    
+    This function reads data from a CSV file, transposes it to align with
+    the expected format (likely time series data across spatial points),
+    and calculates the temporal (dt) and spatial (dx) step sizes. These
+    step sizes are crucial for numerical differentiation and integration
+    schemes used in discovering the underlying differential equation.
+    
+    Args:
+        filename (str): The name of the CSV file containing the data.
+            The data is expected to be organized such that each row
+            represents a spatial point and each column represents a time step.
+    
+    Returns:
+        tuple: A tuple containing:
+            - data (ndarray): The processed data array.
+            - dt (float): The calculated time step size.
+            - dx (float): The calculated space step size.
+    
+    Why:
+        The function prepares the data and calculates essential parameters
+        (dt, dx) required for subsequent numerical analysis, which is a
+        fundamental step in identifying the governing differential equation
+        from the provided dataset.
+    """
     shape = 80
     data = np.loadtxt(filename, delimiter=',').T
     t = np.linspace(0, 1, shape + 1)
@@ -13,6 +39,18 @@ def kdv_data(filename):
     return data, dt, dx
 
 def ac_data(filename: str):
+    """
+    Loads simulation data from a file and determines the temporal and spatial resolution. This is a preliminary step to analyze the data and identify the underlying differential equations. The increments are needed to properly discretize the domain when comparing discovered equations with the data.
+    
+        Args:
+            filename (str): The name of the file containing the simulation data.
+    
+        Returns:
+            tuple: A tuple containing:
+              - data (np.ndarray): The loaded simulation data.
+              - dt (float): The time increment between data points.
+              - dx (float): The space increment between data points.
+    """
     t = np.linspace(0., 1., 51)
     x = np.linspace(-1., 0.984375, 128)
     data = np.load(filename)
@@ -21,6 +59,23 @@ def ac_data(filename: str):
     return data, dt, dx
 
 def darcy_data(filename: str):
+    """
+    Loads Darcy flow data and grid spacing from a file.
+    
+    This function is used to load the precomputed solutions of the Darcy flow equation,
+    which serve as a testbed for evaluating the equation discovery process. The data
+    represents the flow field, and the grid spacing is essential for numerical
+    computations and comparisons.
+    
+    Args:
+        filename (str): The name of the file containing the Darcy flow data.
+    
+    Returns:
+        tuple: A tuple containing:
+            - data (numpy.ndarray): The Darcy flow data loaded from the file.
+            - dx (float): The grid spacing in the x-direction.
+            - dy (float): The grid spacing in the y-direction.
+    """
     x = np.linspace(0., 1., 128)
     y = np.linspace(0., 1., 128)
     data = np.load(filename)
@@ -29,6 +84,23 @@ def darcy_data(filename: str):
     return data, dx, dy
 
 def wave_data(filename):
+    """
+    Loads wave data and prepares it for differential equation discovery.
+    
+        This method reads wave data from a CSV file, transposes it to the correct format,
+        and calculates the time and space increments necessary for subsequent
+        differential equation modeling. The data and increments are essential
+        for setting up the problem domain and numerical computations within the EPDE framework.
+        
+        Args:
+            filename: The name of the CSV file containing the wave data.
+        
+        Returns:
+            A tuple containing:
+              - data: A NumPy array representing the wave data.
+              - dt: The time increment.
+              - dx: The space increment.
+    """
     shape = 80
     data = np.loadtxt(filename, delimiter=',').T
     t = np.linspace(0, 1, shape + 1)
