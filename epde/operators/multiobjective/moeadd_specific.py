@@ -58,9 +58,9 @@ def penalty_based_intersection(sol_obj, weight, ideal_obj,
         Normalizer for solution objective functions.
     
     '''
-    print(f'Objective before normalization: {sol_obj.obj_fun} for normalizer {obj_normalizer}')
+    # print(f'Objective before normalization: {sol_obj.obj_fun} for normalizer {obj_normalizer}')
     solution_objective = sol_obj.obj_fun if obj_normalizer is None else obj_normalizer(sol_obj.obj_fun)
-    print(f'Objective after expected normalization: {solution_objective}')
+    # print(f'Objective after expected normalization: {solution_objective}')
     
     d_1 = np.dot((solution_objective - ideal_obj), weight) / np.linalg.norm(weight)
     d_2 = np.linalg.norm(solution_objective - (ideal_obj + d_1 * weight/np.linalg.norm(weight)))
@@ -378,32 +378,38 @@ class OffspringUpdater(CompoundOperator):
             offspring = objective.unplaced_candidates.pop()
             attempt = 1
             attempt_limit = self.params['attempt_limit']
-            temp_offspring = self.suboperators['chromosome_mutation'].apply(objective=offspring,
-                                                                            arguments=subop_args['chromosome_mutation'])
+            temp_offspring = offspring
             replaced = 0
             while True:
+                # temp_offspring = self.suboperators['chromosome_mutation'].apply(objective=offspring,
+                #                                                             arguments=subop_args['chromosome_mutation'])
+                temp_offspring = self.suboperators['chromosome_mutation'].apply(objective=temp_offspring,
+                                                                                arguments=subop_args[
+                                                                                    'chromosome_mutation'])
+                # temp_offspring.reset_state()
                 self.suboperators['right_part_selector'].apply(objective=temp_offspring,
                                                                arguments=subop_args['right_part_selector'])
                 self.suboperators['chromosome_fitness'].apply(objective=temp_offspring,
                                                               arguments=subop_args['chromosome_fitness'])
 
                 if tuple(temp_offspring.obj_fun) not in objective.history:
+                    # for obj_idx, obj in enumerate(temp_offspring.obj_fun):
+                    #     obj = obj / objective.max_obj[obj_idx]
                     self.suboperators['pareto_level_updater'].apply(objective=(temp_offspring, objective),
                                                                     arguments=subop_args['pareto_level_updater'])
                     objective.history.add(tuple(temp_offspring.obj_fun))
+                    # print(tuple(temp_offspring.obj_fun))
                     break
-                elif replaced >= attempt_limit:
-                    print("Allowed replication")
-                    self.suboperators['pareto_level_updater'].apply(objective=(temp_offspring, objective),
-                                                                    arguments=subop_args['pareto_level_updater'])
+                    # return objective
+                elif replaced == attempt_limit:
+                    print("Could not generate unique offspring")
                     break
-                elif attempt >= attempt_limit:
-                    temp_offspring.create()
+                elif attempt == attempt_limit:
+                    # temp_offspring.create()
+                    temp_offspring = offspring
+                    # temp_offspring.reset_state()
                     replaced += 1
-                    attempt = 1
-
-                self.suboperators['chromosome_mutation'].apply(objective=temp_offspring,
-                                                               arguments=subop_args['chromosome_mutation'])
+                    attempt = 0
                 attempt += 1
         return objective
     

@@ -109,7 +109,7 @@ class ChromosomeCrossover(CompoundOperator):
                                                                                               objective[1].vals[eq_key]),
                                                                                  arguments = subop_args['equation_crossover'])
             objective[0].vals.replace_gene(gene_key = eq_key, value = temp_eq_1)
-            offspring_2.vals.replace_gene(gene_key = eq_key, value = temp_eq_2)
+            objective[1].vals.replace_gene(gene_key = eq_key, value = temp_eq_2)
             
         for param_key in params_keys:
             temp_param_1, temp_param_2 = self.suboperators['param_crossover'].apply(objective = (objective[0].vals[param_key],

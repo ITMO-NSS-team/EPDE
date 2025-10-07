@@ -109,20 +109,15 @@ class TermMutation(CompoundOperator):
             
         """       
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
-        
-        create_derivs = bool(objective[1].structure[objective[0]].descr_variable_marker)
-        
-        new_term = Term(objective[1].pool, mandatory_family = objective[1].structure[objective[0]].descr_variable_marker, 
-                        create_derivs=create_derivs,
-                        max_factors_in_term = objective[1].metaparameters['max_factors_in_term']['value'])
-        while not (check_uniqueness(new_term, objective[1].structure[:objective[0]] + objective[1].structure[objective[0]+1:]) and
-                   new_term.contains_meaningful()):
-            new_term = Term(objective[1].pool, mandatory_family = objective[1].structure[objective[0]].descr_variable_marker, 
-                            create_derivs=create_derivs,
-                            max_factors_in_term = objective[1].metaparameters['max_factors_in_term']['value'])
-        new_term.use_cache()
+
+        objective[1].structure[objective[0]].randomize()
+        objective[1].structure[objective[0]].reset_saved_state()
+        while not objective[1].structure.count(objective[1].structure[objective[0]]) == 1:
+            objective[1].structure[objective[0]].randomize()
+            objective[1].structure[objective[0]].reset_saved_state()
+        # objective[1].structure[objective[0]].use_cache()
         # print(f'CREATED DURING MUTATION: {new_term.name}, while contatining {objective[1].structure[objective[0]].descr_variable_marker}')
-        return new_term
+        return objective[1].structure[objective[0]]
 
     def use_default_tags(self):
         self._tags = {'mutation', 'term level', 'exploration', 'no suboperators'}
