@@ -327,6 +327,9 @@ class Term(ComplexStructure):
     def contains_variable(self, variable):
         return any([factor.variable == variable for factor in self.structure])
 
+    def contains_meaningful(self):
+        return any([factor.status['meaningful'] for factor in self.structure])
+
     def __eq__(self, other):
         return (all([any([other_elem == self_elem for other_elem in other.structure]) for self_elem in self.structure])
                 and all([any([other_elem == self_elem for self_elem in self.structure]) for other_elem in other.structure])

@@ -9,6 +9,7 @@ import warnings
 from itertools import chain
 
 from typing import Union, List
+from functools import reduce
 
 def flatten_chain(matrix):
     return list(chain.from_iterable(matrix))
@@ -32,6 +33,15 @@ def clear_list_of_lists(inp_list) -> list:
     return [elem for elem in inp_list if len(elem) > 0]
 
 
+class ObjFunNormalizer(object):
+    def __init__(self, obj_worst_vals: np.ndarray):
+        self._worst_vals = obj_worst_vals
+
+    def __call__(self, obj_vals: np.ndarray):
+        assert obj_vals.size == self._worst_vals.size, 'Passed objective values have different length, than stored max ones.'
+        return obj_vals / self._worst_vals
+
+
 class ParetoLevels(object):
     '''
     
@@ -53,7 +63,7 @@ class ParetoLevels(object):
     
     '''
     def __init__(self, population, sorting_method = fast_non_dominated_sorting, 
-                 update_method = ndl_update, initial_sort = False):
+                 update_method = ndl_update): # , initial_sort = False
         """
         Args:
             population (`list`): List with the elements - canidate solutions of the case-specific subclass of 
@@ -67,6 +77,8 @@ class ParetoLevels(object):
         self.population = []
         self._update_method = update_method
         self.unplaced_candidates = population
+
+        self.normalizer = None
         self.history = set()
     
     def manual_reconst(self, attribute:str, value, except_attrs:dict):
@@ -87,6 +99,15 @@ class ParetoLevels(object):
         self.__dict__ = {key : item for key, item in attributes.items()
                          if key not in except_keys}
     
+    def set_normalizer(self):
+        # worst_objectives = reduce(lambda x, y: x.extend(y),
+        #                           [[elem.obj_fun for elem in level] for level in self.levels], []) # : np.ndarray
+        objectives = np.stack(reduce(lambda x, y: x.extend(y) or x,
+                                     [[elem.obj_fun for elem in level] for level in self.levels]), axis = 0)
+        
+
+        self.normalizer = ObjFunNormalizer(np.max(objectives, axis = 0))
+
     @property
     def levels(self):
         return self._levels
@@ -338,8 +359,7 @@ class MOEADDOptimizer(object):
                               Confirmed {len(population)}/{pop_size} solutions.')
                         break
                     solution_gen_idx += 1
-            self.pareto_levels = ParetoLevels(population, sorting_method = nds_method, update_method = ndl_update,
-                                              initial_sort = False)
+            self.pareto_levels = ParetoLevels(population, sorting_method = nds_method, update_method = ndl_update) # initial_sort = False
         else:
             if not isinstance(passed_population, ParetoLevels):
                 raise TypeError(f'Incorrect type of the population passed. Expected ParetoLevels object, instead got \
@@ -449,7 +469,6 @@ class MOEADDOptimizer(object):
         builder.assemble(True)
         self.set_sector_processer(builder.processer)
     
-        
     def optimize(self, epochs):
         """
         Method for the main unconstrained evolutionary optimization. Can be applied repeatedly to 

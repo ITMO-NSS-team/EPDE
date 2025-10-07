@@ -115,7 +115,8 @@ class TermMutation(CompoundOperator):
         new_term = Term(objective[1].pool, mandatory_family = objective[1].structure[objective[0]].descr_variable_marker, 
                         create_derivs=create_derivs,
                         max_factors_in_term = objective[1].metaparameters['max_factors_in_term']['value'])
-        while not check_uniqueness(new_term, objective[1].structure[:objective[0]] + objective[1].structure[objective[0]+1:]):
+        while not (check_uniqueness(new_term, objective[1].structure[:objective[0]] + objective[1].structure[objective[0]+1:]) and
+                   new_term.contains_meaningful()):
             new_term = Term(objective[1].pool, mandatory_family = objective[1].structure[objective[0]].descr_variable_marker, 
                             create_derivs=create_derivs,
                             max_factors_in_term = objective[1].metaparameters['max_factors_in_term']['value'])

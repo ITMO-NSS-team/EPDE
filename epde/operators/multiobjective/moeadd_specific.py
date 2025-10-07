@@ -8,15 +8,18 @@ Created on Fri Jul 29 19:08:51 2022
 import copy
 import numpy as np
 import time
-from typing import Union
+from typing import Union, Tuple
 from functools import reduce, partial
 
-from epde.optimizers.moeadd.moeadd import ParetoLevels
+from epde.optimizers.moeadd.moeadd import ParetoLevels, ObjFunNormalizer
 from epde.operators.utils.template import CompoundOperator, add_base_param_to_operator
 from epde.operators.multiobjective.mutations import get_basic_mutation
 
+from epde.structure.main_structures import SoEq
 
-def penalty_based_intersection(sol_obj, weight, ideal_obj, penalty_factor = 1.) -> float:
+
+def penalty_based_intersection(sol_obj, weight, ideal_obj, 
+                               penalty_factor = 1., obj_normalizer: ObjFunNormalizer = None) -> float:
     '''
     Calculation of the penalty pased intersection, that is minimized for the solutions inside the 
     domain, specified by **weight** vector. The calculations are held, according to the following formulas:
@@ -50,10 +53,17 @@ def penalty_based_intersection(sol_obj, weight, ideal_obj, penalty_factor = 1.) 
     
     penalty_factor : float, optional, default 1.
         The penalty parameter, represents :math:`\Theta` in the equations.
+
+    obj_normalizer : ObjFunNormalizer obj., optional, defaut None.
+        Normalizer for solution objective functions.
     
     '''
-    d_1 = np.dot((sol_obj.obj_fun - ideal_obj), weight) / np.linalg.norm(weight)
-    d_2 = np.linalg.norm(sol_obj.obj_fun - (ideal_obj + d_1 * weight/np.linalg.norm(weight)))
+    print(f'Objective before normalization: {sol_obj.obj_fun} for normalizer {obj_normalizer}')
+    solution_objective = sol_obj.obj_fun if obj_normalizer is None else obj_normalizer(sol_obj.obj_fun)
+    print(f'Objective after expected normalization: {solution_objective}')
+    
+    d_1 = np.dot((solution_objective - ideal_obj), weight) / np.linalg.norm(weight)
+    d_2 = np.linalg.norm(solution_objective - (ideal_obj + d_1 * weight/np.linalg.norm(weight)))
     return d_1 + penalty_factor * d_2
 
 
@@ -87,7 +97,7 @@ def population_to_sectors(population, weights):
     return list(map(solution_selection, np.arange(len(weights))))    
 
 
-def locate_pareto_worst(levels, weights, best_obj, penalty_factor = 1.):
+def locate_pareto_worst(levels: ParetoLevels, weights: np.ndarray, best_obj: np.ndarray, penalty_factor: float = 1.):
     '''
     
     Function, dedicated to the selection of the worst solution on the Pareto levels.
@@ -114,7 +124,8 @@ def locate_pareto_worst(levels, weights, best_obj, penalty_factor = 1.):
     if len(crowded_domains) == 1:
         most_crowded_domain = crowded_domains[0]
     else:
-        PBI = lambda domain_idx: sum([penalty_based_intersection(sol_obj, weights[domain_idx], best_obj, penalty_factor) for sol_obj in domain_solutions[domain_idx]])
+        PBI = lambda domain_idx: sum([penalty_based_intersection(sol_obj, weights[domain_idx], best_obj, penalty_factor, levels.normalizer)
+                                      for sol_obj in domain_solutions[domain_idx]])
         PBIS = np.fromiter(map(PBI, crowded_domains), dtype = float)
         most_crowded_domain = crowded_domains[np.argmax(PBIS)]
         
@@ -127,21 +138,34 @@ def locate_pareto_worst(levels, weights, best_obj, penalty_factor = 1.):
     max_level = np.max(domain_solution_NDL_idxs)
     worst_NDL_section = [domain_solutions[most_crowded_domain][sol_idx] for sol_idx in np.arange(len(domain_solutions[most_crowded_domain])) 
                         if domain_solution_NDL_idxs[sol_idx] == max_level]
-    PBIS = np.fromiter(map(lambda solution: penalty_based_intersection(solution, weights[most_crowded_domain], best_obj, penalty_factor), worst_NDL_section), dtype = float)
+    PBIS = np.fromiter(map(lambda solution: penalty_based_intersection(solution, weights[most_crowded_domain], best_obj, penalty_factor, levels.normalizer),
+                           worst_NDL_section), dtype = float)
     return worst_NDL_section[np.argmax(PBIS)]
 
 
 class PopulationUpdater(CompoundOperator):
     key = 'PopulationUpdater'
     
-    def apply(self, objective : ParetoLevels, arguments : dict):
+    def apply(self, objective : Tuple[Union[SoEq, ParetoLevels]], arguments : dict):
         '''
         Update population to get the pareto-nondomiated levels with the worst element removed. 
         Here, "worst" means the solution with highest PBI value (penalty-based boundary intersection)
-        '''         
+        '''
+        assert isinstance(objective, tuple), f'Expected input of PopulationUpdater to be a Tuple of SoEq and ParetoLevels.\n'\
+                                             f'Did not get even a Tuple, instead got {type(objective)}!'
+        assert isinstance(objective[0], SoEq), f'Expected input of PopulationUpdater to be a Tuple of SoEq and ParetoLevels.\n'\
+                                               f'Did not get a SoEq obj in the first position, instead got {type(objective[0])}!'        
+        assert isinstance(objective[1], ParetoLevels), f'Expected input of PopulationUpdater to be a Tuple of SoEq and ParetoLevels.\n'\
+                                                       f'Did not get even a ParetoLevels in the second position, '\
+                                                       f'instead got {type(objective[1])}!.'
+
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         # print(f'PopulationUpdater.params is {self.params}')
         
+        # TODO: Init normalizer here!
+        # print('objective is ', objective)
+        # objective[1].set_normalizer()
+
         objective[1].update(objective[0])  #levels_updated = ndl_update(offspring, levels)
         if len(objective[1].levels) == 1:
             worst_solution = locate_pareto_worst(objective[1], self_args['weights'], 
@@ -168,7 +192,8 @@ class PopulationUpdater(CompoundOperator):
                 else:
                     PBI = lambda domain_idx: np.sum([penalty_based_intersection(sol_obj, self_args['weights'][domain_idx],
                                                                                 self_args['best_obj'], 
-                                                                                self.params['PBI_penalty'])
+                                                                                self.params['PBI_penalty'],
+                                                                                objective[1].normalizer)
                                                      for sol_obj in last_level_by_domains[domain_idx]])
                     PBIS = np.fromiter(map(PBI, crowded_domains), dtype = float)
                     most_crowded_domain = crowded_domains[np.argmax(PBIS)]
@@ -179,7 +204,8 @@ class PopulationUpdater(CompoundOperator):
                 else:
                     PBIS = np.fromiter(map(lambda solution: penalty_based_intersection(solution, 
                                                                                        self_args['weights'][most_crowded_domain],
-                                                                                       self_args['best_obj'], self.params['PBI_penalty']),
+                                                                                       self_args['best_obj'], self.params['PBI_penalty'],
+                                                                                       objective[1].normalizer),
                                                last_level_by_domains[most_crowded_domain]), dtype = float)
                     worst_solution = last_level_by_domains[most_crowded_domain][np.argmax(PBIS)]                    
         
@@ -242,7 +268,8 @@ class PopulationUpdaterConstrained(object):
                         most_crowded_domain = crowded_domains[0]
                     else:
                         PBI = lambda domain_idx: np.sum([penalty_based_intersection(sol_obj, self_args['weights'][domain_idx], 
-                                                                                    self_args['best_obj'], self.params['PBI_penalty']) 
+                                                                                    self_args['best_obj'], self.params['PBI_penalty'],
+                                                                                    objective.normalizer) 
                                                             for sol_obj in last_level_by_domains[domain_idx]])
                         PBIS = np.fromiter(map(PBI, crowded_domains), dtype = float)
                         most_crowded_domain = crowded_domains[np.argmax(PBIS)]
@@ -417,7 +444,7 @@ class InitialParetoLevelSorting(CompoundOperator):
 
         '''
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
-        
+
         if len(objective.population) == 0:
             for idx, candidate in enumerate(objective.unplaced_candidates):
                 self.suboperators['right_part_selector'].apply(objective = candidate,
@@ -432,6 +459,10 @@ class InitialParetoLevelSorting(CompoundOperator):
                                                                   arguments=subop_args['chromosome_fitness'])
                 objective.history.add(tuple(candidate.obj_fun))
             objective.initial_placing()
+        
+            # TODO: consider carefully, where normalizer init shall be held. If here, only the initial values are employed
+        objective.set_normalizer()
+
         return objective
     
 def get_initial_sorter(right_part_selector : CompoundOperator, 

@@ -115,7 +115,7 @@ class EqRightPartSelector(CompoundOperator):
                         term.structure = [factor for factor in term.structure if factor not in factors_simplified]
                         term.reset_saved_state()
                         # If term's order became zero -- replace term
-                        if len(term.structure) == 0:
+                        if (len(term.structure) == 0 or not term.contains_meaningful()):
                             term.randomize()
                             term.reset_saved_state()
                         while objective.structure.count(term) > 1 or term == temp:

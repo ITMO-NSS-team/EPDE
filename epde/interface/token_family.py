@@ -275,7 +275,7 @@ class TokenFamily(object):
             try:
                 constancy = np.isclose(np.min(data), np.max(data))
             except TypeError:
-                print(f"No {label} data in cache!")
+                print(f"No {label} data in cache for constancy check. Functionality of eval-d token check TBD.")
                 continue
             if constancy:
                 constant_tokens_labels.append(label)

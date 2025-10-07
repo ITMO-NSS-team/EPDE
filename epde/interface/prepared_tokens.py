@@ -222,21 +222,23 @@ class TrigonometricTokens(PreparedTokens):
     """
     Class for prepared tokens, that belongs to the trigonometric family
     """
-    def __init__(self, freq: tuple = (np.pi/2., 2*np.pi), dimensionality=1):
+    def __init__(self, freq: tuple = (np.pi/2., 2*np.pi), dimensionality: int = 1, meaningful: bool = False):
         """
         Initialization of class
 
         Args:
             freq (`tuple`): optional, default - (pi/2., 2*pi)
-                interval for parameter frequency in trigonometric token
+                interval for parameter frequency in trigonometric token.
             dimensionality (`int`): optional, default - 1
-                data dimension 
+                data dimension.
+            meaningful (`bool`): optional, defaule - False
+                flag, if the token can be used as a separate term or term-forming factor in the equation.
         """
         assert freq[1] > freq[0] and len(freq) == 2, 'The tuple, defining frequncy interval, shall contain 2 elements with first - the left boundary of interval and the second - the right one. '
 
         self._token_family = TokenFamily(token_type='trigonometric')
         self._token_family.set_status(unique_specific_token=True, unique_token_type=True,
-                                      meaningful=False)
+                                      meaningful=meaningful)
             
         def latex_form(label, **params):
             '''
