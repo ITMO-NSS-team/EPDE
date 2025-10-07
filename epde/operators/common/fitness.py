@@ -318,10 +318,19 @@ class L2LRFitness(CompoundOperator):
 
                     lr += eq_cv.mean()
 
+        fitness_value = round(fitness_value, 8)
+        lr = round(lr / target_vals.ndim, 8)
+
+        # if lr > self.params['max_lr']:
+        #     self.params['max_lr'] = lr
+        # if fitness_value > self.params['max_lp']:
+        #     self.params['max_lp'] = fitness_value
+
         objective.fitness_calculated = True
         objective.fitness_value = fitness_value
         objective.stability_calculated = True
         objective.coefficients_stability = lr
+
 
     def feature_reshape(self, features_vals):
         features = features_vals[0]
