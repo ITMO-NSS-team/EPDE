@@ -48,7 +48,8 @@ class EqRightPartSelector(CompoundOperator):
 
         objective.reset_state(True)
 
-        while not (objective.right_part_selected and objective.simplified):
+        while not (objective.simplified and objective.is_correct_right_part):
+            objective.is_correct_right_part = False
             min_fitness = np.inf
             weights_internal = np.zeros_like(objective.structure)
             min_idx = 0
@@ -75,8 +76,11 @@ class EqRightPartSelector(CompoundOperator):
             # if not np.isclose(objective.fitness_value, max_fitness) and global_var.verbose.show_warnings:
             #     warnings.warn('Reevaluation of fitness function for equation has obtained different result. Not an error, if ANN DE solver is used.')
             self.simplify_equation(objective)
+            if objective.structure[objective.target_idx].contains_variable(objective.main_var_to_explain) and objective.structure[objective.target_idx].contains_deriv(objective.main_var_to_explain):
+                objective.is_correct_right_part = True
         else:
             objective.reset_explaining_term(objective.target_idx)
+            objective.right_part_selected = True
 
     def simplify_equation(self, objective: Equation):
         # Get nonzero terms
@@ -121,11 +125,8 @@ class EqRightPartSelector(CompoundOperator):
                         while objective.structure.count(term) > 1 or term == temp:
                             term.randomize()
                             term.reset_saved_state()
-                        objective.simplified = False
-                        objective.right_part_selected = False
-                        return
+                    return
         objective.simplified = True
-        objective.right_part_selected = True
 
     def use_default_tags(self):
         self._tags = {'equation right part selection', 'gene level', 'contains suboperators', 'inplace'}
