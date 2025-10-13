@@ -215,25 +215,7 @@ class Term(ComplexStructure):
             self.prev_normalized = normalize
             value = super().evaluate(structural)
             if normalize:
-                value = np.ones_like(value)
-                if np.ndim(value) != 1:
-                    for factor in self.structure:
-                        temp = factor.evaluate()
-                        # value *= normalize_ts(temp)
-                        value *= minmax_normalize(temp)
-                        # value *= factor.evaluate(structural)
-                    # else:
-                    #     # value = normalize_ts(value)
-                    #     value = minmax_normalize(value)
-                else:
-                    # if np.std(value) != 0:
-                    #     value = (value - np.mean(value)) / np.std(value)
-                    # else:
-                    #     value = (value - np.mean(value))
-                    for factor in self.structure:
-                        temp = factor.evaluate()
-                        # value *= normalize_ts(temp)
-                        value *= (temp - np.mean(temp) - np.min(temp)) / (np.max(temp) - np.min(temp))
+                value /= np.linalg.norm(value, 2)
             if np.all([len(factor.params) == 1 for factor in self.structure]) and grids is None:
                 # Место возможных проблем: сохранение/загрузка нормализованных данных
                 self.saved[normalize] = global_var.tensor_cache.add(self.cache_label, value, normalized=normalize)
@@ -364,7 +346,7 @@ class Term(ComplexStructure):
 class Equation(ComplexStructure):
     __slots__ = ['_history', 'structure', 'interelement_operator', 'n_immutable', 'pool',
                   # '_target', '_features', 'saved', 'saved_as','max_factors_in_term', 'operator',
-                 'target_idx', 'right_part_selected', '_weights_final', 'weights_final_evald', 'simplified',
+                 'target_idx', 'right_part_selected', '_weights_final', 'weights_final_evald', 'simplified', 'is_correct_right_part',
                  '_weights_internal', 'weights_internal_evald', 'fitness_calculated', 'stability_calculated', 'aic_calculated', 'solver_form_defined',
                  '_fitness_value', '_coefficients_stability', '_aic', 'metaparameters', 'main_var_to_explain'] # , '_solver_form'
 
@@ -509,8 +491,8 @@ class Equation(ComplexStructure):
         if not (deriv or mandatory_family):
             raise ValueError('No property passed for restoration.')
         while True:
-            print(
-                f'Restoring containment of {mandatory_family} in {self.text_form}.')
+            # print(
+            #     f'Restoring containment of {mandatory_family} in {self.text_form}.')
             replacement_idx = np.random.randint(low=0, high=len(self.structure))
             mf_marker = mandatory_family if mandatory_family else None
             temp = Term(self.pool, mandatory_family=mf_marker,
@@ -524,9 +506,6 @@ class Equation(ComplexStructure):
             elif mandatory_family and temp.contains_variable(self.main_var_to_explain) and not deriv:
                 self.structure[replacement_idx] = temp
                 break
-            else:
-                print('temp', temp.name, 'self.main_var_to_explain',
-                      self.main_var_to_explain)
 
     def reconstruct_by_right_part(self, right_part_idx):
         warnings.warn(message='Tokens can no longer be set as right-part-unique',
@@ -608,6 +587,7 @@ class Equation(ComplexStructure):
         self.aic_calculated = False
         self.simplified = False
         self.solver_form_defined = False
+        self.is_correct_right_part = False
 
     @HistoryExtender('\n -> was copied by deepcopy(self)', 'n')
     def __deepcopy__(self, memo=None):
@@ -641,6 +621,7 @@ class Equation(ComplexStructure):
         new_equation.stability_calculated = self.stability_calculated
         new_equation.aic_calculated = self.aic_calculated
         new_equation.simplified = self.simplified
+        new_equation.is_correct_right_part = self.is_correct_right_part
         new_equation.solver_form_defined = False
 
         try:
