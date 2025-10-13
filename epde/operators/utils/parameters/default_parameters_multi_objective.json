@@ -58,7 +58,7 @@
 	},
 	"MetaparameterMutation" : {
         "mean" : 0.0,
-        "std" : 1e-3
+        "std" : 1e-5
 	},
 	"TermMutation" : {
 

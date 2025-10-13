@@ -16,6 +16,7 @@ from epde.operators.utils.template import CompoundOperator, add_base_param_to_op
 from epde.operators.multiobjective.mutations import get_basic_mutation
 
 from epde.structure.main_structures import SoEq
+from copy import deepcopy
 
 
 def penalty_based_intersection(sol_obj, weight, ideal_obj, 
@@ -171,43 +172,33 @@ class PopulationUpdater(CompoundOperator):
             worst_solution = locate_pareto_worst(objective[1], self_args['weights'], 
                                                  self_args['best_obj'], self.params['PBI_penalty'])
         else:
-            if objective[1].levels[len(objective[1].levels) - 1] == 1:
-                domain_solutions = population_to_sectors(objective[1].population, self_args['weights'])
-                reference_solution = objective[1].levels[len(objective[1].levels) - 1][0]
-                reference_solution_domain = [idx for idx in np.arange(domain_solutions) if reference_solution in domain_solutions[idx]]
-                if len(domain_solutions[reference_solution_domain] == 1):
-                    worst_solution = locate_pareto_worst(objective[1].levels, self_args['weights'],
-                                                         self_args['best_obj'], self.params['PBI_penalty'])                            
-                else:
-                    worst_solution = reference_solution
+            last_level_by_domains = population_to_sectors(objective[1].levels[-1],
+                                                          self_args['weights'])
+            most_crowded_count = np.max([len(domain) for domain in last_level_by_domains])
+            crowded_domains = [domain_idx for domain_idx in np.arange(len(self_args['weights']))
+                               if len(last_level_by_domains[domain_idx]) == most_crowded_count]
+
+            if len(crowded_domains) == 1:
+                most_crowded_domain = crowded_domains[0]
             else:
-                last_level_by_domains = population_to_sectors(objective[1].levels[len(objective[1].levels)-1], 
-                                                              self_args['weights'])
-                most_crowded_count = np.max([len(domain) for domain in last_level_by_domains]); 
-                crowded_domains = [domain_idx for domain_idx in np.arange(len(self_args['weights'])) 
-                                   if len(last_level_by_domains[domain_idx]) == most_crowded_count]
-        
-                if len(crowded_domains) == 1:
-                    most_crowded_domain = crowded_domains[0]
-                else:
-                    PBI = lambda domain_idx: np.sum([penalty_based_intersection(sol_obj, self_args['weights'][domain_idx],
-                                                                                self_args['best_obj'], 
-                                                                                self.params['PBI_penalty'],
-                                                                                objective[1].normalizer)
-                                                     for sol_obj in last_level_by_domains[domain_idx]])
-                    PBIS = np.fromiter(map(PBI, crowded_domains), dtype = float)
-                    most_crowded_domain = crowded_domains[np.argmax(PBIS)]
-                    
-                if len(last_level_by_domains[most_crowded_domain]) == 1:
-                    worst_solution = locate_pareto_worst(objective[1], self_args['weights'], 
-                                                         self_args['best_obj'], self.params['PBI_penalty'])
-                else:
-                    PBIS = np.fromiter(map(lambda solution: penalty_based_intersection(solution, 
-                                                                                       self_args['weights'][most_crowded_domain],
-                                                                                       self_args['best_obj'], self.params['PBI_penalty'],
-                                                                                       objective[1].normalizer),
-                                               last_level_by_domains[most_crowded_domain]), dtype = float)
-                    worst_solution = last_level_by_domains[most_crowded_domain][np.argmax(PBIS)]                    
+                PBI = lambda domain_idx: np.sum([penalty_based_intersection(sol_obj, self_args['weights'][domain_idx],
+                                                                            self_args['best_obj'],
+                                                                            self.params['PBI_penalty'],
+                                                                            objective[1].normalizer)
+                                                 for sol_obj in last_level_by_domains[domain_idx]])
+                PBIS = np.fromiter(map(PBI, crowded_domains), dtype = float)
+                most_crowded_domain = crowded_domains[np.argmax(PBIS)]
+
+            if len(last_level_by_domains[most_crowded_domain]) == 1:
+                worst_solution = locate_pareto_worst(objective[1], self_args['weights'],
+                                                     self_args['best_obj'], self.params['PBI_penalty'])
+            else:
+                PBIS = np.fromiter(map(lambda solution: penalty_based_intersection(solution,
+                                                                                   self_args['weights'][most_crowded_domain],
+                                                                                   self_args['best_obj'], self.params['PBI_penalty'],
+                                                                                   objective[1].normalizer),
+                                           last_level_by_domains[most_crowded_domain]), dtype = float)
+                worst_solution = last_level_by_domains[most_crowded_domain][np.argmax(PBIS)]
         
         objective[1].delete_point(worst_solution)
         
@@ -378,36 +369,27 @@ class OffspringUpdater(CompoundOperator):
             offspring = objective.unplaced_candidates.pop()
             attempt = 1
             attempt_limit = self.params['attempt_limit']
-            temp_offspring = offspring
+            temp_offspring = deepcopy(offspring)
             replaced = 0
             while True:
-                # temp_offspring = self.suboperators['chromosome_mutation'].apply(objective=offspring,
-                #                                                             arguments=subop_args['chromosome_mutation'])
                 temp_offspring = self.suboperators['chromosome_mutation'].apply(objective=temp_offspring,
-                                                                                arguments=subop_args[
-                                                                                    'chromosome_mutation'])
-                # temp_offspring.reset_state()
+                                                                                arguments=subop_args['chromosome_mutation'])
                 self.suboperators['right_part_selector'].apply(objective=temp_offspring,
                                                                arguments=subop_args['right_part_selector'])
                 self.suboperators['chromosome_fitness'].apply(objective=temp_offspring,
                                                               arguments=subop_args['chromosome_fitness'])
 
                 if tuple(temp_offspring.obj_fun) not in objective.history:
-                    # for obj_idx, obj in enumerate(temp_offspring.obj_fun):
-                    #     obj = obj / objective.max_obj[obj_idx]
                     self.suboperators['pareto_level_updater'].apply(objective=(temp_offspring, objective),
                                                                     arguments=subop_args['pareto_level_updater'])
                     objective.history.add(tuple(temp_offspring.obj_fun))
                     # print(tuple(temp_offspring.obj_fun))
                     break
-                    # return objective
                 elif replaced == attempt_limit:
                     print("Could not generate unique offspring")
                     break
                 elif attempt == attempt_limit:
-                    # temp_offspring.create()
-                    temp_offspring = offspring
-                    # temp_offspring.reset_state()
+                    temp_offspring = deepcopy(offspring)
                     replaced += 1
                     attempt = 0
                 attempt += 1

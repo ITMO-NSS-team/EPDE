@@ -127,15 +127,11 @@ class L2LRFitness(CompoundOperator):
 
         try:
             if features is None:
-                maximum = target.max(axis=0)
-                minimum = target.min(axis=0)
-                discr = (target - target.mean(axis=0) - minimum) / (maximum - minimum)
+                discr = (target - target.mean(axis=0)) / np.linalg.norm(target, 2)
             else:
                 discr_feats = np.dot(features, objective.weights_final[:-1][objective.weights_internal != 0])
                 discr_feats = discr_feats + np.full(target.shape, objective.weights_final[-1])
-                maximum = np.max([discr_feats.max(axis=0), target.max(axis=0)])
-                minimum = np.min([discr_feats.min(axis=0), target.min(axis=0)])
-                discr = ((discr_feats - minimum) - (target - minimum)) / (maximum - minimum)
+                discr = (discr_feats - target) / np.linalg.norm(target, 2)
             discr = np.multiply(discr, self.g_fun_vals)
             rl_error = np.linalg.norm(discr, ord=2)
         except ValueError:
@@ -145,32 +141,14 @@ class L2LRFitness(CompoundOperator):
             raise ValueError('Incorrect penalty coefficient set, value shall be in (0, 1).')
 
         fitness_value = rl_error
-        # if np.sum(objective.weights_final) == 0:
-        #     fitness_value /= self.params['penalty_coeff']
 
         if force_out_of_place:
             return fitness_value
 
-        # discr = np.mean(discr ** 2)
-        # ll = np.log(discr)
-        # aic = 2 * len(objective.weights_final) - 2 * ll
-        # ssr = np.sum(discr ** 2)
-        # n = len(target)
-        # llf = - n / 2 * np.log(2 * np.pi) - n / 2 * np.log(ssr / n) - n / 2
-        # aic = 2 * len([_ for _ in objective.weights_final if _ != 0]) - 2 * llf
-        # aic = np.log(n) * len([_ for _ in objective.weights_final if _ != 0]) - 2 * llf
-        # objective.aic = 1/(1 + np.exp(- 1e-4 * ll))
-
-        # if force_out_of_place:
-        #     return 1 / (np.exp(-aic / 3e5))
-
-        # objective.aic = 1 / (np.exp(-aic / 3e5))
         objective.aic = None
         objective.aic_calculated = True
-        # print(aic)
-        # print(len([_ for _ in objective.weights_final if _ !=0]))
-        # print(objective.aic)
-        assert objective.simplified, 'Trying to evaluate not simplified equation.'
+
+        # assert objective.simplified, 'Trying to evaluate not simplified equation.'
 
         # Calculate r-loss
         data_shape = global_var.grid_cache.g_func.shape
@@ -190,7 +168,7 @@ class L2LRFitness(CompoundOperator):
         if target_vals.ndim == 1:
             window_size = len(target_vals) // 2
             num_horizons = len(target_vals) - window_size + 1
-            if window_size < 15:
+            if num_horizons < 30:
                 step_size = 1
             else:
                 step_size = num_horizons // 30
@@ -200,10 +178,10 @@ class L2LRFitness(CompoundOperator):
                 for start_idx in range(0, num_horizons, step_size):
                     end_idx = start_idx + window_size
                     target_window = target_vals[start_idx:end_idx]
-                    if np.isclose(np.sqrt(np.mean(np.power(target_window, 2))), 0, atol=1e-10):
+                    if np.isclose(np.linalg.norm(target_window, 2), 0):
                         window_stability = np.abs(np.std(target_window))
                     else:
-                        window_stability = np.abs(np.std(target_window) / np.sqrt(np.mean(np.power(target_window, 2))))
+                        window_stability = np.abs(np.std(target_window) / np.linalg.norm(target_window, 2))
                     eq_window_weights.append(window_stability)
                 lr = np.mean(eq_window_weights)
             else:
@@ -217,8 +195,8 @@ class L2LRFitness(CompoundOperator):
                     valuable_weights = estimator.coef_[:-1]
                     eq_window_weights.append(valuable_weights)
                 eq_cv = np.array([
-                    np.abs(np.std(_)) if np.isclose(np.sqrt(np.mean(np.power(_, 2))), 0, atol=1e-10)
-                    else np.abs(np.std(_) / np.sqrt(np.mean(np.power(_, 2))))
+                    np.abs(np.std(_)) if np.isclose(np.linalg.norm(_, 2), 0)
+                    else np.abs(np.std(_) / np.linalg.norm(_, 2))
                     for _ in zip(*eq_window_weights)
                 ])
                 lr = eq_cv.mean()
@@ -229,7 +207,7 @@ class L2LRFitness(CompoundOperator):
                 eq_window_weights = []
                 window_size = target_vals.shape[dim] // 2
                 num_horizons = target_vals.shape[dim] - window_size + 1
-                if window_size < 15:
+                if num_horizons < 30:
                     step_size = 1
                 else:
                     step_size = num_horizons // 30
@@ -241,10 +219,10 @@ class L2LRFitness(CompoundOperator):
                             target_window = target_vals[start_idx:end_idx, :].reshape(-1)
                         else:
                             target_window = target_vals[:, start_idx:end_idx].reshape(-1)
-                        if np.isclose(np.sqrt(np.mean(np.power(target_window, 2))), 0, atol=1e-10):
+                        if np.isclose(np.linalg.norm(target_window, 2), 0):
                             window_stability = np.abs(np.std(target_window))
                         else:
-                            window_stability = np.abs(np.std(target_window) / np.sqrt(np.mean(np.power(target_window, 2))))
+                            window_stability = np.abs(np.std(target_window) / np.linalg.norm(target_window, 2))
                         eq_window_weights.append(window_stability)
                     lr += np.mean(eq_window_weights)
                 else:
@@ -263,8 +241,8 @@ class L2LRFitness(CompoundOperator):
                         valuable_weights = estimator.coef_[:-1]
                         eq_window_weights.append(valuable_weights)
                     eq_cv = np.array([
-                        np.abs(np.std(_)) if np.isclose(np.sqrt(np.mean(np.power(_, 2))), 0, atol=1e-10)
-                        else np.abs(np.std(_) / np.sqrt(np.mean(np.power(_, 2))))
+                        np.abs(np.std(_)) if np.isclose(np.linalg.norm(_, 2), 0)
+                        else np.abs(np.std(_) / np.linalg.norm(_, 2))
                         for _ in zip(*eq_window_weights)
                     ])
                     lr += eq_cv.mean()
@@ -285,10 +263,10 @@ class L2LRFitness(CompoundOperator):
                             target_window = target_vals[:, start_idx:end_idx, :].reshape(-1)
                         else:
                             target_window = target_vals[:, :, start_idx:end_idx].reshape(-1)
-                        if np.isclose(np.sqrt(np.mean(np.power(target_window, 2))), 0, atol=1e-10):
+                        if np.isclose(np.linalg.norm(target_window, 2), 0):
                             window_stability = np.abs(np.std(target_window))
                         else:
-                            window_stability = np.abs(np.std(target_window) / np.sqrt(np.mean(np.power(target_window, 2))))
+                            window_stability = np.abs(np.std(target_window) / np.linalg.norm(target_window, 2))
                         eq_window_weights.append(window_stability)
                     lr += np.mean(eq_window_weights)
                 else:
@@ -311,20 +289,14 @@ class L2LRFitness(CompoundOperator):
                         valuable_weights = estimator.coef_[:-1]
                         eq_window_weights.append(valuable_weights)
                     eq_cv = np.array([
-                        np.abs(np.std(_)) if np.isclose(np.sqrt(np.mean(np.power(_, 2))), 0, atol=1e-10)
-                        else np.abs(np.std(_) / np.sqrt(np.mean(np.power(_, 2))))
+                        np.abs(np.std(_)) if np.isclose(np.linalg.norm(_, 2), 0)
+                        else np.abs(np.std(_) / np.linalg.norm(_, 2))
                         for _ in zip(*eq_window_weights)
                     ])
-
                     lr += eq_cv.mean()
 
         fitness_value = round(fitness_value, 8)
         lr = round(lr / target_vals.ndim, 8)
-
-        # if lr > self.params['max_lr']:
-        #     self.params['max_lr'] = lr
-        # if fitness_value > self.params['max_lp']:
-        #     self.params['max_lp'] = fitness_value
 
         objective.fitness_calculated = True
         objective.fitness_value = fitness_value
