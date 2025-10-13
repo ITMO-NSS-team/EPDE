@@ -44,8 +44,7 @@ class SystemMutation(CompoundOperator):
                                                                       subop_args['param_mutation'])
             altered_objective.vals.replace_gene(gene_key = param_key, value = altered_param)
             altered_objective.vals.pass_parametric_gene(key = param_key, value = altered_param)
-        
-        altered_objective.reset_state() # Использовать ли reset_right_part
+
         return altered_objective
 
     def use_default_tags(self):
@@ -62,6 +61,9 @@ class EquationMutation(CompoundOperator):
             if np.random.uniform(0, 1) <= self.params['r_mutation']:
                 objective.structure[term_idx] = self.suboperators['mutation'].apply(objective = (term_idx, objective),
                                                                                     arguments = subop_args['mutation'])
+        # term_idx = np.random.choice(len(objective.structure))
+        # objective.structure[term_idx] = self.suboperators['mutation'].apply(objective=(term_idx, objective),
+        #                                                                     arguments=subop_args['mutation'])
         return objective
 
     def use_default_tags(self):
@@ -74,7 +76,7 @@ class MetaparameterMutation(CompoundOperator):
     def apply(self, objective : Union[int, float], arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
-        altered_objective = objective + np.random.normal(loc = self.params['mean'], scale = self.params['std'])        
+        altered_objective = np.random.normal(objective, scale = self.params['std'])
         if altered_objective < 0:
             altered_objective = - altered_objective
         
@@ -110,14 +112,15 @@ class TermMutation(CompoundOperator):
         """       
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
+        temp = deepcopy(objective[1].structure[objective[0]])
         objective[1].structure[objective[0]].randomize()
-        objective[1].structure[objective[0]].reset_saved_state()
-        while not objective[1].structure.count(objective[1].structure[objective[0]]) == 1:
-            objective[1].structure[objective[0]].randomize()
-            objective[1].structure[objective[0]].reset_saved_state()
-        # objective[1].structure[objective[0]].use_cache()
+        new_term = objective[1].structure[objective[0]]
+        new_term.reset_saved_state()
+        while objective[1].structure.count(new_term) > 1 or new_term == temp:
+            new_term.randomize()
+            new_term.reset_saved_state()
         # print(f'CREATED DURING MUTATION: {new_term.name}, while contatining {objective[1].structure[objective[0]].descr_variable_marker}')
-        return objective[1].structure[objective[0]]
+        return new_term
 
     def use_default_tags(self):
         self._tags = {'mutation', 'term level', 'exploration', 'no suboperators'}
