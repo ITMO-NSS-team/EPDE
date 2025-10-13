@@ -215,7 +215,7 @@ class Term(ComplexStructure):
             self.prev_normalized = normalize
             value = super().evaluate(structural)
             if normalize:
-                value /= np.linalg.norm(value, 2)
+                value = value / np.linalg.norm(value, 2)
             if np.all([len(factor.params) == 1 for factor in self.structure]) and grids is None:
                 # Место возможных проблем: сохранение/загрузка нормализованных данных
                 self.saved[normalize] = global_var.tensor_cache.add(self.cache_label, value, normalized=normalize)
