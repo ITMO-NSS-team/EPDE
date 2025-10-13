@@ -82,9 +82,9 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
                 if weight_idx in nonzero_features_indexes:
                     weights[weight_idx] = valueable_weights[nonzero_features_indexes.index(weight_idx)]
             weights[-1] = valueable_weights[-1]
-            nonzero_terms_mask = np.array([False if np.isclose(weight, 0) else True for weight in weights])
-            weights = np.array([item if keep else 0 for item, keep in zip(weights, nonzero_terms_mask)])
-            objective.weights_internal = np.array([item if keep else 0 for item, keep in zip(objective.weights_internal, nonzero_terms_mask[:-1])])
+            # nonzero_terms_mask = np.array([False if np.isclose(weight, 0) else True for weight in weights])
+            # weights = np.array([item if keep else 0 for item, keep in zip(weights, nonzero_terms_mask)])
+            # objective.weights_internal = np.array([item if keep else 0 for item, keep in zip(objective.weights_internal, nonzero_terms_mask[:-1])])
             objective.weights_final_evald = True
             objective.weights_final = weights
             
