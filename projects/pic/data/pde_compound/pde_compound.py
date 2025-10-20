@@ -212,7 +212,7 @@ class PCExperiment:
         popsize = 12
         search_obj.set_moeadd_params(
             population_size=popsize,
-            training_epochs=30
+            training_epochs=2
         )
 
         # Prepare custom tokens
@@ -245,7 +245,7 @@ class PCExperiment:
         )
 
         factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
-        bounds = (1e-9, 1e-2)
+        bounds = (1e-4, 1e-3)
 
         search_obj.fit(
             data=noised_data,

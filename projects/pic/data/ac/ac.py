@@ -95,7 +95,7 @@ def ac_data(filename: str):
 def AC_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
     # Test scenario to evaluate performance on Allen-Cahn equation
     eq_ac_symbolic = '0.0001 * d^2u/dx1^2{power: 1.0} + -5.0 * u{power: 3.0} + 5.0 * u{power: 1.0} + 0.0 = du/dx0{power: 1.0}'
-    eq_ac_incorrect = '-1.0 * d^2u/dx0^2{power: 1.0} + 1.5 * u{power: 1.0} + -0.0 = du/dx0{power: 1.0}'
+    eq_ac_incorrect = '4.976781518840499 * u{power: 1.0} + 0.0001 * d^2u/dx1^2{power: 1.0} + -4.974425220166616 * u{power: 3.0} + 0.0 * du/dx1{power: 1.0} * d^2u/dx0^2{power: 1.0} + 0.002262543822130977 = du/dx0{power: 1.0}'
 
     grid, data = ac_data(os.path.join(foldername, 'ac_data.npy'))
     noised_data = noise_data(data, noise_level)
@@ -111,7 +111,7 @@ def AC_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
 
-    epde_search_obj.create_pool(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 2),
+    epde_search_obj.create_pool(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 3),
                                 additional_tokens=[], data_nn=data_nn)
 
     assert compare_equations(eq_ac_symbolic, eq_ac_incorrect, epde_search_obj)
@@ -125,7 +125,7 @@ def ac_discovery(foldername, noise_level):
     dimensionality = data.ndim - 1
 
     epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True,
-                                      use_pic=True, boundary=20,
+                                      use_pic=True, boundary=(5, 10),
                                       coordinate_tensors=grid, device='cuda')
 
     # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
@@ -135,7 +135,7 @@ def ac_discovery(foldername, noise_level):
     popsize = 8
 
     epde_search_obj.set_moeadd_params(population_size=popsize,
-                                      training_epochs=30)
+                                      training_epochs=10)
 
     custom_grid_tokens = CacheStoredTokens(token_type='grid',
                                                 token_labels=['t', 'x'],
@@ -150,7 +150,7 @@ def ac_discovery(foldername, noise_level):
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
-    bounds = (1e-9, 1e-4)
+    bounds = (1e-8, 1e-0)
     epde_search_obj.fit(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 3), derivs=None,
                         equation_terms_max_number=5, data_fun_pow=3,
                         additional_tokens=[],

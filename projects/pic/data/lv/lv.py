@@ -100,22 +100,22 @@ def lv_discovery(noise_level):
                                       dimensionality=dimensionality)
     grid_tokens = GridTokens(['x_0', ], dimensionality=dimensionality, max_power=2)
 
-    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True, use_pic=True, boundary=10,
+    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True, use_pic=True, boundary=15,
                                  coordinate_tensors=(t,), verbose_params={'show_iter_idx': True},
                                  device='cuda')
 
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
 
-    popsize = 8
-    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=30)
+    popsize = 12
+    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=10)
 
     factors_max_number = {'factors_num': [1, 2], 'probas' : [0.8, 0.2]}
 
     epde_search_obj.fit(data=[x, y], variable_names=['u', 'v'], max_deriv_order=(1,),
                         equation_terms_max_number=5, data_fun_pow=1, additional_tokens=[trig_tokens, ],
                         equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-4, 1e-0))  #
+                        eq_sparsity_interval=(1e-8, 1e-0))  #
 
     epde_search_obj.equations(only_print=True, num=1)
 

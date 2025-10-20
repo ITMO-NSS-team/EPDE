@@ -47,6 +47,7 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
     for var in all_vars:
         correct_eq.vals[var].main_var_to_explain = var
         correct_eq.vals[var].metaparameters = metaparams
+        correct_eq.vals[var].simplified = True
     print(correct_eq.text_form)
 
     incorrect_eq = translate_equation(eq_incorrect_symbolic, search_obj.pool,
@@ -54,6 +55,7 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
     for var in all_vars:
         incorrect_eq.vals[var].main_var_to_explain = var
         incorrect_eq.vals[var].metaparameters = metaparams
+        incorrect_eq.vals[var].simplified = True
     print(incorrect_eq.text_form)
 
     fit_operator.apply(correct_eq, {})
@@ -92,8 +94,7 @@ def ODE_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
     # g3 = lambda x: 4.
     # g4 = lambda x: 1.5*x
 
-    eq_ode_symbolic = '-1.0 * d^2u/dx0^2{power: 1.0} + 1.5 * x_0{power: 1.0, dim: 0.0} + -4.0 * u{power: 1.0} + -0.0 \
-                       = du/dx0{power: 1.0} * sin{power: 1.0, freq: 2.0, dim: 0.0}'
+    eq_ode_symbolic = '-3.9920083373920305 * u{power: 1.0} + -0.986615483876419 * du/dx0{power: 1.0} * sin{power: 1.0, freq: 2.0000000038280255, dim: 0.0} + 1.497626641591792 * x_0{power: 1.0, dim: 0.0} + -0.03054107154984344 = d^2u/dx0^2{power: 1.0}'
     eq_ode_incorrect = '1.0 * du/dx0{power: 1.0} + 3.5 * x_0{power: 1.0, dim: 0.0} * u{power: 1.0} + -1.2 \
                         = du/dx0{power: 1.0} * sin{power: 1.0, freq: 2.0, dim: 0.0}'
 
@@ -137,15 +138,15 @@ def ODE_discovery(foldername, noise_level):
                                       dimensionality=dimensionality)
     grid_tokens = GridTokens(['x_0', ], dimensionality=dimensionality, max_power=2)
 
-    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=10,
+    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=20,
                                  coordinate_tensors=[t,], verbose_params={'show_iter_idx': True},
                                  device='cuda')
 
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
 
-    popsize = 8
-    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=15)
+    popsize = 12
+    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=10)
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
@@ -153,7 +154,7 @@ def ODE_discovery(foldername, noise_level):
                         equation_terms_max_number=5, data_fun_pow=3,
                         additional_tokens=[trig_tokens, grid_tokens],
                         equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-10, 1e-0)) # , data_nn=data_nn
+                        eq_sparsity_interval=(1e-8, 1e-0)) # , data_nn=data_nn
 
     epde_search_obj.equations(only_print=True, num=1)
 
@@ -186,7 +187,7 @@ def ODE_simple_discovery(foldername, noise_level):
                                      preprocessor_kwargs={})
 
     popsize = 8
-    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=5)
+    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=10)
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
@@ -194,7 +195,7 @@ def ODE_simple_discovery(foldername, noise_level):
                         equation_terms_max_number=5, data_fun_pow=3,
                         additional_tokens=[trig_tokens, grid_tokens],
                         equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-6, 1e0)) #
+                        eq_sparsity_interval=(1e-4, 1e-0)) #
 
     epde_search_obj.equations(only_print=True, num=1)
 
@@ -223,6 +224,6 @@ if __name__ == "__main__":
     ode_folder_name = os.path.join(directory)
 
     # ODE_test(fit_operator, ode_folder_name, 0)
-    # ODE_discovery(ode_folder_name, 0)
-    ODE_simple_discovery(ode_folder_name, 0)
+    ODE_discovery(ode_folder_name, 0)
+    # ODE_simple_discovery(ode_folder_name, 0)
 

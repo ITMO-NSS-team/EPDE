@@ -175,25 +175,17 @@ class ParetoLevels(object):
             None
         """
         new_levels = []
-        deleted = False
+        population_cleared = []
+        point_system = point.described_variables
         for level in self.levels:
             temp = []
             for element in level:
-                if not np.allclose(element.obj_fun, point.obj_fun) or deleted:
+                if element.described_variables != point_system:
                     temp.append(element)
-                else:
-                    deleted = True
+                    population_cleared.append(element)
             if not len(temp) == 0:
                 new_levels.append(temp)
 
-        population_cleared = []
-        deleted = False
-        for elem in self.population:
-            if not np.allclose(elem.obj_fun, point.obj_fun) or deleted:
-                population_cleared.append(elem)
-            else:
-                deleted = True
-                
         if len(population_cleared) != sum([len(level) for level in new_levels]):
             print(len(population_cleared), len(self.population), sum([len(level) for level in new_levels]))
             print('initial population', [solution.vals for solution in self.population], len([solution.vals for solution in self.population]), '\n')
