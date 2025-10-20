@@ -47,6 +47,7 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
     for var in all_vars:
         correct_eq.vals[var].main_var_to_explain = var
         correct_eq.vals[var].metaparameters = metaparams
+        correct_eq.vals[var].simplified = True
     print(correct_eq.text_form)
 
     incorrect_eq = translate_equation(eq_incorrect_symbolic, search_obj.pool,
@@ -54,6 +55,7 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
     for var in all_vars:
         incorrect_eq.vals[var].main_var_to_explain = var
         incorrect_eq.vals[var].metaparameters = metaparams
+        incorrect_eq.vals[var].simplified = True
     print(incorrect_eq.text_form)
 
     fit_operator.apply(correct_eq, {})
@@ -111,10 +113,12 @@ def wave_test(operator: CompoundOperator, foldername: str, noise_level: int = 0)
                                  verbose_params={'show_iter_idx': True},
                                  device='cpu')
 
-    # epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
-    #                                  preprocessor_kwargs={})
-    epde_search_obj.set_preprocessor(default_preprocessor_type='spectral',
-                                     preprocessor_kwargs={"n":80})
+    epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+                                     preprocessor_kwargs={})
+    # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
+    #                                  preprocessor_kwargs={'epochs_max': 1e4})
+    # epde_search_obj.set_preprocessor(default_preprocessor_type='spectral',
+    #                                  preprocessor_kwargs={"n":80})
 
     epde_search_obj.create_pool(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 2),
                                 additional_tokens=[])
@@ -139,10 +143,12 @@ def wave_discovery(foldername, noise_level):
     #                                  preprocessor_kwargs={"n": 80})
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
+    # epde_search_obj.set_preprocessor(default_preprocessor_type='poly',
+    #                                  preprocessor_kwargs={'use_smoothing': True})
     popsize = 8
 
     epde_search_obj.set_moeadd_params(population_size=popsize,
-                                      training_epochs=5)
+                                      training_epochs=1)
 
 
     custom_grid_tokens = CacheStoredTokens(token_type='grid',
@@ -158,7 +164,7 @@ def wave_discovery(foldername, noise_level):
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
-    bounds = (1e-5, 1e2)
+    bounds = (1e-6, 1e-4)
     epde_search_obj.fit(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 3), derivs=None,
                         equation_terms_max_number=5, data_fun_pow=3,
                         additional_tokens=[],
@@ -187,5 +193,5 @@ if __name__ == "__main__":
     directory = os.path.dirname(os.path.realpath(__file__))
     wave_folder_name = os.path.join(directory)
 
-    wave_test(fit_operator, wave_folder_name, 0)
-    # wave_discovery(wave_folder_name, 0)
+    # wave_test(fit_operator, wave_folder_name, 0)
+    wave_discovery(wave_folder_name, 0)

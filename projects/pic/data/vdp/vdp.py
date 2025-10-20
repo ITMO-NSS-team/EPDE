@@ -133,7 +133,7 @@ def vdp_discovery(foldername, noise_level):
                                       dimensionality=dimensionality)
     grid_tokens = GridTokens(['x_0', ], dimensionality=dimensionality, max_power=2)
 
-    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=1,
+    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=32,
                                  coordinate_tensors=(t,), verbose_params={'show_iter_idx': True},
                                  device='cuda')
 
@@ -141,7 +141,7 @@ def vdp_discovery(foldername, noise_level):
                                      preprocessor_kwargs={})
 
     popsize = 8
-    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=30)
+    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=10)
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
