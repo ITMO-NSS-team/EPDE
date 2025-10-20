@@ -57,13 +57,13 @@ class EquationMutation(CompoundOperator):
     def apply(self, objective : Equation, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
-        # for term_idx in range(objective.n_immutable, len(objective.structure)):
-        #     if np.random.uniform(0, 1) <= self.params['r_mutation']:
-        #         objective.structure[term_idx] = self.suboperators['mutation'].apply(objective = (term_idx, objective),
-        #                                                                             arguments = subop_args['mutation'])
-        term_idx = np.random.choice(len(objective.structure))
-        objective.structure[term_idx] = self.suboperators['mutation'].apply(objective=(term_idx, objective),
-                                                                            arguments=subop_args['mutation'])
+        for term_idx in range(objective.n_immutable, len(objective.structure)):
+            if np.random.uniform(0, 1) <= self.params['r_mutation']:
+                objective.structure[term_idx] = self.suboperators['mutation'].apply(objective = (term_idx, objective),
+                                                                                    arguments = subop_args['mutation'])
+        # term_idx = np.random.choice(len(objective.structure))
+        # objective.structure[term_idx] = self.suboperators['mutation'].apply(objective=(term_idx, objective),
+        #                                                                     arguments=subop_args['mutation'])
         return objective
 
     def use_default_tags(self):
