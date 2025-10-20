@@ -215,7 +215,9 @@ class Term(ComplexStructure):
             self.prev_normalized = normalize
             value = super().evaluate(structural)
             if normalize:
-                value = value / np.linalg.norm(value, 2)
+                value = (value - np.mean(value)) / np.std(value)
+                # value = value / np.linalg.norm(value, 2)
+
             if np.all([len(factor.params) == 1 for factor in self.structure]) and grids is None:
                 # Место возможных проблем: сохранение/загрузка нормализованных данных
                 self.saved[normalize] = global_var.tensor_cache.add(self.cache_label, value, normalized=normalize)
@@ -580,7 +582,7 @@ class Equation(ComplexStructure):
     def reset_state(self, reset_right_part: bool = True):
         if reset_right_part:
             self.right_part_selected = False
-        self.weights_internal_evald = False
+        # self.weights_internal_evald = False
         self.weights_final_evald = False
         self.fitness_calculated = False
         self.stability_calculated = False
@@ -744,17 +746,28 @@ class Equation(ComplexStructure):
 
     @property
     def described_variables(self):
-        eps = 1e-7
         described = set()
         for term_idx, term in enumerate(self.structure):
+            cache_label = set()
             if term_idx == self.target_idx:
-                described.update({factor.family_type for factor in term.structure
-                                  if factor.is_deriv and factor.deriv_code != [None]})
+                for factor in term.structure:
+                    if len(factor.params) == 1:
+                        factor_label = (factor.cache_label[0])
+                    else:
+                        factor_label = (factor.cache_label[0], (factor.cache_label[1][-1]))
+                    cache_label.add(factor_label)
             else:
-                weight_idx = term_idx if term_idx < term_idx else term_idx - 1
-                if np.abs(self.weights_final[weight_idx]) > eps:
-                    described.update({factor.family_type for factor in term.structure
-                                      if factor.is_deriv and factor.deriv_code != [None]})
+                weight_idx = term_idx if term_idx < self.target_idx else term_idx - 1
+                if not np.isclose(self.weights_internal[weight_idx], 0):
+                    for factor in term.structure:
+                        if len(factor.params) == 1:
+                            factor_label = (factor.cache_label[0])
+                        else:
+                            factor_label = (factor.cache_label[0], (factor.cache_label[1][-1]))
+                        cache_label.add(factor_label)
+            if len(cache_label) > 0:
+                cache_label = frozenset(cache_label)
+                described.add(cache_label)
         described = frozenset(described)
         return described
 
@@ -1109,6 +1122,13 @@ class SoEq(moeadd.MOEADDSolution):
     @property
     def fitness_calculated(self):
         return all([equation.fitness_calculated for equation in self.vals])
+
+    @property
+    def described_variables(self):
+        equations_caches = set()
+        for equation in self.vals:
+            equations_caches.add(equation.described_variables)
+        return frozenset(equations_caches)
 
 
 class SoEqIterator(object):
