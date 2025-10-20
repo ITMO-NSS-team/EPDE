@@ -382,7 +382,7 @@ class OffspringUpdater(CompoundOperator):
                     self.suboperators['pareto_level_updater'].apply(objective=(temp_offspring, objective),
                                                                     arguments=subop_args['pareto_level_updater'])
                     objective.history.add(system)
-                    print(temp_offspring.obj_fun)
+                    # print(temp_offspring.obj_fun)
                     break
                 elif replaced == offspring_attempt_limit:
                     print("Could not generate unique offspring")
@@ -392,8 +392,7 @@ class OffspringUpdater(CompoundOperator):
                     replaced += 1
                     attempt = 0
                 temp_offspring = self.suboperators['chromosome_mutation'].apply(objective=temp_offspring,
-                                                                                arguments=subop_args[
-                                                                                    'chromosome_mutation'])
+                                                                                arguments=subop_args['chromosome_mutation'])
                 attempt += 1
         return objective
     
@@ -448,7 +447,7 @@ class InitialParetoLevelSorting(CompoundOperator):
                 self.suboperators['chromosome_fitness'].apply(objective=candidate,
                                                               arguments=subop_args['chromosome_fitness'])
                 objective.history.add(system)
-                print(candidate.obj_fun)
+                # print(candidate.obj_fun)
             objective.initial_placing()
         
             # TODO: consider carefully, where normalizer init shall be held. If here, only the initial values are employed
