@@ -60,9 +60,7 @@ class EqRightPartSelector(CompoundOperator):
                 if not (objective.structure[target_idx].contains_variable(objective.main_var_to_explain) and objective.structure[target_idx].contains_deriv(objective.main_var_to_explain)):
                     continue
                 objective.target_idx = target_idx
-                fitness = self.suboperators['fitness_calculation'].apply(objective,
-                                                                            arguments = subop_args['fitness_calculation'],
-                                                                            force_out_of_place = True)
+                fitness = self.suboperators['fitness_calculation'].apply(objective, arguments = subop_args['fitness_calculation'], force_out_of_place = True)
                 if fitness < min_fitness:
                     min_fitness = fitness
                     min_idx = target_idx
@@ -72,14 +70,10 @@ class EqRightPartSelector(CompoundOperator):
 
             objective.weights_internal = weights_internal
             objective.target_idx = min_idx
-            # self.suboperators['fitness_calculation'].apply(objective, arguments = subop_args['fitness_calculation'])
-            # if not np.isclose(objective.fitness_value, max_fitness) and global_var.verbose.show_warnings:
-            #     warnings.warn('Reevaluation of fitness function for equation has obtained different result. Not an error, if ANN DE solver is used.')
             self.simplify_equation(objective)
             if objective.structure[objective.target_idx].contains_variable(objective.main_var_to_explain) and objective.structure[objective.target_idx].contains_deriv(objective.main_var_to_explain):
                 objective.is_correct_right_part = True
         else:
-            objective.reset_explaining_term(objective.target_idx)
             objective.right_part_selected = True
 
     def simplify_equation(self, objective: Equation):
@@ -88,18 +82,18 @@ class EqRightPartSelector(CompoundOperator):
         nonrs_terms = [term for i, term in enumerate(objective.structure) if i != objective.target_idx]
         nonzero_terms = [item for item, keep in zip(nonrs_terms, nonzero_terms_mask) if keep]
         nonzero_terms.append(objective.structure[objective.target_idx])
-        nonzero_terms_labels = [[term.cache_label[0]] if not isinstance(term.cache_label[0], tuple) else list(next(zip(*term.cache_label))) for term in nonzero_terms]
 
+        equation_terms = objective.described_variables
         # If amount nonzero terms is more than one -- get their intersection
-        if len(nonzero_terms) > 1:
-            common_factor = np.array(list(set.intersection(*map(set, nonzero_terms_labels)))).flatten()
+        if len(equation_terms) > 1:
+            common_factor = list(frozenset.intersection(*equation_terms))
             common_dim = []
             if len(common_factor) > 0:
                 # Find if this intersection in the same dimension (i.e. trigonometry functions) + it's minimal order
                 min_order = np.inf
                 for term in nonzero_terms:
                     for factor in term.structure:
-                        if factor.cache_label[0] == common_factor[0]:
+                        if factor.cache_label[0] == common_factor[0][0]:
                             if len(factor.params) > 1:
                                 common_dim.append(factor.params[-1])
                             if factor.cache_label[1][0] < min_order:
@@ -110,7 +104,7 @@ class EqRightPartSelector(CompoundOperator):
                         temp = deepcopy(term)
                         factors_simplified = []
                         for factor in term.structure:
-                            if factor.cache_label[0] == common_factor[0]:
+                            if factor.cache_label[0] == common_factor[0][0]:
                                 for i, value in enumerate(factor.params_description):
                                     if factor.params_description[i]["name"] == "power":
                                         factor.params[i] -= min_order
