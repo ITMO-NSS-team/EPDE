@@ -10,7 +10,8 @@
         "number_of_neighbors" : 4
  	},
 	"ParetoLevelUpdater" : {
-    	"attempt_limit" : 5
+    	"mutation_attempt_limit" : 5,
+		"offspring_attempt_limit" : 5
 	},
 	"InitialParetoLevelSorting" : {
 	
