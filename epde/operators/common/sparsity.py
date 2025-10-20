@@ -8,7 +8,8 @@ Created on Fri Jun  4 13:35:18 2021
 
 from typing import Union, Callable
 import numpy as np
-from sklearn.linear_model import Lasso
+from sklearn.linear_model import Lasso, LassoLars
+from pysindy import STLSQ
 
 import epde.globals as global_var
 from epde.operators.utils.template import CompoundOperator
@@ -60,15 +61,17 @@ class LASSOSparsity(CompoundOperator):
         # print(f'Metaparameter: {objective.metaparameters}, objective.metaparameters[("sparsity", objective.main_var_to_explain)]')
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
-        estimator = Lasso(alpha = objective.metaparameters[('sparsity', objective.main_var_to_explain)]['value'],
-                          copy_X=True, fit_intercept=True, max_iter=1000,
-                          positive=False, precompute=False, random_state=None,
-                          selection='random', tol=0.0001, warm_start=False)
+        # estimator = Lasso(alpha = objective.metaparameters[('sparsity', objective.main_var_to_explain)]['value'],
+        #                   copy_X=True, fit_intercept=True, max_iter=1000,
+        #                   positive=False, precompute=False, random_state=None,
+        #                   selection='random', tol=0.0001, warm_start=False)
+        estimator = STLSQ(threshold=objective.metaparameters[('sparsity', objective.main_var_to_explain)]['value'],
+                          copy_X=True, unbias=True, max_iter=1000, alpha=0.05)
         _, target, features = objective.evaluate(normalize = True, return_val = False)
         self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)
 
         estimator.fit(features, target, sample_weight = self.g_fun_vals)
-        objective.weights_internal = estimator.coef_
+        objective.weights_internal = estimator.coef_[-1]
 
     def use_default_tags(self):
         self._tags = {'sparsity', 'gene level', 'no suboperators', 'inplace'}
