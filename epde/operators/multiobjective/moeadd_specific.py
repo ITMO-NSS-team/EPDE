@@ -190,8 +190,7 @@ class PopulationUpdater(CompoundOperator):
                 most_crowded_domain = crowded_domains[np.argmax(PBIS)]
 
             if len(last_level_by_domains[most_crowded_domain]) == 1:
-                worst_solution = locate_pareto_worst(objective[1], self_args['weights'],
-                                                     self_args['best_obj'], self.params['PBI_penalty'])
+                worst_solution = last_level_by_domains[most_crowded_domain][0]
             else:
                 PBIS = np.fromiter(map(lambda solution: penalty_based_intersection(solution,
                                                                                    self_args['weights'][most_crowded_domain],
@@ -367,31 +366,34 @@ class OffspringUpdater(CompoundOperator):
 
         while objective.unplaced_candidates:
             offspring = objective.unplaced_candidates.pop()
-            attempt = 1
-            attempt_limit = self.params['attempt_limit']
+            attempt = 0
+            mutation_attempt_limit = self.params['mutation_attempt_limit']
+            offspring_attempt_limit = self.params['offspring_attempt_limit']
             temp_offspring = deepcopy(offspring)
             replaced = 0
             while True:
-                temp_offspring = self.suboperators['chromosome_mutation'].apply(objective=temp_offspring,
-                                                                                arguments=subop_args['chromosome_mutation'])
                 self.suboperators['right_part_selector'].apply(objective=temp_offspring,
                                                                arguments=subop_args['right_part_selector'])
-                self.suboperators['chromosome_fitness'].apply(objective=temp_offspring,
-                                                              arguments=subop_args['chromosome_fitness'])
-
-                if tuple(temp_offspring.obj_fun) not in objective.history:
+                temp_offspring.reset_state()
+                system = temp_offspring.described_variables
+                if system not in objective.history:
+                    self.suboperators['chromosome_fitness'].apply(objective=temp_offspring,
+                                                                  arguments=subop_args['chromosome_fitness'])
                     self.suboperators['pareto_level_updater'].apply(objective=(temp_offspring, objective),
                                                                     arguments=subop_args['pareto_level_updater'])
-                    objective.history.add(tuple(temp_offspring.obj_fun))
-                    # print(tuple(temp_offspring.obj_fun))
+                    objective.history.add(system)
+                    print(temp_offspring.obj_fun)
                     break
-                elif replaced == attempt_limit:
+                elif replaced == offspring_attempt_limit:
                     print("Could not generate unique offspring")
                     break
-                elif attempt == attempt_limit:
+                elif attempt == mutation_attempt_limit:
                     temp_offspring = deepcopy(offspring)
                     replaced += 1
                     attempt = 0
+                temp_offspring = self.suboperators['chromosome_mutation'].apply(objective=temp_offspring,
+                                                                                arguments=subop_args[
+                                                                                    'chromosome_mutation'])
                 attempt += 1
         return objective
     
@@ -437,15 +439,16 @@ class InitialParetoLevelSorting(CompoundOperator):
             for idx, candidate in enumerate(objective.unplaced_candidates):
                 self.suboperators['right_part_selector'].apply(objective = candidate,
                                                                 arguments = subop_args['right_part_selector'])
-                self.suboperators['chromosome_fitness'].apply(objective = objective.unplaced_candidates[idx],
-                                                              arguments = subop_args['chromosome_fitness'])
-                while tuple(candidate.obj_fun) in objective.history:
+                system = candidate.described_variables
+                while system in objective.history:
                     candidate.create()
                     self.suboperators['right_part_selector'].apply(objective=candidate,
                                                                    arguments=subop_args['right_part_selector'])
-                    self.suboperators['chromosome_fitness'].apply(objective=objective.unplaced_candidates[idx],
-                                                                  arguments=subop_args['chromosome_fitness'])
-                objective.history.add(tuple(candidate.obj_fun))
+                    system = candidate.described_variables
+                self.suboperators['chromosome_fitness'].apply(objective=candidate,
+                                                              arguments=subop_args['chromosome_fitness'])
+                objective.history.add(system)
+                print(candidate.obj_fun)
             objective.initial_placing()
         
             # TODO: consider carefully, where normalizer init shall be held. If here, only the initial values are employed
