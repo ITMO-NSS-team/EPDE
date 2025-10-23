@@ -65,22 +65,20 @@ class L2Fitness(CompoundOperator):
         """        
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
-        self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
+        if force_out_of_place:
+            self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
         self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
         
         _, target, features = objective.evaluate(normalize = False, return_val = False)
-        try:
-            if features is None:
-                discr_feats = 0
-            else:
-                discr_feats = np.dot(features, objective.weights_final[:-1][objective.weights_internal != 0])
+        if features is None:
+            discr_feats = 0
+        else:
+            discr_feats = np.dot(features, objective.weights_final[:-1][objective.weights_internal != 0])
 
-            discr = (discr_feats + np.full(target.shape, objective.weights_final[-1]) - target)
-            self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)
-            discr = np.multiply(discr, self.g_fun_vals)
-            rl_error = np.linalg.norm(discr, ord = 2)
-        except ValueError:
-            raise ValueError('An error in getting weights ')
+        discr = (discr_feats + np.full(target.shape, objective.weights_final[-1]) - target)
+        self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)
+        discr = np.multiply(discr, self.g_fun_vals)
+        rl_error = np.linalg.norm(discr, ord = 2)
 
         if not (self.params['penalty_coeff'] > 0. and self.params['penalty_coeff'] < 1.):
             raise ValueError('Incorrect penalty coefficient set, value shall be in (0, 1).')
@@ -124,20 +122,17 @@ class L2LRFitness(CompoundOperator):
         _, target, features = objective.evaluate(normalize=False, return_val=False)
 
         self.get_g_fun_vals()
+        data_shape = global_var.grid_cache.g_func.shape
 
-        try:
-            if features is None:
-                discr = target - objective.weights_final[-1]
-            else:
-                discr_feats = np.dot(features, objective.weights_final[:-1][objective.weights_internal != 0])
-                discr_feats = discr_feats + objective.weights_final[-1]
-                discr = discr_feats - target
+        if features is None:
+            discr = target - objective.weights_final[-1]
+        else:
+            discr_feats = np.dot(features, objective.weights_final[:-1][objective.weights_internal != 0])
+            discr_feats = discr_feats + objective.weights_final[-1]
+            discr = discr_feats - target
 
-            discr = np.multiply(discr, self.g_fun_vals) / np.std(target)
-            # discr = np.multiply(discr, self.g_fun_vals) / np.linalg.norm(target, 2)
-            rl_error = np.linalg.norm(discr, 2)
-        except ValueError:
-            raise ValueError('An error in getting weights ')
+        discr = np.multiply(discr, self.g_fun_vals) / np.std(target)
+        rl_error = np.sqrt(np.mean(discr ** 2))
 
         if not (self.params['penalty_coeff'] > 0. and self.params['penalty_coeff'] < 1.):
             raise ValueError('Incorrect penalty coefficient set, value shall be in (0, 1).')
@@ -153,17 +148,17 @@ class L2LRFitness(CompoundOperator):
         # assert objective.simplified, 'Trying to evaluate not simplified equation.'
 
         # Calculate r-loss
-        data_shape = global_var.grid_cache.g_func.shape
         target_vals = target.reshape(*data_shape)
         features_vals = []
 
         if target_vals.ndim == 1:
+            horizons_default = 30
             window_size = len(target_vals) // 2
             num_horizons = len(target_vals) - window_size + 1
-            if num_horizons < 30:
+            if num_horizons < horizons_default:
                 step_size = 1
             else:
-                step_size = num_horizons // 30
+                step_size = num_horizons // horizons_default
             eq_window_weights = []
             # Compute coefficients and collect statistics over horizons
             if features is None:
@@ -187,21 +182,23 @@ class L2LRFitness(CompoundOperator):
                     eq_window_weights.append(valuable_weights)
                 eq_cv = np.array([
                     np.abs(np.std(_)) if np.isclose(np.mean(_), 0)
+                    # else np.abs(np.std(_) / np.sqrt(np.mean(np.pow(_, 2))))
                     else np.abs(np.std(_) / np.mean(_))
                     for _ in zip(*eq_window_weights)
                 ])
-                lr = eq_cv.mean()
+                lr = eq_cv.sum()
 
         elif target_vals.ndim == 2:
             lr = 0
             for dim in range(target_vals.ndim):
+                horizons_default = 30
                 eq_window_weights = []
                 window_size = target_vals.shape[dim] // 2
                 num_horizons = target_vals.shape[dim] - window_size + 1
-                if num_horizons < 30:
+                if num_horizons < horizons_default:
                     step_size = 1
                 else:
-                    step_size = num_horizons // 30
+                    step_size = num_horizons // horizons_default
                 # Compute coefficients and collect statistics over horizons
                 if features is None:
                     for start_idx in range(0, num_horizons, step_size):
@@ -235,7 +232,7 @@ class L2LRFitness(CompoundOperator):
                         else np.abs(np.std(_) / np.mean(_))
                         for _ in zip(*eq_window_weights)
                     ])
-                    lr += eq_cv.mean()
+                    lr += eq_cv.sum()
 
         elif target_vals.ndim == 3:
             lr = 0
@@ -282,7 +279,7 @@ class L2LRFitness(CompoundOperator):
                         else np.abs(np.std(_) / np.mean(_))
                         for _ in zip(*eq_window_weights)
                     ])
-                    lr += eq_cv.mean()
+                    lr += eq_cv.sum()
 
         objective.fitness_calculated = True
         objective.fitness_value = fitness_value
@@ -334,8 +331,8 @@ class SolverBasedFitness(CompoundOperator):
             net = None
 
         self.set_adapter(net=net)
-
-        self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
+        if force_out_of_place:
+            self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
         self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
 
         print('solving equation:')
@@ -415,7 +412,8 @@ class PIC(CompoundOperator):
 
         self.set_adapter(net=net)
 
-        self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
+        if force_out_of_place:
+            self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
         self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
 
         print('solving equation:')
@@ -443,7 +441,7 @@ class PIC(CompoundOperator):
                 referential_data = global_var.tensor_cache.get((eq.main_var_to_explain, (1.0,)))
                 discr = solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape)
                 discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape)) / np.std(discr)
-                rl_error = np.linalg.norm(discr, ord=2)
+                rl_error = np.sqrt(np.mean(discr ** 2))
 
                 print(f'fitness error is {rl_error}, while loss addition is {float(loss_add)}')
                 lp = rl_error + self.params['pinn_loss_mult'] * float(
@@ -493,7 +491,7 @@ class PIC(CompoundOperator):
                         else np.abs(np.std(_) / np.mean(_))
                         for _ in zip(*eq_window_weights)
                     ])
-                    lr = eq_cv.mean()
+                    lr = eq_cv.sum()
 
             elif target_vals.ndim == 2:
                 lr = 0
@@ -540,7 +538,7 @@ class PIC(CompoundOperator):
                             else np.abs(np.std(_) / np.mean(_))
                             for _ in zip(*eq_window_weights)
                         ])
-                        lr += eq_cv.mean()
+                        lr += eq_cv.sum()
 
             elif target_vals.ndim == 3:
                 lr = 0
@@ -590,7 +588,7 @@ class PIC(CompoundOperator):
                             else np.abs(np.std(_) / np.mean(_))
                             for _ in zip(*eq_window_weights)
                         ])
-                        lr += eq_cv.mean()
+                        lr += eq_cv.sum()
 
             eq.fitness_calculated = True
             eq.fitness_value = lp

@@ -57,13 +57,22 @@ class EquationMutation(CompoundOperator):
     def apply(self, objective : Equation, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
-        for term_idx in range(objective.n_immutable, len(objective.structure)):
-            if np.random.uniform(0, 1) <= self.params['r_mutation']:
-                objective.structure[term_idx] = self.suboperators['mutation'].apply(objective = (term_idx, objective),
-                                                                                    arguments = subop_args['mutation'])
-        # term_idx = np.random.choice(len(objective.structure))
-        # objective.structure[term_idx] = self.suboperators['mutation'].apply(objective=(term_idx, objective),
-        #                                                                     arguments=subop_args['mutation'])
+        # for term_idx in range(objective.n_immutable, len(objective.structure)):
+        #     if np.random.uniform(0, 1) <= self.params['r_mutation']:
+        #         objective.structure[term_idx] = self.suboperators['mutation'].apply(objective = (term_idx, objective),
+        #                                                                             arguments = subop_args['mutation'])
+        nonzero_terms_mask = np.array([False if weight == 0 else True for weight in objective.weights_internal],
+                                      dtype=np.integer)
+        nonrs_terms_idx = [i for i, term in enumerate(objective.structure) if i != objective.target_idx]
+        nonzero_terms_idx = [item for item, keep in zip(nonrs_terms_idx, nonzero_terms_mask) if keep]
+        nonzero_terms_idx.append(objective.target_idx)
+        # term_idx = np.random.choice(nonzero_terms_idx)
+        if len(nonzero_terms_idx) > 0:
+            term_idx = np.random.choice(nonzero_terms_idx)
+        else:
+            term_idx = objective.target_idx
+        objective.structure[term_idx] = self.suboperators['mutation'].apply(objective=(term_idx, objective),
+                                                                            arguments=subop_args['mutation'])
         return objective
 
     def use_default_tags(self):

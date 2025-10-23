@@ -430,7 +430,7 @@ def kdv_sindy_discovery(foldername, noise_level):
     popsize = 8
 
     epde_search_obj.set_moeadd_params(population_size=popsize,
-                                      training_epochs=5)
+                                      training_epochs=10)
 
     custom_trigonometric_eval_fun = {
         'cos(t)sin(x)': lambda *grids, **kwargs: (np.cos(grids[0]) * np.sin(grids[1])) ** kwargs['power']}
@@ -451,7 +451,7 @@ def kdv_sindy_discovery(foldername, noise_level):
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
-    bounds = (1e-8, 1e-0)
+    bounds = (1e-12, 1e-0)
     epde_search_obj.fit(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 3), derivs=None,
                         equation_terms_max_number=5, data_fun_pow=3,
                         additional_tokens=[],

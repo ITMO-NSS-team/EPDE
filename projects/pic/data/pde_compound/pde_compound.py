@@ -170,7 +170,7 @@ class PCExperiment:
         search_obj = EpdeSearch(
             use_solver=False,
             use_pic=True,
-            boundary=10,
+            boundary=(10, 25),
             coordinate_tensors=[grid[0], grid[1]],
             verbose_params={'show_iter_idx': True},
             device='cuda'
@@ -209,10 +209,10 @@ class PCExperiment:
             preprocessor_kwargs={}
         )
 
-        popsize = 12
+        popsize = 8
         search_obj.set_moeadd_params(
             population_size=popsize,
-            training_epochs=2
+            training_epochs=5
         )
 
         # Prepare custom tokens
@@ -245,7 +245,7 @@ class PCExperiment:
         )
 
         factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
-        bounds = (1e-4, 1e-3)
+        bounds = (1e-8, 1e-0)
 
         search_obj.fit(
             data=noised_data,
