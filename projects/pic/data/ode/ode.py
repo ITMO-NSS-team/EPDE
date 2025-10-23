@@ -145,8 +145,8 @@ def ODE_discovery(foldername, noise_level):
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
 
-    popsize = 12
-    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=10)
+    popsize = 16
+    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=15)
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 

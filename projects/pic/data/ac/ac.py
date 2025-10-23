@@ -132,10 +132,10 @@ def ac_discovery(foldername, noise_level):
     #                                     preprocessor_kwargs={'epochs_max' : 1e3})
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
-    popsize = 8
+    popsize = 16
 
     epde_search_obj.set_moeadd_params(population_size=popsize,
-                                      training_epochs=10)
+                                      training_epochs=5)
 
     custom_grid_tokens = CacheStoredTokens(token_type='grid',
                                                 token_labels=['t', 'x'],
@@ -150,7 +150,7 @@ def ac_discovery(foldername, noise_level):
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
-    bounds = (1e-8, 1e-0)
+    bounds = (1e-12, 1e-0)
     epde_search_obj.fit(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 3), derivs=None,
                         equation_terms_max_number=5, data_fun_pow=3,
                         additional_tokens=[],
