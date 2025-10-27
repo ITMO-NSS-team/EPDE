@@ -49,9 +49,10 @@ class EqRightPartSelector(CompoundOperator):
         objective.reset_state(True)
 
         while not (objective.simplified and objective.is_correct_right_part):
-            objective.is_correct_right_part = False
+            objective.reset_state(True)
             min_fitness = np.inf
             weights_internal = np.zeros_like(objective.structure)
+            objective.weights_internal_evald = False
             min_idx = 0
             if not any(term.contains_variable(objective.main_var_to_explain) and term.contains_deriv(objective.main_var_to_explain) for term in objective.structure):
                 objective.restore_property(mandatory_family=objective.main_var_to_explain, deriv=True)
@@ -69,12 +70,14 @@ class EqRightPartSelector(CompoundOperator):
                     pass
 
             objective.weights_internal = weights_internal
+            objective.weights_internal_evald = True
             objective.target_idx = min_idx
             self.simplify_equation(objective)
             if objective.structure[objective.target_idx].contains_variable(objective.main_var_to_explain) and objective.structure[objective.target_idx].contains_deriv(objective.main_var_to_explain):
                 objective.is_correct_right_part = True
         else:
             objective.right_part_selected = True
+            objective.reset_state(False)
 
     def simplify_equation(self, objective: Equation):
         # Get nonzero terms

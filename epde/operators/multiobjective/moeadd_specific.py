@@ -366,37 +366,42 @@ class OffspringUpdater(CompoundOperator):
 
         while objective.unplaced_candidates:
             offspring = objective.unplaced_candidates.pop()
-            attempt = 1
+            attempt = 0
+            replaced = 0
             mutation_attempt_limit = self.params['mutation_attempt_limit']
             offspring_attempt_limit = self.params['offspring_attempt_limit']
             temp_offspring = deepcopy(offspring)
-            replaced = 0
+            self.suboperators['sparsity'].apply(objective=temp_offspring,
+                                                arguments=subop_args['sparsity'])
             while True:
                 temp_offspring = self.suboperators['chromosome_mutation'].apply(objective=temp_offspring,
                                                                                 arguments=subop_args['chromosome_mutation'])
                 self.suboperators['right_part_selector'].apply(objective=temp_offspring,
                                                                arguments=subop_args['right_part_selector'])
-                temp_offspring.reset_state()
                 system = temp_offspring.described_variables
                 if system not in objective.history:
+
                     self.suboperators['chromosome_fitness'].apply(objective=temp_offspring,
                                                                   arguments=subop_args['chromosome_fitness'])
                     self.suboperators['pareto_level_updater'].apply(objective=(temp_offspring, objective),
                                                                     arguments=subop_args['pareto_level_updater'])
                     objective.history.add(system)
-                    print(temp_offspring.obj_fun)
+                    # print(temp_offspring.obj_fun)
                     break
                 elif replaced == offspring_attempt_limit:
                     print("Could not generate unique offspring")
                     break
                 elif attempt == mutation_attempt_limit:
                     temp_offspring = deepcopy(offspring)
+                    self.suboperators['sparsity'].apply(objective=temp_offspring,
+                                                        arguments=subop_args['sparsity'])
                     replaced += 1
                     attempt = 0
                 attempt += 1
         return objective
     
 def get_pareto_levels_updater(right_part_selector : CompoundOperator, chromosome_fitness : CompoundOperator,
+                              sparsity : CompoundOperator,
                               mutation : CompoundOperator = None, constrained : bool = False, 
                               mutation_params : dict = {}, pl_updater_params : dict = {}, 
                               combiner_params : dict = {}):
@@ -409,6 +414,7 @@ def get_pareto_levels_updater(right_part_selector : CompoundOperator, chromosome
     pl_updater = get_basic_populator_updater(pl_updater_params)
     updater.set_suboperators(operators = {'chromosome_mutation' : mutation,
                                           'pareto_level_updater' : pl_updater,
+                                          'sparsity' : sparsity,
                                           'right_part_selector' : right_part_selector,
                                           'chromosome_fitness' : chromosome_fitness})
     return updater

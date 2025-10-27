@@ -335,24 +335,25 @@ class MOEADDOptimizer(object):
 
             for solution_idx in range(pop_size - psize):
                 solution_gen_idx = 0
-                while True:
-                    if type(solution_params) == type(None): solution_params = {}
-                    temp_solution = pop_constructor.create(**solution_params)
-                    temp_solution.set_domain(psize + solution_idx)
-                    if not np.any([temp_solution == solution for solution in population]):
-                        population.append(temp_solution)
-                        print(f'New solution accepted, confirmed {len(population)}/{pop_size} solutions.')
-                        break
-                    if solution_gen_idx == soluton_creation_attempts['softmax'] and global_var.verbose.show_warnings:
-                        print('solutions tried:', solution_gen_idx)
-                        warnings.warn('Too many failed attempts to create unique solutions for multiobjective optimization.\
-                                      Change solution parameters to allow more diversity.')
-                    if solution_gen_idx == soluton_creation_attempts['hardmax']:
-                        population.append(temp_solution)
-                        print(f'New solution accepted, despite being a dublicate of another solution.\
-                              Confirmed {len(population)}/{pop_size} solutions.')
-                        break
-                    solution_gen_idx += 1
+                # while True:
+                if type(solution_params) == type(None): solution_params = {}
+                temp_solution = pop_constructor.create(**solution_params)
+                temp_solution.set_domain(psize + solution_idx)
+                population.append(temp_solution)
+                    # if temp_solution.described_variables not np.any([temp_solution == solution for solution in population]):
+                    #     population.append(temp_solution)
+                    #     print(f'New solution accepted, confirmed {len(population)}/{pop_size} solutions.')
+                    #     break
+                    # if solution_gen_idx == soluton_creation_attempts['softmax'] and global_var.verbose.show_warnings:
+                    #     print('solutions tried:', solution_gen_idx)
+                    #     warnings.warn('Too many failed attempts to create unique solutions for multiobjective optimization.\
+                    #                   Change solution parameters to allow more diversity.')
+                    # if solution_gen_idx == soluton_creation_attempts['hardmax']:
+                    #     population.append(temp_solution)
+                    #     print(f'New solution accepted, despite being a dublicate of another solution.\
+                    #           Confirmed {len(population)}/{pop_size} solutions.')
+                    #     break
+                solution_gen_idx += 1
             self.pareto_levels = ParetoLevels(population, sorting_method = nds_method, update_method = ndl_update) # initial_sort = False
         else:
             if not isinstance(passed_population, ParetoLevels):
