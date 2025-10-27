@@ -82,8 +82,8 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
                 if weight_idx in nonzero_features_indexes:
                     weights[weight_idx] = valueable_weights[nonzero_features_indexes.index(weight_idx)]
             weights[-1] = valueable_weights[-1]
-            objective.weights_final_evald = True
             objective.weights_final = weights
+        objective.weights_final_evald = True
             
     def use_default_tags(self):
         self._tags = {'coefficient calculation', 'gene level', 'no suboperators', 'inplace'}

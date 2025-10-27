@@ -74,8 +74,7 @@ class MOEADDDirector(OptimizationPatternDirector):
             fitness = map_operator_between_levels(fitness, 'gene level', 'chromosome level',
                                                   objective_condition=fitness_cond)
 
-
-
+            sparsity_c = map_operator_between_levels(sparsity, 'gene level', 'chromosome level')
 
         rps_cond = lambda x: any([not elem_eq.right_part_selected for elem_eq in x.vals])
         sys_rps = map_operator_between_levels(right_part_selector, 'gene level', 'chromosome level', 
@@ -85,6 +84,7 @@ class MOEADDDirector(OptimizationPatternDirector):
         initial_sorter = get_initial_sorter(right_part_selector = sys_rps, chromosome_fitness = fitness, 
                                             sorter_params = sorter_params)
         population_updater = get_pareto_levels_updater(right_part_selector = sys_rps, chromosome_fitness = fitness,
+                                                       sparsity=sparsity_c,
                                                        constrained = False, mutation_params = mutation_params, 
                                                        pl_updater_params = pareto_updater_params, 
                                                        combiner_params = pareto_combiner_params)

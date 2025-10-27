@@ -66,12 +66,14 @@ class LASSOSparsity(CompoundOperator):
                           positive=False, precompute=False, random_state=None,
                           selection='random', tol=0.0001, warm_start=False)
         # estimator = STLSQ(threshold=objective.metaparameters[('sparsity', objective.main_var_to_explain)]['value'],
-        #                   copy_X=True, unbias=True, max_iter=1000, alpha=0.05)
+        #                   copy_X=True, unbias=True, max_iter=20, alpha=1e-5, ridge_kw={"tol": 1e-10})
         _, target, features = objective.evaluate(normalize = True, return_val = False)
         self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)
 
         estimator.fit(features, target, sample_weight = self.g_fun_vals)
         objective.weights_internal = estimator.coef_
+        # objective.weights_internal = estimator.coef_[0]
+        objective.weights_internal_evald = True
 
     def use_default_tags(self):
         self._tags = {'sparsity', 'gene level', 'no suboperators', 'inplace'}

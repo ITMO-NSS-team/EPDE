@@ -66,11 +66,11 @@ class EquationMutation(CompoundOperator):
         nonrs_terms_idx = [i for i, term in enumerate(objective.structure) if i != objective.target_idx]
         nonzero_terms_idx = [item for item, keep in zip(nonrs_terms_idx, nonzero_terms_mask) if keep]
         nonzero_terms_idx.append(objective.target_idx)
-        # term_idx = np.random.choice(nonzero_terms_idx)
         if len(nonzero_terms_idx) > 0:
             term_idx = np.random.choice(nonzero_terms_idx)
         else:
             term_idx = objective.target_idx
+        # term_idx = np.random.choice(range(len(objective.structure)))
         objective.structure[term_idx] = self.suboperators['mutation'].apply(objective=(term_idx, objective),
                                                                             arguments=subop_args['mutation'])
         return objective
