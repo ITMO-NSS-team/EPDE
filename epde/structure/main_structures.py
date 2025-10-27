@@ -215,9 +215,15 @@ class Term(ComplexStructure):
             self.prev_normalized = normalize
             value = super().evaluate(structural)
             if normalize:
-                value = (value - np.mean(value)) / np.std(value)
+                # value = (value - np.mean(value)) / np.std(value)
                 # value = value / np.linalg.norm(value, 2)
+                value = minmax_normalize(value)
 
+                # value = np.ones_like(value)
+                # for factor in self.structure:
+                #     factor_value = factor.evaluate()
+                #     factor_value_normalized = minmax_normalize(factor_value)
+                #     value *= factor_value_normalized
             if np.all([len(factor.params) == 1 for factor in self.structure]) and grids is None:
                 # Место возможных проблем: сохранение/загрузка нормализованных данных
                 self.saved[normalize] = global_var.tensor_cache.add(self.cache_label, value, normalized=normalize)
@@ -582,14 +588,21 @@ class Equation(ComplexStructure):
     def reset_state(self, reset_right_part: bool = True):
         if reset_right_part:
             self.right_part_selected = False
+            self.is_correct_right_part = False
+            self.simplified = False
+            self.weights_internal_evald = False
+            self.weights_internal = None
         # self.weights_internal_evald = False
+        # self.weights_internal = None
         self.weights_final_evald = False
+        self.weights_final = None
         self.fitness_calculated = False
+        self.fitness_value = None
         self.stability_calculated = False
+        self.coefficients_stability = None
         self.aic_calculated = False
-        self.simplified = False
         self.solver_form_defined = False
-        self.is_correct_right_part = False
+
 
     @HistoryExtender('\n -> was copied by deepcopy(self)', 'n')
     def __deepcopy__(self, memo=None):
@@ -687,8 +700,8 @@ class Equation(ComplexStructure):
     @weights_internal.setter
     def weights_internal(self, weights):
         self._weights_internal = weights
-        self.weights_internal_evald = True
-        self.weights_final_evald = False
+        # self.weights_internal_evald = True
+        # self.weights_final_evald = False
 
     @property
     def weights_final(self):
@@ -701,7 +714,7 @@ class Equation(ComplexStructure):
     @weights_final.setter
     def weights_final(self, weights):
         self._weights_final = weights
-        self.weights_final_evald = True
+        # self.weights_final_evald = True
 
     @property
     def text_form(self):

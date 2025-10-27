@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt
 
 from epde.solver.data import Domain
 from epde.solver.models import Fourier_embedding, mat_model
+from epde.preprocessing.smoothers import NN
 
 
 class BasicDeriv(ABC):
@@ -39,7 +40,7 @@ class AutogradDeriv(BasicDeriv):
             args.requires_grad = True
         if axes == [None,]:
             return u(args)[..., component].reshape(-1, 1)
-        if isinstance(u, torch.nn.Sequential):
+        if isinstance(u, NN) or isinstance(u, torch.nn.Sequential):
             comp_sum = u(args)[..., component].sum(dim = 0)
         elif isinstance(u, torch.Tensor):
             raise TypeError('Autograd shall have torch.nn.Sequential as its inputs.')
@@ -346,22 +347,9 @@ def minmax_normalize(matrix):
     if np.ndim(matrix) == 0:
         raise ValueError('Incorrect input to the normalization: the data has 0 dimensions')
     elif np.ndim(matrix) == 1:
-        return matrix
+        return 2 * (matrix - matrix.min()) / (matrix.max() - matrix.min()) - 1
     else:
-        domain_min = np.min(matrix)
-        domain_max = np.max(matrix)
-        domain_mean = np.mean(matrix)
-        if domain_max != domain_min:
-            matrix = (matrix - domain_mean - domain_min) / (domain_max - domain_min)
-        # for i in np.arange(matrix.shape[0]):
-        #     row_min = np.min(matrix[i])
-        #     row_max = np.max(matrix[i])
-        #
-        #     # Only normalize if the row has variation
-        #     if domain_max != domain_min:
-        #         matrix[i] = (matrix[i] - domain_mean - domain_min) / (domain_max - domain_min)
-        #     else:
-        #         # If all values are the same, set to 0.5 or keep original (0.5 is midpoint)
-        #         matrix[i] = 0.5
+        for i in np.arange(matrix.shape[0]):
+            matrix[i] = 2 * (matrix[i] - matrix[i].min()) / (matrix[i].max() - matrix[i].min()) - 1
 
         return matrix
