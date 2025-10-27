@@ -209,10 +209,10 @@ class PCExperiment:
             preprocessor_kwargs={}
         )
 
-        popsize = 8
+        popsize = 20
         search_obj.set_moeadd_params(
             population_size=popsize,
-            training_epochs=5
+            training_epochs=12
         )
 
         # Prepare custom tokens

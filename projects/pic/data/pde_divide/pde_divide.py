@@ -132,10 +132,10 @@ class PDEDivideExperiment(PDEAnalysis):
             preprocessor_kwargs={}
         )
 
-        popsize = 16
+        popsize = 8
         search_obj.set_moeadd_params(
             population_size=popsize,
-            training_epochs=20
+            training_epochs=15
         )
 
         grid_tokens, custom_trig_tokens = self.create_custom_tokens(grid)
