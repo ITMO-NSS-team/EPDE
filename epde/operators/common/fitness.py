@@ -19,6 +19,7 @@ from epde.operators.utils.template import CompoundOperator
 import epde.globals as global_var
 from sklearn.linear_model import LinearRegression
 from scipy.optimize import minimize
+from epde.supplementary import minmax_normalize
 
 LOSS_NAN_VAL = 1e7
 
@@ -129,10 +130,13 @@ class L2LRFitness(CompoundOperator):
         else:
             discr_feats = np.dot(features, objective.weights_final[:-1][objective.weights_internal != 0])
             discr_feats = discr_feats + objective.weights_final[-1]
+            # discr = minmax_normalize(discr_feats.reshape(*data_shape)) - minmax_normalize(target.reshape(*data_shape))
+            # discr = discr.flatten()
             discr = discr_feats - target
 
-        discr = np.multiply(discr, self.g_fun_vals) / np.std(target)
-        rl_error = np.sqrt(np.mean(discr ** 2))
+        discr = np.multiply(discr, self.g_fun_vals)
+        # rl_error = np.mean(discr ** 2)
+        rl_error = np.sum(np.abs(discr)) / np.sum(np.abs(target)) * 100
 
         if not (self.params['penalty_coeff'] > 0. and self.params['penalty_coeff'] < 1.):
             raise ValueError('Incorrect penalty coefficient set, value shall be in (0, 1).')
