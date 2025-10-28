@@ -350,6 +350,8 @@ def minmax_normalize(matrix):
         return 2 * (matrix - matrix.min()) / (matrix.max() - matrix.min()) - 1
     else:
         for i in np.arange(matrix.shape[0]):
-            matrix[i] = 2 * (matrix[i] - matrix[i].min()) / (matrix[i].max() - matrix[i].min()) - 1
-
+            if matrix[i].max() != matrix[i].min():
+                matrix[i] = 2 * (matrix[i] - matrix[i].min()) / (matrix[i].max() - matrix[i].min()) - 1
+            else:
+                matrix[i] = np.zeros_like(matrix[i])
         return matrix

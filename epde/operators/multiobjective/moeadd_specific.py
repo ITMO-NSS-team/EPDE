@@ -453,7 +453,7 @@ class InitialParetoLevelSorting(CompoundOperator):
                 self.suboperators['chromosome_fitness'].apply(objective=candidate,
                                                               arguments=subop_args['chromosome_fitness'])
                 objective.history.add(system)
-                print(candidate.obj_fun)
+                # print(candidate.obj_fun)
             objective.initial_placing()
         
             # TODO: consider carefully, where normalizer init shall be held. If here, only the initial values are employed

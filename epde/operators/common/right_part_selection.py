@@ -52,7 +52,6 @@ class EqRightPartSelector(CompoundOperator):
             objective.reset_state(True)
             min_fitness = np.inf
             weights_internal = np.zeros_like(objective.structure)
-            objective.weights_internal_evald = False
             min_idx = 0
             if not any(term.contains_variable(objective.main_var_to_explain) and term.contains_deriv(objective.main_var_to_explain) for term in objective.structure):
                 objective.restore_property(mandatory_family=objective.main_var_to_explain, deriv=True)
