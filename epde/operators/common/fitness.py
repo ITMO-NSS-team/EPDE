@@ -444,8 +444,9 @@ class PIC(CompoundOperator):
                 print(f'solution[..., eq_idx] {solution[..., eq_idx].shape}, eq_idx {eq_idx}')
                 referential_data = global_var.tensor_cache.get((eq.main_var_to_explain, (1.0,)))
                 discr = solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape)
-                discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape)) / np.std(discr)
-                rl_error = np.sqrt(np.mean(discr ** 2))
+                discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape))
+                # rl_error = np.sqrt(np.mean(discr ** 2))
+                rl_error = np.sum(np.abs(discr)) / np.sum(np.abs(referential_data.reshape(solution[..., eq_idx].shape))) * 100
 
                 print(f'fitness error is {rl_error}, while loss addition is {float(loss_add)}')
                 lp = rl_error + self.params['pinn_loss_mult'] * float(
