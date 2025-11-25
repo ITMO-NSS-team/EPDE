@@ -61,18 +61,19 @@ class EquationMutation(CompoundOperator):
         #     if np.random.uniform(0, 1) <= self.params['r_mutation']:
         #         objective.structure[term_idx] = self.suboperators['mutation'].apply(objective = (term_idx, objective),
         #                                                                             arguments = subop_args['mutation'])
-        nonzero_terms_mask = np.array([False if weight == 0 else True for weight in objective.weights_internal],
-                                      dtype=np.integer)
-        nonrs_terms_idx = [i for i, term in enumerate(objective.structure) if i != objective.target_idx]
-        nonzero_terms_idx = [item for item, keep in zip(nonrs_terms_idx, nonzero_terms_mask) if keep]
-        nonzero_terms_idx.append(objective.target_idx)
-        if len(nonzero_terms_idx) > 0:
-            term_idx = np.random.choice(nonzero_terms_idx)
-        else:
-            term_idx = objective.target_idx
-        # term_idx = np.random.choice(range(len(objective.structure)))
+        # nonzero_terms_mask = np.array([False if weight == 0 else True for weight in objective.weights_internal],
+        #                               dtype=np.integer)
+        # nonrs_terms_idx = [i for i, term in enumerate(objective.structure) if i != objective.target_idx]
+        # nonzero_terms_idx = [item for item, keep in zip(nonrs_terms_idx, nonzero_terms_mask) if keep]
+        # nonzero_terms_idx.append(objective.target_idx)
+        # if len(nonzero_terms_idx) > 0:
+        #     term_idx = np.random.choice(nonzero_terms_idx)
+        # else:
+        #     term_idx = objective.target_idx
+        term_idx = np.random.choice(range(len(objective.structure)))
         objective.structure[term_idx] = self.suboperators['mutation'].apply(objective=(term_idx, objective),
                                                                             arguments=subop_args['mutation'])
+        objective.structure[term_idx].reset_saved_state()
         return objective
 
     def use_default_tags(self):
@@ -88,7 +89,16 @@ class MetaparameterMutation(CompoundOperator):
         altered_objective = np.random.normal(objective, objective)
         if altered_objective < 0:
             altered_objective = - altered_objective
+        # if altered_objective > 1:
+        #     altered_objective = 1
 
+        # altered_objective = objective + np.random.randint(-1, 2)
+        # if altered_objective < 1:
+        #     altered_objective = 1
+        # if altered_objective > 4:
+        #     altered_objective = 4
+        #
+        # return altered_objective
         return np.float64(altered_objective)
 
     def use_default_tags(self):
@@ -123,13 +133,13 @@ class TermMutation(CompoundOperator):
 
         temp = deepcopy(objective[1].structure[objective[0]])
         objective[1].structure[objective[0]].randomize()
-        new_term = objective[1].structure[objective[0]]
-        new_term.reset_saved_state()
-        while objective[1].structure.count(new_term) > 1 or new_term == temp:
-            new_term.randomize()
-            new_term.reset_saved_state()
+        objective[1].structure[objective[0]].reset_saved_state()
+        while (len(objective[1].described_variables_full) != len(objective[1].structure)
+               or objective[1].structure[objective[0]].described_variables_full == temp.described_variables_full):
+            objective[1].structure[objective[0]].randomize()
+            objective[1].structure[objective[0]].reset_saved_state()
         # print(f'CREATED DURING MUTATION: {new_term.name}, while contatining {objective[1].structure[objective[0]].descr_variable_marker}')
-        return new_term
+        return objective[1].structure[objective[0]]
 
     def use_default_tags(self):
         self._tags = {'mutation', 'term level', 'exploration', 'no suboperators'}
@@ -200,8 +210,9 @@ class TermParameterMutation(CompoundOperator):
                     factor.params = parameter_selection
             term.structure = filter_powers(term.structure)
             print(f'checking presence of {term.name} as {objective[0]}-th element in {objective[1].text_form}')
-            if check_uniqueness(term, objective[1].structure[:objective[0]] + 
-                                objective[1].structure[objective[0]+1:]):
+            # if check_uniqueness(term, objective[1].structure[:objective[0]] +
+            #                     objective[1].structure[objective[0]+1:]):
+            if len(objective[1].described_variables_full) == len(objective[1].structure):
                 break
         term.reset_saved_state()
         return term
