@@ -53,8 +53,10 @@ def check_dominance(target, compared_with) -> bool:
 
     sdn = 5 # Number of significant digits
     for obj_fun_idx in range(len(target.obj_fun)):
-        if rts(target.obj_fun[obj_fun_idx], sdn) <= rts(compared_with.obj_fun[obj_fun_idx], sdn):
-            if rts(target.obj_fun[obj_fun_idx], sdn) < rts(compared_with.obj_fun[obj_fun_idx], sdn):
+        # if rts(target.obj_fun[obj_fun_idx], sdn) <= rts(compared_with.obj_fun[obj_fun_idx], sdn):
+        #     if rts(target.obj_fun[obj_fun_idx], sdn) < rts(compared_with.obj_fun[obj_fun_idx], sdn):
+        if target.obj_fun[obj_fun_idx] <= compared_with.obj_fun[obj_fun_idx]:
+            if target.obj_fun[obj_fun_idx] < compared_with.obj_fun[obj_fun_idx]:
                 flag = True
         else:
             return False
