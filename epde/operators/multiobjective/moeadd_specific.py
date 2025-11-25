@@ -147,7 +147,7 @@ def locate_pareto_worst(levels: ParetoLevels, weights: np.ndarray, best_obj: np.
 class PopulationUpdater(CompoundOperator):
     key = 'PopulationUpdater'
     
-    def apply(self, objective : Tuple[Union[SoEq, ParetoLevels]], arguments : dict):
+    def apply_deprecated(self, objective : Tuple[Union[SoEq, ParetoLevels]], arguments : dict):
         '''
         Update population to get the pareto-nondomiated levels with the worst element removed. 
         Here, "worst" means the solution with highest PBI value (penalty-based boundary intersection)
@@ -201,7 +201,7 @@ class PopulationUpdater(CompoundOperator):
         
         objective[1].delete_point(worst_solution)
 
-    def apply_new(self, objective: Tuple[Union[SoEq, ParetoLevels]], arguments: dict):
+    def apply(self, objective: Tuple[Union[SoEq, ParetoLevels]], arguments: dict):
         '''
         Update population to get the pareto-nondomiated levels with the worst element removed.
         Here, "worst" means the solution with highest PBI value (penalty-based boundary intersection)
@@ -456,7 +456,7 @@ class OffspringUpdater(CompoundOperator):
                 if system not in objective.history:
                     self.suboperators['chromosome_fitness'].apply(objective=temp_offspring,
                                                                   arguments=subop_args['chromosome_fitness'])
-                    self.suboperators['pareto_level_updater'].apply_new(objective=(temp_offspring, objective),
+                    self.suboperators['pareto_level_updater'].apply(objective=(temp_offspring, objective),
                                                                     arguments=subop_args['pareto_level_updater'])
                     objective.history.add(system)
                     print(temp_offspring.obj_fun)

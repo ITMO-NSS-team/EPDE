@@ -16,7 +16,7 @@ from functools import partial
 from epde.structure.structure_template import check_uniqueness
 from epde.optimizers.moeadd.moeadd import ParetoLevels
 
-from epde.supplementary import detect_similar_terms, detect_similar_terms_new, flatten
+from epde.supplementary import detect_similar_terms, detect_similar_terms, flatten
 from epde.decorators import HistoryExtender, ResetEquationStatus
 
 from epde.operators.utils.template import CompoundOperator, add_base_param_to_operator
@@ -164,7 +164,7 @@ class EquationCrossover(CompoundOperator):
         equation2_target_idx = objective[1].target_idx
         equation2_target_term = deepcopy(objective[1].structure[equation2_target_idx])
 
-        equation1_terms, equation2_terms = detect_similar_terms_new(objective[0], objective[1])
+        equation1_terms, equation2_terms = detect_similar_terms(objective[0], objective[1])
         assert len(equation1_terms[0]) == len(equation2_terms[0]) and len(equation1_terms[1]) == len(equation2_terms[1])
         same_num = len(equation1_terms[0]); similar_num = len(equation1_terms[1])
         objective[0].structure = flatten(equation1_terms); objective[1].structure = flatten(equation2_terms)
