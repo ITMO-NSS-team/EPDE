@@ -134,7 +134,7 @@ def locate_pareto_worst(levels: ParetoLevels, weights: np.ndarray, best_obj: np.
     domain_solution_NDL_idxs = np.empty(most_crowded_count)
     for solution_idx, solution in enumerate(domain_solutions[most_crowded_domain]):
         domain_solution_NDL_idxs[solution_idx] = [level_idx for level_idx in np.arange(len(levels.levels)) 
-                                                    if any([np.allclose(solution.obj_fun, level_solution.obj_fun) for level_solution in levels.levels[level_idx]])][0]
+                                                    if any([solution.described_variables_extra == level_solution.described_variables_extra for level_solution in levels.levels[level_idx]])][0]
         
     max_level = np.max(domain_solution_NDL_idxs)
     worst_NDL_section = [domain_solutions[most_crowded_domain][sol_idx] for sol_idx in np.arange(len(domain_solutions[most_crowded_domain])) 
@@ -199,6 +199,70 @@ class PopulationUpdater(CompoundOperator):
                                            last_level_by_domains[most_crowded_domain]), dtype = float)
                 worst_solution = last_level_by_domains[most_crowded_domain][np.argmax(PBIS)]
         
+        objective[1].delete_point(worst_solution)
+
+    def apply_new(self, objective: Tuple[Union[SoEq, ParetoLevels]], arguments: dict):
+        '''
+        Update population to get the pareto-nondomiated levels with the worst element removed.
+        Here, "worst" means the solution with highest PBI value (penalty-based boundary intersection)
+        '''
+        assert isinstance(objective,
+                          tuple), f'Expected input of PopulationUpdater to be a Tuple of SoEq and ParetoLevels.\n' \
+                                  f'Did not get even a Tuple, instead got {type(objective)}!'
+        assert isinstance(objective[0],
+                          SoEq), f'Expected input of PopulationUpdater to be a Tuple of SoEq and ParetoLevels.\n' \
+                                 f'Did not get a SoEq obj in the first position, instead got {type(objective[0])}!'
+        assert isinstance(objective[1],
+                          ParetoLevels), f'Expected input of PopulationUpdater to be a Tuple of SoEq and ParetoLevels.\n' \
+                                         f'Did not get even a ParetoLevels in the second position, ' \
+                                         f'instead got {type(objective[1])}!.'
+
+        self_args, subop_args = self.parse_suboperator_args(arguments=arguments)
+        # print(f'PopulationUpdater.params is {self.params}')
+
+        # TODO: Init normalizer here!
+        # print('objective is ', objective)
+        objective[1].set_normalizer()
+
+        objective[1].update(objective[0])  # levels_updated = ndl_update(offspring, levels)
+        if len(objective[1].levels) == 1:
+            worst_solution = locate_pareto_worst(objective[1], self_args['weights'],
+                                                 self_args['best_obj'], self.params['PBI_penalty'])
+        else:
+            if len(objective[1].levels[-1]) == 1:
+                solution = objective[1].levels[-1][0]
+                population_by_domains = population_to_sectors(objective[1].population, self_args['weights'])
+                solution_subregion = [domain for domain in population_by_domains if solution in domain][0]
+
+                if len(solution_subregion) > 1:
+                    worst_solution = solution
+                else:
+                    worst_solution = locate_pareto_worst(objective[1], self_args['weights'],
+                                                 self_args['best_obj'], self.params['PBI_penalty'])
+            else:
+                most_crowded_count = 0
+                max_PBI = 0
+                population_by_domains = population_to_sectors(objective[1].population, self_args['weights'])
+                for solution in objective[1].levels[-1]:
+                    solution_subregion = [[domain_idx, domain] for domain_idx, domain in enumerate(population_by_domains) if solution in domain][0]
+                    if len(solution_subregion[1]) > most_crowded_count:
+                        most_crowded_count = len(solution_subregion[1])
+                        max_PBI = np.sum([penalty_based_intersection(domain, self_args['weights'][solution_subregion[0]],
+                                                              self_args['best_obj'], self.params['PBI_penalty'],
+                                                              objective[1].normalizer) for domain in solution_subregion[1]])
+                        worst_solution = solution
+                    elif len(solution_subregion[1]) == most_crowded_count:
+                        solution_subregion_PBI = np.sum([penalty_based_intersection(domain, self_args['weights'][solution_subregion[0]],
+                                                              self_args['best_obj'], self.params['PBI_penalty'],
+                                                              objective[1].normalizer) for domain in solution_subregion[1]])
+                        if max_PBI < solution_subregion_PBI:
+                            max_PBI = solution_subregion_PBI
+                            worst_solution = solution
+
+                if most_crowded_count == 1:
+                    worst_solution = locate_pareto_worst(objective[1], self_args['weights'],
+                                                 self_args['best_obj'], self.params['PBI_penalty'])
+
         objective[1].delete_point(worst_solution)
         
     @property
@@ -383,7 +447,7 @@ class OffspringUpdater(CompoundOperator):
 
                     self.suboperators['chromosome_fitness'].apply(objective=temp_offspring,
                                                                   arguments=subop_args['chromosome_fitness'])
-                    self.suboperators['pareto_level_updater'].apply(objective=(temp_offspring, objective),
+                    self.suboperators['pareto_level_updater'].apply_new(objective=(temp_offspring, objective),
                                                                     arguments=subop_args['pareto_level_updater'])
                     objective.history.add(system)
                     # print(temp_offspring.obj_fun)
