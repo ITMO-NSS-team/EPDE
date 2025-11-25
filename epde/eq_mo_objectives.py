@@ -16,7 +16,7 @@ def generate_partial(obj_function, equation_key):
     return partial(obj_function, equation_key=equation_key)
 
 
-def equation_fitness(system, equation_key):
+def equation_fitness(system, equation_key = None):
     '''
     Evaluate the quality of the system of PDEs, using the individual values of fitness function for equations.
 
@@ -30,8 +30,13 @@ def equation_fitness(system, equation_key):
         error : float.
         The value of the error metric.
     '''
-    assert system.vals[equation_key].fitness_calculated, 'Trying to call fitness before its evaluation.'
-    res = system.vals[equation_key].fitness_value
+    if equation_key:
+        assert all(equation.fitness_calculated for equation in system.vals), 'Trying to call fitness before its evaluation.'
+        res = system.vals[equation_key].fitness_calculated
+    else:
+        for equation in system.vals:
+            assert equation.fitness_value
+        res = np.mean([equation.fitness_value for equation in system.vals])
     return res
 
 
@@ -97,9 +102,14 @@ def equation_complexity_by_factors(system, equation_key):
     return eq_compl
 
 
-def equation_terms_stability(system, equation_key):
-    assert system.vals[equation_key].stability_calculated
-    res = system.vals[equation_key].coefficients_stability
+def equation_terms_stability(system, equation_key = None):
+    if equation_key:
+        assert system.vals[equation_key].stability_calculated
+        res = system.vals[equation_key].coefficients_stability
+    else:
+        for equation in system.vals:
+            assert equation.stability_calculated
+        res = np.mean([equation.coefficients_stability for equation in system.vals])
     return res
 
 def equation_aic(system, equation_key):
