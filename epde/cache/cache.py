@@ -444,6 +444,11 @@ class Cache(object):
                 return (obj[0] in self.memory_normalized['numpy'].keys()) or (obj[0] in self.memory_normalized['torch'].keys())
             else:
                 return (obj[0] in self.memory_default['numpy'].keys()) or (obj[0] in self.memory_default['torch'].keys())
+        elif (type(obj) == tuple or type(obj) == list) and type(obj[0]) == frozenset and type(obj[1]) == bool:
+            if obj[1]:
+                return (obj[0] in self.memory_normalized['numpy'].keys()) or (obj[0] in self.memory_normalized['torch'].keys())
+            else:
+                return (obj[0] in self.memory_default['numpy'].keys()) or (obj[0] in self.memory_default['torch'].keys())
         elif type(obj) == np.ndarray:
             try:
                 return np.any([np.all(obj == entry_values) for entry_values in self.memory_default['numpy'].values()])
