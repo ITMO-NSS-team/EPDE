@@ -351,7 +351,7 @@ class EpdeSearch(object):
         global_var.tensor_cache.memory_usage_properties(example_tensor, mem_for_cache_frac, mem_for_cache_abs)
 
     def set_moeadd_params(self, population_size: int = 6, solution_params: dict = {},
-                          delta: float = 1/50., neighbors_number: int = 3,
+                          H: int = 15, neighbors_number: int = 3,
                           nds_method: Callable = fast_non_dominated_sorting,
                           ndl_update_method: Callable = ndl_update,
                           subregion_mating_limitation: float = .95,
@@ -367,7 +367,7 @@ class EpdeSearch(object):
                 The size of the population of solutions, created during MO - optimization, default 6.
             solution_params (`dict`): optional
                 Dictionary, containing additional parameters to be sent into the newly created solutions.
-            delta (`float`): optional
+            H (`float`): optional
                 parameter of uniform spacing between the weight vectors; *H = 1 / delta*
                 should be integer - a number of divisions along an objective coordinate axis.
             neighbors_number (`int`): *> 0*, optional
@@ -407,8 +407,8 @@ class EpdeSearch(object):
         Returns:
             None
         """
-        self.optimizer_init_params = {'weights_num': population_size, 'pop_size': population_size,
-                              'delta': delta, 'neighbors_number': neighbors_number,
+        self.optimizer_init_params = {'pop_size': population_size,
+                              'H': population_size-1, 'neighbors_number': neighbors_number,
                               'solution_params': solution_params,
                               'nds_method' : nds_method, 
                               'ndl_update' : ndl_update_method}
@@ -847,18 +847,16 @@ class EpdeSearch(object):
                           opt_strategy_director: OptimizationPatternDirector,
                           population: List[SoEq] = None, use_pic: bool = False):
         if multiobjective_mode:
+            best_sol_vals = [0., 0.] if use_pic else [0., 1.]
+            optimizer_init_params['best_sol_vals'] = best_sol_vals
             optimizer_init_params['passed_population'] = population
             optimizer = MOEADDOptimizer(**optimizer_init_params)
-
-            # if best_sol_vals is None:
-            best_sol_vals = [0., 0.] if use_pic else [0., 1.]
-            # best_sol_vals = [0., 0.] if use_pic else [0., 1.]
-
             same_obj_count = sum([1 for token_family in optimizer_init_params['population_instruct']['pool'].families
                                   if token_family.status['demands_equation']])
             best_obj = np.concatenate([np.full(same_obj_count, fill_value = fval) for fval in best_sol_vals])
             print('best_obj', len(best_obj))
-            optimizer.pass_best_objectives(*best_obj)
+            # optimizer.pass_best_objectives(*best_obj)
+            optimizer.pass_best_objectives(*best_sol_vals)
         else:
             optimizer_init_params['passed_population'] = population
             optimizer = SimpleOptimizer(**optimizer_init_params)
