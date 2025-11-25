@@ -7,6 +7,7 @@ Created on Mon Jul  6 15:39:18 2020
 """
 
 import numpy as np
+import math
 import itertools
 from typing import Union, Callable, List
 try:
@@ -273,7 +274,7 @@ class TokenFamily(object):
             data_label = (label, (1.0,))
             data = global_var.tensor_cache.memory_default["numpy"].get(data_label)
             try:
-                constancy = np.isclose(np.min(data), np.max(data))
+                constancy = math.isclose(np.min(data), np.max(data))
             except TypeError:
                 print(f"No {label} data in cache for constancy check. Functionality of eval-d token check TBD.")
                 continue
