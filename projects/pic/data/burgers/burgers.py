@@ -134,7 +134,7 @@ def burgers_discovery(foldername, noise_level):
     #                                     preprocessor_kwargs={'epochs_max' : 1e3})
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
-    popsize = 8
+    popsize = 16
 
     epde_search_obj.set_moeadd_params(population_size=popsize,
                                       training_epochs=15)

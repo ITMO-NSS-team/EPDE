@@ -98,7 +98,7 @@ def lorenz_discovery(noise_level):
 
     dimensionality = x.ndim - 1
 
-    trig_tokens = TrigonometricTokens(freq=(2 - 1e-8, 2 + 1e-8),
+    trig_tokens = TrigonometricTokens(freq=(2, 2),
                                       dimensionality=dimensionality)
     grid_tokens = GridTokens(['x_0', ], dimensionality=dimensionality, max_power=2)
 
@@ -109,8 +109,8 @@ def lorenz_discovery(noise_level):
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
 
-    popsize = 12
-    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=50)
+    popsize = 16
+    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=30)
 
     factors_max_number = {'factors_num': [1, 2], 'probas' : [0.8, 0.2]}
 
