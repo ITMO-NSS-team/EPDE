@@ -87,11 +87,11 @@ class ParetoLevelsCrossover(CompoundOperator):
 
                                                                                          arguments = subop_args['chromosome_crossover'])
 
-            if len(new_system_1.vars_to_describe) > 1 and np.random.random() < 0.2:
-                key = np.random.choice(new_system_1.vars_to_describe)
-                temp = deepcopy(new_system_1.vals.chromosome[key])
-                new_system_1.vals.chromosome[key] = new_system_2.vals.chromosome[key]
-                new_system_2.vals.chromosome[key] = temp
+            # if len(new_system_1.vars_to_describe) > 1 and np.random.random() < 0.2:
+            #     key = np.random.choice(new_system_1.vars_to_describe)
+            #     temp = deepcopy(new_system_1.vals.chromosome[key])
+            #     new_system_1.vals.chromosome[key] = new_system_2.vals.chromosome[key]
+            #     new_system_2.vals.chromosome[key] = temp
 
             offsprings.extend([new_system_1, new_system_2])
 
@@ -119,15 +119,15 @@ class ChromosomeCrossover(CompoundOperator):
             objective[0].vals.replace_gene(gene_key = eq_key, value = temp_eq_1)
             objective[1].vals.replace_gene(gene_key = eq_key, value = temp_eq_2)
             
-        for param_key in params_keys:
-            temp_param_1, temp_param_2 = self.suboperators['param_crossover'].apply(objective = (objective[0].vals[param_key],
-                                                                                                 objective[1].vals[param_key]),
-                                                                                    arguments = subop_args['param_crossover'])
-            objective[0].vals.replace_gene(gene_key = param_key, value = temp_param_1)
-            objective[1].vals.replace_gene(gene_key = param_key, value = temp_param_2)
-
-            objective[0].vals.pass_parametric_gene(key = param_key, value = temp_param_1)
-            objective[1].vals.pass_parametric_gene(key = param_key, value = temp_param_2)
+        # for param_key in params_keys:
+        #     temp_param_1, temp_param_2 = self.suboperators['param_crossover'].apply(objective = (objective[0].vals[param_key],
+        #                                                                                          objective[1].vals[param_key]),
+        #                                                                             arguments = subop_args['param_crossover'])
+        #     objective[0].vals.replace_gene(gene_key = param_key, value = temp_param_1)
+        #     objective[1].vals.replace_gene(gene_key = param_key, value = temp_param_2)
+        #
+        #     objective[0].vals.pass_parametric_gene(key = param_key, value = temp_param_1)
+        #     objective[1].vals.pass_parametric_gene(key = param_key, value = temp_param_2)
 
         return objective[0], objective[1]
 
