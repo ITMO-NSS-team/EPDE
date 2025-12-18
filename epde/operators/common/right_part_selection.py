@@ -46,18 +46,18 @@ class EqRightPartSelector(CompoundOperator):
     def apply(self, objective : Equation, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
-        objective.reset_state(True)
-
         while not (objective.simplified and objective.is_correct_right_part):
             objective.reset_state(True)
             min_fitness = np.inf
-            weights_internal = np.zeros_like(objective.structure)
+            weights_internal = np.zeros(len(objective.structure) - 1)
             min_idx = 0
-            if not any(term.contains_variable(objective.main_var_to_explain) and term.contains_deriv(objective.main_var_to_explain) for term in objective.structure):
-                objective.restore_property(mandatory_family=objective.main_var_to_explain, deriv=True)
+            while not any(term.contains_deriv(objective.main_var_to_explain) for term in objective.structure):
+            # while not any(term.contains_deriv() for term in objective.structure):
+                objective.restore_property(mandatory_family=False, deriv=True)
                 
             for target_idx, target_term in enumerate(objective.structure):
-                if not (objective.structure[target_idx].contains_variable(objective.main_var_to_explain) and objective.structure[target_idx].contains_deriv(objective.main_var_to_explain)):
+                if not objective.structure[target_idx].contains_deriv(objective.main_var_to_explain):
+                # if not objective.structure[target_idx].contains_deriv():
                     continue
                 objective.target_idx = target_idx
                 fitness = self.suboperators['fitness_calculation'].apply(objective, arguments = subop_args['fitness_calculation'], force_out_of_place = True)
@@ -68,11 +68,17 @@ class EqRightPartSelector(CompoundOperator):
                 else:
                     pass
 
+            if all(weights_internal == 0):
+                objective.randomize()
+                continue
+
             objective.weights_internal = weights_internal
             objective.weights_internal_evald = True
             objective.target_idx = min_idx
-            self.simplify_equation(objective)
-            if objective.structure[objective.target_idx].contains_variable(objective.main_var_to_explain) and objective.structure[objective.target_idx].contains_deriv(objective.main_var_to_explain):
+            if not self.simplify_equation(objective):
+                objective.simplified = True
+            if objective.structure[objective.target_idx].contains_deriv(objective.main_var_to_explain):
+            # if objective.structure[objective.target_idx].contains_deriv():
                 objective.is_correct_right_part = True
         else:
             objective.right_part_selected = True
@@ -88,41 +94,51 @@ class EqRightPartSelector(CompoundOperator):
         equation_terms = objective.described_variables
         # If amount nonzero terms is more than one -- get their intersection
         if len(equation_terms) > 1:
-            common_factor = list(frozenset.intersection(*equation_terms))
-            common_dim = []
-            if len(common_factor) > 0:
-                # Find if this intersection in the same dimension (i.e. trigonometry functions) + it's minimal order
-                min_order = np.inf
-                for term in nonzero_terms:
-                    for factor in term.structure:
-                        if factor.cache_label[0] == common_factor[0][0]:
-                            if len(factor.params) > 1:
-                                common_dim.append(factor.params[-1])
-                            if factor.cache_label[1][0] < min_order:
-                                min_order = factor.cache_label[1][0]
-                if len(set(common_dim)) < 2:
-                    # If dimension is the same -- reduce order of terms' factor
+            common_factors = list(frozenset.intersection(*equation_terms))
+            if len(common_factors) > 0:
+                for common_factor in common_factors:
+                    # Find if this intersection in the same dimension (i.e. trigonometry functions) + it's minimal order
+                    min_order = np.inf
+                    common_dim = []
                     for term in nonzero_terms:
-                        temp = deepcopy(term)
-                        factors_simplified = []
                         for factor in term.structure:
-                            if factor.cache_label[0] == common_factor[0][0]:
-                                for i, value in enumerate(factor.params_description):
-                                    if factor.params_description[i]["name"] == "power":
-                                        factor.params[i] -= min_order
-                                        if factor.params[i] == 0:
-                                            factors_simplified.append(factor)
-                        term.structure = [factor for factor in term.structure if factor not in factors_simplified]
-                        term.reset_saved_state()
-                        # If term's order became zero -- replace term
-                        if (len(term.structure) == 0 or not term.contains_meaningful()):
-                            term.randomize()
+                            if len(factor.params) == 1:
+                                factor_label = (factor.cache_label[0])
+                            else:
+                                factor_label = (factor.cache_label[0], (factor.cache_label[1][-1]))
+                            if factor_label == common_factor:
+                                if len(factor.params) > 1:
+                                    common_dim.append(factor.params[-1])
+                                if factor.cache_label[1][0] < min_order:
+                                    min_order = factor.cache_label[1][0]
+                    if len(set(common_dim)) < 2:
+                        # If dimension is the same -- reduce order of terms' factor
+                        for term in nonzero_terms:
+                            factors_simplified = []
+                            for factor in term.structure:
+                                if len(factor.params) == 1:
+                                    factor_label = (factor.cache_label[0])
+                                else:
+                                    factor_label = (factor.cache_label[0], (factor.cache_label[1][-1]))
+                                if factor_label == common_factor:
+                                    for i, value in enumerate(factor.params_description):
+                                        if factor.params_description[i]["name"] == "power":
+                                            factor.params[i] -= min_order
+                                            if factor.params[i] == 0:
+                                                factors_simplified.append(factor)
+                                        else:
+                                            continue
+                            term.structure = [factor for factor in term.structure if factor not in factors_simplified]
                             term.reset_saved_state()
-                        while objective.structure.count(term) > 1 or term == temp:
-                            term.randomize()
-                            term.reset_saved_state()
-                    return
-        objective.simplified = True
+                            # If term's order became zero -- replace term
+                            if len(term.structure) == 0 or not term.contains_meaningful():
+                                term.randomize()
+                                term.reset_saved_state()
+                            while len(objective.described_variables_full) != len(objective.structure):
+                                term.randomize()
+                                term.reset_saved_state()
+                        return True
+        return False
 
     def use_default_tags(self):
         self._tags = {'equation right part selection', 'gene level', 'contains suboperators', 'inplace'}

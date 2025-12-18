@@ -47,6 +47,8 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
     for var in all_vars:
         correct_eq.vals[var].main_var_to_explain = var
         correct_eq.vals[var].metaparameters = metaparams
+        correct_eq.vals[var].weights_internal = np.ones(len(correct_eq.vals[var].structure) - 1)
+        correct_eq.vals[var].weights_internal_evald = True
     print(correct_eq.text_form)
 
     incorrect_eq = translate_equation(eq_incorrect_symbolic, search_obj.pool,
@@ -54,6 +56,8 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
     for var in all_vars:
         incorrect_eq.vals[var].main_var_to_explain = var
         incorrect_eq.vals[var].metaparameters = metaparams
+        incorrect_eq.vals[var].weights_internal = np.ones(len(incorrect_eq.vals[var].structure) - 1)
+        incorrect_eq.vals[var].weights_internal_evald = True
     print(incorrect_eq.text_form)
 
     fit_operator.apply(correct_eq, {})
@@ -94,7 +98,7 @@ def ac_data(filename: str):
 
 def AC_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
     # Test scenario to evaluate performance on Allen-Cahn equation
-    eq_ac_symbolic = '0.0001 * d^2u/dx1^2{power: 1.0} + -5.0 * u{power: 3.0} + 5.0 * u{power: 1.0} + 0.0 = du/dx0{power: 1.0}'
+    eq_ac_symbolic = '0.0001 * d^2u/dx1^2{power: 1.0} + -5.0 * u{power: 3.0} + 5.0 * u{power: 1.0} + 5.0 * u{power: 2.0} * du/dx1{power: 1.0} + 0.0 = du/dx0{power: 1.0}'
     eq_ac_incorrect = '4.976781518840499 * u{power: 1.0} + 0.0001 * d^2u/dx1^2{power: 1.0} + -4.974425220166616 * u{power: 3.0} + 0.0 * du/dx1{power: 1.0} * d^2u/dx0^2{power: 1.0} + 0.002262543822130977 = du/dx0{power: 1.0}'
 
     grid, data = ac_data(os.path.join(foldername, 'ac_data.npy'))
@@ -104,7 +108,7 @@ def AC_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
     print('Shapes:', data.shape, grid[0].shape)
     dimensionality = 1
 
-    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=10,
+    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=(5, 12),
                                  coordinate_tensors=((grid[0], grid[1])), verbose_params={'show_iter_idx': True},
                                  device='cpu')
 
@@ -135,7 +139,7 @@ def ac_discovery(foldername, noise_level):
     popsize = 16
 
     epde_search_obj.set_moeadd_params(population_size=popsize,
-                                      training_epochs=20)
+                                      training_epochs=5)
 
     custom_grid_tokens = CacheStoredTokens(token_type='grid',
                                                 token_labels=['t', 'x'],
@@ -152,10 +156,10 @@ def ac_discovery(foldername, noise_level):
 
     bounds = (1e-12, 1e-0)
     epde_search_obj.fit(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 3), derivs=None,
-                        equation_terms_max_number=5, data_fun_pow=3,
+                        equation_terms_max_number=8, data_fun_pow=3,
                         additional_tokens=[],
                         equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=bounds, fourier_layers=False, data_nn=data_nn) #
+                        eq_sparsity_interval=bounds, fourier_layers=False) #, data_nn=data_nn
 
     epde_search_obj.equations(only_print=True, num=1)
     epde_search_obj.visualize_solutions()
@@ -167,6 +171,7 @@ if __name__ == "__main__":
     import torch
     from epde.operators.utils.default_parameter_loader import EvolutionaryParams
     print(torch.cuda.is_available())
+    print(f"CUDA version linked with PyTorch: {torch.version.cuda}")
     # Operator = fitness.SolverBasedFitness # Replace by the developed PIC-based operator.
     # Operator = fitness.PIC
     Operator = fitness.L2LRFitness

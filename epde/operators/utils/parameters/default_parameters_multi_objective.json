@@ -40,7 +40,7 @@
         "metaparam_proportion" : 0.05
 	},
  	"EquationCrossover" : {
-
+		"crossover_probability" : 1
 	},	
 	"EquationExchangeCrossover" : {
 
@@ -52,7 +52,7 @@
         "term_param_proportion" : 0.4
 	},
 	"SystemMutation" : {
-		"indiv_mutation_prob" : 0.7
+		"indiv_mutation_prob" : 1
     },
 	"EquationMutation" : {
         "r_mutation" : 0.6

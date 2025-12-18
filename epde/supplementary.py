@@ -221,7 +221,7 @@ def form_label(x, y):
     print(type(x), type(y.cache_label))
     return x + ' * ' + y.cache_label if len(x) > 0 else x + y.cache_label
 
-def detect_similar_terms(base_equation_1, base_equation_2):   # Переделать!
+def detect_similar_terms_deprecated(base_equation_1, base_equation_2):   # Переделать!
     same_terms_from_eq1 = []
     same_terms_from_eq2 = []
     eq2_processed = np.full(
@@ -261,6 +261,40 @@ def detect_similar_terms(base_equation_1, base_equation_2):   # Передела
         len(different_terms_from_eq2) == len(base_equation_2.structure)
     return [same_terms_from_eq1, similar_terms_from_eq1, different_terms_from_eq1], [same_terms_from_eq2, similar_terms_from_eq2, different_terms_from_eq2]
 
+def detect_similar_terms(base_equation_1, base_equation_2):
+    first_equation_terms = base_equation_1.described_variables_extra
+    all_first_equation_terms = base_equation_1.described_variables_full
+    second_equation_terms = base_equation_2.described_variables_extra
+    all_second_equation_terms = base_equation_2.described_variables_full
+
+    same_terms_from_eq1 = []
+    same_terms_from_eq2 = []
+    similar_terms_from_eq1 = []
+    similar_terms_from_eq2 = []
+    different_terms_from_eq1 = []
+    different_terms_from_eq2 = []
+
+    common_terms = first_equation_terms.intersection(second_equation_terms)
+    all_terms = first_equation_terms.union(second_equation_terms)
+    different_terms = first_equation_terms.symmetric_difference(second_equation_terms)
+
+    for term in base_equation_1.structure:
+        if term.cache_label in common_terms:
+            same_terms_from_eq1.append(term)
+        elif term.cache_label in (first_equation_terms - all_second_equation_terms):
+            similar_terms_from_eq1.append(term)
+        else:
+            different_terms_from_eq1.append(term)
+
+    for term in base_equation_2.structure:
+        if term.cache_label in common_terms:
+            same_terms_from_eq2.append(term)
+        elif term.cache_label in (second_equation_terms - all_first_equation_terms):
+            similar_terms_from_eq1.append(term)
+        else:
+            different_terms_from_eq2.append(term)
+
+    return [same_terms_from_eq1, similar_terms_from_eq1, different_terms_from_eq1], [same_terms_from_eq2, similar_terms_from_eq2, different_terms_from_eq2]
 
 def filter_powers(gene):
     gene_filtered = []

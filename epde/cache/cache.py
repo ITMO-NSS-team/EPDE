@@ -236,7 +236,8 @@ class Cache(object):
         Setting the number of unaccounted elements at the edges
         """
         assert '0' in self.memory_default['numpy'].keys(), 'Boundaries should be specified for grid cache.'
-        shape = self.get('0')[1].shape
+        shape = self.get('0').shape
+        self.initial_shape = shape
         if isinstance(boundary_width, int):
             if any([elem <= 2*boundary_width for elem in shape]):
                 raise IndexError(f'Mismatching shapes: boundary of {boundary_width} does not fit data of shape {shape}')
@@ -247,6 +248,10 @@ class Cache(object):
             raise TypeError(f'Incorrect type of boundaries: {type(boundary_width)}, instead of expected int or list/tuple')
 
         self.boundary_width = boundary_width
+        if isinstance(boundary_width, int):
+            self.inner_shape = np.array(self.get('0').shape) - 2 * boundary_width
+        elif isinstance(boundary_width, (list, tuple)):
+            self.inner_shape = np.array(self.get('0').shape) - np.multiply(np.array(boundary_width), 2)
 
     def memory_usage_properties(self, obj_test_case=None, mem_for_cache_frac=None, mem_for_cache_abs=None):
         """
@@ -440,6 +445,11 @@ class Cache(object):
         if (type(obj) == tuple or type(obj) == list) and type(obj[0]) == str:
             return (obj in self.memory_default['numpy'].keys()) or (obj in self.memory_default['torch'].keys()) 
         elif (type(obj) == tuple or type(obj) == list) and type(obj[0]) == tuple and type(obj[1]) == bool:
+            if obj[1]:
+                return (obj[0] in self.memory_normalized['numpy'].keys()) or (obj[0] in self.memory_normalized['torch'].keys())
+            else:
+                return (obj[0] in self.memory_default['numpy'].keys()) or (obj[0] in self.memory_default['torch'].keys())
+        elif (type(obj) == tuple or type(obj) == list) and type(obj[0]) == frozenset and type(obj[1]) == bool:
             if obj[1]:
                 return (obj[0] in self.memory_normalized['numpy'].keys()) or (obj[0] in self.memory_normalized['torch'].keys())
             else:

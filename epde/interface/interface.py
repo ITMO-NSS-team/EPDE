@@ -65,7 +65,7 @@ class InputDataEntry(object):
         derivatives (`np.ndarray`): values of derivatives
         deriv_properties (`dict`): settings of derivatives
     """
-    def __init__(self, var_name: str, var_idx: int, data_tensor: Union[List[np.ndarray], np.ndarray]):
+    def __init__(self, var_name: str, var_idx: int, data_tensor: Union[List[np.ndarray], np.ndarray], boundary):
         self.var_name = var_name
         self.var_idx = var_idx 
         if isinstance(data_tensor, np.ndarray):
@@ -76,6 +76,7 @@ class InputDataEntry(object):
             assert all([data_tensor[0].ndim == tensor.ndim for tensor in data_tensor]), 'Mismatching dimensionalities of data tensors.'
             self.ndim = data_tensor[0].ndim
         self.data_tensor = data_tensor
+        self.boundary = boundary
 
 
     def set_derivatives(self, preprocesser: PreprocessingPipe, deriv_tensors: Union[list, np.ndarray] = None,
@@ -135,6 +136,8 @@ class InputDataEntry(object):
         """
         var_idx = self.var_idx
         deriv_codes = self.d_orders
+        self.data_tensor = self.data_tensor[self.boundary != 0]
+        self.derivatives = np.array([derivative[self.boundary.flatten() != 0] for derivative in self.derivatives.T]).T
         derivs_stacked = prepare_var_tensor(self.data_tensor, self.derivatives, 
                                             time_axis=global_var.time_axis)
         deriv_codes = [(var_idx, code) for code in deriv_codes]
@@ -351,7 +354,7 @@ class EpdeSearch(object):
         global_var.tensor_cache.memory_usage_properties(example_tensor, mem_for_cache_frac, mem_for_cache_abs)
 
     def set_moeadd_params(self, population_size: int = 6, solution_params: dict = {},
-                          delta: float = 1/50., neighbors_number: int = 3,
+                          H: int = 15, neighbors_number: int = 3,
                           nds_method: Callable = fast_non_dominated_sorting,
                           ndl_update_method: Callable = ndl_update,
                           subregion_mating_limitation: float = .95,
@@ -367,7 +370,7 @@ class EpdeSearch(object):
                 The size of the population of solutions, created during MO - optimization, default 6.
             solution_params (`dict`): optional
                 Dictionary, containing additional parameters to be sent into the newly created solutions.
-            delta (`float`): optional
+            H (`float`): optional
                 parameter of uniform spacing between the weight vectors; *H = 1 / delta*
                 should be integer - a number of divisions along an objective coordinate axis.
             neighbors_number (`int`): *> 0*, optional
@@ -407,8 +410,8 @@ class EpdeSearch(object):
         Returns:
             None
         """
-        self.optimizer_init_params = {'weights_num': population_size, 'pop_size': population_size,
-                              'delta': delta, 'neighbors_number': neighbors_number,
+        self.optimizer_init_params = {'pop_size': population_size,
+                              'H': population_size-1, 'neighbors_number': neighbors_number,
                               'solution_params': solution_params,
                               'nds_method' : nds_method, 
                               'ndl_update' : ndl_update_method}
@@ -534,7 +537,12 @@ class EpdeSearch(object):
                         exponent = np.multiply.reduce(exponent_partial, axis=0)
                         return exponent
 
-                    global_var.grid_cache.g_func = decorator(baseline_exp_function)
+                    def return_ones(grids):
+                        ones_partial = np.array([np.ones_like(grid) for grid in grids])
+                        ones = np.multiply.reduce(ones_partial, axis=0)
+                        return ones
+                    # global_var.grid_cache.g_func = decorator(baseline_exp_function)
+                    global_var.grid_cache.g_func = decorator(return_ones)
                 else:
                     global_var.grid_cache.g_func = decorator(function_form)
 
@@ -671,7 +679,7 @@ class EpdeSearch(object):
             
         for data_elem_idx, data_tensor in enumerate(data):
             entry = InputDataEntry(var_name=variable_names[data_elem_idx], var_idx=data_elem_idx,
-                                   data_tensor=data_tensor)
+                                   data_tensor=data_tensor, boundary=self.cache[0].g_func)
             derivs_tensor = derivs[data_elem_idx] if derivs is not None else None
             entry.set_derivatives(preprocesser=self.preprocessor_pipeline, deriv_tensors=derivs_tensor,
                                   grid=grid, max_order=max_deriv_order)
@@ -847,18 +855,16 @@ class EpdeSearch(object):
                           opt_strategy_director: OptimizationPatternDirector,
                           population: List[SoEq] = None, use_pic: bool = False):
         if multiobjective_mode:
+            best_sol_vals = [0., 0.] if use_pic else [0., 1.]
+            optimizer_init_params['best_sol_vals'] = best_sol_vals
             optimizer_init_params['passed_population'] = population
             optimizer = MOEADDOptimizer(**optimizer_init_params)
-
-            # if best_sol_vals is None:
-            best_sol_vals = [0., 0.] if use_pic else [0., 1.]
-            # best_sol_vals = [0., 0.] if use_pic else [0., 1.]
-
             same_obj_count = sum([1 for token_family in optimizer_init_params['population_instruct']['pool'].families
                                   if token_family.status['demands_equation']])
             best_obj = np.concatenate([np.full(same_obj_count, fill_value = fval) for fval in best_sol_vals])
             print('best_obj', len(best_obj))
-            optimizer.pass_best_objectives(*best_obj)
+            # optimizer.pass_best_objectives(*best_obj)
+            optimizer.pass_best_objectives(*best_sol_vals)
         else:
             optimizer_init_params['passed_population'] = population
             optimizer = SimpleOptimizer(**optimizer_init_params)

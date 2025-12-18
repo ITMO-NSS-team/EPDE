@@ -145,7 +145,7 @@ def wave_discovery(foldername, noise_level):
                                      preprocessor_kwargs={})
     # epde_search_obj.set_preprocessor(default_preprocessor_type='poly',
     #                                  preprocessor_kwargs={'use_smoothing': True})
-    popsize = 8
+    popsize = 16
 
     epde_search_obj.set_moeadd_params(population_size=popsize,
                                       training_epochs=1)

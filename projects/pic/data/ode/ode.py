@@ -48,6 +48,8 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
         correct_eq.vals[var].main_var_to_explain = var
         correct_eq.vals[var].metaparameters = metaparams
         correct_eq.vals[var].simplified = True
+        correct_eq.vals[var].weights_internal = np.ones(len(correct_eq.vals[var].structure) - 1)
+        correct_eq.vals[var].weights_internal_evald = True
     print(correct_eq.text_form)
 
     incorrect_eq = translate_equation(eq_incorrect_symbolic, search_obj.pool,
@@ -56,6 +58,8 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
         incorrect_eq.vals[var].main_var_to_explain = var
         incorrect_eq.vals[var].metaparameters = metaparams
         incorrect_eq.vals[var].simplified = True
+        incorrect_eq.vals[var].weights_internal = np.ones(len(incorrect_eq.vals[var].structure) - 1)
+        incorrect_eq.vals[var].weights_internal_evald = True
     print(incorrect_eq.text_form)
 
     fit_operator.apply(correct_eq, {})
@@ -95,8 +99,7 @@ def ODE_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
     # g4 = lambda x: 1.5*x
 
     eq_ode_symbolic = '-3.9920083373920305 * u{power: 1.0} + -0.986615483876419 * du/dx0{power: 1.0} * sin{power: 1.0, freq: 2.0000000038280255, dim: 0.0} + 1.497626641591792 * x_0{power: 1.0, dim: 0.0} + -0.03054107154984344 = d^2u/dx0^2{power: 1.0}'
-    eq_ode_incorrect = '1.0 * du/dx0{power: 1.0} + 3.5 * x_0{power: 1.0, dim: 0.0} * u{power: 1.0} + -1.2 \
-                        = du/dx0{power: 1.0} * sin{power: 1.0, freq: 2.0, dim: 0.0}'
+    eq_ode_incorrect = '-3.9919846984962026 * u{power: 1.0} + 1.4976001925733695 * x_0{power: 1.0, dim: 0.0} + -0.9866128232501611 * du/dx0{power: 1.0} * sin{power: 1.0, freq: 1.9999999949253542, dim: 0.0} + 0.05044127504001312 * du/dx0{power: 1.0} * cos{power: 1.0, freq: 1.9999999925289447, dim: 0.0} + -0.030378350634238452 = d^2u/dx0^2{power: 1.0}'
 
     step = 0.05;
     steps_num = 320
@@ -187,7 +190,7 @@ def ODE_simple_discovery(foldername, noise_level):
                                      preprocessor_kwargs={})
 
     popsize = 8
-    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=10)
+    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=20)
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 

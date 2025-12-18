@@ -102,9 +102,10 @@ class ParetoLevels(object):
     def set_normalizer(self):
         # worst_objectives = reduce(lambda x, y: x.extend(y),
         #                           [[elem.obj_fun for elem in level] for level in self.levels], []) # : np.ndarray
+        # objectives = np.stack(reduce(lambda x, y: x.extend(y) or x,
+        #                              [[elem.obj_fun for elem in level] for level in self.levels]), axis = 0)
         objectives = np.stack(reduce(lambda x, y: x.extend(y) or x,
-                                     [[elem.obj_fun for elem in level] for level in self.levels]), axis = 0)
-        
+                                     [[elem.obj_fun for elem in self.population]]), axis = 0)
 
         self.normalizer = ObjFunNormalizer(np.max(objectives, axis = 0))
 
@@ -176,11 +177,11 @@ class ParetoLevels(object):
         """
         new_levels = []
         population_cleared = []
-        point_system = point.described_variables
+        point_system = point.described_variables_extra
         for level in self.levels:
             temp = []
             for element in level:
-                if element.described_variables != point_system:
+                if element.described_variables_extra != point_system:
                     temp.append(element)
                     population_cleared.append(element)
             if not len(temp) == 0:
@@ -264,7 +265,7 @@ class MOEADDOptimizer(object):
     
     >>> pop_constr = test_population_constructor()
     >>> optimizer = moeadd_optimizer(pop_constr, 40, 40, 
-    >>>                              None, delta = 1/50., 
+    >>>                              None, H = 15,
     >>>                              neighbors_number = 5)
     >>> operator = test_evolutionary_operator(mixing_xover,
     >>>                                      gaussian_mutation)
@@ -277,10 +278,10 @@ class MOEADDOptimizer(object):
     and evolutionary operator contains mutation and crossover suboperators.
     
     """
-    def __init__(self, population_instruct, weights_num, pop_size, solution_params,
-                 delta: float, neighbors_number: int,
+    def __init__(self, population_instruct, pop_size, solution_params,
+                 H: int, neighbors_number: int,
                  nds_method = fast_non_dominated_sorting, ndl_update = ndl_update, 
-                 passed_population: Union[List, ParetoLevels] = None):
+                 passed_population: Union[List, ParetoLevels] = None, best_sol_vals = None):
         """
         Initialization of the evolutionary optimizer is done with the introduction of 
         initial population of candidate solutions, divided into Pareto non-dominated 
@@ -300,7 +301,7 @@ class MOEADDOptimizer(object):
             The size of the candidate solution population.
         solution_params : dict
             The dicitionary with the solution parameters, passed into each new created solution during the initialization.
-        delta : float
+        H : float
             The parameter of uniform spacing between the weight vectors; *H = 1 / delta* should be integer - a number of divisions along an objective coordinate axis.
         neighbors_number : int 
             The number of neighboring weight vectors to be considered during the operation of evolutionary operators as the "neighbors" of the processed sectors.
@@ -316,7 +317,7 @@ class MOEADDOptimizer(object):
                 Dept. Electr. Comput. Eng., Michigan State Univ., East Lansing,
                 MI, USA, Tech. Rep. COIN No. 2014014, 2014.* The default - ``moeadd.moeadd_supplementary.ndl_update``
         """
-        assert weights_num == pop_size, 'Each individual in population has to correspond to a sector'
+        # assert weights_num == pop_size, 'Each individual in population has to correspond to a sector'
         self.abbreviated_search_executed = False
         soluton_creation_attempts= {'softmax' : 10,
                                     'hardmax' : 100}
@@ -325,6 +326,7 @@ class MOEADDOptimizer(object):
                  type(solution_params) == dict), 'The solution parameters, passed into population constructor must be in dictionary'
 
         pop_constructor = SystemsPopulationConstructor(**population_instruct)
+        # pop_size = self.get_number_of_points(len(best_sol_vals) * len(pop_constructor.vars_demand_equation), H)
 
         if (passed_population is None) or isinstance(passed_population, list):
             population = [] if passed_population is None else passed_population
@@ -338,6 +340,10 @@ class MOEADDOptimizer(object):
                 # while True:
                 if type(solution_params) == type(None): solution_params = {}
                 temp_solution = pop_constructor.create(**solution_params)
+                for equation in temp_solution.vals:
+                    while len(equation.described_variables_full) != len(equation.structure):
+                        temp_solution.vals[equation.main_var_to_explain].randomize()
+                        temp_solution.vals[equation.main_var_to_explain].reset_saved_state()
                 temp_solution.set_domain(psize + solution_idx)
                 population.append(temp_solution)
                     # if temp_solution.described_variables not np.any([temp_solution == solution for solution in population]):
@@ -360,22 +366,18 @@ class MOEADDOptimizer(object):
                 raise TypeError(f'Incorrect type of the population passed. Expected ParetoLevels object, instead got \
                                  {type(passed_population)}')
             self.pareto_levels = passed_population
-                                 
-        self.weights = []; weights_size = len(population[0].obj_funs) #np.empty((pop_size, len(optimized_functionals)))
-        for weights_idx in range(weights_num):
-            temp_weights = self.weights_generation(weights_size, delta)
-            while temp_weights in self.weights:
-                temp_weights = self.weights_generation(weights_size, delta)
-            self.weights.append(temp_weights)
-        self.weights = np.array(self.weights)
+        weights_size = len(best_sol_vals) #np.empty((pop_size, len(optimized_functionals)))
+        # weights_size = len(set([fun.func for fun in population[0].obj_funs]))
+        self.weights = np.array(self.weights_generation_new(weights_size, H))
 
         self.neighborhood_lists = []
+        weights_num = self.weights.shape[0]
         for weights_idx in range(weights_num):
             self.neighborhood_lists.append([elem_idx for elem_idx, _ in sorted(
                     list(zip(np.arange(weights_num), [np.linalg.norm(self.weights[weights_idx, :] - self.weights[weights_idx_inner, :]) for weights_idx_inner in np.arange(weights_num)])), 
                     key = lambda pair: pair[1])][:neighbors_number+1]) # срез листа - задаёт регион "близости"
 
-        self.best_obj = None
+        self.best_obj = best_sol_vals
         self._hist = []
 
     def abbreviated_search(self, population, sorting_method, update_method):
@@ -398,9 +400,37 @@ class MOEADDOptimizer(object):
             else:
                 warnings.warn(f'The multiobjective optimization algorithm has been able to create only {len(population)} unique solution. The search has been abbreviated.')
         self.abbreviated_search_executed = True
-            
+
     @staticmethod
     def weights_generation(weights_num, delta) -> list:
+        """
+        Method to calculate the set of vectors to divide the problem of Pareto frontier
+        discovery into several subproblems of Pareto frontier sector discovery, where
+        each sector is defined by a weight vector.
+
+        Args:
+            weights_num (`int`): Number of the weight vectors, dividing the objective function values space.
+            delta (`float`): Parameter of uniform spacing between the weight vectors; *H = 1 / delta*
+                should be integer - a number of divisions along an objective coordinate axis.
+
+        Returns:
+            weights (`list`): weight vectors (`np.ndarrays`), introduced to decompose the optimization problem into
+                several subproblems by dividing Pareto frontier into a number of sectors.
+        """
+        weights = np.empty(weights_num)
+        assert 1. / delta == round(1. / delta)  # check, if 1/delta is integer number
+        m = np.zeros(weights_num)
+        for weight_idx in np.arange(weights_num):
+            weights[weight_idx] = np.around(np.random.choice(
+                [div_idx * delta for div_idx in np.arange(1. / delta + 1e-8 - np.sum(m[:weight_idx + 1]))]), 2)
+            m[weight_idx] = weights[weight_idx] / delta
+        weights[-1] = np.around(1 - np.sum(weights[:-1]), 2)
+
+        weights = np.abs(weights)
+        return list(weights)
+
+    @staticmethod
+    def weights_generation_new(weights_num,  H) -> list:
         """
         Method to calculate the set of vectors to divide the problem of Pareto frontier
         discovery into several subproblems of Pareto frontier sector discovery, where
@@ -408,25 +438,44 @@ class MOEADDOptimizer(object):
         
         Args:
             weights_num (`int`): Number of the weight vectors, dividing the objective function values space.
-            delta (`float`): Parameter of uniform spacing between the weight vectors; *H = 1 / delta*        
+            H (`float`): Parameter of uniform spacing between the weight vectors; *H = 1 / delta*
                 should be integer - a number of divisions along an objective coordinate axis.
         
         Returns:
             weights (`list`): weight vectors (`np.ndarrays`), introduced to decompose the optimization problem into 
                 several subproblems by dividing Pareto frontier into a number of sectors.
         """
-        weights = np.empty(weights_num)
-        assert 1./delta == round(1./delta) # check, if 1/delta is integer number
-        m = np.zeros(weights_num)
-        for weight_idx in np.arange(weights_num):
-            weights[weight_idx] = np.around(np.random.choice([div_idx * delta for div_idx in np.arange(1./delta + 1e-8 - np.sum(m[:weight_idx + 1]))]), 2)
-            m[weight_idx] = weights[weight_idx]/delta
-        weights[-1] = np.around(1 - np.sum(weights[:-1]), 2)
-        
-        weights = np.abs(weights)
-        return list(weights)
 
-    
+        def das_dennis_recursion(ref_dirs, ref_dir, n_partitions, beta, depth):
+            if depth == len(ref_dir) - 1:
+                ref_dir[depth] = beta / (1.0 * n_partitions)
+                ref_dirs.append(ref_dir[None, :])
+            else:
+                for i in range(beta + 1):
+                    ref_dir[depth] = 1.0 * i / (1.0 * n_partitions)
+                    das_dennis_recursion(ref_dirs, np.copy(ref_dir), n_partitions, beta - i, depth + 1)
+
+        if H == 0:
+            return np.full((1, weights_num), 1 / weights_num)
+        else:
+            ref_dirs = []
+            ref_dir = np.full(weights_num, np.nan)
+            das_dennis_recursion(ref_dirs, ref_dir, H, H, 0)
+            return np.concatenate(ref_dirs, axis=0)
+
+    @staticmethod
+    def get_number_of_points(weights_num, H):
+        def factorial(n: int):
+            if (n == 0 or n == 1):
+                return 1
+            else:
+                return n * factorial(n - 1)
+
+        def binomial_coefficient(n, k):
+            return factorial(n) / (factorial(k) * factorial(n - k))
+
+        return int(binomial_coefficient(H + weights_num - 1, weights_num - 1))
+
     def pass_best_objectives(self, *args) -> None:
         """
         Setter of the `moeadd_optimizer.best_obj` attribute. 

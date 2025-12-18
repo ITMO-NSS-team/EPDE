@@ -7,7 +7,7 @@ Created on Thu Jun 17 13:58:18 2021
 """
 
 import numpy as np
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, Ridge
 
 import epde.globals as global_var
 from epde.operators.utils.template import CompoundOperator
@@ -67,11 +67,13 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
                     features = np.vstack([features, features_vals[i]])
             features = np.vstack([features, np.ones(features_vals[0].shape)]) # Добавляем константную фичу
             features = np.transpose(features)
-            estimator = LinearRegression(fit_intercept=False)
+            estimator = LinearRegression(copy_X=True, fit_intercept=False, n_jobs=-1,
+                              positive=False, tol=0.0001)
+            # estimator = LinearRegression(fit_intercept=False)
             if features.ndim == 1:
                 features = features.reshape(-1, 1)
             try:
-                self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)
+                self.g_fun_vals = global_var.grid_cache.g_func[global_var.grid_cache.g_func != 0]
             except AttributeError:
                 self.g_fun_vals = None
             estimator.fit(features, target_vals, sample_weight = self.g_fun_vals)

@@ -206,8 +206,8 @@ class Term(ComplexStructure):
     def evaluate(self, structural, grids=None):
         assert global_var.tensor_cache is not None, 'Currently working only with connected cache'
         normalize = structural
-        if self.saved[structural] or (self.cache_label, normalize) in global_var.tensor_cache:
-            value = global_var.tensor_cache.get(self.cache_label, normalized=normalize,
+        if self.saved[structural] or (self.described_variables_full, normalize) in global_var.tensor_cache:
+            value = global_var.tensor_cache.get(self.described_variables_full, normalized=normalize,
                                                 saved_as=self.saved_as[normalize])
             value = value.reshape(-1)
             return value
@@ -217,7 +217,8 @@ class Term(ComplexStructure):
             if normalize:
                 # value = (value - np.mean(value)) / np.std(value)
                 # value = value / np.linalg.norm(value, 2)
-                value = minmax_normalize(value)
+                # value = minmax_normalize(value)
+                value = 2 * (value - value.min()) / (value.max() - value.min()) - 1
 
                 # value = np.ones_like(value)
                 # for factor in self.structure:
@@ -226,9 +227,9 @@ class Term(ComplexStructure):
                 #     value *= factor_value_normalized
             if np.all([len(factor.params) == 1 for factor in self.structure]) and grids is None:
                 # Место возможных проблем: сохранение/загрузка нормализованных данных
-                self.saved[normalize] = global_var.tensor_cache.add(self.cache_label, value, normalized=normalize)
+                self.saved[normalize] = global_var.tensor_cache.add(self.described_variables_full, value, normalized=normalize)
                 if self.saved[normalize]:
-                    self.saved_as[normalize] = self.cache_label
+                    self.saved_as[normalize] = self.described_variables_full
             value = value.reshape(-1)
             return value
 
@@ -249,8 +250,7 @@ class Term(ComplexStructure):
                     new_term.reset_occupied_tokens()
                     _, new_term.structure[factor_idx] = self.pool.create(create_meaningful=meaningful_taken,
                                                                          occupied=new_term.occupied_tokens_labels + taken_tokens)
-            if check_uniqueness(new_term, equation.structure[:equation_position] +
-                                equation.structure[equation_position + 1:]):
+            if len(equation.described_variables_full) == len(equation.structure):
                 self.structure = new_term.structure
                 self.structure = filter_powers(self.structure)
                 self.reset_saved_state()
@@ -306,19 +306,22 @@ class Term(ComplexStructure):
 
     def contains_deriv(self, variable=None):
         if variable is None:
-            return any([factor.is_deriv and factor.deriv_code != [None,] and
+            return sum([factor.is_deriv and factor.deriv_code != [None,] and
                         factor.evaluator._evaluator == simple_function_evaluator
-                        for factor in self.structure])
+                        for factor in self.structure]) == 1
         else:
-            return any([factor.variable == variable and factor.deriv_code != [None,] and
+            return sum([factor.variable == variable and factor.is_deriv and factor.deriv_code != [None,] and
                         factor.evaluator._evaluator == simple_function_evaluator
-                        for factor in self.structure])
+                        for factor in self.structure]) == 1
 
     def contains_variable(self, variable):
         return any([factor.variable == variable for factor in self.structure])
 
     def contains_meaningful(self):
         return any([factor.status['meaningful'] for factor in self.structure])
+
+    def contains_t_derivative(self):
+        return any([factor.deriv_code[0] == 0 if not factor.deriv_code is None else False for factor in self.structure])
 
     def __eq__(self, other):
         return (all([any([other_elem == self_elem for other_elem in other.structure]) for self_elem in self.structure])
@@ -349,6 +352,32 @@ class Term(ComplexStructure):
                 pass
 
         return new_struct
+
+    @property
+    def described_variables(self):
+        described = set()
+        for factor in self.structure:
+            if len(factor.params) == 1:
+                factor_label = (factor.cache_label[0])
+            else:
+                factor_label = (factor.cache_label[0], (factor.cache_label[1][-1]))
+            described.add(factor_label)
+        described = frozenset(described)
+        return described
+
+    @property
+    def described_variables_full(self):
+        described = set()
+        for factor in self.structure:
+            if factor.ftype == 'trigonometric':
+                label = (factor.cache_label[0], tuple(
+                    factor.cache_label[1][i] for i, param in factor.params_description.items() if
+                    param['name'] != 'freq'))
+                described.add(label)
+            else:
+                described.add(factor.cache_label)
+        described = frozenset(described)
+        return described
 
 
 class Equation(ComplexStructure):
@@ -419,23 +448,29 @@ class Equation(ComplexStructure):
         self.main_var_to_explain = var_to_explain
 
         force_var_to_explain = True   # False
-        for i in range(len(basic_structure), self.metaparameters['terms_number']['value']):
-            check_test = 0
-            while True:
-                check_test += 1
-                mf = var_to_explain if force_var_to_explain else None
-                new_term = Term(self.pool, max_factors_in_term=self.metaparameters['max_factors_in_term']['value'],
-                                mandatory_family=mf, passed_term=None)
+        for i in range(len(basic_structure), int(self.metaparameters['terms_number']['value'])):
+            new_term = Term(self.pool, max_factors_in_term=self.metaparameters['max_factors_in_term']['value'],
+                            mandatory_family=None, passed_term=None)
+            while new_term.described_variables_full in self.described_variables_full:
+                new_term.randomize()
+                new_term.reset_saved_state()
+                # check_test += 1
+                #
 
-                if check_uniqueness(new_term, self.structure):
-                    force_var_to_explain = False
-                    break
+
+                # if new_term.described_variables_extra not in self.described_variables_full:
+                #     force_var_to_explain = False
+                #     break
 
             self.structure.append(new_term)
 
         for idx, _ in enumerate(self.structure):
             self.structure[idx].use_cache()
 #        self.coefficients_stability = np.inf
+
+    def randomize(self):
+        self.__init__(self.pool, [], self.main_var_to_explain, metaparameters=self.metaparameters)
+        self.reset_saved_state()
 
     def manual_reconst(self, attribute:str, value, except_attrs:dict):
         from epde.loader import attrs_from_dict, get_typespec_attrs
@@ -494,7 +529,7 @@ class Equation(ComplexStructure):
                     forbidden_tokens.add(token)
         return forbidden_tokens
 
-    def restore_property(self, deriv: bool = False, mandatory_family: bool = False):
+    def restore_property(self, deriv: bool = False, mandatory_family: bool = False, t_derivative: bool = False):
         # TODO: non-urgent, rewrite for an arbitrary equation property check
         if not (deriv or mandatory_family):
             raise ValueError('No property passed for restoration.')
@@ -502,13 +537,18 @@ class Equation(ComplexStructure):
             # print(
             #     f'Restoring containment of {mandatory_family} in {self.text_form}.')
             replacement_idx = np.random.randint(low=0, high=len(self.structure))
-            mf_marker = mandatory_family if mandatory_family else None
+            mf_marker = self.main_var_to_explain if mandatory_family else None
             temp = Term(self.pool, mandatory_family=mf_marker,
                         max_factors_in_term=self.metaparameters['max_factors_in_term']['value'])
+            if t_derivative:
+                while not temp.contains_t_derivative():
+                    temp = Term(self.pool, mandatory_family=mf_marker,
+                                max_factors_in_term=self.metaparameters['max_factors_in_term']['value'])
+                break
             if deriv and mandatory_family and temp.contains_deriv() and temp.contains_variable(self.main_var_to_explain):
                 self.structure[replacement_idx] = temp
                 break
-            elif deriv and temp.contains_deriv() and not mandatory_family:
+            elif deriv and temp.contains_deriv(self.main_var_to_explain) and not mandatory_family:
                 self.structure[replacement_idx] = temp
                 break
             elif mandatory_family and temp.contains_variable(self.main_var_to_explain) and not deriv:
@@ -531,7 +571,7 @@ class Equation(ComplexStructure):
         return new_eq
 
     def evaluate(self, normalize=True, return_val=False, grids=None):
-        target = self.structure[self.target_idx].evaluate(normalize, grids=grids)
+        target = self.structure[self.target_idx].evaluate(False, grids=grids)
 
         # Place for improvent: introduce shifted_idx where necessary
         def shifted_idx(idx):
@@ -549,22 +589,19 @@ class Equation(ComplexStructure):
             feature_indexes = [idx for idx in range(len(self.structure))
                                if self.weights_internal[shifted_idx(idx)] != 0 and idx != self.target_idx]
         if len(feature_indexes) > 0:
-            for feat_idx in range(len(feature_indexes)):
-                if feat_idx == 0:
-                    features = self.structure[feature_indexes[feat_idx]].evaluate(normalize, grids=grids)
-                else:
-                    temp = self.structure[feature_indexes[feat_idx]].evaluate(normalize, grids=grids)
-                    features = np.vstack([features, temp])
-
+            features = self.structure[feature_indexes[0]].evaluate(False, grids=grids)
+            for feat_idx in range(1, len(feature_indexes)):
+                temp = self.structure[feature_indexes[feat_idx]].evaluate(False, grids=grids)
+                features = np.vstack([features, temp])
             if features.ndim == 1:
                 features = np.expand_dims(features, 1).T
-            temp_feats = np.vstack([features, np.ones(features.shape[1])])
             features = np.transpose(features)
-            temp_feats = np.transpose(temp_feats)
         else:
             features = None
 
         if return_val:
+            temp_feats = np.vstack([features, np.ones(features.shape[1])])
+            temp_feats = np.transpose(temp_feats)
             self.prev_normalized = normalize
             if normalize:
                 elem1 = np.expand_dims(target, axis=1)
@@ -784,6 +821,49 @@ class Equation(ComplexStructure):
         described = frozenset(described)
         return described
 
+    @property
+    def described_variables_extra(self):
+        described = set()
+        for term_idx, term in enumerate(self.structure):
+            cache_label = set()
+            if term_idx == self.target_idx:
+                for factor in term.structure:
+                    if factor.ftype == 'trigonometric':
+                        label = (factor.cache_label[0], tuple(factor.cache_label[1][i] for i, param in factor.params_description.items() if param['name'] != 'freq'))
+                        cache_label.add(label)
+                    else:
+                        cache_label.add(factor.cache_label)
+            else:
+                weight_idx = term_idx if term_idx < self.target_idx else term_idx - 1
+                if not np.isclose(self.weights_internal[weight_idx], 0):
+                    for factor in term.structure:
+                        if factor.ftype == 'trigonometric':
+                            label = (factor.cache_label[0], tuple(factor.cache_label[1][i] for i, param in factor.params_description.items() if param['name'] != 'freq'))
+                            cache_label.add(label)
+                        else:
+                            cache_label.add(factor.cache_label)
+            if len(cache_label) > 0:
+                cache_label = frozenset(cache_label)
+                described.add(cache_label)
+        described = frozenset(described)
+        return described
+
+    @property
+    def described_variables_full(self):
+        described = set()
+        for term_idx, term in enumerate(self.structure):
+            cache_label = set()
+            for factor in term.structure:
+                if factor.ftype == 'trigonometric':
+                    label = (factor.cache_label[0], tuple(factor.cache_label[1][i] for i, param in factor.params_description.items() if param['name'] != 'freq'))
+                    cache_label.add(label)
+                else:
+                    cache_label.add(factor.cache_label)
+            cache_label = frozenset(cache_label)
+            described.add(cache_label)
+        described = frozenset(described)
+        return described
+
     def max_deriv_orders(self):
         solver_form = self.solver_form()
         max_orders = np.zeros(global_var.grid_cache.get('0').ndim)
@@ -950,7 +1030,8 @@ class SoEq(moeadd.MOEADDSolution):
 
     def use_default_multiobjective_function(self, use_pic: bool = False):
         if use_pic:
-            self.use_pic_multiobjective_function()
+            # self.use_pic_multiobjective_function()
+            self.use_new_multiobjective_function()
         else:
             self.use_legacy_multiobjective_function()
 
@@ -977,6 +1058,21 @@ class SoEq(moeadd.MOEADDSolution):
             # quality_objectives + stability_objectives + complexity_objectives)
             # quality_objectives + stability_objectives + aic_objectives)
             quality_objectives + stability_objectives)
+
+    def use_new_multiobjective_function(self):
+        from epde.eq_mo_objectives import generate_partial, equation_fitness, equation_complexity_by_factors, equation_terms_stability, equation_aic
+        complexity_objectives = [generate_partial(equation_complexity_by_factors, eq_key)
+                                 for eq_key in self.vars_to_describe]
+        quality_objectives = [generate_partial(
+            equation_fitness, eq_key) for eq_key in self.vars_to_describe]
+        stability_objectives = [generate_partial(
+            equation_terms_stability, eq_key) for eq_key in self.vars_to_describe]
+        aic_objectives = [generate_partial(
+            equation_aic, eq_key) for eq_key in self.vars_to_describe]
+        self.set_objective_functions(
+            # quality_objectives + stability_objectives + complexity_objectives)
+            # quality_objectives + stability_objectives + aic_objectives)
+            [equation_fitness] + [equation_terms_stability])
 
     def use_default_singleobjective_function(self):
         from epde.eq_mo_objectives import generate_partial, equation_fitness
@@ -1138,10 +1234,17 @@ class SoEq(moeadd.MOEADDSolution):
 
     @property
     def described_variables(self):
-        equations_caches = set()
+        equations_caches = []
         for equation in self.vals:
-            equations_caches.add(equation.described_variables)
-        return frozenset(equations_caches)
+            equations_caches.append(equation.described_variables)
+        return tuple(equations_caches)
+
+    @property
+    def described_variables_extra(self):
+        equations_caches = []
+        for equation in self.vals:
+            equations_caches.append(equation.described_variables_extra)
+        return tuple(equations_caches)
 
 
 class SoEqIterator(object):

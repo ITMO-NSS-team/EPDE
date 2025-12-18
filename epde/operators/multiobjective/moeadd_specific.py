@@ -62,9 +62,12 @@ def penalty_based_intersection(sol_obj, weight, ideal_obj,
     # print(f'Objective before normalization: {sol_obj.obj_fun} for normalizer {obj_normalizer}')
     solution_objective = sol_obj.obj_fun if obj_normalizer is None else obj_normalizer(sol_obj.obj_fun)
     # print(f'Objective after expected normalization: {solution_objective}')
-    
-    d_1 = np.dot((solution_objective - ideal_obj), weight) / np.linalg.norm(weight)
-    d_2 = np.linalg.norm(solution_objective - (ideal_obj + d_1 * weight/np.linalg.norm(weight)))
+
+    weight_full = [item for item in weight for _ in sol_obj.vals]
+    ideal_obj_full = [item for item in ideal_obj for _ in sol_obj.vals]
+
+    d_1 = np.dot((solution_objective - ideal_obj_full), weight_full) / np.linalg.norm(weight_full)
+    d_2 = np.linalg.norm(solution_objective - (ideal_obj_full + np.multiply(d_1, weight_full) / np.linalg.norm(weight_full)))
     return d_1 + penalty_factor * d_2
 
 
@@ -134,7 +137,7 @@ def locate_pareto_worst(levels: ParetoLevels, weights: np.ndarray, best_obj: np.
     domain_solution_NDL_idxs = np.empty(most_crowded_count)
     for solution_idx, solution in enumerate(domain_solutions[most_crowded_domain]):
         domain_solution_NDL_idxs[solution_idx] = [level_idx for level_idx in np.arange(len(levels.levels)) 
-                                                    if any([np.allclose(solution.obj_fun, level_solution.obj_fun) for level_solution in levels.levels[level_idx]])][0]
+                                                    if any([solution.described_variables_extra == level_solution.described_variables_extra for level_solution in levels.levels[level_idx]])][0]
         
     max_level = np.max(domain_solution_NDL_idxs)
     worst_NDL_section = [domain_solutions[most_crowded_domain][sol_idx] for sol_idx in np.arange(len(domain_solutions[most_crowded_domain])) 
@@ -147,7 +150,7 @@ def locate_pareto_worst(levels: ParetoLevels, weights: np.ndarray, best_obj: np.
 class PopulationUpdater(CompoundOperator):
     key = 'PopulationUpdater'
     
-    def apply(self, objective : Tuple[Union[SoEq, ParetoLevels]], arguments : dict):
+    def apply_deprecated(self, objective : Tuple[Union[SoEq, ParetoLevels]], arguments : dict):
         '''
         Update population to get the pareto-nondomiated levels with the worst element removed. 
         Here, "worst" means the solution with highest PBI value (penalty-based boundary intersection)
@@ -199,6 +202,70 @@ class PopulationUpdater(CompoundOperator):
                                            last_level_by_domains[most_crowded_domain]), dtype = float)
                 worst_solution = last_level_by_domains[most_crowded_domain][np.argmax(PBIS)]
         
+        objective[1].delete_point(worst_solution)
+
+    def apply(self, objective: Tuple[Union[SoEq, ParetoLevels]], arguments: dict):
+        '''
+        Update population to get the pareto-nondomiated levels with the worst element removed.
+        Here, "worst" means the solution with highest PBI value (penalty-based boundary intersection)
+        '''
+        assert isinstance(objective,
+                          tuple), f'Expected input of PopulationUpdater to be a Tuple of SoEq and ParetoLevels.\n' \
+                                  f'Did not get even a Tuple, instead got {type(objective)}!'
+        assert isinstance(objective[0],
+                          SoEq), f'Expected input of PopulationUpdater to be a Tuple of SoEq and ParetoLevels.\n' \
+                                 f'Did not get a SoEq obj in the first position, instead got {type(objective[0])}!'
+        assert isinstance(objective[1],
+                          ParetoLevels), f'Expected input of PopulationUpdater to be a Tuple of SoEq and ParetoLevels.\n' \
+                                         f'Did not get even a ParetoLevels in the second position, ' \
+                                         f'instead got {type(objective[1])}!.'
+
+        self_args, subop_args = self.parse_suboperator_args(arguments=arguments)
+        # print(f'PopulationUpdater.params is {self.params}')
+
+        # TODO: Init normalizer here!
+        # print('objective is ', objective)
+        # objective[1].set_normalizer()
+
+        objective[1].update(objective[0])  # levels_updated = ndl_update(offspring, levels)
+        if len(objective[1].levels) == 1:
+            worst_solution = locate_pareto_worst(objective[1], self_args['weights'],
+                                                 self_args['best_obj'], self.params['PBI_penalty'])
+        else:
+            if len(objective[1].levels[-1]) == 1:
+                solution = objective[1].levels[-1][0]
+                population_by_domains = population_to_sectors(objective[1].population, self_args['weights'])
+                solution_subregion = [domain for domain in population_by_domains if solution in domain][0]
+
+                if len(solution_subregion) > 1:
+                    worst_solution = solution
+                else:
+                    worst_solution = locate_pareto_worst(objective[1], self_args['weights'],
+                                                 self_args['best_obj'], self.params['PBI_penalty'])
+            else:
+                most_crowded_count = 0
+                max_PBI = 0
+                population_by_domains = population_to_sectors(objective[1].population, self_args['weights'])
+                for solution in objective[1].levels[-1]:
+                    solution_subregion = [[domain_idx, domain] for domain_idx, domain in enumerate(population_by_domains) if solution in domain][0]
+                    if len(solution_subregion[1]) > most_crowded_count:
+                        most_crowded_count = len(solution_subregion[1])
+                        max_PBI = np.sum([penalty_based_intersection(domain, self_args['weights'][solution_subregion[0]],
+                                                              self_args['best_obj'], self.params['PBI_penalty'],
+                                                              objective[1].normalizer) for domain in solution_subregion[1]])
+                        worst_solution = solution
+                    elif len(solution_subregion[1]) == most_crowded_count:
+                        solution_subregion_PBI = np.sum([penalty_based_intersection(domain, self_args['weights'][solution_subregion[0]],
+                                                              self_args['best_obj'], self.params['PBI_penalty'],
+                                                              objective[1].normalizer) for domain in solution_subregion[1]])
+                        if max_PBI < solution_subregion_PBI:
+                            max_PBI = solution_subregion_PBI
+                            worst_solution = solution
+
+                if most_crowded_count == 1:
+                    worst_solution = locate_pareto_worst(objective[1], self_args['weights'],
+                                                 self_args['best_obj'], self.params['PBI_penalty'])
+
         objective[1].delete_point(worst_solution)
         
     @property
@@ -370,31 +437,38 @@ class OffspringUpdater(CompoundOperator):
             replaced = 0
             mutation_attempt_limit = self.params['mutation_attempt_limit']
             offspring_attempt_limit = self.params['offspring_attempt_limit']
+            # self.suboperators['sparsity'].apply(objective=offspring,
+            #                                     arguments=subop_args['sparsity'])
             temp_offspring = deepcopy(offspring)
-            self.suboperators['sparsity'].apply(objective=temp_offspring,
-                                                arguments=subop_args['sparsity'])
             while True:
                 temp_offspring = self.suboperators['chromosome_mutation'].apply(objective=temp_offspring,
                                                                                 arguments=subop_args['chromosome_mutation'])
+                temp_offspring.reset_state(True)
                 self.suboperators['right_part_selector'].apply(objective=temp_offspring,
                                                                arguments=subop_args['right_part_selector'])
-                system = temp_offspring.described_variables
-                if system not in objective.history:
 
+                if len(temp_offspring.vars_to_describe) > 1:
+                    term_replaced = is_rps_in_other_equation(temp_offspring)
+                    while any(term_replaced):
+                        temp_offspring.reset_state(True)
+                        self.suboperators['right_part_selector'].apply(objective=temp_offspring,
+                                                                       arguments=subop_args['right_part_selector'])
+                        term_replaced = is_rps_in_other_equation(temp_offspring)
+
+                system = temp_offspring.described_variables_extra
+                if system not in objective.history:
                     self.suboperators['chromosome_fitness'].apply(objective=temp_offspring,
                                                                   arguments=subop_args['chromosome_fitness'])
                     self.suboperators['pareto_level_updater'].apply(objective=(temp_offspring, objective),
                                                                     arguments=subop_args['pareto_level_updater'])
                     objective.history.add(system)
-                    # print(temp_offspring.obj_fun)
+                    print(temp_offspring.obj_fun)
                     break
                 elif replaced == offspring_attempt_limit:
                     print("Could not generate unique offspring")
                     break
                 elif attempt == mutation_attempt_limit:
                     temp_offspring = deepcopy(offspring)
-                    self.suboperators['sparsity'].apply(objective=temp_offspring,
-                                                        arguments=subop_args['sparsity'])
                     replaced += 1
                     attempt = 0
                 attempt += 1
@@ -442,22 +516,41 @@ class InitialParetoLevelSorting(CompoundOperator):
 
         if len(objective.population) == 0:
             for idx, candidate in enumerate(objective.unplaced_candidates):
+                candidate.reset_state(True)
                 self.suboperators['right_part_selector'].apply(objective = candidate,
                                                                 arguments = subop_args['right_part_selector'])
-                system = candidate.described_variables
+                if len(candidate.vars_to_describe) > 1:
+                    replaced = is_rps_in_other_equation(candidate)
+                    while any(replaced):
+                        candidate.reset_state(True)
+                        self.suboperators['right_part_selector'].apply(objective=candidate,
+                                                                       arguments=subop_args['right_part_selector'])
+                        replaced = is_rps_in_other_equation(candidate)
+
+                system = candidate.described_variables_extra
                 while system in objective.history:
                     candidate.create()
+                    candidate.reset_state(True)
                     self.suboperators['right_part_selector'].apply(objective=candidate,
                                                                    arguments=subop_args['right_part_selector'])
-                    system = candidate.described_variables
+
+                    if len(candidate.vars_to_describe) > 1:
+                        replaced = is_rps_in_other_equation(candidate)
+                        while any(replaced):
+                            candidate.reset_state(True)
+                            self.suboperators['right_part_selector'].apply(objective=candidate,
+                                                                           arguments=subop_args['right_part_selector'])
+                            replaced = is_rps_in_other_equation(candidate)
+
+                    system = candidate.described_variables_extra
                 self.suboperators['chromosome_fitness'].apply(objective=candidate,
                                                               arguments=subop_args['chromosome_fitness'])
                 objective.history.add(system)
-                # print(candidate.obj_fun)
+                print(candidate.obj_fun)
             objective.initial_placing()
         
             # TODO: consider carefully, where normalizer init shall be held. If here, only the initial values are employed
-        objective.set_normalizer()
+        # objective.set_normalizer()
 
         return objective
     
@@ -470,3 +563,38 @@ def get_initial_sorter(right_part_selector : CompoundOperator,
     sorter.set_suboperators(operators = {'right_part_selector' : right_part_selector,
                                           'chromosome_fitness' : chromosome_fitness})
     return sorter
+
+from itertools import combinations
+
+def has_subset_pair(collection_of_sets):
+    """
+    Checks if any two sets within a collection are subsets of one another.
+    """
+    # Iterate through all unique pairs of sets in the collection
+    for set1, set2 in combinations(collection_of_sets, 2):
+        # Check if set1 is a subset of set2, or vice versa
+        if set1.issubset(set2):
+            # Found a pair that has a subset relationship
+            return True, set1, set2
+        elif set2.issubset(set1):
+            return True, set2, set1
+    # No subset relationship found among any pairs
+    return False, None, None
+
+def is_rps_in_other_equation(objective):
+    rsterms = [None for _ in objective.vals]
+    replaced = [False for _ in objective.vals]
+    for equation_idx, equation in enumerate(objective.vals):
+        rsterms[equation_idx] = equation.structure[equation.target_idx].described_variables_full
+
+    for equation_idx, equation in enumerate(objective.vals):
+        rs = rsterms[:equation_idx] + rsterms[equation_idx + 1:]
+        for term_idx, term in enumerate(equation.structure):
+            if any(rsterm.issubset(term.described_variables_full) for rsterm in rs):
+                replaced[equation_idx] = True
+                term.randomize()
+                term.reset_saved_state()
+                while any(rsterm.issubset(term.described_variables_full) for rsterm in rs) or len(equation.described_variables_full) != len(equation.structure):
+                    term.randomize()
+                    term.reset_saved_state()
+    return replaced
