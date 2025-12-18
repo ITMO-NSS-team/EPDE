@@ -96,7 +96,7 @@ def lv_discovery(noise_level):
 
     dimensionality = x.ndim - 1
 
-    trig_tokens = TrigonometricTokens(freq=(2, 2),
+    trig_tokens = TrigonometricTokens(freq=(2 - 1e-8, 2 + 1e-8),
                                       dimensionality=dimensionality)
     grid_tokens = GridTokens(['x_0', ], dimensionality=dimensionality, max_power=2)
 
@@ -108,12 +108,12 @@ def lv_discovery(noise_level):
                                      preprocessor_kwargs={})
 
     popsize = 16
-    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=30)
+    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=5)
 
     factors_max_number = {'factors_num': [1, 2], 'probas' : [0.8, 0.2]}
 
     epde_search_obj.fit(data=[x, y], variable_names=['u', 'v'], max_deriv_order=(1,),
-                        equation_terms_max_number=5, data_fun_pow=1, additional_tokens=[trig_tokens, ],
+                        equation_terms_max_number=7, data_fun_pow=1, additional_tokens=[trig_tokens, ],
                         equation_factors_max_number=factors_max_number,
                         eq_sparsity_interval=(1e-8, 1e-0))  #
 

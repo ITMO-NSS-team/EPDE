@@ -47,6 +47,8 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
     for var in all_vars:
         correct_eq.vals[var].main_var_to_explain = var
         correct_eq.vals[var].metaparameters = metaparams
+        correct_eq.vals[var].weights_internal = np.ones(len(correct_eq.vals[var].structure) - 1)
+        correct_eq.vals[var].weights_internal_evald = True
     print(correct_eq.text_form)
 
     incorrect_eq = translate_equation(eq_incorrect_symbolic, search_obj.pool,
@@ -54,6 +56,8 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
     for var in all_vars:
         incorrect_eq.vals[var].main_var_to_explain = var
         incorrect_eq.vals[var].metaparameters = metaparams
+        incorrect_eq.vals[var].weights_internal = np.ones(len(incorrect_eq.vals[var].structure) - 1)
+        incorrect_eq.vals[var].weights_internal_evald = True
     print(incorrect_eq.text_form)
 
     fit_operator.apply(correct_eq, {})
@@ -113,24 +117,24 @@ def ns_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
     eq_ac_symbolic = '0.0001 * d^2u/dx1^2{power: 1.0} + -5.0 * u{power: 3.0} + 5.0 * u{power: 1.0} + 0.0 = du/dx0{power: 1.0}'
     eq_ac_incorrect = '4.976781518840499 * u{power: 1.0} + 0.0001 * d^2u/dx1^2{power: 1.0} + -4.974425220166616 * u{power: 3.0} + 0.0 * du/dx1{power: 1.0} * d^2u/dx0^2{power: 1.0} + 0.002262543822130977 = du/dx0{power: 1.0}'
 
-    grid, data = ns_data(os.path.join(foldername, 'ac_data.npy'))
+    grid, data = ns_data(os.path.join(foldername, 'cylinder_nektar_wake.mat'))
     # noised_data = noise_data(data, noise_level)
     # data_nn = load_pretrained_PINN(os.path.join(foldername, 'ac_ann_pretrained.pickle'))
 
-    print('Shapes:', data.shape, grid[0].shape)
+    # print('Shapes:', data.shape, grid[0].shape)
     dimensionality = 1
 
     epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=10,
-                                 coordinate_tensors=((grid[0], grid[1])), verbose_params={'show_iter_idx': True},
+                                 coordinate_tensors=grid, verbose_params={'show_iter_idx': True},
                                  device='cpu')
 
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
 
-    epde_search_obj.create_pool(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 3),
-                                additional_tokens=[], data_nn=data_nn)
+    epde_search_obj.create_pool(data=data, variable_names=["u", "v", "p"], max_deriv_order=(1, 2, 2),
+                                additional_tokens=[])#, data_nn=data_nn
 
-    assert compare_equations(eq_ac_symbolic, eq_ac_incorrect, epde_search_obj)
+    assert compare_equations([eq_ac_symbolic] * 3, [eq_ac_incorrect] * 3, epde_search_obj)
 
 
 def ns_discovery(foldername, noise_level):
@@ -148,7 +152,7 @@ def ns_discovery(foldername, noise_level):
     #                                     preprocessor_kwargs={'epochs_max' : 1e3})
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
-    popsize = 32
+    popsize = 16
 
     epde_search_obj.set_moeadd_params(population_size=popsize,
                                       training_epochs=50)
@@ -164,7 +168,7 @@ def ns_discovery(foldername, noise_level):
 
     # trig_tokens = TrigonometricTokens(dimensionality=dimensionality, freq = (0.999, 1.001))
 
-    factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
+    factors_max_number = {'factors_num': [1, 2], 'probas': [0.8, 0.2]}
 
     bounds = (1e-12, 1e-0)
     epde_search_obj.fit(data=data, variable_names=["u", "v", "p"], max_deriv_order=(1, 2, 2), derivs=None,
@@ -195,5 +199,5 @@ if __name__ == "__main__":
     directory = os.path.dirname(os.path.realpath(__file__))
     ns_folder_name = os.path.join(directory)
 
-    # AC_test(fit_operator, ac_folder_name, 0)
+    # ns_test(fit_operator, ns_folder_name, 0)
     ns_discovery(ns_folder_name, 0)

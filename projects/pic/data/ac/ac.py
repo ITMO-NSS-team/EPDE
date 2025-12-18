@@ -98,7 +98,7 @@ def ac_data(filename: str):
 
 def AC_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
     # Test scenario to evaluate performance on Allen-Cahn equation
-    eq_ac_symbolic = '0.0001 * d^2u/dx1^2{power: 1.0} + -5.0 * u{power: 3.0} + 5.0 * u{power: 1.0} + 0.0 = du/dx0{power: 1.0}'
+    eq_ac_symbolic = '0.0001 * d^2u/dx1^2{power: 1.0} + -5.0 * u{power: 3.0} + 5.0 * u{power: 1.0} + 5.0 * u{power: 2.0} * du/dx1{power: 1.0} + 0.0 = du/dx0{power: 1.0}'
     eq_ac_incorrect = '4.976781518840499 * u{power: 1.0} + 0.0001 * d^2u/dx1^2{power: 1.0} + -4.974425220166616 * u{power: 3.0} + 0.0 * du/dx1{power: 1.0} * d^2u/dx0^2{power: 1.0} + 0.002262543822130977 = du/dx0{power: 1.0}'
 
     grid, data = ac_data(os.path.join(foldername, 'ac_data.npy'))
@@ -156,7 +156,7 @@ def ac_discovery(foldername, noise_level):
 
     bounds = (1e-12, 1e-0)
     epde_search_obj.fit(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 3), derivs=None,
-                        equation_terms_max_number=5, data_fun_pow=3,
+                        equation_terms_max_number=8, data_fun_pow=3,
                         additional_tokens=[],
                         equation_factors_max_number=factors_max_number,
                         eq_sparsity_interval=bounds, fourier_layers=False) #, data_nn=data_nn
@@ -171,6 +171,7 @@ if __name__ == "__main__":
     import torch
     from epde.operators.utils.default_parameter_loader import EvolutionaryParams
     print(torch.cuda.is_available())
+    print(f"CUDA version linked with PyTorch: {torch.version.cuda}")
     # Operator = fitness.SolverBasedFitness # Replace by the developed PIC-based operator.
     # Operator = fitness.PIC
     Operator = fitness.L2LRFitness

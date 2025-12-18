@@ -98,11 +98,7 @@ def lorenz_discovery(noise_level):
 
     dimensionality = x.ndim - 1
 
-    trig_tokens = TrigonometricTokens(freq=(2, 2),
-                                      dimensionality=dimensionality)
-    grid_tokens = GridTokens(['x_0', ], dimensionality=dimensionality, max_power=2)
-
-    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True, use_pic=True, boundary=(100, 100, 100, 100),
+    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True, use_pic=True, boundary=(100),
                                  coordinate_tensors=[t, ], verbose_params={'show_iter_idx': True},
                                  device='cuda')
 
@@ -110,9 +106,13 @@ def lorenz_discovery(noise_level):
                                      preprocessor_kwargs={})
 
     popsize = 16
-    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=30)
+    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=10)
 
     factors_max_number = {'factors_num': [1, 2], 'probas' : [0.8, 0.2]}
+
+    trig_tokens = TrigonometricTokens(freq=(2 - 1e-8, 2 + 1e-8),
+                                      dimensionality=dimensionality)
+    grid_tokens = GridTokens(['x_0', ], dimensionality=dimensionality, max_power=2)
 
     epde_search_obj.fit(data=[x, y, z], variable_names=['u', 'v', 'w'], max_deriv_order=(1,),
                         equation_terms_max_number=5, data_fun_pow=1, additional_tokens=[trig_tokens, ],
