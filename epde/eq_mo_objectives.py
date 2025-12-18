@@ -36,7 +36,8 @@ def equation_fitness(system, equation_key = None):
     else:
         for equation in system.vals:
             assert equation.fitness_value
-        res = np.mean([equation.fitness_value for equation in system.vals])
+        # res = np.mean([equation.fitness_value for equation in system.vals])
+        res = tuple([equation.fitness_value for equation in system.vals])
     return res
 
 
@@ -109,7 +110,8 @@ def equation_terms_stability(system, equation_key = None):
     else:
         for equation in system.vals:
             assert equation.stability_calculated
-        res = np.mean([equation.coefficients_stability for equation in system.vals])
+        # res = np.mean([equation.coefficients_stability for equation in system.vals])
+        res = tuple([equation.coefficients_stability for equation in system.vals])
     return res
 
 def equation_aic(system, equation_key):

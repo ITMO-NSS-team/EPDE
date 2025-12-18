@@ -366,9 +366,7 @@ class MOEADDOptimizer(object):
                 raise TypeError(f'Incorrect type of the population passed. Expected ParetoLevels object, instead got \
                                  {type(passed_population)}')
             self.pareto_levels = passed_population
-
-        self.weights = []
-        weights_size = len(population[0].obj_funs) #np.empty((pop_size, len(optimized_functionals)))
+        weights_size = len(best_sol_vals) #np.empty((pop_size, len(optimized_functionals)))
         # weights_size = len(set([fun.func for fun in population[0].obj_funs]))
         self.weights = np.array(self.weights_generation_new(weights_size, H))
 
@@ -379,7 +377,7 @@ class MOEADDOptimizer(object):
                     list(zip(np.arange(weights_num), [np.linalg.norm(self.weights[weights_idx, :] - self.weights[weights_idx_inner, :]) for weights_idx_inner in np.arange(weights_num)])), 
                     key = lambda pair: pair[1])][:neighbors_number+1]) # срез листа - задаёт регион "близости"
 
-        self.best_obj = None
+        self.best_obj = best_sol_vals
         self._hist = []
 
     def abbreviated_search(self, population, sorting_method, update_method):

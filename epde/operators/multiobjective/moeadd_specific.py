@@ -62,9 +62,12 @@ def penalty_based_intersection(sol_obj, weight, ideal_obj,
     # print(f'Objective before normalization: {sol_obj.obj_fun} for normalizer {obj_normalizer}')
     solution_objective = sol_obj.obj_fun if obj_normalizer is None else obj_normalizer(sol_obj.obj_fun)
     # print(f'Objective after expected normalization: {solution_objective}')
-    
-    d_1 = np.dot((solution_objective - ideal_obj), weight) / np.linalg.norm(weight)
-    d_2 = np.linalg.norm(solution_objective - (ideal_obj + d_1 * weight/np.linalg.norm(weight)))
+
+    weight_full = [item for item in weight for _ in sol_obj.vals]
+    ideal_obj_full = [item for item in ideal_obj for _ in sol_obj.vals]
+
+    d_1 = np.dot((solution_objective - ideal_obj_full), weight_full) / np.linalg.norm(weight_full)
+    d_2 = np.linalg.norm(solution_objective - (ideal_obj_full + np.multiply(d_1, weight_full) / np.linalg.norm(weight_full)))
     return d_1 + penalty_factor * d_2
 
 
