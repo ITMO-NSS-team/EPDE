@@ -87,11 +87,11 @@ class ParetoLevelsCrossover(CompoundOperator):
 
                                                                                          arguments = subop_args['chromosome_crossover'])
 
-            # if len(new_system_1.vars_to_describe) > 1 and np.random.random() < 0.2:
-            #     key = np.random.choice(new_system_1.vars_to_describe)
-            #     temp = deepcopy(new_system_1.vals.chromosome[key])
-            #     new_system_1.vals.chromosome[key] = new_system_2.vals.chromosome[key]
-            #     new_system_2.vals.chromosome[key] = temp
+            if len(new_system_1.vars_to_describe) > 1 and np.random.random() < 0.2:
+                key = np.random.choice(new_system_1.vars_to_describe)
+                temp = deepcopy(new_system_1.vals.chromosome[key])
+                new_system_1.vals.chromosome[key] = new_system_2.vals.chromosome[key]
+                new_system_2.vals.chromosome[key] = temp
 
             offsprings.extend([new_system_1, new_system_2])
 

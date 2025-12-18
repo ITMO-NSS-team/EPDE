@@ -225,7 +225,7 @@ class PopulationUpdater(CompoundOperator):
 
         # TODO: Init normalizer here!
         # print('objective is ', objective)
-        objective[1].set_normalizer()
+        # objective[1].set_normalizer()
 
         objective[1].update(objective[0])  # levels_updated = ndl_update(offspring, levels)
         if len(objective[1].levels) == 1:
@@ -582,17 +582,19 @@ def has_subset_pair(collection_of_sets):
     return False, None, None
 
 def is_rps_in_other_equation(objective):
-    rsterms = set()
+    rsterms = [None for _ in objective.vals]
     replaced = [False for _ in objective.vals]
-    for equation in objective.vals:
-        rsterms.add(equation.structure[equation.target_idx].described_variables_full)
     for equation_idx, equation in enumerate(objective.vals):
+        rsterms[equation_idx] = equation.structure[equation.target_idx].described_variables_full
+
+    for equation_idx, equation in enumerate(objective.vals):
+        rs = rsterms[:equation_idx] + rsterms[equation_idx + 1:]
         for term_idx, term in enumerate(equation.structure):
-            if term_idx != equation.target_idx and term.described_variables_full in rsterms:
+            if any(rsterm.issubset(term.described_variables_full) for rsterm in rs):
                 replaced[equation_idx] = True
                 term.randomize()
                 term.reset_saved_state()
-                while len(equation.described_variables_full) != len(equation.structure):
+                while any(rsterm.issubset(term.described_variables_full) for rsterm in rs) or len(equation.described_variables_full) != len(equation.structure):
                     term.randomize()
                     term.reset_saved_state()
     return replaced

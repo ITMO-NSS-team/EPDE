@@ -306,13 +306,13 @@ class Term(ComplexStructure):
 
     def contains_deriv(self, variable=None):
         if variable is None:
-            return any([factor.is_deriv and factor.deriv_code != [None,] and
+            return sum([factor.is_deriv and factor.deriv_code != [None,] and
                         factor.evaluator._evaluator == simple_function_evaluator
-                        for factor in self.structure])
+                        for factor in self.structure]) == 1
         else:
-            return any([factor.variable == variable and factor.deriv_code != [None,] and
+            return sum([factor.variable == variable and factor.is_deriv and factor.deriv_code != [None,] and
                         factor.evaluator._evaluator == simple_function_evaluator
-                        for factor in self.structure])
+                        for factor in self.structure]) == 1
 
     def contains_variable(self, variable):
         return any([factor.variable == variable for factor in self.structure])
@@ -369,7 +369,13 @@ class Term(ComplexStructure):
     def described_variables_full(self):
         described = set()
         for factor in self.structure:
-            described.add(factor.cache_label)
+            if factor.ftype == 'trigonometric':
+                label = (factor.cache_label[0], tuple(
+                    factor.cache_label[1][i] for i, param in factor.params_description.items() if
+                    param['name'] != 'freq'))
+                described.add(label)
+            else:
+                described.add(factor.cache_label)
         described = frozenset(described)
         return described
 
@@ -443,16 +449,18 @@ class Equation(ComplexStructure):
 
         force_var_to_explain = True   # False
         for i in range(len(basic_structure), int(self.metaparameters['terms_number']['value'])):
-            check_test = 0
-            while True:
-                check_test += 1
-                mf = var_to_explain if force_var_to_explain else None
-                new_term = Term(self.pool, max_factors_in_term=self.metaparameters['max_factors_in_term']['value'],
-                                mandatory_family=mf, passed_term=None)
+            new_term = Term(self.pool, max_factors_in_term=self.metaparameters['max_factors_in_term']['value'],
+                            mandatory_family=None, passed_term=None)
+            while new_term.described_variables_full in self.described_variables_full:
+                new_term.randomize()
+                new_term.reset_saved_state()
+                # check_test += 1
+                #
 
-                if new_term.described_variables_full not in self.described_variables_full:
-                    force_var_to_explain = False
-                    break
+
+                # if new_term.described_variables_extra not in self.described_variables_full:
+                #     force_var_to_explain = False
+                #     break
 
             self.structure.append(new_term)
 
@@ -462,6 +470,7 @@ class Equation(ComplexStructure):
 
     def randomize(self):
         self.__init__(self.pool, [], self.main_var_to_explain, metaparameters=self.metaparameters)
+        self.reset_saved_state()
 
     def manual_reconst(self, attribute:str, value, except_attrs:dict):
         from epde.loader import attrs_from_dict, get_typespec_attrs
@@ -562,7 +571,7 @@ class Equation(ComplexStructure):
         return new_eq
 
     def evaluate(self, normalize=True, return_val=False, grids=None):
-        target = self.structure[self.target_idx].evaluate(normalize, grids=grids)
+        target = self.structure[self.target_idx].evaluate(False, grids=grids)
 
         # Place for improvent: introduce shifted_idx where necessary
         def shifted_idx(idx):
@@ -580,9 +589,9 @@ class Equation(ComplexStructure):
             feature_indexes = [idx for idx in range(len(self.structure))
                                if self.weights_internal[shifted_idx(idx)] != 0 and idx != self.target_idx]
         if len(feature_indexes) > 0:
-            features = self.structure[feature_indexes[0]].evaluate(normalize, grids=grids)
+            features = self.structure[feature_indexes[0]].evaluate(False, grids=grids)
             for feat_idx in range(1, len(feature_indexes)):
-                temp = self.structure[feature_indexes[feat_idx]].evaluate(normalize, grids=grids)
+                temp = self.structure[feature_indexes[feat_idx]].evaluate(False, grids=grids)
                 features = np.vstack([features, temp])
             if features.ndim == 1:
                 features = np.expand_dims(features, 1).T

@@ -49,13 +49,15 @@ class EqRightPartSelector(CompoundOperator):
         while not (objective.simplified and objective.is_correct_right_part):
             objective.reset_state(True)
             min_fitness = np.inf
-            weights_internal = np.zeros_like(objective.structure)
+            weights_internal = np.zeros(len(objective.structure) - 1)
             min_idx = 0
-            if not any(term.contains_deriv(objective.main_var_to_explain) for term in objective.structure):
+            while not any(term.contains_deriv(objective.main_var_to_explain) for term in objective.structure):
+            # while not any(term.contains_deriv() for term in objective.structure):
                 objective.restore_property(mandatory_family=False, deriv=True)
                 
             for target_idx, target_term in enumerate(objective.structure):
                 if not objective.structure[target_idx].contains_deriv(objective.main_var_to_explain):
+                # if not objective.structure[target_idx].contains_deriv():
                     continue
                 objective.target_idx = target_idx
                 fitness = self.suboperators['fitness_calculation'].apply(objective, arguments = subop_args['fitness_calculation'], force_out_of_place = True)
@@ -66,12 +68,17 @@ class EqRightPartSelector(CompoundOperator):
                 else:
                     pass
 
+            if all(weights_internal == 0):
+                objective.randomize()
+                continue
+
             objective.weights_internal = weights_internal
             objective.weights_internal_evald = True
             objective.target_idx = min_idx
             if not self.simplify_equation(objective):
                 objective.simplified = True
             if objective.structure[objective.target_idx].contains_deriv(objective.main_var_to_explain):
+            # if objective.structure[objective.target_idx].contains_deriv():
                 objective.is_correct_right_part = True
         else:
             objective.right_part_selected = True
