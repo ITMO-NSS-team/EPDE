@@ -419,6 +419,7 @@ class CacheStoredTokens(CustomTokens):
                  non_default_power = True):
         if set(token_labels) != set(list(token_tensors.keys())):
             raise KeyError('The labels of tokens do not match the labels of passed tensors')
+        token_tensors = {key: value[global_var.grid_cache.g_func != 0] for key, value in token_tensors.items()}
         upload_simple_tokens(list(token_tensors.keys()), global_var.tensor_cache, list(token_tensors.values()))
         super().__init__(token_type=token_type, token_labels=token_labels, evaluator=simple_function_evaluator,
                          params_ranges=params_ranges, params_equality_ranges=params_equality_ranges,

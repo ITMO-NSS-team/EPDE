@@ -65,7 +65,7 @@ class InputDataEntry(object):
         derivatives (`np.ndarray`): values of derivatives
         deriv_properties (`dict`): settings of derivatives
     """
-    def __init__(self, var_name: str, var_idx: int, data_tensor: Union[List[np.ndarray], np.ndarray]):
+    def __init__(self, var_name: str, var_idx: int, data_tensor: Union[List[np.ndarray], np.ndarray], boundary):
         self.var_name = var_name
         self.var_idx = var_idx 
         if isinstance(data_tensor, np.ndarray):
@@ -76,6 +76,7 @@ class InputDataEntry(object):
             assert all([data_tensor[0].ndim == tensor.ndim for tensor in data_tensor]), 'Mismatching dimensionalities of data tensors.'
             self.ndim = data_tensor[0].ndim
         self.data_tensor = data_tensor
+        self.boundary = boundary
 
 
     def set_derivatives(self, preprocesser: PreprocessingPipe, deriv_tensors: Union[list, np.ndarray] = None,
@@ -135,6 +136,8 @@ class InputDataEntry(object):
         """
         var_idx = self.var_idx
         deriv_codes = self.d_orders
+        self.data_tensor = self.data_tensor[self.boundary != 0]
+        self.derivatives = np.array([derivative[self.boundary.flatten() != 0] for derivative in self.derivatives.T]).T
         derivs_stacked = prepare_var_tensor(self.data_tensor, self.derivatives, 
                                             time_axis=global_var.time_axis)
         deriv_codes = [(var_idx, code) for code in deriv_codes]
@@ -534,7 +537,12 @@ class EpdeSearch(object):
                         exponent = np.multiply.reduce(exponent_partial, axis=0)
                         return exponent
 
-                    global_var.grid_cache.g_func = decorator(baseline_exp_function)
+                    def return_ones(grids):
+                        ones_partial = np.array([np.ones_like(grid) for grid in grids])
+                        ones = np.multiply.reduce(ones_partial, axis=0)
+                        return ones
+                    # global_var.grid_cache.g_func = decorator(baseline_exp_function)
+                    global_var.grid_cache.g_func = decorator(return_ones)
                 else:
                     global_var.grid_cache.g_func = decorator(function_form)
 
@@ -671,7 +679,7 @@ class EpdeSearch(object):
             
         for data_elem_idx, data_tensor in enumerate(data):
             entry = InputDataEntry(var_name=variable_names[data_elem_idx], var_idx=data_elem_idx,
-                                   data_tensor=data_tensor)
+                                   data_tensor=data_tensor, boundary=self.cache[0].g_func)
             derivs_tensor = derivs[data_elem_idx] if derivs is not None else None
             entry.set_derivatives(preprocesser=self.preprocessor_pipeline, deriv_tensors=derivs_tensor,
                                   grid=grid, max_order=max_deriv_order)

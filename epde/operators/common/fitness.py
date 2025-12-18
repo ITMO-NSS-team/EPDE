@@ -123,7 +123,7 @@ class L2LRFitness(CompoundOperator):
         _, target, features = objective.evaluate(normalize=False, return_val=False)
 
         self.get_g_fun_vals()
-        data_shape = global_var.grid_cache.g_func.shape
+        data_shape = global_var.grid_cache.inner_shape
 
         if features is None:
             # target_normalized = 2 * (target - target.min()) / (target.max() - target.min()) - 1
@@ -310,7 +310,7 @@ class L2LRFitness(CompoundOperator):
 
     def get_g_fun_vals(self):
         try:
-            self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)
+            self.g_fun_vals = global_var.grid_cache.g_func[global_var.grid_cache.g_func != 0].reshape(-1)
         except AttributeError:
             self.g_fun_vals = None
 

@@ -71,7 +71,7 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
             if features.ndim == 1:
                 features = features.reshape(-1, 1)
             try:
-                self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)
+                self.g_fun_vals = global_var.grid_cache.g_func[global_var.grid_cache.g_func != 0]
             except AttributeError:
                 self.g_fun_vals = None
             estimator.fit(features, target_vals, sample_weight = self.g_fun_vals)

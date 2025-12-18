@@ -84,6 +84,17 @@ class CustomEvaluator(EvaluatorTemplate):
                 self.indexes_vect[tensor_idx] = tuple([subarg[tensor_idx]
                                                        for subarg in func_args])
         value = grid_function(self.indexes_vect)
+        if len(global_var.grid_cache.initial_shape) > 1:
+            value = value.reshape(*global_var.grid_cache.initial_shape)
+            if isinstance(global_var.grid_cache.boundary_width, int):
+                for dim in range(value.ndim):
+                    value[dim] = value[global_var.grid_cache.boundary_width:-global_var.grid_cache.boundary_width]
+            elif isinstance(global_var.grid_cache.boundary_width, (list, tuple)):
+                for dim in range(value.ndim):
+                    value[dim] = value[global_var.grid_cache.boundary_width[dim]:-global_var.grid_cache.boundary_width[dim]]
+            value = value.reshape(-1)
+        else:
+            value = value[global_var.grid_cache.boundary_width:-global_var.grid_cache.boundary_width]
         return value
 
 
