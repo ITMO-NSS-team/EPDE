@@ -86,7 +86,7 @@ class EqRightPartSelector(CompoundOperator):
 
     def simplify_equation(self, objective: Equation):
         # Get nonzero terms
-        nonzero_terms_mask = np.array([False if weight == 0 else True for weight in objective.weights_internal], dtype=np.integer)
+        nonzero_terms_mask = np.array([False if weight == 0 else True for weight in objective.weights_internal], dtype=np.int32)
         nonrs_terms = [term for i, term in enumerate(objective.structure) if i != objective.target_idx]
         nonzero_terms = [item for item, keep in zip(nonrs_terms, nonzero_terms_mask) if keep]
         nonzero_terms.append(objective.structure[objective.target_idx])

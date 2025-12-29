@@ -230,7 +230,7 @@ class EpdeSearch(object):
         optimizer_exec_params (`dict`): parameters for execution algorithm of optimization
         optimizer (`OptimizationPatternDirector`): the strategy of the evolutionary algorithm
     """
-    def __init__(self, multiobjective_mode: bool = True, use_pic = False, use_default_strategy: bool = True, director=None, 
+    def __init__(self, multiobjective_mode: bool = True, use_pic = True, use_default_strategy: bool = True, director=None, 
                  director_params: dict = {'variation_params': {}, 'mutation_params': {},
                                           'pareto_combiner_params': {}, 'pareto_updater_params': {}}, 
                  time_axis: int = 0, define_domain: bool = True, function_form=None, boundary: int = 0,
