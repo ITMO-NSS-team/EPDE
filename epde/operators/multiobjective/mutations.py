@@ -34,12 +34,12 @@ class SystemMutation(CompoundOperator):
         # altered_eq = self.suboperators['equation_mutation'].apply(altered_objective.vals[eq_key],
         #                                                           subop_args['equation_mutation'])
         for eq_key in eqs_keys:
-            affected_by_mutation = np.random.random() < (self.params['indiv_mutation_prob'] / len(eq_key))
+            affected_by_mutation = np.random.random() < (self.params['indiv_mutation_prob'] / len(eqs_keys))
             if affected_by_mutation:
                 altered_eq = self.suboperators['equation_mutation'].apply(altered_objective.vals[eq_key],
                                                                           subop_args['equation_mutation'])
 
-            altered_objective.vals.replace_gene(gene_key = eq_key, value = altered_eq)
+                altered_objective.vals.replace_gene(gene_key = eq_key, value = altered_eq)
 
         for param_key in params_keys:
             altered_param = self.suboperators['param_mutation'].apply(altered_objective.vals[param_key],
