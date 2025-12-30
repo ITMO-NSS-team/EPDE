@@ -547,8 +547,10 @@ class InitialParetoLevelSorting(CompoundOperator):
                                                               arguments=subop_args['chromosome_fitness'])
                 objective.history.add(system)
                 print(candidate.obj_fun)
+            objective.associate_weights()
             objective.initial_placing()
         
+            # objective.
             # TODO: consider carefully, where normalizer init shall be held. If here, only the initial values are employed
         # objective.set_normalizer()
 
@@ -561,7 +563,7 @@ def get_initial_sorter(right_part_selector : CompoundOperator,
     sorter = InitialParetoLevelSorting()
     add_kwarg_to_updater(operator = sorter)
     sorter.set_suboperators(operators = {'right_part_selector' : right_part_selector,
-                                          'chromosome_fitness' : chromosome_fitness})
+                                         'chromosome_fitness' : chromosome_fitness})
     return sorter
 
 from itertools import combinations

@@ -8,7 +8,7 @@ import numpy as np
 import warnings
 from itertools import chain
 
-from typing import Union, List
+from typing import Union, List, Callable
 from functools import reduce
 
 def flatten_chain(matrix):
@@ -22,9 +22,10 @@ from epde.structure.main_structures import SoEq
 from epde.optimizers.moeadd.population_constr import SystemsPopulationConstructor
 from epde.optimizers.moeadd.vis import ParetoVisualizer
 
+from epde.optimizers.moeadd.solution_template import MOEADDSolution
 from epde.optimizers.moeadd.strategy_elems import MOEADDSectorProcesser
-from epde.optimizers.moeadd.supplementary import fast_non_dominated_sorting, ndl_update, Equality, Inequality
-from scipy.spatial import ConvexHull    
+from epde.optimizers.moeadd.supplementary import fast_non_dominated_sorting, ndl_update, Equality, Inequality, acute_angle
+from scipy.spatial import ConvexHull
 
 def clear_list_of_lists(inp_list) -> list:
     '''
@@ -40,6 +41,76 @@ class ObjFunNormalizer(object):
     def __call__(self, obj_vals: np.ndarray):
         assert obj_vals.size == self._worst_vals.size, 'Passed objective values have different length, than stored max ones.'
         return obj_vals / self._worst_vals
+
+
+def checkWeightAssignmentUniqueness(arg: np.ndarray):
+    assert arg.ndim == 2 and arg.shape[0] == arg.shape[1], 'weights assignment array has to be a square matrix'
+    for widx in range(arg.shape[0]):
+        assert np.sum(arg[widx, :]) == 1, f'Rows of weight assignment matrixes have to contain a single "1", instead got {arg[widx, :]}.'
+    for sidx in range(arg.shape[1]):
+        assert np.sum(arg[:, sidx]) == 1, f'Columns of solution assignment in weight matrixes have to contain a single "1", instead got {arg[:, sidx]}.'
+
+
+def randomSolutionAssignment(weights: np.ndarray, solutions: List[MOEADDSolution]):
+    assert len(solutions) == weights.shape[0], 'Solutions do not match weights in length.'
+    indexes = np.random.permutation(len(solutions))
+
+    for idx, solution in enumerate(solutions):
+        solution.set_domain(indexes[idx])
+
+
+def marriageSolutionAssignment(weights: np.ndarray, solutions: List[MOEADDSolution]):
+    assert len(solutions) == weights.shape[0], f'Solutions do not match weights in length: {len(solutions)} vs {weights.shape[0]}.'
+
+    acute_angles = np.empty((weights.shape[0], weights.shape[0]))
+    for i, weight in enumerate(weights):
+        for j, solution in enumerate(solutions):
+            acute_angles[i, j] = acute_angle(weight, solution.obj_fun)
+
+    w_preferences = np.argsort(acute_angles, axis = 1)
+
+    s_decisions = np.full(shape = len(solutions), fill_value = -1, dtype = int)
+    s_cur_pref = np.full(shape = len(solutions), fill_value = 0.)
+
+    matches = np.zeros_like(w_preferences) # Match flags: 0 - no match, 1 - suggested match
+
+    while not np.isclose(np.sum(matches), weights.shape[0]):
+        for i in range(weights.shape[0]):
+            if sum(matches[i]) > 0:
+                continue
+
+            for j in range(w_preferences.shape[1]):
+                if s_decisions[w_preferences[i, 0]] == -1:
+                    matches[i, ...] = 0
+                    matches[i, w_preferences[i, 0]]  = 1
+                    s_decisions[w_preferences[i, 0]] = i
+                    s_cur_pref[w_preferences[i, 0]]  = acute_angles[i, w_preferences[i, 0]]
+                    break
+
+                elif (s_cur_pref[w_preferences[i, 0]] > acute_angles[i, w_preferences[i, 0]]):
+                    w_preferences[s_decisions[w_preferences[i, 0]]] = np.roll(w_preferences[s_decisions[w_preferences[i, 0]]], shift = -1, axis = 0)
+                    w_preferences[s_decisions[w_preferences[i, 0]], -1] = -1
+                    assert matches[s_decisions[w_preferences[i, 0]], w_preferences[i, 0]] == 1, 'Boop! Possible error'
+                    matches[s_decisions[w_preferences[i, 0]], w_preferences[i, 0]] = 0
+
+                    matches[i, ...]  = 0
+                    matches[i, w_preferences[i, 0]]  = 1
+                    s_decisions[w_preferences[i, 0]] = i
+                    s_cur_pref[w_preferences[i, 0]]  = acute_angles[i, w_preferences[i, 0]]
+                    break
+
+                else:
+                    w_preferences[i] = np.roll(w_preferences[i], shift = -1, axis = 0)
+                    w_preferences[i, -1] = -1
+
+    print('acute_angles\n', acute_angles)
+    print('matches\n', matches)
+
+    checkWeightAssignmentUniqueness(matches)
+    for sol_idx, solution in enumerate(solutions):
+        weight_idx = np.where(matches[:, sol_idx] == 1)[0][0]
+        print(f'Assigned weight {weight_idx} for {sol_idx}')
+        solution.set_domain(weight_idx)
 
 
 class ParetoLevels(object):
@@ -62,8 +133,13 @@ class ParetoLevels(object):
         moeadd optimizer, thus no extra interactions of a user with this class are necessary.
     
     '''
-    def __init__(self, population, sorting_method = fast_non_dominated_sorting, 
-                 update_method = ndl_update): # , initial_sort = False
+    _weights_assigned = False
+
+    def __init__(self,
+                 population, weights: np.ndarray = None, 
+                 sorting_method: Callable = fast_non_dominated_sorting, 
+                 update_method: Callable = ndl_update,
+                 weights_assigner: Callable = marriageSolutionAssignment): # , initial_sort = False
         """
         Args:
             population (`list`): List with the elements - canidate solutions of the case-specific subclass of 
@@ -73,9 +149,13 @@ class ParetoLevels(object):
             update_method (`callable`): optional, defalut - ``src.moeadd.moeadd_supplementary.ndl_update``
                 The method of point addition into the population and onto the non-dominated levels.
         """
+        assert weights.ndim == 2, 'Weights must be represented as a 2D np.ndarray, where 1st dim - index of the weight vector, 2nd - component'
         self._sorting_method = sorting_method
-        self.population = []
         self._update_method = update_method
+        self.set_weights(weights)
+
+        self._weights_assigner = weights_assigner
+        self.population = []
         self.unplaced_candidates = population
 
         self.normalizer = None
@@ -100,10 +180,6 @@ class ParetoLevels(object):
                          if key not in except_keys}
     
     def set_normalizer(self):
-        # worst_objectives = reduce(lambda x, y: x.extend(y),
-        #                           [[elem.obj_fun for elem in level] for level in self.levels], []) # : np.ndarray
-        # objectives = np.stack(reduce(lambda x, y: x.extend(y) or x,
-        #                              [[elem.obj_fun for elem in level] for level in self.levels]), axis = 0)
         objectives = np.stack(reduce(lambda x, y: x.extend(y) or x,
                                      [[elem.obj_fun for elem in self.population]]), axis = 0)
 
@@ -129,17 +205,12 @@ class ParetoLevels(object):
         """
         while self._unplaced_candidates:
             self.population.append(self._unplaced_candidates.pop())
-        # if any([any([candidate == other_candidate for other_candidate in self.population[:idx] + self.population[idx+1:]])
-                # for idx, candidate in enumerate(self.population)]):
-            # print([candidate.text_form for candidate in self.population])
-            # raise Exception('Duplicating initial candidates')
         self.levels = self.sort()
 
     def sort(self):
         """
         Sorting of the population into Pareto non-dominated levels.
         """
-        # self.levels = self._sorting_method(self.population)
         return self._sorting_method(self.population)
     
     @property
@@ -202,7 +273,6 @@ class ParetoLevels(object):
 
     def fit_convex_hull(self):
         """
-
         """
         if len(self.levels) > 1:
             warnings.warn('Algorithm has not converged to a single Pareto level yet!')
@@ -225,6 +295,25 @@ class ParetoLevels(object):
         matching_solutions = [solution for solution in self.levels[0] 
                               if solution.matches_complexitiy(complexity)]
         return matching_solutions        
+
+    def set_weights(self, weights):
+        if weights is None:
+            print(f'Setting ParetoLevels attribule weights with None: this should be a placeholder, expect futher logs.')
+        #if neccessary, implement additional logic into setter
+        self._weights = weights
+
+    def associate_weights(self):
+        if not self._weights_assigned:
+            if self._weights is None:
+                raise AttributeError('Weights should not be None in the assignment phase.')
+            
+            if len(self.population) == 0:
+                self._weights_assigner(self._weights, self.unplaced_candidates)
+            else:
+                self._weights_assigner(self._weights, self.population)
+            
+            self._weights_assigned = True
+
 
 class ParetoLevelsIterator(object):
     """
@@ -279,9 +368,9 @@ class MOEADDOptimizer(object):
     
     """
     def __init__(self, population_instruct, pop_size, solution_params,
-                 H: int, neighbors_number: int,
-                 nds_method = fast_non_dominated_sorting, ndl_update = ndl_update, 
-                 passed_population: Union[List, ParetoLevels] = None, best_sol_vals = None):
+                 H: int, neighbors_number: int, nds_method = fast_non_dominated_sorting, 
+                 ndl_update = ndl_update, passed_population: Union[List, ParetoLevels] = None,
+                 best_sol_vals = None, weights_assigner: str = 'marriage'):
         """
         Initialization of the evolutionary optimizer is done with the introduction of 
         initial population of candidate solutions, divided into Pareto non-dominated 
@@ -293,8 +382,6 @@ class MOEADDOptimizer(object):
         ----------
         population_instruct : dict
             Parameters of the individual creation.
-        weights_num : int
-            Number of the weight vectors, dividing the objective function values space. Often, shall be same, as the population size.
         best_obj : List[int]
             List of best obtaiable values for each criteria in the optimization problem.
         pop_size : int 
@@ -308,67 +395,64 @@ class MOEADDOptimizer(object):
         nds_method : callable, optional
             Method of non-dominated sorting of the candidate solutions. The default method is implemented according to the article 
             *K. Deb, A. Pratap, S. Agarwal, and T. Meyarivan, “A fast and elitist multiobjective genetic algorithm: NSGA-II,” IEEE Trans. Evol. Comput.,
-            vol. 6, no. 2, pp. 182–197, Apr. 2002.* The default is ``moeadd.moeadd_supplementary.fast_non_dominated_sorting``
+            vol. 6, no. 2, pp. 182-197, Apr. 2002.* The default is ``moeadd.moeadd_supplementary.fast_non_dominated_sorting``
         ndl_update : callable, optional
-                Method of adding a new solution point into the objective functions space, introduced 
-                to minimize the recalculation of the non-dominated levels for the entire population. 
-                The default method was taken from the *K. Li, K. Deb, Q. Zhang, and S. Kwong, “Efficient non-domination level
-                update approach for steady-state evolutionary multiobjective optimization,” 
-                Dept. Electr. Comput. Eng., Michigan State Univ., East Lansing,
-                MI, USA, Tech. Rep. COIN No. 2014014, 2014.* The default - ``moeadd.moeadd_supplementary.ndl_update``
+            Method of adding a new solution point into the objective functions space, introduced 
+            to minimize the recalculation of the non-dominated levels for the entire population. 
+            The default method was taken from the *K. Li, K. Deb, Q. Zhang, and S. Kwong, “Efficient non-domination level
+            update approach for steady-state evolutionary multiobjective optimization,” 
+            Dept. Electr. Comput. Eng., Michigan State Univ., East Lansing,
+            MI, USA, Tech. Rep. COIN No. 2014014, 2014.* The default - ``moeadd.moeadd_supplementary.ndl_update``
+        passed_population : list or ParetoLevels object, optional
+            Pre-generated initial guess of the population. Can be passed as a ``list`` of candidate solutions or as a ``ParetoLevels`` object.
+            If the number of passed candidates is lower, than the required size of the population, additional solutions will be created.
+        solution_assignment : str, optional
+            Method of initial weight allocation to candidate solutions. Existing options are 'random' for legacy random allocation and 
+            'marriage' for Gale-Shapley algorithm. The default - 'marriage'
         """
-        # assert weights_num == pop_size, 'Each individual in population has to correspond to a sector'
         self.abbreviated_search_executed = False
-        soluton_creation_attempts= {'softmax' : 10,
-                                    'hardmax' : 100}
 
         assert (type(solution_params) == type(None) or
                  type(solution_params) == dict), 'The solution parameters, passed into population constructor must be in dictionary'
 
+        weights_size = len(best_sol_vals)
+        self.weights = np.array(self.weights_generation(weights_size, H))
+
         pop_constructor = SystemsPopulationConstructor(**population_instruct)
-        # pop_size = self.get_number_of_points(len(best_sol_vals) * len(pop_constructor.vars_demand_equation), H)
 
         if (passed_population is None) or isinstance(passed_population, list):
             population = [] if passed_population is None else passed_population
             psize = len(population)
             for solution_idx in range(psize):
-                population[solution_idx].set_domain(solution_idx)
                 pop_constructor.applyToPassed(population[solution_idx], **solution_params)
 
             for solution_idx in range(pop_size - psize):
                 solution_gen_idx = 0
-                # while True:
                 if type(solution_params) == type(None): solution_params = {}
                 temp_solution = pop_constructor.create(**solution_params)
+
                 for equation in temp_solution.vals:
                     while len(equation.described_variables_full) != len(equation.structure):
                         temp_solution.vals[equation.main_var_to_explain].randomize()
                         temp_solution.vals[equation.main_var_to_explain].reset_saved_state()
-                temp_solution.set_domain(psize + solution_idx)
                 population.append(temp_solution)
-                    # if temp_solution.described_variables not np.any([temp_solution == solution for solution in population]):
-                    #     population.append(temp_solution)
-                    #     print(f'New solution accepted, confirmed {len(population)}/{pop_size} solutions.')
-                    #     break
-                    # if solution_gen_idx == soluton_creation_attempts['softmax'] and global_var.verbose.show_warnings:
-                    #     print('solutions tried:', solution_gen_idx)
-                    #     warnings.warn('Too many failed attempts to create unique solutions for multiobjective optimization.\
-                    #                   Change solution parameters to allow more diversity.')
-                    # if solution_gen_idx == soluton_creation_attempts['hardmax']:
-                    #     population.append(temp_solution)
-                    #     print(f'New solution accepted, despite being a dublicate of another solution.\
-                    #           Confirmed {len(population)}/{pop_size} solutions.')
-                    #     break
+
                 solution_gen_idx += 1
-            self.pareto_levels = ParetoLevels(population, sorting_method = nds_method, update_method = ndl_update) # initial_sort = False
+            if weights_assigner == 'marriage':
+                weights_assigner_method = marriageSolutionAssignment
+            elif weights_assigner == 'random':
+                weights_assigner_method = randomSolutionAssignment
+            else:
+                warnings.warn(f'Get unimplemented method of weights assignment {weights_assigner_method}')
+            self.pareto_levels = ParetoLevels(population, weights=self.weights,
+                                              sorting_method = nds_method, 
+                                              update_method = ndl_update,
+                                              weights_assigner=weights_assigner_method)
         else:
             if not isinstance(passed_population, ParetoLevels):
                 raise TypeError(f'Incorrect type of the population passed. Expected ParetoLevels object, instead got \
                                  {type(passed_population)}')
             self.pareto_levels = passed_population
-        weights_size = len(best_sol_vals) #np.empty((pop_size, len(optimized_functionals)))
-        # weights_size = len(set([fun.func for fun in population[0].obj_funs]))
-        self.weights = np.array(self.weights_generation_new(weights_size, H))
 
         self.neighborhood_lists = []
         weights_num = self.weights.shape[0]
@@ -402,7 +486,7 @@ class MOEADDOptimizer(object):
         self.abbreviated_search_executed = True
 
     @staticmethod
-    def weights_generation(weights_num, delta) -> list:
+    def weights_generation_old(weights_num, delta) -> list:
         """
         Method to calculate the set of vectors to divide the problem of Pareto frontier
         discovery into several subproblems of Pareto frontier sector discovery, where
@@ -430,7 +514,7 @@ class MOEADDOptimizer(object):
         return list(weights)
 
     @staticmethod
-    def weights_generation_new(weights_num,  H) -> list:
+    def weights_generation(weights_num,  H) -> list:
         """
         Method to calculate the set of vectors to divide the problem of Pareto frontier
         discovery into several subproblems of Pareto frontier sector discovery, where
@@ -562,5 +646,4 @@ class MOEADDOptimizer(object):
     def plot_pareto(self, dimensions:list, **visualizer_kwargs):
         assert len(dimensions) == 2, 'Current approach supports only two dimensional plots'
         visualizer = ParetoVisualizer(self.pareto_levels)
-        # visualizer.plot_pareto(dimensions = dimensions, **visualizer_kwargs)
         visualizer.plot_pareto_mt(dimensions = dimensions, **visualizer_kwargs)
