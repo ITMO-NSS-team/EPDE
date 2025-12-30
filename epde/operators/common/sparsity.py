@@ -31,7 +31,8 @@ class CustomPhysicsLasso(BaseEstimator, RegressorMixin):
         std = np.array(weights).std(axis=0, ddof=1)
         mu = np.array(weights).mean(axis=0)
         # cv = std ** 2 / (std ** 2 + mu ** 2)
-        cv = np.sqrt(std ** 2 / (std ** 2 + mu ** 2))
+        # cv = np.sqrt(std ** 2 / (std ** 2 + mu ** 2))
+        cv = std ** 2 / (mu ** 2)
         return cv
 
     def calculate_weights(self, X, y):
