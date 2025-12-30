@@ -202,11 +202,14 @@ class L2LRFitness(CompoundOperator):
                 eq_window_weights.append(valuable_weights)
             std = np.array(eq_window_weights).std(axis=0, ddof=1)
             mu = np.array(eq_window_weights).mean(axis=0)
-            scale = []
-            for feature in range(features.shape[-1]):
-                scale.append(feature_window[:, feature] ** 2 / (feature_window[:, feature] ** 2 + target_window ** 2))
-            scale = np.array(scale).mean(axis=1)
-            eq_cv = np.sqrt(std ** 2 / (std ** 2 + mu ** 2) * scale)
+            # scale = []
+            # for feature in range(features.shape[-1]):
+            #     # scale.append(feature_window[:, feature] ** 2 / (feature_window[:, feature] ** 2 + target_window ** 2))
+            #     scale.append(np.linalg.norm(feature_window[:, feature] * mu[feature], ord=2) / np.linalg.norm(target_window, ord=2))
+            # scale = np.array(scale) / sum(scale)
+            # eq_cv = np.sqrt(std ** 2 / (std ** 2 + mu ** 2) * scale)
+            # eq_cv = np.sqrt(std ** 2 / (std ** 2 + mu ** 2)) * scale
+            eq_cv = std ** 2 / (mu ** 2)
             lr += np.nan_to_num(eq_cv).sum()
 
         lr = lr / (len(objective.structure) - 1) / target_vals.ndim
