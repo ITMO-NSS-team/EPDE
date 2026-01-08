@@ -153,7 +153,7 @@ def wave_discovery(foldername, noise_level):
 
     custom_grid_tokens = CacheStoredTokens(token_type='grid',
                                                 token_labels=['t', 'x'],
-                                                token_tensors={'t': grid[0], 'x': grid[1]},
+                                                token_tensors={'t': grid[..., 0], 'x': grid[..., 1]},
                                                 params_ranges={'power': (1, 1)},
                                                 params_equality_ranges=None)
 
