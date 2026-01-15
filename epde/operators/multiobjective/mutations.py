@@ -34,7 +34,7 @@ class SystemMutation(CompoundOperator):
         # altered_eq = self.suboperators['equation_mutation'].apply(altered_objective.vals[eq_key],
         #                                                           subop_args['equation_mutation'])
         for eq_key in eqs_keys:
-            affected_by_mutation = np.random.random() < (self.params['indiv_mutation_prob'] / len(eqs_keys))
+            affected_by_mutation = np.random.random() < self.params['indiv_mutation_prob']
             if affected_by_mutation:
                 altered_eq = self.suboperators['equation_mutation'].apply(altered_objective.vals[eq_key],
                                                                           subop_args['equation_mutation'])
