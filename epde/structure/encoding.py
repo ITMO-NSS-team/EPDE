@@ -169,6 +169,10 @@ class ChromosomeEqIterator(object):
         self._idx = 0
         self._chromosome_equation_labels = list(self._chromosome.equation_keys)
 
+    def __iter__(self):
+        # Return the iterator object itself
+        return self
+
     def __next__(self):
         if self._idx < len(self._chromosome_equation_labels):
             res = self._chromosome[self._chromosome_equation_labels[self._idx]]
