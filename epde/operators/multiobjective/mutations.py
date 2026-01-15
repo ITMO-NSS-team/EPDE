@@ -34,7 +34,7 @@ class SystemMutation(CompoundOperator):
         # altered_eq = self.suboperators['equation_mutation'].apply(altered_objective.vals[eq_key],
         #                                                           subop_args['equation_mutation'])
         for eq_key in eqs_keys:
-            affected_by_mutation = np.random.random() < (self.params['indiv_mutation_prob'] / len(eqs_keys))
+            affected_by_mutation = np.random.random() < self.params['indiv_mutation_prob']
             if affected_by_mutation:
                 altered_eq = self.suboperators['equation_mutation'].apply(altered_objective.vals[eq_key],
                                                                           subop_args['equation_mutation'])
@@ -59,19 +59,6 @@ class EquationMutation(CompoundOperator):
     def apply(self, objective : Equation, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
-        # for term_idx in range(objective.n_immutable, len(objective.structure)):
-        #     if np.random.uniform(0, 1) <= self.params['r_mutation']:
-        #         objective.structure[term_idx] = self.suboperators['mutation'].apply(objective = (term_idx, objective),
-        #                                                                             arguments = subop_args['mutation'])
-        # nonzero_terms_mask = np.array([False if weight == 0 else True for weight in objective.weights_internal],
-        #                               dtype=np.integer)
-        # nonrs_terms_idx = [i for i, term in enumerate(objective.structure) if i != objective.target_idx]
-        # nonzero_terms_idx = [item for item, keep in zip(nonrs_terms_idx, nonzero_terms_mask) if keep]
-        # nonzero_terms_idx.append(objective.target_idx)
-        # if len(nonzero_terms_idx) > 0:
-        #     term_idx = np.random.choice(nonzero_terms_idx)
-        # else:
-        #     term_idx = objective.target_idx
         term_idx = np.random.choice(range(len(objective.structure)))
         objective.structure[term_idx] = self.suboperators['mutation'].apply(objective=(term_idx, objective),
                                                                             arguments=subop_args['mutation'])
@@ -91,16 +78,7 @@ class MetaparameterMutation(CompoundOperator):
         altered_objective = np.random.normal(objective, objective)
         if altered_objective < 0:
             altered_objective = - altered_objective
-        # if altered_objective > 1:
-        #     altered_objective = 1
 
-        # altered_objective = objective + np.random.randint(-1, 2)
-        # if altered_objective < 1:
-        #     altered_objective = 1
-        # if altered_objective > 4:
-        #     altered_objective = 4
-        #
-        # return altered_objective
         return np.float64(altered_objective)
 
     def use_default_tags(self):

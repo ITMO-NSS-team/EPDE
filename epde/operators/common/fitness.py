@@ -116,6 +116,7 @@ class L2LRFitness(CompoundOperator):
         None
         """
         self_args, subop_args = self.parse_suboperator_args(arguments=arguments)
+        # self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
         if force_out_of_place:
             self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
         self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
@@ -126,29 +127,13 @@ class L2LRFitness(CompoundOperator):
         data_shape = global_var.grid_cache.inner_shape
 
         if features is None:
-            # target_normalized = 2 * (target - target.min()) / (target.max() - target.min()) - 1
-            # discr = target_normalized - target_normalized.mean()
             discr = target - target.mean()
-            denom = target + target.mean()
         else:
             discr_feats = np.dot(features, objective.weights_final[:-1][objective.weights_internal != 0])
             discr_feats = discr_feats + objective.weights_final[-1]
-            # discr = minmax_normalize(discr_feats.reshape(*data_shape)) - minmax_normalize(target.reshape(*data_shape))
-            # discr = discr.flatten()
-            # maximum = np.max((discr_feats.max(), target.max()))
-            # minimum = np.min((discr_feats.min(), target.min()))
-            # target_normalized = 2 * (target - minimum) / (maximum - minimum) - 1
-            # discr = target_normalized - (2 * (discr_feats - minimum) / (maximum - minimum) - 1)
             discr = target - discr_feats
-            denom = target + discr_feats
 
-        discr = np.multiply(discr, self.g_fun_vals)
-
-        # rl_error = np.mean(discr ** 2)
-        # rl_error = np.sqrt(np.mean(discr ** 2)) / (target.max() - target.mean())
-        # rl_error = np.sqrt(np.mean(discr ** 2)) / target.std()
         rl_error = np.sum(np.abs(discr)) / np.sum(np.abs(target))
-        # rl_error = np.mean(np.abs(discr) / np.abs(denom)) / 2
 
         if not (self.params['penalty_coeff'] > 0. and self.params['penalty_coeff'] < 1.):
             raise ValueError('Incorrect penalty coefficient set, value shall be in (0, 1).')
@@ -164,7 +149,6 @@ class L2LRFitness(CompoundOperator):
         # Calculate r-loss
         target_vals = target.reshape(*data_shape)
         slices = [slice(None) for _ in range(target_vals.ndim)]
-        # if not features is None:
         features_vals = features.reshape(*data_shape, -1)
         sample_weights_vals = self.g_fun_vals.reshape(*data_shape)
 
@@ -178,16 +162,9 @@ class L2LRFitness(CompoundOperator):
             else:
                 step_size = num_horizons // horizons_default
             eq_window_weights = []
+
             # Compute coefficients and collect statistics over horizons
             slices_window = slices.copy()
-            # if features is None:
-            #     for start_idx in range(0, num_horizons, step_size):
-            #         end_idx = start_idx + window_size
-            #         slices_window[dim] = slice(start_idx, end_idx)
-            #         target_window = target_vals[*slices_window]
-            #         eq_window_weights.append(target_window.mean())
-            #     lr += np.sqrt(np.std(eq_window_weights, ddof=1) ** 2 / (np.std(eq_window_weights, ddof=1) ** 2 + np.mean(eq_window_weights) ** 2))
-            # else:
             for start_idx in range(0, num_horizons, step_size):
                 end_idx = start_idx + window_size
                 slices_window[dim] = slice(start_idx, end_idx)
@@ -195,29 +172,15 @@ class L2LRFitness(CompoundOperator):
                 feature_window = features_vals[*slices_window, :].reshape(-1, features.shape[-1])
                 sample_weights_window = sample_weights_vals[*slices_window].reshape(-1)
                 estimator = LinearRegression(fit_intercept=True)
-                # estimator = Ridge(alpha=0, copy_X=True, fit_intercept=True, max_iter=20,
-                #                   positive=False, random_state=None, tol=0.0001, solver='sparse_cg')
                 estimator.fit(feature_window, target_window, sample_weight=sample_weights_window)
                 valuable_weights = estimator.coef_
                 eq_window_weights.append(valuable_weights)
             std = np.array(eq_window_weights).std(axis=0, ddof=1)
             mu = np.array(eq_window_weights).mean(axis=0)
-            # scale = []
-            # for feature in range(features.shape[-1]):
-            #     # scale.append(feature_window[:, feature] ** 2 / (feature_window[:, feature] ** 2 + target_window ** 2))
-            #     scale.append(np.linalg.norm(feature_window[:, feature] * mu[feature], ord=2) / np.linalg.norm(target_window, ord=2))
-            # scale = np.array(scale) / sum(scale)
-            # eq_cv = np.sqrt(std ** 2 / (std ** 2 + mu ** 2) * scale)
-            # eq_cv = np.sqrt(std ** 2 / (std ** 2 + mu ** 2)) * scale
             eq_cv = std ** 2 / (mu ** 2)
             lr += np.nan_to_num(eq_cv).sum()
 
         lr = lr / (len(objective.structure) - 1) / target_vals.ndim
-        # if force_out_of_place:
-        #     return lr
-
-        fv = 1 - np.abs(np.log10(fitness_value + 1e-9) / 8)
-        lrt = 1 - np.abs(np.log10(lr + 1e-9) / 8)
 
         objective.fitness_calculated = True
         objective.fitness_value = fitness_value

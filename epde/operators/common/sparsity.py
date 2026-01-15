@@ -17,10 +17,12 @@ from epde.structure.main_structures import Equation
 import time
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 
 class CustomPhysicsLasso(BaseEstimator, RegressorMixin):
-    def __init__(self, max_iter=100, tol=1e-4):
+    def __init__(self, max_iter=20, tol=1e-4):
         self.max_iter = max_iter
         self.tol = tol
 
@@ -33,6 +35,7 @@ class CustomPhysicsLasso(BaseEstimator, RegressorMixin):
         # cv = std ** 2 / (std ** 2 + mu ** 2)
         # cv = np.sqrt(std ** 2 / (std ** 2 + mu ** 2))
         cv = std ** 2 / (mu ** 2)
+        # cv = abs(std / mu)
         return cv
 
     def calculate_weights(self, X, y):
@@ -45,12 +48,13 @@ class CustomPhysicsLasso(BaseEstimator, RegressorMixin):
             w_full, _, _, _ = np.linalg.lstsq(X_batch, y_batch, rcond=None)
             weights.append(w_full)
 
-        return weights
+        return np.array(weights)
 
     def fit(self, X, y):
         X, y = check_X_y(X, y, dtype=np.float64)
         self.n_samples, self.n_features = X.shape
         self.batch_size = int(self.n_samples * 0.5)  # 50% of data
+        # self.batch_size = self.n_features + 1
 
         # --- 1. Initialization ---
         # Add column of 1s to solve for intercept correctly via OLS
@@ -60,6 +64,25 @@ class CustomPhysicsLasso(BaseEstimator, RegressorMixin):
         self.coef_ = np.array(weights).mean(axis=0)[:-1]
         self.intercept_ = np.array(weights).mean(axis=0)[-1]
 
+        # # Create the figure and axes
+        # fig, axs = plt.subplots(2, 1, figsize=(8, 6))
+        #
+        # # Subplot 1: Coefficients
+        # sns.barplot(x=['d^2u/dx^2', "u^3", "u", "du/dx * d^2u/dx^2"], y=self.coef_, ax=axs[0], color='tab:blue')
+        # axs[0].set_yscale("symlog", linthresh=1e-8)
+        # axs[0].set_title("Coefficients")
+        # axs[0].set_ylabel("Coefficient Value")
+        #
+        # # Subplot 2: CV (excluding last element)
+        # # sns.barplot(x=np.arange(len(cv) - 1), y=cv[:-1], ax=axs[1], color='tab:red')
+        # sns.barplot(x=['d^2u/dx^2', "u^3", "u", "du/dx * d^2u/dx^2"], y=cv[:-1], ax=axs[1], color='tab:red')
+        # axs[1].set_yscale("log")
+        # axs[1].set_title("Instability of Coefficients")
+        # axs[1].set_ylabel("Value (Log)")
+        #
+        # plt.tight_layout()
+        # plt.show()
+
         # Pre-compute norms of features (optimization)
         # These are constant throughout the loop
         norm_sq_features = np.sum(X ** 2, axis=0)
@@ -68,11 +91,9 @@ class CustomPhysicsLasso(BaseEstimator, RegressorMixin):
         y_pred = X @ self.coef_ + self.intercept_
         residual = y - y_pred
 
-        max_change_old = 0.0
-
         # --- 2. Coordinate Descent Loop ---
-        for iteration in range(self.max_iter):
-            max_change = 0.0
+        for iteration in range(self.max_iter * self.n_features):
+            max_change = self.tol
 
             # A. Update Intercept (Unpenalized)
             # The optimal intercept shift is simply the mean of the residuals
@@ -82,16 +103,12 @@ class CustomPhysicsLasso(BaseEstimator, RegressorMixin):
             residual -= intercept_shift
 
             # B. Update Coefficients
-            for j in range(self.n_features):
+            for j in np.argsort(cv[:-1])[::-1]:
                 if self.coef_[j] == 0:
                     continue
 
                 old_coef = self.coef_[j]
                 norm_sq = norm_sq_features[j]
-
-                # Skip constant columns to avoid division by zero
-                # if norm_sq == 0:
-                #     continue
 
                 # 1. Calculate partial residual correlation
                 # This represents the correlation between feature j and the target
@@ -102,19 +119,57 @@ class CustomPhysicsLasso(BaseEstimator, RegressorMixin):
                 # 2. Soft Thresholding
                 # Threshold is N * alpha
                 threshold = cv[j] * sum(y ** 2)
+                # threshold = cv[j] * norm_sq
+                # threshold = cv[j]
                 new_coef = self._soft_threshold(rho, threshold) / norm_sq
 
                 # 3. Update State
                 self.coef_[j] = new_coef
+                if new_coef == 0:
+                    weights = self.calculate_weights(X[:, self.coef_ != 0], y)
+                    new_cv = self.get_cv(weights)
+                    mask = self.coef_ != 0
+                    mask = np.append(mask, True)
+                    iter_cv = iter(new_cv)
+                    cv = [next(iter_cv) if val else 0 for val in mask]
+
+                    new_coefs = np.array(weights).mean(axis=0)[:-1]
+                    iter_coefs = iter(new_coefs)
+                    self.coef_ = np.array([next(iter_coefs) if val else 0 for val in mask[:-1]])
+                    self.intercept_ = np.array(weights).mean(axis=0)[-1]
+
+                    y_pred = X @ self.coef_ + self.intercept_
+                    residual = y - y_pred
+
+                    # # Create the figure and axes
+                    # fig, axs = plt.subplots(2, 1, figsize=(8, 6))
+                    #
+                    # # Subplot 1: Coefficients
+                    # # sns.barplot(x=np.arange(len(self.coef_)), y=self.coef_, ax=axs[0], color='tab:blue')
+                    # sns.barplot(x=['d^2u/dx^2', "u^3", "u", "du/dx * d^2u/dx^2"], y=self.coef_, ax=axs[0], color='tab:blue')
+                    # axs[0].set_yscale("symlog", linthresh=1e-8)
+                    # axs[0].set_title("Coefficients")
+                    # axs[0].set_ylabel("Coefficient Value")
+                    #
+                    # # Subplot 2: CV (excluding last element)
+                    # # sns.barplot(x=np.arange(len(cv) - 1), y=cv[:-1], ax=axs[1], color='tab:red')
+                    # sns.barplot(x=['d^2u/dx^2', "u^3", "u", "du/dx * d^2u/dx^2"], y=cv[:-1], ax=axs[1], color='tab:red')
+                    # axs[1].set_yscale("log")
+                    # axs[1].set_title("Instability of Coefficients")
+                    # axs[1].set_ylabel("Value (Log)")
+                    #
+                    # plt.tight_layout()
+                    # plt.show()
+                    break
+
                 # Update residual vector efficiently
                 # r_new = r_old - (w_new - w_old) * X_j
                 residual -= (new_coef - old_coef) * X[:, j]
                 max_change = max(max_change, abs((new_coef - old_coef) / old_coef))
+            else:
+                if max_change < self.tol:
+                    break
 
-            if abs(max_change - max_change_old) < self.tol:
-                break
-
-            max_change_old = max_change
 
         self.n_iter_ = iteration + 1
         # print("-------")
