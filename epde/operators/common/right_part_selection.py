@@ -61,14 +61,14 @@ class EqRightPartSelector(CompoundOperator):
                     continue
                 objective.target_idx = target_idx
                 fitness = self.suboperators['fitness_calculation'].apply(objective, arguments = subop_args['fitness_calculation'], force_out_of_place = True)
-                if fitness < min_fitness:
+                if fitness < min_fitness and not all(objective.weights_internal == 0):
                     min_fitness = fitness
                     min_idx = target_idx
                     weights_internal = objective.weights_internal
                 else:
                     pass
 
-            if all(weights_internal == 0):
+            if all(weights_internal == 0) or np.isinf(min_fitness):
                 objective.randomize()
                 continue
 
