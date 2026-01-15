@@ -63,9 +63,11 @@ def marriageSolutionAssignment(weights: np.ndarray, solutions: List[MOEADDSoluti
     assert len(solutions) == weights.shape[0], f'Solutions do not match weights in length: {len(solutions)} vs {weights.shape[0]}.'
 
     acute_angles = np.empty((weights.shape[0], weights.shape[0]))
+
     for i, weight in enumerate(weights):
+        weight_full = [item for item in weight for _ in solutions[0].vals]
         for j, solution in enumerate(solutions):
-            acute_angles[i, j] = acute_angle(weight, solution.obj_fun)
+            acute_angles[i, j] = acute_angle(weight_full, solution.obj_fun)
 
     w_preferences = np.argsort(acute_angles, axis = 1)
 
