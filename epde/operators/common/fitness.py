@@ -126,10 +126,13 @@ class L2LRFitness(CompoundOperator):
         self.get_g_fun_vals()
         data_shape = global_var.grid_cache.inner_shape
 
-        discr_feats = np.dot(features, objective.weights_final[:-1][objective.weights_internal != 0])
-        discr_feats = discr_feats + objective.weights_final[-1]
-        discr = target - discr_feats
-        discr = np.multiply(discr, self.g_fun_vals)
+        if features is None:
+            discr = target - target.mean()
+        else:
+            discr_feats = np.dot(features, objective.weights_final[:-1][objective.weights_internal != 0])
+            discr_feats = discr_feats + objective.weights_final[-1]
+            discr = target - discr_feats
+
         rl_error = np.sum(np.abs(discr)) / np.sum(np.abs(target))
 
         if not (self.params['penalty_coeff'] > 0. and self.params['penalty_coeff'] < 1.):
