@@ -434,9 +434,9 @@ class OffspringUpdater(CompoundOperator):
         while objective.unplaced_candidates:
             offspring = objective.unplaced_candidates.pop()
             attempt = 0
-            # replaced = 0
+            replaced = 0
             mutation_attempt_limit = self.params['mutation_attempt_limit']
-            # offspring_attempt_limit = self.params['offspring_attempt_limit']
+            offspring_attempt_limit = self.params['offspring_attempt_limit']
             # self.suboperators['sparsity'].apply(objective=offspring,
             #                                     arguments=subop_args['sparsity'])
             temp_offspring = deepcopy(offspring)
@@ -464,13 +464,13 @@ class OffspringUpdater(CompoundOperator):
                     objective.history.add(system)
                     print(temp_offspring.obj_fun)
                     break
-                elif attempt == mutation_attempt_limit:
+                elif attempt == offspring_attempt_limit:
                     print("Could not generate unique offspring")
                     break
-                # elif attempt == mutation_attempt_limit:
-                #     temp_offspring = deepcopy(offspring)
-                #     replaced += 1
-                #     attempt = 0
+                elif attempt == mutation_attempt_limit:
+                    temp_offspring.create()
+                    replaced += 1
+                    attempt = 0
                 attempt += 1
         return objective
     
