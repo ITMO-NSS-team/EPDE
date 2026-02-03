@@ -5,7 +5,7 @@ Created on Wed Jun  2 15:43:19 2021
 
 @author: mike_ubuntu
 """
-
+import random
 from ast import operator
 from operator import eq
 import numpy as np
@@ -77,14 +77,20 @@ class ParetoLevelsCrossover(CompoundOperator):
 
         offsprings = []
         for pair_idx in np.arange(crossover_pool.shape[0]):
-            if len(crossover_pool[pair_idx, 0].vals) != len(crossover_pool[pair_idx, 1].vals):
-                raise IndexError('Equations have diffferent number of terms')
+            # if len(crossover_pool[pair_idx, 0].vals) != len(crossover_pool[pair_idx, 1].vals):
+            #     raise IndexError('Equations have diffferent number of terms')
             new_system_1 = deepcopy(crossover_pool[pair_idx, 0])
             new_system_2 = deepcopy(crossover_pool[pair_idx, 1])
             # new_system_1.reset_state(False); new_system_2.reset_state()
             
             new_system_1, new_system_2 = self.suboperators['chromosome_crossover'].apply(objective = (new_system_1, new_system_2),
                                                                                          arguments = subop_args['chromosome_crossover'])
+
+            for eq_key in new_system_1.vals.equation_keys:
+                assert len(new_system_1.vals[eq_key].terms_labels) == len(new_system_1.vals[eq_key].structure)
+                assert len(new_system_2.vals[eq_key].terms_labels) == len(new_system_2.vals[eq_key].structure)
+                assert len(crossover_pool[pair_idx, 0].vals[eq_key].terms_labels) == len(crossover_pool[pair_idx, 0].vals[eq_key].structure)
+                assert len(crossover_pool[pair_idx, 1].vals[eq_key].terms_labels) == len(crossover_pool[pair_idx, 1].vals[eq_key].structure)
 
             # if len(new_system_1.vars_to_describe) > 1 and np.random.random() < 0.2:
             #     key = np.random.choice(new_system_1.vars_to_describe)
@@ -109,15 +115,24 @@ class ChromosomeCrossover(CompoundOperator):
    
         assert objective[0].vals.same_encoding(objective[1].vals)
         offspring_1 = objective[0]; offspring_2 = objective[1]
-                
-        eqs_keys = objective[0].vals.equation_keys; params_keys = objective[1].vals.params_keys
+
+        eqs_keys = offspring_1.vals.equation_keys; params_keys = offspring_2.vals.params_keys
+
+        if len(eqs_keys) > 1 and random.random() < 0.1:
+            eq_key = random.choice(eqs_keys)
+            temp_eq = deepcopy(offspring_1.vals[eq_key])
+            offspring_1.vals.replace_gene(gene_key = eq_key, value = offspring_2.vals[eq_key])
+            offspring_2.vals.replace_gene(gene_key = eq_key, value = temp_eq)
+
+            return offspring_1, offspring_2
+
         for eq_key in eqs_keys:
-            temp_eq_1, temp_eq_2 = self.suboperators['equation_crossover'].apply(objective = (objective[0].vals[eq_key],
-                                                                                              objective[1].vals[eq_key]),
+            temp_eq_1, temp_eq_2 = self.suboperators['equation_crossover'].apply(objective = (offspring_1.vals[eq_key],
+                                                                                              offspring_2.vals[eq_key]),
                                                                                  arguments = subop_args['equation_crossover'])
-            objective[0].vals.replace_gene(gene_key = eq_key, value = temp_eq_1)
-            objective[1].vals.replace_gene(gene_key = eq_key, value = temp_eq_2)
-            
+            offspring_1.vals.replace_gene(gene_key = eq_key, value = temp_eq_1)
+            offspring_2.vals.replace_gene(gene_key = eq_key, value = temp_eq_2)
+
         # for param_key in params_keys:
         #     temp_param_1, temp_param_2 = self.suboperators['param_crossover'].apply(objective = (objective[0].vals[param_key],
         #                                                                                          objective[1].vals[param_key]),
@@ -128,7 +143,7 @@ class ChromosomeCrossover(CompoundOperator):
         #     objective[0].vals.pass_parametric_gene(key = param_key, value = temp_param_1)
         #     objective[1].vals.pass_parametric_gene(key = param_key, value = temp_param_2)
 
-        return objective[0], objective[1]
+        return offspring_1, offspring_2
 
     def use_default_tags(self):
         self._tags = {'crossover', 'chromosome level', 'contains suboperators', 'standard'}
@@ -159,68 +174,39 @@ class EquationCrossover(CompoundOperator):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
         equation1_target_idx = objective[0].target_idx
-        equation1_target_term = deepcopy(objective[0].structure[equation1_target_idx])
         equation2_target_idx = objective[1].target_idx
+        equation1_target_term = deepcopy(objective[0].structure[equation1_target_idx])
         equation2_target_term = deepcopy(objective[1].structure[equation2_target_idx])
+        equation1 = deepcopy(objective[0])
+        equation2 = deepcopy(objective[1])
 
         equation1_terms, equation2_terms = detect_similar_terms(objective[0], objective[1])
-        assert len(equation1_terms[0]) == len(equation2_terms[0]) and len(equation1_terms[1]) == len(equation2_terms[1])
         same_num = len(equation1_terms[0]); similar_num = len(equation1_terms[1])
-        objective[0].structure = flatten(equation1_terms); objective[1].structure = flatten(equation2_terms)
-        objective[0].reset_saved_state()
-        objective[1].reset_saved_state()
 
-        # for i in range(same_num, same_num + similar_num):
-        #     temp_term_1, temp_term_2 = self.suboperators['term_param_crossover'].apply(objective = (objective[0].structure[i],
-        #                                                                                             objective[1].structure[i]),
-        #                                                                                arguments = subop_args['term_param_crossover'])
-        #     if (temp_term_1.described_variables not in objective[0].described_variables_full and
-        #             temp_term_2.described_variables not in objective[1].described_variables_full):
-        #         objective[0].structure[i] = temp_term_1; objective[1].structure[i] = temp_term_2
+        if same_num == 0:
+            return objective[0], objective[1]
 
-        for i in range(len(objective[0].structure)):
-            if objective[0].structure[i].described_variables_full == equation1_target_term.described_variables_full:
-                objective[0].target_idx = i
-            elif objective[1].structure[i].described_variables_full == equation2_target_term.described_variables_full:
-                objective[1].target_idx = i
+        equation1.structure = flatten(equation1_terms); equation2.structure = flatten(equation2_terms)
 
-        eq1_not_eq2 = [term for term in equation1_terms[1] if term.described_variables_full != equation1_target_term.described_variables_full]
-        eq2_not_eq1 = [term for term in equation2_terms[1] if term.described_variables_full != equation2_target_term.described_variables_full]
+        for term in equation1.structure:
+            if term.term_label not in equation1.terms_labels:
+                equation1.structure.append(term)
 
-        if len(eq1_not_eq2) > 0 and len(eq2_not_eq1) > 0:
-            eq1_term = np.random.choice(eq1_not_eq2)
-            eq2_term = np.random.choice(eq2_not_eq1)
-        # if len(equation1_terms[1]) > 0 and len(equation2_terms[1]) > 0:
-        #     eq1_term = np.random.choice(equation1_terms[1])
-        #     eq2_term = np.random.choice(equation2_terms[1])
+        for term in equation1_terms[1]:
+            if term.term_label not in equation2.terms_labels:
+                equation2.structure.append(term)
 
-            for term in objective[0].structure:
-                if term.described_variables_extra == eq1_term.described_variables_extra:
-                    term = deepcopy(eq2_term)
-                    term.reset_saved_state()
-                    break
+        for i in range(len(equation1.structure)):
+            if equation1.structure[i].term_label == equation1_target_term.term_label:
+                equation1.target_idx = i
+                break
 
-            for term in objective[1].structure:
-                if term.described_variables_extra == eq2_term.described_variables_extra:
-                    term = deepcopy(eq1_term)
-                    term.reset_saved_state()
-                    break
+        for i in range(len(equation2.structure)):
+            if equation2.structure[i].term_label == equation2_target_term.term_label:
+                equation2.target_idx = i
+                break
 
-        # replaced = False
-        # for i in range(same_num, len(objective[0].structure)):
-        #     if replaced:
-        #         break
-        #     for j in range(same_num, len(objective[1].structure)):
-        #         if i != objective[0].target_idx and j != objective[1].target_idx and \
-        #             objective[1].structure[j].described_variables not in objective[0].described_variables_full and \
-        #                 objective[0].structure[i].described_variables not in objective[1].described_variables_full:
-        #             if np.random.uniform(0, 1) <= self.params['crossover_probability']:
-        #                 objective[0].structure[i], objective[1].structure[j] = objective[1].structure[j], objective[0].structure[i]
-        #                 replaced = True
-        #                 break
-
-
-        return objective[0], objective[1]
+        return equation1, equation2
 
     def use_default_tags(self):
         self._tags = {'crossover', 'gene level', 'contains suboperators', 'standard'}
@@ -232,7 +218,7 @@ class EquationExchangeCrossover(CompoundOperator):
     def apply(self, objective : tuple, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
-        objective[0].structure, objective[1].structure = objective[1].structure, objective[0].structure
+        # objective[0].structure, objective[1].structure = objective[1].structure, objective[0].structure
         return objective[0], objective[1]
 
     def use_default_tags(self):
@@ -345,11 +331,12 @@ class TermCrossover(CompoundOperator):
         """
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
-        if (np.random.uniform(0, 1) <= self.params['crossover_probability'] and
-            objective[1].descr_variable_marker == objective[0].descr_variable_marker):
-                return objective[1], objective[0]
-        else:
-                return objective[0], objective[1]
+        # if (np.random.uniform(0, 1) <= self.params['crossover_probability'] and
+        #     objective[1].descr_variable_marker == objective[0].descr_variable_marker):
+        #         return objective[1], objective[0]
+        # else:
+        #         return objective[0], objective[1]
+        return objective[0], objective[1]
         
     def use_default_tags(self):
         self._tags = {'crossover', 'term level', 'exploration', 'no suboperators', 'standard'}
@@ -378,6 +365,6 @@ def get_basic_variation(variation_params : dict = {}):
                                                      'term_crossover' : term_crossover})
     chromosome_crossover.set_suboperators(operators = {'equation_crossover' : [equation_crossover, equation_exchange_crossover],
                                                        'param_crossover' : metaparameter_crossover},
-                                          probas = {'equation_crossover' : [0.9, 0.1]})
+                                          probas = {'equation_crossover' : [1.0, 0.0]})
     pl_cross.set_suboperators(operators = {'chromosome_crossover' : chromosome_crossover})
     return pl_cross

@@ -46,6 +46,8 @@ class EqRightPartSelector(CompoundOperator):
     def apply(self, objective : Equation, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
+        assert len(objective.structure) == len(objective.terms_labels)
+
         while not (objective.simplified and objective.is_correct_right_part):
             objective.reset_state(True)
             min_fitness = np.inf
@@ -61,20 +63,25 @@ class EqRightPartSelector(CompoundOperator):
                     continue
                 objective.target_idx = target_idx
                 fitness = self.suboperators['fitness_calculation'].apply(objective, arguments = subop_args['fitness_calculation'], force_out_of_place = True)
-                if fitness < min_fitness and not all(objective.weights_internal == 0):
+                if fitness is not None and fitness < min_fitness:
                     min_fitness = fitness
                     min_idx = target_idx
                     weights_internal = objective.weights_internal
-                else:
-                    pass
+                    weights_final = [weight for weight in objective.weights_final if weight != 0]
 
-            if all(weights_internal == 0) or np.isinf(min_fitness):
+                objective.weights_internal_evald = False
+                objective.weights_final_evald = False
+
+            if np.isinf(min_fitness):
                 objective.randomize()
                 continue
 
             objective.weights_internal = weights_internal
+            objective.weights_final = weights_final
             objective.weights_internal_evald = True
+            objective.weights_final_evald = True
             objective.target_idx = min_idx
+
             if not self.simplify_equation(objective):
                 objective.simplified = True
             if objective.structure[objective.target_idx].contains_deriv(objective.main_var_to_explain):
@@ -82,7 +89,7 @@ class EqRightPartSelector(CompoundOperator):
                 objective.is_correct_right_part = True
         else:
             objective.right_part_selected = True
-            objective.reset_state(False)
+            objective.remove_zero_terms()
 
     def simplify_equation(self, objective: Equation):
         # Get nonzero terms
@@ -90,8 +97,8 @@ class EqRightPartSelector(CompoundOperator):
         nonrs_terms = [term for i, term in enumerate(objective.structure) if i != objective.target_idx]
         nonzero_terms = [item for item, keep in zip(nonrs_terms, nonzero_terms_mask) if keep]
         nonzero_terms.append(objective.structure[objective.target_idx])
+        equation_terms = [term.term_label_without_power for term in nonzero_terms]
 
-        equation_terms = objective.described_variables
         # If amount nonzero terms is more than one -- get their intersection
         if len(equation_terms) > 1:
             common_factors = list(frozenset.intersection(*equation_terms))
@@ -130,13 +137,11 @@ class EqRightPartSelector(CompoundOperator):
                                             continue
                             term.structure = [factor for factor in term.structure if factor not in factors_simplified]
                             term.reset_saved_state()
+
                             # If term's order became zero -- replace term
-                            if len(term.structure) == 0 or not term.contains_meaningful():
+                            while len(term.structure) == 0 or not term.contains_meaningful() or len(objective.terms_labels) != len(objective.structure):
                                 term.randomize()
-                                term.reset_saved_state()
-                            while len(objective.described_variables_full) != len(objective.structure):
-                                term.randomize()
-                                term.reset_saved_state()
+
                         return True
         return False
 

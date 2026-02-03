@@ -11,6 +11,7 @@ import warnings
 import copy
 import os
 import pickle
+from copy import deepcopy
 from typing import Union, Callable, Tuple
 from functools import singledispatchmethod, reduce
 try:
@@ -206,8 +207,8 @@ class Term(ComplexStructure):
     def evaluate(self, structural, grids=None):
         assert global_var.tensor_cache is not None, 'Currently working only with connected cache'
         normalize = structural
-        if self.saved[structural] or (self.described_variables_full, normalize) in global_var.tensor_cache:
-            value = global_var.tensor_cache.get(self.described_variables_full, normalized=normalize,
+        if self.saved[structural] or (self.term_label, normalize) in global_var.tensor_cache:
+            value = global_var.tensor_cache.get(self.term_label, normalized=normalize,
                                                 saved_as=self.saved_as[normalize])
             value = value.reshape(-1)
             return value
@@ -227,9 +228,9 @@ class Term(ComplexStructure):
                 #     value *= factor_value_normalized
             if np.all([len(factor.params) == 1 for factor in self.structure]) and grids is None:
                 # Место возможных проблем: сохранение/загрузка нормализованных данных
-                self.saved[normalize] = global_var.tensor_cache.add(self.described_variables_full, value, normalized=normalize)
+                self.saved[normalize] = global_var.tensor_cache.add(self.term_label, value, normalized=normalize)
                 if self.saved[normalize]:
-                    self.saved_as[normalize] = self.described_variables_full
+                    self.saved_as[normalize] = self.term_label
             value = value.reshape(-1)
             return value
 
@@ -250,7 +251,7 @@ class Term(ComplexStructure):
                     new_term.reset_occupied_tokens()
                     _, new_term.structure[factor_idx] = self.pool.create(create_meaningful=meaningful_taken,
                                                                          occupied=new_term.occupied_tokens_labels + taken_tokens)
-            if len(equation.described_variables_full) == len(equation.structure):
+            if len(equation.terms_labels) == len(equation.structure):
                 self.structure = new_term.structure
                 self.structure = filter_powers(self.structure)
                 self.reset_saved_state()
@@ -354,7 +355,7 @@ class Term(ComplexStructure):
         return new_struct
 
     @property
-    def described_variables(self):
+    def term_label_without_power(self):
         described = set()
         for factor in self.structure:
             if len(factor.params) == 1:
@@ -366,13 +367,11 @@ class Term(ComplexStructure):
         return described
 
     @property
-    def described_variables_full(self):
+    def term_label(self):
         described = set()
         for factor in self.structure:
             if factor.ftype == 'trigonometric':
-                label = (factor.cache_label[0], tuple(
-                    factor.cache_label[1][i] for i, param in factor.params_description.items() if
-                    param['name'] != 'freq'))
+                label = (factor.cache_label[0], tuple(factor.cache_label[1][i] for i, param in factor.params_description.items() if param['name'] != 'freq'))
                 described.add(label)
             else:
                 described.add(factor.cache_label)
@@ -451,7 +450,7 @@ class Equation(ComplexStructure):
         for i in range(len(basic_structure), int(self.metaparameters['terms_number']['value'])):
             new_term = Term(self.pool, max_factors_in_term=self.metaparameters['max_factors_in_term']['value'],
                             mandatory_family=None, passed_term=None)
-            while new_term.described_variables_full in self.described_variables_full:
+            while new_term.term_label in self.terms_labels:
                 new_term.randomize()
                 new_term.reset_saved_state()
                 # check_test += 1
@@ -497,6 +496,21 @@ class Equation(ComplexStructure):
                 term.descr_variable_marker = self.main_var_to_explain
             else:
                 term.descr_variable_marker = False
+
+    def remove_zero_terms(self):
+        if self.weights_internal_evald:
+            zero_terms = []
+            target_bias = 0
+            for i in range(len(self.structure)):
+                if i == self.target_idx:
+                    continue
+                idx = i if i < self.target_idx else i - 1
+                if self.weights_internal[idx] == 0:
+                    target_bias += 1 if i < self.target_idx else 0
+                    zero_terms.append(i)
+            self.structure = [term for term_idx, term in enumerate(self.structure) if term_idx not in zero_terms]
+            self.target_idx -= target_bias
+
 
     def __eq__(self, other):
         if self.weights_final_evald and other.weights_final_evald:
@@ -588,6 +602,7 @@ class Equation(ComplexStructure):
         else:
             feature_indexes = [idx for idx in range(len(self.structure))
                                if self.weights_internal[shifted_idx(idx)] != 0 and idx != self.target_idx]
+            # feature_indexes = [idx for idx in range(len(self.structure)) if idx != self.target_idx]
         if len(feature_indexes) > 0:
             features = self.structure[feature_indexes[0]].evaluate(False, grids=grids)
             for feat_idx in range(1, len(feature_indexes)):
@@ -629,10 +644,12 @@ class Equation(ComplexStructure):
             self.simplified = False
             self.weights_internal_evald = False
             self.weights_internal = None
+            # self.weights_final_evald = False
+            self.weights_final = None
         # self.weights_internal_evald = False
         # self.weights_internal = None
         self.weights_final_evald = False
-        self.weights_final = None
+        # self.weights_final = None
         self.fitness_calculated = False
         self.fitness_value = None
         self.stability_calculated = False
@@ -695,6 +712,18 @@ class Equation(ComplexStructure):
         # print(add)
         self._history += add
 
+    def add_random_term(self):
+        new_term = Term(self.pool, max_factors_in_term=self.metaparameters['max_factors_in_term']['value'],
+                        mandatory_family=None, passed_term=None)
+
+        attempt = 0
+        while new_term.term_label in self.terms_labels or attempt < 10:
+            new_term.randomize()
+            attempt += 1
+
+        if attempt < 10:
+            self.structure.append(deepcopy(new_term))
+
     @property
     def history(self):
         return self._history
@@ -755,20 +784,22 @@ class Equation(ComplexStructure):
 
     @property
     def text_form(self):
-        form = ''
-        if self.weights_final_evald:
-            for term_idx in range(len(self.structure)):
-                if term_idx != self.target_idx:
-                    form += str(self.weights_final[term_idx]) if term_idx < self.target_idx else str(
-                        self.weights_final[term_idx-1])
-                    form += ' * ' + self.structure[term_idx].name + ' + '
-            form += str(self.weights_final[-1]) + ' = ' + \
-                self.structure[self.target_idx].name
-        else:
-            for term_idx in range(len(self.structure)):
-                form += 'k_' + str(term_idx) + ' ' + \
-                    self.structure[term_idx].name + ' + '
-            form += 'k_' + str(len(self.structure)) + ' = 0'
+        try:
+            form = ''
+            if self.weights_final_evald:
+                for term_idx in range(len(self.structure)):
+                    if term_idx != self.target_idx:
+                        form += str(self.weights_final[term_idx]) if term_idx < self.target_idx else str(self.weights_final[term_idx-1])
+                        form += ' * ' + self.structure[term_idx].name + ' + '
+                form += str(self.weights_final[-1]) + ' = ' + \
+                    self.structure[self.target_idx].name
+            else:
+                for term_idx in range(len(self.structure)):
+                    form += 'k_' + str(term_idx) + ' ' + \
+                        self.structure[term_idx].name + ' + '
+                form += 'k_' + str(len(self.structure)) + ' = 0'
+        except:
+            form = ''
         return form
 
     @property
@@ -795,7 +826,7 @@ class Equation(ComplexStructure):
         return self.text_form
 
     @property
-    def described_variables(self):
+    def terms_labels_without_power(self):
         described = set()
         for term_idx, term in enumerate(self.structure):
             cache_label = set()
@@ -822,34 +853,7 @@ class Equation(ComplexStructure):
         return described
 
     @property
-    def described_variables_extra(self):
-        described = set()
-        for term_idx, term in enumerate(self.structure):
-            cache_label = set()
-            if term_idx == self.target_idx:
-                for factor in term.structure:
-                    if factor.ftype == 'trigonometric':
-                        label = (factor.cache_label[0], tuple(factor.cache_label[1][i] for i, param in factor.params_description.items() if param['name'] != 'freq'))
-                        cache_label.add(label)
-                    else:
-                        cache_label.add(factor.cache_label)
-            else:
-                weight_idx = term_idx if term_idx < self.target_idx else term_idx - 1
-                if not np.isclose(self.weights_internal[weight_idx], 0):
-                    for factor in term.structure:
-                        if factor.ftype == 'trigonometric':
-                            label = (factor.cache_label[0], tuple(factor.cache_label[1][i] for i, param in factor.params_description.items() if param['name'] != 'freq'))
-                            cache_label.add(label)
-                        else:
-                            cache_label.add(factor.cache_label)
-            if len(cache_label) > 0:
-                cache_label = frozenset(cache_label)
-                described.add(cache_label)
-        described = frozenset(described)
-        return described
-
-    @property
-    def described_variables_full(self):
+    def terms_labels(self):
         described = set()
         for term_idx, term in enumerate(self.structure):
             cache_label = set()
@@ -1132,7 +1136,7 @@ class SoEq(moeadd.MOEADDSolution):
     @staticmethod
     def equation_opt_iteration(population, evol_operator, population_size, iter_index, unexplained_vars, strict_restrictions=True):
         for equation in population:
-            if equation.described_variables in unexplained_vars:
+            if equation.terms_labels_without_power in unexplained_vars:
                 equation.penalize_fitness(coeff=0.)
         population = population_sort(population)
         population = population[:population_size]
@@ -1233,17 +1237,17 @@ class SoEq(moeadd.MOEADDSolution):
         return all([equation.fitness_calculated for equation in self.vals])
 
     @property
-    def described_variables(self):
+    def terms_labels_without_power(self):
         equations_caches = []
         for equation in self.vals:
-            equations_caches.append(equation.described_variables)
+            equations_caches.append(equation.terms_labels_without_power)
         return tuple(equations_caches)
 
     @property
-    def described_variables_extra(self):
+    def terms_labels(self):
         equations_caches = []
         for equation in self.vals:
-            equations_caches.append(equation.described_variables_extra)
+            equations_caches.append(equation.terms_labels)
         return tuple(equations_caches)
 
 

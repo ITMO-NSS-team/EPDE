@@ -68,6 +68,7 @@ def marriageSolutionAssignment(weights: np.ndarray, solutions: List[MOEADDSoluti
         weight_full = [item for item in weight for _ in solutions[0].vals]
         for j, solution in enumerate(solutions):
             acute_angles[i, j] = acute_angle(weight_full, solution.obj_fun)
+            # acute_angles[i, j] = acute_angle(weight, solution.obj_fun)
 
     w_preferences = np.argsort(acute_angles, axis = 1)
 
@@ -250,11 +251,11 @@ class ParetoLevels(object):
         """
         new_levels = []
         population_cleared = []
-        point_system = point.described_variables_extra
+        point_system = point.terms_labels
         for level in self.levels:
             temp = []
             for element in level:
-                if element.described_variables_extra != point_system:
+                if element.terms_labels != point_system:
                     temp.append(element)
                     population_cleared.append(element)
             if not len(temp) == 0:
@@ -434,7 +435,7 @@ class MOEADDOptimizer(object):
                 temp_solution = pop_constructor.create(**solution_params)
 
                 for equation in temp_solution.vals:
-                    while len(equation.described_variables_full) != len(equation.structure):
+                    while len(equation.terms_labels) != len(equation.structure):
                         temp_solution.vals[equation.main_var_to_explain].randomize()
                         temp_solution.vals[equation.main_var_to_explain].reset_saved_state()
                 population.append(temp_solution)

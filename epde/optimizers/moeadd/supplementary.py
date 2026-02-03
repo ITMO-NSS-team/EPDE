@@ -1,6 +1,6 @@
 """
 
-Supplementary procedures for the moeadd optimizer. 
+Supplementary procedures for the moeadd optimizer.
 
 Contains:
 ---------
@@ -51,12 +51,11 @@ def check_dominance(target, compared_with) -> bool:
     """
     flag = False
 
-    sdn = 5 # Number of significant digits
-    for obj_fun_idx in range(len(target.obj_fun.reshape(-1))):
-        # if rts(target.obj_fun[obj_fun_idx], sdn) <= rts(compared_with.obj_fun[obj_fun_idx], sdn):
-        #     if rts(target.obj_fun[obj_fun_idx], sdn) < rts(compared_with.obj_fun[obj_fun_idx], sdn):
-        if target.obj_fun.reshape(-1)[obj_fun_idx] <= compared_with.obj_fun.reshape(-1)[obj_fun_idx]:
-            if target.obj_fun.reshape(-1)[obj_fun_idx] < compared_with.obj_fun.reshape(-1)[obj_fun_idx]:
+    eq_keys = target.vals.equation_keys
+    for obj_fun_idx in range(len(target.obj_fun)):
+        if target.vals[eq_keys[obj_fun_idx % len(eq_keys)]].terms_labels == compared_with.vals[eq_keys[obj_fun_idx % len(eq_keys)]].terms_labels:
+            continue
+        if target.obj_fun[obj_fun_idx] < compared_with.obj_fun[obj_fun_idx]:
                 flag = True
         else:
             return False
