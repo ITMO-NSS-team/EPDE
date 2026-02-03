@@ -11,7 +11,7 @@
  	},
 	"ParetoLevelUpdater" : {
     	"mutation_attempt_limit" : 3,
-		"offspring_attempt_limit" : 10
+		"offspring_attempt_limit" : 3
 	},
 	"InitialParetoLevelSorting" : {
 	
@@ -52,7 +52,7 @@
         "term_param_proportion" : 0.4
 	},
 	"SystemMutation" : {
-		"indiv_mutation_prob" : 0.6
+		"indiv_mutation_prob" : 1
     },
 	"EquationMutation" : {
         "r_mutation" : 0.6

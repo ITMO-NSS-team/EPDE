@@ -20,6 +20,8 @@ import matplotlib.pyplot as plt
 from epde.solver.data import Domain
 from epde.solver.models import Fourier_embedding, mat_model
 from epde.preprocessing.smoothers import NN
+from numpy.lib.stride_tricks import sliding_window_view
+
 
 
 class BasicDeriv(ABC):
@@ -262,10 +264,8 @@ def detect_similar_terms_deprecated(base_equation_1, base_equation_2):   # Пе�
     return [same_terms_from_eq1, similar_terms_from_eq1, different_terms_from_eq1], [same_terms_from_eq2, similar_terms_from_eq2, different_terms_from_eq2]
 
 def detect_similar_terms(base_equation_1, base_equation_2):
-    first_equation_terms = base_equation_1.described_variables_extra
-    all_first_equation_terms = base_equation_1.described_variables_full
-    second_equation_terms = base_equation_2.described_variables_extra
-    all_second_equation_terms = base_equation_2.described_variables_full
+    all_first_equation_terms = base_equation_1.terms_labels
+    all_second_equation_terms = base_equation_2.terms_labels
 
     same_terms_from_eq1 = []
     same_terms_from_eq2 = []
@@ -274,23 +274,23 @@ def detect_similar_terms(base_equation_1, base_equation_2):
     different_terms_from_eq1 = []
     different_terms_from_eq2 = []
 
-    common_terms = first_equation_terms.intersection(second_equation_terms)
-    all_terms = first_equation_terms.union(second_equation_terms)
-    different_terms = first_equation_terms.symmetric_difference(second_equation_terms)
+    common_terms = all_first_equation_terms.intersection(all_second_equation_terms)
+    all_terms = all_first_equation_terms.union(all_second_equation_terms)
+    different_terms = all_first_equation_terms.symmetric_difference(all_second_equation_terms)
 
     for term in base_equation_1.structure:
-        if term.cache_label in common_terms:
+        if term.term_label in common_terms:
             same_terms_from_eq1.append(term)
-        elif term.cache_label in (first_equation_terms - all_second_equation_terms):
+        elif term.term_label in (all_first_equation_terms - all_second_equation_terms):
             similar_terms_from_eq1.append(term)
         else:
             different_terms_from_eq1.append(term)
 
     for term in base_equation_2.structure:
-        if term.cache_label in common_terms:
+        if term.term_label in common_terms:
             same_terms_from_eq2.append(term)
-        elif term.cache_label in (second_equation_terms - all_first_equation_terms):
-            similar_terms_from_eq1.append(term)
+        elif term.term_label in (all_second_equation_terms - all_first_equation_terms):
+            similar_terms_from_eq2.append(term)
         else:
             different_terms_from_eq2.append(term)
 
@@ -389,3 +389,81 @@ def minmax_normalize(matrix):
             else:
                 matrix[i] = np.zeros_like(matrix[i])
         return matrix
+
+
+def calculate_weights(X, y, sample_weights, grid_shape):
+    """
+    Vectorized calculation of weights across sliding windows.
+    """
+    n_samples, n_features = X.shape
+
+    # 1. Augment X with intercept column immediately (Vectorized)
+    X_aug = np.hstack([X, np.ones((n_samples, 1))])
+    n_features_aug = X_aug.shape[1]
+
+    # 2. Reshape to spatial grid
+    X_grid = X_aug.reshape(*grid_shape, n_features_aug)
+    y_grid = y.reshape(*grid_shape)
+    sample_weights_grid = sample_weights.reshape(*grid_shape)
+
+    all_weights = []
+
+    # 3. Iterate over dimensions (still necessary, but inner work is vectorized)
+    for dim in range(len(grid_shape)):
+    # for dim in range(1):
+        window_size = grid_shape[dim] // 2
+        num_horizons = window_size + 1
+        step_size = max(1, num_horizons // 30)
+
+        # --- Create Sliding Windows (Zero Copy) ---
+        # Creates a view of shape: (..., window_len) at the end
+        X_windows = sliding_window_view(X_grid, window_shape=window_size, axis=dim)
+        y_windows = sliding_window_view(y_grid, window_shape=window_size, axis=dim)
+        w_windows = sliding_window_view(sample_weights_grid, window_shape=window_size, axis=dim)
+
+        # Apply step size stride
+        X_windows = X_windows.take(indices=range(0, num_horizons, step_size), axis=dim)
+        y_windows = y_windows.take(indices=range(0, num_horizons, step_size), axis=dim)
+        w_windows = w_windows.take(indices=range(0, num_horizons, step_size), axis=dim)
+
+
+        # --- Reshape for Batch Regression ---
+        # Move the batch dimension (sliding dim) to axis 0
+        X_windows = np.moveaxis(X_windows, dim, 0)
+        y_windows = np.moveaxis(y_windows, dim, 0)
+        w_windows = np.moveaxis(w_windows, dim, 0)
+
+        # Prepare dimensions for flattening: (Batch, Samples_in_Window, Features)
+        # Current X_windows: (Batch, Other_Dim, Features, Window_Len)
+        # We want to merge (Other_Dim, Window_Len) -> Samples
+
+        # Move 'Features' to the end so we can flatten everything else
+        # (Batch, Other_Dim, Features, Window_Len) -> (Batch, Other_Dim, Window_Len, Features)
+        X_windows = np.moveaxis(X_windows, -2, -1)
+
+        # Flatten spatial dimensions
+        batch_size = X_windows.shape[0]
+        X_batch = X_windows.reshape(batch_size, -1, n_features_aug)
+        y_batch = y_windows.reshape(batch_size, -1)
+        weights_batch = w_windows.reshape(batch_size, -1, 1)
+
+        # --- Solve Normal Equations (Batch Mode) ---
+        # w = (X^T X + alpha*I)^-1 X^T y
+
+        # 1. Compute Gram Matrices: (Batch, F, F)
+        # transposing the last two dimensions of X_batch
+        XTW = X_batch.transpose(0, 2, 1) * weights_batch.transpose(0, 2, 1)
+        XTWX = XTW @ X_batch
+        XTWy = XTW @ y_batch[..., None]
+
+        # 2. Solve (Fast CPU Vectorized Solver)
+        # np.linalg.solve supports batch dimensions!
+        try:
+            w_batch = np.linalg.solve(XTWX, XTWy)
+            all_weights.append(w_batch.squeeze(-1))
+        except np.linalg.LinAlgError:
+            # Fallback for extremely ill-conditioned matrices (rare with ridge)
+            w_batch = np.linalg.lstsq(XTWX, XTWy, rcond=None)[0]
+            all_weights.append(w_batch)
+
+    return np.vstack(all_weights)

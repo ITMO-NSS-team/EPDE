@@ -250,18 +250,7 @@ def hs_discovery(foldername, noise_level):
     popsize = 16
 
     epde_search_obj.set_moeadd_params(population_size=popsize,
-                                      training_epochs=15)
-
-    # def laser_f(t, x, y):
-    #     return 3e6 * np.exp(-50000 * (np.pow(x - 0.5 * 0.1 * (1 + 0.5 * np.sin(2 * math.pi * t / 5)), 2) + np.pow(y - 0.02 * t, 2)))
-    #
-    # laser = laser_f(grid[-1], grid[0], grid[1])
-    #
-    # custom_laser_tokens = CacheStoredTokens(token_type='laser',
-    #                                             token_labels=['L'],
-    #                                             token_tensors={'L': laser},
-    #                                             params_ranges={'power': (1, 1)},
-    #                                             params_equality_ranges=None, meaningful=True)
+                                      training_epochs=1)
 
     trig_params_ranges = {'power': (1, 1)}
     trig_params_equal_ranges = {}
@@ -350,18 +339,7 @@ def hs_3d_discovery(foldername, noise_level):
     popsize = 16
 
     epde_search_obj.set_moeadd_params(population_size=popsize,
-                                      training_epochs=5)
-
-    # def laser_f(t, x, y):
-    #     return 3e6 * np.exp(-50000 * (np.pow(x - 0.5 * 0.1 * (1 + 0.5 * np.sin(2 * math.pi * t / 5)), 2) + np.pow(y - 0.02 * t, 2)))
-    #
-    # laser = laser_f(grid[-1], grid[0], grid[1])
-    #
-    # custom_laser_tokens = CacheStoredTokens(token_type='laser',
-    #                                             token_labels=['L'],
-    #                                             token_tensors={'L': laser},
-    #                                             params_ranges={'power': (1, 1)},
-    #                                             params_equality_ranges=None, meaningful=True)
+                                      training_epochs=1)
 
     trig_params_ranges = {'power': (1, 1)}
     trig_params_equal_ranges = {}
@@ -400,6 +378,6 @@ if __name__ == "__main__":
     ac_folder_name = os.path.join(directory)
 
     # hs_test(fit_operator, ac_folder_name, 0)
-    # hs_discovery(ac_folder_name, 0)
+    hs_discovery(ac_folder_name, 0)
     # hs_2d_discovery(ac_folder_name, 0)
-    hs_3d_discovery(ac_folder_name, 0)
+    # hs_3d_discovery(ac_folder_name, 0)

@@ -7,182 +7,99 @@ Created on Fri Jun  4 13:35:18 2021
 """
 
 import numpy as np
-from sklearn.linear_model import Lasso, LassoLars, OrthogonalMatchingPursuit, Ridge, ElasticNet, SGDRegressor
-# from cuml.linear_model import Ridge
-# from pysindy import STLSQ, SR3
-from scipy.linalg import lstsq
 import epde.globals as global_var
 from epde.operators.utils.template import CompoundOperator
 from epde.structure.main_structures import Equation
 import time
 from sklearn.base import BaseEstimator, RegressorMixin
-from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
-import seaborn as sns
+# import seaborn as sns
 import matplotlib.pyplot as plt
+from epde.supplementary import calculate_weights
 
 
-class CustomPhysicsLasso(BaseEstimator, RegressorMixin):
-    def __init__(self, max_iter=20, tol=1e-4):
+class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
+    def __init__(self, max_iter=20, tol=1e-4, grid_shape=None):
         self.max_iter = max_iter
         self.tol = tol
+        self.grid_shape = grid_shape
 
     def _soft_threshold(self, x, lambda_):
         return np.sign(x) * np.maximum(np.abs(x) - lambda_, 0)
 
     def get_cv(self, weights):
-        std = np.array(weights).std(axis=0, ddof=1)
-        mu = np.array(weights).mean(axis=0)
-        # cv = std ** 2 / (std ** 2 + mu ** 2)
-        # cv = np.sqrt(std ** 2 / (std ** 2 + mu ** 2))
-        cv = std ** 2 / (mu ** 2)
-        # cv = abs(std / mu)
-        return cv
+        # Calculate Coefficient of Variation (CV)
+        weights_arr = np.array(weights)
+        std = weights_arr.std(axis=0, ddof=1)
+        mu = weights_arr.mean(axis=0)
 
-    def calculate_weights(self, X, y):
-        X_aug = np.column_stack([X, np.ones(self.n_samples)])
-        weights = []
-        for _ in range(30):
-            idx = np.random.choice(self.n_samples, self.batch_size, replace=False)
-            X_batch = X_aug[idx]
-            y_batch = y[idx]
-            w_full, _, _, _ = np.linalg.lstsq(X_batch, y_batch, rcond=None)
-            weights.append(w_full)
+        # Safe division
+        with np.errstate(divide='ignore', invalid='ignore'):
+            cv = (std ** 2) / (mu ** 2)
+            cv[mu == 0] = 0.0  # Handle zero mean
 
-        return np.array(weights)
+        return np.nan_to_num(cv)
 
-    def fit(self, X, y):
-        X, y = check_X_y(X, y, dtype=np.float64)
+    def fit(self, X, y, sample_weights):
         self.n_samples, self.n_features = X.shape
-        self.batch_size = int(self.n_samples * 0.5)  # 50% of data
-        # self.batch_size = self.n_features + 1
 
-        # --- 1. Initialization ---
-        # Add column of 1s to solve for intercept correctly via OLS
-        weights = self.calculate_weights(X, y)
-        cv = self.get_cv(weights)
+        # 1. Initial Weights
+        weights = calculate_weights(X, y, sample_weights=sample_weights, grid_shape=self.grid_shape)
+        cv = self.get_cv(weights[:, :-1])
 
-        self.coef_ = np.array(weights).mean(axis=0)[:-1]
-        self.intercept_ = np.array(weights).mean(axis=0)[-1]
+        self.coef_ = weights.mean(axis=0)[:-1]
+        self.intercept_ = weights.mean(axis=0)[-1]
 
-        # # Create the figure and axes
-        # fig, axs = plt.subplots(2, 1, figsize=(8, 6))
-        #
-        # # Subplot 1: Coefficients
-        # sns.barplot(x=['d^2u/dx^2', "u^3", "u", "du/dx * d^2u/dx^2"], y=self.coef_, ax=axs[0], color='tab:blue')
-        # axs[0].set_yscale("symlog", linthresh=1e-8)
-        # axs[0].set_title("Coefficients")
-        # axs[0].set_ylabel("Coefficient Value")
-        #
-        # # Subplot 2: CV (excluding last element)
-        # # sns.barplot(x=np.arange(len(cv) - 1), y=cv[:-1], ax=axs[1], color='tab:red')
-        # sns.barplot(x=['d^2u/dx^2', "u^3", "u", "du/dx * d^2u/dx^2"], y=cv[:-1], ax=axs[1], color='tab:red')
-        # axs[1].set_yscale("log")
-        # axs[1].set_title("Instability of Coefficients")
-        # axs[1].set_ylabel("Value (Log)")
-        #
-        # plt.tight_layout()
-        # plt.show()
-
-        # Pre-compute norms of features (optimization)
-        # These are constant throughout the loop
         norm_sq_features = np.sum(X ** 2, axis=0)
+        residual = y - (X @ self.coef_ + self.intercept_)
 
-        # Pre-compute initial residual: r = y - (Xw + b)
-        y_pred = X @ self.coef_ + self.intercept_
-        residual = y - y_pred
-
-        # --- 2. Coordinate Descent Loop ---
-        for iteration in range(self.max_iter * self.n_features):
+        # 2. Coordinate Descent Loop
+        for iteration in range(self.max_iter):
             max_change = self.tol
 
-            # A. Update Intercept (Unpenalized)
-            # The optimal intercept shift is simply the mean of the residuals
-            # because we want mean(y - Xw - b_new) = 0
-            intercept_shift = np.mean(residual)
-            self.intercept_ += intercept_shift
-            residual -= intercept_shift
+            if all(self.coef_ == 0):
+                break
 
-            # B. Update Coefficients
-            for j in np.argsort(cv[:-1])[::-1]:
-                if self.coef_[j] == 0:
+            # Sort features by instability (highest CV first)
+            for j in np.argsort(cv)[::-1]:
+                old_coef = self.coef_[j]
+
+                if old_coef == 0:
                     continue
 
-                old_coef = self.coef_[j]
                 norm_sq = norm_sq_features[j]
+                y_sq_sum = np.sum((y - self.intercept_) ** 2)
 
-                # 1. Calculate partial residual correlation
-                # This represents the correlation between feature j and the target
-                # if feature j were removed from the model.
-                # rho = dot(X_j, residual + old_coef * X_j)
+                # Partial residual correlation
                 rho = np.dot(X[:, j], residual) + old_coef * norm_sq
 
-                # 2. Soft Thresholding
-                # Threshold is N * alpha
-                threshold = cv[j] * sum(y ** 2)
-                # threshold = cv[j] * norm_sq
-                # threshold = cv[j]
+                # Use CV-based Thresholding
+                # threshold = cv[j] * y_sq_sum
+                threshold = cv[j] * self.n_samples
+                # threshold = cv[j] * norm_sq * abs(old_coef)
                 new_coef = self._soft_threshold(rho, threshold) / norm_sq
 
-                # 3. Update State
                 self.coef_[j] = new_coef
+
                 if new_coef == 0:
-                    weights = self.calculate_weights(X[:, self.coef_ != 0], y)
-                    new_cv = self.get_cv(weights)
-                    mask = self.coef_ != 0
-                    mask = np.append(mask, True)
-                    iter_cv = iter(new_cv)
-                    cv = [next(iter_cv) if val else 0 for val in mask]
+                    weights = calculate_weights(X[:, self.coef_ != 0], y, sample_weights=sample_weights, grid_shape=self.grid_shape)
+                    new_cv = iter(self.get_cv(weights[:, :-1]))
+                    cv = np.array([next(new_cv) if _ else 0 for _ in self.coef_ != 0])
 
-                    new_coefs = np.array(weights).mean(axis=0)[:-1]
-                    iter_coefs = iter(new_coefs)
-                    self.coef_ = np.array([next(iter_coefs) if val else 0 for val in mask[:-1]])
-                    self.intercept_ = np.array(weights).mean(axis=0)[-1]
-
-                    y_pred = X @ self.coef_ + self.intercept_
-                    residual = y - y_pred
-
-                    # # Create the figure and axes
-                    # fig, axs = plt.subplots(2, 1, figsize=(8, 6))
-                    #
-                    # # Subplot 1: Coefficients
-                    # # sns.barplot(x=np.arange(len(self.coef_)), y=self.coef_, ax=axs[0], color='tab:blue')
-                    # sns.barplot(x=['d^2u/dx^2', "u^3", "u", "du/dx * d^2u/dx^2"], y=self.coef_, ax=axs[0], color='tab:blue')
-                    # axs[0].set_yscale("symlog", linthresh=1e-8)
-                    # axs[0].set_title("Coefficients")
-                    # axs[0].set_ylabel("Coefficient Value")
-                    #
-                    # # Subplot 2: CV (excluding last element)
-                    # # sns.barplot(x=np.arange(len(cv) - 1), y=cv[:-1], ax=axs[1], color='tab:red')
-                    # sns.barplot(x=['d^2u/dx^2', "u^3", "u", "du/dx * d^2u/dx^2"], y=cv[:-1], ax=axs[1], color='tab:red')
-                    # axs[1].set_yscale("log")
-                    # axs[1].set_title("Instability of Coefficients")
-                    # axs[1].set_ylabel("Value (Log)")
-                    #
-                    # plt.tight_layout()
-                    # plt.show()
+                    new_coef = iter(weights.mean(axis=0)[:-1])
+                    self.coef_ = np.array([next(new_coef) if _ else 0 for _ in self.coef_ != 0])
+                    self.intercept_ = weights.mean(axis=0)[-1]
+                    residual = y - (X @ self.coef_ + self.intercept_)
                     break
 
-                # Update residual vector efficiently
-                # r_new = r_old - (w_new - w_old) * X_j
                 residual -= (new_coef - old_coef) * X[:, j]
-                max_change = max(max_change, abs((new_coef - old_coef) / old_coef))
-            else:
-                if max_change < self.tol:
-                    break
+                change = abs(new_coef - old_coef) / abs(old_coef)
+                # change = abs(self.intercept_ - old_intercept) / abs(old_intercept)
+                max_change = max(max_change, change)
 
-
-        self.n_iter_ = iteration + 1
-        # print("-------")
-        # print(self.n_iter_)
-        # print(np.mean(cv[:-1]))
-        # print(sum(abs(y - X @ self.coef_ - self.intercept_)) / sum(abs(y)))
-        # print(self.coef_, self.intercept_)
+            if max_change < self.tol:
+                break
+        # print(iteration)
         return self
-
-    def predict(self, X):
-        check_is_fitted(self)
-        X = check_array(X)
-        return X @ self.coef_ + self.intercept_
 
 
 class LASSOSparsity(CompoundOperator):
@@ -230,72 +147,19 @@ class LASSOSparsity(CompoundOperator):
         # print(f'Metaparameter: {objective.metaparameters}, objective.metaparameters[("sparsity", objective.main_var_to_explain)]')
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
-        # estimator = Lasso(alpha = objective.metaparameters[('sparsity', objective.main_var_to_explain)]['value'],
-        #                   copy_X=True, fit_intercept=True, max_iter=1000,
-        #                   positive=False, precompute=False, random_state=None,
-        #                   selection='random', tol=0.0001, warm_start=True)
-        # estimator = SGDRegressor(alpha=objective.metaparameters[('sparsity', objective.main_var_to_explain)]['value'],
-        #                   penalty='l1', fit_intercept=True, max_iter=1000,
-        #                   random_state=None, tol=0.0001, warm_start=False)
-        # estimator = Ridge(alpha=objective.metaparameters[('sparsity', objective.main_var_to_explain)]['value'],
-        #                   copy_X=True, fit_intercept=True,
-        #                   positive=False, random_state=None,
-        #                   tol=0.0001, solver='cholesky')
-        estimator = CustomPhysicsLasso()
-        # estimator = ElasticNet(alpha=objective.metaparameters[('sparsity', objective.main_var_to_explain)]['value'],
-        #                        l1_ratio=objective.metaparameters[('threshold', objective.main_var_to_explain)]['value'],
-        #                        copy_X=True, fit_intercept=True, max_iter=1000,
-        #                        positive=False, precompute=False, random_state=None,
-        #                        selection='random', tol=0.0001, warm_start=False
-        #                        )
-        # estimator = OrthogonalMatchingPursuit(n_nonzero_coefs=objective.metaparameters[('nonzero_terms', objective.main_var_to_explain)]['value'], fit_intercept=True)
-        # estimator = STLSQ(threshold=objective.metaparameters[('sparsity', objective.main_var_to_explain)]['value'],
-        #                   copy_X=True, unbias=True, max_iter=20, alpha=objective.metaparameters[('threshold', objective.main_var_to_explain)]['value'], ridge_kw={"tol": 1e-10})
-        # estimator = SR3(reg_weight_lam=objective.metaparameters[('sparsity', objective.main_var_to_explain)]['value'],
-        #                 regularizer='L2', relax_coeff_nu=objective.metaparameters[('nu', objective.main_var_to_explain)]['value'],
-        #                 copy_X=True, unbias=True)
+        estimator = PhysicsInformedLasso(grid_shape=global_var.grid_cache.inner_shape)
 
-        start_time = time.time()  # record start time
         _, target, features = objective.evaluate(normalize = True, return_val = False)
-        end_time = time.time()  # record end time
-        elapsed_time = end_time - start_time
-        # print(f"Elapsed time for evaluating: {elapsed_time / len(features.reshape(-1)):.12f} seconds")
 
         self.g_fun_vals = global_var.grid_cache.g_func[global_var.grid_cache.g_func != 0]
 
-        # fraction = 0.1
-        # num_subsample = int(len(target) * fraction)
-        #
-        # probabilities = self.g_fun_vals / np.sum(self.g_fun_vals)
-        # indices = np.random.choice(
-        #     a=np.arange(len(target)),
-        #     size=num_subsample,
-        #     replace=False,
-        #     p=probabilities
-        # )
-        #
-        # features_subsampled = features[indices]
-        # target_subsampled = target[indices]
-        # weights_subsampled = self.g_fun_vals[indices]
-
-        start_time = time.time()  # record start time
-        # estimator.fit(features, target, sample_weight = self.g_fun_vals)
-        end_time = time.time()  # record end time
-        elapsed_time = end_time - start_time
-        # print(f"Elapsed time for fitting: {elapsed_time / len(features.reshape(-1)):.12f} seconds")
-
-        # estimator.fit(features_subsampled, target_subsampled, sample_weight=weights_subsampled)
-        estimator.fit(features, target)
+        estimator.fit(features, target, self.g_fun_vals)
         objective.weights_internal = estimator.coef_
-        # print(estimator.coef_)
-        # objective.weights_internal = np.where(
-        #     np.abs(estimator.w) < objective.metaparameters[('threshold', objective.main_var_to_explain)]['value'],
-        #     0, estimator.w)
-        # objective.weights_internal = estimator.coef_
-        # objective.weights_internal = np.where(np.abs(estimator.coef_) < objective.metaparameters[('threshold', objective.main_var_to_explain)]['value'], 0, estimator.coef_)
-        # objective.weights_internal = estimator.coef_[0]
-        # objective.weights_internal = np.where(np.abs(estimator.coef_[0]) < objective.metaparameters[('threshold', objective.main_var_to_explain)]['value'], 0, estimator.coef_[0])
         objective.weights_internal_evald = True
+        objective.weights_final = np.append(objective.weights_internal, estimator.intercept_)
+        objective.weights_final_evald = True
+        objective.weights_final = [weight for weight in objective.weights_final if weight != 0]
+
 
     def use_default_tags(self):
         self._tags = {'sparsity', 'gene level', 'no suboperators', 'inplace'}

@@ -212,7 +212,7 @@ class PCExperiment:
         popsize = 20
         search_obj.set_moeadd_params(
             population_size=popsize,
-            training_epochs=12
+            training_epochs=5
         )
 
         # Prepare custom tokens

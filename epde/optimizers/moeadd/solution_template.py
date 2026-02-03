@@ -31,6 +31,7 @@ def get_domain_idx(solution, weights) -> int:
         return np.fromiter(map(lambda x: acute_angle(x, solution), weights), dtype=float).argmin()
     elif type(solution.obj_fun) == np.ndarray:
         return np.fromiter(map(lambda x: acute_angle([item for item in x for _ in solution.vals], solution.obj_fun), weights), dtype=float).argmin()
+        # return np.fromiter(map(lambda x: acute_angle(x, solution.obj_fun), weights), dtype=float).argmin()
     else:
         raise ValueError(
             'Can not detect the vector of objective function for solution')

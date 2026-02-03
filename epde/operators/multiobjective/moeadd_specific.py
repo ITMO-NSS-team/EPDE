@@ -67,7 +67,9 @@ def penalty_based_intersection(sol_obj, weight, ideal_obj,
     ideal_obj_full = [item for item in ideal_obj for _ in sol_obj.vals]
 
     d_1 = np.dot((solution_objective - ideal_obj_full), weight_full) / np.linalg.norm(weight_full)
+    # d_1 = np.dot((solution_objective - ideal_obj), weight) / np.linalg.norm(weight)
     d_2 = np.linalg.norm(solution_objective - (ideal_obj_full + np.multiply(d_1, weight_full) / np.linalg.norm(weight_full)))
+    # d_2 = np.linalg.norm(solution_objective - (ideal_obj + np.multiply(d_1, weight) / np.linalg.norm(weight)))
     return d_1 + penalty_factor * d_2
 
 
@@ -136,8 +138,8 @@ def locate_pareto_worst(levels: ParetoLevels, weights: np.ndarray, best_obj: np.
     worst_NDL_section = []
     domain_solution_NDL_idxs = np.empty(most_crowded_count)
     for solution_idx, solution in enumerate(domain_solutions[most_crowded_domain]):
-        domain_solution_NDL_idxs[solution_idx] = [level_idx for level_idx in np.arange(len(levels.levels)) 
-                                                    if any([solution.described_variables_extra == level_solution.described_variables_extra for level_solution in levels.levels[level_idx]])][0]
+        domain_solution_NDL_idxs[solution_idx] = [level_idx for level_idx in np.arange(len(levels.levels))
+                                                  if any([solution.terms_labels == level_solution.terms_labels for level_solution in levels.levels[level_idx]])][0]
         
     max_level = np.max(domain_solution_NDL_idxs)
     worst_NDL_section = [domain_solutions[most_crowded_domain][sol_idx] for sol_idx in np.arange(len(domain_solutions[most_crowded_domain])) 
@@ -439,7 +441,18 @@ class OffspringUpdater(CompoundOperator):
             offspring_attempt_limit = self.params['offspring_attempt_limit']
             # self.suboperators['sparsity'].apply(objective=offspring,
             #                                     arguments=subop_args['sparsity'])
+            offspring.reset_state(True)
             temp_offspring = deepcopy(offspring)
+            # self.suboperators['right_part_selector'].apply(objective=temp_offspring,
+            #                                                arguments=subop_args['right_part_selector'])
+            #
+            # if len(offspring.vars_to_describe) > 1:
+            #     term_replaced = is_rps_in_other_equation(temp_offspring)
+            #     while any(term_replaced):
+            #         offspring.reset_state(True)
+            #         self.suboperators['right_part_selector'].apply(objective=temp_offspring,
+            #                                                        arguments=subop_args['right_part_selector'])
+            #         term_replaced = is_rps_in_other_equation(temp_offspring)
             while True:
                 temp_offspring = self.suboperators['chromosome_mutation'].apply(objective=temp_offspring,
                                                                                 arguments=subop_args['chromosome_mutation'])
@@ -455,7 +468,7 @@ class OffspringUpdater(CompoundOperator):
                                                                        arguments=subop_args['right_part_selector'])
                         term_replaced = is_rps_in_other_equation(temp_offspring)
 
-                system = temp_offspring.described_variables_extra
+                system = temp_offspring.terms_labels
                 if system not in objective.history:
                     self.suboperators['chromosome_fitness'].apply(objective=temp_offspring,
                                                                   arguments=subop_args['chromosome_fitness'])
@@ -464,13 +477,15 @@ class OffspringUpdater(CompoundOperator):
                     objective.history.add(system)
                     print(temp_offspring.obj_fun)
                     break
-                elif attempt == offspring_attempt_limit:
+                if replaced == offspring_attempt_limit:
                     print("Could not generate unique offspring")
                     break
-                elif attempt == mutation_attempt_limit:
+                if attempt == mutation_attempt_limit:
                     temp_offspring.create()
                     replaced += 1
                     attempt = 0
+                    # print("Could not generate unique offspring")
+                    # break
                 attempt += 1
         return objective
     
@@ -527,7 +542,7 @@ class InitialParetoLevelSorting(CompoundOperator):
                                                                        arguments=subop_args['right_part_selector'])
                         replaced = is_rps_in_other_equation(candidate)
 
-                system = candidate.described_variables_extra
+                system = candidate.terms_labels
                 while system in objective.history:
                     candidate.create()
                     candidate.reset_state(True)
@@ -542,7 +557,7 @@ class InitialParetoLevelSorting(CompoundOperator):
                                                                            arguments=subop_args['right_part_selector'])
                             replaced = is_rps_in_other_equation(candidate)
 
-                    system = candidate.described_variables_extra
+                    system = candidate.terms_labels
                 self.suboperators['chromosome_fitness'].apply(objective=candidate,
                                                               arguments=subop_args['chromosome_fitness'])
                 objective.history.add(system)
@@ -587,16 +602,16 @@ def is_rps_in_other_equation(objective):
     rsterms = [None for _ in objective.vals]
     replaced = [False for _ in objective.vals]
     for equation_idx, equation in enumerate(objective.vals):
-        rsterms[equation_idx] = equation.structure[equation.target_idx].described_variables_full
+        rsterms[equation_idx] = equation.structure[equation.target_idx].term_label
 
     for equation_idx, equation in enumerate(objective.vals):
         rs = rsterms[:equation_idx] + rsterms[equation_idx + 1:]
         for term_idx, term in enumerate(equation.structure):
-            if any(rsterm.issubset(term.described_variables_full) for rsterm in rs):
+            if any(rsterm.issubset(term.term_label) for rsterm in rs):
                 replaced[equation_idx] = True
                 term.randomize()
                 term.reset_saved_state()
-                while any(rsterm.issubset(term.described_variables_full) for rsterm in rs) or len(equation.described_variables_full) != len(equation.structure):
+                while any(rsterm.issubset(term.term_label) for rsterm in rs) or len(equation.terms_labels) != len(equation.structure):
                     term.randomize()
                     term.reset_saved_state()
     return replaced

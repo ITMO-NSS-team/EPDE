@@ -20,6 +20,7 @@ import epde.globals as global_var
 from sklearn.linear_model import LinearRegression, Ridge
 from scipy.optimize import minimize
 from epde.supplementary import minmax_normalize
+from epde.supplementary import calculate_weights
 
 LOSS_NAN_VAL = 1e7
 
@@ -119,17 +120,22 @@ class L2LRFitness(CompoundOperator):
         # self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
         if force_out_of_place:
             self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
+            if all(objective.weights_internal == 0):
+                return None
         self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
 
-        _, target, features = objective.evaluate(normalize=False, return_val=False)
+        if force_out_of_place:
+            _, target, features = objective.evaluate(normalize=False, return_val=False)
+        else:
+            _, target, features = objective.evaluate(normalize=True, return_val=False)
+        # _, target, features = objective.evaluate(normalize=False, return_val=False)
 
         self.get_g_fun_vals()
-        data_shape = global_var.grid_cache.inner_shape
 
         if features is None:
             discr = target - target.mean()
         else:
-            discr_feats = np.dot(features, objective.weights_final[:-1][objective.weights_internal != 0])
+            discr_feats = np.dot(features, objective.weights_final[:-1])
             discr_feats = discr_feats + objective.weights_final[-1]
             discr = target - discr_feats
 
@@ -146,46 +152,24 @@ class L2LRFitness(CompoundOperator):
         objective.aic = None
         objective.aic_calculated = True
 
-        # Calculate r-loss
-        target_vals = target.reshape(*data_shape)
-        slices = [slice(None) for _ in range(target_vals.ndim)]
-        features_vals = features.reshape(*data_shape, -1)
-        sample_weights_vals = self.g_fun_vals.reshape(*data_shape)
+        data_shape = global_var.grid_cache.inner_shape
+        weights = calculate_weights(features, target, self.g_fun_vals, data_shape)
+        weights_arr = np.array(weights)
+        std = weights_arr.std(axis=0, ddof=1)
+        mu = weights_arr.mean(axis=0)
 
-        lr = 0
-        for dim in range(target_vals.ndim):
-            horizons_default = 30
-            window_size = target_vals.shape[dim] // 2
-            num_horizons = window_size + 1
-            if num_horizons < horizons_default:
-                step_size = 1
-            else:
-                step_size = num_horizons // horizons_default
-            eq_window_weights = []
+        # Safe division
+        with np.errstate(divide='ignore', invalid='ignore'):
+            cv = (std ** 2) / (mu ** 2)
+            cv[mu == 0] = 0.0  # Handle zero mean
 
-            # Compute coefficients and collect statistics over horizons
-            slices_window = slices.copy()
-            for start_idx in range(0, num_horizons, step_size):
-                end_idx = start_idx + window_size
-                slices_window[dim] = slice(start_idx, end_idx)
-                target_window = target_vals[*slices_window].reshape(-1)
-                feature_window = features_vals[*slices_window, :].reshape(-1, features.shape[-1])
-                sample_weights_window = sample_weights_vals[*slices_window].reshape(-1)
-                estimator = LinearRegression(fit_intercept=True)
-                estimator.fit(feature_window, target_window, sample_weight=sample_weights_window)
-                valuable_weights = estimator.coef_
-                eq_window_weights.append(valuable_weights)
-            std = np.array(eq_window_weights).std(axis=0, ddof=1)
-            mu = np.array(eq_window_weights).mean(axis=0)
-            eq_cv = std ** 2 / (mu ** 2)
-            lr += np.nan_to_num(eq_cv).sum()
-
-        lr = lr / (len(objective.structure) - 1) / target_vals.ndim
+        total_lr = sum(cv[:-1]) / len(data_shape)
+        # total_lr = sum(dim_results) / target_vals.ndim
 
         objective.fitness_calculated = True
         objective.fitness_value = fitness_value
         objective.stability_calculated = True
-        objective.coefficients_stability = lr
+        objective.coefficients_stability = total_lr
 
     def get_g_fun_vals(self):
         try:

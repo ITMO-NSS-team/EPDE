@@ -33,19 +33,22 @@ class SystemMutation(CompoundOperator):
         # eq_key = np.random.choice(eqs_keys)
         # altered_eq = self.suboperators['equation_mutation'].apply(altered_objective.vals[eq_key],
         #                                                           subop_args['equation_mutation'])
+        affected_by_mutation = True
         for eq_key in eqs_keys:
-            affected_by_mutation = np.random.random() < self.params['indiv_mutation_prob']
+            if len(eqs_keys) > 1:
+                affected_by_mutation = np.random.random() < self.params['indiv_mutation_prob']
+
             if affected_by_mutation:
                 altered_eq = self.suboperators['equation_mutation'].apply(altered_objective.vals[eq_key],
                                                                           subop_args['equation_mutation'])
 
                 altered_objective.vals.replace_gene(gene_key = eq_key, value = altered_eq)
 
-        for param_key in params_keys:
-            altered_param = self.suboperators['param_mutation'].apply(altered_objective.vals[param_key],
-                                                                      subop_args['param_mutation'])
-            altered_objective.vals.replace_gene(gene_key = param_key, value = altered_param)
-            altered_objective.vals.pass_parametric_gene(key = param_key, value = altered_param)
+        # for param_key in params_keys:
+        #     altered_param = self.suboperators['param_mutation'].apply(altered_objective.vals[param_key],
+        #                                                               subop_args['param_mutation'])
+        #     altered_objective.vals.replace_gene(gene_key = param_key, value = altered_param)
+        #     altered_objective.vals.pass_parametric_gene(key = param_key, value = altered_param)
 
         return altered_objective
 
@@ -59,11 +62,17 @@ class EquationMutation(CompoundOperator):
     def apply(self, objective : Equation, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
-        term_idx = np.random.choice(range(len(objective.structure)))
-        objective.structure[term_idx] = self.suboperators['mutation'].apply(objective=(term_idx, objective),
-                                                                            arguments=subop_args['mutation'])
-        objective.structure[term_idx].reset_saved_state()
-        return objective
+        # term_idx = np.random.choice(range(len(objective.structure)))
+        # objective.structure[term_idx] = self.suboperators['mutation'].apply(objective=(term_idx, objective),
+        #                                                                     arguments=subop_args['mutation'])
+        # objective.structure[term_idx].reset_saved_state()
+        equation = deepcopy(objective)
+        for _ in range(10):
+            equation.add_random_term()
+
+        assert len(equation.terms_labels) == len(equation.structure)
+
+        return equation
 
     def use_default_tags(self):
         self._tags = {'mutation', 'gene level', 'contains suboperators'}
@@ -114,8 +123,8 @@ class TermMutation(CompoundOperator):
         temp = deepcopy(objective[1].structure[objective[0]])
         objective[1].structure[objective[0]].randomize()
         objective[1].structure[objective[0]].reset_saved_state()
-        while (len(objective[1].described_variables_full) != len(objective[1].structure)
-               or objective[1].structure[objective[0]].described_variables_full == temp.described_variables_full):
+        while (len(objective[1].terms_labels) != len(objective[1].structure)
+               or objective[1].structure[objective[0]].terms_labels == temp.terms_labels):
             objective[1].structure[objective[0]].randomize()
             objective[1].structure[objective[0]].reset_saved_state()
         # print(f'CREATED DURING MUTATION: {new_term.name}, while contatining {objective[1].structure[objective[0]].descr_variable_marker}')
@@ -192,7 +201,7 @@ class TermParameterMutation(CompoundOperator):
             print(f'checking presence of {term.name} as {objective[0]}-th element in {objective[1].text_form}')
             # if check_uniqueness(term, objective[1].structure[:objective[0]] +
             #                     objective[1].structure[objective[0]+1:]):
-            if len(objective[1].described_variables_full) == len(objective[1].structure):
+            if len(objective[1].terms_labels) == len(objective[1].structure):
                 break
         term.reset_saved_state()
         return term
