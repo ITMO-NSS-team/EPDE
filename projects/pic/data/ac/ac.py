@@ -36,7 +36,7 @@ def load_pretrained_PINN(ann_filename):
 
 def noise_data(data, noise_level):
     # add noise level to the input data
-    return noise_level * 0.01 * np.std(data) * np.random.normal(size=data.shape) + data
+    return noise_level * np.std(data) * np.random.normal(size=data.shape) + data
 
 
 def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
@@ -49,6 +49,7 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
         correct_eq.vals[var].metaparameters = metaparams
         correct_eq.vals[var].weights_internal = np.ones(len(correct_eq.vals[var].structure) - 1)
         correct_eq.vals[var].weights_internal_evald = True
+        correct_eq.vals[var].weights_final_evald = True
     print(correct_eq.text_form)
 
     incorrect_eq = translate_equation(eq_incorrect_symbolic, search_obj.pool,
@@ -58,14 +59,15 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
         incorrect_eq.vals[var].metaparameters = metaparams
         incorrect_eq.vals[var].weights_internal = np.ones(len(incorrect_eq.vals[var].structure) - 1)
         incorrect_eq.vals[var].weights_internal_evald = True
+        incorrect_eq.vals[var].weights_final_evald = True
     print(incorrect_eq.text_form)
 
-    fit_operator.apply(correct_eq, {})
+    # fit_operator.apply(correct_eq, {})
     fit_operator.apply(incorrect_eq, {})
     print([[correct_eq.vals[var].fitness_value, incorrect_eq.vals[var].fitness_value] for var in all_vars])
     print([[correct_eq.vals[var].coefficients_stability, incorrect_eq.vals[var].coefficients_stability] for var in
            all_vars])
-    print([[correct_eq.vals[var].aic, incorrect_eq.vals[var].aic] for var in all_vars])
+    # print([[correct_eq.vals[var].aic, incorrect_eq.vals[var].aic] for var in all_vars])
 
     # print([correct_eq.vals[var].coefficients_stability < incorrect_eq.vals[var].coefficients_stability for var in all_vars])
     return all([correct_eq.vals[var].coefficients_stability < incorrect_eq.vals[var].coefficients_stability for var in
@@ -98,8 +100,8 @@ def ac_data(filename: str):
 
 def AC_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
     # Test scenario to evaluate performance on Allen-Cahn equation
-    eq_ac_symbolic = '0.0001 * d^2u/dx1^2{power: 1.0} + -5.0 * u{power: 3.0} + 5.0 * u{power: 1.0} + 5.0 * u{power: 2.0} * du/dx1{power: 1.0} + 0.0 = du/dx0{power: 1.0}'
-    eq_ac_incorrect = '4.976781518840499 * u{power: 1.0} + 0.0001 * d^2u/dx1^2{power: 1.0} + -4.974425220166616 * u{power: 3.0} + 0.0 * du/dx1{power: 1.0} * d^2u/dx0^2{power: 1.0} + 0.002262543822130977 = du/dx0{power: 1.0}'
+    eq_ac_symbolic = '0.0001 * d^2u/dx1^2{power: 1.0} + -5.0 * u{power: 3.0} + 5.0 * u{power: 1.0} + 0.0 = du/dx0{power: 1.0}'
+    eq_ac_incorrect = ' 0.0001 * d^2u/dx1^2{power: 1.0} + -4.976781518840499 * u{power: 3.0} + 4.974425220166616 * u{power: 1.0} + 0.0 * du/dx1{power: 1.0} * d^2u/dx1^2{power: 1.0} + 0.002262543822130977 = du/dx0{power: 1.0}'
 
     grid, data = ac_data(os.path.join(foldername, 'ac_data.npy'))
     noised_data = noise_data(data, noise_level)
@@ -139,7 +141,7 @@ def ac_discovery(foldername, noise_level):
     popsize = 16
 
     epde_search_obj.set_moeadd_params(population_size=popsize,
-                                      training_epochs=5)
+                                      training_epochs=1)
 
     custom_grid_tokens = CacheStoredTokens(token_type='grid',
                                                 token_labels=['t', 'x'],
@@ -156,7 +158,7 @@ def ac_discovery(foldername, noise_level):
 
     bounds = (1e-12, 1e-0)
     epde_search_obj.fit(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 3), derivs=None,
-                        equation_terms_max_number=8, data_fun_pow=3,
+                        equation_terms_max_number=5, data_fun_pow=3,
                         additional_tokens=[],
                         equation_factors_max_number=factors_max_number,
                         eq_sparsity_interval=bounds, fourier_layers=False) #, data_nn=data_nn

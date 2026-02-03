@@ -145,17 +145,17 @@ def ns_discovery(foldername, noise_level):
     # dimensionality = data.ndim - 1
 
     epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True,
-                                      use_pic=True, boundary=5,
+                                      use_pic=True, boundary=[20, 20, 45],
                                       coordinate_tensors=grid, device='cuda')
 
     # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
     #                                     preprocessor_kwargs={'epochs_max' : 1e3})
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
-    popsize = 16
+    popsize = 32
 
     epde_search_obj.set_moeadd_params(population_size=popsize,
-                                      training_epochs=50)
+                                      training_epochs=30)
 
     custom_grid_tokens = CacheStoredTokens(token_type='grid',
                                                 token_labels=['t', 'x'],
@@ -172,7 +172,7 @@ def ns_discovery(foldername, noise_level):
 
     bounds = (1e-12, 1e-0)
     epde_search_obj.fit(data=data, variable_names=["u", "v", "p"], max_deriv_order=(1, 2, 2), derivs=None,
-                        equation_terms_max_number=10, data_fun_pow=1,
+                        equation_terms_max_number=20, data_fun_pow=1,
                         additional_tokens=[],
                         equation_factors_max_number=factors_max_number,
                         eq_sparsity_interval=bounds, fourier_layers=False) # , data_nn=data_nn

@@ -149,7 +149,7 @@ def ODE_discovery(foldername, noise_level):
                                      preprocessor_kwargs={})
 
     popsize = 16
-    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=15)
+    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=5)
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
@@ -190,11 +190,11 @@ def ODE_simple_discovery(foldername, noise_level):
                                      preprocessor_kwargs={})
 
     popsize = 8
-    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=20)
+    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=5)
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
-    epde_search_obj.fit(data=[x, ], variable_names=['u', ], max_deriv_order=(2, 3),
+    epde_search_obj.fit(data=[x, ], variable_names=['u', ], max_deriv_order=(1),
                         equation_terms_max_number=5, data_fun_pow=3,
                         additional_tokens=[trig_tokens, grid_tokens],
                         equation_factors_max_number=factors_max_number,
@@ -227,6 +227,6 @@ if __name__ == "__main__":
     ode_folder_name = os.path.join(directory)
 
     # ODE_test(fit_operator, ode_folder_name, 0)
-    ODE_discovery(ode_folder_name, 0)
-    # ODE_simple_discovery(ode_folder_name, 0)
+    # ODE_discovery(ode_folder_name, 0)
+    ODE_simple_discovery(ode_folder_name, 0)
 

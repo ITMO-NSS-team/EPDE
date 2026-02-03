@@ -136,7 +136,7 @@ def ks_discovery(foldername, noise_level):
     popsize = 16
 
     epde_search_obj.set_moeadd_params(population_size=popsize,
-                                      training_epochs=10)
+                                      training_epochs=3)
 
     custom_grid_tokens = CacheStoredTokens(token_type='grid',
                                                 token_labels=['t', 'x'],
@@ -153,7 +153,7 @@ def ks_discovery(foldername, noise_level):
 
     bounds = (1e-12, 1e-0)
     epde_search_obj.fit(data=data, variable_names=["u"], max_deriv_order=(1, 4), derivs=None,
-                        equation_terms_max_number=10, data_fun_pow=1,
+                        equation_terms_max_number=7, data_fun_pow=1,
                         additional_tokens=[],
                         equation_factors_max_number=factors_max_number,
                         eq_sparsity_interval=bounds, fourier_layers=False) # , data_nn=data_nn

@@ -204,7 +204,7 @@ def hl_discovery(foldername, noise_level):
     dimensionality = data.ndim - 1
 
     epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True,
-                                      use_pic=True, boundary=(1,1,1,1),
+                                      use_pic=True, boundary=(0,0,0,0),
                                       coordinate_tensors=grid, device='cuda')
 
     # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
@@ -263,5 +263,5 @@ if __name__ == "__main__":
     directory = os.path.dirname(os.path.realpath(__file__))
     ac_folder_name = os.path.join(directory)
 
-    # hl_test(fit_operator, ac_folder_name, 0)
-    hl_discovery(ac_folder_name, 0)
+    hl_test(fit_operator, ac_folder_name, 0)
+    # hl_discovery(ac_folder_name, 0)

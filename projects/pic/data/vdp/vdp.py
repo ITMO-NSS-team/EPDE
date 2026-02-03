@@ -141,7 +141,7 @@ def vdp_discovery(foldername, noise_level):
                                      preprocessor_kwargs={})
 
     popsize = 16
-    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=10)
+    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=1)
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
