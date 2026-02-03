@@ -73,8 +73,8 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
                 rho = np.dot(X[:, j], residual) + old_coef * norm_sq
 
                 # Use CV-based Thresholding
-                # threshold = cv[j] * y_sq_sum
-                threshold = cv[j] * self.n_samples
+                threshold = cv[j] * y_sq_sum
+                # threshold = cv[j] * self.n_samples
                 # threshold = cv[j] * norm_sq * abs(old_coef)
                 new_coef = self._soft_threshold(rho, threshold) / norm_sq
 
