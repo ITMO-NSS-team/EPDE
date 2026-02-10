@@ -52,13 +52,11 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
         norm_sq_features = np.sum(X ** 2, axis=0)
         residual = y - (X @ self.coef_ + self.intercept_)
 
+        iteration = 0
+        max_change = np.inf
+
         # 2. Coordinate Descent Loop
-        for iteration in range(self.max_iter):
-            max_change = self.tol
-
-            if all(self.coef_ == 0):
-                break
-
+        while iteration < self.max_iter and not all(self.coef_ == 0):
             # Sort features by instability (highest CV first)
             for j in np.argsort(cv)[::-1]:
                 old_coef = self.coef_[j]
@@ -89,6 +87,7 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
                     self.coef_ = np.array([next(new_coef) if _ else 0 for _ in self.coef_ != 0])
                     self.intercept_ = weights.mean(axis=0)[-1]
                     residual = y - (X @ self.coef_ + self.intercept_)
+                    iteration = 0
                     break
 
                 residual -= (new_coef - old_coef) * X[:, j]
@@ -98,6 +97,7 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
 
             if max_change < self.tol:
                 break
+            iteration += 1
         # print(iteration)
         return self
 
