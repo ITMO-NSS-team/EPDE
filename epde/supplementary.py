@@ -455,6 +455,8 @@ def calculate_weights(X, y, sample_weights, grid_shape):
         XTW = X_batch.transpose(0, 2, 1) * weights_batch.transpose(0, 2, 1)
         XTWX = XTW @ X_batch
         XTWy = XTW @ y_batch[..., None]
+        ridge = 1e-6 * np.eye(n_features_aug)
+        XTWX += ridge
 
         # 2. Solve (Fast CPU Vectorized Solver)
         # np.linalg.solve supports batch dimensions!
