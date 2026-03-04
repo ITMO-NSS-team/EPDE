@@ -646,7 +646,7 @@ class EpdeSearch(object):
                     derivs=None, max_deriv_order=1, additional_tokens=[],
                     data_fun_pow: int = 1, deriv_fun_pow: int = 1, grid: list = None,
                     data_nn: torch.nn.Sequential = None, fourier_layers: bool = True,
-                    fourier_params: dict = {'L' : [4,], 'M' : [3,]}):
+                    fourier_params: dict = {'L' : [4,], 'M' : [3,]}, ann_epochs_max = 1e5):
         '''
         Create pool of tokens to represent elementary functions, that can be included in equations.
         
@@ -699,8 +699,8 @@ class EpdeSearch(object):
                 global_var.reset_data_repr_nn(data = data, derivs = base_derivs, train = False, 
                                               grids = grid, predefined_ann = data_nn, device = self._device)
             else:
-                epochs_max = 1e4 # 1e4
-                global_var.reset_data_repr_nn(data = data, derivs = base_derivs, epochs_max=epochs_max,
+                # epochs_max = 1e5 # 1e4
+                global_var.reset_data_repr_nn(data = data, derivs = base_derivs, epochs_max=ann_epochs_max,
                                               grids = grid, predefined_ann = None, device = self._device, 
                                               use_fourier = fourier_layers, fourier_params = fourier_params)
 
@@ -754,7 +754,7 @@ class EpdeSearch(object):
             equation_factors_max_number=1, variable_names=['u',], eq_sparsity_interval=(1e-4, 2.5), 
             derivs=None, max_deriv_order=1, additional_tokens = None, data_fun_pow: int = 1, deriv_fun_pow: int = 1,
             optimizer: Union[SimpleOptimizer, MOEADDOptimizer] = None, pool: TFPool = None,
-            population: List[SoEq] = None, data_nn = None, 
+            population: List[SoEq] = None, data_nn = None, ann_epochs_max = 1e5,
             fourier_layers: bool = False, fourier_params: dict = {'L' : [4,], 'M' : [3,]}):
         """
         Fit epde search algorithm to obtain differential equations, describing passed data.
@@ -827,7 +827,8 @@ class EpdeSearch(object):
                                  derivs=derivs, max_deriv_order=max_deriv_order, 
                                  additional_tokens=additional_tokens, 
                                  data_fun_pow = data_fun_pow, deriv_fun_pow = deriv_fun_pow, 
-                                 data_nn = data_nn, fourier_layers=fourier_layers, fourier_params=fourier_params)
+                                 data_nn = data_nn, ann_epochs_max = ann_epochs_max,
+                                 fourier_layers=fourier_layers, fourier_params=fourier_params)
         else:
             self.pool = pool; self.pool_params = cur_params
 

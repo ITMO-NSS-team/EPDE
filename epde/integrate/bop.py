@@ -261,7 +261,7 @@ class PregenBOperator(object):
                     operator.set_grid(grid=coords)
                     operator.values = bc_values
                     bconds.append(operator)
-        print('Types of conds:', [type(cond) for cond in bconds])
+        # print('Types of conds:', [type(cond) for cond in bconds])
         self.conditions = bconds
 
 

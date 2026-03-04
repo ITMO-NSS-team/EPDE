@@ -377,7 +377,7 @@ class SolverAdapter(object):
         else:
             equations_prepared = SolverEquation()
             for form in equations:
-                print(f'form is solve has a type of {type(form)}: {form}')
+                # print(f'form is solve has a type of {type(form)}: {form}')
                 if isinstance(form, dict):
                     equations_prepared.add(form)
                 elif (isinstance(form, list) or isinstance(form, tuple)) and len(form) == 2:

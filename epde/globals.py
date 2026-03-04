@@ -171,7 +171,7 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: b
         t = 0
         min_loss = np.inf
         loss_mean = np.inf
-        print(f'Training NN to represent data for {epochs_max} epochs')
+        print(f'Training ANN to represent input data on {epochs_max} epochs:')
         while loss_mean > 1e-6 and t < epochs_max:
 
             permutation = torch.randperm(grids_tr.size()[0])
@@ -184,8 +184,6 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: b
                 indices = permutation[i:i+batch_size]
                 batch_x, batch_y = grids_tr[indices], data_tr[indices]
 
-                # print(f'batch_y {batch_y.get_device()}, batch_x {batch_x.get_device()},, {next(model.parameters()).is_cuda}')
-                # print(f'model(batch_x) {model(batch_x)}') 
                 loss = torch.mean(torch.abs(batch_y - model(batch_x)))
                 if derivs is not None:
                     for var_idx, deriv_axes, deriv_tensor in derivs:
@@ -194,7 +192,6 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: b
                                                                                           deriv_tensor.shape)].reshape_as(deriv_autograd).to(device)
                         
                         loss_add = 1e2 * torch.mean(torch.abs(batch_derivs - deriv_autograd))
-                        # print(loss, loss_add)
                         loss += loss_add
 
                 if penalised_derivs is not None:
@@ -216,7 +213,7 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: b
                 min_loss = loss_mean
             t += 1
         model = best_model
-        print(f'min loss is {min_loss}, in last epoch: {loss_list}, ')
+        print(f'min loss is {min_loss}, in last epoch: {loss_list}.')
         solution_guess_nn = best_model
     else:
         solution_guess_nn = model

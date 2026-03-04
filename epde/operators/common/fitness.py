@@ -194,7 +194,7 @@ class SolverBasedFitness(CompoundOperator):
         if self.adapter is None or net is not None:
             compiling_params = {'mode': 'autograd', 'tol':0.01, 'lambda_bound': 100} #  'h': 1e-1
             optimizer_params = {}
-            training_params = {'epochs': 4e3, 'info_string_every' : 1e3}
+            training_params = {'epochs': 1e3, 'info_string_every' : 1e3}
             early_stopping_params = {'patience': 4, 'no_improvement_patience' : 250}
 
             explicit_cpu = False
@@ -272,7 +272,7 @@ class PIC(CompoundOperator):
         if self.adapter is None or net is not None:
             compiling_params = {'mode': 'autograd', 'tol': 0.01, 'lambda_bound': 100}  # 'h': 1e-1
             optimizer_params = {}
-            training_params = {'epochs': 4e3, 'info_string_every': 1e3}
+            training_params = {'epochs': 1e3, 'info_string_every': 1e3}
             early_stopping_params = {'patience': 4, 'no_improvement_patience': 250}
 
             explicit_cpu = False
@@ -306,10 +306,10 @@ class PIC(CompoundOperator):
                                                                boundary_conditions=None, use_fourier=True)
 
         _, grids = global_var.grid_cache.get_all(mode='torch')
-
+        grids = [grid[global_var.grid_cache.g_func != 0] for grid in grids]
         grids = torch.stack([grid.reshape(-1) for grid in grids], dim=1).float()
         solution = solution_nn(grids).detach().cpu().numpy()
-        self.g_fun_vals = global_var.grid_cache.g_func
+        self.g_fun_vals = global_var.grid_cache.g_func[global_var.grid_cache.g_func != 0]
 
         if force_out_of_place:
             sum_err = 0
@@ -319,8 +319,6 @@ class PIC(CompoundOperator):
             if torch.isnan(loss_add):
                 lp = 2 * LOSS_NAN_VAL
             else:
-                print(f'solution shape {solution.shape}')
-                print(f'solution[..., eq_idx] {solution[..., eq_idx].shape}, eq_idx {eq_idx}')
                 referential_data = global_var.tensor_cache.get((eq.main_var_to_explain, (1.0,)))
                 discr = solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape)
                 discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape))
@@ -339,7 +337,7 @@ class PIC(CompoundOperator):
 
             # Calculate r-loss
             _, target, features = eq.evaluate(normalize=False, return_val=False)
-            data_shape = global_var.grid_cache.g_func.shape
+            data_shape = global_var.grid_cache.g_func[global_var.grid_cache.g_func != 0].shape
             target_vals = target.reshape(*data_shape)
 
             if target_vals.ndim == 1:
