@@ -240,8 +240,6 @@ class SolverBasedFitness(CompoundOperator):
             else:
                 referential_data = global_var.tensor_cache.get((eq.main_var_to_explain, (1.0,)))
 
-                print(f'solution shape {solution.shape}')
-                print(f'solution[..., eq_idx] {solution[..., eq_idx].shape}, eq_idx {eq_idx}')
                 discr = (solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape))
                 discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape))
                 rl_error = np.linalg.norm(discr, ord = 2) 

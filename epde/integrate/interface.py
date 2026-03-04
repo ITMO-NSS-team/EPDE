@@ -30,32 +30,32 @@ class SystemSolverInterface(object):
 
         try:
             coeff_tensor = torch.ones_like(grids[0]).to(device)
-            
         except KeyError:
             raise NotImplementedError('No cache implemented')
+        
         for factor in term.structure:
             if factor.is_deriv:
                 for param_idx, param_descr in factor.params_description.items():
                     if param_descr['name'] == 'power':
                         power_param_idx = param_idx
                 deriv_orders.append(factor.deriv_code)
+
                 if factor.evaluator._evaluator != simple_function_evaluator:
                     if factor.evaluator._evaluator._single_function_token:
                         eval_func = factor.evaluator._evaluator._evaluation_functions_torch 
                     else:
                         eval_func = factor.evaluator._evaluator._evaluation_functions_torch[factor.label]
                     if not isinstance(eval_func, torch.nn.Sequential):
-                        # print(f'for term {factor.name} eval func {eval_func} is non')
                         eval_func_kwargs = dict()
                         for key in factor.evaluator._evaluator.eval_fun_params_labels:
                             for param_idx, param_descr in factor.params_description.items():
                                 if param_descr['name'] == key:
                                     eval_func_kwargs[key] = factor.params[param_idx]
-                        # print(f'eval_func_kwargs for {factor.name} are {eval_func_kwargs}')
                         lbd_eval_func = make_eval_func(eval_func, eval_func_kwargs)
                     deriv_powers.append(lbd_eval_func)
                 else:
                     deriv_powers.append(factor.params[power_param_idx])
+
                 try:
                     if isinstance(factor.variable, str):
                         cur_deriv_var = variables.index(factor.variable)
@@ -83,8 +83,6 @@ class SystemSolverInterface(object):
         if deriv_vars == []:
             if isinstance(deriv_powers, int) and deriv_powers != 0:
                 raise Exception('Something went wrong with parsing an equation for solver')
-            # elif isinstance(deriv_powers, list) and all([spec_power != 0 for spec_power in deriv_powers]):
-            #     raise Exception('Something went wrong with parsing an equation for solver')
             else:
                 deriv_vars = [0,]
 
@@ -96,7 +94,6 @@ class SystemSolverInterface(object):
                'pow': deriv_powers,
                'var': deriv_vars}
 
-        # print(f'Translated {term.name} to "term" {deriv_orders}, "pow" {deriv_powers}, "var" {deriv_vars} ')
         return res
 
     @singledispatchmethod
@@ -155,8 +152,12 @@ class SystemSolverInterface(object):
         return _solver_form
 
     def use_grids(self, grids=None): # 
+        print('=' * 10 + ' USE GRIDS ' + '=' * 10)
+        print('before: ', grids)
+
         if grids is None and self.grids is None:
             _, self.grids = global_var.grid_cache.get_all(mode = 'torch')
+            self.grids = [grid[global_var.grid_cache.g_func != 0] for grid in self.grids]
         elif grids is not None:
             if len(grids) != len(global_var.grid_cache.get_all(mode = 'torch')[1]):
                 raise ValueError(
@@ -164,9 +165,11 @@ class SystemSolverInterface(object):
             if isinstance(grids[0], np.ndarray):
                 grids = [torch.from_numpy(subgrid).to(self._device) for subgrid in grids]
             self.grids = grids
+        print(self.grids[0].shape)
+
             
 
-    def form(self, grids=None, mode = 'NN'):
+    def form(self, grids=None, mode = 'NN'): # -> List[str, ]:
         self.use_grids(grids=grids)
         equation_forms = []
 

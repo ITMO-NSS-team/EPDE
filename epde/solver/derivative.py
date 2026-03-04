@@ -133,6 +133,7 @@ class Derivative_autograd(DerivativeInt):
         Returns:
             der_term (torch.Tensor): resulting field, computed on a grid.
         """
+        # print(f'In take_derivative {grid_points.shape}')
         dif_dir = list(term.keys())[1]
         # it is may be int, function of grid or torch.Tensor
         if callable(term['coeff']):
@@ -156,16 +157,20 @@ class Derivative_autograd(DerivativeInt):
                     factor_val = term['pow'][j](der_args)
                 else:             
                     factor_val = term['pow'][j](*der_args)
+                # print(f'factor_val.shape is {factor_val.shape}')
                 der_term = der_term * factor_val
             else:
                 if derivative == [None] or derivative is None:
                     der = self.model(grid_points)[:, term['var'][j]].reshape(-1, 1)
                 else:
                     der = self._nn_autograd(self.model, grid_points, term['var'][j], axis=derivative)
+                # print(f'der.shape is {der.shape} from grid_points of shape {grid_points.shape}')
+
                 if isinstance(term['pow'][j],(int,float)):
                     der_term = der_term * der ** term['pow'][j]
                 elif isinstance(term['pow'][j], Callable):
                     der_term = der_term * term['pow'][j](der)
+        # print(f'coeff.shape {coeff.shape} & der_term.shape {der_term.shape}')
         der_term = coeff * der_term
         return der_term
 
