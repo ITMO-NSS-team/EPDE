@@ -152,9 +152,6 @@ class SystemSolverInterface(object):
         return _solver_form
 
     def use_grids(self, grids=None): # 
-        print('=' * 10 + ' USE GRIDS ' + '=' * 10)
-        print('before: ', grids)
-
         if grids is None and self.grids is None:
             _, self.grids = global_var.grid_cache.get_all(mode = 'torch')
             self.grids = [grid[global_var.grid_cache.g_func != 0] for grid in self.grids]
@@ -165,8 +162,6 @@ class SystemSolverInterface(object):
             if isinstance(grids[0], np.ndarray):
                 grids = [torch.from_numpy(subgrid).to(self._device) for subgrid in grids]
             self.grids = grids
-        print(self.grids[0].shape)
-
             
 
     def form(self, grids=None, mode = 'NN'): # -> List[str, ]:
