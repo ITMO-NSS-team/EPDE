@@ -323,7 +323,8 @@ class PIC(CompoundOperator):
                 discr = solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape)
                 discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape))
                 # rl_error = np.sqrt(np.mean(discr ** 2))
-                rl_error = np.sum(np.abs(discr)) / np.sum(np.abs(referential_data.reshape(solution[..., eq_idx].shape))) * 100
+                # rl_error = np.sum(np.abs(discr)) / np.sum(np.abs(referential_data.reshape(solution[..., eq_idx].shape))) * 100
+                rl_error = np.mean(discr ** 2)
 
                 print(f'fitness error is {rl_error}, while loss addition is {float(loss_add)}')
                 lp = rl_error + self.params['pinn_loss_mult'] * float(
@@ -336,148 +337,24 @@ class PIC(CompoundOperator):
             eq.aic_calculated = True
 
             # Calculate r-loss
-            _, target, features = eq.evaluate(normalize=False, return_val=False)
-            data_shape = global_var.grid_cache.g_func[global_var.grid_cache.g_func != 0].shape
-            target_vals = target.reshape(*data_shape)
+            data_shape = global_var.grid_cache.inner_shape
+            _, target, features = eq.evaluate(normalize=True, return_val=False)
+            weights = calculate_weights(features, target, self.g_fun_vals, data_shape)
+            weights_arr = np.array(weights)
+            std = weights_arr.std(axis=0, ddof=1)
+            mu = weights_arr.mean(axis=0)
 
-            if target_vals.ndim == 1:
-                window_size = len(target_vals) // 2
-                num_horizons = len(target_vals) - window_size + 1
-                if num_horizons < 30:
-                    step_size = 1
-                else:
-                    step_size = num_horizons // 30
-                eq_window_weights = []
-                # Compute coefficients and collect statistics over horizons
-                if features is None:
-                    for start_idx in range(0, num_horizons, step_size):
-                        end_idx = start_idx + window_size
-                        target_window = target_vals[start_idx:end_idx]
-                        if np.isclose(np.mean(target_window), 0):
-                            window_stability = np.abs(np.std(target_window))
-                        else:
-                            window_stability = np.abs(np.std(target_window) / np.mean(target_window))
-                        eq_window_weights.append(window_stability)
-                    lr = np.mean(eq_window_weights)
-                else:
-                    for start_idx in range(0, num_horizons, step_size):
-                        end_idx = start_idx + window_size
-                        target_window = target_vals[start_idx:end_idx]
-                        feature_window = features.reshape(*data_shape, -1)[start_idx:end_idx, :].reshape(-1, features.shape[-1])
-                        estimator = LinearRegression(fit_intercept=True)
-                        estimator.fit(feature_window, target_window, sample_weight=self.g_fun_vals[start_idx:end_idx])
-                        valuable_weights = estimator.coef_
-                        eq_window_weights.append(valuable_weights)
-                    eq_cv = np.array([
-                        np.abs(np.std(_)) if np.isclose(np.mean(_), 0)
-                        else np.abs(np.std(_) / np.mean(_))
-                        for _ in zip(*eq_window_weights)
-                    ])
-                    lr = eq_cv.sum()
+            # Safe division
+            with np.errstate(divide='ignore', invalid='ignore'):
+                cv = (std ** 2) / (mu ** 2)
+                cv[mu == 0] = 0.0  # Handle zero mean
 
-            elif target_vals.ndim == 2:
-                lr = 0
-                for dim in range(target_vals.ndim):
-                    eq_window_weights = []
-                    window_size = target_vals.shape[dim] // 2
-                    num_horizons = target_vals.shape[dim] - window_size + 1
-                    if num_horizons < 30:
-                        step_size = 1
-                    else:
-                        step_size = num_horizons // 30
-                    # Compute coefficients and collect statistics over horizons
-                    if features is None:
-                        for start_idx in range(0, num_horizons, step_size):
-                            end_idx = start_idx + window_size
-                            if dim == 0:
-                                target_window = target_vals[start_idx:end_idx, :].reshape(-1)
-                            else:
-                                target_window = target_vals[:, start_idx:end_idx].reshape(-1)
-                            if np.isclose(np.mean(target_window), 0):
-                                window_stability = np.abs(np.std(target_window))
-                            else:
-                                window_stability = np.abs(np.std(target_window) / np.mean(target_window))
-                            eq_window_weights.append(window_stability)
-                        lr += np.mean(eq_window_weights)
-                    else:
-                        for start_idx in range(0, num_horizons, step_size):
-                            end_idx = start_idx + window_size
-                            estimator = LinearRegression(fit_intercept=True)
-                            if dim == 0:
-                                target_window = target_vals[start_idx:end_idx, :].reshape(-1)
-                                feature_window = features.reshape(*data_shape, -1)[start_idx:end_idx, :].reshape(-1, features.shape[-1])
-                                estimator.fit(feature_window, target_window,
-                                              sample_weight=self.g_fun_vals.reshape(*data_shape, -1)[start_idx:end_idx, :].reshape(-1))
-                            else:
-                                target_window = target_vals[:, start_idx:end_idx].reshape(-1)
-                                feature_window = features.reshape(*data_shape, -1)[:, start_idx:end_idx].reshape(-1, features.shape[-1])
-                                estimator.fit(feature_window, target_window,
-                                              sample_weight=self.g_fun_vals.reshape(*data_shape, -1)[:, start_idx:end_idx].reshape(-1))
-                            valuable_weights = estimator.coef_
-                            eq_window_weights.append(valuable_weights)
-                        eq_cv = np.array([
-                            np.abs(np.std(_)) if np.isclose(np.mean(_), 0)
-                            else np.abs(np.std(_) / np.mean(_))
-                            for _ in zip(*eq_window_weights)
-                        ])
-                        lr += eq_cv.sum()
-
-            elif target_vals.ndim == 3:
-                lr = 0
-                for dim in range(target_vals.ndim):
-                    eq_window_weights = []
-                    window_size = target_vals.shape[dim] // 2
-                    num_horizons = target_vals.shape[dim] - window_size + 1
-                    # Compute coefficients and collect statistics over horizons
-                    if features is None:
-                        for start_idx in range(num_horizons):
-                            end_idx = start_idx + window_size
-                            if dim == 0:
-                                target_window = target_vals[start_idx:end_idx, :, :].reshape(-1)
-                            elif dim == 1:
-                                target_window = target_vals[:, start_idx:end_idx, :].reshape(-1)
-                            else:
-                                target_window = target_vals[:, :, start_idx:end_idx].reshape(-1)
-                            if np.isclose(np.mean(target_window), 0):
-                                window_stability = np.abs(np.std(target_window))
-                            else:
-                                window_stability = np.abs(np.std(target_window) / np.mean(target_window))
-                            eq_window_weights.append(window_stability)
-                        lr += np.mean(eq_window_weights)
-                    else:
-                        for start_idx in range(num_horizons):
-                            end_idx = start_idx + window_size
-                            estimator = LinearRegression(fit_intercept=True)
-                            if dim == 0:
-                                target_window = target_vals[start_idx:end_idx, :, :].reshape(-1)
-                                feature_window = features.reshape(*data_shape, -1)[start_idx:end_idx, :, :].reshape(-1, features.shape[-1])
-                                estimator.fit(feature_window, target_window,
-                                              sample_weight=self.g_fun_vals.reshape(*data_shape, -1)[start_idx:end_idx, :, :].reshape(-1))
-                            elif dim == 1:
-                                target_window = target_vals[:, start_idx:end_idx, :].reshape(-1)
-                                feature_window = features.reshape(*data_shape, -1)[:, start_idx:end_idx, :].reshape(-1, features.shape[-1])
-                                estimator.fit(feature_window, target_window,
-                                              sample_weight=self.g_fun_vals.reshape(*data_shape, -1)[:, start_idx:end_idx, :].reshape(-1))
-                            elif dim == 2:
-                                target_window = target_vals[:, :, start_idx:end_idx].reshape(-1)
-                                feature_window = features.reshape(*data_shape, -1)[:, :, start_idx:end_idx].reshape(-1, features.shape[-1])
-                                estimator.fit(feature_window, target_window,
-                                              sample_weight=self.g_fun_vals.reshape(*data_shape, -1)[:, :, start_idx:end_idx].reshape(-1))
-                            valuable_weights = estimator.coef_
-                            eq_window_weights.append(valuable_weights)
-                        eq_cv = np.array([
-                            np.abs(np.std(_)) if np.isclose(np.mean(_), 0)
-                            else np.abs(np.std(_) / np.mean(_))
-                            for _ in zip(*eq_window_weights)
-                        ])
-                        lr += eq_cv.sum()
+            total_lr = sum(cv[:-1]) / len(data_shape)
 
             eq.fitness_calculated = True
             eq.fitness_value = lp
             eq.stability_calculated = True
-            eq.coefficients_stability = lr
-
-            print('Lr: ', lr, '\t Lp: ', lp)
+            eq.coefficients_stability = total_lr
 
     def feature_reshape(self, features_vals):
         features = features_vals[0]
