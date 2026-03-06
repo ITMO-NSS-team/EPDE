@@ -50,13 +50,12 @@ class ComplexStructure(object):
         assert len(self.structure) > 0, 'Attempt to evaluate an empty complex structure'
         if len(self.structure) == 1:
             return self.structure[0].evaluate(structural)
-        else:
-            try:
-                return reduce(lambda x, y: self.interelement_operator(x, y.evaluate(structural)),
-                              self.structure[1:], self.structure[0].evaluate(structural))
-            except ValueError:
-                print([element.name for element in self.structure])
-                raise ValueError('operands could not be broadcast together with shapes')
+        try:
+            evaluated = [elem.evaluate(structural) for elem in self.structure]
+            return reduce(self.interelement_operator, evaluated)
+        except ValueError:
+            print([element.name for element in self.structure])
+            raise ValueError('operands could not be broadcast together with shapes')
 
     def reset_saved_state(self):
         self.saved = {True: False, False: False}
