@@ -34,7 +34,7 @@
 
  	},
  	"ChromosomeCrossover" : {
-
+		"equation_exchange_prob" : 0.1
 	},	
  	"MetaparamerCrossover" : {
         "metaparam_proportion" : 0.05
@@ -55,7 +55,8 @@
 		"indiv_mutation_prob" : 1
     },
 	"EquationMutation" : {
-        "r_mutation" : 0.6
+        "r_mutation" : 0.6,
+		"n_added_terms" : 5
 	},
 	"MetaparameterMutation" : {
         "mean" : 0.0,
