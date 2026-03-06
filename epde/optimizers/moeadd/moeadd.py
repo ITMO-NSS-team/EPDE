@@ -629,8 +629,11 @@ class MOEADDOptimizer(object):
                 stats = self.pareto_levels.get_stats()
                 self._hist.append(stats)
                 if global_var.verbose.iter_fitness:
-                    print(f'after epoch {epoch_idx} obtained OF: mean = {np.mean(stats[0], axis = 0)}, \
-                           var = {np.mean(stats[0], axis = 0)}')    
+                    print(f'\n--- Dominating Pareto front (epoch {epoch_idx}) ---')
+                    for sol_idx, solution in enumerate(self.pareto_levels.levels[0]):
+                        print(f'  [{sol_idx}] obj_fun = {solution.obj_fun}')
+                        print(f'       {solution.text_form}')
+                    print('---')    
 
     def form_processer_args(self, cur_weight : int): # TODO: inspect the most convenient input format
         """
@@ -649,4 +652,5 @@ class MOEADDOptimizer(object):
     def plot_pareto(self, dimensions:list, **visualizer_kwargs):
         assert len(dimensions) == 2, 'Current approach supports only two dimensional plots'
         visualizer = ParetoVisualizer(self.pareto_levels)
-        visualizer.plot_pareto_mt(dimensions = dimensions, **visualizer_kwargs)
+        # visualizer.plot_pareto_mt(dimensions = dimensions, **visualizer_kwargs)
+        visualizer.plot_pareto_per_equation()
