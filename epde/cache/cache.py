@@ -150,6 +150,8 @@ class Cache(object):
     def __init__(self, device = 'cpu'):
         self._device = device
         self.max_allowed_tensors = None
+        self._g_func_flat_cache = None
+        self._g_func_mask_cache = None
         
         self.memory_default = {'torch' : dict(), 'numpy' : dict()} # TODO: add separate cache for torch tensors and numpy
         self.memory_normalized = {'torch' : dict(), 'numpy' : dict()}
@@ -226,6 +228,20 @@ class Cache(object):
     @g_func.setter
     def g_func(self, function: Union[Callable, np.ndarray, list]):
         self._g_func = function
+        self._g_func_flat_cache = None
+        self._g_func_mask_cache = None
+
+    @property
+    def g_func_flat(self):
+        if self._g_func_flat_cache is None:
+            self._g_func_flat_cache = self.g_func.reshape(-1)
+        return self._g_func_flat_cache
+
+    @property
+    def g_func_mask(self):
+        if self._g_func_mask_cache is None:
+            self._g_func_mask_cache = self.g_func != 0
+        return self._g_func_mask_cache
 
     def add_base_matrix(self, label):
         assert label in self.memory_default['numpy'].keys()
