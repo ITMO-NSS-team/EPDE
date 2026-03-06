@@ -722,7 +722,7 @@ class Equation(ComplexStructure):
                         mandatory_family=None, passed_term=None)
 
         attempt = 0
-        while new_term.term_label in self.terms_labels or attempt < 10:
+        while new_term.term_label in self.terms_labels and attempt < 10:
             new_term.randomize()
             attempt += 1
 
