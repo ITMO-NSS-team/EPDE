@@ -150,7 +150,7 @@ def locate_pareto_worst(levels: ParetoLevels, weights: np.ndarray, best_obj: np.
         Best achievable values of the objective functions.
     
     penalty_factor : float, optional, default 1.
-        The penalty parameter, used during penalty based intersection value calculation.        
+        The penalty parameter, used during penalty based intersection value calculation.
     
     '''
     domain_solutions = population_to_sectors(levels.population, weights)
@@ -221,16 +221,24 @@ class PopulationUpdater(CompoundOperator):
                 if len(solution_subregion) > 1:
                     worst_solution = solution
                 else:
-                    # Subregion has only this solution — use decomposition on entire population
-                    worst_solution = decomposition_based_worst(objective[1].population, self_args['weights'],
+                    # Subregion has only this solution — use NDL-aware decomposition
+                    worst_solution = locate_pareto_worst(objective[1], self_args['weights'],
+                                                         self_args['best_obj'], self.params['PBI_penalty'])
+            else:
+                # Algorithm 4, Case 3: multiple solutions on last front
+                last_front = objective[1].levels[-1]
+                last_front_by_domains = population_to_sectors(last_front, self_args['weights'])
+                most_crowded_count = max(len(d) for d in last_front_by_domains)
+
+                if most_crowded_count > 1:
+                    # Most crowded subregion has >1 solutions — remove worst PBI there
+                    worst_solution = decomposition_based_worst(last_front, self_args['weights'],
                                                                self_args['best_obj'], self.params['PBI_penalty'],
                                                                objective[1].normalizer)
-            else:
-                # Algorithm 4, Case 3: multiple solutions on last front —
-                # decomposition restricted to last front only
-                worst_solution = decomposition_based_worst(objective[1].levels[-1], self_args['weights'],
-                                                           self_args['best_obj'], self.params['PBI_penalty'],
-                                                           objective[1].normalizer)
+                else:
+                    # All subregions have size 1 — find worst in whole population
+                    worst_solution = locate_pareto_worst(objective[1], self_args['weights'],
+                                                         self_args['best_obj'], self.params['PBI_penalty'])
 
         objective[1].delete_point(worst_solution)
         
