@@ -384,7 +384,8 @@ class Equation(ComplexStructure):
                   # '_target', '_features', 'saved', 'saved_as','max_factors_in_term', 'operator',
                  'target_idx', 'right_part_selected', '_weights_final', 'weights_final_evald', 'simplified', 'is_correct_right_part',
                  '_weights_internal', 'weights_internal_evald', 'fitness_calculated', 'stability_calculated', 'aic_calculated', 'solver_form_defined',
-                 '_fitness_value', '_coefficients_stability', '_aic', 'metaparameters', 'main_var_to_explain'] # , '_solver_form'
+                 '_fitness_value', '_coefficients_stability', '_aic', 'metaparameters', 'main_var_to_explain',
+                 '_eval_cache', '_cached_sw_weights'] # , '_solver_form'
 
 
     def __init__(self, pool: TFPool, basic_structure: Union[list, tuple, set], var_to_explain: str = None,
@@ -585,29 +586,25 @@ class Equation(ComplexStructure):
         return new_eq
 
     def evaluate(self, normalize=True, return_val=False, grids=None):
+        cache_key = (normalize, return_val, grids is None)
+        if grids is None and hasattr(self, '_eval_cache') and cache_key in self._eval_cache:
+            return self._eval_cache[cache_key]
+
         target = self.structure[self.target_idx].evaluate(False, grids=grids)
 
-        # Place for improvent: introduce shifted_idx where necessary
-        def shifted_idx(idx):
-            if idx < self.target_idx:
-                return idx
-            elif idx > self.target_idx:
-                return idx - 1
-            else:
-                return -1
-
         if normalize:
-            feature_indexes = list(range(len(self.structure)))
-            feature_indexes.remove(self.target_idx)
+            feature_indexes = [i for i in range(len(self.structure)) if i != self.target_idx]
         else:
-            feature_indexes = [idx for idx in range(len(self.structure))
-                               if self.weights_internal[shifted_idx(idx)] != 0 and idx != self.target_idx]
-            # feature_indexes = [idx for idx in range(len(self.structure)) if idx != self.target_idx]
+            feature_indexes = []
+            for idx in range(len(self.structure)):
+                if idx == self.target_idx:
+                    continue
+                shifted = idx if idx < self.target_idx else idx - 1
+                if self.weights_internal[shifted] != 0:
+                    feature_indexes.append(idx)
         if len(feature_indexes) > 0:
-            features = self.structure[feature_indexes[0]].evaluate(False, grids=grids)
-            for feat_idx in range(1, len(feature_indexes)):
-                temp = self.structure[feature_indexes[feat_idx]].evaluate(False, grids=grids)
-                features = np.vstack([features, temp])
+            feat_list = [self.structure[idx].evaluate(False, grids=grids) for idx in feature_indexes]
+            features = np.vstack(feat_list)
             if features.ndim == 1:
                 features = np.expand_dims(features, 1).T
             features = np.transpose(features)
@@ -633,9 +630,15 @@ class Equation(ComplexStructure):
                     features_val = np.zeros_like(target)
                 value = np.add(elem1, - features_val)
                 # print(value.shape)
-            return value, target, features
+            result = (value, target, features)
         else:
-            return None, target, features
+            result = (None, target, features)
+
+        if grids is None:
+            if not hasattr(self, '_eval_cache'):
+                self._eval_cache = {}
+            self._eval_cache[cache_key] = result
+        return result
 
     def reset_state(self, reset_right_part: bool = True):
         if reset_right_part:
@@ -656,6 +659,8 @@ class Equation(ComplexStructure):
         self.coefficients_stability = None
         self.aic_calculated = False
         self.solver_form_defined = False
+        self._eval_cache = {}
+        self._cached_sw_weights = None
 
 
     @HistoryExtender('\n -> was copied by deepcopy(self)', 'n')

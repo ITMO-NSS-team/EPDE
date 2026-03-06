@@ -78,7 +78,7 @@ class L2Fitness(CompoundOperator):
             discr_feats = np.dot(features, objective.weights_final[:-1][objective.weights_internal != 0])
 
         discr = (discr_feats + np.full(target.shape, objective.weights_final[-1]) - target)
-        self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)
+        self.g_fun_vals = global_var.grid_cache.g_func_flat
         discr = np.multiply(discr, self.g_fun_vals)
         rl_error = np.linalg.norm(discr, ord = 2)
 
@@ -153,7 +153,10 @@ class L2LRFitness(CompoundOperator):
         objective.aic_calculated = True
 
         data_shape = global_var.grid_cache.inner_shape
-        weights = calculate_weights(features, target, self.g_fun_vals, data_shape)
+        if hasattr(objective, '_cached_sw_weights') and objective._cached_sw_weights is not None:
+            weights = objective._cached_sw_weights
+        else:
+            weights = calculate_weights(features, target, self.g_fun_vals, data_shape)
         weights_arr = np.array(weights)
         std = weights_arr.std(axis=0, ddof=1)
         mu = weights_arr.mean(axis=0)
@@ -164,7 +167,6 @@ class L2LRFitness(CompoundOperator):
             cv[mu == 0] = 0.0  # Handle zero mean
 
         total_lr = sum(cv[:-1]) / len(data_shape)
-        # total_lr = sum(dim_results) / target_vals.ndim
 
         objective.fitness_calculated = True
         objective.fitness_value = fitness_value
@@ -173,7 +175,7 @@ class L2LRFitness(CompoundOperator):
 
     def get_g_fun_vals(self):
         try:
-            self.g_fun_vals = global_var.grid_cache.g_func[global_var.grid_cache.g_func != 0].reshape(-1)
+            self.g_fun_vals = global_var.grid_cache.g_func[global_var.grid_cache.g_func_mask].reshape(-1)
         except AttributeError:
             self.g_fun_vals = None
 
@@ -230,7 +232,7 @@ class SolverBasedFitness(CompoundOperator):
         grids = torch.stack([grid.reshape(-1) for grid in grids], dim = 1).float()
         solution = solution_nn(grids).detach().cpu().numpy()
         self.g_fun_vals = global_var.grid_cache.g_func
-        
+
         if force_out_of_place:
             sum_err = 0
 
@@ -306,10 +308,11 @@ class PIC(CompoundOperator):
                                                                boundary_conditions=None, use_fourier=True)
 
         _, grids = global_var.grid_cache.get_all(mode='torch')
-        grids = [grid[global_var.grid_cache.g_func != 0] for grid in grids]
+        g_mask = global_var.grid_cache.g_func_mask
+        grids = [grid[g_mask] for grid in grids]
         grids = torch.stack([grid.reshape(-1) for grid in grids], dim=1).float()
         solution = solution_nn(grids).detach().cpu().numpy()
-        self.g_fun_vals = global_var.grid_cache.g_func[global_var.grid_cache.g_func != 0]
+        self.g_fun_vals = global_var.grid_cache.g_func[g_mask]
 
         if force_out_of_place:
             sum_err = 0
@@ -339,7 +342,10 @@ class PIC(CompoundOperator):
             # Calculate r-loss
             data_shape = global_var.grid_cache.inner_shape
             _, target, features = eq.evaluate(normalize=True, return_val=False)
-            weights = calculate_weights(features, target, self.g_fun_vals, data_shape)
+            if hasattr(eq, '_cached_sw_weights') and eq._cached_sw_weights is not None:
+                weights = eq._cached_sw_weights
+            else:
+                weights = calculate_weights(features, target, self.g_fun_vals, data_shape)
             weights_arr = np.array(weights)
             std = weights_arr.std(axis=0, ddof=1)
             mu = weights_arr.mean(axis=0)
@@ -369,7 +375,7 @@ class PIC(CompoundOperator):
 
     def get_g_fun_vals(self):
         try:
-            self.g_fun_vals = global_var.grid_cache.g_func.reshape(-1)
+            self.g_fun_vals = global_var.grid_cache.g_func_flat
         except AttributeError:
             self.g_fun_vals = None
                 

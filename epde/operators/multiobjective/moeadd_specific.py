@@ -13,6 +13,7 @@ from functools import reduce, partial
 
 from epde.optimizers.moeadd.moeadd import ParetoLevels, ObjFunNormalizer
 from epde.operators.utils.template import CompoundOperator, add_base_param_to_operator
+import epde.globals as global_var
 from epde.operators.multiobjective.mutations import get_basic_mutation
 
 from epde.structure.main_structures import SoEq
@@ -103,6 +104,35 @@ def population_to_sectors(population, weights):
     return list(map(solution_selection, np.arange(len(weights))))    
 
 
+def decomposition_based_worst(solutions: list, weights: np.ndarray, best_obj: np.ndarray,
+                              penalty_factor: float = 1., obj_normalizer: ObjFunNormalizer = None):
+    '''
+    Algorithm 3 from the MOEA/DD paper (Li, Deb, Zhang, 2015).
+    Finds the worst solution among a given set using decomposition-based selection:
+    1. Distribute solutions into subregions defined by weight vectors
+    2. Find the most crowded subregion (ties broken by largest sum of PBI)
+    3. Return the solution with the largest individual PBI in that subregion
+    '''
+    domain_solutions = population_to_sectors(solutions, weights)
+    most_crowded_count = max(len(domain) for domain in domain_solutions)
+    crowded_domains = [idx for idx, domain in enumerate(domain_solutions)
+                       if len(domain) == most_crowded_count]
+
+    if len(crowded_domains) == 1:
+        most_crowded_domain = crowded_domains[0]
+    else:
+        PBI = lambda domain_idx: sum([penalty_based_intersection(sol, weights[domain_idx], best_obj,
+                                      penalty_factor, obj_normalizer) for sol in domain_solutions[domain_idx]])
+        PBIS = np.fromiter(map(PBI, crowded_domains), dtype=float)
+        most_crowded_domain = crowded_domains[np.argmax(PBIS)]
+
+    candidates = domain_solutions[most_crowded_domain]
+    PBIS = np.fromiter(map(lambda s: penalty_based_intersection(s, weights[most_crowded_domain], best_obj,
+                                                                 penalty_factor, obj_normalizer),
+                           candidates), dtype=float)
+    return candidates[np.argmax(PBIS)]
+
+
 def locate_pareto_worst(levels: ParetoLevels, weights: np.ndarray, best_obj: np.ndarray, penalty_factor: float = 1.):
     '''
     
@@ -121,7 +151,7 @@ def locate_pareto_worst(levels: ParetoLevels, weights: np.ndarray, best_obj: np.
         Best achievable values of the objective functions.
     
     penalty_factor : float, optional, default 1.
-        The penalty parameter, used during penalty based intersection value calculation.        
+        The penalty parameter, used during penalty based intersection value calculation.
     
     '''
     domain_solutions = population_to_sectors(levels.population, weights)
@@ -151,60 +181,7 @@ def locate_pareto_worst(levels: ParetoLevels, weights: np.ndarray, best_obj: np.
 
 class PopulationUpdater(CompoundOperator):
     key = 'PopulationUpdater'
-    
-    def apply_deprecated(self, objective : Tuple[Union[SoEq, ParetoLevels]], arguments : dict):
-        '''
-        Update population to get the pareto-nondomiated levels with the worst element removed. 
-        Here, "worst" means the solution with highest PBI value (penalty-based boundary intersection)
-        '''
-        assert isinstance(objective, tuple), f'Expected input of PopulationUpdater to be a Tuple of SoEq and ParetoLevels.\n'\
-                                             f'Did not get even a Tuple, instead got {type(objective)}!'
-        assert isinstance(objective[0], SoEq), f'Expected input of PopulationUpdater to be a Tuple of SoEq and ParetoLevels.\n'\
-                                               f'Did not get a SoEq obj in the first position, instead got {type(objective[0])}!'        
-        assert isinstance(objective[1], ParetoLevels), f'Expected input of PopulationUpdater to be a Tuple of SoEq and ParetoLevels.\n'\
-                                                       f'Did not get even a ParetoLevels in the second position, '\
-                                                       f'instead got {type(objective[1])}!.'
 
-        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
-        # print(f'PopulationUpdater.params is {self.params}')
-        
-        # TODO: Init normalizer here!
-        # print('objective is ', objective)
-        objective[1].set_normalizer()
-
-        objective[1].update(objective[0])  #levels_updated = ndl_update(offspring, levels)
-        if len(objective[1].levels) == 1:
-            worst_solution = locate_pareto_worst(objective[1], self_args['weights'], 
-                                                 self_args['best_obj'], self.params['PBI_penalty'])
-        else:
-            last_level_by_domains = population_to_sectors(objective[1].levels[-1],
-                                                          self_args['weights'])
-            most_crowded_count = np.max([len(domain) for domain in last_level_by_domains])
-            crowded_domains = [domain_idx for domain_idx in np.arange(len(self_args['weights']))
-                               if len(last_level_by_domains[domain_idx]) == most_crowded_count]
-
-            if len(crowded_domains) == 1:
-                most_crowded_domain = crowded_domains[0]
-            else:
-                PBI = lambda domain_idx: np.sum([penalty_based_intersection(sol_obj, self_args['weights'][domain_idx],
-                                                                            self_args['best_obj'],
-                                                                            self.params['PBI_penalty'],
-                                                                            objective[1].normalizer)
-                                                 for sol_obj in last_level_by_domains[domain_idx]])
-                PBIS = np.fromiter(map(PBI, crowded_domains), dtype = float)
-                most_crowded_domain = crowded_domains[np.argmax(PBIS)]
-
-            if len(last_level_by_domains[most_crowded_domain]) == 1:
-                worst_solution = last_level_by_domains[most_crowded_domain][0]
-            else:
-                PBIS = np.fromiter(map(lambda solution: penalty_based_intersection(solution,
-                                                                                   self_args['weights'][most_crowded_domain],
-                                                                                   self_args['best_obj'], self.params['PBI_penalty'],
-                                                                                   objective[1].normalizer),
-                                           last_level_by_domains[most_crowded_domain]), dtype = float)
-                worst_solution = last_level_by_domains[most_crowded_domain][np.argmax(PBIS)]
-        
-        objective[1].delete_point(worst_solution)
 
     def apply(self, objective: Tuple[Union[SoEq, ParetoLevels]], arguments: dict):
         '''
@@ -231,42 +208,38 @@ class PopulationUpdater(CompoundOperator):
 
         objective[1].update(objective[0])  # levels_updated = ndl_update(offspring, levels)
         if len(objective[1].levels) == 1:
-            worst_solution = locate_pareto_worst(objective[1], self_args['weights'],
-                                                 self_args['best_obj'], self.params['PBI_penalty'])
+            # Algorithm 4, Case 1: single front — decomposition on entire population
+            worst_solution = decomposition_based_worst(objective[1].population, self_args['weights'],
+                                                       self_args['best_obj'], self.params['PBI_penalty'],
+                                                       objective[1].normalizer)
         else:
             if len(objective[1].levels[-1]) == 1:
+                # Algorithm 4, Case 2: single solution on last front
                 solution = objective[1].levels[-1][0]
                 population_by_domains = population_to_sectors(objective[1].population, self_args['weights'])
-                solution_subregion = [domain for domain in population_by_domains if solution in domain][0]
+                solution_subregion = next(domain for domain in population_by_domains if solution in domain)
 
                 if len(solution_subregion) > 1:
                     worst_solution = solution
                 else:
+                    # Subregion has only this solution — use NDL-aware decomposition
                     worst_solution = locate_pareto_worst(objective[1], self_args['weights'],
-                                                 self_args['best_obj'], self.params['PBI_penalty'])
+                                                         self_args['best_obj'], self.params['PBI_penalty'])
             else:
-                most_crowded_count = 0
-                max_PBI = 0
-                population_by_domains = population_to_sectors(objective[1].population, self_args['weights'])
-                for solution in objective[1].levels[-1]:
-                    solution_subregion = [[domain_idx, domain] for domain_idx, domain in enumerate(population_by_domains) if solution in domain][0]
-                    if len(solution_subregion[1]) > most_crowded_count:
-                        most_crowded_count = len(solution_subregion[1])
-                        max_PBI = np.sum([penalty_based_intersection(domain, self_args['weights'][solution_subregion[0]],
-                                                              self_args['best_obj'], self.params['PBI_penalty'],
-                                                              objective[1].normalizer) for domain in solution_subregion[1]])
-                        worst_solution = solution
-                    elif len(solution_subregion[1]) == most_crowded_count:
-                        solution_subregion_PBI = np.sum([penalty_based_intersection(domain, self_args['weights'][solution_subregion[0]],
-                                                              self_args['best_obj'], self.params['PBI_penalty'],
-                                                              objective[1].normalizer) for domain in solution_subregion[1]])
-                        if max_PBI < solution_subregion_PBI:
-                            max_PBI = solution_subregion_PBI
-                            worst_solution = solution
+                # Algorithm 4, Case 3: multiple solutions on last front
+                last_front = objective[1].levels[-1]
+                last_front_by_domains = population_to_sectors(last_front, self_args['weights'])
+                most_crowded_count = max(len(d) for d in last_front_by_domains)
 
-                if most_crowded_count == 1:
+                if most_crowded_count > 1:
+                    # Most crowded subregion has >1 solutions — remove worst PBI there
+                    worst_solution = decomposition_based_worst(last_front, self_args['weights'],
+                                                               self_args['best_obj'], self.params['PBI_penalty'],
+                                                               objective[1].normalizer)
+                else:
+                    # All subregions have size 1 — find worst in whole population
                     worst_solution = locate_pareto_worst(objective[1], self_args['weights'],
-                                                 self_args['best_obj'], self.params['PBI_penalty'])
+                                                         self_args['best_obj'], self.params['PBI_penalty'])
 
         objective[1].delete_point(worst_solution)
         
@@ -475,10 +448,12 @@ class OffspringUpdater(CompoundOperator):
                     self.suboperators['pareto_level_updater'].apply(objective=(temp_offspring, objective),
                                                                     arguments=subop_args['pareto_level_updater'])
                     objective.history.add(system)
-                    print(temp_offspring.obj_fun)
+                    if global_var.verbose.candidate_objectives:
+                        print(temp_offspring.obj_fun)
                     break
                 if replaced == offspring_attempt_limit:
-                    print("Could not generate unique offspring")
+                    if global_var.verbose.candidate_objectives:
+                        print("Could not generate unique offspring")
                     break
                 if attempt == mutation_attempt_limit:
                     temp_offspring.create()
@@ -561,11 +536,11 @@ class InitialParetoLevelSorting(CompoundOperator):
                 self.suboperators['chromosome_fitness'].apply(objective=candidate,
                                                               arguments=subop_args['chromosome_fitness'])
                 objective.history.add(system)
-                print(candidate.obj_fun)
+                if global_var.verbose.candidate_objectives:
+                    print(candidate.obj_fun)
             objective.associate_weights()
             objective.initial_placing()
-        
-            # objective.
+
             # TODO: consider carefully, where normalizer init shall be held. If here, only the initial values are employed
         # objective.set_normalizer()
 
