@@ -41,9 +41,11 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
 
     def fit(self, X, y, sample_weights):
         self.n_samples, self.n_features = X.shape
+        self.cached_weights_ = None
 
         # 1. Initial Weights
         weights = calculate_weights(X, y, sample_weights=sample_weights, grid_shape=self.grid_shape)
+        self.cached_weights_ = weights
         cv = self.get_cv(weights[:, :-1])
 
         self.coef_ = weights.mean(axis=0)[:-1]
@@ -80,6 +82,7 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
 
                 if new_coef == 0:
                     weights = calculate_weights(X[:, self.coef_ != 0], y, sample_weights=sample_weights, grid_shape=self.grid_shape)
+                    self.cached_weights_ = weights
                     new_cv = iter(self.get_cv(weights[:, :-1]))
                     cv = np.array([next(new_cv) if _ else 0 for _ in self.coef_ != 0])
 
@@ -151,7 +154,7 @@ class LASSOSparsity(CompoundOperator):
 
         _, target, features = objective.evaluate(normalize = True, return_val = False)
 
-        self.g_fun_vals = global_var.grid_cache.g_func[global_var.grid_cache.g_func != 0]
+        self.g_fun_vals = global_var.grid_cache.g_func[global_var.grid_cache.g_func_mask]
 
         estimator.fit(features, target, self.g_fun_vals)
         objective.weights_internal = estimator.coef_
@@ -159,6 +162,8 @@ class LASSOSparsity(CompoundOperator):
         objective.weights_final = np.append(objective.weights_internal, estimator.intercept_)
         objective.weights_final_evald = True
         objective.weights_final = [weight for weight in objective.weights_final if weight != 0]
+        objective._cached_sw_weights = estimator.cached_weights_
+        objective._eval_cache = {}
 
 
     def use_default_tags(self):

@@ -153,7 +153,10 @@ class L2LRFitness(CompoundOperator):
         objective.aic_calculated = True
 
         data_shape = global_var.grid_cache.inner_shape
-        weights = calculate_weights(features, target, self.g_fun_vals, data_shape)
+        if hasattr(objective, '_cached_sw_weights') and objective._cached_sw_weights is not None:
+            weights = objective._cached_sw_weights
+        else:
+            weights = calculate_weights(features, target, self.g_fun_vals, data_shape)
         weights_arr = np.array(weights)
         std = weights_arr.std(axis=0, ddof=1)
         mu = weights_arr.mean(axis=0)
@@ -339,7 +342,10 @@ class PIC(CompoundOperator):
             # Calculate r-loss
             data_shape = global_var.grid_cache.inner_shape
             _, target, features = eq.evaluate(normalize=True, return_val=False)
-            weights = calculate_weights(features, target, self.g_fun_vals, data_shape)
+            if hasattr(eq, '_cached_sw_weights') and eq._cached_sw_weights is not None:
+                weights = eq._cached_sw_weights
+            else:
+                weights = calculate_weights(features, target, self.g_fun_vals, data_shape)
             weights_arr = np.array(weights)
             std = weights_arr.std(axis=0, ddof=1)
             mu = weights_arr.mean(axis=0)

@@ -384,7 +384,8 @@ class Equation(ComplexStructure):
                   # '_target', '_features', 'saved', 'saved_as','max_factors_in_term', 'operator',
                  'target_idx', 'right_part_selected', '_weights_final', 'weights_final_evald', 'simplified', 'is_correct_right_part',
                  '_weights_internal', 'weights_internal_evald', 'fitness_calculated', 'stability_calculated', 'aic_calculated', 'solver_form_defined',
-                 '_fitness_value', '_coefficients_stability', '_aic', 'metaparameters', 'main_var_to_explain'] # , '_solver_form'
+                 '_fitness_value', '_coefficients_stability', '_aic', 'metaparameters', 'main_var_to_explain',
+                 '_eval_cache', '_cached_sw_weights'] # , '_solver_form'
 
 
     def __init__(self, pool: TFPool, basic_structure: Union[list, tuple, set], var_to_explain: str = None,
@@ -656,6 +657,8 @@ class Equation(ComplexStructure):
         self.coefficients_stability = None
         self.aic_calculated = False
         self.solver_form_defined = False
+        self._eval_cache = {}
+        self._cached_sw_weights = None
 
 
     @HistoryExtender('\n -> was copied by deepcopy(self)', 'n')
