@@ -13,6 +13,7 @@ from functools import reduce, partial
 
 from epde.optimizers.moeadd.moeadd import ParetoLevels, ObjFunNormalizer
 from epde.operators.utils.template import CompoundOperator, add_base_param_to_operator
+import epde.globals as global_var
 from epde.operators.multiobjective.mutations import get_basic_mutation
 
 from epde.structure.main_structures import SoEq
@@ -447,10 +448,12 @@ class OffspringUpdater(CompoundOperator):
                     self.suboperators['pareto_level_updater'].apply(objective=(temp_offspring, objective),
                                                                     arguments=subop_args['pareto_level_updater'])
                     objective.history.add(system)
-                    print(temp_offspring.obj_fun)
+                    if global_var.verbose.candidate_objectives:
+                        print(temp_offspring.obj_fun)
                     break
                 if replaced == offspring_attempt_limit:
-                    print("Could not generate unique offspring")
+                    if global_var.verbose.candidate_objectives:
+                        print("Could not generate unique offspring")
                     break
                 if attempt == mutation_attempt_limit:
                     temp_offspring.create()
@@ -533,7 +536,8 @@ class InitialParetoLevelSorting(CompoundOperator):
                 self.suboperators['chromosome_fitness'].apply(objective=candidate,
                                                               arguments=subop_args['chromosome_fitness'])
                 objective.history.add(system)
-                print(candidate.obj_fun)
+                if global_var.verbose.candidate_objectives:
+                    print(candidate.obj_fun)
             objective.associate_weights()
             objective.initial_placing()
 
