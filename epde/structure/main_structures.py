@@ -592,22 +592,16 @@ class Equation(ComplexStructure):
 
         target = self.structure[self.target_idx].evaluate(False, grids=grids)
 
-        # Place for improvent: introduce shifted_idx where necessary
-        def shifted_idx(idx):
-            if idx < self.target_idx:
-                return idx
-            elif idx > self.target_idx:
-                return idx - 1
-            else:
-                return -1
-
         if normalize:
-            feature_indexes = list(range(len(self.structure)))
-            feature_indexes.remove(self.target_idx)
+            feature_indexes = [i for i in range(len(self.structure)) if i != self.target_idx]
         else:
-            feature_indexes = [idx for idx in range(len(self.structure))
-                               if self.weights_internal[shifted_idx(idx)] != 0 and idx != self.target_idx]
-            # feature_indexes = [idx for idx in range(len(self.structure)) if idx != self.target_idx]
+            feature_indexes = []
+            for idx in range(len(self.structure)):
+                if idx == self.target_idx:
+                    continue
+                shifted = idx if idx < self.target_idx else idx - 1
+                if self.weights_internal[shifted] != 0:
+                    feature_indexes.append(idx)
         if len(feature_indexes) > 0:
             feat_list = [self.structure[idx].evaluate(False, grids=grids) for idx in feature_indexes]
             features = np.vstack(feat_list)
