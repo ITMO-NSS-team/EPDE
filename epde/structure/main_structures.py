@@ -586,6 +586,10 @@ class Equation(ComplexStructure):
         return new_eq
 
     def evaluate(self, normalize=True, return_val=False, grids=None):
+        cache_key = (normalize, return_val, grids is None)
+        if grids is None and hasattr(self, '_eval_cache') and cache_key in self._eval_cache:
+            return self._eval_cache[cache_key]
+
         target = self.structure[self.target_idx].evaluate(False, grids=grids)
 
         # Place for improvent: introduce shifted_idx where necessary
@@ -605,10 +609,8 @@ class Equation(ComplexStructure):
                                if self.weights_internal[shifted_idx(idx)] != 0 and idx != self.target_idx]
             # feature_indexes = [idx for idx in range(len(self.structure)) if idx != self.target_idx]
         if len(feature_indexes) > 0:
-            features = self.structure[feature_indexes[0]].evaluate(False, grids=grids)
-            for feat_idx in range(1, len(feature_indexes)):
-                temp = self.structure[feature_indexes[feat_idx]].evaluate(False, grids=grids)
-                features = np.vstack([features, temp])
+            feat_list = [self.structure[idx].evaluate(False, grids=grids) for idx in feature_indexes]
+            features = np.vstack(feat_list)
             if features.ndim == 1:
                 features = np.expand_dims(features, 1).T
             features = np.transpose(features)
@@ -634,9 +636,15 @@ class Equation(ComplexStructure):
                     features_val = np.zeros_like(target)
                 value = np.add(elem1, - features_val)
                 # print(value.shape)
-            return value, target, features
+            result = (value, target, features)
         else:
-            return None, target, features
+            result = (None, target, features)
+
+        if grids is None:
+            if not hasattr(self, '_eval_cache'):
+                self._eval_cache = {}
+            self._eval_cache[cache_key] = result
+        return result
 
     def reset_state(self, reset_right_part: bool = True):
         if reset_right_part:
