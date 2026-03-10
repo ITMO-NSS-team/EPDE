@@ -104,7 +104,7 @@ class VerboseManager:
 def init_verbose(plot_DE_solutions : bool = False, show_iter_idx : bool = True,
                  show_iter_fitness : bool = False, show_iter_stats : bool = False,
                  show_ann_loss : bool = False, show_warnings : bool = False,
-                 candidate_objectives : bool = False):
+                 candidate_objectives : bool = True):
     """
     Method for initialized of manager for output in text form
 
