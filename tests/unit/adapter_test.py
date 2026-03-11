@@ -85,4 +85,4 @@ def test_adapter_form_only():
     
     
 def test_adapter_full_solution():
-        
+        pass
