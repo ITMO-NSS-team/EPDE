@@ -62,7 +62,7 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
         incorrect_eq.vals[var].weights_final_evald = True
     print(incorrect_eq.text_form)
 
-    # fit_operator.apply(correct_eq, {})
+    fit_operator.apply(correct_eq, {})
     fit_operator.apply(incorrect_eq, {})
     print([[correct_eq.vals[var].fitness_value, incorrect_eq.vals[var].fitness_value] for var in all_vars])
     print([[correct_eq.vals[var].coefficients_stability, incorrect_eq.vals[var].coefficients_stability] for var in
@@ -176,9 +176,30 @@ if __name__ == "__main__":
     print(f"CUDA version linked with PyTorch: {torch.version.cuda}")
     # Operator = fitness.SolverBasedFitness # Replace by the developed PIC-based operator.
     # Operator = fitness.PIC
-    Operator = fitness.L2LRFitness
+    #Operator = fitness.L2LRFitness
+    Operator = fitness.DeepXDEBasedFitness
     params = EvolutionaryParams()
-    operator_params = params.get_default_params_for_operator('DiscrepancyBasedFitnessWithCV') #{"penalty_coeff": 0.2, "pinn_loss_mult": 1e4}
+    #operator_params = params.get_default_params_for_operator('DiscrepancyBasedFitnessWithCV') #{"penalty_coeff": 0.2, "pinn_loss_mult": 1e4}
+    try:
+        operator_params = params.get_default_params_for_operator('DeepXDEBasedFitness')
+    except Exception as e:
+        print(f"Предупреждение: не удалось загрузить параметры для DeepXDEBasedFitness: {e}")
+        print("Использую ручную конфигурацию.")
+        operator_params = {
+            "deepxde_config": {
+                "net": [50, 50, 50],
+                "activation": "tanh",
+                "optimizer": "adam",
+                "lr": 1e-3,
+                "num_domain": 1000,
+                "num_boundary": 200,
+                "num_initial": 200,
+                "epochs": 2000
+            },
+            "penalty_coeff": 0.2,
+            "error_metric": "rmse"
+        }
+
     print('operator_params ', operator_params)
     fit_operator = prepare_suboperators(Operator(list(operator_params.keys())), operator_params)
 
@@ -186,5 +207,5 @@ if __name__ == "__main__":
     directory = os.path.dirname(os.path.realpath(__file__))
     ac_folder_name = os.path.join(directory)
 
-    # AC_test(fit_operator, ac_folder_name, 0)
-    ac_discovery(ac_folder_name, 0)
+    AC_test(fit_operator, ac_folder_name, 0)
+    # ac_discovery(ac_folder_name, 0)
