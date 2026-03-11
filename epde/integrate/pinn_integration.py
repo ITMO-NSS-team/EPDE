@@ -9,7 +9,7 @@ import os
 import numpy as np
 import torch
 
-from typing import Callable, Union, Dict, List
+from typing import Callable, Union, Dict, List, Tuple
 from functools import singledispatchmethod, singledispatch
 
 from torch.nn import Sequential
@@ -327,24 +327,24 @@ class SolverAdapter(object):
     def solve_epde_system(self, system: Union[SoEq, dict], grids: list=None, boundary_conditions=None,
                           mode='NN', data=None, use_cache: bool = False, use_fourier: bool = False,
                           fourier_params: dict = None, use_adaptive_lambdas: bool = False,
-                          to_numpy: bool = False, grid_var_keys = None, *args, **kwargs):
+                          to_numpy: bool = False, grid_var_keys = None,
+                          *args, **kwargs) -> Tuple[float, Union[torch.Tensor, np.ndarray]]:
         solver_device(device = self._device)
 
         if isinstance(system, SoEq):
             system_interface = SystemSolverInterface(system_to_adapt=system)
             system_solver_forms = system_interface.form(grids = grids, mode = mode)
         elif isinstance(system, dict):
-            system_solver_forms = list(system.values())
+            system_solver_forms = list(system.values()) # TODO: refactor instead of quickfixes
         elif isinstance(system, list):
             system_solver_forms = system
         else:
             raise TypeError(f'Incorrect type of the equations passed into solver. Expected dict or SoEq, got {type(system)}.')
-        
+
         if boundary_conditions is None:
-            raise NotImplementedError('TBD')
             op_gen = PregenBOperator(system=system,
                                      system_of_equation_solver_form=[sf_labeled[1] for sf_labeled
-                                                                     in system.values()])
+                                                                     in system_solver_forms]) # system.values .vals()
             op_gen.generate_default_bc(vals = data, grids = grids)
             boundary_conditions = op_gen.conditions
             
@@ -355,6 +355,7 @@ class SolverAdapter(object):
 
         if grids is None:
             grid_var_keys, grids = global_var.grid_cache.get_all(mode = 'torch')
+            grids = [grid[global_var.grid_cache.g_func != 0] for grid in grids]
         elif grid_var_keys is None:
             grid_var_keys, _ = global_var.grid_cache.get_all(mode = 'torch')
 
@@ -367,15 +368,23 @@ class SolverAdapter(object):
 
     def solve(self, equations: Union[List, SoEq, SolverEquation], domain: Domain,
               boundary_conditions = None, mode = 'NN', use_cache: bool = False, 
-              use_fourier: bool = False, fourier_params: dict = None, #  epochs = 1e3, 
-              use_adaptive_lambdas: bool = False, to_numpy = False, *args, **kwargs):
+              use_fourier: bool = False, fourier_params: dict = None,
+              use_adaptive_lambdas: bool = False, to_numpy = False,
+              *args, **kwargs) -> Tuple[float, Union[torch.Tensor, np.ndarray]]:
     
         if isinstance(equations, SolverEquation):
             equations_prepared = equations
         else:
             equations_prepared = SolverEquation()
             for form in equations:
-                equations_prepared.add(form)
+                # print(f'form is solve has a type of {type(form)}: {form}')
+                if isinstance(form, dict):
+                    equations_prepared.add(form)
+                elif (isinstance(form, list) or isinstance(form, tuple)) and len(form) == 2:
+                    equations_prepared.add(form[1])
+                else:
+                    raise ValueError()
+                
         if self.net is None:
             self.net = self.get_net(equations_prepared, mode, domain, use_fourier,
                                     fourier_params, device=self._device)

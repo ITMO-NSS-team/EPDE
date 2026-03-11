@@ -7,11 +7,14 @@ Created on Tue Feb  9 16:14:57 2021
 """
 
 from dataclasses import dataclass
+import copy
 import warnings
 from typing import List, Union
 
 import numpy as np
 import torch
+import torch.nn.functional as F
+import epde.globals as global_var
 # device = torch.device('cpu') # TODO: make system-agnostic approach
 
 from epde.cache.cache import Cache
@@ -94,12 +97,14 @@ class VerboseManager:
     show_iter_idx : bool
     iter_fitness : bool
     iter_stats : bool
-    show_ann_loss : bool    
+    show_ann_loss : bool
     show_warnings : bool
+    candidate_objectives : bool
     
-def init_verbose(plot_DE_solutions : bool = False, show_iter_idx : bool = True, 
-                 show_iter_fitness : bool = False, show_iter_stats : bool = False, 
-                 show_ann_loss : bool = False, show_warnings : bool = False):
+def init_verbose(plot_DE_solutions : bool = False, show_iter_idx : bool = True,
+                 show_iter_fitness : bool = False, show_iter_stats : bool = False,
+                 show_ann_loss : bool = False, show_warnings : bool = False,
+                 candidate_objectives : bool = True):
     """
     Method for initialized of manager for output in text form
 
@@ -118,8 +123,9 @@ def init_verbose(plot_DE_solutions : bool = False, show_iter_idx : bool = True,
     global verbose
     if not show_warnings:
         warnings.filterwarnings("ignore")
-    verbose = VerboseManager(plot_DE_solutions, show_iter_idx, show_iter_fitness, 
-                             show_iter_stats, show_ann_loss, show_warnings)
+    verbose = VerboseManager(plot_DE_solutions, show_iter_idx, show_iter_fitness,
+                             show_iter_stats, show_ann_loss, show_warnings,
+                             candidate_objectives)
 
 def reset_control_nn(n_control: int = 1, ann: torch.nn.Sequential = None, 
                      ctrl_args: list = [(0, [None,]),], device: str = 'cpu'):
@@ -133,90 +139,129 @@ def reset_control_nn(n_control: int = 1, ann: torch.nn.Sequential = None,
 
 
 def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: bool = True,
-                       derivs: List[Union[int, List, Union[np.ndarray]]] = None, 
+                       derivs: List[Union[int, List, Union[np.ndarray]]] = None,
                        penalised_derivs: List[Union[int, List]] = None,
                        epochs_max=1e3, predefined_ann: torch.nn.Sequential = None,
-                       batch_frac=0.5, learining_rate=1e-6, device = 'cpu',
-                       use_fourier: bool = True, fourier_params: dict = {'L' : [4,], 'M' : [3,]}): 
+                       batch_frac=0.5, val_frac=0.2, learning_rate=1e-4, device='cpu',
+                       use_fourier: bool = True, fourier_params: dict = None,
+                       deriv_weight=1, penalty_weight=1e3):
     '''
-    Represent the data with ANN, suitable to be used as the initial guess of the candidate equations solutions 
+    Represent the data with ANN, suitable to be used as the initial guess of the candidate equations solutions
     during the equation search, employing solver-based fitness function.
 
     Possible addition: add optimization in Sobolev space, using passed derivatives, incl. higher orders.
     '''
 
+    if fourier_params is None:
+        fourier_params = {'L': [4,], 'M': [3,]}
+
     global solution_guess_nn
 
     if predefined_ann is None:
-        model = create_solution_net(equations_num=len(data), domain_dim=len(grids), device = device,
+        model = create_solution_net(equations_num=len(data), domain_dim=len(grids), device=device,
                                     use_fourier=use_fourier, fourier_params=fourier_params)
-        # model = NN(Num_Hidden_Layers=5, Neurons_Per_Layer=50, Input_Dim=len(grids), Activation_Function='Tanh')
+        # model = NN(Num_Hidden_Layers=5, Neurons_Per_Layer=50, Input_Dim=len(grids), Activation_Function='Rational')
+
 
     else:
         model = predefined_ann
 
     if train:
-        model.to(device)
+        model = model.to(device)
 
-        grids_tr = torch.from_numpy(np.array([subgrid.reshape(-1) for subgrid in grids])).float().T
-        data_tr = torch.from_numpy(np.array([data_var.reshape(-1) for data_var in data])).float().T
+        grids_tr = torch.from_numpy(np.array([subgrid[global_var.grid_cache.g_func != 0].reshape(-1) for subgrid in grids])).float().T
+        data_tr = torch.from_numpy(np.array([data_var[global_var.grid_cache.g_func != 0].reshape(-1) for data_var in data])).float().T
         grids_tr = grids_tr.to(device)
         data_tr = data_tr.to(device)
 
-        batch_size = int(data[0].size * batch_frac)
-        optimizer = torch.optim.Adam(model.parameters(), lr = learining_rate)
-        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 2000, gamma=0.5)
+        n_total = grids_tr.size()[0]
+        n_val = max(1, int(n_total * val_frac))
+        perm_split = torch.randperm(n_total)
+        val_indices = perm_split[:n_val]
+        train_indices = perm_split[n_val:]
+
+        grids_val, data_val = grids_tr[val_indices], data_tr[val_indices]
+        grids_train, data_train = grids_tr[train_indices], data_tr[train_indices]
+
+        batch_size = int(data_train.size()[0] * batch_frac)
+        optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+        epochs_max = int(epochs_max)
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=max(1, epochs_max // 20), factor=0.5)
         deriv_calc = AutogradDeriv()
 
-        t = 0
-        min_loss = np.inf
-        loss_mean = np.inf
-        print(f'Training NN to represent data for {epochs_max} epochs')
-        while loss_mean > 1e-6 and t < epochs_max:
+        best_state = None
+        min_val_loss = np.inf
+        val_patience = max(1, epochs_max // 10)
+        val_no_improve = 0
 
-            permutation = torch.randperm(grids_tr.size()[0])
+        print(f'Training ANN to represent input data on {epochs_max} epochs:')
+        for t in range(epochs_max):
+            permutation = torch.randperm(grids_train.size()[0])
 
             loss_list = []
 
-            for i in range(0, grids_tr.size()[0], batch_size):
+            for i in range(0, grids_train.size()[0], batch_size):
                 optimizer.zero_grad()
 
                 indices = permutation[i:i+batch_size]
-                batch_x, batch_y = grids_tr[indices], data_tr[indices]
+                batch_x = grids_train[indices].detach().requires_grad_(True)
+                batch_y = data_train[indices]
 
-                # print(f'batch_y {batch_y.get_device()}, batch_x {batch_x.get_device()},, {next(model.parameters()).is_cuda}')
-                # print(f'model(batch_x) {model(batch_x)}') 
-                loss = torch.mean(torch.abs(batch_y - model(batch_x)))
-                if derivs is not None:
-                    for var_idx, deriv_axes, deriv_tensor in derivs:
-                        deriv_autograd = deriv_calc.take_derivative(model, batch_x, axes = deriv_axes, component = var_idx)
-                        batch_derivs = torch.from_numpy(deriv_tensor)[torch.unravel_index(indices, 
-                                                                                          deriv_tensor.shape)].reshape_as(deriv_autograd).to(device)
-                        
-                        loss_add = 1e2 * torch.mean(torch.abs(batch_derivs - deriv_autograd))
-                        # print(loss, loss_add)
-                        loss += loss_add
+                pred = model(batch_x)
+                loss = F.mse_loss(pred, batch_y) / (torch.mean(batch_y ** 2) + 1e-8)
+                # if derivs is not None:
+                #     deriv_loss = 0
+                #     for var_idx, deriv_axes, deriv_tensor in derivs:
+                #         deriv_autograd = deriv_calc.take_derivative(model, batch_x, axes=deriv_axes, component=var_idx)
+                #         flat_indices = train_indices[indices]
+                #         batch_derivs = torch.from_numpy(deriv_tensor.reshape(-1))[flat_indices].reshape_as(deriv_autograd).float().to(device)
+                #         deriv_loss += deriv_weight * F.mse_loss(deriv_autograd, batch_derivs) / (torch.mean(batch_derivs ** 2) + 1e-8)
+                #
+                # loss += deriv_loss / len(derivs)
 
                 if penalised_derivs is not None:
-                    for var_idx, deriv_axes in derivs:
-                        deriv_autograd = deriv_calc.take_derivative(model, batch_x, axes = deriv_axes, component = var_idx)
-                        batch_derivs = torch.from_numpy(deriv_tensor)[torch.unravel_index(indices, 
-                                                                                          deriv_tensor.shape)].reshape_as(deriv_autograd).to(device)
-                        higher_ord_penalty = 1e3 * torch.mean(torch.abs(deriv_autograd))
-
-                        loss += higher_ord_penalty
+                    for var_idx, deriv_axes in penalised_derivs:
+                        deriv_autograd = deriv_calc.take_derivative(model, batch_x, axes=deriv_axes, component=var_idx)
+                        loss += penalty_weight * torch.mean(torch.abs(deriv_autograd))
 
                 loss.backward()
                 optimizer.step()
                 loss_list.append(loss.item())
-            scheduler.step()
-            loss_mean = np.mean(loss_list)
-            if loss_mean < min_loss:
-                best_model = model
-                min_loss = loss_mean
-            t += 1
-        model = best_model
-        print(f'min loss is {min_loss}, in last epoch: {loss_list}, ')
-        solution_guess_nn = best_model
+
+            train_loss_mean = np.mean(loss_list)
+
+            with torch.no_grad():
+                val_loss = (F.mse_loss(model(grids_val), data_val) / (torch.mean(data_val ** 2) + 1e-8)).item()
+
+            # if derivs is not None:
+            #     grids_val_grad = grids_val.detach().requires_grad_(True)
+            #     deriv_loss = 0
+            #     for var_idx, deriv_axes, deriv_tensor in derivs:
+            #         deriv_autograd = deriv_calc.take_derivative(model, grids_val_grad, axes=deriv_axes, component=var_idx)
+            #         batch_derivs = torch.from_numpy(deriv_tensor.reshape(-1))[val_indices].reshape_as(deriv_autograd).float().to(device)
+            #         deriv_loss += deriv_weight * F.mse_loss(deriv_autograd, batch_derivs).item() / (torch.mean(batch_derivs ** 2).item() + 1e-8)
+            #
+            #     val_loss += deriv_loss / len(derivs)
+
+            scheduler.step(val_loss)
+
+            if val_loss < min_val_loss:
+                best_state = copy.deepcopy(model.state_dict())
+                min_val_loss = val_loss
+                val_no_improve = 0
+            else:
+                val_no_improve += 1
+
+            if t % 100 == 0 and t != 0:
+                print(f"Epoch {t:4d} | Train Loss: {train_loss_mean:.6e} | Val Loss: {val_loss:.6e}")
+
+            if val_no_improve >= val_patience:
+                print(f"Early stopping at epoch {t}, best val loss: {min_val_loss:.6e}")
+                break
+
+        if best_state is not None:
+            model.load_state_dict(best_state)
+        print(f'Best val loss: {min_val_loss:.6e}, final train loss: {train_loss_mean:.6e}')
+        solution_guess_nn = model
     else:
         solution_guess_nn = model

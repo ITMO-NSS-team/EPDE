@@ -41,9 +41,11 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
 
     def fit(self, X, y, sample_weights):
         self.n_samples, self.n_features = X.shape
+        self.cached_weights_ = None
 
         # 1. Initial Weights
         weights = calculate_weights(X, y, sample_weights=sample_weights, grid_shape=self.grid_shape)
+        self.cached_weights_ = weights
         cv = self.get_cv(weights[:, :-1])
 
         self.coef_ = weights.mean(axis=0)[:-1]
@@ -53,12 +55,15 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
         residual = y - (X @ self.coef_ + self.intercept_)
 
         iteration = 0
-        max_change = np.inf
 
         # 2. Coordinate Descent Loop
         while iteration < self.max_iter and not all(self.coef_ == 0):
+            max_change = 0
+            max_abs_coef = 0.0
+
             # Sort features by instability (highest CV first)
-            for j in np.argsort(cv)[::-1]:
+            indices = np.argsort(cv)[::-1]
+            for j in indices:
                 old_coef = self.coef_[j]
 
                 if old_coef == 0:
@@ -80,6 +85,7 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
 
                 if new_coef == 0:
                     weights = calculate_weights(X[:, self.coef_ != 0], y, sample_weights=sample_weights, grid_shape=self.grid_shape)
+                    self.cached_weights_ = weights
                     new_cv = iter(self.get_cv(weights[:, :-1]))
                     cv = np.array([next(new_cv) if _ else 0 for _ in self.coef_ != 0])
 
@@ -88,15 +94,57 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
                     self.intercept_ = weights.mean(axis=0)[-1]
                     residual = y - (X @ self.coef_ + self.intercept_)
                     iteration = 0
+                    max_change = np.inf
                     break
 
                 residual -= (new_coef - old_coef) * X[:, j]
-                change = abs(new_coef - old_coef) / abs(old_coef)
+                change = abs(new_coef - old_coef)
+                if change > max_change:
+                    max_change = change
+                # change = abs(new_coef - old_coef) / abs(old_coef)
                 # change = abs(self.intercept_ - old_intercept) / abs(old_intercept)
-                max_change = max(max_change, change)
+                # max_change = max(max_change, change)
 
-            if max_change < self.tol:
-                break
+            max_abs_coef = np.max(np.abs(self.coef_))
+
+            # Критерий 1: max_j |w_new - w_old| <= tol * max_j |w_j|
+            if max_change <= self.tol * max_abs_coef:
+                # Критерий 2: Dual Gap <= tol * ||y||^2 / n_samples
+                # Вычисляем компоненты дуального зазора
+                # Примечание: Для Lasso с весами lambda_j = threshold_j
+
+                # 1. Вычисляем корреляции признаков с остатками
+                xt_residual = X.T @ residual
+                y_sq_sum = np.sum((y - self.intercept_) ** 2)
+
+                # 2. Масштабирующий фактор для обеспечения дуальной допустимости
+                # В sklearn: dual_scale = min(1, alpha / max(|X.T @ res|))
+                # Здесь используем ваши индивидуальные threshold_j
+                dual_norm = 0
+                for j in range(self.n_features):
+                    if cv[j] * y_sq_sum > 0:
+                        dual_norm = max(dual_norm, abs(xt_residual[j]) / cv[j] * y_sq_sum)
+
+                if dual_norm > 1.0:
+                    const_residual = residual / dual_norm
+                else:
+                    const_residual = residual
+
+                # 3. Вычисление Gap: Primal Objective - Dual Objective
+                # Primal = 0.5 * ||res||^2 + sum(threshold_j * |w_j|)
+                # Dual = 0.5 * ||y-intercept||^2 - 0.5 * ||y-intercept - const_residual||^2
+                primal_obj = 0.5 * np.sum(residual ** 2) + np.sum(cv * y_sq_sum * np.abs(self.coef_))
+                dual_obj = 0.5 * y_sq_sum - 0.5 * np.sum((y - self.intercept_ - const_residual) ** 2)
+
+                dual_gap = primal_obj - dual_obj
+
+                # Итоговая проверка по формуле со скрина
+                if dual_gap <= self.tol * (y_sq_sum / self.n_samples):
+                    break
+
+            # if max_change < self.tol:
+            #     break
+
             iteration += 1
         # print(iteration)
         return self
@@ -151,7 +199,7 @@ class LASSOSparsity(CompoundOperator):
 
         _, target, features = objective.evaluate(normalize = True, return_val = False)
 
-        self.g_fun_vals = global_var.grid_cache.g_func[global_var.grid_cache.g_func != 0]
+        self.g_fun_vals = global_var.grid_cache.g_func[global_var.grid_cache.g_func_mask]
 
         estimator.fit(features, target, self.g_fun_vals)
         objective.weights_internal = estimator.coef_
@@ -159,6 +207,8 @@ class LASSOSparsity(CompoundOperator):
         objective.weights_final = np.append(objective.weights_internal, estimator.intercept_)
         objective.weights_final_evald = True
         objective.weights_final = [weight for weight in objective.weights_final if weight != 0]
+        objective._cached_sw_weights = estimator.cached_weights_
+        objective._eval_cache = {}
 
 
     def use_default_tags(self):

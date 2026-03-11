@@ -118,7 +118,7 @@ class ChromosomeCrossover(CompoundOperator):
 
         eqs_keys = offspring_1.vals.equation_keys; params_keys = offspring_2.vals.params_keys
 
-        if len(eqs_keys) > 1 and random.random() < 0.1:
+        if len(eqs_keys) > 1 and random.random() < self.params['equation_exchange_prob']:
             eq_key = random.choice(eqs_keys)
             temp_eq = deepcopy(offspring_1.vals[eq_key])
             offspring_1.vals.replace_gene(gene_key = eq_key, value = offspring_2.vals[eq_key])
@@ -134,14 +134,14 @@ class ChromosomeCrossover(CompoundOperator):
             offspring_2.vals.replace_gene(gene_key = eq_key, value = temp_eq_2)
 
         # for param_key in params_keys:
-        #     temp_param_1, temp_param_2 = self.suboperators['param_crossover'].apply(objective = (objective[0].vals[param_key],
-        #                                                                                          objective[1].vals[param_key]),
+        #     temp_param_1, temp_param_2 = self.suboperators['param_crossover'].apply(objective = (offspring_1.vals[param_key],
+        #                                                                                          offspring_2.vals[param_key]),
         #                                                                             arguments = subop_args['param_crossover'])
-        #     objective[0].vals.replace_gene(gene_key = param_key, value = temp_param_1)
-        #     objective[1].vals.replace_gene(gene_key = param_key, value = temp_param_2)
+        #     offspring_1.vals.replace_gene(gene_key = param_key, value = temp_param_1)
+        #     offspring_2.vals.replace_gene(gene_key = param_key, value = temp_param_2)
         #
-        #     objective[0].vals.pass_parametric_gene(key = param_key, value = temp_param_1)
-        #     objective[1].vals.pass_parametric_gene(key = param_key, value = temp_param_2)
+        #     offspring_1.vals.pass_parametric_gene(key = param_key, value = temp_param_1)
+        #     offspring_2.vals.pass_parametric_gene(key = param_key, value = temp_param_2)
 
         return offspring_1, offspring_2
 
@@ -155,11 +155,8 @@ class MetaparamerCrossover(CompoundOperator):
     def apply(self, objective : tuple, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
-        # offspring_1 = objective[0] + self.params['metaparam_proportion'] * (objective[1] - objective[0])
-        # offspring_2 = objective[0] + (1 - self.params['metaparam_proportion']) * (objective[1] - objective[0])
-
-        offspring_1 = objective[0]
-        offspring_2 = objective[1]
+        offspring_1 = objective[0] + self.params['metaparam_proportion'] * (objective[1] - objective[0])
+        offspring_2 = objective[0] + (1 - self.params['metaparam_proportion']) * (objective[1] - objective[0])
         return offspring_1, offspring_2
 
     def use_default_tags(self):
@@ -331,12 +328,11 @@ class TermCrossover(CompoundOperator):
         """
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
-        # if (np.random.uniform(0, 1) <= self.params['crossover_probability'] and
-        #     objective[1].descr_variable_marker == objective[0].descr_variable_marker):
-        #         return objective[1], objective[0]
-        # else:
-        #         return objective[0], objective[1]
-        return objective[0], objective[1]
+        if (np.random.uniform(0, 1) <= self.params['crossover_probability'] and
+            objective[1].descr_variable_marker == objective[0].descr_variable_marker):
+                return objective[1], objective[0]
+        else:
+                return objective[0], objective[1]
         
     def use_default_tags(self):
         self._tags = {'crossover', 'term level', 'exploration', 'no suboperators', 'standard'}
@@ -357,7 +353,8 @@ def get_basic_variation(variation_params : dict = {}):
     add_kwarg_to_operator(operator = metaparameter_crossover)
     equation_exchange_crossover = EquationExchangeCrossover()
 
-    chromosome_crossover = ChromosomeCrossover()
+    chromosome_crossover = ChromosomeCrossover(['equation_exchange_prob'])
+    add_kwarg_to_operator(operator = chromosome_crossover)
 
     pl_cross = ParetoLevelsCrossover([])
     
