@@ -227,6 +227,6 @@ if __name__ == "__main__":
     ode_folder_name = os.path.join(directory)
 
     # ODE_test(fit_operator, ode_folder_name, 0)
-    # ODE_discovery(ode_folder_name, 0)
-    ODE_simple_discovery(ode_folder_name, 0)
+    ODE_discovery(ode_folder_name, 0)
+    # ODE_simple_discovery(ode_folder_name, 0)
 

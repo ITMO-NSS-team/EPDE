@@ -242,10 +242,10 @@ def ns_discovery(foldername, noise_level):
     #                                     preprocessor_kwargs={'epochs_max' : 1e3})
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
-    popsize = 32
+    popsize = 64
 
     epde_search_obj.set_moeadd_params(population_size=popsize,
-                                      training_epochs=5)
+                                      training_epochs=30)
 
     custom_grid_tokens = CacheStoredTokens(token_type='grid',
                                                 token_labels=['t', 'x'],
@@ -289,5 +289,5 @@ if __name__ == "__main__":
     directory = os.path.dirname(os.path.realpath(__file__))
     ns_folder_name = os.path.join(directory)
 
-    ns_test(fit_operator, ns_folder_name, 0)
-    # ns_discovery(ns_folder_name, 0)
+    # ns_test(fit_operator, ns_folder_name, 0)
+    ns_discovery(ns_folder_name, 0)

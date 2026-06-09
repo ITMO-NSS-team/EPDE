@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import re
 import sys
 
 _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -72,12 +73,72 @@ def main(argv=None) -> int:
                         help="overwrite existing per-rep JSONs instead of skipping")
     parser.add_argument('--seed-base', type=int, default=0,
                         help="seed for rep 0 (rep i uses seed_base + i)")
+    parser.add_argument('--epochs', type=int, default=None,
+                        help="override moeadd.training_epochs from the YAML.")
+    parser.add_argument('--gram-mode', default='vcoef',
+                        choices=('axis', 'vcoef'),
+                        help="Gram / stability strategy (default: vcoef = "
+                             "varying-coefficient stability, patch-free, "
+                             "data-driven basis modes). 'axis' = legacy "
+                             "axis-aligned sliding-window backup (var/mu^2 CV).")
+    parser.add_argument('--noise-level', type=float, default=0.0,
+                        help="Additive Gaussian noise applied to every data "
+                             "array returned by ``cfg.load_data``. Convention "
+                             "matches PySINDy's noisy benchmark: "
+                             "``sigma = noise_level * 0.01 * std(data)``. "
+                             "Noise re-applied per rep with seed "
+                             "``seed_base + rep_idx`` so reps see "
+                             "independent realisations.")
+    parser.add_argument('--vc-coord-penalty', type=float, default=None,
+                        help="kappa weight for the vcoef coordinate-modulation "
+                             "penalty (globals.vc_coord_penalty). 0 disables; "
+                             "larger penalises coordinate-modulated spurious "
+                             "terms harder. Default: leave globals' value.")
     args = parser.parse_args(argv)
 
     try:
         cfg = load_config(args.system)
     except FileNotFoundError as exc:
         parser.error(str(exc))
+
+    # Pin the gram mode before the batch starts; applies to every rep in
+    # run_smoke since the setting is a process-level global.
+    from epde import globals as _gv
+    _gv.set_gram_config(args.gram_mode)
+    if args.vc_coord_penalty is not None:
+        _gv.vc_coord_penalty = float(args.vc_coord_penalty)
+
+    # When ``--noise-level`` is set, monkey-patch ``cfg.load_data`` so
+    # every call inside ``build_search`` injects independent Gaussian
+    # noise sized at PySINDy's convention. ``_gv.noise_seed`` is
+    # advanced by run_smoke per rep so each rep sees a fresh draw.
+    if args.noise_level > 0:
+        import numpy as _np
+        orig_load = cfg.load_data
+        nl = float(args.noise_level)
+        def _noisy_load():
+            coords, data, vars_, dim = orig_load()
+            seed = getattr(_gv, 'noise_seed', None)
+            if seed is None:
+                seed = args.seed_base
+            rng = _np.random.default_rng(int(seed))
+            def _noisy(arr):
+                a = _np.asarray(arr, dtype=_np.float64)
+                sigma = nl * 0.01 * float(_np.std(a))
+                if sigma > 0:
+                    a = a + rng.normal(0.0, sigma, size=a.shape)
+                return a
+            if isinstance(data, _np.ndarray):
+                noisy = _noisy(data)
+            elif isinstance(data, (list, tuple)):
+                noisy = type(data)(_noisy(a) for a in data)
+            else:
+                noisy = data
+            return coords, noisy, vars_, dim
+        cfg.load_data = _noisy_load
+
+    if args.epochs is not None:
+        cfg.hparams['moeadd']['training_epochs'] = int(args.epochs)
 
     run_smoke(
         cfg,

@@ -279,8 +279,8 @@ if __name__ == "__main__":
     # print('operator_params ', operator_params)
     fit_operator = prepare_suboperators(Operator(list(operator_params.keys())), operator_params)
 
-    #lorenz_discovery(0)
-    lorenz_test(fit_operator, noise_level=0)
+    lorenz_discovery(0)
+    # lorenz_test(fit_operator, noise_level=0)
 
 
     def get_pic_network_summary(operator):

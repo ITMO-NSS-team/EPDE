@@ -29,13 +29,64 @@ import argparse
 import glob
 import json
 import os
+import re
 import statistics
 import sys
 from collections import defaultdict
 
 _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, _THIS_DIR)
-from thesis_metrics import consistency_rate, wilson_ci  # noqa: E402
+from thesis_metrics import (  # noqa: E402
+    coefficient_error_best,
+    consistency_rate,
+    wilson_ci,
+)
+_CONFIGS_DIR = os.path.join(_THIS_DIR, 'configs')
+_TRUTH_CACHE: dict = {}
+
+
+def _load_truth_eq_alts(system: str):
+    """Same shape as :func:`thesis_aggregate._load_truth_eq_alts`: returns
+    ``[primary, *alternatives]`` lists of equation strings (or an empty
+    list when the system has no YAML truth)."""
+    if system in _TRUTH_CACHE:
+        return _TRUTH_CACHE[system]
+    import yaml
+    path = os.path.join(_CONFIGS_DIR, f'{system}.yaml')
+    if not os.path.exists(path):
+        _TRUTH_CACHE[system] = []
+        return []
+    with open(path, 'r', encoding='utf-8') as fh:
+        cfg = yaml.safe_load(fh) or {}
+    primary = list(cfg.get('truth_equations') or [])
+    if not primary:
+        _TRUTH_CACHE[system] = []
+        return []
+    alts = [list(eqs) for eqs in (cfg.get('truth_alternatives') or []) if eqs]
+    result = [primary] + alts
+    _TRUTH_CACHE[system] = result
+    return result
+
+
+_EQ_PREFIX_RE = re.compile(r'^\s*[/\\|]\s+')
+
+
+def _rep_coef_error(rec: dict, truth_alts: list):
+    """Mirror of :func:`thesis_aggregate._rep_coef_error`: filter the
+    trailing hparams string out of ``discovered_text`` and strip the
+    coupled-system equation prefix (``/``, ``|``, ``\\``) before calling
+    the coefficient-error metric."""
+    if not rec.get('structural_success') or not truth_alts:
+        return None
+    raw = rec.get('discovered_text') or []
+    disc_text = [_EQ_PREFIX_RE.sub('', s).strip()
+                 for s in raw if isinstance(s, str) and '=' in s]
+    if not disc_text:
+        return None
+    err = coefficient_error_best(disc_text, truth_alts)
+    if err != err:
+        return None
+    return err
 
 
 # Ordered so the report reads from "all off" to "all on" along each axis.
@@ -115,9 +166,10 @@ def _mean_std(values: list):
     return mean, std
 
 
-def _summarize_cell(reps: list) -> dict:
+def _summarize_cell(reps: list, system: str = '') -> dict:
     if not reps:
         return {'n': 0}
+    truth_alts = _load_truth_eq_alts(system) if system else []
     successes = sum(1 for r in reps if r.get('structural_success'))
     hammings = [r['hamming'] for r in reps if r.get('hamming') is not None]
     runtimes = [r['runtime_sec'] for r in reps if 'runtime_sec' in r]
@@ -129,12 +181,15 @@ def _summarize_cell(reps: list) -> dict:
     epochs_success = [r['discovery_epoch'] for r in reps
                       if r.get('structural_success')
                       and r.get('discovery_epoch') is not None]
+    coef_errs = [e for e in (_rep_coef_error(r, truth_alts) for r in reps)
+                 if e is not None]
     rate = successes / len(reps)
     ci = wilson_ci(successes, len(reps))
-    mean_h = statistics.fmean(hammings) if hammings else float('nan')
+    mean_h, std_h = _mean_std(hammings)
     mean_t, std_t = _mean_std(runtimes)
     mean_npar, std_npar = _mean_std(n_paretos)
     mean_ep, std_ep = _mean_std(epochs_success)
+    mean_ce, std_ce = _mean_std(coef_errs)
     discovered_tokens = [json.dumps(r.get('discovered_tokens', []), sort_keys=True) for r in reps]
     errors = sum(1 for r in reps if 'error' in r)
     return {
@@ -144,6 +199,7 @@ def _summarize_cell(reps: list) -> dict:
         'wilson_lo': ci[0],
         'wilson_hi': ci[1],
         'mean_hamming': mean_h,
+        'std_hamming': std_h,
         'consistency': consistency_rate(discovered_tokens),
         'mean_runtime_sec': mean_t,
         'std_runtime_sec': std_t,
@@ -151,6 +207,9 @@ def _summarize_cell(reps: list) -> dict:
         'std_n_pareto': std_npar,
         'mean_epoch_identified': mean_ep,
         'std_epoch_identified': std_ep,
+        'mean_coef_error': mean_ce,
+        'std_coef_error': std_ce,
+        'n_coef_error': len(coef_errs),
         'errors': errors,
     }
 
@@ -167,10 +226,11 @@ def _cell_axes(cell: str) -> tuple:
 
 def _format_table(summary: dict) -> str:
     header = (
-        '| System | Cell | W | I | R | n | Success | mean H | '
-        'runtime (mean±std) | unique cands (mean±std) | epoch identified (mean±std) |'
+        '| System | Cell | W | I | R | n | Success | H (mean±std) | '
+        'coef err (mean±std) | runtime (mean±std) | '
+        'unique cands (mean±std) | epoch identified (mean±std) |'
     )
-    sep = '|---|---|---|---|---|---|---|---|---|---|---|'
+    sep = '|---|---|---|---|---|---|---|---|---|---|---|---|'
     rows = [header, sep]
 
     def _check(b: bool) -> str:
@@ -179,10 +239,7 @@ def _format_table(summary: dict) -> str:
     def _success(c):
         if c['n'] == 0:
             return '-'
-        return (
-            f"{c['rate']*100:.0f}% [{c['wilson_lo']*100:.0f}-{c['wilson_hi']*100:.0f}%] "
-            f"({c['successes']}/{c['n']})"
-        )
+        return f"{c['rate']*100:.0f}% ({c['successes']}/{c['n']})"
 
     def _num(c, key, fmt):
         if c['n'] == 0:
@@ -210,7 +267,8 @@ def _format_table(summary: dict) -> str:
             rows.append(
                 f"| {system} | {cell} | {_check(w)} | {_check(i)} | {_check(r)} | "
                 f"{c['n']} | {_success(c)} | "
-                f"{_num(c, 'mean_hamming', '{:.1f}')} | "
+                f"{_ms(c, 'mean_hamming', 'std_hamming', '{:.1f}')} | "
+                f"{_ms(c, 'mean_coef_error', 'std_coef_error', '{:.3f}')} | "
                 f"{_ms(c, 'mean_runtime_sec', 'std_runtime_sec', '{:.1f}', 's')} | "
                 f"{_ms(c, 'mean_n_pareto', 'std_n_pareto', '{:.1f}')} | "
                 f"{_ms(c, 'mean_epoch_identified', 'std_epoch_identified', '{:.1f}')} |"
@@ -264,7 +322,8 @@ def aggregate(root: str = None) -> dict:
     root = root or DEFAULT_RESULTS_DIR
     records = _load_records(root)
     summary = {
-        system: {cell: _summarize_cell(reps) for cell, reps in by_cell.items()}
+        system: {cell: _summarize_cell(reps, system)
+                 for cell, reps in by_cell.items()}
         for system, by_cell in records.items()
     }
     return summary

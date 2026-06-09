@@ -107,12 +107,12 @@ def lv_discovery(noise_level):
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
 
-    popsize = 16
-    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=1)
+    popsize = 32
+    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=5)
 
     factors_max_number = {'factors_num': [1, 2], 'probas' : [0.8, 0.2]}
 
-    epde_search_obj.fit(data=[x, y], variable_names=['u', 'v'], max_deriv_order=(1,),
+    epde_search_obj.fit(data=[x, y], variable_names=['u', 'v'], max_deriv_order=(2,),
                         equation_terms_max_number=7, data_fun_pow=3, additional_tokens=[trig_tokens, grid_tokens],
                         equation_factors_max_number=factors_max_number,
                         eq_sparsity_interval=(1e-8, 1e-0))  #
@@ -135,4 +135,4 @@ if __name__ == "__main__":
     print('operator_params ', operator_params)
     fit_operator = prepare_suboperators(Operator(list(operator_params.keys())), operator_params)
 
-    #lv_discovery(0)
+    lv_discovery(0)

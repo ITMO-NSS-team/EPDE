@@ -4,3 +4,11 @@
 name: wave
 truth_equations:
   - "0.04 * d^2u/dx1^2{power: 1.0} = d^2u/dx0^2{power: 1.0}"
+
+# Alternative form: degenerate quadratic shadow of the wave equation. On
+# u_tt = c^2*u_xx the terms u_xx^2, u_xx*u_tt, u_tt^2 are collinear, so this is
+# an exact algebraic consequence (R^2 ~= 1; the c^2=0.04 wave-speed ratio is one
+# root of its 1 = 48.68 r - 591.98 r^2). EPDE discovers it instead of the PDE
+# form; it is algebraically correct for the dataset and so credits as valid.
+truth_alternatives:
+  - - "48.67869238111131 * d^2u/dx1^2{power: 1.0} * d^2u/dx0^2{power: 1.0} + -591.9797844706457 * d^2u/dx0^2{power: 2.0} = d^2u/dx1^2{power: 2.0}"

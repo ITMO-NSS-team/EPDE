@@ -693,9 +693,13 @@ def run_smoke(
     """
     out_root = _resolve_out_root(system_cfg, outdir)
     os.makedirs(out_root, exist_ok=True)
+    from epde import globals as _gv
     for pipeline in pipelines:
         for rep in range(reps):
             seed = seed_base + rep
+            # Per-rep noise seed for the ``--noise-level`` injection
+            # path (no-op when noise is disabled).
+            _gv.noise_seed = seed
             out_path = os.path.join(out_root, f"{pipeline}_rep{rep:02d}.json")
             if resume and os.path.exists(out_path):
                 try:

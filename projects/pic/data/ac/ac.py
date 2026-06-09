@@ -136,7 +136,7 @@ def ac_discovery(foldername, noise_level):
 
     dimensionality = data.ndim - 1
 
-    epde_search_obj = EpdeSearch(use_solver=True, multiobjective_mode=True,
+    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True,
                                       use_pic=True, boundary=(5, 10), verbose_params = {'show_iter_idx' : True, 'show_iter_fitness' : True},
                                       coordinate_tensors=grid, device='cuda')
 
@@ -218,5 +218,5 @@ if __name__ == "__main__":
     directory = os.path.dirname(os.path.realpath(__file__))
     ac_folder_name = os.path.join(directory)
 
-    AC_test(fit_operator, ac_folder_name, 0)
-    # ac_discovery(ac_folder_name, 0)
+    # AC_test(fit_operator, ac_folder_name, 0)
+    ac_discovery(ac_folder_name, 0)

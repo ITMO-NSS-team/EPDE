@@ -271,6 +271,180 @@ def wilson_ci(successes: int, n: int, z: float = 1.96):
     return (max(0.0, center - half), min(1.0, center + half))
 
 
+# ---------------------------------------------------------------------------
+# Coefficient-error metric
+#
+# Companion to the structural Hamming metric: once a rep matches the truth
+# structurally (canonical equality), how close are its numerical coefficients
+# to the truth coefficients? Target-flip robust: both sides are written as
+# ``sum(c_i * t_i) - target = 0`` and re-normalised so the truth's target
+# term has coefficient 1, then per-term relative errors are averaged.
+# ---------------------------------------------------------------------------
+
+
+def _parse_term_with_coef(term_text: str):
+    """Parse one ``c * f1{...} * f2{...}`` term into ``(term_canonical, coef)``.
+
+    ``term_canonical`` is the same ``frozenset(factors)`` :func:`_parse_term`
+    produces. Returns ``None`` for pure-constant terms (``0.0``,
+    ``-0.5``) and zero-coef terms, mirroring the structural metric's
+    drop rule so coefficient comparison stays aligned with structure.
+    """
+    pieces = [p.strip() for p in term_text.split('*')]
+    factors = []
+    coef = 1.0
+    coef_seen = False
+    for piece in pieces:
+        if not piece:
+            continue
+        factor = _parse_factor(piece)
+        if factor is None:
+            try:
+                coef *= float(piece)
+                coef_seen = True
+            except ValueError:
+                continue
+        else:
+            factors.append(factor)
+    if not factors:
+        return None
+    if coef_seen and abs(coef) < 1e-12:
+        return None
+    if not coef_seen:
+        coef = 1.0
+    return (frozenset(factors), coef)
+
+
+def _equation_term_coefs(eq_text: str):
+    """Parse ``sum_terms = target`` into ``(coef_by_term, target_key)``.
+
+    Equation is rewritten as ``sum_terms - target = 0``; ``coef_by_term``
+    holds the signed coefficient of every canonical term in that form
+    (target term gets ``-target_coef`` so the dict is in ``Σ c_i t_i = 0``
+    form). Same factor / param canonicalisation as :func:`_parse_term`.
+    """
+    if '=' not in eq_text:
+        return None
+    lhs, rhs = eq_text.split('=', 1)
+    target = _parse_term_with_coef(rhs)
+    if target is None:
+        return None
+    target_key, target_coef = target
+    coef_by_term: dict = {}
+    for term_text in lhs.split('+'):
+        parsed = _parse_term_with_coef(term_text)
+        if parsed is None:
+            continue
+        key, coef = parsed
+        coef_by_term[key] = coef_by_term.get(key, 0.0) + coef
+    coef_by_term[target_key] = coef_by_term.get(target_key, 0.0) - target_coef
+    return coef_by_term, target_key
+
+
+def _equation_relative_coef_error(disc_eq_text: str, truth_eq_text: str) -> float:
+    """Mean per-term relative coefficient error between two equations.
+
+    Both equations are written in ``Σ c_i t_i = 0`` form, anchored at the
+    truth's target term so both sides have anchor coef 1, then matched
+    term-by-term on the canonical factor set. The relative error for a
+    matched term ``t_i`` is ``|c_disc - c_truth| / |c_truth|``; missing
+    terms (in discovered or truth) contribute 1.0 each. Returns
+    ``float('nan')`` if either equation fails to parse or the truth's
+    anchor term is absent from / has zero coefficient in the discovered
+    equation (target-flip unresolvable).
+    """
+    disc = _equation_term_coefs(disc_eq_text)
+    truth = _equation_term_coefs(truth_eq_text)
+    if disc is None or truth is None:
+        return float('nan')
+    disc_coefs, _ = disc
+    truth_coefs, anchor = truth
+    truth_anchor_coef = truth_coefs.get(anchor, 0.0)
+    disc_anchor_coef = disc_coefs.get(anchor, 0.0)
+    if abs(truth_anchor_coef) < 1e-12 or abs(disc_anchor_coef) < 1e-12:
+        return float('nan')
+    truth_norm = {k: v / truth_anchor_coef for k, v in truth_coefs.items()}
+    disc_norm = {k: v / disc_anchor_coef for k, v in disc_coefs.items()}
+    keys = set(truth_norm) | set(disc_norm)
+    errors: List[float] = []
+    for k in keys:
+        if k == anchor:
+            continue  # both 1.0 by construction
+        tc = truth_norm.get(k)
+        dc = disc_norm.get(k)
+        if tc is None:
+            errors.append(1.0)  # extra term in discovered
+            continue
+        if dc is None:
+            errors.append(1.0)  # missing term in discovered
+            continue
+        if abs(tc) < 1e-12:
+            errors.append(0.0 if abs(dc) < 1e-12 else 1.0)
+            continue
+        errors.append(abs(dc - tc) / abs(tc))
+    if not errors:
+        return 0.0
+    return sum(errors) / len(errors)
+
+
+def _system_coef_error(discovered_eq_texts: Sequence[str],
+                       truth_eq_texts: Sequence[str]) -> float:
+    """Bipartite coef-error matching between two equation systems.
+
+    Pads the shorter side with empty equations (each empty pair scores
+    1.0) and brute-forces over permutations to minimise the average
+    per-equation :func:`_equation_relative_coef_error`. Returns
+    ``float('nan')`` if every permutation contains an unparseable pair.
+    """
+    disc = [s for s in discovered_eq_texts if isinstance(s, str) and s.strip()]
+    truth = [s for s in truth_eq_texts if isinstance(s, str) and s.strip()]
+    if not disc or not truth:
+        return float('nan')
+    n = max(len(disc), len(truth))
+    pad_d = list(disc) + [''] * (n - len(disc))
+    pad_t = list(truth) + [''] * (n - len(truth))
+    best = float('nan')
+    for perm in permutations(range(n)):
+        total = 0.0
+        valid = True
+        for i in range(n):
+            de, te = pad_d[i], pad_t[perm[i]]
+            if not de or not te:
+                total += 1.0  # unmatched eq counts as fully-wrong
+                continue
+            err = _equation_relative_coef_error(de, te)
+            if err != err:  # nan
+                valid = False
+                break
+            total += err
+        if not valid:
+            continue
+        avg = total / n
+        if best != best or avg < best:
+            best = avg
+    return best
+
+
+def coefficient_error_best(discovered_eq_texts: Sequence[str],
+                           truth_alternatives_text_lists) -> float:
+    """Lowest mean coef error across all declared truth alternatives.
+
+    ``truth_alternatives_text_lists`` is an iterable of equation-string
+    lists -- the primary truth followed by each alternative. The minimum
+    is taken across alternatives so a target-flipped / identity-based
+    discovery is scored against the closest valid analytical form (same
+    convention as :func:`hamming_best`).
+    """
+    best = float('nan')
+    for truth_alt in truth_alternatives_text_lists:
+        err = _system_coef_error(discovered_eq_texts, truth_alt)
+        if err != err:
+            continue
+        if best != best or err < best:
+            best = err
+    return best
+
+
 if __name__ == '__main__':
     # Quick self-check: round-trip the Lorenz triple and confirm Hamming == 0
     # against itself, then perturb one term and confirm Hamming == 2.
@@ -371,5 +545,50 @@ if __name__ == '__main__':
     print('hamming(2-eq vs 3-eq-with-1-dup) =', h_dup,
           '(expected', expected, '— missing duplicate of', same_eq[:30], ')')
     assert h_dup == expected, f"expected {expected}, got {h_dup}"
+
+    # Coefficient-error metric: identical equations -> 0.
+    truth_eq = ('10.0 * v{power: 1.0} + -10.0 * u{power: 1.0} '
+                '= du/dx0{power: 1.0}')
+    ce_zero = _equation_relative_coef_error(truth_eq, truth_eq)
+    print('coef_err(identical) =', ce_zero)
+    assert ce_zero == 0.0, f"expected 0, got {ce_zero}"
+
+    # 10% perturbation on one term -> 10% / 2 matched non-anchor terms = 5%.
+    perturbed_eq = ('11.0 * v{power: 1.0} + -10.0 * u{power: 1.0} '
+                    '= du/dx0{power: 1.0}')
+    ce_perturb = _equation_relative_coef_error(perturbed_eq, truth_eq)
+    print('coef_err(+10% on v term) =', ce_perturb)
+    assert abs(ce_perturb - 0.05) < 1e-9, f"expected 0.05, got {ce_perturb}"
+
+    # Target-flip robustness: wave-style flip with scale factor.
+    wave_truth_eq = '0.04 * d^2u/dx1^2{power: 1.0} = d^2u/dx0^2{power: 1.0}'
+    wave_flipped_eq = '25.0 * d^2u/dx0^2{power: 1.0} = d^2u/dx1^2{power: 1.0}'
+    ce_wave = _equation_relative_coef_error(wave_flipped_eq, wave_truth_eq)
+    print('coef_err(wave 25 vs 0.04 flipped) =', ce_wave)
+    assert abs(ce_wave) < 1e-9, f"expected 0, got {ce_wave}"
+
+    # System-level bipartite pairing for LV: swap the two equations'
+    # order on the discovered side; result must be unchanged.
+    lv_truth = [
+        ('20.0 * u{power: 1.0} + -20.0 * u{power: 1.0} * v{power: 1.0} '
+         '= du/dx0{power: 1.0}'),
+        ('20.0 * u{power: 1.0} * v{power: 1.0} + -20.0 * v{power: 1.0} '
+         '= dv/dx0{power: 1.0}'),
+    ]
+    lv_disc_swapped = list(reversed(lv_truth))
+    ce_lv = _system_coef_error(lv_disc_swapped, lv_truth)
+    print('coef_err(LV swapped order) =', ce_lv)
+    assert abs(ce_lv) < 1e-9, f"expected 0, got {ce_lv}"
+
+    # coefficient_error_best: picks the matching alternative.
+    burgers_truth_alts = [
+        ['-1.0 * u{power: 1.0} * du/dx1{power: 1.0} = du/dx0{power: 1.0}'],
+        ['1.0 * u{power: 1.0} = x{power: 1.0, dim: 1.0} * du/dx1{power: 1.0}'],
+    ]
+    # Discovered the similarity-solution identity with 5% coef drift.
+    disc_burgers = ['1.05 * u{power: 1.0} = x{power: 1.0, dim: 1.0} * du/dx1{power: 1.0}']
+    ce_best = coefficient_error_best(disc_burgers, burgers_truth_alts)
+    print('coef_err_best(burgers alt) =', ce_best)
+    assert abs(ce_best - 0.05) < 1e-9, f"expected 0.05, got {ce_best}"
 
     print('thesis_metrics self-check OK')

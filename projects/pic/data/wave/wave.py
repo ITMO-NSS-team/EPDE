@@ -197,5 +197,5 @@ if __name__ == "__main__":
     directory = os.path.dirname(os.path.realpath(__file__))
     wave_folder_name = os.path.join(directory)
 
-    wave_test(fit_operator, wave_folder_name, 0)
-    # wave_discovery(wave_folder_name, 0)
+    # wave_test(fit_operator, wave_folder_name, 0)
+    wave_discovery(wave_folder_name, 0)

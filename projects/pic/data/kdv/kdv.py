@@ -421,7 +421,7 @@ def kdv_sga_discovery(foldername, noise_level):
 def kdv_sindy_discovery(foldername, noise_level):
     grid, data = kdv_sindy_data(os.path.join(foldername, 'kdv_sindy.mat'))
     noised_data = noise_data(data, noise_level)
-    data_nn = load_pretrained_PINN(os.path.join(foldername, f'kdv_{noise_level}_ann.pickle'))
+    # data_nn = load_pretrained_PINN(os.path.join(foldername, f'kdv_{noise_level}_ann.pickle'))
 
     dimensionality = data.ndim - 1
 
@@ -436,7 +436,7 @@ def kdv_sindy_discovery(foldername, noise_level):
     popsize = 16
 
     epde_search_obj.set_moeadd_params(population_size=popsize,
-                                      training_epochs=1)
+                                      training_epochs=3)
 
     custom_trigonometric_eval_fun = {
         'cos(t)sin(x)': lambda *grids, **kwargs: (np.cos(grids[0]) * np.sin(grids[1])) ** kwargs['power']}
@@ -476,8 +476,8 @@ if __name__ == "__main__":
     from epde.operators.utils.default_parameter_loader import EvolutionaryParams
     print("CUDA available:", torch.cuda.is_available())
     # Operator = fitness.SolverBasedFitness # Replace by the developed PIC-based operator.
-    Operator = fitness.PIC
-    # Operator = fitness.L2LRFitness
+    # Operator = fitness.PIC
+    Operator = fitness.L2LRFitness
     params = EvolutionaryParams()
     operator_params = params.get_default_params_for_operator('DiscrepancyBasedFitnessWithCV') #{"penalty_coeff": 0.2, "pinn_loss_mult": 1e4}
     # operator_params = {"penalty_coeff": 0.2, "pinn_loss_mult": 1e4}
@@ -488,11 +488,11 @@ if __name__ == "__main__":
     directory = os.path.dirname(os.path.realpath(__file__))
     kdv_folder_name = os.path.join(directory)
 
-    KdV_test(fit_operator, kdv_folder_name, 0)
+    # KdV_test(fit_operator, kdv_folder_name, 0)
     # KdV_h_test(fit_operator, kdv_folder_name, 0)
     # KdV_sga_test(fit_operator, kdv_folder_name, 0)
 
     # kdv_discovery(kdv_folder_name, 0)
     # kdv_h_discovery(kdv_folder_name, 0)
     # kdv_sga_discovery(kdv_folder_name, 5)
-    # kdv_sindy_discovery(kdv_folder_name, 0)
+    kdv_sindy_discovery(kdv_folder_name, 0)

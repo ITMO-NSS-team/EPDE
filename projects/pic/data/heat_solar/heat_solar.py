@@ -378,6 +378,7 @@ if __name__ == "__main__":
     ac_folder_name = os.path.join(directory)
 
     # hs_test(fit_operator, ac_folder_name, 0)
-    hs_discovery(ac_folder_name, 0)
-    # hs_2d_discovery(ac_folder_name, 0)
+    # hs_discovery(ac_folder_name, 0)
+    hs_2d_discovery(ac_folder_name, 0)
     # hs_3d_discovery(ac_folder_name, 0)
+
