@@ -1,0 +1,69 @@
+Level 0:
+Solution 0: [1.68548918e-01 5.87535732e-01 1.65615202e-01 6.68755330e-02
+ 5.95300827e-02 1.71934571e-02 2.09447915e-04 1.25140819e-04]
+Solution 1: [1.68548918e-01 5.87535732e-01 6.08448285e-02 2.98829475e-01
+ 5.95300827e-02 1.71934571e-02 3.49717379e-05 5.02375169e-04]
+Solution 2: [1.68548918e-01 3.05387798e-01 6.08448285e-02 2.54037564e-01
+ 5.95300827e-02 6.69133950e-04 3.49717379e-05 6.28083937e-01]
+Solution 3: [0.34058553 0.11974578 0.53025537 0.30731457 0.0408795  0.0032565
+ 0.00944805 0.98051025]
+Solution 4: [1.54800627e-02 4.80670047e-01 4.61347987e-01 3.01709747e-01
+ 1.38795104e-05 1.22200237e-03 4.75139897e-03 1.50171122e-03]
+Solution 5: [0.34058553 0.30686634 0.2729797  0.30120621 0.0408795  0.78297974
+ 0.79345352 0.00168167]
+
+Level 0:
+  Solution 0:
+    0.022567781542515552 * w{power: 1.0} + 7.632170615426642 * d^2y/dx0^2{power: 1.0} + -0.01711201560175186 = dx/dx0{power: 1.0}
+    0.2536764562690325 * v{power: 1.0} + -0.19958940084418278 = dy/dx0{power: 1.0}
+    -10.482818076000715 * d^2w/dx0^2{power: 1.0} + -0.00015187967484433642 = dv/dx0{power: 1.0}
+    9.85531425340345 * d^2v/dx0^2{power: 1.0} + -0.0004161944630335888 = dw/dx0{power: 1.0}
+    \frac{\partial x_}{\partial x0} = 2.257\cdot 10^{-2} w + 7.632\frac{\partial ^2y}{\partial x_0^2} + -1.711\cdot 10^{-2} 
+    \frac{\partial y}{\partial x_0} = 2.537\cdot 10^{-1} v + -1.996\cdot 10^{-1} 
+    \frac{\partial v}{\partial x_0} = -1.048\cdot 10^{1} \frac{\partial ^2w}{\partial x_0^2} + -1.519\cdot 10^{-4} 
+    \frac{\partial w}{\partial x_0} = 9.855\frac{\partial ^2v}{\partial x_0^2} + -4.162\cdot 10^{-4} 
+  Solution 1:
+    7.632170615428692 * d^2y/dx0^2{power: 1.0} + 0.022567781542511704 * w{power: 1.0} + -0.0171120156017489 = dx/dx0{power: 1.0}
+    0.2536764562690325 * v{power: 1.0} + -0.19958940084418278 = dy/dx0{power: 1.0}
+    0.10138595565324753 * dw/dx0{power: 1.0} + 4.5840584785208574e-05 = d^2v/dx0^2{power: 1.0}
+    1.8852843650024134 * d^2x/dx0^2{power: 1.0} + -0.00023203927551660301 = dw/dx0{power: 1.0} * y{power: 1.0}
+    \frac{\partial x_}{\partial x0} = 7.632\frac{\partial ^2y}{\partial x_0^2} + 2.257\cdot 10^{-2} w + -1.711\cdot 10^{-2} 
+    \frac{\partial y}{\partial x_0} = 2.537\cdot 10^{-1} v + -1.996\cdot 10^{-1} 
+    \frac{\partial ^2v}{\partial x_0^2} = 1.014\cdot 10^{-1} \frac{\partial w}{\partial x_0} + 4.584\cdot 10^{-5} 
+    \frac{\partial w}{\partial x_0} \cdot y = 1.885\frac{\partial ^2x_}{\partial x0^2} + -2.32\cdot 10^{-4} 
+  Solution 2:
+    0.022567781542515552 * w{power: 1.0} + 7.632170615426642 * d^2y/dx0^2{power: 1.0} + -0.01711201560175186 = dx/dx0{power: 1.0}
+    -1.753612179698415 * dw/dx0{power: 1.0} + -0.001052271471859256 = dy/dx0{power: 1.0} * y{power: 1.0}
+    0.10138595565324753 * dw/dx0{power: 1.0} + 4.5840584785208574e-05 = d^2v/dx0^2{power: 1.0}
+    0.0013468546583865178 * v{power: 1.0} + -0.3107978925385913 * d^2y/dx0^2{power: 1.0} + -0.001048986783738471 = d^2w/dx0^2{power: 1.0}
+    \frac{\partial x_}{\partial x0} = 2.257\cdot 10^{-2} w + 7.632\frac{\partial ^2y}{\partial x_0^2} + -1.711\cdot 10^{-2} 
+    \frac{\partial y}{\partial x_0} \cdot y = -1.754\frac{\partial w}{\partial x_0} + -1.052\cdot 10^{-3} 
+    \frac{\partial ^2v}{\partial x_0^2} = 1.014\cdot 10^{-1} \frac{\partial w}{\partial x_0} + 4.584\cdot 10^{-5} 
+    \frac{\partial ^2w}{\partial x_0^2} = 1.347\cdot 10^{-3} v + -3.108\cdot 10^{-1} \frac{\partial ^2y}{\partial x_0^2} + -1.049\cdot 10^{-3} 
+  Solution 3:
+    0.28239000475358067 * w{power: 1.0} + 0.00011659820399746746 * t{power: 1.0, dim: 0.0} + -0.23001106568572893 = dx/dx0{power: 1.0}
+    -0.007644729799041725 * y{power: 1.0} + 0.00957948795663441 * w{power: 1.0} + -0.002633087648063145 = d^2y/dx0^2{power: 1.0}
+    -0.0056005379896137235 * v{power: 1.0} + 0.00438249291688817 = d^2v/dx0^2{power: 1.0} * y{power: 1.0}
+    -0.00864828164053751 * w{power: 1.0} + -0.313239677620233 * dy/dx0{power: 1.0} + 0.006267959266519468 = dw/dx0{power: 1.0}
+    \frac{\partial x_}{\partial x0} = 2.824\cdot 10^{-1} w + 1.166\cdot 10^{-4} t + -2.3\cdot 10^{-1} 
+    \frac{\partial ^2y}{\partial x_0^2} = -7.645\cdot 10^{-3} y + 9.579\cdot 10^{-3} w + -2.633\cdot 10^{-3} 
+    \frac{\partial ^2v}{\partial x_0^2} \cdot y = -5.601\cdot 10^{-3} v + 4.382\cdot 10^{-3} 
+    \frac{\partial w}{\partial x_0} = -8.648\cdot 10^{-3} w + -3.132\cdot 10^{-1} \frac{\partial y}{\partial x_0} + 6.268\cdot 10^{-3} 
+  Solution 4:
+    9.594921958323562 * d^2y/dx0^2{power: 1.0} + 0.0003548194458698113 = dx/dx0{power: 1.0}
+    0.0996926639843462 * x{power: 1.0} + -0.0887000913213148 = dy/dx0{power: 1.0}
+    -0.0310979483139374 * y{power: 1.0} + 0.01930672751670958 = dv/dx0{power: 1.0}
+    3.0078208561440523 * d^2x/dx0^2{power: 1.0} + -0.0003868676014865936 = dw/dx0{power: 1.0}
+    \frac{\partial x_}{\partial x0} = 9.595\frac{\partial ^2y}{\partial x_0^2} + 3.548\cdot 10^{-4} 
+    \frac{\partial y}{\partial x_0} = 9.969\cdot 10^{-2} x + -8.87\cdot 10^{-2} 
+    \frac{\partial v}{\partial x_0} = -3.11\cdot 10^{-2} y + 1.931\cdot 10^{-2} 
+    \frac{\partial w}{\partial x_0} = 3.008\frac{\partial ^2x_}{\partial x0^2} + -3.869\cdot 10^{-4} 
+  Solution 5:
+    0.28239000475358067 * w{power: 1.0} + 0.00011659820399746746 * t{power: 1.0, dim: 0.0} + -0.23001106568572893 = dx/dx0{power: 1.0}
+    0.20799307983676754 * dv/dx0{power: 1.0} + 0.01036670025828908 * dy/dx0{power: 1.0} + 4.4806388824811186e-05 = d^2y/dx0^2{power: 1.0} * w{power: 1.0}
+    0.31166137691746004 * d^2x/dx0^2{power: 1.0} + 0.0005857307311615105 * y{power: 1.0} + -0.00035523476559426936 = d^2v/dx0^2{power: 1.0}
+    -0.3214085622947858 * dy/dx0{power: 1.0} + -0.0005827778172809981 = dw/dx0{power: 1.0}
+    \frac{\partial x_}{\partial x0} = 2.824\cdot 10^{-1} w + 1.166\cdot 10^{-4} t + -2.3\cdot 10^{-1} 
+    \frac{\partial ^2y}{\partial x_0^2} \cdot w = 2.08\cdot 10^{-1} \frac{\partial v}{\partial x_0} + 1.037\cdot 10^{-2} \frac{\partial y}{\partial x_0} + 4.481\cdot 10^{-5} 
+    \frac{\partial ^2v}{\partial x_0^2} = 3.117\cdot 10^{-1} \frac{\partial ^2x_}{\partial x0^2} + 5.857\cdot 10^{-4} y + -3.552\cdot 10^{-4} 
+    \frac{\partial w}{\partial x_0} = -3.214\cdot 10^{-1} \frac{\partial y}{\partial x_0} + -5.828\cdot 10^{-4} 

@@ -1,0 +1,9 @@
+{
+    "best_params": {
+        "poly_window": 7,
+        "population_size": 14,
+        "sigma": 2,
+        "boundary": 4
+    },
+    "score": 111.85055133382585
+}

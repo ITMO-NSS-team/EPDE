@@ -1,0 +1,30 @@
+Level 0:
+Solution 0: [0.70209293 0.82835649 0.01167101 0.01240476]
+Solution 1: [0.70209293 0.67246895 0.01167101 0.0165749 ]
+Solution 2: [0.68438767 0.03401001 1.52319836 3.91842567]
+Level 1:
+Solution 0: [ 0.99869068  0.98485133 10.37310276  2.97794978]
+
+Level 0:
+  Solution 0:
+    -0.010828337178327166 * x1{power: 1.0} + 0.0035185739966783407 = d^2x1/dx0^2{power: 1.0}
+    -0.009898734227305087 * y1{power: 1.0} + 0.0068910344034074636 = d^2y1/dx0^2{power: 1.0}
+    \frac{\partial ^2x_1}{\partial x0^2} = -1.083\cdot 10^{-2} x1 + 3.519\cdot 10^{-3} 
+    \frac{\partial ^2y1}{\partial x_0^2} = -9.899\cdot 10^{-3} y1 + 6.891\cdot 10^{-3} 
+  Solution 1:
+    -0.010828337178327166 * x1{power: 1.0} + 0.0035185739966783407 = d^2x1/dx0^2{power: 1.0}
+    0.08272131452958136 * x1{power: 1.0} * y1{power: 1.0} + -0.018184316159605265 = dy1/dx0{power: 1.0}
+    \frac{\partial ^2x_1}{\partial x0^2} = -1.083\cdot 10^{-2} x1 + 3.519\cdot 10^{-3} 
+    \frac{\partial y1}{\partial x_0} = 8.272\cdot 10^{-2} x1 \cdot y1 + -1.818\cdot 10^{-2} 
+  Solution 2:
+    -0.011169170055343642 * x1{power: 1.0} + 1.2529543310760457e-06 * t{power: 1.0, dim: 0.0} + 0.0035024135026080973 = d^2x1/dx0^2{power: 1.0}
+    0.701696800967289 * dy1/dx0{power: 1.0} + 4.187419685771516e-07 * t{power: 1.0, dim: 0.0} + -2.6296500075071315e-05 = y1{power: 1.0} * dy1/dx0{power: 1.0}
+    \frac{\partial ^2x_1}{\partial x0^2} = -1.117\cdot 10^{-2} x1 + 1.253\cdot 10^{-6} t + 3.502\cdot 10^{-3} 
+    y1 \cdot \frac{\partial y1}{\partial x_0} = 7.017\cdot 10^{-1} \frac{\partial y1}{\partial x_0} + 4.187\cdot 10^{-7} t + -2.63\cdot 10^{-5} 
+
+Level 1:
+  Solution 0:
+    9.248160820281743e-05 * t{power: 1.0, dim: 0.0} * d^2y1/dx0^2{power: 1.0} + 3.847830198720565e-06 = d^2x1/dx0^2{power: 1.0}
+    0.008740281012133548 * y1{power: 1.0} + -0.0058068140127400985 = dy1/dx0{power: 1.0}
+    \frac{\partial ^2x_1}{\partial x0^2} = 9.248\cdot 10^{-5} t \cdot \frac{\partial ^2y1}{\partial x_0^2} + 3.848\cdot 10^{-6} 
+    \frac{\partial y1}{\partial x_0} = 8.74\cdot 10^{-3} y1 + -5.807\cdot 10^{-3} 

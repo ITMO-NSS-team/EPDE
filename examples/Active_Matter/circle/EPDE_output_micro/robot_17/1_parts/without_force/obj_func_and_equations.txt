@@ -1,0 +1,87 @@
+Level 0:
+Solution 0: [0.95851709 0.83648436 0.89610386 0.03169652]
+Solution 1: [0.77050537 0.75965977 0.2033385  0.03331483]
+Solution 2: [0.05595421 0.83664416 0.45483494 0.04364945]
+Solution 3: [0.05595421 0.28565308 0.45483494 0.59103179]
+Solution 4: [0.8462896  0.50022929 0.07282223 1.66992577]
+Solution 5: [0.77262586 0.75965977 0.18901889 0.03331483]
+Solution 6: [0.77260144 0.04101869 0.18901889 1.67764402]
+Solution 7: [0.05595421 0.04101869 0.45483494 1.67764402]
+Solution 8: [0.86068874 0.83664416 0.05331772 0.04364945]
+Solution 9: [0.04940901 0.38664327 3.25504013 0.36309336]
+Solution 10: [0.8462896  0.75965977 0.07282223 0.03331483]
+Solution 11: [0.86068874 0.04101869 0.05331772 1.67764402]
+Solution 12: [0.8363039  1.04874355 0.02612526 1.44168472]
+Solution 13: [1.03532483 0.50725757 0.10071284 1.48468161]
+
+Level 0:
+  Solution 0:
+    2.4903347700681596e-05 * x1{power: 1.0} + -0.00029999704167707686 * dy1/dx0{power: 1.0} + -1.4180607461382677e-05 = dx1/dx0{power: 1.0} * dy1/dx0{power: 1.0}
+    0.47798925449218393 * d^2x1/dx0^2{power: 1.0} + 4.239172953244223e-06 = d^2y1/dx0^2{power: 1.0}
+    \frac{\partial x_1}{\partial x0} \cdot \frac{\partial y1}{\partial x_0} = 2.49\cdot 10^{-5} x1 + -3.0\cdot 10^{-4} \frac{\partial y1}{\partial x_0} + -1.418\cdot 10^{-5} 
+    \frac{\partial ^2y1}{\partial x_0^2} = 4.78\cdot 10^{-1} \frac{\partial ^2x_1}{\partial x0^2} + 4.239\cdot 10^{-6} 
+  Solution 1:
+    -0.00562701898164157 * x1{power: 1.0} + -3.585477207146554e-06 * t{power: 1.0, dim: 0.0} + 0.0037660246901010143 = d^2x1/dx0^2{power: 1.0} * x1{power: 1.0}
+    0.669111848511533 * dx1/dx0{power: 1.0} * x1{power: 1.0} + 4.974833644343581e-05 = dy1/dx0{power: 1.0}
+    \frac{\partial ^2x_1}{\partial x0^2} \cdot x1 = -5.627\cdot 10^{-3} x1 + -3.585\cdot 10^{-6} t + 3.766\cdot 10^{-3} 
+    \frac{\partial y1}{\partial x_0} = 6.691\cdot 10^{-1} \frac{\partial x_1}{\partial x0} \cdot x1 + 4.975\cdot 10^{-5} 
+  Solution 2:
+    0.001281330615113419 * y1{power: 1.0} + 1.5849926599048973 * dx1/dx0{power: 1.0} * x1{power: 1.0} + -9.948281853494857e-05 = dx1/dx0{power: 1.0}
+    0.30083648830590143 * d^2x1/dx0^2{power: 1.0} + 1.5146139154190063e-06 = d^2y1/dx0^2{power: 1.0} * x1{power: 1.0}
+    \frac{\partial x_1}{\partial x0} = 1.281\cdot 10^{-3} y1 + 1.585\frac{\partial x_1}{\partial x0} \cdot x1 + -9.948\cdot 10^{-5} 
+    \frac{\partial ^2y1}{\partial x_0^2} \cdot x1 = 3.008\cdot 10^{-1} \frac{\partial ^2x_1}{\partial x0^2} + 1.515\cdot 10^{-6} 
+  Solution 3:
+    0.001281330615113419 * y1{power: 1.0} + 1.5849926599048973 * dx1/dx0{power: 1.0} * x1{power: 1.0} + -9.948281853494857e-05 = dx1/dx0{power: 1.0}
+    0.5506491200619057 * d^2y1/dx0^2{power: 1.0} + -0.0013368936815465393 * y1{power: 1.0} + 5.1688815574869586e-05 = d^2y1/dx0^2{power: 1.0} * x1{power: 1.0}
+    \frac{\partial x_1}{\partial x0} = 1.281\cdot 10^{-3} y1 + 1.585\frac{\partial x_1}{\partial x0} \cdot x1 + -9.948\cdot 10^{-5} 
+    \frac{\partial ^2y1}{\partial x_0^2} \cdot x1 = 5.506\cdot 10^{-1} \frac{\partial ^2y1}{\partial x_0^2} + -1.337\cdot 10^{-3} y1 + 5.169\cdot 10^{-5} 
+  Solution 4:
+    0.00637043471681311 * d^2y1/dx0^2{power: 1.0} * t{power: 1.0, dim: 0.0} + -2.783499592797765e-06 = d^2x1/dx0^2{power: 1.0}
+    3.376899967149953e-06 * t{power: 1.0, dim: 0.0} + 0.010750257115063954 * t{power: 1.0, dim: 0.0} * dy1/dx0{power: 1.0} + -0.00042945023214656364 = dy1/dx0{power: 1.0}
+    \frac{\partial ^2x_1}{\partial x0^2} = 6.37\cdot 10^{-3} \frac{\partial ^2y1}{\partial x_0^2} \cdot t + -2.783\cdot 10^{-6} 
+    \frac{\partial y1}{\partial x_0} = 3.377\cdot 10^{-6} t + 1.075\cdot 10^{-2} t \cdot \frac{\partial y1}{\partial x_0} + -4.295\cdot 10^{-4} 
+  Solution 5:
+    -0.009000591144779147 * x1{power: 1.0} + -5.764107576579272e-06 * t{power: 1.0, dim: 0.0} + 0.0060309585558229305 = d^2x1/dx0^2{power: 1.0}
+    0.669111848511533 * dx1/dx0{power: 1.0} * x1{power: 1.0} + 4.974833644343581e-05 = dy1/dx0{power: 1.0}
+    \frac{\partial ^2x_1}{\partial x0^2} = -9.001\cdot 10^{-3} x1 + -5.764\cdot 10^{-6} t + 6.031\cdot 10^{-3} 
+    \frac{\partial y1}{\partial x_0} = 6.691\cdot 10^{-1} \frac{\partial x_1}{\partial x0} \cdot x1 + 4.975\cdot 10^{-5} 
+  Solution 6:
+    -0.009000695189901261 * x1{power: 1.0} + -5.7634507195886655e-06 * t{power: 1.0, dim: 0.0} + 0.0060309585558229305 = d^2x1/dx0^2{power: 1.0}
+    0.6362629833427726 * dy1/dx0{power: 1.0} + 1.4576948379497366e-07 * t{power: 1.0, dim: 0.0} + -1.3914009878931441e-05 = x1{power: 1.0} * dy1/dx0{power: 1.0}
+    \frac{\partial ^2x_1}{\partial x0^2} = -9.001\cdot 10^{-3} x1 + -5.763\cdot 10^{-6} t + 6.031\cdot 10^{-3} 
+    x1 \cdot \frac{\partial y1}{\partial x_0} = 6.363\cdot 10^{-1} \frac{\partial y1}{\partial x_0} + 1.458\cdot 10^{-7} t + -1.391\cdot 10^{-5} 
+  Solution 7:
+    0.001281330615113419 * y1{power: 1.0} + 1.5849926599048973 * dx1/dx0{power: 1.0} * x1{power: 1.0} + -9.948281853494857e-05 = dx1/dx0{power: 1.0}
+    0.6362629833427726 * dy1/dx0{power: 1.0} + 1.4576948379497366e-07 * t{power: 1.0, dim: 0.0} + -1.3914009878931441e-05 = x1{power: 1.0} * dy1/dx0{power: 1.0}
+    \frac{\partial x_1}{\partial x0} = 1.281\cdot 10^{-3} y1 + 1.585\frac{\partial x_1}{\partial x0} \cdot x1 + -9.948\cdot 10^{-5} 
+    x1 \cdot \frac{\partial y1}{\partial x_0} = 6.363\cdot 10^{-1} \frac{\partial y1}{\partial x_0} + 1.458\cdot 10^{-7} t + -1.391\cdot 10^{-5} 
+  Solution 8:
+    0.5305587313859856 * dy1/dx0{power: 1.0} + -0.00046996948505136115 = dx1/dx0{power: 1.0}
+    0.30083648830590143 * d^2x1/dx0^2{power: 1.0} + 1.5146139154190063e-06 = d^2y1/dx0^2{power: 1.0} * x1{power: 1.0}
+    \frac{\partial x_1}{\partial x0} = 5.306\cdot 10^{-1} \frac{\partial y1}{\partial x_0} + -4.7\cdot 10^{-4} 
+    \frac{\partial ^2y1}{\partial x_0^2} \cdot x1 = 3.008\cdot 10^{-1} \frac{\partial ^2x_1}{\partial x0^2} + 1.515\cdot 10^{-6} 
+  Solution 9:
+    0.621038744300416 * dx1/dx0{power: 1.0} + -9.373843310547305e-07 * t{power: 1.0, dim: 0.0} + -0.0013768763590312058 * x1{power: 1.0} + 0.0009367734376645961 = dx1/dx0{power: 1.0} * x1{power: 1.0}
+    -0.003942789125013193 * y1{power: 1.0} + 0.34917910671267616 * d^2y1/dx0^2{power: 1.0} + -1.1529469446322485e-06 * t{power: 1.0, dim: 0.0} + 0.00023367043515715692 = d^2y1/dx0^2{power: 1.0} * x1{power: 1.0}
+    \frac{\partial x_1}{\partial x0} \cdot x1 = 6.21\cdot 10^{-1} \frac{\partial x_1}{\partial x0} + -9.374\cdot 10^{-7} t + -1.377\cdot 10^{-3} x1 + 9.368\cdot 10^{-4} 
+    \frac{\partial ^2y1}{\partial x_0^2} \cdot x1 = -3.943\cdot 10^{-3} y1 + 3.492\cdot 10^{-1} \frac{\partial ^2y1}{\partial x_0^2} + -1.153\cdot 10^{-6} t + 2.337\cdot 10^{-4} 
+  Solution 10:
+    0.00637043471681311 * d^2y1/dx0^2{power: 1.0} * t{power: 1.0, dim: 0.0} + -2.783499592797765e-06 = d^2x1/dx0^2{power: 1.0}
+    0.669111848511533 * dx1/dx0{power: 1.0} * x1{power: 1.0} + 4.974833644343581e-05 = dy1/dx0{power: 1.0}
+    \frac{\partial ^2x_1}{\partial x0^2} = 6.37\cdot 10^{-3} \frac{\partial ^2y1}{\partial x_0^2} \cdot t + -2.783\cdot 10^{-6} 
+    \frac{\partial y1}{\partial x_0} = 6.691\cdot 10^{-1} \frac{\partial x_1}{\partial x0} \cdot x1 + 4.975\cdot 10^{-5} 
+  Solution 11:
+    0.5305587313859856 * dy1/dx0{power: 1.0} + -0.00046996948505136115 = dx1/dx0{power: 1.0}
+    0.6362629833427726 * dy1/dx0{power: 1.0} + 1.4576948379497366e-07 * t{power: 1.0, dim: 0.0} + -1.3914009878931441e-05 = x1{power: 1.0} * dy1/dx0{power: 1.0}
+    \frac{\partial x_1}{\partial x0} = 5.306\cdot 10^{-1} \frac{\partial y1}{\partial x_0} + -4.7\cdot 10^{-4} 
+    x1 \cdot \frac{\partial y1}{\partial x_0} = 6.363\cdot 10^{-1} \frac{\partial y1}{\partial x_0} + 1.458\cdot 10^{-7} t + -1.391\cdot 10^{-5} 
+  Solution 12:
+    -0.00021393629662549177 * y1{power: 1.0} * t{power: 1.0, dim: 0.0} + 0.00048178508819772504 = d^2x1/dx0^2{power: 1.0}
+    -0.001803604631394657 * x1{power: 1.0} + 0.001088667684435023 = d^2y1/dx0^2{power: 1.0}
+    \frac{\partial ^2x_1}{\partial x0^2} = -2.139\cdot 10^{-4} y1 \cdot t + 4.818\cdot 10^{-4} 
+    \frac{\partial ^2y1}{\partial x_0^2} = -1.804\cdot 10^{-3} x1 + 1.089\cdot 10^{-3} 
+  Solution 13:
+    -4.5787454061653295e-06 * t{power: 1.0, dim: 0.0} + -0.01389490664527251 * y1{power: 1.0} + 0.0008961517765496271 = d^2x1/dx0^2{power: 1.0}
+    -0.007035396283249202 * y1{power: 1.0} + 0.011038841300870303 * dy1/dx0{power: 1.0} * t{power: 1.0, dim: 0.0} + 0.00023802270988120897 = dy1/dx0{power: 1.0}
+    \frac{\partial ^2x_1}{\partial x0^2} = -4.579\cdot 10^{-6} t + -1.389\cdot 10^{-2} y1 + 8.962\cdot 10^{-4} 
+    \frac{\partial y1}{\partial x_0} = -7.035\cdot 10^{-3} y1 + 1.104\cdot 10^{-2} \frac{\partial y1}{\partial x_0} \cdot t + 2.38\cdot 10^{-4} 
