@@ -23,7 +23,18 @@ import epde.globals as global_var
 from sklearn.linear_model import LinearRegression, Ridge
 from scipy.optimize import minimize
 from epde.supplementary import minmax_normalize
-from epde.supplementary import calculate_weights
+from epde.operators.common.stability import (calculate_weights, vc_stability_total_lr)
+from epde import _loop_stats
+
+
+def _gram_dispatch_kwargs():
+    """Return ``(gram_cls, gram_kwargs)`` for ``calculate_weights``. The
+    axis backup path uses ``GramSetup`` (``calculate_weights``'s default),
+    so this is always ``(None, None)``; the ``vcoef`` default does not
+    route through ``calculate_weights`` (it scores via ``VaryingCoefSetup``
+    directly in ``PhysicsInformedLasso.fit``).
+    """
+    return (None, None)
 
 LOSS_NAN_VAL = 1e7
 
@@ -54,6 +65,7 @@ class L2Fitness(CompoundOperator):
 
     key = 'DiscrepancyBasedFitness'
 
+    @_loop_stats.timed('L2Fitness.apply')
     def apply(self, objective: Equation, arguments: dict, force_out_of_place: bool = False):
         """
         Calculate the fitness function values. The result is not returned, but stored in the equation.fitness_value attribute.
@@ -142,20 +154,34 @@ class L2Fitness(CompoundOperator):
             _, sw_target, sw_features = objective.evaluate(normalize=True, return_val=False)
             if sw_features is None:
                 total_lr = 1.0
+            elif global_var.gram_mode == 'vcoef':
+                if getattr(objective, '_cached_vc_score', None) is not None:
+                    total_lr = float(np.sum(objective._cached_vc_score))
+                else:
+                    # Non-zero terms only; exclude the intercept when it is zeroed
+                    # (weights_final[-1] == 0) -- same policy as the axis path.
+                    _, t_nz, f_nz = objective.evaluate(normalize=False, return_val=False)
+                    total_lr = (1.0 if f_nz is None else vc_stability_total_lr(
+                        f_nz, t_nz, self.g_fun_vals, data_shape,
+                        main_var=objective.main_var_to_explain,
+                        fit_intercept=objective.weights_final[-1] != 0))
             else:
                 if hasattr(objective, '_cached_sw_weights') and objective._cached_sw_weights is not None:
                     sw_weights = objective._cached_sw_weights
                 else:
+                    _gc, _gk = _gram_dispatch_kwargs()
                     sw_weights = calculate_weights(
                         sw_features, sw_target, self.g_fun_vals, data_shape,
                         objective.weights_final[-1] != 0,
+                        gram_cls=_gc, gram_kwargs=_gk,
                     )
                 sw_arr = np.array(sw_weights)
-                std = sw_arr.std(axis=0, ddof=1)
                 mu = sw_arr.mean(axis=0)
+                std = sw_arr.std(axis=0, ddof=1)
                 with np.errstate(divide='ignore', invalid='ignore'):
                     cv = (std ** 2) / (mu ** 2)
-                total_lr = sum(cv) / len(data_shape)
+                    cv[mu == 0] = 0.0
+                total_lr = sum(np.nan_to_num(cv)) / len(data_shape)
         except Exception:
             total_lr = 1.0
         objective.stability_calculated = True
@@ -168,6 +194,7 @@ class L2Fitness(CompoundOperator):
 class L2LRFitness(CompoundOperator):
     key = 'DiscrepancyBasedFitnessWithCV'
 
+    @_loop_stats.timed('L2LRFitness.apply')
     def apply(self, objective: Equation, arguments: dict, force_out_of_place: bool = False):
         """
         Calculate the fitness function values. The result is not returned, but stored in the equation.fitness_value attribute.
@@ -186,7 +213,7 @@ class L2LRFitness(CompoundOperator):
 
         if force_out_of_place:
             self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
-            if all(objective.weights_internal == 0):
+            if all(objective.weights_internal[:-1] == 0):
                 return None
         self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
 
@@ -203,22 +230,11 @@ class L2LRFitness(CompoundOperator):
         if features is None:
             discr = target - target.mean()
         else:
-            # ``features`` width depends on the ``normalize`` flag passed to
-            # ``evaluate`` above: ``normalize=True`` returns all N-1
-            # non-target columns; ``normalize=False`` filters to only the
-            # nonzero-weight columns. ``weights_final[:-1]`` matches the
-            # latter shape (nonzero count); ``weights_internal`` matches the
-            # former (full N-1, with zeros). Pick whichever lines up with
-            # the actual feature matrix -- same pattern as L2Fitness.apply.
-            n_cols = features.shape[1] if features.ndim > 1 else 1
-            mask = objective.weights_internal != 0
-            if n_cols == len(mask):
-                discr_feats = np.dot(features, objective.weights_internal)
-            elif n_cols == int(mask.sum()):
+            if objective.weights_internal[-1]:
                 discr_feats = np.dot(features, objective.weights_final[:-1])
+                discr_feats = discr_feats + objective.weights_final[-1]
             else:
-                discr_feats = np.zeros(features.shape[0])
-            discr_feats = discr_feats + objective.weights_final[-1]
+                discr_feats = np.dot(features, objective.weights_final)
             discr = target - discr_feats
 
         rl_error = np.sum(np.abs(discr)) / np.sum(np.abs(target))
@@ -235,23 +251,31 @@ class L2LRFitness(CompoundOperator):
         objective.aic_calculated = True
 
         data_shape = global_var.grid_cache.inner_shape
-        if features is None:
-            # Degenerate candidate (all features pruned by sparsity).
-            # Nothing to fit sliding-window weights on -- skip the CV
-            # calculation and report unit stability so downstream callers
-            # still get a finite value.
-            total_lr = 1.0
+        if global_var.gram_mode == 'vcoef':
+            if getattr(objective, '_cached_vc_score', None) is not None:
+                total_lr = float(np.sum(objective._cached_vc_score))
+            else:
+                total_lr = vc_stability_total_lr(
+                    features, target, self.g_fun_vals, data_shape,
+                    main_var=objective.main_var_to_explain,
+                    fit_intercept=objective.weights_internal[-1] != 0)
         else:
             if hasattr(objective, '_cached_sw_weights') and objective._cached_sw_weights is not None:
                 weights = objective._cached_sw_weights
             else:
-                weights = calculate_weights(features, target, self.g_fun_vals, data_shape, objective.weights_final[-1] != 0)
+                _gc, _gk = _gram_dispatch_kwargs()
+                weights = calculate_weights(
+                    features, target, self.g_fun_vals, data_shape,
+                    objective.weights_internal[-1] != 0,
+                    gram_cls=_gc, gram_kwargs=_gk,
+                )
             weights_arr = np.array(weights)
-            std = weights_arr.std(axis=0, ddof=1)
             mu = weights_arr.mean(axis=0)
+            std = weights_arr.std(axis=0, ddof=1)
             with np.errstate(divide='ignore', invalid='ignore'):
                 cv = (std ** 2) / (mu ** 2)
-            total_lr = sum(cv) / len(data_shape)
+                cv[mu == 0] = 0.0
+            total_lr = sum(np.nan_to_num(cv)) / len(data_shape)
 
         # if force_out_of_place:
         #     return fitness_value * total_lr
@@ -430,19 +454,33 @@ class PIC(CompoundOperator):
             # Calculate r-loss
             data_shape = global_var.grid_cache.inner_shape
             _, target, features = eq.evaluate(normalize=True, return_val=False)
-            if hasattr(eq, '_cached_sw_weights') and eq._cached_sw_weights is not None:
-                weights = eq._cached_sw_weights
+            if global_var.gram_mode == 'vcoef':
+                if getattr(eq, '_cached_vc_score', None) is not None:
+                    total_lr = float(np.sum(eq._cached_vc_score))
+                else:
+                    total_lr = vc_stability_total_lr(
+                        features, target, self.g_fun_vals, data_shape,
+                        main_var=objective.main_var_to_explain,
+                        fit_intercept=objective.weights_internal[-1] != 0)
             else:
-                weights = calculate_weights(features, target, self.g_fun_vals, data_shape)
-            weights_arr = np.array(weights)
-            std = weights_arr.std(axis=0, ddof=1)
-            mu = weights_arr.mean(axis=0)
+                if hasattr(eq, '_cached_sw_weights') and eq._cached_sw_weights is not None:
+                    weights = eq._cached_sw_weights
+                else:
+                    _gc, _gk = _gram_dispatch_kwargs()
+                    weights = calculate_weights(
+                        features, target, self.g_fun_vals, data_shape,
+                        gram_cls=_gc, gram_kwargs=_gk,
+                    )
+                weights_arr = np.array(weights)
+                mu = weights_arr.mean(axis=0)
+                std = weights_arr.std(axis=0, ddof=1)
 
-            # Safe division
-            with np.errstate(divide='ignore', invalid='ignore'):
-                cv = (std ** 2) / (mu ** 2)
+                # Safe division
+                with np.errstate(divide='ignore', invalid='ignore'):
+                    cv = (std ** 2) / (mu ** 2)
+                    cv[mu == 0] = 0.0
 
-            total_lr = sum(cv) / len(data_shape)
+                total_lr = sum(np.nan_to_num(cv)) / len(data_shape)
 
             eq.fitness_calculated = True
             eq.fitness_value = lp
@@ -570,12 +608,30 @@ class DeepXDEBasedFitness(CompoundOperator):
         _, target, features = eq.evaluate(normalize=False, return_val=False)
         data_shape = global_var.grid_cache.inner_shape
         self.get_g_fun_vals()
-        weights = calculate_weights(features, target, self.g_fun_vals, data_shape)
-        weights_arr = np.array(weights)
-        std = weights_arr.std(axis=0, ddof=1)
-        mu = weights_arr.mean(axis=0)
-        cv = (std ** 2) / (mu ** 2)
-        total_lr = np.sum(cv) / len(data_shape)
+        if global_var.gram_mode == 'vcoef':
+            if getattr(eq, '_cached_vc_score', None) is not None:
+                total_lr = float(np.sum(eq._cached_vc_score))
+            else:
+                total_lr = vc_stability_total_lr(
+                    features, target, self.g_fun_vals, data_shape,
+                    main_var=objective.main_var_to_explain,
+                    fit_intercept=objective.weights_internal[-1] != 0)
+        else:
+            if hasattr(eq, '_cached_sw_weights') and eq._cached_sw_weights is not None:
+                weights = eq._cached_sw_weights
+            else:
+                _gc, _gk = _gram_dispatch_kwargs()
+                weights = calculate_weights(
+                    features, target, self.g_fun_vals, data_shape,
+                    gram_cls=_gc, gram_kwargs=_gk,
+                )
+            weights_arr = np.array(weights)
+            mu = weights_arr.mean(axis=0)
+            std = weights_arr.std(axis=0, ddof=1)
+            with np.errstate(divide='ignore', invalid='ignore'):
+                cv = (std ** 2) / (mu ** 2)
+                cv[mu == 0] = 0.0
+            total_lr = np.sum(np.nan_to_num(cv)) / len(data_shape)
         eq.coefficients_stability = total_lr
         eq.stability_calculated = True
 

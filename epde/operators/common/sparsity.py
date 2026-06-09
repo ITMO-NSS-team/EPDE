@@ -16,7 +16,8 @@ import time
 from sklearn.base import BaseEstimator, RegressorMixin
 # import seaborn as sns
 import matplotlib.pyplot as plt
-from epde.supplementary import calculate_weights, GramSetup
+from epde.operators.common.stability import (calculate_weights, GramSetup,
+                                              VaryingCoefSetup)
 from epde import _loop_stats
 
 
@@ -233,10 +234,15 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
     - Aggressive: Instant elimination of features that hit zero during optimization.
     """
 
-    def __init__(self, max_iter=1000, tol=1e-4, grid_shape=None):
+    def __init__(self, max_iter=1000, tol=1e-4, grid_shape=None,
+                 main_var: str = None):
         self.max_iter = max_iter
         self.tol = tol
         self.grid_shape = grid_shape
+        # Threaded through to ``VaryingCoefSetup`` so the basis-mode
+        # resolver picks the equation's own primary variable when
+        # multi-var systems use different scales per equation.
+        self.main_var = main_var
         self.coef_ = None
         self.full_coef_ = None  # Includes the intercept
 
@@ -244,26 +250,26 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
         return np.sign(x) * np.maximum(np.abs(x) - lambda_, 0.0)
 
     def get_cv(self, weights):
-        """Calculates Squared Coefficient of Variation (std^2 / mean^2)."""
-        weights_arr = np.array(weights)
-        std = weights_arr.std(axis=0, ddof=1)
-        mu = weights_arr.mean(axis=0)
+        """Per-feature CV-stability metric for the axis backup path:
+        ``(std / mean)^2 = var / mu^2`` across the sliding windows.
 
+        The squared coefficient of variation of each feature's per-window
+        weight. It blows up (large CV) for features whose fitted coefficient
+        is unstable or near-zero-mean across horizons, so the
+        ``active_thresholds = cv * max_corr`` step in
+        :meth:`PhysicsInformedLasso.fit` prunes them first. The default
+        ``gram_mode='vcoef'`` path does not call this -- it scores via
+        ``VaryingCoefSetup.score`` instead.
+        """
+        weights_arr = np.asarray(weights)
         with np.errstate(divide='ignore', invalid='ignore'):
-            cv = std ** 2 / mu ** 2
-            # cv = std ** 2
-
+            std = weights_arr.std(axis=0, ddof=1)
+            mu = weights_arr.mean(axis=0)
+            cv = (std ** 2) / (mu ** 2)
+            cv[mu == 0] = 0.0
         return np.nan_to_num(cv)
 
-    # def get_cv(self, weights):
-    #     weights_arr = np.asarray(weights)
-    #     q1, q3 = np.percentile(weights_arr, [25, 75], axis=0)
-    #     spread = (q3 - q1) / 1.349  # IQR/1.349 ≈ σ for Gaussian
-    #     center = np.median(weights_arr, axis=0)
-    #     with np.errstate(divide='ignore', invalid='ignore'):
-    #         cv = spread ** 2 / (center ** 2 + spread ** 2)
-    #     return np.nan_to_num(cv)
-
+    @_loop_stats.timed('PhysicsInformedLasso.fit')
     def fit(self, X, y, sample_weights=None, gram_setup=None):
         n_samples, n_features = X.shape
 
@@ -290,7 +296,17 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
         # super-Gram, reuse it -- saves the windowed matmul that
         # otherwise repeats for every candidate target_idx in one sweep.
         if gram_setup is None:
-            gram_setup = GramSetup(X, y, sample_weights, self.grid_shape)
+            if global_var.gram_mode == 'vcoef':
+                gram_setup = VaryingCoefSetup(
+                    X, y, sample_weights, self.grid_shape,
+                    main_var=self.main_var)
+            else:  # 'axis' backup
+                gram_setup = GramSetup(X, y, sample_weights, self.grid_shape)
+
+        # Varying-coefficient mode returns a per-feature stability score
+        # directly (no per-window weight stack), so the in-fit CV-threshold
+        # path branches on it below.
+        is_vcoef = getattr(gram_setup, 'is_vcoef', False)
 
         outer_iteration = 0
         max_outer_iters = total_features  # Max possible eliminations
@@ -308,7 +324,9 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
 
             # 2. Calculate physical priors ONLY for the active library --
             # slice the precomputed full Gram by the current active mask.
-            weights = gram_setup.solve(active_mask)
+            # ``vcoef`` yields the per-feature score directly; the axis
+            # path returns a per-window weight stack reduced by ``get_cv``.
+            weights = None if is_vcoef else gram_setup.solve(active_mask)
 
             # Slice data for the CD run
             X_active = X_aug[:, active_mask]
@@ -318,16 +336,39 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
             # so threshold scale tracks the current problem as features drop.
             max_corr = np.max(np.abs(X_T_y[active_mask]))
 
-            # 3. CV performs as adaptive alpha
-            active_cv = self.get_cv(weights)
+            # 3. CV performs as adaptive alpha. In vcoef mode this is each
+            # term's stability score (Var(gamma_0) + NC_deb)/gamma_0^2 --
+            # significance plus debiased region-variation -- which prunes weak /
+            # zero / unstable / spuriously-varying terms.
+            active_cv = (gram_setup.score(active_mask) if is_vcoef
+                         else self.get_cv(weights))
+
             # Tackle the most physically unstable feature first so unstable
             # terms get shrunk to zero before they pollute the residual.
-            cv_order = np.argsort(active_cv)[::-1]
             active_thresholds = active_cv * max_corr
+            # active_thresholds = active_cv
             # active_thresholds = active_cv * norm_sq_active
 
-            # Initialize coefficients
-            active_coef = weights.mean(axis=0)
+            cv_order = np.argsort(active_cv)[::-1]
+            # cv_order = np.argsort(active_thresholds)[::-1]
+
+            # Initialize coefficients from a single global weighted-OLS on
+            # the full dataset rather than the mean over per-window OLS
+            # coefficients. The per-window mean is biased toward zero on
+            # heterogeneous data (e.g. KdV solitons, where most windows see
+            # ~0 signal so the mean is shrunk by ``M_signal / M``); the
+            # global OLS is unbiased.
+            sw_active = (sample_weights if sample_weights is not None
+                          else np.ones(n_samples))
+            try:
+                XTWX_full = X_active.T @ (sw_active[:, None] * X_active)
+                XTWy_full = X_active.T @ (sw_active * y)
+                active_coef = np.linalg.solve(XTWX_full, XTWy_full)
+            except np.linalg.LinAlgError:
+                # ``vcoef`` has no per-window stack to average; fall back to
+                # a zero start (CD recovers it) instead of weights.mean.
+                active_coef = (np.zeros(int(active_mask.sum())) if is_vcoef
+                               else weights.mean(axis=0))
 
             residual = y - (X_active @ active_coef)
 
@@ -407,6 +448,27 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
 
         _loop_stats.record('PhysicsInformedLasso.RFE_outer', outer_iters_executed, max_outer_iters)
         self.cached_weights_ = weights
+        # Per-active-term stability scores on the converged mask, summed as the
+        # stability objective in fitness. ``None`` for the axis backup path.
+        self.cached_vc_score_ = (gram_setup.score(active_mask)
+                                 if is_vcoef else None)
+
+        # Relaxed-LASSO refit: replace the surviving CD-output
+        # coefficients with a single global weighted-OLS on
+        # ``X[:, active_mask]``. Sparsity decisions (which features
+        # survived) are preserved; only the magnitudes become unbiased
+        # global estimates.
+        if np.any(active_mask):
+            sw_active = (sample_weights if sample_weights is not None
+                          else np.ones(n_samples))
+            X_final = X_aug[:, active_mask]
+            try:
+                XTWX_final = X_final.T @ (sw_active[:, None] * X_final)
+                XTWy_final = X_final.T @ (sw_active * y)
+                refit = np.linalg.solve(XTWX_final, XTWy_final)
+                self.full_coef_[active_mask] = refit
+            except np.linalg.LinAlgError:
+                pass  # singular -> keep CD result
 
         # Map back to standard sklearn attributes
         self.coef_ = self.full_coef_[:-1]
@@ -442,7 +504,8 @@ class LASSOSparsity(CompoundOperator):
         
     """
     key = 'LASSOBasedSparsity'
-    
+
+    @_loop_stats.timed('LASSOSparsity.apply')
     def apply(self, objective : Equation, arguments : dict):
         """
         Apply the operator, to fit the LASSO regression to the equation object to detect the 
@@ -538,10 +601,13 @@ class VWSRSparsity(CompoundOperator):
     """
     key = 'VWSRBasedSparsity'
 
+    @_loop_stats.timed('VWSRSparsity.apply')
     def apply(self, objective : Equation, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
-        estimator = PhysicsInformedLasso(grid_shape=global_var.grid_cache.inner_shape)
+        estimator = PhysicsInformedLasso(
+            grid_shape=global_var.grid_cache.inner_shape,
+            main_var=objective.main_var_to_explain)
 
         self.g_fun_vals = global_var.grid_cache.g_func[global_var.grid_cache.g_func_mask]
 
@@ -557,16 +623,20 @@ class VWSRSparsity(CompoundOperator):
             target = Z[:, t]
             feature_indexes = [i for i in range(Z.shape[1]) if i != t]
             features = Z[:, feature_indexes]
-            gram_setup = GramSetup.from_full(gram_super, t)
+            if gram_super.get('mode') == 'vcoef':
+                gram_setup = VaryingCoefSetup.from_full(gram_super, t)
+            else:
+                gram_setup = GramSetup.from_full(gram_super, t)
         else:
             _, target, features = objective.evaluate(normalize=True, return_val=False)
             gram_setup = None
         estimator.fit(features, target, self.g_fun_vals, gram_setup=gram_setup)
-        objective.weights_internal = estimator.coef_
+        objective.weights_internal = np.array([*estimator.coef_, estimator.intercept_])
         objective.weights_internal_evald = True
-        objective.weights_final = np.append([weight for weight in estimator.coef_ if weight != 0], estimator.intercept_)
+        objective.weights_final = np.array([weight for weight in objective.weights_internal if weight != 0])
         objective.weights_final_evald = True
         objective._cached_sw_weights = estimator.cached_weights_
+        objective._cached_vc_score = estimator.cached_vc_score_
         # See LASSOSparsity.apply: _eval_cache survives a weights update;
         # only structural resets via ``Equation.reset_state`` should wipe it.
 

@@ -8,6 +8,7 @@ Created on Fri Jul 29 19:08:51 2022
 import copy
 import numpy as np
 import time
+import warnings
 from typing import Union, Tuple
 from functools import reduce, partial
 
@@ -502,24 +503,47 @@ class InitialParetoLevelSorting(CompoundOperator):
                     attempts, uniqueness_attempt_limit,
                 )
                 if hit_cap:
-                    # Initial population must be duplicate-free for MOEA/D's
-                    # per-sector uniqueness invariant. If the candidate pool
-                    # is too small to satisfy pop_size, fail loud rather than
-                    # silently corrupt the initial Pareto layer.
-                    raise RuntimeError(
-                        f"InitialParetoLevelSorting: could not generate a unique "
-                        f"initial candidate after {uniqueness_attempt_limit} attempts "
-                        f"(candidate index {idx}, {len(objective.history)} unique "
-                        f"systems already placed). The search space appears smaller "
-                        f"than the requested population. Reduce pop_size, widen the "
-                        f"token pool, or raise InitialParetoLevelSorting's "
-                        f"'uniqueness_attempt_limit' parameter."
+                    # Search-space collapse: the RPS+simplify pipeline canonicalises
+                    # ``uniqueness_attempt_limit`` consecutive create() outputs into
+                    # one of the already-placed structures. Diagnostic builds want
+                    # to observe the partial population's objective values rather
+                    # than abort. Policy:
+                    # warn, register the placed candidates in ``population`` /
+                    # ``levels[0]`` so downstream consumers can read their
+                    # ``text_form`` + ``obj_fun``, set ``_init_collapsed=True``,
+                    # and stop -- MOEA/D's ``optimize`` checks this flag after
+                    # init and skips the epoch loop so mutation/crossover never
+                    # runs on the degenerate population.
+                    warnings.warn(
+                        f"InitialParetoLevelSorting: search-space collapse at "
+                        f"candidate {idx} after {uniqueness_attempt_limit} attempts "
+                        f"({len(objective.history)} unique systems placed of "
+                        f"{len(objective.unplaced_candidates)} requested). Stopping "
+                        f"the search; placed candidates are accessible via "
+                        f"pareto_levels.levels[0]."
                     )
+                    placed = list(objective.unplaced_candidates[:idx])
+                    objective.population = placed
+                    objective.unplaced_candidates = []
+                    # Single-level dump: Pareto-correctness is moot here because
+                    # we're terminating. Consumers reading ``levels[0]`` get
+                    # every placed candidate.
+                    objective.levels = [placed] if placed else [[]]
+                    objective._init_collapsed = True
+                    init_collapsed = True
+                    break
                 self.suboperators['chromosome_fitness'].apply(objective=candidate,
                                                               arguments=subop_args['chromosome_fitness'])
                 objective.history.add(system)
                 if global_var.verbose.candidate_objectives:
                     print(candidate.obj_fun)
+            else:
+                init_collapsed = False
+            if init_collapsed:
+                if global_var.verbose.show_iter_idx:
+                    print(f'\n*** Search-space collapse: stopping early with '
+                          f'{len(objective.levels[0])} placed candidates. ***')
+                return
             if global_var.verbose.show_iter_idx:
                 print('\n========== Marriage (weight assignment) ==========')
             objective.associate_weights()

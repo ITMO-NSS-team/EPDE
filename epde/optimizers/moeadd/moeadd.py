@@ -27,6 +27,8 @@ from epde.optimizers.moeadd.strategy_elems import MOEADDSectorProcesser
 from epde.optimizers.moeadd.supplementary import fast_non_dominated_sorting, ndl_update, Equality, Inequality, acute_angle
 from scipy.spatial import ConvexHull
 
+from epde import _loop_stats
+
 def clear_list_of_lists(inp_list) -> list:
     '''
     Delete elements-lists with len(0) from the list
@@ -671,23 +673,45 @@ class MOEADDOptimizer(object):
                 linked.reset_traversal_cond()
                 linked.initial[0][1].set_output(self.pareto_levels)
                 init_block.apply(self.form_processer_args(0))
-            for epoch_idx in np.arange(epochs):
+            if getattr(self.pareto_levels, '_init_collapsed', False):
+                # Init flagged a search-space collapse (see
+                # ``InitialParetoLevelSorting.apply``). Skip the epoch loop --
+                # mutation/crossover on a degenerate truncated population would
+                # only contaminate the results. Snapshot the placed level-0
+                # candidates once so downstream consumers
+                # (``pareto_history`` / ``thesis_runner._extract_*``) still
+                # see something.
+                snapshot = []
+                for sol in self.pareto_levels.levels[0]:
+                    try:
+                        obj = sol.obj_fun.tolist() if hasattr(sol.obj_fun, 'tolist') else list(sol.obj_fun)
+                    except Exception:
+                        obj = None
+                    snapshot.append({'text_form': sol.text_form, 'obj_fun': obj})
+                self._pareto_history.append(snapshot)
                 if global_var.verbose.show_iter_idx:
-                    print(f'\n----- Multiobjective optimization : {epoch_idx + 1}-th epoch -----')
-                # Shuffle sector order each epoch. The prior fixed
-                # 0..N-1 traversal gave early sectors a population
-                # advantage every epoch (their offspring entered the
-                # global Pareto pool before late sectors saw the
-                # evolved chromosomes). Reproducibility is preserved
-                # because np.random is seeded by the caller via
-                # ``_set_seeds`` before optimization.
-                n_sectors = len(self.weights)
-                for order_idx, weight_idx in enumerate(np.random.permutation(n_sectors)):
+                    print(f'\n*** MOEADD.optimize: early stop after init collapse '
+                          f'with {len(self.pareto_levels.levels[0])} candidates. ***')
+                return
+            for epoch_idx in np.arange(epochs):
+                with _loop_stats.timer('MOEADD.epoch'):
                     if global_var.verbose.show_iter_idx:
-                        print(f'During MO : processing {order_idx + 1}-th sector (of {n_sectors}).')
-                    sp_kwargs = self.form_processer_args(weight_idx)
-                    self.sector_processer.run(population_subset = self.pareto_levels,
-                                              EA_kwargs = sp_kwargs)
+                        print(f'\n----- Multiobjective optimization : {epoch_idx + 1}-th epoch -----')
+                    # Shuffle sector order each epoch. The prior fixed
+                    # 0..N-1 traversal gave early sectors a population
+                    # advantage every epoch (their offspring entered the
+                    # global Pareto pool before late sectors saw the
+                    # evolved chromosomes). Reproducibility is preserved
+                    # because np.random is seeded by the caller via
+                    # ``_set_seeds`` before optimization.
+                    n_sectors = len(self.weights)
+                    for order_idx, weight_idx in enumerate(np.random.permutation(n_sectors)):
+                        if global_var.verbose.show_iter_idx:
+                            print(f'During MO : processing {order_idx + 1}-th sector (of {n_sectors}).')
+                        sp_kwargs = self.form_processer_args(weight_idx)
+                        with _loop_stats.timer('MOEADD.sector'):
+                            self.sector_processer.run(population_subset = self.pareto_levels,
+                                                      EA_kwargs = sp_kwargs)
                 stats = self.pareto_levels.get_stats()
                 self._hist.append(stats)
                 # Snapshot the current Pareto-0 structures so consumers can

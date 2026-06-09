@@ -22,6 +22,58 @@ from epde.supplementary import create_solution_net, AutogradDeriv
 from epde.preprocessing.smoothers import NN
 
 
+# Gram-construction configuration, read by VWSRSparsity.apply,
+# PhysicsInformedLasso.fit, EqRightPartSelector._precompute_super_gram,
+# and L2LRFitness.apply. ``mode='vcoef'`` (default) uses the
+# varying-coefficient stability estimator (``VaryingCoefSetup``);
+# ``mode='axis'`` is the legacy axis-aligned sliding-window backup
+# (``GramSetup`` reduced by the var/mu^2 CV in
+# ``PhysicsInformedLasso.get_cv``).
+gram_mode: str = 'vcoef'
+
+# Per-rep seed for additive Gaussian noise applied at ``cfg.load_data()``;
+# rewritten each rep so every rep sees an independent noise realization.
+noise_seed = None
+
+# ``gram_mode='vcoef'`` varying-coefficient stability config (see
+# ``epde.operators.common.stability.VaryingCoefSetup``). ``vc_modes_cache`` resolves the
+# per-axis basis resolution once per ``(grid_shape, main_var)`` from the
+# Taylor microscale and reuses it for every candidate so the basis is
+# identical across individuals; cleared on ``set_gram_config``. ``vc_k_max``
+# caps modes per axis; ``vc_freq_coef`` scales the frequency ridge that
+# suppresses noise leakage into the non-constant energy.
+vc_modes_cache: dict = {}
+vc_k_max: int = 6
+vc_freq_coef: float = 1.0
+
+# When True, ``VaryingCoefSetup._solve_gammas`` solves the mode block
+# PER-FEATURE (block-diagonal in feature index) instead of jointly: cross-
+# feature mode collinearity is dropped so a true constant-coefficient term's
+# region-variation B (=nc_deb/C) is not inflated by collinear grid-modulated
+# cousins (``x*u_xx``/``sin*u_xx`` sharing ``u_xx``'s mode energy, which pushed
+# the weak true term's L1 threshold above its signal -> the ac t0/3 collapse).
+# Extends the existing Frisch-Waugh constant-block decoupling to the modes.
+# Default True; set False for the legacy joint mode solve.
+vc_mode_decouple: bool = True
+
+
+def set_gram_config(mode: str = 'vcoef'):
+    """Override the global Gram-construction mode before ``build_search``.
+
+    Used by ``projects/thesis/thesis_runner.py`` / ``profile_loop_stats.py``
+    to switch between the varying-coefficient default (``'vcoef'``) and the
+    axis-aligned sliding-window backup (``'axis'``) via a single CLI flag.
+    """
+    global gram_mode
+    if mode not in ('axis', 'vcoef'):
+        raise ValueError(
+            f'gram_mode must be "axis" or "vcoef"; got {mode!r}')
+    gram_mode = mode
+    # Stale per-axis basis resolution from a prior CLI/config must not bleed
+    # into a new invocation -- the source data or grid_shape may have changed.
+    vc_modes_cache.clear()
+
+
 def init_caches(set_grids: bool = False, device = 'cpu'):
     """
     Initialization global variables for keeping input data, values of grid and useful tensors such as evaluated terms

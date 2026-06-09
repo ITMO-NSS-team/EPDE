@@ -26,6 +26,7 @@ from epde.decorators import HistoryExtender, ResetEquationStatus
 
 class SystemMutation(CompoundOperator):
     key = 'SystemMutation'
+    @_loop_stats.timed('SystemMutation.apply')
     def apply(self, objective : SoEq, arguments : dict): # TODO: add setter for best_individuals & worst individuals
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
@@ -69,6 +70,7 @@ class SystemMutation(CompoundOperator):
 
 class EquationMutation(CompoundOperator):
     key = 'EquationMutation'
+    @_loop_stats.timed('EquationMutation.apply')
     @HistoryExtender(f'\n -> mutating equation', 'ba')
     def apply(self, objective : Equation, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
@@ -91,7 +93,11 @@ class EquationMutation(CompoundOperator):
         r_mutation = self.params['r_mutation']
         replace_attempts = 0
         mutable_count = max(1, len(equation.structure) - equation.n_immutable)
-        for term_idx in range(equation.n_immutable, len(equation.structure)):
+        # Reverse order so a full-drop dedup inside TermMutation (which can
+        # remove ``term`` and shrink ``structure``) only shifts indices we
+        # have already processed -- forward iteration would skip terms or
+        # run off the end of the now-shorter structure.
+        for term_idx in reversed(range(equation.n_immutable, len(equation.structure))):
             if np.random.uniform(0, 1) <= r_mutation:
                 replace_attempts += 1
                 self.suboperators['mutation'].apply(
@@ -175,45 +181,34 @@ class TermMutation(CompoundOperator):
         # optimization. Saves a ~10ms Term deepcopy on every replace_terms
         # iter (was the largest remaining mutation-path deepcopy cost).
         original_structure = term.structure
-        original_labels = term.factors_labels
         term.randomize()
         term.reset_saved_state()
         equation._invalidate_label_cache()
 
-        # Re-randomize while the mutation produced a duplicate term within
-        # the equation OR no actual change vs the previous term. Cap the
-        # retries so a tight token pool can't deadlock the optimizer (same
-        # hazard fixed in ``enforce_rps_uniqueness`` / ``simplify_equation``).
-        # On cap-hit, revert to the pre-mutation term: silently committing a
-        # duplicate or no-op violates the structure-dedup rule and lets
-        # population diversity drift unobservably.
-        max_iter = 100
-        attempts = 0
-        hit_cap = True
-        for _ in range(max_iter):
-            attempts += 1
-            signatures = {t.factors_labels for t in equation.structure}
-            duplicate = len(signatures) != len(equation.structure)
-            unchanged = term.factors_labels == original_labels
-            if not (duplicate or unchanged):
-                hit_cap = False
-                break
-            term.randomize()
-            term.reset_saved_state()
+        # Full-drop dedup (no regeneration, no retry loop): if the freshly
+        # mutated term now duplicates another term in the equation, remove
+        # it outright. Only at the 2-term floor (nothing safe to drop) do we
+        # restore the unique pre-mutation term. This is the mutation-path
+        # policy -- distinct from simplify's regenerate-n-then-drop -- and
+        # keeps duplicates out of the population (otherwise caught a
+        # generation later at the RPS entry / crossover assert).
+        signatures = {t.factors_labels for t in equation.structure}
+        duplicate = len(signatures) != len(equation.structure)
+        if duplicate and len(equation.structure) > 2:
+            tgt = getattr(equation, 'target_idx', None)
+            equation.structure = [t for t in equation.structure if t is not term]
+            if tgt is not None and term_idx < tgt:
+                equation.target_idx -= 1
             equation._invalidate_label_cache()
-        if hit_cap:
-            # Revert by restoring the original Factor list. The Term
-            # instance itself is the same one, and only its ``structure``
-            # slot was mutated by randomize() -- restoring that slot
-            # restores its observable identity for downstream consumers
-            # (factors_labels, __eq__ both read ``structure`` live).
+            _loop_stats.record('TermMutation.unique_term.DROP', 1, 1)
+        elif duplicate:
+            # Floor: restore the (unique) pre-mutation term in place.
             term.structure = original_structure
             term.reset_saved_state()
             equation._invalidate_label_cache()
-        _loop_stats.record(
-            'TermMutation.unique_term' + ('.FAIL' if hit_cap else ''),
-            attempts, max_iter,
-        )
+            _loop_stats.record('TermMutation.unique_term.FLOOR_REVERT', 1, 1)
+        else:
+            _loop_stats.record('TermMutation.unique_term', 1, 1)
         return term
 
     def use_default_tags(self):

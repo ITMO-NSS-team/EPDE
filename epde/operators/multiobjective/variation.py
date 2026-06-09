@@ -46,7 +46,8 @@ class ParetoLevelsCrossover(CompoundOperator):
     copy_properties_to
     """
     key = 'ParetoLevelsCrossover'
-    
+
+    @_loop_stats.timed('ParetoLevelsCrossover.apply')
     def apply(self, objective : ParetoLevels, arguments : dict):
         """
         Method to obtain a new population by selection of parent individuals (equations) and performing a crossover between them to get the offsprings.
@@ -167,6 +168,7 @@ class MetaparamerCrossover(CompoundOperator):
 class EquationCrossover(CompoundOperator):
     key = 'EquationCrossover'
 
+    @_loop_stats.timed('EquationCrossover.apply')
     @HistoryExtender(f'\n -> performing equation crossover', 'ba')
     def apply(self, objective : tuple, arguments : dict):
         """Hybrid random-partition + parameter-blend crossover.

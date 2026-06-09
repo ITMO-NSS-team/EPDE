@@ -15,7 +15,7 @@ import epde.globals as global_var
 from epde.operators.utils.template import CompoundOperator
 from epde.decorators import HistoryExtender
 from epde.structure.main_structures import Term, Equation
-from epde.supplementary import GramSetup, retry_until_unique
+from epde.operators.common.stability import (GramSetup, VaryingCoefSetup)
 from epde import _loop_stats
 
 class EqRightPartSelector(CompoundOperator):
@@ -44,17 +44,8 @@ class EqRightPartSelector(CompoundOperator):
     '''
     key = 'FitnessCheckingRightPartSelector'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Negative cache: structure hashes that produced ``inf`` fitness on
-        # every eligible target_idx. Scope is one operator-tree lifetime,
-        # which matches one ``EpdeSearch.fit()`` call -- the strategy
-        # builder in ``epde/optimizers/moeadd/strategy.py`` constructs a
-        # fresh ``EqRightPartSelector()`` per build. Repeat encounters
-        # skip the term-sweep via internal ``objective.randomize()``.
-        self._bad_structures: set = set()
-
     @staticmethod
+    @_loop_stats.timed('EqRPS.gram_super')
     def _precompute_super_gram(objective: Equation) -> None:
         """Build a per-equation super-Gram over all structure terms and
         attach it to ``objective._gram_super`` for the upcoming term-sweep.
@@ -79,8 +70,13 @@ class EqRightPartSelector(CompoundOperator):
                 objective._gram_super = None
                 _loop_stats.record('EqRPS.gram_super_skip', 1, 1)
                 return
-            objective._gram_super = GramSetup.precompute_super(
-                Z, sample_weights, grid_shape)
+            if global_var.gram_mode == 'vcoef':
+                objective._gram_super = VaryingCoefSetup.precompute_super(
+                    Z, sample_weights, grid_shape,
+                    main_var=objective.main_var_to_explain)
+            else:  # 'axis' backup
+                objective._gram_super = GramSetup.precompute_super(
+                    Z, sample_weights, grid_shape)
             _loop_stats.record('EqRPS.gram_super_built', 1, 1)
         except Exception:
             # Defensive: any unexpected failure (shape mismatch, missing
@@ -89,6 +85,7 @@ class EqRightPartSelector(CompoundOperator):
             objective._gram_super = None
             _loop_stats.record('EqRPS.gram_super_skip', 1, 1)
 
+    @_loop_stats.timed('EqRPS.apply')
     @HistoryExtender('\n -> The equation structure was detected: ', 'a')
     def apply(self, objective : Equation, arguments : dict):
         """Select a right-part term for ``objective`` in-place.
@@ -144,49 +141,41 @@ class EqRightPartSelector(CompoundOperator):
                 objective.restore_property(mandatory_family=False, deriv=True)
             _loop_stats.record('EqRPS.inner_derivative', inner_attempts, inner_max_iter)
 
-            # Negative cache: this structure already zeroed out for every
-            # target_idx on a prior call (sparsity is deterministic on
-            # the same input). Skip the term-sweep, reroll, retry.
-            if objective.terms_labels in self._bad_structures:
-                _loop_stats.record('EqRPS.bad_structure_skip', 1, 1)
-                objective.randomize()
-                continue
-
             # Tier 3: precompute the super-Gram over all terms ONCE per
             # outer iter so the term-sweep below derives per-target
             # GramSetup views via pure slicing instead of rebuilding the
             # windowed XTWX matmul for every candidate.
             self._precompute_super_gram(objective)
 
-            for target_idx, target_term in enumerate(objective.structure):
-                if not objective.structure[target_idx].contains_deriv(objective.main_var_to_explain):
-                    continue
-                objective.target_idx = target_idx
-                fitness = self.suboperators['fitness_calculation'].apply(objective, arguments = subop_args['fitness_calculation'], force_out_of_place = True)
-                if fitness is not None and fitness < min_fitness:
-                    min_fitness = fitness
-                    min_idx = target_idx
-                    weights_internal = objective.weights_internal
-                    weights_final = objective.weights_final
-                    sw_weights = objective._cached_sw_weights
+            with _loop_stats.timer('EqRPS.term_sweep'):
+                for target_idx, target_term in enumerate(objective.structure):
+                    if not objective.structure[target_idx].contains_deriv(objective.main_var_to_explain):
+                        continue
+                    objective.target_idx = target_idx
+                    fitness = self.suboperators['fitness_calculation'].apply(objective, arguments = subop_args['fitness_calculation'], force_out_of_place = True)
+                    if fitness is not None and fitness < min_fitness:
+                        min_fitness = fitness
+                        min_idx = target_idx
+                        weights_internal = objective.weights_internal
+                        weights_final = objective.weights_final
+                        sw_weights = objective._cached_sw_weights
+                        vc_score = objective._cached_vc_score
 
-                objective.weights_internal_evald = False
-                objective.weights_final_evald = False
+                    objective.weights_internal_evald = False
+                    objective.weights_final_evald = False
 
             if np.isinf(min_fitness):
                 # Every eligible target produced inf fitness for the
                 # post-restore structure -- reroll this single equation
-                # locally (cheap) and continue the outer loop. The
-                # negative cache below remembers the structure shape so
-                # future outer iters / future calls skip the term-sweep.
+                # locally (cheap) and continue the outer loop.
                 _loop_stats.record('EqRPS.inf_fitness_regen', 1, 1)
-                self._bad_structures.add(objective.terms_labels)
                 objective.randomize()
                 continue
 
             objective.weights_internal = weights_internal
             objective.weights_final = weights_final
             objective._cached_sw_weights = sw_weights
+            objective._cached_vc_score = vc_score
             objective.weights_internal_evald = True
             objective.weights_final_evald = True
             objective.target_idx = min_idx
@@ -204,6 +193,13 @@ class EqRightPartSelector(CompoundOperator):
         objective._gram_super = None
         objective.right_part_selected = True
         objective.remove_zero_terms()
+        # Hard invariant: no duplicate terms may leave RPS. simplify and
+        # scrub both regenerate-then-drop, so a surviving duplicate is a
+        # logic error to surface HERE -- not one generation later at the
+        # crossover/mutation assert (the crash site that "lies").
+        _final_sigs = {term.factors_labels for term in objective.structure}
+        assert len(_final_sigs) == len(objective.structure), \
+            'EqRightPartSelector.apply: duplicate terms survived RPS.'
 
     def simplify_equation(self, objective: Equation):
         # Get nonzero terms
@@ -215,6 +211,59 @@ class EqRightPartSelector(CompoundOperator):
 
         if len(equation_terms) <= 1:
             return False
+
+        # Degree reduction: when a SINGLE non-target term remains, the
+        # equation is ``coef * f = g`` with f, g products of powered
+        # factors. If every factor power in BOTH f and g shares a common
+        # divisor p >= 2, the whole equation is a p-th power -- take the
+        # p-th root (divide every power by p; the coefficient is recomputed
+        # downstream). E.g. ``c*(u_xx)^2 = (u_tt)^2`` -> ``sqrt(c)*u_xx = u_tt``.
+        # Keeps the lowest-degree equivalent form so it is not penalised /
+        # mistaken for a distinct higher-order structure.
+        if len(nonzero_terms) == 2:
+            powers, integral = [], True
+            for term in nonzero_terms:
+                for factor in term.structure:
+                    for i in factor.params_description:
+                        if factor.params_description[i]["name"] == "power":
+                            p = factor.params[i]
+                            if float(p) != int(p) or int(p) < 1:
+                                integral = False
+                            powers.append(int(p))
+            if integral and powers:
+                root = int(np.gcd.reduce(np.array(powers, dtype=int)))
+                if root >= 2:
+                    # p-th root: divide every factor power by the gcd,
+                    # collapsing the equation to its lowest equivalent
+                    # degree (c*(u_xx)^2=(u_tt)^2 -> sqrt(c)*u_xx=u_tt).
+                    for term in nonzero_terms:
+                        for factor in term.structure:
+                            for i in factor.params_description:
+                                if factor.params_description[i]["name"] == "power":
+                                    factor.set_param(int(factor.params[i]) // root, idx=i)
+                        term.reset_saved_state()
+                    # The reduction can collapse a survivor onto a zero-weight
+                    # candidate already in the structure (u^2 -> u when a u
+                    # term exists). Such a colliding copy is ALWAYS a
+                    # zero-weight non-survivor -- two genuinely nonzero terms
+                    # cannot collide via a p-th root unless they were already
+                    # equal, which the entry assert forbids -- so drop the
+                    # redundant copies outright (drop-immediately). The reduced
+                    # low-degree form survives on the kept terms; no revert.
+                    keep_ids = {id(t) for t in nonzero_terms}
+                    kept_labels = {t.factors_labels for t in nonzero_terms}
+                    redundant = [t for t in objective.structure
+                                 if id(t) not in keep_ids
+                                 and t.factors_labels in kept_labels]
+                    for t in redundant:
+                        _regen_or_drop_term(
+                            objective, t, max_iter=0,
+                            stats_name='simplify_equation.degree_reduction')
+                    try:
+                        objective.reset_state(reset_right_part=False)
+                    except TypeError:
+                        objective.reset_state()
+                    return True
         common_factors = list(frozenset.intersection(*equation_terms))
         if not common_factors:
             return False
@@ -244,27 +293,20 @@ class EqRightPartSelector(CompoundOperator):
                 term.structure = [factor for factor in term.structure if factor not in factors_simplified]
                 term.reset_saved_state()
 
-                # If term's order became zero -- replace term.
-                # Cap retries so a constrained token pool can't
-                # deadlock the optimizer (same hazard fixed in
-                # ``enforce_rps_uniqueness``).
-                def _replacement_acceptable():
-                    empty = len(term.structure) == 0
-                    not_meaningful = not term.contains_meaningful()
-                    signatures = {t.factors_labels for t in objective.structure}
-                    duplicate = len(signatures) != len(objective.structure)
-                    return not (empty or not_meaningful or duplicate)
-
-                # Cap-hit policy is silently-accept-whatever-state: the
-                # term may still be empty/non-meaningful/duplicate when
-                # the cap fires, and the outer RPS loop is expected to
-                # detect that on its next pass.
-                retry_until_unique(
-                    predicate=_replacement_acceptable,
-                    mutate=lambda: term.randomize(),
-                    max_iter=max_iter,
-                    stats_name='simplify_equation.replace_term',
-                )
+                # If the term's order became zero (or it now duplicates
+                # another term), regenerate it; if the pool can't yield a
+                # unique, meaningful replacement within the cap, DROP it.
+                # A duplicate must never ride out of RPS -- see the exit
+                # assert in ``apply``.
+                status = _regen_or_drop_term(
+                    objective, term, max_iter=max_iter,
+                    stats_name='simplify_equation.replace_term')
+                if status in ('target', 'floor'):
+                    # Offending term is the RPS target, or dropping would
+                    # degenerate the equation -> decline this
+                    # simplification and let the outer RPS loop reset and
+                    # re-select.
+                    return False
 
             # Structure changed: invalidate stale fitness /
             # weights / AIC caches while leaving RPS to the
@@ -358,6 +400,83 @@ class RandomRHPSelector(CompoundOperator):
         self._tags = {'equation right part selection', 'gene level', 'contains suboperators', 'inplace'}
 
 
+def _regen_or_drop_term(equation: Equation, term, *, max_iter: int = 100,
+                        min_terms: int = 2,
+                        stats_name: str = 'simplify_equation.regen_or_drop') -> str:
+    """Make ``equation.structure`` unique w.r.t. ``term`` by regenerating
+    ``term`` up to ``max_iter`` times; if it is still empty / non-meaningful
+    / a duplicate, DROP it from the structure.
+
+    This is the simplify/scrub cap-hit policy -- *regenerate-n-then-drop* --
+    deliberately distinct from the *keep-or-revert* ``retry_until_unique``
+    policy used by ``Equation.__init__`` and the mutation operators.
+    ``max_iter == 0`` means "drop immediately if unacceptable" (no
+    regeneration) -- used by the degree-reduction branch and the scrub
+    duplicate gate.
+
+    The acceptability predicate ranges over the FULL structure, so a
+    duplicate against a zero-weight candidate elsewhere is caught too. The
+    RPS target is never dropped: if ``term`` is the target AND a duplicate,
+    the OTHER member of its duplicate group is dropped instead; if the
+    target is merely empty/non-meaningful, ``'target'`` is returned for the
+    caller to handle. Refuses to drop below ``min_terms`` (returns
+    ``'floor'``). On a drop, ``target_idx`` is reindexed exactly as in
+    ``Equation.remove_zero_terms``.
+
+    Returns one of ``'ok'`` (already acceptable), ``'regenerated'``,
+    ``'dropped'``, ``'target'``, ``'floor'``.
+    """
+    idx = next((j for j, t in enumerate(equation.structure) if t is term), None)
+    if idx is None:
+        return 'ok'  # already dropped earlier in this pass
+
+    def _acceptable():
+        if len(term.structure) == 0 or not term.contains_meaningful():
+            return False
+        signatures = {t.factors_labels for t in equation.structure}
+        return len(signatures) == len(equation.structure)
+
+    cap = max_iter if max_iter > 0 else 1
+    if _acceptable():
+        _loop_stats.record(stats_name, 1, cap)
+        return 'ok'
+
+    attempts = 0
+    for _ in range(max_iter):
+        attempts += 1
+        term.randomize()
+        term.reset_saved_state()
+        if _acceptable():
+            _loop_stats.record(stats_name, attempts, cap)
+            equation._invalidate_label_cache()
+            return 'regenerated'
+    _loop_stats.record(stats_name, max(attempts, 1), cap)
+
+    # Exhausted (or max_iter == 0): drop the offending term, if legal.
+    tgt = getattr(equation, 'target_idx', None)
+    drop_idx = idx
+    if tgt is not None and idx == tgt:
+        # Can't drop the RPS target. If it duplicates another term, drop
+        # that other (non-target) member; if it is merely empty/non-
+        # meaningful, leave it for the caller to resolve.
+        my_label = term.factors_labels
+        other = next((j for j, t in enumerate(equation.structure)
+                      if j != idx and t.factors_labels == my_label), None)
+        if other is None:
+            equation._invalidate_label_cache()
+            return 'target'
+        drop_idx = other
+    if len(equation.structure) <= min_terms:
+        equation._invalidate_label_cache()
+        return 'floor'
+    equation.structure = [t for j, t in enumerate(equation.structure)
+                          if j != drop_idx]
+    if tgt is not None and drop_idx < tgt:
+        equation.target_idx -= 1
+    equation._invalidate_label_cache()
+    return 'dropped'
+
+
 def _scrub_conflicting_terms(equation: Equation, fixed_rps, *, max_iter: int = 2000,
                               skip_idx=None) -> bool:
     """Replace any term in ``equation.structure`` whose factor signature is a
@@ -387,12 +506,13 @@ def _scrub_conflicting_terms(equation: Equation, fixed_rps, *, max_iter: int = 2
     def _conflicts(t):
         return any(rs.issubset(t.factors_labels) for rs in fixed_rps)
 
+    # Snapshot the conflicting terms by identity: the randomize loop below
+    # never resizes ``structure``, but the duplicate-drop pass afterwards
+    # does, so index-based iteration would be unsafe.
+    conflicting = [term for idx, term in enumerate(equation.structure)
+                   if idx != skip_idx and _conflicts(term)]
     changed = False
-    for idx, term in enumerate(equation.structure):
-        if idx == skip_idx:
-            continue
-        if not _conflicts(term):
-            continue
+    for term in conflicting:
         attempts = 0
         for _ in range(max_iter):
             attempts += 1
@@ -406,6 +526,15 @@ def _scrub_conflicting_terms(equation: Equation, fixed_rps, *, max_iter: int = 2
         changed = True
 
     if changed:
+        # Cap-hit may leave a scrubbed term as a DUPLICATE (regenerate
+        # exhausted). A conflicting-but-unique term is tolerated -- the
+        # bidirectional outer loop re-selects -- but a duplicate must not
+        # ride out of RPS, so drop it (the n regenerate attempts were
+        # already spent in the loop above). The skip_idx term is excluded
+        # from ``conflicting`` and is never dropped.
+        for term in conflicting:
+            _regen_or_drop_term(equation, term, max_iter=0,
+                                stats_name='scrub_conflicting_terms.drop')
         try:
             equation.reset_state(reset_right_part=False)
         except TypeError:
@@ -436,6 +565,7 @@ class SoEqRightPartSelector(CompoundOperator):
     """
     key = 'SoEqRightPartSelector'
 
+    @_loop_stats.timed('SoEqRPS.apply')
     def apply(self, objective, arguments: dict):
         """Run per-equation RPS forward + bidirectional passes in-place.
 

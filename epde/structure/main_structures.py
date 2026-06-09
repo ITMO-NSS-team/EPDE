@@ -223,6 +223,7 @@ class Term(ComplexStructure):
         else:
             raise ValueError('Described variable marker shall be a family label (i.e. "u") of "False"')
 
+    @_loop_stats.timed('Term.evaluate')
     def evaluate(self, structural, grids=None):
         assert global_var.tensor_cache is not None, 'Currently working only with connected cache'
         normalize = structural
@@ -407,7 +408,7 @@ class Equation(ComplexStructure):
                  'target_idx', 'right_part_selected', '_weights_final', 'weights_final_evald', 'simplified', 'is_correct_right_part',
                  '_weights_internal', 'weights_internal_evald', 'fitness_calculated', 'stability_calculated', 'aic_calculated', 'solver_form_defined',
                  '_fitness_value', '_coefficients_stability', '_aic', 'metaparameters', 'main_var_to_explain',
-                 '_eval_cache', '_cached_sw_weights',
+                 '_eval_cache', '_cached_sw_weights', '_cached_vc_score',
                  '_terms_labels_cache', '_terms_labels_without_power_cache',
                  '_gram_super'] # , '_solver_form'
 
@@ -568,6 +569,7 @@ class Equation(ComplexStructure):
             return (all([any([other_elem == self_elem for other_elem in other.structure]) for self_elem in self.structure])
                     and all([any([other_elem == self_elem for self_elem in self.structure]) for other_elem in other.structure])
                     and len(other.structure) == len(self.structure)
+                    and len(self.weights_final) == len(other.weights_final)
                     and np.all(np.isclose(self.weights_final, other.weights_final)))
         else:
             return (all([any([other_elem == self_elem for other_elem in other.structure]) for self_elem in self.structure])
@@ -701,6 +703,7 @@ class Equation(ComplexStructure):
         new_eq.reset_saved_state()
         return new_eq
 
+    @_loop_stats.timed('Equation.evaluate')
     def evaluate(self, normalize: bool = True, return_val: bool = False,
                  grids: list = None) -> Tuple:
         """Evaluate the equation and return (value, target, features).
@@ -804,6 +807,9 @@ class Equation(ComplexStructure):
         self._eval_cache = {}
         # consumed by epde.operators.common.fitness.L2LRFitness; resets here.
         self._cached_sw_weights = None
+        # vcoef analogue of _cached_sw_weights: per-term stability scores from
+        # the sparsity gram_setup, summed as the stability objective in fitness.
+        self._cached_vc_score = None
         self._terms_labels_cache = None
         self._terms_labels_without_power_cache = None
         # Tier 3 super-Gram cache (set by EqRightPartSelector for the
@@ -845,7 +851,7 @@ class Equation(ComplexStructure):
         new_struct = _deepcopy_slots(
             self, memo,
             attrs_to_avoid_copy=(
-                '_cached_sw_weights',
+                '_cached_sw_weights', '_cached_vc_score',
                 '_terms_labels_cache', '_terms_labels_without_power_cache',
                 '_gram_super',
             ),
@@ -878,7 +884,7 @@ class Equation(ComplexStructure):
             self, memo={},
             attrs_to_avoid_copy=(
                 'structure',
-                '_cached_sw_weights',
+                '_cached_sw_weights', '_cached_vc_score',
                 '_terms_labels_cache', '_terms_labels_without_power_cache',
                 '_gram_super',
             ),
@@ -1026,7 +1032,7 @@ class Equation(ComplexStructure):
                     if term_idx != self.target_idx:
                         form += str(self.weights_final[term_idx]) if term_idx < self.target_idx else str(self.weights_final[term_idx-1])
                         form += ' * ' + self.structure[term_idx].name + ' + '
-                form += str(self.weights_final[-1]) + ' = ' + \
+                form += str(self.weights_internal[-1]) + ' = ' + \
                     self.structure[self.target_idx].name
             else:
                 for term_idx in range(len(self.structure)):
@@ -1050,7 +1056,7 @@ class Equation(ComplexStructure):
             exp_str = r'\cdot 10^{{{0}}} '.format(str(exp)) if exp != 0 else ''
             form += str(mnt) + exp_str + term.latex_form + r' + '
 
-        mnt, exp = exp_form(self.weights_final[-1], digits_rounding_max)
+        mnt, exp = exp_form(self.weights_internal[-1], digits_rounding_max)
         exp_str = r'\cdot 10^{{{0}}} '.format(str(exp)) if exp != 0 else ''
 
         form += str(mnt) + exp_str

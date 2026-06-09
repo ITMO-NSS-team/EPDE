@@ -22,6 +22,8 @@ from functools import reduce, singledispatchmethod
 
 import epde.globals as global_var
 
+from epde import _loop_stats
+
 from epde.optimizers.builder import StrategyBuilder
 from epde.optimizers.builder import OptimizationPatternDirector
 
@@ -754,8 +756,9 @@ class EpdeSearch(object):
             print('Trying to get derivatives before their calculation. Call EPDESearch.create_pool() to calculate derivatives')
             return None
 
+    @_loop_stats.timed('EpdeSearch.fit')
     def fit(self, data: Union[np.ndarray, list, tuple] = None, equation_terms_max_number=6,
-            equation_factors_max_number=1, variable_names=['u',], eq_sparsity_interval=(1e-4, 2.5), 
+            equation_factors_max_number=1, variable_names=['u',], eq_sparsity_interval=(1e-4, 2.5),
             derivs=None, max_deriv_order=1, additional_tokens = None, data_fun_pow: int = 1, deriv_fun_pow: int = 1,
             optimizer: Union[SimpleOptimizer, MOEADDOptimizer] = None, pool: TFPool = None,
             population: List[SoEq] = None, data_nn = None, ann_epochs_max = 1e5,
