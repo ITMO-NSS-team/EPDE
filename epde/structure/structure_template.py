@@ -6,12 +6,52 @@ Created on Tue Jul 26 13:38:20 2022
 @author: maslyaev
 """
 
+import copy
 import numpy as np
 from functools import reduce
 try:
     from collections.abc import Iterable
 except ImportError:
     from collections import Iterable
+
+
+def _deepcopy_slots(src, memo, attrs_to_avoid_copy=(), attrs_to_share_by_ref=()):
+    """Slot-aware deep copy used by Term/Equation/SoEq/Factor.
+
+    Replicates the loop that previously lived in each class's
+    ``__deepcopy__``: iterate ``__slots__``, skip attrs in
+    ``attrs_to_avoid_copy`` (sets them to None instead), tolerate slots
+    that are not yet set (AttributeError -> skip), deepcopy lists
+    element-by-element so subclassed list types survive.
+
+    ``attrs_to_share_by_ref`` aliases the named slots from ``src``
+    directly instead of deep-copying them -- used for immutable /
+    single-instance objects (e.g. ``pool``, ``_evaluator``) that the
+    same population shares.
+
+    Hosted here (not in ``main_structures``) so ``Factor`` can call it
+    without creating a circular import (``main_structures`` already
+    imports ``Factor``).
+    """
+    clss = src.__class__
+    new_struct = clss.__new__(clss)
+    memo[id(src)] = new_struct
+    for k in src.__slots__:
+        try:
+            if k in attrs_to_avoid_copy:
+                setattr(new_struct, k, None)
+            elif k in attrs_to_share_by_ref:
+                setattr(new_struct, k, getattr(src, k))
+            else:
+                value = getattr(src, k)
+                if isinstance(value, list):
+                    setattr(new_struct, k, [copy.deepcopy(elem, memo) for elem in value])
+                else:
+                    setattr(new_struct, k, copy.deepcopy(value, memo))
+        except AttributeError:
+            pass
+    return new_struct
+
 
 def check_uniqueness(obj, background):
     return not any([elem == obj for elem in background])

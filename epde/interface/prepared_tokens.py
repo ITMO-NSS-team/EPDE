@@ -319,9 +319,22 @@ class GridTokens(PreparedTokens):
 
         Args:
             dimensionality (`int`): optional, default - 1
-                data dimension 
+                data dimension
         """
-        assert len(labels) == dimensionality + 1, 'Incorrect labels for grids.'
+        # Two valid configurations:
+        # 1. One label per axis (legacy): ``['x_0', ..., 'x_N']`` with
+        #    ``len == dimensionality + 1``. Each axis is its own token,
+        #    plus the ``dim`` param redundantly encodes the same axis.
+        # 2. Single label (consolidated): ``['x']`` representing a single
+        #    family where the ``dim`` parameter is the ONLY axis
+        #    discriminator. Removes the redundant ``x_N`` prefix.
+        # ``set_status(unique_token_type=True)`` already restricts to one
+        # grid factor per term in either configuration, so behaviour is
+        # identical -- the consolidation is a labelling cleanup.
+        assert 1 <= len(labels) <= dimensionality + 1, (
+            f'Grid labels must be either a single name or one per axis; '
+            f'got {len(labels)} labels for dimensionality={dimensionality}'
+        )
         
         self._token_family = TokenFamily(token_type='grids')
         self._token_family.set_status(unique_specific_token=True, unique_token_type=True,

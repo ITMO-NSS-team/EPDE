@@ -193,6 +193,15 @@ class TerminalToken(Token):
 
     @params.setter
     def params(self, params):
+        # Canonical mutation point for whole-array assignment to
+        # ``factor.params``. ``Factor`` overrides this setter and
+        # ``set_param`` below to also invalidate its memoized
+        # ``_cache_label`` / ``_structural_label`` /
+        # ``_structural_label_without_power`` slots after delegating
+        # here. Numpy in-place index assignment (``factor.params[i] =
+        # X``) bypasses both setters. New writers MUST route through
+        # one of these two paths or call
+        # ``factor._invalidate_label_cache()`` explicitly.
         assert len(params) == self._number_params, "Input array has incorrect size"
         self._params = np.array(params, dtype=float)
         self._fix_val = False

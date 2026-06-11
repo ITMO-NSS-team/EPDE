@@ -28,9 +28,19 @@ class EvaluatorTemplate(ABC):
 
 
 class CustomEvaluator(EvaluatorTemplate):
-    def __init__(self, evaluation_functions_np: Union[Callable, dict] = None, 
+    def __init__(self, evaluation_functions_np: Union[Callable, dict] = None,
                  evaluation_functions_torch: Union[Callable, dict] = None,
-                 eval_fun_params_labels: Union[list, tuple, set] = ['power']):
+                 eval_fun_params_labels: Union[list, tuple, set] = ['power'],
+                 native_vectorized: bool = False):
+        """Wrap one or many evaluation functions for use as a factor evaluator.
+
+        ``native_vectorized=True`` skips the per-element ``np.vectorize``
+        dispatch on the hot path: the func is called ONCE with the full
+        grid arrays. The built-in evaluators in this module all set this
+        flag because their numpy ops (``np.cos``, ``np.sin``, ``np.power``,
+        ``np.full_like``, etc.) vectorize natively. User code passing a
+        non-vectorising callable should leave the default ``False``.
+        """
         self._evaluation_functions_np = evaluation_functions_np
         self._evaluation_functions_torch = evaluation_functions_torch
 
@@ -43,6 +53,7 @@ class CustomEvaluator(EvaluatorTemplate):
             self._single_function_token = True
 
         self.eval_fun_params_labels = eval_fun_params_labels
+        self.native_vectorized = native_vectorized
 
     def __call__(self, factor, structural: bool = False, func_args: List[Union[torch.Tensor, np.ndarray]] = None, 
                  torch_mode: bool = False, **kwargs): # s
@@ -67,23 +78,32 @@ class CustomEvaluator(EvaluatorTemplate):
                 if param_descr['name'] == key:
                     eval_fun_kwargs[key] = factor.params[param_idx]
 
-        grid_function = np.vectorize(lambda args: funcs(*args, **eval_fun_kwargs))
-
         if func_args is None:
             new_grid = False
             func_args = factor.grids
         else:
             new_grid = True
-        try:
-            if new_grid:
-                raise AttributeError
-            self.indexes_vect
-        except AttributeError:
-            self.indexes_vect = np.empty_like(func_args[0], dtype=object)
-            for tensor_idx, _ in np.ndenumerate(func_args[0]):
-                self.indexes_vect[tensor_idx] = tuple([subarg[tensor_idx]
-                                                       for subarg in func_args])
-        value = grid_function(self.indexes_vect)
+
+        if self.native_vectorized:
+            # Fast path: call funcs once with the full grid arrays. The
+            # built-in numpy evaluators (trig, sign, grid, inverse,
+            # const, velocity) all return an array of shape
+            # ``func_args[0].shape``. This skips an N-element
+            # ``np.vectorize`` loop that on Wave (65k samples)
+            # dominated evaluator self-time at ~35 s per run.
+            value = funcs(*func_args, **eval_fun_kwargs)
+        else:
+            grid_function = np.vectorize(lambda args: funcs(*args, **eval_fun_kwargs))
+            try:
+                if new_grid:
+                    raise AttributeError
+                self.indexes_vect
+            except AttributeError:
+                self.indexes_vect = np.empty_like(func_args[0], dtype=object)
+                for tensor_idx, _ in np.ndenumerate(func_args[0]):
+                    self.indexes_vect[tensor_idx] = tuple([subarg[tensor_idx]
+                                                           for subarg in func_args])
+            value = grid_function(self.indexes_vect)
         value = value[global_var.grid_cache.g_func != 0]
         value = value.reshape(-1)
         return value
@@ -125,7 +145,9 @@ def simple_function_evaluator(factor, structural: bool = False, grids=None,
 
     else:
         if factor.params[power_param_idx] == 1:
-            value = global_var.tensor_cache.get(factor.cache_label, structural = structural, torch_mode = torch_mode)
+            # Same bucketed key Factor.evaluate uses so trig factors with
+            # within-tolerance freq share a single cached evaluation.
+            value = global_var.tensor_cache.get(factor.structural_label, structural = structural, torch_mode = torch_mode)
             return value
         else:
             value = global_var.tensor_cache.get(factor_params_to_str(factor, set_default_power = True,
@@ -259,30 +281,37 @@ vhef_grad = [vhef_grad_1, vhef_grad_2, vhef_grad_3,
              vhef_grad_10, vhef_grad_11, vhef_grad_12,
              vhef_grad_13, vhef_grad_14, vhef_grad_15]
 
-sign_evaluator = CustomEvaluator(evaluation_functions_np=sign_eval_fun_np, 
-                                evaluation_functions_torch=sign_eval_fun_torch, 
-                                eval_fun_params_labels = ['power', 'dim'])
+sign_evaluator = CustomEvaluator(evaluation_functions_np=sign_eval_fun_np,
+                                evaluation_functions_torch=sign_eval_fun_torch,
+                                eval_fun_params_labels = ['power', 'dim'],
+                                native_vectorized=True)
 
-phased_sine_evaluator = CustomEvaluator(evaluation_functions_np = phased_sine_1d_np, 
+phased_sine_evaluator = CustomEvaluator(evaluation_functions_np = phased_sine_1d_np,
                                         evaluation_functions_torch = phased_sine_1d_torch,
-                                        eval_fun_params_labels = ['power', 'freq', 'phase']) # , use_factors_grids = True
+                                        eval_fun_params_labels = ['power', 'freq', 'phase'],
+                                        native_vectorized=True) # , use_factors_grids = True
 trigonometric_evaluator = CustomEvaluator(evaluation_functions_np = trig_eval_fun_np,
                                           evaluation_functions_torch = trig_eval_fun_torch,
-                                          eval_fun_params_labels=['freq', 'dim', 'power']) # , use_factors_grids = True
+                                          eval_fun_params_labels=['freq', 'dim', 'power'],
+                                          native_vectorized=True) # , use_factors_grids = True
 grid_evaluator = CustomEvaluator(evaluation_functions_np = grid_eval_fun_np,
                                  evaluation_functions_torch = grid_eval_fun_torch,
-                                 eval_fun_params_labels=['dim', 'power']) # , use_factors_grids=True
+                                 eval_fun_params_labels=['dim', 'power'],
+                                 native_vectorized=True) # , use_factors_grids=True
 
 inverse_function_evaluator = CustomEvaluator(evaluation_functions_np = inverse_eval_fun_np,
                                              evaluation_functions_torch = inverse_eval_fun_torch,
-                                             eval_fun_params_labels=['dim', 'power']) # , use_factors_grids=True
+                                             eval_fun_params_labels=['dim', 'power'],
+                                             native_vectorized=True) # , use_factors_grids=True
 
 const_evaluator = CustomEvaluator(evaluation_functions_np = const_eval_fun_np,
-                                  evaluation_functions_torch = const_eval_fun_torch, 
-                                  eval_fun_params_labels = ['power', 'value'])
+                                  evaluation_functions_torch = const_eval_fun_torch,
+                                  eval_fun_params_labels = ['power', 'value'],
+                                  native_vectorized=True)
 const_grad_evaluator = CustomEvaluator(evaluation_functions_np = const_grad_fun_np,
                                        evaluation_functions_torch =  const_grad_fun_np,
-                                       eval_fun_params_labels = ['power', 'value'])
+                                       eval_fun_params_labels = ['power', 'value'],
+                                       native_vectorized=True)
 
 velocity_evaluator = CustomEvaluator(velocity_heating_eval_fun, ['p' + str(idx+1) for idx in range(15)])
 velocity_grad_evaluators = [CustomEvaluator(component, ['p' + str(idx+1) for idx in range(15)])

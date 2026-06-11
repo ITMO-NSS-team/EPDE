@@ -7,7 +7,7 @@ from epde.operators.utils.template import add_base_param_to_operator
 
 from epde.operators.common.right_part_selection import RandomRHPSelector
 from epde.operators.common.fitness import L2Fitness
-from epde.operators.common.sparsity import LASSOSparsity
+from epde.operators.common.sparsity import LASSOSparsity, VWSRSparsity
 from epde.operators.common.coeff_calculation import LinRegBasedCoeffsEquation
 from epde.operators.singleobjective.mutations import get_singleobjective_mutation
 from epde.operators.singleobjective.variation import get_singleobjective_variation
@@ -38,7 +38,7 @@ class BaselineDirector(OptimizationPatternDirector):
         selection = RouletteWheelSelection(['parents_fraction'])
         add_kwarg_to_operator(operator = selection)
 
-        sparsity = LASSOSparsity()
+        sparsity = VWSRSparsity()
         coeff_calc = LinRegBasedCoeffsEquation()
         eq_fitness = L2Fitness(['penalty_coeff'])
         add_kwarg_to_operator(operator = eq_fitness)

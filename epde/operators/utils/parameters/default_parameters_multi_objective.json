@@ -1,10 +1,10 @@
 {
 	"MOEADDSelection" : {
-    	"delta" : 0.9, 
-    	"parents_fraction" : 0.4
+    	"delta" : 0.9,
+    	"parents_fraction" : 0.2
  	},
 	"PopulationUpdater" : {
-    	"PBI_penalty" : 1.0
+    	"PBI_penalty" : 5.0
 	},
 	"SortingBasedNeighborSelector" : {
         "number_of_neighbors" : 4
@@ -14,7 +14,7 @@
 		"offspring_attempt_limit" : 3
 	},
 	"InitialParetoLevelSorting" : {
-	
+		"uniqueness_attempt_limit" : 100
 	},
  	"DiscrepancyBasedFitness" : {
         "penalty_coeff" : 0.2
@@ -30,6 +30,20 @@
         "penalty_coeff" : 0.2,
         "pinn_loss_mult" : 1e4
  	},
+	"DeepXDEBasedFitness": {
+        "deepxde_config": {
+            "net": [95, 100, 95],
+            "activation": "tanh",
+            "optimizer": "adam",
+            "lr": 1e-3,
+            "num_domain": 1000,
+            "num_boundary": 200,
+            "num_initial": 200,
+            "epochs": 2000
+        },
+        "penalty_coeff": 0.2,
+        "error_metric": "rmse"
+    },
  	"ParetoLevelsCrossover" : {
 
  	},
@@ -56,7 +70,7 @@
     },
 	"EquationMutation" : {
         "r_mutation" : 0.6,
-		"n_added_terms" : 5
+		"n_added_terms" : 12
 	},
 	"MetaparameterMutation" : {
         "mean" : 0.0,

@@ -19,99 +19,68 @@ from epde.operators.multiobjective.mutations import get_basic_mutation
 from epde.structure.main_structures import SoEq
 from copy import deepcopy
 
+from epde import _loop_stats
 
-def penalty_based_intersection(sol_obj, weight, ideal_obj, 
-                               penalty_factor = 1., obj_normalizer: ObjFunNormalizer = None) -> float:
+
+def penalty_based_intersection(sol_obj, weight, ideal_obj,
+                               penalty_factor=1., obj_normalizer=None) -> float:
     '''
-    Calculation of the penalty pased intersection, that is minimized for the solutions inside the 
-    domain, specified by **weight** vector. The calculations are held, according to the following formulas:
-        
-    .. math:: g^{pbi}(\mathbf{x}|\mathbf{w}, \mathbf{z^{*}}) = d_1 + \Theta d_2 \longrightarrow min
-        
-    subject to :math:`\mathbf{x} \in \Omega`
-
-    where: 
-        
-    .. math::        
-        d_1 = ||(\mathbf{f}(\mathbf{x}) - \mathbf{z^{*}})^{t}\mathbf{w}|| (||\mathbf{w}||)^{-1}
-
-        d_2 = || \mathbf{f}(\mathbf{x}) - (\mathbf(z^{*}) + d_1 \mathbf{w} (||\mathbf{w}||)^{-1})||
-
-    Arguments:
-    ----------
-    
-    sol_obj : object of subclass of ``src.moeadd.moeadd_solution_template.MOEADDSolution``
-        The solution, for which the penalty based intersection is calculated. In the equations above,
-        it denotes :math:`\mathbf{x}`, with the :math:`\mathbf{F}(\mathbf{x})` representing the
-        objective function values.
-    
-    weight : np.array
-        Values of the weight vector, specific to the domain, in which the solution is located.
-        Represents the :math:`\mathbf{w}` in the equations above.
-    
-    ideal_obj : `np.array`
-        The value of best achievable objective functions values; denoted as 
-        :math:`\mathbf{z^{*}} = (z^{*}_1, z^{*}_2, \; ... \;, z^{*}_m)`.
-    
-    penalty_factor : float, optional, default 1.
-        The penalty parameter, represents :math:`\Theta` in the equations.
-
-    obj_normalizer : ObjFunNormalizer obj., optional, defaut None.
-        Normalizer for solution objective functions.
-    
+    Calculation of the penalty based intersection in an expanded 2N-D space.
+    This ensures that individual equations within the system maintain the
+    trade-off defined by the weight vector.
     '''
-    # print(f'Objective before normalization: {sol_obj.obj_fun} for normalizer {obj_normalizer}')
     solution_objective = sol_obj.obj_fun if obj_normalizer is None else obj_normalizer(sol_obj.obj_fun)
-    # print(f'Objective after expected normalization: {solution_objective}')
 
-    weight_full = [item for item in weight for _ in sol_obj.vals]
-    ideal_obj_full = [item for item in ideal_obj for _ in sol_obj.vals]
+    weight_arr = np.asarray(weight)
+    ideal_obj_arr = np.asarray(ideal_obj)
+    n_eqs = len(sol_obj.vals)
+    n_obj = solution_objective.shape[0]
+    if weight_arr.size * n_eqs == n_obj:
+        # MOEA/D weight is per objective TYPE -- expand to per-equation space.
+        weight_full = np.repeat(weight_arr, n_eqs)
+        ideal_obj_full = np.repeat(ideal_obj_arr, n_eqs)
+    else:
+        # Weight already lives in the full objective space (legacy
+        # objective list of per-equation partials).
+        weight_full = weight_arr
+        ideal_obj_full = ideal_obj_arr
 
-    d_1 = np.dot((solution_objective - ideal_obj_full), weight_full) / np.linalg.norm(weight_full)
-    # d_1 = np.dot((solution_objective - ideal_obj), weight) / np.linalg.norm(weight)
-    d_2 = np.linalg.norm(solution_objective - (ideal_obj_full + np.multiply(d_1, weight_full) / np.linalg.norm(weight_full)))
-    # d_2 = np.linalg.norm(solution_objective - (ideal_obj + np.multiply(d_1, weight) / np.linalg.norm(weight)))
+    weight_norm = np.linalg.norm(weight_full)
+
+    d_1 = np.dot((solution_objective - ideal_obj_full), weight_full) / weight_norm
+    d_2 = np.linalg.norm(solution_objective - (ideal_obj_full + d_1 * (weight_full / weight_norm)))
+
     return d_1 + penalty_factor * d_2
 
 
 def population_to_sectors(population, weights):
     '''
-    
     The distribution of the solutions into the domains, defined by weights vectors.
-    
-    Parameters:
-    -----------
-    
-    population : list
-        List, containing the candidate solutions for the evolutionary algorithm. Elements shall
-        belong to the case-specific subclass of ``src.moeadd.moeadd_solution_template.MOEADDSolution``.
-        
-    weights : np.ndarray
-        Numpy ndarray of weight vectors; first dimension - weight index, second dimension - 
-        weight value in the objective function space.
-        
-    Returns:
-    ---------
-    
-    population_divided : list
-        List of candidate solutions, belonging to the weight domain. The outer index of the list - 
-        the weight vector index, inner - the index of a particular candidate solution inside the domain.
-
-        
     '''
-    solution_selection = lambda weight_idx: [solution for solution in population 
+    solution_selection = lambda weight_idx: [solution for solution in population
                                              if solution.get_domain(weights) == weight_idx]
-    return list(map(solution_selection, np.arange(len(weights))))    
+    return list(map(solution_selection, np.arange(len(weights))))
 
 
 def decomposition_based_worst(solutions: list, weights: np.ndarray, best_obj: np.ndarray,
-                              penalty_factor: float = 1., obj_normalizer: ObjFunNormalizer = None):
+                              penalty_factor: float = 1., obj_normalizer=None):
     '''
-    Algorithm 3 from the MOEA/DD paper (Li, Deb, Zhang, 2015).
-    Finds the worst solution among a given set using decomposition-based selection:
-    1. Distribute solutions into subregions defined by weight vectors
-    2. Find the most crowded subregion (ties broken by largest sum of PBI)
-    3. Return the solution with the largest individual PBI in that subregion
+    Decomposition-based worst-solution finder. Returns argmax PBI over the
+    most-crowded subregion within ``solutions``; ties on niche count are
+    broken by sum-PBI per paper Eq. (7).
+
+    Used as a helper for two branches of Algorithm 4 in the MOEA/DD paper
+    (Li, Deb, Zhang, Kwong, 2015):
+      * ``PopulationUpdater`` case ``l = 1`` -- called with the full
+        population; equivalent to ``LOCATE_WORST`` (Algorithm 5) since
+        every solution lives on the single front.
+      * ``PopulationUpdater`` case ``l > 1, |F_l| > 1, |Phi^h| > 1`` --
+        called with ONLY the last front ``F_l``. This is a deliberate
+        EPDE deviation from Algorithm 4 line 18, which says
+        ``argmax_{x in Phi^h} g^pbi(x|w^h, z*)`` over the FULL subregion
+        (potentially containing elite F_1..F_{l-1} solutions). Restricting
+        to F_l preserves convergence elites at the cost of some selection
+        pressure within Phi^h; see audit notes for the rationale.
     '''
     domain_solutions = population_to_sectors(solutions, weights)
     most_crowded_count = max(len(domain) for domain in domain_solutions)
@@ -121,127 +90,126 @@ def decomposition_based_worst(solutions: list, weights: np.ndarray, best_obj: np
     if len(crowded_domains) == 1:
         most_crowded_domain = crowded_domains[0]
     else:
-        PBI = lambda domain_idx: sum([penalty_based_intersection(sol, weights[domain_idx], best_obj,
-                                      penalty_factor, obj_normalizer) for sol in domain_solutions[domain_idx]])
-        PBIS = np.fromiter(map(PBI, crowded_domains), dtype=float)
+        # Tie-breaking via largest sum of PBI in the crowded subregions
+        PBIS = [sum(penalty_based_intersection(sol, weights[domain_idx], best_obj, penalty_factor, obj_normalizer)
+                    for sol in domain_solutions[domain_idx])
+                for domain_idx in crowded_domains]
         most_crowded_domain = crowded_domains[np.argmax(PBIS)]
 
     candidates = domain_solutions[most_crowded_domain]
-    PBIS = np.fromiter(map(lambda s: penalty_based_intersection(s, weights[most_crowded_domain], best_obj,
-                                                                 penalty_factor, obj_normalizer),
-                           candidates), dtype=float)
-    return candidates[np.argmax(PBIS)]
+
+    # Find the solution with the largest individual PBI in the selected subregion
+    PBIS_candidates = [
+        penalty_based_intersection(s, weights[most_crowded_domain], best_obj, penalty_factor, obj_normalizer)
+        for s in candidates]
+
+    return candidates[np.argmax(PBIS_candidates)]
 
 
-def locate_pareto_worst(levels: ParetoLevels, weights: np.ndarray, best_obj: np.ndarray, penalty_factor: float = 1.):
+def locate_pareto_worst(levels, weights: np.ndarray, best_obj: np.ndarray, penalty_factor: float = 1.):
     '''
-    
-    Function, dedicated to the selection of the worst solution on the Pareto levels.
-    
-    Arguments:
-    ----------
-    
-    levels : pareto_levels obj
-        The levels, on which the worst candidate solution is detected.
-    
-    weights : np.ndarray
-        The weight vectors of the moeadd optimizer.
-        
-    best_obj : np.array
-        Best achievable values of the objective functions.
-    
-    penalty_factor : float, optional, default 1.
-        The penalty parameter, used during penalty based intersection value calculation.
-    
+    Function dedicated to the selection of the worst solution on the Pareto levels.
     '''
     domain_solutions = population_to_sectors(levels.population, weights)
-    most_crowded_count = max([len(domain) for domain in domain_solutions]); crowded_domains = [domain_idx for domain_idx in np.arange(len(weights)) if 
-                                                                           len(domain_solutions[domain_idx]) == most_crowded_count]
+    most_crowded_count = max(len(domain) for domain in domain_solutions)
+
+    crowded_domains = [domain_idx for domain_idx, domain in enumerate(domain_solutions)
+                       if len(domain) == most_crowded_count]
+
     if len(crowded_domains) == 1:
         most_crowded_domain = crowded_domains[0]
     else:
-        PBI = lambda domain_idx: sum([penalty_based_intersection(sol_obj, weights[domain_idx], best_obj, penalty_factor, levels.normalizer)
-                                      for sol_obj in domain_solutions[domain_idx]])
-        PBIS = np.fromiter(map(PBI, crowded_domains), dtype = float)
+        PBIS = [
+            sum(penalty_based_intersection(sol_obj, weights[domain_idx], best_obj, penalty_factor, levels.normalizer)
+                for sol_obj in domain_solutions[domain_idx])
+            for domain_idx in crowded_domains]
         most_crowded_domain = crowded_domains[np.argmax(PBIS)]
-        
-    worst_NDL_section = []
-    domain_solution_NDL_idxs = np.empty(most_crowded_count)
-    for solution_idx, solution in enumerate(domain_solutions[most_crowded_domain]):
-        domain_solution_NDL_idxs[solution_idx] = [level_idx for level_idx in np.arange(len(levels.levels))
-                                                  if any([solution.terms_labels == level_solution.terms_labels for level_solution in levels.levels[level_idx]])][0]
-        
+
+    candidates = domain_solutions[most_crowded_domain]
+    domain_solution_NDL_idxs = np.empty(len(candidates))
+
+    # Optimized loop for locating the NDL index
+    for solution_idx, solution in enumerate(candidates):
+        # NOTE: If your solution objects have a `.rank` or `.ndl` attribute,
+        # replace this inner loop entirely with: `domain_solution_NDL_idxs[solution_idx] = solution.rank`
+        for level_idx, level in enumerate(levels.levels):
+            if any(solution.equations_labels == level_solution.equations_labels for level_solution in level):
+                domain_solution_NDL_idxs[solution_idx] = level_idx
+                break
+
     max_level = np.max(domain_solution_NDL_idxs)
-    worst_NDL_section = [domain_solutions[most_crowded_domain][sol_idx] for sol_idx in np.arange(len(domain_solutions[most_crowded_domain])) 
-                        if domain_solution_NDL_idxs[sol_idx] == max_level]
-    PBIS = np.fromiter(map(lambda solution: penalty_based_intersection(solution, weights[most_crowded_domain], best_obj, penalty_factor, levels.normalizer),
-                           worst_NDL_section), dtype = float)
-    return worst_NDL_section[np.argmax(PBIS)]
+    worst_NDL_section = [candidates[sol_idx] for sol_idx in range(len(candidates))
+                         if domain_solution_NDL_idxs[sol_idx] == max_level]
+
+    PBIS_worst = [
+        penalty_based_intersection(solution, weights[most_crowded_domain], best_obj, penalty_factor, levels.normalizer)
+        for solution in worst_NDL_section]
+
+    return worst_NDL_section[np.argmax(PBIS_worst)]
 
 
 class PopulationUpdater(CompoundOperator):
     key = 'PopulationUpdater'
 
-
-    def apply(self, objective: Tuple[Union[SoEq, ParetoLevels]], arguments: dict):
+    def apply(self, objective: Tuple, arguments: dict):
         '''
-        Update population to get the pareto-nondomiated levels with the worst element removed.
-        Here, "worst" means the solution with highest PBI value (penalty-based boundary intersection)
+        Update population to get the pareto-nondominated levels with the worst element removed.
+        Here, "worst" means the solution with highest PBI value (penalty-based boundary intersection).
         '''
-        assert isinstance(objective,
-                          tuple), f'Expected input of PopulationUpdater to be a Tuple of SoEq and ParetoLevels.\n' \
-                                  f'Did not get even a Tuple, instead got {type(objective)}!'
-        assert isinstance(objective[0],
-                          SoEq), f'Expected input of PopulationUpdater to be a Tuple of SoEq and ParetoLevels.\n' \
-                                 f'Did not get a SoEq obj in the first position, instead got {type(objective[0])}!'
-        assert isinstance(objective[1],
-                          ParetoLevels), f'Expected input of PopulationUpdater to be a Tuple of SoEq and ParetoLevels.\n' \
-                                         f'Did not get even a ParetoLevels in the second position, ' \
-                                         f'instead got {type(objective[1])}!.'
-
         self_args, subop_args = self.parse_suboperator_args(arguments=arguments)
-        # print(f'PopulationUpdater.params is {self.params}')
 
-        # TODO: Init normalizer here!
-        # print('objective is ', objective)
-        # objective[1].set_normalizer()
+        # objective[1] represents the ParetoLevels object
+        levels_obj = objective[1]
 
-        objective[1].update(objective[0])  # levels_updated = ndl_update(offspring, levels)
-        if len(objective[1].levels) == 1:
+        # Add offspring to population and update non-dominated levels
+        levels_obj.update(objective[0])
+
+        if len(levels_obj.levels) == 1:
             # Algorithm 4, Case 1: single front — decomposition on entire population
-            worst_solution = decomposition_based_worst(objective[1].population, self_args['weights'],
+            worst_solution = decomposition_based_worst(levels_obj.population, self_args['weights'],
                                                        self_args['best_obj'], self.params['PBI_penalty'],
-                                                       objective[1].normalizer)
+                                                       levels_obj.normalizer)
         else:
-            if len(objective[1].levels[-1]) == 1:
+            if len(levels_obj.levels[-1]) == 1:
                 # Algorithm 4, Case 2: single solution on last front
-                solution = objective[1].levels[-1][0]
-                population_by_domains = population_to_sectors(objective[1].population, self_args['weights'])
+                solution = levels_obj.levels[-1][0]
+                population_by_domains = population_to_sectors(levels_obj.population, self_args['weights'])
                 solution_subregion = next(domain for domain in population_by_domains if solution in domain)
 
                 if len(solution_subregion) > 1:
                     worst_solution = solution
                 else:
                     # Subregion has only this solution — use NDL-aware decomposition
-                    worst_solution = locate_pareto_worst(objective[1], self_args['weights'],
+                    worst_solution = locate_pareto_worst(levels_obj, self_args['weights'],
                                                          self_args['best_obj'], self.params['PBI_penalty'])
             else:
-                # Algorithm 4, Case 3: multiple solutions on last front
-                last_front = objective[1].levels[-1]
+                # Algorithm 4, Case 3: multiple solutions on last front F_l.
+                # DEVIATION from the paper: the crowded-subregion search and
+                # the worst-PBI argmax are both restricted to F_l, NOT to
+                # the full Phi^h as Algorithm 4 line 18 specifies. The
+                # paper would let us eliminate an elite F_1 solution if it
+                # happened to have the largest PBI inside the crowded
+                # subregion; we prefer to keep the elite and only churn
+                # the last-front candidates. See ``decomposition_based_worst``
+                # docstring for the full rationale.
+                last_front = levels_obj.levels[-1]
                 last_front_by_domains = population_to_sectors(last_front, self_args['weights'])
                 most_crowded_count = max(len(d) for d in last_front_by_domains)
 
                 if most_crowded_count > 1:
-                    # Most crowded subregion has >1 solutions — remove worst PBI there
+                    # Most crowded F_l subregion has >1 solutions -- drop
+                    # the worst-PBI one among F_l members of that subregion.
                     worst_solution = decomposition_based_worst(last_front, self_args['weights'],
                                                                self_args['best_obj'], self.params['PBI_penalty'],
-                                                               objective[1].normalizer)
+                                                               levels_obj.normalizer)
                 else:
-                    # All subregions have size 1 — find worst in whole population
-                    worst_solution = locate_pareto_worst(objective[1], self_args['weights'],
+                    # Every F_l solution sits alone in its subregion: fall
+                    # back to NDL-aware LOCATE_WORST over the full P'
+                    # (Algorithm 5).
+                    worst_solution = locate_pareto_worst(levels_obj, self_args['weights'],
                                                          self_args['best_obj'], self.params['PBI_penalty'])
 
-        objective[1].delete_point(worst_solution)
+        levels_obj.delete_point(worst_solution)
         
     @property
     def arguments(self):
@@ -415,33 +383,27 @@ class OffspringUpdater(CompoundOperator):
             # self.suboperators['sparsity'].apply(objective=offspring,
             #                                     arguments=subop_args['sparsity'])
             offspring.reset_state(True)
-            temp_offspring = deepcopy(offspring)
-            # self.suboperators['right_part_selector'].apply(objective=temp_offspring,
-            #                                                arguments=subop_args['right_part_selector'])
-            #
-            # if len(offspring.vars_to_describe) > 1:
-            #     term_replaced = is_rps_in_other_equation(temp_offspring)
-            #     while any(term_replaced):
-            #         offspring.reset_state(True)
-            #         self.suboperators['right_part_selector'].apply(objective=temp_offspring,
-            #                                                        arguments=subop_args['right_part_selector'])
-            #         term_replaced = is_rps_in_other_equation(temp_offspring)
+            # First iteration aliases ``offspring``; ``chromosome_mutation``
+            # (SystemMutation) deepcopies its input before mutating, so the
+            # parent ``offspring`` is never touched. The initial
+            # ``deepcopy(offspring)`` here was discarded immediately by the
+            # very next line below (SystemMutation reassigns
+            # ``temp_offspring``) -- a per-pass SoEq deepcopy of pure waste.
+            temp_offspring = offspring
+            total_attempts = 0
+            hit_offspring_cap = False
             while True:
+                total_attempts += 1
                 temp_offspring = self.suboperators['chromosome_mutation'].apply(objective=temp_offspring,
                                                                                 arguments=subop_args['chromosome_mutation'])
                 temp_offspring.reset_state(True)
+                # SoEqRightPartSelector enforces cross-equation RPS
+                # uniqueness inline (sequential pre-scrub), so no post-hoc
+                # ``enforce_rps_uniqueness`` retry loop is needed here.
                 self.suboperators['right_part_selector'].apply(objective=temp_offspring,
                                                                arguments=subop_args['right_part_selector'])
 
-                if len(temp_offspring.vars_to_describe) > 1:
-                    term_replaced = is_rps_in_other_equation(temp_offspring)
-                    while any(term_replaced):
-                        temp_offspring.reset_state(True)
-                        self.suboperators['right_part_selector'].apply(objective=temp_offspring,
-                                                                       arguments=subop_args['right_part_selector'])
-                        term_replaced = is_rps_in_other_equation(temp_offspring)
-
-                system = temp_offspring.terms_labels
+                system = temp_offspring.equations_labels
                 if system not in objective.history:
                     self.suboperators['chromosome_fitness'].apply(objective=temp_offspring,
                                                                   arguments=subop_args['chromosome_fitness'])
@@ -452,6 +414,7 @@ class OffspringUpdater(CompoundOperator):
                         print(temp_offspring.obj_fun)
                     break
                 if replaced == offspring_attempt_limit:
+                    hit_offspring_cap = True
                     if global_var.verbose.candidate_objectives:
                         print("Could not generate unique offspring")
                     break
@@ -462,6 +425,12 @@ class OffspringUpdater(CompoundOperator):
                     # print("Could not generate unique offspring")
                     # break
                 attempt += 1
+            # Track total iters and cap-hits separately for the success vs failure paths.
+            theoretical_cap = (offspring_attempt_limit + 1) * (mutation_attempt_limit + 1)
+            _loop_stats.record(
+                'OffspringUpdater.unique_offspring' + ('.FAIL' if hit_offspring_cap else ''),
+                total_attempts, theoretical_cap,
+            )
         return objective
     
 def get_pareto_levels_updater(right_part_selector : CompoundOperator, chromosome_fitness : CompoundOperator,
@@ -505,41 +474,58 @@ class InitialParetoLevelSorting(CompoundOperator):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
         if len(objective.population) == 0:
+            uniqueness_attempt_limit = self.params['uniqueness_attempt_limit']
+            if global_var.verbose.show_iter_idx:
+                print('\n========== Initial population ==========')
             for idx, candidate in enumerate(objective.unplaced_candidates):
                 candidate.reset_state(True)
+                # SoEqRightPartSelector handles cross-equation RPS
+                # uniqueness inline; no post-hoc retry needed.
                 self.suboperators['right_part_selector'].apply(objective = candidate,
                                                                 arguments = subop_args['right_part_selector'])
-                if len(candidate.vars_to_describe) > 1:
-                    replaced = is_rps_in_other_equation(candidate)
-                    while any(replaced):
-                        candidate.reset_state(True)
-                        self.suboperators['right_part_selector'].apply(objective=candidate,
-                                                                       arguments=subop_args['right_part_selector'])
-                        replaced = is_rps_in_other_equation(candidate)
 
-                system = candidate.terms_labels
+                system = candidate.equations_labels
+                attempts = 0
+                hit_cap = False
                 while system in objective.history:
+                    if attempts >= uniqueness_attempt_limit:
+                        hit_cap = True
+                        break
+                    attempts += 1
                     candidate.create()
                     candidate.reset_state(True)
                     self.suboperators['right_part_selector'].apply(objective=candidate,
                                                                    arguments=subop_args['right_part_selector'])
-
-                    if len(candidate.vars_to_describe) > 1:
-                        replaced = is_rps_in_other_equation(candidate)
-                        while any(replaced):
-                            candidate.reset_state(True)
-                            self.suboperators['right_part_selector'].apply(objective=candidate,
-                                                                           arguments=subop_args['right_part_selector'])
-                            replaced = is_rps_in_other_equation(candidate)
-
-                    system = candidate.terms_labels
+                    system = candidate.equations_labels
+                _loop_stats.record(
+                    'InitialParetoLevelSorting.unique_candidate' + ('.FAIL' if hit_cap else ''),
+                    attempts, uniqueness_attempt_limit,
+                )
+                if hit_cap:
+                    # Initial population must be duplicate-free for MOEA/D's
+                    # per-sector uniqueness invariant. If the candidate pool
+                    # is too small to satisfy pop_size, fail loud rather than
+                    # silently corrupt the initial Pareto layer.
+                    raise RuntimeError(
+                        f"InitialParetoLevelSorting: could not generate a unique "
+                        f"initial candidate after {uniqueness_attempt_limit} attempts "
+                        f"(candidate index {idx}, {len(objective.history)} unique "
+                        f"systems already placed). The search space appears smaller "
+                        f"than the requested population. Reduce pop_size, widen the "
+                        f"token pool, or raise InitialParetoLevelSorting's "
+                        f"'uniqueness_attempt_limit' parameter."
+                    )
                 self.suboperators['chromosome_fitness'].apply(objective=candidate,
                                                               arguments=subop_args['chromosome_fitness'])
                 objective.history.add(system)
                 if global_var.verbose.candidate_objectives:
                     print(candidate.obj_fun)
+            if global_var.verbose.show_iter_idx:
+                print('\n========== Marriage (weight assignment) ==========')
             objective.associate_weights()
             objective.initial_placing()
+            if global_var.verbose.show_iter_idx:
+                print('\n========== Multiobjective optimization ==========')
 
             # TODO: consider carefully, where normalizer init shall be held. If here, only the initial values are employed
         # objective.set_normalizer()
@@ -573,20 +559,61 @@ def has_subset_pair(collection_of_sets):
     # No subset relationship found among any pairs
     return False, None, None
 
-def is_rps_in_other_equation(objective):
-    rsterms = [None for _ in objective.vals]
-    replaced = [False for _ in objective.vals]
-    for equation_idx, equation in enumerate(objective.vals):
-        rsterms[equation_idx] = equation.structure[equation.target_idx].term_label
+def _debug_assert_rps_unique(objective) -> list:
+    """Debug helper: scan an SoEq's equations and return a per-equation
+    list of bools indicating which equations contain at least one
+    non-target term whose factor set is a superset of another equation's
+    target term factor set.
 
-    for equation_idx, equation in enumerate(objective.vals):
-        rs = rsterms[:equation_idx] + rsterms[equation_idx + 1:]
+    The post-hoc enforcement loop that used to call this and rewrite
+    conflicting terms is gone -- ``SoEqRightPartSelector`` now propagates
+    the uniqueness constraint forward across equations during the RPS
+    sweep itself, so a correctly-implemented pipeline must produce an
+    all-False result here. Use this in tests or temporary asserts to
+    catch regressions; do NOT wire it back into the operator graph as a
+    repair step.
+    """
+    equations = list(objective.vals)
+    rsterms = [eq.structure[eq.target_idx].factors_labels for eq in equations]
+    flagged = [False] * len(equations)
+
+    for eq_idx, equation in enumerate(equations):
+        other_rs = rsterms[:eq_idx] + rsterms[eq_idx + 1:]
         for term_idx, term in enumerate(equation.structure):
-            if any(rsterm.issubset(term.term_label) for rsterm in rs):
-                replaced[equation_idx] = True
-                term.randomize()
-                term.reset_saved_state()
-                while any(rsterm.issubset(term.term_label) for rsterm in rs) or len(equation.terms_labels) != len(equation.structure):
-                    term.randomize()
-                    term.reset_saved_state()
-    return replaced
+            if term_idx == equation.target_idx:
+                continue
+            if any(rs.issubset(term.factors_labels) for rs in other_rs):
+                flagged[eq_idx] = True
+                break
+    return flagged
+
+
+def is_rps_in_other_equation(objective):
+    """Deprecated alias. The post-hoc uniqueness repair has been replaced
+    by ``SoEqRightPartSelector`` (sequential pre-scrub), so this is now a
+    pure assertion helper that returns a per-equation flag list without
+    mutating anything. External callers should migrate to using the new
+    operator and remove their ``while any(is_rps_in_other_equation(...))``
+    retry loops; the new operator guarantees the result is all-False on a
+    well-formed SoEq.
+    """
+    warnings.warn(
+        'is_rps_in_other_equation is now a pure debug check; '
+        'SoEqRightPartSelector enforces uniqueness during RPS dispatch. '
+        'Drop your retry loop.',
+        DeprecationWarning, stacklevel=2,
+    )
+    return _debug_assert_rps_unique(objective)
+
+
+def enforce_rps_uniqueness(objective, *, max_iter: int = 100) -> list:
+    """Deprecated. Retained as an assertion-only shim for code that
+    imports the old name; mutates nothing. Wraps
+    :func:`_debug_assert_rps_unique`.
+    """
+    warnings.warn(
+        'enforce_rps_uniqueness is now a pure debug check; '
+        'SoEqRightPartSelector enforces uniqueness during RPS dispatch.',
+        DeprecationWarning, stacklevel=2,
+    )
+    return _debug_assert_rps_unique(objective)

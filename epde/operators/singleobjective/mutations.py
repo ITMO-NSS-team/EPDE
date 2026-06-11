@@ -7,6 +7,7 @@ Created on Wed Jun  2 15:46:31 2021
 """
 
 import numpy as np
+import warnings
 from copy import deepcopy
 from functools import partial
 from typing import Union
@@ -60,11 +61,15 @@ class EquationMutation(CompoundOperator):
 
     @HistoryExtender(f'\n -> mutating equation', 'ba')
     def apply(self, objective : Equation, arguments : dict):
-        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)  
+        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
+        mutated = False
         for term_idx in range(objective.n_immutable, len(objective.structure)):
             if np.random.uniform(0, 1) <= self.params['r_mutation']:
                 objective.structure[term_idx] = self.suboperators['mutation'].apply(objective = (term_idx, objective),
                                                                                     arguments = subop_args['mutation'])
+                mutated = True
+        if mutated:
+            objective._invalidate_label_cache()
         return objective
 
     def use_default_tags(self):
@@ -160,23 +165,17 @@ class TermParameterMutation(CompoundOperator):
         
         unmutable_params = {'dim', 'power'}
         # objective[1] = deepcopy(objective[1])
-        while True:
-            # Костыль!
-            print('ENTERING LOOP')
-            try:
-                objective[1].target_idx
-            except AttributeError:
-                objective[1].target_idx = 0
-            #
-            term = objective[1].structure[objective[0]] 
+        try:
+            objective[1].target_idx
+        except AttributeError:
+            objective[1].target_idx = 0
+
+        max_iter = 100
+        for _ in range(max_iter):
+            term = objective[1].structure[objective[0]]
             for factor in term.structure:
                 if objective[0] == objective[1].target_idx:
                     continue
-                # if objective[0] < altered_objective.target_idx:
-                #     corresponding_weight = altered_objective.weights_internal[objective[0]] 
-                # else:
-                #     corresponding_weight = altered_objective.weights_internal[objective[0] - 1]
-                # if corresponding_weight == 0:                
                 parameter_selection = deepcopy(factor.params)
                 for param_idx, param_properties in factor.params_description.items():
                     if np.random.random() < self.params['r_param_mutation'] and param_properties['name'] not in unmutable_params:
@@ -189,17 +188,22 @@ class TermParameterMutation(CompoundOperator):
                         elif isinstance(interval[0], float):
                             shift = np.random.normal(loc= 0, scale = self.params['multiplier']*(interval[1] - interval[0]))
                         else:
-                            raise ValueError('In current version of framework only integer and real values for parameters are supported') 
+                            raise ValueError('In current version of framework only integer and real values for parameters are supported')
                         if self.params['strict_restrictions']:
                             parameter_selection[param_idx] = np.min((np.max((parameter_selection[param_idx] + shift, interval[0])), interval[1]))
                         else:
                             parameter_selection[param_idx] = parameter_selection[param_idx] + shift
                     factor.params = parameter_selection
             term.structure = filter_powers(term.structure)
-            print(f'checking presence of {term.name} as {objective[0]}-th element in {objective[1].text_form}')
-            if check_uniqueness(term, objective[1].structure[:objective[0]] + 
+            objective[1]._invalidate_label_cache()
+            if check_uniqueness(term, objective[1].structure[:objective[0]] +
                                 objective[1].structure[objective[0]+1:]):
                 break
+        else:
+            warnings.warn(
+                f"TermParameterMutation: no unique mutation found in {max_iter} attempts; "
+                "leaving last candidate (may duplicate an existing term)."
+            )
         term.reset_saved_state()
         return term
     

@@ -396,8 +396,8 @@ class TokenFamily(object):
                     generated_token.use_grids_cache()
                 generated_token.scaled = False
                 _ = generated_token.evaluate()
-                print(generated_token.cache_label)
-                if generated_token.cache_label not in global_var.tensor_cache.memory_default['numpy'].keys():
+                print(generated_token.structural_label)
+                if generated_token.structural_label not in global_var.tensor_cache.memory_default['numpy'].keys():
                     raise KeyError('Generated token somehow was not stored in cache.')
 
 
@@ -557,15 +557,26 @@ class TFPool(object):
         assert variable is not None, 'Can not create token with a specific variable for '
         families = [f for f in self.families if variable == f.variable]
 
-        while True:
+        max_iter = len(families) + 1
+        family = None
+        for _ in range(max_iter):
+            if not families:
+                raise RuntimeError(
+                    f"TFPool.create_with_var: no family can produce a token for variable={variable!r}"
+                )
             try:
                 probabilities = np.array([len(f.tokens) for f in families])
-                family = np.random.choice(families, p = probabilities/probabilities.sum())                
-                return family.create(label=None, token_status=token_status, 
-                                     all_vars = [family.variable for family in self.families_demand_equation],
+                family = np.random.choice(families, p=probabilities/probabilities.sum())
+                return family.create(label=None, token_status=token_status,
+                                     all_vars=[fam.variable for fam in self.families_demand_equation],
                                      **kwargs)
             except ValueError:
-                families.remove(family)
+                if family is not None and family in families:
+                    families.remove(family)
+                    family = None
+        raise RuntimeError(
+            f"TFPool.create_with_var: exhausted {max_iter} attempts for variable={variable!r}"
+        )
                 
     def __add__(self, other):
         return TFPool(families=self.families + other.families)

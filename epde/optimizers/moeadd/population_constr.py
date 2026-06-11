@@ -39,9 +39,9 @@ class SystemsPopulationConstructor(object):
             passed_solution.use_default_multiobjective_function(self.use_pic)
 
     def create(self, **kwargs):
-        # sparsity = kwargs.get('sparsity', 10 ** (np.random.uniform(low = np.log10(self.sparsity_interval[0]),
-        #                                                               high = np.log10(self.sparsity_interval[1]),
-        #                                                               size = len(self.vars_demand_equation))))
+        sparsity = kwargs.get('sparsity', 10 ** (np.random.uniform(low = np.log10(self.sparsity_interval[0]),
+                                                                      high = np.log10(self.sparsity_interval[1]),
+                                                                      size = len(self.vars_demand_equation))))
         # # nonzero_terms = kwargs.get('nonzero_terms', np.random.randint(low=1,
         #                                                            high=self.terms_number,
         #                                                            size=len(self.vars_demand_equation)))
@@ -57,8 +57,8 @@ class SystemsPopulationConstructor(object):
         # print(f'Creating new equation, sparsity value {sparsity}')
         metaparameters = {'terms_number'        : {'optimizable' : False, 'value' : terms_number},
                           'max_factors_in_term' : {'optimizable' : False, 'value' : max_factors_in_term}}
-        # for idx, variable in enumerate(self.vars_demand_equation):
-        #     metaparameters[('sparsity', variable)] = {'optimizable' : True, 'value' : sparsity[idx]}
+        for idx, variable in enumerate(self.vars_demand_equation):
+            metaparameters[('sparsity', variable)] = {'optimizable' : True, 'value' : sparsity[idx]}
             # metaparameters[('nonzero_terms', variable)] = {'optimizable': True, 'value': nonzero_terms[idx]}
             # metaparameters[('threshold', variable)] = {'optimizable': True, 'value': threshold[idx]}
             # metaparameters[('nu', variable)] = {'optimizable': True, 'value': nu[idx]}

@@ -17,7 +17,6 @@ import torch
 
 from copy import deepcopy
 from typing import Union, Callable, List, Tuple
-from collections import OrderedDict
 from functools import reduce, singledispatchmethod
 
 import epde.globals as global_var
@@ -40,12 +39,12 @@ from epde.operators.utils.default_parameter_loader import EvolutionaryParams
 from epde.decorators import BoundaryExclusion
 
 from epde.evaluators import simple_function_evaluator, trigonometric_evaluator
-from epde.supplementary import define_derivatives
 from epde.cache.cache import upload_simple_tokens, upload_grids, prepare_var_tensor
 
 from epde.preprocessing.preprocessor_setups import PreprocessorSetup
 from epde.preprocessing.preprocessor import ConcretePrepBuilder, PreprocessingPipe
 
+from epde.structure.domain import InputDataEntry
 from epde.structure.main_structures import Equation, SoEq
 
 from epde.interface.token_family import TFPool, TokenFamily
@@ -53,159 +52,6 @@ from epde.interface.type_checks import *
 from epde.interface.prepared_tokens import PreparedTokens, CustomTokens, DataPolynomials
 from epde.integrate import BoundaryConditions, SolverAdapter, SystemSolverInterface
 
-class InputDataEntry(object):
-    """
-    Class for keeping input data
-
-    Attributes:
-        var_name (`str`): name of input data dependent variable
-        data_tensor (`np.ndarray`): value of the input data
-        names (`list`): keys for derivatides
-        d_orders (`list`): keys for derivatides on `int` format for `solver`
-        derivatives (`np.ndarray`): values of derivatives
-        deriv_properties (`dict`): settings of derivatives
-    """
-    def __init__(self, var_name: str, var_idx: int, data_tensor: Union[List[np.ndarray], np.ndarray], boundary):
-        self.var_name = var_name
-        self.var_idx = var_idx 
-        if isinstance(data_tensor, np.ndarray):
-            check_nparray(data_tensor) 
-            self.ndim = data_tensor.ndim
-        elif isinstance(data_tensor, list):
-            [check_nparray(tensor) for tensor in data_tensor]
-            assert all([data_tensor[0].ndim == tensor.ndim for tensor in data_tensor]), 'Mismatching dimensionalities of data tensors.'
-            self.ndim = data_tensor[0].ndim
-        self.data_tensor = data_tensor
-        self.boundary = boundary
-
-
-    def set_derivatives(self, preprocesser: PreprocessingPipe, deriv_tensors: Union[list, np.ndarray] = None,
-                        max_order: Union[list, tuple, int] = 1, grid: list = []):
-        """
-        Method for setting derivatives ot calculate derivatives from data
-
-        Args:
-            preprocesser (`PreprocessingPipe`): operator for preprocessing data (smooting and calculating derivatives)
-            deriv_tensor (`np.ndarray`): values of derivatives
-            max_order (`list`|`tuple`|`int`): order for derivatives
-            grid: value of grid
-
-        Returns:
-            None
-        """
-        deriv_names, deriv_orders = define_derivatives(self.var_name, dimensionality=self.ndim,
-                                                       max_order=max_order)
-
-        self.names = deriv_names
-        self.d_orders = deriv_orders
-
-        if deriv_tensors is None and isinstance(self.data_tensor, np.ndarray):
-            self.data_tensor, self.derivatives = preprocesser.run(self.data_tensor, grid=grid,
-                                                                  max_order=max_order)
-            self.deriv_properties = {'max order': max_order,
-                                     'dimensionality': self.data_tensor.ndim}
-        elif deriv_tensors is None and isinstance(self.data_tensor, list):
-            if isinstance(grid[0], np.ndarray):
-                raise ValueError('A single set of grids passed for multiple samples mode.')
-            data_tensors, derivatives = [], []
-            for samp_idx, sample in enumerate(self.data_tensor):
-                processed_data, derivs = preprocesser.run(sample, grid=grid[samp_idx],
-                                                          max_order=max_order)
-                data_tensors.append(processed_data)
-                derivatives.append(derivs)
-            self.data_tensor = np.concatenate(data_tensors, axis = 0) # TODO: stack data_tensors with the time axis in the correct wa
-            self.derivatives = np.concatenate(derivatives, axis=0) # TODO: check the correct
-            self.deriv_properties = {'max order': max_order,
-                                     'dimensionality': self.data_tensor.ndim}
-
-        elif deriv_tensors is not None and isinstance(self.data_tensor, list):
-            self.data_tensor = np.concatenate(self.data_tensor, axis = 0)
-
-            print(f'Concatenating arrays of len {len(deriv_tensors)}')
-            self.derivatives = np.concatenate(deriv_tensors, axis = 0)
-            self.deriv_properties = {'max order': max_order,
-                                     'dimensionality': self.data_tensor.ndim}            
-        else:
-            self.derivatives = deriv_tensors
-            self.deriv_properties = {'max order': max_order,
-                                     'dimensionality': self.data_tensor.ndim}
-
-    def use_global_cache(self): # , var_idx: int, deriv_codes: list
-        """
-        Method for add calculated derivatives in the cache
-        """
-        var_idx = self.var_idx
-        deriv_codes = self.d_orders
-        self.data_tensor = self.data_tensor[self.boundary != 0]
-        self.derivatives = np.array([derivative[self.boundary.flatten() != 0] for derivative in self.derivatives.T]).T
-        derivs_stacked = prepare_var_tensor(self.data_tensor, self.derivatives, 
-                                            time_axis=global_var.time_axis)
-        deriv_codes = [(var_idx, code) for code in deriv_codes]
-
-        try:
-            upload_simple_tokens(self.names, global_var.tensor_cache, derivs_stacked, 
-                                 deriv_codes=deriv_codes)
-            upload_simple_tokens([self.var_name,], global_var.tensor_cache, [self.data_tensor,],
-                                 deriv_codes=[(var_idx, [None,]),])
-            upload_simple_tokens([self.var_name,], global_var.initial_data_cache, [self.data_tensor,])
-
-        except AttributeError:
-            raise NameError('Cache has not been declared before tensor addition.')
-        print(f'Size of linked labels is {len(global_var.tensor_cache._deriv_codes)}')
-        global_var.tensor_cache.use_structural()
-
-    @staticmethod
-    def latex_form(label, **params):
-        '''
-        Parameters
-        ----------
-        label : str
-            label of the token, for which we construct the latex form.
-        **params : dict
-            dictionary with parameter labels as keys and tuple of parameter values 
-            and their output text forms as values.
-
-        Returns
-        -------
-        form : str
-            LaTeX-styled text form of token.
-        '''            
-        if '/' in label:
-            label = label[:label.find('x')+1] + '_' + label[label.find('x')+1:]
-            label = label.replace('d', r'\partial ').replace('/', r'}{')
-            label = r'\frac{' + label + r'}'
-                            
-        if params['power'][0] > 1:
-            label = r'\left(' + label + r'\right)^{{{0}}}'.format(params["power"][1])
-        return label
-
-    def create_derivs_family(self, max_deriv_power: int = 1):
-        self._derivs_family = TokenFamily(token_type=f'deriv of {self.var_name}', variable = self.var_name, 
-                                          family_of_derivs=True)
-        
-        self._derivs_family.set_latex_form_constructor(self.latex_form)
-        self._derivs_family.set_status(demands_equation=True, unique_specific_token=False,
-                                       unique_token_type=False, s_and_d_merged=False,
-                                       meaningful=True)
-        self._derivs_family.set_params(self.names, OrderedDict([('power', (1, max_deriv_power))]),
-                                      {'power': 0}, self.d_orders)
-        self._derivs_family.set_evaluator(simple_function_evaluator)
-
-    def create_polynomial_family(self, max_power):
-        polynomials = DataPolynomials(self.var_name, max_power = max_power)
-        self._polynomial_family = polynomials.token_family
-
-    def get_families(self):
-        return [self._polynomial_family, self._derivs_family]
-
-    def matched_derivs(self, max_order = 1):
-        derivs_stacked = prepare_var_tensor(self.data_tensor, self.derivatives, 
-                                            time_axis=global_var.time_axis)
-        # print(f'Creating matched derivs: {[[self.var_idx, key, len(key) <= max_order] for idx, 
-        #                                    key in enumerate(self.d_orders)]}')
-        # print(f'From {self.d_orders}')
-        return [[self.var_idx, key, derivs_stacked[idx, ...]] for idx, key in enumerate(self.d_orders)
-                if len(key) <= max_order]
 
 def simple_selector(sorted_neighbors, number_of_neighbors=4):
     return sorted_neighbors[:number_of_neighbors]
@@ -230,15 +76,16 @@ class EpdeSearch(object):
         optimizer_exec_params (`dict`): parameters for execution algorithm of optimization
         optimizer (`OptimizationPatternDirector`): the strategy of the evolutionary algorithm
     """
-    def __init__(self, multiobjective_mode: bool = True, use_pic = True, use_default_strategy: bool = True, director=None, 
+    def __init__(self, multiobjective_mode: bool = True, use_pic = True, use_default_strategy: bool = True, director=None,
                  director_params: dict = {'variation_params': {}, 'mutation_params': {},
-                                          'pareto_combiner_params': {}, 'pareto_updater_params': {}}, 
+                                          'pareto_combiner_params': {}, 'pareto_updater_params': {}},
                  time_axis: int = 0, define_domain: bool = True, function_form=None, boundary: int = 0,
-                 use_solver: bool = False, verbose_params: dict = {'show_iter_idx' : True}, 
+                 use_solver: bool = False, verbose_params: dict = {'show_iter_idx' : True},
                  coordinate_tensors=None, memory_for_cache=15, prune_domain: bool = False,
-                 pivotal_tensor_label=None, pruner=None, threshold: float = 1e-2, 
-                 division_fractions=3, rectangular: bool = True, 
-                 params_filename: str = None, device: str = 'cpu'):
+                 pivotal_tensor_label=None, pruner=None, threshold: float = 1e-2,
+                 division_fractions=3, rectangular: bool = True,
+                 params_filename: str = None, device: str = 'cpu',
+                 fitness_cls=None, sparsity_cls=None):
         """
         Args:
             multiobjective_mode (`bool`): optional, default True
@@ -319,8 +166,9 @@ class EpdeSearch(object):
                 self.director = BaselineDirector()
                 builder = StrategyBuilder(EvolutionaryStrategy)
             self.director.builder = builder
-            self.director.use_baseline(use_solver=self._mode_info['solver_fitness'], 
-                                       use_pic=self._use_pic, params=director_params)
+            self.director.use_baseline(use_solver=self._mode_info['solver_fitness'],
+                                       use_pic=self._use_pic, params=director_params,
+                                       fitness_cls=fitness_cls, sparsity_cls=sparsity_cls)
         else:
             raise NotImplementedError('Wrong arguments passed during the epde search initialization')
 
@@ -360,8 +208,9 @@ class EpdeSearch(object):
                           subregion_mating_limitation: float = .95,
                           PBI_penalty: float = 1., training_epochs: int = 100,
                           neighborhood_selector: Callable = simple_selector,
-                          neighborhood_selector_params: tuple = (4,)):
-        """
+                          neighborhood_selector_params: tuple = (4,),
+                          early_stopping_callback: Callable = None):
+        r"""
         Setting the parameters of the multiobjective evolutionary algorithm. declaration of
         the default values is held in the initialization of EpdeSearch object.
 
@@ -416,9 +265,10 @@ class EpdeSearch(object):
                               'nds_method' : nds_method, 
                               'ndl_update' : ndl_update_method}
         
-        self.optimizer_exec_params = {'epochs' : training_epochs}
- 
-    def set_singleobjective_params(self, population_size: int = 4, solution_params: dict = {}, 
+        self.optimizer_exec_params = {'epochs' : training_epochs,
+                                      'early_stopping_callback' : early_stopping_callback}
+
+    def set_singleobjective_params(self, population_size: int = 4, solution_params: dict = {},
                                    sorting_method: Callable = simple_sorting, training_epochs: int = 50):
         """
         Setting parameters for singelobjective optimization.
@@ -699,10 +549,10 @@ class EpdeSearch(object):
                 global_var.reset_data_repr_nn(data = data, derivs = base_derivs, train = False, 
                                               grids = grid, predefined_ann = data_nn, device = self._device)
             else:
-                # epochs_max = 1e5 # 1e4
-                global_var.reset_data_repr_nn(data = data, derivs = base_derivs, epochs_max=ann_epochs_max,
-                                              grids = grid, predefined_ann = None, device = self._device, 
-                                              use_fourier = fourier_layers, fourier_params = fourier_params)
+                epochs_max = 1e5 # 1e4
+                # global_var.reset_data_repr_nn(data = data, derivs = base_derivs, epochs_max=ann_epochs_max,
+                #                               grids = grid, predefined_ann = None, device = self._device,
+                #                               use_fourier = fourier_layers, fourier_params = fourier_params)
 
         if isinstance(additional_tokens, list):
             if not all([isinstance(tf, (TokenFamily, PreparedTokens)) for tf in additional_tokens]):
@@ -948,6 +798,18 @@ class EpdeSearch(object):
             return global_var.grid_cache, global_var.tensor_cache
         else:
             return None, global_var.tensor_cache
+
+    @property
+    def pareto_history(self):
+        """Per-epoch Pareto-level-0 snapshots, populated during ``fit``.
+
+        Returns a list of length ``training_epochs``; each element is a
+        list of ``{'text_form': str, 'obj_fun': list}`` dicts -- one per
+        solution on the non-dominated front at the end of that epoch.
+        Empty list when the optimizer hasn't been run or doesn't track
+        epoch history (e.g. single-objective mode).
+        """
+        return getattr(self.optimizer, '_pareto_history', [])
 
     def get_equations_by_complexity(self, complexity : Union[float, list]):
         '''

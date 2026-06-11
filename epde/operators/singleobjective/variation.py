@@ -175,10 +175,12 @@ class EquationCrossover(CompoundOperator):
 
         for i in range(same_num + similar_num, len(objective[0].structure)):
             if check_uniqueness(objective[0].structure[i], objective[1].structure) and check_uniqueness(objective[1].structure[i], objective[0].structure):
-                objective[0].structure[i], objective[1].structure[i] = self.suboperators['term_crossover'].apply(objective = (objective[0].structure[i], 
+                objective[0].structure[i], objective[1].structure[i] = self.suboperators['term_crossover'].apply(objective = (objective[0].structure[i],
                                                                                                                               objective[1].structure[i]),
                                                                                                                arguments = subop_args['term_crossover'])
-                
+
+        objective[0]._invalidate_label_cache()
+        objective[1]._invalidate_label_cache()
         return objective[0], objective[1]
 
     def use_default_tags(self):
@@ -186,12 +188,14 @@ class EquationCrossover(CompoundOperator):
 
 class EquationExchangeCrossover(CompoundOperator):
     key = 'EquationExchangeCrossover'
-    
+
     @HistoryExtender(f'\n -> performing equation exchange crossover', 'ba')
     def apply(self, objective : tuple, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
-        
+
         objective[0].structure, objective[1].structure = objective[1].structure, objective[0].structure
+        objective[0]._invalidate_label_cache()
+        objective[1]._invalidate_label_cache()
         return objective[0], objective[1]
 
     def use_default_tags(self):
@@ -248,17 +252,19 @@ class TermParamCrossover(CompoundOperator):
             for param_idx in np.arange(objective[0].structure[term1_token_idx].params.size):
                 if param_idx != power_param_idx and param_idx != dim_param_idx:
                     try:
-                        objective[0].structure[term1_token_idx].params[param_idx] = (objective[0].structure[term1_token_idx].params[param_idx] + 
-                                                                                     self.params['term_param_proportion'] 
-                                                                                     * (objective[1].structure[term2_token_idx].params[param_idx] 
-                                                                                        - objective[0].structure[term1_token_idx].params[param_idx]))
+                        factor1 = objective[0].structure[term1_token_idx]
+                        factor2 = objective[1].structure[term2_token_idx]
+                        new_v1 = (factor1.params[param_idx]
+                                  + self.params['term_param_proportion']
+                                  * (factor2.params[param_idx] - factor1.params[param_idx]))
+                        factor1.set_param(new_v1, idx=param_idx)
                     except KeyError:
                         print([(token.label, token.params) for token in objective[0].structure], [(token.label, token.params) for token in objective[1].structure])
-                        raise Exception('Wrong set of parameters:', objective[0].structure[term1_token_idx].params_description, objective[1].structure[term1_token_idx].params_description)
-                    objective[1].structure[term2_token_idx].params[param_idx] = (objective[0].structure[term1_token_idx].params[param_idx] + 
-                                                                                (1 - self.params['term_param_proportion']) 
-                                                                                * (objective[1].structure[term2_token_idx].params[param_idx] 
-                                                                                - objective[0].structure[term1_token_idx].params[param_idx]))
+                        raise Exception('Wrong set of parameters:', factor1.params_description, factor2.params_description)
+                    new_v2 = (factor1.params[param_idx]
+                              + (1 - self.params['term_param_proportion'])
+                              * (factor2.params[param_idx] - factor1.params[param_idx]))
+                    factor2.set_param(new_v2, idx=param_idx)
         objective[0].reset_occupied_tokens(); objective[1].reset_occupied_tokens()
         return objective[0], objective[1]
 

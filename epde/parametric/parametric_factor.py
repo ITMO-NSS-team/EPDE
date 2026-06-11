@@ -108,12 +108,7 @@ class ParametricFactor(Factor):
                       'deriv': deriv_eval_dict, 'structural': False}
 
     def eval_grad(self, param_label: str):
-        # if self.saved['deriv'][param_label]:
-        #     return global_var.tensor_cache.get(self.grad_cache_label,
-        #                                        structural = False)
-        # else:
         value = self._grad_evaluator[param_label].apply(self)
-        # self.saved['deriv'][param_label] = global_var.tensor_cache.add(self.grad_cache_label, value, structural = False)
         return value
 
 

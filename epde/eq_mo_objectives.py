@@ -60,47 +60,38 @@ def equation_complexity_by_terms(system, equation_key):
     return np.count_nonzero(system.vals[equation_key].weights_internal)
 
 
-def equation_complexity_by_factors(system, equation_key):
-    '''
-    Evaluate the complexity of the system of PDEs, evaluating a number of factors in terms for each
-    equation. In the evaluation, we consider only terms with non-zero weights and target, while
-    the free coefficient is not included in the final metric. Also, the real-valued factors are
-    not considered in the result.
-
-    Parameters:
-    -----------
-        system - ``epde.structure.main_structures.SoEq`` object
-        The system, that is to be evaluated.
-
-    Returns:
-    ----------
-        discrepancy : list of integers.
-        The values of the error metric: list entry for each of the equations.
-    '''
-    # eq_compl = 0
-
-    # for idx, term in enumerate(system.vals[equation_key].structure):
-    #     if idx < system.vals[equation_key].target_idx:
-    #         if not system.vals[equation_key].weights_final[idx] == 0:
-    #             eq_compl += len(term.structure)
-    #     elif idx > system.vals[equation_key].target_idx:
-    #         if not system.vals[equation_key].weights_final[idx-1] == 0:
-    #             eq_compl += len(term.structure)
-    #     else:
-    #         eq_compl += len(term.structure)
-    # return eq_compl
+def _complexity_single_eq(system, equation_key):
+    # Index by ``weights_internal`` (always length ``len(structure)-1``,
+    # one entry per non-target term in structure order) rather than
+    # ``weights_final`` (zero-filtered to ``nnz+1`` by ``LASSOSparsity``
+    # and ``VWSRSparsity``): structure-position indexing breaks against
+    # ``weights_final`` whenever the sparsity step zeros more than one
+    # weight.
+    equation = system.vals[equation_key]
     eq_compl = 0
-
-    for idx, term in enumerate(system.vals[equation_key].structure):
-        if idx < system.vals[equation_key].target_idx:
-            if not system.vals[equation_key].weights_final[idx] == 0:
+    for idx, term in enumerate(equation.structure):
+        if idx < equation.target_idx:
+            if not equation.weights_internal[idx] == 0:
                 eq_compl += complexity_deriv(term.structure)
-        elif idx > system.vals[equation_key].target_idx:
-            if not system.vals[equation_key].weights_final[idx-1] == 0:
+        elif idx > equation.target_idx:
+            if not equation.weights_internal[idx-1] == 0:
                 eq_compl += complexity_deriv(term.structure)
         else:
             eq_compl += complexity_deriv(term.structure)
     return eq_compl
+
+
+def equation_complexity_by_factors(system, equation_key=None):
+    '''
+    Evaluate the complexity of the system of PDEs as a number of factors in
+    non-zero terms for each equation, excluding the free coefficient and
+    real-valued factors. When ``equation_key`` is None, returns a per-equation
+    tuple matching the ``system.vars_to_describe`` order; otherwise the scalar
+    complexity for the named equation.
+    '''
+    if equation_key is None:
+        return tuple(_complexity_single_eq(system, k) for k in system.vars_to_describe)
+    return _complexity_single_eq(system, equation_key)
 
 
 def equation_terms_stability(system, equation_key = None):

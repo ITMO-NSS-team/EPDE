@@ -84,31 +84,48 @@ def ndl_update(new_solution, levels) -> list:   # efficient_ndl_update
 
     """
     moving_set = {new_solution}
-    new_levels = deepcopy(levels)  # levels# CAUSES ERRORS DUE TO DEEPCOPY
+    # Shallow per-level copy: ndl_update only mutates the outer list (slice
+    # assignment, append, extend) and the inner level lists (append, replace);
+    # the MOEADDSolution objects themselves are never mutated, so cloning them
+    # via deepcopy is pure overhead (per-call on every individual added to the
+    # non-dominated levels). Aliasing ``levels`` directly DOES corrupt the input
+    # because of the in-place slice assignment below -- the comprehension below
+    # gives us a fresh outer list and fresh inner lists while preserving the
+    # original solution-object identities.
+    new_levels = [list(lvl) for lvl in levels]
 
     for level_idx in np.arange(len(levels)):
         moving_set_new = set()
         for ms_idx, moving_set_elem in enumerate(moving_set):
-            if np.any([check_dominance(solution, moving_set_elem) for solution in new_levels[level_idx]]):
+            level_new = new_levels[level_idx]
+            # Compute each direction of dominance against the (possibly already
+            # mutated) new level exactly once instead of re-running the same
+            # list-comp inside up to three branches.
+            dom_over_me = [check_dominance(s, moving_set_elem) for s in level_new]
+            dom_by_me = [check_dominance(moving_set_elem, s) for s in level_new]
+            if any(dom_over_me):
                 moving_set_new.add(moving_set_elem)
-            elif (not np.any([check_dominance(solution, moving_set_elem) for solution in new_levels[level_idx]]) and
-                  not np.any([check_dominance(moving_set_elem, solution) for solution in new_levels[level_idx]])):
-                new_levels[level_idx].append(moving_set_elem)
-            elif np.all([check_dominance(moving_set_elem, solution) for solution in levels[level_idx]]):
+            elif not any(dom_by_me):
+                # Falls through from branch 1, so `not any(dom_over_me)` already holds:
+                # incomparable with every existing element, append to this level.
+                level_new.append(moving_set_elem)
+            elif all(check_dominance(moving_set_elem, s) for s in levels[level_idx]):
+                # NOTE: this branch deliberately checks the ORIGINAL ``levels``
+                # snapshot, not the mutated ``new_levels``, to detect the case
+                # where this element dominates the entire pre-update Pareto
+                # layer and therefore deserves a new layer above it.
                 temp_levels = new_levels[level_idx:]
                 new_levels[level_idx:] = []
                 new_levels.append([moving_set_elem,])
-                new_levels.extend(temp_levels)  # ; completed_levels = True
+                new_levels.extend(temp_levels)
             else:
-                dominated_level_elems = [level_elem for level_elem in new_levels[level_idx] if check_dominance(
-                    moving_set_elem, level_elem)]
-                non_dominated_level_elems = [
-                    level_elem for level_elem in new_levels[level_idx] if not check_dominance(moving_set_elem, level_elem)]
-                non_dominated_level_elems.append(moving_set_elem)
-                new_levels[level_idx] = non_dominated_level_elems
-
-                for element in dominated_level_elems:
-                    moving_set_new.add(element)
+                # Partial domination: keep non-dominated elements + me at this
+                # level; bump dominated elements down via moving_set_new.
+                new_levels[level_idx] = [le for le, dom in zip(level_new, dom_by_me) if not dom]
+                new_levels[level_idx].append(moving_set_elem)
+                for le, dom in zip(level_new, dom_by_me):
+                    if dom:
+                        moving_set_new.add(le)
         moving_set = moving_set_new
         if not len(moving_set):
             break

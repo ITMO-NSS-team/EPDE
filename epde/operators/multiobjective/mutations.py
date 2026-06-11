@@ -18,17 +18,28 @@ from epde.structure.structure_template import check_uniqueness
 from epde.supplementary import filter_powers
 from epde.operators.utils.template import CompoundOperator, add_base_param_to_operator
 
+from epde import _loop_stats
+
 
 from epde.decorators import HistoryExtender, ResetEquationStatus
 
 
 class SystemMutation(CompoundOperator):
     key = 'SystemMutation'
-    def apply(self, objective : SoEq, arguments : dict): # TODO: add setter for best_individuals & worst individuals 
-        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)    
-    
-        altered_objective = deepcopy(objective)
-        
+    def apply(self, objective : SoEq, arguments : dict): # TODO: add setter for best_individuals & worst individuals
+        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
+
+        # The only caller is ``OffspringUpdater.apply``, which pops the
+        # offspring from ``unplaced_candidates`` (no other refs) and feeds
+        # it here via ``chromosome_mutation``. Mutating in place is
+        # observationally equivalent to deepcopying first -- the caller's
+        # alias is the only handle on this SoEq, and the suboperators
+        # (EquationMutation, MetaparameterMutation) were already updated
+        # to mutate in place. Saves a full SoEq deepcopy per offspring
+        # iteration (heaviest single deepcopy in the multi-objective hot
+        # path).
+        altered_objective = objective
+
         eqs_keys = altered_objective.vals.equation_keys; params_keys = altered_objective.vals.params_keys
         # eq_key = np.random.choice(eqs_keys)
         # altered_eq = self.suboperators['equation_mutation'].apply(altered_objective.vals[eq_key],
@@ -44,11 +55,11 @@ class SystemMutation(CompoundOperator):
 
                 altered_objective.vals.replace_gene(gene_key = eq_key, value = altered_eq)
 
-        # for param_key in params_keys:
-        #     altered_param = self.suboperators['param_mutation'].apply(altered_objective.vals[param_key],
-        #                                                               subop_args['param_mutation'])
-        #     altered_objective.vals.replace_gene(gene_key = param_key, value = altered_param)
-        #     altered_objective.vals.pass_parametric_gene(key = param_key, value = altered_param)
+        for param_key in params_keys:
+            altered_param = self.suboperators['param_mutation'].apply(altered_objective.vals[param_key],
+                                                                      subop_args['param_mutation'])
+            altered_objective.vals.replace_gene(gene_key = param_key, value = altered_param)
+            altered_objective.vals.pass_parametric_gene(key = param_key, value = altered_param)
 
         return altered_objective
 
@@ -62,13 +73,47 @@ class EquationMutation(CompoundOperator):
     def apply(self, objective : Equation, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
-        # term_idx = np.random.choice(range(len(objective.structure)))
-        # objective.structure[term_idx] = self.suboperators['mutation'].apply(objective=(term_idx, objective),
-        #                                                                     arguments=subop_args['mutation'])
-        # objective.structure[term_idx].reset_saved_state()
-        equation = deepcopy(objective)
-        for _ in range(10):
-            equation.add_random_term()
+        # SystemMutation.apply already deepcopied the enclosing SoEq, so
+        # ``objective`` is already a fresh clone -- mutating in place is
+        # safe and saves a per-call SoEq-deep deepcopy of the equation
+        # (was ~5ms per call, ~5000 calls per lv_new rep).
+        equation = objective
+
+        # Phase 1 -- per-term Bernoulli term-replace via the ``mutation``
+        # sub-operator (TermMutation). Restores the pre-aaea0f4 design
+        # that the JSON defaults still reflect (r_mutation = 0.6 was
+        # vestigial after that commit silently replaced term-replace with
+        # term-add). Without this phase mature chromosomes spin on
+        # add_random_term no-ops once they reach the terms_number cap
+        # and structural exploration collapses to crossover alone.
+        # Skip ``n_immutable`` head terms so the right-part anchor and
+        # any mandatory_family terms survive across mutations.
+        r_mutation = self.params['r_mutation']
+        replace_attempts = 0
+        mutable_count = max(1, len(equation.structure) - equation.n_immutable)
+        for term_idx in range(equation.n_immutable, len(equation.structure)):
+            if np.random.uniform(0, 1) <= r_mutation:
+                replace_attempts += 1
+                self.suboperators['mutation'].apply(
+                    objective=(term_idx, equation),
+                    arguments=subop_args['mutation'],
+                )
+        _loop_stats.record('EquationMutation.replace_terms',
+                           replace_attempts, mutable_count)
+
+        # Phase 2 -- bounded term-add. Two caps apply: ``n_added_terms``
+        # (per-call ceiling, default 5 per JSON) and the
+        # ``terms_number`` metaparameter (chromosome-wide ceiling,
+        # enforced inside ``add_random_term``). Either cap-hit or pool
+        # exhaustion breaks the loop -- canonical structure-dedup
+        # contract.
+        n_added = int(self.params['n_added_terms'])
+        add_attempts = 0
+        for _ in range(n_added):
+            add_attempts += 1
+            if not equation.add_random_term():
+                break
+        _loop_stats.record('EquationMutation.add_terms', add_attempts, n_added)
 
         assert len(equation.terms_labels) == len(equation.structure)
 
@@ -120,15 +165,56 @@ class TermMutation(CompoundOperator):
         """       
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
-        temp = deepcopy(objective[1].structure[objective[0]])
-        objective[1].structure[objective[0]].randomize()
-        objective[1].structure[objective[0]].reset_saved_state()
-        while (len(objective[1].terms_labels) != len(objective[1].structure)
-               or objective[1].structure[objective[0]].terms_labels == temp.terms_labels):
-            objective[1].structure[objective[0]].randomize()
-            objective[1].structure[objective[0]].reset_saved_state()
-        # print(f'CREATED DURING MUTATION: {new_term.name}, while contatining {objective[1].structure[objective[0]].descr_variable_marker}')
-        return objective[1].structure[objective[0]]
+        term_idx, equation = objective
+        term = equation.structure[term_idx]
+        # ``randomize()`` REPLACES ``term.structure`` with a freshly
+        # built list of fresh ``Factor`` instances (see
+        # ``Term.randomize`` at main_structures.py:203). The old list
+        # survives as ``original_structure`` here -- no deepcopy needed,
+        # the alias is intentional. Same trick as the ``add_random_term``
+        # optimization. Saves a ~10ms Term deepcopy on every replace_terms
+        # iter (was the largest remaining mutation-path deepcopy cost).
+        original_structure = term.structure
+        original_labels = term.factors_labels
+        term.randomize()
+        term.reset_saved_state()
+        equation._invalidate_label_cache()
+
+        # Re-randomize while the mutation produced a duplicate term within
+        # the equation OR no actual change vs the previous term. Cap the
+        # retries so a tight token pool can't deadlock the optimizer (same
+        # hazard fixed in ``enforce_rps_uniqueness`` / ``simplify_equation``).
+        # On cap-hit, revert to the pre-mutation term: silently committing a
+        # duplicate or no-op violates the structure-dedup rule and lets
+        # population diversity drift unobservably.
+        max_iter = 100
+        attempts = 0
+        hit_cap = True
+        for _ in range(max_iter):
+            attempts += 1
+            signatures = {t.factors_labels for t in equation.structure}
+            duplicate = len(signatures) != len(equation.structure)
+            unchanged = term.factors_labels == original_labels
+            if not (duplicate or unchanged):
+                hit_cap = False
+                break
+            term.randomize()
+            term.reset_saved_state()
+            equation._invalidate_label_cache()
+        if hit_cap:
+            # Revert by restoring the original Factor list. The Term
+            # instance itself is the same one, and only its ``structure``
+            # slot was mutated by randomize() -- restoring that slot
+            # restores its observable identity for downstream consumers
+            # (factors_labels, __eq__ both read ``structure`` live).
+            term.structure = original_structure
+            term.reset_saved_state()
+            equation._invalidate_label_cache()
+        _loop_stats.record(
+            'TermMutation.unique_term' + ('.FAIL' if hit_cap else ''),
+            attempts, max_iter,
+        )
+        return term
 
     def use_default_tags(self):
         self._tags = {'mutation', 'term level', 'exploration', 'no suboperators'}
@@ -161,24 +247,20 @@ class TermParameterMutation(CompoundOperator):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
         unmutable_params = {'dim', 'power'}
-        # objective[1] = deepcopy(objective[1])
-        while True:
-            # Костыль!
-            print('ENTERING LOOP')
-            try:
-                objective[1].target_idx
-            except AttributeError:
-                objective[1].target_idx = 0
-            #
-            term = objective[1].structure[objective[0]] 
+        term_idx, equation = objective
+        if not hasattr(equation, 'target_idx'):
+            equation.target_idx = 0
+
+        # Cap the retry loop so a constrained token pool can't deadlock
+        # the optimizer (same hazard fixed in ``enforce_rps_uniqueness``).
+        max_iter = 100
+        attempts = 0
+        for _ in range(max_iter):
+            attempts += 1
+            term = equation.structure[term_idx]
             for factor in term.structure:
-                if objective[0] == objective[1].target_idx:
+                if term_idx == equation.target_idx:
                     continue
-                # if objective[0] < altered_objective.target_idx:
-                #     corresponding_weight = altered_objective.weights_internal[objective[0]] 
-                # else:
-                #     corresponding_weight = altered_objective.weights_internal[objective[0] - 1]
-                # if corresponding_weight == 0:                
                 parameter_selection = deepcopy(factor.params)
                 for param_idx, param_properties in factor.params_description.items():
                     if np.random.random() < self.params['r_param_mutation'] and param_properties['name'] not in unmutable_params:
@@ -187,22 +269,22 @@ class TermParameterMutation(CompoundOperator):
                             shift = 0
                             continue
                         if isinstance(interval[0], int):
-                            shift = np.rint(np.random.normal(loc= 0, scale = self.params['multiplier']*(interval[1] - interval[0]))).astype(int) #
+                            shift = np.rint(np.random.normal(loc=0, scale=self.params['multiplier']*(interval[1] - interval[0]))).astype(int)
                         elif isinstance(interval[0], float):
-                            shift = np.random.normal(loc= 0, scale = self.params['multiplier']*(interval[1] - interval[0]))
+                            shift = np.random.normal(loc=0, scale=self.params['multiplier']*(interval[1] - interval[0]))
                         else:
-                            raise ValueError('In current version of framework only integer and real values for parameters are supported') 
+                            raise ValueError('In current version of framework only integer and real values for parameters are supported')
                         if self.params['strict_restrictions']:
                             parameter_selection[param_idx] = np.min((np.max((parameter_selection[param_idx] + shift, interval[0])), interval[1]))
                         else:
                             parameter_selection[param_idx] = parameter_selection[param_idx] + shift
                     factor.params = parameter_selection
             term.structure = filter_powers(term.structure)
-            print(f'checking presence of {term.name} as {objective[0]}-th element in {objective[1].text_form}')
-            # if check_uniqueness(term, objective[1].structure[:objective[0]] +
-            #                     objective[1].structure[objective[0]+1:]):
-            if len(objective[1].terms_labels) == len(objective[1].structure):
+            equation._invalidate_label_cache()
+            signatures = {t.factors_labels for t in equation.structure}
+            if len(signatures) == len(equation.structure):
                 break
+        _loop_stats.record('TermParameterMutation.unique', attempts, max_iter)
         term.reset_saved_state()
         return term
     
@@ -215,7 +297,7 @@ def get_basic_mutation(mutation_params):
 
     term_mutation = TermMutation([])
 
-    equation_mutation = EquationMutation(['r_mutation', 'type_probabilities'])
+    equation_mutation = EquationMutation(['r_mutation', 'n_added_terms', 'type_probabilities'])
     add_kwarg_to_operator(operator = equation_mutation)
     
     metaparameter_mutation = MetaparameterMutation(['std', 'mean'])

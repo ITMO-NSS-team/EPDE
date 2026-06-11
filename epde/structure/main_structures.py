@@ -26,6 +26,7 @@ import torch
 import epde.globals as global_var
 import epde.optimizers.moeadd.solution_template as moeadd
 
+from epde import _loop_stats
 from epde.decorators import HistoryExtender, BoundaryExclusion
 from epde.evaluators import simple_function_evaluator
 from epde.interface.token_family import TFPool
@@ -33,8 +34,15 @@ from epde.preprocessing.domain_pruning import DomainPruner
 
 from epde.structure.encoding import Chromosome
 from epde.structure.factor import Factor
-from epde.structure.structure_template import ComplexStructure, check_uniqueness
-from epde.supplementary import filter_powers, normalize_ts, population_sort, flatten, rts, exp_form, minmax_normalize
+from epde.structure.structure_template import ComplexStructure, check_uniqueness, _deepcopy_slots
+from epde.supplementary import filter_powers, normalize_ts, population_sort, flatten, rts, exp_form, minmax_normalize, retry_until_unique
+
+
+_DEFAULT_EQUATION_METAPARAMETERS = {
+    'sparsity':            {'optimizable': True,  'value': 1.},
+    'terms_number':        {'optimizable': False, 'value': 5.},
+    'max_factors_in_term': {'optimizable': False, 'value': 1.},
+}
 
 
 class Term(ComplexStructure):
@@ -56,8 +64,19 @@ class Term(ComplexStructure):
                  'pool', 'max_factors_in_term', 'cache_linked', 'occupied_tokens_labels',
                  '_descr_variable_marker']
 
-    def __init__(self, pool, passed_term=None, mandatory_family=None, max_factors_in_term=1,
-                 create_derivs: bool = False, interelement_operator=np.multiply, collapse_powers = True):
+    def __init__(self, pool: 'TFPool', passed_term=None, mandatory_family: str = None,
+                 max_factors_in_term: Union[int, dict] = 1,
+                 create_derivs: bool = False, interelement_operator: Callable = np.multiply,
+                 collapse_powers: bool = True):
+        """
+        Construct a single Term (a product of Factor objects).
+
+        If ``passed_term`` is None, the term is randomized from ``pool`` honoring
+        ``max_factors_in_term`` and any ``mandatory_family`` constraint. If
+        ``passed_term`` is a list/str, the term is built from the supplied factors
+        and ``collapse_powers`` controls whether identical factors are collapsed
+        into a single factor with summed power.
+        """
         super().__init__(interelement_operator)
         self.pool = pool
         self.max_factors_in_term = max_factors_in_term
@@ -207,8 +226,8 @@ class Term(ComplexStructure):
     def evaluate(self, structural, grids=None):
         assert global_var.tensor_cache is not None, 'Currently working only with connected cache'
         normalize = structural
-        if self.saved[structural] or (self.term_label, normalize) in global_var.tensor_cache:
-            value = global_var.tensor_cache.get(self.term_label, normalized=normalize,
+        if self.saved[structural] or (self.factors_labels, normalize) in global_var.tensor_cache:
+            value = global_var.tensor_cache.get(self.factors_labels, normalized=normalize,
                                                 saved_as=self.saved_as[normalize])
             value = value.reshape(-1)
             return value
@@ -226,15 +245,22 @@ class Term(ComplexStructure):
                 #     factor_value = factor.evaluate()
                 #     factor_value_normalized = minmax_normalize(factor_value)
                 #     value *= factor_value_normalized
-            if np.all([len(factor.params) == 1 for factor in self.structure]) and grids is None:
-                # Место возможных проблем: сохранение/загрузка нормализованных данных
-                self.saved[normalize] = global_var.tensor_cache.add(self.term_label, value, normalized=normalize)
+            if grids is None:
+                # Cache key is (factors_labels, normalize). factors_labels is a
+                # frozenset of Factor.structural_label, which already
+                # bucket-quantizes continuous params, so the cached product
+                # applies to every term sharing this signature regardless of
+                # how many params each individual factor carries. The legacy
+                # len(factor.params)==1 gate predated the structural-label
+                # quantization and was overly conservative.
+                self.saved[normalize] = global_var.tensor_cache.add(self.factors_labels, value, normalized=normalize)
                 if self.saved[normalize]:
-                    self.saved_as[normalize] = self.term_label
+                    self.saved_as[normalize] = self.factors_labels
             value = value.reshape(-1)
             return value
 
-    def filter_tokens_by_right_part(self, reference_target, equation, equation_position):
+    def filter_tokens_by_right_part(self, reference_target, equation, equation_position,
+                                    max_retries: int = 100):
         warnings.warn(message='Tokens can no longer be set as right-part-unique',
                       category=DeprecationWarning)
         taken_tokens = [factor.label for factor in reference_target.structure
@@ -242,9 +268,8 @@ class Term(ComplexStructure):
         meaningful_taken = any([factor.status['meaningful'] for factor in reference_target.structure
                                 if factor.status['unique_for_right_part']])
 
-        accept_term_try = 0
-        while True:
-            accept_term_try += 1
+        new_term = None
+        for accept_term_try in range(1, max_retries + 1):
             new_term = copy.deepcopy(self)
             for factor_idx, factor in enumerate(new_term.structure):
                 if factor.label in taken_tokens:
@@ -255,14 +280,17 @@ class Term(ComplexStructure):
                 self.structure = new_term.structure
                 self.structure = filter_powers(self.structure)
                 self.reset_saved_state()
-                break
+                return
             if accept_term_try == 10 and global_var.verbose.show_warnings:
                 warnings.warn('Can not create unique term, while filtering equation tokens in regards to the right part.')
             if accept_term_try >= 10:
                 self.randomize(forbidden_factors=new_term.occupied_tokens_labels + taken_tokens)
-            if accept_term_try == 100:
-                print('Something wrong with the random generation of term while running "filter_tokens_by_right_part"')
-                print('proposed', new_term.name, 'for ', equation.text_form, 'with respect to', reference_target.name)
+
+        last_attempt_name = new_term.name if new_term is not None else '<no candidate>'
+        raise RuntimeError(
+            f'filter_tokens_by_right_part: failed to create unique term after '
+            f'{max_retries} retries. Last attempted: {last_attempt_name} for '
+            f'{equation.text_form} with respect to {reference_target.name}')
 
     def reset_occupied_tokens(self):
         occupied_tokens_new = []
@@ -285,6 +313,20 @@ class Term(ComplexStructure):
                     label for label in token.tokens if label not in self.occupied_tokens_labels]
                 available_tokens.append(token_new)
         return available_tokens
+
+    def iter_available_tokens(self):
+        """Generator equivalent of `available_tokens`; yields one filtered family at a time.
+
+        Allows consumers that only need to iterate (rather than realize the full
+        list) to avoid the per-call list materialization. Each yielded family is
+        still deepcopied — that's the unavoidable per-element cost.
+        """
+        for token in self.pool.families:
+            if not all([label in self.occupied_tokens_labels for label in token.tokens]):
+                token_new = copy.deepcopy(token)
+                token_new.tokens = [
+                    label for label in token.tokens if label not in self.occupied_tokens_labels]
+                yield token_new
 
     @property
     def total_params(self):
@@ -331,52 +373,32 @@ class Term(ComplexStructure):
 
     @HistoryExtender('\n -> was copied by deepcopy(self)', 'n')
     def __deepcopy__(self, memo=None):
-        clss = self.__class__
-        new_struct = clss.__new__(clss)
-        memo[id(self)] = new_struct
-
-        attrs_to_avoid_copy = []
-        for k in self.__slots__:
-            try:
-                if k not in attrs_to_avoid_copy:
-                    if not isinstance(k, list):
-                        setattr(new_struct, k, copy.deepcopy(
-                            getattr(self, k), memo))
-                    else:
-                        temp = []
-                        for elem in getattr(self, k):
-                            temp.append(copy.deepcopy(elem, memo))
-                        setattr(new_struct, k, temp)
-                else:
-                    setattr(new_struct, k, None)
-            except AttributeError:
-                pass
-
-        return new_struct
+        # ``pool`` is the population-wide TFPool, set once and never
+        # mutated; sharing by ref skips a recursive copy of every token
+        # family in every Term clone.
+        return _deepcopy_slots(self, memo, attrs_to_share_by_ref=('pool',))
 
     @property
-    def term_label_without_power(self):
-        described = set()
-        for factor in self.structure:
-            if len(factor.params) == 1:
-                factor_label = (factor.cache_label[0])
-            else:
-                factor_label = (factor.cache_label[0], (factor.cache_label[1][-1]))
-            described.add(factor_label)
-        described = frozenset(described)
-        return described
+    def factors_labels_without_power(self) -> frozenset:
+        """Return a frozenset of structural labels with the ``power`` param dropped.
+
+        Identity is delegated to ``Factor.structural_label_without_power``,
+        which quantizes continuous-tolerance params (e.g. trig ``freq``)
+        into bucket indices so structural dedup stays consistent with
+        ``Factor.__eq__``.
+        """
+        return frozenset(factor.structural_label_without_power for factor in self.structure)
 
     @property
-    def term_label(self):
-        described = set()
-        for factor in self.structure:
-            if factor.ftype == 'trigonometric':
-                label = (factor.cache_label[0], tuple(factor.cache_label[1][i] for i, param in factor.params_description.items() if param['name'] != 'freq'))
-                described.add(label)
-            else:
-                described.add(factor.cache_label)
-        described = frozenset(described)
-        return described
+    def factors_labels(self) -> frozenset:
+        """Return a frozenset of structural labels for each factor in the term.
+
+        Identity is delegated to ``Factor.structural_label``, which
+        bucketises continuous-tolerance params (e.g. trig ``freq``) so
+        within-bucket differences don't fracture structural identity.
+        Used as a hashable identity for set/membership checks.
+        """
+        return frozenset(factor.structural_label for factor in self.structure)
 
 
 class Equation(ComplexStructure):
@@ -385,13 +407,13 @@ class Equation(ComplexStructure):
                  'target_idx', 'right_part_selected', '_weights_final', 'weights_final_evald', 'simplified', 'is_correct_right_part',
                  '_weights_internal', 'weights_internal_evald', 'fitness_calculated', 'stability_calculated', 'aic_calculated', 'solver_form_defined',
                  '_fitness_value', '_coefficients_stability', '_aic', 'metaparameters', 'main_var_to_explain',
-                 '_eval_cache', '_cached_sw_weights'] # , '_solver_form'
+                 '_eval_cache', '_cached_sw_weights',
+                 '_terms_labels_cache', '_terms_labels_without_power_cache',
+                 '_gram_super'] # , '_solver_form'
 
 
     def __init__(self, pool: TFPool, basic_structure: Union[list, tuple, set], var_to_explain: str = None,
-                 metaparameters: dict = {'sparsity': {'optimizable': True, 'value': 1.},
-                                         'terms_number': {'optimizable': False, 'value': 5.},
-                                         'max_factors_in_term': {'optimizable': False, 'value': 1.}},
+                 metaparameters: dict = None,
                  interelement_operator: Callable = np.add):
         """
 
@@ -430,6 +452,9 @@ class Equation(ComplexStructure):
         super().__init__(interelement_operator)
         self.reset_state()
 
+        if metaparameters is None:
+            metaparameters = copy.deepcopy(_DEFAULT_EQUATION_METAPARAMETERS)
+
         self.n_immutable = len(basic_structure)
         self.pool = pool
         self.structure = []
@@ -448,21 +473,36 @@ class Equation(ComplexStructure):
         self.main_var_to_explain = var_to_explain
 
         force_var_to_explain = True   # False
+        max_iter = 100
         for i in range(len(basic_structure), int(self.metaparameters['terms_number']['value'])):
             new_term = Term(self.pool, max_factors_in_term=self.metaparameters['max_factors_in_term']['value'],
                             mandatory_family=None, passed_term=None)
-            while new_term.term_label in self.terms_labels:
+            def _term_mutate():
                 new_term.randomize()
                 new_term.reset_saved_state()
-                # check_test += 1
-                #
-
-
-                # if new_term.described_variables_extra not in self.described_variables_full:
-                #     force_var_to_explain = False
-                #     break
-
+            success, _ = retry_until_unique(
+                predicate=lambda: new_term.factors_labels not in self.terms_labels,
+                mutate=_term_mutate,
+                max_iter=max_iter,
+                stats_name='Equation.__init__.unique_term',
+            )
+            if not success:
+                # Pool can't yield a unique term against the current
+                # structure -- stop, don't try further slots. Subsequent
+                # ``new_term`` draws would face the same exhausted pool,
+                # so the only honest outcome is a shorter equation.
+                # (D1 raises for the same exhaustion class in
+                # InitialParetoLevelSorting; here we warn-accept because
+                # ``Equation.__init__`` is invoked during the initial
+                # population draw and aborting fit() entirely would be
+                # surprising user-facing behavior.)
+                warnings.warn(
+                    f"Equation.__init__: no unique term in {max_iter} attempts at slot {i}; "
+                    "pool may be exhausted -- stopping with a shorter equation."
+                )
+                break
             self.structure.append(new_term)
+            self._invalidate_label_cache()
 
         for idx, _ in enumerate(self.structure):
             self.structure[idx].use_cache()
@@ -487,6 +527,7 @@ class Equation(ComplexStructure):
 
                 attrs_from_dict(term, term_elem, except_attrs)
                 self.structure.append(term)
+            self._invalidate_label_cache()
 
     def reset_explaining_term(self, term_idx=0):
         for idx, term in enumerate(self.structure):
@@ -509,8 +550,17 @@ class Equation(ComplexStructure):
                 if self.weights_internal[idx] == 0:
                     target_bias += 1 if i < self.target_idx else 0
                     zero_terms.append(i)
-            self.structure = [term for term_idx, term in enumerate(self.structure) if term_idx not in zero_terms]
-            self.target_idx -= target_bias
+            if zero_terms:
+                self.structure = [term for term_idx, term in enumerate(self.structure) if term_idx not in zero_terms]
+                self.target_idx -= target_bias
+                # ``_invalidate_label_cache`` also wipes _eval_cache, which
+                # is essential here: the right-part-selector's per-target
+                # sweep populates the cache keyed on target_idx, and the
+                # adjusted target_idx above can collide with a swept value.
+                # ``_cached_sw_weights`` was computed for the surviving
+                # features and still aligns with the new structure, so it
+                # is preserved.
+                self._invalidate_label_cache()
 
 
     def __eq__(self, other):
@@ -548,27 +598,93 @@ class Equation(ComplexStructure):
         # TODO: non-urgent, rewrite for an arbitrary equation property check
         if not (deriv or mandatory_family):
             raise ValueError('No property passed for restoration.')
-        while True:
-            # print(
-            #     f'Restoring containment of {mandatory_family} in {self.text_form}.')
-            replacement_idx = np.random.randint(low=0, high=len(self.structure))
-            mf_marker = self.main_var_to_explain if mandatory_family else None
-            temp = Term(self.pool, mandatory_family=mf_marker,
-                        max_factors_in_term=self.metaparameters['max_factors_in_term']['value'])
+        # Bound both the outer and the inner sampling loops, and reject any
+        # candidate whose factor signature would collide with another
+        # existing term -- see feedback-structure-dedup memory.
+        max_outer = 200
+        max_inner = 100
+
+        # Prefer ADDING the new property-carrying term so existing structure
+        # is preserved; fall back to REPLACING a random term only when the
+        # ``terms_number`` cap is already reached.
+        terms_cap = int(self.metaparameters['terms_number']['value'])
+        can_add = len(self.structure) < terms_cap
+
+        def _slot_duplicate(idx, candidate):
+            """Duplicate check that ignores the slot we're about to write
+            to. ``idx=None`` => add path: check against ALL existing terms.
+            ``idx=k``       => replace path: skip slot k.
+            """
+            sig = candidate.factors_labels
+            return any((idx is None or j != idx) and other.factors_labels == sig
+                       for j, other in enumerate(self.structure))
+
+        def _commit(idx, term):
+            if idx is None:
+                self.structure.append(term)
+            else:
+                self.structure[idx] = term
+            self._invalidate_label_cache()
+
+        mf_marker = self.main_var_to_explain if mandatory_family else None
+        max_factors = self.metaparameters['max_factors_in_term']['value']
+        outer_attempts = 0
+        for _ in range(max_outer):
+            outer_attempts += 1
+            target_idx = None if can_add else np.random.randint(low=0, high=len(self.structure))
+            temp = Term(self.pool, mandatory_family=mf_marker, max_factors_in_term=max_factors)
             if t_derivative:
-                while not temp.contains_t_derivative():
-                    temp = Term(self.pool, mandatory_family=mf_marker,
-                                max_factors_in_term=self.metaparameters['max_factors_in_term']['value'])
-                break
+                inner = 0
+                while not temp.contains_t_derivative() and inner < max_inner:
+                    temp = Term(self.pool, mandatory_family=mf_marker, max_factors_in_term=max_factors)
+                    inner += 1
+                _loop_stats.record('restore_property.t_derivative_inner', inner, max_inner)
+                if not temp.contains_t_derivative():
+                    continue
+                if _slot_duplicate(target_idx, temp):
+                    continue
+                _commit(target_idx, temp)
+                _loop_stats.record('restore_property.outer', outer_attempts, max_outer)
+                return
             if deriv and mandatory_family and temp.contains_deriv() and temp.contains_variable(self.main_var_to_explain):
-                self.structure[replacement_idx] = temp
-                break
+                if _slot_duplicate(target_idx, temp):
+                    continue
+                _commit(target_idx, temp)
+                _loop_stats.record('restore_property.outer', outer_attempts, max_outer)
+                return
             elif deriv and temp.contains_deriv(self.main_var_to_explain) and not mandatory_family:
-                self.structure[replacement_idx] = temp
-                break
+                if _slot_duplicate(target_idx, temp):
+                    continue
+                _commit(target_idx, temp)
+                _loop_stats.record('restore_property.outer', outer_attempts, max_outer)
+                return
             elif mandatory_family and temp.contains_variable(self.main_var_to_explain) and not deriv:
-                self.structure[replacement_idx] = temp
-                break
+                if _slot_duplicate(target_idx, temp):
+                    continue
+                _commit(target_idx, temp)
+                _loop_stats.record('restore_property.outer', outer_attempts, max_outer)
+                return
+        _loop_stats.record('restore_property.outer', outer_attempts, max_outer)
+        # Cap-hit is a configuration-failure signal, not a probabilistic
+        # search miss. In healthy configs the outer loop completes in
+        # single-digit attempts (observed mean 2.8-3.3, max 16 across
+        # every historical thesis run). Reaching ``max_outer`` means the
+        # token pool genuinely cannot produce a property-carrying term --
+        # e.g. ``max_derivative_order=0`` in every domain, the derivative
+        # family is missing from the pool, or ``mandatory_family`` wiring
+        # is wrong. Raise loudly so the user can fix the config, rather
+        # than silently returning a property-less equation.
+        raise RuntimeError(
+            f"Equation.restore_property: could not install requested "
+            f"property (deriv={deriv}, mandatory_family={mandatory_family}, "
+            f"t_derivative={t_derivative}) for main_var="
+            f"{self.main_var_to_explain!r} after {max_outer} sampling "
+            f"attempts. This is a configuration error -- verify that "
+            f"the token pool exposes a derivative family for this "
+            f"variable (max_derivative_order > 0 in at least one "
+            f"domain, derivative tokens enrolled, mandatory_family "
+            f"wiring correct)."
+        )
 
     def reconstruct_by_right_part(self, right_part_idx):
         warnings.warn(message='Tokens can no longer be set as right-part-unique',
@@ -585,9 +701,29 @@ class Equation(ComplexStructure):
         new_eq.reset_saved_state()
         return new_eq
 
-    def evaluate(self, normalize=True, return_val=False, grids=None):
-        cache_key = (normalize, return_val, grids is None)
-        if grids is None and hasattr(self, '_eval_cache') and cache_key in self._eval_cache:
+    def evaluate(self, normalize: bool = True, return_val: bool = False,
+                 grids: list = None) -> Tuple:
+        """Evaluate the equation and return (value, target, features).
+
+        ``target`` is the LHS term values; ``features`` is a 2-D matrix of the
+        non-target term evaluations (``None`` if every other term is zero-weight
+        and ``normalize=False``); ``value`` is the residual when
+        ``return_val=True`` else ``None``.
+
+        Caching policy: results are cached per
+        (normalize, return_val, grids-is-None, target_idx) when
+        ``grids is None`` AND ``normalize`` is True. The ``normalize=False``
+        branch additionally filters ``feature_indexes`` by the current
+        ``weights_internal`` (lines below); since callers update weights
+        between successive ``evaluate(normalize=False)`` calls, caching that
+        branch would risk returning stale (target, features) tuples with
+        out-of-date feature masks. ``normalize=True`` is weight-independent
+        and is the path benefitting from cache hits (sparsity then L2LRFitness
+        both call ``evaluate(normalize=True)`` in one fitness invocation).
+        """
+        cacheable = (grids is None) and normalize
+        cache_key = (normalize, return_val, grids is None, self.target_idx)
+        if cacheable and hasattr(self, '_eval_cache') and cache_key in self._eval_cache:
             return self._eval_cache[cache_key]
 
         target = self.structure[self.target_idx].evaluate(False, grids=grids)
@@ -629,18 +765,24 @@ class Equation(ComplexStructure):
                 else:
                     features_val = np.zeros_like(target)
                 value = np.add(elem1, - features_val)
-                # print(value.shape)
             result = (value, target, features)
         else:
             result = (None, target, features)
 
-        if grids is None:
+        if cacheable:
             if not hasattr(self, '_eval_cache'):
                 self._eval_cache = {}
             self._eval_cache[cache_key] = result
         return result
 
-    def reset_state(self, reset_right_part: bool = True):
+    def reset_state(self, reset_right_part: bool = True) -> None:
+        """Drop all cached evaluation/fitness state on this Equation.
+
+        Call after any structural mutation (or to discard a stale fitness/AIC
+        evaluation). Set ``reset_right_part=False`` to keep target_idx and
+        weight assignments — useful when only the LHS-derived caches need
+        clearing.
+        """
         if reset_right_part:
             self.right_part_selected = False
             self.is_correct_right_part = False
@@ -660,32 +802,91 @@ class Equation(ComplexStructure):
         self.aic_calculated = False
         self.solver_form_defined = False
         self._eval_cache = {}
+        # consumed by epde.operators.common.fitness.L2LRFitness; resets here.
         self._cached_sw_weights = None
+        self._terms_labels_cache = None
+        self._terms_labels_without_power_cache = None
+        # Tier 3 super-Gram cache (set by EqRightPartSelector for the
+        # term-sweep, never persists past one sweep). Structural reset
+        # invalidates it.
+        self._gram_super = None
+
+    def _invalidate_label_cache(self):
+        """Drop memoized caches keyed on the current structure; call after
+        ``self.structure`` (or ``self.target_idx``) mutates.
+
+        Covers both the terms-labels caches and the per-evaluation
+        ``_eval_cache`` populated by :meth:`evaluate`. The eval cache key
+        includes ``self.target_idx`` and the cached value depends on which
+        terms occupy ``self.structure``, so any structural mutation must
+        drop it -- otherwise callers like the right-part-selector's
+        per-target sweep can leave stale entries that survive into the
+        post-RPS fitness call (e.g. after ``remove_zero_terms`` adjusts
+        ``target_idx`` onto a value the sweep already cached).
+        """
+        self._terms_labels_cache = None
+        self._terms_labels_without_power_cache = None
+        if hasattr(self, '_eval_cache'):
+            self._eval_cache = {}
+        # Super-Gram is built from term evaluations; any structural
+        # change invalidates the matched-rank assumption.
+        self._gram_super = None
 
 
     @HistoryExtender('\n -> was copied by deepcopy(self)', 'n')
     def __deepcopy__(self, memo=None):
-        clss = self.__class__
-        new_struct = clss.__new__(clss)
-        memo[id(self)] = new_struct
-
-        attrs_to_avoid_copy = []
-        for k in self.__slots__:
-            try:
-                if k not in attrs_to_avoid_copy:
-                    if not isinstance(k, list):
-                        setattr(new_struct, k, copy.deepcopy(getattr(self, k), memo))
-                    else:
-                        temp = []
-                        for elem in getattr(self, k):
-                            temp.append(copy.deepcopy(elem, memo))
-                        setattr(new_struct, k, temp)
-                else:
-                    setattr(new_struct, k, None)
-            except AttributeError:
-                pass
-
+        # Volatile slot caches are about to be invalidated by the next
+        # mutation anyway -- skip the deep-copy. ``pool`` is the
+        # population-wide TFPool (single instance, never mutated) --
+        # share by reference. ``metaparameters`` IS mutated via
+        # ``encoding.Gene.__setitem__``
+        # (see test_main_structures_characterization::test_metaparameters_*)
+        # and MUST stay deep-copied.
+        new_struct = _deepcopy_slots(
+            self, memo,
+            attrs_to_avoid_copy=(
+                '_cached_sw_weights',
+                '_terms_labels_cache', '_terms_labels_without_power_cache',
+                '_gram_super',
+            ),
+            attrs_to_share_by_ref=('pool',),
+        )
+        # ``_eval_cache`` must round-trip as a *fresh empty dict* (separate
+        # ref, equal == content); the cache content itself can be heavy
+        # (cached evaluated tensors) and is the cheapest thing to discard
+        # since the next ``evaluate()`` repopulates lazily.
+        new_struct._eval_cache = {}
         return new_struct
+
+    def clone_shell(self):
+        """Return a deepcopied equation **without** copying ``structure``.
+
+        Useful when the caller is about to immediately replace
+        ``new_equation.structure`` with a freshly built term list (e.g.
+        ``EquationCrossover.apply``'s Phase 6) -- deepcopying the parent's
+        full ``[Term, Term, ...]`` only to overwrite it is wasted work
+        (Term + Factor recursion accounts for the bulk of an Equation
+        deepcopy).
+
+        The returned shell aliases ``pool`` by reference (single
+        population-wide instance), gets a fresh empty ``_eval_cache``
+        (the cached evaluations don't survive a structural rewrite),
+        and has ``structure = []`` so the caller can ``.append`` /
+        assign without aliasing the parent's term list.
+        """
+        clone = _deepcopy_slots(
+            self, memo={},
+            attrs_to_avoid_copy=(
+                'structure',
+                '_cached_sw_weights',
+                '_terms_labels_cache', '_terms_labels_without_power_cache',
+                '_gram_super',
+            ),
+            attrs_to_share_by_ref=('pool',),
+        )
+        clone.structure = []
+        clone._eval_cache = {}
+        return clone
 
     def copy_properties_to(self, new_equation):
         new_equation.weights_internal_evald = self.weights_internal_evald
@@ -714,20 +915,49 @@ class Equation(ComplexStructure):
             pass
 
     def add_history(self, add):
-        # print(add)
         self._history += add
 
-    def add_random_term(self):
+    def add_random_term(self) -> bool:
+        """Try to append one fresh, non-duplicate term to ``self.structure``.
+
+        Returns ``True`` if a term was appended, ``False`` if either the
+        ``terms_number`` cap was already reached or the token pool could
+        not produce a non-duplicate within ``max_iter`` retries. Callers
+        that invoke this in a loop (e.g. ``EquationMutation.apply``,
+        ``Equation.__init__``) MUST stop on the first ``False`` -- once
+        the pool stops yielding uniques, further calls will not yield any
+        either, and continuing past the failure pushes downstream
+        operators (``_scrub_conflicting_terms``, ``EqRightPartSelector``)
+        into states that violate the duplicate-term invariant.
+        """
+        cap = int(self.metaparameters['terms_number']['value'])
+        if len(self.structure) >= cap:
+            return False
+        # Cap diverges from the 100-attempt convention shared by
+        # ``Equation.__init__.unique_term`` and
+        # ``simplify_equation.replace_term``: this method is invoked in
+        # an outer loop (``EquationMutation.apply``) that retries by
+        # drawing more terms anyway, so a tight fast-fail saves cycles
+        # when the pool is exhausted.
+        max_iter = 10
         new_term = Term(self.pool, max_factors_in_term=self.metaparameters['max_factors_in_term']['value'],
                         mandatory_family=None, passed_term=None)
-
-        attempt = 0
-        while new_term.term_label in self.terms_labels or attempt < 10:
-            new_term.randomize()
-            attempt += 1
-
-        if attempt < 10:
-            self.structure.append(deepcopy(new_term))
+        success, _ = retry_until_unique(
+            predicate=lambda: new_term.factors_labels not in self.terms_labels,
+            mutate=lambda: new_term.randomize(),
+            max_iter=max_iter,
+            stats_name='add_random_term',
+        )
+        if success:
+            # ``new_term`` is locally scoped and its factors were minted
+            # fresh by ``pool.create()`` (no Factor-instance caching), so
+            # appending the instance directly is safe -- nothing else
+            # aliases its structure. Saves a per-call Term deepcopy that
+            # was ~1.6ms × 29k calls per lv_new rep.
+            self.structure.append(new_term)
+            self._invalidate_label_cache()
+            return True
+        return False
 
     @property
     def history(self):
@@ -803,7 +1033,7 @@ class Equation(ComplexStructure):
                     form += 'k_' + str(term_idx) + ' ' + \
                         self.structure[term_idx].name + ' + '
                 form += 'k_' + str(len(self.structure)) + ' = 0'
-        except:
+        except (AttributeError, IndexError, TypeError):
             form = ''
         return form
 
@@ -831,47 +1061,62 @@ class Equation(ComplexStructure):
         return self.text_form
 
     @property
-    def terms_labels_without_power(self):
+    def terms_labels_without_power(self) -> frozenset:
+        """Frozenset of per-term factor-label sets, with the power parameter dropped.
+
+        Skips terms whose internal weight is exactly zero (target term always
+        contributes). Per-term labels are delegated to
+        ``Term.factors_labels_without_power`` so structural identity rules
+        (e.g. trig freq bucketization via ``Factor.structural_label``) stay
+        consistent across every dedup site. Memoized in
+        ``_terms_labels_without_power_cache``; the 15 call sites of
+        :meth:`_invalidate_label_cache` cover every Equation-driven structure
+        mutation. Term-level mutations from external operators that bypass
+        the Equation must invalidate the cache themselves.
+        """
+        cached = getattr(self, '_terms_labels_without_power_cache', None)
+        if cached is not None:
+            return cached
         described = set()
         for term_idx, term in enumerate(self.structure):
-            cache_label = set()
-            if term_idx == self.target_idx:
-                for factor in term.structure:
-                    if len(factor.params) == 1:
-                        factor_label = (factor.cache_label[0])
-                    else:
-                        factor_label = (factor.cache_label[0], (factor.cache_label[1][-1]))
-                    cache_label.add(factor_label)
-            else:
+            if term_idx != self.target_idx:
                 weight_idx = term_idx if term_idx < self.target_idx else term_idx - 1
-                if not np.isclose(self.weights_internal[weight_idx], 0):
-                    for factor in term.structure:
-                        if len(factor.params) == 1:
-                            factor_label = (factor.cache_label[0])
-                        else:
-                            factor_label = (factor.cache_label[0], (factor.cache_label[1][-1]))
-                        cache_label.add(factor_label)
-            if len(cache_label) > 0:
-                cache_label = frozenset(cache_label)
-                described.add(cache_label)
-        described = frozenset(described)
-        return described
+                if np.isclose(self.weights_internal[weight_idx], 0):
+                    continue
+            term_labels = term.factors_labels_without_power
+            if len(term_labels) > 0:
+                described.add(term_labels)
+        result = frozenset(described)
+        self._terms_labels_without_power_cache = result
+        return result
 
     @property
-    def terms_labels(self):
-        described = set()
-        for term_idx, term in enumerate(self.structure):
-            cache_label = set()
-            for factor in term.structure:
-                if factor.ftype == 'trigonometric':
-                    label = (factor.cache_label[0], tuple(factor.cache_label[1][i] for i, param in factor.params_description.items() if param['name'] != 'freq'))
-                    cache_label.add(label)
-                else:
-                    cache_label.add(factor.cache_label)
-            cache_label = frozenset(cache_label)
-            described.add(cache_label)
-        described = frozenset(described)
-        return described
+    def terms_labels(self) -> frozenset:
+        """Frozenset of per-term factor-label sets identifying this equation's structure.
+
+        Each inner element is the ``Term.factors_labels`` of one term -- so
+        per-term identity rules (e.g. trig freq bucketization via
+        ``Factor.structural_label``) are applied uniformly. Used as a
+        hashable structural fingerprint for membership tests against
+        ``objective.history``. Memoized in ``_terms_labels_cache``; see
+        ``terms_labels_without_power`` for invalidation contract.
+        """
+        cached = getattr(self, '_terms_labels_cache', None)
+        if cached is not None:
+            return cached
+        result = frozenset(term.factors_labels for term in self.structure)
+        self._terms_labels_cache = result
+        return result
+
+    @property
+    def factors_labels(self) -> frozenset:
+        """Alias of ``terms_labels`` — naming mirror used by some operators."""
+        return self.terms_labels
+
+    @property
+    def factors_labels_without_power(self) -> frozenset:
+        """Alias of ``terms_labels_without_power``."""
+        return self.terms_labels_without_power
 
     def max_deriv_orders(self):
         solver_form = self.solver_form()
@@ -994,8 +1239,9 @@ def check_metaparameters(metaparameters: dict):
 
 
 class SoEq(moeadd.MOEADDSolution):
-    def __init__(self, pool: TFPool, metaparameters: dict):
+    def __init__(self, pool: TFPool, metaparameters: dict) -> None:
         '''
+        Top-level solution gene: a system of one Equation per variable.
 
         Parameters
         ----------
@@ -1045,13 +1291,12 @@ class SoEq(moeadd.MOEADDSolution):
             self.use_legacy_multiobjective_function()
 
     def use_legacy_multiobjective_function(self):
-        from epde.eq_mo_objectives import generate_partial, equation_fitness, equation_complexity_by_factors
-        complexity_objectives = [generate_partial(equation_complexity_by_factors, eq_key)
-                                 for eq_key in self.vars_to_describe]
-        quality_objectives = [generate_partial(
-            equation_fitness, eq_key) for eq_key in self.vars_to_describe]
-        self.set_objective_functions(
-            quality_objectives + complexity_objectives)
+        from epde.eq_mo_objectives import equation_fitness, equation_complexity_by_factors
+        # Both functions return per-equation tuples when called without an
+        # equation_key, so the overall obj_fun layout matches the NEW path
+        # (one weight per objective TYPE, expanded across equations by
+        # MOEA/D). See penalty_based_intersection for the expansion logic.
+        self.set_objective_functions([equation_fitness, equation_complexity_by_factors])
 
     def use_pic_multiobjective_function(self):
         from epde.eq_mo_objectives import generate_partial, equation_fitness, equation_complexity_by_factors, equation_terms_stability, equation_aic
@@ -1192,27 +1437,15 @@ class SoEq(moeadd.MOEADDSolution):
         return hash(self.vals.hash_descr)
 
     def __deepcopy__(self, memo=None):
-        clss = self.__class__
-        new_struct = clss.__new__(clss)
-        memo[id(self)] = new_struct
-
+        # SoEq has no own __slots__; the helper iterates the inherited
+        # (likely empty) ABC slots harmlessly. Then carry the __dict__ over.
+        new_struct = _deepcopy_slots(self, memo)
         for k, v in self.__dict__.items():
             setattr(new_struct, k, copy.deepcopy(v, memo))
-
-        for k in self.__slots__:
-            try:
-                if not isinstance(k, list):
-                    setattr(new_struct, k, copy.deepcopy(getattr(self, k), memo))
-                else:
-                    temp = []
-                    for elem in getattr(self, k):
-                        temp.append(copy.deepcopy(elem, memo))
-                    setattr(new_struct, k, temp)
-            except AttributeError:
-                pass
         return new_struct
 
-    def reset_state(self, reset_right_part: bool = True):
+    def reset_state(self, reset_right_part: bool = True) -> None:
+        """Forward reset_state to every Equation in this system."""
         for equation in self.vals:
             equation.reset_state(reset_right_part)
 
@@ -1220,9 +1453,13 @@ class SoEq(moeadd.MOEADDSolution):
         for eq_label in self.vals.equation_keys:  # Not the best code possible here
             self.vals[eq_label].copy_properties_to(objective.vals[eq_label])
 
-    def solver_params(self, full_domain, grids=None):
+    def solver_params(self, full_domain: bool, grids: list = None) -> Tuple:
         '''
-        Returns solver form, grid and boundary conditions
+        Return solver form, grid and boundary conditions for every equation.
+
+        Pass ``full_domain=True`` to read from the initial-data cache (the
+        complete sampled domain) instead of the active grid cache. ``grids``
+        overrides the implicit grid used to evaluate solver forms.
         '''
         equation_forms = []
         bconds = []
@@ -1242,18 +1479,38 @@ class SoEq(moeadd.MOEADDSolution):
         return all([equation.fitness_calculated for equation in self.vals])
 
     @property
-    def terms_labels_without_power(self):
+    def equations_labels_without_power(self) -> Tuple[frozenset, ...]:
+        """Tuple of ``Equation.terms_labels_without_power`` for each equation.
+
+        Order matches ``self.vars_to_describe``. Useful for structural identity
+        checks on the system as a whole (e.g., dedup against history).
+        """
         equations_caches = []
         for equation in self.vals:
             equations_caches.append(equation.terms_labels_without_power)
         return tuple(equations_caches)
 
     @property
-    def terms_labels(self):
+    def equations_labels(self) -> Tuple[frozenset, ...]:
+        """Tuple of ``Equation.terms_labels`` for each equation in the system.
+
+        Element order matches ``self.vars_to_describe``. The hashable per-equation
+        frozensets enable ``system in objective.history`` membership checks.
+        """
         equations_caches = []
         for equation in self.vals:
             equations_caches.append(equation.terms_labels)
         return tuple(equations_caches)
+
+    @property
+    def terms_labels_without_power(self):
+        # TODO(deprecate): use equations_labels_without_power
+        return self.equations_labels_without_power
+
+    @property
+    def terms_labels(self):
+        # TODO(deprecate): use equations_labels
+        return self.equations_labels
 
 
 class SoEqIterator(object):

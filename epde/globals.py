@@ -7,7 +7,6 @@ Created on Tue Feb  9 16:14:57 2021
 """
 
 from dataclasses import dataclass
-import copy
 import warnings
 from typing import List, Union
 
@@ -246,7 +245,7 @@ def reset_data_repr_nn(data: List[np.ndarray], grids: List[np.ndarray], train: b
             scheduler.step(val_loss)
 
             if val_loss < min_val_loss:
-                best_state = copy.deepcopy(model.state_dict())
+                best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
                 min_val_loss = val_loss
                 val_no_improve = 0
             else:

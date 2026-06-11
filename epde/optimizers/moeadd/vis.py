@@ -196,6 +196,7 @@ class ParetoVisualizer(object):
         if filename is not None:
             plt.savefig(filename + '.' + save_format, dpi=300, quality=94, format=save_format)
         plt.show()
+        plt.close()
 
     def plot_pareto_per_equation(self, plot_level=1, annotate_best=True,
                                  filename=None, save_format='eps'):
@@ -289,3 +290,4 @@ class ParetoVisualizer(object):
         if filename is not None:
             plt.savefig(filename + '.' + save_format, dpi=300, format=save_format)
         plt.show()
+        plt.close(fig)

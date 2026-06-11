@@ -313,7 +313,7 @@ class ControlExp():
             loss_hist.append(loss)
             
             if fig_folder is not None and LV_exp:
-                plt.figure(figsize=(11, 6))
+                fig = plt.figure(figsize=(11, 6))
                 plt.plot(grids_merged.cpu().detach().numpy(), control_inputs.cpu().detach().numpy()[:, 0], color = 'k')
                 plt.plot(grids_merged.cpu().detach().numpy(), control_inputs.cpu().detach().numpy()[:, 1], color = 'r')
                 plt.plot(grids_merged.cpu().detach().numpy(), global_var.control_nn.net(control_inputs).cpu().detach().numpy(),
@@ -321,6 +321,7 @@ class ControlExp():
                 plt.grid()
                 frame_name = f'Exp_{time.month}_{time.day}_at_{time.hour}_{time.minute}_{t}.png'
                 plt.savefig(os.path.join(fig_folder, frame_name))
+                plt.close(fig)
             
             if fig_folder is not None:
                 exp_res = {'state'   : control_inputs.cpu().detach().numpy(),

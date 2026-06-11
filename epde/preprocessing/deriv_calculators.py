@@ -32,8 +32,9 @@ def Heatmap(Matrix, interval = None, area = ((0, 1), (0, 1)), xlabel = '', ylabe
     ax.axis([x.min(), x.max(), y.min(), y.max()])
     fig.colorbar(c, ax=ax)
     plt.title(title)
-    plt.show()
     if type(filename) != type(None): plt.savefig(filename + '.eps', format='eps')
+    plt.show()
+    plt.close(fig)
 
 class AbstractDeriv(ABC):
     def __init__(self, *args, **kwargs):
@@ -389,6 +390,7 @@ class TotalVariation(AbstractDeriv):
                 Heatmap(u[1], title=str(epoch))
                 plt.plot(u[1, :, int(u.shape[2]/2.)])
                 plt.show()
+                plt.close()
             u, w, lap_mul = self.admm_step(data = data_fft, steps = np.ones(data.ndim), initial_u = u, initial_w = w, 
                                            initial_lap=lap_mul, lbd = lbd, reg_strng = reg_strng, 
                                            c_const = c_const)

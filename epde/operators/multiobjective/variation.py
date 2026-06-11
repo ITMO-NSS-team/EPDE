@@ -16,12 +16,13 @@ from functools import partial
 from epde.structure.structure_template import check_uniqueness
 from epde.optimizers.moeadd.moeadd import ParetoLevels
 
-from epde.supplementary import detect_similar_terms, detect_similar_terms, flatten
 from epde.decorators import HistoryExtender, ResetEquationStatus
 
 from epde.operators.utils.template import CompoundOperator, add_base_param_to_operator
 from epde.operators.multiobjective.moeadd_specific import get_basic_populator_updater
 from epde.operators.multiobjective.mutations import get_basic_mutation
+
+from epde import _loop_stats
 
 
 class ParetoLevelsCrossover(CompoundOperator):
@@ -92,11 +93,11 @@ class ParetoLevelsCrossover(CompoundOperator):
                 assert len(crossover_pool[pair_idx, 0].vals[eq_key].terms_labels) == len(crossover_pool[pair_idx, 0].vals[eq_key].structure)
                 assert len(crossover_pool[pair_idx, 1].vals[eq_key].terms_labels) == len(crossover_pool[pair_idx, 1].vals[eq_key].structure)
 
-            # if len(new_system_1.vars_to_describe) > 1 and np.random.random() < 0.2:
-            #     key = np.random.choice(new_system_1.vars_to_describe)
-            #     temp = deepcopy(new_system_1.vals.chromosome[key])
-            #     new_system_1.vals.chromosome[key] = new_system_2.vals.chromosome[key]
-            #     new_system_2.vals.chromosome[key] = temp
+            if len(new_system_1.vars_to_describe) > 1 and np.random.random() < 0.2:
+                key = np.random.choice(new_system_1.vars_to_describe)
+                temp = deepcopy(new_system_1.vals.chromosome[key])
+                new_system_1.vals.chromosome[key] = new_system_2.vals.chromosome[key]
+                new_system_2.vals.chromosome[key] = temp
 
             offsprings.extend([new_system_1, new_system_2])
 
@@ -165,62 +166,186 @@ class MetaparamerCrossover(CompoundOperator):
 
 class EquationCrossover(CompoundOperator):
     key = 'EquationCrossover'
-    
+
     @HistoryExtender(f'\n -> performing equation crossover', 'ba')
     def apply(self, objective : tuple, arguments : dict):
+        """Hybrid random-partition + parameter-blend crossover.
+
+        Parents enter crossover in the post-RPS "non-zero" form: zero-
+        weight terms were physically removed by ``remove_zero_terms`` at
+        the end of the previous right_part_selector pass, so every term
+        in ``parent.structure`` contributed meaningfully to the parent's
+        fitness. See project memory ``project_mutation_crossover_non_zero_form``.
+
+        Three-phase build:
+          * **Anchor:** terms whose ``factors_labels`` match exactly
+            across parents (full structural identity, including bucketed
+            params) are preserved unchanged in both offspring.
+          * **Param-blend pairs:** among the non-anchor terms, pair up
+            across parents by the looser factor-function signature
+            (frozenset of ``factor.label`` only, ignoring params). Each
+            such pair is passed through ``TermParamCrossover`` to produce
+            two distinct blended variants -- one per offspring.
+          * **Random partition:** the remaining truly-unique terms (no
+            anchor match, no param-blend match) get a coin-flip
+            assignment to one offspring or the other.
+
+        The previous design called ``flatten(detect_similar_terms(...))``
+        which produced two offspring containing the structural UNION of
+        both parents -- i.e. clone offspring with zero diversity. This
+        rewrite delivers genuinely-different offspring, activates the
+        wired-but-dormant ``term_param_crossover`` sub-operator, and
+        keeps the D10 dedup invariant.
+        """
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
-        equation1_target_idx = objective[0].target_idx
-        equation2_target_idx = objective[1].target_idx
-        equation1_target_term = deepcopy(objective[0].structure[equation1_target_idx])
-        equation2_target_term = deepcopy(objective[1].structure[equation2_target_idx])
-        equation1 = deepcopy(objective[0])
-        equation2 = deepcopy(objective[1])
+        parent1 = objective[0]
+        parent2 = objective[1]
+        # Snapshot target term identity (not the term itself) -- the
+        # actual deepcopy is deferred to ``_ensure_target`` and only
+        # pays when the target wasn't already partitioned into the
+        # offspring via Phase 1/2/3. Common case (target shared as an
+        # anchor) saves both deepcopies entirely.
+        p1_target_ref = parent1.structure[parent1.target_idx]
+        p2_target_ref = parent2.structure[parent2.target_idx]
+        p1_target_labels = p1_target_ref.factors_labels
+        p2_target_labels = p2_target_ref.factors_labels
 
-        equation1_terms, equation2_terms = detect_similar_terms(objective[0], objective[1])
-        same_num = len(equation1_terms[0]); similar_num = len(equation1_terms[1])
+        def factor_signature(term):
+            """Factor-function-set signature, ignoring params.
 
-        if same_num == 0:
+            Two terms have the "same factor functions, different params"
+            relation iff they share this signature but differ on
+            ``factors_labels``.
+            """
+            return frozenset(factor.label for factor in term.structure)
+
+        # Phase 1 -- find same-anchor pairs (exact factors_labels match).
+        # Pairs are stored as (i, j) so each offspring inherits its own
+        # parent's instance of the anchored term: two terms with equal
+        # ``factors_labels`` (bucketed structural identity) can still
+        # carry slightly different ``factor.params`` within the bucket,
+        # and that within-bucket variation is genuine signal we want to
+        # preserve per-offspring.
+        common_labels = parent1.terms_labels & parent2.terms_labels
+        anchor_pairs = []
+        e2_used = set()
+        unique_e1_idxs = []
+        for i, term_e1 in enumerate(parent1.structure):
+            if term_e1.factors_labels in common_labels:
+                matched = False
+                for j, term_e2 in enumerate(parent2.structure):
+                    if j in e2_used:
+                        continue
+                    if term_e2.factors_labels == term_e1.factors_labels:
+                        anchor_pairs.append((i, j))
+                        e2_used.add(j)
+                        matched = True
+                        break
+                if not matched:
+                    unique_e1_idxs.append(i)
+            else:
+                unique_e1_idxs.append(i)
+        unique_e2_idxs = [j for j in range(len(parent2.structure))
+                          if j not in e2_used]
+
+        # Phase 2 -- find param-blend pairs (matching factor function set,
+        # differing params) among the unique-side terms.
+        param_pairs = []
+        remaining_e1 = list(unique_e1_idxs)
+        remaining_e2 = list(unique_e2_idxs)
+        for i in list(remaining_e1):
+            sig_i = factor_signature(parent1.structure[i])
+            for j in list(remaining_e2):
+                if factor_signature(parent2.structure[j]) == sig_i:
+                    param_pairs.append((i, j))
+                    remaining_e1.remove(i)
+                    remaining_e2.remove(j)
+                    break
+
+        # Phase 3 -- assemble offspring.
+        # Each anchor pair contributes parent1's instance to offspring1
+        # and parent2's instance to offspring2 (preserving per-parent
+        # within-bucket variation -- see Phase 1 comment).
+        offspring1_terms = [deepcopy(parent1.structure[i]) for i, _ in anchor_pairs]
+        offspring2_terms = [deepcopy(parent2.structure[j]) for _, j in anchor_pairs]
+
+        for i, j in param_pairs:
+            t1 = deepcopy(parent1.structure[i])
+            t2 = deepcopy(parent2.structure[j])
+            blended1, blended2 = self.suboperators['term_param_crossover'].apply(
+                objective=(t1, t2),
+                arguments=subop_args['term_param_crossover'],
+            )
+            offspring1_terms.append(blended1)
+            offspring2_terms.append(blended2)
+
+        truly_unique = ([('e1', i) for i in remaining_e1]
+                        + [('e2', j) for j in remaining_e2])
+        for source, idx in truly_unique:
+            src = parent1 if source == 'e1' else parent2
+            term = deepcopy(src.structure[idx])
+            if np.random.random() < 0.5:
+                offspring1_terms.append(term)
+            else:
+                offspring2_terms.append(term)
+
+        # Phase 4 -- force-include each parent's target term so right-part
+        # validity survives the partition. Anchored / partitioned targets
+        # are already present; the helper is a no-op in that case. When
+        # we DO need to add the target, deepcopy on the spot so the
+        # offspring doesn't alias the parent's term.
+        def _ensure_target(terms, parent_target_term, target_labels):
+            for t in terms:
+                if t.factors_labels == target_labels:
+                    return terms
+            return [deepcopy(parent_target_term)] + terms
+
+        offspring1_terms = _ensure_target(
+            offspring1_terms, p1_target_ref, p1_target_labels)
+        offspring2_terms = _ensure_target(
+            offspring2_terms, p2_target_ref, p2_target_labels)
+
+        # Phase 5 -- D10 post-assembly dedup gate. A param-blend pair can
+        # in principle produce a structural_label that collides with an
+        # anchor term, and we'd rather revert to parents than emit a
+        # duplicate-bearing chromosome.
+        eq1_sigs = [t.factors_labels for t in offspring1_terms]
+        eq2_sigs = [t.factors_labels for t in offspring2_terms]
+        had_duplicate = (len(set(eq1_sigs)) != len(eq1_sigs)
+                         or len(set(eq2_sigs)) != len(eq2_sigs))
+        _loop_stats.record(
+            'EquationCrossover.duplicate_offspring' + ('.FAIL' if had_duplicate else ''),
+            1, 1,
+        )
+        if had_duplicate:
             return objective[0], objective[1]
 
-        equation1.structure = flatten(equation1_terms); equation2.structure = flatten(equation2_terms)
+        # Phase 6 -- build the offspring Equation objects via shell
+        # clones (no parent ``structure`` deepcopy). The offspring term
+        # list is freshly built above; cloning the full parent and then
+        # overwriting ``.structure`` wasted a Term+Factor recursion that
+        # was the heaviest single deepcopy in the crossover hot path.
+        equation1 = parent1.clone_shell()
+        equation2 = parent2.clone_shell()
+        equation1.structure = offspring1_terms
+        equation2.structure = offspring2_terms
 
-        for term in equation1.structure:
-            if term.term_label not in equation1.terms_labels:
-                equation1.structure.append(term)
-
-        for term in equation1_terms[1]:
-            if term.term_label not in equation2.terms_labels:
-                equation2.structure.append(term)
-
-        for i in range(len(equation1.structure)):
-            if equation1.structure[i].term_label == equation1_target_term.term_label:
+        for i, t in enumerate(equation1.structure):
+            if t.factors_labels == p1_target_labels:
                 equation1.target_idx = i
                 break
-
-        for i in range(len(equation2.structure)):
-            if equation2.structure[i].term_label == equation2_target_term.term_label:
+        for i, t in enumerate(equation2.structure):
+            if t.factors_labels == p2_target_labels:
                 equation2.target_idx = i
                 break
 
+        equation1._invalidate_label_cache()
+        equation2._invalidate_label_cache()
         return equation1, equation2
 
     def use_default_tags(self):
         self._tags = {'crossover', 'gene level', 'contains suboperators', 'standard'}
-
-class EquationExchangeCrossover(CompoundOperator):
-    key = 'EquationExchangeCrossover'
-    
-    @HistoryExtender(f'\n -> performing equation exchange crossover', 'ba')
-    def apply(self, objective : tuple, arguments : dict):
-        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
-        
-        # objective[0].structure, objective[1].structure = objective[1].structure, objective[0].structure
-        return objective[0], objective[1]
-
-    def use_default_tags(self):
-        self._tags = {'crossover', 'gene level', 'contains suboperators', 'standard'}
-
 
 class TermParamCrossover(CompoundOperator):
     """
@@ -275,18 +400,20 @@ class TermParamCrossover(CompoundOperator):
 
             for param_idx in np.arange(objective[0].structure[term1_token_idx].params.size):
                 if param_idx != power_param_idx and param_idx != dim_param_idx:
+                    factor1 = objective[0].structure[term1_token_idx]
+                    factor2 = objective[1].structure[term2_token_idx]
                     try:
-                        objective[0].structure[term1_token_idx].params[param_idx] = (objective[0].structure[term1_token_idx].params[param_idx] + 
-                                                                                     self.params['term_param_proportion'] 
-                                                                                     * (objective[1].structure[term2_token_idx].params[param_idx] 
-                                                                                        - objective[0].structure[term1_token_idx].params[param_idx]))
+                        new_v1 = (factor1.params[param_idx]
+                                  + self.params['term_param_proportion']
+                                  * (factor2.params[param_idx] - factor1.params[param_idx]))
+                        factor1.set_param(new_v1, idx=param_idx)
                     except KeyError:
                         print([(token.label, token.params) for token in objective[0].structure], [(token.label, token.params) for token in objective[1].structure])
-                        raise Exception('Wrong set of parameters:', objective[0].structure[term1_token_idx].params_description, objective[1].structure[term1_token_idx].params_description)
-                    objective[1].structure[term2_token_idx].params[param_idx] = (objective[0].structure[term1_token_idx].params[param_idx] + 
-                                                                                (1 - self.params['term_param_proportion']) 
-                                                                                * (objective[1].structure[term2_token_idx].params[param_idx] 
-                                                                                - objective[0].structure[term1_token_idx].params[param_idx]))
+                        raise Exception('Wrong set of parameters:', factor1.params_description, factor2.params_description)
+                    new_v2 = (factor1.params[param_idx]
+                              + (1 - self.params['term_param_proportion'])
+                              * (factor2.params[param_idx] - factor1.params[param_idx]))
+                    factor2.set_param(new_v2, idx=param_idx)
         objective[0].reset_occupied_tokens(); objective[1].reset_occupied_tokens()
         return objective[0], objective[1]
 
@@ -351,17 +478,15 @@ def get_basic_variation(variation_params : dict = {}):
     add_kwarg_to_operator(operator=equation_crossover)
     metaparameter_crossover = MetaparamerCrossover(['metaparam_proportion'])
     add_kwarg_to_operator(operator = metaparameter_crossover)
-    equation_exchange_crossover = EquationExchangeCrossover()
 
     chromosome_crossover = ChromosomeCrossover(['equation_exchange_prob'])
     add_kwarg_to_operator(operator = chromosome_crossover)
 
     pl_cross = ParetoLevelsCrossover([])
-    
-    equation_crossover.set_suboperators(operators = {'term_param_crossover' : term_param_crossover, 
+
+    equation_crossover.set_suboperators(operators = {'term_param_crossover' : term_param_crossover,
                                                      'term_crossover' : term_crossover})
-    chromosome_crossover.set_suboperators(operators = {'equation_crossover' : [equation_crossover, equation_exchange_crossover],
-                                                       'param_crossover' : metaparameter_crossover},
-                                          probas = {'equation_crossover' : [1.0, 0.0]})
+    chromosome_crossover.set_suboperators(operators = {'equation_crossover' : equation_crossover,
+                                                       'param_crossover' : metaparameter_crossover})
     pl_cross.set_suboperators(operators = {'chromosome_crossover' : chromosome_crossover})
     return pl_cross
