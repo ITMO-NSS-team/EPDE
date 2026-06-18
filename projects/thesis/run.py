@@ -94,6 +94,19 @@ def main(argv=None) -> int:
                              "penalty (globals.vc_coord_penalty). 0 disables; "
                              "larger penalises coordinate-modulated spurious "
                              "terms harder. Default: leave globals' value.")
+    parser.add_argument('--single-objective', default=None,
+                        choices=('discrepancy', 'instability'),
+                        help="Run the SINGLE-objective evolutionary optimizer "
+                             "driven by this objective alone (forces "
+                             "multiobjective_mode=False). 'instability' tests "
+                             "whether vcoef instability alone finds the true "
+                             "equation; 'discrepancy' is the residual baseline. "
+                             "Default: unset = multi-objective MOEA/D.")
+    parser.add_argument('--anchor-on-residual', action='store_true',
+                        default=False,
+                        help="In 'max_corr' anchor mode, anchor the L1 "
+                             "threshold to the working residual max|X^T r| "
+                             "instead of the raw target max|X^T y|.")
     args = parser.parse_args(argv)
 
     try:
@@ -105,8 +118,15 @@ def main(argv=None) -> int:
     # run_smoke since the setting is a process-level global.
     from epde import globals as _gv
     _gv.set_gram_config(args.gram_mode)
+    _gv.set_anchor_on_residual(args.anchor_on_residual)
     if args.vc_coord_penalty is not None:
         _gv.vc_coord_penalty = float(args.vc_coord_penalty)
+
+    # Single-objective mode: pin the objective and flip the search to the
+    # single-criterion optimizer for every rep in this batch.
+    if args.single_objective is not None:
+        _gv.set_single_objective_metric(args.single_objective)
+        cfg.hparams['search']['multiobjective_mode'] = False
 
     # When ``--noise-level`` is set, monkey-patch ``cfg.load_data`` so
     # every call inside ``build_search`` injects independent Gaussian

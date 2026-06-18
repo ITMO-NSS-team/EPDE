@@ -477,97 +477,129 @@ def _regen_or_drop_term(equation: Equation, term, *, max_iter: int = 100,
     return 'dropped'
 
 
-def _scrub_conflicting_terms(equation: Equation, fixed_rps, *, max_iter: int = 2000,
-                              skip_idx=None) -> bool:
-    """Replace any term in ``equation.structure`` whose factor signature is a
-    superset of one of the ``fixed_rps`` signatures (each a ``frozenset`` of
-    factor labels).
+def _target_term_in_other_equation(eq_with_target: Equation,
+                                   eq_other: Equation):
+    """Return ``eq_with_target``'s TARGET-term factor signature iff that
+    whole term also appears as a (standalone) term in ``eq_other``'s ACTIVE
+    structure; otherwise ``None``.
 
-    Term-similarity semantics here are **superset**, unlike
-    ``detect_similar_terms`` (exact match) and ``simplify_equation``'s
-    duplicate check (set-cardinality on ``factors_labels``). A term
-    "conflicts" with a fixed RPS when its factor set contains every
-    factor of the RPS plus optional extras -- this is the
-    cross-equation interference pattern SoEqRPS needs to break, and it
-    is intentionally stricter than exact equality. Future maintainers
-    changing one of the three predicates should NOT propagate it here
-    without re-deriving the bidirectional-RPS proof.
+    This enforces target-term uniqueness across a system: the explained
+    right-part term of one equation may not be carried as a complete term
+    by another equation of the same system (the documented Lotka-Volterra
+    leak where ``dv/dx0`` rode into the ``u`` equation as its own term).
 
-    When ``skip_idx`` is passed, the term at that index is left alone
-    -- used by the bidirectional pass below to preserve an equation's
-    own already-selected RPS.
+    It is deliberately a WHOLE-TERM equality test -- ``target.factors_labels``
+    is one element of ``eq_other.active_terms_labels`` -- NOT a
+    sub-product/divides test: a target derivative appearing only as a
+    FACTOR inside a composite coupling term (e.g. continuity's ``v_y``
+    inside the v-momentum ``v*v_y`` of true Navier-Stokes) is legitimate
+    physics and is left untouched.
 
-    Returns True if at least one term was randomized; the equation's
-    cached fitness/weight state is reset on the way out.
+    Directional by construction (``eq_with_target``'s target into
+    ``eq_other``); the caller scans both orderings of every pair. The
+    target term is re-fetched as ``structure[target_idx]`` (never cached
+    across rerolls) and guarded exactly as the existing degeneracy path
+    (right_part_selection.py:608-612). ACTIVE scope means a zero-weight
+    padding copy is ignored; any later reactivation is caught by the next
+    per-generation RPS pass.
     """
-    if not fixed_rps:
+    try:
+        target_sig = eq_with_target.structure[
+            eq_with_target.target_idx].factors_labels
+    except (AttributeError, IndexError, TypeError):
+        return None
+    return target_sig if target_sig in eq_other.active_terms_labels else None
+
+
+def _break_equation_duplication(equation: Equation, shared_sigs, *,
+                                preferred_sigs=(), max_iter: int = 2000) -> bool:
+    """Break a system-level degeneracy by randomizing ONE non-target term of
+    ``equation`` whose factor signature belongs to ``shared_sigs`` (the
+    active structure this equation shares with another equation of the
+    system).
+
+    The term matching one of ``preferred_sigs`` (typically the other
+    equation's target signature) is chosen first, so the rerolled equation
+    moves away from "the other equation's explained quantity" before
+    touching genuinely shared coupling terms. The randomize loop demands
+    that the replacement (a) leaves ``shared_sigs`` and (b) does not
+    duplicate another term; on cap-hit a surviving duplicate is dropped via
+    the ``_regen_or_drop_term`` drop policy (a still-shared-but-unique term
+    is tolerated -- the caller's convergence loop re-checks).
+
+    Returns True if the structure changed; cached fitness/weight state is
+    reset on the way out so the caller can re-run right-part selection.
+    """
+    candidates = [term for idx, term in enumerate(equation.structure)
+                  if idx != getattr(equation, 'target_idx', None)
+                  and term.factors_labels in shared_sigs]
+    if not candidates:
+        # The shared structure is carried entirely by the target term (a
+        # single-term law explained from both sides). Nothing safe to
+        # randomize here; the caller's pass cap tolerates the leftover.
         return False
 
-    def _conflicts(t):
-        return any(rs.issubset(t.factors_labels) for rs in fixed_rps)
+    preferred = [t for t in candidates if t.factors_labels in preferred_sigs]
+    term = preferred[0] if preferred else candidates[0]
 
-    # Snapshot the conflicting terms by identity: the randomize loop below
-    # never resizes ``structure``, but the duplicate-drop pass afterwards
-    # does, so index-based iteration would be unsafe.
-    conflicting = [term for idx, term in enumerate(equation.structure)
-                   if idx != skip_idx and _conflicts(term)]
-    changed = False
-    for term in conflicting:
-        attempts = 0
-        for _ in range(max_iter):
-            attempts += 1
-            term.randomize()
-            term.reset_saved_state()
-            signatures = {t.factors_labels for t in equation.structure}
-            duplicate = len(signatures) != len(equation.structure)
-            if not _conflicts(term) and not duplicate:
-                break
-        _loop_stats.record('scrub_conflicting_terms', attempts, max_iter)
-        changed = True
+    attempts = 0
+    for _ in range(max_iter):
+        attempts += 1
+        term.randomize()
+        term.reset_saved_state()
+        signatures = {t.factors_labels for t in equation.structure}
+        duplicate = len(signatures) != len(equation.structure)
+        if term.factors_labels not in shared_sigs and not duplicate:
+            break
+    _loop_stats.record('break_equation_duplication', attempts, max_iter)
+    # Cap-hit may leave the rerolled term as a DUPLICATE -- a duplicate must
+    # never ride out of RPS, so drop it (regenerate attempts already spent).
+    _regen_or_drop_term(equation, term, max_iter=0,
+                        stats_name='break_equation_duplication.drop')
 
-    if changed:
-        # Cap-hit may leave a scrubbed term as a DUPLICATE (regenerate
-        # exhausted). A conflicting-but-unique term is tolerated -- the
-        # bidirectional outer loop re-selects -- but a duplicate must not
-        # ride out of RPS, so drop it (the n regenerate attempts were
-        # already spent in the loop above). The skip_idx term is excluded
-        # from ``conflicting`` and is never dropped.
-        for term in conflicting:
-            _regen_or_drop_term(equation, term, max_iter=0,
-                                stats_name='scrub_conflicting_terms.drop')
-        try:
-            equation.reset_state(reset_right_part=False)
-        except TypeError:
-            equation.reset_state()
-    return changed
+    try:
+        equation.reset_state(reset_right_part=False)
+    except TypeError:
+        equation.reset_state()
+    return True
 
 
 class SoEqRightPartSelector(CompoundOperator):
-    """Chromosome-level RPS that enforces bidirectional cross-equation
-    uniqueness.
+    """Chromosome-level RPS that prevents system-level degeneracy.
 
-    Forward sequential pass (pre-scrub each equation against
-    already-selected RPS, then run the per-equation sweep) handles the
-    case where equation_k > equation_j re-uses equation_j's RPS as a
-    non-target term. A second bidirectional convergence pass closes the
-    other direction: equation_j's structure is also scrubbed of any term
-    whose factor set is a superset of equation_k's (k > j) RPS. Without
-    the second pass the FIRST equation in ``vars_to_describe`` could keep
-    a later equation's target as a non-RPS term (e.g. LV's eq for u
-    keeping ``dv/dx0``), since at the time it was processed the later
-    RPS was not yet known.
+    Invariant: no equation's TARGET term may appear as a whole (standalone)
+    term in ANY other equation of the system -- the explained right-part
+    term of one equation is reserved to that equation. This is a whole-term
+    equality rule, NOT a sub-product one: a target derivative appearing only
+    as a FACTOR inside a composite coupling term of another equation (e.g.
+    continuity's ``v_y`` inside the v-momentum convective term ``v*v_y`` of
+    Navier-Stokes) is legitimate physics and is left untouched.
 
-    The bidirectional pass is bounded by ``max_bidirectional_passes`` and
-    exits as soon as a full sweep produces no scrubbing changes
-    (fixed-point). Each pass also re-runs the per-equation selector when
-    its structure changed, since the prior target_idx may no longer be
-    optimal under the new structure.
+    Cross-equation FACTOR sharing is otherwise allowed: an equation for
+    ``v`` may carry ``du/dx0`` inside a composite term even when the
+    equation for ``u`` explains ``du/dx0`` -- only a bare standalone
+    ``du/dx0`` term in the ``v`` equation is forbidden.
+
+    This subsumes the old "no two equations share an identical active
+    structure" guard: two equations that collapse onto the same law (e.g.
+    both Navier-Stokes velocity equations becoming continuity) necessarily
+    have DIFFERENT targets, so each carries the other's target as a
+    standalone term and is broken here. (The only case it cannot catch --
+    two full duplicates sharing the identical target -- requires a composite
+    target carrying both equations' main-var derivatives, which is
+    unreachable for the studied systems.)
+
+    Mechanics: a plain per-equation forward pass first, then a bounded
+    convergence loop that, each pass, rerolls any equation carrying another
+    equation's target term as a whole term (via
+    ``_break_equation_duplication`` + right-part re-selection). The loop
+    exits at the first pass with no changes (fixed point).
     """
     key = 'SoEqRightPartSelector'
 
     @_loop_stats.timed('SoEqRPS.apply')
     def apply(self, objective, arguments: dict):
-        """Run per-equation RPS forward + bidirectional passes in-place.
+        """Run per-equation RPS, then resolve system degeneracies in-place.
 
         Failures inside ``EqRightPartSelector.apply`` are handled locally
         via per-equation ``objective.randomize()`` -- this method has no
@@ -578,56 +610,54 @@ class SoEqRightPartSelector(CompoundOperator):
         eq_args = subop_args.get('eq_right_part_selector', arguments)
 
         equations = list(objective)
-        rps_signatures = [None] * len(equations)
 
-        # Forward sequential pass: pre-scrub each equation against
-        # already-fixed RPS signatures, then run the per-equation selector.
-        for eq_idx, equation in enumerate(equations):
-            other_rps = [rs for rs in rps_signatures[:eq_idx] if rs is not None]
-            if other_rps:
-                _scrub_conflicting_terms(equation, other_rps)
+        # Forward pass: plain per-equation right-part selection. No
+        # cross-equation scrubbing -- shared terms are legitimate coupling.
+        for equation in equations:
             eq_selector.apply(objective=equation, arguments=eq_args)
-            try:
-                rps_signatures[eq_idx] = equation.structure[
-                    equation.target_idx].factors_labels
-            except (AttributeError, IndexError, TypeError):
-                rps_signatures[eq_idx] = None
 
-        # Bidirectional convergence: each equation now knows the others'
-        # RPS, so re-scrub against the full set (skipping own target) and
-        # re-select when scrubbing changes the structure. Iterates until
-        # a full pass yields no changes.
+        # Degeneracy resolution: enforce target-term uniqueness until a full
+        # pass makes no change or the pass budget is exhausted.
         max_passes = 50
         passes_used = 0
         for _ in range(max_passes):
             passes_used += 1
             any_changes = False
-            for eq_idx, equation in enumerate(equations):
-                other_rps = [rs for i, rs in enumerate(rps_signatures)
-                             if i != eq_idx and rs is not None]
-                if not other_rps:
-                    continue
-                target_idx = getattr(equation, 'target_idx', None)
-                changed = _scrub_conflicting_terms(
-                    equation, other_rps, skip_idx=target_idx,
-                )
-                if not changed:
-                    continue
-                # Scrubbing mutated non-target terms: force re-selection so
-                # the post-scrub structure is evaluated for the best RPS.
-                equation.right_part_selected = False
-                equation.simplified = False
-                equation.is_correct_right_part = False
-                eq_selector.apply(objective=equation, arguments=eq_args)
-                try:
-                    rps_signatures[eq_idx] = equation.structure[
-                        equation.target_idx].factors_labels
-                except (AttributeError, IndexError, TypeError):
-                    pass
-                any_changes = True
+            # Target-term uniqueness: no equation's TARGET term may appear
+            # as a whole (standalone) term in ANOTHER equation of the
+            # system. Directional -- scan every ordered pair (i -> j) and,
+            # when eq i's target rides in eq j, reroll eq j's offending copy
+            # via the same _break_equation_duplication drop-or-reroll
+            # primitive, then re-select eq j's right part. A target
+            # derivative that appears only as a FACTOR inside a composite
+            # coupling term of eq j (e.g. continuity's ``v_y`` in ``v*v_y``)
+            # is left untouched -- this is whole-term equality, not
+            # sub-product. If the only match is eq j's own target,
+            # _break_equation_duplication finds no rerollable candidate and
+            # returns False, so the pass tolerates it (cannot reroll a
+            # target).
+            for i in range(len(equations)):
+                for j in range(len(equations)):
+                    if i == j:
+                        continue
+                    eq_i, eq_j = equations[i], equations[j]
+                    leak_sig = _target_term_in_other_equation(eq_i, eq_j)
+                    if leak_sig is None:
+                        continue
+                    changed = _break_equation_duplication(
+                        eq_j, {leak_sig}, preferred_sigs={leak_sig})
+                    if not changed:
+                        continue
+                    eq_j.right_part_selected = False
+                    eq_j.simplified = False
+                    eq_j.is_correct_right_part = False
+                    eq_selector.apply(objective=eq_j, arguments=eq_args)
+                    _loop_stats.record('SoEqRPS.target_leak_repair', 1, 1)
+                    any_changes = True
+
             if not any_changes:
                 break
-        _loop_stats.record('SoEqRPS.bidirectional', passes_used, max_passes)
+        _loop_stats.record('SoEqRPS.degeneracy_passes', passes_used, max_passes)
 
     def use_default_tags(self):
         self._tags = {'right part selection', 'chromosome level',

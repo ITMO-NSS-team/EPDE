@@ -11,13 +11,6 @@ from epde.interface.prepared_tokens import CustomTokens, PhasedSine1DTokens, Con
 from epde.interface.equation_translator import translate_equation
 from epde.interface.interface import EpdeSearch
 
-from epde.operators.common.coeff_calculation import LinRegBasedCoeffsEquation
-from epde.operators.common.sparsity import LASSOSparsity
-
-from epde.operators.utils.operator_mappers import map_operator_between_levels
-import epde.operators.common.fitness as fitness
-from epde.operators.utils.template import CompoundOperator
-
 from epde import TrigonometricTokens, GridTokens, CacheStoredTokens
 import epde.globals as global_var
 
@@ -36,51 +29,6 @@ def load_pretrained_PINN(ann_filename):
 def noise_data(data, noise_level):
     # add noise level to the input data
     return noise_level * 0.01 * np.std(data) * np.random.normal(size=data.shape) + data
-
-
-def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
-                      search_obj: EpdeSearch, all_vars: List[str] = ['u', ]) -> bool:
-    metaparams = {('sparsity', var): {'optimizable': False, 'value': 1E-6} for var in all_vars}
-
-    correct_eq = translate_equation(correct_symbolic, search_obj.pool, all_vars=all_vars)
-    for var in all_vars:
-        correct_eq.vals[var].main_var_to_explain = var
-        correct_eq.vals[var].metaparameters = metaparams
-    print(correct_eq.text_form)
-
-    incorrect_eq = translate_equation(eq_incorrect_symbolic, search_obj.pool,
-                                      all_vars=all_vars)  # , all_vars = ['u', 'v'])
-    for var in all_vars:
-        incorrect_eq.vals[var].main_var_to_explain = var
-        incorrect_eq.vals[var].metaparameters = metaparams
-    print(incorrect_eq.text_form)
-
-    fit_operator.apply(correct_eq, {})
-    fit_operator.apply(incorrect_eq, {})
-    print([[correct_eq.vals[var].fitness_value, incorrect_eq.vals[var].fitness_value] for var in all_vars])
-    print([[correct_eq.vals[var].coefficients_stability, incorrect_eq.vals[var].coefficients_stability] for var in
-           all_vars])
-    print([[correct_eq.vals[var].aic, incorrect_eq.vals[var].aic] for var in all_vars])
-
-    # print([correct_eq.vals[var].coefficients_stability < incorrect_eq.vals[var].coefficients_stability for var in all_vars])
-    return all([correct_eq.vals[var].coefficients_stability < incorrect_eq.vals[var].coefficients_stability for var in
-                all_vars])
-
-
-def prepare_suboperators(fitness_operator: CompoundOperator, operator_params: dict) -> CompoundOperator:
-    sparsity = LASSOSparsity()
-    coeff_calc = LinRegBasedCoeffsEquation()
-
-    # sparsity = map_operator_between_levels(sparsity, 'gene level', 'chromosome level')
-    # coeff_calc = map_operator_between_levels(coeff_calc, 'gene level', 'chromosome level')
-
-    fitness_operator.set_suboperators({'sparsity': sparsity,
-                                       'coeff_calc': coeff_calc})
-    fitness_cond = lambda x: not getattr(x, 'fitness_calculated')
-    fitness_operator.params = operator_params
-    fitness_operator = map_operator_between_levels(fitness_operator, 'gene level', 'chromosome level',
-                                                   objective_condition=fitness_cond)
-    return fitness_operator
 
 
 def apoptosis_discovery(noise_level):
@@ -123,14 +71,6 @@ def apoptosis_discovery(noise_level):
 
 if __name__ == "__main__":
     import torch
-    from epde.operators.utils.default_parameter_loader import EvolutionaryParams
     print(torch.cuda.is_available())
-    # Operator = fitness.SolverBasedFitness # Replace by the developed PIC-based operator.
-    # Operator = fitness.PIC
-    Operator = fitness.L2LRFitness
-    params = EvolutionaryParams()
-    operator_params = params.get_default_params_for_operator('DiscrepancyBasedFitnessWithCV') #{"penalty_coeff": 0.2, "pinn_loss_mult": 1e4}
-    print('operator_params ', operator_params)
-    fit_operator = prepare_suboperators(Operator(list(operator_params.keys())), operator_params)
 
     apoptosis_discovery(0)

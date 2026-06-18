@@ -14,7 +14,9 @@ from epde.operators.utils.template import add_base_param_to_operator
 
 from epde.operators.multiobjective.selections import MOEADDSelection
 from epde.operators.multiobjective.variation import get_basic_variation
-from epde.operators.common.fitness import L2Fitness, L2LRFitness, SolverBasedFitness, PIC, DeepXDEBasedFitness
+from epde.operators.common.fitness import SolverFreeFitness, SolverBasedFitness
+from epde.operators.common.objectives import (L2Discrepancy, WAPEDiscrepancy, Instability,
+                                              SolverL2Discrepancy, DeepXDEError)
 from epde.operators.common.right_part_selection import RandomRHPSelector, EqRightPartSelector, SoEqRightPartSelector
 
 from epde.operators.multiobjective.moeadd_specific import get_pareto_levels_updater, SimpleNeighborSelector, get_initial_sorter
@@ -29,11 +31,19 @@ class MOEADDDirector(OptimizationPatternDirector):
     Class for creating strategy builder of multicriterian optimization
     """
     def use_baseline(self, use_solver: bool = False, use_pic: bool = True,
-                     fitness_cls=None, sparsity_cls=None,
+                     discrepancy_metric: str = 'wape', sparsity_cls=None,
                      variation_params : dict = {}, mutation_params : dict = {},
                      sorter_params : dict = {}, pareto_combiner_params : dict = {},
                      pareto_updater_params : dict = {}, **kwargs):
         add_kwarg_to_operator = partial(add_base_param_to_operator, target_dict = kwargs)
+
+        def _solver_free_fitness(metric: str, with_instability: bool):
+            """Assemble a SolverFreeFitness host: a discrepancy filler
+            (selected by ``metric``) as primary, plus instability when
+            ``use_pic``."""
+            disc = L2Discrepancy() if metric == 'l2' else WAPEDiscrepancy()
+            objectives = [disc] + ([Instability()] if with_instability else [])
+            return SolverFreeFitness(['penalty_coeff'], objectives=objectives, primary=disc)
 
         neighborhood_selector = SimpleNeighborSelector(['number_of_neighbors'])
         add_kwarg_to_operator(operator = neighborhood_selector)
@@ -51,22 +61,31 @@ class MOEADDDirector(OptimizationPatternDirector):
         coeff_calc = LinRegBasedCoeffsEquation()
 
         if use_solver:
-            # fitness = PIC(['penalty_coeff']) if use_pic else SolverBasedFitness(['penalty_coeff'])
-            fitness = DeepXDEBasedFitness(['penalty_coeff']) if use_pic else SolverBasedFitness(['penalty_coeff'])
-            # self.best_objectives = [0., 1., 0.] if use_pic else [0., 1.]
+            if use_pic:
+                dxe = DeepXDEError()
+                fitness = SolverBasedFitness(['penalty_coeff', 'pinn_loss_mult'],
+                                             objectives=[dxe], primary=dxe,
+                                             stability=Instability(), backend='deepxde')
+            else:
+                disc = SolverL2Discrepancy()
+                fitness = SolverBasedFitness(['penalty_coeff', 'pinn_loss_mult'],
+                                             objectives=[disc], primary=disc,
+                                             backend='autograd', masked=False)
 
             sparsity_c = map_operator_between_levels(sparsity, 'gene level', 'chromosome level')
             coeff_calc_c = map_operator_between_levels(coeff_calc, 'gene level', 'chromosome level')
         else:
             sparsity_c = sparsity; coeff_calc_c = coeff_calc
 
-            fitness = (fitness_cls if fitness_cls is not None else L2LRFitness)(['penalty_coeff'])
+            fitness = _solver_free_fitness(discrepancy_metric, use_pic)
         add_kwarg_to_operator(operator = fitness)
 
         fitness.set_suboperators({'sparsity' : sparsity_c, 'coeff_calc' : coeff_calc_c})
         fitness_cond = lambda x: not getattr(x, 'fitness_calculated')
         if use_solver:
-            fitness_lightweight = L2LRFitness(['penalty_coeff'])
+            # The RPS term-sweep must never solve: use a lightweight
+            # solver-free WAPE fitness as the right-part fitness instead.
+            fitness_lightweight = _solver_free_fitness('wape', False)
             add_kwarg_to_operator(operator = fitness_lightweight)
             fitness_lightweight.set_suboperators({'sparsity' : sparsity, 'coeff_calc' : coeff_calc})
             right_part_selector.set_suboperators({'fitness_calculation' : fitness_lightweight})
@@ -79,11 +98,11 @@ class MOEADDDirector(OptimizationPatternDirector):
 
             sparsity_c = map_operator_between_levels(sparsity, 'gene level', 'chromosome level')
 
-        # Chromosome-level RPS that threads "already-fixed RPS signatures"
-        # across the equations of a SoEq, pre-scrubbing each later
-        # equation's structure so the post-hoc enforce_rps_uniqueness check
-        # becomes unnecessary (the entire SoEq comes out uniqueness-clean
-        # by construction).
+        # Chromosome-level RPS that resolves system degeneracy: after the
+        # per-equation sweeps it rerolls any equation whose ACTIVE structure
+        # coincides with another equation's (the same law rearranged), while
+        # allowing legitimate cross-equation coupling terms. The SoEq comes
+        # out degeneracy-clean by construction.
         sys_rps_inner = SoEqRightPartSelector()
         sys_rps_inner.set_suboperators({'eq_right_part_selector': right_part_selector})
         rps_cond = lambda x: any([not elem_eq.right_part_selected for elem_eq in x.vals])

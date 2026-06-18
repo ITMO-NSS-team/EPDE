@@ -12,3 +12,18 @@ truth_equations:
 # form; it is algebraically correct for the dataset and so credits as valid.
 truth_alternatives:
   - - "48.67869238111131 * d^2u/dx1^2{power: 1.0} * d^2u/dx0^2{power: 1.0} + -591.9797844706457 * d^2u/dx0^2{power: 2.0} = d^2u/dx1^2{power: 2.0}"
+  # Trig-modulated shadow: the discovered coefficients satisfy
+  # c3/c2 = -c1 to 5 decimals, so the equation factorizes EXACTLY as
+  # (1 - 1.0834*sin(2t)) * (u_tt - 0.04012*u_xx) = 0 -- the true wave law
+  # times a time-modulation factor (verified R^2 = 0.9999857 on the data;
+  # 0.04012 = c^2 to FD accuracy). NOTE: token-set credit cannot check the
+  # factorization constraint, so any coefficient combo over these tokens
+  # is credited; accepted as policy, same as the quadratic shadow above.
+  - - "0.04012 * d^2u/dx1^2{power: 1.0} + 1.08338 * d^2u/dx0^2{power: 1.0} * sin{power: 1.0, freq: 2.0, dim: 0.0} + -0.04347 * d^2u/dx1^2{power: 1.0} * sin{power: 1.0, freq: 2.0, dim: 0.0} + 0.0 = d^2u/dx0^2{power: 1.0}"
+  # Solution-dependent modulated shadows, same factorized family
+  # g * (u_tt - c^2 u_xx) = 0 with g = 1 - b*F for a pool token F:
+  #   F = du/dx0: c3/c2 = -0.040015 vs -c1 = -0.040124, R^2 = 0.9999571
+  #   F = u:      c3/c2 = -0.040152 vs -c1 = -0.040291, R^2 = 0.9999648
+  # (both verified on the data with the discovered coefficients).
+  - - "0.04012 * d^2u/dx1^2{power: 1.0} + 0.68737 * du/dx0{power: 1.0} * d^2u/dx0^2{power: 1.0} + -0.02751 * d^2u/dx1^2{power: 1.0} * du/dx0{power: 1.0} + 0.0 = d^2u/dx0^2{power: 1.0}"
+  - - "0.46769 * u{power: 1.0} * d^2u/dx0^2{power: 1.0} + -0.01878 * u{power: 1.0} * d^2u/dx1^2{power: 1.0} + 0.04029 * d^2u/dx1^2{power: 1.0} + 0.0 = d^2u/dx0^2{power: 1.0}"

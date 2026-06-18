@@ -489,7 +489,7 @@ class VaryingCoefSetup:
     *non-constant* energy is small relative to its constant part; the
     per-term stability score is
 
-        score_j = (Var(gamma_{j,0}) + NC_j) / (gamma_{j,0}^2 + 1e-30)
+        score_j = (Var(gamma_{j,0}) + NC_j) / gamma_{j,0}^2
 
     with ``NC_j = sum_{k>=1} max(gamma_{j,d,k}^2 - lam*Var(gamma_{j,d,k}), 0)``
     the noise-debiased non-constant energy: significance of the constant
@@ -738,13 +738,9 @@ class VaryingCoefSetup:
         sigma2 = max(rss, 0.0) / max(self.N_eff - nf, 1.0)
         mean_power = self.yWy / max(self.N_eff, 1.0)
         noise_rel = min(max(sigma2 / (mean_power + 1e-30), 0.0), 1.0)
-        # OLS coefficient variances Var(gamma_0) = sigma^2 (X^T W X)^{-1}.
-        var0_vec = sigma2 * (np.diag(AcN_inv) / (dC * dC))
 
         gamma = np.zeros(nf * B)
-        var = np.zeros(nf * B)
         gamma[const_local] = g0_vec
-        var[const_local] = var0_vec
 
         # --- Mode block: fit the constant-fit residual r = y - X gamma_0 onto
         # the basis-modulated columns (r is the OLS residual, so it is already
@@ -777,9 +773,8 @@ class VaryingCoefSetup:
             except np.linalg.LinAlgError:
                 AmmN_inv = np.linalg.pinv(AmmN)
             gamma[mode_local] = (AmmN_inv @ (b_m / dM)) / dM
-            var[mode_local] = sigma2 * (np.diag(AmmN_inv) / (dM * dM))
 
-        return {'gamma': gamma, 'var': var, 'active_feats': active_feats,
+        return {'gamma': gamma, 'active_feats': active_feats,
                 'nf': nf, 'B': B, 'mk': mk, 'mean_power': mean_power}
 
     def beta_field_stats(self, active_mask=None):
@@ -805,66 +800,50 @@ class VaryingCoefSetup:
             mad[i] = float(np.median(np.abs(beta - m)))
         return {'mu': mu, 'std': sd, 'median': med, 'mad': mad}
 
-    def score(self, active_mask=None):
-        """Per-active-feature stability score (the ``report`` form), uncapped:
+    def score(self, active_mask=None, *, component=None):
+        """Per-active-feature instability score (biased NC, uncapped):
 
-            score_j = (Var(gamma_0) + NC_deb) / (gamma_0^2 + 1e-30),
-            NC_deb  = sum_{k>=1} max(gamma_{0,k}^2 - lam*Var(gamma_{0,k}), 0).
+            score_j = NC_j / gamma_{j,0}^2,   NC_j = sum_{k>=1} gamma_{j,k}^2.
 
-        Two normalised instabilities over the squared constant coefficient: the
-        significance term ``Var(gamma_0)/gamma_0^2`` (a noisy / weakly identified
-        coefficient) plus the noise-DEBIASED non-constant energy
-        ``NC_deb/gamma_0^2`` of the varying coefficient ``beta_j(x)`` (each
-        mode's own sampling variance subtracted, so a pure-noise modulation
-        contributes ~0). A true (homogeneous) term fits with a well-identified
-        CONSTANT coefficient -> both terms ~0 -> score ~0 (kept); the debiasing
-        is what saves a genuinely weak true term (Allen-Cahn's 1e-4 diffusion).
-        A spurious term either VARIES across the region (``gamma_k^2 >> Var`` ->
-        large ``NC_deb``) or is poorly identified (large ``Var(gamma_0)``) ->
-        large score.
+        The non-constant energy of the term's varying coefficient ``beta_j(x)``
+        over the squared constant part ``gamma_{j,0}^2``. A true (homogeneous)
+        term fits a well-identified CONSTANT coefficient -> modes ~0 -> score ~0
+        (kept); a spurious term whose coefficient VARIES across the region has
+        large mode energy -> large score. ``gamma_0`` is the Frisch-Waugh
+        features-only OLS coefficient, so a surviving real term's ``gamma_0``
+        stays away from 0 and the ratio is finite without a cap; a degenerate
+        ~0-coefficient form (``gamma_0^2 == 0``) maps to +inf so trivial forms
+        (e.g. ``u_xx = 0``) are pushed off the Pareto front.
 
-        Uncapped: the former 1e6 cap only masked a ``gamma_0 ~ 0`` blow-up from a
-        zeroed intercept appended as a feature column. The Frisch-Waugh solve
-        keeps ``gamma_0`` the clean features-only OLS coefficient and the
-        intercept-exclusion fit (``fit_intercept = weights[-1] != 0``) removes
-        that source, so a surviving real term's ``gamma_0`` stays away from 0 and
-        the ratio stays finite without a cap.
-
-        Aligned to the active feature columns: a drop-in for the
-        ``get_cv`` return (``active_thresholds = score * max_corr`` in
-        ``PhysicsInformedLasso.fit``); the equation-level stability objective is
-        the sum over the non-zero real terms (see ``vc_stability_total_lr``).
+        ``component`` is accepted for backward compatibility but IGNORED: the
+        significance (``Var(gamma_0)``) and debias channels were removed, so only
+        the biased NC energy remains. Aligned to the active feature columns -- a
+        drop-in for the ``get_cv`` return (``active_thresholds = score *
+        max_corr`` in ``PhysicsInformedLasso.fit``); the equation-level objective
+        sums it over the non-zero terms (see ``vc_stability_total_lr``).
         """
         sol = self._solve_gammas(active_mask)
         if sol is None:
             return np.zeros(0)
-        gamma, var = sol['gamma'], sol['var']
+        gamma = sol['gamma']
         nf, B, mk = sol['nf'], sol['B'], sol['mk']
-        import epde.globals as _gv
-        lam = float(getattr(_gv, 'vc_debias_lambda', 1.0))
         is_const = mk == 0
         nonconst = ~is_const
         scores = np.empty(nf)
         for i in range(nf):
-            sl = slice(i * B, (i + 1) * B)
-            g = gamma[sl]
-            v = var[sl]
+            g = gamma[i * B:(i + 1) * B]
             g0 = float(g[is_const][0]) if np.any(is_const) else 0.0
-            var0 = float(v[is_const][0]) if np.any(is_const) else 0.0
             C = g0 ** 2
-            nc_g2 = g[nonconst] ** 2
-            nc_deb = float(np.sum(np.maximum(nc_g2 - lam * v[nonconst], 0.0)))
-            # Significance + debiased region-variation over the squared constant
-            # coefficient (floored by 1e-30), uncapped.
-            scores[i] = (var0 + nc_deb) / (C + 1e-30)
+            nc = float(np.sum(g[nonconst] ** 2))
+            scores[i] = nc / C if C > 0.0 else np.inf
         return np.nan_to_num(scores)
 
 
 def vc_stability_total_lr(features, target, sample_weights, grid_shape,
                           main_var: str = None, fit_intercept: bool = True):
     """Equation-level varying-coefficient stability: the SUM over the equation's
-    terms of the per-term ``score`` ``(Var(gamma_0) + NC_deb)/gamma_0^2`` (the
-    ``gram_mode='vcoef'`` replacement for the inline ``total_lr``).
+    terms of the per-term ``score`` ``NC/gamma_0^2`` (biased non-constant energy;
+    the ``gram_mode='vcoef'`` replacement for the inline ``total_lr``).
     Lower = more stable. Pass non-zero-term features (``evaluate(normalize=
     False)``) and ``fit_intercept = weights_final[-1] != 0`` so neither
     zero-weight terms nor a zeroed intercept (a ~0 coefficient that would blow

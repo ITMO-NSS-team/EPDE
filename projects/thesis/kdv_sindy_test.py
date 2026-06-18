@@ -37,7 +37,8 @@ import numpy as np
 import epde.globals as global_var
 from epde import globals as gv
 from epde.interface.equation_translator import translate_equation
-from epde.operators.common.fitness import L2LRFitness
+from epde.operators.common.fitness import SolverFreeFitness
+from epde.operators.common.objectives import WAPEDiscrepancy, Instability
 from epde.operators.common.sparsity import VWSRSparsity
 from epde.operators.common.coeff_calculation import LinRegBasedCoeffsEquation
 from epde.operators.utils.operator_mappers import map_operator_between_levels
@@ -103,7 +104,9 @@ def build_pool_only(cfg, pipeline_kwargs):
 
 
 def make_fit_operator():
-    """Build a gene-level ``L2LRFitness`` + ``VWSRSparsity`` chain.
+    """Build a gene-level ``SolverFreeFitness`` (WAPE discrepancy +
+    instability) + ``VWSRSparsity`` chain -- the new-pipeline solver-free
+    fitness.
 
     We intentionally do NOT map to chromosome level here: the test
     drives the gene-level operator per-equation by hand with
@@ -113,8 +116,10 @@ def make_fit_operator():
     untouched).
     """
     params = EvolutionaryParams()
-    op_params = params.get_default_params_for_operator('DiscrepancyBasedFitnessWithCV')
-    fit_op = L2LRFitness(list(op_params.keys()))
+    op_params = params.get_default_params_for_operator('SolverFreeFitness')
+    disc = WAPEDiscrepancy()
+    fit_op = SolverFreeFitness(list(op_params.keys()),
+                               objectives=[disc, Instability()], primary=disc)
     fit_op.params = op_params
     fit_op.set_suboperators({
         'sparsity': VWSRSparsity(),
@@ -292,10 +297,14 @@ def main(argv=None) -> int:
                    help="Gram / stability strategy (default: vcoef = "
                         "varying-coefficient stability). 'axis' = legacy "
                         "axis-aligned sliding-window backup (var/mu^2 CV).")
+    p.add_argument('--anchor-on-residual', action='store_true', default=False,
+                   help="In 'max_corr' mode, anchor on the working residual "
+                        "max|X^T r| instead of the raw target max|X^T y|.")
     p.add_argument('--seed', type=int, default=0)
     args = p.parse_args(argv)
 
     gv.set_gram_config(args.gram_mode)
+    gv.set_anchor_on_residual(args.anchor_on_residual)
     cfg = load_config(args.system)
     cfg.hparams['moeadd']['early_stop_on_truth'] = False
     pipeline_kwargs = pipeline_settings('new')
@@ -303,6 +312,7 @@ def main(argv=None) -> int:
 
     print(f'{args.system} SINDy seeded-equation test')
     print(f'  gram_mode={args.gram_mode}')
+    print(f'  anchor_on_residual={args.anchor_on_residual}')
     print(f'  seed={args.seed}')
 
     search = build_pool_only(cfg, pipeline_kwargs)

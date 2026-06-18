@@ -15,7 +15,7 @@ from epde.interface.interface import EpdeSearch
 from epde.interface.prepared_tokens import (ConstantToken, CustomEvaluator,
                                             CustomTokens, PhasedSine1DTokens)
 from epde.operators.common.coeff_calculation import LinRegBasedCoeffsEquation
-from epde.operators.common.fitness import L2LRFitness
+# from epde.operators.common.fitness import L2LRFitness
 from epde.operators.common.sparsity import LASSOSparsity
 from epde.operators.utils.default_parameter_loader import EvolutionaryParams
 from epde.operators.utils.operator_mappers import map_operator_between_levels
@@ -276,14 +276,14 @@ def main():
     operator_params = params.get_default_params_for_operator('DiscrepancyBasedFitnessWithCV')
     print('Operator params:', operator_params)
 
-    fitness_operator = OperatorFactory.create_fitness_operator(L2LRFitness, operator_params)
+    # fitness_operator = OperatorFactory.create_fitness_operator(L2LRFitness, operator_params)
 
     # Set up paths
     directory = os.path.dirname(os.path.realpath(__file__))
     pc_folder_name = os.path.join(directory)
 
     # Run experiments
-    experiment = PCExperiment(pc_folder_name, fitness_operator)
+    experiment = PCExperiment(pc_folder_name, None)
     # experiment.run_test(0)  # Uncomment to run comparison test
     experiment.run_discovery(0)  # Run discovery experiment
 

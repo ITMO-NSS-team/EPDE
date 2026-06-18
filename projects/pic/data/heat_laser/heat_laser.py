@@ -251,8 +251,6 @@ if __name__ == "__main__":
     import torch
     from epde.operators.utils.default_parameter_loader import EvolutionaryParams
     print(torch.cuda.is_available())
-    # Operator = fitness.SolverBasedFitness # Replace by the developed PIC-based operator.
-    # Operator = fitness.PIC
     Operator = fitness.L2LRFitness
     params = EvolutionaryParams()
     operator_params = params.get_default_params_for_operator('DiscrepancyBasedFitnessWithCV') #{"penalty_coeff": 0.2, "pinn_loss_mult": 1e4}

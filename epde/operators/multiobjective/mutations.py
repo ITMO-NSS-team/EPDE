@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+Multiobjective mutation operators (MOEA/D-D pipeline).
+
+Ownership contract: the sole caller, ``OffspringUpdater.apply``, pops
+the offspring from ``ParetoLevels.unplaced_candidates`` -- that pop is
+the only live reference to the SoEq. The whole mutation hierarchy
+(``SystemMutation`` -> ``EquationMutation`` -> ``TermMutation``)
+therefore mutates in place and returns the same object; no defensive
+deepcopies are made on the hot path.
+
 Created on Wed Jun  2 15:46:31 2021
 
 @author: mike_ubuntu
@@ -22,6 +31,11 @@ from epde import _loop_stats
 
 
 from epde.decorators import HistoryExtender, ResetEquationStatus
+
+# Bounded regenerate-retry budget for TermMutation: how many times a
+# freshly randomized term that duplicates an existing one is re-rolled
+# before falling back to the drop / floor-revert dedup policy.
+MAX_REGEN_RETRIES = 3
 
 
 class SystemMutation(CompoundOperator):
@@ -81,15 +95,19 @@ class EquationMutation(CompoundOperator):
         # (was ~5ms per call, ~5000 calls per lv_new rep).
         equation = objective
 
-        # Phase 1 -- per-term Bernoulli term-replace via the ``mutation``
-        # sub-operator (TermMutation). Restores the pre-aaea0f4 design
-        # that the JSON defaults still reflect (r_mutation = 0.6 was
-        # vestigial after that commit silently replaced term-replace with
-        # term-add). Without this phase mature chromosomes spin on
-        # add_random_term no-ops once they reach the terms_number cap
-        # and structural exploration collapses to crossover alone.
-        # Skip ``n_immutable`` head terms so the right-part anchor and
-        # any mandatory_family terms survive across mutations.
+        # Snapshot the term-set fingerprint before mutation; reset_state runs
+        # below only if the SET changes, so an untouched equation keeps its
+        # right part and skips the term-sweep. Set granularity is sound (the
+        # fit depends only on the term set); the one same-set/different-order
+        # case (drop then re-add the same signature) is blocked by dropped_sigs.
+        structure_before = equation.terms_labels
+
+        # Per-term Bernoulli term-replace via the ``mutation`` sub-operator
+        # (TermMutation), governed by ``r_mutation``. Without it, mature
+        # chromosomes at the terms_number cap spin on add_random_term no-ops
+        # and structural exploration collapses to crossover alone. Skip
+        # ``n_immutable`` head terms so the right-part anchor and any
+        # mandatory_family terms survive across mutations.
         r_mutation = self.params['r_mutation']
         replace_attempts = 0
         mutable_count = max(1, len(equation.structure) - equation.n_immutable)
@@ -107,21 +125,35 @@ class EquationMutation(CompoundOperator):
         _loop_stats.record('EquationMutation.replace_terms',
                            replace_attempts, mutable_count)
 
-        # Phase 2 -- bounded term-add. Two caps apply: ``n_added_terms``
-        # (per-call ceiling, default 5 per JSON) and the
-        # ``terms_number`` metaparameter (chromosome-wide ceiling,
-        # enforced inside ``add_random_term``). Either cap-hit or pool
-        # exhaustion breaks the loop -- canonical structure-dedup
-        # contract.
+        # Signatures dropped by the replace step. The add step below must not
+        # re-add them: that is the only way to restore the original set while
+        # permuting structure order (desyncing the position-indexed weights),
+        # so forbidding it keeps the set-based change detection complete.
+        dropped_sigs = structure_before - equation.terms_labels
+
+        # Probabilistic term-add: each of the ``n_added_terms`` slots fires a
+        # Bernoulli trial at ``term_addition_prob``, so the genome no longer
+        # grows unconditionally on every mutation call.
+        # The ``terms_number`` metaparameter (chromosome-wide ceiling,
+        # enforced inside ``add_random_term``) still caps growth; cap-hit
+        # or pool exhaustion breaks the loop.
         n_added = int(self.params['n_added_terms'])
+        term_addition_prob = self.params['term_addition_prob']
         add_attempts = 0
         for _ in range(n_added):
+            if np.random.random() >= term_addition_prob:
+                continue
             add_attempts += 1
-            if not equation.add_random_term():
+            if not equation.add_random_term(forbidden_sigs=dropped_sigs):
                 break
         _loop_stats.record('EquationMutation.add_terms', add_attempts, n_added)
 
         assert len(equation.terms_labels) == len(equation.structure)
+
+        # Reset RPS state iff the term set actually changed; a no-op mutation
+        # leaves the equation's right-part selection intact (not re-swept).
+        if equation.terms_labels != structure_before:
+            equation.reset_state(reset_right_part=True)
 
         return equation
 
@@ -135,7 +167,14 @@ class MetaparameterMutation(CompoundOperator):
     def apply(self, objective : Union[int, float], arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
-        altered_objective = np.random.normal(objective, objective)
+        # Canonical Gaussian perturbation using the declared ``mean`` /
+        # ``std`` params; ``std`` scales relative to the current value so
+        # the perturbation stays proportionate across metaparameter
+        # magnitudes. Negative results are reflected at 0. With the JSON
+        # defaults (mean=0.0, std=1.0) this matches the previous
+        # ``normal(objective, objective)`` distribution.
+        altered_objective = objective + np.random.normal(self.params['mean'],
+                                                         self.params['std'] * np.abs(objective))
         if altered_objective < 0:
             altered_objective = - altered_objective
 
@@ -181,19 +220,29 @@ class TermMutation(CompoundOperator):
         # optimization. Saves a ~10ms Term deepcopy on every replace_terms
         # iter (was the largest remaining mutation-path deepcopy cost).
         original_structure = term.structure
-        term.randomize()
-        term.reset_saved_state()
-        equation._invalidate_label_cache()
+        # Bounded regenerate-retry: re-roll a duplicate-producing
+        # randomize() up to MAX_REGEN_RETRIES times before invoking the
+        # dedup policy below. ``original_structure`` keeps aliasing the
+        # pre-mutation factor list throughout -- every randomize() call
+        # builds a fresh list, so the floor-revert stays valid.
+        attempts = 0
+        for _ in range(MAX_REGEN_RETRIES):
+            attempts += 1
+            term.randomize()
+            term.reset_saved_state()
+            equation._invalidate_label_cache()
+            signatures = {t.factors_labels for t in equation.structure}
+            duplicate = len(signatures) != len(equation.structure)
+            if not duplicate:
+                break
+        _loop_stats.record('TermMutation.regen_attempts', attempts, MAX_REGEN_RETRIES)
 
-        # Full-drop dedup (no regeneration, no retry loop): if the freshly
-        # mutated term now duplicates another term in the equation, remove
-        # it outright. Only at the 2-term floor (nothing safe to drop) do we
-        # restore the unique pre-mutation term. This is the mutation-path
-        # policy -- distinct from simplify's regenerate-n-then-drop -- and
-        # keeps duplicates out of the population (otherwise caught a
-        # generation later at the RPS entry / crossover assert).
-        signatures = {t.factors_labels for t in equation.structure}
-        duplicate = len(signatures) != len(equation.structure)
+        # Dedup policy after the retry budget: if the mutated term still
+        # duplicates another term in the equation, remove it outright.
+        # Only at the 2-term floor (nothing safe to drop) do we restore
+        # the unique pre-mutation term. This keeps duplicates out of the
+        # population (otherwise caught a generation later at the RPS
+        # entry / crossover assert).
         if duplicate and len(equation.structure) > 2:
             tgt = getattr(equation, 'target_idx', None)
             equation.structure = [t for t in equation.structure if t is not term]
@@ -292,7 +341,7 @@ def get_basic_mutation(mutation_params):
 
     term_mutation = TermMutation([])
 
-    equation_mutation = EquationMutation(['r_mutation', 'n_added_terms', 'type_probabilities'])
+    equation_mutation = EquationMutation(['r_mutation', 'n_added_terms', 'term_addition_prob'])
     add_kwarg_to_operator(operator = equation_mutation)
     
     metaparameter_mutation = MetaparameterMutation(['std', 'mean'])

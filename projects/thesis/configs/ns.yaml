@@ -18,3 +18,8 @@ truth_equations:
 # auto-bumped 32 to cover per-equation trade-offs. Override to 48.
 moeadd:
   population_size: 48
+
+# dx0 = t (order 1: first-order momentum/continuity), dx1 = y, dx2 = x
+# (order 2: viscous Laplacian terms d^2/dx1^2, d^2/dx2^2).
+fit:
+  max_deriv_order: [1, 2, 2]

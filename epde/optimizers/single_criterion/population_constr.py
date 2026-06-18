@@ -12,8 +12,18 @@ from warnings import warn
 from epde.structure.main_structures import SoEq
 
 class SystemsPopulationConstructor(object):
-    def __init__(self, pool, terms_number : int = 8, max_factors_in_term : int = 2, 
-                 obj_functions : Callable = None, sparsity_interval : tuple = (1., 1.)):
+    def __init__(self, pool, terms_number : int = 8, max_factors_in_term : int = 2,
+                 obj_functions : Callable = None, sparsity_interval : tuple = (1., 1.),
+                 use_pic: bool = False):
+        # ``use_pic`` is accepted (and ignored) because EpdeSearch.fit
+        # injects it into the shared ``population_instruct`` dict used by
+        # both the single- and multi-objective population constructors;
+        # the single-objective objective set is chosen by the global
+        # single_objective_metric instead (see SoEq.use_default_
+        # singleobjective_function). Without this parameter the
+        # constructor raised TypeError and single-objective mode could
+        # never start.
+        self._use_pic = use_pic
         if sparsity_interval[0] != sparsity_interval[1]:
             warn(message = 'Single criterion optimization requires use of fixed sparsity constant. \
                             The right boundary of iterval will be used the value')

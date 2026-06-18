@@ -119,6 +119,19 @@ class MOEADDSolution(ABC):
         self.precomputed_domain = True
         self._domain = idx
 
+    def reset_moeadd_state(self):
+        """Drop the cached MOEADD-level state (objective vector and sector
+        domain) so both are re-derived from the current chromosome.
+
+        Must be called on offspring produced by copying a parent solution:
+        a deepcopy carries the parent's ``precomputed_domain`` / ``_domain``
+        (and ``precomputed_value`` / ``_obj_fun``), so without this reset
+        the offspring inherits its parent's sector association forever and
+        the crowding/niching logic operates on stale domains.
+        """
+        self.precomputed_value = False
+        self.precomputed_domain = False
+
     def __eq__(self, other):
         if isinstance(other, type(self)):
             return self.vals == other.vals

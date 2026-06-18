@@ -54,9 +54,8 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
         """Build target + un-normalised feature matrix from the LASSO
         survivors, independent of ``Equation.evaluate``.
 
-        Mirrors the pre-aaea0f4 legacy feature builder: iterate the
-        structure, skip the target, emit columns only for terms whose
-        ``weights_internal`` slot is non-zero. Returns
+        Iterate the structure, skip the target, and emit columns only for
+        terms whose ``weights_internal`` slot is non-zero. Returns
         ``(target, features)`` with ``features=None`` when every
         non-target slot was filtered to zero.
         """

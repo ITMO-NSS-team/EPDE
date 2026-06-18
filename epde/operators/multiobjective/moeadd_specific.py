@@ -46,6 +46,11 @@ def penalty_based_intersection(sol_obj, weight, ideal_obj,
         weight_full = weight_arr
         ideal_obj_full = ideal_obj_arr
 
+    if obj_normalizer is not None:
+        # The solution objective above is normalized; the ideal point must
+        # live on the same scale (a no-op for the usual all-zero ideal).
+        ideal_obj_full = obj_normalizer(np.asarray(ideal_obj_full, dtype=float))
+
     weight_norm = np.linalg.norm(weight_full)
 
     d_1 = np.dot((solution_objective - ideal_obj_full), weight_full) / weight_norm
@@ -63,39 +68,49 @@ def population_to_sectors(population, weights):
     return list(map(solution_selection, np.arange(len(weights))))
 
 
+def _most_crowded_domain(domain_solutions: list, weights: np.ndarray, best_obj: np.ndarray,
+                         penalty_factor: float, obj_normalizer, candidate_idxs: list = None) -> int:
+    '''
+    Select the index of the most crowded subregion; ties on niche count are
+    broken by the largest sum of PBI in the tied subregions (paper Eq. (7)).
+    Shared by ``decomposition_based_worst``, ``locate_pareto_worst`` and the
+    last-front branch of ``PopulationUpdater``.
+
+    ``candidate_idxs`` optionally restricts the search to a subset of
+    subregion indices (paper Algorithm 4, line 16: "the most crowded
+    subregion associated with those solutions in F_l"); the niche counts
+    themselves always run over the full ``domain_solutions`` content.
+    '''
+    if candidate_idxs is None:
+        candidate_idxs = range(len(domain_solutions))
+    most_crowded_count = max(len(domain_solutions[idx]) for idx in candidate_idxs)
+    crowded_domains = [idx for idx in candidate_idxs
+                       if len(domain_solutions[idx]) == most_crowded_count]
+
+    if len(crowded_domains) == 1:
+        return crowded_domains[0]
+
+    PBIS = [sum(penalty_based_intersection(sol, weights[domain_idx], best_obj, penalty_factor, obj_normalizer)
+                for sol in domain_solutions[domain_idx])
+            for domain_idx in crowded_domains]
+    return crowded_domains[np.argmax(PBIS)]
+
+
 def decomposition_based_worst(solutions: list, weights: np.ndarray, best_obj: np.ndarray,
-                              penalty_factor: float = 1., obj_normalizer=None):
+                              penalty_factor: float = 1., obj_normalizer=None, sectors: list = None):
     '''
     Decomposition-based worst-solution finder. Returns argmax PBI over the
     most-crowded subregion within ``solutions``; ties on niche count are
     broken by sum-PBI per paper Eq. (7).
 
-    Used as a helper for two branches of Algorithm 4 in the MOEA/DD paper
-    (Li, Deb, Zhang, Kwong, 2015):
-      * ``PopulationUpdater`` case ``l = 1`` -- called with the full
-        population; equivalent to ``LOCATE_WORST`` (Algorithm 5) since
-        every solution lives on the single front.
-      * ``PopulationUpdater`` case ``l > 1, |F_l| > 1, |Phi^h| > 1`` --
-        called with ONLY the last front ``F_l``. This is a deliberate
-        EPDE deviation from Algorithm 4 line 18, which says
-        ``argmax_{x in Phi^h} g^pbi(x|w^h, z*)`` over the FULL subregion
-        (potentially containing elite F_1..F_{l-1} solutions). Restricting
-        to F_l preserves convergence elites at the cost of some selection
-        pressure within Phi^h; see audit notes for the rationale.
+    Used by ``PopulationUpdater`` for case ``l = 1`` of Algorithm 4 in the
+    MOEA/DD paper (Li, Deb, Zhang, Kwong, 2015) -- called with the full
+    population; equivalent to ``LOCATE_WORST`` (Algorithm 5) since every
+    solution lives on the single front.
     '''
-    domain_solutions = population_to_sectors(solutions, weights)
-    most_crowded_count = max(len(domain) for domain in domain_solutions)
-    crowded_domains = [idx for idx, domain in enumerate(domain_solutions)
-                       if len(domain) == most_crowded_count]
-
-    if len(crowded_domains) == 1:
-        most_crowded_domain = crowded_domains[0]
-    else:
-        # Tie-breaking via largest sum of PBI in the crowded subregions
-        PBIS = [sum(penalty_based_intersection(sol, weights[domain_idx], best_obj, penalty_factor, obj_normalizer)
-                    for sol in domain_solutions[domain_idx])
-                for domain_idx in crowded_domains]
-        most_crowded_domain = crowded_domains[np.argmax(PBIS)]
+    domain_solutions = population_to_sectors(solutions, weights) if sectors is None else sectors
+    most_crowded_domain = _most_crowded_domain(domain_solutions, weights, best_obj,
+                                               penalty_factor, obj_normalizer)
 
     candidates = domain_solutions[most_crowded_domain]
 
@@ -107,36 +122,27 @@ def decomposition_based_worst(solutions: list, weights: np.ndarray, best_obj: np
     return candidates[np.argmax(PBIS_candidates)]
 
 
-def locate_pareto_worst(levels, weights: np.ndarray, best_obj: np.ndarray, penalty_factor: float = 1.):
+def locate_pareto_worst(levels, weights: np.ndarray, best_obj: np.ndarray, penalty_factor: float = 1.,
+                        sectors: list = None):
     '''
     Function dedicated to the selection of the worst solution on the Pareto levels.
     '''
-    domain_solutions = population_to_sectors(levels.population, weights)
-    most_crowded_count = max(len(domain) for domain in domain_solutions)
-
-    crowded_domains = [domain_idx for domain_idx, domain in enumerate(domain_solutions)
-                       if len(domain) == most_crowded_count]
-
-    if len(crowded_domains) == 1:
-        most_crowded_domain = crowded_domains[0]
-    else:
-        PBIS = [
-            sum(penalty_based_intersection(sol_obj, weights[domain_idx], best_obj, penalty_factor, levels.normalizer)
-                for sol_obj in domain_solutions[domain_idx])
-            for domain_idx in crowded_domains]
-        most_crowded_domain = crowded_domains[np.argmax(PBIS)]
+    domain_solutions = population_to_sectors(levels.population, weights) if sectors is None else sectors
+    most_crowded_domain = _most_crowded_domain(domain_solutions, weights, best_obj,
+                                               penalty_factor, levels.normalizer)
 
     candidates = domain_solutions[most_crowded_domain]
     domain_solution_NDL_idxs = np.empty(len(candidates))
 
-    # Optimized loop for locating the NDL index
     for solution_idx, solution in enumerate(candidates):
-        # NOTE: If your solution objects have a `.rank` or `.ndl` attribute,
-        # replace this inner loop entirely with: `domain_solution_NDL_idxs[solution_idx] = solution.rank`
-        for level_idx, level in enumerate(levels.levels):
-            if any(solution.equations_labels == level_solution.equations_labels for level_solution in level):
-                domain_solution_NDL_idxs[solution_idx] = level_idx
-                break
+        try:
+            domain_solution_NDL_idxs[solution_idx] = next(
+                level_idx for level_idx, level in enumerate(levels.levels)
+                if any(solution is level_solution for level_solution in level))
+        except StopIteration:
+            raise RuntimeError(
+                'locate_pareto_worst: a candidate solution from the population is '
+                'missing from the Pareto levels; population and levels are out of sync.')
 
     max_level = np.max(domain_solution_NDL_idxs)
     worst_NDL_section = [candidates[sol_idx] for sol_idx in range(len(candidates))
@@ -161,54 +167,66 @@ class PopulationUpdater(CompoundOperator):
 
         # objective[1] represents the ParetoLevels object
         levels_obj = objective[1]
+        weights = self_args['weights']
 
         # Add offspring to population and update non-dominated levels
         levels_obj.update(objective[0])
 
+        # Sector association is computed once per update and passed into
+        # the worst-finders (previously recomputed up to 3x per insertion).
+        population_sectors = population_to_sectors(levels_obj.population, weights)
+
         if len(levels_obj.levels) == 1:
             # Algorithm 4, Case 1: single front — decomposition on entire population
-            worst_solution = decomposition_based_worst(levels_obj.population, self_args['weights'],
+            worst_solution = decomposition_based_worst(levels_obj.population, weights,
                                                        self_args['best_obj'], self.params['PBI_penalty'],
-                                                       levels_obj.normalizer)
+                                                       levels_obj.normalizer, sectors=population_sectors)
         else:
             if len(levels_obj.levels[-1]) == 1:
                 # Algorithm 4, Case 2: single solution on last front
                 solution = levels_obj.levels[-1][0]
-                population_by_domains = population_to_sectors(levels_obj.population, self_args['weights'])
-                solution_subregion = next(domain for domain in population_by_domains if solution in domain)
+                solution_subregion = next(domain for domain in population_sectors if solution in domain)
 
                 if len(solution_subregion) > 1:
                     worst_solution = solution
                 else:
                     # Subregion has only this solution — use NDL-aware decomposition
-                    worst_solution = locate_pareto_worst(levels_obj, self_args['weights'],
-                                                         self_args['best_obj'], self.params['PBI_penalty'])
+                    worst_solution = locate_pareto_worst(levels_obj, weights,
+                                                         self_args['best_obj'], self.params['PBI_penalty'],
+                                                         sectors=population_sectors)
             else:
-                # Algorithm 4, Case 3: multiple solutions on last front F_l.
-                # DEVIATION from the paper: the crowded-subregion search and
-                # the worst-PBI argmax are both restricted to F_l, NOT to
-                # the full Phi^h as Algorithm 4 line 18 specifies. The
-                # paper would let us eliminate an elite F_1 solution if it
-                # happened to have the largest PBI inside the crowded
-                # subregion; we prefer to keep the elite and only churn
-                # the last-front candidates. See ``decomposition_based_worst``
-                # docstring for the full rationale.
+                # Algorithm 4, Case 3 (lines 16-22): multiple solutions on
+                # the last front F_l. Identify the most crowded subregion
+                # Phi^h among the subregions associated with F_l members;
+                # niche counts and the worst-PBI argmax both run over the
+                # FULL subregion content, so an elite solution from an
+                # earlier front is eliminated if it owns the largest PBI
+                # inside Phi^h -- exactly as the paper specifies.
                 last_front = levels_obj.levels[-1]
-                last_front_by_domains = population_to_sectors(last_front, self_args['weights'])
-                most_crowded_count = max(len(d) for d in last_front_by_domains)
+                last_front_ids = {id(sol) for sol in last_front}
+                fl_domain_idxs = [idx for idx, domain in enumerate(population_sectors)
+                                  if any(id(sol) in last_front_ids for sol in domain)]
+                most_crowded_idx = _most_crowded_domain(population_sectors, weights,
+                                                        self_args['best_obj'], self.params['PBI_penalty'],
+                                                        levels_obj.normalizer, candidate_idxs=fl_domain_idxs)
+                subregion = population_sectors[most_crowded_idx]
 
-                if most_crowded_count > 1:
-                    # Most crowded F_l subregion has >1 solutions -- drop
-                    # the worst-PBI one among F_l members of that subregion.
-                    worst_solution = decomposition_based_worst(last_front, self_args['weights'],
-                                                               self_args['best_obj'], self.params['PBI_penalty'],
-                                                               levels_obj.normalizer)
+                if len(subregion) > 1:
+                    # |Phi^h| > 1: eliminate argmax PBI over the whole
+                    # subregion (Algorithm 4, lines 17-19).
+                    PBIS = [penalty_based_intersection(sol, weights[most_crowded_idx],
+                                                       self_args['best_obj'], self.params['PBI_penalty'],
+                                                       levels_obj.normalizer)
+                            for sol in subregion]
+                    worst_solution = subregion[np.argmax(PBIS)]
                 else:
-                    # Every F_l solution sits alone in its subregion: fall
-                    # back to NDL-aware LOCATE_WORST over the full P'
-                    # (Algorithm 5).
-                    worst_solution = locate_pareto_worst(levels_obj, self_args['weights'],
-                                                         self_args['best_obj'], self.params['PBI_penalty'])
+                    # |Phi^h| = 1: every F_l member is associated with an
+                    # isolated subregion -- preserve them and fall back to
+                    # LOCATE_WORST over the full P' (Algorithm 5, lines
+                    # 20-22 of Algorithm 4).
+                    worst_solution = locate_pareto_worst(levels_obj, weights,
+                                                         self_args['best_obj'], self.params['PBI_penalty'],
+                                                         sectors=population_sectors)
 
         levels_obj.delete_point(worst_solution)
         
@@ -339,26 +357,30 @@ class SimpleNeighborSelector(CompoundOperator):
 
     def apply(self, objective : list, arguments : dict):
         '''
-            Simple selector of neighboring weight vectors: takes n-closest (*n = number_of_neighbors*)ones to the 
-            processed one. Defined to be used inside the moeadd algorithm.
-        
+            Selector of neighboring weight vectors: randomly chooses
+            *number_of_neighbors* indices from the proximity list E(i) of the
+            processed weight vector, as prescribed by Algorithm 3, line 2 of
+            the MOEA/DD paper ("Randomly choose k indices from E(i)").
+            Defined to be used inside the moeadd algorithm.
+
             Arguments:
             ----------
-            
+
             sorted_neighbors : list
                 proximity list of neighboring vectors, ranged in the ascending order of the angles between vectors.
-                
+
             number_of_neighbors : int
                 numbers of vectors to be considered as the adjacent ones
-                
+
             Returns:
             ---------
-            
-            sorted_neighbors[:number_of_neighbors] : list
-                self evident slice of proximity list
+
+            selected_neighbors : list
+                random subset of the proximity list of size *number_of_neighbors*
         '''
-        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)        
-        return objective[:self.params['number_of_neighbors']]
+        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
+        n_select = min(self.params['number_of_neighbors'], len(objective))
+        return list(np.random.choice(objective, size = n_select, replace = False))
     
     def use_default_tags(self):
         self._tags = {'neighbor selector', 'custom level', 'no suboperators', 'inplace'}    
@@ -383,13 +405,22 @@ class OffspringUpdater(CompoundOperator):
             offspring_attempt_limit = self.params['offspring_attempt_limit']
             # self.suboperators['sparsity'].apply(objective=offspring,
             #                                     arguments=subop_args['sparsity'])
-            offspring.reset_state(True)
-            # First iteration aliases ``offspring``; ``chromosome_mutation``
-            # (SystemMutation) deepcopies its input before mutating, so the
-            # parent ``offspring`` is never touched. The initial
-            # ``deepcopy(offspring)`` here was discarded immediately by the
-            # very next line below (SystemMutation reassigns
-            # ``temp_offspring``) -- a per-pass SoEq deepcopy of pure waste.
+            # RPS-state reset is no longer done here in bulk; it is coupled to
+            # the structure-changing operators (EquationCrossover / Equation
+            # Mutation), so only changed equations are re-selected.
+            # Crossover offspring are deepcopies of their parents and so
+            # inherit the parent's cached sector domain / objective vector
+            # (precomputed_domain / precomputed_value). Reset, so niching
+            # operates on the offspring's OWN objective-space position --
+            # consistent with create()-rebuilt solutions, whose caches are
+            # reset by MOEADDSolution.__init__.
+            offspring.reset_moeadd_state()
+            # ``chromosome_mutation`` (SystemMutation) mutates its input
+            # IN PLACE and returns the same object -- the pop() above is
+            # the only live reference, so no defensive deepcopy is needed.
+            # The retry loop below depends on that identity contract:
+            # each pass keeps editing the same SoEq until it is unique
+            # or replaced wholesale by ``temp_offspring.create()``.
             temp_offspring = offspring
             total_attempts = 0
             hit_offspring_cap = False
@@ -397,10 +428,14 @@ class OffspringUpdater(CompoundOperator):
                 total_attempts += 1
                 temp_offspring = self.suboperators['chromosome_mutation'].apply(objective=temp_offspring,
                                                                                 arguments=subop_args['chromosome_mutation'])
-                temp_offspring.reset_state(True)
-                # SoEqRightPartSelector enforces cross-equation RPS
-                # uniqueness inline (sequential pre-scrub), so no post-hoc
-                # ``enforce_rps_uniqueness`` retry loop is needed here.
+                # EquationMutation already reset the RPS state of the changed
+                # equations; only the moeadd niching cache must be re-derived
+                # from the post-mutation objectives.
+                temp_offspring.reset_moeadd_state()
+                # SoEqRightPartSelector resolves system degeneracy inline
+                # (no two equations may share an identical active
+                # structure), so no post-hoc ``enforce_rps_uniqueness``
+                # retry loop is needed here.
                 self.suboperators['right_part_selector'].apply(objective=temp_offspring,
                                                                arguments=subop_args['right_part_selector'])
 
@@ -480,8 +515,8 @@ class InitialParetoLevelSorting(CompoundOperator):
                 print('\n========== Initial population ==========')
             for idx, candidate in enumerate(objective.unplaced_candidates):
                 candidate.reset_state(True)
-                # SoEqRightPartSelector handles cross-equation RPS
-                # uniqueness inline; no post-hoc retry needed.
+                # SoEqRightPartSelector resolves system degeneracy
+                # inline; no post-hoc retry needed.
                 self.suboperators['right_part_selector'].apply(objective = candidate,
                                                                 arguments = subop_args['right_part_selector'])
 
@@ -548,11 +583,11 @@ class InitialParetoLevelSorting(CompoundOperator):
                 print('\n========== Marriage (weight assignment) ==========')
             objective.associate_weights()
             objective.initial_placing()
+            # Initialize the PBI objective normalizer from the placed
+            # population; MOEADDOptimizer.optimize refreshes it per epoch.
+            objective.set_normalizer()
             if global_var.verbose.show_iter_idx:
                 print('\n========== Multiobjective optimization ==========')
-
-            # TODO: consider carefully, where normalizer init shall be held. If here, only the initial values are employed
-        # objective.set_normalizer()
 
         return objective
     
@@ -584,29 +619,26 @@ def has_subset_pair(collection_of_sets):
     return False, None, None
 
 def _debug_assert_rps_unique(objective) -> list:
-    """Debug helper: scan an SoEq's equations and return a per-equation
-    list of bools indicating which equations contain at least one
-    non-target term whose factor set is a superset of another equation's
-    target term factor set.
+    """Debug helper: scan an SoEq's equations pairwise and return a
+    per-equation list of bools flagging equations whose ACTIVE structure
+    (target + nonzero-weight terms, ``Equation.active_terms_labels``)
+    coincides with an EARLIER equation's -- i.e. the system carries the
+    same law twice (rearranged), the degenerate state that
+    ``SoEqRightPartSelector`` resolves during RPS dispatch.
 
-    The post-hoc enforcement loop that used to call this and rewrite
-    conflicting terms is gone -- ``SoEqRightPartSelector`` now propagates
-    the uniqueness constraint forward across equations during the RPS
-    sweep itself, so a correctly-implemented pipeline must produce an
-    all-False result here. Use this in tests or temporary asserts to
-    catch regressions; do NOT wire it back into the operator graph as a
-    repair step.
+    Cross-equation term sharing is NOT flagged: an equation for ``v``
+    keeping ``du/dx0`` as a coupling term is legitimate. A correctly-
+    implemented pipeline must produce an all-False result here. Use this
+    in tests or temporary asserts to catch regressions; do NOT wire it
+    back into the operator graph as a repair step.
     """
     equations = list(objective.vals)
-    rsterms = [eq.structure[eq.target_idx].factors_labels for eq in equations]
+    sigs = [eq.active_terms_labels for eq in equations]
     flagged = [False] * len(equations)
 
-    for eq_idx, equation in enumerate(equations):
-        other_rs = rsterms[:eq_idx] + rsterms[eq_idx + 1:]
-        for term_idx, term in enumerate(equation.structure):
-            if term_idx == equation.target_idx:
-                continue
-            if any(rs.issubset(term.factors_labels) for rs in other_rs):
+    for eq_idx in range(1, len(equations)):
+        for other_idx in range(eq_idx):
+            if sigs[eq_idx] and sigs[eq_idx] == sigs[other_idx]:
                 flagged[eq_idx] = True
                 break
     return flagged
@@ -614,7 +646,8 @@ def _debug_assert_rps_unique(objective) -> list:
 
 def is_rps_in_other_equation(objective):
     """Deprecated alias. The post-hoc uniqueness repair has been replaced
-    by ``SoEqRightPartSelector`` (sequential pre-scrub), so this is now a
+    by ``SoEqRightPartSelector`` (system-degeneracy resolution: no two
+    equations may share an identical active structure), so this is now a
     pure assertion helper that returns a per-equation flag list without
     mutating anything. External callers should migrate to using the new
     operator and remove their ``while any(is_rps_in_other_equation(...))``
@@ -623,8 +656,8 @@ def is_rps_in_other_equation(objective):
     """
     warnings.warn(
         'is_rps_in_other_equation is now a pure debug check; '
-        'SoEqRightPartSelector enforces uniqueness during RPS dispatch. '
-        'Drop your retry loop.',
+        'SoEqRightPartSelector resolves system degeneracy during RPS '
+        'dispatch. Drop your retry loop.',
         DeprecationWarning, stacklevel=2,
     )
     return _debug_assert_rps_unique(objective)
@@ -637,7 +670,7 @@ def enforce_rps_uniqueness(objective, *, max_iter: int = 100) -> list:
     """
     warnings.warn(
         'enforce_rps_uniqueness is now a pure debug check; '
-        'SoEqRightPartSelector enforces uniqueness during RPS dispatch.',
+        'SoEqRightPartSelector resolves system degeneracy during RPS dispatch.',
         DeprecationWarning, stacklevel=2,
     )
     return _debug_assert_rps_unique(objective)

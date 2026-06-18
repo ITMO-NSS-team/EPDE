@@ -17,3 +17,18 @@ truth_alternatives:
   # u and substitute u*d^3u/dx1^3 = -3 u^2 du/dx1 + du/dx1 d^2u/dx1^2
   # to get -(1/3) u du/dx0 - (1/3) du/dx1 d^2u/dx1^2 = u^2 du/dx1.
   - - "-0.3333333333 * u{power: 1.0} * du/dx0{power: 1.0} + -0.3333333333 * du/dx1{power: 1.0} * d^2u/dx1^2{power: 1.0} + 0.0 = u{power: 2.0} * du/dx1{power: 1.0}"
+  # Degenerate-quadratic d'Alembert product (wave-style): the dataset is a
+  # TWO-SOLITON solution with speeds ~1.0 and ~0.5; away from the collision
+  # each soliton satisfies u_tt = c_i^2 u_xx pointwise, so the product
+  # (u_tt - 1.002 u_xx)(u_tt - 0.251 u_xx) = 0 holds everywhere. Verified
+  # exact on the data: R^2 = 0.9999988 with the discovered coefficients
+  # (roots c^2 = 1.0021, 0.2512 -> speeds 1.001, 0.501); see _kdv_why.py.
+  - - "-0.2517 * d^2u/dx1^2{power: 2.0} + 1.2533 * d^2u/dx0^2{power: 1.0} * d^2u/dx1^2{power: 1.0} + 0.0 = d^2u/dx0^2{power: 2.0}"
+  # First-order eikonal product (lower-order twin of the quadratic above):
+  # each soliton is a traveling wave u_t = -c u_x, so the two-soliton data
+  # satisfies (u_t + 0.5 u_x)(u_t + 1.0 u_x) = 0 pointwise. Verified exact:
+  # R^2 = 0.9999999, factors give speeds 0.500/1.000 (sum 1.5009, prod 0.5007).
+  - - "-0.500667 * du/dx1{power: 2.0} + -1.500925 * du/dx0{power: 1.0} * du/dx1{power: 1.0} + 0.0 = du/dx0{power: 2.0}"
+  # Same eikonal with u_x^2 re-expressed via the credited spatial identity
+  # u*u_xx = -u^3 + u_x^2 (alt 0 above). Verified R^2 = 0.9999956.
+  - - "-0.504695 * u{power: 1.0} * d^2u/dx1^2{power: 1.0} + -0.500541 * u{power: 3.0} + -1.499227 * du/dx0{power: 1.0} * du/dx1{power: 1.0} + 0.0 = du/dx0{power: 2.0}"

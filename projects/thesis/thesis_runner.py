@@ -45,7 +45,6 @@ if _THIS_DIR not in sys.path:
     sys.path.insert(0, _THIS_DIR)
 
 from epde.interface.interface import EpdeSearch  # noqa: E402
-from epde.operators.common.fitness import L2Fitness, L2LRFitness  # noqa: E402
 from epde.operators.common.sparsity import LASSOSparsity, VWSRSparsity  # noqa: E402
 from epde import GridTokens, TrigonometricTokens  # noqa: E402
 
@@ -73,21 +72,22 @@ _TOKEN_REGISTRY = {
 
 
 # Full 2x2x2 ablation table for the three thesis-NEW contributions:
-# (1) WAPE fitness      -> L2LRFitness   vs LEGACY L2Fitness
+# (1) WAPE fitness      -> discrepancy_metric='wape' vs LEGACY 'l2'
+#                          (the discrepancy filler in SolverFreeFitness)
 # (2) Instability obj   -> use_pic=True swaps MOEA/D's 2nd objective
 #                          (equation_terms_stability) vs LEGACY
 #                          (equation_complexity_by_factors)
 # (3) Novel regularizer -> VWSRSparsity (PhysicsInformedLasso, CV-weighted)
 #                          vs LEGACY LASSOSparsity (sklearn.Lasso)
 _PIPELINE_SETTINGS = {
-    'legacy':      {'fitness_cls': L2Fitness,   'sparsity_cls': LASSOSparsity, 'use_pic': False},
-    'wape':        {'fitness_cls': L2LRFitness, 'sparsity_cls': LASSOSparsity, 'use_pic': False},
-    'instab':      {'fitness_cls': L2Fitness,   'sparsity_cls': LASSOSparsity, 'use_pic': True},
-    'reg':         {'fitness_cls': L2Fitness,   'sparsity_cls': VWSRSparsity,  'use_pic': False},
-    'wape_instab': {'fitness_cls': L2LRFitness, 'sparsity_cls': LASSOSparsity, 'use_pic': True},
-    'wape_reg':    {'fitness_cls': L2LRFitness, 'sparsity_cls': VWSRSparsity,  'use_pic': False},
-    'instab_reg':  {'fitness_cls': L2Fitness,   'sparsity_cls': VWSRSparsity,  'use_pic': True},
-    'new':         {'fitness_cls': L2LRFitness, 'sparsity_cls': VWSRSparsity,  'use_pic': True},
+    'legacy':      {'discrepancy_metric': 'l2',   'sparsity_cls': LASSOSparsity, 'use_pic': False},
+    'wape':        {'discrepancy_metric': 'wape', 'sparsity_cls': LASSOSparsity, 'use_pic': False},
+    'instab':      {'discrepancy_metric': 'l2',   'sparsity_cls': LASSOSparsity, 'use_pic': True},
+    'reg':         {'discrepancy_metric': 'l2',   'sparsity_cls': VWSRSparsity,  'use_pic': False},
+    'wape_instab': {'discrepancy_metric': 'wape', 'sparsity_cls': LASSOSparsity, 'use_pic': True},
+    'wape_reg':    {'discrepancy_metric': 'wape', 'sparsity_cls': VWSRSparsity,  'use_pic': False},
+    'instab_reg':  {'discrepancy_metric': 'l2',   'sparsity_cls': VWSRSparsity,  'use_pic': True},
+    'new':         {'discrepancy_metric': 'wape', 'sparsity_cls': VWSRSparsity,  'use_pic': True},
 }
 
 # Default pipelines for the main Section 4.5 comparison.
@@ -108,7 +108,7 @@ def pipeline_settings(pipeline: str) -> dict:
 
     Recognises the original two labels (``legacy``, ``new``) and the six
     off-diagonal ablation labels. Forward the returned dict directly to
-    :class:`EpdeSearch` (``use_pic``, ``fitness_cls``, ``sparsity_cls``).
+    :class:`EpdeSearch` (``use_pic``, ``discrepancy_metric``, ``sparsity_cls``).
     """
     try:
         return dict(_PIPELINE_SETTINGS[pipeline])
@@ -433,7 +433,17 @@ def build_search(cfg: 'SystemCfg', pipeline_kwargs: dict) -> EpdeSearch:
     additional_tokens = _build_token_pool(cfg, coords, dim)
     search = _construct_search(cfg, coords, pipeline_kwargs)
     _configure_preprocessor(search, cfg)
-    _configure_moeadd(search, cfg, variable_names)
+    if cfg.hparams['search']['multiobjective_mode']:
+        _configure_moeadd(search, cfg, variable_names)
+    else:
+        # Single-objective mode: _configure_moeadd would forward MOEA/D-only
+        # strategy params onto the single-objective blocks. Reuse the YAML's
+        # population_size / training_epochs for the single-objective optimizer.
+        mo = cfg.hparams['moeadd']
+        search.set_singleobjective_params(
+            population_size=int(mo['population_size']),
+            training_epochs=int(mo['training_epochs']),
+        )
     _run_fit(search, cfg, data, variable_names, dim, additional_tokens)
     return search
 
@@ -518,7 +528,11 @@ def _extract_discovered(search: EpdeSearch) -> list:
 def _extract_objectives(search: EpdeSearch) -> list:
     """Return per-solution objective vectors aligned with ``_extract_discovered``."""
     try:
-        level0 = search.optimizer.pareto_levels.levels[0]
+        if getattr(search, 'multiobjective_mode', True):
+            level0 = search.optimizer.pareto_levels.levels[0]
+        else:
+            # Single-objective: a flat population list; sorted-best first.
+            level0 = search.optimizer.population.sort()
     except Exception:
         return []
     out = []
@@ -570,15 +584,19 @@ def run_one(system_cfg: SystemCfg, pipeline: str, seed: int) -> dict:
     truth_alts = _truth_alts(system_cfg)
     _set_seeds(seed)
 
+    from epde import globals as global_var
     record: dict = {
         'system': system_cfg.name,
         'pipeline': pipeline,
         'seed': seed,
         'pipeline_kwargs': {
             'use_pic': pipeline_kwargs['use_pic'],
-            'fitness_cls': pipeline_kwargs['fitness_cls'].__name__,
+            'discrepancy_metric': pipeline_kwargs['discrepancy_metric'],
             'sparsity_cls': pipeline_kwargs['sparsity_cls'].__name__,
         },
+        'gram_mode': getattr(global_var, 'gram_mode', None),
+        'vc_instability_component': getattr(
+            global_var, 'vc_instability_component', 'both'),
     }
 
     t0 = time.time()

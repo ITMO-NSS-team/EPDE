@@ -5,8 +5,11 @@ from functools import partial
 from epde.operators.utils.operator_mappers import map_operator_between_levels
 from epde.operators.utils.template import add_base_param_to_operator
 
-from epde.operators.common.right_part_selection import RandomRHPSelector
-from epde.operators.common.fitness import L2Fitness
+from epde.operators.common.right_part_selection import (EqRightPartSelector,
+                                                        SoEqRightPartSelector)
+from epde.operators.common.fitness import SolverFreeFitness
+from epde.operators.common.objectives import WAPEDiscrepancy, Instability
+import epde.globals as global_var
 from epde.operators.common.sparsity import LASSOSparsity, VWSRSparsity
 from epde.operators.common.coeff_calculation import LinRegBasedCoeffsEquation
 from epde.operators.singleobjective.mutations import get_singleobjective_mutation
@@ -40,7 +43,17 @@ class BaselineDirector(OptimizationPatternDirector):
 
         sparsity = VWSRSparsity()
         coeff_calc = LinRegBasedCoeffsEquation()
-        eq_fitness = L2Fitness(['penalty_coeff'])
+        # Single-objective fitness: discrepancy is always computed (it
+        # drives diagnostics and any right-part work); when the global
+        # single_objective_metric is 'instability', the instability filler
+        # is added too so equation_terms_stability has a value to read.
+        # Which attribute the optimizer actually minimises is chosen by
+        # SoEq.use_default_singleobjective_function (the objective reader).
+        disc = WAPEDiscrepancy()
+        objectives = [disc]
+        if getattr(global_var, 'single_objective_metric', 'discrepancy') == 'instability':
+            objectives.append(Instability())
+        eq_fitness = SolverFreeFitness(['penalty_coeff'], objectives=objectives, primary=disc)
         add_kwarg_to_operator(operator = eq_fitness)
         eq_fitness.set_suboperators({'sparsity' : sparsity, 'coeff_calc' : coeff_calc})
 
@@ -49,12 +62,26 @@ class BaselineDirector(OptimizationPatternDirector):
                                                   objective_condition = fitness_cond)
         pop_fitness = map_operator_between_levels(sys_fitness, 'chromosome level', 'population level') # TODO: edit in operator_mappers.py 
         
-        # Check for optimality of operator application
+        # Fitness-based right-part selection with zero-term pruning, the
+        # same machinery MOEA/D uses (EqRightPartSelector sweeps candidate
+        # targets by the discrepancy returned from ``eq_fitness`` with
+        # force_out_of_place=True, then remove_zero_terms prunes). This
+        # replaces the old RandomRHPSelector: random selection left the
+        # structure unpruned, so the in-place fitness saw the full feature
+        # matrix against a sparse weight vector (shape mismatch). The
+        # pruned structure keeps features aligned with weights_final, and
+        # using the data-driven RPS also makes the single-objective search
+        # consistent with the multi-objective one.
         rps_cond = lambda x: any([not elem_eq.right_part_selected for elem_eq in x.vals])
-        right_part_selector = RandomRHPSelector()
-        sys_rps = map_operator_between_levels(right_part_selector, 'gene level', 'chromosome level',
-                                              objective_condition = rps_cond)
-        pop_rps = map_operator_between_levels(sys_rps, 'chromosome level', 'population level') # TODO: edit in operator_mappers.py 
+        eq_right_part_selector = EqRightPartSelector()
+        eq_right_part_selector.set_suboperators({'fitness_calculation': eq_fitness})
+        sys_rps_inner = SoEqRightPartSelector()
+        sys_rps_inner.set_suboperators({'eq_right_part_selector': eq_right_part_selector})
+        # rps_cond is a per-chromosome predicate; on a chromosome->population
+        # map it is the element_condition (objective_condition would be
+        # handed the population object, which has no ``.vals``).
+        pop_rps = map_operator_between_levels(sys_rps_inner, 'chromosome level', 'population level',
+                                              element_condition = rps_cond) # TODO: edit in operator_mappers.py
 
         population_pruner = SizeRestriction()
 

@@ -11,13 +11,6 @@ from epde.interface.prepared_tokens import CustomTokens, PhasedSine1DTokens, Con
 from epde.interface.equation_translator import translate_equation
 from epde.interface.interface import EpdeSearch
 
-from epde.operators.common.coeff_calculation import LinRegBasedCoeffsEquation
-from epde.operators.common.sparsity import LASSOSparsity
-
-from epde.operators.utils.operator_mappers import map_operator_between_levels
-import epde.operators.common.fitness as fitness
-from epde.operators.utils.template import CompoundOperator
-
 from epde import TrigonometricTokens, GridTokens, CacheStoredTokens
 import epde.globals as global_var
 
@@ -39,50 +32,6 @@ def noise_data(data, noise_level):
     return noise_level * 0.01 * np.std(data) * np.random.normal(size=data.shape) + data
 
 
-def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
-                      search_obj: EpdeSearch, all_vars: List[str] = ['u', ]) -> bool:
-    metaparams = {('sparsity', var): {'optimizable': False, 'value': 1E-6} for var in all_vars}
-
-    correct_eq = translate_equation(correct_symbolic, search_obj.pool, all_vars=all_vars)
-    for var in all_vars:
-        correct_eq.vals[var].main_var_to_explain = var
-        correct_eq.vals[var].metaparameters = metaparams
-    print(correct_eq.text_form)
-
-    incorrect_eq = translate_equation(eq_incorrect_symbolic, search_obj.pool,
-                                      all_vars=all_vars)  # , all_vars = ['u', 'v'])
-    for var in all_vars:
-        incorrect_eq.vals[var].main_var_to_explain = var
-        incorrect_eq.vals[var].metaparameters = metaparams
-    print(incorrect_eq.text_form)
-
-    fit_operator.apply(correct_eq, {})
-    fit_operator.apply(incorrect_eq, {})
-    print([[correct_eq.vals[var].fitness_value, incorrect_eq.vals[var].fitness_value] for var in all_vars])
-    print([[correct_eq.vals[var].coefficients_stability, incorrect_eq.vals[var].coefficients_stability] for var in
-           all_vars])
-    print([[correct_eq.vals[var].aic, incorrect_eq.vals[var].aic] for var in all_vars])
-
-    # print([correct_eq.vals[var].coefficients_stability < incorrect_eq.vals[var].coefficients_stability for var in all_vars])
-    return all([correct_eq.vals[var].coefficients_stability < incorrect_eq.vals[var].coefficients_stability for var in
-                all_vars])
-
-
-def prepare_suboperators(fitness_operator: CompoundOperator, operator_params: dict) -> CompoundOperator:
-    sparsity = LASSOSparsity()
-    coeff_calc = LinRegBasedCoeffsEquation()
-
-    # sparsity = map_operator_between_levels(sparsity, 'gene level', 'chromosome level')
-    # coeff_calc = map_operator_between_levels(coeff_calc, 'gene level', 'chromosome level')
-
-    fitness_operator.set_suboperators({'sparsity': sparsity,
-                                       'coeff_calc': coeff_calc})
-    fitness_cond = lambda x: not getattr(x, 'fitness_calculated')
-    fitness_operator.params = operator_params
-    fitness_operator = map_operator_between_levels(fitness_operator, 'gene level', 'chromosome level',
-                                                   objective_condition=fitness_cond)
-    return fitness_operator
-
 def ks_data(filename: str):
     data = scio.loadmat('kuramoto_sivishinky.mat')
     t = np.ravel(data['tt'])
@@ -91,31 +40,6 @@ def ks_data(filename: str):
 
     grids = np.meshgrid(t, x, indexing = 'ij')  # np.stack(, axis = 2) , axis = 2)
     return grids, u
-
-
-def ks_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
-    # Test scenario to evaluate performance on Allen-Cahn equation
-    eq_ac_symbolic = '0.0001 * d^2u/dx1^2{power: 1.0} + -5.0 * u{power: 3.0} + 5.0 * u{power: 1.0} + 0.0 = du/dx0{power: 1.0}'
-    eq_ac_incorrect = '4.976781518840499 * u{power: 1.0} + 0.0001 * d^2u/dx1^2{power: 1.0} + -4.974425220166616 * u{power: 3.0} + 0.0 * du/dx1{power: 1.0} * d^2u/dx0^2{power: 1.0} + 0.002262543822130977 = du/dx0{power: 1.0}'
-
-    grid, data = ks_data(os.path.join(foldername, 'ac_data.npy'))
-    # noised_data = noise_data(data, noise_level)
-    # data_nn = load_pretrained_PINN(os.path.join(foldername, 'ac_ann_pretrained.pickle'))
-
-    print('Shapes:', data.shape, grid[0].shape)
-    dimensionality = 1
-
-    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=10,
-                                 coordinate_tensors=((grid[0], grid[1])), verbose_params={'show_iter_idx': True},
-                                 device='cpu')
-
-    epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
-                                     preprocessor_kwargs={})
-
-    epde_search_obj.create_pool(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 3),
-                                additional_tokens=[]) #, data_nn=data_nn
-
-    assert compare_equations(eq_ac_symbolic, eq_ac_incorrect, epde_search_obj)
 
 
 def ks_discovery(foldername, noise_level):
@@ -166,19 +90,10 @@ def ks_discovery(foldername, noise_level):
 
 if __name__ == "__main__":
     import torch
-    from epde.operators.utils.default_parameter_loader import EvolutionaryParams
     print(torch.cuda.is_available())
-    # Operator = fitness.SolverBasedFitness # Replace by the developed PIC-based operator.
-    # Operator = fitness.PIC
-    Operator = fitness.L2LRFitness
-    params = EvolutionaryParams()
-    operator_params = params.get_default_params_for_operator('DiscrepancyBasedFitnessWithCV') #{"penalty_coeff": 0.2, "pinn_loss_mult": 1e4}
-    print('operator_params ', operator_params)
-    fit_operator = prepare_suboperators(Operator(list(operator_params.keys())), operator_params)
 
     # Paths
     directory = os.path.dirname(os.path.realpath(__file__))
     ns_folder_name = os.path.join(directory)
 
-    # AC_test(fit_operator, ac_folder_name, 0)
     ks_discovery(ns_folder_name, 0)

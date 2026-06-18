@@ -542,18 +542,35 @@ class Equation(ComplexStructure):
 
     def remove_zero_terms(self):
         if self.weights_internal_evald:
-            zero_terms = []
+            wi = self._weights_internal
+            # weights_internal: one coef per non-target term, optionally a
+            # trailing intercept slot (VWSR: len == m+1; legacy LASSO: len == m).
+            m = len(self.structure) - 1
+            has_intercept = len(wi) == m + 1
+            zero_terms = []        # structure indices to drop
+            zero_coef_pos = []     # matching coefficient indices to drop
             target_bias = 0
             for i in range(len(self.structure)):
                 if i == self.target_idx:
                     continue
                 idx = i if i < self.target_idx else i - 1
-                if self.weights_internal[idx] == 0:
+                if wi[idx] == 0:
                     target_bias += 1 if i < self.target_idx else 0
                     zero_terms.append(i)
+                    zero_coef_pos.append(idx)
             if zero_terms:
                 self.structure = [term for term_idx, term in enumerate(self.structure) if term_idx not in zero_terms]
                 self.target_idx -= target_bias
+                # Compact weights_internal in lockstep with the structure so
+                # later position-indexed reads (active_terms_labels, the
+                # intercept slot, re-prune) stay aligned. weights_final already
+                # holds only the non-zero entries, so it needs no surgery.
+                if has_intercept or zero_coef_pos:
+                    zcp = set(zero_coef_pos)
+                    kept = [wi[j] for j in range(m) if j not in zcp]
+                    if has_intercept:
+                        kept.append(wi[-1])
+                    self._weights_internal = np.array(kept)
                 # ``_invalidate_label_cache`` also wipes _eval_cache, which
                 # is essential here: the right-part-selector's per-target
                 # sweep populates the cache keyed on target_idx, and the
@@ -868,8 +885,8 @@ class Equation(ComplexStructure):
         """Return a deepcopied equation **without** copying ``structure``.
 
         Useful when the caller is about to immediately replace
-        ``new_equation.structure`` with a freshly built term list (e.g.
-        ``EquationCrossover.apply``'s Phase 6) -- deepcopying the parent's
+        ``new_equation.structure`` with a freshly built term list (e.g. in
+        ``EquationCrossover.apply``) -- deepcopying the parent's
         full ``[Term, Term, ...]`` only to overwrite it is wasted work
         (Term + Factor recursion accounts for the bulk of an Equation
         deepcopy).
@@ -923,7 +940,7 @@ class Equation(ComplexStructure):
     def add_history(self, add):
         self._history += add
 
-    def add_random_term(self) -> bool:
+    def add_random_term(self, forbidden_sigs=frozenset()) -> bool:
         """Try to append one fresh, non-duplicate term to ``self.structure``.
 
         Returns ``True`` if a term was appended, ``False`` if either the
@@ -933,8 +950,13 @@ class Equation(ComplexStructure):
         ``Equation.__init__``) MUST stop on the first ``False`` -- once
         the pool stops yielding uniques, further calls will not yield any
         either, and continuing past the failure pushes downstream
-        operators (``_scrub_conflicting_terms``, ``EqRightPartSelector``)
+        operators (``_break_equation_duplication``, ``EqRightPartSelector``)
         into states that violate the duplicate-term invariant.
+
+        ``forbidden_sigs`` is an optional frozenset of ``factors_labels`` the
+        new term may not take (on top of the ban on duplicating an existing
+        term). ``EquationMutation`` passes the signatures it just dropped so a
+        mutation never re-adds a term it removed in the same call.
         """
         cap = int(self.metaparameters['terms_number']['value'])
         if len(self.structure) >= cap:
@@ -949,7 +971,8 @@ class Equation(ComplexStructure):
         new_term = Term(self.pool, max_factors_in_term=self.metaparameters['max_factors_in_term']['value'],
                         mandatory_family=None, passed_term=None)
         success, _ = retry_until_unique(
-            predicate=lambda: new_term.factors_labels not in self.terms_labels,
+            predicate=lambda: (new_term.factors_labels not in self.terms_labels
+                               and new_term.factors_labels not in forbidden_sigs),
             mutate=lambda: new_term.randomize(),
             max_iter=max_iter,
             stats_name='add_random_term',
@@ -1113,6 +1136,33 @@ class Equation(ComplexStructure):
         result = frozenset(term.factors_labels for term in self.structure)
         self._terms_labels_cache = result
         return result
+
+    @property
+    def active_terms_labels(self) -> frozenset:
+        """Frozenset of per-term factor-label sets for the equation's ACTIVE
+        structure: the target term plus every non-target term with a nonzero
+        internal weight. Unlike ``terms_labels`` (full structure, zero-weight
+        padding included) this is the structural fingerprint of the fitted
+        law itself, so two equations of a system encode the same law
+        rearranged iff their values are equal. Factor powers are kept
+        (``u^2`` and ``u`` stay distinct), unlike ``terms_labels_without_power``.
+
+        Not memoized: the value depends on ``weights_internal``, whose setter
+        does not invalidate the label caches. Falls back to the full-structure
+        ``terms_labels`` when the weights have not been evaluated yet.
+        """
+        if not self.weights_internal_evald:
+            return self.terms_labels
+        described = set()
+        for term_idx, term in enumerate(self.structure):
+            if term_idx != self.target_idx:
+                weight_idx = term_idx if term_idx < self.target_idx else term_idx - 1
+                if np.isclose(self.weights_internal[weight_idx], 0):
+                    continue
+            term_labels = term.factors_labels
+            if len(term_labels) > 0:
+                described.add(term_labels)
+        return frozenset(described)
 
     @property
     def factors_labels(self) -> frozenset:
@@ -1335,8 +1385,15 @@ class SoEq(moeadd.MOEADDSolution):
             [equation_fitness] + [equation_terms_stability])
 
     def use_default_singleobjective_function(self):
-        from epde.eq_mo_objectives import generate_partial, equation_fitness
-        quality_objectives = [generate_partial(equation_fitness, eq_key) for eq_key in self.vars_to_describe]#range(len(self.tokens_for_eq))]
+        # globals.single_objective_metric picks which (already-computed)
+        # attribute drives selection: 'discrepancy' -> equation_fitness,
+        # 'instability' -> equation_terms_stability.
+        import epde.globals as global_var
+        from epde.eq_mo_objectives import (generate_partial, equation_fitness,
+                                           equation_terms_stability)
+        metric = getattr(global_var, 'single_objective_metric', 'discrepancy')
+        objective = equation_terms_stability if metric == 'instability' else equation_fitness
+        quality_objectives = [generate_partial(objective, eq_key) for eq_key in self.vars_to_describe]
         self.set_objective_functions(quality_objectives)
 
     def set_objective_functions(self, obj_funs):

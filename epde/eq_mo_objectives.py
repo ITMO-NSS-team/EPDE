@@ -32,7 +32,7 @@ def equation_fitness(system, equation_key = None):
     '''
     if equation_key:
         assert all(equation.fitness_calculated for equation in system.vals), 'Trying to call fitness before its evaluation.'
-        res = system.vals[equation_key].fitness_calculated
+        res = system.vals[equation_key].fitness_value
     else:
         for equation in system.vals:
             assert equation.fitness_calculated

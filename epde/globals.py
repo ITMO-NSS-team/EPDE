@@ -31,6 +31,14 @@ from epde.preprocessing.smoothers import NN
 # ``PhysicsInformedLasso.get_cv``).
 gram_mode: str = 'vcoef'
 
+# Which objective the SINGLE-objective optimizer minimises: 'discrepancy'
+# (default, the residual fitness) or 'instability' (vcoef coefficient
+# stability). The fitness host always computes discrepancy; when this is
+# 'instability' it ALSO computes instability and the objective reader
+# (SoEq.use_default_singleobjective_function) points the optimizer at it.
+# Set via ``set_single_objective_metric`` before ``build_search``.
+single_objective_metric: str = 'discrepancy'
+
 # Per-rep seed for additive Gaussian noise applied at ``cfg.load_data()``;
 # rewritten each rep so every rep sees an independent noise realization.
 noise_seed = None
@@ -56,6 +64,15 @@ vc_freq_coef: float = 1.0
 # Default True; set False for the legacy joint mode solve.
 vc_mode_decouple: bool = True
 
+# When True, ``PhysicsInformedLasso.fit`` (the 'max_corr' anchor mode) anchors
+# the L1 threshold to the WORKING RESIDUAL ``max_k|X_k^T r|`` (r = y minus the
+# previous outer-iteration fit) instead of the RAW target ``max_k|X_k^T y|``.
+# On the first pass r = y (full_coef_ = 0) so it matches the legacy anchor;
+# thereafter the scale tracks what is still UNEXPLAINED as RFE shrinks the
+# library, instead of staying pinned to ||y|| (which the dominant term inflates
+# and which masks weak terms). No effect in 'tstat' mode (no max_corr there).
+anchor_on_residual: bool = False
+
 
 def set_gram_config(mode: str = 'vcoef'):
     """Override the global Gram-construction mode before ``build_search``.
@@ -72,6 +89,29 @@ def set_gram_config(mode: str = 'vcoef'):
     # Stale per-axis basis resolution from a prior CLI/config must not bleed
     # into a new invocation -- the source data or grid_shape may have changed.
     vc_modes_cache.clear()
+
+
+def set_single_objective_metric(metric: str = 'discrepancy'):
+    """Override the single-objective optimizer's objective before
+    ``build_search``. Mirrors ``set_gram_config``: a process-level global
+    read at population construction by
+    ``SoEq.use_default_singleobjective_function`` and the single-objective
+    director's fitness assembly.
+    """
+    global single_objective_metric
+    if metric not in ('discrepancy', 'instability'):
+        raise ValueError(
+            f'single_objective_metric must be "discrepancy" or "instability"; got {metric!r}')
+    single_objective_metric = metric
+
+
+def set_anchor_on_residual(flag: bool = False):
+    """Override whether the 'max_corr' anchor uses the working residual
+    (``max|X^T r|``) instead of the raw target (``max|X^T y|``), before
+    ``build_search``.
+    """
+    global anchor_on_residual
+    anchor_on_residual = bool(flag)
 
 
 def init_caches(set_grids: bool = False, device = 'cpu'):

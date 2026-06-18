@@ -27,3 +27,9 @@ truth_alternatives:
 # so it doesn't quietly rely on the thesis_runner auto-bump.
 moeadd:
   population_size: 32
+
+# First-order ODE system: cap time derivatives at order 1 (the default (2,)
+# admits d^2/dx0^2 tokens; note the second-derivative truth_alternative
+# becomes unrepresentable under this cap -- it simply won't be discovered).
+fit:
+  max_deriv_order: [1]

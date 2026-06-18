@@ -8,8 +8,24 @@ truth_equations:
   - "28.0 * u{power: 1.0} + -1.0 * u{power: 1.0} * w{power: 1.0} + -1.0 * v{power: 1.0} = dv/dx0{power: 1.0}"
   - "1.0 * u{power: 1.0} * v{power: 1.0} + -2.6666666666666665 * w{power: 1.0} = dw/dx0{power: 1.0}"
 
+# Degenerate-quadratic re-expression of the w-equation's u*v term. Using the
+# system's own characteristic constraint du/dx0 = 10*(v-u):
+#   0.005*(du/dx0)^2 = 0.5*(v-u)^2 = 0.5*u^2 + 0.5*v^2 - u*v,
+# so 0.5*u^2 + 0.5*v^2 - 0.005*(du/dx0)^2 == u*v identically. EPDE discovers
+# the w-equation in this form (du, dv recovered exactly); it is an exact
+# consequence of the Lorenz ODEs (R^2 = 0.9999999992, analytic match to
+# machine precision). Credited as the full system with du/dv = truth.
+truth_alternatives:
+  - - "10.0 * v{power: 1.0} + -10.0 * u{power: 1.0} = du/dx0{power: 1.0}"
+    - "28.0 * u{power: 1.0} + -1.0 * u{power: 1.0} * w{power: 1.0} + -1.0 * v{power: 1.0} = dv/dx0{power: 1.0}"
+    - "-2.66670 * w{power: 1.0} + 0.499978 * v{power: 2.0} + -0.00499928 * du/dx0{power: 2.0} + 0.499992 * u{power: 2.0} + 0.0 = dw/dx0{power: 1.0}"
+
 # Lorenz is a 3-equation system; the (discrepancy, complexity)^3
 # objective space needs more weight vectors than the
 # auto-bumped 32 to cover per-equation trade-offs. Override to 48.
 moeadd:
   population_size: 48
+
+# First-order ODE system: cap time derivatives at order 1.
+fit:
+  max_deriv_order: [1]

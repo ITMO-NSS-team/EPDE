@@ -4,396 +4,193 @@
 Created on Fri Jun  4 13:20:59 2021
 
 @author: mike_ubuntu
+
+Fitness host operators. Each owns ONE responsibility: run the shared
+scaffolding (sparsity -> coefficient fit -> context) and delegate every
+scalar objective to a pluggable *filler* from
+``epde.operators.common.objectives``.
+
+* :class:`SolverFreeFitness` -- gene-level; hosts solver-free fillers
+  (``L2Discrepancy`` / ``WAPEDiscrepancy`` / ``Instability`` / ...).
+  Replaces the former ``L2Fitness`` and ``L2LRFitness``.
+* :class:`SolverBasedFitness` -- chromosome-level; solves the system once
+  via a PDE backend (autograd ``SolverAdapter`` or DeepXDE) and hosts
+  solver-based fillers (``SolverL2Discrepancy`` / ``PICError`` /
+  ``DeepXDEError``) plus an optional ``Instability`` r-loss. Replaces the
+  former ``SolverBasedFitness``, ``PIC`` and ``DeepXDEBasedFitness``.
+
+The metric logic lives in the fillers (single responsibility); the hosts
+only orchestrate the fit and write each filler's value to its attribute.
 """
+from copy import deepcopy
 
 import numpy as np
-from copy import deepcopy
 import torch
 
 import matplotlib.pyplot as plt
 from matplotlib import cm
 
 from epde.integrate import SolverAdapter
-# DeepXDEAdapter is imported lazily inside DeepXDEBasedFitness.apply() to
-# avoid triggering deepxde's import-time backend banner when no DeepXDE
-# solver is used (e.g. legacy L2/L2LR fitness paths).
+# DeepXDEAdapter is imported lazily inside the deepxde backend to avoid
+# triggering deepxde's import-time backend banner when no DeepXDE solver
+# is used (the solver-free path never imports it).
 from epde.structure.main_structures import SoEq, Equation
 from epde.operators.utils.template import CompoundOperator
 import epde.globals as global_var
-from sklearn.linear_model import LinearRegression, Ridge
-from scipy.optimize import minimize
-from epde.supplementary import minmax_normalize
-from epde.operators.common.stability import (calculate_weights, vc_stability_total_lr)
+# Re-exported so ``from epde.operators.common.fitness import
+# vc_stability_total_lr`` keeps working for external callers
+# (e.g. projects/thesis/_vc_cache_gate.py).
+from epde.operators.common.stability import (calculate_weights, vc_stability_total_lr)  # noqa: F401
+from epde.operators.common.objectives import (
+    FitContext, SolverContext, EquationObjective, SolverObjective,
+    L2Discrepancy, WAPEDiscrepancy, Instability,
+    SolverL2Discrepancy, PICError, DeepXDEError, LOSS_NAN_VAL,
+)
 from epde import _loop_stats
 
 
-def _gram_dispatch_kwargs():
-    """Return ``(gram_cls, gram_kwargs)`` for ``calculate_weights``. The
-    axis backup path uses ``GramSetup`` (``calculate_weights``'s default),
-    so this is always ``(None, None)``; the ``vcoef`` default does not
-    route through ``calculate_weights`` (it scores via ``VaryingCoefSetup``
-    directly in ``PhysicsInformedLasso.fit``).
+class SolverFreeFitness(CompoundOperator):
+    """Solver-free fitness host (gene level).
+
+    Runs ``sparsity`` (when the primary filler asks) and ``coeff_calc``,
+    then evaluates each configured objective filler and stores its scalar
+    on the equation. The ``primary`` filler (a discrepancy) drives the
+    right-part-selection scaffolding and is the value returned for
+    ``EqRightPartSelector``'s ``force_out_of_place`` term-sweep.
+
+    Parameters
+    ----------
+    param_keys : list
+        Operator parameter names (``['penalty_coeff']``).
+    objectives : list of EquationObjective
+        Fillers to evaluate in-place; each writes its own attribute.
+    primary : EquationObjective, optional
+        The discrepancy filler used for RPS / force_out_of_place. Defaults
+        to ``objectives[0]``.
     """
-    return (None, None)
+    key = 'SolverFreeFitness'
 
-LOSS_NAN_VAL = 1e7
+    def __init__(self, param_keys: list = None, objectives: list = None,
+                 primary: EquationObjective = None):
+        super().__init__(param_keys if param_keys is not None else ['penalty_coeff'])
+        self.objectives = list(objectives) if objectives else []
+        self.primary = primary if primary is not None else (
+            self.objectives[0] if self.objectives else None)
 
-class L2Fitness(CompoundOperator):
-    """
-    The operator, which calculates fitness function to the individual (equation) as the L2 norm
-    of the vector of disrepancy between left part of the equation and the right part, evaluated
-    on the grid nodes.
-
-    Notable attributes:
-    -------------------
-
-    params : dict
-        Inhereted from the ``CompoundOperator`` class.
-        Parameters of the operator; main parameters:
-
-            penalty_coeff - penalty coefficient, to that the fitness function value of equation with no non-zero coefficients, is multiplied;
-
-    suboperators : dict
-
-
-    Methods:
-    -----------
-    apply(equation)
-        calculate the fitness function of the equation, that will be stored in the equation.fitness_value.
-
-    """
-
-    key = 'DiscrepancyBasedFitness'
-
-    @_loop_stats.timed('L2Fitness.apply')
+    @_loop_stats.timed('SolverFreeFitness.apply')
     def apply(self, objective: Equation, arguments: dict, force_out_of_place: bool = False):
-        """
-        Calculate the fitness function values. The result is not returned, but stored in the equation.fitness_value attribute.
-
-        Parameters:
-        ------------
-        equation : Equation object
-            the equation object, to that the fitness function is obtained.
-
-        Returns:
-        ------------
-
-        None
-        """
-        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
-
-        # Run sparsity when the caller explicitly asks for an
-        # out-of-place fitness OR when the equation lacks a valid
-        # ``weights_internal`` state. The latter can happen when an
-        # upstream ``EqRightPartSelector`` exhausted its
-        # ``inf_fitness_regen`` outer loop without committing a target
-        # (every candidate target had all-zero LASSO survivors) -- the
-        # equation reaches us with ``weights_internal_evald=False``,
-        # and without this fallback ``coeff_calc`` would assert.
-        need_sparsity = (force_out_of_place
-                         or not getattr(objective, 'weights_internal_evald', False))
-        if need_sparsity:
-            self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
-            # Reject degenerate candidates ONLY when this is RPS's
-            # term-sweep (``force_out_of_place=True``) -- there the
-            # caller compares per-target fitness values and a ``None``
-            # signals "skip this target". For the final per-equation
-            # fitness eval downstream (``force_out_of_place=False``)
-            # we must always return a finite value so
-            # ``equation.fitness_calculated`` stays True; otherwise the
-            # MOEA/D objective-aggregation asserts. All-zero-weight
-            # candidates fall through to the residual computation
-            # below, yielding ``rl_error = ||target||`` (just the bare
-            # target norm) which is a finite but poor fitness.
-            if force_out_of_place and all(objective.weights_internal == 0):
-                return None
-        self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
-
-        _, target, features = objective.evaluate(normalize = False, return_val = False)
-        if features is None:
-            discr_feats = 0
-        else:
-            n_cols = features.shape[1] if features.ndim > 1 else 1
-            mask = objective.weights_internal != 0
-            if n_cols == len(mask):
-                discr_feats = np.dot(features, objective.weights_internal)
-            elif n_cols == int(mask.sum()):
-                discr_feats = np.dot(features, objective.weights_final[:-1])
-            else:
-                discr_feats = np.zeros(features.shape[0])
-
-        discr = (discr_feats + np.full(target.shape, objective.weights_final[-1]) - target)
-        try:
-            self.g_fun_vals = global_var.grid_cache.g_func[global_var.grid_cache.g_func_mask].reshape(-1)
-        except AttributeError:
-            self.g_fun_vals = None
-        if self.g_fun_vals is not None and self.g_fun_vals.shape == discr.shape:
-            discr = np.multiply(discr, self.g_fun_vals)
-        rl_error = np.linalg.norm(discr, ord = 2)
-
-        if not (self.params['penalty_coeff'] > 0. and self.params['penalty_coeff'] < 1.):
-            raise ValueError('Incorrect penalty coefficient set, value shall be in (0, 1).')
-
-        fitness_value = rl_error
-        if np.sum(objective.weights_final) == 0:
-            fitness_value /= self.params['penalty_coeff']
-
-        if force_out_of_place:
-            return fitness_value
-        else:
-            objective.fitness_calculated = True
-            objective.fitness_value = fitness_value
-
-        # When ``use_pic=True`` is paired with ``fitness_cls=L2Fitness``,
-        # ``equation_terms_stability`` is registered as an MOEA/D objective
-        # but the L2 fitness path never sets ``stability_calculated``.
-        # Mirror ``L2LRFitness``'s CV side-effect so the objective's
-        # assertion holds without touching the L2 fitness value above.
-        try:
-            data_shape = global_var.grid_cache.inner_shape
-            _, sw_target, sw_features = objective.evaluate(normalize=True, return_val=False)
-            if sw_features is None:
-                total_lr = 1.0
-            elif global_var.gram_mode == 'vcoef':
-                if getattr(objective, '_cached_vc_score', None) is not None:
-                    total_lr = float(np.sum(objective._cached_vc_score))
-                else:
-                    # Non-zero terms only; exclude the intercept when it is zeroed
-                    # (weights_final[-1] == 0) -- same policy as the axis path.
-                    _, t_nz, f_nz = objective.evaluate(normalize=False, return_val=False)
-                    total_lr = (1.0 if f_nz is None else vc_stability_total_lr(
-                        f_nz, t_nz, self.g_fun_vals, data_shape,
-                        main_var=objective.main_var_to_explain,
-                        fit_intercept=objective.weights_final[-1] != 0))
-            else:
-                if hasattr(objective, '_cached_sw_weights') and objective._cached_sw_weights is not None:
-                    sw_weights = objective._cached_sw_weights
-                else:
-                    _gc, _gk = _gram_dispatch_kwargs()
-                    sw_weights = calculate_weights(
-                        sw_features, sw_target, self.g_fun_vals, data_shape,
-                        objective.weights_final[-1] != 0,
-                        gram_cls=_gc, gram_kwargs=_gk,
-                    )
-                sw_arr = np.array(sw_weights)
-                mu = sw_arr.mean(axis=0)
-                std = sw_arr.std(axis=0, ddof=1)
-                with np.errstate(divide='ignore', invalid='ignore'):
-                    cv = (std ** 2) / (mu ** 2)
-                    cv[mu == 0] = 0.0
-                total_lr = sum(np.nan_to_num(cv)) / len(data_shape)
-        except Exception:
-            total_lr = 1.0
-        objective.stability_calculated = True
-        objective.coefficients_stability = total_lr
-
-    def use_default_tags(self):
-        self._tags = {'fitness evaluation', 'gene level', 'contains suboperators', 'inplace'}
-
-
-class L2LRFitness(CompoundOperator):
-    key = 'DiscrepancyBasedFitnessWithCV'
-
-    @_loop_stats.timed('L2LRFitness.apply')
-    def apply(self, objective: Equation, arguments: dict, force_out_of_place: bool = False):
-        """
-        Calculate the fitness function values. The result is not returned, but stored in the equation.fitness_value attribute.
-
-        Parameters:
-        ------------
-        equation : Equation object
-            the equation object, to that the fitness function is obtained.
-
-        Returns:
-        ------------
-
-        None
-        """
         self_args, subop_args = self.parse_suboperator_args(arguments=arguments)
 
-        if force_out_of_place:
+        penalty_coeff = self.params['penalty_coeff']
+        if not (penalty_coeff > 0. and penalty_coeff < 1.):
+            raise ValueError('Incorrect penalty coefficient set, value shall be in (0, 1).')
+
+        primary = self.primary
+        # Sparsity is run when the primary (discrepancy) filler asks for it:
+        # always during the RPS sweep, and as a fallback in-place when the
+        # equation lacks a valid weights_internal state (see L2Discrepancy /
+        # WAPEDiscrepancy.needs_sparsity, lifted from the old operators).
+        if primary.needs_sparsity(objective, force_out_of_place):
             self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
-            if all(objective.weights_internal[:-1] == 0):
+            # During the RPS term-sweep a degenerate (all-zero-weight)
+            # candidate is skipped by returning None; in-place we always
+            # fall through to a finite value.
+            if force_out_of_place and primary.is_degenerate(objective):
                 return None
         self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
 
-        if force_out_of_place:
-            _, target, features = objective.evaluate(normalize=False, return_val=False)
-        else:
-            _, target, features = objective.evaluate(normalize=True, return_val=False)
-
-        # self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
-        # _, target, features = objective.evaluate(normalize=False, return_val=False)
-
-        self.get_g_fun_vals()
-
-        if features is None:
-            discr = target - target.mean()
-        else:
-            if objective.weights_internal[-1]:
-                discr_feats = np.dot(features, objective.weights_final[:-1])
-                discr_feats = discr_feats + objective.weights_final[-1]
-            else:
-                discr_feats = np.dot(features, objective.weights_final)
-            discr = target - discr_feats
-
-        rl_error = np.sum(np.abs(discr)) / np.sum(np.abs(target))
-
-        if not (self.params['penalty_coeff'] > 0. and self.params['penalty_coeff'] < 1.):
-            raise ValueError('Incorrect penalty coefficient set, value shall be in (0, 1).')
-
-        fitness_value = rl_error
+        try:
+            g_fun_vals = global_var.grid_cache.g_func[
+                global_var.grid_cache.g_func_mask].reshape(-1)
+        except AttributeError:
+            g_fun_vals = None
+        try:
+            data_shape = global_var.grid_cache.inner_shape
+        except AttributeError:
+            data_shape = None
+        ctx = FitContext(g_fun_vals=g_fun_vals, data_shape=data_shape,
+                         penalty_coeff=penalty_coeff, for_rps=force_out_of_place)
 
         if force_out_of_place:
-            return fitness_value
+            return primary.compute(objective, ctx)
 
+        # In-place finalization: weights_internal has selected the sparse
+        # support, so physically prune the now-dead zero-weight terms before
+        # objectives are scored and the structure is stored/rendered -- the
+        # standing in-place counterpart to the remove_zero_terms that
+        # EqRightPartSelector runs after its own sweep. Applied
+        # UNCONDITIONALLY (not just on the sparsity fallback): an equation can
+        # reach the front carrying weights_internal zeros that were never
+        # pruned (a survivor whose support tightened without a following
+        # prune), which otherwise desyncs text_form (it indexes the compacted
+        # weights_final by full-structure position) -- the spurious
+        # cross-equation "leak" render artefact. Safe now that
+        # remove_zero_terms compacts weights_internal in lockstep; scoring is
+        # unaffected (the fillers read weights_final / evaluate()). The RPS
+        # sweep returned above, so this never runs out-of-place (which must
+        # keep every candidate term).
+        if getattr(objective, 'weights_internal_evald', False):
+            objective.remove_zero_terms()
+
+        for filler in self.objectives:
+            setattr(objective, filler.value_attr, filler.compute(objective, ctx))
+            setattr(objective, filler.flag_attr, True)
+            if filler.compute(objective, ctx) == 0:
+                print()
+        # AIC is not produced by the solver-free path; expose the default
+        # the legacy WAPE operator set so downstream readers don't assert.
         objective.aic = None
         objective.aic_calculated = True
 
-        data_shape = global_var.grid_cache.inner_shape
-        if global_var.gram_mode == 'vcoef':
-            if getattr(objective, '_cached_vc_score', None) is not None:
-                total_lr = float(np.sum(objective._cached_vc_score))
-            else:
-                total_lr = vc_stability_total_lr(
-                    features, target, self.g_fun_vals, data_shape,
-                    main_var=objective.main_var_to_explain,
-                    fit_intercept=objective.weights_internal[-1] != 0)
-        else:
-            if hasattr(objective, '_cached_sw_weights') and objective._cached_sw_weights is not None:
-                weights = objective._cached_sw_weights
-            else:
-                _gc, _gk = _gram_dispatch_kwargs()
-                weights = calculate_weights(
-                    features, target, self.g_fun_vals, data_shape,
-                    objective.weights_internal[-1] != 0,
-                    gram_cls=_gc, gram_kwargs=_gk,
-                )
-            weights_arr = np.array(weights)
-            mu = weights_arr.mean(axis=0)
-            std = weights_arr.std(axis=0, ddof=1)
-            with np.errstate(divide='ignore', invalid='ignore'):
-                cv = (std ** 2) / (mu ** 2)
-                cv[mu == 0] = 0.0
-            total_lr = sum(np.nan_to_num(cv)) / len(data_shape)
-
-        # if force_out_of_place:
-        #     return fitness_value * total_lr
-
-        objective.fitness_calculated = True
-        objective.fitness_value = fitness_value
-        objective.stability_calculated = True
-        objective.coefficients_stability = total_lr
-
-    def get_g_fun_vals(self):
-        try:
-            self.g_fun_vals = global_var.grid_cache.g_func[global_var.grid_cache.g_func_mask].reshape(-1)
-        except AttributeError:
-            self.g_fun_vals = None
-
     def use_default_tags(self):
         self._tags = {'fitness evaluation', 'gene level', 'contains suboperators', 'inplace'}
 
-class SolverBasedFitness(CompoundOperator):
-    # To be modified to include physics-informed information criterion (PIC)
 
+class SolverBasedFitness(CompoundOperator):
+    """Solver-based fitness host (chromosome level).
+
+    Solves the candidate system once with a PDE backend, then scores each
+    equation with the configured solver fillers. Subsumes the former
+    ``SolverBasedFitness`` (``backend='autograd'``, ``masked=False``,
+    ``SolverL2Discrepancy``), ``PIC`` (``backend='autograd'``,
+    ``masked=True``, ``PICError`` + ``Instability``) and
+    ``DeepXDEBasedFitness`` (``backend='deepxde'``, ``DeepXDEError`` +
+    ``Instability``).
+
+    The right-part-selection term-sweep never solves: the director wires a
+    lightweight :class:`SolverFreeFitness` as the RPS fitness instead.
+    """
     key = 'SolverBasedFitness'
 
-    def __init__(self, param_keys: list):
+    def __init__(self, param_keys: list, objectives: list = None,
+                 primary: SolverObjective = None, stability: Instability = None,
+                 backend: str = 'autograd', masked: bool = False):
         super().__init__(param_keys)
         self.adapter = None
+        self.backend = backend
+        self.masked = masked
+        self.objectives = list(objectives) if objectives else []
+        self.primary = primary if primary is not None else (
+            self.objectives[0] if self.objectives else None)
+        # Optional solver-free r-loss filler (instability) reused as a
+        # second objective, mirroring PIC / DeepXDE.
+        self.stability = stability
 
-    def set_adapter(self, net = None):
-
+    def set_adapter(self, net=None, pretrained_net=None):
+        if self.backend == 'deepxde':
+            if self.adapter is None:
+                from epde.integrate.deepxde_integration import DeepXDEAdapter
+                cfg = self.params.get('deepxde_config', {})
+                self.adapter = DeepXDEAdapter(pretrained_net=pretrained_net, **cfg)
+            return
         if self.adapter is None or net is not None:
-            compiling_params = {'mode': 'autograd', 'tol':0.01, 'lambda_bound': 100} #  'h': 1e-1
-            optimizer_params = {}
-            training_params = {'epochs': 1e3, 'info_string_every' : 1e3}
-            early_stopping_params = {'patience': 4, 'no_improvement_patience' : 250}
-
-            explicit_cpu = False
-            device = 'cuda' if (torch.cuda.is_available and not explicit_cpu) else 'cpu'
-
-            self.adapter = SolverAdapter(net = net, use_cache = False, device=device)
-
-            self.adapter.set_compiling_params(**compiling_params)
-            self.adapter.set_optimizer_params(**optimizer_params)
-            self.adapter.set_early_stopping_params(**early_stopping_params)
-            self.adapter.set_training_params(**training_params)
-
-    def apply(self, objective : SoEq, arguments : dict, force_out_of_place: bool = False):
-        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
-
-        try:
-            net = deepcopy(global_var.solution_guess_nn)
-        except NameError:
-            net = None
-
-        self.set_adapter(net=net)
-        if force_out_of_place:
-            self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
-        self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
-
-        print('solving equation:')
-        print(objective.text_form)
-
-        loss_add, solution_nn = self.adapter.solve_epde_system(system = objective, grids = None,
-                                                               boundary_conditions = None, use_fourier=True)
-        _, grids = global_var.grid_cache.get_all(mode = 'torch')
-
-        grids = torch.stack([grid.reshape(-1) for grid in grids], dim = 1).float()
-        solution = solution_nn(grids).detach().cpu().numpy()
-        self.g_fun_vals = global_var.grid_cache.g_func
-
-        if force_out_of_place:
-            sum_err = 0
-
-        for eq_idx, eq in enumerate(objective.vals):
-            if torch.isnan(loss_add):
-                fitness_value = 2*LOSS_NAN_VAL
-            else:
-                referential_data = global_var.tensor_cache.get((eq.main_var_to_explain, (1.0,)))
-
-                discr = (solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape))
-                discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape))
-                rl_error = np.linalg.norm(discr, ord = 2)
-
-                print(f'fitness error is {rl_error}, while loss addition is {float(loss_add)}')
-                fitness_value = rl_error + self.params['pinn_loss_mult'] * float(loss_add) # TODO: make pinn_loss_mult case dependent
-                if np.sum(eq.weights_final) == 0:
-                    fitness_value /= self.params['penalty_coeff']
-
-                if force_out_of_place:
-                    sum_err += fitness_value
-                else:
-                    eq.fitness_calculated = True
-                    eq.fitness_value = fitness_value
-
-    def use_default_tags(self):
-        self._tags = {'fitness evaluation', 'chromosome level', 'contains suboperators', 'inplace'}
-
-
-class PIC(CompoundOperator):
-
-    key = 'PIC'
-
-    def __init__(self, param_keys: list):
-        super().__init__(param_keys)
-        self.adapter = None
-
-    def set_adapter(self, net=None):
-
-        if self.adapter is None or net is not None:
-            compiling_params = {'mode': 'autograd', 'tol': 0.01, 'lambda_bound': 100}  # 'h': 1e-1
+            compiling_params = {'mode': 'autograd', 'tol': 0.01, 'lambda_bound': 100}
             optimizer_params = {}
             training_params = {'epochs': 1e3, 'info_string_every': 1e3}
             early_stopping_params = {'patience': 4, 'no_improvement_patience': 250}
-
             explicit_cpu = False
             device = 'cuda' if (torch.cuda.is_available and not explicit_cpu) else 'cpu'
-
             self.adapter = SolverAdapter(net=net, use_cache=False, device=device)
-
             self.adapter.set_compiling_params(**compiling_params)
             self.adapter.set_optimizer_params(**optimizer_params)
             self.adapter.set_early_stopping_params(**early_stopping_params)
@@ -401,265 +198,154 @@ class PIC(CompoundOperator):
 
     def apply(self, objective: SoEq, arguments: dict, force_out_of_place: bool = False):
         self_args, subop_args = self.parse_suboperator_args(arguments=arguments)
-
-        try:
-            net = deepcopy(global_var.solution_guess_nn)
-        except NameError:
-            net = None
-
-        self.set_adapter(net=net)
-
         if force_out_of_place:
             self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
         self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
 
+        if self.backend == 'deepxde':
+            return self._apply_deepxde(objective, force_out_of_place)
+        return self._apply_autograd(objective, force_out_of_place)
+
+    def _build_fit_context(self):
+        try:
+            g_fun_vals = global_var.grid_cache.g_func[
+                global_var.grid_cache.g_func_mask].reshape(-1)
+        except AttributeError:
+            g_fun_vals = None
+        try:
+            data_shape = global_var.grid_cache.inner_shape
+        except AttributeError:
+            data_shape = None
+        return g_fun_vals, data_shape
+
+    def _apply_autograd(self, objective, force_out_of_place):
+        try:
+            net = deepcopy(global_var.solution_guess_nn)
+        except NameError:
+            net = None
+        self.set_adapter(net=net)
+
         print('solving equation:')
         print(objective.text_form)
-
-        loss_add, solution_nn = self.adapter.solve_epde_system(system=objective, grids=None,
-                                                               boundary_conditions=None, use_fourier=True)
+        loss_add, solution_nn = self.adapter.solve_epde_system(
+            system=objective, grids=None, boundary_conditions=None, use_fourier=True)
 
         _, grids = global_var.grid_cache.get_all(mode='torch')
-        g_mask = global_var.grid_cache.g_func_mask
-        grids = [grid[g_mask] for grid in grids]
+        if self.masked:
+            g_mask = global_var.grid_cache.g_func_mask
+            grids = [grid[g_mask] for grid in grids]
+            g_fun_vals = global_var.grid_cache.g_func[g_mask]
+        else:
+            g_fun_vals = global_var.grid_cache.g_func
         grids = torch.stack([grid.reshape(-1) for grid in grids], dim=1).float()
         solution = solution_nn(grids).detach().cpu().numpy()
-        self.g_fun_vals = global_var.grid_cache.g_func[g_mask]
 
-        if force_out_of_place:
-            sum_err = 0
+        sctx = SolverContext(solution=solution, loss_add=loss_add, g_fun_vals=g_fun_vals,
+                             penalty_coeff=self.params['penalty_coeff'],
+                             pinn_loss_mult=self.params['pinn_loss_mult'])
+        sw_g, data_shape = self._build_fit_context()
+        fit_ctx = FitContext(g_fun_vals=sw_g, data_shape=data_shape,
+                             penalty_coeff=self.params['penalty_coeff'], for_rps=False)
 
+        sum_err = 0.0
         for eq_idx, eq in enumerate(objective.vals):
-            # Calculate p-loss
-            if torch.isnan(loss_add):
-                lp = 2 * LOSS_NAN_VAL
-            else:
-                referential_data = global_var.tensor_cache.get((eq.main_var_to_explain, (1.0,)))
-                discr = solution[..., eq_idx] - referential_data.reshape(solution[..., eq_idx].shape)
-                discr = np.multiply(discr, self.g_fun_vals.reshape(discr.shape))
-                # rl_error = np.sqrt(np.mean(discr ** 2))
-                # rl_error = np.sum(np.abs(discr)) / np.sum(np.abs(referential_data.reshape(solution[..., eq_idx].shape))) * 100
-                rl_error = np.mean(discr ** 2)
-
-                print(f'fitness error is {rl_error}, while loss addition is {float(loss_add)}')
-                lp = rl_error + self.params['pinn_loss_mult'] * float(
-                    loss_add)  # TODO: make pinn_loss_mult case dependent
-
+            err = self.primary.compute(eq, eq_idx, sctx)
             if force_out_of_place:
-                sum_err += lp
+                sum_err += err
                 continue
+            setattr(eq, self.primary.value_attr, err)
+            setattr(eq, self.primary.flag_attr, True)
+            if self.stability is not None:
+                eq.aic_calculated = True
+                setattr(eq, self.stability.value_attr, self.stability.compute(eq, fit_ctx))
+                setattr(eq, self.stability.flag_attr, True)
+        if force_out_of_place:
+            return sum_err
 
-            eq.aic_calculated = True
-
-            # Calculate r-loss
-            data_shape = global_var.grid_cache.inner_shape
-            _, target, features = eq.evaluate(normalize=True, return_val=False)
-            if global_var.gram_mode == 'vcoef':
-                if getattr(eq, '_cached_vc_score', None) is not None:
-                    total_lr = float(np.sum(eq._cached_vc_score))
-                else:
-                    total_lr = vc_stability_total_lr(
-                        features, target, self.g_fun_vals, data_shape,
-                        main_var=objective.main_var_to_explain,
-                        fit_intercept=objective.weights_internal[-1] != 0)
-            else:
-                if hasattr(eq, '_cached_sw_weights') and eq._cached_sw_weights is not None:
-                    weights = eq._cached_sw_weights
-                else:
-                    _gc, _gk = _gram_dispatch_kwargs()
-                    weights = calculate_weights(
-                        features, target, self.g_fun_vals, data_shape,
-                        gram_cls=_gc, gram_kwargs=_gk,
-                    )
-                weights_arr = np.array(weights)
-                mu = weights_arr.mean(axis=0)
-                std = weights_arr.std(axis=0, ddof=1)
-
-                # Safe division
-                with np.errstate(divide='ignore', invalid='ignore'):
-                    cv = (std ** 2) / (mu ** 2)
-                    cv[mu == 0] = 0.0
-
-                total_lr = sum(np.nan_to_num(cv)) / len(data_shape)
-
-            eq.fitness_calculated = True
-            eq.fitness_value = lp
-            eq.stability_calculated = True
-            eq.coefficients_stability = total_lr
-
-    def feature_reshape(self, features_vals):
-        features = features_vals[0]
-        if len(features_vals) > 1:
-            for i in range(1, len(features_vals)):
-                features = np.vstack([features, features_vals[i]])
-        features = np.vstack([features, np.ones(features_vals[0].shape)])  # Add constant feature
-        features = np.transpose(features)
-        if features.ndim == 1:
-            features = features.reshape(-1, 1)
-        return features
-
-    def get_g_fun_vals(self):
+    def _apply_deepxde(self, objective, force_out_of_place):
         try:
-            self.g_fun_vals = global_var.grid_cache.g_func_flat
-        except AttributeError:
-            self.g_fun_vals = None
+            pretrained_net = deepcopy(global_var.solution_guess_nn)
+        except Exception:
+            pretrained_net = None
+        self.set_adapter(pretrained_net=pretrained_net)
+
+        # Keep the DeepXDEError filler's config in sync with host params
+        # (the legacy DeepXDEBasedFitness read these from self.params).
+        if isinstance(self.primary, DeepXDEError):
+            self.primary.error_metric = self.params.get('error_metric', 'rmse')
+            self.primary.penalty_coeff = self.params.get('penalty_coeff', 0.2)
+
+        keys, grids = global_var.grid_cache.get_all(mode='numpy')
+        mask_flat = global_var.grid_cache.g_func_mask.flatten()
+
+        if isinstance(objective, SoEq):
+            eqs = [objective.vals[v] for v in objective.vars_to_describe]
+        else:
+            eqs = [objective]
+        data_list = []
+        for eq in eqs:
+            _, target, _ = eq.evaluate(normalize=False, return_val=False)
+            data_list.append(target.reshape(-1))
+
+        try:
+            solution_list, loss = self.adapter.solve(
+                equation_or_system=objective, grids=grids, data=data_list)
+            if np.isnan(loss):
+                raise ValueError('NaN loss')
+        except Exception as exc:
+            print(f'[SolverBasedFitness/deepxde] DeepXDE solve failed: {exc}')
+            if force_out_of_place:
+                return LOSS_NAN_VAL
+            for eq in eqs:
+                eq.fitness_value = LOSS_NAN_VAL
+                eq.fitness_calculated = True
+            return
+
+        sw_g, data_shape = self._build_fit_context()
+        fit_ctx = FitContext(g_fun_vals=sw_g, data_shape=data_shape,
+                             penalty_coeff=self.params.get('penalty_coeff', 0.2),
+                             for_rps=False)
+        # Pack per-eq masked (solution, data) for DeepXDEError.
+        masked_solutions = [solution_list[i][mask_flat] for i in range(len(eqs))]
+        masked_data = [data_list[i] for i in range(len(eqs))]
+        sctx = SolverContext(solution=masked_solutions, loss_add=loss,
+                             g_fun_vals=masked_data,
+                             penalty_coeff=self.params.get('penalty_coeff', 0.2),
+                             pinn_loss_mult=0.0)
+
+        total_err = 0.0
+        for eq_idx, eq in enumerate(eqs):
+            err = self.primary.compute(eq, eq_idx, sctx)
+            if force_out_of_place:
+                total_err += err
+                continue
+            setattr(eq, self.primary.value_attr, err)
+            setattr(eq, self.primary.flag_attr, True)
+            if self.stability is not None:
+                setattr(eq, self.stability.value_attr, self.stability.compute(eq, fit_ctx))
+                setattr(eq, self.stability.flag_attr, True)
+        if force_out_of_place:
+            return total_err / max(len(eqs), 1)
 
     def use_default_tags(self):
         self._tags = {'fitness evaluation', 'chromosome level', 'contains suboperators', 'inplace'}
 
-class DeepXDEBasedFitness(CompoundOperator):
-    key = 'DeepXDEBasedFitness'
-
-    def __init__(self, param_keys: list):
-        super().__init__(param_keys)
-        self.adapter = None
-
-    def set_adapter(self, config: dict = None, pretrained_net=None):
-        if self.adapter is None:
-            from epde.integrate.deepxde_integration import DeepXDEAdapter
-            cfg = self.params.get('deepxde_config', {}) if config is None else config
-            self.adapter = DeepXDEAdapter(pretrained_net=pretrained_net, **cfg)
-
-    def apply(self, objective, arguments: dict, force_out_of_place: bool = False):
-        self_args, subop_args = self.parse_suboperator_args(arguments=arguments)
-
-        if force_out_of_place:
-            self.suboperators['sparsity'].apply(objective, subop_args.get('sparsity', {}))
-        self.suboperators['coeff_calc'].apply(objective, subop_args.get('coeff_calc', {}))
-
-        try:
-            pretrained_net = deepcopy(global_var.solution_guess_nn)
-        except:
-            pretrained_net = None
-        self.set_adapter(pretrained_net=pretrained_net)
-
-        keys, grids = global_var.grid_cache.get_all(mode='numpy')
-
-        if isinstance(objective, SoEq):
-            data_list = []
-            for var_name in objective.vars_to_describe:
-                eq = objective.vals[var_name]
-                _, target, _ = eq.evaluate(normalize=False, return_val=False)
-                data_list.append(target.reshape(-1))
-        else:
-            _, target, _ = objective.evaluate(normalize=False, return_val=False)
-            data_list = [target.reshape(-1)]
-
-        try:
-            solution_list, loss = self.adapter.solve(equation_or_system=objective,
-                                                     grids=grids,
-                                                     data=data_list)
-            if np.isnan(loss):
-                raise ValueError("NaN loss")
-
-            if isinstance(objective, SoEq):
-                for idx, (var_name, eq) in enumerate({val: objective.vals[val] for val in objective.vars_to_describe}.items()):
-                    err = self._compute_error(solution_list[idx], data_list[idx], eq)
-                    if force_out_of_place:
-                        pass
-                    else:
-                        eq.fitness_value = err
-                        eq.fitness_calculated = True
-                        self._compute_stability_for_equation(eq)
-            else:
-                solution = solution_list[0]
-                data = data_list[0]
-                err = self._compute_error(solution, data, objective)
-                if force_out_of_place:
-                    return err
-                else:
-                    objective.fitness_value = err
-                    objective.fitness_calculated = True
-                    self._compute_stability_for_equation(objective)
-        except Exception as e:
-            print(f'[DeepXDEBasedFitness] DeepXDE solve failed: {e}')
-            fitness_value = 1e7
-            if force_out_of_place:
-                return fitness_value
-            else:
-                objective.fitness_value = fitness_value
-                objective.fitness_calculated = True
-                return
-
-        if force_out_of_place and isinstance(objective, SoEq):
-            total_err = np.mean([eq.fitness_value for eq in objective.vals.values()])
-            return total_err
-
-    def _compute_error(self, solution, data, eq):
-        mask = global_var.grid_cache.g_func_mask
-        mask_flat = mask.flatten()
-        masked_solution = solution[mask_flat]
-        masked_data = data
-        metric = self.params.get('error_metric', 'rmse')
-        if metric == 'rmse':
-            err = np.sqrt(np.mean((masked_solution - masked_data) ** 2))
-        elif metric == 'l2':
-            err = np.linalg.norm(masked_solution - masked_data, ord=2)
-        elif metric == 'mae':
-            err = np.mean(np.abs(masked_solution - masked_data))
-        else:
-            err = np.sqrt(np.mean((masked_solution - masked_data) ** 2))
-        if np.sum(eq.weights_final) == 0:
-            err /= self.params.get('penalty_coeff', 0.2)
-        return err
-
-    def _compute_stability_for_equation(self, eq: Equation):
-        # Повторно вычисляется evaluate
-        _, target, features = eq.evaluate(normalize=False, return_val=False)
-        data_shape = global_var.grid_cache.inner_shape
-        self.get_g_fun_vals()
-        if global_var.gram_mode == 'vcoef':
-            if getattr(eq, '_cached_vc_score', None) is not None:
-                total_lr = float(np.sum(eq._cached_vc_score))
-            else:
-                total_lr = vc_stability_total_lr(
-                    features, target, self.g_fun_vals, data_shape,
-                    main_var=objective.main_var_to_explain,
-                    fit_intercept=objective.weights_internal[-1] != 0)
-        else:
-            if hasattr(eq, '_cached_sw_weights') and eq._cached_sw_weights is not None:
-                weights = eq._cached_sw_weights
-            else:
-                _gc, _gk = _gram_dispatch_kwargs()
-                weights = calculate_weights(
-                    features, target, self.g_fun_vals, data_shape,
-                    gram_cls=_gc, gram_kwargs=_gk,
-                )
-            weights_arr = np.array(weights)
-            mu = weights_arr.mean(axis=0)
-            std = weights_arr.std(axis=0, ddof=1)
-            with np.errstate(divide='ignore', invalid='ignore'):
-                cv = (std ** 2) / (mu ** 2)
-                cv[mu == 0] = 0.0
-            total_lr = np.sum(np.nan_to_num(cv)) / len(data_shape)
-        eq.coefficients_stability = total_lr
-        eq.stability_calculated = True
-
-    def get_g_fun_vals(self):
-        try:
-            self.g_fun_vals = global_var.grid_cache.g_func[global_var.grid_cache.g_func_mask].reshape(-1)
-        except:
-            self.g_fun_vals = None
-
-    def use_default_tags(self):
-        self._tags = {'fitness evaluation', 'gene level', 'contains suboperators', 'inplace'}
 
 def plot_data_vs_solution(grid, data, solution):
-    if grid.shape[1]==2:
+    if grid.shape[1] == 2:
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
-        ax.plot_trisurf(grid[:,0].reshape(-1), grid[:,1].reshape(-1),
+        ax.plot_trisurf(grid[:, 0].reshape(-1), grid[:, 1].reshape(-1),
                         solution.reshape(-1), cmap=cm.jet, linewidth=0.2)
         ax.set_xlabel("x1")
         ax.set_ylabel("x2")
         plt.show()
         plt.close(fig)
-    if grid.shape[1]==1:
+    if grid.shape[1] == 1:
         fig = plt.figure()
-        plt.scatter(grid.reshape(-1), solution.reshape(-1), color = 'r')
-        plt.scatter(grid.reshape(-1), data.reshape(-1), color = 'k')
+        plt.scatter(grid.reshape(-1), solution.reshape(-1), color='r')
+        plt.scatter(grid.reshape(-1), data.reshape(-1), color='k')
         plt.show()
         plt.close(fig)
     else:
         raise Exception('Infeasible dimensionality of the input dataset.')
-

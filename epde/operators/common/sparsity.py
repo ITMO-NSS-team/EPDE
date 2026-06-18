@@ -273,17 +273,44 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
     def fit(self, X, y, sample_weights=None, gram_setup=None):
         n_samples, n_features = X.shape
 
-        # 1. AUGMENTATION: Treat intercept as a constant physical term C
-        X_aug = np.column_stack((X, np.ones(n_samples)))
-        total_features = n_features + 1
+        total_features = n_features + 1  # + intercept (constant term C)
 
         # Master state trackers
         active_mask = np.ones(total_features, dtype=bool)
         self.full_coef_ = np.zeros(total_features)
 
-        # Precompute static operations for speed
-        norm_sq_features = np.sum(X_aug ** 2, axis=0)
-        X_T_y = X_aug.T @ y  # Cached once; slice by active_mask each outer iter.
+        # Precompute the augmented Gram blocks ONCE. The RFE outer loop and the
+        # coordinate descent below run entirely in Gram space (slicing these by
+        # ``active_mask``), so the expensive per-iteration ``X^T W X`` re-matmul
+        # and the per-coordinate O(N) dot products collapse to O(P^2) / O(P) ops
+        # -- the dominant cost on large-N systems. The intercept (a constant ones
+        # column) is folded in block-wise so the full N x (P+1) ``X_aug`` is never
+        # materialized. A single WEIGHTED Gram drives EVERYTHING (CD selection,
+        # anchor, OLS init, relaxed refit); a sub-block of a Gram equals the Gram of
+        # the sub-columns, so this is exact. The sample weights are the grid
+        # ``g_func``, which is 1 in the interior and 0 in the boundary margin -- and
+        # the boundary zeros are masked out upstream, so by DEFAULT W = I and this
+        # is the plain Gram. When a non-uniform g_func IS supplied, weighting the
+        # CD too means boundary downweighting applies to term SELECTION, not just
+        # the final magnitudes (which the relaxed refit already weighted).
+        Xf = np.asarray(X, dtype=float)
+        y = np.asarray(y, dtype=float).reshape(-1)
+        sw = (np.asarray(sample_weights, dtype=float).reshape(-1)
+              if sample_weights is not None else np.ones(n_samples))
+
+        _wX = sw[:, None] * Xf
+        G_w = np.empty((total_features, total_features))
+        G_w[:n_features, :n_features] = Xf.T @ _wX
+        _ws = _wX.sum(axis=0)  # = X^T w
+        G_w[:n_features, -1] = _ws
+        G_w[-1, :n_features] = _ws
+        G_w[-1, -1] = float(sw.sum())
+        Gy_w = np.empty(total_features)
+        Gy_w[:n_features] = Xf.T @ (sw * y)
+        Gy_w[-1] = float((sw * y).sum())
+
+        norm_sq_features = np.diag(G_w).copy()  # weighted column norms^2
+        X_T_y = Gy_w                            # raw-target anchor: max|X^T W y|
 
         # Pre-build the full sliding-window Gram matrix ONCE. The outer
         # RFE loop below will slice it by ``active_mask`` per iteration
@@ -318,59 +345,50 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
         while outer_iteration < max_outer_iters:
             outer_iters_executed += 1
 
-            # 1. Isolate the currently "stabilized" library
-            surviving_features_mask = active_mask[:-1]
-            intercept_is_active = active_mask[-1]
-
-            # 2. Calculate physical priors ONLY for the active library --
-            # slice the precomputed full Gram by the current active mask.
-            # ``vcoef`` yields the per-feature score directly; the axis
-            # path returns a per-window weight stack reduced by ``get_cv``.
+            # ``vcoef`` yields the per-feature score directly; the axis path
+            # returns a per-window weight stack reduced by ``get_cv``.
             weights = None if is_vcoef else gram_setup.solve(active_mask)
 
-            # Slice data for the CD run
-            X_active = X_aug[:, active_mask]
-            norm_sq_active = norm_sq_features[active_mask]
+            # Slice the (weighted) precomputed Gram by the current active set.
+            active_idx = np.where(active_mask)[0]
+            Gua = G_w[np.ix_(active_idx, active_idx)]   # active x active (weighted)
+            Gya = Gy_w[active_idx]
+            norm_sq_active = norm_sq_features[active_idx]
 
-            # Anchor the penalty to the max correlation on the SURVIVING subspace
-            # so threshold scale tracks the current problem as features drop.
-            max_corr = np.max(np.abs(X_T_y[active_mask]))
+            # Anchor the penalty to the max WEIGHTED correlation on the surviving
+            # subspace. 'anchor_on_residual': X_active^T W (y - X_aug @ full_coef_)
+            # = Gy_w[active] - G_w[active, :] @ full_coef_ (no N; full_coef_ = 0 on
+            # the first pass so this reduces to max|X^T W y| then).
+            if getattr(global_var, 'anchor_on_residual', False):
+                max_corr = np.max(np.abs(Gya - G_w[active_idx, :] @ self.full_coef_))
+            else:
+                max_corr = np.max(np.abs(X_T_y[active_mask]))
 
-            # 3. CV performs as adaptive alpha. In vcoef mode this is each
-            # term's stability score (Var(gamma_0) + NC_deb)/gamma_0^2 --
-            # significance plus debiased region-variation -- which prunes weak /
-            # zero / unstable / spuriously-varying terms.
-            active_cv = (gram_setup.score(active_mask) if is_vcoef
-                         else self.get_cv(weights))
+            # CV performs as adaptive alpha. In vcoef mode this is each term's
+            # instability score NC/gamma_0^2 (biased non-constant energy), which
+            # prunes weak / zero / unstable / spuriously-varying terms.
+            active_cv = (gram_setup.score(active_mask)
+                         if is_vcoef else self.get_cv(weights))
 
-            # Tackle the most physically unstable feature first so unstable
-            # terms get shrunk to zero before they pollute the residual.
+            # Tackle the most physically unstable feature first.
             active_thresholds = active_cv * max_corr
-            # active_thresholds = active_cv
-            # active_thresholds = active_cv * norm_sq_active
-
             cv_order = np.argsort(active_cv)[::-1]
-            # cv_order = np.argsort(active_thresholds)[::-1]
 
-            # Initialize coefficients from a single global weighted-OLS on
-            # the full dataset rather than the mean over per-window OLS
-            # coefficients. The per-window mean is biased toward zero on
-            # heterogeneous data (e.g. KdV solitons, where most windows see
-            # ~0 signal so the mean is shrunk by ``M_signal / M``); the
-            # global OLS is unbiased.
-            sw_active = (sample_weights if sample_weights is not None
-                          else np.ones(n_samples))
+            # Initialize coefficients from a single global WEIGHTED-OLS, in Gram
+            # space: solve(G_w[active, active], Gy_w[active]). The axis path falls
+            # back to its per-window mean when the system is singular.
             try:
-                XTWX_full = X_active.T @ (sw_active[:, None] * X_active)
-                XTWy_full = X_active.T @ (sw_active * y)
-                active_coef = np.linalg.solve(XTWX_full, XTWy_full)
+                active_coef = np.linalg.solve(
+                    G_w[np.ix_(active_idx, active_idx)], Gy_w[active_idx])
             except np.linalg.LinAlgError:
-                # ``vcoef`` has no per-window stack to average; fall back to
-                # a zero start (CD recovers it) instead of weights.mean.
-                active_coef = (np.zeros(int(active_mask.sum())) if is_vcoef
+                active_coef = (np.zeros(active_idx.size) if is_vcoef
                                else weights.mean(axis=0))
 
-            residual = y - (X_active @ active_coef)
+            # Running product q = (X_active^T X_active) @ active_coef, maintained
+            # incrementally so each coordinate update is O(active) instead of the
+            # legacy O(N) residual update: rho_j = X_j^T(y - X_active beta) +
+            # beta_j*||X_j||^2 = Gya[j] - q[j] + beta_j*norm_sq.
+            q = Gua @ active_coef
 
             # =================================================================
             # INNER LOOP: Pure Coordinate Descent on the Stabilized Library
@@ -378,48 +396,47 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
             cd_iteration = 0
             cd_iters_executed = 0
             killed_feature = False
-            while cd_iteration < self.max_iter:
-                cd_iters_executed += 1
-                max_change = 0.0
+            # errstate hoisted OUT of the inner loop (was entered per-coordinate).
+            with np.errstate(divide='ignore', invalid='ignore'):
+                while cd_iteration < self.max_iter:
+                    cd_iters_executed += 1
+                    max_change = 0.0
 
-                for j in cv_order:
-                    old_coef = active_coef[j]
-                    norm_sq = norm_sq_active[j]
+                    for j in cv_order:
+                        old_coef = active_coef[j]
+                        norm_sq = norm_sq_active[j]
 
-                    # Partial correlation rho
-                    rho = np.dot(X_active[:, j], residual) + old_coef * norm_sq
+                        # rho = X_j^T(y - X_active beta) + beta_j*||X_j||^2,
+                        # computed in Gram space (no O(N) dot).
+                        rho = Gya[j] - q[j] + old_coef * norm_sq
+                        new_coef = self._soft_threshold(
+                            rho, active_thresholds[j]) / norm_sq
 
-                    # Apply CV-based soft thresholding (Penalty is FIXED for this inner loop)
-                    new_coef = self._soft_threshold(rho, active_thresholds[j]) / norm_sq
+                        delta = new_coef - old_coef
+                        active_coef[j] = new_coef
+                        if delta != 0.0:
+                            q += delta * Gua[:, j]   # O(active) Gram-space update
 
-                    # Standard residual update
-                    residual -= (new_coef - old_coef) * X_active[:, j]
-                    active_coef[j] = new_coef
+                        if new_coef == 0 and old_coef != 0:
+                            # A feature died -- hand control to the outer loop so
+                            # CVs/anchor/thresholds recompute on the smaller set.
+                            killed_feature = True
+                            break
 
-                    if new_coef == 0 and old_coef != 0:
-                        # A feature just died — hand control back to the outer
-                        # loop so CVs/anchor/thresholds get recomputed on the
-                        # smaller library before doing any more CD work.
-                        killed_feature = True
-                        break
-
-                    with np.errstate(divide='ignore', invalid='ignore'):
-                        change = abs(new_coef - old_coef)
+                        change = abs(delta)
                         if old_coef != 0:
                             change /= abs(old_coef)
                         if change > max_change:
                             max_change = change
 
-                if killed_feature:
-                    break
+                    if killed_feature:
+                        break
 
-                # Inner loop convergence check
-                if max_change <= self.tol:
-                    # You can add your Dual Gap check here if desired,
-                    # but max_change is usually sufficient for the inner loop
-                    break
+                    # Inner loop convergence check
+                    if max_change <= self.tol:
+                        break
 
-                cd_iteration += 1
+                    cd_iteration += 1
             _loop_stats.record('PhysicsInformedLasso.CD_inner', cd_iters_executed, self.max_iter)
 
             # =================================================================
@@ -459,14 +476,10 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
         # survived) are preserved; only the magnitudes become unbiased
         # global estimates.
         if np.any(active_mask):
-            sw_active = (sample_weights if sample_weights is not None
-                          else np.ones(n_samples))
-            X_final = X_aug[:, active_mask]
+            active_idx = np.where(active_mask)[0]
             try:
-                XTWX_final = X_final.T @ (sw_active[:, None] * X_final)
-                XTWy_final = X_final.T @ (sw_active * y)
-                refit = np.linalg.solve(XTWX_final, XTWy_final)
-                self.full_coef_[active_mask] = refit
+                self.full_coef_[active_mask] = np.linalg.solve(
+                    G_w[np.ix_(active_idx, active_idx)], Gy_w[active_idx])
             except np.linalg.LinAlgError:
                 pass  # singular -> keep CD result
 

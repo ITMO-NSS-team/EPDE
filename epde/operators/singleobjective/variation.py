@@ -161,7 +161,16 @@ class EquationCrossover(CompoundOperator):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
         
         equation1_terms, equation2_terms = detect_similar_terms(objective[0], objective[1])
-        assert len(equation1_terms[0]) == len(equation2_terms[0]) and len(equation1_terms[1]) == len(equation2_terms[1])
+        # The "same" / "similar" partitions must pair symmetrically for the
+        # term-by-term crossover below. They can come out asymmetric when the
+        # two parents have different active-term counts (e.g. pruned
+        # structures of unequal length, which the fitness-based RPS now
+        # produces in single-objective mode). Skip crossover for such a pair
+        # rather than aborting the whole run. MOEA/D never hits this (its
+        # parents pair symmetrically), so this is a no-op there.
+        if not (len(equation1_terms[0]) == len(equation2_terms[0])
+                and len(equation1_terms[1]) == len(equation2_terms[1])):
+            return objective[0], objective[1]
         same_num = len(equation1_terms[0]); similar_num = len(equation1_terms[1])
         objective[0].structure = flatten(equation1_terms); objective[1].structure = flatten(equation2_terms)
     
@@ -240,11 +249,19 @@ class TermParamCrossover(CompoundOperator):
         objective[0].reset_saved_state(); objective[1].reset_saved_state()
         
         if len(objective[0].structure) != len(objective[1].structure):
-            print([(token.label, token.params) for token in objective[0].structure], [(token.label, token.params) for token in objective[1].structure])
-            raise Exception('Wrong terms passed:')
+            # Paired "similar" terms can have different factor counts when the
+            # structures are pruned to unequal length (fitness-based RPS in
+            # single-objective mode). Param crossover is undefined here -- skip
+            # this pair rather than crash. MOEA/D passes equal-length terms,
+            # so this is a no-op there.
+            return objective[0], objective[1]
         for term1_token_idx in np.arange(len(objective[0].structure)):
-            term2_token_idx = [i for i in np.arange(len(objective[1].structure)) 
-                               if objective[1].structure[i].label == objective[0].structure[term1_token_idx].label][0]
+            _label_matches = [i for i in np.arange(len(objective[1].structure))
+                              if objective[1].structure[i].label == objective[0].structure[term1_token_idx].label]
+            if not _label_matches:
+                # No factor with a matching label in the paired term; skip it.
+                continue
+            term2_token_idx = _label_matches[0]
             for param_idx, param_descr in objective[0].structure[term1_token_idx].params_description.items():
                 if param_descr['name'] == 'power': power_param_idx = param_idx
                 if param_descr['name'] == 'dim': dim_param_idx = param_idx                
