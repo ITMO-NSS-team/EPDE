@@ -1,0 +1,39 @@
+# JHTDB isotropic1024coarse pilot plane, KNOWN-TRUTH config: 3D NS
+# momentum on a 2D slice with exact injected tokens for pressure,
+# viscous and out-of-plane terms (see adapters/jhtdb_plane.py).
+# Signal-check ceiling R^2 = 0.991-0.992 (fixed physics coefficients).
+# Axis order (t, y, x): du/dx1 = du/dy, du/dx2 = du/dx.
+name: jhtdb_plane
+adapter: jhtdb_plane
+
+truth_equations:
+  - "-1.0 * u{power: 1.0} * du/dx2{power: 1.0} + -1.0 * v{power: 1.0} * du/dx1{power: 1.0} + -1.0 * w{power: 1.0} * u_z{power: 1.0} + -1.0 * p_x{power: 1.0} + 1.0 * nu_lap_u{power: 1.0} = du/dx0{power: 1.0}"
+  - "-1.0 * u{power: 1.0} * dv/dx2{power: 1.0} + -1.0 * v{power: 1.0} * dv/dx1{power: 1.0} + -1.0 * w{power: 1.0} * v_z{power: 1.0} + -1.0 * p_y{power: 1.0} + 1.0 * nu_lap_v{power: 1.0} = dv/dx0{power: 1.0}"
+
+search:
+  boundary: 4
+
+preprocessor:
+  type: poly
+  kwargs:
+    polynomial_window: 9
+    poly_order: 4
+
+# coupled 2-equation system -> larger population (4-dim objective space,
+# many candidates tie on the same Pareto level; user directive July 2026)
+moeadd:
+  population_size: 48
+  training_epochs: 8
+
+additional_tokens: []
+
+fit:
+  # truth = target du/dt + 5 features = 6 terms per equation
+  equation_terms_max_number: 6
+  data_fun_pow: 1
+  deriv_fun_pow: 1
+  max_deriv_order: [1, 1, 1]
+  equation_factors_max_number:
+    factors_num: [1, 2]
+    probas: [0.5, 0.5]
+  eq_sparsity_interval: [1.0e-8, 1.0]
