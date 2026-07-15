@@ -6,7 +6,6 @@ Created on Tue Jul 26 13:46:45 2022
 @author: maslyaev
 """
 
-import gc
 import warnings
 import copy
 import os
@@ -21,7 +20,6 @@ except ImportError:
 
 
 import numpy as np
-import torch
 
 import epde.globals as global_var
 import epde.optimizers.moeadd.solution_template as moeadd
@@ -35,7 +33,7 @@ from epde.preprocessing.domain_pruning import DomainPruner
 from epde.structure.encoding import Chromosome
 from epde.structure.factor import Factor
 from epde.structure.structure_template import ComplexStructure, check_uniqueness, _deepcopy_slots
-from epde.supplementary import filter_powers, normalize_ts, population_sort, flatten, rts, exp_form, minmax_normalize, retry_until_unique
+from epde.supplementary import filter_powers, flatten, exp_form, retry_until_unique
 
 
 _DEFAULT_EQUATION_METAPARAMETERS = {
@@ -78,7 +76,6 @@ class Term(ComplexStructure):
         structure:
         occupied_tokens_labels:
         descr_variable_marker:
-        prev_normalized
     """
     __slots__ = ['_history', 'structure', 'interelement_operator', 'saved', 'saved_as',
                  'pool', 'max_factors_in_term', 'cache_linked', 'occupied_tokens_labels',
@@ -253,7 +250,6 @@ class Term(ComplexStructure):
             value = value.reshape(-1)
             return value
         else:
-            self.prev_normalized = normalize
             value = super().evaluate(structural)
             if normalize:
                 # value = (value - np.mean(value)) / np.std(value)
@@ -279,39 +275,6 @@ class Term(ComplexStructure):
                     self.saved_as[normalize] = self.factors_labels
             value = value.reshape(-1)
             return value
-
-    def filter_tokens_by_right_part(self, reference_target, equation, equation_position,
-                                    max_retries: int = 100):
-        warnings.warn(message='Tokens can no longer be set as right-part-unique',
-                      category=DeprecationWarning)
-        taken_tokens = [factor.label for factor in reference_target.structure
-			 if factor.status['unique_for_right_part']]
-        meaningful_taken = any([factor.status['meaningful'] for factor in reference_target.structure
-                                if factor.status['unique_for_right_part']])
-
-        new_term = None
-        for accept_term_try in range(1, max_retries + 1):
-            new_term = copy.deepcopy(self)
-            for factor_idx, factor in enumerate(new_term.structure):
-                if factor.label in taken_tokens:
-                    new_term.reset_occupied_tokens()
-                    _, new_term.structure[factor_idx] = self.pool.create(create_meaningful=meaningful_taken,
-                                                                         occupied=new_term.occupied_tokens_labels + taken_tokens)
-            if len(equation.terms_labels) == len(equation.structure):
-                self.structure = new_term.structure
-                self.structure = filter_powers(self.structure)
-                self.reset_saved_state()
-                return
-            if accept_term_try == 10 and global_var.verbose.show_warnings:
-                warnings.warn('Can not create unique term, while filtering equation tokens in regards to the right part.')
-            if accept_term_try >= 10:
-                self.randomize(forbidden_factors=new_term.occupied_tokens_labels + taken_tokens)
-
-        last_attempt_name = new_term.name if new_term is not None else '<no candidate>'
-        raise RuntimeError(
-            f'filter_tokens_by_right_part: failed to create unique term after '
-            f'{max_retries} retries. Last attempted: {last_attempt_name} for '
-            f'{equation.text_form} with respect to {reference_target.name}')
 
     def reset_occupied_tokens(self):
         occupied_tokens_new = []
@@ -681,20 +644,6 @@ class Equation(ComplexStructure):
     def contains_variable(self, variable):
         return any([term.contains_variable(variable) for term in self.structure])
 
-    @property
-    def forbidden_token_labels(self):
-        warnings.warn(message='Tokens can no longer be set as right-part-unique',
-                      category=DeprecationWarning)
-        target_symbolic = [
-            factor.label for factor in self.structure[self.target_idx].structure]
-        forbidden_tokens = set()
-
-        for token_family in self.pool.families:
-            for token in token_family.tokens:
-                if token in target_symbolic and token_family.status['unique_for_right_part']:
-                    forbidden_tokens.add(token)
-        return forbidden_tokens
-
     def restore_property(self, deriv: bool = False, mandatory_family: bool = False, t_derivative: bool = False):
         # TODO: non-urgent, rewrite for an arbitrary equation property check
         if not (deriv or mandatory_family):
@@ -787,21 +736,6 @@ class Equation(ComplexStructure):
             f"wiring correct)."
         )
 
-    def reconstruct_by_right_part(self, right_part_idx):
-        warnings.warn(message='Tokens can no longer be set as right-part-unique',
-                      category=DeprecationWarning)
-        new_eq = copy.deepcopy(self)
-        self.copy_properties_to(new_eq)
-        new_eq.target_idx = right_part_idx
-        if any([factor.status['unique_for_right_part'] for factor in new_eq.structure[right_part_idx].structure]):
-            for term_idx, term in enumerate(new_eq.structure):
-                if term_idx != right_part_idx:
-                    term.filter_tokens_by_right_part(
-                        new_eq.structure[right_part_idx], self, term_idx)
-
-        new_eq.reset_saved_state()
-        return new_eq
-
     @_loop_stats.timed('Equation.evaluate')
     def evaluate(self, normalize: bool = True, return_val: bool = False,
                  grids: list = None) -> Tuple:
@@ -853,7 +787,6 @@ class Equation(ComplexStructure):
         if return_val:
             temp_feats = np.vstack([features, np.ones(features.shape[1])])
             temp_feats = np.transpose(temp_feats)
-            self.prev_normalized = normalize
             if normalize:
                 elem1 = np.expand_dims(target, axis=1)
                 value = np.add(elem1, - reduce(lambda x, y: np.add(x, y), [np.multiply(self.weights_internal[idx_full], temp_feats[:, idx_sparse])
@@ -1262,85 +1195,6 @@ class Equation(ComplexStructure):
                 described.add(term_labels)
         return frozenset(described)
 
-    @property
-    def factors_labels(self) -> frozenset:
-        """Alias of ``terms_labels`` — naming mirror used by some operators."""
-        return self.terms_labels
-
-    @property
-    def factors_labels_without_power(self) -> frozenset:
-        """Alias of ``terms_labels_without_power``."""
-        return self.terms_labels_without_power
-
-    def max_deriv_orders(self):
-        solver_form = self.solver_form()
-        max_orders = np.zeros(global_var.grid_cache.get('0').ndim)
-
-        def count_order(obj, deriv_ax):
-            if obj is None:
-                return 0
-            else:
-                return obj.count(deriv_ax)
-
-        for term in solver_form:
-            if isinstance(term[2], list):
-                for deriv_factor in term[1]:
-                    orders = np.array([count_order(deriv_factor, ax) for ax
-                                       in np.arange(max_orders.size)])
-                    max_orders = np.maximum(max_orders, orders)
-            else:
-                orders = np.array([count_order(term[1], ax) for ax
-                                   in np.arange(max_orders.size)])
-                max_orders = np.maximum(max_orders, orders)
-        if np.max(max_orders) > 4:
-            raise NotImplementedError('The current implementation allows does not allow higher orders of equation, than 2.')
-        return max_orders
-
-    def boundary_conditions(self, max_deriv_orders=(1,), main_var_key=('u', (1.0,)), full_domain: bool = False,
-                                grids : list = None):
-            required_bc_ord = max_deriv_orders   # We assume, that the maximum order of the equation here is 2
-            if global_var.grid_cache is None:
-                raise NameError('Grid cache has not been initialized yet.')
-
-            bconds = []
-            hardcoded_bc_relative_locations = {0: (), 1: (0,), 2: (0, 1),
-                                               3: (0., 0.5, 1.), 4: (0., 1/3., 2/3., 1.)}
-
-            if full_domain:
-                grid_cache = global_var.initial_data_cache
-                tensor_cache = global_var.initial_data_cache
-            else:
-                grid_cache = global_var.grid_cache
-                tensor_cache = global_var.tensor_cache
-
-            tensor_shape = grid_cache.get('0').shape
-
-            def get_boundary_ind(tensor_shape, axis, rel_loc):
-                return tuple(np.meshgrid(*[np.arange(shape) if dim_idx != axis else min(int(rel_loc * shape), shape-1)
-                                           for dim_idx, shape in enumerate(tensor_shape)], indexing='ij'))
-            for ax_idx, ax_ord in enumerate(required_bc_ord):
-                for loc_fraction in hardcoded_bc_relative_locations[ax_ord]:
-                    indexes = get_boundary_ind(tensor_shape, axis=ax_idx, rel_loc=loc_fraction)
-                    coords_raw = np.array([grid_cache.get(str(idx))[indexes] for idx
-                                           in np.arange(len(tensor_shape))])
-                    coords = coords_raw.T
-                    if coords.ndim > 2:
-                        coords = coords.squeeze()
-                    vals = np.expand_dims(tensor_cache.get(main_var_key)[indexes], axis=0).T
-
-                    coords = torch.from_numpy(coords).type(torch.FloatTensor)
-
-                    vals = torch.from_numpy(vals).type(torch.FloatTensor)
-                    bconds.append([coords, vals, 'dirichlet'])
-
-            return bconds
-
-    def clear_after_solver(self):
-        del self.model
-        del self._solver_form
-        self.solver_form_defined = False
-        gc.collect()
-
     def __iter__(self):
         return EquationIterator(self)        
 
@@ -1375,18 +1229,6 @@ class EquationIterator(object):
             return (coeff, term)
         else:
             raise StopIteration
-
-def solver_formed_grid(training_grid=None):
-    raise NotImplementedError('solver_formed_grid function is to be depricated')
-    if training_grid is None:
-        keys, training_grid = global_var.grid_cache.get_all()
-    else:
-        keys, _ = global_var.grid_cache.get_all()
-
-    assert len(keys) == training_grid[0].ndim, 'Mismatching dimensionalities'
-
-    training_grid = np.array(training_grid).reshape((len(training_grid), -1))
-    return torch.from_numpy(training_grid).T.type(torch.FloatTensor)
 
 def check_metaparameters(metaparameters: dict):
     metaparam_labels = ['max_terms_number', 'max_factors_in_term', 'sparsity']  # noqa: F841
@@ -1477,19 +1319,11 @@ class SoEq(moeadd.MOEADDSolution):
             quality_objectives + stability_objectives)
 
     def use_new_multiobjective_function(self):
-        from epde.eq_mo_objectives import generate_partial, equation_fitness, equation_complexity_by_factors, equation_terms_stability, equation_aic
-        complexity_objectives = [generate_partial(equation_complexity_by_factors, eq_key)
-                                 for eq_key in self.vars_to_describe]
-        quality_objectives = [generate_partial(
-            equation_fitness, eq_key) for eq_key in self.vars_to_describe]
-        stability_objectives = [generate_partial(
-            equation_terms_stability, eq_key) for eq_key in self.vars_to_describe]
-        aic_objectives = [generate_partial(
-            equation_aic, eq_key) for eq_key in self.vars_to_describe]
-        self.set_objective_functions(
-            # quality_objectives + stability_objectives + complexity_objectives)
-            # quality_objectives + stability_objectives + aic_objectives)
-            [equation_fitness] + [equation_terms_stability])
+        from epde.eq_mo_objectives import equation_fitness, equation_terms_stability
+        # Both objectives return per-equation tuples when called without an
+        # equation_key (flattened by ``obj_fun``), so no per-variable
+        # generate_partial expansion is needed here.
+        self.set_objective_functions([equation_fitness] + [equation_terms_stability])
 
     def use_default_singleobjective_function(self):
         # globals.single_objective_metric picks which (already-computed)
@@ -1553,17 +1387,6 @@ class SoEq(moeadd.MOEADDSolution):
         moeadd.MOEADDSolution.__init__(self, self.vals, self.obj_funs)
         self.moeadd_set = True
 
-    @staticmethod
-    def equation_opt_iteration(population, evol_operator, population_size, iter_index, unexplained_vars, strict_restrictions=True):
-        for equation in population:
-            if equation.terms_labels_without_power in unexplained_vars:
-                equation.penalize_fitness(coeff=0.)
-        population = population_sort(population)
-        population = population[:population_size]
-        gc.collect()
-        population = evol_operator.apply(population, unexplained_vars)
-        return population
-
     @property
     def obj_fun(self):
         return np.array(flatten([func(self) for func in self.obj_funs]))
@@ -1623,24 +1446,6 @@ class SoEq(moeadd.MOEADDSolution):
         for eq_label in self.vals.equation_keys:  # Not the best code possible here
             self.vals[eq_label].copy_properties_to(objective.vals[eq_label])
 
-    def solver_params(self, full_domain: bool, grids: list = None) -> Tuple:
-        '''
-        Return solver form, grid and boundary conditions for every equation.
-
-        Pass ``full_domain=True`` to read from the initial-data cache (the
-        complete sampled domain) instead of the active grid cache. ``grids``
-        overrides the implicit grid used to evaluate solver forms.
-        '''
-        equation_forms = []
-        bconds = []
-
-        for idx, equation in enumerate(self.vals):
-            equation_forms.append(equation.solver_form(grids=grids))
-            bconds.append(equation.boundary_conditions(full_domain=full_domain, grids=grids,
-                                                       index=idx))
-
-        return equation_forms, solver_formed_grid(grids), bconds
-
     def __iter__(self):
         return SoEqIterator(self)
 
@@ -1671,16 +1476,6 @@ class SoEq(moeadd.MOEADDSolution):
         for equation in self.vals:
             equations_caches.append(equation.terms_labels)
         return tuple(equations_caches)
-
-    @property
-    def terms_labels_without_power(self):
-        # TODO(deprecate): use equations_labels_without_power
-        return self.equations_labels_without_power
-
-    @property
-    def terms_labels(self):
-        # TODO(deprecate): use equations_labels
-        return self.equations_labels
 
 
 class SoEqIterator(object):

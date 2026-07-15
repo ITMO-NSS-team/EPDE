@@ -200,25 +200,6 @@ class TestEquationLabelProperties:
 
 
 # ---------------------------------------------------------------------------
-# 6. TestRenameAliases (Phase 3)
-#
-# Pin the alias contract: deprecated old names delegate to new names with
-# identical results. If a future commit drops an alias, this test catches it.
-# ---------------------------------------------------------------------------
-
-class TestRenameAliases:
-    # Term-level term_label / term_label_without_power aliases were
-    # removed; all callers route through factors_labels(_without_power)
-    # directly. SoEq still aliases equations_labels(_without_power) to
-    # keep the MOEA/D-side history-membership API stable.
-    def test_soeq_alias_equations_labels(self, soeq):
-        assert soeq.equations_labels == soeq.terms_labels
-
-    def test_soeq_alias_equations_labels_without_power(self, soeq):
-        assert soeq.equations_labels_without_power == soeq.terms_labels_without_power
-
-
-# ---------------------------------------------------------------------------
 # 7. TestEquationLabelsAfterTermMutation
 #
 # terms_labels / terms_labels_without_power are memoized in slot caches
@@ -262,46 +243,6 @@ class TestEquationLabelsAfterTermMutation:
         equation._invalidate_label_cache()
         assert equation._terms_labels_cache is None
         assert equation._terms_labels_without_power_cache is None
-
-    def test_factors_labels_alias_on_equation(self, equation):
-        # Phase 3 added factors_labels on Term; mutations.py:127 also reads
-        # it on Equation (treating the names as interchangeable). Pin the alias.
-        assert equation.factors_labels == equation.terms_labels
-        assert equation.factors_labels_without_power == equation.terms_labels_without_power
-
-
-# ---------------------------------------------------------------------------
-# 8. TestFilterTokensByRightPartExhaustion (Phase 6)
-#
-# Pin: filter_tokens_by_right_part raises RuntimeError when it cannot find
-# a unique term within the retry budget. Pre-Phase-6 the function looped
-# forever (or warned and continued); Phase 6 caps retries with a hard fail.
-# ---------------------------------------------------------------------------
-
-class TestFilterTokensByRightPartExhaustion:
-    def test_raises_runtimeerror_on_exhaustion(self, equation):
-        import warnings as _w
-
-        # The deprecated function reads factor.status['unique_for_right_part'];
-        # patch it onto our test factors (the fixture uses the modern token-
-        # family schema where this key is absent).
-        for t in equation.structure:
-            for f in t.structure:
-                f.status['unique_for_right_part'] = False
-
-        # Force a duplicate so terms_labels never matches len(structure)
-        # — guaranteeing the loop never breaks out via success.
-        equation.structure.append(copy.deepcopy(equation.structure[0]))
-        equation._invalidate_label_cache()
-
-        target = equation.structure[equation.target_idx]
-        candidate = equation.structure[0]
-
-        with _w.catch_warnings():
-            _w.simplefilter('ignore', DeprecationWarning)
-            with pytest.raises(RuntimeError, match='filter_tokens_by_right_part'):
-                candidate.filter_tokens_by_right_part(
-                    target, equation, equation_position=0, max_retries=1)
 
 
 # ---------------------------------------------------------------------------
