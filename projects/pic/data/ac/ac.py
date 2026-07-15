@@ -54,7 +54,7 @@ def ac_discovery(foldername, noise_level):
 
     # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
     #                                     preprocessor_kwargs={'epochs_max' : 1e3})
-    epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+    epde_search_obj.set_preprocessor(default_preprocessor_type='poly',
                                      preprocessor_kwargs={})
     popsize = 16
 
