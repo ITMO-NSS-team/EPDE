@@ -608,6 +608,34 @@ class TestCacheFieldRegistry:
 
 
 # ---------------------------------------------------------------------------
+# 10c. Phase-5 flagged fixes
+# ---------------------------------------------------------------------------
+
+class TestPhase5Fixes:
+
+    def test_chromosome_eq_key_mismatch_returns_false(self):
+        # Pre-fix, Chromosome.__eq__ compared self's keys with THEMSELVES,
+        # so mismatched chromosomes fell through to a KeyError. Now a key
+        # mismatch is an ordinary inequality.
+        from epde.structure.encoding import Chromosome
+        a = Chromosome.__new__(Chromosome)
+        b = Chromosome.__new__(Chromosome)
+        a.chromosome = {'u': 1}
+        b.chromosome = {'v': 1}
+        assert (a == b) is False
+        b.chromosome = {'u': 1}
+        assert (a == b) is True
+
+    def test_alt_instability_cache_wiped_on_structure_change(self, equation):
+        # survival/tile memo is keyed on the OLD structure -- unlike the
+        # sparsity caches, nothing recomputes it on the converged mask, so
+        # _invalidate_label_cache must wipe it.
+        equation._cached_alt_instability = ('survival', 0.5)
+        equation._invalidate_label_cache()
+        assert equation._cached_alt_instability is None
+
+
+# ---------------------------------------------------------------------------
 # 11. TestResetStateSoftAsymmetry (refactoring plan, Phase 1 / item 2)
 #
 # ``reset_state(reset_right_part=False)`` clears ``weights_final_evald``
