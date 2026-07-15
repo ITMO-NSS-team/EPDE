@@ -297,7 +297,17 @@ class EqRightPartSelector(CompoundOperator):
                     return True
         common_factors = list(frozenset.intersection(*equation_terms))
         if not common_factors:
-            return False
+            # No symbolic reduction applies -- run the numeric completion of
+            # the duplicate-term invariant: exactly linearly dependent
+            # nonzero feature columns (the generalization of a duplicate
+            # term the label test cannot see, e.g. two symbolically distinct
+            # products evaluating to proportional fields) make the active-
+            # support OLS refit rank-deficient ("infinite solutions"), so
+            # such terms are regenerated like duplicates. The target is
+            # never touched: a target in the SPAN of independent features is
+            # a perfect fit (a valid identity), not a degeneracy.
+            return self._regenerate_dependent_terms(objective,
+                                                    nonzero_terms[:-1])
 
         for common_factor in common_factors:
             # Min power across the matching factor in every nonzero term.
@@ -348,6 +358,75 @@ class EqRightPartSelector(CompoundOperator):
                 objective.reset_state()
             return True
         return False
+
+    def _regenerate_dependent_terms(self, objective: Equation,
+                                    feature_terms) -> bool:
+        """Regenerate nonzero non-target terms whose evaluated columns are
+        EXACTLY linearly dependent (incl. against the intercept).
+
+        Such columns leave the active-support coefficient solve with
+        infinitely many solutions (the observed lv / lorenz failure), so
+        they are held to the same regenerate-n-then-drop policy as
+        duplicate labels. Strictly machine-exact (``_LIN_DEP_RTOL`` on unit
+        columns): near-collinear physics -- including valid analytical
+        identities -- is never touched, in keeping with the
+        no-collinearity-machinery principle.
+
+        Returns True iff the structure changed; the caller's outer RPS loop
+        then re-runs the term sweep and re-checks (bounded by its own
+        iteration cap).
+        """
+        if not feature_terms:
+            return False
+        cols = [np.asarray(term.evaluate(False, grids=None),
+                           dtype=float).reshape(-1)
+                for term in feature_terms]
+        scan = _flag_dependent_columns(cols)
+        if scan is None:
+            # Non-finite column: dependence undecidable, mirror the
+            # super-Gram skip rather than regenerating on a data problem.
+            _loop_stats.record('simplify_equation.lin_dep_skip', 1, 1)
+            return False
+        flagged_idx, basis = scan
+        if not flagged_idx:
+            return False
+
+        def _independent(term):
+            col = np.asarray(term.evaluate(False, grids=None),
+                             dtype=float).reshape(-1)
+            if not np.all(np.isfinite(col)):
+                return False
+            nrm = np.linalg.norm(col)
+            if nrm == 0.0:
+                return False
+            u = col / nrm
+            K = np.stack(basis, axis=1)
+            coef, *_ = np.linalg.lstsq(K, u, rcond=None)
+            return np.linalg.norm(u - K @ coef) >= _LIN_DEP_RTOL
+
+        changed = False
+        for i in flagged_idx:
+            term = feature_terms[i]
+            status = _regen_or_drop_term(
+                objective, term, max_iter=100,
+                stats_name='simplify_equation.lin_dep',
+                extra_ok=_independent)
+            if status == 'floor':
+                break
+            if status in ('regenerated', 'dropped'):
+                changed = True
+                if status == 'regenerated':
+                    # The accepted replacement joins the basis so the
+                    # remaining flagged terms are checked against it too.
+                    col = np.asarray(term.evaluate(False, grids=None),
+                                     dtype=float).reshape(-1)
+                    basis.append(col / np.linalg.norm(col))
+        if changed:
+            try:
+                objective.reset_state(reset_right_part=False)
+            except TypeError:
+                objective.reset_state()
+        return changed
 
     def use_default_tags(self):
         self._tags = {'equation right part selection', 'gene level', 'contains suboperators', 'inplace'}
@@ -431,6 +510,52 @@ class RandomRHPSelector(CompoundOperator):
         self._tags = {'equation right part selection', 'gene level', 'contains suboperators', 'inplace'}
 
 
+# Relative projection residual (on unit-normalized columns) below which an
+# evaluated term column counts as EXACTLY linearly dependent on the columns
+# before it. This is a machine-exactness test for rank deficiency ("infinite
+# solutions" in the OLS/Gram solves), NOT a collinearity threshold: exact
+# dependence projects to ~eps*conditioning, while even severely near-collinear
+# physics (incl. valid analytical identities) sits many orders of magnitude
+# above 1e-10.
+_LIN_DEP_RTOL = 1e-10
+
+
+def _flag_dependent_columns(cols, rtol: float = _LIN_DEP_RTOL):
+    """Greedy exact-dependence scan over evaluated feature columns.
+
+    Seeds the kept basis with the intercept column (the coefficient fits
+    include one, so an exactly-constant term column is redundant with it),
+    then walks ``cols`` in order: a column whose unit-normalized projection
+    residual on the kept basis falls below ``rtol`` -- or an all-zero
+    column -- is flagged as dependent; otherwise it joins the basis.
+    Dependence is weight-invariant (a diagonal sample weighting preserves
+    exact linear dependence), so the unweighted columns are checked.
+
+    Returns ``(flagged_indices, basis)`` where ``basis`` is the list of
+    kept unit columns (intercept first), or ``None`` when any column is
+    non-finite -- the check is not applicable then (mirrors the
+    ``_precompute_super_gram`` skip).
+    """
+    n = cols[0].size
+    basis = [np.full(n, 1.0 / np.sqrt(n))]
+    flagged = []
+    for i, col in enumerate(cols):
+        if not np.all(np.isfinite(col)):
+            return None
+        nrm = np.linalg.norm(col)
+        if nrm == 0.0:
+            flagged.append(i)
+            continue
+        u = col / nrm
+        K = np.stack(basis, axis=1)
+        coef, *_ = np.linalg.lstsq(K, u, rcond=None)
+        if np.linalg.norm(u - K @ coef) < rtol:
+            flagged.append(i)
+        else:
+            basis.append(u)
+    return flagged, basis
+
+
 def _amplification_ratio(objective: Equation) -> float:
     """Amplification ratio of the CURRENT candidate right-part fit:
 
@@ -469,10 +594,16 @@ def _amplification_ratio(objective: Equation) -> float:
 
 def _regen_or_drop_term(equation: Equation, term, *, max_iter: int = 100,
                         min_terms: int = 2,
-                        stats_name: str = 'simplify_equation.regen_or_drop') -> str:
+                        stats_name: str = 'simplify_equation.regen_or_drop',
+                        extra_ok=None) -> str:
     """Make ``equation.structure`` unique w.r.t. ``term`` by regenerating
     ``term`` up to ``max_iter`` times; if it is still empty / non-meaningful
     / a duplicate, DROP it from the structure.
+
+    ``extra_ok`` (optional ``Term -> bool``) extends the acceptability
+    predicate beyond label uniqueness -- used by the linear-dependence
+    scrub, whose redundant columns are label-unique yet must still be
+    regenerated (and dropped on cap-hit, like a persistent duplicate).
 
     This is the simplify/scrub cap-hit policy -- *regenerate-n-then-drop* --
     deliberately distinct from the *keep-or-revert* ``retry_until_unique``
@@ -501,7 +632,9 @@ def _regen_or_drop_term(equation: Equation, term, *, max_iter: int = 100,
         if len(term.structure) == 0 or not term.contains_meaningful():
             return False
         signatures = {t.factors_labels for t in equation.structure}
-        return len(signatures) == len(equation.structure)
+        if len(signatures) != len(equation.structure):
+            return False
+        return extra_ok is None or bool(extra_ok(term))
 
     cap = max_iter if max_iter > 0 else 1
     if _acceptable():
