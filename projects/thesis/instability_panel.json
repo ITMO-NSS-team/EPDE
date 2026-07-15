@@ -1,0 +1,966 @@
+[
+  {
+    "system": "ode",
+    "variables": [
+      "u"
+    ],
+    "n_candidates": 6,
+    "rows": [
+      {
+        "disc": 0.013013498122155909,
+        "instab_vcoef": 8.420424789102235e-06,
+        "instab_cv": 6.970796443121393e-06,
+        "instab_survival": 0.00535630680470537,
+        "instab_tile": 0.03041823829804531,
+        "label": "true",
+        "category": "true"
+      },
+      {
+        "disc": 0.8027739725426799,
+        "instab_vcoef": 0.05842531338506209,
+        "instab_cv": 0.04394300349692041,
+        "instab_survival": 0.3606695221214436,
+        "instab_tile": 0.38226325813474404,
+        "label": "wrong:missing",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.012856160328163552,
+        "instab_vcoef": 1.4578834685388289,
+        "instab_cv": 0.9167664069484669,
+        "instab_survival": 1.0930289983351444,
+        "instab_tile": 0.27354299504573065,
+        "label": "wrong:overfit",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.0026096064673436603,
+        "instab_vcoef": 0.03368730787700496,
+        "instab_cv": 0.004687591655949441,
+        "instab_survival": 0.10126181653680336,
+        "instab_tile": 1.1570419667683094,
+        "label": "wrong:disc[instab_reg_rep00.json]",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.24960485414735098,
+        "instab_vcoef": 0.0002502072929118229,
+        "instab_cv": 0.0008436547437265543,
+        "instab_survival": 0.04726638580698356,
+        "instab_tile": 0.057824997501546654,
+        "label": "wrong:disc[instab_reg_rep01.json]",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.24960485414735098,
+        "instab_vcoef": 0.0002502072929118211,
+        "instab_cv": 0.0008436547437265475,
+        "instab_survival": 0.04726638580698238,
+        "instab_tile": 0.05782499750154684,
+        "label": "wrong:disc[instab_reg_rep03.json]",
+        "category": "wrong"
+      }
+    ]
+  },
+  {
+    "system": "vdp",
+    "variables": [
+      "u"
+    ],
+    "n_candidates": 6,
+    "rows": [
+      {
+        "disc": 0.00016842098912115945,
+        "instab_vcoef": 5.788382246745723e-07,
+        "instab_cv": 4.110922943270652e-07,
+        "instab_survival": 0.000365974681613409,
+        "instab_tile": 0.001757420166652874,
+        "label": "true",
+        "category": "true"
+      },
+      {
+        "disc": 0.9887191124470203,
+        "instab_vcoef": 5.176899463450383,
+        "instab_cv": 0.8358045702095993,
+        "instab_survival": 1.321418608125049,
+        "instab_tile": 1.2477770097171204,
+        "label": "wrong:missing",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.00016775722616008728,
+        "instab_vcoef": 3.140729339985528,
+        "instab_cv": 2.2881770106803274,
+        "instab_survival": 1.3271122833803013,
+        "instab_tile": 7.682722869380855,
+        "label": "wrong:overfit",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.00016555065660302164,
+        "instab_vcoef": 0.3363812319942423,
+        "instab_cv": 3.407657755014529,
+        "instab_survival": 1.8118828749211726,
+        "instab_tile": 0.4151893960900352,
+        "label": "wrong:disc[legacy_rep00.json]",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.12058516048305085,
+        "instab_vcoef": 1722.531584141167,
+        "instab_cv": 1206.4814490292622,
+        "instab_survival": 12.121265678008282,
+        "instab_tile": 23.20619256468983,
+        "label": "wrong:disc[legacy_rep01.json]",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.00010008437207314832,
+        "instab_vcoef": 53.95704856685293,
+        "instab_cv": 137.0365040292291,
+        "instab_survival": 17.441255207296845,
+        "instab_tile": 17.117284460454535,
+        "label": "wrong:disc[legacy_rep02.json]",
+        "category": "wrong"
+      }
+    ]
+  },
+  {
+    "system": "lorenz",
+    "variables": [
+      "u",
+      "v",
+      "w"
+    ],
+    "n_candidates": 8,
+    "rows": [
+      {
+        "disc": 3.3379190383653876e-05,
+        "instab_vcoef": 2.1279425955075917e-07,
+        "instab_cv": 1.3387168207237488e-05,
+        "instab_survival": 0.00024106711403840207,
+        "instab_tile": 0.001418742552539968,
+        "label": "true",
+        "category": "true"
+      },
+      {
+        "disc": 3.038281078106747e-05,
+        "instab_vcoef": 5.54521646747329e-07,
+        "instab_cv": 1.7335381068435476e-05,
+        "instab_survival": 0.0002971732872211801,
+        "instab_tile": 0.0025337115117787115,
+        "label": "identity[1]",
+        "category": "identity"
+      },
+      {
+        "disc": 2.9150147277547214e-05,
+        "instab_vcoef": 1.9316818980932018e-07,
+        "instab_cv": 1.3400773919151201e-05,
+        "instab_survival": 0.00024672653175611983,
+        "instab_tile": 0.0014780740561726935,
+        "label": "identity[2]",
+        "category": "identity"
+      },
+      {
+        "disc": 0.2761550857870249,
+        "instab_vcoef": 1.028026834912551,
+        "instab_cv": 0.37847848256364675,
+        "instab_survival": 0.1433916511370386,
+        "instab_tile": 0.13115123174302198,
+        "label": "wrong:missing",
+        "category": "wrong"
+      },
+      {
+        "disc": 3.283528501310182e-05,
+        "instab_vcoef": 28.828120457102973,
+        "instab_cv": 4.962802479168183,
+        "instab_survival": 0.5636187341558557,
+        "instab_tile": 1.7242322436910975,
+        "label": "wrong:overfit",
+        "category": "wrong"
+      },
+      {
+        "label": "wrong:disc[legacy_rep01.json]",
+        "category": "wrong",
+        "error": "IndexError: list index out of range"
+      },
+      {
+        "label": "wrong:disc[legacy_rep02.json]",
+        "category": "wrong",
+        "error": "IndexError: list index out of range"
+      },
+      {
+        "label": "wrong:disc[legacy_rep03.json]",
+        "category": "wrong",
+        "error": "IndexError: list index out of range"
+      }
+    ]
+  },
+  {
+    "system": "lv",
+    "variables": [
+      "u",
+      "v"
+    ],
+    "n_candidates": 7,
+    "rows": [
+      {
+        "disc": 0.004879070824289846,
+        "instab_vcoef": 0.0024536551276070104,
+        "instab_cv": 0.00015249804831200098,
+        "instab_survival": 0.005220426185469902,
+        "instab_tile": 0.008082302883456094,
+        "label": "true",
+        "category": "true"
+      },
+      {
+        "label": "identity[1]",
+        "category": "identity",
+        "error": "IndexError: list index out of range"
+      },
+      {
+        "disc": 0.5023697086120599,
+        "instab_vcoef": 7560.006890329333,
+        "instab_cv": 44.180089497951414,
+        "instab_survival": 1.8542331275650812,
+        "instab_tile": 0.30623529726481563,
+        "label": "wrong:missing",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.00449145511821385,
+        "instab_vcoef": 515.0084178912667,
+        "instab_cv": 32.34773973280963,
+        "instab_survival": 0.338836433888506,
+        "instab_tile": 1.1504711432712975,
+        "label": "wrong:overfit",
+        "category": "wrong"
+      },
+      {
+        "label": "wrong:disc[instab_reg_rep00.json]",
+        "category": "wrong",
+        "error": "IndexError: list index out of range"
+      },
+      {
+        "label": "wrong:disc[instab_reg_rep01.json]",
+        "category": "wrong",
+        "error": "IndexError: list index out of range"
+      },
+      {
+        "label": "wrong:disc[instab_reg_rep02.json]",
+        "category": "wrong",
+        "error": "IndexError: list index out of range"
+      }
+    ]
+  },
+  {
+    "system": "wave",
+    "variables": [
+      "u"
+    ],
+    "n_candidates": 9,
+    "rows": [
+      {
+        "disc": 0.01889926559039035,
+        "instab_vcoef": 4.621149999749362e-05,
+        "instab_cv": 1.3667696832963737e-05,
+        "instab_survival": 0.0004473004854165662,
+        "instab_tile": 0.002096515207420302,
+        "label": "true",
+        "category": "true"
+      },
+      {
+        "disc": 0.0005506434341618078,
+        "instab_vcoef": 1.134550004267892e-08,
+        "instab_cv": 0.00013067369872932967,
+        "instab_survival": 0.002798742314702678,
+        "instab_tile": 0.026177331555812686,
+        "label": "identity[1]",
+        "category": "identity"
+      },
+      {
+        "disc": 0.0032345066309998603,
+        "instab_vcoef": 1.5526719196623364e-06,
+        "instab_cv": 0.008389946477880654,
+        "instab_survival": 0.04176979823495122,
+        "instab_tile": 0.3273436957353292,
+        "label": "identity[2]",
+        "category": "identity"
+      },
+      {
+        "disc": 0.005607112718490921,
+        "instab_vcoef": 2.0404976499240393e-06,
+        "instab_cv": 1.0535968256100376,
+        "instab_survival": 0.11326567929595668,
+        "instab_tile": 0.23994314684263546,
+        "label": "identity[3]",
+        "category": "identity"
+      },
+      {
+        "disc": 0.005078764655658374,
+        "instab_vcoef": 6.315417411303172e-07,
+        "instab_cv": 0.053637102374572816,
+        "instab_survival": 0.06481508201588605,
+        "instab_tile": 0.3577124040385775,
+        "label": "identity[4]",
+        "category": "identity"
+      },
+      {
+        "disc": 0.017102459953042548,
+        "instab_vcoef": 0.010052429650342852,
+        "instab_cv": 0.1202672714685699,
+        "instab_survival": 0.11152924469092605,
+        "instab_tile": 0.22806450534295006,
+        "label": "wrong:overfit",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.8262007704910527,
+        "instab_vcoef": 0.46636598802855483,
+        "instab_cv": 0.05994285918152154,
+        "instab_survival": 0.08454625567942038,
+        "instab_tile": 0.38998988494379666,
+        "label": "wrong:disc[instab_reg_rep00.json]",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.27962186563204533,
+        "instab_vcoef": 0.05734660277856648,
+        "instab_cv": 0.0018613182995118635,
+        "instab_survival": 0.0003628066453814261,
+        "instab_tile": 0.0016501081268853034,
+        "label": "wrong:disc[instab_reg_rep01.json]",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.09677018981715232,
+        "instab_vcoef": 0.0037031536882944334,
+        "instab_cv": 0.03174078758178632,
+        "instab_survival": 0.10358327885949159,
+        "instab_tile": 0.7540676229366188,
+        "label": "wrong:disc[instab_reg_rep02.json]",
+        "category": "wrong"
+      }
+    ]
+  },
+  {
+    "system": "kdv_cossin",
+    "variables": [
+      "u"
+    ],
+    "n_candidates": 6,
+    "rows": [
+      {
+        "disc": 0.002890943355632978,
+        "instab_vcoef": 8.366927507379187e-05,
+        "instab_cv": 7.778971620733923e-06,
+        "instab_survival": 0.0021378793215194505,
+        "instab_tile": 0.0007979889894837172,
+        "label": "true",
+        "category": "true"
+      },
+      {
+        "disc": 0.567342719996802,
+        "instab_vcoef": 65.28471630148677,
+        "instab_cv": 2.6557810966231545,
+        "instab_survival": 0.34948953804346927,
+        "instab_tile": 1.4052762551929985,
+        "label": "wrong:missing",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.0027853003289291887,
+        "instab_vcoef": 2.257166835744004,
+        "instab_cv": 0.3402470233309101,
+        "instab_survival": 0.3885840492525219,
+        "instab_tile": 0.40129044676179965,
+        "label": "wrong:overfit",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.008726664469490676,
+        "instab_vcoef": 1.7698987961918666,
+        "instab_cv": 15.247239860432055,
+        "instab_survival": 2.081794309102331,
+        "instab_tile": 26.384523016657607,
+        "label": "wrong:disc[legacy_rep00.json]",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.012225688645331132,
+        "instab_vcoef": 1.7343365863495865,
+        "instab_cv": 93.33814722187445,
+        "instab_survival": 14.187879926816755,
+        "instab_tile": 8.99595771397656,
+        "label": "wrong:disc[legacy_rep01.json]",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.008135825560241105,
+        "instab_vcoef": 6.456120572135431,
+        "instab_cv": 11.357284299794976,
+        "instab_survival": 1.0056723176841422,
+        "instab_tile": 8.090570853478063,
+        "label": "wrong:disc[legacy_rep02.json]",
+        "category": "wrong"
+      }
+    ]
+  },
+  {
+    "system": "kdv",
+    "variables": [
+      "u"
+    ],
+    "n_candidates": 12,
+    "rows": [
+      {
+        "disc": 0.020566024304502828,
+        "instab_vcoef": 3.7481898920746497e-05,
+        "instab_cv": 4.9598748123669956e-05,
+        "instab_survival": 1.1539157249145343e-05,
+        "instab_tile": 1.547066785492847e-05,
+        "label": "true",
+        "category": "true"
+      },
+      {
+        "disc": 0.0018089929217636306,
+        "instab_vcoef": 5.663976633506881e-06,
+        "instab_cv": 1.8058047608596383e-06,
+        "instab_survival": 2.9872685002994e-05,
+        "instab_tile": 3.501642261998883e-05,
+        "label": "identity[1]",
+        "category": "identity"
+      },
+      {
+        "disc": 0.00721205768201776,
+        "instab_vcoef": 0.0009657045437100136,
+        "instab_cv": 1.730021267353756e-05,
+        "instab_survival": 3.0491562819189972e-05,
+        "instab_tile": 6.560209356092135e-05,
+        "label": "identity[2]",
+        "category": "identity"
+      },
+      {
+        "disc": 0.0012402668027795968,
+        "instab_vcoef": 1.8137524918969002e-05,
+        "instab_cv": 7.458620957952792e-07,
+        "instab_survival": 2.1108192021642925e-05,
+        "instab_tile": 3.72646034881216e-05,
+        "label": "identity[3]",
+        "category": "identity"
+      },
+      {
+        "disc": 0.0010450423995601232,
+        "instab_vcoef": 6.807271169852147e-07,
+        "instab_cv": 0.22250287451827008,
+        "instab_survival": 9.287294038780588e-05,
+        "instab_tile": 0.00032133107040968113,
+        "label": "identity[4]",
+        "category": "identity"
+      },
+      {
+        "disc": 0.00022173841045807887,
+        "instab_vcoef": 1.161419963474893e-08,
+        "instab_cv": 0.02774611195466186,
+        "instab_survival": 1.4524698517730476e-05,
+        "instab_tile": 2.5391667877467362e-05,
+        "label": "identity[5]",
+        "category": "identity"
+      },
+      {
+        "disc": 0.0019736668693448433,
+        "instab_vcoef": 1.8420861107290602e-05,
+        "instab_cv": 0.08345252620004462,
+        "instab_survival": 9.939272411553694e-05,
+        "instab_tile": 0.0002437557337846339,
+        "label": "identity[6]",
+        "category": "identity"
+      },
+      {
+        "disc": 0.3780434627585585,
+        "instab_vcoef": 0.014072432578052428,
+        "instab_cv": 0.00013733249708952662,
+        "instab_survival": 4.693759797801009e-06,
+        "instab_tile": 5.14664385100797e-06,
+        "label": "wrong:missing",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.020566024300952772,
+        "instab_vcoef": 56974857.351279035,
+        "instab_cv": 316.2559621157516,
+        "instab_survival": 0.2389932135977443,
+        "instab_tile": 0.6988398775173232,
+        "label": "wrong:overfit",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.1897431465336639,
+        "instab_vcoef": 89495.46406821065,
+        "instab_cv": 7.865295966711855,
+        "instab_survival": 0.0117776342050547,
+        "instab_tile": 0.01704992044958486,
+        "label": "wrong:disc[legacy_rep00.json]",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.11929618069075272,
+        "instab_vcoef": 0.2081192950141773,
+        "instab_cv": 602.5831466169049,
+        "instab_survival": 0.00038694599948455564,
+        "instab_tile": 0.0013742123350638689,
+        "label": "wrong:disc[legacy_rep01.json]",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.5793627279371474,
+        "instab_vcoef": 63.763226121645566,
+        "instab_cv": 4.414472454169688,
+        "instab_survival": 9.68005971177776,
+        "instab_tile": 3.0570691907531127,
+        "label": "wrong:disc[legacy_rep02.json]",
+        "category": "wrong"
+      }
+    ]
+  },
+  {
+    "system": "ac",
+    "variables": [
+      "u"
+    ],
+    "n_candidates": 6,
+    "rows": [
+      {
+        "disc": 0.005984419620021239,
+        "instab_vcoef": 0.023855004275615703,
+        "instab_cv": 0.0024446161589221356,
+        "instab_survival": 0.015011036418325746,
+        "instab_tile": 0.08134393892771977,
+        "label": "true",
+        "category": "true"
+      },
+      {
+        "disc": 0.8678139453512894,
+        "instab_vcoef": 5.16437232169962,
+        "instab_cv": 0.723490478134562,
+        "instab_survival": 0.30083877259255987,
+        "instab_tile": 1.2565267741778325,
+        "label": "wrong:missing",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.005966208197374133,
+        "instab_vcoef": 1.5188123543455625,
+        "instab_cv": 9.517808966670195,
+        "instab_survival": 0.13726254361738738,
+        "instab_tile": 2.265830534824525,
+        "label": "wrong:overfit",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.006320802394229835,
+        "instab_vcoef": 198.10847358918656,
+        "instab_cv": 11.91372707642402,
+        "instab_survival": 1.2603235701139768,
+        "instab_tile": 1.1564734525782603,
+        "label": "wrong:disc[legacy_rep00.json]",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.3413871047605801,
+        "instab_vcoef": 55498.531874975335,
+        "instab_cv": 12532.221229259589,
+        "instab_survival": 5.988221251370929,
+        "instab_tile": 21.22795286583518,
+        "label": "wrong:disc[legacy_rep01.json]",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.9250633570956013,
+        "instab_vcoef": 53809.54114166586,
+        "instab_cv": 49.9988838555168,
+        "instab_survival": 4.1781164514579325,
+        "instab_tile": 32.33938148930114,
+        "label": "wrong:disc[legacy_rep02.json]",
+        "category": "wrong"
+      }
+    ]
+  },
+  {
+    "system": "burgers_inviscid",
+    "variables": [
+      "u"
+    ],
+    "n_candidates": 7,
+    "rows": [
+      {
+        "disc": 1.5860521290622797e-05,
+        "instab_vcoef": 2.777062456179324e-10,
+        "instab_cv": 2.7056760351001568e-11,
+        "instab_survival": 2.8818857355672443e-06,
+        "instab_tile": 1.1086584695601579e-05,
+        "label": "true",
+        "category": "true"
+      },
+      {
+        "disc": 3.1094412164606553e-15,
+        "instab_vcoef": 8.608959175757638e-21,
+        "instab_cv": 4.406908143364295e-31,
+        "instab_survival": 5.551115123125783e-17,
+        "instab_tile": 0.0,
+        "label": "identity[1]",
+        "category": "identity"
+      },
+      {
+        "disc": 3.0413021893619894e-15,
+        "instab_vcoef": 1.0909874512328578e-19,
+        "instab_cv": 7.072035299042426e-28,
+        "instab_survival": 1.942890293094024e-15,
+        "instab_tile": 1.4493961586481691e-13,
+        "label": "identity[2]",
+        "category": "identity"
+      },
+      {
+        "disc": 1.5860521290620974e-05,
+        "instab_vcoef": 151763799.160655,
+        "instab_cv": 19.353702597103684,
+        "instab_survival": 1.7976931348623157e+308,
+        "instab_tile": 0.9643544988325974,
+        "label": "wrong:overfit",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.999998999444886,
+        "instab_vcoef": 14.652203024823582,
+        "instab_cv": 24.156984950696053,
+        "instab_survival": 2.948200742422976,
+        "instab_tile": 0.665223069445312,
+        "label": "wrong:disc[legacy_rep00.json]",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.9999994529231212,
+        "instab_vcoef": 50.88452603182875,
+        "instab_cv": 74.62660866796632,
+        "instab_survival": 2.5385853203327087,
+        "instab_tile": 0.7685207327677646,
+        "label": "wrong:disc[legacy_rep01.json]",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.15402068533396898,
+        "instab_vcoef": 0.024571512131797833,
+        "instab_cv": 0.0019040996454672986,
+        "instab_survival": 0.021751109365542545,
+        "instab_tile": 0.12671166478307214,
+        "label": "wrong:disc[legacy_rep02.json]",
+        "category": "wrong"
+      }
+    ]
+  },
+  {
+    "system": "pde_divide",
+    "variables": [
+      "u"
+    ],
+    "n_candidates": 6,
+    "rows": [
+      {
+        "disc": 0.00015305243417535893,
+        "instab_vcoef": 6.99151312509226e-08,
+        "instab_cv": 9.370546615782895e-09,
+        "instab_survival": 5.238175852420567e-05,
+        "instab_tile": 4.4152974247620403e-05,
+        "label": "true",
+        "category": "true"
+      },
+      {
+        "disc": 0.9962494649333201,
+        "instab_vcoef": 71.51281646576449,
+        "instab_cv": 5.845443853990469,
+        "instab_survival": 0.17713628415179186,
+        "instab_tile": 1.198085834269117,
+        "label": "wrong:missing",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.00014953975686618975,
+        "instab_vcoef": 1.6680716518797865,
+        "instab_cv": 3.837681762771011,
+        "instab_survival": 0.17084637489832763,
+        "instab_tile": 4.980751500588655,
+        "label": "wrong:overfit",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.10879322826649512,
+        "instab_vcoef": 1.1596195310377615,
+        "instab_cv": 26.09214518720542,
+        "instab_survival": 0.8369068500230987,
+        "instab_tile": 6.827351154529752,
+        "label": "wrong:disc[legacy_rep00.json]",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.106295310052066,
+        "instab_vcoef": 0.8240303865120651,
+        "instab_cv": 1.4250648138997337,
+        "instab_survival": 0.440662759842887,
+        "instab_tile": 15.307314131773527,
+        "label": "wrong:disc[legacy_rep01.json]",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.038250801338470364,
+        "instab_vcoef": 18.506339980655792,
+        "instab_cv": 3339.6532173838305,
+        "instab_survival": 2.11690413581485,
+        "instab_tile": 36.18834998952083,
+        "label": "wrong:disc[legacy_rep02.json]",
+        "category": "wrong"
+      }
+    ]
+  },
+  {
+    "system": "pde_compound",
+    "variables": [
+      "u"
+    ],
+    "n_candidates": 6,
+    "rows": [
+      {
+        "disc": 0.0016797239475141845,
+        "instab_vcoef": 6.086879246035166e-07,
+        "instab_cv": 5.3483710230787545e-06,
+        "instab_survival": 7.203586051468292e-05,
+        "instab_tile": 1.0230599487637163e-05,
+        "label": "true",
+        "category": "true"
+      },
+      {
+        "disc": 0.8489043767541977,
+        "instab_vcoef": 0.3223285714050652,
+        "instab_cv": 0.5953181081267663,
+        "instab_survival": 0.013335840296725437,
+        "instab_tile": 0.00029091883449200445,
+        "label": "wrong:missing",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.0015860158341492825,
+        "instab_vcoef": 0.005734825747492075,
+        "instab_cv": 0.6902799154073007,
+        "instab_survival": 0.38744830165001765,
+        "instab_tile": 0.0024292068491465497,
+        "label": "wrong:overfit",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.7909805944846513,
+        "instab_vcoef": 34.11899630938411,
+        "instab_cv": 24111.858871117034,
+        "instab_survival": 1.8456623092786604,
+        "instab_tile": 1.5986296670684075,
+        "label": "wrong:disc[legacy_rep00.json]",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.47802700946564425,
+        "instab_vcoef": 0.08536917699887349,
+        "instab_cv": 0.9529157430635427,
+        "instab_survival": 0.3042087918505618,
+        "instab_tile": 0.5161388482261431,
+        "label": "wrong:disc[legacy_rep01.json]",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.28774551710721963,
+        "instab_vcoef": 0.013665671596599562,
+        "instab_cv": 0.08068190135360166,
+        "instab_survival": 0.0844068924292502,
+        "instab_tile": 0.6012562910211808,
+        "label": "wrong:disc[legacy_rep02.json]",
+        "category": "wrong"
+      }
+    ]
+  },
+  {
+    "system": "burgers_viscous",
+    "variables": [
+      "u"
+    ],
+    "n_candidates": 6,
+    "rows": [
+      {
+        "disc": 0.006039990438319417,
+        "instab_vcoef": 0.0004443751535883561,
+        "instab_cv": 1.1578488067412535e-05,
+        "instab_survival": 0.0004646075120934341,
+        "instab_tile": 0.0023524151873594726,
+        "label": "true",
+        "category": "true"
+      },
+      {
+        "disc": 0.4716128937381808,
+        "instab_vcoef": 11.025012651741363,
+        "instab_cv": 0.031828604612871486,
+        "instab_survival": 0.005046789618344174,
+        "instab_tile": 0.005646285021279086,
+        "label": "wrong:missing",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.005677895527439134,
+        "instab_vcoef": 235.04443136231123,
+        "instab_cv": 49.74150858737522,
+        "instab_survival": 0.03624170884433837,
+        "instab_tile": 0.37558838325916455,
+        "label": "wrong:overfit",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.001465682827708227,
+        "instab_vcoef": 1727.5230920270494,
+        "instab_cv": 19.50058753102052,
+        "instab_survival": 3.8241606580465297,
+        "instab_tile": 0.44767174398269927,
+        "label": "wrong:disc[legacy_rep00.json]",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.15822284458438182,
+        "instab_vcoef": 699134.234074095,
+        "instab_cv": 32.90458744874026,
+        "instab_survival": 14.009370122017176,
+        "instab_tile": 1.6142761937870478,
+        "label": "wrong:disc[legacy_rep01.json]",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.4627917333251468,
+        "instab_vcoef": 2932.3823144502526,
+        "instab_cv": 7.250484103119598,
+        "instab_survival": 0.49449341383868606,
+        "instab_tile": 1.976319432370689,
+        "label": "wrong:disc[legacy_rep02.json]",
+        "category": "wrong"
+      }
+    ]
+  },
+  {
+    "system": "ks",
+    "variables": [
+      "u"
+    ],
+    "n_candidates": 6,
+    "rows": [
+      {
+        "disc": 0.04673377615384259,
+        "instab_vcoef": 1.8823029210850924e-06,
+        "instab_cv": 1.7491974313591807e-06,
+        "instab_survival": 0.0011718819253909358,
+        "instab_tile": 0.006399364135798348,
+        "label": "true",
+        "category": "true"
+      },
+      {
+        "disc": 0.9701317650146405,
+        "instab_vcoef": 3.7358235820693233,
+        "instab_cv": 0.3283716301903736,
+        "instab_survival": 0.297793649198672,
+        "instab_tile": 1.2384429312586147,
+        "label": "wrong:missing",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.04673294685142472,
+        "instab_vcoef": 7.463837404733046,
+        "instab_cv": 1.1120367812110967,
+        "instab_survival": 0.5323201071975279,
+        "instab_tile": 1.6057330658384779,
+        "label": "wrong:overfit",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.9972224432362776,
+        "instab_vcoef": 77.28689721152313,
+        "instab_cv": 18.375802134827815,
+        "instab_survival": 8.20519425264282,
+        "instab_tile": 18.705997830873237,
+        "label": "wrong:disc[legacy_rep00.json]",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.9980583860509276,
+        "instab_vcoef": 0.8556960976758593,
+        "instab_cv": 0.09940168363614506,
+        "instab_survival": 0.2454344774212609,
+        "instab_tile": 13.969697963959426,
+        "label": "wrong:disc[legacy_rep01.json]",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.9997862036984322,
+        "instab_vcoef": 85.5767243481919,
+        "instab_cv": 5.383207768950205,
+        "instab_survival": 17.864265084631672,
+        "instab_tile": 5.941169405830108,
+        "label": "wrong:disc[legacy_rep02.json]",
+        "category": "wrong"
+      }
+    ]
+  },
+  {
+    "system": "ns",
+    "variables": [
+      "u",
+      "v",
+      "p"
+    ],
+    "n_candidates": 6,
+    "rows": [
+      {
+        "disc": 0.006811880811402477,
+        "instab_vcoef": 0.004331402046748059,
+        "instab_cv": 0.0007244881293684652,
+        "instab_survival": 0.007235668679171493,
+        "instab_tile": 0.03085188423221727,
+        "label": "true",
+        "category": "true"
+      },
+      {
+        "disc": 0.02630894415325911,
+        "instab_vcoef": 0.040433961066200085,
+        "instab_cv": 0.005097006124098281,
+        "instab_survival": 0.01567841603576552,
+        "instab_tile": 0.06067471446188436,
+        "label": "wrong:missing",
+        "category": "wrong"
+      },
+      {
+        "disc": 0.006800751885751868,
+        "instab_vcoef": 1.3738277965223276,
+        "instab_cv": 0.18130770720627892,
+        "instab_survival": 0.041543394258689116,
+        "instab_tile": 0.23670567973565082,
+        "label": "wrong:overfit",
+        "category": "wrong"
+      },
+      {
+        "label": "wrong:disc[legacy_rep00.json]",
+        "category": "wrong",
+        "error": "IndexError: list index out of range"
+      },
+      {
+        "label": "wrong:disc[new_rep00.json]",
+        "category": "wrong",
+        "error": "IndexError: list index out of range"
+      },
+      {
+        "label": "wrong:disc[new_rep01.json]",
+        "category": "wrong",
+        "error": "IndexError: list index out of range"
+      }
+    ]
+  }
+]

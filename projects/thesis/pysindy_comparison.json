@@ -1,0 +1,67 @@
+{
+  "ac": {
+    "system": "ac",
+    "coef_relerr_mean": 0.11180118618807522,
+    "coef_relerr_n_success": 24
+  },
+  "burgers_inviscid": {
+    "system": "burgers_inviscid",
+    "coef_relerr_mean": 0.0,
+    "coef_relerr_n_success": 28
+  },
+  "burgers_viscous": {
+    "system": "burgers_viscous",
+    "coef_relerr_mean": 0.01382257133497579,
+    "coef_relerr_n_success": 21
+  },
+  "kdv": {
+    "system": "kdv",
+    "coef_relerr_mean": 0.03350695851180019,
+    "coef_relerr_n_success": 21
+  },
+  "kdv_cossin": {
+    "system": "kdv_cossin",
+    "coef_relerr_mean": 0.05296183441976479,
+    "coef_relerr_n_success": 24
+  },
+  "ks": {
+    "system": "ks",
+    "coef_relerr_mean": 0.037511789466947165,
+    "coef_relerr_n_success": 18
+  },
+  "lorenz": {
+    "system": "lorenz",
+    "coef_relerr_mean": null,
+    "coef_relerr_n_success": 0
+  },
+  "lv": {
+    "system": "lv",
+    "coef_relerr_mean": 0.013425293544116385,
+    "coef_relerr_n_success": 15
+  },
+  "ode": {
+    "system": "ode",
+    "coef_relerr_mean": 0.017748622444405032,
+    "coef_relerr_n_success": 28
+  },
+  "pde_compound": {
+    "system": "pde_compound",
+    "coef_relerr_mean": 0.00983426298860235,
+    "coef_relerr_n_success": 13
+  },
+  "pde_divide": {
+    "system": "pde_divide",
+    "coef_relerr_mean": 0.000248180388140562,
+    "coef_relerr_n_success": 20
+  },
+  "vdp": {
+    "system": "vdp",
+    "coef_relerr_mean": 0.0087834446800919,
+    "coef_relerr_n_success": 30
+  },
+  "wave": {
+    "system": "wave",
+    "coef_relerr_mean": 0.006770107454699692,
+    "coef_relerr_n_success": 30
+  }
+}
