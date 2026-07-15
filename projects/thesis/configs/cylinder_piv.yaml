@@ -1,0 +1,39 @@
+# REAL TR-PIV cylinder wake, UNKNOWN-TRUTH config (von Karman Institute /
+# MODULO Ex_5: 71x30 grid, developed-shedding snapshots 300..800 @3 kHz,
+# decimated x2 by default -> 250 frames).
+#
+# truth_equations is deliberately empty. The vorticity-transport
+# signal-check (pic/data/cylinder_piv/signal_check.py) is only marginal
+# (advection R^2 ~ 0.60 at denoise sigma ~ 1), and pressure is not
+# measured by PIV, so no complete momentum-form truth exists on (u, v)
+# alone -- an honest hard real case. Truth metrics are recorded as null;
+# the front is for manual inspection.
+#
+# Axis convention matches ns: dx0 = t, dx1 = y, dx2 = x.
+name: cylinder_piv
+adapter: cylinder_piv
+
+truth_equations: []
+
+adapter_kwargs:
+  denoise_sigma: 1.0
+  i0: 300
+  i1: 800
+  decimate_t: 2
+
+search:
+  # (t, y, x) explicit trim; the 10% heuristic would eat 25 frames per
+  # side of the 250-frame series.
+  boundary: [10, 3, 6]
+
+moeadd:
+  population_size: 32
+  training_epochs: 5
+
+additional_tokens: []
+
+fit:
+  equation_terms_max_number: 8
+  data_fun_pow: 1
+  max_deriv_order: [1, 2, 2]
+  eq_sparsity_interval: [1.0e-8, 1.0]
