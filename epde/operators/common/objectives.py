@@ -37,6 +37,27 @@ from epde.operators.common.stability import calculate_weights, vc_stability_tota
 LOSS_NAN_VAL = 1e7
 
 
+def _extract_coefs_intercept(equation):
+    """Reconstruct ``(coefs, intercept)`` from ``weights_final`` under the
+    VWSR convention: ``weights_internal[-1]`` is the intercept-presence flag.
+    A zero intercept was dropped from ``weights_final`` (it is then
+    nnz-length); a non-zero one is its trailing entry. ``weights_final`` is
+    sparsity-truncated -- NOT position-indexed like ``weights_internal``.
+    Pinned by TestSparsityWeightsFinalConventions."""
+    if equation.weights_internal[-1]:
+        return equation.weights_final[:-1], equation.weights_final[-1]
+    return equation.weights_final, 0.0
+
+
+def _degenerate_excluding_intercept(filler, equation) -> bool:
+    """Shared ``is_degenerate`` for the VWSR-paired discrepancy fillers:
+    degenerate iff every non-intercept weight is zero, or the post-fit
+    discrepancy exceeds the filler's ``degenerate_threshold``."""
+    fv = getattr(equation, 'fitness_value', None)
+    return bool(np.all(equation.weights_internal[:-1] == 0)
+                or (fv is not None and fv > filler.degenerate_threshold))
+
+
 # --------------------------------------------------------------------------- #
 #  Solver-free fillers                                                        #
 # --------------------------------------------------------------------------- #
@@ -112,6 +133,13 @@ class L2Discrepancy(EquationObjective):
             else:
                 discr_feats = np.zeros(features.shape[0])
 
+        # ``weights_final[-1]`` is read as the intercept UNCONDITIONALLY --
+        # coherent only under the LASSOSparsity pairing, whose weights_final
+        # always carries a trailing intercept slot (nnz+1, even when 0.0).
+        # VWSRSparsity drops a zero intercept (weights_final is then
+        # nnz-length); its fillers (WAPE/ScaleInvariant/L2Relative) branch on
+        # the ``weights_internal[-1]`` presence flag instead. Pinned by
+        # TestSparsityWeightsFinalConventions.
         discr = (discr_feats + np.full(target.shape, equation.weights_final[-1]) - target)
         g = ctx.g_fun_vals
         if g is not None and getattr(g, 'shape', None) == discr.shape:
@@ -144,8 +172,7 @@ class WAPEDiscrepancy(EquationObjective):
     # in-place fitness trigger sparsity itself -- and also repairs the latent
     # L2LRFitness crash when an RPS-exhausted equation arrived unfitted.
 
-    def is_degenerate(self, equation) -> bool:
-        return bool(np.all(equation.weights_internal[:-1] == 0))
+    is_degenerate = _degenerate_excluding_intercept
 
     def compute(self, equation, ctx: FitContext) -> float:
         # L2LRFitness used un-normalised features only on the RPS sweep
@@ -155,12 +182,8 @@ class WAPEDiscrepancy(EquationObjective):
         if features is None:
             discr = target - target.mean()
         else:
-            if equation.weights_internal[-1]:
-                discr_feats = np.dot(features, equation.weights_final[:-1])
-                discr_feats = discr_feats + equation.weights_final[-1]
-            else:
-                discr_feats = np.dot(features, equation.weights_final)
-            discr = target - discr_feats
+            coefs, intercept = _extract_coefs_intercept(equation)
+            discr = target - (np.dot(features, coefs) + intercept)
         rl_error = np.sum(np.abs(discr)) / np.sum(np.abs(target))
         return float(rl_error)
 
