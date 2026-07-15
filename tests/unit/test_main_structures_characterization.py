@@ -363,6 +363,187 @@ class TestTargetTerm:
 
 
 # ---------------------------------------------------------------------------
+# 9. TestSparsityWeightsFinalConventions (refactoring plan, Phase 1)
+#
+# The two sparsity operators emit DIFFERENT weights_final layouts:
+#   * LASSOSparsity (sparsity.py, ``np.append(nonzero, intercept)``): the
+#     intercept slot is ALWAYS present -- len == nnz + 1 even for a zero
+#     intercept. weights_internal holds coefficients only (no intercept slot).
+#   * VWSRSparsity (``[w for w in weights_internal if w != 0]``): a ZERO
+#     intercept is dropped -- weights_final is then nnz-length with no
+#     intercept slot. weights_internal = [*coef, intercept] and its LAST entry
+#     acts as the intercept-presence flag the discrepancy fillers branch on
+#     (see WAPEDiscrepancy.compute).
+# ``L2Discrepancy.compute`` reads ``weights_final[-1]`` as the intercept
+# unconditionally, which is coherent only under the LASSO pairing. These tests
+# pin both conventions so any future unification must consciously flip them.
+# ---------------------------------------------------------------------------
+
+class TestSparsityWeightsFinalConventions:
+
+    @staticmethod
+    def _prime_grid_globals():
+        # Neither fixture path sets the weak-form weighting nor the boundary-
+        # trimmed shape; the sparsity operators read both from the grid cache.
+        global_var.grid_cache.g_func = np.ones(50)
+        global_var.grid_cache.inner_shape = np.array([50])
+
+    def test_lasso_weights_final_always_has_intercept_slot(self, equation, monkeypatch):
+        import epde.operators.common.sparsity as sparsity_mod
+
+        class _StubLasso:
+            def __init__(self, **kwargs):
+                pass
+
+            def fit(self, X, y, sample_weight):
+                self.coef_ = np.array([0.7])
+                self.intercept_ = 0.0          # ZERO intercept
+
+        monkeypatch.setattr(sparsity_mod, 'Lasso', _StubLasso)
+        self._prime_grid_globals()
+        equation.metaparameters[('sparsity', 'u')] = {'value': 1.0}
+
+        sparsity_mod.LASSOSparsity().apply(equation, arguments={})
+
+        # Legacy layout: weights_internal = coefficients only (no intercept).
+        assert len(equation.weights_internal) == 1
+        # Intercept slot survives even at 0.0 -> len == nnz + 1.
+        assert len(equation.weights_final) == 2
+        assert equation.weights_final[-1] == 0.0
+
+    def test_vwsr_weights_final_omits_zero_intercept(self, equation, monkeypatch):
+        import epde.operators.common.sparsity as sparsity_mod
+
+        class _StubPIL:
+            def __init__(self, **kwargs):
+                pass
+
+            def fit(self, X, y, sample_weights, gram_setup=None):
+                self.coef_ = np.array([0.7])
+                self.intercept_ = 0.0          # ZERO intercept
+                self.cached_weights_ = None    # vcoef mode leaves this None
+                self.cached_vc_score_ = np.array([0.01])
+
+        monkeypatch.setattr(sparsity_mod, 'PhysicsInformedLasso', _StubPIL)
+        self._prime_grid_globals()
+
+        sparsity_mod.VWSRSparsity().apply(equation, arguments={})
+
+        # VWSR layout: weights_internal = [*coef, intercept].
+        assert np.array_equal(equation.weights_internal, np.array([0.7, 0.0]))
+        # Zero intercept dropped -> nnz-length weights_final, NO intercept slot.
+        assert np.array_equal(equation.weights_final, np.array([0.7]))
+        # weights_internal[-1] is the presence flag the fillers consume.
+        assert equation.weights_internal[-1] == 0.0
+        # The stability caches land on the equation (sparsity.py:651-652).
+        assert equation._cached_sw_weights is None
+        assert np.array_equal(equation._cached_vc_score, np.array([0.01]))
+
+    def test_vwsr_weights_final_keeps_nonzero_intercept(self, equation, monkeypatch):
+        import epde.operators.common.sparsity as sparsity_mod
+
+        class _StubPIL:
+            def __init__(self, **kwargs):
+                pass
+
+            def fit(self, X, y, sample_weights, gram_setup=None):
+                self.coef_ = np.array([0.7])
+                self.intercept_ = 0.3          # NON-zero intercept
+                self.cached_weights_ = None
+                self.cached_vc_score_ = np.array([0.01])
+
+        monkeypatch.setattr(sparsity_mod, 'PhysicsInformedLasso', _StubPIL)
+        self._prime_grid_globals()
+
+        sparsity_mod.VWSRSparsity().apply(equation, arguments={})
+
+        assert np.array_equal(equation.weights_final, np.array([0.7, 0.3]))
+        assert equation.weights_internal[-1] == 0.3
+
+
+# ---------------------------------------------------------------------------
+# 10. TestSparsityCachePreservation (refactoring plan, Phase 1 / CHECK #1)
+#
+# ``_cached_sw_weights`` / ``_cached_vc_score`` are recomputed by
+# ``PhysicsInformedLasso.fit`` on the CONVERGED active mask (sparsity.py:
+# 449-471) -- their columns cover only the surviving features (+ intercept).
+# ``remove_zero_terms`` drops exactly the zero-weight terms, so the caches
+# still align with the pruned structure and are DELIBERATELY preserved across
+# both ``remove_zero_terms`` and ``_invalidate_label_cache``; wiping them
+# there would force a recompute on a differently-windowed path right before
+# ``Instability.compute`` reads them (fitness.py:141 -> 155-157). These tests
+# pin that preservation policy.
+# ---------------------------------------------------------------------------
+
+class TestSparsityCachePreservation:
+
+    def test_invalidate_label_cache_preserves_sparsity_caches(self, equation):
+        sw_sentinel = np.ones((5, 2))
+        vc_sentinel = np.array([0.01, 0.02])
+        equation._cached_sw_weights = sw_sentinel
+        equation._cached_vc_score = vc_sentinel
+        equation._gram_super = {'mode': 'vcoef'}
+        _ = equation.terms_labels
+        _ = equation.terms_labels_without_power
+        equation._eval_cache = {(True, False, True, 0): 'sentinel'}
+
+        equation._invalidate_label_cache()
+
+        # Structure-keyed caches wiped ...
+        assert equation._terms_labels_cache is None
+        assert equation._terms_labels_without_power_cache is None
+        assert equation._eval_cache == {}
+        assert equation._gram_super is None
+        # ... the sparsity caches survive by identity (CHECK #1 policy).
+        assert equation._cached_sw_weights is sw_sentinel
+        assert equation._cached_vc_score is vc_sentinel
+
+    def test_remove_zero_terms_preserves_sparsity_caches(self, equation):
+        sw_sentinel = np.ones((5, 1))
+        vc_sentinel = np.array([0.02])
+        equation._cached_sw_weights = sw_sentinel
+        equation._cached_vc_score = vc_sentinel
+        # VWSR layout on the 2-term fixture: [feature_u, intercept]; the
+        # zero feature weight makes remove_zero_terms drop the u term.
+        equation.weights_internal = np.array([0.0, 0.5])
+        equation.weights_internal_evald = True
+
+        equation.remove_zero_terms()
+
+        assert len(equation.structure) == 1               # u dropped, target kept
+        assert equation._cached_sw_weights is sw_sentinel
+        assert equation._cached_vc_score is vc_sentinel
+
+    def test_cached_sw_weights_column_alignment_post_prune(self, basic_pool):
+        from epde.structure.main_structures import Term
+
+        soeq = _build_soeq(basic_pool)
+        equation = soeq.vals['u']
+        equation.weights_internal_evald = True
+        # Third term (u * du/dx0) so the prune leaves a non-degenerate
+        # feature set: structure = [u, u*du/dx0, du/dx0(target)].
+        extra = Term(basic_pool, passed_term=['u', 'du/dx0'],
+                     max_factors_in_term=2)
+        equation.structure.insert(1, extra)
+        equation._invalidate_label_cache()
+
+        # Converged VWSR state: u kept (0.5), extra zeroed, intercept 0.3.
+        equation.weights_internal = np.array([0.5, 0.0, 0.3])
+        equation.weights_internal_evald = True
+        # Axis-mode cache on the converged ACTIVE mask: columns = surviving
+        # features + intercept = 2.
+        equation._cached_sw_weights = np.ones((5, 2))
+
+        equation.remove_zero_terms()
+
+        # Preserved cache still aligns: columns == (features + intercept)
+        # == len(structure) after the prune ([u, target] -> 1 feature + 1).
+        assert len(equation.structure) == 2
+        assert equation._cached_sw_weights.shape[-1] == len(equation.structure)
+        assert np.array_equal(equation.weights_internal, np.array([0.5, 0.3]))
+
+
+# ---------------------------------------------------------------------------
 # 10b. TestCacheFieldRegistry (refactoring plan, Phase 3)
 #
 # ``_EQ_CACHE_FIELDS`` is the single source of truth for Equation cache slots
@@ -424,3 +605,38 @@ class TestCacheFieldRegistry:
                     assert got is not equation._eval_cache
                 else:
                     assert got is None
+
+
+# ---------------------------------------------------------------------------
+# 11. TestResetStateSoftAsymmetry (refactoring plan, Phase 1 / item 2)
+#
+# ``reset_state(reset_right_part=False)`` clears ``weights_final_evald``
+# UNCONDITIONALLY but leaves the ``_weights_final`` data in place (only the
+# reset_right_part=True branch nulls it). The state is safe-by-guard: the
+# ``weights_final`` property getter raises while the flag is down. Pinning
+# this asymmetry -- "cleaning it up" by moving the flag reset into the
+# if-block would CHANGE behavior (the flag would survive a soft reset).
+# ---------------------------------------------------------------------------
+
+class TestResetStateSoftAsymmetry:
+
+    def test_soft_reset_keeps_final_weights_data_but_flags_unevald(self, equation):
+        data = np.array([1.0, 0.0])
+        equation.weights_final = data
+        equation.weights_final_evald = True
+
+        equation.reset_state(reset_right_part=False)
+
+        assert equation.weights_final_evald is False
+        assert equation._weights_final is data            # data survives
+        with pytest.raises(AttributeError):
+            _ = equation.weights_final                    # guard holds
+
+    def test_hard_reset_also_clears_final_weights_data(self, equation):
+        equation.weights_final = np.array([1.0, 0.0])
+        equation.weights_final_evald = True
+
+        equation.reset_state(reset_right_part=True)
+
+        assert equation.weights_final_evald is False
+        assert equation._weights_final is None

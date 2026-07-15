@@ -74,6 +74,11 @@ class SolverFreeFitness(CompoundOperator):
                  primary: EquationObjective = None):
         super().__init__(param_keys if param_keys is not None else ['penalty_coeff'])
         self.objectives = list(objectives) if objectives else []
+        # objectives[0] fallback: kept for API stability, but the RPS
+        # scaffolding (needs_sparsity / is_degenerate) silently follows list
+        # order through it -- pass ``primary`` explicitly (every in-tree
+        # caller does) and make sure it is a DISCREPANCY filler, never
+        # Instability.
         self.primary = primary if primary is not None else (
             self.objectives[0] if self.objectives else None)
 
@@ -197,6 +202,8 @@ class SolverBasedFitness(CompoundOperator):
         self.backend = backend
         self.masked = masked
         self.objectives = list(objectives) if objectives else []
+        # objectives[0] fallback: see SolverFreeFitness.__init__ -- pass
+        # ``primary`` explicitly with a discrepancy filler.
         self.primary = primary if primary is not None else (
             self.objectives[0] if self.objectives else None)
         # Optional solver-free r-loss filler (instability) reused as a

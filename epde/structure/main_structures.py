@@ -656,10 +656,14 @@ class Equation(ComplexStructure):
                 # ``_invalidate_label_cache`` also wipes _eval_cache, which
                 # is essential here: the right-part-selector's per-target
                 # sweep populates the cache keyed on target_idx, and the
-                # adjusted target_idx above can collide with a swept value.
-                # ``_cached_sw_weights`` was computed for the surviving
-                # features and still aligns with the new structure, so it
-                # is preserved.
+                # post-drop target_idx can collide with a swept value.
+                # ``_cached_sw_weights`` / ``_cached_vc_score`` are preserved:
+                # PhysicsInformedLasso.fit recomputes them on the CONVERGED
+                # active mask (sparsity.py:449-471), so their columns cover
+                # exactly the features surviving this prune -- they still
+                # align with the compacted structure, and Instability.compute
+                # reads them right after this call (fitness.py:141->155-157).
+                # Pinned by TestSparsityCachePreservation.
                 self._invalidate_label_cache()
 
 
@@ -1091,8 +1095,8 @@ class Equation(ComplexStructure):
         if self.weights_final_evald:
             return self._weights_final
         else:
-            print(self.text_form)
-            raise AttributeError('Final weights called before initialization')
+            raise AttributeError(
+                f'Final weights called before initialization on {self.text_form}')
 
     @weights_final.setter
     def weights_final(self, weights):
@@ -1146,6 +1150,28 @@ class Equation(ComplexStructure):
     def state(self):
         return self.text_form
 
+    def _active_term_label_set(self, *, drop_power: bool) -> frozenset:
+        """Per-term factor-label signatures over the ACTIVE structure: the
+        target term plus every non-target term whose internal weight is
+        non-zero. ``drop_power`` selects each term's
+        ``factors_labels_without_power`` (True) or ``factors_labels`` (False).
+        The zero-weight skip applies only when a target is selected; empty
+        per-term label sets are dropped. Shared by ``terms_labels_without_power``
+        and ``active_terms_labels``.
+        """
+        tgt = self.target_idx
+        described = set()
+        for term_idx, term in enumerate(self.structure):
+            if tgt is not None and term_idx != tgt:
+                weight_idx = term_idx if term_idx < tgt else term_idx - 1
+                if np.isclose(self.weights_internal[weight_idx], 0):
+                    continue
+            term_labels = (term.factors_labels_without_power if drop_power
+                           else term.factors_labels)
+            if term_labels:
+                described.add(term_labels)
+        return frozenset(described)
+
     @property
     def terms_labels_without_power(self) -> frozenset:
         """Frozenset of per-term factor-label sets, with the power parameter dropped.
@@ -1163,16 +1189,7 @@ class Equation(ComplexStructure):
         cached = getattr(self, '_terms_labels_without_power_cache', None)
         if cached is not None:
             return cached
-        described = set()
-        for term_idx, term in enumerate(self.structure):
-            if term_idx != self.target_idx:
-                weight_idx = term_idx if term_idx < self.target_idx else term_idx - 1
-                if np.isclose(self.weights_internal[weight_idx], 0):
-                    continue
-            term_labels = term.factors_labels_without_power
-            if len(term_labels) > 0:
-                described.add(term_labels)
-        result = frozenset(described)
+        result = self._active_term_label_set(drop_power=True)
         self._terms_labels_without_power_cache = result
         return result
 
@@ -1210,16 +1227,7 @@ class Equation(ComplexStructure):
         """
         if not self.weights_internal_evald:
             return self.terms_labels
-        described = set()
-        for term_idx, term in enumerate(self.structure):
-            if term_idx != self.target_idx:
-                weight_idx = term_idx if term_idx < self.target_idx else term_idx - 1
-                if np.isclose(self.weights_internal[weight_idx], 0):
-                    continue
-            term_labels = term.factors_labels
-            if len(term_labels) > 0:
-                described.add(term_labels)
-        return frozenset(described)
+        return self._active_term_label_set(drop_power=False)
 
     def __iter__(self):
         return EquationIterator(self)        
@@ -1453,6 +1461,13 @@ class SoEq(moeadd.MOEADDSolution):
         return form
 
     def __hash__(self):
+        # Identity-flavored: ``Chromosome.hash_descr`` returns BOUND METHODS
+        # for Equation genes (ComplexStructure.hash_descr is a plain method,
+        # not a property), so equal-by-``__eq__`` systems generally hash
+        # differently -- a latent hash/eq contract violation. Left alone on
+        # purpose: no live set/dict of SoEq exists (``objective.history``
+        # stores equations_labels tuples), and changing the hash would
+        # perturb any future hash-based iteration order.
         return hash(self.vals.hash_descr)
 
     def __deepcopy__(self, memo=None):
@@ -1479,6 +1494,13 @@ class SoEq(moeadd.MOEADDSolution):
     def fitness_calculated(self):
         return all([equation.fitness_calculated for equation in self.vals])
 
+    def _equation_label_tuple(self, *, drop_power: bool) -> Tuple[frozenset, ...]:
+        """Per-equation label frozensets in ``self.vars_to_describe`` order.
+        ``drop_power`` selects each equation's ``terms_labels_without_power``
+        (True) vs ``terms_labels`` (False)."""
+        return tuple(eq.terms_labels_without_power if drop_power else eq.terms_labels
+                     for eq in self.vals)
+
     @property
     def equations_labels_without_power(self) -> Tuple[frozenset, ...]:
         """Tuple of ``Equation.terms_labels_without_power`` for each equation.
@@ -1486,10 +1508,7 @@ class SoEq(moeadd.MOEADDSolution):
         Order matches ``self.vars_to_describe``. Useful for structural identity
         checks on the system as a whole (e.g., dedup against history).
         """
-        equations_caches = []
-        for equation in self.vals:
-            equations_caches.append(equation.terms_labels_without_power)
-        return tuple(equations_caches)
+        return self._equation_label_tuple(drop_power=True)
 
     @property
     def equations_labels(self) -> Tuple[frozenset, ...]:
@@ -1498,10 +1517,7 @@ class SoEq(moeadd.MOEADDSolution):
         Element order matches ``self.vars_to_describe``. The hashable per-equation
         frozensets enable ``system in objective.history`` membership checks.
         """
-        equations_caches = []
-        for equation in self.vals:
-            equations_caches.append(equation.terms_labels)
-        return tuple(equations_caches)
+        return self._equation_label_tuple(drop_power=False)
 
 
 class SoEqIterator(object):

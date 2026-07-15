@@ -26,6 +26,22 @@ from epde import _loop_stats
 # along an axis is ``N - window_size + 1`` and no wrap occurs.
 _DEFAULT_CIRCULAR_CV = True
 
+# --- Numerical guard constants (values unchanged from the historical
+# inline literals; hoisted so a change to the noise-floor / conditioning
+# strategy is a one-line edit instead of code archaeology) ---
+# Degenerate-column / near-zero-denominator guard: well below any
+# meaningful data scale, keeps 1/scale and ratio denominators finite.
+_DIAG_FLOOR = 1e-30
+# Tiny flat ridge added to an EQUILIBRATED (unit-diagonal) Gram so
+# Cholesky stays well-defined under exact collinearity.
+_UNIT_RIDGE = 1e-10
+# Baseline of the frequency ridge ``rho*k^2`` on the varying-coefficient
+# mode block (the noise-adaptive part scales on top of this).
+_FREQ_RIDGE_BASE = 1e-6
+# Target number of sliding-window start positions per axis; the stride is
+# ``max(1, num_horizons // _HORIZON_SUBSAMPLE)``.
+_HORIZON_SUBSAMPLE = 30
+
 
 def _windowed_take(arr: np.ndarray, dim: int, window_size: int,
                     num_horizons: int, step_size: int,
@@ -128,7 +144,7 @@ class GramSetup:
             # start (the input is virtually periodic); linear: only the
             # first ``window_size + 1`` positions yield a full window.
             num_horizons = grid_shape[dim] if circular_cv else window_size + 1
-            step_size = max(1, num_horizons // 30)
+            step_size = max(1, num_horizons // _HORIZON_SUBSAMPLE)
 
             X_windows = _windowed_take(X_grid, dim, window_size,
                                        num_horizons, step_size, circular_cv)
@@ -158,7 +174,7 @@ class GramSetup:
             # (well below any meaningful data scale) so ``1/scale`` stays
             # finite for near-zero columns.
             diag = np.diagonal(XTWX_full, axis1=1, axis2=2)
-            scales = np.sqrt(np.maximum(np.abs(diag), 1e-30))
+            scales = np.sqrt(np.maximum(np.abs(diag), _DIAG_FLOOR))
 
             self._per_dim.append((XTWX_full, XTWy_full, scales))
 
@@ -216,7 +232,7 @@ class GramSetup:
             # construction) to keep Cholesky well-defined when columns
             # are exactly collinear.
             idx = np.arange(active_size)
-            A[:, idx, idx] += 1e-10
+            A[:, idx, idx] += _UNIT_RIDGE
 
             batch_size = A.shape[0]
             w_norm, L = _cholesky_solve_batched(A, b)
@@ -282,7 +298,7 @@ class GramSetup:
         for dim in range(len(grid_shape)):
             window_size = grid_shape[dim] // 2
             num_horizons = grid_shape[dim] if circular_cv else window_size + 1
-            step_size = max(1, num_horizons // 30)
+            step_size = max(1, num_horizons // _HORIZON_SUBSAMPLE)
 
             Z_windows = _windowed_take(Z_grid, dim, window_size,
                                        num_horizons, step_size, circular_cv)
@@ -301,7 +317,7 @@ class GramSetup:
             XTWX_super = ZTW @ Z_batch
 
             diag = np.diagonal(XTWX_super, axis1=1, axis2=2)
-            scales_super = np.sqrt(np.maximum(np.abs(diag), 1e-30))
+            scales_super = np.sqrt(np.maximum(np.abs(diag), _DIAG_FLOOR))
 
             per_dim_super.append((XTWX_super, scales_super))
 
@@ -363,7 +379,7 @@ class GramSetup:
 
 
 def taylor_microscale(field: np.ndarray, grid_shape, axis: int,
-                       eps: float = 1e-30,
+                       eps: float = _DIAG_FLOOR,
                        deriv_field: np.ndarray = None) -> float:
     """Return the Taylor microscale of ``field`` along ``axis``.
 
@@ -725,9 +741,9 @@ class VaryingCoefSetup:
         # the modes.
         Ac = G_a[np.ix_(const_local, const_local)]
         bc = Phiy_a[const_local]
-        dC = np.sqrt(np.maximum(np.diag(Ac), 1e-30))
+        dC = np.sqrt(np.maximum(np.diag(Ac), _DIAG_FLOOR))
         AcN = Ac / np.outer(dC, dC)
-        AcN[np.diag_indices_from(AcN)] += 1e-10
+        AcN[np.diag_indices_from(AcN)] += _UNIT_RIDGE
         try:
             AcN_inv = np.linalg.inv(AcN)
         except np.linalg.LinAlgError:
@@ -737,7 +753,7 @@ class VaryingCoefSetup:
         rss = self.yWy - float(g0_vec @ bc)
         sigma2 = max(rss, 0.0) / max(self.N_eff - nf, 1.0)
         mean_power = self.yWy / max(self.N_eff, 1.0)
-        noise_rel = min(max(sigma2 / (mean_power + 1e-30), 0.0), 1.0)
+        noise_rel = min(max(sigma2 / (mean_power + _DIAG_FLOOR), 0.0), 1.0)
 
         gamma = np.zeros(nf * B)
         gamma[const_local] = g0_vec
@@ -751,11 +767,11 @@ class VaryingCoefSetup:
             Amm = G_a[np.ix_(mode_local, mode_local)]
             Amc = G_a[np.ix_(mode_local, const_local)]
             b_m = Phiy_a[mode_local] - Amc @ g0_vec
-            dM = np.sqrt(np.maximum(np.diag(Amm), 1e-30))
+            dM = np.sqrt(np.maximum(np.diag(Amm), _DIAG_FLOOR))
             AmmN = Amm / np.outer(dM, dM)
             kmax2 = max(float(np.max(mk)) ** 2, 1.0)
             cm = col_mode[mode_local]
-            ridge_m = 1e-6 + self.freq_coef * noise_rel * (cm ** 2 / kmax2)
+            ridge_m = _FREQ_RIDGE_BASE + self.freq_coef * noise_rel * (cm ** 2 / kmax2)
             AmmN[np.diag_indices_from(AmmN)] += ridge_m
             import epde.globals as _gv
             if getattr(_gv, 'vc_mode_decouple', False):
