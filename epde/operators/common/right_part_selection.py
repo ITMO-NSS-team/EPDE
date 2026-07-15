@@ -15,6 +15,7 @@ import epde.globals as global_var
 from epde.operators.utils.template import CompoundOperator
 from epde.decorators import HistoryExtender
 from epde.structure.main_structures import Term, Equation
+from epde.supplementary import filter_powers
 from epde.operators.common.stability import (GramSetup, VaryingCoefSetup)
 from epde import _loop_stats
 
@@ -703,20 +704,75 @@ def _target_term_in_other_equation(eq_with_target: Equation,
     padding copy is ignored; any later reactivation is caught by the next
     per-generation RPS pass.
     """
-    try:
-        target_sig = eq_with_target.structure[
-            eq_with_target.target_idx].factors_labels
-    except (AttributeError, IndexError, TypeError):
+    tgt = eq_with_target.target
+    if tgt is None:
         return None
+    target_sig = tgt.factors_labels
     return target_sig if target_sig in eq_other.active_terms_labels else None
+
+
+def _wrap_term_with_factor(equation: Equation, term: Term, banned_sigs,
+                           max_tries: int = 20) -> bool:
+    """Demote ``term`` (a leaked standalone copy of another equation's
+    target) into a FACTOR of a composite term: multiply it by one extra
+    pool factor instead of destroying it.
+
+    The whole-term uniqueness invariant allows another equation's target
+    as a factor inside a composite coupling term, just not as a separate
+    term. The leaked standalone copy is often the small-angle/stepping-stone
+    form of legitimate coupling physics (e.g. ``th2''`` inside the ``th1``
+    double-pendulum equation, whose true form is ``cos(D)*th2''``), so
+    wrapping preserves that information where a reroll erases it.
+
+    Accepts the wrap iff the new signature (a) differs from the original,
+    (b) is outside ``banned_sigs`` and (c) duplicates no other term of the
+    equation. Restores the original structure and returns False when the
+    per-term factor cap is already reached or no acceptable wrap was drawn
+    -- the caller then falls back to the randomize repair.
+    """
+    # The authoritative factor cap is the equation-level metaparameter
+    # (evolution-built terms mirror it, but e.g. translated equations
+    # leave the Term attribute at its constructor default of 1).
+    try:
+        cap = equation.metaparameters['max_factors_in_term']['value']
+    except (AttributeError, KeyError, TypeError):
+        cap = term.max_factors_in_term
+    if isinstance(cap, dict):
+        cap = max(cap['factors_num'])
+    if len(term.structure) >= int(cap):
+        return False
+    original = term.structure
+    original_sig = term.factors_labels
+    other_sigs = {t.factors_labels for t in equation.structure if t is not term}
+    attempts = 0
+    for _ in range(max_tries):
+        attempts += 1
+        try:
+            _, factor = term.pool.create(label=None, create_meaningful=False)
+        except ValueError:
+            break
+        # filter_powers clones via copy_for_power_update, so ``original``
+        # stays intact for the restore path below.
+        term.structure = filter_powers(list(original) + [factor])
+        term.reset_saved_state()
+        sig = term.factors_labels
+        if sig != original_sig and sig not in banned_sigs and sig not in other_sigs:
+            _loop_stats.record('break_equation_duplication.wrap', attempts, max_tries)
+            return True
+    term.structure = original
+    term.reset_saved_state()
+    _loop_stats.record('break_equation_duplication.wrap_fail', attempts, max_tries)
+    return False
 
 
 def _break_equation_duplication(equation: Equation, shared_sigs, *,
                                 preferred_sigs=(), max_iter: int = 2000) -> bool:
-    """Break a system-level degeneracy by randomizing ONE non-target term of
+    """Break a system-level degeneracy by repairing ONE non-target term of
     ``equation`` whose factor signature belongs to ``shared_sigs`` (the
     active structure this equation shares with another equation of the
-    system).
+    system). Repair prefers demoting the term to a factor of a composite
+    term (:func:`_wrap_term_with_factor`); only when that fails is the
+    term randomized away.
 
     The term matching one of ``preferred_sigs`` (typically the other
     equation's target signature) is chosen first, so the rerolled equation
@@ -741,6 +797,17 @@ def _break_equation_duplication(equation: Equation, shared_sigs, *,
 
     preferred = [t for t in candidates if t.factors_labels in preferred_sigs]
     term = preferred[0] if preferred else candidates[0]
+
+    # Demote-to-factor repair first: keep the leaked target alive as a
+    # factor of a composite coupling term (legal under the whole-term
+    # rule) instead of rerolling it into unrelated structure. Falls back
+    # to the randomize path when the wrap cannot produce a unique term.
+    if _wrap_term_with_factor(equation, term, set(shared_sigs)):
+        try:
+            equation.reset_state(reset_right_part=False)
+        except TypeError:
+            equation.reset_state()
+        return True
 
     attempts = 0
     for _ in range(max_iter):
