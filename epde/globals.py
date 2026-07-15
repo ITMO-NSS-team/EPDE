@@ -52,7 +52,7 @@ noise_seed = None
 # suppresses noise leakage into the non-constant energy.
 vc_modes_cache: dict = {}
 vc_k_max: int = 6
-vc_freq_coef: float = 1.0
+vc_freq_coef: float = 0.0
 
 # When True, ``VaryingCoefSetup._solve_gammas`` solves the mode block
 # PER-FEATURE (block-diagonal in feature index) instead of jointly: cross-
