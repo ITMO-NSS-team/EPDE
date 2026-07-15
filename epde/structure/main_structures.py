@@ -385,6 +385,43 @@ class Term(ComplexStructure):
         return frozenset(factor.structural_label for factor in self.structure)
 
 
+# Registry of every Equation-level cache slot and its invalidation policy --
+# the single source of truth consumed by ``reset_state``,
+# ``_invalidate_label_cache``, ``__deepcopy__`` and ``clone_shell``. Adding a
+# new cache means adding ONE entry here (plus the slot in
+# ``Equation.__slots__``; a characterization test asserts the two stay in
+# sync). Policies:
+#   'structure'  -- keyed on the current structure/target: wiped by BOTH
+#                   ``reset_state`` and ``_invalidate_label_cache``.
+#   'reset-only' -- wiped by ``reset_state`` but DELIBERATELY survives
+#                   ``_invalidate_label_cache`` / ``remove_zero_terms``:
+#                   PhysicsInformedLasso.fit recomputes the sparsity caches on
+#                   the CONVERGED active mask, so they still align with the
+#                   zero-pruned structure and Instability.compute reads them
+#                   right after the prune (fitness.py). Pinned by
+#                   TestSparsityCachePreservation.
+_EQ_CACHE_FIELDS = (
+    ('_eval_cache', 'structure'),                        # evaluate() memo, wiped to a FRESH {}
+    ('_terms_labels_cache', 'structure'),
+    ('_terms_labels_without_power_cache', 'structure'),
+    ('_gram_super', 'structure'),                        # EqRPS tier-3 super-Gram, one sweep only
+    ('_cached_sw_weights', 'reset-only'),                # axis-mode sliding-window weights
+    ('_cached_vc_score', 'reset-only'),                  # vcoef per-term stability scores
+    # (metric, value) memo for the survival/tile estimators. UNLIKE the two
+    # sparsity caches above it is a pure Instability.compute memo of the OLD
+    # structure (nothing recomputes it on the converged mask), so it must not
+    # survive a structural mutation. No-op under the default vcoef metric,
+    # which never populates it.
+    ('_cached_alt_instability', 'structure'),
+)
+_EQ_STRUCTURE_CACHES = tuple(f for f, p in _EQ_CACHE_FIELDS if p == 'structure')
+# Slots skipped by the copy paths. ``_eval_cache`` is exempt: it is traversed
+# by ``_deepcopy_slots`` and then replaced with a fresh dict, so the copy owns
+# an EMPTY-but-equal dict (pinned by
+# test_eval_cache_after_deepcopy_is_fresh_dict).
+_EQ_CACHE_AVOID_COPY = tuple(f for f, _ in _EQ_CACHE_FIELDS if f != '_eval_cache')
+
+
 class Equation(ComplexStructure):
     __slots__ = ['_history', 'structure', 'interelement_operator', 'n_immutable', 'pool',
                   # '_target', '_features', 'saved', 'saved_as','max_factors_in_term', 'operator',
@@ -826,30 +863,25 @@ class Equation(ComplexStructure):
             self.simplified = False
             self.weights_internal_evald = False
             self.weights_internal = None
-            # self.weights_final_evald = False
             self.weights_final = None
-        # self.weights_internal_evald = False
-        # self.weights_internal = None
+        # Deliberate asymmetry: ``weights_final_evald`` drops on EVERY reset,
+        # while the ``_weights_final`` data is nulled only on a hard reset
+        # (reset_right_part=True). A soft reset therefore leaves stale data
+        # behind a lowered flag -- safe-by-guard, because the ``weights_final``
+        # property getter raises while the flag is down. Moving this line into
+        # the if-block would CHANGE behavior (the flag would survive a soft
+        # reset). Pinned by TestResetStateSoftAsymmetry.
         self.weights_final_evald = False
-        # self.weights_final = None
         self.fitness_calculated = False
         self.fitness_value = None
         self.stability_calculated = False
         self.coefficients_stability = None
         self.aic_calculated = False
         self.solver_form_defined = False
-        self._eval_cache = {}
-        # consumed by epde.operators.common.fitness.L2LRFitness; resets here.
-        self._cached_sw_weights = None
-        # vcoef analogue of _cached_sw_weights: per-term stability scores from
-        # the sparsity gram_setup, summed as the stability objective in fitness.
-        self._cached_vc_score = None
-        self._terms_labels_cache = None
-        self._terms_labels_without_power_cache = None
-        # Tier 3 super-Gram cache (set by EqRightPartSelector for the
-        # term-sweep, never persists past one sweep). Structural reset
-        # invalidates it.
-        self._gram_super = None
+        # Wipe EVERY registered cache -- both policies (see _EQ_CACHE_FIELDS
+        # for the per-field docs).
+        for field, _policy in _EQ_CACHE_FIELDS:
+            setattr(self, field, {} if field == '_eval_cache' else None)
 
     def _invalidate_label_cache(self):
         """Drop memoized caches keyed on the current structure; call after
@@ -864,13 +896,14 @@ class Equation(ComplexStructure):
         post-RPS fitness call (e.g. after ``remove_zero_terms`` adjusts
         ``target_idx`` onto a value the sweep already cached).
         """
-        self._terms_labels_cache = None
-        self._terms_labels_without_power_cache = None
-        if hasattr(self, '_eval_cache'):
-            self._eval_cache = {}
-        # Super-Gram is built from term evaluations; any structural
-        # change invalidates the matched-rank assumption.
-        self._gram_super = None
+        # Only the 'structure'-policy caches (see _EQ_CACHE_FIELDS): the
+        # sparsity caches deliberately survive this call.
+        for field in _EQ_STRUCTURE_CACHES:
+            if field == '_eval_cache':
+                if hasattr(self, '_eval_cache'):
+                    self._eval_cache = {}
+            else:
+                setattr(self, field, None)
 
 
     @HistoryExtender('\n -> was copied by deepcopy(self)', 'n')
@@ -884,11 +917,7 @@ class Equation(ComplexStructure):
         # and MUST stay deep-copied.
         new_struct = _deepcopy_slots(
             self, memo,
-            attrs_to_avoid_copy=(
-                '_cached_sw_weights', '_cached_vc_score',
-                '_terms_labels_cache', '_terms_labels_without_power_cache',
-                '_gram_super',
-            ),
+            attrs_to_avoid_copy=_EQ_CACHE_AVOID_COPY,
             attrs_to_share_by_ref=('pool',),
         )
         # ``_eval_cache`` must round-trip as a *fresh empty dict* (separate
@@ -919,10 +948,7 @@ class Equation(ComplexStructure):
             attrs_to_avoid_copy=(
                 'structure',
                 '_target_term',   # shell has no structure; target must be None until the caller rebuilds
-                '_cached_sw_weights', '_cached_vc_score',
-                '_terms_labels_cache', '_terms_labels_without_power_cache',
-                '_gram_super',
-            ),
+            ) + _EQ_CACHE_AVOID_COPY,
             attrs_to_share_by_ref=('pool',),
         )
         clone.structure = []

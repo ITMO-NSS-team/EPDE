@@ -360,3 +360,67 @@ class TestTargetTerm:
         assert equation.target is t                       # target Term survived by identity
         assert equation.target_idx == self._pos(equation, t)
         assert t in equation.structure
+
+
+# ---------------------------------------------------------------------------
+# 10b. TestCacheFieldRegistry (refactoring plan, Phase 3)
+#
+# ``_EQ_CACHE_FIELDS`` is the single source of truth for Equation cache slots
+# and their invalidation policy; reset_state/_invalidate_label_cache/
+# __deepcopy__/clone_shell all derive from it. These tests hold the registry,
+# __slots__, and the four consumers in sync.
+# ---------------------------------------------------------------------------
+
+class TestCacheFieldRegistry:
+
+    def test_cache_registry_covers_all_cache_slots(self):
+        from epde.structure.main_structures import _EQ_CACHE_FIELDS
+        cache_slots = {
+            s for s in Equation.__slots__
+            if s.startswith('_cached_') or s in (
+                '_eval_cache', '_gram_super',
+                '_terms_labels_cache', '_terms_labels_without_power_cache')
+        }
+        assert {f for f, _ in _EQ_CACHE_FIELDS} == cache_slots
+        assert all(p in ('structure', 'reset-only') for _, p in _EQ_CACHE_FIELDS)
+
+    def test_reset_state_wipes_every_registry_field(self, equation):
+        from epde.structure.main_structures import _EQ_CACHE_FIELDS
+        for field, _ in _EQ_CACHE_FIELDS:
+            setattr(equation, field, {'sentinel': 1} if field == '_eval_cache'
+                    else np.array([1.0]))
+        equation.reset_state(True)
+        for field, _ in _EQ_CACHE_FIELDS:
+            expected = {} if field == '_eval_cache' else None
+            assert getattr(equation, field) == expected if field == '_eval_cache' \
+                else getattr(equation, field) is None
+
+    def test_invalidate_label_cache_wipes_exactly_structure_policy_fields(self, equation):
+        from epde.structure.main_structures import _EQ_CACHE_FIELDS
+        sentinels = {}
+        for field, _ in _EQ_CACHE_FIELDS:
+            val = {'sentinel': 1} if field == '_eval_cache' else np.array([1.0])
+            setattr(equation, field, val)
+            sentinels[field] = val
+        equation._invalidate_label_cache()
+        for field, policy in _EQ_CACHE_FIELDS:
+            if policy == 'structure':
+                expected = {} if field == '_eval_cache' else None
+                got = getattr(equation, field)
+                assert (got == expected) if field == '_eval_cache' else (got is None)
+            else:
+                assert getattr(equation, field) is sentinels[field]
+
+    def test_deepcopy_and_clone_shell_skip_all_registry_fields(self, equation):
+        from epde.structure.main_structures import _EQ_CACHE_FIELDS
+        for field, _ in _EQ_CACHE_FIELDS:
+            setattr(equation, field, {'sentinel': 1} if field == '_eval_cache'
+                    else np.array([1.0]))
+        for cloned in (copy.deepcopy(equation), equation.clone_shell()):
+            for field, _ in _EQ_CACHE_FIELDS:
+                got = getattr(cloned, field)
+                if field == '_eval_cache':
+                    assert got == {}           # fresh dict, never the source's
+                    assert got is not equation._eval_cache
+                else:
+                    assert got is None
