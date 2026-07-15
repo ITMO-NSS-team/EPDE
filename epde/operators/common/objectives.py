@@ -65,8 +65,17 @@ class EquationObjective:
     def needs_sparsity(self, equation, for_rps: bool) -> bool:
         return bool(for_rps or not getattr(equation, 'weights_internal_evald', False))
 
+    # A candidate target whose post-fit discrepancy exceeds this is declined
+    # during the RPS term-sweep (a degenerate target fits too poorly to be the
+    # right part). Checked AFTER compute() has set ``fitness_value`` -- see
+    # ``SolverFreeFitness.apply``; reading it before compute() gives the stale /
+    # ``None`` default and the check silently never fires.
+    degenerate_threshold = 1.0
+
     def is_degenerate(self, equation) -> bool:
-        return bool(np.all(equation.weights_internal == 0))
+        fv = getattr(equation, 'fitness_value', None)
+        return bool(np.all(equation.weights_internal == 0)
+                    or (fv is not None and fv > self.degenerate_threshold))
 
     def compute(self, equation, ctx: FitContext) -> float:
         raise NotImplementedError

@@ -92,10 +92,11 @@ class SolverFreeFitness(CompoundOperator):
         # WAPEDiscrepancy.needs_sparsity, lifted from the old operators).
         if primary.needs_sparsity(objective, force_out_of_place):
             self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
-            # During the RPS term-sweep a degenerate (all-zero-weight)
-            # candidate is skipped by returning None; in-place we always
-            # fall through to a finite value.
-            if force_out_of_place and primary.is_degenerate(objective):
+            # During the RPS term-sweep a candidate whose sparsity killed every
+            # feature is skipped here (pre-fit, weights-only -- fitness_value is
+            # not computed yet); the discrepancy-threshold degeneracy check runs
+            # post-compute below. In-place we always fall through to a value.
+            if force_out_of_place and bool(np.all(objective.weights_internal[:-1] == 0)):
                 return None
         self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
 
@@ -112,7 +113,14 @@ class SolverFreeFitness(CompoundOperator):
                          penalty_coeff=penalty_coeff, for_rps=force_out_of_place)
 
         if force_out_of_place:
-            return primary.compute(objective, ctx)
+            val = primary.compute(objective, ctx)
+            objective.fitness_value = val
+            # Post-fit degeneracy: decline a candidate target that still fits
+            # poorly (discrepancy above the filler's degenerate_threshold) so RPS
+            # won't select it. fitness_value is now the freshly computed value.
+            if primary.is_degenerate(objective):
+                return None
+            return val
 
         # In-place finalization: weights_internal has selected the sparse
         # support, so physically prune the now-dead zero-weight terms before
@@ -132,11 +140,30 @@ class SolverFreeFitness(CompoundOperator):
         if getattr(objective, 'weights_internal_evald', False):
             objective.remove_zero_terms()
 
+        # An equation that RPS left unfitted -- e.g. every candidate target in its
+        # term-sweep was declined by the degeneracy check (discrepancy over the
+        # threshold) -- has no final weights. Score it as maximally degenerate so
+        # MOEA/D selects it out, instead of crashing on weights_final access.
+        if not getattr(objective, 'weights_final_evald', False):
+            for filler in self.objectives:
+                setattr(objective, filler.value_attr, LOSS_NAN_VAL)
+                setattr(objective, filler.flag_attr, True)
+            objective.aic = None
+            objective.aic_calculated = True
+            return
+
         for filler in self.objectives:
             setattr(objective, filler.value_attr, filler.compute(objective, ctx))
             setattr(objective, filler.flag_attr, True)
-            if filler.compute(objective, ctx) == 0:
-                print()
+        # The RPS-time is_degenerate check (fitness.py force_out_of_place branch)
+        # only declines candidate TARGETS; it cannot evict an already-fitted form
+        # that is non-dominated via an artificially-low instability (e.g. a single
+        # -term SInv cancellation residual of 1.0 with stability ~0). Apply the
+        # primary's degeneracy verdict here too -- now that fitness_value holds the
+        # in-place discrepancy -- so a degenerate form is dominated out of the front.
+        if primary is not None and primary.is_degenerate(objective):
+            for filler in self.objectives:
+                setattr(objective, filler.value_attr, LOSS_NAN_VAL)
         # AIC is not produced by the solver-free path; expose the default
         # the legacy WAPE operator set so downstream readers don't assert.
         objective.aic = None
