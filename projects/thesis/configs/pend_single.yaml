@@ -1,0 +1,45 @@
+# REAL single pendulum (HardwareX MultiArm rig, optical encoder @10 kHz,
+# decimated x40 -> 250 Hz effective; small-amplitude swing, angle CENTERED
+# on the hanging equilibrium by the adapter -- see adapters/pend_single.py
+# for why centering is load-bearing). KNOWN-TRUTH real-data calibration
+# point #2: damped linear oscillator, signal-check R^2 = 0.996
+# (a ~ -64.8 = -g/l, damping ~ -0.65). Coefficients indicative only.
+name: pend_single
+adapter: pend_single
+
+truth_equations:
+  - "-64.8 * theta{power: 1.0} + -0.65 * dtheta/dx0{power: 1.0} = d^2theta/dx0^2{power: 1.0}"
+
+# The damping term is small; credit the undamped oscillator too.
+truth_alternatives:
+  - - "-64.8 * theta{power: 1.0} = d^2theta/dx0^2{power: 1.0}"
+
+adapter_kwargs:
+  start: 4000
+  n: 5000
+  step: 40
+
+search:
+  boundary: 60
+
+preprocessor:
+  type: poly
+  kwargs:
+    polynomial_window: 51
+    poly_order: 4
+
+moeadd:
+  population_size: 16
+  training_epochs: 12
+
+additional_tokens: []
+
+fit:
+  equation_terms_max_number: 4
+  data_fun_pow: 1
+  deriv_fun_pow: 1
+  max_deriv_order: [2]
+  equation_factors_max_number:
+    factors_num: [1, 2]
+    probas: [0.8, 0.2]
+  eq_sparsity_interval: [1.0e-8, 1.0]
