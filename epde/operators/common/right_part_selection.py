@@ -154,6 +154,22 @@ class EqRightPartSelector(CompoundOperator):
                     objective.target_idx = target_idx
                     fitness = self.suboperators['fitness_calculation'].apply(objective, arguments = subop_args['fitness_calculation'], force_out_of_place = True)
                     if fitness is not None and fitness < min_fitness:
+                        # Amplified-identity guard: decline a would-be winner
+                        # whose fit only "explains" the target by amplifying
+                        # the residual of a near-null feature combination
+                        # (huge mutually-cancelling coefficients, e.g. the LV
+                        # ``Lambda*(du+dv-alpha*u+gamma*v) = d^2u`` parasite).
+                        # Identity-form refits (A ~ 1-2) pass untouched; if
+                        # every eligible target declines, min_fitness stays
+                        # inf and the standard reroll path below fires.
+                        cap = global_var.rps_amplification_cap
+                        if cap is not None and \
+                                _amplification_ratio(objective) > cap:
+                            _loop_stats.record('EqRPS.amplification_decline',
+                                               1, 1)
+                            objective.weights_internal_evald = False
+                            objective.weights_final_evald = False
+                            continue
                         min_fitness = fitness
                         min_idx = target_idx
                         weights_internal = objective.weights_internal
@@ -413,6 +429,42 @@ class RandomRHPSelector(CompoundOperator):
 
     def use_default_tags(self):
         self._tags = {'equation right part selection', 'gene level', 'contains suboperators', 'inplace'}
+
+
+def _amplification_ratio(objective: Equation) -> float:
+    """Amplification ratio of the CURRENT candidate right-part fit:
+
+        A = sum_j |c_j| * ||col_j||  /  ||target col||
+
+    over the nonzero non-target terms plus the fitted intercept
+    (``weights_internal = [*term_coefs, intercept]``, the
+    ``LinRegBasedCoeffsEquation`` layout). A ~ 1 when the terms combine
+    without cancellation to the target's magnitude (every truth anchor
+    measures A in [1.0, 6.65]); A >> 1 is the amplified-identity parasite,
+    where near-cancelling giant coefficients fit the target out of the
+    noise of a valid near-null feature combination. Returns ``inf`` on a
+    non-finite/degenerate evaluation so the caller declines the candidate.
+    """
+    w = np.asarray(objective.weights_internal, dtype=float)
+    if not np.all(np.isfinite(w)):
+        return np.inf
+    tgt = objective.target_idx
+    t = np.asarray(objective.structure[tgt].evaluate(False, grids=None),
+                   dtype=float).reshape(-1)
+    den = np.linalg.norm(t)
+    if not np.isfinite(den) or den == 0.0:
+        return np.inf
+    nonrs = [term for i, term in enumerate(objective.structure) if i != tgt]
+    num = 0.0
+    for wj, term in zip(w[:len(nonrs)], nonrs):
+        if wj == 0.0:
+            continue
+        col = np.asarray(term.evaluate(False, grids=None),
+                         dtype=float).reshape(-1)
+        num += abs(wj) * np.linalg.norm(col)
+    if len(w) > len(nonrs) and w[-1] != 0.0:
+        num += abs(w[-1]) * np.sqrt(t.size)  # intercept column of ones
+    return num / den
 
 
 def _regen_or_drop_term(equation: Equation, term, *, max_iter: int = 100,

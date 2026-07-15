@@ -73,6 +73,22 @@ vc_mode_decouple: bool = True
 # and which masks weak terms). No effect in 'tstat' mode (no max_corr there).
 anchor_on_residual: bool = False
 
+# RPS amplified-identity guard: during the right-part term-sweep, a candidate
+# target whose winning fit has amplification ratio
+#   A = sum_j |c_j| * ||col_j|| / ||target col||   (nonzero terms + intercept)
+# above this cap is DECLINED -- the parasitic ``Lambda * (near-null identity
+# combination) = target`` shape, where huge mutually-cancelling coefficients
+# stretch the residual of a VALID analytical identity (e.g. the LV sum
+# identity du+dv = alpha*u - gamma*v) to imitate an unrelated target out of
+# derivative noise. Evidence base (truth-anchor sweep, 14 equations incl.
+# real data): true forms sit at A in [1.0, 6.65]; observed parasites at
+# ~7e2..1.6e6 -- the cap of 100 leaves 15x headroom above the worst truth
+# (a genuine stiff balance still passes) and 6x below the mildest parasite.
+# Identity-form refits (du = -dv + alpha*u - gamma*v, A ~ 2) are UNAFFECTED:
+# only the amplified-cancellation shape is declined, so valid identities stay
+# credited. None disables the guard.
+rps_amplification_cap = 100.0
+
 
 def set_gram_config(mode: str = 'vcoef'):
     """Override the global Gram-construction mode before ``build_search``.
@@ -112,6 +128,24 @@ def set_anchor_on_residual(flag: bool = False):
     """
     global anchor_on_residual
     anchor_on_residual = bool(flag)
+
+
+def set_rps_amplification_cap(cap=100.0):
+    """Override the RPS amplified-identity guard before ``build_search``.
+
+    ``cap`` is the maximum admissible amplification ratio ``A`` of a
+    candidate right-part fit (see :data:`rps_amplification_cap`); ``None``
+    disables the guard. Mirrors ``set_gram_config``: a process-level global
+    read by ``EqRightPartSelector`` during the term-sweep.
+    """
+    global rps_amplification_cap
+    if cap is not None:
+        cap = float(cap)
+        if not np.isfinite(cap) or cap <= 1.0:
+            raise ValueError(
+                'rps_amplification_cap must be a finite value > 1 (true '
+                f'forms reach A ~ 6.7) or None to disable; got {cap!r}')
+    rps_amplification_cap = cap
 
 
 def init_caches(set_grids: bool = False, device = 'cpu'):
