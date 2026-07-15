@@ -1,0 +1,38 @@
+# dp_real with the coupled-system sizing directive applied: bigger
+# population (4-dim per-equation objective space -> many Pareto ties)
+# and a looser terms cap (sparsity prunes; the true theta1 EOM needs
+# 4 terms but junk crowding needs headroom to coexist with it).
+# Everything else mirrors configs/dp_real.yaml.
+name: dp_real_big
+adapter: dp_real
+
+truth_equations: []
+
+adapter_kwargs:
+  variant: encoder
+  step: 4
+
+search:
+  boundary: 60
+
+preprocessor:
+  type: poly
+  kwargs:
+    polynomial_window: 51
+    poly_order: 4
+
+moeadd:
+  population_size: 64
+  training_epochs: 20
+
+additional_tokens: []
+
+fit:
+  equation_terms_max_number: 8
+  data_fun_pow: 1
+  deriv_fun_pow: 2
+  max_deriv_order: [2]
+  equation_factors_max_number:
+    factors_num: [1, 2]
+    probas: [0.5, 0.5]
+  eq_sparsity_interval: [1.0e-8, 1.0]
