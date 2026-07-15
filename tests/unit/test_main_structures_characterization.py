@@ -329,3 +329,93 @@ class TestEquationDefaultMetaparameters:
         # Mutation MUST stay local — the dict objects are independent.
         assert eq2.metaparameters['sparsity']['value'] == 1.0
         assert eq1.metaparameters is not eq2.metaparameters
+
+
+# ---------------------------------------------------------------------------
+# 6. TestTargetTerm
+#
+# The right-part target is an identity-tracked Term (``_target_term`` slot),
+# exposed via the ``target`` (Term-or-None) and ``target_idx`` (derived int-or-
+# None) properties. Pins: identity survives drops/reorders of other terms, a
+# dropped/orphaned target degrades to None (no stale index -> the IndexError
+# regression is gone), deepcopy preserves identity, and the target resets on
+# structure change.
+# ---------------------------------------------------------------------------
+
+class TestTargetTerm:
+    def _pos(self, equation, term):
+        return next(i for i, x in enumerate(equation.structure) if x is term)
+
+    def test_target_is_a_structure_term(self, equation):
+        assert equation.target is not None
+        assert equation.target is equation.structure[equation.target_idx]
+
+    def test_target_tracks_identity_through_drop(self, equation):
+        t = equation.target
+        victim = next(term for term in equation.structure if term is not t)
+        before = self._pos(equation, victim) < self._pos(equation, t)
+        old_idx = equation.target_idx
+        equation.structure = [x for x in equation.structure if x is not victim]
+        equation._invalidate_label_cache()
+        assert equation.target is t                       # identity preserved
+        assert equation.target_idx == (old_idx - 1 if before else old_idx)
+
+    def test_dropping_target_yields_none(self, equation):
+        t = equation.target
+        equation.structure = [x for x in equation.structure if x is not t]
+        equation._invalidate_label_cache()
+        assert equation.target is None
+        assert equation.target_idx is None               # no dangling index
+
+    def test_orphan_target_degrades_to_none(self, equation):
+        # Regression for the original IndexError: a target Term that is no
+        # longer in the structure (e.g. left over after randomize() rebuilt it
+        # smaller) must NOT surface as an out-of-range integer index.
+        equation._target_term = copy.deepcopy(equation.structure[0])  # not ``is`` any term
+        assert equation.target is None
+        assert equation.target_idx is None
+
+    def test_deepcopy_preserves_target_identity(self, equation):
+        eq2 = copy.deepcopy(equation)
+        assert eq2.target is not equation.target          # deep-copied
+        assert eq2.target is eq2.structure[eq2.target_idx]  # identity within the clone
+        assert eq2.target_idx == equation.target_idx
+
+    def test_reset_state_nulls_target_only_with_right_part(self, equation):
+        assert equation.target is not None
+        equation.reset_state(reset_right_part=False)
+        assert equation.target is not None
+        equation.reset_state(reset_right_part=True)
+        assert equation.target is None
+
+    def test_randomize_nulls_target(self, equation):
+        assert equation.target is not None
+        equation.randomize()
+        assert equation.target is None
+
+    def test_clone_shell_has_no_target(self, equation):
+        shell = equation.clone_shell()
+        assert shell.structure == []
+        assert shell.target is None
+        assert shell.target_idx is None
+
+    def test_target_idx_setter_anchors_to_term(self, equation):
+        equation.target_idx = 0
+        t0 = equation.structure[0]
+        assert equation.target is t0
+        equation.structure.insert(0, copy.deepcopy(equation.structure[-1]))
+        equation._invalidate_label_cache()
+        assert equation.target is t0                      # re-anchored, not literal 0
+        assert equation.target_idx == 1
+
+    def test_remove_zero_terms_keeps_target_identity(self, equation):
+        t = equation.target
+        assert len(equation.structure) >= 2
+        # Zero the single non-target term's internal weight (a 2-term equation
+        # maps that term to weights_internal[0] regardless of target side).
+        equation.weights_internal = np.array([0.0])
+        equation.weights_internal_evald = True
+        equation.remove_zero_terms()
+        assert equation.target is t                       # target Term survived by identity
+        assert equation.target_idx == self._pos(equation, t)
+        assert t in equation.structure

@@ -182,7 +182,7 @@ class EqRightPartSelector(CompoundOperator):
 
             if not self.simplify_equation(objective):
                 objective.simplified = True
-            if objective.structure[objective.target_idx].contains_deriv(objective.main_var_to_explain):
+            if objective.target is not None and objective.target.contains_deriv(objective.main_var_to_explain):
                 objective.is_correct_right_part = True
 
         _loop_stats.record('EqRPS.outer', outer_attempts, outer_max_iter)
@@ -192,6 +192,20 @@ class EqRightPartSelector(CompoundOperator):
         # is only valid for the structure observed during the sweep.
         objective._gram_super = None
         objective.right_part_selected = True
+        # Exit guarantee: a valid target MUST leave RPS. The cap-break path
+        # (outer loop exhausted) or a structural reroll inside the loop
+        # (``objective.randomize()`` on inf-fitness) can leave the identity-
+        # tracked target as None; install a deterministic, valid target so the
+        # downstream ``Equation.evaluate`` never indexes a stale/None position.
+        # Prefer the first term carrying a derivative of the explained variable
+        # (the only physically valid right part); fall back to term 0.
+        if objective.target is None and objective.structure:
+            objective.target_idx = next(
+                (i for i, term in enumerate(objective.structure)
+                 if term.contains_deriv(objective.main_var_to_explain)),
+                0,
+            )
+            _loop_stats.record('EqRPS.exit_target_fallback', 1, 1)
         objective.remove_zero_terms()
         # Hard invariant: no duplicate terms may leave RPS. simplify and
         # scrub both regenerate-then-drop, so a surviving duplicate is a
@@ -203,10 +217,11 @@ class EqRightPartSelector(CompoundOperator):
 
     def simplify_equation(self, objective: Equation):
         # Get nonzero terms
+        tgt = objective.target_idx
         nonzero_terms_mask = np.array([False if weight == 0 else True for weight in objective.weights_internal], dtype=np.int32)
-        nonrs_terms = [term for i, term in enumerate(objective.structure) if i != objective.target_idx]
+        nonrs_terms = [term for i, term in enumerate(objective.structure) if i != tgt]
         nonzero_terms = [item for item, keep in zip(nonrs_terms, nonzero_terms_mask) if keep]
-        nonzero_terms.append(objective.structure[objective.target_idx])
+        nonzero_terms.append(objective.target)
         equation_terms = [term.factors_labels_without_power for term in nonzero_terms]
 
         if len(equation_terms) <= 1:
@@ -453,26 +468,26 @@ def _regen_or_drop_term(equation: Equation, term, *, max_iter: int = 100,
     _loop_stats.record(stats_name, max(attempts, 1), cap)
 
     # Exhausted (or max_iter == 0): drop the offending term, if legal.
-    tgt = getattr(equation, 'target_idx', None)
-    drop_idx = idx
-    if tgt is not None and idx == tgt:
+    target_term = equation.target          # the Term, or None
+    drop_term = term
+    if target_term is not None and term is target_term:
         # Can't drop the RPS target. If it duplicates another term, drop
         # that other (non-target) member; if it is merely empty/non-
         # meaningful, leave it for the caller to resolve.
         my_label = term.factors_labels
-        other = next((j for j, t in enumerate(equation.structure)
-                      if j != idx and t.factors_labels == my_label), None)
+        other = next((t for t in equation.structure
+                      if t is not term and t.factors_labels == my_label), None)
         if other is None:
             equation._invalidate_label_cache()
             return 'target'
-        drop_idx = other
+        drop_term = other
     if len(equation.structure) <= min_terms:
         equation._invalidate_label_cache()
         return 'floor'
-    equation.structure = [t for j, t in enumerate(equation.structure)
-                          if j != drop_idx]
-    if tgt is not None and drop_idx < tgt:
-        equation.target_idx -= 1
+    equation.structure = [t for t in equation.structure if t is not drop_term]
+    # No manual target_idx decrement: the identity-tracked target auto-tracks
+    # the surviving target Term (``drop_term`` is never the target -- the
+    # branch above reroutes a target collision to the other duplicate).
     equation._invalidate_label_cache()
     return 'dropped'
 

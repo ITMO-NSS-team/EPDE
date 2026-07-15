@@ -244,10 +244,12 @@ class TermMutation(CompoundOperator):
         # population (otherwise caught a generation later at the RPS
         # entry / crossover assert).
         if duplicate and len(equation.structure) > 2:
-            tgt = getattr(equation, 'target_idx', None)
+            # Identity-tracked target auto-updates when ``term`` is removed; no
+            # manual target_idx decrement needed. If ``term`` was the target,
+            # ``equation.target`` degrades to None and the subsequent
+            # reset_state(reset_right_part=True) in EquationMutation.apply
+            # re-selects via RPS.
             equation.structure = [t for t in equation.structure if t is not term]
-            if tgt is not None and term_idx < tgt:
-                equation.target_idx -= 1
             equation._invalidate_label_cache()
             _loop_stats.record('TermMutation.unique_term.DROP', 1, 1)
         elif duplicate:
@@ -292,8 +294,11 @@ class TermParameterMutation(CompoundOperator):
         
         unmutable_params = {'dim', 'power'}
         term_idx, equation = objective
-        if not hasattr(equation, 'target_idx'):
-            equation.target_idx = 0
+        # NB: no target is set here. The ``term_idx == equation.target_idx``
+        # guard below skips param-mutating the right-part term when one is
+        # selected; when the target is None (unselected) the comparison is
+        # simply False and every term is eligible -- RPS selects the right
+        # part, not this operator.
 
         # Cap the retry loop so a constrained token pool can't deadlock
         # the optimizer (same hazard fixed in ``enforce_rps_uniqueness``).

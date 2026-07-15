@@ -165,10 +165,10 @@ class TermParameterMutation(CompoundOperator):
         
         unmutable_params = {'dim', 'power'}
         # objective[1] = deepcopy(objective[1])
-        try:
-            objective[1].target_idx
-        except AttributeError:
-            objective[1].target_idx = 0
+        # No target is set here: the ``objective[0] == target_idx`` guard below
+        # skips param-mutating the right-part term when one is selected; an
+        # unselected target (None) compares False, so every term is eligible.
+        # RPS selects the right part, not this operator.
 
         max_iter = 100
         for _ in range(max_iter):

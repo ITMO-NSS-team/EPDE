@@ -68,12 +68,13 @@ def _complexity_single_eq(system, equation_key):
     # ``weights_final`` whenever the sparsity step zeros more than one
     # weight.
     equation = system.vals[equation_key]
+    tgt = equation.target_idx
     eq_compl = 0
     for idx, term in enumerate(equation.structure):
-        if idx < equation.target_idx:
+        if idx < tgt:
             if not equation.weights_internal[idx] == 0:
                 eq_compl += complexity_deriv(term.structure)
-        elif idx > equation.target_idx:
+        elif idx > tgt:
             if not equation.weights_internal[idx-1] == 0:
                 eq_compl += complexity_deriv(term.structure)
         else:

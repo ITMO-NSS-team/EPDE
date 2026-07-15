@@ -425,10 +425,11 @@ class Term(ComplexStructure):
 class Equation(ComplexStructure):
     __slots__ = ['_history', 'structure', 'interelement_operator', 'n_immutable', 'pool',
                   # '_target', '_features', 'saved', 'saved_as','max_factors_in_term', 'operator',
-                 'target_idx', 'right_part_selected', '_weights_final', 'weights_final_evald', 'simplified', 'is_correct_right_part',
+                 '_target_term', 'right_part_selected', '_weights_final', 'weights_final_evald', 'simplified', 'is_correct_right_part',
                  '_weights_internal', 'weights_internal_evald', 'fitness_calculated', 'stability_calculated', 'aic_calculated', 'solver_form_defined',
                  '_fitness_value', '_coefficients_stability', '_aic', 'metaparameters', 'main_var_to_explain',
                  '_eval_cache', '_cached_sw_weights', '_cached_vc_score',
+                 '_cached_alt_instability',
                  '_terms_labels_cache', '_terms_labels_without_power_cache',
                  '_gram_super'] # , '_solver_form'
 
@@ -471,6 +472,7 @@ class Equation(ComplexStructure):
 
         """
         super().__init__(interelement_operator)
+        self._target_term = None   # identity-tracked right-part target (see ``target`` property)
         self.reset_state()
 
         if metaparameters is None:
@@ -544,6 +546,50 @@ class Equation(ComplexStructure):
         self.__init__(self.pool, [], self.main_var_to_explain, metaparameters=self.metaparameters)
         self.reset_saved_state()
 
+    @property
+    def target(self):
+        """The right-part Term, identity-validated against the live structure.
+
+        Returns the stored target Term iff it is still present in
+        ``self.structure`` (by identity, ``is``); otherwise ``None``. This is
+        the safety net for the whole right-part model: a target dropped by any
+        structural mutation degrades to ``None`` instead of dangling as a stale
+        index. Access the target through this property (a call) rather than
+        ``self.structure[self.target_idx]``.
+        """
+        tgt = self._target_term
+        if tgt is None:
+            return None
+        for term in self.structure:
+            if term is tgt:
+                return tgt
+        return None
+
+    @property
+    def target_idx(self):
+        """Position of the target Term in ``self.structure`` (int), or ``None``.
+
+        Derived from the target Term's identity, so it auto-tracks term
+        drops/reorders -- no manual reindexing on structure change. O(n);
+        capture into a local before using it inside a loop/comprehension.
+        """
+        tgt = self._target_term
+        if tgt is None:
+            return None
+        for i, term in enumerate(self.structure):
+            if term is tgt:
+                return i
+        return None
+
+    @target_idx.setter
+    def target_idx(self, value):
+        # Anchor the target to the Term currently at ``value`` so the position
+        # survives later drops/reorders of OTHER terms. ``None`` clears it.
+        if value is None:
+            self._target_term = None
+        else:
+            self._target_term = self.structure[value]
+
     def manual_reconst(self, attribute:str, value, except_attrs:dict):
         from epde.loader import attrs_from_dict, get_typespec_attrs
         supported_attrs = ['structure']
@@ -578,20 +624,25 @@ class Equation(ComplexStructure):
             # trailing intercept slot (VWSR: len == m+1; legacy LASSO: len == m).
             m = len(self.structure) - 1
             has_intercept = len(wi) == m + 1
+            # Capture the PRE-drop target position once for the weight-index
+            # map below. The target Term is never zero-weight-dropped (the
+            # ``i == tgt`` skip keeps it), so its identity survives and the
+            # derived ``target_idx`` recomputes correctly against the compacted
+            # structure -- no manual reindex needed.
+            tgt = self.target_idx
             zero_terms = []        # structure indices to drop
             zero_coef_pos = []     # matching coefficient indices to drop
-            target_bias = 0
             for i in range(len(self.structure)):
-                if i == self.target_idx:
+                if i == tgt:
                     continue
-                idx = i if i < self.target_idx else i - 1
+                idx = i if i < tgt else i - 1
                 if wi[idx] == 0:
-                    target_bias += 1 if i < self.target_idx else 0
                     zero_terms.append(i)
                     zero_coef_pos.append(idx)
             if zero_terms:
                 self.structure = [term for term_idx, term in enumerate(self.structure) if term_idx not in zero_terms]
-                self.target_idx -= target_bias
+                # No ``self.target_idx -= ...`` -- the identity-tracked target
+                # auto-tracks the surviving target Term.
                 # Compact weights_internal in lockstep with the structure so
                 # later position-indexed reads (active_terms_labels, the
                 # intercept slot, re-prune) stay aligned. weights_final already
@@ -772,21 +823,22 @@ class Equation(ComplexStructure):
         and is the path benefitting from cache hits (sparsity then L2LRFitness
         both call ``evaluate(normalize=True)`` in one fitness invocation).
         """
+        tgt = self.target_idx          # identity-derived position, captured once
         cacheable = (grids is None) and normalize
-        cache_key = (normalize, return_val, grids is None, self.target_idx)
+        cache_key = (normalize, return_val, grids is None, tgt)
         if cacheable and hasattr(self, '_eval_cache') and cache_key in self._eval_cache:
             return self._eval_cache[cache_key]
 
-        target = self.structure[self.target_idx].evaluate(False, grids=grids)
+        target = self.target.evaluate(False, grids=grids)
 
         if normalize:
-            feature_indexes = [i for i in range(len(self.structure)) if i != self.target_idx]
+            feature_indexes = [i for i in range(len(self.structure)) if i != tgt]
         else:
             feature_indexes = []
             for idx in range(len(self.structure)):
-                if idx == self.target_idx:
+                if idx == tgt:
                     continue
-                shifted = idx if idx < self.target_idx else idx - 1
+                shifted = idx if idx < tgt else idx - 1
                 if self.weights_internal[shifted] != 0:
                     feature_indexes.append(idx)
         if len(feature_indexes) > 0:
@@ -836,6 +888,7 @@ class Equation(ComplexStructure):
         """
         if reset_right_part:
             self.right_part_selected = False
+            self._target_term = None   # identity-tracked target: cleared in lockstep with the weights below
             self.is_correct_right_part = False
             self.simplified = False
             self.weights_internal_evald = False
@@ -932,6 +985,7 @@ class Equation(ComplexStructure):
             self, memo={},
             attrs_to_avoid_copy=(
                 'structure',
+                '_target_term',   # shell has no structure; target must be None until the caller rebuilds
                 '_cached_sw_weights', '_cached_vc_score',
                 '_terms_labels_cache', '_terms_labels_without_power_cache',
                 '_gram_super',
@@ -939,6 +993,7 @@ class Equation(ComplexStructure):
             attrs_to_share_by_ref=('pool',),
         )
         clone.structure = []
+        clone._target_term = None
         clone._eval_cache = {}
         return clone
 
@@ -1090,12 +1145,13 @@ class Equation(ComplexStructure):
         try:
             form = ''
             if self.weights_final_evald:
+                tgt = self.target_idx
                 for term_idx in range(len(self.structure)):
-                    if term_idx != self.target_idx:
-                        form += str(self.weights_final[term_idx]) if term_idx < self.target_idx else str(self.weights_final[term_idx-1])
+                    if term_idx != tgt:
+                        form += str(self.weights_final[term_idx]) if term_idx < tgt else str(self.weights_final[term_idx-1])
                         form += ' * ' + self.structure[term_idx].name + ' + '
                 form += str(self.weights_internal[-1]) + ' = ' + \
-                    self.structure[self.target_idx].name
+                    self.target.name
             else:
                 for term_idx in range(len(self.structure)):
                     form += 'k_' + str(term_idx) + ' ' + \
@@ -1107,11 +1163,14 @@ class Equation(ComplexStructure):
 
     @property
     def latex_form(self):
-        form = self.structure[self.target_idx].latex_form + r' = '
+        if self.target is None or not self.weights_final_evald:
+            return ''
+        tgt = self.target_idx
+        form = self.target.latex_form + r' = '
         digits_rounding_max = 3
         for idx, term in enumerate(self.structure):
-            idx_corrected = idx if idx <= self.target_idx else idx - 1
-            if idx == self.target_idx or self.weights_final[idx_corrected] == 0:
+            idx_corrected = idx if idx < tgt else idx - 1
+            if idx == tgt or self.weights_final[idx_corrected] == 0:
                 continue
 
             mnt, exp = exp_form(self.weights_final[idx_corrected], digits_rounding_max)
@@ -1293,11 +1352,12 @@ class EquationIterator(object):
     def __next__(self) -> Tuple[Union[None, float], Term]:
         if self._internal_idx < len(self._equation.structure):
             if self._equation.weights_final_evald:
+                tgt = self._equation.target_idx
                 while True:
-                    idx_in_weights = self._internal_idx if self._internal_idx <= self._equation.target_idx \
+                    idx_in_weights = self._internal_idx if self._internal_idx <= tgt \
                         else self._internal_idx - 1
 
-                    if self._internal_idx == self._equation.target_idx:
+                    if self._internal_idx == tgt:
                         coeff = -1.
                         break
                     elif self._equation.weights_final[idx_in_weights] == 0:
