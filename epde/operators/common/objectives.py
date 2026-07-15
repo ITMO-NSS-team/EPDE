@@ -188,6 +188,43 @@ class WAPEDiscrepancy(EquationObjective):
         return float(rl_error)
 
 
+class ScaleInvariantDiscrepancy(EquationObjective):
+    """Scale-invariant discrepancy: the pointwise cancellation residual
+
+        mean_x  |sum_k c_k phi_k(x)|  /  sum_k |c_k phi_k(x)|
+
+    summed over every term of the equation (target + fitted features + intercept).
+    Unlike WAPE (``sum|target-fit| / sum|target|``) this is invariant under
+    multiplying the whole equation by any field ``g(x)`` -- numerator and
+    denominator both pick up ``|g(x)|`` pointwise and it cancels -- and under
+    target choice (the term *set* is the same whichever term is the right part).
+    Bounded in [0, 1] by the triangle inequality, so it does NOT reward rewriting
+    ``E = 0`` as the degenerate ``T*E = 0``.
+
+    Reconstructs ``(coefs, intercept)`` from ``weights_final`` exactly as
+    ``WAPEDiscrepancy`` (same ``weights_internal[-1]`` intercept test and the same
+    ``normalize = not for_rps`` term set), so it is a drop-in primary filler.
+    """
+    name = 'discrepancy'
+    value_attr = 'fitness_value'
+    flag_attr = 'fitness_calculated'
+
+    is_degenerate = _degenerate_excluding_intercept
+
+    def compute(self, equation, ctx: FitContext) -> float:
+        normalize = not ctx.for_rps
+        _, target, features = equation.evaluate(normalize=normalize, return_val=False)
+        if features is None:
+            # only the target term survives -> a single term cannot cancel.
+            return 1.0
+        coefs, intercept = _extract_coefs_intercept(equation)
+        contribs = features * np.asarray(coefs)[None, :]          # per-term weighted values
+        resid = target - contribs.sum(axis=1) - intercept        # |sum_k c_k phi_k|
+        term_mass = np.abs(target) + np.abs(contribs).sum(axis=1) + abs(intercept)
+        rho = np.abs(resid) / term_mass
+        return float(np.mean(rho))
+
+
 class Instability(EquationObjective):
     """Varying-coefficient instability (the metric removed from all five
     operators, consolidated here once).
@@ -232,6 +269,47 @@ class Instability(EquationObjective):
             return float(np.sum(np.nan_to_num(cv)) / len(data_shape))
         except Exception:
             return 1.0
+
+
+class L2RelativeDiscrepancy(EquationObjective):
+    """L2 relative residual -- an L2 analogue of :class:`WAPEDiscrepancy`,
+    selectable as a primary ``discrepancy_metric`` alongside ``'wape'`` and
+    ``'scale_invariant'``:
+
+        ||target - sum_j c_j phi_j||_2 / ||target||_2
+
+    WAPE is the L1 (``sum|.| / sum|.|``) form of the same relative residual;
+    this is the L2 (Euclidean-norm) form. ``L2Discrepancy`` computes the same
+    residual norm but WITHOUT the ``/ ||target||`` normalisation (and weights it
+    by ``g_func``); this one normalises by the right-part norm and -- like WAPE /
+    ScaleInvariant -- does not ``g_func``-weight.
+
+    A primary discrepancy filler: it owns the right-part-selection scaffolding
+    (un-normalised term set during the ``force_out_of_place`` sweep, normalised
+    in-place; ``is_degenerate`` on the ``weights_internal[:-1]`` all-zero test
+    and the post-fit ``degenerate_threshold``) exactly as
+    :class:`WAPEDiscrepancy`, so it can drive ``EqRightPartSelector`` and the
+    Pareto quality axis as a drop-in for WAPE.
+    """
+    name = 'discrepancy'
+    value_attr = 'fitness_value'
+    flag_attr = 'fitness_calculated'
+
+    is_degenerate = _degenerate_excluding_intercept
+
+    def compute(self, equation, ctx: FitContext) -> float:
+        normalize = not ctx.for_rps
+        _, target, features = equation.evaluate(normalize=normalize, return_val=False)
+        target = np.asarray(target, dtype=float)
+        if features is None:
+            discr = target - target.mean()
+        else:
+            coefs, intercept = _extract_coefs_intercept(equation)
+            discr = target - (np.dot(features, coefs) + intercept)
+        den = float(np.linalg.norm(target))
+        if den <= 0.0:
+            return float(LOSS_NAN_VAL)
+        return float(np.linalg.norm(discr) / den)
 
 
 # --------------------------------------------------------------------------- #

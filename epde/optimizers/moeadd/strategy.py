@@ -15,7 +15,9 @@ from epde.operators.utils.template import add_base_param_to_operator
 from epde.operators.multiobjective.selections import MOEADDSelection
 from epde.operators.multiobjective.variation import get_basic_variation
 from epde.operators.common.fitness import SolverFreeFitness, SolverBasedFitness
-from epde.operators.common.objectives import (L2Discrepancy, WAPEDiscrepancy, Instability,
+from epde.operators.common.objectives import (L2Discrepancy, WAPEDiscrepancy,
+                                              ScaleInvariantDiscrepancy, Instability,
+                                              L2RelativeDiscrepancy,
                                               SolverL2Discrepancy, DeepXDEError)
 from epde.operators.common.right_part_selection import RandomRHPSelector, EqRightPartSelector, SoEqRightPartSelector
 
@@ -41,7 +43,14 @@ class MOEADDDirector(OptimizationPatternDirector):
             """Assemble a SolverFreeFitness host: a discrepancy filler
             (selected by ``metric``) as primary, plus instability when
             ``use_pic``."""
-            disc = L2Discrepancy() if metric == 'l2' else WAPEDiscrepancy()
+            if metric == 'l2':
+                disc = L2Discrepancy()
+            elif metric in ('scale_invariant', 'sinv', 'cancellation'):
+                disc = ScaleInvariantDiscrepancy()
+            elif metric in ('l2_relative', 'l2_rel', 'residual'):
+                disc = L2RelativeDiscrepancy()
+            else:
+                disc = WAPEDiscrepancy()
             objectives = [disc] + ([Instability()] if with_instability else [])
             return SolverFreeFitness(['penalty_coeff'], objectives=objectives, primary=disc)
 
@@ -85,7 +94,7 @@ class MOEADDDirector(OptimizationPatternDirector):
         if use_solver:
             # The RPS term-sweep must never solve: use a lightweight
             # solver-free WAPE fitness as the right-part fitness instead.
-            fitness_lightweight = _solver_free_fitness('wape', False)
+            fitness_lightweight = _solver_free_fitness('l2_relative', False)
             add_kwarg_to_operator(operator = fitness_lightweight)
             fitness_lightweight.set_suboperators({'sparsity' : sparsity, 'coeff_calc' : coeff_calc})
             right_part_selector.set_suboperators({'fitness_calculation' : fitness_lightweight})
