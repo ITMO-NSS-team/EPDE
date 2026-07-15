@@ -23,6 +23,7 @@ six ablation cells off the 000/111 diagonal cover the 2x2x2 factorial):
 
 from __future__ import annotations
 
+import functools
 import importlib
 import json
 import os
@@ -157,6 +158,28 @@ class SystemCfg:
     # ``truth_alternatives`` list. ``hamming_best`` /
     # ``structural_success_any`` from thesis_metrics walk all of them.
     truth_alternatives: tuple = field(default_factory=tuple)
+    # Keyword arguments bound onto the adapter's ``load_data`` (YAML
+    # ``adapter_kwargs`` block, overridable per-run via run.py
+    # ``--adapter-kwarg key=value``). Kept here so run_one can record the
+    # exact preprocessing knobs into the rep JSON.
+    adapter_kwargs: dict = field(default_factory=dict)
+    # True when the adapter declares ``TOKENS_NEED_SEARCH = True``:
+    # its ``build_extra_tokens`` constructs tokens that touch the global
+    # caches (e.g. ``CacheStoredTokens`` filters arrays by
+    # ``grid_cache.g_func``), so the EpdeSearch object must be built
+    # BEFORE the token pool. Existing adapters keep the original
+    # tokens-then-search order.
+    tokens_need_search: bool = False
+    # Optional adapter hook: precomputed derivatives handed to
+    # ``search.fit(derivs=...)``, bypassing the numerical preprocessor.
+    # Called with no arguments AFTER load_data (may rely on state cached
+    # by load_data). Must return one ``(n_points, n_derivs)`` array per
+    # variable, columns in ``define_derivatives`` order (d/dx0, d/dx1,
+    # ...), rows C-order-flattened over the data grid. Use case: fields
+    # whose sampled resolution is too coarse for stable numerical
+    # differentiation but whose exact derivatives are available (JHTDB
+    # server-side operators).
+    load_derivs: Optional[Callable[[], list]] = None
 
 
 def _load_yaml(path: str) -> dict:
@@ -250,16 +273,28 @@ def load_config(name_or_path: str) -> SystemCfg:
     overrides = {k: v for k, v in system_dict.items() if k in HPARAM_KEYS}
     hparams = _deep_merge(defaults_dict, overrides)
 
+    # Optional YAML ``adapter_kwargs`` block: bound onto load_data so the
+    # loader's preprocessing knobs (densification, decimation, denoise
+    # sigma, ...) are declarative and per-run overridable from run.py.
+    adapter_kwargs = dict(system_dict.get('adapter_kwargs') or {})
+    load_data = adapter_mod.load_data
+    if adapter_kwargs:
+        load_data = functools.partial(adapter_mod.load_data, **adapter_kwargs)
+
     kwargs: dict = dict(
         name=name,
         truth_tokens=truth_tokens,
         truth_alternatives=truth_alternatives,
         outdir=outdir,
-        load_data=adapter_mod.load_data,
+        load_data=load_data,
         hparams=hparams,
+        adapter_kwargs=adapter_kwargs,
+        tokens_need_search=bool(getattr(adapter_mod, 'TOKENS_NEED_SEARCH', False)),
     )
     if hasattr(adapter_mod, 'build_extra_tokens'):
         kwargs['build_extra_tokens'] = adapter_mod.build_extra_tokens
+    if hasattr(adapter_mod, 'load_derivs'):
+        kwargs['load_derivs'] = adapter_mod.load_derivs
     return SystemCfg(**kwargs)
 
 
@@ -420,7 +455,7 @@ def _run_fit(search: EpdeSearch, cfg: 'SystemCfg', data, variable_names,
         data=data,
         variable_names=variable_names,
         max_deriv_order=max_deriv_order,
-        derivs=None,
+        derivs=cfg.load_derivs() if cfg.load_derivs is not None else None,
         equation_terms_max_number=f['equation_terms_max_number'],
         data_fun_pow=f['data_fun_pow'],
         deriv_fun_pow=f['deriv_fun_pow'],
@@ -446,8 +481,16 @@ def build_search(cfg: 'SystemCfg', pipeline_kwargs: dict) -> EpdeSearch:
     selection can vary per-rep without touching the YAML.
     """
     coords, data, variable_names, dim = cfg.load_data()
-    additional_tokens = _build_token_pool(cfg, coords, dim)
-    search = _construct_search(cfg, coords, pipeline_kwargs)
+    # Adapters whose extra tokens touch the global caches at construction
+    # (``TOKENS_NEED_SEARCH = True``, e.g. CacheStoredTokens filtering by
+    # grid_cache.g_func) need the EpdeSearch object built first. Everyone
+    # else keeps the original tokens-then-search order.
+    if cfg.tokens_need_search:
+        search = _construct_search(cfg, coords, pipeline_kwargs)
+        additional_tokens = _build_token_pool(cfg, coords, dim)
+    else:
+        additional_tokens = _build_token_pool(cfg, coords, dim)
+        search = _construct_search(cfg, coords, pipeline_kwargs)
     _configure_preprocessor(search, cfg)
     if cfg.hparams['search']['multiobjective_mode']:
         _configure_moeadd(search, cfg, variable_names)
@@ -619,6 +662,11 @@ def run_one(system_cfg: SystemCfg, pipeline: str, seed: int) -> dict:
         'gram_mode': getattr(global_var, 'gram_mode', None),
         'vc_instability_component': getattr(
             global_var, 'vc_instability_component', 'both'),
+        'instability_metric': global_var.resolve_instability_metric(),
+        'rps_amplification_cap': getattr(
+            global_var, 'rps_amplification_cap', None),
+        'adapter_kwargs': dict(system_cfg.adapter_kwargs) or None,
+        'truth_known': truth_known,
     }
 
     t0 = time.time()

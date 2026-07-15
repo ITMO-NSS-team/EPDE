@@ -107,6 +107,32 @@ def main(argv=None) -> int:
                         help="In 'max_corr' anchor mode, anchor the L1 "
                              "threshold to the working residual max|X^T r| "
                              "instead of the raw target max|X^T y|.")
+    parser.add_argument('--instability-metric', default=None,
+                        choices=('vcoef', 'cv', 'survival', 'tile'),
+                        help="Estimator for the INSTABILITY OBJECTIVE "
+                             "(globals.instability_metric). Default: unset = "
+                             "resolve from --gram-mode (vcoef->vcoef, "
+                             "axis->cv). 'survival' = block-resampled "
+                             "coefficient survival (statistical); 'tile' = "
+                             "between-tile dispersion (basis-free spatial). "
+                             "The sparsity keep-rule follows --gram-mode "
+                             "regardless.")
+    parser.add_argument('--amplification-cap', type=float, default=None,
+                        help="RPS amplified-identity guard: decline a "
+                             "candidate right part whose fit has "
+                             "sum|c_j|*||col_j|| / ||target|| above this cap "
+                             "(globals.rps_amplification_cap). Truth anchors "
+                             "measure A in [1.0, 6.65]; observed parasites "
+                             "~7e2..1.6e6. 0 disables. Default: leave "
+                             "globals' value (100).")
+    parser.add_argument('--adapter-kwarg', action='append', default=[],
+                        metavar='KEY=VALUE',
+                        help="Override one adapter load_data kwarg "
+                             "(repeatable), merged over the YAML's "
+                             "adapter_kwargs block. Values parse as Python "
+                             "literals with plain-string fallback -- e.g. "
+                             "--adapter-kwarg densify=5 "
+                             "--adapter-kwarg variant=encoder.")
     args = parser.parse_args(argv)
 
     try:
@@ -114,11 +140,36 @@ def main(argv=None) -> int:
     except FileNotFoundError as exc:
         parser.error(str(exc))
 
+    # Merge CLI adapter kwargs over the YAML block and rebind load_data.
+    # Runs BEFORE the noise wrapper below so noise always wraps the final
+    # loader. cfg.adapter_kwargs is recorded into every rep JSON.
+    if args.adapter_kwarg:
+        import ast
+        import functools
+        overrides = {}
+        for item in args.adapter_kwarg:
+            key, sep, raw = item.partition('=')
+            if not sep or not key:
+                parser.error(f"--adapter-kwarg expects KEY=VALUE, got {item!r}")
+            try:
+                value = ast.literal_eval(raw)
+            except (ValueError, SyntaxError):
+                value = raw
+            overrides[key] = value
+        cfg.adapter_kwargs = {**cfg.adapter_kwargs, **overrides}
+        base = cfg.load_data
+        base_fn = base.func if isinstance(base, functools.partial) else base
+        cfg.load_data = functools.partial(base_fn, **cfg.adapter_kwargs)
+
     # Pin the gram mode before the batch starts; applies to every rep in
     # run_smoke since the setting is a process-level global.
     from epde import globals as _gv
     _gv.set_gram_config(args.gram_mode)
     _gv.set_anchor_on_residual(args.anchor_on_residual)
+    _gv.set_instability_metric(args.instability_metric)
+    if args.amplification_cap is not None:
+        _gv.set_rps_amplification_cap(
+            None if args.amplification_cap == 0 else args.amplification_cap)
     if args.vc_coord_penalty is not None:
         _gv.vc_coord_penalty = float(args.vc_coord_penalty)
 
