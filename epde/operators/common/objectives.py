@@ -33,6 +33,7 @@ import numpy as np
 
 import epde.globals as global_var
 from epde.operators.common.stability import calculate_weights, vc_stability_total_lr
+from epde.operators.common.survival import survival_scores, tile_scores
 
 LOSS_NAN_VAL = 1e7
 
@@ -226,49 +227,68 @@ class ScaleInvariantDiscrepancy(EquationObjective):
 
 
 class Instability(EquationObjective):
-    """Varying-coefficient instability (the metric removed from all five
-    operators, consolidated here once).
+    """The instability objective, dispatching on the estimator selected by
+    ``epde.globals.resolve_instability_metric()``:
 
-    Fast path: sum the per-term ``_cached_vc_score`` produced by
-    ``PhysicsInformedLasso`` (``VWSRSparsity``). Fallback (LASSO / axis
-    paths, where no cache exists): ``vc_stability_total_lr`` for
-    ``gram_mode='vcoef'``, else the sliding-window CV via
-    ``calculate_weights``. On any failure returns ``1.0`` (matching the
-    old ``try/except`` guards).
+    * ``'vcoef'`` (default under ``gram_mode='vcoef'``): fast path sums the
+      per-term ``_cached_vc_score`` produced by ``PhysicsInformedLasso``
+      (``VWSRSparsity``); fallback (LASSO path, no cache) is
+      ``vc_stability_total_lr``.
+    * ``'cv'`` (default under ``gram_mode='axis'``): axis-aligned
+      sliding-window CV via ``calculate_weights``.
+    * ``'survival'`` / ``'tile'``: the block-based estimators from
+      ``epde.operators.common.survival``, memoized per equation as
+      ``_cached_alt_instability = (metric, value)``.
+
+    The estimator choice affects ONLY this objective; the sparsity
+    keep-rule keeps following ``gram_mode``. Fails loudly: any exception
+    propagates -- a silent fallback value would corrupt the Pareto front
+    invisibly.
     """
     name = 'instability'
     value_attr = 'coefficients_stability'
     flag_attr = 'stability_calculated'
 
     def compute(self, equation, ctx: FitContext) -> float:
-        cached = getattr(equation, '_cached_vc_score', None)
-        if cached is not None:
-            return float(np.sum(cached))
-        try:
-            data_shape = ctx.data_shape
-            _, target, features = equation.evaluate(normalize=True, return_val=False)
-            if features is None:
-                return 1.0
-            fit_intercept = bool(equation.weights_internal[-1] != 0)
-            if global_var.gram_mode == 'vcoef':
-                return float(vc_stability_total_lr(
-                    features, target, ctx.g_fun_vals, data_shape,
-                    main_var=equation.main_var_to_explain,
-                    fit_intercept=fit_intercept))
-            sw = getattr(equation, '_cached_sw_weights', None)
-            if sw is None:
-                sw = calculate_weights(
-                    features, target, ctx.g_fun_vals, data_shape, fit_intercept,
-                    gram_cls=None, gram_kwargs=None)
-            sw_arr = np.array(sw)
-            mu = sw_arr.mean(axis=0)
-            std = sw_arr.std(axis=0, ddof=1)
-            with np.errstate(divide='ignore', invalid='ignore'):
-                cv = (std ** 2) / (mu ** 2)
-                cv[mu == 0] = 0.0
-            return float(np.sum(np.nan_to_num(cv)) / len(data_shape))
-        except Exception:
+        metric = global_var.resolve_instability_metric()
+        if metric == 'vcoef':
+            cached = getattr(equation, '_cached_vc_score', None)
+            if cached is not None:
+                return float(np.sum(cached))
+        elif metric in ('survival', 'tile'):
+            cached = getattr(equation, '_cached_alt_instability', None)
+            if cached is not None and cached[0] == metric:
+                return float(cached[1])
+        data_shape = ctx.data_shape
+        _, target, features = equation.evaluate(normalize=True, return_val=False)
+        if features is None:
             return 1.0
+        fit_intercept = bool(equation.weights_internal[-1] != 0)
+        if metric == 'vcoef':
+            return float(vc_stability_total_lr(
+                features, target, ctx.g_fun_vals, data_shape,
+                main_var=equation.main_var_to_explain,
+                fit_intercept=fit_intercept))
+        if metric in ('survival', 'tile'):
+            estimator = survival_scores if metric == 'survival' else tile_scores
+            scores = estimator(features, target, ctx.g_fun_vals, data_shape,
+                               fit_intercept=fit_intercept)
+            value = float(np.sum(scores))
+            equation._cached_alt_instability = (metric, value)
+            return value
+        # metric == 'cv': the axis-aligned sliding-window CV.
+        sw = getattr(equation, '_cached_sw_weights', None)
+        if sw is None:
+            sw = calculate_weights(
+                features, target, ctx.g_fun_vals, data_shape, fit_intercept,
+                gram_cls=None, gram_kwargs=None)
+        sw_arr = np.array(sw)
+        mu = sw_arr.mean(axis=0)
+        std = sw_arr.std(axis=0, ddof=1)
+        with np.errstate(divide='ignore', invalid='ignore'):
+            cv = (std ** 2) / (mu ** 2)
+            cv[mu == 0] = 0.0
+        return float(np.sum(np.nan_to_num(cv)) / len(data_shape))
 
 
 class L2RelativeDiscrepancy(EquationObjective):
