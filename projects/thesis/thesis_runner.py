@@ -351,12 +351,23 @@ def _build_token_pool(cfg: 'SystemCfg', coords, dim: int) -> list:
 
 
 def _construct_search(cfg: 'SystemCfg', coords, pipeline_kwargs: dict) -> EpdeSearch:
-    """Instantiate EpdeSearch from cfg.hparams['search'] + pipeline_kwargs."""
+    """Instantiate EpdeSearch from cfg.hparams['search'] + pipeline_kwargs.
+
+    ``search.boundary`` (per-system YAML) overrides the default
+    10%-of-axis heuristic -- needed for short real-data series where 10%
+    of a densified axis over/under-trims (e.g. lv_real's 201 points).
+    Scalar for ODE, list -> per-axis tuple for PDE.
+    """
     sh = cfg.hparams['search']
+    boundary = sh.get('boundary')
+    if boundary is None:
+        boundary = _boundary_for(coords)
+    elif isinstance(boundary, list):
+        boundary = tuple(boundary)
     return EpdeSearch(
         use_solver=sh['use_solver'],
         multiobjective_mode=sh['multiobjective_mode'],
-        boundary=_boundary_for(coords),
+        boundary=boundary,
         coordinate_tensors=coords,
         verbose_params=sh['verbose'],
         device=sh['device'],
@@ -373,7 +384,12 @@ def _configure_preprocessor(search: EpdeSearch, cfg: 'SystemCfg') -> None:
 def _configure_moeadd(search: EpdeSearch, cfg: 'SystemCfg',
                        variable_names: list) -> None:
     mo = cfg.hparams['moeadd']
-    early_stop_cb = _build_truth_match_callback(cfg) if mo.get('early_stop_on_truth') else None
+    # Truth-match early stop only makes sense when a truth is declared;
+    # unknown-truth real-data configs (empty truth_equations) skip it.
+    early_stop_cb = (
+        _build_truth_match_callback(cfg)
+        if mo.get('early_stop_on_truth') and cfg.truth_tokens else None
+    )
     population_size = int(mo['population_size'])
     # Coupled systems (multi-equation: lv, lorenz, ns) live in a joint
     # (discrepancy, complexity)^k objective space where k is the number
@@ -581,7 +597,13 @@ def run_one(system_cfg: SystemCfg, pipeline: str, seed: int) -> dict:
     )
 
     pipeline_kwargs = pipeline_settings(pipeline)
-    truth_alts = _truth_alts(system_cfg)
+    # Unknown-truth real-data configs declare no truth_equations; every
+    # truth-dependent metric is recorded as null and the truth-matching
+    # helpers are never consulted. The rep JSON still carries the full
+    # Pareto front (texts, canonical tokens, objective vectors) for
+    # manual inspection.
+    truth_known = bool(system_cfg.truth_tokens)
+    truth_alts = _truth_alts(system_cfg) if truth_known else ()
     _set_seeds(seed)
 
     from epde import globals as global_var
@@ -609,9 +631,20 @@ def run_one(system_cfg: SystemCfg, pipeline: str, seed: int) -> dict:
         pareto_history = list(getattr(search, 'pareto_history', []))
         candidate_history = _extract_candidate_history(search)
         if per_solution_tokens:
-            hammings = [hamming_best(c, truth_alts) for c in per_solution_tokens]
-            best_idx = int(min(range(len(hammings)), key=lambda i: hammings[i]))
-            discovery_epochs = _discovery_epochs(per_solution_tokens, pareto_history)
+            if truth_known:
+                hammings = [hamming_best(c, truth_alts) for c in per_solution_tokens]
+                best_idx = int(min(range(len(hammings)), key=lambda i: hammings[i]))
+                discovery_epochs = _discovery_epochs(per_solution_tokens, pareto_history)
+                structural_success = any(
+                    structural_success_any(c, truth_alts) for c in per_solution_tokens
+                )
+            else:
+                # No truth to rank against: 'best' fields default to the
+                # first Pareto-0 solution; truth metrics stay null.
+                hammings = None
+                best_idx = 0
+                discovery_epochs = None
+                structural_success = None
             best_objectives = (
                 objectives_per_solution[best_idx]
                 if best_idx < len(objectives_per_solution) else None
@@ -623,17 +656,17 @@ def run_one(system_cfg: SystemCfg, pipeline: str, seed: int) -> dict:
                 'discovered_text': solutions_text[best_idx],
                 'discovered_tokens_per_solution': [_tokens_to_json(c) for c in per_solution_tokens],
                 'discovered_tokens': _tokens_to_json(per_solution_tokens[best_idx]),
-                'truth_tokens': _tokens_to_json(system_cfg.truth_tokens),
+                'truth_tokens': (_tokens_to_json(system_cfg.truth_tokens)
+                                 if truth_known else None),
                 'hamming_per_solution': hammings,
-                'hamming': hammings[best_idx],
+                'hamming': hammings[best_idx] if truth_known else None,
                 'discovery_epoch_per_solution': discovery_epochs,
-                'discovery_epoch': discovery_epochs[best_idx],
+                'discovery_epoch': (discovery_epochs[best_idx]
+                                    if truth_known else None),
                 'n_epochs': len(pareto_history),
                 'objectives_per_solution': objectives_per_solution,
                 'objectives': best_objectives,
-                'structural_success': any(
-                    structural_success_any(c, truth_alts) for c in per_solution_tokens
-                ),
+                'structural_success': structural_success,
                 # Sidecar payload: stripped by run_smoke before the rep
                 # JSON is written; persisted to <rep>.history.json
                 # alongside the rep file. Underscore prefix marks this as
@@ -649,12 +682,13 @@ def run_one(system_cfg: SystemCfg, pipeline: str, seed: int) -> dict:
                 'discovered_text': [],
                 'discovered_tokens_per_solution': [],
                 'discovered_tokens': [],
-                'truth_tokens': _tokens_to_json(system_cfg.truth_tokens),
-                'hamming_per_solution': [],
+                'truth_tokens': (_tokens_to_json(system_cfg.truth_tokens)
+                                 if truth_known else None),
+                'hamming_per_solution': [] if truth_known else None,
                 'hamming': None,
                 'objectives_per_solution': [],
                 'objectives': None,
-                'structural_success': False,
+                'structural_success': False if truth_known else None,
                 '_candidate_history': candidate_history,
             })
     except Exception as exc:  # pragma: no cover - smoke-time diagnostic
