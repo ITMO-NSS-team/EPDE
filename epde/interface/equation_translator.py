@@ -47,7 +47,7 @@ def _(text_form : str, pool, all_vars: List[str], use_pic: bool = False):
                 max_factors = len(factors)
             term_list.append(Term(pool, passed_term=factors, collapse_powers=False))
 
-    metaparameters={'terms_number': {'optimizable': False, 'value': len(term_list)},
+    metaparameters={'max_terms_number': {'optimizable': False, 'value': len(term_list)},
                     'max_factors_in_term': {'optimizable': False, 'value': max_factors}}
     for var_key in all_vars:
         metaparameters[('sparsity', var_key)] = {'optimizable': True, 'value': 0.}
@@ -92,7 +92,7 @@ def _(text_form : dict, pool, all_vars: List[str], use_pic: bool = False):
                     max_factors = len(factors)
                 term_list.append(Term(pool, passed_term=factors, collapse_powers=False))
     
-        metaparameters={'terms_number': {'optimizable': False, 'value': len(term_list)},
+        metaparameters={'max_terms_number': {'optimizable': False, 'value': len(term_list)},
                         'max_factors_in_term': {'optimizable': False, 'value': max_factors}}
         for var_key in all_vars:
             metaparameters[('sparsity', var_key)] = {'optimizable': True, 'value': 0.}
@@ -182,7 +182,7 @@ class CoeffLessEquation():
                 terms_aggregated = lp_terms_translated + [rp_translated,]
                 max_factors = max([len(term.structure) for term in terms_aggregated])
 
-                metaparameters={'terms_number': {'optimizable': False, 'value': len(term_list)},
+                metaparameters={'max_terms_number': {'optimizable': False, 'value': len(term_list)},
                                 'max_factors_in_term': {'optimizable': False, 'value': max_factors}}
                 for var_key in all_vars:
                     metaparameters[('sparsity', var_key)] = {'optimizable': True, 'value': 0.}
@@ -213,7 +213,7 @@ class CoeffLessEquation():
             terms_aggregated = self.lp_terms_translated + [self.rp_translated,]
             max_factors = max([len(term.structure) for term in terms_aggregated])
 
-            metaparameters={'terms_number': {'optimizable': False, 'value': len(term_list)},
+            metaparameters={'max_terms_number': {'optimizable': False, 'value': len(term_list)},
                             'max_factors_in_term': {'optimizable': False, 'value': max_factors}}
             for var_key in all_vars:
                 metaparameters[('sparsity', var_key)] = {'optimizable': True, 'value': 0.}

@@ -315,7 +315,7 @@ class TestFilterTokensByRightPartExhaustion:
 
 class TestEquationDefaultMetaparameters:
     def test_two_equations_have_independent_default_metaparameters(self, basic_pool):
-        # Default terms_number is 5; passing five basic terms skips the
+        # Default max_terms_number is 5; passing five basic terms skips the
         # random-padding loop entirely (range(5, 5) is empty).
         eq1 = Equation(basic_pool, basic_structure=['u'] * 5,
                        var_to_explain='u')

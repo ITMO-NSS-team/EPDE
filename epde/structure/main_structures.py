@@ -40,9 +40,29 @@ from epde.supplementary import filter_powers, normalize_ts, population_sort, fla
 
 _DEFAULT_EQUATION_METAPARAMETERS = {
     'sparsity':            {'optimizable': True,  'value': 1.},
-    'terms_number':        {'optimizable': False, 'value': 5.},
+    'max_terms_number':    {'optimizable': False, 'value': 5.},
     'max_factors_in_term': {'optimizable': False, 'value': 1.},
 }
+
+
+def _normalize_metaparameters(mp: dict) -> dict:
+    """In-place: accept the legacy ``terms_number`` metaparameter key and
+    rename it to ``max_terms_number`` with a one-time DeprecationWarning.
+
+    Idempotent and safe when neither key is present (downstream reads then
+    rely on the default dict). If BOTH keys are present, the new key is
+    authoritative and the stale legacy key is dropped silently.
+    """
+    if 'terms_number' in mp:
+        if 'max_terms_number' not in mp:
+            warnings.warn(
+                "The 'terms_number' metaparameter key is deprecated; use "
+                "'max_terms_number'. The legacy key was normalized automatically.",
+                DeprecationWarning, stacklevel=2)
+            mp['max_terms_number'] = mp.pop('terms_number')
+        else:
+            mp.pop('terms_number')
+    return mp
 
 
 class Term(ComplexStructure):
@@ -455,12 +475,14 @@ class Equation(ComplexStructure):
 
         if metaparameters is None:
             metaparameters = copy.deepcopy(_DEFAULT_EQUATION_METAPARAMETERS)
+        else:
+            _normalize_metaparameters(metaparameters)   # legacy 'terms_number' -> 'max_terms_number'
 
         self.n_immutable = len(basic_structure)
         self.pool = pool
         self.structure = []
         self.metaparameters = metaparameters
-        if (self.metaparameters['terms_number']['value'] < self.n_immutable):
+        if (self.metaparameters['max_terms_number']['value'] < self.n_immutable):
             raise ValueError(
                 'Maximum number of terms parameter is lower, than number of passed basic terms.')
 
@@ -475,7 +497,16 @@ class Equation(ComplexStructure):
 
         force_var_to_explain = True   # False
         max_iter = 100
-        for i in range(len(basic_structure), int(self.metaparameters['terms_number']['value'])):
+        max_terms = int(self.metaparameters['max_terms_number']['value'])
+        # Variable per-equation birth size: draw a target term count in
+        # [low, max_terms] (inclusive). ``low`` pins the floor at 2 but never
+        # below the immutable head terms and never above the configured max,
+        # so the term count is a genuine per-equation property bounded by the
+        # max rather than a value that births every equation at full size.
+        low = min(max(2, self.n_immutable), max_terms)
+        high = max_terms
+        birth_n = np.random.randint(low, high + 1) if low <= high else max_terms
+        for i in range(len(basic_structure), birth_n):
             new_term = Term(self.pool, max_factors_in_term=self.metaparameters['max_factors_in_term']['value'],
                             mandatory_family=None, passed_term=None)
             def _term_mutate():
@@ -625,8 +656,8 @@ class Equation(ComplexStructure):
 
         # Prefer ADDING the new property-carrying term so existing structure
         # is preserved; fall back to REPLACING a random term only when the
-        # ``terms_number`` cap is already reached.
-        terms_cap = int(self.metaparameters['terms_number']['value'])
+        # ``max_terms_number`` cap is already reached.
+        terms_cap = int(self.metaparameters['max_terms_number']['value'])
         can_add = len(self.structure) < terms_cap
 
         def _slot_duplicate(idx, candidate):
@@ -944,7 +975,7 @@ class Equation(ComplexStructure):
         """Try to append one fresh, non-duplicate term to ``self.structure``.
 
         Returns ``True`` if a term was appended, ``False`` if either the
-        ``terms_number`` cap was already reached or the token pool could
+        ``max_terms_number`` cap was already reached or the token pool could
         not produce a non-duplicate within ``max_iter`` retries. Callers
         that invoke this in a loop (e.g. ``EquationMutation.apply``,
         ``Equation.__init__``) MUST stop on the first ``False`` -- once
@@ -958,7 +989,7 @@ class Equation(ComplexStructure):
         term). ``EquationMutation`` passes the signatures it just dropped so a
         mutation never re-adds a term it removed in the same call.
         """
-        cap = int(self.metaparameters['terms_number']['value'])
+        cap = int(self.metaparameters['max_terms_number']['value'])
         if len(self.structure) >= cap:
             return False
         # Cap diverges from the 100-attempt convention shared by
@@ -991,6 +1022,14 @@ class Equation(ComplexStructure):
     @property
     def history(self):
         return self._history
+
+    @property
+    def term_number(self) -> int:
+        """Actual number of terms currently in this equation's structure
+        (a per-equation property). Bounded ABOVE by the
+        ``max_terms_number`` metaparameter, but after the variable-birth
+        draw it is generally less than that configured max. Read-only."""
+        return len(self.structure)
 
     @property
     def fitness_value(self):
@@ -1290,7 +1329,8 @@ def solver_formed_grid(training_grid=None):
     return torch.from_numpy(training_grid).T.type(torch.FloatTensor)
 
 def check_metaparameters(metaparameters: dict):
-    metaparam_labels = ['terms_number', 'max_factors_in_term', 'sparsity']
+    metaparam_labels = ['max_terms_number', 'max_factors_in_term', 'sparsity']  # noqa: F841
+    _normalize_metaparameters(metaparameters)
     return True
 
 
@@ -1335,7 +1375,14 @@ class SoEq(moeadd.MOEADDSolution):
             for idx, eq_elem in enumerate(value):
                 eq = Equation.__new__(Equation)
                 attrs_from_dict(eq, eq_elem, except_attrs)
+                # attrs_from_dict bypasses Equation.__init__, so a pre-rename
+                # serialized chromosome can carry the legacy 'terms_number'
+                # metaparameter key; normalize it here.
+                if hasattr(eq, 'metaparameters'):
+                    _normalize_metaparameters(eq.metaparameters)
                 equations[self.vars_to_describe[idx]] = eq
+            if hasattr(self, 'metaparameters'):
+                _normalize_metaparameters(self.metaparameters)
             self.vals = Chromosome(equations, {key: val for key, val in self.metaparameters.items()
                                                if val['optimizable']})
 
