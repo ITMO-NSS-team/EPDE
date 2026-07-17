@@ -14,7 +14,6 @@ Created on Wed Jun  2 15:43:19 2021
 
 @author: mike_ubuntu
 """
-import random
 from ast import operator
 from operator import eq
 import numpy as np
@@ -129,7 +128,7 @@ class ChromosomeCrossover(CompoundOperator):
         # crossover. Ref-swap is safe: both offspring are already
         # exclusive deepcopies (see module ownership contract).
         for eq_key in eqs_keys:
-            if len(eqs_keys) > 1 and random.random() < self.params['equation_exchange_prob']:
+            if len(eqs_keys) > 1 and np.random.random() < self.params['equation_exchange_prob']:
                 temp_eq = offspring_1.vals[eq_key]
                 offspring_1.vals.replace_gene(gene_key = eq_key, value = offspring_2.vals[eq_key])
                 offspring_2.vals.replace_gene(gene_key = eq_key, value = temp_eq)
