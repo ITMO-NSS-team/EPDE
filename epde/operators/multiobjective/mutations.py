@@ -20,17 +20,14 @@ from copy import deepcopy
 from functools import partial
 from typing import Union
 
-from epde.optimizers.moeadd.moeadd import ParetoLevels
-
-from epde.structure.main_structures import Equation, SoEq, Term
-from epde.structure.structure_template import check_uniqueness
+from epde.structure.main_structures import Equation, SoEq
 from epde.supplementary import filter_powers
 from epde.operators.utils.template import CompoundOperator, add_base_param_to_operator
 
 from epde import _loop_stats
 
 
-from epde.decorators import HistoryExtender, ResetEquationStatus
+from epde.decorators import HistoryExtender
 
 # Bounded regenerate-retry budget for TermMutation: how many times a
 # freshly randomized term that duplicates an existing one is re-rolled

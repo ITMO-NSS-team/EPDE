@@ -14,21 +14,16 @@ Created on Wed Jun  2 15:43:19 2021
 
 @author: mike_ubuntu
 """
-from ast import operator
-from operator import eq
 import numpy as np
 from copy import deepcopy
 
 from functools import partial
 
-from epde.structure.structure_template import check_uniqueness
 from epde.optimizers.moeadd.moeadd import ParetoLevels
 
-from epde.decorators import HistoryExtender, ResetEquationStatus
+from epde.decorators import HistoryExtender
 
 from epde.operators.utils.template import CompoundOperator, add_base_param_to_operator
-from epde.operators.multiobjective.moeadd_specific import get_basic_populator_updater
-from epde.operators.multiobjective.mutations import get_basic_mutation
 
 from epde import _loop_stats
 

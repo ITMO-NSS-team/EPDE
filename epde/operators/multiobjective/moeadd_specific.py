@@ -5,20 +5,16 @@ Created on Fri Jul 29 19:08:51 2022
 
 @author: maslyaev
 """
-import copy
 import numpy as np
-import time
 import warnings
+from itertools import combinations
 from typing import Union, Tuple
-from functools import reduce, partial
+from functools import partial
 
-from epde.optimizers.moeadd.moeadd import ParetoLevels, ObjFunNormalizer
+from epde.optimizers.moeadd.moeadd import ParetoLevels
 from epde.operators.utils.template import CompoundOperator, add_base_param_to_operator
 import epde.globals as global_var
 from epde.operators.multiobjective.mutations import get_basic_mutation
-
-from epde.structure.main_structures import SoEq
-from copy import deepcopy
 
 from epde import _loop_stats
 
@@ -709,8 +705,6 @@ def get_initial_sorter(right_part_selector : CompoundOperator,
     sorter.set_suboperators(operators = {'right_part_selector' : right_part_selector,
                                          'chromosome_fitness' : chromosome_fitness})
     return sorter
-
-from itertools import combinations
 
 def has_subset_pair(collection_of_sets):
     """
