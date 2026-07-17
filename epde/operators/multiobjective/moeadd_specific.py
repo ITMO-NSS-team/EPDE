@@ -566,6 +566,10 @@ def get_pareto_levels_updater(right_part_selector : CompoundOperator, chromosome
     pl_updater = get_basic_populator_updater(pl_updater_params)
     updater.set_suboperators(operators = {'chromosome_mutation' : mutation,
                                           'pareto_level_updater' : pl_updater,
+                                          # Dormant hook retained for the legacy
+                                          # LASSO mode; on the live path sparsity
+                                          # runs inside the fitness host (see the
+                                          # MOEADD strategy wiring).
                                           'sparsity' : sparsity,
                                           'right_part_selector' : right_part_selector,
                                           'chromosome_fitness' : chromosome_fitness})

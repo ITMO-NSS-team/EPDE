@@ -30,23 +30,21 @@ from epde import _loop_stats
 
 class ParetoLevelsCrossover(CompoundOperator):
     """
-    The crossover operator, combining parameter crossover for terms with same 
-    factors but different parameters & full exchange of terms between the 
-    completely different ones.
-    
+    Population-level crossover driver for the MOEA/DD loop.
+
+    Builds the mating pool from each solution's ``crossover_times()``
+    counter (incremented by selection), shuffles and pairs it, deepcopies
+    every pair (establishing the ownership contract for the hierarchy
+    below), runs the ``chromosome_crossover`` suboperator on each pair and
+    stores the offspring in ``objective.unplaced_candidates`` for
+    ``OffspringUpdater`` to consume.
+
     Noteable attributes:
     -----------
     suboperators : dict
-        Inhereted from the Specific_Operator class. 
-        Suboperators, performing tasks of parent selection, parameter crossover, full terms crossover, calculation of weights for each terms & 
-        fitness function calculation. Dictionary: keys - strings from 'Selection', 'Param_crossover', 'Term_crossover', 'Coeff_calc', 'Fitness_eval'.
-        values - corresponding operators (objects of Specific_Operator class).
-
-    Methods:
-    -----------
-    apply(population)
-        return the new population, created with the noted operators and containing both parent individuals and their offsprings.    
-    copy_properties_to
+        Single entry ``'chromosome_crossover'`` (ChromosomeCrossover),
+        which per equation gene either swaps the gene wholesale between
+        the offspring or recombines it via EquationCrossover.
     """
     key = 'ParetoLevelsCrossover'
 
@@ -418,6 +416,11 @@ class TermParamCrossover(CompoundOperator):
         if len(objective[0].structure) != len(objective[1].structure):
             print([(token.label, token.params) for token in objective[0].structure], [(token.label, token.params) for token in objective[1].structure])
             raise Exception('Wrong terms passed:')
+        # ``dim_param_idx`` deliberately persists across tokens: once any token
+        # binds it (a real 'dim' entry or the power fallback below), later
+        # tokens without a 'dim' param keep the stale index. Load-bearing
+        # legacy semantics -- do not reset per token.
+        dim_param_idx = None
         for term1_token_idx in np.arange(len(objective[0].structure)):
             term2_token_idx = [i for i in np.arange(len(objective[1].structure)) 
                                if objective[1].structure[i].label == objective[0].structure[term1_token_idx].label][0]
@@ -425,9 +428,7 @@ class TermParamCrossover(CompoundOperator):
                 if param_descr['name'] == 'power': power_param_idx = param_idx
                 if param_descr['name'] == 'dim': dim_param_idx = param_idx
             
-            try:                # TODO: refactor logic
-                dim_param_idx
-            except:
+            if dim_param_idx is None:
                 dim_param_idx = power_param_idx
 
             for param_idx in np.arange(objective[0].structure[term1_token_idx].params.size):
