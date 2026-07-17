@@ -92,6 +92,18 @@ def _most_crowded_domain(domain_solutions: list, weights: np.ndarray, best_obj: 
     return crowded_domains[np.argmax(PBIS)]
 
 
+def _worst_by_pbi(candidates: list, weight, best_obj, penalty_factor, obj_normalizer):
+    '''
+    Argmax of the individual PBI over ``candidates`` for one weight vector
+    (first max wins on ties, per ``np.argmax``). The elimination core shared
+    by ``decomposition_based_worst``, ``locate_pareto_worst`` and the
+    last-front branch of ``PopulationUpdater``.
+    '''
+    PBIS = [penalty_based_intersection(candidate, weight, best_obj, penalty_factor, obj_normalizer)
+            for candidate in candidates]
+    return candidates[np.argmax(PBIS)]
+
+
 def decomposition_based_worst(solutions: list, weights: np.ndarray, best_obj: np.ndarray,
                               penalty_factor: float = 1., obj_normalizer=None, sectors: list = None):
     '''
@@ -110,12 +122,9 @@ def decomposition_based_worst(solutions: list, weights: np.ndarray, best_obj: np
 
     candidates = domain_solutions[most_crowded_domain]
 
-    # Find the solution with the largest individual PBI in the selected subregion
-    PBIS_candidates = [
-        penalty_based_intersection(s, weights[most_crowded_domain], best_obj, penalty_factor, obj_normalizer)
-        for s in candidates]
-
-    return candidates[np.argmax(PBIS_candidates)]
+    # The solution with the largest individual PBI in the selected subregion.
+    return _worst_by_pbi(candidates, weights[most_crowded_domain], best_obj,
+                         penalty_factor, obj_normalizer)
 
 
 def locate_pareto_worst(levels, weights: np.ndarray, best_obj: np.ndarray, penalty_factor: float = 1.,
@@ -144,11 +153,8 @@ def locate_pareto_worst(levels, weights: np.ndarray, best_obj: np.ndarray, penal
     worst_NDL_section = [candidates[sol_idx] for sol_idx in range(len(candidates))
                          if domain_solution_NDL_idxs[sol_idx] == max_level]
 
-    PBIS_worst = [
-        penalty_based_intersection(solution, weights[most_crowded_domain], best_obj, penalty_factor, levels.normalizer)
-        for solution in worst_NDL_section]
-
-    return worst_NDL_section[np.argmax(PBIS_worst)]
+    return _worst_by_pbi(worst_NDL_section, weights[most_crowded_domain], best_obj,
+                         penalty_factor, levels.normalizer)
 
 
 class PopulationUpdater(CompoundOperator):
@@ -210,11 +216,9 @@ class PopulationUpdater(CompoundOperator):
                 if len(subregion) > 1:
                     # |Phi^h| > 1: eliminate argmax PBI over the whole
                     # subregion (Algorithm 4, lines 17-19).
-                    PBIS = [penalty_based_intersection(sol, weights[most_crowded_idx],
-                                                       self_args['best_obj'], self.params['PBI_penalty'],
-                                                       levels_obj.normalizer)
-                            for sol in subregion]
-                    worst_solution = subregion[np.argmax(PBIS)]
+                    worst_solution = _worst_by_pbi(subregion, weights[most_crowded_idx],
+                                                   self_args['best_obj'], self.params['PBI_penalty'],
+                                                   levels_obj.normalizer)
                 else:
                     # |Phi^h| = 1: every F_l member is associated with an
                     # isolated subregion -- preserve them and fall back to
@@ -430,6 +434,19 @@ def regenerate_degenerate_equations(offspring, right_part_selector, chromosome_f
         chromosome_fitness.apply(objective=offspring, arguments=fitness_args)
 
 
+def _rps_fitness_regenerate(candidate, right_part_selector, chromosome_fitness,
+                            rps_args, fitness_args):
+    """Right-part selection, then fitness, then re-roll of any equations the
+    fitness host flagged fit-degenerate -- the evaluation sequence every fresh
+    or re-created candidate goes through before its verdicts (degenerate?
+    duplicate?) can be read. Shared by the two retry sites of
+    ``InitialParetoLevelSorting``."""
+    right_part_selector.apply(objective=candidate, arguments=rps_args)
+    chromosome_fitness.apply(objective=candidate, arguments=fitness_args)
+    regenerate_degenerate_equations(candidate, right_part_selector,
+                                    chromosome_fitness, rps_args, fitness_args)
+
+
 class OffspringUpdater(CompoundOperator):
     key = 'ParetoLevelUpdater'
 
@@ -590,17 +607,14 @@ class InitialParetoLevelSorting(CompoundOperator):
             # budget. A true collapse (cannot find ANY non-degenerate form for a
             # slot) still stops the search.
             pool_exhausted = False
+            init_collapsed = False
             for idx, candidate in enumerate(objective.unplaced_candidates):
                 candidate.reset_state(True)
                 # SoEqRightPartSelector resolves system degeneracy inline; the
                 # retry below additionally rejects fit-degenerate candidates and
                 # (while uniques remain) duplicate ACTIVE forms. Fitness must run
                 # first because both verdicts are only known post-sparsification.
-                self.suboperators['right_part_selector'].apply(objective = candidate,
-                                                                arguments = subop_args['right_part_selector'])
-                self.suboperators['chromosome_fitness'].apply(objective=candidate,
-                                                              arguments=subop_args['chromosome_fitness'])
-                regenerate_degenerate_equations(
+                _rps_fitness_regenerate(
                     candidate, self.suboperators['right_part_selector'],
                     self.suboperators['chromosome_fitness'],
                     subop_args['right_part_selector'], subop_args['chromosome_fitness'])
@@ -627,11 +641,7 @@ class InitialParetoLevelSorting(CompoundOperator):
                     attempts += 1
                     candidate.create()
                     candidate.reset_state(True)
-                    self.suboperators['right_part_selector'].apply(objective=candidate,
-                                                                   arguments=subop_args['right_part_selector'])
-                    self.suboperators['chromosome_fitness'].apply(objective=candidate,
-                                                                  arguments=subop_args['chromosome_fitness'])
-                    regenerate_degenerate_equations(
+                    _rps_fitness_regenerate(
                         candidate, self.suboperators['right_part_selector'],
                         self.suboperators['chromosome_fitness'],
                         subop_args['right_part_selector'], subop_args['chromosome_fitness'])
@@ -677,8 +687,6 @@ class InitialParetoLevelSorting(CompoundOperator):
                 objective.history.add(system)
                 if global_var.verbose.candidate_objectives:
                     print(candidate.obj_fun)
-            else:
-                init_collapsed = False
             if init_collapsed:
                 if global_var.verbose.show_iter_idx:
                     print(f'\n*** Search-space collapse: stopping early with '
