@@ -1,0 +1,48 @@
+# REAL Hudson's Bay lynx-hare Lotka-Volterra (1900-1920, 21 annual pelt
+# records, cubic-spline densified to ~201 points by the adapter).
+#
+# This is the KNOWN-TRUTH real-data calibration point: the OLS
+# signal-check (pic/data/lv/real_lynxhare_check.py) confirmed all four
+# canonical LV signs at R^2 = 0.93 / 0.88, so structural success against
+# the LV form below is a meaningful metric on real data. Coefficient
+# values in truth_equations are indicative only -- canonicalisation
+# ignores magnitudes, so structural matching is unaffected.
+#
+# Hyperparameters mirror the established pic/data/lv/lv_real.py run:
+# poly(21, 4) derivatives, boundary 10, data_fun_pow 1 (LV has no squared
+# terms; u*v assembles from factors_num=2 -- power 2 only hands the search
+# a u^2 overfit trap), terms 5, sparsity 1e-8..1.
+name: lv_real
+adapter: lv_real
+
+truth_equations:
+  - "0.5 * u{power: 1.0} + -0.03 * u{power: 1.0} * v{power: 1.0} = du/dx0{power: 1.0}"
+  - "0.03 * u{power: 1.0} * v{power: 1.0} + -0.8 * v{power: 1.0} = dv/dx0{power: 1.0}"
+
+adapter_kwargs:
+  densify: 10
+
+search:
+  boundary: 10
+
+preprocessor:
+  type: poly
+  kwargs:
+    polynomial_window: 21
+    poly_order: 4
+
+moeadd:
+  population_size: 24
+  training_epochs: 18
+
+# Autonomous system: no trig-of-grid tokens.
+additional_tokens: []
+
+fit:
+  equation_terms_max_number: 5
+  data_fun_pow: 1
+  max_deriv_order: [1]
+  equation_factors_max_number:
+    factors_num: [1, 2]
+    probas: [0.7, 0.3]
+  eq_sparsity_interval: [1.0e-8, 1.0]

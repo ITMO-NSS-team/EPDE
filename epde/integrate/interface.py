@@ -119,9 +119,10 @@ class SystemSolverInterface(object):
                 grids = [torch.from_numpy(subgrid).to(self._device) for subgrid in grids]            
             default_domain = False
 
+        tgt = equation.target_idx
         for term_idx, term in enumerate(equation.structure):
-            if term_idx != equation.target_idx:
-                if term_idx < equation.target_idx:
+            if term_idx != tgt:
+                if term_idx < tgt:
                     weight = equation.weights_final[term_idx]
                 else:
                     weight = equation.weights_final[term_idx-1]
@@ -142,12 +143,13 @@ class SystemSolverInterface(object):
 
         target_weight = -1 # torch.full_like(input = grids[0], fill_value = -1.).to(self._device)
 
-        target_form = self._term_solver_form(equation.structure[equation.target_idx], grids, default_domain, variables)
+        target_term = equation.target
+        target_form = self._term_solver_form(target_term, grids, default_domain, variables)
         target_form['coeff'] = target_form['coeff'] * target_weight
         # target_form['coeff'] = adjust_shape(target_form['coeff'], mode = mode)
         # print(f'target_form shape is {target_form["coeff"].shape}')
 
-        _solver_form[equation.structure[equation.target_idx].name] = target_form
+        _solver_form[target_term.name] = target_form
 
         return _solver_form
 

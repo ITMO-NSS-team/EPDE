@@ -1,0 +1,272 @@
+{
+  "ac": {
+    "legacy": {
+      "n": 21,
+      "successes": 0,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.15464382326420195,
+      "mean_hamming": 5.85,
+      "consistency": 0.047619047619047616,
+      "mean_runtime_sec": 519.8179195608411,
+      "errors": 1
+    },
+    "new": {
+      "n": 30,
+      "successes": 30,
+      "rate": 1.0,
+      "wilson_lo": 0.8864829086095221,
+      "wilson_hi": 1.0,
+      "mean_hamming": 0.0,
+      "consistency": 1.0,
+      "mean_runtime_sec": 372.60851689179736,
+      "errors": 0
+    }
+  },
+  "burgers_inviscid": {
+    "legacy": {
+      "n": 3,
+      "successes": 0,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.5615060804490177,
+      "mean_hamming": 2.6666666666666665,
+      "consistency": 0.6666666666666666,
+      "mean_runtime_sec": 960.8962853749593,
+      "errors": 0
+    },
+    "new": {
+      "n": 30,
+      "successes": 3,
+      "rate": 0.1,
+      "wilson_lo": 0.03459925995971615,
+      "wilson_hi": 0.25621441315266624,
+      "mean_hamming": 3.933333333333333,
+      "consistency": 0.6666666666666666,
+      "mean_runtime_sec": 584.5087391535441,
+      "errors": 0
+    }
+  },
+  "burgers_viscous": {
+    "new": {
+      "n": 30,
+      "successes": 27,
+      "rate": 0.9,
+      "wilson_lo": 0.7437855868473339,
+      "wilson_hi": 0.9654007400402839,
+      "mean_hamming": 0.1,
+      "consistency": 0.9,
+      "mean_runtime_sec": 1026.8644128640492,
+      "errors": 0
+    }
+  },
+  "kdv": {
+    "legacy": {
+      "n": 1,
+      "successes": 0,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.7934567085261071,
+      "mean_hamming": 5.0,
+      "consistency": 1.0,
+      "mean_runtime_sec": 3488.0759568214417,
+      "errors": 0
+    },
+    "new": {
+      "n": 30,
+      "successes": 20,
+      "rate": 0.6666666666666666,
+      "wilson_lo": 0.48779725813830266,
+      "wilson_hi": 0.807697044731538,
+      "mean_hamming": 2.0,
+      "consistency": 0.6666666666666666,
+      "mean_runtime_sec": 1274.4695264895756,
+      "errors": 0
+    }
+  },
+  "kdv_cossin": {
+    "new": {
+      "n": 30,
+      "successes": 24,
+      "rate": 0.8,
+      "wilson_lo": 0.6269395261897256,
+      "wilson_hi": 0.9049502189759876,
+      "mean_hamming": 1.2333333333333334,
+      "consistency": 0.8,
+      "mean_runtime_sec": 167.2445907831192,
+      "errors": 0
+    }
+  },
+  "ks": {
+    "new": {
+      "n": 30,
+      "successes": 20,
+      "rate": 0.6666666666666666,
+      "wilson_lo": 0.48779725813830266,
+      "wilson_hi": 0.807697044731538,
+      "mean_hamming": 1.3,
+      "consistency": 0.4666666666666667,
+      "mean_runtime_sec": 3254.4895514647164,
+      "errors": 0
+    }
+  },
+  "lorenz": {
+    "legacy": {
+      "n": 30,
+      "successes": 0,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.113517091390478,
+      "mean_hamming": 29.966666666666665,
+      "consistency": 0.03333333333333333,
+      "mean_runtime_sec": 78.52560108502706,
+      "errors": 0
+    },
+    "new": {
+      "n": 30,
+      "successes": 0,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.113517091390478,
+      "mean_hamming": 6.833333333333333,
+      "consistency": 0.1,
+      "mean_runtime_sec": 387.03513929843905,
+      "errors": 0
+    }
+  },
+  "lv": {
+    "legacy": {
+      "n": 30,
+      "successes": 0,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.113517091390478,
+      "mean_hamming": 17.333333333333332,
+      "consistency": 0.03333333333333333,
+      "mean_runtime_sec": 41.313056055704756,
+      "errors": 0
+    },
+    "new": {
+      "n": 30,
+      "successes": 9,
+      "rate": 0.3,
+      "wilson_lo": 0.16664562643958933,
+      "wilson_hi": 0.4787612101166018,
+      "mean_hamming": 2.8,
+      "consistency": 0.7,
+      "mean_runtime_sec": 671.77618552049,
+      "errors": 0
+    }
+  },
+  "ns": {
+    "new": {
+      "n": 30,
+      "successes": 0,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.113517091390478,
+      "mean_hamming": 13.0,
+      "consistency": 0.6,
+      "mean_runtime_sec": 3533.1408136765162,
+      "errors": 18
+    }
+  },
+  "ode": {
+    "legacy": {
+      "n": 30,
+      "successes": 0,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.113517091390478,
+      "mean_hamming": 6.066666666666666,
+      "consistency": 0.03333333333333333,
+      "mean_runtime_sec": 27.14165372053782,
+      "errors": 0
+    },
+    "new": {
+      "n": 30,
+      "successes": 28,
+      "rate": 0.9333333333333333,
+      "wilson_lo": 0.7867618227892791,
+      "wilson_hi": 0.9815233646723066,
+      "mean_hamming": 0.06666666666666667,
+      "consistency": 0.9333333333333333,
+      "mean_runtime_sec": 61.45313452084859,
+      "errors": 0
+    }
+  },
+  "pde_compound": {
+    "new": {
+      "n": 30,
+      "successes": 13,
+      "rate": 0.43333333333333335,
+      "wilson_lo": 0.2737723743061511,
+      "wilson_hi": 0.6080299045459127,
+      "mean_hamming": 2.1,
+      "consistency": 0.43333333333333335,
+      "mean_runtime_sec": 438.5803554614385,
+      "errors": 0
+    }
+  },
+  "pde_divide": {
+    "new": {
+      "n": 30,
+      "successes": 20,
+      "rate": 0.6666666666666666,
+      "wilson_lo": 0.48779725813830266,
+      "wilson_hi": 0.807697044731538,
+      "mean_hamming": 1.9,
+      "consistency": 0.23333333333333334,
+      "mean_runtime_sec": 377.26007777055105,
+      "errors": 0
+    }
+  },
+  "vdp": {
+    "legacy": {
+      "n": 30,
+      "successes": 2,
+      "rate": 0.06666666666666667,
+      "wilson_lo": 0.01847663532769335,
+      "wilson_hi": 0.21323817721072091,
+      "mean_hamming": 4.666666666666667,
+      "consistency": 0.06666666666666667,
+      "mean_runtime_sec": 121.47896575927734,
+      "errors": 0
+    },
+    "new": {
+      "n": 30,
+      "successes": 30,
+      "rate": 1.0,
+      "wilson_lo": 0.8864829086095221,
+      "wilson_hi": 1.0,
+      "mean_hamming": 0.0,
+      "consistency": 1.0,
+      "mean_runtime_sec": 138.40101693471271,
+      "errors": 0
+    }
+  },
+  "wave": {
+    "legacy": {
+      "n": 30,
+      "successes": 1,
+      "rate": 0.03333333333333333,
+      "wilson_lo": 0.0059084379948573795,
+      "wilson_hi": 0.16670751396958874,
+      "mean_hamming": 4.1,
+      "consistency": 0.06666666666666667,
+      "mean_runtime_sec": 288.77272277673086,
+      "errors": 0
+    },
+    "new": {
+      "n": 30,
+      "successes": 30,
+      "rate": 1.0,
+      "wilson_lo": 0.8864829086095221,
+      "wilson_hi": 1.0,
+      "mean_hamming": 0.0,
+      "consistency": 1.0,
+      "mean_runtime_sec": 245.19499712785085,
+      "errors": 0
+    }
+  }
+}

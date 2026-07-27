@@ -1,0 +1,50 @@
+# REAL double pendulum, UNKNOWN-TRUTH config (encoder variant by default:
+# HardwareX MultiArm-Pendulum optical encoders @1 kHz, radians; the
+# signal-check winner at R^2 = 0.998).
+#
+# truth_equations is deliberately empty: truth metrics (hamming,
+# structural_success, discovery_epoch) are recorded as null and the rep
+# JSON carries the full Pareto front for manual inspection. The physically
+# expected coupled EOM (D = th1 - th2):
+#   th1'' = -A cos(D) th2'' - A sin(D) th2'^2 - (g/l1) sin th1
+#   th2'' = -B cos(D) th1'' + B sin(D) th1'^2 - (g/l2) sin th2
+# The adapter injects sin_th1/sin_th2 (standalone gravity terms) and
+# cos_delta/sin_delta (factor-only coupling) as CacheStoredTokens.
+#
+# Hyperparameters mirror pic/data/dp/MultiArm_Pendulum/dp_encoder_discovery.py
+# with its parsimony note applied (terms=5: the true EOM is 4 terms; 10
+# left six spurious slots).
+name: dp_real
+adapter: dp_real
+
+truth_equations: []
+
+adapter_kwargs:
+  variant: encoder
+  step: 4
+
+search:
+  boundary: 60
+
+preprocessor:
+  type: poly
+  kwargs:
+    polynomial_window: 51
+    poly_order: 4
+
+moeadd:
+  population_size: 30
+  training_epochs: 20
+
+# Trig-of-state tokens come from the adapter; no trig-of-grid tokens.
+additional_tokens: []
+
+fit:
+  equation_terms_max_number: 5
+  data_fun_pow: 1
+  deriv_fun_pow: 2
+  max_deriv_order: [2]
+  equation_factors_max_number:
+    factors_num: [1, 2]
+    probas: [0.5, 0.5]
+  eq_sparsity_interval: [1.0e-8, 1.0]

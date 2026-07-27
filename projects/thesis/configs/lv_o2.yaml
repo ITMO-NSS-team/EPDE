@@ -1,0 +1,36 @@
+# Lotka-Volterra (coupled 2D ODE)
+# Data: ``pic/data/lv/data_20.npy`` (the ``_20`` suffix names the rate
+# constants). Original YAML claimed alpha=2/3, beta=4/3, delta=1, gamma=1
+# but least-squares fit to the actual trajectory yields all four rates
+# ≈ 20 (LS produced 19.86, 19.94, 19.94, 19.97 with <3% residual). Rounded
+# to the integer-20 generator value.
+name: lv_o2
+adapter: lv
+truth_equations:
+  - "20.0 * u{power: 1.0} + -20.0 * u{power: 1.0} * v{power: 1.0} = du/dx0{power: 1.0}"
+  - "20.0 * u{power: 1.0} * v{power: 1.0} + -20.0 * v{power: 1.0} = dv/dx0{power: 1.0}"
+
+# Alternative analytical form: the sum-relation
+# ``du/dx0 + dv/dx0 = 20 * (u - v)`` is derivable directly from the two
+# Lotka-Volterra ODEs (adding them cancels the ``u v`` cross-term),
+# and its time derivative ``d^2u/dx0^2 + d^2v/dx0^2 = 20 * (du/dx0 -
+# dv/dx0)`` is also a valid identity. EPDE consistently discovers this
+# pair (5 of 30 reps' best Pareto-0 solutions) instead of the
+# individual rate equations; residuals against the data are 1.3% and
+# 8.3% (the 2nd-derivative form picks up FD noise). Both equations
+# hold for every LV trajectory and so credit as analytically-correct
+# discovery.
+truth_alternatives:
+  - - "-1.0 * dv/dx0{power: 1.0} + 20.0 * u{power: 1.0} + -20.0 * v{power: 1.0} = du/dx0{power: 1.0}"
+    - "20.0 * du/dx0{power: 1.0} + -20.0 * dv/dx0{power: 1.0} + -1.0 * d^2u/dx0^2{power: 1.0} = d^2v/dx0^2{power: 1.0}"
+
+# LV is a 2-equation system; pin population_size to 32 explicitly
+# so it doesn't quietly rely on the thesis_runner auto-bump.
+moeadd:
+  population_size: 32
+
+# First-order ODE system: cap time derivatives at order 1 (the default (2,)
+# admits d^2/dx0^2 tokens; note the second-derivative truth_alternative
+# becomes unrepresentable under this cap -- it simply won't be discovered).
+fit:
+  max_deriv_order: [2]

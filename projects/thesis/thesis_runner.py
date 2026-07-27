@@ -23,6 +23,7 @@ six ablation cells off the 000/111 diagonal cover the 2x2x2 factorial):
 
 from __future__ import annotations
 
+import functools
 import importlib
 import json
 import os
@@ -157,6 +158,28 @@ class SystemCfg:
     # ``truth_alternatives`` list. ``hamming_best`` /
     # ``structural_success_any`` from thesis_metrics walk all of them.
     truth_alternatives: tuple = field(default_factory=tuple)
+    # Keyword arguments bound onto the adapter's ``load_data`` (YAML
+    # ``adapter_kwargs`` block, overridable per-run via run.py
+    # ``--adapter-kwarg key=value``). Kept here so run_one can record the
+    # exact preprocessing knobs into the rep JSON.
+    adapter_kwargs: dict = field(default_factory=dict)
+    # True when the adapter declares ``TOKENS_NEED_SEARCH = True``:
+    # its ``build_extra_tokens`` constructs tokens that touch the global
+    # caches (e.g. ``CacheStoredTokens`` filters arrays by
+    # ``grid_cache.g_func``), so the EpdeSearch object must be built
+    # BEFORE the token pool. Existing adapters keep the original
+    # tokens-then-search order.
+    tokens_need_search: bool = False
+    # Optional adapter hook: precomputed derivatives handed to
+    # ``search.fit(derivs=...)``, bypassing the numerical preprocessor.
+    # Called with no arguments AFTER load_data (may rely on state cached
+    # by load_data). Must return one ``(n_points, n_derivs)`` array per
+    # variable, columns in ``define_derivatives`` order (d/dx0, d/dx1,
+    # ...), rows C-order-flattened over the data grid. Use case: fields
+    # whose sampled resolution is too coarse for stable numerical
+    # differentiation but whose exact derivatives are available (JHTDB
+    # server-side operators).
+    load_derivs: Optional[Callable[[], list]] = None
 
 
 def _load_yaml(path: str) -> dict:
@@ -250,16 +273,28 @@ def load_config(name_or_path: str) -> SystemCfg:
     overrides = {k: v for k, v in system_dict.items() if k in HPARAM_KEYS}
     hparams = _deep_merge(defaults_dict, overrides)
 
+    # Optional YAML ``adapter_kwargs`` block: bound onto load_data so the
+    # loader's preprocessing knobs (densification, decimation, denoise
+    # sigma, ...) are declarative and per-run overridable from run.py.
+    adapter_kwargs = dict(system_dict.get('adapter_kwargs') or {})
+    load_data = adapter_mod.load_data
+    if adapter_kwargs:
+        load_data = functools.partial(adapter_mod.load_data, **adapter_kwargs)
+
     kwargs: dict = dict(
         name=name,
         truth_tokens=truth_tokens,
         truth_alternatives=truth_alternatives,
         outdir=outdir,
-        load_data=adapter_mod.load_data,
+        load_data=load_data,
         hparams=hparams,
+        adapter_kwargs=adapter_kwargs,
+        tokens_need_search=bool(getattr(adapter_mod, 'TOKENS_NEED_SEARCH', False)),
     )
     if hasattr(adapter_mod, 'build_extra_tokens'):
         kwargs['build_extra_tokens'] = adapter_mod.build_extra_tokens
+    if hasattr(adapter_mod, 'load_derivs'):
+        kwargs['load_derivs'] = adapter_mod.load_derivs
     return SystemCfg(**kwargs)
 
 
@@ -351,12 +386,23 @@ def _build_token_pool(cfg: 'SystemCfg', coords, dim: int) -> list:
 
 
 def _construct_search(cfg: 'SystemCfg', coords, pipeline_kwargs: dict) -> EpdeSearch:
-    """Instantiate EpdeSearch from cfg.hparams['search'] + pipeline_kwargs."""
+    """Instantiate EpdeSearch from cfg.hparams['search'] + pipeline_kwargs.
+
+    ``search.boundary`` (per-system YAML) overrides the default
+    10%-of-axis heuristic -- needed for short real-data series where 10%
+    of a densified axis over/under-trims (e.g. lv_real's 201 points).
+    Scalar for ODE, list -> per-axis tuple for PDE.
+    """
     sh = cfg.hparams['search']
+    boundary = sh.get('boundary')
+    if boundary is None:
+        boundary = _boundary_for(coords)
+    elif isinstance(boundary, list):
+        boundary = tuple(boundary)
     return EpdeSearch(
         use_solver=sh['use_solver'],
         multiobjective_mode=sh['multiobjective_mode'],
-        boundary=_boundary_for(coords),
+        boundary=boundary,
         coordinate_tensors=coords,
         verbose_params=sh['verbose'],
         device=sh['device'],
@@ -373,7 +419,12 @@ def _configure_preprocessor(search: EpdeSearch, cfg: 'SystemCfg') -> None:
 def _configure_moeadd(search: EpdeSearch, cfg: 'SystemCfg',
                        variable_names: list) -> None:
     mo = cfg.hparams['moeadd']
-    early_stop_cb = _build_truth_match_callback(cfg) if mo.get('early_stop_on_truth') else None
+    # Truth-match early stop only makes sense when a truth is declared;
+    # unknown-truth real-data configs (empty truth_equations) skip it.
+    early_stop_cb = (
+        _build_truth_match_callback(cfg)
+        if mo.get('early_stop_on_truth') and cfg.truth_tokens else None
+    )
     population_size = int(mo['population_size'])
     # Coupled systems (multi-equation: lv, lorenz, ns) live in a joint
     # (discrepancy, complexity)^k objective space where k is the number
@@ -404,7 +455,7 @@ def _run_fit(search: EpdeSearch, cfg: 'SystemCfg', data, variable_names,
         data=data,
         variable_names=variable_names,
         max_deriv_order=max_deriv_order,
-        derivs=None,
+        derivs=cfg.load_derivs() if cfg.load_derivs is not None else None,
         equation_terms_max_number=f['equation_terms_max_number'],
         data_fun_pow=f['data_fun_pow'],
         deriv_fun_pow=f['deriv_fun_pow'],
@@ -430,8 +481,16 @@ def build_search(cfg: 'SystemCfg', pipeline_kwargs: dict) -> EpdeSearch:
     selection can vary per-rep without touching the YAML.
     """
     coords, data, variable_names, dim = cfg.load_data()
-    additional_tokens = _build_token_pool(cfg, coords, dim)
-    search = _construct_search(cfg, coords, pipeline_kwargs)
+    # Adapters whose extra tokens touch the global caches at construction
+    # (``TOKENS_NEED_SEARCH = True``, e.g. CacheStoredTokens filtering by
+    # grid_cache.g_func) need the EpdeSearch object built first. Everyone
+    # else keeps the original tokens-then-search order.
+    if cfg.tokens_need_search:
+        search = _construct_search(cfg, coords, pipeline_kwargs)
+        additional_tokens = _build_token_pool(cfg, coords, dim)
+    else:
+        additional_tokens = _build_token_pool(cfg, coords, dim)
+        search = _construct_search(cfg, coords, pipeline_kwargs)
     _configure_preprocessor(search, cfg)
     if cfg.hparams['search']['multiobjective_mode']:
         _configure_moeadd(search, cfg, variable_names)
@@ -581,7 +640,13 @@ def run_one(system_cfg: SystemCfg, pipeline: str, seed: int) -> dict:
     )
 
     pipeline_kwargs = pipeline_settings(pipeline)
-    truth_alts = _truth_alts(system_cfg)
+    # Unknown-truth real-data configs declare no truth_equations; every
+    # truth-dependent metric is recorded as null and the truth-matching
+    # helpers are never consulted. The rep JSON still carries the full
+    # Pareto front (texts, canonical tokens, objective vectors) for
+    # manual inspection.
+    truth_known = bool(system_cfg.truth_tokens)
+    truth_alts = _truth_alts(system_cfg) if truth_known else ()
     _set_seeds(seed)
 
     from epde import globals as global_var
@@ -597,6 +662,11 @@ def run_one(system_cfg: SystemCfg, pipeline: str, seed: int) -> dict:
         'gram_mode': getattr(global_var, 'gram_mode', None),
         'vc_instability_component': getattr(
             global_var, 'vc_instability_component', 'both'),
+        'instability_metric': global_var.resolve_instability_metric(),
+        'rps_amplification_cap': getattr(
+            global_var, 'rps_amplification_cap', None),
+        'adapter_kwargs': dict(system_cfg.adapter_kwargs) or None,
+        'truth_known': truth_known,
     }
 
     t0 = time.time()
@@ -609,9 +679,20 @@ def run_one(system_cfg: SystemCfg, pipeline: str, seed: int) -> dict:
         pareto_history = list(getattr(search, 'pareto_history', []))
         candidate_history = _extract_candidate_history(search)
         if per_solution_tokens:
-            hammings = [hamming_best(c, truth_alts) for c in per_solution_tokens]
-            best_idx = int(min(range(len(hammings)), key=lambda i: hammings[i]))
-            discovery_epochs = _discovery_epochs(per_solution_tokens, pareto_history)
+            if truth_known:
+                hammings = [hamming_best(c, truth_alts) for c in per_solution_tokens]
+                best_idx = int(min(range(len(hammings)), key=lambda i: hammings[i]))
+                discovery_epochs = _discovery_epochs(per_solution_tokens, pareto_history)
+                structural_success = any(
+                    structural_success_any(c, truth_alts) for c in per_solution_tokens
+                )
+            else:
+                # No truth to rank against: 'best' fields default to the
+                # first Pareto-0 solution; truth metrics stay null.
+                hammings = None
+                best_idx = 0
+                discovery_epochs = None
+                structural_success = None
             best_objectives = (
                 objectives_per_solution[best_idx]
                 if best_idx < len(objectives_per_solution) else None
@@ -623,17 +704,17 @@ def run_one(system_cfg: SystemCfg, pipeline: str, seed: int) -> dict:
                 'discovered_text': solutions_text[best_idx],
                 'discovered_tokens_per_solution': [_tokens_to_json(c) for c in per_solution_tokens],
                 'discovered_tokens': _tokens_to_json(per_solution_tokens[best_idx]),
-                'truth_tokens': _tokens_to_json(system_cfg.truth_tokens),
+                'truth_tokens': (_tokens_to_json(system_cfg.truth_tokens)
+                                 if truth_known else None),
                 'hamming_per_solution': hammings,
-                'hamming': hammings[best_idx],
+                'hamming': hammings[best_idx] if truth_known else None,
                 'discovery_epoch_per_solution': discovery_epochs,
-                'discovery_epoch': discovery_epochs[best_idx],
+                'discovery_epoch': (discovery_epochs[best_idx]
+                                    if truth_known else None),
                 'n_epochs': len(pareto_history),
                 'objectives_per_solution': objectives_per_solution,
                 'objectives': best_objectives,
-                'structural_success': any(
-                    structural_success_any(c, truth_alts) for c in per_solution_tokens
-                ),
+                'structural_success': structural_success,
                 # Sidecar payload: stripped by run_smoke before the rep
                 # JSON is written; persisted to <rep>.history.json
                 # alongside the rep file. Underscore prefix marks this as
@@ -649,12 +730,13 @@ def run_one(system_cfg: SystemCfg, pipeline: str, seed: int) -> dict:
                 'discovered_text': [],
                 'discovered_tokens_per_solution': [],
                 'discovered_tokens': [],
-                'truth_tokens': _tokens_to_json(system_cfg.truth_tokens),
-                'hamming_per_solution': [],
+                'truth_tokens': (_tokens_to_json(system_cfg.truth_tokens)
+                                 if truth_known else None),
+                'hamming_per_solution': [] if truth_known else None,
                 'hamming': None,
                 'objectives_per_solution': [],
                 'objectives': None,
-                'structural_success': False,
+                'structural_success': False if truth_known else None,
                 '_candidate_history': candidate_history,
             })
     except Exception as exc:  # pragma: no cover - smoke-time diagnostic

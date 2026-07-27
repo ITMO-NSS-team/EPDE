@@ -298,8 +298,9 @@ class DeepXDEAdapter:
                 use_weights = getattr(eq, "weights_final_evald", False) and hasattr(eq, "weights_final")
                 residual = y[:, eq_idx:eq_idx + 1] * 0.0
                 all_terms = eq.structure
+                tgt = eq.target_idx
                 for term_idx, term in enumerate(all_terms):
-                    if term_idx == eq.target_idx:
+                    if term_idx == tgt:
                         continue
                     coeff = float(eq.weights_final[term_idx]) if use_weights else 1.0
                     term_val = 1.0
@@ -309,7 +310,7 @@ class DeepXDEAdapter:
                     residual += coeff * term_val
                 if use_weights and len(eq.weights_final) > len(all_terms):
                     residual += float(eq.weights_final[-1]) * (y[:, 0:1] * 0.0 + 1.0)
-                target = eq.structure[eq.target_idx]
+                target = eq.target
                 target_val = 1.0
                 for factor in target.structure:
                     fv = self._factor_value_with_map(dde, factor, x, y, self.coord_map, var_idx_map)

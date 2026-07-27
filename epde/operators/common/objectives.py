@@ -33,8 +33,30 @@ import numpy as np
 
 import epde.globals as global_var
 from epde.operators.common.stability import calculate_weights, vc_stability_total_lr
+from epde.operators.common.survival import survival_scores, tile_scores
 
 LOSS_NAN_VAL = 1e7
+
+
+def _extract_coefs_intercept(equation):
+    """Reconstruct ``(coefs, intercept)`` from ``weights_final`` under the
+    VWSR convention: ``weights_internal[-1]`` is the intercept-presence flag.
+    A zero intercept was dropped from ``weights_final`` (it is then
+    nnz-length); a non-zero one is its trailing entry. ``weights_final`` is
+    sparsity-truncated -- NOT position-indexed like ``weights_internal``.
+    Pinned by TestSparsityWeightsFinalConventions."""
+    if equation.weights_internal[-1]:
+        return equation.weights_final[:-1], equation.weights_final[-1]
+    return equation.weights_final, 0.0
+
+
+def _degenerate_excluding_intercept(filler, equation) -> bool:
+    """Shared ``is_degenerate`` for the VWSR-paired discrepancy fillers:
+    degenerate iff every non-intercept weight is zero, or the post-fit
+    discrepancy exceeds the filler's ``degenerate_threshold``."""
+    fv = getattr(equation, 'fitness_value', None)
+    return bool(np.all(equation.weights_internal[:-1] == 0)
+                or (fv is not None and fv > filler.degenerate_threshold))
 
 
 # --------------------------------------------------------------------------- #
@@ -65,8 +87,17 @@ class EquationObjective:
     def needs_sparsity(self, equation, for_rps: bool) -> bool:
         return bool(for_rps or not getattr(equation, 'weights_internal_evald', False))
 
+    # A candidate target whose post-fit discrepancy exceeds this is declined
+    # during the RPS term-sweep (a degenerate target fits too poorly to be the
+    # right part). Checked AFTER compute() has set ``fitness_value`` -- see
+    # ``SolverFreeFitness.apply``; reading it before compute() gives the stale /
+    # ``None`` default and the check silently never fires.
+    degenerate_threshold = 1.0
+
     def is_degenerate(self, equation) -> bool:
-        return bool(np.all(equation.weights_internal == 0))
+        fv = getattr(equation, 'fitness_value', None)
+        return bool(np.all(equation.weights_internal == 0)
+                    or (fv is not None and fv > self.degenerate_threshold))
 
     def compute(self, equation, ctx: FitContext) -> float:
         raise NotImplementedError
@@ -103,6 +134,13 @@ class L2Discrepancy(EquationObjective):
             else:
                 discr_feats = np.zeros(features.shape[0])
 
+        # ``weights_final[-1]`` is read as the intercept UNCONDITIONALLY --
+        # coherent only under the LASSOSparsity pairing, whose weights_final
+        # always carries a trailing intercept slot (nnz+1, even when 0.0).
+        # VWSRSparsity drops a zero intercept (weights_final is then
+        # nnz-length); its fillers (WAPE/ScaleInvariant/L2Relative) branch on
+        # the ``weights_internal[-1]`` presence flag instead. Pinned by
+        # TestSparsityWeightsFinalConventions.
         discr = (discr_feats + np.full(target.shape, equation.weights_final[-1]) - target)
         g = ctx.g_fun_vals
         if g is not None and getattr(g, 'shape', None) == discr.shape:
@@ -135,8 +173,7 @@ class WAPEDiscrepancy(EquationObjective):
     # in-place fitness trigger sparsity itself -- and also repairs the latent
     # L2LRFitness crash when an RPS-exhausted equation arrived unfitted.
 
-    def is_degenerate(self, equation) -> bool:
-        return bool(np.all(equation.weights_internal[:-1] == 0))
+    is_degenerate = _degenerate_excluding_intercept
 
     def compute(self, equation, ctx: FitContext) -> float:
         # L2LRFitness used un-normalised features only on the RPS sweep
@@ -146,60 +183,153 @@ class WAPEDiscrepancy(EquationObjective):
         if features is None:
             discr = target - target.mean()
         else:
-            if equation.weights_internal[-1]:
-                discr_feats = np.dot(features, equation.weights_final[:-1])
-                discr_feats = discr_feats + equation.weights_final[-1]
-            else:
-                discr_feats = np.dot(features, equation.weights_final)
-            discr = target - discr_feats
+            coefs, intercept = _extract_coefs_intercept(equation)
+            discr = target - (np.dot(features, coefs) + intercept)
         rl_error = np.sum(np.abs(discr)) / np.sum(np.abs(target))
         return float(rl_error)
 
 
-class Instability(EquationObjective):
-    """Varying-coefficient instability (the metric removed from all five
-    operators, consolidated here once).
+class ScaleInvariantDiscrepancy(EquationObjective):
+    """Scale-invariant discrepancy: the pointwise cancellation residual
 
-    Fast path: sum the per-term ``_cached_vc_score`` produced by
-    ``PhysicsInformedLasso`` (``VWSRSparsity``). Fallback (LASSO / axis
-    paths, where no cache exists): ``vc_stability_total_lr`` for
-    ``gram_mode='vcoef'``, else the sliding-window CV via
-    ``calculate_weights``. On any failure returns ``1.0`` (matching the
-    old ``try/except`` guards).
+        mean_x  |sum_k c_k phi_k(x)|  /  sum_k |c_k phi_k(x)|
+
+    summed over every term of the equation (target + fitted features + intercept).
+    Unlike WAPE (``sum|target-fit| / sum|target|``) this is invariant under
+    multiplying the whole equation by any field ``g(x)`` -- numerator and
+    denominator both pick up ``|g(x)|`` pointwise and it cancels -- and under
+    target choice (the term *set* is the same whichever term is the right part).
+    Bounded in [0, 1] by the triangle inequality, so it does NOT reward rewriting
+    ``E = 0`` as the degenerate ``T*E = 0``.
+
+    Reconstructs ``(coefs, intercept)`` from ``weights_final`` exactly as
+    ``WAPEDiscrepancy`` (same ``weights_internal[-1]`` intercept test and the same
+    ``normalize = not for_rps`` term set), so it is a drop-in primary filler.
+    """
+    name = 'discrepancy'
+    value_attr = 'fitness_value'
+    flag_attr = 'fitness_calculated'
+
+    is_degenerate = _degenerate_excluding_intercept
+
+    def compute(self, equation, ctx: FitContext) -> float:
+        normalize = not ctx.for_rps
+        _, target, features = equation.evaluate(normalize=normalize, return_val=False)
+        if features is None:
+            # only the target term survives -> a single term cannot cancel.
+            return 1.0
+        coefs, intercept = _extract_coefs_intercept(equation)
+        contribs = features * np.asarray(coefs)[None, :]          # per-term weighted values
+        resid = target - contribs.sum(axis=1) - intercept        # |sum_k c_k phi_k|
+        term_mass = np.abs(target) + np.abs(contribs).sum(axis=1) + abs(intercept)
+        rho = np.abs(resid) / term_mass
+        return float(np.mean(rho))
+
+
+class Instability(EquationObjective):
+    """The instability objective, dispatching on the estimator selected by
+    ``epde.globals.resolve_instability_metric()``:
+
+    * ``'vcoef'`` (default under ``gram_mode='vcoef'``): fast path sums the
+      per-term ``_cached_vc_score`` produced by ``PhysicsInformedLasso``
+      (``VWSRSparsity``); fallback (LASSO path, no cache) is
+      ``vc_stability_total_lr``.
+    * ``'cv'`` (default under ``gram_mode='axis'``): axis-aligned
+      sliding-window CV via ``calculate_weights``.
+    * ``'survival'`` / ``'tile'``: the block-based estimators from
+      ``epde.operators.common.survival``, memoized per equation as
+      ``_cached_alt_instability = (metric, value)``.
+
+    The estimator choice affects ONLY this objective; the sparsity
+    keep-rule keeps following ``gram_mode``. Fails loudly: any exception
+    propagates -- a silent fallback value would corrupt the Pareto front
+    invisibly.
     """
     name = 'instability'
     value_attr = 'coefficients_stability'
     flag_attr = 'stability_calculated'
 
     def compute(self, equation, ctx: FitContext) -> float:
-        cached = getattr(equation, '_cached_vc_score', None)
-        if cached is not None:
-            return float(np.sum(cached))
-        try:
-            data_shape = ctx.data_shape
-            _, target, features = equation.evaluate(normalize=True, return_val=False)
-            if features is None:
-                return 1.0
-            fit_intercept = bool(equation.weights_internal[-1] != 0)
-            if global_var.gram_mode == 'vcoef':
-                return float(vc_stability_total_lr(
-                    features, target, ctx.g_fun_vals, data_shape,
-                    main_var=equation.main_var_to_explain,
-                    fit_intercept=fit_intercept))
-            sw = getattr(equation, '_cached_sw_weights', None)
-            if sw is None:
-                sw = calculate_weights(
-                    features, target, ctx.g_fun_vals, data_shape, fit_intercept,
-                    gram_cls=None, gram_kwargs=None)
-            sw_arr = np.array(sw)
-            mu = sw_arr.mean(axis=0)
-            std = sw_arr.std(axis=0, ddof=1)
-            with np.errstate(divide='ignore', invalid='ignore'):
-                cv = (std ** 2) / (mu ** 2)
-                cv[mu == 0] = 0.0
-            return float(np.sum(np.nan_to_num(cv)) / len(data_shape))
-        except Exception:
+        metric = global_var.resolve_instability_metric()
+        if metric == 'vcoef':
+            cached = getattr(equation, '_cached_vc_score', None)
+            if cached is not None:
+                return float(np.sum(cached))
+        elif metric in ('survival', 'tile'):
+            cached = getattr(equation, '_cached_alt_instability', None)
+            if cached is not None and cached[0] == metric:
+                return float(cached[1])
+        data_shape = ctx.data_shape
+        _, target, features = equation.evaluate(normalize=True, return_val=False)
+        if features is None:
             return 1.0
+        fit_intercept = bool(equation.weights_internal[-1] != 0)
+        if metric == 'vcoef':
+            return float(vc_stability_total_lr(
+                features, target, ctx.g_fun_vals, data_shape,
+                main_var=equation.main_var_to_explain,
+                fit_intercept=fit_intercept))
+        if metric in ('survival', 'tile'):
+            estimator = survival_scores if metric == 'survival' else tile_scores
+            scores = estimator(features, target, ctx.g_fun_vals, data_shape,
+                               fit_intercept=fit_intercept)
+            value = float(np.sum(scores))
+            equation._cached_alt_instability = (metric, value)
+            return value
+        # metric == 'cv': the axis-aligned sliding-window CV.
+        sw = getattr(equation, '_cached_sw_weights', None)
+        if sw is None:
+            sw = calculate_weights(
+                features, target, ctx.g_fun_vals, data_shape, fit_intercept,
+                gram_cls=None, gram_kwargs=None)
+        sw_arr = np.array(sw)
+        mu = sw_arr.mean(axis=0)
+        std = sw_arr.std(axis=0, ddof=1)
+        with np.errstate(divide='ignore', invalid='ignore'):
+            cv = (std ** 2) / (mu ** 2)
+            cv[mu == 0] = 0.0
+        return float(np.sum(np.nan_to_num(cv)) / len(data_shape))
+
+
+class L2RelativeDiscrepancy(EquationObjective):
+    """L2 relative residual -- an L2 analogue of :class:`WAPEDiscrepancy`,
+    selectable as a primary ``discrepancy_metric`` alongside ``'wape'`` and
+    ``'scale_invariant'``:
+
+        ||target - sum_j c_j phi_j||_2 / ||target||_2
+
+    WAPE is the L1 (``sum|.| / sum|.|``) form of the same relative residual;
+    this is the L2 (Euclidean-norm) form. ``L2Discrepancy`` computes the same
+    residual norm but WITHOUT the ``/ ||target||`` normalisation (and weights it
+    by ``g_func``); this one normalises by the right-part norm and -- like WAPE /
+    ScaleInvariant -- does not ``g_func``-weight.
+
+    A primary discrepancy filler: it owns the right-part-selection scaffolding
+    (un-normalised term set during the ``force_out_of_place`` sweep, normalised
+    in-place; ``is_degenerate`` on the ``weights_internal[:-1]`` all-zero test
+    and the post-fit ``degenerate_threshold``) exactly as
+    :class:`WAPEDiscrepancy`, so it can drive ``EqRightPartSelector`` and the
+    Pareto quality axis as a drop-in for WAPE.
+    """
+    name = 'discrepancy'
+    value_attr = 'fitness_value'
+    flag_attr = 'fitness_calculated'
+
+    is_degenerate = _degenerate_excluding_intercept
+
+    def compute(self, equation, ctx: FitContext) -> float:
+        normalize = not ctx.for_rps
+        _, target, features = equation.evaluate(normalize=normalize, return_val=False)
+        target = np.asarray(target, dtype=float)
+        if features is None:
+            discr = target - target.mean()
+        else:
+            coefs, intercept = _extract_coefs_intercept(equation)
+            discr = target - (np.dot(features, coefs) + intercept)
+        den = float(np.linalg.norm(target))
+        if den <= 0.0:
+            return float(LOSS_NAN_VAL)
+        return float(np.linalg.norm(discr) / den)
 
 
 # --------------------------------------------------------------------------- #

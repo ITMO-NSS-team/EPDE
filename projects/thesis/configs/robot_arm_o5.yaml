@@ -1,0 +1,40 @@
+# DaISy flexible robot arm, ORDER-5 stress setup (scratch, reuses the
+# robot_arm adapter). The official plant is ~5th-order; the SG ladder gives
+# R^2 = 0.9987-0.9995 at order 5 vs 0.9974-0.9986 at order 4, with the
+# order-5 coefficients ~= the differentiated order-4 two-mode law (odd
+# derivatives dominate) -- so this probes whether the search prefers the
+# genuine 5th-order form or falls back to order <= 4.
+# poly_order 6 required: a lower-order window polynomial has zero 5th deriv.
+name: robot_arm_o5
+adapter: robot_arm
+
+truth_equations: []
+
+adapter_kwargs:
+  dt: 0.01
+
+search:
+  boundary: 30
+
+preprocessor:
+  type: poly
+  kwargs:
+    polynomial_window: 13
+    poly_order: 6
+
+moeadd:
+  population_size: 16
+  training_epochs: 10
+
+additional_tokens: []
+
+fit:
+  # full order-5 form = target d5y + {y, y', y'', y''', y'''', u} = 7 terms
+  equation_terms_max_number: 7
+  data_fun_pow: 1
+  deriv_fun_pow: 1
+  max_deriv_order: [5]
+  equation_factors_max_number:
+    factors_num: [1, 2]
+    probas: [0.8, 0.2]
+  eq_sparsity_interval: [1.0e-8, 1.0]

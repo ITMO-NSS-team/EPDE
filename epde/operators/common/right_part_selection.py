@@ -15,6 +15,7 @@ import epde.globals as global_var
 from epde.operators.utils.template import CompoundOperator
 from epde.decorators import HistoryExtender
 from epde.structure.main_structures import Term, Equation
+from epde.supplementary import filter_powers
 from epde.operators.common.stability import (GramSetup, VaryingCoefSetup)
 from epde import _loop_stats
 
@@ -154,6 +155,22 @@ class EqRightPartSelector(CompoundOperator):
                     objective.target_idx = target_idx
                     fitness = self.suboperators['fitness_calculation'].apply(objective, arguments = subop_args['fitness_calculation'], force_out_of_place = True)
                     if fitness is not None and fitness < min_fitness:
+                        # Amplified-identity guard: decline a would-be winner
+                        # whose fit only "explains" the target by amplifying
+                        # the residual of a near-null feature combination
+                        # (huge mutually-cancelling coefficients, e.g. the LV
+                        # ``Lambda*(du+dv-alpha*u+gamma*v) = d^2u`` parasite).
+                        # Identity-form refits (A ~ 1-2) pass untouched; if
+                        # every eligible target declines, min_fitness stays
+                        # inf and the standard reroll path below fires.
+                        cap = global_var.rps_amplification_cap
+                        if cap is not None and \
+                                _amplification_ratio(objective) > cap:
+                            _loop_stats.record('EqRPS.amplification_decline',
+                                               1, 1)
+                            objective.weights_internal_evald = False
+                            objective.weights_final_evald = False
+                            continue
                         min_fitness = fitness
                         min_idx = target_idx
                         weights_internal = objective.weights_internal
@@ -182,7 +199,7 @@ class EqRightPartSelector(CompoundOperator):
 
             if not self.simplify_equation(objective):
                 objective.simplified = True
-            if objective.structure[objective.target_idx].contains_deriv(objective.main_var_to_explain):
+            if objective.target is not None and objective.target.contains_deriv(objective.main_var_to_explain):
                 objective.is_correct_right_part = True
 
         _loop_stats.record('EqRPS.outer', outer_attempts, outer_max_iter)
@@ -192,6 +209,20 @@ class EqRightPartSelector(CompoundOperator):
         # is only valid for the structure observed during the sweep.
         objective._gram_super = None
         objective.right_part_selected = True
+        # Exit guarantee: a valid target MUST leave RPS. The cap-break path
+        # (outer loop exhausted) or a structural reroll inside the loop
+        # (``objective.randomize()`` on inf-fitness) can leave the identity-
+        # tracked target as None; install a deterministic, valid target so the
+        # downstream ``Equation.evaluate`` never indexes a stale/None position.
+        # Prefer the first term carrying a derivative of the explained variable
+        # (the only physically valid right part); fall back to term 0.
+        if objective.target is None and objective.structure:
+            objective.target_idx = next(
+                (i for i, term in enumerate(objective.structure)
+                 if term.contains_deriv(objective.main_var_to_explain)),
+                0,
+            )
+            _loop_stats.record('EqRPS.exit_target_fallback', 1, 1)
         objective.remove_zero_terms()
         # Hard invariant: no duplicate terms may leave RPS. simplify and
         # scrub both regenerate-then-drop, so a surviving duplicate is a
@@ -203,10 +234,11 @@ class EqRightPartSelector(CompoundOperator):
 
     def simplify_equation(self, objective: Equation):
         # Get nonzero terms
+        tgt = objective.target_idx
         nonzero_terms_mask = np.array([False if weight == 0 else True for weight in objective.weights_internal], dtype=np.int32)
-        nonrs_terms = [term for i, term in enumerate(objective.structure) if i != objective.target_idx]
+        nonrs_terms = [term for i, term in enumerate(objective.structure) if i != tgt]
         nonzero_terms = [item for item, keep in zip(nonrs_terms, nonzero_terms_mask) if keep]
-        nonzero_terms.append(objective.structure[objective.target_idx])
+        nonzero_terms.append(objective.target)
         equation_terms = [term.factors_labels_without_power for term in nonzero_terms]
 
         if len(equation_terms) <= 1:
@@ -266,7 +298,17 @@ class EqRightPartSelector(CompoundOperator):
                     return True
         common_factors = list(frozenset.intersection(*equation_terms))
         if not common_factors:
-            return False
+            # No symbolic reduction applies -- run the numeric completion of
+            # the duplicate-term invariant: exactly linearly dependent
+            # nonzero feature columns (the generalization of a duplicate
+            # term the label test cannot see, e.g. two symbolically distinct
+            # products evaluating to proportional fields) make the active-
+            # support OLS refit rank-deficient ("infinite solutions"), so
+            # such terms are regenerated like duplicates. The target is
+            # never touched: a target in the SPAN of independent features is
+            # a perfect fit (a valid identity), not a degeneracy.
+            return self._regenerate_dependent_terms(objective,
+                                                    nonzero_terms[:-1])
 
         for common_factor in common_factors:
             # Min power across the matching factor in every nonzero term.
@@ -317,6 +359,75 @@ class EqRightPartSelector(CompoundOperator):
                 objective.reset_state()
             return True
         return False
+
+    def _regenerate_dependent_terms(self, objective: Equation,
+                                    feature_terms) -> bool:
+        """Regenerate nonzero non-target terms whose evaluated columns are
+        EXACTLY linearly dependent (incl. against the intercept).
+
+        Such columns leave the active-support coefficient solve with
+        infinitely many solutions (the observed lv / lorenz failure), so
+        they are held to the same regenerate-n-then-drop policy as
+        duplicate labels. Strictly machine-exact (``_LIN_DEP_RTOL`` on unit
+        columns): near-collinear physics -- including valid analytical
+        identities -- is never touched, in keeping with the
+        no-collinearity-machinery principle.
+
+        Returns True iff the structure changed; the caller's outer RPS loop
+        then re-runs the term sweep and re-checks (bounded by its own
+        iteration cap).
+        """
+        if not feature_terms:
+            return False
+        cols = [np.asarray(term.evaluate(False, grids=None),
+                           dtype=float).reshape(-1)
+                for term in feature_terms]
+        scan = _flag_dependent_columns(cols)
+        if scan is None:
+            # Non-finite column: dependence undecidable, mirror the
+            # super-Gram skip rather than regenerating on a data problem.
+            _loop_stats.record('simplify_equation.lin_dep_skip', 1, 1)
+            return False
+        flagged_idx, basis = scan
+        if not flagged_idx:
+            return False
+
+        def _independent(term):
+            col = np.asarray(term.evaluate(False, grids=None),
+                             dtype=float).reshape(-1)
+            if not np.all(np.isfinite(col)):
+                return False
+            nrm = np.linalg.norm(col)
+            if nrm == 0.0:
+                return False
+            u = col / nrm
+            K = np.stack(basis, axis=1)
+            coef, *_ = np.linalg.lstsq(K, u, rcond=None)
+            return np.linalg.norm(u - K @ coef) >= _LIN_DEP_RTOL
+
+        changed = False
+        for i in flagged_idx:
+            term = feature_terms[i]
+            status = _regen_or_drop_term(
+                objective, term, max_iter=100,
+                stats_name='simplify_equation.lin_dep',
+                extra_ok=_independent)
+            if status == 'floor':
+                break
+            if status in ('regenerated', 'dropped'):
+                changed = True
+                if status == 'regenerated':
+                    # The accepted replacement joins the basis so the
+                    # remaining flagged terms are checked against it too.
+                    col = np.asarray(term.evaluate(False, grids=None),
+                                     dtype=float).reshape(-1)
+                    basis.append(col / np.linalg.norm(col))
+        if changed:
+            try:
+                objective.reset_state(reset_right_part=False)
+            except TypeError:
+                objective.reset_state()
+        return changed
 
     def use_default_tags(self):
         self._tags = {'equation right part selection', 'gene level', 'contains suboperators', 'inplace'}
@@ -400,12 +511,100 @@ class RandomRHPSelector(CompoundOperator):
         self._tags = {'equation right part selection', 'gene level', 'contains suboperators', 'inplace'}
 
 
+# Relative projection residual (on unit-normalized columns) below which an
+# evaluated term column counts as EXACTLY linearly dependent on the columns
+# before it. This is a machine-exactness test for rank deficiency ("infinite
+# solutions" in the OLS/Gram solves), NOT a collinearity threshold: exact
+# dependence projects to ~eps*conditioning, while even severely near-collinear
+# physics (incl. valid analytical identities) sits many orders of magnitude
+# above 1e-10.
+_LIN_DEP_RTOL = 1e-10
+
+
+def _flag_dependent_columns(cols, rtol: float = _LIN_DEP_RTOL):
+    """Greedy exact-dependence scan over evaluated feature columns.
+
+    Seeds the kept basis with the intercept column (the coefficient fits
+    include one, so an exactly-constant term column is redundant with it),
+    then walks ``cols`` in order: a column whose unit-normalized projection
+    residual on the kept basis falls below ``rtol`` -- or an all-zero
+    column -- is flagged as dependent; otherwise it joins the basis.
+    Dependence is weight-invariant (a diagonal sample weighting preserves
+    exact linear dependence), so the unweighted columns are checked.
+
+    Returns ``(flagged_indices, basis)`` where ``basis`` is the list of
+    kept unit columns (intercept first), or ``None`` when any column is
+    non-finite -- the check is not applicable then (mirrors the
+    ``_precompute_super_gram`` skip).
+    """
+    n = cols[0].size
+    basis = [np.full(n, 1.0 / np.sqrt(n))]
+    flagged = []
+    for i, col in enumerate(cols):
+        if not np.all(np.isfinite(col)):
+            return None
+        nrm = np.linalg.norm(col)
+        if nrm == 0.0:
+            flagged.append(i)
+            continue
+        u = col / nrm
+        K = np.stack(basis, axis=1)
+        coef, *_ = np.linalg.lstsq(K, u, rcond=None)
+        if np.linalg.norm(u - K @ coef) < rtol:
+            flagged.append(i)
+        else:
+            basis.append(u)
+    return flagged, basis
+
+
+def _amplification_ratio(objective: Equation) -> float:
+    """Amplification ratio of the CURRENT candidate right-part fit:
+
+        A = sum_j |c_j| * ||col_j||  /  ||target col||
+
+    over the nonzero non-target terms plus the fitted intercept
+    (``weights_internal = [*term_coefs, intercept]``, the
+    ``LinRegBasedCoeffsEquation`` layout). A ~ 1 when the terms combine
+    without cancellation to the target's magnitude (every truth anchor
+    measures A in [1.0, 6.65]); A >> 1 is the amplified-identity parasite,
+    where near-cancelling giant coefficients fit the target out of the
+    noise of a valid near-null feature combination. Returns ``inf`` on a
+    non-finite/degenerate evaluation so the caller declines the candidate.
+    """
+    w = np.asarray(objective.weights_internal, dtype=float)
+    if not np.all(np.isfinite(w)):
+        return np.inf
+    tgt = objective.target_idx
+    t = np.asarray(objective.structure[tgt].evaluate(False, grids=None),
+                   dtype=float).reshape(-1)
+    den = np.linalg.norm(t)
+    if not np.isfinite(den) or den == 0.0:
+        return np.inf
+    nonrs = [term for i, term in enumerate(objective.structure) if i != tgt]
+    num = 0.0
+    for wj, term in zip(w[:len(nonrs)], nonrs):
+        if wj == 0.0:
+            continue
+        col = np.asarray(term.evaluate(False, grids=None),
+                         dtype=float).reshape(-1)
+        num += abs(wj) * np.linalg.norm(col)
+    if len(w) > len(nonrs) and w[-1] != 0.0:
+        num += abs(w[-1]) * np.sqrt(t.size)  # intercept column of ones
+    return num / den
+
+
 def _regen_or_drop_term(equation: Equation, term, *, max_iter: int = 100,
                         min_terms: int = 2,
-                        stats_name: str = 'simplify_equation.regen_or_drop') -> str:
+                        stats_name: str = 'simplify_equation.regen_or_drop',
+                        extra_ok=None) -> str:
     """Make ``equation.structure`` unique w.r.t. ``term`` by regenerating
     ``term`` up to ``max_iter`` times; if it is still empty / non-meaningful
     / a duplicate, DROP it from the structure.
+
+    ``extra_ok`` (optional ``Term -> bool``) extends the acceptability
+    predicate beyond label uniqueness -- used by the linear-dependence
+    scrub, whose redundant columns are label-unique yet must still be
+    regenerated (and dropped on cap-hit, like a persistent duplicate).
 
     This is the simplify/scrub cap-hit policy -- *regenerate-n-then-drop* --
     deliberately distinct from the *keep-or-revert* ``retry_until_unique``
@@ -434,7 +633,9 @@ def _regen_or_drop_term(equation: Equation, term, *, max_iter: int = 100,
         if len(term.structure) == 0 or not term.contains_meaningful():
             return False
         signatures = {t.factors_labels for t in equation.structure}
-        return len(signatures) == len(equation.structure)
+        if len(signatures) != len(equation.structure):
+            return False
+        return extra_ok is None or bool(extra_ok(term))
 
     cap = max_iter if max_iter > 0 else 1
     if _acceptable():
@@ -453,26 +654,26 @@ def _regen_or_drop_term(equation: Equation, term, *, max_iter: int = 100,
     _loop_stats.record(stats_name, max(attempts, 1), cap)
 
     # Exhausted (or max_iter == 0): drop the offending term, if legal.
-    tgt = getattr(equation, 'target_idx', None)
-    drop_idx = idx
-    if tgt is not None and idx == tgt:
+    target_term = equation.target          # the Term, or None
+    drop_term = term
+    if target_term is not None and term is target_term:
         # Can't drop the RPS target. If it duplicates another term, drop
         # that other (non-target) member; if it is merely empty/non-
         # meaningful, leave it for the caller to resolve.
         my_label = term.factors_labels
-        other = next((j for j, t in enumerate(equation.structure)
-                      if j != idx and t.factors_labels == my_label), None)
+        other = next((t for t in equation.structure
+                      if t is not term and t.factors_labels == my_label), None)
         if other is None:
             equation._invalidate_label_cache()
             return 'target'
-        drop_idx = other
+        drop_term = other
     if len(equation.structure) <= min_terms:
         equation._invalidate_label_cache()
         return 'floor'
-    equation.structure = [t for j, t in enumerate(equation.structure)
-                          if j != drop_idx]
-    if tgt is not None and drop_idx < tgt:
-        equation.target_idx -= 1
+    equation.structure = [t for t in equation.structure if t is not drop_term]
+    # No manual target_idx decrement: the identity-tracked target auto-tracks
+    # the surviving target Term (``drop_term`` is never the target -- the
+    # branch above reroutes a target collision to the other duplicate).
     equation._invalidate_label_cache()
     return 'dropped'
 
@@ -503,20 +704,75 @@ def _target_term_in_other_equation(eq_with_target: Equation,
     padding copy is ignored; any later reactivation is caught by the next
     per-generation RPS pass.
     """
-    try:
-        target_sig = eq_with_target.structure[
-            eq_with_target.target_idx].factors_labels
-    except (AttributeError, IndexError, TypeError):
+    tgt = eq_with_target.target
+    if tgt is None:
         return None
+    target_sig = tgt.factors_labels
     return target_sig if target_sig in eq_other.active_terms_labels else None
+
+
+def _wrap_term_with_factor(equation: Equation, term: Term, banned_sigs,
+                           max_tries: int = 20) -> bool:
+    """Demote ``term`` (a leaked standalone copy of another equation's
+    target) into a FACTOR of a composite term: multiply it by one extra
+    pool factor instead of destroying it.
+
+    The whole-term uniqueness invariant allows another equation's target
+    as a factor inside a composite coupling term, just not as a separate
+    term. The leaked standalone copy is often the small-angle/stepping-stone
+    form of legitimate coupling physics (e.g. ``th2''`` inside the ``th1``
+    double-pendulum equation, whose true form is ``cos(D)*th2''``), so
+    wrapping preserves that information where a reroll erases it.
+
+    Accepts the wrap iff the new signature (a) differs from the original,
+    (b) is outside ``banned_sigs`` and (c) duplicates no other term of the
+    equation. Restores the original structure and returns False when the
+    per-term factor cap is already reached or no acceptable wrap was drawn
+    -- the caller then falls back to the randomize repair.
+    """
+    # The authoritative factor cap is the equation-level metaparameter
+    # (evolution-built terms mirror it, but e.g. translated equations
+    # leave the Term attribute at its constructor default of 1).
+    try:
+        cap = equation.metaparameters['max_factors_in_term']['value']
+    except (AttributeError, KeyError, TypeError):
+        cap = term.max_factors_in_term
+    if isinstance(cap, dict):
+        cap = max(cap['factors_num'])
+    if len(term.structure) >= int(cap):
+        return False
+    original = term.structure
+    original_sig = term.factors_labels
+    other_sigs = {t.factors_labels for t in equation.structure if t is not term}
+    attempts = 0
+    for _ in range(max_tries):
+        attempts += 1
+        try:
+            _, factor = term.pool.create(label=None, create_meaningful=False)
+        except ValueError:
+            break
+        # filter_powers clones via copy_for_power_update, so ``original``
+        # stays intact for the restore path below.
+        term.structure = filter_powers(list(original) + [factor])
+        term.reset_saved_state()
+        sig = term.factors_labels
+        if sig != original_sig and sig not in banned_sigs and sig not in other_sigs:
+            _loop_stats.record('break_equation_duplication.wrap', attempts, max_tries)
+            return True
+    term.structure = original
+    term.reset_saved_state()
+    _loop_stats.record('break_equation_duplication.wrap_fail', attempts, max_tries)
+    return False
 
 
 def _break_equation_duplication(equation: Equation, shared_sigs, *,
                                 preferred_sigs=(), max_iter: int = 2000) -> bool:
-    """Break a system-level degeneracy by randomizing ONE non-target term of
+    """Break a system-level degeneracy by repairing ONE non-target term of
     ``equation`` whose factor signature belongs to ``shared_sigs`` (the
     active structure this equation shares with another equation of the
-    system).
+    system). Repair prefers demoting the term to a factor of a composite
+    term (:func:`_wrap_term_with_factor`); only when that fails is the
+    term randomized away.
 
     The term matching one of ``preferred_sigs`` (typically the other
     equation's target signature) is chosen first, so the rerolled equation
@@ -541,6 +797,17 @@ def _break_equation_duplication(equation: Equation, shared_sigs, *,
 
     preferred = [t for t in candidates if t.factors_labels in preferred_sigs]
     term = preferred[0] if preferred else candidates[0]
+
+    # Demote-to-factor repair first: keep the leaked target alive as a
+    # factor of a composite coupling term (legal under the whole-term
+    # rule) instead of rerolling it into unrelated structure. Falls back
+    # to the randomize path when the wrap cannot produce a unique term.
+    if _wrap_term_with_factor(equation, term, set(shared_sigs)):
+        try:
+            equation.reset_state(reset_right_part=False)
+        except TypeError:
+            equation.reset_state()
+        return True
 
     attempts = 0
     for _ in range(max_iter):

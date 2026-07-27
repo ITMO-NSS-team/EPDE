@@ -200,25 +200,6 @@ class TestEquationLabelProperties:
 
 
 # ---------------------------------------------------------------------------
-# 6. TestRenameAliases (Phase 3)
-#
-# Pin the alias contract: deprecated old names delegate to new names with
-# identical results. If a future commit drops an alias, this test catches it.
-# ---------------------------------------------------------------------------
-
-class TestRenameAliases:
-    # Term-level term_label / term_label_without_power aliases were
-    # removed; all callers route through factors_labels(_without_power)
-    # directly. SoEq still aliases equations_labels(_without_power) to
-    # keep the MOEA/D-side history-membership API stable.
-    def test_soeq_alias_equations_labels(self, soeq):
-        assert soeq.equations_labels == soeq.terms_labels
-
-    def test_soeq_alias_equations_labels_without_power(self, soeq):
-        assert soeq.equations_labels_without_power == soeq.terms_labels_without_power
-
-
-# ---------------------------------------------------------------------------
 # 7. TestEquationLabelsAfterTermMutation
 #
 # terms_labels / terms_labels_without_power are memoized in slot caches
@@ -263,46 +244,6 @@ class TestEquationLabelsAfterTermMutation:
         assert equation._terms_labels_cache is None
         assert equation._terms_labels_without_power_cache is None
 
-    def test_factors_labels_alias_on_equation(self, equation):
-        # Phase 3 added factors_labels on Term; mutations.py:127 also reads
-        # it on Equation (treating the names as interchangeable). Pin the alias.
-        assert equation.factors_labels == equation.terms_labels
-        assert equation.factors_labels_without_power == equation.terms_labels_without_power
-
-
-# ---------------------------------------------------------------------------
-# 8. TestFilterTokensByRightPartExhaustion (Phase 6)
-#
-# Pin: filter_tokens_by_right_part raises RuntimeError when it cannot find
-# a unique term within the retry budget. Pre-Phase-6 the function looped
-# forever (or warned and continued); Phase 6 caps retries with a hard fail.
-# ---------------------------------------------------------------------------
-
-class TestFilterTokensByRightPartExhaustion:
-    def test_raises_runtimeerror_on_exhaustion(self, equation):
-        import warnings as _w
-
-        # The deprecated function reads factor.status['unique_for_right_part'];
-        # patch it onto our test factors (the fixture uses the modern token-
-        # family schema where this key is absent).
-        for t in equation.structure:
-            for f in t.structure:
-                f.status['unique_for_right_part'] = False
-
-        # Force a duplicate so terms_labels never matches len(structure)
-        # — guaranteeing the loop never breaks out via success.
-        equation.structure.append(copy.deepcopy(equation.structure[0]))
-        equation._invalidate_label_cache()
-
-        target = equation.structure[equation.target_idx]
-        candidate = equation.structure[0]
-
-        with _w.catch_warnings():
-            _w.simplefilter('ignore', DeprecationWarning)
-            with pytest.raises(RuntimeError, match='filter_tokens_by_right_part'):
-                candidate.filter_tokens_by_right_part(
-                    target, equation, equation_position=0, max_retries=1)
-
 
 # ---------------------------------------------------------------------------
 # 5. TestEquationDefaultMetaparameters
@@ -315,7 +256,7 @@ class TestFilterTokensByRightPartExhaustion:
 
 class TestEquationDefaultMetaparameters:
     def test_two_equations_have_independent_default_metaparameters(self, basic_pool):
-        # Default terms_number is 5; passing five basic terms skips the
+        # Default max_terms_number is 5; passing five basic terms skips the
         # random-padding loop entirely (range(5, 5) is empty).
         eq1 = Equation(basic_pool, basic_structure=['u'] * 5,
                        var_to_explain='u')
@@ -329,3 +270,401 @@ class TestEquationDefaultMetaparameters:
         # Mutation MUST stay local — the dict objects are independent.
         assert eq2.metaparameters['sparsity']['value'] == 1.0
         assert eq1.metaparameters is not eq2.metaparameters
+
+
+# ---------------------------------------------------------------------------
+# 6. TestTargetTerm
+#
+# The right-part target is an identity-tracked Term (``_target_term`` slot),
+# exposed via the ``target`` (Term-or-None) and ``target_idx`` (derived int-or-
+# None) properties. Pins: identity survives drops/reorders of other terms, a
+# dropped/orphaned target degrades to None (no stale index -> the IndexError
+# regression is gone), deepcopy preserves identity, and the target resets on
+# structure change.
+# ---------------------------------------------------------------------------
+
+class TestTargetTerm:
+    def _pos(self, equation, term):
+        return next(i for i, x in enumerate(equation.structure) if x is term)
+
+    def test_target_is_a_structure_term(self, equation):
+        assert equation.target is not None
+        assert equation.target is equation.structure[equation.target_idx]
+
+    def test_target_tracks_identity_through_drop(self, equation):
+        t = equation.target
+        victim = next(term for term in equation.structure if term is not t)
+        before = self._pos(equation, victim) < self._pos(equation, t)
+        old_idx = equation.target_idx
+        equation.structure = [x for x in equation.structure if x is not victim]
+        equation._invalidate_label_cache()
+        assert equation.target is t                       # identity preserved
+        assert equation.target_idx == (old_idx - 1 if before else old_idx)
+
+    def test_dropping_target_yields_none(self, equation):
+        t = equation.target
+        equation.structure = [x for x in equation.structure if x is not t]
+        equation._invalidate_label_cache()
+        assert equation.target is None
+        assert equation.target_idx is None               # no dangling index
+
+    def test_orphan_target_degrades_to_none(self, equation):
+        # Regression for the original IndexError: a target Term that is no
+        # longer in the structure (e.g. left over after randomize() rebuilt it
+        # smaller) must NOT surface as an out-of-range integer index.
+        equation._target_term = copy.deepcopy(equation.structure[0])  # not ``is`` any term
+        assert equation.target is None
+        assert equation.target_idx is None
+
+    def test_deepcopy_preserves_target_identity(self, equation):
+        eq2 = copy.deepcopy(equation)
+        assert eq2.target is not equation.target          # deep-copied
+        assert eq2.target is eq2.structure[eq2.target_idx]  # identity within the clone
+        assert eq2.target_idx == equation.target_idx
+
+    def test_reset_state_nulls_target_only_with_right_part(self, equation):
+        assert equation.target is not None
+        equation.reset_state(reset_right_part=False)
+        assert equation.target is not None
+        equation.reset_state(reset_right_part=True)
+        assert equation.target is None
+
+    def test_randomize_nulls_target(self, equation):
+        assert equation.target is not None
+        equation.randomize()
+        assert equation.target is None
+
+    def test_clone_shell_has_no_target(self, equation):
+        shell = equation.clone_shell()
+        assert shell.structure == []
+        assert shell.target is None
+        assert shell.target_idx is None
+
+    def test_target_idx_setter_anchors_to_term(self, equation):
+        equation.target_idx = 0
+        t0 = equation.structure[0]
+        assert equation.target is t0
+        equation.structure.insert(0, copy.deepcopy(equation.structure[-1]))
+        equation._invalidate_label_cache()
+        assert equation.target is t0                      # re-anchored, not literal 0
+        assert equation.target_idx == 1
+
+    def test_remove_zero_terms_keeps_target_identity(self, equation):
+        t = equation.target
+        assert len(equation.structure) >= 2
+        # Zero the single non-target term's internal weight (a 2-term equation
+        # maps that term to weights_internal[0] regardless of target side).
+        equation.weights_internal = np.array([0.0])
+        equation.weights_internal_evald = True
+        equation.remove_zero_terms()
+        assert equation.target is t                       # target Term survived by identity
+        assert equation.target_idx == self._pos(equation, t)
+        assert t in equation.structure
+
+
+# ---------------------------------------------------------------------------
+# 9. TestSparsityWeightsFinalConventions (refactoring plan, Phase 1)
+#
+# The two sparsity operators emit DIFFERENT weights_final layouts:
+#   * LASSOSparsity (sparsity.py, ``np.append(nonzero, intercept)``): the
+#     intercept slot is ALWAYS present -- len == nnz + 1 even for a zero
+#     intercept. weights_internal holds coefficients only (no intercept slot).
+#   * VWSRSparsity (``[w for w in weights_internal if w != 0]``): a ZERO
+#     intercept is dropped -- weights_final is then nnz-length with no
+#     intercept slot. weights_internal = [*coef, intercept] and its LAST entry
+#     acts as the intercept-presence flag the discrepancy fillers branch on
+#     (see WAPEDiscrepancy.compute).
+# ``L2Discrepancy.compute`` reads ``weights_final[-1]`` as the intercept
+# unconditionally, which is coherent only under the LASSO pairing. These tests
+# pin both conventions so any future unification must consciously flip them.
+# ---------------------------------------------------------------------------
+
+class TestSparsityWeightsFinalConventions:
+
+    @staticmethod
+    def _prime_grid_globals():
+        # Neither fixture path sets the weak-form weighting nor the boundary-
+        # trimmed shape; the sparsity operators read both from the grid cache.
+        global_var.grid_cache.g_func = np.ones(50)
+        global_var.grid_cache.inner_shape = np.array([50])
+
+    def test_lasso_weights_final_always_has_intercept_slot(self, equation, monkeypatch):
+        import epde.operators.common.sparsity as sparsity_mod
+
+        class _StubLasso:
+            def __init__(self, **kwargs):
+                pass
+
+            def fit(self, X, y, sample_weight):
+                self.coef_ = np.array([0.7])
+                self.intercept_ = 0.0          # ZERO intercept
+
+        monkeypatch.setattr(sparsity_mod, 'Lasso', _StubLasso)
+        self._prime_grid_globals()
+        equation.metaparameters[('sparsity', 'u')] = {'value': 1.0}
+
+        sparsity_mod.LASSOSparsity().apply(equation, arguments={})
+
+        # Legacy layout: weights_internal = coefficients only (no intercept).
+        assert len(equation.weights_internal) == 1
+        # Intercept slot survives even at 0.0 -> len == nnz + 1.
+        assert len(equation.weights_final) == 2
+        assert equation.weights_final[-1] == 0.0
+
+    def test_vwsr_weights_final_omits_zero_intercept(self, equation, monkeypatch):
+        import epde.operators.common.sparsity as sparsity_mod
+
+        class _StubPIL:
+            def __init__(self, **kwargs):
+                pass
+
+            def fit(self, X, y, sample_weights, gram_setup=None):
+                self.coef_ = np.array([0.7])
+                self.intercept_ = 0.0          # ZERO intercept
+                self.cached_weights_ = None    # vcoef mode leaves this None
+                self.cached_vc_score_ = np.array([0.01])
+
+        monkeypatch.setattr(sparsity_mod, 'PhysicsInformedLasso', _StubPIL)
+        self._prime_grid_globals()
+
+        sparsity_mod.VWSRSparsity().apply(equation, arguments={})
+
+        # VWSR layout: weights_internal = [*coef, intercept].
+        assert np.array_equal(equation.weights_internal, np.array([0.7, 0.0]))
+        # Zero intercept dropped -> nnz-length weights_final, NO intercept slot.
+        assert np.array_equal(equation.weights_final, np.array([0.7]))
+        # weights_internal[-1] is the presence flag the fillers consume.
+        assert equation.weights_internal[-1] == 0.0
+        # The stability caches land on the equation (sparsity.py:651-652).
+        assert equation._cached_sw_weights is None
+        assert np.array_equal(equation._cached_vc_score, np.array([0.01]))
+
+    def test_vwsr_weights_final_keeps_nonzero_intercept(self, equation, monkeypatch):
+        import epde.operators.common.sparsity as sparsity_mod
+
+        class _StubPIL:
+            def __init__(self, **kwargs):
+                pass
+
+            def fit(self, X, y, sample_weights, gram_setup=None):
+                self.coef_ = np.array([0.7])
+                self.intercept_ = 0.3          # NON-zero intercept
+                self.cached_weights_ = None
+                self.cached_vc_score_ = np.array([0.01])
+
+        monkeypatch.setattr(sparsity_mod, 'PhysicsInformedLasso', _StubPIL)
+        self._prime_grid_globals()
+
+        sparsity_mod.VWSRSparsity().apply(equation, arguments={})
+
+        assert np.array_equal(equation.weights_final, np.array([0.7, 0.3]))
+        assert equation.weights_internal[-1] == 0.3
+
+
+# ---------------------------------------------------------------------------
+# 10. TestSparsityCachePreservation (refactoring plan, Phase 1 / CHECK #1)
+#
+# ``_cached_sw_weights`` / ``_cached_vc_score`` are recomputed by
+# ``PhysicsInformedLasso.fit`` on the CONVERGED active mask (sparsity.py:
+# 449-471) -- their columns cover only the surviving features (+ intercept).
+# ``remove_zero_terms`` drops exactly the zero-weight terms, so the caches
+# still align with the pruned structure and are DELIBERATELY preserved across
+# both ``remove_zero_terms`` and ``_invalidate_label_cache``; wiping them
+# there would force a recompute on a differently-windowed path right before
+# ``Instability.compute`` reads them (fitness.py:141 -> 155-157). These tests
+# pin that preservation policy.
+# ---------------------------------------------------------------------------
+
+class TestSparsityCachePreservation:
+
+    def test_invalidate_label_cache_preserves_sparsity_caches(self, equation):
+        sw_sentinel = np.ones((5, 2))
+        vc_sentinel = np.array([0.01, 0.02])
+        equation._cached_sw_weights = sw_sentinel
+        equation._cached_vc_score = vc_sentinel
+        equation._gram_super = {'mode': 'vcoef'}
+        _ = equation.terms_labels
+        _ = equation.terms_labels_without_power
+        equation._eval_cache = {(True, False, True, 0): 'sentinel'}
+
+        equation._invalidate_label_cache()
+
+        # Structure-keyed caches wiped ...
+        assert equation._terms_labels_cache is None
+        assert equation._terms_labels_without_power_cache is None
+        assert equation._eval_cache == {}
+        assert equation._gram_super is None
+        # ... the sparsity caches survive by identity (CHECK #1 policy).
+        assert equation._cached_sw_weights is sw_sentinel
+        assert equation._cached_vc_score is vc_sentinel
+
+    def test_remove_zero_terms_preserves_sparsity_caches(self, equation):
+        sw_sentinel = np.ones((5, 1))
+        vc_sentinel = np.array([0.02])
+        equation._cached_sw_weights = sw_sentinel
+        equation._cached_vc_score = vc_sentinel
+        # VWSR layout on the 2-term fixture: [feature_u, intercept]; the
+        # zero feature weight makes remove_zero_terms drop the u term.
+        equation.weights_internal = np.array([0.0, 0.5])
+        equation.weights_internal_evald = True
+
+        equation.remove_zero_terms()
+
+        assert len(equation.structure) == 1               # u dropped, target kept
+        assert equation._cached_sw_weights is sw_sentinel
+        assert equation._cached_vc_score is vc_sentinel
+
+    def test_cached_sw_weights_column_alignment_post_prune(self, basic_pool):
+        from epde.structure.main_structures import Term
+
+        soeq = _build_soeq(basic_pool)
+        equation = soeq.vals['u']
+        equation.weights_internal_evald = True
+        # Third term (u * du/dx0) so the prune leaves a non-degenerate
+        # feature set: structure = [u, u*du/dx0, du/dx0(target)].
+        extra = Term(basic_pool, passed_term=['u', 'du/dx0'],
+                     max_factors_in_term=2)
+        equation.structure.insert(1, extra)
+        equation._invalidate_label_cache()
+
+        # Converged VWSR state: u kept (0.5), extra zeroed, intercept 0.3.
+        equation.weights_internal = np.array([0.5, 0.0, 0.3])
+        equation.weights_internal_evald = True
+        # Axis-mode cache on the converged ACTIVE mask: columns = surviving
+        # features + intercept = 2.
+        equation._cached_sw_weights = np.ones((5, 2))
+
+        equation.remove_zero_terms()
+
+        # Preserved cache still aligns: columns == (features + intercept)
+        # == len(structure) after the prune ([u, target] -> 1 feature + 1).
+        assert len(equation.structure) == 2
+        assert equation._cached_sw_weights.shape[-1] == len(equation.structure)
+        assert np.array_equal(equation.weights_internal, np.array([0.5, 0.3]))
+
+
+# ---------------------------------------------------------------------------
+# 10b. TestCacheFieldRegistry (refactoring plan, Phase 3)
+#
+# ``_EQ_CACHE_FIELDS`` is the single source of truth for Equation cache slots
+# and their invalidation policy; reset_state/_invalidate_label_cache/
+# __deepcopy__/clone_shell all derive from it. These tests hold the registry,
+# __slots__, and the four consumers in sync.
+# ---------------------------------------------------------------------------
+
+class TestCacheFieldRegistry:
+
+    def test_cache_registry_covers_all_cache_slots(self):
+        from epde.structure.main_structures import _EQ_CACHE_FIELDS
+        cache_slots = {
+            s for s in Equation.__slots__
+            if s.startswith('_cached_') or s in (
+                '_eval_cache', '_gram_super',
+                '_terms_labels_cache', '_terms_labels_without_power_cache')
+        }
+        assert {f for f, _ in _EQ_CACHE_FIELDS} == cache_slots
+        assert all(p in ('structure', 'reset-only') for _, p in _EQ_CACHE_FIELDS)
+
+    def test_reset_state_wipes_every_registry_field(self, equation):
+        from epde.structure.main_structures import _EQ_CACHE_FIELDS
+        for field, _ in _EQ_CACHE_FIELDS:
+            setattr(equation, field, {'sentinel': 1} if field == '_eval_cache'
+                    else np.array([1.0]))
+        equation.reset_state(True)
+        for field, _ in _EQ_CACHE_FIELDS:
+            expected = {} if field == '_eval_cache' else None
+            assert getattr(equation, field) == expected if field == '_eval_cache' \
+                else getattr(equation, field) is None
+
+    def test_invalidate_label_cache_wipes_exactly_structure_policy_fields(self, equation):
+        from epde.structure.main_structures import _EQ_CACHE_FIELDS
+        sentinels = {}
+        for field, _ in _EQ_CACHE_FIELDS:
+            val = {'sentinel': 1} if field == '_eval_cache' else np.array([1.0])
+            setattr(equation, field, val)
+            sentinels[field] = val
+        equation._invalidate_label_cache()
+        for field, policy in _EQ_CACHE_FIELDS:
+            if policy == 'structure':
+                expected = {} if field == '_eval_cache' else None
+                got = getattr(equation, field)
+                assert (got == expected) if field == '_eval_cache' else (got is None)
+            else:
+                assert getattr(equation, field) is sentinels[field]
+
+    def test_deepcopy_and_clone_shell_skip_all_registry_fields(self, equation):
+        from epde.structure.main_structures import _EQ_CACHE_FIELDS
+        for field, _ in _EQ_CACHE_FIELDS:
+            setattr(equation, field, {'sentinel': 1} if field == '_eval_cache'
+                    else np.array([1.0]))
+        for cloned in (copy.deepcopy(equation), equation.clone_shell()):
+            for field, _ in _EQ_CACHE_FIELDS:
+                got = getattr(cloned, field)
+                if field == '_eval_cache':
+                    assert got == {}           # fresh dict, never the source's
+                    assert got is not equation._eval_cache
+                else:
+                    assert got is None
+
+
+# ---------------------------------------------------------------------------
+# 10c. Phase-5 flagged fixes
+# ---------------------------------------------------------------------------
+
+class TestPhase5Fixes:
+
+    def test_chromosome_eq_key_mismatch_returns_false(self):
+        # Pre-fix, Chromosome.__eq__ compared self's keys with THEMSELVES,
+        # so mismatched chromosomes fell through to a KeyError. Now a key
+        # mismatch is an ordinary inequality.
+        from epde.structure.encoding import Chromosome
+        a = Chromosome.__new__(Chromosome)
+        b = Chromosome.__new__(Chromosome)
+        a.chromosome = {'u': 1}
+        b.chromosome = {'v': 1}
+        assert (a == b) is False
+        b.chromosome = {'u': 1}
+        assert (a == b) is True
+
+    def test_alt_instability_cache_wiped_on_structure_change(self, equation):
+        # survival/tile memo is keyed on the OLD structure -- unlike the
+        # sparsity caches, nothing recomputes it on the converged mask, so
+        # _invalidate_label_cache must wipe it.
+        equation._cached_alt_instability = ('survival', 0.5)
+        equation._invalidate_label_cache()
+        assert equation._cached_alt_instability is None
+
+
+# ---------------------------------------------------------------------------
+# 11. TestResetStateSoftAsymmetry (refactoring plan, Phase 1 / item 2)
+#
+# ``reset_state(reset_right_part=False)`` clears ``weights_final_evald``
+# UNCONDITIONALLY but leaves the ``_weights_final`` data in place (only the
+# reset_right_part=True branch nulls it). The state is safe-by-guard: the
+# ``weights_final`` property getter raises while the flag is down. Pinning
+# this asymmetry -- "cleaning it up" by moving the flag reset into the
+# if-block would CHANGE behavior (the flag would survive a soft reset).
+# ---------------------------------------------------------------------------
+
+class TestResetStateSoftAsymmetry:
+
+    def test_soft_reset_keeps_final_weights_data_but_flags_unevald(self, equation):
+        data = np.array([1.0, 0.0])
+        equation.weights_final = data
+        equation.weights_final_evald = True
+
+        equation.reset_state(reset_right_part=False)
+
+        assert equation.weights_final_evald is False
+        assert equation._weights_final is data            # data survives
+        with pytest.raises(AttributeError):
+            _ = equation.weights_final                    # guard holds
+
+    def test_hard_reset_also_clears_final_weights_data(self, equation):
+        equation.weights_final = np.array([1.0, 0.0])
+        equation.weights_final_evald = True
+
+        equation.reset_state(reset_right_part=True)
+
+        assert equation.weights_final_evald is False
+        assert equation._weights_final is None

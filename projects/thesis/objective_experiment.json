@@ -1,0 +1,2853 @@
+[
+  {
+    "system": "ode",
+    "variables": [
+      "u"
+    ],
+    "n_candidates": 6,
+    "per_noise": {
+      "0.0": [
+        {
+          "disc": 0.013013498122155909,
+          "instab": 1.2803229940718099e-05,
+          "gengap": 0.01325934781285667,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.8027739725426799,
+          "instab": 0.043075457990354504,
+          "gengap": 0.8206416559170746,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.012856160328163552,
+          "instab": 1.1797228545592737,
+          "gengap": 0.013304115520399798,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.0026096064673436603,
+          "instab": 0.031256879565061346,
+          "gengap": 0.002770146312297095,
+          "label": "wrong:disc[instab_reg_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.24960485414735098,
+          "instab": 0.0006688925648443707,
+          "gengap": 0.2549688185549575,
+          "label": "wrong:disc[instab_reg_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.24960485414735098,
+          "instab": 0.0006688925648443685,
+          "gengap": 0.2549688185549573,
+          "label": "wrong:disc[instab_reg_rep03.json]",
+          "category": "wrong"
+        }
+      ],
+      "1.0": [
+        {
+          "disc": 0.7527510891952134,
+          "instab": 0.1099567314923644,
+          "gengap": 0.7598201705002223,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.9250075105033806,
+          "instab": 0.07140907041834688,
+          "gengap": 0.9270975811667784,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.7527453129572377,
+          "instab": 258.7018804297667,
+          "gengap": 0.7613926649397315,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.7516887483970791,
+          "instab": 39.116094608329334,
+          "gengap": 0.7654952698863052,
+          "label": "wrong:disc[instab_reg_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.7679950275419464,
+          "instab": 0.011910457120905858,
+          "gengap": 0.7682880345427714,
+          "label": "wrong:disc[instab_reg_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.7679950275419464,
+          "instab": 0.01191045712090587,
+          "gengap": 0.7682880345427713,
+          "label": "wrong:disc[instab_reg_rep03.json]",
+          "category": "wrong"
+        }
+      ],
+      "4.0": [
+        {
+          "disc": 0.9629021307608341,
+          "instab": 3.4476328960836358,
+          "gengap": 0.9725019795635418,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.9924895589930572,
+          "instab": 0.714905598914764,
+          "gengap": 0.9977512592906699,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9629020231088689,
+          "instab": 17751.00049159783,
+          "gengap": 0.9739314212643712,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9613049694296302,
+          "instab": 56.11207531037189,
+          "gengap": 0.9845528845715151,
+          "label": "wrong:disc[instab_reg_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9634729641051207,
+          "instab": 0.10660419324364614,
+          "gengap": 0.9662344354750442,
+          "label": "wrong:disc[instab_reg_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9634729641051207,
+          "instab": 0.1066041932436462,
+          "gengap": 0.9662344354750441,
+          "label": "wrong:disc[instab_reg_rep03.json]",
+          "category": "wrong"
+        }
+      ],
+      "8.0": [
+        {
+          "disc": 0.9725309143026456,
+          "instab": 72.50581334854596,
+          "gengap": 0.9801702216304914,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.996797835225856,
+          "instab": 2.526219624784371,
+          "gengap": 1.0007716855222146,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9724915790864309,
+          "instab": 102.72278049033658,
+          "gengap": 0.9811563044266026,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9708790407910761,
+          "instab": 139.73819202210217,
+          "gengap": 0.9964479155112297,
+          "label": "wrong:disc[instab_reg_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9725574761369283,
+          "instab": 0.14358097080373705,
+          "gengap": 0.9760748537973908,
+          "label": "wrong:disc[instab_reg_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9725574761369281,
+          "instab": 0.14358097080373716,
+          "gengap": 0.9760748537973908,
+          "label": "wrong:disc[instab_reg_rep03.json]",
+          "category": "wrong"
+        }
+      ]
+    }
+  },
+  {
+    "system": "vdp",
+    "variables": [
+      "u"
+    ],
+    "n_candidates": 6,
+    "per_noise": {
+      "0.0": [
+        {
+          "disc": 0.00016842098912115945,
+          "instab": 5.69984040102104e-07,
+          "gengap": 0.00017003528327709313,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.9887191124470203,
+          "instab": 0.9323926948771801,
+          "gengap": 1.0125395070538623,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.00016775722616008728,
+          "instab": 2.2769905947264597,
+          "gengap": 0.00016964333815128752,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.00016555065660302164,
+          "instab": 0.43809049759944896,
+          "gengap": 0.00016784848469409165,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.12058516048305085,
+          "instab": 1547.2418351844553,
+          "gengap": 0.12556929274718298,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.00010008437207314832,
+          "instab": 253.92989247281085,
+          "gengap": 0.00010814511749850764,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "1.0": [
+        {
+          "disc": 0.9255715161577935,
+          "instab": 2.9440344819987776,
+          "gengap": 0.936520104344097,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.9985953540681072,
+          "instab": 3.305633215452726,
+          "gengap": 1.0146393790507808,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9253716593692451,
+          "instab": 12.323922886733879,
+          "gengap": 0.9382480563416945,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.924852884752232,
+          "instab": 32.16173506150582,
+          "gengap": 0.9431840681785855,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9262417123611492,
+          "instab": 45957.58613742023,
+          "gengap": 0.9627424754583828,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9251279092655472,
+          "instab": 96.42316543701587,
+          "gengap": 0.9554502731908151,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "4.0": [
+        {
+          "disc": 0.9912373666537836,
+          "instab": 95.46750255698873,
+          "gengap": 1.0088678169155079,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.9999487781327051,
+          "instab": 90.46903852409092,
+          "gengap": 1.015273876214479,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.988603235338035,
+          "instab": 108.03709471936267,
+          "gengap": 1.0103975367919162,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9842631960358713,
+          "instab": 14.37470577707287,
+          "gengap": 1.0103756168959304,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9910947186415692,
+          "instab": 308592.36127386556,
+          "gengap": 1.0362752034737606,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9897482277994721,
+          "instab": 12726.439886722905,
+          "gengap": 1.0387220146190812,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "8.0": [
+        {
+          "disc": 0.9931780520990675,
+          "instab": 136.18969800796197,
+          "gengap": 1.012149171124255,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.999955652604042,
+          "instab": 121.99862115054572,
+          "gengap": 1.0155489953107717,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9839910667874272,
+          "instab": 155.16083510481747,
+          "gengap": 1.0094479886157937,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9735331227262846,
+          "instab": 19.589189796410942,
+          "gengap": 1.002590797865265,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9930532619162741,
+          "instab": 5852.061027509593,
+          "gengap": 1.046351998769703,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9898120132885633,
+          "instab": 1540.1569839969047,
+          "gengap": 1.0503976848921777,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ]
+    }
+  },
+  {
+    "system": "lorenz",
+    "variables": [
+      "u",
+      "v",
+      "w"
+    ],
+    "n_candidates": 7,
+    "per_noise": {
+      "0.0": [
+        {
+          "disc": 3.3379190383653876e-05,
+          "instab": 2.0945272274729356e-07,
+          "gengap": 3.384281189012163e-05,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 3.038281078106747e-05,
+          "instab": 5.488563213469275e-07,
+          "gengap": 3.093955048894186e-05,
+          "label": "identity[1]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.2761550857870249,
+          "instab": 0.34391332487315895,
+          "gengap": 0.2761682248368774,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 3.283528501310182e-05,
+          "instab": 27.365118545256777,
+          "gengap": 3.3357210217700946e-05,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "label": "wrong:disc[legacy_rep03.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        }
+      ],
+      "1.0": [
+        {
+          "disc": 0.5867313297262932,
+          "instab": 0.36440890066644044,
+          "gengap": 0.5891728624075578,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.5896705789495431,
+          "instab": 0.650161017199091,
+          "gengap": 0.5924667287918796,
+          "label": "identity[1]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.6801728672179556,
+          "instab": 0.6446466517879378,
+          "gengap": 0.6827768774578339,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.5867310837433981,
+          "instab": 525.0429737494113,
+          "gengap": 0.5894204183604798,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "label": "wrong:disc[legacy_rep03.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        }
+      ],
+      "4.0": [
+        {
+          "disc": 0.9454917155431196,
+          "instab": 8.731688556091308,
+          "gengap": 0.9481422114271209,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.9457713519683838,
+          "instab": 12.2438956911673,
+          "gengap": 0.9490442228952943,
+          "label": "identity[1]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.9562111020066029,
+          "instab": 8.845227344758134,
+          "gengap": 0.9587763641140451,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9454912317054324,
+          "instab": 420.82475849959235,
+          "gengap": 0.9485652214747886,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "label": "wrong:disc[legacy_rep03.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        }
+      ],
+      "8.0": [
+        {
+          "disc": 0.9858857519801284,
+          "instab": 198.24695004652114,
+          "gengap": 0.9883143737575693,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.9858412835792253,
+          "instab": 201.752086689108,
+          "gengap": 0.9888882323814793,
+          "label": "identity[1]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.9885612637103636,
+          "instab": 198.28221147805826,
+          "gengap": 0.9908207404924566,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9858851970936607,
+          "instab": 570.9644188934087,
+          "gengap": 0.9888056016747381,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "label": "wrong:disc[legacy_rep03.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        }
+      ]
+    }
+  },
+  {
+    "system": "lv",
+    "variables": [
+      "u",
+      "v"
+    ],
+    "n_candidates": 7,
+    "per_noise": {
+      "0.0": [
+        {
+          "disc": 0.004879070824289846,
+          "instab": 0.0019453006102923174,
+          "gengap": 0.005307357053448534,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "label": "identity[1]",
+          "category": "identity",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "disc": 0.5023697086120599,
+          "instab": 449.9269582009087,
+          "gengap": 0.5231480962020753,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.00449145511821385,
+          "instab": 312.04761537693946,
+          "gengap": 0.004751981322853958,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "label": "wrong:disc[instab_reg_rep00.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "label": "wrong:disc[instab_reg_rep01.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "label": "wrong:disc[instab_reg_rep02.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        }
+      ],
+      "1.0": [
+        {
+          "disc": 0.0874597505039983,
+          "instab": 0.0005075422476287922,
+          "gengap": 0.10629279086226373,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "label": "identity[1]",
+          "category": "identity",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "disc": 0.5516641578970992,
+          "instab": 431.99732941807304,
+          "gengap": 0.5818751194147754,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.08711203134360794,
+          "instab": 0.4329740469295714,
+          "gengap": 0.1059239906136685,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "label": "wrong:disc[instab_reg_rep00.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "label": "wrong:disc[instab_reg_rep01.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "label": "wrong:disc[instab_reg_rep02.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        }
+      ],
+      "4.0": [
+        {
+          "disc": 0.33098800483455065,
+          "instab": 0.007906092013013335,
+          "gengap": 0.38570788788925775,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "label": "identity[1]",
+          "category": "identity",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "disc": 0.6924830297787185,
+          "instab": 377.8221924968456,
+          "gengap": 0.7383394769762631,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.3301911863770024,
+          "instab": 0.7507517544146012,
+          "gengap": 0.3850643089190465,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "label": "wrong:disc[instab_reg_rep00.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "label": "wrong:disc[instab_reg_rep01.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "label": "wrong:disc[instab_reg_rep02.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        }
+      ],
+      "8.0": [
+        {
+          "disc": 0.5746190563102821,
+          "instab": 0.03100006579103757,
+          "gengap": 0.6388644280800783,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "label": "identity[1]",
+          "category": "identity",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "disc": 0.8213235566100894,
+          "instab": 309.0266532558123,
+          "gengap": 0.8760354062142413,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.5734747743318442,
+          "instab": 0.9950494205583891,
+          "gengap": 0.6379967492659883,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "label": "wrong:disc[instab_reg_rep00.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "label": "wrong:disc[instab_reg_rep01.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "label": "wrong:disc[instab_reg_rep02.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        }
+      ]
+    }
+  },
+  {
+    "system": "wave",
+    "variables": [
+      "u"
+    ],
+    "n_candidates": 9,
+    "per_noise": {
+      "0.0": [
+        {
+          "disc": 0.01889926559039035,
+          "instab": 4.6134106894610184e-05,
+          "gengap": 0.018895143837256972,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.0005506434341618078,
+          "instab": 2.805161070126891e-07,
+          "gengap": 0.0005493686013746006,
+          "label": "identity[1]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.0032345066309998603,
+          "instab": 1.6441514260933785e-05,
+          "gengap": 0.003224965896211259,
+          "label": "identity[2]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.005607112718490921,
+          "instab": 5.7470152555131956e-05,
+          "gengap": 0.005623415780105843,
+          "label": "identity[3]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.005078764655658374,
+          "instab": 4.773645117124077e-05,
+          "gengap": 0.005081742044909084,
+          "label": "identity[4]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.017102459953042548,
+          "instab": 0.010476052633539344,
+          "gengap": 0.017096546868649202,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.8262007704910527,
+          "instab": 0.35320057359493295,
+          "gengap": 0.8269127629803172,
+          "label": "wrong:disc[instab_reg_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.27962186563204533,
+          "instab": 0.05530007939077834,
+          "gengap": 0.27933876756234405,
+          "label": "wrong:disc[instab_reg_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.09677018981715232,
+          "instab": 0.003704181399341945,
+          "gengap": 0.09711706224590948,
+          "label": "wrong:disc[instab_reg_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "1.0": [
+        {
+          "disc": 0.8483151668584825,
+          "instab": 0.01707764159419806,
+          "gengap": 0.848709046736564,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.6570838918155594,
+          "instab": 4.143645195304443,
+          "gengap": 0.6577053383087726,
+          "label": "identity[1]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.2689540404674175,
+          "instab": 0.03002733492633556,
+          "gengap": 0.26932355845662753,
+          "label": "identity[2]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.8345362986997018,
+          "instab": 1.8809093194194215,
+          "gengap": 0.8355427156840746,
+          "label": "identity[3]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.2999022382767752,
+          "instab": 0.03429053570765868,
+          "gengap": 0.2999323633660553,
+          "label": "identity[4]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.7934931788124394,
+          "instab": 0.013711400523794026,
+          "gengap": 0.7938472513826662,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9999586678415674,
+          "instab": 2.8637234992318352,
+          "gengap": 1.0002216909398725,
+          "label": "wrong:disc[instab_reg_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.8672416855686372,
+          "instab": 0.08883204513633708,
+          "gengap": 0.8677794993653443,
+          "label": "wrong:disc[instab_reg_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.8466853757412387,
+          "instab": 0.07409455985395458,
+          "gengap": 0.8487269448233196,
+          "label": "wrong:disc[instab_reg_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "4.0": [
+        {
+          "disc": 0.758899214697573,
+          "instab": 0.0027020612816546817,
+          "gengap": 0.7595541944328367,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.5451542927057054,
+          "instab": 0.009250750347387617,
+          "gengap": 0.5469879349814231,
+          "label": "identity[1]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.2388637022779474,
+          "instab": 0.01825296338387954,
+          "gengap": 0.239053734831696,
+          "label": "identity[2]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.7567166728144998,
+          "instab": 1.413745681482706,
+          "gengap": 0.757889105196993,
+          "label": "identity[3]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.2671849935667531,
+          "instab": 0.02085496996912801,
+          "gengap": 0.26749803794804156,
+          "label": "identity[4]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.7524357107536821,
+          "instab": 0.02836386543802936,
+          "gengap": 0.7532279215890164,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9999999925609724,
+          "instab": 15912.188401064215,
+          "gengap": 1.0001105598135305,
+          "label": "wrong:disc[instab_reg_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.7871174280521114,
+          "instab": 0.07050643465030772,
+          "gengap": 0.7879801952480783,
+          "label": "wrong:disc[instab_reg_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.7618647378433959,
+          "instab": 0.018532023762775768,
+          "gengap": 0.7642225134514703,
+          "label": "wrong:disc[instab_reg_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "8.0": [
+        {
+          "disc": 0.7508243006920426,
+          "instab": 0.001973331173308879,
+          "gengap": 0.7515873093180687,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.5333499321285436,
+          "instab": 0.005838794733574568,
+          "gengap": 0.5352471145544943,
+          "label": "identity[1]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.23616934952788535,
+          "instab": 0.025794364275476725,
+          "gengap": 0.236418054150586,
+          "label": "identity[2]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.7498555962595902,
+          "instab": 1.06070890184098,
+          "gengap": 0.7509764114997273,
+          "label": "identity[3]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.2652992559666548,
+          "instab": 0.019435470694706677,
+          "gengap": 0.2657442722040835,
+          "label": "identity[4]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.7497677799518055,
+          "instab": 0.13982467273839388,
+          "gengap": 0.7506274127242824,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9999999663832962,
+          "instab": 3521.2020562907533,
+          "gengap": 1.00007807450053,
+          "label": "wrong:disc[instab_reg_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.7798194013864781,
+          "instab": 0.06844283312736166,
+          "gengap": 0.7808246859049429,
+          "label": "wrong:disc[instab_reg_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.7542184530262056,
+          "instab": 0.05627153512044305,
+          "gengap": 0.7565426286080128,
+          "label": "wrong:disc[instab_reg_rep02.json]",
+          "category": "wrong"
+        }
+      ]
+    }
+  },
+  {
+    "system": "kdv_cossin",
+    "variables": [
+      "u"
+    ],
+    "n_candidates": 6,
+    "per_noise": {
+      "0.0": [
+        {
+          "disc": 0.002890943355632978,
+          "instab": 8.254102673271043e-05,
+          "gengap": 0.0028932090090028283,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.567342719996802,
+          "instab": 11.618720834900964,
+          "gengap": 0.5673628000581186,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.0027853003289291887,
+          "instab": 2.2517079029072953,
+          "gengap": 0.00279190290962233,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.008726664469490676,
+          "instab": 1.7843278787938455,
+          "gengap": 0.008780797695282621,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.012225688645331132,
+          "instab": 1.7815821644666434,
+          "gengap": 0.012250020514660176,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.008135825560241105,
+          "instab": 6.442553488375088,
+          "gengap": 0.008172853000433382,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "1.0": [
+        {
+          "disc": 0.6774570639051165,
+          "instab": 15.344254280853955,
+          "gengap": 0.6776313466551965,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.9609639341093679,
+          "instab": 4.337050375205437,
+          "gengap": 0.9613621003111744,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.6121710106853835,
+          "instab": 20.74588267826011,
+          "gengap": 0.6124417103377828,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.10107927508143069,
+          "instab": 3.5144560769978113,
+          "gengap": 0.10140422197089027,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9007561610130751,
+          "instab": 22.91769204705472,
+          "gengap": 0.9027529684254546,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9186005672440717,
+          "instab": 22.91003610321325,
+          "gengap": 0.9209908193030479,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "4.0": [
+        {
+          "disc": 0.8215002144813984,
+          "instab": 11.445067958081463,
+          "gengap": 0.821885132225414,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.9791914836337563,
+          "instab": 10.913697451698061,
+          "gengap": 0.9797888179098223,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.8057637594315111,
+          "instab": 17.14292992692652,
+          "gengap": 0.8064196937174285,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.21377265761304004,
+          "instab": 2.568056769859496,
+          "gengap": 0.21468026610400037,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.5573613716579956,
+          "instab": 17.148020362993417,
+          "gengap": 0.558056815622015,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.5960102092069226,
+          "instab": 74.88008152429393,
+          "gengap": 0.5969791201795162,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "8.0": [
+        {
+          "disc": 0.9264003381829794,
+          "instab": 7.781983324880418,
+          "gengap": 0.9272262579033187,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.9929531647923022,
+          "instab": 8.737526351234413,
+          "gengap": 0.9939603628947117,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9243197482213305,
+          "instab": 16.67485440062176,
+          "gengap": 0.9254214285053012,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.27376261010226743,
+          "instab": 7.183875666873103,
+          "gengap": 0.27500431296319383,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.4126495060288349,
+          "instab": 55.08297908551281,
+          "gengap": 0.4132211444237665,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.43612803221900553,
+          "instab": 2646.4004142598806,
+          "gengap": 0.4368477214562367,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ]
+    }
+  },
+  {
+    "system": "kdv",
+    "variables": [
+      "u"
+    ],
+    "n_candidates": 12,
+    "per_noise": {
+      "0.0": [
+        {
+          "disc": 0.020566024304502828,
+          "instab": 3.670992944024346e-05,
+          "gengap": 0.0205679301196358,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.0018089929217636306,
+          "instab": 5.637343411543284e-06,
+          "gengap": 0.0018094377757363368,
+          "label": "identity[1]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.00721205768201776,
+          "instab": 0.0009613055102941941,
+          "gengap": 0.007215585827248477,
+          "label": "identity[2]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.0012402668027795968,
+          "instab": 1.808949483108732e-05,
+          "gengap": 0.0012406462131861627,
+          "label": "identity[3]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.0010450423995601232,
+          "instab": 6.885485221396352e-07,
+          "gengap": 0.001044549151279849,
+          "label": "identity[4]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.00022173841045807887,
+          "instab": 1.1947444361493482e-08,
+          "gengap": 0.00022182243054468898,
+          "label": "identity[5]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.0019736668693448433,
+          "instab": 1.8487754655825963e-05,
+          "gengap": 0.00197346156711815,
+          "label": "identity[6]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.3780434627585585,
+          "instab": 0.0052657976510870905,
+          "gengap": 0.37809187088556184,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.020566024300952772,
+          "instab": 52203403.17916064,
+          "gengap": 0.020568751538555658,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.1897431465336639,
+          "instab": 29236.471154406045,
+          "gengap": 0.1897576426486504,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.11929618069075272,
+          "instab": 0.16494336227190348,
+          "gengap": 0.11934875255435724,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.5793627279371474,
+          "instab": 20.691412838114108,
+          "gengap": 0.5795071752353873,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "1.0": [
+        {
+          "disc": 0.40099736576008754,
+          "instab": 0.49521276611580445,
+          "gengap": 0.4010804595497069,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.3299037039890705,
+          "instab": 0.00019404546789254004,
+          "gengap": 0.33012152888196905,
+          "label": "identity[1]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.9115076870071998,
+          "instab": 0.01271807976887553,
+          "gengap": 0.9115917439847484,
+          "label": "identity[2]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.14908494054510504,
+          "instab": 0.1890219318729466,
+          "gengap": 0.1491588596844102,
+          "label": "identity[3]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.3156484417611211,
+          "instab": 0.0035511616709301926,
+          "gengap": 0.3158481186631917,
+          "label": "identity[4]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.035104371162089705,
+          "instab": 0.0134506566315508,
+          "gengap": 0.03512117269959945,
+          "label": "identity[5]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.07372405155420789,
+          "instab": 28.46040923044218,
+          "gengap": 0.0737900033662405,
+          "label": "identity[6]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.40349983107397525,
+          "instab": 0.0047938980057846015,
+          "gengap": 0.4035766755601968,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.4009973656844198,
+          "instab": 43109928.13039571,
+          "gengap": 0.40109959548519497,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.2603701504697393,
+          "instab": 5752.360077075,
+          "gengap": 0.26038950774038794,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.15178137198289549,
+          "instab": 0.38621617726486757,
+          "gengap": 0.15179217521839838,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.588386512438168,
+          "instab": 20.223870599485966,
+          "gengap": 0.5885293651091819,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "4.0": [
+        {
+          "disc": 0.614916241016438,
+          "instab": 0.3197809022062813,
+          "gengap": 0.6150409192318291,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.8055403919139907,
+          "instab": 0.008864640643421524,
+          "gengap": 0.8057479686661256,
+          "label": "identity[1]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.9578066158187019,
+          "instab": 1.0181185310368983,
+          "gengap": 0.9578213854917514,
+          "label": "identity[2]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.38638944720618823,
+          "instab": 0.13252882433669136,
+          "gengap": 0.3866662279193589,
+          "label": "identity[3]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.5046457113656476,
+          "instab": 0.001316032119699484,
+          "gengap": 0.5046795104653742,
+          "label": "identity[4]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.2637055989780434,
+          "instab": 0.021264917370018163,
+          "gengap": 0.2638525081826208,
+          "label": "identity[5]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.29390256001161014,
+          "instab": 3.4119059324958436,
+          "gengap": 0.29422486396921516,
+          "label": "identity[6]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.6213713493449554,
+          "instab": 0.006595953237558316,
+          "gengap": 0.6214957391774877,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.6149162383485514,
+          "instab": 1119220.6981958912,
+          "gengap": 0.6150625336416163,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.634067509354378,
+          "instab": 22.882191515144488,
+          "gengap": 0.6341511368978942,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.3641502305231792,
+          "instab": 0.09101867065019727,
+          "gengap": 0.36417721102623973,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.6822443830078659,
+          "instab": 17.44797883270557,
+          "gengap": 0.6823779307899792,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "8.0": [
+        {
+          "disc": 0.8242440129111592,
+          "instab": 0.2650641156088467,
+          "gengap": 0.8243551772330631,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.9273469953957125,
+          "instab": 0.11417752889268629,
+          "gengap": 0.9274165608333073,
+          "label": "identity[1]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.9136757220801704,
+          "instab": 1.1856945060546957,
+          "gengap": 0.9137376301430368,
+          "label": "identity[2]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.6193425150492177,
+          "instab": 0.2456155048415663,
+          "gengap": 0.6195600507120945,
+          "label": "identity[3]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.5149793845976173,
+          "instab": 0.0005379870686574473,
+          "gengap": 0.515007194863622,
+          "label": "identity[4]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.627919767967462,
+          "instab": 2.611233081745364,
+          "gengap": 0.628236463130465,
+          "label": "identity[5]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.6229073276451079,
+          "instab": 184.68573489880532,
+          "gengap": 0.623260197461784,
+          "label": "identity[6]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.8324105463299691,
+          "instab": 0.021755420423954955,
+          "gengap": 0.8325229541187821,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.8242440073315609,
+          "instab": 711716.1575086244,
+          "gengap": 0.824372208852119,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.880956982009582,
+          "instab": 3.14528512151168,
+          "gengap": 0.8810598055820441,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.5997219409749325,
+          "instab": 0.35913811762119774,
+          "gengap": 0.5997752493337544,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.7960976711665324,
+          "instab": 14.74013586464025,
+          "gengap": 0.7962588121255242,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ]
+    }
+  },
+  {
+    "system": "ac",
+    "variables": [
+      "u"
+    ],
+    "n_candidates": 6,
+    "per_noise": {
+      "0.0": [
+        {
+          "disc": 0.005984419620021239,
+          "instab": 0.022748557754760486,
+          "gengap": 0.006027201768724454,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.8678139453512894,
+          "instab": 1.2193685218732337,
+          "gengap": 0.8682248913369524,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.005966208197374133,
+          "instab": 1.328673483400219,
+          "gengap": 0.006012653363434473,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.006320802394229835,
+          "instab": 187.98978763202874,
+          "gengap": 0.0063288877446781,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.3413871047605801,
+          "instab": 11098.840987487401,
+          "gengap": 0.342082732948743,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9250633570956013,
+          "instab": 14273.566012506644,
+          "gengap": 0.9271413217606711,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "1.0": [
+        {
+          "disc": 0.21936307517222586,
+          "instab": 1.2361031903831385,
+          "gengap": 0.2195210798798519,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.8754517972752933,
+          "instab": 1.1379544023828936,
+          "gengap": 0.8759646203967458,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.21935561960112882,
+          "instab": 5.971374687390122,
+          "gengap": 0.21954339805067544,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.21932679605150332,
+          "instab": 2247.5447005794163,
+          "gengap": 0.21963664751990497,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.3470751981433257,
+          "instab": 4668.933376014843,
+          "gengap": 0.347976303640061,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9644679407849531,
+          "instab": 1078.3621894179873,
+          "gengap": 0.9663464977465989,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "4.0": [
+        {
+          "disc": 0.6705816017562638,
+          "instab": 148.86977089616445,
+          "gengap": 0.6709896043349337,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.935945165187138,
+          "instab": 0.7708096588595018,
+          "gengap": 0.9364705988943133,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.6705169526863028,
+          "instab": 158.99573317593544,
+          "gengap": 0.670981841748208,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.6701327779882278,
+          "instab": 227.22301022037428,
+          "gengap": 0.6710974252286489,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.38109170551526,
+          "instab": 1027.793883743513,
+          "gengap": 0.382566394385357,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9797692556473603,
+          "instab": 214899.85679961919,
+          "gengap": 0.9815645320324214,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "8.0": [
+        {
+          "disc": 0.8795018870431789,
+          "instab": 227.6697853187418,
+          "gengap": 0.8801283282646141,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.9769858172087177,
+          "instab": 0.6224811188052038,
+          "gengap": 0.9774623284908088,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.8793087843947208,
+          "instab": 351.8033206914312,
+          "gengap": 0.8799773461843771,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.8784149998686683,
+          "instab": 2629.639563546746,
+          "gengap": 0.8796469434290698,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.4023856718911078,
+          "instab": 495.82852894765955,
+          "gengap": 0.4039970383595087,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9868678445609588,
+          "instab": 1404.2804276802563,
+          "gengap": 0.9888473487197267,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ]
+    }
+  },
+  {
+    "system": "burgers_inviscid",
+    "variables": [
+      "u"
+    ],
+    "n_candidates": 7,
+    "per_noise": {
+      "0.0": [
+        {
+          "disc": 1.5860521290622797e-05,
+          "instab": 2.775361172153473e-10,
+          "gengap": 1.5864869406052955e-05,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 3.1094412164606553e-15,
+          "instab": 1.5244229188106564e-14,
+          "gengap": 3.0711848979815773e-15,
+          "label": "identity[1]",
+          "category": "identity"
+        },
+        {
+          "disc": 3.0413021893619894e-15,
+          "instab": 4.423318240204347e-13,
+          "gengap": 3.075262190200387e-15,
+          "label": "identity[2]",
+          "category": "identity"
+        },
+        {
+          "disc": 1.5860521290620974e-05,
+          "instab": 151993612.57587728,
+          "gengap": 1.5865987604753675e-05,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.999998999444886,
+          "instab": 76.17711097503818,
+          "gengap": 1.0000923950588276,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9999994529231212,
+          "instab": 139.32127798252634,
+          "gengap": 1.0000255515356429,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.15402068533396898,
+          "instab": 0.024136907818032852,
+          "gengap": 0.15405071721040228,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "1.0": [
+        {
+          "disc": 0.5236383520207974,
+          "instab": 8.218366160358977e-05,
+          "gengap": 0.523617951547476,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.2170443133433366,
+          "instab": 7.536147856378024e-06,
+          "gengap": 0.2171070944487932,
+          "label": "identity[1]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.21698283635686944,
+          "instab": 0.00035412177927323193,
+          "gengap": 0.21730471761698475,
+          "label": "identity[2]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.5101180780636112,
+          "instab": 0.03293065020108344,
+          "gengap": 0.5102931260557444,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9999555214108824,
+          "instab": 1.713508196824149,
+          "gengap": 1.000163402328299,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9999655507958788,
+          "instab": 2.212404484168997,
+          "gengap": 1.0000579706687052,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.5419157052195052,
+          "instab": 0.023095255738816073,
+          "gengap": 0.5418934211877143,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "4.0": [
+        {
+          "disc": 0.9533367894346602,
+          "instab": 0.009622811102510608,
+          "gengap": 0.9537270115844944,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.6665070748239957,
+          "instab": 0.00012184617528125629,
+          "gengap": 0.6667909602055238,
+          "label": "identity[1]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.6663205144042211,
+          "instab": 0.005720248201188806,
+          "gengap": 0.6674044896636516,
+          "label": "identity[2]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.9190947659476604,
+          "instab": 3.2439201104110205,
+          "gengap": 0.9199418738968032,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9995509625700479,
+          "instab": 0.16962545401419024,
+          "gengap": 0.9997403916821234,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9998547729309848,
+          "instab": 0.5247156016920286,
+          "gengap": 0.9999123539830453,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9563801496112756,
+          "instab": 0.05143928527097076,
+          "gengap": 0.9567870554537449,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "8.0": [
+        {
+          "disc": 0.9951643956814878,
+          "instab": 0.061784407809128895,
+          "gengap": 0.9959558035762542,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.8743179917360316,
+          "instab": 0.0004946734547477661,
+          "gengap": 0.8746496715281705,
+          "label": "identity[1]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.8740773169406776,
+          "instab": 0.023194901555992364,
+          "gengap": 0.8754675655988596,
+          "label": "identity[2]",
+          "category": "identity"
+        },
+        {
+          "disc": 0.9777780615924677,
+          "instab": 37.374390979504,
+          "gengap": 0.9788736851063948,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9983668514799289,
+          "instab": 0.24342504776285487,
+          "gengap": 0.9985294144755029,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9998048920368542,
+          "instab": 0.39053867996427116,
+          "gengap": 1.0000142714200841,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9956645341049797,
+          "instab": 0.16951688345817895,
+          "gengap": 0.9964176831458625,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ]
+    }
+  },
+  {
+    "system": "pde_divide",
+    "variables": [
+      "u"
+    ],
+    "n_candidates": 6,
+    "per_noise": {
+      "0.0": [
+        {
+          "disc": 0.00015305243417535893,
+          "instab": 6.983372403216443e-08,
+          "gengap": 0.00015313117328940383,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.9962494649333201,
+          "instab": 36.130218907968306,
+          "gengap": 0.9963586249434099,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.00014953975686618975,
+          "instab": 1.6553968538740222,
+          "gengap": 0.00014962381060924999,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.10879322826649512,
+          "instab": 1.041248574614828,
+          "gengap": 0.10891215807023451,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.106295310052066,
+          "instab": 0.7081223799627908,
+          "gengap": 0.10647580798848533,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.038250801338470364,
+          "instab": 18.43919138212779,
+          "gengap": 0.038334336539495396,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "1.0": [
+        {
+          "disc": 0.9707916610311429,
+          "instab": 18.87758396585504,
+          "gengap": 0.970937353069555,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.9970054008992815,
+          "instab": 36.118579908335484,
+          "gengap": 0.9971213446354515,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.5555280563297198,
+          "instab": 8.912656610433206,
+          "gengap": 0.5558747293665608,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.3245391784924309,
+          "instab": 7508.055607220656,
+          "gengap": 0.32484610130988767,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.2699368452792636,
+          "instab": 6.761458427658832,
+          "gengap": 0.2702446915707935,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.097409980189965,
+          "instab": 14.055330556299078,
+          "gengap": 0.09750013692564553,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "4.0": [
+        {
+          "disc": 0.9988895022326058,
+          "instab": 40.064963889681515,
+          "gengap": 0.9991381285232176,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.9993625077371634,
+          "instab": 40.914773219728296,
+          "gengap": 0.9994059579385756,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.8992601219290959,
+          "instab": 8.847142776819672,
+          "gengap": 0.8997288685137024,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.3946487037906754,
+          "instab": 147464.14241335943,
+          "gengap": 0.395024668710908,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.5989616912909692,
+          "instab": 11.53786790558422,
+          "gengap": 0.5995385280342568,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.15840612090113237,
+          "instab": 250.74433934503003,
+          "gengap": 0.15863815497940295,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "8.0": [
+        {
+          "disc": 0.9998006788563544,
+          "instab": 22.150824101879795,
+          "gengap": 1.0000597584671136,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.9998381416769326,
+          "instab": 21.48875692611499,
+          "gengap": 0.9998733071002931,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9706778958447807,
+          "instab": 3.2214877074289,
+          "gengap": 0.9711393770432402,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.41116240673738497,
+          "instab": 58372.12125335827,
+          "gengap": 0.41160884405365933,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.7814489762478953,
+          "instab": 18.420018389089524,
+          "gengap": 0.7823489788089959,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.1810379321705025,
+          "instab": 126.85347198170001,
+          "gengap": 0.18141749835322685,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ]
+    }
+  },
+  {
+    "system": "pde_compound",
+    "variables": [
+      "u"
+    ],
+    "n_candidates": 6,
+    "per_noise": {
+      "0.0": [
+        {
+          "disc": 0.0016797239475141845,
+          "instab": 6.088120142355792e-07,
+          "gengap": 0.0016801502369008104,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.8489043767541977,
+          "instab": 0.03768923356707198,
+          "gengap": 0.8489814559462708,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.0015860158341492825,
+          "instab": 0.006243420534469457,
+          "gengap": 0.0015865094448255788,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.7909805944846513,
+          "instab": 19.179593336260307,
+          "gengap": 0.7913767023473101,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.47802700946564425,
+          "instab": 0.07301421907944988,
+          "gengap": 0.4782724843044132,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.28774551710721963,
+          "instab": 0.00809898096396005,
+          "gengap": 0.2877976008113683,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "1.0": [
+        {
+          "disc": 0.8813344401474799,
+          "instab": 0.20841259318664374,
+          "gengap": 0.8813320262945332,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.8935773609456454,
+          "instab": 0.04215585578672908,
+          "gengap": 0.8935633058516373,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.518773985758551,
+          "instab": 2.200200838722194,
+          "gengap": 0.5191352052076138,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9311565310780213,
+          "instab": 1.4779637382576178,
+          "gengap": 0.9311219036198612,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9886555904923685,
+          "instab": 14.145563587848589,
+          "gengap": 0.9887707840828104,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.8892654694022027,
+          "instab": 0.03698351267531215,
+          "gengap": 0.889413627825889,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "4.0": [
+        {
+          "disc": 0.9814792643983482,
+          "instab": 0.2803014915972587,
+          "gengap": 0.981674826813458,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.9817502745078256,
+          "instab": 0.16641897358721713,
+          "gengap": 0.9817680851250997,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9245244246022383,
+          "instab": 1.2288051359441727,
+          "gengap": 0.924970160214167,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.8422039002817443,
+          "instab": 4.658724175847451,
+          "gengap": 0.8424697838093218,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.8221472374693461,
+          "instab": 2.0134753558859932,
+          "gengap": 0.822214224455433,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9770097995053024,
+          "instab": 0.17258721362092166,
+          "gengap": 0.9770468309183492,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "8.0": [
+        {
+          "disc": 0.995186370877203,
+          "instab": 0.930441142434276,
+          "gengap": 0.9954405613668263,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.9952337552075602,
+          "instab": 0.27626672486484116,
+          "gengap": 0.9952766822067561,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9794936590565967,
+          "instab": 7.6499636580356976,
+          "gengap": 0.9799183514462467,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.7392696556446678,
+          "instab": 517.9153877238493,
+          "gengap": 0.739520937038099,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.6123171826149886,
+          "instab": 1.8625848669041052,
+          "gengap": 0.6123480977155928,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9895259822832715,
+          "instab": 0.6439721402536309,
+          "gengap": 0.989794686897719,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ]
+    }
+  },
+  {
+    "system": "burgers_viscous",
+    "variables": [
+      "u"
+    ],
+    "n_candidates": 6,
+    "per_noise": {
+      "0.0": [
+        {
+          "disc": 0.006039990438319417,
+          "instab": 0.00043266721152681643,
+          "gengap": 0.0060549356483544925,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.4716128937381808,
+          "instab": 0.1351471573318382,
+          "gengap": 0.4722463369212661,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.005677895527439134,
+          "instab": 224.27263752840653,
+          "gengap": 0.005693149454181807,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.001465682827708227,
+          "instab": 1642.2524216843876,
+          "gengap": 0.0014716516179945236,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.15822284458438182,
+          "instab": 6129.621096178725,
+          "gengap": 0.1598651640070136,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.4627917333251468,
+          "instab": 58.234650316390194,
+          "gengap": 0.4648457197486157,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "1.0": [
+        {
+          "disc": 0.3938698015963504,
+          "instab": 0.203102597633467,
+          "gengap": 0.39452964077247366,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.5105655082755892,
+          "instab": 0.12280781303441317,
+          "gengap": 0.5110768578630637,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.3705389273668656,
+          "instab": 1.8261492970312865,
+          "gengap": 0.3711948446207407,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.20968814136564315,
+          "instab": 76.57620774107727,
+          "gengap": 0.20986221581180495,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.5375003401552698,
+          "instab": 193.94068947088334,
+          "gengap": 0.5389204281469344,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.6690842487117185,
+          "instab": 3.1507434149686477,
+          "gengap": 0.6710830658852576,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "4.0": [
+        {
+          "disc": 0.7633332866196516,
+          "instab": 1.8464814226472916,
+          "gengap": 0.7635767989694148,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.7678529148348102,
+          "instab": 0.16870662848871462,
+          "gengap": 0.7680019113914279,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.7411954593354387,
+          "instab": 2.637259483685819,
+          "gengap": 0.7415315701147588,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.4632029985525086,
+          "instab": 9.845224449519215,
+          "gengap": 0.46341957561171226,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.7678365364331022,
+          "instab": 10.612303489440869,
+          "gengap": 0.7682571358248991,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.7906415015659212,
+          "instab": 10.20161351122737,
+          "gengap": 0.792361618609466,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "8.0": [
+        {
+          "disc": 0.9254395037489255,
+          "instab": 2.251387304405483,
+          "gengap": 0.9255078270978844,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.9257952246354477,
+          "instab": 0.36810312380226956,
+          "gengap": 0.9258226212930608,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9169374053997403,
+          "instab": 5.333960975523697,
+          "gengap": 0.9171508323232317,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.6253018150264555,
+          "instab": 2066.9154290130737,
+          "gengap": 0.6256853198410491,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.777169264172273,
+          "instab": 8.91698410578179,
+          "gengap": 0.777882775723887,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.847454405204765,
+          "instab": 6.641734528444657,
+          "gengap": 0.8492862644008475,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ]
+    }
+  },
+  {
+    "system": "ks",
+    "variables": [
+      "u"
+    ],
+    "n_candidates": 6,
+    "per_noise": {
+      "0.0": [
+        {
+          "disc": 0.04673377615384259,
+          "instab": 1.8947889142291557e-06,
+          "gengap": 0.04674366706561565,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.9701317650146405,
+          "instab": 1.4827221257816565,
+          "gengap": 0.970193884146127,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.04673294685142472,
+          "instab": 6.144778524555522,
+          "gengap": 0.04674288731777728,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9972224432362776,
+          "instab": 25.374396086189577,
+          "gengap": 0.9974509881035106,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9980583860509276,
+          "instab": 0.449449145245992,
+          "gengap": 0.998071246432156,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9997862036984322,
+          "instab": 20.55475633445922,
+          "gengap": 1.0000055186320724,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "1.0": [
+        {
+          "disc": 0.9710233459236983,
+          "instab": 0.7567268374493082,
+          "gengap": 0.9710975165791491,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.9720815970084257,
+          "instab": 1.706760930332269,
+          "gengap": 0.972150870956583,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9710216474096732,
+          "instab": 72.6195909962385,
+          "gengap": 0.9710986863278842,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9978376426105423,
+          "instab": 21.923981564159984,
+          "gengap": 0.9980025027932431,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9983069464137669,
+          "instab": 0.449271637129391,
+          "gengap": 0.9983181527387135,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9997840370482269,
+          "instab": 15.956218765114674,
+          "gengap": 0.9999853352670939,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "4.0": [
+        {
+          "disc": 0.9781644816997341,
+          "instab": 0.4988727054165576,
+          "gengap": 0.9782381378281851,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.9790614060185434,
+          "instab": 3.2235301078402308,
+          "gengap": 0.9791277002292024,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9781641842955884,
+          "instab": 384.256112240442,
+          "gengap": 0.9782415277248986,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9995160781075859,
+          "instab": 374.6250083640106,
+          "gengap": 0.9995477102907654,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9994665502184431,
+          "instab": 0.46596211905560087,
+          "gengap": 0.9994781407047967,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9999071669109855,
+          "instab": 13.315986343954329,
+          "gengap": 1.0000036851692102,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ],
+      "8.0": [
+        {
+          "disc": 0.9884728373179902,
+          "instab": 0.590268945600748,
+          "gengap": 0.9885222308058942,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.9885865736310038,
+          "instab": 5.729477428286312,
+          "gengap": 0.9886309813032973,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9884728105239883,
+          "instab": 3341.4573488440487,
+          "gengap": 0.9885257150854053,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9998157039875779,
+          "instab": 51.70190319726622,
+          "gengap": 0.9998413589001824,
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9998727488166963,
+          "instab": 0.517041356528431,
+          "gengap": 0.9998854278389683,
+          "label": "wrong:disc[legacy_rep01.json]",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.9999611593295427,
+          "instab": 15.162194212361154,
+          "gengap": 1.0000284778424058,
+          "label": "wrong:disc[legacy_rep02.json]",
+          "category": "wrong"
+        }
+      ]
+    }
+  },
+  {
+    "system": "ns",
+    "variables": [
+      "u",
+      "v",
+      "p"
+    ],
+    "n_candidates": 6,
+    "per_noise": {
+      "0.0": [
+        {
+          "disc": 0.006811880811402477,
+          "instab": 0.004314097159208924,
+          "gengap": 0.006812224636383137,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.02630894415325911,
+          "instab": 0.04024019786335185,
+          "gengap": 0.026311172599044863,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.006800751885751868,
+          "instab": 1.3704322541565273,
+          "gengap": 0.006801159662802209,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "label": "wrong:disc[new_rep00.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "label": "wrong:disc[new_rep01.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        }
+      ],
+      "1.0": [
+        {
+          "disc": 0.13003572073779016,
+          "instab": 0.24361216441504535,
+          "gengap": 0.1300423824298993,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.1344602934875413,
+          "instab": 0.14145023801949533,
+          "gengap": 0.1344666489741501,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.13000666133740127,
+          "instab": 1.3662254096560464,
+          "gengap": 0.13001411622184714,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "label": "wrong:disc[new_rep00.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "label": "wrong:disc[new_rep01.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        }
+      ],
+      "4.0": [
+        {
+          "disc": 0.45920999009452984,
+          "instab": 68.99182523370644,
+          "gengap": 0.4592328046283202,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.4599100984722932,
+          "instab": 56.527929164944524,
+          "gengap": 0.45993053161408454,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.4585492010043705,
+          "instab": 65.43466766627006,
+          "gengap": 0.4585737709863249,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "label": "wrong:disc[new_rep00.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "label": "wrong:disc[new_rep01.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        }
+      ],
+      "8.0": [
+        {
+          "disc": 0.7245406776719782,
+          "instab": 60.09584780931433,
+          "gengap": 0.7245700970681547,
+          "label": "true",
+          "category": "true"
+        },
+        {
+          "disc": 0.7246152847423044,
+          "instab": 53.653786389369486,
+          "gengap": 0.7246429301042868,
+          "label": "wrong:missing",
+          "category": "wrong"
+        },
+        {
+          "disc": 0.7238040589842821,
+          "instab": 57.79744660060902,
+          "gengap": 0.7238362979249601,
+          "label": "wrong:overfit",
+          "category": "wrong"
+        },
+        {
+          "label": "wrong:disc[legacy_rep00.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "label": "wrong:disc[new_rep00.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        },
+        {
+          "label": "wrong:disc[new_rep01.json]",
+          "category": "wrong",
+          "error": "IndexError: list index out of range"
+        }
+      ]
+    }
+  }
+]

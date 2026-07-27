@@ -52,7 +52,7 @@ noise_seed = None
 # suppresses noise leakage into the non-constant energy.
 vc_modes_cache: dict = {}
 vc_k_max: int = 6
-vc_freq_coef: float = 1.0
+vc_freq_coef: float = 0.0
 
 # When True, ``VaryingCoefSetup._solve_gammas`` solves the mode block
 # PER-FEATURE (block-diagonal in feature index) instead of jointly: cross-
@@ -72,6 +72,36 @@ vc_mode_decouple: bool = True
 # library, instead of staying pinned to ||y|| (which the dominant term inflates
 # and which masks weak terms). No effect in 'tstat' mode (no max_corr there).
 anchor_on_residual: bool = False
+
+# Which estimator the INSTABILITY OBJECTIVE (the ``Instability`` filler /
+# ``equation_terms_stability`` Pareto axis) uses. Decoupled from
+# ``gram_mode``, which keeps governing the sparsity keep-rule unchanged.
+#   None         -> resolve from gram_mode ('vcoef' -> 'vcoef', 'axis' -> 'cv')
+#                   -- exact backward compatibility (the default).
+#   'vcoef'      -> varying-coefficient NC/gamma_0^2 (the Hadamard default).
+#   'cv'         -> axis-aligned sliding-window CV (var/mu^2).
+#   'survival'   -> block-resampled coefficient survival
+#                   (sign-flip rate + MAD/|median| across refits).
+#   'tile'       -> per-tile refits, between-tile dispersion MAD/|median|
+#                   (basis-free spatial inhomogeneity).
+# Set via ``set_instability_metric`` before ``build_search``.
+instability_metric = None
+
+# RPS amplified-identity guard: during the right-part term-sweep, a candidate
+# target whose winning fit has amplification ratio
+#   A = sum_j |c_j| * ||col_j|| / ||target col||   (nonzero terms + intercept)
+# above this cap is DECLINED -- the parasitic ``Lambda * (near-null identity
+# combination) = target`` shape, where huge mutually-cancelling coefficients
+# stretch the residual of a VALID analytical identity (e.g. the LV sum
+# identity du+dv = alpha*u - gamma*v) to imitate an unrelated target out of
+# derivative noise. Evidence base (truth-anchor sweep, 14 equations incl.
+# real data): true forms sit at A in [1.0, 6.65]; observed parasites at
+# ~7e2..1.6e6 -- the cap of 100 leaves 15x headroom above the worst truth
+# (a genuine stiff balance still passes) and 6x below the mildest parasite.
+# Identity-form refits (du = -dv + alpha*u - gamma*v, A ~ 2) are UNAFFECTED:
+# only the amplified-cancellation shape is declined, so valid identities stay
+# credited. None disables the guard.
+rps_amplification_cap = 100.0
 
 
 def set_gram_config(mode: str = 'vcoef'):
@@ -112,6 +142,50 @@ def set_anchor_on_residual(flag: bool = False):
     """
     global anchor_on_residual
     anchor_on_residual = bool(flag)
+
+
+def set_instability_metric(metric=None):
+    """Override the instability-objective estimator before ``build_search``.
+
+    Mirrors ``set_gram_config``: a process-level global read by the
+    ``Instability`` filler in ``epde.operators.common.objectives``. ``None``
+    (default) resolves from ``gram_mode`` for exact backward compatibility;
+    see :data:`instability_metric` for the estimator menu. The sparsity
+    keep-rule keeps following ``gram_mode`` regardless.
+    """
+    global instability_metric
+    valid = (None, 'vcoef', 'cv', 'survival', 'tile')
+    if metric not in valid:
+        raise ValueError(
+            f'instability_metric must be one of {valid}; got {metric!r}')
+    instability_metric = metric
+
+
+def set_rps_amplification_cap(cap=100.0):
+    """Override the RPS amplified-identity guard before ``build_search``.
+
+    ``cap`` is the maximum admissible amplification ratio ``A`` of a
+    candidate right-part fit (see :data:`rps_amplification_cap`); ``None``
+    disables the guard. Mirrors ``set_gram_config``: a process-level global
+    read by ``EqRightPartSelector`` during the term-sweep.
+    """
+    global rps_amplification_cap
+    if cap is not None:
+        cap = float(cap)
+        if not np.isfinite(cap) or cap <= 1.0:
+            raise ValueError(
+                'rps_amplification_cap must be a finite value > 1 (true '
+                f'forms reach A ~ 6.7) or None to disable; got {cap!r}')
+    rps_amplification_cap = cap
+
+
+def resolve_instability_metric() -> str:
+    """The effective instability-objective estimator: the explicit
+    ``instability_metric`` override if set, else the one ``gram_mode``
+    implies ('vcoef' -> 'vcoef', 'axis' -> 'cv')."""
+    if instability_metric is not None:
+        return instability_metric
+    return 'vcoef' if gram_mode == 'vcoef' else 'cv'
 
 
 def init_caches(set_grids: bool = False, device = 'cpu'):

@@ -59,12 +59,13 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
         ``(target, features)`` with ``features=None`` when every
         non-target slot was filtered to zero.
         """
-        target = objective.structure[objective.target_idx].evaluate(False)
+        tgt = objective.target_idx
+        target = objective.target.evaluate(False)
         feats = []
         for term_idx, term in enumerate(objective.structure):
-            if term_idx == objective.target_idx:
+            if term_idx == tgt:
                 continue
-            wi_pos = (term_idx if term_idx < objective.target_idx
+            wi_pos = (term_idx if term_idx < tgt
                       else term_idx - 1)
             if objective.weights_internal[wi_pos] != 0:
                 feats.append(term.evaluate(False))

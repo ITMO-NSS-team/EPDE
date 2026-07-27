@@ -391,6 +391,49 @@ def best_obj_values(levels : ParetoLevels):
     return np.sort(vals, axis = 0)[(0, -1), ...]
 
 
+def _equation_is_degenerate(eq) -> bool:
+    """An equation the in-place fitness host flagged fit-degenerate: its
+    primary objective was set to ``LOSS_NAN_VAL`` (sparsity collapsed it, its
+    discrepancy exceeded the degeneracy threshold, or RPS left it unfitted)."""
+    from epde.operators.common.objectives import LOSS_NAN_VAL
+    fv = getattr(eq, 'fitness_value', None)
+    return fv is not None and fv >= LOSS_NAN_VAL
+
+
+def has_degenerate_equation(offspring) -> bool:
+    """True if ANY equation of ``offspring`` is still fit-degenerate."""
+    return any(_equation_is_degenerate(eq) for eq in offspring.vals)
+
+
+def regenerate_degenerate_equations(offspring, right_part_selector, chromosome_fitness,
+                                    rps_args, fitness_args, max_passes: int = 3):
+    """Re-roll ONLY the fit-degenerate equations of ``offspring`` in place.
+
+    The in-place fitness host marks an equation whose discrepancy is degenerate
+    (e.g. sparsity collapsed it to a single uncancellable term) with
+    ``LOSS_NAN_VAL`` on every objective. Rather than discard the whole system --
+    wasting its non-degenerate equations -- randomize ONLY the flagged genes,
+    re-run RPS + fitness, and repeat up to ``max_passes``. Equations still
+    degenerate after the passes keep their penalty, and the caller is expected
+    to DROP the offspring (rather than place a ``LOSS_NAN_VAL`` form). A
+    single-equation system degrades to a plain re-roll of that equation.
+
+    Shared by ``OffspringUpdater`` and ``InitialParetoLevelSorting`` so the
+    initial population is held to the same no-degenerate-forms contract as the
+    per-epoch offspring.
+    """
+    for _ in range(max_passes):
+        degenerate = [eq for eq in offspring.vals if _equation_is_degenerate(eq)]
+        if not degenerate:
+            return
+        for eq in degenerate:
+            eq.randomize()
+            eq.reset_state(reset_right_part=True)
+        offspring.reset_moeadd_state()
+        right_part_selector.apply(objective=offspring, arguments=rps_args)
+        chromosome_fitness.apply(objective=offspring, arguments=fitness_args)
+
+
 class OffspringUpdater(CompoundOperator):
     key = 'ParetoLevelUpdater'
 
@@ -443,12 +486,38 @@ class OffspringUpdater(CompoundOperator):
                 if system not in objective.history:
                     self.suboperators['chromosome_fitness'].apply(objective=temp_offspring,
                                                                   arguments=subop_args['chromosome_fitness'])
-                    self.suboperators['pareto_level_updater'].apply(objective=(temp_offspring, objective),
-                                                                    arguments=subop_args['pareto_level_updater'])
-                    objective.history.add(system)
-                    if global_var.verbose.candidate_objectives:
-                        print(temp_offspring.obj_fun)
-                    break
+                    # Re-roll ONLY the equations the fitness host flagged
+                    # fit-degenerate (sparsity collapsed them to LOSS_NAN_VAL),
+                    # leaving the system's good equations intact -- a single bad
+                    # gene no longer dominates the whole offspring out.
+                    regenerate_degenerate_equations(
+                        temp_offspring,
+                        self.suboperators['right_part_selector'],
+                        self.suboperators['chromosome_fitness'],
+                        subop_args['right_part_selector'],
+                        subop_args['chromosome_fitness'])
+                    # Fitness physically pruned the zero-weight terms
+                    # (remove_zero_terms), so equations_labels NOW reflects the
+                    # ACTIVE structure. The pre-fit check above keyed the
+                    # UN-pruned candidate, so two distinct candidates that
+                    # sparsify to the same active form both passed it -- re-check
+                    # the post-prune label so a duplicate active form is never
+                    # placed twice (the repeated-objective leak). An offspring
+                    # still degenerate after regeneration is DROPPED, not
+                    # inserted, so LOSS_NAN_VAL never reaches the front/history.
+                    final_label = temp_offspring.equations_labels
+                    if (final_label not in objective.history
+                            and not has_degenerate_equation(temp_offspring)):
+                        self.suboperators['pareto_level_updater'].apply(objective=(temp_offspring, objective),
+                                                                        arguments=subop_args['pareto_level_updater'])
+                        objective.history.add(final_label)
+                        if global_var.verbose.candidate_objectives:
+                            print(temp_offspring.obj_fun)
+                        break
+                    # Duplicate active form or unrecoverable degenerate: record
+                    # the active label so an identical pruned candidate
+                    # short-circuits, then keep searching for a novel one.
+                    objective.history.add(final_label)
                 if replaced == offspring_attempt_limit:
                     hit_offspring_cap = True
                     if global_var.verbose.candidate_objectives:
@@ -468,7 +537,8 @@ class OffspringUpdater(CompoundOperator):
                 total_attempts, theoretical_cap,
             )
         return objective
-    
+
+
 def get_pareto_levels_updater(right_part_selector : CompoundOperator, chromosome_fitness : CompoundOperator,
                               sparsity : CompoundOperator,
                               mutation : CompoundOperator = None, constrained : bool = False, 
@@ -513,36 +583,75 @@ class InitialParetoLevelSorting(CompoundOperator):
             uniqueness_attempt_limit = self.params['uniqueness_attempt_limit']
             if global_var.verbose.show_iter_idx:
                 print('\n========== Initial population ==========')
+            # MOEA/D needs every popsize slot filled (one weight vector per
+            # population member), but the token pool may yield fewer DISTINCT
+            # non-degenerate forms than popsize. Policy: degeneracy is a HARD
+            # reject (a LOSS_NAN_VAL form is never seeded); a duplicate is a SOFT
+            # reject (prefer unique, but a non-degenerate duplicate is an
+            # acceptable fill). Once a slot proves the unique pool is exhausted,
+            # ``pool_exhausted`` drops the uniqueness retries for the remaining
+            # slots so they fill immediately instead of each burning the full
+            # budget. A true collapse (cannot find ANY non-degenerate form for a
+            # slot) still stops the search.
+            pool_exhausted = False
             for idx, candidate in enumerate(objective.unplaced_candidates):
                 candidate.reset_state(True)
-                # SoEqRightPartSelector resolves system degeneracy
-                # inline; no post-hoc retry needed.
+                # SoEqRightPartSelector resolves system degeneracy inline; the
+                # retry below additionally rejects fit-degenerate candidates and
+                # (while uniques remain) duplicate ACTIVE forms. Fitness must run
+                # first because both verdicts are only known post-sparsification.
                 self.suboperators['right_part_selector'].apply(objective = candidate,
                                                                 arguments = subop_args['right_part_selector'])
+                self.suboperators['chromosome_fitness'].apply(objective=candidate,
+                                                              arguments=subop_args['chromosome_fitness'])
+                regenerate_degenerate_equations(
+                    candidate, self.suboperators['right_part_selector'],
+                    self.suboperators['chromosome_fitness'],
+                    subop_args['right_part_selector'], subop_args['chromosome_fitness'])
 
-                system = candidate.equations_labels
                 attempts = 0
                 hit_cap = False
-                while system in objective.history:
+                while True:
+                    # equations_labels is the post-prune ACTIVE structure.
+                    degenerate = has_degenerate_equation(candidate)
+                    duplicate = candidate.equations_labels in objective.history
+                    if not (degenerate or (duplicate and not pool_exhausted)):
+                        break
                     if attempts >= uniqueness_attempt_limit:
-                        hit_cap = True
+                        if degenerate:
+                            # No non-degenerate form found for this slot at all
+                            # -> genuine search-space collapse.
+                            hit_cap = True
+                        else:
+                            # Non-degenerate but only duplicates remain: the
+                            # unique pool is exhausted. Accept this duplicate as
+                            # a fill, and stop retrying uniqueness on later slots.
+                            pool_exhausted = True
                         break
                     attempts += 1
                     candidate.create()
                     candidate.reset_state(True)
                     self.suboperators['right_part_selector'].apply(objective=candidate,
                                                                    arguments=subop_args['right_part_selector'])
-                    system = candidate.equations_labels
+                    self.suboperators['chromosome_fitness'].apply(objective=candidate,
+                                                                  arguments=subop_args['chromosome_fitness'])
+                    regenerate_degenerate_equations(
+                        candidate, self.suboperators['right_part_selector'],
+                        self.suboperators['chromosome_fitness'],
+                        subop_args['right_part_selector'], subop_args['chromosome_fitness'])
+                system = candidate.equations_labels
                 _loop_stats.record(
                     'InitialParetoLevelSorting.unique_candidate' + ('.FAIL' if hit_cap else ''),
                     attempts, uniqueness_attempt_limit,
                 )
                 if hit_cap:
-                    # Search-space collapse: the RPS+simplify pipeline canonicalises
-                    # ``uniqueness_attempt_limit`` consecutive create() outputs into
-                    # one of the already-placed structures. Diagnostic builds want
-                    # to observe the partial population's objective values rather
-                    # than abort. Policy:
+                    # Search-space collapse: every one of
+                    # ``uniqueness_attempt_limit`` consecutive create() outputs
+                    # stayed fit-degenerate even after regeneration, so this slot
+                    # has no valid (non-LOSS_NAN_VAL) form to seed. (Duplicates
+                    # do NOT trigger this -- they are filled, see pool_exhausted.)
+                    # Diagnostic builds want to observe the partial population's
+                    # objective values rather than abort. Policy:
                     # warn, register the placed candidates in ``population`` /
                     # ``levels[0]`` so downstream consumers can read their
                     # ``text_form`` + ``obj_fun``, set ``_init_collapsed=True``,
@@ -567,8 +676,8 @@ class InitialParetoLevelSorting(CompoundOperator):
                     objective._init_collapsed = True
                     init_collapsed = True
                     break
-                self.suboperators['chromosome_fitness'].apply(objective=candidate,
-                                                              arguments=subop_args['chromosome_fitness'])
+                # Fitness already computed inside the uniqueness/degeneracy loop;
+                # ``system`` is the placed candidate's active structure.
                 objective.history.add(system)
                 if global_var.verbose.candidate_objectives:
                     print(candidate.obj_fun)

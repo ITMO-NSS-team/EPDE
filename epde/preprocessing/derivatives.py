@@ -16,6 +16,7 @@ import torch
 
 import epde.globals as global_var
 from epde.preprocessing.cheb import process_point_cheb
+from epde.preprocessing.deriv_calculators import _MP_MIN_POINTS
 from epde.preprocessing.smoothing import smoothing
 from epde.supplementary import define_derivatives, train_ann, use_ann_to_predict
     
@@ -78,9 +79,8 @@ def preprocess_derivatives_poly(field, grid=None, steps=None, data_name=None, ou
     for idx, _ in np.ndenumerate(field):
         index_array.append((idx, field, grid, polynomial_window,
                            max_order, polynomial_boundary, poly_order))
-    print(len(index_array))
 
-    if mp_poolsize > 1:
+    if mp_poolsize > 1 and len(index_array) >= _MP_MIN_POINTS:
         pool = mp.Pool(mp_poolsize)
         derivatives = pool.map_async(process_point_cheb, index_array)
         pool.close()

@@ -230,8 +230,8 @@ class EquationCrossover(CompoundOperator):
         # pays when the target wasn't already partitioned into the
         # offspring during assembly. Common case (target shared as an
         # anchor) saves both deepcopies entirely.
-        p1_target_ref = parent1.structure[parent1.target_idx]
-        p2_target_ref = parent2.structure[parent2.target_idx]
+        p1_target_ref = parent1.target
+        p2_target_ref = parent2.target
         p1_target_labels = p1_target_ref.factors_labels
         p2_target_labels = p2_target_ref.factors_labels
 

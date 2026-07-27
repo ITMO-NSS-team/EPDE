@@ -1,0 +1,39 @@
+# DaISy flexible robot arm, ORDER-4 stress setup (scratch, reuses the
+# robot_arm adapter). Motivation: the official plant is ~5th-order; the
+# offline SG order-ladder shows y'''' ~ {y, y', y'', y''', u} reaches
+# R^2 = 0.997-0.999 across smoothing windows (vs 0.95 at order 2), with
+# the two-flexural-mode signature y'''' = -(w1^2+w2^2) y'' - w1^2 w2^2 y.
+# UNKNOWN-TRUTH: front for manual inspection.
+name: robot_arm_o4
+adapter: robot_arm
+
+truth_equations: []
+
+adapter_kwargs:
+  dt: 0.01
+
+search:
+  boundary: 30
+
+preprocessor:
+  type: poly
+  kwargs:
+    polynomial_window: 9
+    poly_order: 4
+
+moeadd:
+  population_size: 16
+  training_epochs: 10
+
+additional_tokens: []
+
+fit:
+  # full order-4 form = target d4y + {y, y', y'', y''', u} = 6 terms
+  equation_terms_max_number: 6
+  data_fun_pow: 1
+  deriv_fun_pow: 1
+  max_deriv_order: [4]
+  equation_factors_max_number:
+    factors_num: [1, 2]
+    probas: [0.8, 0.2]
+  eq_sparsity_interval: [1.0e-8, 1.0]

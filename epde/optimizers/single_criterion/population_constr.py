@@ -44,7 +44,7 @@ class SystemsPopulationConstructor(object):
         max_factors_in_term = kwargs.get('max_factors_in_term', self.max_factors_in_term)
         
         print(f'Creating new equation, sparsity value {sparsity}')
-        metaparameters = {'terms_number'        : {'optimizable' : False, 'value' : terms_number},
+        metaparameters = {'max_terms_number'    : {'optimizable' : False, 'value' : terms_number},
                           'max_factors_in_term' : {'optimizable' : False, 'value' : max_factors_in_term}}
         for idx, variable in enumerate(self.vars_demand_equation):
             metaparameters[('sparsity', variable)] = {'optimizable' : False, 'value' : sparsity}

@@ -1,0 +1,49 @@
+# REAL Silverbox (electronic Duffing oscillator, nonlinearbenchmark.org).
+# KNOWN-TRUTH real-data target: y'' = a*y + b*y^3 + d*y' + g*u_in.
+# Signal-check ceiling R^2 = 0.987; the cubic term's dR^2 ~ 4e-4 sits
+# below the derivative-noise floor (fs ~ 10x resonance), so the linear
+# form is credited as a valid alternative -- whether the search recovers
+# y^3 is the experiment.
+name: silverbox
+adapter: silverbox
+
+truth_equations:
+  - "-177912.0 * y{power: 1.0} + -483056.0 * y{power: 3.0} + -30.6 * dy/dx0{power: 1.0} + 128495.0 * u_in{power: 1.0} = d^2y/dx0^2{power: 1.0}"
+
+truth_alternatives:
+  - - "-177912.0 * y{power: 1.0} + -30.6 * dy/dx0{power: 1.0} + 128495.0 * u_in{power: 1.0} = d^2y/dx0^2{power: 1.0}"
+
+adapter_kwargs:
+  record: train
+  start: 2000
+  n: 40000
+
+search:
+  boundary: 100
+
+preprocessor:
+  type: poly
+  kwargs:
+    polynomial_window: 9
+    poly_order: 4
+
+moeadd:
+  population_size: 16
+  training_epochs: 10
+
+additional_tokens: []
+
+fit:
+  equation_terms_max_number: 5
+  data_fun_pow: 3
+  deriv_fun_pow: 1
+  max_deriv_order: [2]
+  # The true form is entirely single-factor terms (y, y^3, y', u_in, y'').
+  # Allowing factor pairs handed the search composite bait (y^3*y'',
+  # y''*u_in) that outfits the honest form near the derivative-noise
+  # floor -- the 30-epoch run at [1,2]/[0.8,0.2] converged to hamming 7
+  # on exactly that junk. Same representation-capping lesson as LV.
+  equation_factors_max_number:
+    factors_num: [1]
+    probas: [1.0]
+  eq_sparsity_interval: [1.0e-8, 1.0]

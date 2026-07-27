@@ -1,0 +1,37 @@
+# DaISy flexible robot arm (real, KU Leuven system-ID database).
+# UNKNOWN-TRUTH config: officially a ~5th-order flexible-modes system,
+# but y'' ~ {y, y', u} reaches R^2 = 0.991 -- the discovered reduced ODE
+# is the object of interest. Truth metrics recorded as null; the Pareto
+# front is for manual inspection.
+name: robot_arm
+adapter: robot_arm
+
+truth_equations: []
+
+adapter_kwargs:
+  dt: 0.01
+
+search:
+  boundary: 30
+
+preprocessor:
+  type: poly
+  kwargs:
+    polynomial_window: 9
+    poly_order: 4
+
+moeadd:
+  population_size: 16
+  training_epochs: 10
+
+additional_tokens: []
+
+fit:
+  equation_terms_max_number: 6
+  data_fun_pow: 1
+  deriv_fun_pow: 1
+  max_deriv_order: [2]
+  equation_factors_max_number:
+    factors_num: [1, 2]
+    probas: [0.8, 0.2]
+  eq_sparsity_interval: [1.0e-8, 1.0]
