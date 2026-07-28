@@ -117,16 +117,16 @@ class Solver2D(SolverStrategy):
 
             if len(left_idx) > 0:
                 bcs.append(dde.icbc.DirichletBC(geomtime, make_bc_func(left_idx),
-                                                lambda _, on_boundary: on_boundary and np.isclose(_.x[0], x.min(),
+                                                lambda _, on_boundary: on_boundary and np.isclose(_[0], x.min(),
                                                                                                   rtol=1e-5,
                                                                                                   atol=eps_x),
-                                                component=var_idx))
+                                                component=var_idx)) # Заменил _.x[0] на _[0]
             if len(right_idx) > 0:
                 bcs.append(dde.icbc.DirichletBC(geomtime, make_bc_func(right_idx),
-                                                lambda _, on_boundary: on_boundary and np.isclose(_.x[0], x.max(),
+                                                lambda _, on_boundary: on_boundary and np.isclose(_[0], x.max(),
                                                                                                   rtol=1e-5,
                                                                                                   atol=eps_x),
-                                                component=var_idx))
+                                                component=var_idx)) # Заменил _.x[0] на _[0]
             if len(initial_idx) > 0:
                 bcs.append(dde.icbc.IC(geomtime, make_bc_func(initial_idx),
                                        lambda _, on_initial: on_initial,
@@ -197,28 +197,28 @@ class Solver3D(SolverStrategy):
 
             if len(x_min_idx) > 0:
                 bcs.append(dde.icbc.DirichletBC(geomtime, make_bc_func(x_min_idx),
-                                                lambda _, on_boundary: on_boundary and np.isclose(_.x[0], x.min(),
+                                                lambda _, on_boundary: on_boundary and np.isclose(_[0], x.min(),
                                                                                                   rtol=1e-5,
                                                                                                   atol=eps_x),
-                                                component=var_idx))
+                                                component=var_idx)) # Заменил _.x[0] на _[0]
             if len(x_max_idx) > 0:
                 bcs.append(dde.icbc.DirichletBC(geomtime, make_bc_func(x_max_idx),
-                                                lambda _, on_boundary: on_boundary and np.isclose(_.x[0], x.max(),
+                                                lambda _, on_boundary: on_boundary and np.isclose(_[0], x.max(),
                                                                                                   rtol=1e-5,
                                                                                                   atol=eps_x),
-                                                component=var_idx))
+                                                component=var_idx)) # Заменил _.x[0] на _[0]
             if len(y_min_idx) > 0:
                 bcs.append(dde.icbc.DirichletBC(geomtime, make_bc_func(y_min_idx),
-                                                lambda _, on_boundary: on_boundary and np.isclose(_.x[1], y.min(),
+                                                lambda _, on_boundary: on_boundary and np.isclose(_[1], y.min(),
                                                                                                   rtol=1e-5,
                                                                                                   atol=eps_y),
-                                                component=var_idx))
+                                                component=var_idx)) # Заменил _.x[1] на _[1]
             if len(y_max_idx) > 0:
                 bcs.append(dde.icbc.DirichletBC(geomtime, make_bc_func(y_max_idx),
-                                                lambda _, on_boundary: on_boundary and np.isclose(_.x[1], y.max(),
+                                                lambda _, on_boundary: on_boundary and np.isclose(_[1], y.max(),
                                                                                                   rtol=1e-5,
                                                                                                   atol=eps_y),
-                                                component=var_idx))
+                                                component=var_idx)) # Заменил _.x[1] на _[1]
             if len(initial_idx) > 0:
                 bcs.append(dde.icbc.IC(geomtime, make_bc_func(initial_idx),
                                        lambda _, on_initial: on_initial,
