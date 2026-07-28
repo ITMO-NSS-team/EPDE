@@ -24,14 +24,14 @@
         "pinn_loss_mult" : 1e4,
         "error_metric": "rmse",
         "deepxde_config": {
-            "net": [95, 100, 95],
+            "net": [50, 50, 50],
             "activation": "tanh",
             "optimizer": "adam",
             "lr": 1e-3,
             "num_domain": 1000,
             "num_boundary": 200,
             "num_initial": 200,
-            "epochs": 2000
+            "epochs": 1000
         }
  	},
 	"_comment_legacy_aliases": "Param-registry aliases kept ONLY so the functional test harness (tests/functional) can fetch params by the historical operator names; the production search builds the new SolverFreeFitness / SolverBasedFitness hosts.",
