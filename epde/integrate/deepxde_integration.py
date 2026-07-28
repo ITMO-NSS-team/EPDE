@@ -18,7 +18,6 @@ class SolverStrategy(ABC):
               adapter: 'DeepXDEAdapter') -> Tuple[List[np.ndarray], float]:
         pass
 
-
 class Solver1D(SolverStrategy):
     def solve(self, eq_list, var_names, grids, data_list, adapter):
         t = grids[0]
@@ -68,9 +67,11 @@ class Solver1D(SolverStrategy):
         model = dde.Model(data_obj, net)
         model.compile(adapter.optimizer, lr=adapter.lr)
         try:
-            losshistory, train_state = model.train(epochs=adapter.epochs)  # <-- ИСПРАВЛЕНО
-            final_loss = float(losshistory.loss_train[-1][0]) if losshistory.loss_train else np.nan
+            losshistory, train_state = model.train(epochs=adapter.epochs)
+            final_loss = float(
+                losshistory.loss_train[-1][0]) if losshistory.loss_train else np.nan
         except Exception as e:
+            print(f"Exception: {e}")
             y_pred = [np.full(data.shape, np.nan) for data in data_list]
             return y_pred, np.nan
 
@@ -144,9 +145,10 @@ class Solver2D(SolverStrategy):
         model = dde.Model(data_obj, net)
         model.compile(adapter.optimizer, lr=adapter.lr)
         try:
-            losshistory, train_state = model.train(epochs=adapter.epochs)  # <- исправлено
+            losshistory, train_state = model.train(epochs=adapter.epochs)  # <-- ИСПРАВЛЕНО
             final_loss = float(losshistory.loss_train[-1][0]) if losshistory.loss_train else np.nan
         except Exception as e:
+            print(f"Exception: {e}")
             y_pred = [np.full(data.shape, np.nan) for data in data_list]
             return y_pred, np.nan
 
@@ -236,9 +238,10 @@ class Solver3D(SolverStrategy):
         model = dde.Model(data_obj, net)
         model.compile(adapter.optimizer, lr=adapter.lr)
         try:
-            losshistory, train_state = model.train(epochs=adapter.epochs)  # <- исправлено
+            losshistory, train_state = model.train(epochs=adapter.epochs)  # <-- ИСПРАВЛЕНО
             final_loss = float(losshistory.loss_train[-1][0]) if losshistory.loss_train else np.nan
         except Exception as e:
+            print(f"Exception: {e}")
             y_pred = [np.full(data.shape, np.nan) for data in data_list]
             return y_pred, np.nan
 
@@ -302,7 +305,10 @@ class DeepXDEAdapter:
                 for term_idx, term in enumerate(all_terms):
                     if term_idx == tgt:
                         continue
-                    coeff = float(eq.weights_final[term_idx]) if use_weights else 1.0
+                    if use_weights and len(eq.weights_final) > term_idx:
+                        coeff = float(eq.weights_final[term_idx])
+                    else:
+                        coeff = 1.0
                     term_val = 1.0
                     for factor in term.structure:
                         fv = self._factor_value_with_map(dde, factor, x, y, self.coord_map, var_idx_map)
@@ -311,11 +317,12 @@ class DeepXDEAdapter:
                 if use_weights and len(eq.weights_final) > len(all_terms):
                     residual += float(eq.weights_final[-1]) * (y[:, 0:1] * 0.0 + 1.0)
                 target = eq.target
-                target_val = 1.0
-                for factor in target.structure:
-                    fv = self._factor_value_with_map(dde, factor, x, y, self.coord_map, var_idx_map)
-                    target_val *= fv
-                residual -= target_val
+                if target is not None:
+                    target_val = 1.0
+                    for factor in target.structure:
+                        fv = self._factor_value_with_map(dde, factor, x, y, self.coord_map, var_idx_map)
+                        target_val *= fv
+                    residual -= target_val
                 residuals.append(residual)
             return residuals
 
