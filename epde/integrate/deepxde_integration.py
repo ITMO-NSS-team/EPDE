@@ -62,12 +62,9 @@ class Solver1D(SolverStrategy):
                                 num_boundary=adapter.num_boundary,
                                 num_test=500)
 
-        layer_size = [1] + adapter.net + [len(var_names)]
-        net = dde.nn.FNN(layer_size, adapter.activation, adapter.kernel_initializer)
-        model = dde.Model(data_obj, net)
-        model.compile(adapter.optimizer, lr=adapter.lr)
+        model = adapter._get_or_create_model(data_obj, dim=1, var_count=len(var_names))
         try:
-            losshistory, train_state = model.train(epochs=adapter.epochs)
+            losshistory, train_state = model.train(iterations=adapter.iterations, verbose=adapter.verbose)
             final_loss = float(
                 losshistory.loss_train[-1][0]) if losshistory.loss_train else np.nan
         except Exception as e:
@@ -140,12 +137,9 @@ class Solver2D(SolverStrategy):
                                     num_initial=adapter.num_initial,
                                     num_test=500)
 
-        layer_size = [geomtime.dim] + adapter.net + [len(var_names)]
-        net = dde.nn.FNN(layer_size, adapter.activation, adapter.kernel_initializer)
-        model = dde.Model(data_obj, net)
-        model.compile(adapter.optimizer, lr=adapter.lr)
+        model = adapter._get_or_create_model(data_obj, dim=2, var_count=len(var_names))
         try:
-            losshistory, train_state = model.train(epochs=adapter.epochs)  # <-- ИСПРАВЛЕНО
+            losshistory, train_state = model.train(iterations=adapter.iterations, verbose=adapter.verbose)  # <-- ИСПРАВЛЕНО
             final_loss = float(losshistory.loss_train[-1][0]) if losshistory.loss_train else np.nan
         except Exception as e:
             print(f"Exception: {e}")
@@ -233,12 +227,9 @@ class Solver3D(SolverStrategy):
                                     num_initial=adapter.num_initial,
                                     num_test=500)
 
-        layer_size = [geomtime.dim] + adapter.net + [len(var_names)]
-        net = dde.nn.FNN(layer_size, adapter.activation, adapter.kernel_initializer)
-        model = dde.Model(data_obj, net)
-        model.compile(adapter.optimizer, lr=adapter.lr)
+        model = adapter._get_or_create_model(data_obj, dim=3, var_count=len(var_names))
         try:
-            losshistory, train_state = model.train(epochs=adapter.epochs)  # <-- ИСПРАВЛЕНО
+            losshistory, train_state = model.train(iterations=adapter.iterations, verbose=adapter.verbose)  # <-- ИСПРАВЛЕНО
             final_loss = float(losshistory.loss_train[-1][0]) if losshistory.loss_train else np.nan
         except Exception as e:
             print(f"Exception: {e}")
@@ -263,10 +254,12 @@ class DeepXDEAdapter:
         self.num_domain = int(self.config.get('num_domain', 2000))
         self.num_boundary = int(self.config.get('num_boundary', 500))
         self.num_initial = int(self.config.get('num_initial', 500))
-        self.epochs = int(self.config.get('epochs', 10000))
+        #self.epochs = int(self.config.get('epochs', 10000))
+        self.iterations = int(self.config.get('iterations', 10000))
         # self.iterations = int(self.config.get('epochs', 5))
         self.bc_type = self.config.get('bc_type', 'Dirichlet')
         self.fallback_bc_value = self.config.get('fallback_bc_value', 0.0)
+        self.verbose = config.get('verbose', False)
 
         self.coordinate_mapping = self.config.get('coordinate_mapping', None)
         self.coord_names = None
@@ -277,6 +270,23 @@ class DeepXDEAdapter:
             2: Solver2D(),
             3: Solver3D(),
         }
+
+        self._model = None
+
+    def _get_or_create_model(self, data_obj, dim, var_count):
+        if self._model is None:
+            layer_size = [dim] + self.net + [var_count]
+            net = dde.nn.FNN(layer_size, self.activation, self.kernel_initializer)
+            model = dde.Model(data_obj, net)
+            model.compile(self.optimizer, lr=self.lr, verbose=self.verbose)
+            self._model = model
+        else:
+            def reset_weights(m):
+                if hasattr(m, 'reset_parameters'):
+                    m.reset_parameters()
+            self._model.net.apply(reset_weights)
+            self._model.data = data_obj
+        return self._model
 
     def _set_coordinate_info(self, coord_names):
         self.coord_names = coord_names

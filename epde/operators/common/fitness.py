@@ -340,7 +340,7 @@ class SolverBasedFitness(CompoundOperator):
                              penalty_coeff=self.params.get('penalty_coeff', 0.2),
                              for_rps=False)
         # Pack per-eq masked (solution, data) for DeepXDEError.
-        masked_solutions = [solution_list[i][mask_flat] for i in range(len(eqs))] # был solution_list
+        masked_solutions = [solution_list[i][mask_flat] for i in range(len(eqs))]
         masked_data = [data_list[i] for i in range(len(eqs))]
         sctx = SolverContext(solution=masked_solutions, loss_add=loss,
                              g_fun_vals=masked_data,

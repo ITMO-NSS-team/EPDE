@@ -31,7 +31,9 @@
             "num_domain": 1000,
             "num_boundary": 200,
             "num_initial": 200,
-            "epochs": 1000
+            "iterations": 1000,
+            "epochs": 1000,
+            "verbose": false
         }
  	},
 	"_comment_legacy_aliases": "Param-registry aliases kept ONLY so the functional test harness (tests/functional) can fetch params by the historical operator names; the production search builds the new SolverFreeFitness / SolverBasedFitness hosts.",
