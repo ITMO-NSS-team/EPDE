@@ -395,8 +395,11 @@ class TestInstabilityDispatch:
             AssertionError('must not re-evaluate'))
         assert Instability().compute(eq, _ctx(n)) == pytest.approx(value)
 
-    def test_default_resolution_keeps_vcoef_fast_path(self):
-        assert global_var.resolve_instability_metric() == 'vcoef'
+    def test_default_resolution_is_chi2(self):
+        assert global_var.resolve_instability_metric() == 'chi2'
+
+    def test_explicit_vcoef_keeps_fast_path(self):
+        global_var.set_instability_metric('vcoef')
         eq = SimpleNamespace(_cached_vc_score=np.array([0.1, 0.2]))
         assert Instability().compute(eq, _ctx(10)) == pytest.approx(0.3)
 

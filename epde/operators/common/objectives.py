@@ -380,19 +380,17 @@ class Instability(EquationObjective):
     """The instability objective, dispatching on the estimator selected by
     ``epde.globals.resolve_instability_metric()``:
 
-    * ``'vcoef'`` (default under ``gram_mode='vcoef'``): fast path sums the
-      per-term ``_cached_vc_score`` produced by ``PhysicsInformedLasso``
-      (``VWSRSparsity``); fallback (LASSO path, no cache) is
-      ``vc_stability_total_lr``.
-    * ``'cv'`` (default under ``gram_mode='axis'``): axis-aligned
-      sliding-window CV via ``calculate_weights``.
+    * ``'vcoef'``: fast path sums the per-term ``_cached_vc_score``
+      produced by ``PhysicsInformedLasso`` (``VWSRSparsity``); fallback
+      (LASSO path, no cache) is ``vc_stability_total_lr``.
+    * ``'cv'``: axis-aligned sliding-window CV via ``calculate_weights``.
     * ``'survival'`` / ``'tile'`` / ``'het'`` / ``'chi2'``: the estimators
       from ``epde.operators.common.survival`` (``'het'`` = Q-calibrated
       excess-variance heterogeneity, tau^2/(tau^2+mean^2); ``'chi2'`` =
       per-term Nyblom-Hansen cumulative-score-path constancy: global-OLS
       Theta, one path per grid axis, each bulge measured against the
-      term's own signal energy), memoized per equation as
-      ``_cached_alt_instability = (metric, value)``.
+      term's own signal energy -- the resolver DEFAULT), memoized per
+      equation as ``_cached_alt_instability = (metric, value)``.
 
     The estimator choice affects ONLY this objective; the sparsity
     keep-rule keeps following ``gram_mode``. Fails loudly: any exception

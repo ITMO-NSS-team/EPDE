@@ -76,9 +76,9 @@ anchor_on_residual: bool = False
 # Which estimator the INSTABILITY OBJECTIVE (the ``Instability`` filler /
 # ``equation_terms_stability`` Pareto axis) uses. Decoupled from
 # ``gram_mode``, which keeps governing the sparsity keep-rule unchanged.
-#   None         -> resolve from gram_mode ('vcoef' -> 'vcoef', 'axis' -> 'cv')
-#                   -- exact backward compatibility (the default).
-#   'vcoef'      -> varying-coefficient NC/gamma_0^2 (the Hadamard default).
+#   None         -> 'chi2' (the default; before Aug 2026 it resolved from
+#                   gram_mode: 'vcoef' -> 'vcoef', 'axis' -> 'cv').
+#   'vcoef'      -> varying-coefficient NC/gamma_0^2 (the pre-chi2 default).
 #   'cv'         -> axis-aligned sliding-window CV (var/mu^2).
 #   'survival'   -> block-resampled coefficient survival
 #                   (sign-flip rate + MAD/|median| across refits).
@@ -96,7 +96,9 @@ anchor_on_residual: bool = False
 #                   grid axis, pinned to zero at both ends by the normal
 #                   equations, and its bulge is measured against the
 #                   term's own fitted-signal energy (never the residual).
-#                   No refits, cheapest estimator.
+#                   No refits, cheapest estimator. THE DEFAULT: on the
+#                   14-system clean panels it ties vcoef/cv on both the
+#                   non-domination and strict lenses at zero refit cost.
 # Set via ``set_instability_metric`` before ``build_search``.
 instability_metric = None
 
@@ -162,9 +164,9 @@ def set_instability_metric(metric=None):
 
     Mirrors ``set_gram_config``: a process-level global read by the
     ``Instability`` filler in ``epde.operators.common.objectives``. ``None``
-    (default) resolves from ``gram_mode`` for exact backward compatibility;
-    see :data:`instability_metric` for the estimator menu. The sparsity
-    keep-rule keeps following ``gram_mode`` regardless.
+    (default) resolves to ``'chi2'``; see :data:`instability_metric` for
+    the estimator menu. The sparsity keep-rule keeps following
+    ``gram_mode`` regardless.
 
     ``'chi'`` is accepted as an alias and normalised to ``'chi2'`` HERE, at
     set time -- ``Instability.compute`` dispatches on canonical names, and
@@ -202,11 +204,12 @@ def set_rps_amplification_cap(cap=100.0):
 
 def resolve_instability_metric() -> str:
     """The effective instability-objective estimator: the explicit
-    ``instability_metric`` override if set, else the one ``gram_mode``
-    implies ('vcoef' -> 'vcoef', 'axis' -> 'cv')."""
+    ``instability_metric`` override if set, else ``'chi2'`` (the default;
+    'vcoef' / 'cv' stay available as explicit selections, and the sparsity
+    keep-rule keeps following ``gram_mode`` regardless)."""
     if instability_metric is not None:
         return instability_metric
-    return 'vcoef' if gram_mode == 'vcoef' else 'cv'
+    return 'chi2'
 
 
 # Which residual metric the DISCREPANCY OBJECTIVE family (the
