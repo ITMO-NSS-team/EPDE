@@ -427,7 +427,8 @@ class Equation(ComplexStructure):
                   # '_target', '_features', 'saved', 'saved_as','max_factors_in_term', 'operator',
                  '_target_term', 'right_part_selected', '_weights_final', 'weights_final_evald', 'simplified', 'is_correct_right_part',
                  '_weights_internal', 'weights_internal_evald', 'fitness_calculated', 'stability_calculated', 'aic_calculated', 'solver_form_defined',
-                 '_fitness_value', '_coefficients_stability', '_aic', 'metaparameters', 'main_var_to_explain',
+                 'complexity_calculated',
+                 '_fitness_value', '_coefficients_stability', '_aic', '_complexity_value', 'metaparameters', 'main_var_to_explain',
                  '_eval_cache', '_cached_sw_weights', '_cached_vc_score',
                  '_cached_alt_instability',
                  '_terms_labels_cache', '_terms_labels_without_power_cache',
@@ -880,6 +881,8 @@ class Equation(ComplexStructure):
         self.fitness_value = None
         self.stability_calculated = False
         self.coefficients_stability = None
+        self.complexity_calculated = False
+        self.complexity_value = None
         self.aic_calculated = False
         self.solver_form_defined = False
         # Wipe EVERY registered cache -- both policies (see _EQ_CACHE_FIELDS
@@ -966,6 +969,7 @@ class Equation(ComplexStructure):
         new_equation.right_part_selected = self.right_part_selected
         new_equation.fitness_calculated = self.fitness_calculated
         new_equation.stability_calculated = self.stability_calculated
+        new_equation.complexity_calculated = getattr(self, 'complexity_calculated', False)
         new_equation.aic_calculated = self.aic_calculated
         new_equation.simplified = self.simplified
         new_equation.is_correct_right_part = self.is_correct_right_part
@@ -978,6 +982,11 @@ class Equation(ComplexStructure):
 
         try:
             new_equation._coefficients_stability = self._coefficients_stability
+        except AttributeError:
+            pass
+
+        try:
+            new_equation._complexity_value = self._complexity_value
         except AttributeError:
             pass
 
@@ -1067,6 +1076,14 @@ class Equation(ComplexStructure):
     @coefficients_stability.setter
     def coefficients_stability(self, val):
         self._coefficients_stability = val
+
+    @property
+    def complexity_value(self):
+        return self._complexity_value
+
+    @complexity_value.setter
+    def complexity_value(self, val):
+        self._complexity_value = val
 
     @property
     def aic(self):
@@ -1323,19 +1340,28 @@ class SoEq(moeadd.MOEADDSolution):
                                                if val['optimizable']})
 
     def use_default_multiobjective_function(self, use_pic: bool = False):
-        if use_pic:
+        # Lockstep site #2 of the selectable second axis (the others: the
+        # strategy's filler assembly and the MOEA/D ideal point). The
+        # ``second_objective`` global overrides the use_pic-derived default
+        # when set; unset resolves to exactly the old use_pic branch.
+        import epde.globals as global_var
+        if global_var.resolve_second_objective(use_pic) == 'instability':
             # self.use_pic_multiobjective_function()
             self.use_new_multiobjective_function()
         else:
             self.use_legacy_multiobjective_function()
 
     def use_legacy_multiobjective_function(self):
-        from epde.eq_mo_objectives import equation_fitness, equation_complexity_by_factors
+        from epde.eq_mo_objectives import equation_fitness, equation_complexity
         # Both functions return per-equation tuples when called without an
         # equation_key, so the overall obj_fun layout matches the NEW path
         # (one weight per objective TYPE, expanded across equations by
         # MOEA/D). See penalty_based_intersection for the expansion logic.
-        self.set_objective_functions([equation_fitness, equation_complexity_by_factors])
+        # ``equation_complexity`` is the dispatching family reader: it serves
+        # the Complexity filler's stored value on the live path and falls
+        # back to the lazy cores ('factors' default = bit-compatible with the
+        # old equation_complexity_by_factors wiring) for translated systems.
+        self.set_objective_functions([equation_fitness, equation_complexity])
 
     def use_pic_multiobjective_function(self):
         from epde.eq_mo_objectives import generate_partial, equation_fitness, equation_complexity_by_factors, equation_terms_stability, equation_aic

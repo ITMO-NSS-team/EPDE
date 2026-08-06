@@ -153,24 +153,18 @@ class EqRightPartSelector(CompoundOperator):
                     if not objective.structure[target_idx].contains_deriv(objective.main_var_to_explain):
                         continue
                     objective.target_idx = target_idx
+                    # A None fitness means the candidate was DECLINED inside
+                    # the host: sparsity zeroed every feature, the fit is
+                    # discrepancy-degenerate, or it is an amplified-identity
+                    # parasite (guard ratio above rps_amplification_cap --
+                    # huge mutually-cancelling coefficients, e.g. the LV
+                    # ``Lambda*(du+dv-alpha*u+gamma*v) = d^2u`` form; valid
+                    # identity refits at A ~ 1-2 pass untouched). All decline
+                    # families share one semantics: the candidate is never
+                    # considered. If every eligible target declines,
+                    # min_fitness stays inf and the reroll path below fires.
                     fitness = self.suboperators['fitness_calculation'].apply(objective, arguments = subop_args['fitness_calculation'], force_out_of_place = True)
                     if fitness is not None and fitness < min_fitness:
-                        # Amplified-identity guard: decline a would-be winner
-                        # whose fit only "explains" the target by amplifying
-                        # the residual of a near-null feature combination
-                        # (huge mutually-cancelling coefficients, e.g. the LV
-                        # ``Lambda*(du+dv-alpha*u+gamma*v) = d^2u`` parasite).
-                        # Identity-form refits (A ~ 1-2) pass untouched; if
-                        # every eligible target declines, min_fitness stays
-                        # inf and the standard reroll path below fires.
-                        cap = global_var.rps_amplification_cap
-                        if cap is not None and \
-                                _amplification_ratio(objective) > cap:
-                            _loop_stats.record('EqRPS.amplification_decline',
-                                               1, 1)
-                            objective.weights_internal_evald = False
-                            objective.weights_final_evald = False
-                            continue
                         min_fitness = fitness
                         min_idx = target_idx
                         weights_internal = objective.weights_internal
@@ -214,14 +208,33 @@ class EqRightPartSelector(CompoundOperator):
         # (``objective.randomize()`` on inf-fitness) can leave the identity-
         # tracked target as None; install a deterministic, valid target so the
         # downstream ``Equation.evaluate`` never indexes a stale/None position.
-        # Prefer the first term carrying a derivative of the explained variable
-        # (the only physically valid right part); fall back to term 0.
+        # Candidates: terms carrying a derivative of the explained variable
+        # (the only physically valid right parts); fall back to term 0. Among
+        # them, PREFER the first whose sweep-style fit is not declined by the
+        # host (a None fit = zeroed / degenerate / amplified-identity, one
+        # unified semantics) -- the exit guarantee must not hand a declined
+        # candidate a free pass around the sweep. If every candidate is
+        # declined, the first deriv-carrying term is installed anyway (a
+        # target must leave RPS) and the in-place fitness backstop condemns
+        # the amplified fit to LOSS_NAN_VAL (SolverFreeFitness.apply).
         if objective.target is None and objective.structure:
-            objective.target_idx = next(
-                (i for i, term in enumerate(objective.structure)
-                 if term.contains_deriv(objective.main_var_to_explain)),
-                0,
-            )
+            deriv_idxs = [i for i, term in enumerate(objective.structure)
+                          if term.contains_deriv(objective.main_var_to_explain)]
+            chosen = None
+            if global_var.rps_amplification_cap is not None:
+                for cand_idx in deriv_idxs:
+                    objective.target_idx = cand_idx
+                    cand_fit = self.suboperators['fitness_calculation'].apply(
+                        objective, arguments=subop_args['fitness_calculation'],
+                        force_out_of_place=True)
+                    objective.weights_internal_evald = False
+                    objective.weights_final_evald = False
+                    if cand_fit is not None:
+                        chosen = cand_idx
+                        break
+            if chosen is None:
+                chosen = deriv_idxs[0] if deriv_idxs else 0
+            objective.target_idx = chosen
             _loop_stats.record('EqRPS.exit_target_fallback', 1, 1)
         objective.remove_zero_terms()
         # Hard invariant: no duplicate terms may leave RPS. simplify and
@@ -571,11 +584,19 @@ def _amplification_ratio(objective: Equation) -> float:
     noise of a valid near-null feature combination. Returns ``inf`` on a
     non-finite/degenerate evaluation so the caller declines the candidate.
     """
+    # READ-ONLY evaluations: ``grids=()`` (non-None) makes Term.evaluate skip
+    # its tensor_cache.add while serving cache hits normally and computing
+    # misses identically (the Term-level override never forwards ``grids`` to
+    # the actual computation). The ratio is a pure diagnostic -- it must not
+    # mutate cache state (adds/evictions/saved flags), or its extra
+    # evaluations perturb later fits at float precision and break run
+    # reproducibility (observed as 1e-7-level legacy A/B drift when the ratio
+    # started running for every sweep candidate).
     w = np.asarray(objective.weights_internal, dtype=float)
     if not np.all(np.isfinite(w)):
         return np.inf
     tgt = objective.target_idx
-    t = np.asarray(objective.structure[tgt].evaluate(False, grids=None),
+    t = np.asarray(objective.structure[tgt].evaluate(False, grids=()),
                    dtype=float).reshape(-1)
     den = np.linalg.norm(t)
     if not np.isfinite(den) or den == 0.0:
@@ -585,7 +606,7 @@ def _amplification_ratio(objective: Equation) -> float:
     for wj, term in zip(w[:len(nonrs)], nonrs):
         if wj == 0.0:
             continue
-        col = np.asarray(term.evaluate(False, grids=None),
+        col = np.asarray(term.evaluate(False, grids=()),
                          dtype=float).reshape(-1)
         num += abs(wj) * np.linalg.norm(col)
     if len(w) > len(nonrs) and w[-1] != 0.0:

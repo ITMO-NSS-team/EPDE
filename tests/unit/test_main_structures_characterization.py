@@ -373,8 +373,8 @@ class TestTargetTerm:
 #     intercept is dropped -- weights_final is then nnz-length with no
 #     intercept slot. weights_internal = [*coef, intercept] and its LAST entry
 #     acts as the intercept-presence flag the discrepancy fillers branch on
-#     (see WAPEDiscrepancy.compute).
-# ``L2Discrepancy.compute`` reads ``weights_final[-1]`` as the intercept
+#     (see Discrepancy._compute_wape).
+# ``Discrepancy._compute_l2`` reads ``weights_final[-1]`` as the intercept
 # unconditionally, which is coherent only under the LASSO pairing. These tests
 # pin both conventions so any future unification must consciously flip them.
 # ---------------------------------------------------------------------------

@@ -8,7 +8,7 @@ from epde.operators.utils.template import add_base_param_to_operator
 from epde.operators.common.right_part_selection import (EqRightPartSelector,
                                                         SoEqRightPartSelector)
 from epde.operators.common.fitness import SolverFreeFitness
-from epde.operators.common.objectives import WAPEDiscrepancy, Instability
+from epde.operators.common.objectives import Discrepancy, Instability
 import epde.globals as global_var
 from epde.operators.common.sparsity import LASSOSparsity, VWSRSparsity
 from epde.operators.common.coeff_calculation import LinRegBasedCoeffsEquation
@@ -22,7 +22,16 @@ class BaselineDirector(OptimizationPatternDirector):
         super().__init__()
         self.builder = StrategyBuilder(EvolutionaryStrategy)
 
-    def use_baseline(self, params: dict, **kwargs):
+    def use_baseline(self, params: dict, sparsity_cls=None, **kwargs):
+        # ``sparsity_cls`` used to be swallowed by ``**kwargs`` (EpdeSearch
+        # passes it unconditionally), so single-objective mode silently ran
+        # VWSR regardless of the requested pipeline; the named parameter
+        # honors the request (safe: ``add_base_param_to_operator`` only
+        # reads keys an operator declares). The discrepancy metric is NOT a
+        # parameter here -- the bare ``Discrepancy()`` filler resolves it
+        # from the search configuration (``globals.discrepancy_metric``,
+        # written by ``EpdeSearch.__init__``), so single-objective runs
+        # honor it too.
         variation_params = params.get('variation_params', {})
         mutation_params = params.get('mutation_params', {})
 
@@ -41,7 +50,7 @@ class BaselineDirector(OptimizationPatternDirector):
         selection = RouletteWheelSelection(['parents_fraction'])
         add_kwarg_to_operator(operator = selection)
 
-        sparsity = VWSRSparsity()
+        sparsity = (sparsity_cls if sparsity_cls is not None else VWSRSparsity)()
         coeff_calc = LinRegBasedCoeffsEquation()
         # Single-objective fitness: discrepancy is always computed (it
         # drives diagnostics and any right-part work); when the global
@@ -49,7 +58,7 @@ class BaselineDirector(OptimizationPatternDirector):
         # is added too so equation_terms_stability has a value to read.
         # Which attribute the optimizer actually minimises is chosen by
         # SoEq.use_default_singleobjective_function (the objective reader).
-        disc = WAPEDiscrepancy()
+        disc = Discrepancy()
         objectives = [disc]
         if getattr(global_var, 'single_objective_metric', 'discrepancy') == 'instability':
             objectives.append(Instability())

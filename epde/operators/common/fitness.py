@@ -11,12 +11,12 @@ scalar objective to a pluggable *filler* from
 ``epde.operators.common.objectives``.
 
 * :class:`SolverFreeFitness` -- gene-level; hosts solver-free fillers
-  (``L2Discrepancy`` / ``WAPEDiscrepancy`` / ``Instability`` / ...).
+  (``Discrepancy`` / ``Instability`` / ``Complexity`` / ...).
   Replaces the former ``L2Fitness`` and ``L2LRFitness``.
 * :class:`SolverBasedFitness` -- chromosome-level; solves the system once
   via a PDE backend (autograd ``SolverAdapter`` or DeepXDE) and hosts
-  solver-based fillers (``SolverL2Discrepancy`` / ``PICError`` /
-  ``DeepXDEError``) plus an optional ``Instability`` r-loss. Replaces the
+  ``Discrepancy`` family's solver options ('solver_l2' / 'pic' /
+  'deepxde') plus an optional ``Instability`` r-loss. Replaces the
   former ``SolverBasedFitness``, ``PIC`` and ``DeepXDEBasedFitness``.
 
 The metric logic lives in the fillers (single responsibility); the hosts
@@ -42,9 +42,8 @@ import epde.globals as global_var
 # (e.g. projects/thesis/_vc_cache_gate.py).
 from epde.operators.common.stability import (calculate_weights, vc_stability_total_lr)  # noqa: F401
 from epde.operators.common.objectives import (
-    FitContext, SolverContext, EquationObjective, SolverObjective,
-    L2Discrepancy, WAPEDiscrepancy, Instability,
-    SolverL2Discrepancy, PICError, DeepXDEError, LOSS_NAN_VAL,
+    FitContext, SolverContext, EquationObjective,
+    Discrepancy, Instability, LOSS_NAN_VAL,
 )
 from epde import _loop_stats
 
@@ -93,8 +92,8 @@ class SolverFreeFitness(CompoundOperator):
         primary = self.primary
         # Sparsity is run when the primary (discrepancy) filler asks for it:
         # always during the RPS sweep, and as a fallback in-place when the
-        # equation lacks a valid weights_internal state (see L2Discrepancy /
-        # WAPEDiscrepancy.needs_sparsity, lifted from the old operators).
+        # equation lacks a valid weights_internal state (see
+        # Discrepancy.needs_sparsity, lifted from the old operators).
         if primary.needs_sparsity(objective, force_out_of_place):
             self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
             # During the RPS term-sweep a candidate whose sparsity killed every
@@ -121,9 +120,13 @@ class SolverFreeFitness(CompoundOperator):
             val = primary.compute(objective, ctx)
             objective.fitness_value = val
             # Post-fit degeneracy: decline a candidate target that still fits
-            # poorly (discrepancy above the filler's degenerate_threshold) so RPS
-            # won't select it. fitness_value is now the freshly computed value.
-            if primary.is_degenerate(objective):
+            # poorly (discrepancy above the filler's degenerate_threshold) OR
+            # that only reaches the target through an amplified near-null
+            # combination (guard ratio above ``rps_amplification_cap``).
+            # Either way return None -- exactly like the all-features-zeroed
+            # sparsity case above -- so the RPS sweep never considers the
+            # candidate at all.
+            if primary.is_degenerate(objective) or _amplification_trips(objective):
                 return None
             return val
 
@@ -151,6 +154,12 @@ class SolverFreeFitness(CompoundOperator):
         # MOEA/D selects it out, instead of crashing on weights_final access.
         if not getattr(objective, 'weights_final_evald', False):
             for filler in self.objectives:
+                # Complexity opts out (stamped_on_failure=False): flag stays
+                # down, so the equation_complexity reader falls back to the
+                # lazy structure-derived cores -- the exact pre-filler
+                # legacy semantics for RPS-exhausted equations.
+                if not getattr(filler, 'stamped_on_failure', True):
+                    continue
                 setattr(objective, filler.value_attr, LOSS_NAN_VAL)
                 setattr(objective, filler.flag_attr, True)
             objective.aic = None
@@ -166,9 +175,20 @@ class SolverFreeFitness(CompoundOperator):
         # -term SInv cancellation residual of 1.0 with stability ~0). Apply the
         # primary's degeneracy verdict here too -- now that fitness_value holds the
         # in-place discrepancy -- so a degenerate form is dominated out of the front.
-        if primary is not None and primary.is_degenerate(objective):
+        # An amplified fit (``_amplification_trips``: e.g. the LV
+        # ``Lambda*(du+dv-alpha*u+gamma*v) = d^2u`` parasite) is degenerate
+        # NO MATTER which path installed its target: the term-sweep already
+        # returns None for such candidates, but the sweep's exit-guarantee
+        # fallback can still install one -- this backstop keeps the amplified
+        # fit off the front regardless of how its weights arose.
+        if primary is not None and (primary.is_degenerate(objective)
+                                    or _amplification_trips(objective)):
             for filler in self.objectives:
-                setattr(objective, filler.value_attr, LOSS_NAN_VAL)
+                # Complexity opts out (stamped_on_failure=False): its value
+                # is structure-derived and stays real -- stamping it would
+                # change the legacy Pareto geometry for degenerate forms.
+                if getattr(filler, 'stamped_on_failure', True):
+                    setattr(objective, filler.value_attr, LOSS_NAN_VAL)
         # AIC is not produced by the solver-free path; expose the default
         # the legacy WAPE operator set so downstream readers don't assert.
         objective.aic = None
@@ -178,16 +198,35 @@ class SolverFreeFitness(CompoundOperator):
         self._tags = {'fitness evaluation', 'gene level', 'contains suboperators', 'inplace'}
 
 
+def _amplification_trips(objective) -> bool:
+    """True when the CURRENT fit only reaches its target by amplifying the
+    residual of a near-null feature combination: guard ratio
+    A = sum|c|*||col|| / ||target|| above ``global_var.rps_amplification_cap``
+    (None disables). Shared by the RPS-sweep decline (out-of-place -> return
+    None, exactly like the all-features-zeroed case) and the in-place
+    condemnation stamp, so the verdict is identical no matter which path
+    installed the target. Deferred import: the ratio lives with the RPS
+    machinery."""
+    cap = getattr(global_var, 'rps_amplification_cap', None)
+    if cap is None:
+        return False
+    from epde.operators.common.right_part_selection import _amplification_ratio
+    if _amplification_ratio(objective) > cap:
+        _loop_stats.record('EqRPS.amplification_decline', 1, 1)
+        return True
+    return False
+
+
 class SolverBasedFitness(CompoundOperator):
     """Solver-based fitness host (chromosome level).
 
     Solves the candidate system once with a PDE backend, then scores each
     equation with the configured solver fillers. Subsumes the former
     ``SolverBasedFitness`` (``backend='autograd'``, ``masked=False``,
-    ``SolverL2Discrepancy``), ``PIC`` (``backend='autograd'``,
-    ``masked=True``, ``PICError`` + ``Instability``) and
-    ``DeepXDEBasedFitness`` (``backend='deepxde'``, ``DeepXDEError`` +
-    ``Instability``).
+    ``Discrepancy('solver_l2')``), ``PIC`` (``backend='autograd'``,
+    ``masked=True``, ``Discrepancy('pic')`` + ``Instability``) and
+    ``DeepXDEBasedFitness`` (``backend='deepxde'``,
+    ``Discrepancy('deepxde')`` + ``Instability``).
 
     The right-part-selection term-sweep never solves: the director wires a
     lightweight :class:`SolverFreeFitness` as the RPS fitness instead.
@@ -195,7 +234,7 @@ class SolverBasedFitness(CompoundOperator):
     key = 'SolverBasedFitness'
 
     def __init__(self, param_keys: list, objectives: list = None,
-                 primary: SolverObjective = None, stability: Instability = None,
+                 primary: Discrepancy = None, instability: Instability = None,
                  backend: str = 'autograd', masked: bool = False):
         super().__init__(param_keys)
         self.adapter = None
@@ -206,9 +245,13 @@ class SolverBasedFitness(CompoundOperator):
         # ``primary`` explicitly with a discrepancy filler.
         self.primary = primary if primary is not None else (
             self.objectives[0] if self.objectives else None)
-        # Optional solver-free r-loss filler (instability) reused as a
-        # second objective, mirroring PIC / DeepXDE.
-        self.stability = stability
+        # ``instability=`` is a legacy convenience channel: the filler is
+        # folded into the uniform ``objectives`` list, and the host computes
+        # every non-primary filler with the solver-free FitContext protocol
+        # after the solver pass -- exactly like SolverFreeFitness consumes
+        # its second-objective filler.
+        if instability is not None and all(instability is not obj for obj in self.objectives):
+            self.objectives.append(instability)
 
     def set_adapter(self, net=None, pretrained_net=None):
         if self.backend == 'deepxde':
@@ -289,10 +332,12 @@ class SolverBasedFitness(CompoundOperator):
                 continue
             setattr(eq, self.primary.value_attr, err)
             setattr(eq, self.primary.flag_attr, True)
-            if self.stability is not None:
+            for filler in self.objectives:
+                if filler is self.primary:
+                    continue
                 eq.aic_calculated = True
-                setattr(eq, self.stability.value_attr, self.stability.compute(eq, fit_ctx))
-                setattr(eq, self.stability.flag_attr, True)
+                setattr(eq, filler.value_attr, filler.compute(eq, fit_ctx))
+                setattr(eq, filler.flag_attr, True)
         if force_out_of_place:
             return sum_err
 
@@ -303,9 +348,9 @@ class SolverBasedFitness(CompoundOperator):
             pretrained_net = None
         self.set_adapter(pretrained_net=pretrained_net)
 
-        # Keep the DeepXDEError filler's config in sync with host params
+        # Keep the 'deepxde' family option's config in sync with host params
         # (the legacy DeepXDEBasedFitness read these from self.params).
-        if isinstance(self.primary, DeepXDEError):
+        if getattr(self.primary, 'metric', None) == 'deepxde':
             self.primary.error_metric = self.params.get('error_metric', 'rmse')
             self.primary.penalty_coeff = self.params.get('penalty_coeff', 0.2)
 
@@ -355,9 +400,11 @@ class SolverBasedFitness(CompoundOperator):
                 continue
             setattr(eq, self.primary.value_attr, err)
             setattr(eq, self.primary.flag_attr, True)
-            if self.stability is not None:
-                setattr(eq, self.stability.value_attr, self.stability.compute(eq, fit_ctx))
-                setattr(eq, self.stability.flag_attr, True)
+            for filler in self.objectives:
+                if filler is self.primary:
+                    continue
+                setattr(eq, filler.value_attr, filler.compute(eq, fit_ctx))
+                setattr(eq, filler.flag_attr, True)
         if force_out_of_place:
             return total_err / max(len(eqs), 1)
 
