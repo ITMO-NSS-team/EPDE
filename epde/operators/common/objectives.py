@@ -18,8 +18,10 @@ Two families:
   right-part-selection hooks (``needs_sparsity`` / ``is_degenerate`` /
   normalization) and their value is what ``EqRightPartSelector`` ranks
   candidate targets by during its ``force_out_of_place`` term-sweep.
-* **Solver-based** (:class:`SolverObjective`): compute from a solved field
-  produced by a PDE solver backend.
+* **Solver-based**: the solver options of the same :class:`Discrepancy`
+  family (``'solver_l2'`` / ``'pic'`` / ``'deepxde'``), computed from a
+  solved field produced by a PDE solver backend via the
+  ``compute(eq, eq_idx, sctx)`` protocol.
 
 Every metric's logic lives in exactly ONE filler -- this is the
 single-responsibility split that replaces the copy-pasted discrepancy /
@@ -33,7 +35,9 @@ import numpy as np
 
 import epde.globals as global_var
 from epde.operators.common.stability import calculate_weights, vc_stability_total_lr
-from epde.operators.common.survival import survival_scores, tile_scores
+from epde.operators.common.survival import (
+    chi2_scores, heterogeneity_scores, survival_scores, tile_scores,
+)
 
 LOSS_NAN_VAL = 1e7
 
@@ -83,6 +87,18 @@ class EquationObjective:
     value_attr = 'fitness_value'
     flag_attr = 'fitness_calculated'
 
+    # Whether the host's failure stamps (the unfitted-equation stamp and the
+    # post-compute degeneracy verdict, see ``SolverFreeFitness.apply``)
+    # overwrite this filler's value with LOSS_NAN_VAL. ``Complexity`` opts
+    # out of BOTH: its value is structure-derived, and before it was a
+    # filler the lazy Pareto reader reported the real count for degenerate
+    # and RPS-exhausted forms alike -- stamping would change the legacy
+    # Pareto geometry (two stamped forms would tie on the complexity axis
+    # instead of dominance-comparing on their real counts). A skipped filler
+    # keeps its flag down, so the ``equation_complexity`` reader falls back
+    # to the lazy cores -- the exact pre-filler semantics.
+    stamped_on_failure = True
+
     # -- right-part-selection scaffolding hooks (consulted on the primary) -- #
     def needs_sparsity(self, equation, for_rps: bool) -> bool:
         return bool(for_rps or not getattr(equation, 'weights_internal_evald', False))
@@ -103,24 +119,164 @@ class EquationObjective:
         raise NotImplementedError
 
 
-class L2Discrepancy(EquationObjective):
-    """Weighted L2 norm of the residual (the legacy ``L2Fitness`` core).
+class Discrepancy(EquationObjective):
+    """The DISCREPANCY objective family: one filler containing every residual
+    metric as an option, BUILT FROM THE SEARCH CONFIGURATION -- ``Discrepancy()``
+    constructs bare and resolves its option at compute time from
+    ``epde.globals.resolve_discrepancy_metric()``, which ``EpdeSearch``
+    writes from its ``discrepancy_metric`` kwarg (the same late-dispatch
+    convention as :class:`Instability` and :class:`Complexity`). An explicit
+    constructor metric exists only as internal wiring for fixed-role hosts.
 
-    Reproduces ``L2Fitness.apply`` verbatim: un-normalised features, the
-    three-way ``weights_internal`` / ``weights_final`` reconstruction, the
-    ``g_func`` weighting, and the all-zero penalty division.
+    Options (canonical):
+
+    * ``'wape'`` (default) -- normalised absolute residual, the legacy
+      ``L2LRFitness`` core: ``sum|target - fit| / sum|target|``. Normalised
+      features in-place, un-normalised during the RPS sweep, the
+      ``weights_internal[-1]`` intercept-presence test, no ``g_func``
+      weighting and no penalty division.
+    * ``'l2'`` -- weighted L2 norm of the residual, the legacy ``L2Fitness``
+      core: un-normalised features, the three-way ``weights_internal`` /
+      ``weights_final`` reconstruction, ``g_func`` weighting, and the
+      all-zero penalty division. NO target-scale normalisation.
+    * ``'l2_relative'`` -- ``||target - fit||_2 / ||target||_2``: the L2
+      analogue of WAPE (which is the L1 form of the same relative residual).
+      Like WAPE, no ``g_func`` weighting.
+    * ``'scale_invariant'`` -- the pointwise cancellation residual
+      ``mean_x |sum_k c_k phi_k(x)| / sum_k |c_k phi_k(x)|`` over every term
+      (target + fitted features + intercept). Invariant under multiplying
+      the whole equation by any field ``g(x)`` and under target choice;
+      bounded in [0, 1] by the triangle inequality, so it does NOT reward
+      rewriting ``E = 0`` as the degenerate ``T*E = 0``.
+
+    SOLVER-BASED options (a solver error IS a discrepancy -- it measures
+    the solved field against the data instead of the fitted feature matrix
+    against the target; bodies moved verbatim from the former
+    ``SolverL2Discrepancy`` / ``PICError`` / ``DeepXDEError`` classes):
+
+    * ``'solver_l2'`` -- L2 of (solved field - data), ``g_func``-weighted,
+      plus the PINN residual loss, penalty division on all-zero weights
+      (the legacy ``SolverBasedFitness`` core; named ``solver_l2`` because
+      plain ``'l2'`` is the solver-FREE legacy metric above).
+    * ``'pic'`` -- PIC p-loss: mean squared (solved field - data) weighted
+      by ``g_func`` plus the PINN residual loss, no penalty division.
+    * ``'deepxde'`` -- error of (DeepXDE solution - data) under a
+      configurable inner metric (``error_metric``: 'rmse' default / 'l2' /
+      'mae'); the host packs per-eq masked ``(solution, data)`` pairs and
+      re-syncs ``error_metric`` / ``penalty_coeff`` from its params before
+      each solve (``SolverBasedFitness._apply_deepxde``).
+
+    PROTOCOL: solver-free options are computed as ``compute(equation,
+    ctx: FitContext)`` by ``SolverFreeFitness``; solver options as
+    ``compute(eq, eq_idx, sctx: SolverContext)`` by ``SolverBasedFitness``
+    (``'solver_l2'`` / ``'pic'`` read the full-field ``solution[..., idx]``
+    + the ``tensor_cache`` reference; ``'deepxde'`` reads the per-eq masked
+    pair). ``compute`` dispatches on the call shape and fails loudly when
+    an option is driven through the wrong host.
+
+    Aliases: ``'l2_scaled'`` / ``'l2_rel'`` / ``'residual'`` ->
+    ``'l2_relative'``; ``'scale_inv'`` / ``'sinv'`` / ``'cancellation'`` ->
+    ``'scale_invariant'``. Unknown names raise ``ValueError`` -- this
+    replaces the silent typo-to-WAPE catch-all the strategy switch had.
+
+    Every solver-free option owns the full primary-filler contract
+    (right-part-selection scaffolding): ``needs_sparsity`` is the shared
+    base rule; ``is_degenerate`` branches -- ``'l2'`` keeps its legacy
+    all-zero-``weights_internal`` test (no threshold), the other three use
+    the intercept-excluding test plus the post-fit ``degenerate_threshold``.
+    The RPS hooks are never consulted on solver options (the solver host
+    wires a lightweight solver-free fitness for the RPS term-sweep).
     """
     name = 'discrepancy'
     value_attr = 'fitness_value'
     flag_attr = 'fitness_calculated'
 
-    def needs_sparsity(self, equation, for_rps: bool) -> bool:
-        return bool(for_rps or not getattr(equation, 'weights_internal_evald', False))
+    OPTIONS = ('wape', 'l2', 'l2_relative', 'scale_invariant',
+               'solver_l2', 'pic', 'deepxde')
+    SOLVER_OPTIONS = ('solver_l2', 'pic', 'deepxde')
+    ALIASES = {'l2_scaled': 'l2_relative', 'l2_rel': 'l2_relative',
+               'residual': 'l2_relative', 'scale_inv': 'scale_invariant',
+               'sinv': 'scale_invariant', 'cancellation': 'scale_invariant'}
+
+    def __init__(self, metric: str = None, error_metric: str = 'rmse',
+                 penalty_coeff: float = 0.2):
+        """``Discrepancy()`` -- the normal construction -- carries NO metric:
+        the option is resolved at compute time from
+        ``epde.globals.resolve_discrepancy_metric()``, which ``EpdeSearch``
+        writes from its own configuration. An explicit ``metric`` is
+        INTERNAL wiring only, for hosts whose metric is fixed by their role
+        (the RPS-sweep's ``'l2_relative'`` lightweight fitness; the solver
+        branch's backend-implied ``'solver_l2'`` / ``'deepxde'``)."""
+        if metric is not None:
+            metric = self.ALIASES.get(metric, metric)
+            if metric not in self.OPTIONS:
+                raise ValueError(
+                    f'discrepancy metric must be one of {self.OPTIONS} '
+                    f'(or aliases {tuple(self.ALIASES)}); got {metric!r}')
+        self.metric = metric
+        # 'deepxde'-option inner state (the host re-syncs both from its
+        # params before each solve); harmless carried on other options.
+        self.error_metric = error_metric
+        self.penalty_coeff = penalty_coeff
+
+    def _resolved_metric(self) -> str:
+        """Instance override if wired, else the search-level configuration."""
+        return (self.metric if self.metric is not None
+                else global_var.resolve_discrepancy_metric())
+
+    # needs_sparsity: the shared base ``for_rps or not weights_internal_evald``
+    # rule (the legacy L2Discrepancy override was identical to the base). In
+    # MOEA/D the in-place pass always has weights_internal_evald=True (RPS set
+    # it); in single-objective mode the ``not weights_internal_evald`` clause
+    # lets the in-place fitness trigger sparsity itself -- and also repairs
+    # the latent L2LRFitness crash when an RPS-exhausted equation arrived
+    # unfitted.
 
     def is_degenerate(self, equation) -> bool:
-        return bool(np.all(equation.weights_internal == 0))
+        if self._resolved_metric() == 'l2':
+            # Legacy L2Fitness contract: all-zero weights only, no threshold.
+            return bool(np.all(equation.weights_internal == 0))
+        return _degenerate_excluding_intercept(self, equation)
 
-    def compute(self, equation, ctx: FitContext) -> float:
+    def compute(self, equation, *args) -> float:
+        """Protocol-dispatching compute.
+
+        Solver-free options: ``compute(equation, ctx: FitContext)`` (the
+        ``SolverFreeFitness`` filler-loop shape). Solver options:
+        ``compute(eq, eq_idx: int, sctx: SolverContext)`` (the
+        ``SolverBasedFitness`` per-equation shape). A mismatch means the
+        option was wired to the wrong host -- fail loudly.
+        """
+        metric = self._resolved_metric()
+        if metric in self.SOLVER_OPTIONS:
+            if len(args) != 2:
+                raise TypeError(
+                    f"solver discrepancy option {metric!r} is computed "
+                    "as compute(eq, eq_idx, sctx) by SolverBasedFitness; it "
+                    "cannot serve a solver-free host")
+            eq_idx, sctx = args
+            return getattr(self, f'_compute_{metric}')(equation, eq_idx, sctx)
+        if len(args) != 1:
+            raise TypeError(
+                f"solver-free discrepancy option {metric!r} is computed "
+                "as compute(equation, ctx) by SolverFreeFitness; it cannot "
+                "serve a solver host")
+        return getattr(self, f'_compute_{metric}')(equation, args[0])
+
+    def _compute_wape(self, equation, ctx: FitContext) -> float:
+        # L2LRFitness used un-normalised features only on the RPS sweep
+        # (force_out_of_place), normalised features for the in-place pass.
+        normalize = not ctx.for_rps
+        _, target, features = equation.evaluate(normalize=normalize, return_val=False)
+        if features is None:
+            discr = target - target.mean()
+        else:
+            coefs, intercept = _extract_coefs_intercept(equation)
+            discr = target - (np.dot(features, coefs) + intercept)
+        rl_error = np.sum(np.abs(discr)) / np.sum(np.abs(target))
+        return float(rl_error)
+
+    def _compute_l2(self, equation, ctx: FitContext) -> float:
         _, target, features = equation.evaluate(normalize=False, return_val=False)
         if features is None:
             discr_feats = 0
@@ -138,9 +294,8 @@ class L2Discrepancy(EquationObjective):
         # coherent only under the LASSOSparsity pairing, whose weights_final
         # always carries a trailing intercept slot (nnz+1, even when 0.0).
         # VWSRSparsity drops a zero intercept (weights_final is then
-        # nnz-length); its fillers (WAPE/ScaleInvariant/L2Relative) branch on
-        # the ``weights_internal[-1]`` presence flag instead. Pinned by
-        # TestSparsityWeightsFinalConventions.
+        # nnz-length); the other options branch on the ``weights_internal[-1]``
+        # presence flag instead. Pinned by TestSparsityWeightsFinalConventions.
         discr = (discr_feats + np.full(target.shape, equation.weights_final[-1]) - target)
         g = ctx.g_fun_vals
         if g is not None and getattr(g, 'shape', None) == discr.shape:
@@ -152,67 +307,21 @@ class L2Discrepancy(EquationObjective):
             fitness_value /= ctx.penalty_coeff
         return float(fitness_value)
 
-
-class WAPEDiscrepancy(EquationObjective):
-    """Normalised absolute residual (WAPE), the ``L2LRFitness`` core.
-
-    ``sum|target - fit| / sum|target|``. Reproduces ``L2LRFitness.apply``:
-    normalised features in-place, un-normalised during the RPS sweep, the
-    ``weights_internal[-1]`` intercept-presence test, no ``g_func``
-    weighting and no penalty division.
-    """
-    name = 'discrepancy'
-    value_attr = 'fitness_value'
-    flag_attr = 'fitness_calculated'
-
-    # needs_sparsity: inherits the base ``for_rps or not weights_internal_evald``.
-    # In MOEA/D the in-place pass always has weights_internal_evald=True (RPS
-    # set it), so this is equivalent to the legacy L2LRFitness "sparsity only
-    # on the RPS sweep" behaviour. In single-objective mode (RandomRHPSelector
-    # never runs sparsity) the ``not weights_internal_evald`` clause lets the
-    # in-place fitness trigger sparsity itself -- and also repairs the latent
-    # L2LRFitness crash when an RPS-exhausted equation arrived unfitted.
-
-    is_degenerate = _degenerate_excluding_intercept
-
-    def compute(self, equation, ctx: FitContext) -> float:
-        # L2LRFitness used un-normalised features only on the RPS sweep
-        # (force_out_of_place), normalised features for the in-place pass.
+    def _compute_l2_relative(self, equation, ctx: FitContext) -> float:
         normalize = not ctx.for_rps
         _, target, features = equation.evaluate(normalize=normalize, return_val=False)
+        target = np.asarray(target, dtype=float)
         if features is None:
             discr = target - target.mean()
         else:
             coefs, intercept = _extract_coefs_intercept(equation)
             discr = target - (np.dot(features, coefs) + intercept)
-        rl_error = np.sum(np.abs(discr)) / np.sum(np.abs(target))
-        return float(rl_error)
+        den = float(np.linalg.norm(target))
+        if den <= 0.0:
+            return float(LOSS_NAN_VAL)
+        return float(np.linalg.norm(discr) / den)
 
-
-class ScaleInvariantDiscrepancy(EquationObjective):
-    """Scale-invariant discrepancy: the pointwise cancellation residual
-
-        mean_x  |sum_k c_k phi_k(x)|  /  sum_k |c_k phi_k(x)|
-
-    summed over every term of the equation (target + fitted features + intercept).
-    Unlike WAPE (``sum|target-fit| / sum|target|``) this is invariant under
-    multiplying the whole equation by any field ``g(x)`` -- numerator and
-    denominator both pick up ``|g(x)|`` pointwise and it cancels -- and under
-    target choice (the term *set* is the same whichever term is the right part).
-    Bounded in [0, 1] by the triangle inequality, so it does NOT reward rewriting
-    ``E = 0`` as the degenerate ``T*E = 0``.
-
-    Reconstructs ``(coefs, intercept)`` from ``weights_final`` exactly as
-    ``WAPEDiscrepancy`` (same ``weights_internal[-1]`` intercept test and the same
-    ``normalize = not for_rps`` term set), so it is a drop-in primary filler.
-    """
-    name = 'discrepancy'
-    value_attr = 'fitness_value'
-    flag_attr = 'fitness_calculated'
-
-    is_degenerate = _degenerate_excluding_intercept
-
-    def compute(self, equation, ctx: FitContext) -> float:
+    def _compute_scale_invariant(self, equation, ctx: FitContext) -> float:
         normalize = not ctx.for_rps
         _, target, features = equation.evaluate(normalize=normalize, return_val=False)
         if features is None:
@@ -225,20 +334,63 @@ class ScaleInvariantDiscrepancy(EquationObjective):
         rho = np.abs(resid) / term_mass
         return float(np.mean(rho))
 
+    # -- solver-based options (SolverBasedFitness per-equation protocol) -- #
+
+    def _compute_solver_l2(self, eq, eq_idx, sctx):
+        if _loss_is_nan(sctx.loss_add):
+            return 2 * LOSS_NAN_VAL
+        ref = global_var.tensor_cache.get((eq.main_var_to_explain, (1.0,)))
+        sol = sctx.solution[..., eq_idx]
+        discr = sol - ref.reshape(sol.shape)
+        discr = np.multiply(discr, sctx.g_fun_vals.reshape(discr.shape))
+        rl_error = np.linalg.norm(discr, ord=2)
+        fitness = rl_error + sctx.pinn_loss_mult * float(sctx.loss_add)
+        if np.sum(eq.weights_final) == 0:
+            fitness /= sctx.penalty_coeff
+        return float(fitness)
+
+    def _compute_pic(self, eq, eq_idx, sctx):
+        if _loss_is_nan(sctx.loss_add):
+            return 2 * LOSS_NAN_VAL
+        ref = global_var.tensor_cache.get((eq.main_var_to_explain, (1.0,)))
+        sol = sctx.solution[..., eq_idx]
+        discr = sol - ref.reshape(sol.shape)
+        discr = np.multiply(discr, sctx.g_fun_vals.reshape(discr.shape))
+        rl_error = np.mean(discr ** 2)
+        return float(rl_error + sctx.pinn_loss_mult * float(sctx.loss_add))
+
+    def _compute_deepxde(self, eq, eq_idx, sctx):
+        # sctx.solution[eq_idx] = masked solution, sctx.g_fun_vals[eq_idx] =
+        # masked data (packed by SolverBasedFitness's deepxde branch).
+        masked_solution = sctx.solution[eq_idx]
+        masked_data = sctx.g_fun_vals[eq_idx]
+        metric = self.error_metric
+        if metric == 'l2':
+            err = np.linalg.norm(masked_solution - masked_data, ord=2)
+        elif metric == 'mae':
+            err = np.mean(np.abs(masked_solution - masked_data))
+        else:  # 'rmse' default
+            err = np.sqrt(np.mean((masked_solution - masked_data) ** 2))
+        if np.sum(eq.weights_final) == 0:
+            err /= self.penalty_coeff
+        return float(err)
+
 
 class Instability(EquationObjective):
     """The instability objective, dispatching on the estimator selected by
     ``epde.globals.resolve_instability_metric()``:
 
-    * ``'vcoef'`` (default under ``gram_mode='vcoef'``): fast path sums the
-      per-term ``_cached_vc_score`` produced by ``PhysicsInformedLasso``
-      (``VWSRSparsity``); fallback (LASSO path, no cache) is
-      ``vc_stability_total_lr``.
-    * ``'cv'`` (default under ``gram_mode='axis'``): axis-aligned
-      sliding-window CV via ``calculate_weights``.
-    * ``'survival'`` / ``'tile'``: the block-based estimators from
-      ``epde.operators.common.survival``, memoized per equation as
-      ``_cached_alt_instability = (metric, value)``.
+    * ``'vcoef'``: fast path sums the per-term ``_cached_vc_score``
+      produced by ``PhysicsInformedLasso`` (``VWSRSparsity``); fallback
+      (LASSO path, no cache) is ``vc_stability_total_lr``.
+    * ``'cv'``: axis-aligned sliding-window CV via ``calculate_weights``.
+    * ``'survival'`` / ``'tile'`` / ``'het'`` / ``'chi2'``: the estimators
+      from ``epde.operators.common.survival`` (``'het'`` = Q-calibrated
+      excess-variance heterogeneity, tau^2/(tau^2+mean^2); ``'chi2'`` =
+      per-term Nyblom-Hansen cumulative-score-path constancy: global-OLS
+      Theta, one path per grid axis, each bulge measured against the
+      term's own signal energy -- the resolver DEFAULT), memoized per
+      equation as ``_cached_alt_instability = (metric, value)``.
 
     The estimator choice affects ONLY this objective; the sparsity
     keep-rule keeps following ``gram_mode``. Fails loudly: any exception
@@ -255,7 +407,7 @@ class Instability(EquationObjective):
             cached = getattr(equation, '_cached_vc_score', None)
             if cached is not None:
                 return float(np.sum(cached))
-        elif metric in ('survival', 'tile'):
+        elif metric in ('survival', 'tile', 'het', 'chi2'):
             cached = getattr(equation, '_cached_alt_instability', None)
             if cached is not None and cached[0] == metric:
                 return float(cached[1])
@@ -269,8 +421,9 @@ class Instability(EquationObjective):
                 features, target, ctx.g_fun_vals, data_shape,
                 main_var=equation.main_var_to_explain,
                 fit_intercept=fit_intercept))
-        if metric in ('survival', 'tile'):
-            estimator = survival_scores if metric == 'survival' else tile_scores
+        if metric in ('survival', 'tile', 'het', 'chi2'):
+            estimator = {'survival': survival_scores, 'tile': tile_scores,
+                         'het': heterogeneity_scores, 'chi2': chi2_scores}[metric]
             scores = estimator(features, target, ctx.g_fun_vals, data_shape,
                                fit_intercept=fit_intercept)
             value = float(np.sum(scores))
@@ -291,45 +444,55 @@ class Instability(EquationObjective):
         return float(np.sum(np.nan_to_num(cv)) / len(data_shape))
 
 
-class L2RelativeDiscrepancy(EquationObjective):
-    """L2 relative residual -- an L2 analogue of :class:`WAPEDiscrepancy`,
-    selectable as a primary ``discrepancy_metric`` alongside ``'wape'`` and
-    ``'scale_invariant'``:
+class Complexity(EquationObjective):
+    """The COMPLEXITY objective family: parsimony of the fitted structure,
+    with the option selected per instance (or, when constructed without one,
+    from the process-level ``epde.globals.complexity_metric``).
 
-        ||target - sum_j c_j phi_j||_2 / ||target||_2
+    Options:
 
-    WAPE is the L1 (``sum|.| / sum|.|``) form of the same relative residual;
-    this is the L2 (Euclidean-norm) form. ``L2Discrepancy`` computes the same
-    residual norm but WITHOUT the ``/ ||target||`` normalisation (and weights it
-    by ``g_func``); this one normalises by the right-part norm and -- like WAPE /
-    ScaleInvariant -- does not ``g_func``-weight.
+    * ``'factors'`` (the unset default) -- the legacy factor-count: 0.5 per
+      non-derivative factor, derivative order per derivative factor, summed
+      over the target term and every non-zero-weight term. Bit-compatible
+      with every existing legacy-pipeline artifact (known quirks included --
+      see ``complexity_deriv``).
+    * ``'terms'`` -- active-term count: non-zero non-target
+      ``weights_internal`` slots + 1 when the fitted intercept is non-zero,
+      UNIFORM across the LASSO / VWSR sparsity pairings (see
+      ``_terms_of_equation``).
 
-    A primary discrepancy filler: it owns the right-part-selection scaffolding
-    (un-normalised term set during the ``force_out_of_place`` sweep, normalised
-    in-place; ``is_degenerate`` on the ``weights_internal[:-1]`` all-zero test
-    and the post-fit ``degenerate_threshold``) exactly as
-    :class:`WAPEDiscrepancy`, so it can drive ``EqRightPartSelector`` and the
-    Pareto quality axis as a drop-in for WAPE.
+    A non-primary filler like :class:`Instability` (the RPS scaffolding
+    hooks are never consulted on it). ``stamped_on_failure = False``: the
+    value is deterministic from structure + weights and carries no fit
+    information, so neither host failure stamp touches it -- matching the
+    pre-filler behavior where the lazy Pareto reader reported the true
+    count for degenerate and RPS-exhausted forms alike.
     """
-    name = 'discrepancy'
-    value_attr = 'fitness_value'
-    flag_attr = 'fitness_calculated'
+    name = 'complexity'
+    value_attr = 'complexity_value'
+    flag_attr = 'complexity_calculated'
+    stamped_on_failure = False
 
-    is_degenerate = _degenerate_excluding_intercept
+    OPTIONS = ('factors', 'terms')
+
+    def __init__(self, metric: str = None):
+        if metric is not None and metric not in self.OPTIONS:
+            raise ValueError(
+                f'complexity metric must be one of {self.OPTIONS} or None '
+                f'(= follow globals.complexity_metric); got {metric!r}')
+        self.metric = metric
 
     def compute(self, equation, ctx: FitContext) -> float:
-        normalize = not ctx.for_rps
-        _, target, features = equation.evaluate(normalize=normalize, return_val=False)
-        target = np.asarray(target, dtype=float)
-        if features is None:
-            discr = target - target.mean()
-        else:
-            coefs, intercept = _extract_coefs_intercept(equation)
-            discr = target - (np.dot(features, coefs) + intercept)
-        den = float(np.linalg.norm(target))
-        if den <= 0.0:
-            return float(LOSS_NAN_VAL)
-        return float(np.linalg.norm(discr) / den)
+        # Local import: the per-equation cores live in eq_mo_objectives (the
+        # readers' module), which main_structures also imports locally -- the
+        # same cycle-dodging idiom.
+        from epde.eq_mo_objectives import (_complexity_of_equation,
+                                           _terms_of_equation)
+        metric = (self.metric if self.metric is not None
+                  else global_var.resolve_complexity_metric())
+        if metric == 'terms':
+            return float(_terms_of_equation(equation))
+        return float(_complexity_of_equation(equation))
 
 
 # --------------------------------------------------------------------------- #
@@ -358,83 +521,8 @@ def _loss_is_nan(loss_add) -> bool:
         return False
 
 
-class SolverObjective:
-    """Base class for a solver-based objective filler."""
-    name = 'objective'
-    value_attr = 'fitness_value'
-    flag_attr = 'fitness_calculated'
-
-    def compute(self, eq, eq_idx: int, sctx: SolverContext) -> float:
-        raise NotImplementedError
-
-
-class SolverL2Discrepancy(SolverObjective):
-    """L2 of (solved field - data), weighted by ``g_func``, plus the PINN
-    residual loss (the legacy ``SolverBasedFitness`` core)."""
-    name = 'discrepancy'
-    value_attr = 'fitness_value'
-    flag_attr = 'fitness_calculated'
-
-    def compute(self, eq, eq_idx, sctx):
-        if _loss_is_nan(sctx.loss_add):
-            return 2 * LOSS_NAN_VAL
-        ref = global_var.tensor_cache.get((eq.main_var_to_explain, (1.0,)))
-        sol = sctx.solution[..., eq_idx]
-        discr = sol - ref.reshape(sol.shape)
-        discr = np.multiply(discr, sctx.g_fun_vals.reshape(discr.shape))
-        rl_error = np.linalg.norm(discr, ord=2)
-        fitness = rl_error + sctx.pinn_loss_mult * float(sctx.loss_add)
-        if np.sum(eq.weights_final) == 0:
-            fitness /= sctx.penalty_coeff
-        return float(fitness)
-
-
-class PICError(SolverObjective):
-    """PIC p-loss: mean squared (solved field - data) weighted by ``g_func``
-    plus the PINN residual loss (the legacy ``PIC`` p-loss core)."""
-    name = 'discrepancy'
-    value_attr = 'fitness_value'
-    flag_attr = 'fitness_calculated'
-
-    def compute(self, eq, eq_idx, sctx):
-        if _loss_is_nan(sctx.loss_add):
-            return 2 * LOSS_NAN_VAL
-        ref = global_var.tensor_cache.get((eq.main_var_to_explain, (1.0,)))
-        sol = sctx.solution[..., eq_idx]
-        discr = sol - ref.reshape(sol.shape)
-        discr = np.multiply(discr, sctx.g_fun_vals.reshape(discr.shape))
-        rl_error = np.mean(discr ** 2)
-        return float(rl_error + sctx.pinn_loss_mult * float(sctx.loss_add))
-
-
-class DeepXDEError(SolverObjective):
-    """Error of (DeepXDE solution - data) under a configurable metric
-    (the legacy ``DeepXDEBasedFitness._compute_error`` core).
-
-    The host supplies, per equation, an already-masked ``(solution, data)``
-    pair on ``sctx`` via the special ``solution`` carrying the masked
-    solution and ``g_fun_vals`` carrying the masked target.
-    """
-    name = 'discrepancy'
-    value_attr = 'fitness_value'
-    flag_attr = 'fitness_calculated'
-
-    def __init__(self, error_metric: str = 'rmse', penalty_coeff: float = 0.2):
-        self.error_metric = error_metric
-        self.penalty_coeff = penalty_coeff
-
-    def compute(self, eq, eq_idx, sctx):
-        # sctx.solution[eq_idx] = masked solution, sctx.g_fun_vals[eq_idx] =
-        # masked data (packed by SolverBasedFitness's deepxde branch).
-        masked_solution = sctx.solution[eq_idx]
-        masked_data = sctx.g_fun_vals[eq_idx]
-        metric = self.error_metric
-        if metric == 'l2':
-            err = np.linalg.norm(masked_solution - masked_data, ord=2)
-        elif metric == 'mae':
-            err = np.mean(np.abs(masked_solution - masked_data))
-        else:  # 'rmse' default
-            err = np.sqrt(np.mean((masked_solution - masked_data) ** 2))
-        if np.sum(eq.weights_final) == 0:
-            err /= self.penalty_coeff
-        return float(err)
+# The solver-based discrepancy options live INSIDE the ``Discrepancy``
+# family above (``'solver_l2'`` / ``'pic'`` / ``'deepxde'``); this section
+# keeps only the solver context/plumbing shared with the hosts. The former
+# ``SolverObjective`` base and its three subclasses are gone -- a solver
+# error is a discrepancy.

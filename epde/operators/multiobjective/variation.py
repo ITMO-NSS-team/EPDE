@@ -14,45 +14,37 @@ Created on Wed Jun  2 15:43:19 2021
 
 @author: mike_ubuntu
 """
-import random
-from ast import operator
-from operator import eq
 import numpy as np
 from copy import deepcopy
 
 from functools import partial
 
-from epde.structure.structure_template import check_uniqueness
 from epde.optimizers.moeadd.moeadd import ParetoLevels
 
-from epde.decorators import HistoryExtender, ResetEquationStatus
+from epde.decorators import HistoryExtender
 
 from epde.operators.utils.template import CompoundOperator, add_base_param_to_operator
-from epde.operators.multiobjective.moeadd_specific import get_basic_populator_updater
-from epde.operators.multiobjective.mutations import get_basic_mutation
 
 from epde import _loop_stats
 
 
 class ParetoLevelsCrossover(CompoundOperator):
     """
-    The crossover operator, combining parameter crossover for terms with same 
-    factors but different parameters & full exchange of terms between the 
-    completely different ones.
-    
+    Population-level crossover driver for the MOEA/DD loop.
+
+    Builds the mating pool from each solution's ``crossover_times()``
+    counter (incremented by selection), shuffles and pairs it, deepcopies
+    every pair (establishing the ownership contract for the hierarchy
+    below), runs the ``chromosome_crossover`` suboperator on each pair and
+    stores the offspring in ``objective.unplaced_candidates`` for
+    ``OffspringUpdater`` to consume.
+
     Noteable attributes:
     -----------
     suboperators : dict
-        Inhereted from the Specific_Operator class. 
-        Suboperators, performing tasks of parent selection, parameter crossover, full terms crossover, calculation of weights for each terms & 
-        fitness function calculation. Dictionary: keys - strings from 'Selection', 'Param_crossover', 'Term_crossover', 'Coeff_calc', 'Fitness_eval'.
-        values - corresponding operators (objects of Specific_Operator class).
-
-    Methods:
-    -----------
-    apply(population)
-        return the new population, created with the noted operators and containing both parent individuals and their offsprings.    
-    copy_properties_to
+        Single entry ``'chromosome_crossover'`` (ChromosomeCrossover),
+        which per equation gene either swaps the gene wholesale between
+        the offspring or recombines it via EquationCrossover.
     """
     key = 'ParetoLevelsCrossover'
 
@@ -129,7 +121,7 @@ class ChromosomeCrossover(CompoundOperator):
         # crossover. Ref-swap is safe: both offspring are already
         # exclusive deepcopies (see module ownership contract).
         for eq_key in eqs_keys:
-            if len(eqs_keys) > 1 and random.random() < self.params['equation_exchange_prob']:
+            if len(eqs_keys) > 1 and np.random.random() < self.params['equation_exchange_prob']:
                 temp_eq = offspring_1.vals[eq_key]
                 offspring_1.vals.replace_gene(gene_key = eq_key, value = offspring_2.vals[eq_key])
                 offspring_2.vals.replace_gene(gene_key = eq_key, value = temp_eq)
@@ -424,6 +416,11 @@ class TermParamCrossover(CompoundOperator):
         if len(objective[0].structure) != len(objective[1].structure):
             print([(token.label, token.params) for token in objective[0].structure], [(token.label, token.params) for token in objective[1].structure])
             raise Exception('Wrong terms passed:')
+        # ``dim_param_idx`` deliberately persists across tokens: once any token
+        # binds it (a real 'dim' entry or the power fallback below), later
+        # tokens without a 'dim' param keep the stale index. Load-bearing
+        # legacy semantics -- do not reset per token.
+        dim_param_idx = None
         for term1_token_idx in np.arange(len(objective[0].structure)):
             term2_token_idx = [i for i in np.arange(len(objective[1].structure)) 
                                if objective[1].structure[i].label == objective[0].structure[term1_token_idx].label][0]
@@ -431,9 +428,7 @@ class TermParamCrossover(CompoundOperator):
                 if param_descr['name'] == 'power': power_param_idx = param_idx
                 if param_descr['name'] == 'dim': dim_param_idx = param_idx
             
-            try:                # TODO: refactor logic
-                dim_param_idx
-            except:
+            if dim_param_idx is None:
                 dim_param_idx = power_param_idx
 
             for param_idx in np.arange(objective[0].structure[term1_token_idx].params.size):

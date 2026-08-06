@@ -3,9 +3,7 @@ from epde.operators.common.sparsity import LASSOSparsity
 from epde.operators.utils.operator_mappers import map_operator_between_levels
 from epde.operators.utils.template import CompoundOperator
 from epde.operators.common.fitness import SolverFreeFitness, SolverBasedFitness
-from epde.operators.common.objectives import (
-    WAPEDiscrepancy, Instability, PICError, DeepXDEError,
-)
+from epde.operators.common.objectives import Discrepancy, Instability
 
 
 class FitnessOperatorFactory:
@@ -23,22 +21,22 @@ class FitnessOperatorFactory:
     @staticmethod
     def create(name: str, params: dict) -> CompoundOperator:
         if name == 'L2LRFitness':
-            disc = WAPEDiscrepancy()
+            disc = Discrepancy('wape')
             operator = SolverFreeFitness(list(params.keys()),
                                          objectives=[disc, Instability()], primary=disc)
             sparsity = LASSOSparsity()
             coeff_calc = LinRegBasedCoeffsEquation()
         elif name == 'PIC':
-            primary = PICError()
+            primary = Discrepancy('pic')
             operator = SolverBasedFitness(list(params.keys()), objectives=[primary],
-                                          primary=primary, stability=Instability(),
+                                          primary=primary, instability=Instability(),
                                           backend='autograd', masked=True)
             sparsity = map_operator_between_levels(LASSOSparsity(), 'gene level', 'chromosome level')
             coeff_calc = map_operator_between_levels(LinRegBasedCoeffsEquation(), 'gene level', 'chromosome level')
         elif name == 'DeepXDEBasedFitness':
-            primary = DeepXDEError()
+            primary = Discrepancy('deepxde')
             operator = SolverBasedFitness(list(params.keys()), objectives=[primary],
-                                          primary=primary, stability=Instability(),
+                                          primary=primary, instability=Instability(),
                                           backend='deepxde')
             sparsity = LASSOSparsity()
             coeff_calc = LinRegBasedCoeffsEquation()

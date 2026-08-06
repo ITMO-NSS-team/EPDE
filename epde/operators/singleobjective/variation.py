@@ -22,8 +22,6 @@ from epde.supplementary import detect_similar_terms, flatten
 from epde.decorators import HistoryExtender, ResetEquationStatus
 
 from epde.operators.utils.template import CompoundOperator, add_base_param_to_operator
-from epde.operators.multiobjective.moeadd_specific import get_basic_populator_updater
-from epde.operators.multiobjective.mutations import get_basic_mutation
 
 
 class PopulationLevelCrossover(CompoundOperator):

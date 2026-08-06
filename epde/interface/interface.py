@@ -13,6 +13,7 @@ such as initialization of neccessary token families and derivatives calculation.
 """
 import inspect
 import pickle
+import warnings
 import numpy as np
 import torch
 
@@ -242,7 +243,8 @@ class EpdeSearch(object):
                  pivotal_tensor_label=None, pruner=None, threshold: float = 1e-2,
                  division_fractions=3, rectangular: bool = True,
                  params_filename: str = None, device: str = 'cpu',
-                 discrepancy_metric: str = 'wape', sparsity_cls=None):
+                 discrepancy_metric: str = None, sparsity_cls=None,
+                 solver_backend: str = 'autograd'):
         """
         Args:
             multiobjective_mode (`bool`): optional, default True
@@ -264,6 +266,11 @@ class EpdeSearch(object):
                 Boundary width for the domain. Boundary points will be ignored for the purposes of equation discovery
             use_solver (`bool`): optional
                 Allow use of the automaic partial differential solver to evaluate fitness of the candidate solutions.
+            solver_backend (`str`): optional, default ``'autograd'``
+                Backend for the solver-based fitness (only used with ``use_solver=True``): ``'autograd'``
+                (primary discrepancy ``'solver_l2'``) or ``'deepxde'`` (primary discrepancy ``'deepxde'``).
+                Independent of ``use_pic``, which ONLY selects the second objective (instability in place
+                of the baseline complexity).
             verbose_params (`dict`): optional
                 Description, of algorithm details, that will be demonstrated to the user. Usual
             coordinate_tensors (`list of np.ndarrays`): optional
@@ -293,7 +300,22 @@ class EpdeSearch(object):
         self._device = device
         self.multiobjective_mode = multiobjective_mode
         self._use_pic = use_pic
-        self._discrepancy_metric = discrepancy_metric
+        if use_solver and not multiobjective_mode:
+            raise ValueError('use_solver=True requires multiobjective_mode=True: '
+                             'single-objective mode has no solver-based fitness path.')
+        if solver_backend not in ('autograd', 'deepxde'):
+            raise ValueError(f'Unknown solver_backend {solver_backend!r}: '
+                             "expected 'autograd' or 'deepxde'.")
+        self._solver_backend = solver_backend
+        # Objectives BUILD FROM the search configuration: the kwarg is
+        # written to the process-level global here, and the bare
+        # ``Discrepancy()`` fillers resolve it at compute time (the
+        # Instability/Complexity convention). None = leave the global as-is
+        # (unset -> 'wape'), so a user-set global survives default
+        # construction. Last-constructed search wins -- the standing
+        # process-global trade-off (same as gram_mode).
+        if discrepancy_metric is not None:
+            global_var.set_discrepancy_metric(discrepancy_metric)
 
         global_var.set_time_axis(time_axis)
         global_var.init_verbose(**verbose_params)
@@ -319,14 +341,20 @@ class EpdeSearch(object):
         elif director is None and use_default_strategy:
             if self.multiobjective_mode:
                 self.director = MOEADDDirector()
-                builder = StrategyBuilder(MOEADDSectorProcesser)
+                self.director.builder = StrategyBuilder(MOEADDSectorProcesser)
+                self.director.use_baseline(use_solver=self._mode_info['solver_fitness'],
+                                           use_pic=self._use_pic, params=director_params,
+                                           sparsity_cls=sparsity_cls,
+                                           solver_backend=self._solver_backend)
             else:
                 self.director = BaselineDirector()
-                builder = StrategyBuilder(EvolutionaryStrategy)
-            self.director.builder = builder
-            self.director.use_baseline(use_solver=self._mode_info['solver_fitness'],
-                                       use_pic=self._use_pic, params=director_params,
-                                       discrepancy_metric=discrepancy_metric, sparsity_cls=sparsity_cls)
+                self.director.builder = StrategyBuilder(EvolutionaryStrategy)
+                # use_solver / use_pic are multiobjective-only concepts: passed
+                # here they would fall into ``**kwargs``, which doubles as the
+                # operator-parameter override dict (and the constructor guard
+                # above already rejects use_solver=True in this mode).
+                self.director.use_baseline(params=director_params,
+                                           sparsity_cls=sparsity_cls)
         else:
             raise NotImplementedError('Wrong arguments passed during the epde search initialization')
 
@@ -722,6 +750,11 @@ class EpdeSearch(object):
                 global_var.reset_data_repr_nn(data = data, derivs = base_derivs, train = False, 
                                               grids = grid, predefined_ann = data_nn, device = self._device)
             else:
+                warnings.warn('use_solver=True, but no pretrained data_nn was passed: no '
+                              'data-representation ANN is set up (in-place training is '
+                              'currently disabled), so solver-based fitness runs without '
+                              'one. Pass data_nn= or call global_var.reset_data_repr_nn '
+                              'before fit.', stacklevel=2)
                 epochs_max = 1e5 # 1e4
                 # global_var.reset_data_repr_nn(data = data, derivs = base_derivs, epochs_max=ann_epochs_max,
                 #                               grids = grid, predefined_ann = None, device = self._device,
@@ -882,11 +915,25 @@ class EpdeSearch(object):
 
 
     @staticmethod
+    def _resolve_ideal_point(use_pic: bool) -> list:
+        """MOEA/D utopia point for the strictly-2-axis front (lockstep site
+        #3 of the selectable second axis): discrepancy-ideal 0 plus the
+        second axis' ideal. Instability's ideal is 0. Legacy 'factors'
+        complexity keeps its historical ideal of 1. (the target term alone
+        scores >= 0.5, so 1.0 is achievable-adjacent -- bit-compat); a
+        'terms' count can genuinely reach 0, and a utopia point ABOVE an
+        achievable objective value breaks the PBI dominance assumption, so
+        'terms' gets 0."""
+        if global_var.resolve_second_objective(use_pic) == 'instability':
+            return [0., 0.]
+        return [0., 1.] if global_var.resolve_complexity_metric() == 'factors' else [0., 0.]
+
+    @staticmethod
     def _create_optimizer(multiobjective_mode: bool, optimizer_init_params: dict,
                           opt_strategy_director: OptimizationPatternDirector,
                           population: List[SoEq] = None, use_pic: bool = False):
         if multiobjective_mode:
-            best_sol_vals = [0., 0.] if use_pic else [0., 1.]
+            best_sol_vals = EpdeSearch._resolve_ideal_point(use_pic)
             optimizer_init_params['best_sol_vals'] = best_sol_vals
             optimizer_init_params['passed_population'] = population
             optimizer = MOEADDOptimizer(**optimizer_init_params)
@@ -1169,8 +1216,10 @@ class EpdeMultisample(EpdeSearch):
                  time_axis: int = 0, function_form=None, boundary: int = 0, 
                  use_solver: bool = False, verbose_params: dict = {'show_iter_idx' : True},
                  memory_for_cache=5, prune_domain: bool = False, 
-                 pivotal_tensor_label=None, pruner=None, threshold: float = 1e-2, 
-                 division_fractions=3, rectangular: bool = True, params_filename: str = None):
+                 pivotal_tensor_label=None, pruner=None, threshold: float = 1e-2,
+                 division_fractions=3, rectangular: bool = True, params_filename: str = None,
+                 use_pic=True, discrepancy_metric: str = None, sparsity_cls=None,
+                 solver_backend: str = 'autograd'):
         """
         Args:
             use_default_strategy (`bool`): optional
@@ -1209,14 +1258,19 @@ class EpdeMultisample(EpdeSearch):
             rectangular(`bool`): optional
                 A line of subdomains along an axis can be removed if all values inside them are identical to zero.
         """
-        super().__init__(multiobjective_mode = multiobjective_mode, use_default_strategy = use_default_strategy, 
+        # ``use_pic`` / ``discrepancy_metric`` / ``sparsity_cls`` used to be
+        # omitted here, so every multisample search silently ran the defaults
+        # (True / 'wape' / VWSR) regardless of what the caller wanted.
+        super().__init__(multiobjective_mode = multiobjective_mode, use_default_strategy = use_default_strategy,
                          director = director, director_params = director_params, time_axis = time_axis,
-                         define_domain = False, function_form = function_form, boundary = boundary, 
+                         define_domain = False, function_form = function_form, boundary = boundary,
                          use_solver = use_solver, verbose_params = verbose_params,
-                         coordinate_tensors = None, memory_for_cache = memory_for_cache, prune_domain = prune_domain, 
-                         pivotal_tensor_label = pivotal_tensor_label, pruner = pruner, threshold = threshold, 
-                         division_fractions = division_fractions, rectangular = rectangular, 
-                         params_filename = params_filename)
+                         coordinate_tensors = None, memory_for_cache = memory_for_cache, prune_domain = prune_domain,
+                         pivotal_tensor_label = pivotal_tensor_label, pruner = pruner, threshold = threshold,
+                         division_fractions = division_fractions, rectangular = rectangular,
+                         params_filename = params_filename, use_pic = use_pic,
+                         discrepancy_metric = discrepancy_metric, sparsity_cls = sparsity_cls,
+                         solver_backend = solver_backend)
         self._memory_for_cache = memory_for_cache
         self._boundary = boundary
         self._function_form = function_form
@@ -1465,11 +1519,16 @@ class EpdeMultisample(EpdeSearch):
 
         self.optimizer_init_params['population_instruct'] = {"pool": self.pool, "terms_number": equation_terms_max_number,
                                                              "max_factors_in_term": equation_factors_max_number,
-                                                             "sparsity_interval": eq_sparsity_interval}
-        
+                                                             "sparsity_interval": eq_sparsity_interval,
+                                                             "use_pic": self._use_pic}
+
         if optimizer is None:
-            self.optimizer = self._create_optimizer(self.multiobjective_mode, self.optimizer_init_params, 
-                                                    self.director)
+            # ``use_pic`` must reach the optimizer constructor, or
+            # ``_resolve_ideal_point`` falls back to its ``False`` default and
+            # a PIC multisample search aims at the complexity utopia [0., 1.]
+            # while its fillers compute instability (axes desync).
+            self.optimizer = self._create_optimizer(self.multiobjective_mode, self.optimizer_init_params,
+                                                    self.director, use_pic=self._use_pic)
         else:
             self.optimizer = optimizer
             

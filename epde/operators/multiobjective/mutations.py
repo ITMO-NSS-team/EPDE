@@ -20,17 +20,14 @@ from copy import deepcopy
 from functools import partial
 from typing import Union
 
-from epde.optimizers.moeadd.moeadd import ParetoLevels
-
-from epde.structure.main_structures import Equation, SoEq, Term
-from epde.structure.structure_template import check_uniqueness
+from epde.structure.main_structures import Equation, SoEq
 from epde.supplementary import filter_powers
 from epde.operators.utils.template import CompoundOperator, add_base_param_to_operator
 
 from epde import _loop_stats
 
 
-from epde.decorators import HistoryExtender, ResetEquationStatus
+from epde.decorators import HistoryExtender
 
 # Bounded regenerate-retry budget for TermMutation: how many times a
 # freshly randomized term that duplicates an existing one is re-rolled
@@ -89,9 +86,10 @@ class EquationMutation(CompoundOperator):
     def apply(self, objective : Equation, arguments : dict):
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
-        # SystemMutation.apply already deepcopied the enclosing SoEq, so
-        # ``objective`` is already a fresh clone -- mutating in place is
-        # safe and saves a per-call SoEq-deep deepcopy of the equation
+        # Per the module ownership contract, the enclosing SoEq is the
+        # caller's exclusive object (OffspringUpdater pops the only live
+        # reference; SystemMutation mutates it in place), so mutating the
+        # equation in place is safe and saves a per-call deepcopy
         # (was ~5ms per call, ~5000 calls per lv_new rep).
         equation = objective
 
@@ -104,7 +102,7 @@ class EquationMutation(CompoundOperator):
 
         # Per-term Bernoulli term-replace via the ``mutation`` sub-operator
         # (TermMutation), governed by ``r_mutation``. Without it, mature
-        # chromosomes at the terms_number cap spin on add_random_term no-ops
+        # chromosomes at the max_terms_number cap spin on add_random_term no-ops
         # and structural exploration collapses to crossover alone. Skip
         # ``n_immutable`` head terms so the right-part anchor and any
         # mandatory_family terms survive across mutations.
@@ -134,7 +132,7 @@ class EquationMutation(CompoundOperator):
         # Probabilistic term-add: each of the ``n_added_terms`` slots fires a
         # Bernoulli trial at ``term_addition_prob``, so the genome no longer
         # grows unconditionally on every mutation call.
-        # The ``terms_number`` metaparameter (chromosome-wide ceiling,
+        # The ``max_terms_number`` metaparameter (chromosome-wide ceiling,
         # enforced inside ``add_random_term``) still caps growth; cap-hit
         # or pool exhaustion breaks the loop.
         n_added = int(self.params['n_added_terms'])
@@ -192,22 +190,24 @@ class TermMutation(CompoundOperator):
     
     def apply(self, objective : tuple, arguments : dict): #term_idx, equation):
         """
-        Return a new term, randomly created to be unique from other terms of this particular equation.
-        
+        Randomize the term at ``term_idx`` IN PLACE, keeping it unique among
+        the equation's terms.
+
         Parameters:
         -----------
-        term_idx : integer
-            The index of the mutating term in the equation.
-            
-        equation : Equation object
-            The equation object, in which the term is present.
-        
+        objective : tuple
+            ``(term_idx, equation)`` -- index of the mutated term and the
+            equation that owns it.
+
         Returns:
         ----------
-        new_term : Term object
-            A new, randomly created, term.
-            
-        """       
+        term : Term object
+            The same Term instance, randomized in place. If every regenerate
+            retry produced a duplicate, the term is instead REMOVED from the
+            equation (above the 2-term floor) or reverted to its unique
+            pre-mutation structure (at the floor) -- see the dedup policy
+            below.
+        """
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
         term_idx, equation = objective

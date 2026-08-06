@@ -18,6 +18,7 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
+import epde.globals as global_var
 from epde.operators.common.objectives import FitContext, Instability
 
 
@@ -56,9 +57,15 @@ class TestInstabilityFailsLoudly:
 class TestInstabilityLegitimatePaths:
 
     def test_cached_vc_score_fast_path(self):
-        # The sparsity-pass cache short-circuits everything else.
-        eq = SimpleNamespace(_cached_vc_score=np.array([0.1, 0.2, 0.3]))
-        assert Instability().compute(eq, _ctx()) == pytest.approx(0.6)
+        # Under the 'vcoef' estimator (an explicit selection since chi2
+        # became the default) the sparsity-pass cache short-circuits
+        # everything else.
+        global_var.set_instability_metric('vcoef')
+        try:
+            eq = SimpleNamespace(_cached_vc_score=np.array([0.1, 0.2, 0.3]))
+            assert Instability().compute(eq, _ctx()) == pytest.approx(0.6)
+        finally:
+            global_var.set_instability_metric(None)
 
     def test_features_none_is_a_legitimate_one(self):
         # Only the target term survived: not an error, scores 1.0 by design.
