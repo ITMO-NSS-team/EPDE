@@ -18,6 +18,7 @@ from sklearn.base import BaseEstimator, RegressorMixin
 import matplotlib.pyplot as plt
 from epde.operators.common.stability import (calculate_weights, GramSetup,
                                               VaryingCoefSetup)
+from epde.operators.common.survival import chi2_scores
 from epde import _loop_stats
 
 
@@ -79,8 +80,9 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
         weight. It blows up (large CV) for features whose fitted coefficient
         is unstable or near-zero-mean across horizons, so the
         ``active_thresholds = cv * max_corr`` step in
-        :meth:`PhysicsInformedLasso.fit` prunes them first. The default
-        ``gram_mode='vcoef'`` path does not call this -- it scores via
+        :meth:`PhysicsInformedLasso.fit` prunes them first. Only the
+        ``gram_mode='axis'`` path calls this -- the ``'chi2'`` default
+        scores via ``chi2_scores`` and ``'vcoef'`` via
         ``VaryingCoefSetup.score`` instead.
         """
         weights_arr = np.asarray(weights)
@@ -144,18 +146,22 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
         # already built a per-target ``GramSetup`` view from the
         # super-Gram, reuse it -- saves the windowed matmul that
         # otherwise repeats for every candidate target_idx in one sweep.
+        # 'vcoef' is the ONLY mode that needs its own Gram machinery (the
+        # varying-coefficient setup, explicit opt-in); 'axis' keeps the
+        # legacy windowed backup. The chi default builds NOTHING here: the
+        # CD/OLS already run on the inline weighted Gram above, and the
+        # kill scores come from ``chi2_scores`` on the raw active columns
+        # each outer round.
         if gram_setup is None:
             if global_var.gram_mode == 'vcoef':
                 gram_setup = VaryingCoefSetup(
                     X, y, sample_weights, self.grid_shape,
                     main_var=self.main_var)
-            else:  # 'axis' backup
+            elif global_var.gram_mode == 'axis':
                 gram_setup = GramSetup(X, y, sample_weights, self.grid_shape)
 
-        # Varying-coefficient mode returns a per-feature stability score
-        # directly (no per-window weight stack), so the in-fit CV-threshold
-        # path branches on it below.
         is_vcoef = getattr(gram_setup, 'is_vcoef', False)
+        use_axis_cv = (not is_vcoef) and global_var.gram_mode == 'axis'
 
         outer_iteration = 0
         max_outer_iters = total_features  # Max possible eliminations
@@ -167,9 +173,10 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
         while outer_iteration < max_outer_iters:
             outer_iters_executed += 1
 
-            # ``vcoef`` yields the per-feature score directly; the axis path
-            # returns a per-window weight stack reduced by ``get_cv``.
-            weights = None if is_vcoef else gram_setup.solve(active_mask)
+            # Only the axis backup needs the per-window weight stack (for
+            # ``get_cv``); vcoef and the chi default score directly.
+            weights = (gram_setup.solve(active_mask) if use_axis_cv
+                       else None)
 
             # Slice the (weighted) precomputed Gram by the current active set.
             active_idx = np.where(active_mask)[0]
@@ -186,11 +193,26 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
             else:
                 max_corr = np.max(np.abs(X_T_y[active_mask]))
 
-            # CV performs as adaptive alpha. In vcoef mode this is each term's
-            # instability score NC/gamma_0^2 (biased non-constant energy), which
+            # CV performs as adaptive alpha. Under the chi default it is
+            # each term's Nyblom-Hansen score-path constancy (bulge measured
+            # against the term's own signal energy); explicit vcoef scores
+            # NC/gamma_0^2 (biased non-constant energy). Either way it
             # prunes weak / zero / unstable / spuriously-varying terms.
-            active_cv = (gram_setup.score(active_mask)
-                         if is_vcoef else self.get_cv(weights))
+            if is_vcoef:
+                active_cv = gram_setup.score(active_mask)
+            elif use_axis_cv:
+                active_cv = self.get_cv(weights)
+            else:
+                # The chi default. Every active column is scored, the
+                # intercept as an explicit ones-column: the fit is identical
+                # to fit_intercept=True, and the intercept's own constancy
+                # score lands LAST -- the ``active_idx`` order.
+                feat_idx = active_idx[active_idx < n_features]
+                cols = Xf[:, feat_idx]
+                if active_mask[-1]:
+                    cols = np.hstack([cols, np.ones((n_samples, 1))])
+                active_cv = chi2_scores(cols, y, sw, self.grid_shape,
+                                        fit_intercept=False)
 
             # Tackle the most physically unstable feature first.
             active_thresholds = active_cv * max_corr
@@ -203,8 +225,8 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
                 active_coef = np.linalg.solve(
                     G_w[np.ix_(active_idx, active_idx)], Gy_w[active_idx])
             except np.linalg.LinAlgError:
-                active_coef = (np.zeros(active_idx.size) if is_vcoef
-                               else weights.mean(axis=0))
+                active_coef = (weights.mean(axis=0) if use_axis_cv
+                               else np.zeros(active_idx.size))
 
             # Running product q = (X_active^T X_active) @ active_coef, maintained
             # incrementally so each coordinate update is O(active) instead of the
@@ -457,8 +479,13 @@ class VWSRSparsity(CompoundOperator):
             target = Z[:, t]
             feature_indexes = [i for i in range(Z.shape[1]) if i != t]
             features = Z[:, feature_indexes]
-            if gram_super.get('mode') == 'vcoef':
+            mode = gram_super.get('mode')
+            if mode == 'vcoef':
                 gram_setup = VaryingCoefSetup.from_full(gram_super, t)
+            elif mode == 'chi2':
+                # Z-only super: the chi2 keep-rule needs no windowed view;
+                # the shared Z above already skipped objective.evaluate.
+                gram_setup = None
             else:
                 gram_setup = GramSetup.from_full(gram_super, t)
         else:

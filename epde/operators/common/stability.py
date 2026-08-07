@@ -5,7 +5,7 @@ right-part operators to score and prune candidate library terms:
 
 * ``GramSetup`` -- axis-aligned sliding-window CV (the ``gram_mode='axis'``
   backup), with ``calculate_weights`` as a single-shot wrapper.
-* ``VaryingCoefSetup`` -- the default ``gram_mode='vcoef'`` varying-coefficient
+* ``VaryingCoefSetup`` -- the ``gram_mode='vcoef'`` varying-coefficient
   stability, summed by ``vc_stability_total_lr``; basis resolution resolved
   by ``resolve_vc_modes_from_input`` / ``taylor_microscale``.
 
@@ -493,9 +493,10 @@ def resolve_vc_modes_from_input(grid_shape, main_var=None,
 
 
 class VaryingCoefSetup:
-    """Varying-coefficient stability estimator -- the default
-    ``gram_mode='vcoef'`` path, alternative to the axis-aligned
-    ``GramSetup`` (the ``gram_mode='axis'`` backup).
+    """Varying-coefficient stability estimator -- the explicit
+    ``gram_mode='vcoef'`` path (the only mode with its own Gram machinery;
+    the keep-rule default is the chi2 score on the plain Gram), alternative
+    to the axis-aligned ``GramSetup`` (the ``gram_mode='axis'`` backup).
 
     Instead of measuring each coefficient's dispersion over local
     sub-regions, model each term's coefficient as a smooth function of
@@ -889,7 +890,7 @@ def calculate_weights(X, y, sample_weights, grid_shape, fit_intercept=True,
     ``gram_cls`` selects the construction strategy: default ``None`` ->
     ``GramSetup`` (axis-aligned sliding windows, the backup path).
     ``gram_kwargs`` is forwarded to the chosen class's constructor. The
-    varying-coefficient default (``gram_mode='vcoef'``) does not route
+    varying-coefficient path (``gram_mode='vcoef'``) does not route
     through here -- ``PhysicsInformedLasso.fit`` instantiates
     ``VaryingCoefSetup`` directly.
     """

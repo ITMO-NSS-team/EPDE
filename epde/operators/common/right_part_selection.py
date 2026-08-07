@@ -72,12 +72,19 @@ class EqRightPartSelector(CompoundOperator):
                 _loop_stats.record('EqRPS.gram_super_skip', 1, 1)
                 return
             if global_var.gram_mode == 'vcoef':
+                # The only mode that needs its own Gram machinery.
                 objective._gram_super = VaryingCoefSetup.precompute_super(
                     Z, sample_weights, grid_shape,
                     main_var=objective.main_var_to_explain)
-            else:  # 'axis' backup
+            elif global_var.gram_mode == 'axis':
                 objective._gram_super = GramSetup.precompute_super(
                     Z, sample_weights, grid_shape)
+            else:
+                # The chi default: no windowed super-Gram -- the keep-rule
+                # scores via ``chi2_scores`` on raw columns. Keep the shared
+                # Z so Tier-3 slicing still skips objective.evaluate per
+                # candidate target.
+                objective._gram_super = {'Z': Z, 'mode': 'chi2'}
             _loop_stats.record('EqRPS.gram_super_built', 1, 1)
         except Exception:
             # Defensive: any unexpected failure (shape mismatch, missing
