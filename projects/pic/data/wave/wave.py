@@ -46,11 +46,11 @@ def wave_data(filename):
 def wave_discovery(foldername, noise_level):
     grid, data = wave_data(os.path.join(foldername, 'wave_sln_80.csv'))
     noised_data = noise_data(data, noise_level)
-    data_nn = load_pretrained_PINN(os.path.join(foldername, 'ann_pretrained.pickle'))
+    #data_nn = load_pretrained_PINN(os.path.join(foldername, 'ann_pretrained.pickle'))
 
     dimensionality = data.ndim - 1
 
-    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True,
+    epde_search_obj = EpdeSearch(use_solver=True, use_pic=True,
                                       boundary=20,
                                       coordinate_tensors=(grid[..., 0], grid[..., 1]), device='cuda')
 

@@ -275,7 +275,7 @@ class SolverBasedFitness(CompoundOperator):
 
     def apply(self, objective: SoEq, arguments: dict, force_out_of_place: bool = False):
         self_args, subop_args = self.parse_suboperator_args(arguments=arguments)
-        if force_out_of_place:
+        if force_out_of_place or not getattr(objective, 'weights_internal_evald', False):
             self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
         self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
 

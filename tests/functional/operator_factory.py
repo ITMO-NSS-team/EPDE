@@ -38,8 +38,10 @@ class FitnessOperatorFactory:
             operator = SolverBasedFitness(list(params.keys()), objectives=[primary],
                                           primary=primary, instability=Instability(),
                                           backend='deepxde')
-            sparsity = LASSOSparsity()
-            coeff_calc = LinRegBasedCoeffsEquation()
+            #sparsity = LASSOSparsity()
+            #coeff_calc = LinRegBasedCoeffsEquation()
+            sparsity = map_operator_between_levels(LASSOSparsity(), 'gene level', 'chromosome level')
+            coeff_calc = map_operator_between_levels(LinRegBasedCoeffsEquation(), 'gene level', 'chromosome level')
         else:
             raise ValueError(f"Unknown operator: {name}")
 
