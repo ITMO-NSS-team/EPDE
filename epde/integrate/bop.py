@@ -30,7 +30,7 @@ def get_max_deriv_orders(system_sf: List[Union[Dict[str, Dict]]], variables: Lis
 
     @get_equation_requirements.register
     def _(equation_sf: dict, variables=['u',]) -> dict:  # dict = {u: 0}):
-        dim = global_var.grid_cache.get('0').ndim
+        dim = global_var.samples_manager.ndim
         if len(variables) == 1:
             var_max_orders = np.zeros(dim)
             for term in equation_sf.values():
@@ -84,7 +84,7 @@ def get_max_deriv_orders(system_sf: List[Union[Dict[str, Dict]]], variables: Lis
     return max_orders
 
 class BOPElement(object):
-    def __init__(self, axis: int, key: str, coeff: float = 1., term: list = [None], 
+    def __init__(self, axis: int, key: str, coeff: float = 1., term: list = [None], # domain_idx
                  power: Union[Union[List[int], int]] = 1, var: Union[List[int], int] = 1,
                  rel_location: float = 0., device = 'cpu'):
         self.axis = axis
@@ -137,6 +137,9 @@ class BOPElement(object):
             raise TypeError(
                 f'Incorrect type of coefficients. Must be a type from list {VAL_TYPES}.')
 
+    def setDomain(self, domain_idx: int):
+        self._domain_idx = domain_idx
+
     def __call__(self, values: VAL_TYPES = None) -> dict:
         if not self.vals_set and values is not None:
             self.values = values
@@ -146,7 +149,8 @@ class BOPElement(object):
         if self.grid is not None:
             boundary = self.grid
         elif self.grid is None and self.location is not None:
-            _, all_grids = global_var.grid_cache.get_all(mode = 'torch')
+            # _, all_grids = global_var.grid_cache.get_all(mode = 'torch')
+            all_grids = [torch.from_numpy(grid) for grid in global_var.samples_manager.grids[self._domain_idx]]
 
             abs_loc = self.location * all_grids[0].shape[self.axis]
             if all_grids[0].ndim > 1:
@@ -182,6 +186,7 @@ class PregenBOperator(object):
     def demonstrate_required_ords(self):
         linked_ords = list(zip([eq.main_var_to_explain for eq in self.system],
                                 self.max_deriv_orders))
+        print(linked_ords)
 
     @property
     def conditions(self):
@@ -205,24 +210,21 @@ class PregenBOperator(object):
     def max_deriv_orders(self):
         return get_max_deriv_orders(self.equation_sf, self.variables)
 
-    def generate_default_bc(self, vals: Union[np.ndarray, dict] = None, grids: List[np.ndarray] = None,
-                            allow_high_ords: bool = False, required_bc_ord: List[int] = None):
+    def generate_default_bc(self, vals: Union[np.ndarray, dict] = None, domain_key: int = 0,
+                            grids: List[np.ndarray] = None, allow_high_ords: bool = False,
+                            required_bc_ord: List[int] = None):
         # Implement allow_high_ords - selection of derivatives from
         if required_bc_ord is None:
             required_bc_ord = self.max_deriv_orders
         assert set(self.variables) == set(required_bc_ord.keys()), 'Some conditions miss required orders.'
 
-        grid_cache = global_var.initial_data_cache
-        tensor_cache = global_var.initial_data_cache
-
         if vals is None:
             val_keys = {key: (key, (1.0,)) for key in self.variables}
 
         if grids is None:
-            _, grids = grid_cache.get_all(mode = 'torch')
+            grids = global_var.samples_manager.grids[domain_key]    # grid_cache.get_all(mode = 'torch')
 
-        device = global_var.grid_cache._device
-        # assert self._device
+        device = 'cpu'
         device_on_cpu = (device  == 'cpu')
         relative_bc_location = {0: (), 1: (0,), 2: (0, 1),
                                 3: (0., 0.5, 1.), 4: (0., 1/3., 2/3., 1.)}
@@ -248,7 +250,7 @@ class PregenBOperator(object):
                         coords = coords.squeeze()
 
                     if vals is None:
-                        bc_values = tensor_cache.get(val_keys[variable])[indexes]
+                        bc_values = global_var.samples_manager.getSingleSample(val_keys[variable])[indexes]
                     else:
                         bc_values = vals[indexes]
 

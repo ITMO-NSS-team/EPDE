@@ -5,6 +5,7 @@ Created on Thu Jun 17 13:58:18 2021
 
 @author: mike_ubuntu
 """
+from typing import Dict, Union
 
 import numpy as np
 from sklearn.linear_model import LinearRegression
@@ -54,21 +55,25 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
         """Build target + un-normalised feature matrix from the LASSO
         survivors, independent of ``Equation.evaluate``.
 
-        Mirrors the pre-aaea0f4 legacy feature builder: iterate the
-        structure, skip the target, emit columns only for terms whose
-        ``weights_internal`` slot is non-zero. Returns
+        Iterate the structure, skip the target, and emit columns only for
+        terms whose ``weights_internal`` slot is non-zero. Returns
         ``(target, features)`` with ``features=None`` when every
         non-target slot was filtered to zero.
         """
-        target = objective.structure[objective.target_idx].evaluate(False)
+        tgt = objective.target_idx
+        target: Dict[int, np.ndarray] = objective.target.evaluate(False)
+        # target: Dict[int, np.ndarray] = objective.structure[objective.target_idx].evaluate()
+        # print('Before stacking', [array.shape for array in target.values()])
+        target = np.concat([array for array in target.values()], axis = 0)
         feats = []
         for term_idx, term in enumerate(objective.structure):
-            if term_idx == objective.target_idx:
+            if term_idx == tgt:
                 continue
-            wi_pos = (term_idx if term_idx < objective.target_idx
+            wi_pos = (term_idx if term_idx < tgt
                       else term_idx - 1)
             if objective.weights_internal[wi_pos] != 0:
-                feats.append(term.evaluate(False))
+                fdict = term.evaluate(False)
+                feats.append(np.concat([array for array in fdict.values()], axis = 0))
         if not feats:
             return target, None
         features = np.vstack(feats)

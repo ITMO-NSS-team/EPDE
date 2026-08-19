@@ -24,7 +24,7 @@ from epde.structure.main_structures import SoEq, Equation, Term
 from epde.interface.token_family import TFPool
 from epde.optimizers.moeadd.moeadd import ParetoLevels
 from epde.optimizers.single_criterion.optimizer import Population
-from epde.cache.cache import Cache
+from epde.cache.cache_refactored import Cache
 
 TYPES = {'SoEq' : SoEq, 'TFPool' : TFPool, 'cache' : Cache,
          'ParetoLevels' : ParetoLevels, 'Population' : Population}    
@@ -33,7 +33,7 @@ TYPES = {'SoEq' : SoEq, 'TFPool' : TFPool, 'cache' : Cache,
 # while the second represents attributes for manual reconstruction.
 TYPESPEC_ATTRS = {'SoEq' : (['tokens_for_eq', 'tokens_supp', 'latex_form'], ['vals']), 
                   'Factor' : (['latex_form', '_ann_repr', '_latex_constructor', '_evaluator'], []), 
-                  'Equation' : (['pool', 'latex_form', '_history'], ['structure']), # , '_features', '_target'
+                  'Equation' : (['pool', 'latex_form', '_history', '_target_term'], ['structure']), # _target_term re-linked by index, see attrs_from_dict
                   'Term' : (['pool', 'latex_form'], ['structure']), 'TFPool' : ([], []), 'cache' : ([], []), 
                   'ParetoLevels' : (['levels'], ['population']), 'Population' : ([], [])}
                   
@@ -145,7 +145,16 @@ def obj_to_pickle(obj, not_to_pickle: list = [], manual_pickle: list = []):
                                                                                             get_typespec_attrs(elem)[1])}
         else:
             dict_to_pickle[slot] = elem
-    
+
+    # Persist the identity-tracked right-part target as a plain integer
+    # position. The ``_target_term`` Term itself is excluded from pickling
+    # (TYPESPEC_ATTRS) to avoid an identity break with the freshly
+    # reconstructed structure; ``attrs_from_dict`` re-links it by index once
+    # ``structure`` is rebuilt. Stored under the legacy ``'target_idx'`` key so
+    # pre-rename pickles (which saved the int slot) load unchanged.
+    if parse_obj_type(obj) == 'Equation':
+        dict_to_pickle['target_idx'] = obj.target_idx
+
     return dict_to_pickle
 
 def attrs_from_dict(obj, attributes, except_attrs: dict = {}):
@@ -174,6 +183,22 @@ def attrs_from_dict(obj, attributes, except_attrs: dict = {}):
 
         obj.manual_reconst(man_attr, attributes[man_attr]['elements'], except_attrs)
 
+    # Re-link the identity-tracked right-part target from the saved integer
+    # position, AFTER ``structure`` was rebuilt by manual_reconst above. The
+    # ``'target_idx'`` key covers both post-rename pickles (saved by
+    # obj_to_pickle) and legacy pre-rename pickles (which stored the old int
+    # slot under the same key). The ``target_idx`` property setter resolves the
+    # int against the reconstructed structure into ``_target_term``.
+    if parse_obj_type(obj) == 'Equation':
+        ti = attributes.get('target_idx', None)
+        if ti is not None and getattr(obj, 'structure', None):
+            try:
+                obj.target_idx = int(ti)
+            except (IndexError, ValueError, TypeError):
+                obj._target_term = None
+        else:
+            obj._target_term = None
+
 
 def temp_pickle_save(obj : Union[SoEq, Cache, TFPool, ParetoLevels, Population], 
                      not_to_pickle = [], manual_pickle = []):
@@ -194,14 +219,15 @@ class LoaderAssistant(object):
         return {'SoEq' :     {'tokens_for_eq' : TFPool(pool.families_demand_equation),
                               'tokens_supp' : TFPool(pool.families_equationless), 
                               'latex_form' : None},
-                'Equation' : {'pool' : pool, 
+                'Equation' : {'pool' : pool,
                               'latex_form' : None,
-                              '_history' : None},
-                'Term'     : {'pool' : pool, 
+                              '_history' : None,
+                              '_target_term' : None},
+                'Term'     : {'pool' : pool,
                               'latex_form' : None},
-                'Factor'   : {'_latex_constructor' : None, 
-                              '_evaluator' : None}} 
-    
+                'Factor'   : {'_latex_constructor' : None,
+                              '_evaluator' : None}}
+
     @staticmethod
     def pool_preset():
         return {'TFPool' : {}}
@@ -216,12 +242,13 @@ class LoaderAssistant(object):
                 'SoEq' :     {'tokens_for_eq' : TFPool(pool.families_demand_equation),
                               'tokens_supp' : TFPool(pool.families_equationless), 
                               'latex_form' : None},
-                'Equation' : {'pool' : pool, 
+                'Equation' : {'pool' : pool,
                               'latex_form' : None,
-                              '_history' : None},
-                'Term'     : {'pool' : pool, 
+                              '_history' : None,
+                              '_target_term' : None},
+                'Term'     : {'pool' : pool,
                               'latex_form' : None},
-                'Factor'   : {'_latex_constructor' : None, 
+                'Factor'   : {'_latex_constructor' : None,
                               '_evaluator' : None}}
     
     @staticmethod
@@ -230,12 +257,13 @@ class LoaderAssistant(object):
                 'SoEq' :     {'tokens_for_eq' : TFPool(pool.families_demand_equation),
                               'tokens_supp' : TFPool(pool.families_equationless), 
                               'latex_form' : None},
-                'Equation' : {'pool' : pool, 
+                'Equation' : {'pool' : pool,
                               'latex_form' : None,
-                              '_history' : None},
-                'Term'     : {'pool' : pool, 
+                              '_history' : None,
+                              '_target_term' : None},
+                'Term'     : {'pool' : pool,
                               'latex_form' : None},
-                'Factor'   : {'_latex_constructor' : None, 
+                'Factor'   : {'_latex_constructor' : None,
                               '_evaluator' : None}}
         
 

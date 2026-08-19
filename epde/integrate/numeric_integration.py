@@ -255,11 +255,11 @@ class OdeintAdapter(object):
         self._solve_method = method
         pass # TODO: implement hyperparameters setup, according to the problem specifics
 
-    def solve_epde_system(self, system: Union[SoEq, dict], grids: list=None, boundary_conditions=None,
+    def solve_epde_system(self, system: Union[SoEq, dict], domain_key: int = 0, grids: list=None, boundary_conditions=None,
                           mode='NN', data=None, vars_to_describe = ['u'], *args, **kwargs):
         if isinstance(system, SoEq):
             system_interface = SystemSolverInterface(system_to_adapt=system)
-            system_solver_forms = system_interface.form(grids = grids, mode = mode)
+            system_solver_forms = system_interface.form(domain_key = domain_key, grids = grids, mode = mode)
         elif isinstance(system, list):
             system_solver_forms = system
         else:
@@ -269,7 +269,7 @@ class OdeintAdapter(object):
             op_gen = PregenBOperator(system=system,
                                      system_of_equation_solver_form=[sf_labeled[1] for sf_labeled
                                                                      in system_solver_forms])
-            op_gen.generate_default_bc(vals = data, grids = grids)
+            op_gen.generate_default_bc(domain_key = domain_key, vals = data, grids = grids)
             boundary_conditions = op_gen.conditions
 
         if isinstance(system, SoEq):
@@ -321,8 +321,9 @@ class SpectralAdapter(object):
         if self.spectral_solver is None:
             raise RuntimeError("Failed to load spectral solver.")
         
-    def solve_epde_system(self, system: Union[SoEq, dict], grids: list=None, boundary_conditions=None,
-                          mode='NN', data=None, vars_to_describe = ['u'], *args, **kwargs):
+    def solve_epde_system(self, system: Union[SoEq, dict], domain_key: int = 0, grids: list = None,
+                          boundary_conditions=None, mode='NN', data=None, vars_to_describe = ['u'],
+                          *args, **kwargs):
         if isinstance(system, SoEq):
             system_interface = SystemSolverInterface(system_to_adapt=system)
             system_solver_forms = system_interface.form(grids = grids, mode = mode)
@@ -337,6 +338,9 @@ class SpectralAdapter(object):
                                                                      in system_solver_forms])
             op_gen.generate_default_bc(vals = data, grids = grids)
             boundary_conditions = op_gen.conditions
+
+        for condition in boundary_conditions:
+            condition.setDomain(domain_key)
 
         if isinstance(system, SoEq):
             vars_to_describe = system.vars_to_describe

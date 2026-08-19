@@ -4,7 +4,7 @@ from functools import singledispatchmethod
 import numpy as np
 import torch
 
-from epde.evaluators import simple_function_evaluator
+from epde.evaluators import simpleFunctionEvaluator
 from epde.structure.main_structures import SoEq
 import epde.globals as global_var
 
@@ -40,7 +40,7 @@ class SystemSolverInterface(object):
                         power_param_idx = param_idx
                 deriv_orders.append(factor.deriv_code)
 
-                if factor.evaluator._evaluator != simple_function_evaluator:
+                if factor.evaluator._evaluator != simpleFunctionEvaluator:
                     if factor.evaluator._evaluator._single_function_token:
                         eval_func = factor.evaluator._evaluator._evaluation_functions_torch 
                     else:
@@ -72,7 +72,7 @@ class SystemSolverInterface(object):
                 deriv_vars.append(cur_deriv_var)
             else:
                 grid_arg = None if default_domain else grids
-                coeff_tensor = coeff_tensor * factor.evaluate(grids=grid_arg, torch_mode = True).to(device)
+                coeff_tensor = coeff_tensor * factor.evaluate(grids=grid_arg)[-1].to(device) # , torch_mode = True
         if not derivs_detected:
             deriv_powers = [0,]
             deriv_orders = [[None,],]
@@ -119,9 +119,10 @@ class SystemSolverInterface(object):
                 grids = [torch.from_numpy(subgrid).to(self._device) for subgrid in grids]            
             default_domain = False
 
+        tgt = equation.target_idx
         for term_idx, term in enumerate(equation.structure):
-            if term_idx != equation.target_idx:
-                if term_idx < equation.target_idx:
+            if term_idx != tgt:
+                if term_idx < tgt:
                     weight = equation.weights_final[term_idx]
                 else:
                     weight = equation.weights_final[term_idx-1]
@@ -142,21 +143,25 @@ class SystemSolverInterface(object):
 
         target_weight = -1 # torch.full_like(input = grids[0], fill_value = -1.).to(self._device)
 
-        target_form = self._term_solver_form(equation.structure[equation.target_idx], grids, default_domain, variables)
+        target_term = equation.target
+        target_form = self._term_solver_form(target_term, grids, default_domain, variables)
         target_form['coeff'] = target_form['coeff'] * target_weight
         # target_form['coeff'] = adjust_shape(target_form['coeff'], mode = mode)
         # print(f'target_form shape is {target_form["coeff"].shape}')
 
-        _solver_form[equation.structure[equation.target_idx].name] = target_form
+        _solver_form[target_term.name] = target_form
 
         return _solver_form
 
-    def use_grids(self, grids=None): # 
+    def use_grids(self, domain_key: int = 0, grids=None): # 
         if grids is None and self.grids is None:
-            _, self.grids = global_var.grid_cache.get_all(mode = 'torch')
-            self.grids = [grid[global_var.grid_cache.g_func != 0] for grid in self.grids]
+            assert domain_key is not None, 'Domain index is '
+            self.grids = global_var.samples_manager.grids()[domain_key] # grid_cache.get_all(mode = 'torch')
+            self.grids = [grid[global_var.samples_manager.gFunc('m')[domain_key]]
+                          for grid in self.grids]
+            
         elif grids is not None:
-            if len(grids) != len(global_var.grid_cache.get_all(mode = 'torch')[1]):
+            if len(grids) != len(global_var.samples_manager.grids()[global_var.samples_manager.sampleIDs[0]]):
                 raise ValueError(
                     'Number of passed grids does not match the problem')
             if isinstance(grids[0], np.ndarray):
@@ -164,8 +169,8 @@ class SystemSolverInterface(object):
             self.grids = grids
             
 
-    def form(self, grids=None, mode = 'NN'): # -> List[str, ]:
-        self.use_grids(grids=grids)
+    def form(self, domain_key: int, grids=None, mode = 'NN'): # -> List[str, ]:
+        self.use_grids(domain_key = domain_key, grids = grids)
         equation_forms = []
 
         for equation in self.adaptee.vals:

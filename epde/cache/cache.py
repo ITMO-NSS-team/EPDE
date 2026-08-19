@@ -84,7 +84,7 @@ def upload_grids(grids, cache):
     cache.use_structural()
 
 
-def prepare_var_tensor(var_tensor, derivs_tensor, time_axis):
+def prepareVarTensor(var_tensor, derivs_tensor, time_axis):
     """
     Method for transformation of the input data, the time axis is placed first
 
@@ -134,7 +134,7 @@ def download_variable(var_filename, deriv_filename, time_axis):
     """
     var = np.load(var_filename)
     derivs = np.load(deriv_filename)
-    tokens_tensor = prepare_var_tensor(var, derivs, time_axis)
+    tokens_tensor = prepareVarTensor(var, derivs, time_axis)
     return tokens_tensor
 
 

@@ -27,6 +27,8 @@ from epde.optimizers.moeadd.strategy_elems import MOEADDSectorProcesser
 from epde.optimizers.moeadd.supplementary import fast_non_dominated_sorting, ndl_update, Equality, Inequality, acute_angle
 from scipy.spatial import ConvexHull
 
+from epde import _loop_stats
+
 def clear_list_of_lists(inp_list) -> list:
     '''
     Delete elements-lists with len(0) from the list
@@ -185,10 +187,14 @@ class ParetoLevels(object):
                          if key not in except_keys}
     
     def set_normalizer(self):
-        objectives = np.stack(reduce(lambda x, y: x.extend(y) or x,
-                                     [[elem.obj_fun for elem in self.population]]), axis = 0)
-
-        self.normalizer = ObjFunNormalizer(np.max(objectives, axis = 0))
+        if not self.population:
+            return
+        objectives = np.stack([elem.obj_fun for elem in self.population], axis = 0)
+        worst_vals = np.max(objectives, axis = 0)
+        # An all-zero objective column (e.g. perfect fitness across the
+        # population) must not produce division by zero in the normalizer.
+        worst_vals = np.where(worst_vals == 0, 1.0, worst_vals)
+        self.normalizer = ObjFunNormalizer(worst_vals)
 
     @property
     def levels(self):
@@ -253,12 +259,11 @@ class ParetoLevels(object):
         """
         new_levels = []
         population_cleared = []
-        point_system = point.equations_labels
         deleted_count = 0
         for level in self.levels:
             temp = []
             for element in level:
-                if element.equations_labels != point_system:
+                if element is not point:
                     temp.append(element)
                     population_cleared.append(element)
                 else:
@@ -266,19 +271,14 @@ class ParetoLevels(object):
             if not len(temp) == 0:
                 new_levels.append(temp)
 
-        # Defensive: ``delete_point`` is a single-point API but the
-        # equations_labels match is structural -- two distinct SoEq
-        # instances CAN share the same labels (same structure, different
-        # internal weight history) and both would be silently removed.
-        # The history-based uniqueness guard in OffspringUpdater is
-        # supposed to prevent this, but loud failure is preferable to
-        # silent population shrinkage.
+        # Identity matching removes exactly the chosen object; this can
+        # only fire if the point genuinely isn't on the levels, i.e.
+        # population and levels went out of sync.
         if deleted_count != 1:
             raise RuntimeError(
                 f"ParetoLevels.delete_point: expected to remove exactly 1 "
-                f"point with equations_labels={point_system!r}, removed "
-                f"{deleted_count}. The population contains duplicate "
-                f"chromosomes despite history-based uniqueness guards."
+                f"point, removed {deleted_count}. The requested point is "
+                f"not present on the Pareto levels."
             )
 
         if len(population_cleared) != sum([len(level) for level in new_levels]):
@@ -460,7 +460,7 @@ class MOEADDOptimizer(object):
                 for equation in temp_solution.vals:
                     while len(equation.terms_labels) != len(equation.structure):
                         temp_solution.vals[equation.main_var_to_explain].randomize()
-                        temp_solution.vals[equation.main_var_to_explain].reset_saved_state()
+                        temp_solution.vals[equation.main_var_to_explain].resetSavedState()
                 population.append(temp_solution)
 
                 solution_gen_idx += 1
@@ -671,23 +671,49 @@ class MOEADDOptimizer(object):
                 linked.reset_traversal_cond()
                 linked.initial[0][1].set_output(self.pareto_levels)
                 init_block.apply(self.form_processer_args(0))
-            for epoch_idx in np.arange(epochs):
+            if getattr(self.pareto_levels, '_init_collapsed', False):
+                # Init flagged a search-space collapse (see
+                # ``InitialParetoLevelSorting.apply``). Skip the epoch loop --
+                # mutation/crossover on a degenerate truncated population would
+                # only contaminate the results. Snapshot the placed level-0
+                # candidates once so downstream consumers
+                # (``pareto_history`` / ``thesis_runner._extract_*``) still
+                # see something.
+                snapshot = []
+                for sol in self.pareto_levels.levels[0]:
+                    try:
+                        obj = sol.obj_fun.tolist() if hasattr(sol.obj_fun, 'tolist') else list(sol.obj_fun)
+                    except Exception:
+                        obj = None
+                    snapshot.append({'text_form': sol.text_form, 'obj_fun': obj})
+                self._pareto_history.append(snapshot)
                 if global_var.verbose.show_iter_idx:
-                    print(f'\n----- Multiobjective optimization : {epoch_idx + 1}-th epoch -----')
-                # Shuffle sector order each epoch. The prior fixed
-                # 0..N-1 traversal gave early sectors a population
-                # advantage every epoch (their offspring entered the
-                # global Pareto pool before late sectors saw the
-                # evolved chromosomes). Reproducibility is preserved
-                # because np.random is seeded by the caller via
-                # ``_set_seeds`` before optimization.
-                n_sectors = len(self.weights)
-                for order_idx, weight_idx in enumerate(np.random.permutation(n_sectors)):
+                    print(f'\n*** MOEADD.optimize: early stop after init collapse '
+                          f'with {len(self.pareto_levels.levels[0])} candidates. ***')
+                return
+            for epoch_idx in np.arange(epochs):
+                # Refresh the PBI objective normalizer so its scale tracks
+                # the evolving population (set initially after placement in
+                # InitialParetoLevelSorting).
+                self.pareto_levels.set_normalizer()
+                with _loop_stats.timer('MOEADD.epoch'):
                     if global_var.verbose.show_iter_idx:
-                        print(f'During MO : processing {order_idx + 1}-th sector (of {n_sectors}).')
-                    sp_kwargs = self.form_processer_args(weight_idx)
-                    self.sector_processer.run(population_subset = self.pareto_levels,
-                                              EA_kwargs = sp_kwargs)
+                        print(f'\n----- Multiobjective optimization : {epoch_idx + 1}-th epoch -----')
+                    # Shuffle sector order each epoch. The prior fixed
+                    # 0..N-1 traversal gave early sectors a population
+                    # advantage every epoch (their offspring entered the
+                    # global Pareto pool before late sectors saw the
+                    # evolved chromosomes). Reproducibility is preserved
+                    # because np.random is seeded by the caller via
+                    # ``_set_seeds`` before optimization.
+                    n_sectors = len(self.weights)
+                    for order_idx, weight_idx in enumerate(np.random.permutation(n_sectors)):
+                        if global_var.verbose.show_iter_idx:
+                            print(f'During MO : processing {order_idx + 1}-th sector (of {n_sectors}).')
+                        sp_kwargs = self.form_processer_args(weight_idx)
+                        with _loop_stats.timer('MOEADD.sector'):
+                            self.sector_processer.run(population_subset = self.pareto_levels,
+                                                      EA_kwargs = sp_kwargs)
                 stats = self.pareto_levels.get_stats()
                 self._hist.append(stats)
                 # Snapshot the current Pareto-0 structures so consumers can
@@ -738,5 +764,5 @@ class MOEADDOptimizer(object):
     def plot_pareto(self, dimensions:list, **visualizer_kwargs):
         assert len(dimensions) == 2, 'Current approach supports only two dimensional plots'
         visualizer = ParetoVisualizer(self.pareto_levels)
-        # visualizer.plot_pareto_mt(dimensions = dimensions, **visualizer_kwargs)
-        visualizer.plot_pareto_per_equation()
+        return visualizer.plot_pareto_per_equation(dimensions=tuple(dimensions),
+                                                   **visualizer_kwargs)

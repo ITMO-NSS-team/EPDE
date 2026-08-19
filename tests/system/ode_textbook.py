@@ -24,9 +24,9 @@ from epde.moeadd.moeadd_supplementary import *
 
 import epde.operators.sys_search_operators as operators
 #from epde.src.evo_optimizer import Operator_director
-from epde.evaluators import simple_function_evaluator, trigonometric_evaluator
+from epde.evaluators import simpleFunctionEvaluator, trigonometric_evaluator
 from epde.supplementary import Define_Derivatives
-from epde.cache.cache import upload_simple_tokens, upload_grids, prepare_var_tensor
+from epde.cache.cache import upload_simple_tokens, upload_grids, prepareVarTensor
 from epde.prep.derivatives import Preprocess_derivatives
 from epde.interface.token_family import TF_Pool, Token_family
 
@@ -78,13 +78,13 @@ def test_ode_auto():
             ts_smoothed = np.load(ff_filename) 
             
     global_var.init_caches(set_grids=True)
-    global_var.tensor_cache.memory_usage_properties(obj_test_case=ts, mem_for_cache_frac = 5)  
-    global_var.grid_cache.memory_usage_properties(obj_test_case=x, mem_for_cache_frac = 5)
+    global_var.tensor_cache.memoryUsageProperties(obj_test_case=ts, mem_for_cache_frac = 5)  
+    global_var.grid_cache.memoryUsageProperties(obj_test_case=x, mem_for_cache_frac = 5)
 
     print(type(derivs))
 
     upload_grids(x, global_var.grid_cache)   
-    u_derivs_stacked = prepare_var_tensor(ts_smoothed, derivs, time_axis = 0)
+    u_derivs_stacked = prepareVarTensor(ts_smoothed, derivs, time_axis = 0)
     
     u_names, u_deriv_orders = Define_Derivatives('u', 1, 1) 
     u_names = u_names; u_deriv_orders = u_deriv_orders 
@@ -96,7 +96,7 @@ def test_ode_auto():
     u_token_params = OrderedDict([('power', (1, 1))])
     u_equal_params = {'power' : 0}
     u_tokens.set_params(u_names, u_token_params, u_equal_params, u_deriv_orders)
-    u_tokens.set_evaluator(simple_function_evaluator, [])
+    u_tokens.set_evaluator(simpleFunctionEvaluator, [])
 
     grid_names = ['t',]    
     grid_tokens = Token_family('Grids')
@@ -105,7 +105,7 @@ def test_ode_auto():
     grid_token_params = OrderedDict([('power', (1, 1))])
     grid_equal_params = {'power' : 0}
     grid_tokens.set_params(grid_names, grid_token_params, grid_equal_params)
-    grid_tokens.set_evaluator(simple_function_evaluator, [])
+    grid_tokens.set_evaluator(simpleFunctionEvaluator, [])
 #    
     trig_tokens = Token_family('Trigonometric')
     trig_names = ['sin', 'cos']

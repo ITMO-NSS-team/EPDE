@@ -9,7 +9,8 @@ Created on Thu Mar  5 13:16:43 2020
 import numpy as np
 import copy
 import torch
-from typing import Callable
+from typing import Callable, Dict, List, Union
+
 try:
     from collections.abc import Iterable
 except ImportError:
@@ -19,7 +20,7 @@ import epde.globals as global_var
 from epde.structure.Tokens import TerminalToken
 from epde.supplementary import factor_params_to_str, train_ann, use_ann_to_predict, exp_form
 from epde.structure.structure_template import _deepcopy_slots
-from epde.evaluators import simple_function_evaluator
+from epde.evaluators import simpleFunctionEvaluator
 
 class EvaluatorContained(object):
     """
@@ -40,7 +41,7 @@ class EvaluatorContained(object):
         self._evaluator = eval_function
         # self.eval_kwargs_keys = eval_kwargs_keys
 
-    def apply(self, token, structural=False, func_args=None, torch_mode=False): # , **kwargs
+    def apply(self, token, func_args=None): # , **kwargs structural=False, , torch_mode=False
         """
         Apply the defined evaluator to evaluate the token with specific parameters.
 
@@ -54,7 +55,7 @@ class EvaluatorContained(object):
                 If the evaluator could not be applied to the token.
         """
         # assert list(kwargs.keys()) == self.eval_kwargs_keys, f'Kwargs {kwargs.keys()} != {self.eval_kwargs_keys}'
-        return self._evaluator(token, structural, func_args, torch_mode = torch_mode)
+        return self._evaluator(token, func_args) # structural, , torch_mode = torch_mode
 
 
 class Factor(TerminalToken):
@@ -87,10 +88,11 @@ class Factor(TerminalToken):
         self.is_deriv = not (deriv_code is None)
         self.deriv_code = deriv_code
 
-        self.reset_saved_state()
-        if global_var.tensor_cache is not None:
+        self.resetSavedState()
+        try:
+            global_var.samples_manager # .exists
             self.use_cache()
-        else:
+        except:
             self.cache_linked = False
 
         if randomize:
@@ -119,15 +121,15 @@ class Factor(TerminalToken):
         try:
             return self._ann_repr
         except AttributeError:
-            _, grids = global_var.grid_cache.get_all()
+            grids = global_var.samples_manager.grids() 
             self._ann_repr = train_ann(grids = grids, data=self.evaluate())
             return self._ann_repr
 
-    def predict_with_ann(self, grids: list):
+    def predict_with_ann(self, grids: Union[Dict[int, List[np.ndarray]], List[np.ndarray]]):
         return use_ann_to_predict(self.ann_representation, grids)
 
-    def reset_saved_state(self):
-        self.saved = {'base': False, 'structural': False}
+    def resetSavedState(self):
+        self.saved = {'base': False,} #  'structural': False - probably, TODO add new flags 
 
     @property
     def status(self):
@@ -225,11 +227,11 @@ class Factor(TerminalToken):
             factor_family = [family for family in evaluator.families if family.ftype == self.ftype][0]
             self._evaluator = factor_family._evaluator # TODO: fix calling private attribute
             
-    def evaluate(self, structural=False, grids=None, torch_mode: bool = False):
+    def evaluate(self, grids: Union[Dict[int, List[np.ndarray]], List[np.ndarray]] = None) -> Dict[int, np.ndarray]: # change structura; tp normalized?
+        # structural=False, torch_mode: bool = False
         assert self.cache_linked, 'Missing linked cache.'
         if self.is_deriv and grids is not None:
-            raise Exception(
-                'Derivatives have to evaluated on the initial grid')
+            raise Exception('Derivatives have to evaluated on the initial grid') # What is the logic behind it?
 
         # Key the tensor cache on ``structural_label`` rather than
         # ``cache_label``: continuous-tolerance params (e.g. trig
@@ -240,47 +242,64 @@ class Factor(TerminalToken):
         # (derivatives, grid, const, ...) the two labels are equal so
         # behaviour is unchanged.
         tcache_key = self.structural_label
-        key = 'structural' if structural else 'base'
-        if (tcache_key, structural) in global_var.tensor_cache and grids is None:
-            return global_var.tensor_cache.get(tcache_key,
-                                               structural=structural, torch_mode = torch_mode)
+        # key = 'structural' if structural else 'base'
+        if (tcache_key, False) in global_var.samples_manager and grids is None:
+            return global_var.samples_manager.get(tcache_key) # structural=structural, torch_mode = torch_mode
 
         else:
-            if self.is_deriv and self.evaluator._evaluator != simple_function_evaluator:
+            if self.is_deriv and self.evaluator._evaluator != simpleFunctionEvaluator:
                 if grids is not None:
                     raise Exception('Data-reliant tokens shall not get grids as arguments for evaluation.')
                 if isinstance(self.variable, str):
                     var = self._all_vars.index(self.variable)
-                    func_arg = [global_var.tensor_cache.get(label=None, torch_mode=torch_mode,
-                                                            deriv_code=(var, self.deriv_code)),]
+                    func_arg: Dict[int, np.ndarray] = global_var.samples_manager.get(label=None, deriv_code=(var, self.deriv_code)) 
+                    #    [global_var.tensor_cache.get(label=None, deriv_code=(var, self.deriv_code)),]
                 elif isinstance(self.variable, (list, tuple)):
-                    func_arg = []
+                    func_args: Dict[List[np.ndarray]] = dict()
                     for var_idx, code in enumerate(self.deriv_code):
                         assert len(self.variable) == len(self.deriv_code)
-                        func_arg.append(global_var.tensor_cache.get(label=None, torch_mode=torch_mode,
-                                                                    deriv_code=(self.variable[var_idx], code)))
+                        var_by_samples = global_var.samples_manager.get(label=None, deriv_code=(self.variable[var_idx], code))  # global_var.tensor_cache.get(label=None, deriv_code=(self.variable[var_idx], code))
+                        for key, sample_val in var_by_samples.items():
+                            if len(func_args) == 0:
+                                func_args[key] = [sample_val,]
+                            else:
+                                func_args[key].append(sample_val)
 
-                value = self.evaluator.apply(self, structural=structural, func_args=func_arg, torch_mode=torch_mode)
+                value = self.evaluator.apply(self, func_args = func_arg)
             else:
-                value = self.evaluator.apply(self, structural=structural, func_args=grids, torch_mode=torch_mode)
+                if grids is None:
+                    grids = [None,]
+                if isinstance(grids, list):
+                    grids = {-1: grids}
+
+                if not isinstance(grids, dict):
+                    raise TypeError(f'grids have to be a dict, yet obtained {type(grids)} - typed object.')
+                # else:
+                #     assert isinstance(func_args, dict), \
+                #         'Arg. func_args for CustomEvaluator must be None or DICT of lists of np.ndarrays.'
+                #     assert all([isinstance(func_arg, list) for func_arg in func_args]), \
+                #         'Arg. func_args for CustomEvaluator must be None or dict of LISTS of np.ndarrays.'
+                #     assert all([all([isinstance(arr, np.ndarray) for arr in func_arg]) for func_arg in func_args]), \
+                #         'Arg. func_args for CustomEvaluator must be None or dict of lists of NP.NDARRAYS.'
+                value = self.evaluator.apply(self, func_args = grids)
             if grids is None:
-                if self.is_deriv and self.evaluator._evaluator == simple_function_evaluator:
+                if self.is_deriv and self.evaluator._evaluator == simpleFunctionEvaluator:
                     full_deriv_code = (self._all_vars.index(self.variable), self.deriv_code)
                 else:
                     full_deriv_code = None
 
-                if key == 'structural' and self.status['structural_and_defalut_merged']:
-                    self.saved[key] = global_var.tensor_cache.add(tcache_key, value, structural=False,
-                                                                  deriv_code=full_deriv_code)
-                    global_var.tensor_cache.use_structural(use_base_data=True,
-                                                           label=tcache_key)
-                elif key == 'structural' and not self.status['structural_and_defalut_merged']:
-                    global_var.tensor_cache.use_structural(use_base_data=False,
-                                                           label=tcache_key,
-                                                           replacing_data=value)
-                else:
-                    self.saved[key] = global_var.tensor_cache.add(tcache_key, value, structural=False,
-                                                                  deriv_code=full_deriv_code)
+                # if key == 'structural' and self.status['structural_and_defalut_merged']:
+                #     self.saved[key] = global_var.tensor_cache.add(tcache_key, value, structural=False,
+                #                                                   deriv_code=full_deriv_code)
+                #     global_var.tensor_cache.use_structural(use_base_data=True,
+                #                                            label=tcache_key)
+                # elif key == 'structural' and not self.status['structural_and_defalut_merged']:
+                #     global_var.tensor_cache.use_structural(use_base_data=False,
+                #                                            label=tcache_key,
+                #                                            replacing_data=value)
+                # else:
+                self.saved['base'] = global_var.samples_manager.add(tcache_key, value, structural=False,
+                                                                   deriv_code=full_deriv_code)
             return value
 
     def _invalidate_label_cache(self):
@@ -400,8 +419,9 @@ class Factor(TerminalToken):
         return self._hash_val
 
     @property
-    def grids(self):
-        _, grids = global_var.grid_cache.get_all()
+    def grids(self) -> Dict[int, np.ndarray]:
+        raise DeprecationWarning('Depricated method. Not a warning, but an error!')
+        grids = global_var.samples_manager.grids()
         return grids
 
     def use_grids_cache(self):

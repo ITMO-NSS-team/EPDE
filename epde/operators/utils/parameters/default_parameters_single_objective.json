@@ -14,7 +14,7 @@
 	"InitialParetoLevelSorting" : {
 	
 	},
- 	"DiscrepancyBasedFitness" : {
+ 	"SolverFreeFitness" : {
         "penalty_coeff" : 0.2
  	},
  	"PopulationLevelCrossover" : {

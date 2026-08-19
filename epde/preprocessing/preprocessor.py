@@ -17,7 +17,8 @@ class GeneralizedPrepBuilder(ABC):
     def __init__(self):
         pass
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def prep_pipeline(self):
         pass
 

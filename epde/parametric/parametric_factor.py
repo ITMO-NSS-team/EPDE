@@ -36,7 +36,7 @@ class ParametricFactor(Factor):
         self.defined_params_passed = False
         self.params_predefined = {}
 
-        self.reset_saved_state()
+        self.resetSavedState()
 
     def __deepcopy__(self, memo):
         cls = self.__class__
@@ -76,7 +76,7 @@ class ParametricFactor(Factor):
         return element in self.params_to_optimize
 
     def use_params(self, params):
-        self.reset_saved_state()
+        self.resetSavedState()
         assert len(params) == len(self.params_to_optimize), 'The number of the passed parameters does not match declared problem'
         _params = np.ones(shape=len(self.params_description))
         for param_idx, param_info in self.params_description.items():
@@ -102,7 +102,7 @@ class ParametricFactor(Factor):
             self.params_predefined[param_label] = val
         self.defined_params_passed = True
 
-    def reset_saved_state(self):
+    def resetSavedState(self):
         deriv_eval_dict = {label: False for label in self.params_to_optimize}
         self.saved = {'base': False,
                       'deriv': deriv_eval_dict, 'structural': False}

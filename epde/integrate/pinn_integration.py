@@ -16,7 +16,7 @@ from torch.nn import Sequential
 
 from epde.structure.main_structures import Equation, SoEq
 import epde.globals as global_var
-from epde.evaluators import CustomEvaluator, simple_function_evaluator
+from epde.evaluators import CustomEvaluator, simpleFunctionEvaluator
 
 from epde.integrate.interface import SystemSolverInterface
 from epde.integrate.bop import BOPElement, PregenBOperator
@@ -127,16 +127,18 @@ BASE_TRAINING_PARAMS = {
                         'model_name'        : 'None'
                         }
 
-def solver_formed_grid(training_grid=None, grid_var_keys=None, device = 'cpu'):
-    if training_grid is None:
-        keys, training_grid = global_var.grid_cache.get_all(mode = 'torch')
-    elif grid_var_keys is None:
-        keys, _ = global_var.grid_cache.get_all(mode = 'torch')
+# def solver_formed_grid(training_grid=None, grid_var_keys=None, device = 'cpu'):
+#     if training_grid is None:
+#         # keys, training_grid = global_var.grid_cache.get_all(mode = 'torch')
+#         keys = global_var.samples_manager.grid_keys
+#         training_grid = global_var.samples_manager.grid_keys
+#     elif grid_var_keys is None:
+#         keys, _ = global_var.grid_cache.get_all(mode = 'torch')
 
-    assert len(keys) == training_grid[0].ndim, 'Mismatching dimensionalities'
+#     assert len(keys) == training_grid[0].ndim, 'Mismatching dimensionalities'
 
-    training_grid = np.array(training_grid).reshape((len(training_grid), -1))
-    return torch.from_numpy(training_grid).T.to(device).float()
+#     training_grid = np.array(training_grid).reshape((len(training_grid), -1))
+#     return torch.from_numpy(training_grid).T.to(device).float()
 
 
 class SolverAdapter(object):
@@ -324,16 +326,18 @@ class SolverAdapter(object):
             
         return domain
 
-    def solve_epde_system(self, system: Union[SoEq, dict], grids: list=None, boundary_conditions=None,
-                          mode='NN', data=None, use_cache: bool = False, use_fourier: bool = False,
-                          fourier_params: dict = None, use_adaptive_lambdas: bool = False,
-                          to_numpy: bool = False, grid_var_keys = None,
+    def solve_epde_system(self, system: Union[SoEq, dict], domain_key: int = 0, grids: list=None, 
+                          boundary_conditions=None, mode='NN', data=None, use_cache: bool = False,
+                          use_fourier: bool = False, fourier_params: dict = None,
+                          use_adaptive_lambdas: bool = False, to_numpy: bool = False, grid_var_keys = None,
                           *args, **kwargs) -> Tuple[float, Union[torch.Tensor, np.ndarray]]:
         solver_device(device = self._device)
 
         if isinstance(system, SoEq):
             system_interface = SystemSolverInterface(system_to_adapt=system)
-            system_solver_forms = system_interface.form(grids = grids, mode = mode)
+            system_solver_forms = system_interface.form(domain_key = domain_key, 
+                                                        grids = grids,
+                                                        mode = mode)
         elif isinstance(system, dict):
             system_solver_forms = list(system.values()) # TODO: refactor instead of quickfixes
         elif isinstance(system, list):
@@ -345,19 +349,26 @@ class SolverAdapter(object):
             op_gen = PregenBOperator(system=system,
                                      system_of_equation_solver_form=[sf_labeled[1] for sf_labeled
                                                                      in system_solver_forms]) # system.values .vals()
-            op_gen.generate_default_bc(vals = data, grids = grids)
+            op_gen.generate_default_bc(vals = data, domain_key = domain_key, grids = grids)
             boundary_conditions = op_gen.conditions
-            
+
+        for condition in boundary_conditions:
+            condition.setDomain(domain_key)
+
         bconds_combined = Conditions()
         for cond in boundary_conditions:
             bconds_combined.operator(bnd = cond['bnd_loc'], operator = cond['bnd_op'], 
                                      value = cond['bnd_val'])
 
         if grids is None:
-            grid_var_keys, grids = global_var.grid_cache.get_all(mode = 'torch')
-            grids = [grid[global_var.grid_cache.g_func != 0] for grid in grids]
+            # grid_var_keys, grids = global_var.grid_cache.get_all(mode = 'torch')
+            # grids = [grid[global_var.grid_cache.g_func != 0] for grid in grids]
+            grid_var_keys = global_var.samples_manager.grid_keys
+            grids = global_var.samples_manager.grids[domain_key]
         elif grid_var_keys is None:
-            grid_var_keys, _ = global_var.grid_cache.get_all(mode = 'torch')
+            # grid_var_keys, _ = global_var.grid_cache.get_all(mode = 'torch')
+            grid_var_keys = global_var.samples_manager.grid_keys
+
 
         domain = self.create_domain(grid_var_keys, grids, self._device)
 

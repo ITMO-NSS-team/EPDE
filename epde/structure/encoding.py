@@ -117,7 +117,7 @@ class Chromosome(object):
                 'Incorrect value passed into genes parameters setting.')
 
     def __eq__(self, other):
-        if set(self.chromosome.keys()) != set(self.chromosome.keys()):
+        if set(self.chromosome.keys()) != set(other.chromosome.keys()):
             return False
         return all([self.chromosome[key] == other.chromosome[key] for key in self.chromosome.keys()])
 

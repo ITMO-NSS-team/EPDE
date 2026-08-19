@@ -66,30 +66,26 @@ class MOEADDSelection(CompoundOperator):
                              
         if np.random.uniform() < self.params['delta']:
             selected_regions_idxs = self.suboperators['neighborhood_selector'].apply(self_args['neighborhood_vectors'][self_args['weight_idx']],
-                                                                                     arguments = subop_args['neighborhood_selector']) #, 
+                                                                                     arguments = subop_args['neighborhood_selector'])
 
-            candidate_solution_domains = list(map(lambda x: x.get_domain(self_args['weights']), [candidate for candidate in 
-                                                                                                 objective.population]))
-
-            try:
-                solution_mask = [(objective.population[solution_idx].get_domain(self_args['weights']) in selected_regions_idxs) 
-                                 for solution_idx in candidate_solution_domains]
-            except IndexError:
-                print(f'Indexes are: {[solution_idx for solution_idx in candidate_solution_domains]}')
-                print(len(objective.population), len(candidate_solution_domains))
-                raise IndexError('list index out of range')
+            candidate_solution_domains = [candidate.get_domain(self_args['weights'])
+                                          for candidate in objective.population]
+            solution_mask = [domain in selected_regions_idxs for domain in candidate_solution_domains]
             available_in_proximity = sum(solution_mask)
-            parent_idxs = np.random.choice([idx for idx in np.arange(len(objective.population)) if solution_mask[idx]], 
-                                            size = min(available_in_proximity, parents_number),
-                                            replace = False)
-            if available_in_proximity < parents_number: 
-                parent_idxs_additional = np.random.choice([idx for idx in np.arange(len(objective.population))
-                                                           if not solution_mask[idx]],
-                                                          size = parents_number - available_in_proximity,
-                                                          replace = False)
-                parent_idxs_temp = np.empty(shape = parent_idxs.size + parent_idxs_additional.size)
-                parent_idxs_temp[:parent_idxs.size] = parent_idxs; parent_idxs_temp[parent_idxs.size:] = parent_idxs_additional
-                parent_idxs = parent_idxs_temp
+            if available_in_proximity == 0:
+                # Algorithm 3, lines 3-4 of the MOEA/DD paper: no solution is
+                # associated with the selected subregions -- mate from the
+                # whole population instead.
+                parent_idxs = np.random.choice(np.arange(len(objective.population)),
+                                               size = parents_number, replace = False)
+            else:
+                # Algorithm 3, line 6: parents come exclusively from the
+                # selected subregions. When they hold fewer solutions than
+                # the requested number of parents, sample with replacement
+                # to preserve the parent count.
+                parent_idxs = np.random.choice([idx for idx in np.arange(len(objective.population)) if solution_mask[idx]],
+                                               size = parents_number,
+                                               replace = available_in_proximity < parents_number)
         else:
             parent_idxs = np.random.choice(np.arange(len(objective.population)), size = parents_number, replace = False)
         for idx in parent_idxs.reshape(-1):

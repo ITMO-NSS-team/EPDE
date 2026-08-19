@@ -3,6 +3,7 @@
 
 import numpy as np
 import inspect
+from typing import Callable, Union, Dict, Tuple, Any
 
 from functools import wraps
 from epde.operators.utils.default_parameter_loader import EvolutionaryParams
@@ -17,11 +18,126 @@ OPERATOR_LEVELS = ('custom level', 'term level', 'gene level', 'chromosome level
 OPERATOR_LEVELS_SUPPORTED_TYPES = {'custom level': None, 'term level': Term, 'gene level': Gene,
                                    'chromosome level': Chromosome, 'population level': ParetoLevels}
 
+def checkDicts(*args, suppressed = False) -> None:
+    if suppressed:
+        return None
+    
+    for arg in args:
+        assert all([(isinstance(key, int) and isinstance(value, (np.ndarray, float, int, list))) for key, value in arg.items()]), \
+              f'If input is a dict, it must be in form of int: np.ndarray, instead got {[(type(key), type(value)) for key, value in arg.items()]}'
+        
+    for arg_idx in range(len(args) - 1):
+        assert set(args[0].keys()) == set(args[arg_idx + 1].keys()), 'Mismatching keys of dicts inputs into dictDot'        
+
 def add_base_param_to_operator(operator, target_dict):
     params_container = EvolutionaryParams()
     for param_key, param_value in params_container.get_default_params_for_operator(operator.key).items():
         operator.params[param_key] = target_dict[param_key] if param_key in target_dict.keys(
         ) else param_value
+
+def dictZerosLike(ref: Union[Dict[int, np.ndarray], np.ndarray], dim: int = 0) \
+        -> Union[Dict[int, np.ndarray], np.ndarray]:
+    if isinstance(ref, np.ndarray):
+        return np.zeros(ref.shape[dim])
+    else:
+        return {key: value.shape[dim] for key, value in ref.items()}
+
+def dictApplyUFunc(func: Union[np.ufunc, Callable], *args: Tuple[Union[np.ndarray, Dict[int, np.ndarray], Any]],
+                   suppressed: bool = False) -> Dict[int, np.ndarray]:
+    if all([isinstance(x, dict) for x in args]): # and isinstance(y, dict)
+        checkDicts(*args, suppressed=suppressed)
+
+    dict_idxs = [elem_idx for elem_idx, elem in enumerate(args) if isinstance(elem, dict)]
+    if len(dict_idxs) == 0:
+        return func(*args)
+    else:
+        new_args = []
+        for elem in args:
+            if isinstance(elem, dict):
+                new_args.append(elem)
+            else:
+                new_args.append({key: elem for key in args[dict_idxs[0]].keys()})
+        
+        results = dict()
+        for key in args[dict_idxs[0]].keys():
+            results[key] = func(*[array[key] for array in new_args])
+        
+        return results
+
+def dictDot(x: Union[Dict[int, np.ndarray], np.ndarray], y: Union[Dict[int, np.ndarray], np.ndarray],
+            suppressed: bool = False) -> Dict[int, np.ndarray]:
+    if not (isinstance(x, (dict, np.ndarray)) or isinstance(y, (dict, np.ndarray))):
+        raise TypeError(f'dictDot requires individual or dicts of numpy ndarrays as arguments, instead got {type(x)} and {type(y)}.')
+    
+    if isinstance(x, dict) and isinstance(y, dict):
+        checkDicts(x, y, suppressed=suppressed)
+
+    if isinstance(x, np.ndarray):
+        if isinstance(y, np.ndarray):
+            return {-1: np.dot(x, y)}
+        else:
+            assert isinstance(y, dict), 'Inputs in dictDot must be of type Dict[int, np.ndarray], or np.ndarray'
+            x = {key: x for key in y.keys()}
+    
+    if isinstance(y, np.ndarray):
+        y = {key: y for key in x.keys()}
+
+    results: Dict[int, np.ndarray] = dict()
+    for key in x.keys():
+        results[key] = np.dot(x[key], y[key])
+
+    return results
+
+def dictFullLike(ref: Union[Dict[int, np.ndarray], np.ndarray], val) -> Union[Dict[int, np.ndarray], np.ndarray]:
+    if isinstance(ref, np.ndarray):
+        return np.full_like(ref, val)
+    else:
+        return {key: np.full_like(value) for key, value in ref.items()}
+    
+def dictAdd(x: Union[Dict[int, np.ndarray], np.ndarray, Any], y: Union[Dict[int, np.ndarray], np.ndarray, Any], 
+            suppressed: bool = False) -> Dict[int, np.ndarray]:
+    # if suppressed:
+    #     if 
+    if isinstance(x, dict) and isinstance(y, dict):
+        checkDicts(x, y, suppressed=suppressed)
+
+    if isinstance(x, (np.ndarray, float, int)):
+        if isinstance(y, (np.ndarray, float, int)):
+            return {-1: x + y}
+        else:
+            assert isinstance(y, dict), 'Inputs in dictDot must be of type Dict[int, np.ndarray], or np.ndarray'
+            x = {key: x for key in y.keys()}
+
+    if isinstance(y, (np.ndarray, float, int)):
+        y = {key: y for key in x.keys()}
+
+    
+    results: Dict[int, np.ndarray] = dict()
+    for key in x.keys() | y.keys():
+        results[key] = x[key] + y[key]
+
+    return results
+
+def dictSubtr(x: Union[Dict[int, np.ndarray], np.ndarray, Any], y: Union[Dict[int, np.ndarray], np.ndarray, Any],
+              suppressed: bool = False) -> Dict[int, np.ndarray]:
+    if isinstance(x, dict) and isinstance(y, dict):
+        checkDicts(x, y, suppressed=suppressed)
+
+    if isinstance(x, (np.ndarray, float, int)):
+        if isinstance(y, (np.ndarray, float, int)):
+            return {-1: x - y}
+        else:
+            assert isinstance(y, dict), 'Inputs in dictDot must be of type Dict[int, np.ndarray], or np.ndarray'
+            x = {key: x for key in y.keys()}
+
+    if isinstance(y, (np.ndarray, float, int)):
+        y = {key: y for key in x.keys()}
+
+    results: Dict[int, np.ndarray] = dict()
+    for key in x.keys():
+        results[key] = x[key] - y[key]
+
+    return results
 
 class CompoundOperator():
     '''
@@ -72,10 +188,10 @@ class CompoundOperator():
         if not all([isinstance(key, str) and (isinstance(value, (list, tuple, dict)) or
                                               issubclass(type(value), CompoundOperator))
                     for key, value in operators.items()]):
-            print([(key, isinstance(key, str),
-                    value, (isinstance(value, (list, tuple, dict)) or 
-                            issubclass(type(value), CompoundOperator)))
-                    for key, value in operators.items()])
+            print('set_suboperators: ', [(key, isinstance(key, str),
+                                         value, (isinstance(value, (list, tuple, dict)) or 
+                                                 issubclass(type(value), CompoundOperator)))
+                                         for key, value in operators.items()])
             raise TypeError('The suboperators of an evolutionary operator must be declared in format key : value, where key is str and value - CompoundOperator, list, tuple or dict')
         self._suboperators = SuboperatorContainer(suboperators = operators, probas = probas) 
 

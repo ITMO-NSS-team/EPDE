@@ -29,7 +29,7 @@ sys.path.append('../')
 sys.path.pop()
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')))
 
-# from epde.evaluators import CustomEvaluator, simple_function_evaluator, inverse_function_evaluator
+# from epde.evaluators import CustomEvaluator, simpleFunctionEvaluator, inverse_function_evaluator
 # TODO^ caching of the pre-calculated derivatives
     
 def run_burg_eq_search(multiobjective_mode, derivs):

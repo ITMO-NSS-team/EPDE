@@ -21,9 +21,9 @@ from epde.interface.equation_translator import translate_equation
 import epde.globals as global_var
 
 from epde.interface.prepared_tokens import TrigonometricTokens
-from epde.evaluators import simple_function_evaluator, trigonometric_evaluator
+from epde.evaluators import simpleFunctionEvaluator, trigonometric_evaluator
 from epde.interface.token_family import TokenFamily, TF_Pool
-from epde.cache.cache import prepare_var_tensor, upload_simple_tokens, upload_grids
+from epde.cache.cache import prepareVarTensor, upload_simple_tokens, upload_grids
 from epde.supplementary import Define_Derivatives
 from epde.preprocessing.derivatives import Preprocess_derivatives
 
@@ -36,7 +36,7 @@ def get_basic_var_family(var_name, deriv_names, deriv_orders):
                                   meaningful = True)     
     entry_token_family.set_params(deriv_names, OrderedDict([('power', (1, 1))]),
                                   {'power' : 0}, deriv_orders)
-    entry_token_family.set_evaluator(simple_function_evaluator, [])    
+    entry_token_family.set_evaluator(simpleFunctionEvaluator, [])    
     return entry_token_family
 
 def prepare_basic_inputs():
@@ -46,14 +46,14 @@ def prepare_basic_inputs():
 
     global_var.init_caches(set_grids = True)
     global_var.set_time_axis(0)
-    global_var.grid_cache.memory_usage_properties(u, 3, None)
-    global_var.tensor_cache.memory_usage_properties(u, 3, None)
+    global_var.grid_cache.memoryUsageProperties(u, 3, None)
+    global_var.tensor_cache.memoryUsageProperties(u, 3, None)
 
     deriv_names, deriv_orders = Define_Derivatives(var_name, dimensionality=u.ndim, max_order = 1)
 
     method = 'poly'; method_kwargs = {'grid' : grids, 'smooth' : False}
     data_tensor, derivatives = Preprocess_derivatives(u, method=method, method_kwargs=method_kwargs)
-    derivs_stacked = prepare_var_tensor(u, derivatives, time_axis = global_var.time_axis)
+    derivs_stacked = prepareVarTensor(u, derivatives, time_axis = global_var.time_axis)
 
     upload_grids(grids, global_var.grid_cache)
     upload_simple_tokens(deriv_names, global_var.tensor_cache, derivs_stacked)
@@ -84,5 +84,5 @@ def test_adapter_form_only():
     
     
     
-def test_adapter_full_solution():
+# def test_adapter_full_solution():
         

@@ -9,7 +9,7 @@ Created on Mon Jul  6 15:39:18 2020
 import numpy as np
 import math
 import itertools
-from typing import Union, Callable, List
+from typing import Union, Callable, List, Tuple
 try:
     from collections.abc import Iterable
 except ImportError:
@@ -88,13 +88,13 @@ class TokenFamily(object):
         self.deriv_evaluator_set = True
         self.set_latex_form_constructor()
 
-    def __len__(self):
+    def __len__(self) -> int:
         assert self.params_set, 'Familiy is not fully initialized.'
         return len(self.tokens)
 
     def set_status(self, demands_equation=False, meaningful=False,
                    s_and_d_merged=True, unique_specific_token=False,
-                   unique_token_type=False, requires_grid=False, non_default_power=False):
+                   unique_token_type=False, requires_grid=False, non_default_power=False) -> None:
         """
         Set the status of the elements of the token family; 
 
@@ -120,7 +120,7 @@ class TokenFamily(object):
         self.status['requires_grid'] = requires_grid
         self.status['non_default_power'] = non_default_power
 
-    def set_params(self, tokens, token_params, equality_ranges, derivs_solver_orders=None):
+    def set_params(self, tokens, token_params, equality_ranges, derivs_solver_orders=None) -> None:
         """
         Define the token family with list of tokens and their parameters
 
@@ -156,7 +156,7 @@ class TokenFamily(object):
         if self.evaluator_set:
             self.test_evaluator()
 
-    def set_evaluator(self, eval_function, suppress_eval_test=True):
+    def set_evaluator(self, eval_function, suppress_eval_test=True) -> None:
         """
         Define the evaluator for the token family and its parameters
 
@@ -211,7 +211,7 @@ class TokenFamily(object):
         if self.params_set and not suppress_eval_test:
             self.test_evaluator()
 
-    def set_deriv_evaluator(self, eval_functions, suppress_eval_test=True): # eval_kwargs_keys=[], 
+    def set_deriv_evaluator(self, eval_functions, suppress_eval_test=True) -> None: # eval_kwargs_keys=[], 
         """
         Define the evaluator for the derivatives of the token family and its parameters
 
@@ -235,10 +235,10 @@ class TokenFamily(object):
         if self.params_set and not suppress_eval_test:
             self.test_evaluator(deriv=True)
 
-    def set_latex_form_constructor(self, latex_constructor: Callable = None):
+    def set_latex_form_constructor(self, latex_constructor: Callable = None) -> None:
         self.latex_constructor = latex_constructor
 
-    def test_evaluator(self, deriv=False):
+    def test_evaluator(self, deriv=False) -> None:
         """
         Method to test, if the evaluator and tokens are set properly
 
@@ -258,7 +258,7 @@ class TokenFamily(object):
             self.test_evaluation = self._evaluator.apply(self.test_token)
         print('Test evaluation performed correctly')
 
-    def chech_constancy(self, **tfkwargs):
+    def chech_constancy(self, **tfkwargs) -> None:
         '''
         Method to check, if any single simple token in the studied domain is constant, or close to it. The constant token is to be displayed and deleted from tokens and cache.
 
@@ -272,23 +272,31 @@ class TokenFamily(object):
         constant_tokens_labels = []
         for label in self.tokens:
             data_label = (label, (1.0,))
-            data = global_var.tensor_cache.memory_default["numpy"].get(data_label)
-            try:
-                constancy = math.isclose(np.min(data), np.max(data))
-            except TypeError:
-                print(f"No {label} data in cache for constancy check. Functionality of eval-d token check TBD.")
-                continue
-            if constancy:
+            domain_constancies = []
+            for domain_dict in global_var.tensor_cache.memory_default.values():
+                data = domain_dict.get(data_label)
+
+                try:
+                    constancy = math.isclose(np.min(data), np.max(data))
+                    domain_constancies.append(constancy)
+
+                except TypeError:
+                    print(f"No {label} data in cache for constancy check. Functionality of eval-d token check TBD.")
+                    domain_constancies.append(False)
+                    # continue
+
+            # print(label, domain_constancies)
+            if all(domain_constancies):
                 constant_tokens_labels.append(label)
 
         for label in constant_tokens_labels:
             print(f'Function {label} is assumed to be constant in the studied domain. \
-                          Removed from the equaton search.')
+                    Removed from the equaton search.')
             data_label = (label, (1.0,))
             self.tokens.remove(label)
             global_var.tensor_cache.delete_entry(data_label)
 
-    def evaluate(self, token):
+    def evaluate(self, token) -> None:
         """
         Applying evaluator in token
         """
@@ -300,7 +308,7 @@ class TokenFamily(object):
                 'Evaluator function or its parameters not set before evaluator application.')
 
     def create(self, label=None, token_status: dict = None, all_vars: List[str] = None,
-               create_derivs: bool = False, **factor_params):
+               create_derivs: bool = False, **factor_params) -> Tuple[dict, Factor]:
         """
         Method for creating element of the token family
 
@@ -357,7 +365,7 @@ class TokenFamily(object):
 
         return occupied_by_factor, new_factor
 
-    def cardinality(self, token_status: Union[dict, None] = None):
+    def cardinality(self, token_status: Union[dict, None] = None) -> int:
         """
         Method for getting number of free place for creating new factors for that token family
 
@@ -373,7 +381,7 @@ class TokenFamily(object):
                             for label in self.tokens}
         return len([token for token in self.tokens if token_status[token][0] < token_status[token][1]])
 
-    def evaluate_all(self, all_vars: List[str]):
+    def evaluate_all(self, all_vars: List[str]) -> None:
         """
         Apply method of evaluation for all tokens in token family
         """
@@ -411,28 +419,28 @@ class TFPool(object):
     def __init__(self, families: list):
         self.families = families
     
-    def manual_reconst(self, attribute:str, value, except_attrs:dict):
+    def manual_reconst(self, attribute:str, value, except_attrs:dict) -> None:
         from epde.loader import obj_to_pickle, attrs_from_dict        
         supported_attrs = []
         if attribute not in supported_attrs:
             raise ValueError(f'Attribute {attribute} is not supported by manual_reconst method.')
     
     @property
-    def families_meaningful(self):
+    def families_meaningful(self) -> List[TokenFamily]:
         """
         Getting token families, that are meaningful
         """
         return [family for family in self.families if family.status['meaningful']]
 
     @property
-    def families_demand_equation(self):
+    def families_demand_equation(self) -> List[TokenFamily]:
         """
         Getting token families, that must have an individual equation
         """
         return [family for family in self.families if family.status['demands_equation']]
 
     @property
-    def families_supplementary(self):
+    def families_supplementary(self) -> List[TokenFamily]:
         """
         Getting token families, that are not meaningful
         """

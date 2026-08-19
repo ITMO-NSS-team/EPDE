@@ -19,10 +19,11 @@ from epde.interface.equation_translator import translate_equation, parse_equatio
 def equations_match(eq_checked: Equation, eq_ref: Equation):
     def parse_equation(equation: Equation, eps = 1e-9):
         term_weights = []
+        tgt = equation.target_idx
         for idx, term in enumerate(equation.structure):
-            if idx < equation.target_idx:
+            if idx < tgt:
                 term_weights.append(equation.weights_final[idx])
-            elif idx == equation.target_idx:
+            elif idx == tgt:
                 term_weights.append(1)
             else:
                 term_weights.append(equation.weights_final[idx-1])

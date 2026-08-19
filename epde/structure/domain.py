@@ -2,19 +2,17 @@ import numpy as np
 import torch
 from collections import OrderedDict
 
-from typing import Callable, Tuple, List, Union, Literal
-from functools import singledispatchmethod
+from typing import Callable, Tuple, List, Union, Literal, Dict
+from functools import singledispatchmethod, singledispatch
 
-from epde.cache.cache import upload_grids
-
-from epde.cache.cache import Cache, prepare_var_tensor, upload_simple_tokens
+from epde.cache.cache_refactored import Cache, prepareVarTensor, uploadSimpleTokens, uploadGrids
 from epde.decorators import BoundaryExclusion
 from epde.preprocessing.domain_pruning import DomainPruner
 
 from epde.supplementary import define_derivatives
-from epde.evaluators import simple_function_evaluator # , trigonometric_evaluator
+from epde.evaluators import simpleFunctionEvaluator # , trigonometric_evaluator
 
-from epde.interface.prepared_tokens import DataPolynomials
+from epde.interface.prepared_tokens import DataPolynomials, CustomTokens
 from epde.interface.type_checks import *
 from epde.interface.token_family import TFPool, TokenFamily
 
@@ -97,31 +95,18 @@ RELATIVE_BC_LOC_DIR = {0: (), 1: (0.,), 2: (0., 1.),
     #         if self._g_func is not None:
     #             self._grid_cache.g_func = self._g_func
 
-class InputDataEntry(object):
-    """
-    Class for keeping input data
-
-    Attributes:
-        var_name (`str`): name of input data dependent variable
-        data_tensor (`np.ndarray`): value of the input data
-        names (`list`): keys for derivatides
-        d_orders (`list`): keys for derivatides on `int` format for `solver`
-        derivatives (`np.ndarray`): values of derivatives
-        deriv_properties (`dict`): settings of derivatives
-    """
-    def __init__(self, var_name: str, var_idx: int, data_tensor: Union[List[np.ndarray], np.ndarray], boundary):
+class InputEntry(object):
+    def __init__(self, var_name: str, data_tensor: np.ndarray):
+        self.names = var_name
         self.var_name = var_name
-        self.var_idx = var_idx 
+
         if isinstance(data_tensor, np.ndarray):
             check_nparray(data_tensor) 
             self.ndim = data_tensor.ndim
-        elif isinstance(data_tensor, list):
-            [check_nparray(tensor) for tensor in data_tensor]
-            assert all([data_tensor[0].ndim == tensor.ndim for tensor in data_tensor]), 'Mismatching dimensionalities of data tensors.'
-            self.ndim = data_tensor[0].ndim
+        else:
+            raise TypeError(f'data_tensor arg. in InputEntry.__init__(...) must be a np.ndarray.')
+        
         self.data_tensor = data_tensor
-        self.boundary = boundary
-
 
     def setDerivatives(self, preprocesser: PreprocessingPipe, deriv_tensors: Union[list, np.ndarray] = None,
                         max_order: Union[list, tuple, int] = 1, grid: list = []):
@@ -129,7 +114,8 @@ class InputDataEntry(object):
         Method for setting derivatives ot calculate derivatives from data
 
         Args:
-            preprocesser (`PreprocessingPipe`): operator for preprocessing data (smooting and calculating derivatives)
+            preprocesser (`PreprocessingPipe`): operator for preprocessing data (smooting and calculating derivatives).
+                Typically, we use the one, initialized in EpdeSearch objects: EpdeSearch.preprocessor_pipeline
             deriv_tensor (`np.ndarray`): values of derivatives
             max_order (`list`|`tuple`|`int`): order for derivatives
             grid: value of grid
@@ -149,6 +135,7 @@ class InputDataEntry(object):
             self.deriv_properties = {'max order': max_order,
                                      'dimensionality': self.data_tensor.ndim}
         elif deriv_tensors is None and isinstance(self.data_tensor, list):
+            raise NotImplementedError("Depricated method: used to be a way to create multi-sample setup")
             if isinstance(grid[0], np.ndarray):
                 raise ValueError('A single set of grids passed for multiple samples mode.')
             data_tensors, derivatives = [], []
@@ -174,6 +161,23 @@ class InputDataEntry(object):
             self.deriv_properties = {'max order': max_order,
                                      'dimensionality': self.data_tensor.ndim}
 
+
+class VariableEntry(InputEntry):
+    """
+    Class for keeping input data
+
+    Attributes:
+        var_name (`str`): name of input data dependent variable
+        data_tensor (`np.ndarray`): value of the input data
+        names (`list`): keys for derivatides
+        d_orders (`list`): keys for derivatides on `int` format for `solver`
+        derivatives (`np.ndarray`): values of derivatives
+        deriv_properties (`dict`): settings of derivatives
+    """
+    def __init__(self, var_name: str, var_idx: int, data_tensor: np.ndarray): # Union[List[np.ndarray], np.ndarray]
+        super().__init__(var_name, data_tensor)
+        self.var_idx = var_idx
+
     # def use_global_cache(self): # , var_idx: int, deriv_codes: list
     #     """
     #     Method for add calculated derivatives in the cache
@@ -182,7 +186,7 @@ class InputDataEntry(object):
     #     deriv_codes = self.d_orders
     #     self.data_tensor = self.data_tensor[self.boundary != 0]
     #     self.derivatives = np.array([derivative[self.boundary.flatten() != 0] for derivative in self.derivatives.T]).T
-    #     derivs_stacked = prepare_var_tensor(self.data_tensor, self.derivatives, 
+    #     derivs_stacked = prepareVarTensor(self.data_tensor, self.derivatives, 
     #                                         time_axis=global_var.time_axis)
     #     deriv_codes = [(var_idx, code) for code in deriv_codes]
 
@@ -233,7 +237,7 @@ class InputDataEntry(object):
                                        meaningful=True)
         self._derivs_family.set_params(self.names, OrderedDict([('power', (1, max_deriv_power))]),
                                       {'power': 0}, self.d_orders)
-        self._derivs_family.set_evaluator(simple_function_evaluator)
+        self._derivs_family.set_evaluator(simpleFunctionEvaluator)
 
     def create_polynomial_family(self, max_power):
         polynomials = DataPolynomials(self.var_name, max_power = max_power)
@@ -243,12 +247,12 @@ class InputDataEntry(object):
         return [self._polynomial_family, self._derivs_family]
 
     def matched_derivs(self, max_order: int = 1, time_axis: int = 0):
-        derivs_stacked = prepare_var_tensor(self.data_tensor, self.derivatives, 
+        derivs_stacked = prepareVarTensor(self.data_tensor, self.derivatives, 
                                             time_axis = time_axis)
         # print(f'Creating matched derivs: {[[self.var_idx, key, len(key) <= max_order] for idx, 
         #                                    key in enumerate(self.d_orders)]}')
         # print(f'From {self.d_orders}')
-        return [[self.var_idx, key, derivs_stacked[idx, ...]] for idx, key in enumerate(self.d_orders)
+        return [(self.var_idx, key, derivs_stacked[idx, ...]) for idx, key in enumerate(self.d_orders)
                 if len(key) <= max_order]
 
 
@@ -256,17 +260,18 @@ class Domain(object): # inheritance from cache objects?
     def __init__(self, 
                  grids: Union[np.ndarray, Tuple[np.ndarray], List[np.ndarray]], 
                  grid_cache: Cache,
-                 time_axis: int = 0):
+                 time_axis: int = 0,
+                 ID: int = 0,
+                 boundary: Union[int, List[int], Tuple[int]] = 0):
+        self._ID = ID
         self._time_axis = time_axis
         
         self._g_func = None
         self._g_func_flat_cache = None
         self._g_func_mask_cache = None        
         
-        self._grid_cache = None
-        self._tensor_cache = None
-
         self._pruner = None
+        self.inner_shape = None
 
         if isinstance(grids, np.ndarray): # or (isinstance(grid, (list, tuple)) and len(grid) == 1):
             self._dim = 1
@@ -274,8 +279,9 @@ class Domain(object): # inheritance from cache objects?
         elif isinstance(grids, (tuple, list)):
             self._dim = len(grids)
         
-        self._grid_cache = grid_cache
-        upload_grids(grids, grid_cache)
+        self._grid_cache: Cache = grid_cache
+        uploadGrids(grids, grid_cache, domain_id = self._ID)
+        self.setBoundaries(boundary)
 
     def set_pruner(self, pivotal_tensor: np.ndarray, pruner: DomainPruner = None,
                    threshold : float = 1e-5, division_fractions = 3,
@@ -309,16 +315,9 @@ class Domain(object): # inheritance from cache objects?
             self.pruner.get_boundaries(pivotal_tensor, division_fractions=division_fractions,
                                        rectangular=rectangular)
 
-
-    def setBoundaries(self, boundary_width: Union[int, List[int]]) -> None:
-        """
-        Setting the number of unaccounted elements at the edges
-        """
-        if isinstance(boundary_width, int):
-            self._boundary_width = [boundary_width,] * self._dim
-        elif isinstance(boundary_width, (list, tuple)):
-            assert all([isinstance(width, int) for width in boundary_width]), 'Boundary width has to be an int.'
-            self._boundary_width = boundary_width
+    @property
+    def ID(self) -> int:
+        return self._ID
 
     def prune(self) -> None:
         raise NotImplementedError('Pruning is not implemented yet.')
@@ -328,8 +327,11 @@ class Domain(object): # inheritance from cache objects?
         return tuple(np.meshgrid(*[np.arange(shape) if dim_idx != axis else min(int(rel_loc * shape), shape-1)
                                    for dim_idx, shape in enumerate(tensor_shape)], indexing='ij'))
 
+    def get(self, key) -> np.ndarray:
+        return self._grid_cache.get(label = key, subcache_ID = self._ID)
+
     def getGrids(self, mode: Literal['full', 'solver'] = 'full') -> List[np.ndarray]:
-        _, grids = self._grid_cache.get_all()
+        _, grids = self._grid_cache.get_all(subcache_ID = self._ID)
 
         if mode == 'solver':
             for grid_idx in range(len(grids)):
@@ -338,12 +340,6 @@ class Domain(object): # inheritance from cache objects?
                                               indices = np.r_[bnd : grids[grid_idx].shape[dim_idx]-bnd],
                                               axis    = dim_idx)
         return grids
-
-    def getCachedTensor(self, label: tuple = None, subcache_ID: int = None,
-                        normalized: bool = False, deriv_code = None) -> np.ndarray:
-        if self._tensor_cache is None:
-            raise RuntimeError("Trying to call tensors, linked to a domain, before specializing the cache for the domain.")
-        return self._tensor_cache.get(label, subcache_ID, normalized, deriv_code)
 
     @property
     def g_func(self) -> np.ndarray:
@@ -371,6 +367,14 @@ class Domain(object): # inheritance from cache objects?
             self._g_func_mask_cache = self.g_func != 0
         return self._g_func_mask_cache 
 
+    @property
+    def g_func_masked_val(self) -> np.ndarray:
+        return self.g_func[self.g_func_mask]
+
+    @property
+    def g_func_masked_flat(self) -> np.ndarray:
+        return self.g_func_masked_val.reshape(-1)
+
     def getBCLocation(self, bc_info: dict) -> Tuple[Tuple[np.ndarray], List[np.ndarray]]:
         '''
         Method to get bc locations as indexes of numpy ndarrays, or torch Tensors.
@@ -396,51 +400,188 @@ class Domain(object): # inheritance from cache objects?
 
         return (bc_idxs, bc_locs)
 
-    def addEntry(self, input_entry: InputDataEntry) -> None:
-        deriv_codes = [(input_entry.var_idx, code) for code in input_entry.d_orders]
+    def setBoundaries(self, boundary_width: Union[int, list, tuple]):
+        """
+        Setting the number of unaccounted elements at the edges
+        """
+        # assert '0' in self.memory_default['numpy'].keys(), 'Boundaries should be specified for grid cache.'
+        shape = self._grid_cache.get('0').shape
 
-        derivatives = np.array([derivative[self.g_func_mask] for derivative in input_entry.derivatives.T]).T
-        derivs_stacked = prepare_var_tensor(input_entry.data_tensor, input_entry.derivatives, 
-                                            time_axis = self._time_axis)
-        
-        try:
-            upload_simple_tokens(input_entry.names, self._tensor_cache, derivs_stacked, 
-                                 deriv_codes=deriv_codes)
-            upload_simple_tokens([input_entry.var_name,], self._tensor_cache, [input_entry.data_tensor,],
-                                 deriv_codes=[(input_entry.var_idx, [None,]),])
-            upload_simple_tokens([input_entry.var_name,], self._tensor_cache, [input_entry.data_tensor,])
+        self.initial_shape = shape
+        if isinstance(boundary_width, int):
+            if any([elem <= 2*boundary_width for elem in shape]):
+                raise IndexError(f'Mismatching shapes: boundary of {boundary_width} does not fit data of shape {shape}')
+        elif isinstance(boundary_width, (list, tuple)):
+            if any([elem <= 2*boundary_width[idx] for idx, elem in enumerate(shape)]):
+                raise IndexError(f'Mismatching shapes: boundary of {boundary_width} does not fit data of shape {shape}')                
+        else:
+            raise TypeError(f'Incorrect type of boundaries: {type(boundary_width)}, instead of expected int or list/tuple')
 
-        except AttributeError:
-            raise NameError('Cache has not been declared before tensor addition.')        
-        
+        self.boundary_width = boundary_width
+        if isinstance(boundary_width, int):
+            self.inner_shape = np.array(self.get('0').shape) - 2 * boundary_width
+        elif isinstance(boundary_width, (list, tuple)):
+            self.inner_shape = np.array(self.get('0').shape) - np.multiply(np.array(boundary_width), 2)
+        print(f'Set domain {self} with inner shape of {self.inner_shape}')
 
 
-class Sample(object):
-    def __init__(self, domain: Domain): #  tensor_cache: Cache,
-        # self._tensors = tensor_cache
-        self._domain  = domain
+@singledispatch
+def addEntryToCache(input_entry, domain: Domain, cache: Cache, trajectory_id: int = 0):
+    raise NotImplementedError('Trying to call default addEntryToCache function.')
 
-    def setSample(self, entry: InputDataEntry, preprocessor_pipeline: PreprocessingPipe = None,
-                  derivs: np.ndarray = None, max_deriv_order: Union[int, List[int], Tuple[int]] = 1,
-                  data_fun_pow: int = 1, deriv_fun_pow: int = 1) -> tuple:
+@addEntryToCache.register
+def _(input_entry: InputEntry, domain: Domain, cache: Cache, trajectory_id: int = 0):
+    try:
+        uploadSimpleTokens(labels = input_entry.names, cache = cache, # tensors = , 
+                           subcache_ID = trajectory_id) # , deriv_codes = deriv_codes
+
+    except AttributeError:
+        raise NameError('Cache has not been declared before tensor addition.')      
+
+@addEntryToCache.register
+def _(input_entry: VariableEntry, domain: Domain, cache: Cache, trajectory_id: int = 0):
+    deriv_codes = [(input_entry.var_idx, code) for code in input_entry.d_orders]
+
+    derivatives = np.array([derivative[domain.g_func_mask] for derivative in input_entry.derivatives.T]).T
+    # print(f'In addEntryToCache: {derivatives}')
+    derivs_stacked = prepareVarTensor(input_entry.data_tensor[domain.g_func_mask], derivatives, time_axis = domain._time_axis)
+    
+    try:
+        uploadSimpleTokens(labels = input_entry.names, cache = cache, tensors = derivs_stacked, 
+                           subcache_ID = trajectory_id, deriv_codes = deriv_codes)
+        uploadSimpleTokens(labels = [input_entry.var_name,], cache = cache, tensors = [input_entry.data_tensor[domain.g_func_mask],],
+                           subcache_ID = trajectory_id, deriv_codes=[(input_entry.var_idx, [None,]),])
+        uploadSimpleTokens(labels = [input_entry.var_name,], cache = cache, tensors = [input_entry.data_tensor[domain.g_func_mask],])
+
+    except AttributeError:
+        raise NameError('Cache has not been declared before tensor addition.')      
+
+
+class Trajectory(object): # Pass around in evo. operators or init in globals. Use instead of caches! 
+    def __init__(self, entries: Union[List[VariableEntry], Dict[str, np.ndarray]], 
+                 domain: Domain, cache: Cache, 
+                 cache_id = None, # ID: int = 0,
+                 preprocessor_pipeline: PreprocessingPipe = None, 
+                 additional_cached_tokens: Dict[CustomTokens, Dict[str, np.ndarray]] = None, 
+                 derivs: Union[List[np.ndarray], np.ndarray] = None,
+                 max_deriv_order: Union[int, List[int], Tuple[int]] = 1,
+                 data_fun_pow: int = 1, deriv_fun_pow: int = 1):
+        self.max_deriv_order: int       = 0
+        self._data_tokens: List[TokenFamily]    = None 
+
+        self._domain: Domain = domain
+        self._cache_id: int  = cache_id
+        self._cache: Cache   = cache
+
+        if additional_cached_tokens is not None and not isinstance(additional_cached_tokens, dict):
+            raise TypeError(f'additional_cached_tokens were passed incorrectly, expected dict, got {type(additional_cached_tokens)}')
+
+
+        self.families, self.base_derivs = [], []
+        self.variable_names = []
+
+        if isinstance(entries, list):
+            for entry in entries:
+                self.variable_names.append(entry.var_name)
+                assert isinstance(entry, VariableEntry), \
+                    'Entries have to be passed as list of VariableEntry objects or specific dicts.'
+
+                fam, bd = self.setEntry(entry, preprocessor_pipeline, 
+                                        derivs, max_deriv_order, data_fun_pow, deriv_fun_pow)
+                self.families.extend(fam); self.base_derivs.extend(bd)
+
+        elif isinstance(entries, dict):
+            for key_idx, key in enumerate(entries.keys()):
+                self.variable_names.append(key)
+                assert isinstance(key, str) and isinstance(entries[key], np.ndarray), \
+                    'Dict of entries has to have str as keys and np.ndarrays as values.'
+                
+                entry_formatted = VariableEntry(key, key_idx, entries[key])
+                
+                fam, bd = self.setEntry(entry_formatted, preprocessor_pipeline, 
+                                        derivs, max_deriv_order, data_fun_pow, deriv_fun_pow)
+                self.families.extend(fam); self.base_derivs.extend(bd)
+        else:
+            raise TypeError(f'Incorrect type of entries inputs for Trajectory: \
+                              expected list[VariableEntry] or dict[str, np.ndarray], instead got {type(entries)}.')
+
+        if additional_cached_tokens is None:
+            return None
+        elif isinstance(additional_cached_tokens, dict):
+            for token_type, tokens_val in additional_cached_tokens.items():
+                token_type.upload(trajectory = tokens_val, cache = self._cache, traj_id = self._cache_id)
+        else:
+            print('Unexpected behavior!')
+
+    @property
+    def tokens(self):
+        return self.families # _data_tokens
+
+    def setEntry(self, entry: VariableEntry, preprocessor_pipeline: PreprocessingPipe = None,
+                 derivs: np.ndarray = None, max_deriv_order: Union[int, List[int], Tuple[int]] = 1,
+                 data_fun_pow: int = 1, deriv_fun_pow: int = 1) -> tuple:
         '''
         Returns tuple: first element is a list  matched labled for derivatives
         '''
         entry.setDerivatives(preprocesser = preprocessor_pipeline, deriv_tensors = derivs,
                              grid = self._domain.getGrids(), max_order = max_deriv_order)
         
-        self._domain.addEntry(entry)
+        addEntryToCache(entry, self._domain, self._cache, self.ID)
 
         entry.create_derivs_family(max_deriv_power=deriv_fun_pow)
         entry.create_polynomial_family(max_power=data_fun_pow)
 
         return entry.get_families(), entry.matched_derivs(max_order = 2)
 
+    @property
+    def inner_shape(self) -> np.ndarray:        # Tuple[int]:
+        return self._domain.inner_shape
+
+    def checkShapes(self, domain: Domain) -> bool:
+        sample_tensor = self._cache.get(subcache_ID = self._cache_id)
+        print('In check shapes: ', domain.inner_shape, type(domain.inner_shape), sample_tensor.shape, type(sample_tensor.shape))
+        return (domain.inner_shape == sample_tensor.shape)
+
+    @property
+    def ID(self) -> int:
+        return self._cache_id
+
+    def grids(self) -> np.ndarray:
+        return self._domain.getGrids()
     
+    def gFuncs(self, mode: Literal['d', 'f', 'm', 'dmf', 'dm'] = 'd') -> np.ndarray:
+        match mode:
+            case 'd':
+                return self._domain.g_func
+            case 'f':
+                return self._domain.g_func_flat
+            case 'm':
+                return self._domain.g_func_mask
+            case 'dmf':
+                return self._domain.g_func_masked_flat
+            case 'dm':
+                return self._domain.g_func_masked_val
+            case _:
+                raise NotImplementedError("Incorrect mode for calling g_func of the domain.")
+
+    def get(self, label, normalized=False, saved_as=None, deriv_code = None) -> np.ndarray:
+        return self._cache.get(label = label,
+                               subcache_ID = self._cache_id,
+                               normalized = normalized,
+                               # saved_as = saved_as,
+                               deriv_code = deriv_code)
+        
+    def add(self, label, tensor: np.ndarray, normalized: bool = False,
+            deriv_code = None, indication: bool = False) -> bool:
+        return self._cache.add(label, tensor, self._cache_id, normalized, deriv_code, indication)
+
+    # def __call__(self, *args, **kwargs):
+    #     return global_var.tensor_cache.get(*args, **kwargs)
+
+    # def load(self, label):
+    #     global_var.tensor_cache()
 
         # pass # Add logic to create
-
-
 
     # @singledispatchmethod
     # def set_cache(self, cache: Union[Cache, List[Cache]], token_cache: bool = True):
@@ -456,3 +597,95 @@ class Sample(object):
     #     assert len(self.subdomains) == len(cache), 'Mismatching lengths of subdomains and caches'
     #     for domain_idx, subcache in enumerate(cache):
     #         self.subdomains[domain_idx].set_cache(subcache, token_cache)
+
+class TrajectoriesManager(object):
+    def __init__(self):
+        # self.exists = True
+        self.reset()
+
+    def reset(self):
+        self._traj: Dict[int, Trajectory] = dict()
+        self._domains: Dict[int, Domain] = dict()
+
+    def addTrajectory(self, trajectory: Trajectory, domain: Domain):
+        print(f'Added trajectory {trajectory.ID} to exist. traj: {self._traj.keys()}')
+        if trajectory.ID in self._traj.keys():
+            raise KeyError(f'Trajectory with key {trajectory.ID}')
+        
+        self._traj[trajectory.ID] = trajectory
+        if domain._ID not in self._domains.keys():
+            self._domains[domain._ID] = domain
+        else:
+            assert trajectory.checkShapes(self._domains[domain._ID])
+
+    @property
+    def inner_shapes(self):
+        return {key: trajectory.inner_shape for key, trajectory in self._traj.items()}
+
+    def __getitem__(self, key) -> np.ndarray:
+        if key not in self._traj:
+            raise KeyError(f"Missing key {key} from trajectories: {self._traj.keys}")
+        
+        return self._traj[key]
+
+    def __contains__(self, obj):
+        '''
+        Valid input type:
+            'label' (checked in unnormalized data); ('label1', normalized), where normalized is bool (T if norm, else F);
+            np.ndarray of values (checked in unnormalized data); (np.ndarray, normalized), where normalized is bool
+            (T if norm, else F) and np.ndarray is np.ndarray of tensor values. Does not support scaled vals
+        '''
+        return all([obj in trajectory._cache for trajectory in self._traj.values()])
+
+    @property
+    def trajecatoryIDs(self) -> List[int]:
+        return [key for key in self._traj.keys()]
+
+    def grids(self) -> Dict[int, np.ndarray]:
+        return {key: trajectory.grids() for key, trajectory in self._traj.items()}
+
+    @property
+    def grid_keys(self) -> list:
+        # A bit too hard-coded as: 
+        traj_ID = self.trajecatoryIDs[0]
+        return self._traj[traj_ID]._domain._grid_cache.getKeys()
+
+    @property
+    def ndim(self) -> int:
+        traj_ID = self.trajecatoryIDs[0]
+        return self._traj[traj_ID]._domain._grid_cache.get(label = None).ndim
+
+    def gFunc(self, mode_key: Literal['d', 'f', 'm', 'dmf', 'dm']) -> Dict[int, np.ndarray]:
+        return {key: trajectory.gFuncs(mode_key) for key, trajectory in self._traj.items()}
+
+    def get(self, label, normalized=False, saved_as=None, deriv_code = None, sample_key: int = None, ) -> Dict[int, np.ndarray]:
+        '''
+        Method, mirroring eponymous method of the cache, aimed on calling the method for all samples.
+        '''
+        # for trajectory in self._traj.values():
+        #     print(label, trajectory.get(label, normalized, saved_as, deriv_code).shape)
+        if sample_key is None:
+            return {key : trajectory.get(label, normalized, saved_as, deriv_code) for key, trajectory in self._traj.items()}
+        else:
+            {sample_key: self._traj[sample_key].get(label, normalized, saved_as, deriv_code)}
+    
+    def getSingleTrajectory(self, label, traj_key, normalized=False, saved_as=None, deriv_code = None) -> Dict[int, np.ndarray]:
+        '''
+        Method, mirroring eponymous method of the cache, aimed on calling the method for all samples.
+        '''
+        return self._traj[traj_key].get(label, normalized, saved_as, deriv_code)
+
+
+    def add(self, label, tensors: Dict[int, np.ndarray], normalized: bool = False,
+            deriv_code = None, indication: bool = False) -> bool:
+        success_flag: bool = True
+
+        for key in self._traj.keys():
+            if key not in tensors:
+                raise RuntimeError(f'Missing tensor for sample {key} from tensor dict argument.')
+            sf_new = self._traj[key].add(label, tensors[key], normalized = normalized, 
+                                         deriv_code = deriv_code, indication = indication)
+            success_flag = (success_flag and sf_new)
+
+        return success_flag
+    

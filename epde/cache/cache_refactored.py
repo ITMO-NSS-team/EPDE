@@ -20,9 +20,10 @@ The recommended way to declare the cache object isto declare it as a global vari
 
 from warnings import warn
 import numpy as np
+import random
 import psutil
 
-from typing import Union, Callable, List, Literal
+from typing import Union, Callable, List, Literal, Tuple
 
 import torch
 from collections import OrderedDict
@@ -30,86 +31,6 @@ try:
     from collections.abc import Iterable
 except ImportError:
     from collections import Iterable
-
-
-def uploadSimpleTokens(labels, cache, tensors, 
-                       deriv_codes: List = None, grid_setting = False):
-    """
-    Uploads the basic factor into the cache with its value in ndimensional numpy.array
-
-    Args:
-        labels: list or 1-d array with string name of coefficients
-        cache (`Cache`): keeping values of terms/factors of equations.
-        tensors (`numpy.ndarray`): values for coefficients, shape of array: (n, m, ...), where n is number of coefficients
-        grid_settings:  optional, boolean argument, default - False
-
-    Returns:
-        None
-    """
-    if deriv_codes is not None and len(deriv_codes) != len(labels):
-        print(deriv_codes, labels)
-        raise ValueError('Incorrect number of deriv codes passed, expected ')
-    
-    for idx, label in enumerate(labels):
-        if grid_setting:
-            label_completed = label
-            deriv_code = None
-        else:
-            label_completed = (label, (1.0,))
-            deriv_code = None if deriv_codes is None else deriv_codes[idx]
-        cache.add(label_completed, tensors[idx], deriv_code = deriv_code)
-        cache.add_base_matrix(label_completed)
-
-
-def uploadGrids(grids, cache):
-    """
-    Grids are saved into the base matrices of the cache
-
-    Args:
-        grids (`list|tuple|numpy.ndarray`): value of grids
-        cache (`Cache`): object where grids wiil be stored
-    
-    Returns:
-        None
-    """
-    if type(grids) == list or type(grids) == tuple:
-        labels = [str(idx) for idx, _ in enumerate(grids)]
-        tensors = grids
-    elif type(grids) == np.ndarray:
-        labels = ['0',]
-        tensors = [grids,]
-    uploadSimpleTokens(labels=labels, cache=cache, tensors=tensors, grid_setting=True)
-
-
-def prepareVarTensor(var_tensor, derivs_tensor, time_axis):
-    """
-    Method for transformation of the input data, the time axis is placed first
-
-    Args:
-        var_tensor: numpy.array, 
-        derivs_tensor: numpy.ndarray, 
-        time_axis:
-    Returns:
-        result (`numpy.ndarray`): formed data for the algorithm
-
-    """
-    initial_shape = var_tensor.shape
-    print('initial_shape', initial_shape, 'derivs_tensor.shape', derivs_tensor.shape)
-    var_tensor = np.moveaxis(var_tensor, time_axis, 0)
-    result = np.ones((derivs_tensor.shape[-1], ) + tuple([shape for shape in var_tensor.shape]))
-
-    increment = 0
-    if derivs_tensor.ndim == 2:
-        for i_outer in range(0, derivs_tensor.shape[1]):
-            result[i_outer+increment, ...] = np.moveaxis(derivs_tensor[:, i_outer].reshape(initial_shape),
-                                                         source=time_axis, destination=0)
-    else:
-        for i_outer in range(0, derivs_tensor.shape[-1]):
-            assert derivs_tensor.ndim == var_tensor.ndim + 1, 'The shape of tensor of derivatives does not correspond '
-            result[i_outer+increment, ...] = np.moveaxis(derivs_tensor[..., i_outer],
-                                                         source=time_axis, destination=0)
-    return result
-
 
 
 class Cache(object):
@@ -138,12 +59,39 @@ class Cache(object):
 
     def initMemory(self) -> None:
         self.memory_default    = dict() # In this dict, keys should be IDs of domains, arguments - matching types of tensors/arrays
-        self.memory_normalized = dict() # 'numpy' : dict()
+        self.memory_normalized = dict() # 
         # self.memory_anns       = dict() # Maybe, initialize storage for trained NNs
 
+    # ---------------------- Commented due to the method's logic being transfered to the Domain class ----------------------
+    #
+    # def set_boundaries(self, boundary_width: Union[int, list, tuple]):
+    #     """
+    #     Setting the number of unaccounted elements at the edges
+    #     """
+    #     assert '0' in self.memory_default['numpy'].keys(), 'Boundaries should be specified for grid cache.'
+    #     shape = self.get('0').shape
+    #     self.initial_shape = shape
+    #     if isinstance(boundary_width, int):
+    #         if any([elem <= 2*boundary_width for elem in shape]):
+    #             raise IndexError(f'Mismatching shapes: boundary of {boundary_width} does not fit data of shape {shape}')
+    #     elif isinstance(boundary_width, (list, tuple)):
+    #         if any([elem <= 2*boundary_width[idx] for idx, elem in enumerate(shape)]):
+    #             raise IndexError(f'Mismatching shapes: boundary of {boundary_width} does not fit data of shape {shape}')                
+    #     else:
+    #         raise TypeError(f'Incorrect type of boundaries: {type(boundary_width)}, instead of expected int or list/tuple')
+
+    #     self.boundary_width = boundary_width
+    #     if isinstance(boundary_width, int):
+    #         self.inner_shape = np.array(self.get('0').shape) - 2 * boundary_width
+    #     elif isinstance(boundary_width, (list, tuple)):
+    #         self.inner_shape = np.array(self.get('0').shape) - np.multiply(np.array(boundary_width), 2)
+
     @staticmethod
-    def getMemLen(self, mem_dict: dict) -> int:
-        return sum([len(elem) for elem in mem_dict])
+    def getMemLen(mem_dict: dict) -> int: # self
+        try:
+            return sum([len(elem) for elem in mem_dict.values()])
+        except:
+            return 0
 
     def attrsFromDict(self, attributes, except_attrs: dict = {}) -> None:
         except_attrs['obj_type'] = None
@@ -191,7 +139,7 @@ class Cache(object):
     def clear(self, full=False) -> None:
         raise NotImplementedError('Depricated method! Cache is not expected to be cleared.')
 
-    def add(self, label, tensor, subcache_ID: int, normalized: bool = False,
+    def add(self, label, tensor, subcache_ID: int = 0, normalized: bool = False,
             deriv_code = None, indication: bool = False) -> bool:
         '''
         Method for addition of a new tensor into the cache.
@@ -265,7 +213,14 @@ class Cache(object):
             label = [elem[1] for elem in self._deriv_codes if elem[0] == deriv_code][0]
 
         if label is None:
-            return np.random.choice(list(next(iter(self.memory_default)).values()))
+            if subcache_ID is None:
+                raise RuntimeError("subcache ID must be passed.")
+            print(f'[subcache_ID]: {subcache_ID}, keys: {self.memory_default.keys()}')
+            print(f'cache.get: self.memory_default.values() {self.memory_default[subcache_ID].values()}')
+            print(f'selection from: {list(self.memory_default[subcache_ID].values())}')
+            temp1 = random.choice(list(self.memory_default[subcache_ID].values())) # list(iter())
+            print(f'temp1.shape is: {temp1.shape}')
+            return temp1 # np.random.choice(list(next(())))
         
         if normalized:
             return self.memory_normalized[subcache_ID][label]              
@@ -288,6 +243,12 @@ class Cache(object):
             tensors.append(value)
 
         return keys, tensors
+    
+    def getKeys(self) -> list:    # List[Tuple[int, list]]:
+        if subcache_ID is None:
+            subcache_ID = next(iter(self.memory_default.keys()))
+
+        return list(self.memory_default[subcache_ID].keys())
 
     def __contains__(self, obj):
         '''
@@ -303,7 +264,7 @@ class Cache(object):
         if isinstance(obj, (tuple, list)) and isinstance(obj[0], str):
             return all([obj in memdict.keys() for memdict in self.memory_default.values()])
 
-        elif isinstance(obj, (tuple, list)) and isinstance(obj[0], tuple, frozenset) and isinstance(obj[1], bool):
+        elif isinstance(obj, (tuple, list)) and isinstance(obj[0], (tuple, frozenset)) and isinstance(obj[1], bool):
             if obj[1]:
                 return all([obj[0] in memdict.keys() for memdict in self.memory_normalized.values()])
             else:
@@ -336,21 +297,28 @@ class Cache(object):
         else:
             raise NotImplementedError('Invalid format of function input to check, if the object is in cache')
 
-    def prune_tensors(self, pruner, subcache_ID: int, mem_to_process: List[str] = ['default', 'normalized']):
+    def prune_tensors(self, pruner, subcache_ID: Union[int, List[int]] = None, mem_to_process: List[str] = ['default', 'normalized']):
+        if subcache_ID is None:
+            subcache_ID = list(self.memory_default.keys())
+        elif isinstance(subcache_ID, int):
+            subcache_ID = [subcache_ID,]
+        elif not isinstance(subcache_ID, list):
+            raise TypeError(f"subcache_ID argument of Cache.prune_tensors must be None, an int or a list of ints. Instead got: {type(subcache_ID)}")
 
-        if 'default' in mem_to_process:
-            for array_key in self.memory_default[subcache_ID].keys():
-                try:
-                    self.memory_default[subcache_ID][array_key] = pruner.prune(self.memory_default[subcache_ID][array_key])
-                except (NameError, KeyError) as e:
-                    pass
-        
-        if 'normalized' in mem_to_process:
-            for array_key in self.memory_normalized[subcache_ID].keys():
-                try:
-                    self.memory_normalized[subcache_ID][array_key] = pruner.prune(self.memory_normalized[subcache_ID][array_key])
-                except (NameError, KeyError) as e:
-                    pass
+        for sc_ID in subcache_ID:
+            if 'default' in mem_to_process:
+                for array_key in self.memory_default[sc_ID].keys():
+                    try:
+                        self.memory_default[sc_ID][array_key] = pruner.prune(self.memory_default[sc_ID][array_key])
+                    except (NameError, KeyError) as e:
+                        pass
+            
+            if 'normalized' in mem_to_process:
+                for array_key in self.memory_normalized[sc_ID].keys():
+                    try:
+                        self.memory_normalized[sc_ID][array_key] = pruner.prune(self.memory_normalized[sc_ID][array_key])
+                    except (NameError, KeyError) as e:
+                        pass
 
     @property
     def consumed_memory(self):
@@ -365,6 +333,7 @@ class Cache(object):
 
 
 def upload_complex_token(label: str, params_values: OrderedDict, evaluator, tensor_cache: Cache, grid_cache: Cache):
+    raise DeprecationWarning('Method has been made redundant.')
     try:
         evaluation_function = evaluator.evaluation_functions[label]
     except TypeError:
@@ -377,3 +346,83 @@ def upload_complex_token(label: str, params_values: OrderedDict, evaluator, tens
 
     label_completed = (label, tuple(params_values.values()))
     tensor_cache.add(label_completed, grid_function(indexes_vect))
+
+def uploadSimpleTokens(labels: List[str], cache: Cache, tensors: Union[np.ndarray, List[np.ndarray]], subcache_ID: int = 0, 
+                       deriv_codes: List = None, grid_setting = False):
+    """
+    Uploads the basic factor into the cache with its value in ndimensional numpy.array
+
+    Args:
+        labels: list or 1-d array with string name of coefficients
+        cache (`Cache`): keeping values of terms/factors of equations.
+        tensors (`numpy.ndarray`): values for coefficients, shape of array: (n, m, ...), where n is number of coefficients
+        grid_settings:  optional, boolean argument, default - False
+
+    Returns:
+        None
+    """
+    if deriv_codes is not None and len(deriv_codes) != len(labels):
+        print(deriv_codes, labels)
+        raise ValueError('Incorrect number of deriv codes passed, expected ')
+    
+    for idx, label in enumerate(labels):
+        if grid_setting:
+            label_completed = label
+            deriv_code = None
+        else:
+            label_completed = (label, (1.0,))
+            deriv_code = None if deriv_codes is None else deriv_codes[idx]
+            
+        cache.add(label_completed, tensors[idx], subcache_ID = subcache_ID, deriv_code = deriv_code)
+        # cache.add_base_matrix(label_completed) 
+
+
+def uploadGrids(grids: Union[List[np.ndarray], Tuple[np.ndarray]], cache: Cache, domain_id: int = 0):
+    """
+    Grids are saved into the base matrices of the cache
+
+    Args:
+        grids (`list|tuple|numpy.ndarray`): value of grids
+        cache (`Cache`): object where grids wiil be stored
+    
+    Returns:
+        None
+    """
+    if type(grids) == list or type(grids) == tuple:
+        labels = [str(idx) for idx, _ in enumerate(grids)]
+        tensors = grids
+    elif type(grids) == np.ndarray:
+        labels = ['0',]
+        tensors = [grids,]
+
+    uploadSimpleTokens(labels=labels, cache=cache, subcache_ID=domain_id, tensors=tensors, grid_setting=True)
+
+
+def prepareVarTensor(var_tensor, derivs_tensor, time_axis):
+    """
+    Method for transformation of the input data, the time axis is placed first
+
+    Args:
+        var_tensor: numpy.array, 
+        derivs_tensor: numpy.ndarray, 
+        time_axis:
+    Returns:
+        result (`numpy.ndarray`): formed data for the algorithm
+
+    """
+    initial_shape = var_tensor.shape
+    # print('initial_shape', initial_shape, 'derivs_tensor.shape', derivs_tensor.shape)
+    var_tensor = np.moveaxis(var_tensor, time_axis, 0)
+    result = np.ones((derivs_tensor.shape[-1], ) + tuple([shape for shape in var_tensor.shape]))
+
+    increment = 0
+    if derivs_tensor.ndim == 2:
+        for i_outer in range(0, derivs_tensor.shape[1]):
+            result[i_outer+increment, ...] = np.moveaxis(derivs_tensor[:, i_outer].reshape(initial_shape),
+                                                         source=time_axis, destination=0)
+    else:
+        for i_outer in range(0, derivs_tensor.shape[-1]):
+            assert derivs_tensor.ndim == var_tensor.ndim + 1, 'The shape of tensor of derivatives does not correspond '
+            result[i_outer+increment, ...] = np.moveaxis(derivs_tensor[..., i_outer],
+                                                         source=time_axis, destination=0)
+    return result    

@@ -17,6 +17,14 @@ from typing import Union
 from abc import ABC
 from epde.preprocessing.cheb import process_point_cheb
 
+# Spawning a multiprocessing Pool only pays off for large grids. Under the
+# spawn start method (Windows/macOS-default) every worker re-imports the caller,
+# which costs seconds per worker; for a few-hundred-point ODE that dwarfs the
+# actual per-point Chebyshev fit. Below this many points run the serial map
+# instead -- identical output, no spawn overhead, and no dependence on the
+# caller guarding ``__main__``.
+_MP_MIN_POINTS = 3000
+
 def Heatmap(Matrix, interval = None, area = ((0, 1), (0, 1)), xlabel = '', ylabel = '', figsize=(8,6), filename = None, title = ''):
     y, x = np.meshgrid(np.linspace(area[0][0], area[0][1], Matrix.shape[0]), np.linspace(area[1][0], area[1][1], Matrix.shape[1]))
     fig, ax = plt.subplots(figsize = figsize)
@@ -119,11 +127,10 @@ class PolynomialDeriv(AbstractDeriv):
         index_array = []
 
         for idx, _ in np.ndenumerate(data):
-            index_array.append((idx, data, grid, polynomial_window, max_order, 
+            index_array.append((idx, data, grid, polynomial_window, max_order,
                                 polynomial_boundary, poly_order))
-        print(len(index_array))
 
-        if mp_poolsize > 1:
+        if mp_poolsize > 1 and len(index_array) >= _MP_MIN_POINTS:
             pool = mp.Pool(mp_poolsize)
             derivatives = pool.map_async(process_point_cheb, index_array)
             pool.close()

@@ -86,22 +86,31 @@ class ComplexStructure(object):
         raise NotImplementedError(
             'Functionality of this method has been moved to the evolutionary operator declaration')
 
-    def evaluate(self, structural=False):
+    def evaluate(self): # , structural=False
         assert len(self.structure) > 0, 'Attempt to evaluate an empty complex structure'
         if len(self.structure) == 1:
-            return self.structure[0].evaluate(structural)
+            return self.structure[0].evaluate() # structural
         try:
-            evaluated = [elem.evaluate(structural) for elem in self.structure]
-            return reduce(self.interelement_operator, evaluated)
+            evaluated = [elem.evaluate() for elem in self.structure] # structural
+            if isinstance(evaluated[0], dict):
+                res = dict()
+                for key in evaluated[0].keys():
+                    # print('evald:', [evald[key].shape for evald in evaluated])
+                    res[key] = reduce(self.interelement_operator, [evald[key] for evald in evaluated])
+                return res
+            else:
+                assert isinstance(evaluated[0], np.ndarray), \
+                    f'Result of struct. element evaluation must be a dict or np.ndarray' 
+                return reduce(self.interelement_operator, evaluated)
         except ValueError:
             print([element.name for element in self.structure])
             raise ValueError('operands could not be broadcast together with shapes')
 
-    def reset_saved_state(self):
+    def resetSavedState(self):
         self.saved = {True: False, False: False}
         self.saved_as = {True: None, False: None}
         for elem in self.structure:
-            elem.reset_saved_state()
+            elem.resetSavedState()
 
     @property
     def name(self):

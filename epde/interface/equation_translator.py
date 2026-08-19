@@ -174,15 +174,15 @@ class CoeffLessEquation():
                 rp_translated = Term(pool, passed_term = [parse_factor(factor, pool, all_vars) for factor in rp_term[variable]], 
                                      collapse_powers=False)
                 
-                lp_values = np.vstack(list(map(lambda x: x.evaluate(False).reshape(-1), lp_terms_translated)))
-                rp_value = rp_translated.evaluate(False).reshape(-1)
+                lp_values = np.vstack(list(map(lambda x: x.evaluate().reshape(-1), lp_terms_translated))) # False
+                rp_value = rp_translated.evaluate().reshape(-1) # False
                 lr = LinearRegression()
                 lr.fit(lp_values.T, rp_value)
                 # print(lr.coef_, lr.intercept_, type(lr.coef_))
                 terms_aggregated = lp_terms_translated + [rp_translated,]
                 max_factors = max([len(term.structure) for term in terms_aggregated])
 
-                metaparameters={'terms_number': {'optimizable': False, 'value': len(term_list)},
+                metaparameters={'terms_number': {'optimizable': False, 'value': len(lp_terms_translated + 1)},
                                 'max_factors_in_term': {'optimizable': False, 'value': max_factors}}
                 for var_key in all_vars:
                     metaparameters[('sparsity', var_key)] = {'optimizable': True, 'value': 0.}
@@ -213,7 +213,7 @@ class CoeffLessEquation():
             terms_aggregated = self.lp_terms_translated + [self.rp_translated,]
             max_factors = max([len(term.structure) for term in terms_aggregated])
 
-            metaparameters={'terms_number': {'optimizable': False, 'value': len(term_list)},
+            metaparameters={'terms_number': {'optimizable': False, 'value': len(lp_terms_translated + 1)},
                             'max_factors_in_term': {'optimizable': False, 'value': max_factors}}
             for var_key in all_vars:
                 metaparameters[('sparsity', var_key)] = {'optimizable': True, 'value': 0.}

@@ -52,13 +52,23 @@ def check_dominance(target, compared_with) -> bool:
     flag = False
 
     eq_keys = target.vals.equation_keys
-    for obj_fun_idx in range(len(target.obj_fun)):
+    # The property rebuilds the objective vector on every access -- bind once.
+    t_obj = target.obj_fun
+    c_obj = compared_with.obj_fun
+    for obj_fun_idx in range(len(t_obj)):
+        # Deliberate noise guard: structurally identical equation genes can
+        # still differ in objective values through numerical noise (e.g.
+        # re-fitted weights); such objectives must not create spurious
+        # dominance, so they are excluded from the comparison entirely.
         if target.vals[eq_keys[obj_fun_idx % len(eq_keys)]].terms_labels == compared_with.vals[eq_keys[obj_fun_idx % len(eq_keys)]].terms_labels:
             continue
-        if target.obj_fun[obj_fun_idx] < compared_with.obj_fun[obj_fun_idx]:
-                flag = True
-        else:
+        if t_obj[obj_fun_idx] < c_obj[obj_fun_idx]:
+            flag = True
+        elif t_obj[obj_fun_idx] > c_obj[obj_fun_idx]:
             return False
+        # Equal values (between different structures) are a tie: they
+        # neither establish nor block dominance -- canonical Pareto
+        # semantics ("no objective worse, at least one strictly better").
     return flag
 
 
@@ -83,7 +93,10 @@ def ndl_update(new_solution, levels) -> list:   # efficient_ndl_update
         East Lansing, MI, USA, Tech. Rep. COIN No. 2014014, 2014.*
 
     """
-    moving_set = {new_solution}
+    # A list, not a set: SoEq hashing/equality is structural, so a set could
+    # collapse distinct objects with equal structure, and set iteration order
+    # would make level construction nondeterministic.
+    moving_set = [new_solution]
     # Shallow per-level copy: ndl_update only mutates the outer list (slice
     # assignment, append, extend) and the inner level lists (append, replace);
     # the MOEADDSolution objects themselves are never mutated, so cloning them
@@ -95,8 +108,8 @@ def ndl_update(new_solution, levels) -> list:   # efficient_ndl_update
     new_levels = [list(lvl) for lvl in levels]
 
     for level_idx in np.arange(len(levels)):
-        moving_set_new = set()
-        for ms_idx, moving_set_elem in enumerate(moving_set):
+        moving_set_new = []
+        for moving_set_elem in moving_set:
             level_new = new_levels[level_idx]
             # Compute each direction of dominance against the (possibly already
             # mutated) new level exactly once instead of re-running the same
@@ -104,7 +117,7 @@ def ndl_update(new_solution, levels) -> list:   # efficient_ndl_update
             dom_over_me = [check_dominance(s, moving_set_elem) for s in level_new]
             dom_by_me = [check_dominance(moving_set_elem, s) for s in level_new]
             if any(dom_over_me):
-                moving_set_new.add(moving_set_elem)
+                moving_set_new.append(moving_set_elem)
             elif not any(dom_by_me):
                 # Falls through from branch 1, so `not any(dom_over_me)` already holds:
                 # incomparable with every existing element, append to this level.
@@ -125,12 +138,17 @@ def ndl_update(new_solution, levels) -> list:   # efficient_ndl_update
                 new_levels[level_idx].append(moving_set_elem)
                 for le, dom in zip(level_new, dom_by_me):
                     if dom:
-                        moving_set_new.add(le)
+                        moving_set_new.append(le)
         moving_set = moving_set_new
         if not len(moving_set):
             break
     if len(moving_set):
-        new_levels.append(list(moving_set))
+        # Mixed-origin leftovers (an element descending past the last level
+        # plus elements pushed down by a sibling) can contain dominating
+        # pairs; dumping them as a single level would violate the
+        # non-domination invariant. Sort them into proper sub-levels --
+        # one sub-level in the common case, so no behavior change there.
+        new_levels.extend(fast_non_dominated_sorting(moving_set))
     if len(new_levels[len(new_levels)-1]) == 0:
         _ = new_levels.pop()
     return new_levels
