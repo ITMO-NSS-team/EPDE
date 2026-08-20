@@ -345,8 +345,21 @@ def heterogeneity_scores(features, target, sample_weights, grid_shape,
 
 
 def chi2_scores(features, target, sample_weights, grid_shape,
-                fit_intercept: bool = True):
+                fit_intercept: bool = True, rescale: bool = False):
     """Per-term coefficient-constancy from the CUMULATIVE SCORE PATH.
+
+    ``rescale`` is an OPT-IN (default False = raw): ``rescale=True``
+    multiplies every score by ``yy/rss`` of the SAME global weighted OLS
+    that supplies Theta (the factor is common to all terms, so opting in
+    never changes per-equation kill/rank ORDER, only magnitudes). The
+    raw ``L_j`` carries the equation-level residual ratio inside its
+    bulge magnitude; the rescale strips it so scores compare structures
+    instead of double-counting fit quality -- measured NET HARMFUL live
+    (Aug 2026), hence raw is the default. This is THE canonical form
+    shared by the Instability objective and the sparsity keep-rule
+    (``sparsity._keep_rule_scores``) -- the two MUST use the same
+    instability formula, so both call here with ``rescale=False``. The
+    exact-fit floor returns zeros either way.
 
     Theta comes from OLS on ALL the data and is never re-estimated; what
     propagates is the running score, once along EACH grid axis. With
@@ -489,4 +502,5 @@ def chi2_scores(features, target, sample_weights, grid_shape,
             inc = sg.sum(axis=other) if other else sg
             per_axis.append(_path_functional(inc, gs[d]))
         L = np.mean(per_axis, axis=0)
-    return np.nan_to_num(L)[:p]
+    L = np.nan_to_num(L)[:p]
+    return L * (yy / rss) if rescale else L

@@ -22,14 +22,17 @@ from epde.supplementary import create_solution_net, AutogradDeriv
 from epde.preprocessing.smoothers import NN
 
 
-# Gram-construction configuration, read by VWSRSparsity.apply,
-# PhysicsInformedLasso.fit, EqRightPartSelector._precompute_super_gram,
-# and L2LRFitness.apply. ``mode='vcoef'`` (default) uses the
-# varying-coefficient stability estimator (``VaryingCoefSetup``);
-# ``mode='axis'`` is the legacy axis-aligned sliding-window backup
-# (``GramSetup`` reduced by the var/mu^2 CV in
+# Keep-rule scoring / Gram-construction configuration, read by
+# VWSRSparsity.apply, PhysicsInformedLasso.fit and the EqRPS super-Gram
+# precompute. ``mode='chi2'`` (the default) keeps the plain inline weighted
+# Gram for the CD/OLS and scores terms with the Nyblom-Hansen
+# cumulative-score-path statistic (``survival.chi2_scores``) -- no windowed
+# or varying-coefficient machinery is built. ``mode='vcoef'`` is the ONLY
+# mode that needs its own Gram machinery (``VaryingCoefSetup``), selected
+# only when explicitly chosen; ``mode='axis'`` is the legacy axis-aligned
+# sliding-window backup (``GramSetup`` reduced by the var/mu^2 CV in
 # ``PhysicsInformedLasso.get_cv``).
-gram_mode: str = 'vcoef'
+gram_mode: str = 'chi2'
 
 # Which objective the SINGLE-objective optimizer minimises: 'discrepancy'
 # (default, the residual fitness) or 'instability' (vcoef coefficient
@@ -119,17 +122,21 @@ instability_metric = None
 rps_amplification_cap = 100.0
 
 
-def set_gram_config(mode: str = 'vcoef'):
-    """Override the global Gram-construction mode before ``build_search``.
+def set_gram_config(mode: str = 'chi2'):
+    """Override the global keep-rule scoring mode before ``build_search``.
 
-    Used by ``projects/thesis/thesis_runner.py`` / ``profile_loop_stats.py``
-    to switch between the varying-coefficient default (``'vcoef'``) and the
-    axis-aligned sliding-window backup (``'axis'``) via a single CLI flag.
+    ``'chi2'`` (the default) scores terms with the Nyblom-Hansen
+    cumulative-score-path statistic on the raw columns, building no window
+    or varying-coefficient machinery; ``'vcoef'`` selects the
+    varying-coefficient estimator (only on explicit choice); ``'axis'`` is
+    the sliding-window var/mu^2 backup. Used by
+    ``projects/thesis/thesis_runner.py`` / ``profile_loop_stats.py`` via a
+    single CLI flag.
     """
     global gram_mode
-    if mode not in ('axis', 'vcoef'):
+    if mode not in ('axis', 'vcoef', 'chi2'):
         raise ValueError(
-            f'gram_mode must be "axis" or "vcoef"; got {mode!r}')
+            f'gram_mode must be "axis", "vcoef" or "chi2"; got {mode!r}')
     gram_mode = mode
     # Stale per-axis basis resolution from a prior CLI/config must not bleed
     # into a new invocation -- the source data or grid_shape may have changed.
