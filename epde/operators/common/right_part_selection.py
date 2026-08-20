@@ -358,7 +358,7 @@ class EqRightPartSelector(CompoundOperator):
                     except TypeError:
                         objective.reset_state()
                     return True
-        common_factors = list(frozenset.intersection(*equation_terms))
+        common_factors = _common_factors(equation_terms)
         if not common_factors:
             # No symbolic reduction applies -- run the numeric completion of
             # the duplicate-term invariant: exactly linearly dependent
@@ -598,6 +598,27 @@ class RandomRHPSelector(CompoundOperator):
 # dependence projects to ~eps*conditioning, while even severely near-collinear
 # physics (incl. valid analytical identities) sits many orders of magnitude
 # above 1e-10.
+def _common_factors(equation_terms) -> list:
+    """Factors shared by every term of an equation, in a deterministic order.
+
+    ``frozenset`` iteration order over label tuples depends on the
+    process-wide string-hash salt, which Python randomizes per process
+    unless ``PYTHONHASHSEED`` is set. ``simplify_equation`` walks this list
+    while MUTATING the terms -- reducing the order of each common factor and
+    dropping factors whose power reaches zero -- so with two or more common
+    factors a different order yields a different simplified equation, and the
+    search diverges from there.
+
+    That made whole runs irreproducible across processes despite the explicit
+    random / numpy / torch seeding: the same seed on the same data reached
+    different equations with different costs. Sorting pins the order.
+
+    Elements are ``Factor.structural_label_without_power``, i.e.
+    ``(label, quantized_params)`` with numeric params, so they always compare.
+    """
+    return sorted(frozenset.intersection(*equation_terms))
+
+
 _LIN_DEP_RTOL = 1e-10
 
 
