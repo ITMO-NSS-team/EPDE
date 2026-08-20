@@ -22,7 +22,7 @@ from epde.interface.token_family import TokenFamily
 from epde.cache.cache_refactored import uploadSimpleTokens, prepareVarTensor #upload_simple_tokens, prepareVarTensor  # np_ndarray_section,
 
 from epde.evaluators import CustomEvaluator, EvaluatorTemplate, trigonometric_evaluator, \
-     simpleFunctionEvaluator, const_evaluator, const_grad_evaluator, grid_evaluator, \
+     simple_function_evaluator, const_evaluator, const_grad_evaluator, grid_evaluator, \
      velocity_evaluator, velocity_grad_evaluators, phased_sine_evaluator, sign_evaluator
 
 class PreparedTokens(ABC):
@@ -126,7 +126,7 @@ class DataPolynomials(PreparedTokens):
                                       s_and_d_merged=False, non_default_power = True)
         self._token_family.set_params([var_name,], OrderedDict([('power', (1, max_power))]), 
                                       {'power': 0}, [[None,],])
-        self._token_family.set_evaluator(simpleFunctionEvaluator)
+        self._token_family.set_evaluator(simple_function_evaluator)
         
 class DataSign(PreparedTokens):
     def __init__(self, var_name: str, max_power: int = 1):
@@ -169,7 +169,7 @@ class DataSign(PreparedTokens):
                                       s_and_d_merged=False, non_default_power = True)
         self._token_family.set_params([var_name,], OrderedDict([('power', (1, max_power))]), 
                                       {'power': 0}, [[None,],])
-        self._token_family.set_evaluator(simpleFunctionEvaluator)    
+        self._token_family.set_evaluator(simple_function_evaluator)
 
 class ControlVarTokens(PreparedTokens):
     def __init__(self, sample: Union[np.ndarray, List[np.ndarray]], ann: torch.nn.Sequential = None, 
@@ -447,7 +447,7 @@ class CacheStoredTokens(CustomTokens):
         
         # token_tensors = {key: value[global_var.grid_cache.g_func != 0] for key, value in token_tensors.items()}
         # upload_simple_tokens(list(token_tensors.keys()), global_var.tensor_cache, list(token_tensors.values()))
-        super().__init__(token_type=token_type, token_labels=token_labels, evaluator=simpleFunctionEvaluator,
+        super().__init__(token_type=token_type, token_labels=token_labels, evaluator=simple_function_evaluator,
                          params_ranges=params_ranges, params_equality_ranges=params_equality_ranges,
                          dimensionality=dimensionality, unique_specific_token=unique_specific_token,
                          unique_token_type=unique_token_type, meaningful=meaningful, non_default_power = non_default_power)
@@ -479,7 +479,7 @@ class ExternalDerivativesTokens(CustomTokens):
             # self.d_ords.extend(dord)
 
         super().__init__(token_type=token_type, token_labels=self.deriv_names,
-                         evaluator=simpleFunctionEvaluator, params_ranges=params_ranges,
+                         evaluator=simple_function_evaluator, params_ranges=params_ranges,
                          params_equality_ranges=params_equality_ranges,
                          dimensionality=dimensionality, unique_specific_token=unique_specific_token,
                          unique_token_type=unique_token_type, meaningful=meaningful)

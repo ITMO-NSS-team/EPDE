@@ -10,7 +10,7 @@ from epde.decorators import BoundaryExclusion
 from epde.preprocessing.domain_pruning import DomainPruner
 
 from epde.supplementary import define_derivatives
-from epde.evaluators import simpleFunctionEvaluator # , trigonometric_evaluator
+from epde.evaluators import simple_function_evaluator # , trigonometric_evaluator
 
 from epde.interface.prepared_tokens import DataPolynomials, CustomTokens
 from epde.interface.type_checks import *
@@ -237,7 +237,7 @@ class VariableEntry(InputEntry):
                                        meaningful=True)
         self._derivs_family.set_params(self.names, OrderedDict([('power', (1, max_deriv_power))]),
                                       {'power': 0}, self.d_orders)
-        self._derivs_family.set_evaluator(simpleFunctionEvaluator)
+        self._derivs_family.set_evaluator(simple_function_evaluator)
 
     def create_polynomial_family(self, max_power):
         polynomials = DataPolynomials(self.var_name, max_power = max_power)

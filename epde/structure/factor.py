@@ -20,7 +20,7 @@ import epde.globals as global_var
 from epde.structure.Tokens import TerminalToken
 from epde.supplementary import factor_params_to_str, train_ann, use_ann_to_predict, exp_form
 from epde.structure.structure_template import _deepcopy_slots
-from epde.evaluators import simpleFunctionEvaluator
+from epde.evaluators import simple_function_evaluator
 
 class EvaluatorContained(object):
     """
@@ -247,7 +247,7 @@ class Factor(TerminalToken):
             return global_var.samples_manager.get(tcache_key) # structural=structural, torch_mode = torch_mode
 
         else:
-            if self.is_deriv and self.evaluator._evaluator != simpleFunctionEvaluator:
+            if self.is_deriv and self.evaluator._evaluator != simple_function_evaluator:
                 if grids is not None:
                     raise Exception('Data-reliant tokens shall not get grids as arguments for evaluation.')
                 if isinstance(self.variable, str):
@@ -283,7 +283,7 @@ class Factor(TerminalToken):
                 #         'Arg. func_args for CustomEvaluator must be None or dict of lists of NP.NDARRAYS.'
                 value = self.evaluator.apply(self, func_args = grids)
             if grids is None:
-                if self.is_deriv and self.evaluator._evaluator == simpleFunctionEvaluator:
+                if self.is_deriv and self.evaluator._evaluator == simple_function_evaluator:
                     full_deriv_code = (self._all_vars.index(self.variable), self.deriv_code)
                 else:
                     full_deriv_code = None

@@ -24,7 +24,7 @@ from epde.moeadd.moeadd_supplementary import *
 
 import epde.operators.sys_search_operators as operators
 #from epde.src.evo_optimizer import Operator_director
-from epde.evaluators import simpleFunctionEvaluator, trigonometric_evaluator
+from epde.evaluators import simple_function_evaluator, trigonometric_evaluator
 from epde.supplementary import Define_Derivatives
 from epde.cache.cache import upload_simple_tokens, upload_grids, prepareVarTensor
 from epde.prep.derivatives import Preprocess_derivatives
@@ -96,7 +96,7 @@ def test_ode_auto():
     u_token_params = OrderedDict([('power', (1, 1))])
     u_equal_params = {'power' : 0}
     u_tokens.set_params(u_names, u_token_params, u_equal_params, u_deriv_orders)
-    u_tokens.set_evaluator(simpleFunctionEvaluator, [])
+    u_tokens.set_evaluator(simple_function_evaluator, [])
 
     grid_names = ['t',]    
     grid_tokens = Token_family('Grids')
@@ -105,7 +105,7 @@ def test_ode_auto():
     grid_token_params = OrderedDict([('power', (1, 1))])
     grid_equal_params = {'power' : 0}
     grid_tokens.set_params(grid_names, grid_token_params, grid_equal_params)
-    grid_tokens.set_evaluator(simpleFunctionEvaluator, [])
+    grid_tokens.set_evaluator(simple_function_evaluator, [])
 #    
     trig_tokens = Token_family('Trigonometric')
     trig_names = ['sin', 'cos']

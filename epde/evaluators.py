@@ -120,10 +120,10 @@ class CustomEvaluator(EvaluatorTemplate):
 
 
 
-def simpleFunctionEvaluator(factor,
-                            # structural: bool = False, 
-                            grids: Union[Dict[int, List[np.ndarray]], List[np.ndarray]] = None, 
-                            **kwargs) -> Dict[int, np.ndarray]:
+def simple_function_evaluator(factor,
+                              # structural: bool = False,
+                              grids: Union[Dict[int, List[np.ndarray]], List[np.ndarray]] = None,
+                              **kwargs) -> Dict[int, np.ndarray]:
     '''
 
     Example of the evaluator of token values, that can be used for uploading values of stored functions from cache. Cases, when

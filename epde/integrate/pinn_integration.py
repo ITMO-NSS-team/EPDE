@@ -16,7 +16,7 @@ from torch.nn import Sequential
 
 from epde.structure.main_structures import Equation, SoEq
 import epde.globals as global_var
-from epde.evaluators import CustomEvaluator, simpleFunctionEvaluator
+from epde.evaluators import CustomEvaluator, simple_function_evaluator
 
 from epde.integrate.interface import SystemSolverInterface
 from epde.integrate.bop import BOPElement, PregenBOperator

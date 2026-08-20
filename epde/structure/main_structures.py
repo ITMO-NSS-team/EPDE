@@ -28,7 +28,7 @@ import epde.optimizers.moeadd.solution_template as moeadd
 
 from epde import _loop_stats
 from epde.decorators import HistoryExtender, BoundaryExclusion
-from epde.evaluators import simpleFunctionEvaluator
+from epde.evaluators import simple_function_evaluator
 from epde.interface.token_family import TFPool
 from epde.preprocessing.domain_pruning import DomainPruner
 
@@ -375,11 +375,11 @@ class Term(ComplexStructure):
     def contains_deriv(self, variable=None):
         if variable is None:
             return sum([factor.is_deriv and factor.deriv_code != [None,] and
-                        factor.evaluator._evaluator == simpleFunctionEvaluator
+                        factor.evaluator._evaluator == simple_function_evaluator
                         for factor in self.structure]) == 1
         else:
             return sum([factor.variable == variable and factor.is_deriv and factor.deriv_code != [None,] and
-                        factor.evaluator._evaluator == simpleFunctionEvaluator
+                        factor.evaluator._evaluator == simple_function_evaluator
                         for factor in self.structure]) == 1
 
     def contains_variable(self, variable):

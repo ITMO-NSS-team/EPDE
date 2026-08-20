@@ -21,7 +21,7 @@ from epde.interface.equation_translator import translate_equation
 import epde.globals as global_var
 
 from epde.interface.prepared_tokens import TrigonometricTokens
-from epde.evaluators import simpleFunctionEvaluator, trigonometric_evaluator
+from epde.evaluators import simple_function_evaluator, trigonometric_evaluator
 from epde.interface.token_family import TokenFamily, TF_Pool
 from epde.cache.cache import prepareVarTensor, upload_simple_tokens, upload_grids
 from epde.supplementary import Define_Derivatives
@@ -36,7 +36,7 @@ def get_basic_var_family(var_name, deriv_names, deriv_orders):
                                   meaningful = True)     
     entry_token_family.set_params(deriv_names, OrderedDict([('power', (1, 1))]),
                                   {'power' : 0}, deriv_orders)
-    entry_token_family.set_evaluator(simpleFunctionEvaluator, [])    
+    entry_token_family.set_evaluator(simple_function_evaluator, [])
     return entry_token_family
 
 def prepare_basic_inputs():

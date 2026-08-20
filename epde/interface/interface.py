@@ -42,7 +42,7 @@ from epde.operators.utils.default_parameter_loader import EvolutionaryParams
 
 from epde.decorators import BoundaryExclusion
 
-from epde.evaluators import simpleFunctionEvaluator, trigonometric_evaluator
+from epde.evaluators import simple_function_evaluator, trigonometric_evaluator
 from epde.supplementary import define_derivatives
 from epde.cache.cache_refactored import Cache # upload_simple_tokens, upload_grids, prepareVarTensor, 
 

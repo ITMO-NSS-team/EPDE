@@ -4,7 +4,7 @@ from functools import singledispatchmethod
 import numpy as np
 import torch
 
-from epde.evaluators import simpleFunctionEvaluator
+from epde.evaluators import simple_function_evaluator
 from epde.structure.main_structures import SoEq
 import epde.globals as global_var
 
@@ -40,7 +40,7 @@ class SystemSolverInterface(object):
                         power_param_idx = param_idx
                 deriv_orders.append(factor.deriv_code)
 
-                if factor.evaluator._evaluator != simpleFunctionEvaluator:
+                if factor.evaluator._evaluator != simple_function_evaluator:
                     if factor.evaluator._evaluator._single_function_token:
                         eval_func = factor.evaluator._evaluator._evaluation_functions_torch 
                     else:
