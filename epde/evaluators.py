@@ -153,12 +153,25 @@ def simple_function_evaluator(factor,
             power_param_idx = param_idx
 
     if isinstance(grids, dict):
-        if any([grid is None for grid in grids.values()]):
-            none_cond = True
+        if all([isinstance(grid, list) for grid in grids.values()]):  
+            if any([any([subgr is None for subgr in grid]) for grid in grids.values()]):
+                none_cond = True
+            else:
+                assert all([isinstance(key, int) and isinstance(grid, (np.ndarray, list)) for key, grid in grids.items()]), \
+                    f'Some domain keys and grids do not match desired types: \
+                      got {[(type(key), type(grid)) for key, grid in grids.items]}.'
+                none_cond = False
+        elif all([isinstance(grid, np.ndarray) for grid in grids.values()]):
+            if any([grid is None for grid in grids.values()]):
+                none_cond = True
+            else:
+                assert all([isinstance(key, int) and isinstance(grid, np.ndarray) for key, grid in grids.items()]), \
+                    f'Some domain keys and grids do not match desired types:  \
+                      got {[(type(key), type(grid)) for key, grid in grids.items]}.'
+                none_cond = False
         else:
-            assert all([isinstance(key, int) and isinstance(grid, (np.ndarray, list)) for key, grid in grids.items()]), \
-                f'Some domain keys and grids do not match desired types: got {[(type(key), type(grid)) for key, grid in grids.items]}.'
-            none_cond = False
+            raise TypeError(f'Incorrect type of values in grids dict, \
+                            expected np.ndarrays or list, got {[type(grid) for grid in grids.values()]}')            
     elif isinstance(grids, list):
         if any([grid is None for grid in grids]):
             none_cond = True
@@ -166,6 +179,9 @@ def simple_function_evaluator(factor,
             assert all([isinstance(grid, np.ndarray) for grid in grids]), \
                 f'Some domain reeval grids do not match desired np.ndarray type: got {[type(grid) for grid in grids]}.'
             none_cond = False
+    else:
+        assert grids is None, f'Non-default behavior, expected other grids, got {type(grids)}'
+        none_cond = True
 
     if not none_cond: # grids is not None or any([for grid in ]):
         if isinstance(grids[0], np.ndarray):
