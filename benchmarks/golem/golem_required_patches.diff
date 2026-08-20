@@ -1,0 +1,680 @@
+diff --git a/golem/core/optimisers/genetic/evaluation.py b/golem/core/optimisers/genetic/evaluation.py
+index d94c6e7..d4446ca 100644
+--- a/golem/core/optimisers/genetic/evaluation.py
++++ b/golem/core/optimisers/genetic/evaluation.py
+@@ -110,18 +110,24 @@ class BaseGraphEvaluationDispatcher(ObjectiveEvaluationDispatcher):
+         n_jobs: number of jobs for multiprocessing or 1 for no multiprocessing.
+         graph_cleanup_fn: function to call after graph evaluation, primarily for memory cleanup.
+         delegate_evaluator: delegate graph fitter (e.g. for remote graph fitting before evaluation)
++        collect_garbage: run an explicit ``gc.collect()`` after each evaluated
++            population. Useful when the objective leaves large cyclic garbage
++            behind (fitted models, cached tensors); a needless cost otherwise,
++            since a full collection scans the whole live heap.
+     """
+ 
+     def __init__(self,
+                  adapter: BaseOptimizationAdapter,
+                  n_jobs: int = 1,
+                  graph_cleanup_fn: Optional[GraphFunction] = None,
+-                 delegate_evaluator: Optional[DelegateEvaluator] = None):
++                 delegate_evaluator: Optional[DelegateEvaluator] = None,
++                 collect_garbage: bool = True):
+         self._adapter = adapter
+         self._objective_eval = None
+         self._cleanup = graph_cleanup_fn
+         self._post_eval_callback = None
+         self._delegate_evaluator = delegate_evaluator
++        self._collect_garbage = collect_garbage
+ 
+         self.timer = None
+         self.logger = default_log(self)
+@@ -189,10 +195,21 @@ class BaseGraphEvaluationDispatcher(ObjectiveEvaluationDispatcher):
+             self._post_eval_callback(domain_graph)
+         if self._cleanup:
+             self._cleanup(domain_graph)
+-        gc.collect()
+-
++        # NB: the full collection that used to run here fired once per
++        # individual. A gen-2 collect costs time proportional to the size of
++        # the whole live heap, so on domains whose objective keeps large
++        # objects alive (cached tensors, fitted models) it dominated the
++        # evaluation itself -- ~85 ms per graph, ~70% of the optimiser's wall
++        # clock, on the EPDE equation-discovery objective. It is now done once
++        # per population instead (see `collect_garbage`), which keeps the
++        # memory-hygiene intent at 1/pop_size of the cost.
+         return fitness, domain_graph
+ 
++    def collect_garbage(self):
++        """Population-level heap cleanup, called once per evaluated generation."""
++        if self._collect_garbage:
++            gc.collect()
++
+     def evaluate_with_cache(self, population: PopulationT) -> PopulationT:
+         reversed_population = list(reversed(population))
+         self._remote_compute_cache(reversed_population)
+@@ -229,9 +246,11 @@ class MultiprocessingDispatcher(BaseGraphEvaluationDispatcher):
+                  adapter: BaseOptimizationAdapter,
+                  n_jobs: int = 1,
+                  graph_cleanup_fn: Optional[GraphFunction] = None,
+-                 delegate_evaluator: Optional[DelegateEvaluator] = None):
++                 delegate_evaluator: Optional[DelegateEvaluator] = None,
++                 collect_garbage: bool = True):
+ 
+-        super().__init__(adapter, n_jobs, graph_cleanup_fn, delegate_evaluator)
++        super().__init__(adapter, n_jobs, graph_cleanup_fn, delegate_evaluator,
++                         collect_garbage)
+ 
+     def dispatch(self, objective: ObjectiveFunction, timer: Optional[Timer] = None) -> EvaluationOperator:
+         """Return handler to this object that hides all details
+@@ -262,6 +281,7 @@ class MultiprocessingDispatcher(BaseGraphEvaluationDispatcher):
+         MemoryAnalytics.log(self.logger,
+                             additional_info='parallel evaluation of population',
+                             logging_level=logging.INFO)
++        self.collect_garbage()
+         return successful_evals
+ 
+ 
+@@ -276,4 +296,5 @@ class SequentialDispatcher(BaseGraphEvaluationDispatcher):
+         evaluation_results = [self.evaluate_single(ind.graph, ind.uid) for ind in individuals_to_evaluate]
+         individuals_evaluated = self.apply_evaluation_results(individuals_to_evaluate, evaluation_results)
+         evaluated_population = individuals_evaluated + individuals_to_skip
++        self.collect_garbage()
+         return evaluated_population
+diff --git a/golem/core/optimisers/genetic/gp_optimizer.py b/golem/core/optimisers/genetic/gp_optimizer.py
+index 52aa071..269c3a4 100644
+--- a/golem/core/optimisers/genetic/gp_optimizer.py
++++ b/golem/core/optimisers/genetic/gp_optimizer.py
+@@ -47,7 +47,12 @@ class EvoGraphOptimizer(PopulationalOptimizer):
+         self.elitism = Elitism(graph_optimizer_params)
+         self.operators = [self.regularization, self.selection, self.crossover,
+                           self.mutation, self.inheritance, self.elitism]
+-        self.reproducer = ReproductionController(graph_optimizer_params, self.selection, self.mutation, self.crossover)
++        mating_selection = (Selection(graph_optimizer_params,
++                                      selection_types=graph_optimizer_params.mating_selection_types)
++                            if graph_optimizer_params.mating_selection_types else None)
++        self.reproducer = ReproductionController(graph_optimizer_params, self.selection,
++                                                 self.mutation, self.crossover,
++                                                 mating_selection=mating_selection)
+ 
+         # Define adaptive parameters
+         self._pop_size: PopulationSize = init_adaptive_pop_size(graph_optimizer_params, self.generations)
+diff --git a/golem/core/optimisers/genetic/gp_params.py b/golem/core/optimisers/genetic/gp_params.py
+index b977fec..464def3 100644
+--- a/golem/core/optimisers/genetic/gp_params.py
++++ b/golem/core/optimisers/genetic/gp_params.py
+@@ -1,6 +1,7 @@
+ from dataclasses import dataclass
+ from typing import Sequence, Union, Any, Optional, Callable
+ 
++from golem.core.log import default_log
+ from golem.core.optimisers.adaptive.operator_agent import MutationAgentTypeEnum
+ from golem.core.optimisers.adaptive.mab_agents.neural_contextual_mab_agent import ContextAgentTypeEnum
+ from golem.core.optimisers.genetic.operators.base_mutations import MutationStrengthEnum, MutationTypesEnum, \
+@@ -84,6 +85,12 @@ class GPAlgorithmParameters(AlgorithmParameters):
+     context_agent_type: Union[ContextAgentTypeEnum, Callable] = ContextAgentTypeEnum.nodes_num
+ 
+     selection_types: Optional[Sequence[Union[SelectionTypesEnum, Any]]] = None
++    #: Selection used to build the *mating* pool inside ``ReproductionController``.
++    #: ``None`` keeps the historical behaviour, where reproduction reuses
++    #: ``selection_types`` and -- because the requested pool is never smaller
++    #: than the population it selects from -- applies no mating pressure at all.
++    #: ``SelectionTypesEnum.tournament_with_replacement`` restores it.
++    mating_selection_types: Optional[Sequence[Union[SelectionTypesEnum, Any]]] = None
+     crossover_types: Sequence[Union[CrossoverTypesEnum, Any]] = \
+         (CrossoverTypesEnum.one_point,)
+     mutation_types: Sequence[Union[MutationTypesEnum, Any]] = simple_mutation_set
+@@ -101,3 +108,29 @@ class GPAlgorithmParameters(AlgorithmParameters):
+         if self.multi_objective:
+             # TODO add possibility of using regularization in MO alg
+             self.regularization_type = RegularizationTypesEnum.none
++            if self.genetic_scheme_type == GeneticSchemeTypesEnum.generational:
++                # This combination leaves the loop with NO survival selection
++                # at all, and it fails silently -- the run looks healthy and
++                # the archive still fills up, it just searches much worse.
++                #
++                # Why: elitism is deliberately disabled in multi-objective mode
++                # (Elitism._is_elitism_applicable), and the generational scheme
++                # replaces the whole population with the offspring
++                # (Inheritance.direct_inheritance) instead of selecting among
++                # parents + offspring. The remaining selection call, in
++                # ReproductionController, asks for a mating pool no smaller
++                # than the population it selects from, which every selection
++                # operator answers by returning all of them. Net effect: every
++                # parent breeds regardless of fitness and every offspring
++                # survives regardless of fitness -- a random walk with a Pareto
++                # archive bolted on.
++                #
++                # `steady_state` selects the next population out of
++                # parents + offspring and does apply pressure; it is what
++                # GOLEM's own multi-objective example uses.
++                default_log(self).warning(
++                    'Multi-objective optimisation with the generational genetic '
++                    'scheme applies no survival selection (elitism is disabled '
++                    'for multi-objective runs, and the generational scheme keeps '
++                    'the offspring unconditionally). Use '
++                    'GeneticSchemeTypesEnum.steady_state for multi-objective runs.')
+diff --git a/golem/core/optimisers/genetic/operators/reproduction.py b/golem/core/optimisers/genetic/operators/reproduction.py
+index bbaacde..90459fc 100644
+--- a/golem/core/optimisers/genetic/operators/reproduction.py
++++ b/golem/core/optimisers/genetic/operators/reproduction.py
+@@ -46,11 +46,16 @@ class ReproductionController:
+                  mutation: Mutation,
+                  crossover: Crossover,
+                  window_size: int = 10,
++                 mating_selection: Optional[Selection] = None,
+                  ):
+         self.parameters = parameters
+-        self.selection = selection
++        self.selection = mating_selection or selection
+         self.mutation = mutation
+         self.crossover = crossover
++        #: Sampling with replacement decouples the mating-pool size from the
++        #: population size, so the pool can be larger than the population and
++        #: selection is free to favour the fitter parents.
++        self._mating_with_replacement = mating_selection is not None
+ 
+         self._minimum_valid_ratio = parameters.required_valid_ratio * 0.5
+         self._window_size = window_size
+@@ -101,7 +106,10 @@ class ReproductionController:
+             residual_size = total_target_size - len(collected_next_population)
+             residual_size = max(MIN_POP_SIZE,
+                                 int(residual_size / self.mean_success_rate))
+-            residual_size = min(len(population), residual_size)
++            if not self._mating_with_replacement:
++                # Selection without replacement cannot return more parents than
++                # it was given, so asking for more is pointless.
++                residual_size = min(len(population), residual_size)
+ 
+             # Reproduce the required number of individuals that equals residual size
+             partial_next_population = self.reproduce_uncontrolled(population, evaluator, residual_size)
+diff --git a/golem/core/optimisers/genetic/operators/selection.py b/golem/core/optimisers/genetic/operators/selection.py
+index e42c2f1..f3dd91e 100644
+--- a/golem/core/optimisers/genetic/operators/selection.py
++++ b/golem/core/optimisers/genetic/operators/selection.py
+@@ -5,15 +5,34 @@ from random import choice, randint, sample
+ from typing import Callable, List, Optional
+ 
+ from golem.core.optimisers.genetic.operators.operator import PopulationT, Operator
++from golem.core.optimisers.opt_history_objects.individual import Individual
+ from golem.utilities.data_structures import ComparableEnum as Enum
+ 
+ 
+ class SelectionTypesEnum(Enum):
+     tournament = 'tournament'
+     spea2 = 'spea2'
++    nsga2 = 'nsga2'
++    tournament_with_replacement = 'tournament_with_replacement'
+ 
+ 
+ class Selection(Operator):
++    """Selection operator.
++
++    ``selection_types`` normally comes from the algorithm parameters; pass
++    ``selection_types`` explicitly to build a selection that uses a different
++    set -- used for the *mating* pool, whose requirements differ from those of
++    environmental (survival) selection.
++    """
++
++    def __init__(self, parameters=None, requirements=None, selection_types=None):
++        super().__init__(parameters=parameters, requirements=requirements)
++        self._selection_types_override = selection_types
++
++    @property
++    def selection_types(self):
++        return self._selection_types_override or self.parameters.selection_types
++
+     def __call__(self, population: PopulationT, pop_size: Optional[int] = None) -> PopulationT:
+         """
+         Selection of individuals based on specified type of selection
+@@ -22,14 +41,16 @@ class Selection(Operator):
+         Taken from algorithm parameters if not specified.
+         """
+         pop_size = pop_size if pop_size is not None else self.parameters.pop_size
+-        selection_type = choice(self.parameters.selection_types)
++        selection_type = choice(self.selection_types)
+         return self._selection_by_type(selection_type)(population, pop_size)
+ 
+     @staticmethod
+     def _selection_by_type(selection_type: SelectionTypesEnum) -> Callable[[PopulationT, int], PopulationT]:
+         selections = {
+             SelectionTypesEnum.tournament: tournament_selection,
+-            SelectionTypesEnum.spea2: spea2_selection
++            SelectionTypesEnum.spea2: spea2_selection,
++            SelectionTypesEnum.nsga2: nsga2_selection,
++            SelectionTypesEnum.tournament_with_replacement: tournament_selection_with_replacement,
+         }
+         if selection_type in selections:
+             return selections[selection_type]
+@@ -88,6 +109,133 @@ def random_selection(individuals: PopulationT, pop_size: int) -> PopulationT:
+     return sample(individuals, pop_size)
+ 
+ 
++def _tournament_winner(first: Individual, second: Individual) -> Individual:
++    """Binary-tournament comparison that is correct for both fitness kinds.
++
++    ``dominates`` is Pareto domination for multi-objective fitness and plain
++    better-than for single-objective; mutually non-dominated pairs are decided
++    by a coin flip, as in NSGA-II's binary tournament.
++    """
++    if first.fitness.dominates(second.fitness):
++        return first
++    if second.fitness.dominates(first.fitness):
++        return second
++    return choice((first, second))
++
++
++def tournament_selection_with_replacement(individuals: PopulationT, pop_size: int,
++                                          tournament_size: int = 2) -> PopulationT:
++    """Build a *mating pool* of exactly ``pop_size`` parents, with replacement.
++
++    Deliberately NOT wrapped in ``default_selection_behaviour``: that wrapper
++    returns the input untouched whenever ``len(individuals) <= pop_size``,
++    which is precisely the case in reproduction -- the mating pool is never
++    smaller than the population it is drawn from. The result is that a
++    generational run applies no mating pressure at all: every parent breeds
++    regardless of fitness.
++
++    Each tournament draws its contenders without replacement, so an
++    individual never competes against itself; the tournaments themselves are
++    independent, so a fit individual can win several and enter the pool more
++    than once. That is what decouples the pool size from the population size
++    and lets fitness decide how often a parent breeds.
++    """
++    individuals = list({ind.uid: ind for ind in individuals}.values())
++    if not individuals:
++        return []
++    if len(individuals) == 1:
++        return individuals * pop_size
++    size = max(2, min(tournament_size, len(individuals)))
++    chosen = []
++    for _ in range(pop_size):
++        group = sample(individuals, size)
++        winner = group[0]
++        for contender in group[1:]:
++            winner = _tournament_winner(winner, contender)
++        chosen.append(winner)
++    return chosen
++
++
++def fast_non_dominated_sort(individuals: PopulationT) -> List[List[Individual]]:
++    """Partition ``individuals`` into Pareto fronts (NSGA-II, Deb et al. 2002)."""
++    size = len(individuals)
++    dominated_by = [[] for _ in range(size)]
++    domination_count = [0] * size
++
++    for i in range(size):
++        for j in range(i + 1, size):
++            if individuals[i].fitness.dominates(individuals[j].fitness):
++                dominated_by[i].append(j)
++                domination_count[j] += 1
++            elif individuals[j].fitness.dominates(individuals[i].fitness):
++                dominated_by[j].append(i)
++                domination_count[i] += 1
++
++    # A domination count is only final once every pair has been visited, so
++    # the first front is read off after the loop, not during it.
++    fronts: List[List[int]] = [[i for i in range(size) if domination_count[i] == 0]]
++    current = fronts[0]
++    while current:
++        nxt = []
++        for i in current:
++            for j in dominated_by[i]:
++                domination_count[j] -= 1
++                if domination_count[j] == 0:
++                    nxt.append(j)
++        if nxt:
++            fronts.append(nxt)
++        current = nxt
++    return [[individuals[i] for i in front] for front in fronts]
++
++
++def crowding_distances(front: PopulationT) -> List[float]:
++    """NSGA-II crowding distance: how isolated each solution is on its front."""
++    size = len(front)
++    if size <= 2:
++        return [float('inf')] * size
++    distances = [0.0] * size
++    num_objectives = len(front[0].fitness.values)
++    for axis in range(num_objectives):
++        order = sorted(range(size), key=lambda i: front[i].fitness.values[axis])
++        low = front[order[0]].fitness.values[axis]
++        high = front[order[-1]].fitness.values[axis]
++        distances[order[0]] = distances[order[-1]] = float('inf')
++        span = high - low
++        if span <= 0:
++            continue
++        for rank in range(1, size - 1):
++            nxt = front[order[rank + 1]].fitness.values[axis]
++            prev = front[order[rank - 1]].fitness.values[axis]
++            distances[order[rank]] += (nxt - prev) / span
++    return distances
++
++
++@default_selection_behaviour
++def nsga2_selection(individuals: PopulationT, pop_size: int) -> PopulationT:
++    """NSGA-II environmental selection: Pareto rank, then crowding distance.
++
++    An alternative to ``spea2_selection`` for multi-objective runs. SPEA-2
++    scores density with a k-th-nearest-neighbour estimate over the whole
++    population and truncates one point at a time -- O(N^3) in the worst case
++    and biased towards whichever region happens to be dense. NSGA-II keeps
++    whole fronts and only needs crowding distance on the front that
++    overflows, which is O(M N log N) and spreads the retained solutions more
++    evenly along the front -- what matters on objectives that are strongly
++    correlated, where the front is a thin arc and losing its parsimonious end
++    means losing the interpretable solutions.
++    """
++    chosen: List[Individual] = []
++    for front in fast_non_dominated_sort(list(individuals)):
++        if len(chosen) + len(front) <= pop_size:
++            chosen.extend(front)
++            continue
++        distances = crowding_distances(front)
++        order = sorted(range(len(front)), key=lambda i: distances[i], reverse=True)
++        chosen.extend(front[i] for i in order[:pop_size - len(chosen)])
++        break
++    return chosen
++
++
+ # Code of spea2 selection is modified part of DEAP library (Library URL: https://github.com/DEAP/deap).
+ @default_selection_behaviour
+ def spea2_selection(individuals: PopulationT, pop_size: int) -> PopulationT:
+diff --git a/golem/core/optimisers/optimization_parameters.py b/golem/core/optimisers/optimization_parameters.py
+index cd6d360..e820d26 100644
+--- a/golem/core/optimisers/optimization_parameters.py
++++ b/golem/core/optimisers/optimization_parameters.py
+@@ -37,6 +37,13 @@ class OptimizationParameters:
+     :param show_progress: bool indicating whether to show progress using tqdm or not
+     :param collect_intermediate_metric: save metrics for intermediate (non-root) nodes in graph
+     :param parallelization_mode: identifies the way to parallelize population evaluation
++    :param collect_garbage: run an explicit ``gc.collect()`` after every evaluated
++        population.
++
++        Worth keeping for objectives that leave large cyclic garbage behind
++        (fitted models, cached tensors). A full collection walks the entire live
++        heap, so on domains with a big long-lived working set it can cost more
++        than the evaluations it follows -- switch it off there.
+ 
+     History options:
+ 
+@@ -59,6 +66,7 @@ class OptimizationParameters:
+     show_progress: bool = True
+     collect_intermediate_metric: bool = False
+     parallelization_mode: str = 'populational'
++    collect_garbage: bool = True
+     static_individual_metadata: dict = field(default_factory=lambda: {
+         'use_input_preprocessing': True
+     })
+diff --git a/golem/core/optimisers/populational_optimizer.py b/golem/core/optimisers/populational_optimizer.py
+index ee4b21f..1154f99 100644
+--- a/golem/core/optimisers/populational_optimizer.py
++++ b/golem/core/optimisers/populational_optimizer.py
+@@ -55,7 +55,8 @@ class PopulationalOptimizer(GraphOptimizer):
+         self.eval_dispatcher = dispatcher_type(adapter=graph_generation_params.adapter,
+                                                n_jobs=requirements.n_jobs,
+                                                graph_cleanup_fn=_try_unfit_graph,
+-                                               delegate_evaluator=graph_generation_params.remote_evaluator)
++                                               delegate_evaluator=graph_generation_params.remote_evaluator,
++                                               collect_garbage=requirements.collect_garbage)
+ 
+         # early_stopping_iterations and early_stopping_timeout may be None, so use some obvious max number
+         max_stagnation_length = requirements.early_stopping_iterations or requirements.num_of_generations
+diff --git a/test/unit/optimizers/gp_operators/test_reproduction_controller.py b/test/unit/optimizers/gp_operators/test_reproduction_controller.py
+index e1034f4..b129f8f 100644
+--- a/test/unit/optimizers/gp_operators/test_reproduction_controller.py
++++ b/test/unit/optimizers/gp_operators/test_reproduction_controller.py
+@@ -13,7 +13,7 @@ from golem.core.optimisers.genetic.operators.crossover import Crossover, Crossov
+ from golem.core.optimisers.genetic.operators.mutation import Mutation
+ from golem.core.optimisers.genetic.operators.operator import EvaluationOperator, PopulationT
+ from golem.core.optimisers.genetic.operators.reproduction import ReproductionController
+-from golem.core.optimisers.genetic.operators.selection import Selection
++from golem.core.optimisers.genetic.operators.selection import Selection, SelectionTypesEnum
+ from golem.core.optimisers.genetic.parameters.population_size import ConstRatePopulationSize
+ from golem.core.optimisers.opt_history_objects.individual import Individual
+ from golem.core.optimisers.optimization_parameters import GraphRequirements
+@@ -129,3 +129,70 @@ def test_pop_size_progression(reproducer: ReproductionController, success_rate:
+ 
+         # update pop size
+         parameters.pop_size = pop_size_progress.next(pop)
++
++
++def test_mating_selection_lifts_the_mating_pool_cap():
++    """Without a mating selection the controller caps its request at the size
++    of the population it selects from, and every selection operator answers
++    such a request by returning everyone -- so reproduction applies no
++    selection pressure at all. A mating selection that samples with
++    replacement lifts the cap, and the request survives to the operator."""
++    params = GPAlgorithmParameters(
++        pop_size=20,
++        mutation_types=[MutationTypesEnum.single_add],
++        crossover_types=[CrossoverTypesEnum.none],
++        mating_selection_types=[SelectionTypesEnum.tournament_with_replacement])
++    graph_gen_params = GraphGenerationParams(available_node_types=['x'], rules_for_constraint=[])
++    requirements = GraphRequirements()
++
++    requested = []
++
++    class RecordingSelection(Selection):
++        def __call__(self, population, pop_size=None):
++            requested.append(pop_size)
++            return super().__call__(population, pop_size)
++
++    mating = RecordingSelection(
++        params, requirements,
++        selection_types=[SelectionTypesEnum.tournament_with_replacement])
++    reproduction = ReproductionController(
++        params,
++        selection=Selection(params, requirements),
++        mutation=Mutation(params, requirements, graph_gen_params),
++        crossover=Crossover(params, requirements, graph_gen_params),
++        mating_selection=mating)
++
++    population = get_rand_population(10)
++    reproduction.reproduce(population, MockEvaluator(1.0))
++
++    assert requested, 'the mating selection was never consulted'
++    assert max(requested) > len(population)
++
++
++def test_without_mating_selection_the_pool_never_exceeds_the_population():
++    """Pins the historical behaviour the option above opts out of."""
++    params = GPAlgorithmParameters(
++        pop_size=20,
++        mutation_types=[MutationTypesEnum.single_add],
++        crossover_types=[CrossoverTypesEnum.none])
++    graph_gen_params = GraphGenerationParams(available_node_types=['x'], rules_for_constraint=[])
++    requirements = GraphRequirements()
++
++    requested = []
++
++    class RecordingSelection(Selection):
++        def __call__(self, population, pop_size=None):
++            requested.append(pop_size)
++            return super().__call__(population, pop_size)
++
++    reproduction = ReproductionController(
++        params,
++        selection=RecordingSelection(params, requirements),
++        mutation=Mutation(params, requirements, graph_gen_params),
++        crossover=Crossover(params, requirements, graph_gen_params))
++
++    population = get_rand_population(10)
++    reproduction.reproduce(population, MockEvaluator(1.0))
++
++    assert requested
++    assert max(requested) <= len(population)
+diff --git a/test/unit/optimizers/gp_operators/test_selection.py b/test/unit/optimizers/gp_operators/test_selection.py
+index 953ffb9..4ff4a16 100644
+--- a/test/unit/optimizers/gp_operators/test_selection.py
++++ b/test/unit/optimizers/gp_operators/test_selection.py
+@@ -1,7 +1,13 @@
++import logging
++
+ from golem.core.adapter import DirectAdapter
+ from golem.core.optimisers.genetic.gp_params import GPAlgorithmParameters
++from golem.core.optimisers.genetic.operators.inheritance import GeneticSchemeTypesEnum
+ from golem.core.optimisers.genetic.operators.operator import PopulationT
+-from golem.core.optimisers.genetic.operators.selection import Selection, SelectionTypesEnum, random_selection
++from golem.core.optimisers.fitness.multi_objective_fitness import MultiObjFitness
++from golem.core.optimisers.genetic.operators.selection import (
++    Selection, SelectionTypesEnum, random_selection, nsga2_selection,
++    tournament_selection_with_replacement, fast_non_dominated_sort)
+ from golem.core.optimisers.opt_history_objects.individual import Individual
+ from test.unit.optimizers.test_evaluation import get_objective
+ from test.unit.utils import graph_first, graph_second, graph_third, graph_fourth, graph_fifth
+@@ -81,3 +87,110 @@ def test_custom_selection():
+     selected_individuals = selection(population)
+     assert (all([ind in population for ind in selected_individuals]) and
+             len(selected_individuals) == num_of_inds)
++
++
++def _mo_population(objective_values):
++    """Individuals carrying the given multi-objective fitness vectors.
++
++    The graphs are irrelevant to these operators, which read fitness only.
++    """
++    adapter = DirectAdapter()
++    population = []
++    for values in objective_values:
++        ind = Individual(adapter.adapt(graph_first()))
++        ind.set_evaluation_result(MultiObjFitness(values=values))
++        population.append(ind)
++    return population
++
++
++def test_nsga2_keeps_the_whole_non_dominated_front():
++    # Three mutually non-dominated points, three dominated by all of them.
++    front = [(1.0, 5.0), (3.0, 3.0), (5.0, 1.0)]
++    dominated = [(6.0, 6.0), (7.0, 7.0), (8.0, 8.0)]
++    population = _mo_population(front + dominated)
++
++    selected = nsga2_selection(population, pop_size=3)
++
++    assert len(selected) == 3
++    assert {tuple(ind.fitness.values) for ind in selected} == set(front)
++
++
++def test_nsga2_fills_from_the_next_front_when_the_first_is_too_small():
++    front = [(1.0, 5.0), (5.0, 1.0)]
++    dominated = [(6.0, 6.0), (7.0, 7.0)]
++    population = _mo_population(front + dominated)
++
++    selected = nsga2_selection(population, pop_size=3)
++
++    assert len(selected) == 3
++    assert set(front).issubset({tuple(ind.fitness.values) for ind in selected})
++
++
++def test_nsga2_keeps_the_extremes_when_a_front_overflows():
++    """Crowding distance is infinite at the ends of a front, so the extreme
++    trade-offs survive truncation and the crowded middle is dropped."""
++    population = _mo_population([(1.0, 9.0), (4.0, 4.1), (4.1, 4.0), (9.0, 1.0)])
++
++    selected = nsga2_selection(population, pop_size=2)
++
++    assert {tuple(ind.fitness.values) for ind in selected} == {(1.0, 9.0), (9.0, 1.0)}
++
++
++def test_nsga2_is_reachable_through_the_selection_operator():
++    population = _mo_population([(1.0, 5.0), (3.0, 3.0), (5.0, 1.0), (9.0, 9.0)])
++    parameters = GPAlgorithmParameters(selection_types=[SelectionTypesEnum.nsga2],
++                                       multi_objective=True, pop_size=3)
++    selected = Selection(parameters)(population)
++    assert len(selected) == 3
++
++
++def test_fast_non_dominated_sort_orders_the_fronts():
++    population = _mo_population([(1.0, 1.0), (2.0, 2.0), (3.0, 3.0)])
++    fronts = fast_non_dominated_sort(population)
++    assert [[tuple(ind.fitness.values) for ind in front] for front in fronts] == \
++           [[(1.0, 1.0)], [(2.0, 2.0)], [(3.0, 3.0)]]
++
++
++def test_mating_pool_can_be_larger_than_the_population():
++    """The whole point of sampling with replacement: reproduction asks for a
++    pool that is not smaller than the population it selects from, and every
++    other selection answers that by returning everyone."""
++    population = get_population()
++    pool = tournament_selection_with_replacement(population, pop_size=len(population) * 3)
++    assert len(pool) == len(population) * 3
++    assert all(ind in population for ind in pool)
++
++
++def test_mating_pool_applies_selection_pressure():
++    """With two candidates and binary tournaments, the dominating one wins
++    every draw -- so a pool built with replacement contains only it, where a
++    plain selection would have returned both untouched."""
++    population = _mo_population([(1.0, 1.0), (9.0, 9.0)])
++    best = tuple(population[0].fitness.values)
++
++    pool = tournament_selection_with_replacement(population, pop_size=20)
++
++    assert len(pool) == 20
++    assert all(tuple(ind.fitness.values) == best for ind in pool)
++
++
++def test_mating_pool_survives_a_degenerate_population():
++    assert tournament_selection_with_replacement([], pop_size=5) == []
++    single = get_population()[:1]
++    assert len(tournament_selection_with_replacement(single, pop_size=5)) == 5
++
++
++def test_multi_objective_generational_scheme_is_flagged(caplog):
++    """That combination leaves the loop with no survival selection at all and
++    fails silently, so it must at least say so."""
++    with caplog.at_level(logging.WARNING):
++        GPAlgorithmParameters(multi_objective=True,
++                              genetic_scheme_type=GeneticSchemeTypesEnum.generational)
++    assert any('no survival selection' in record.message for record in caplog.records)
++
++
++def test_steady_state_multi_objective_is_not_flagged(caplog):
++    with caplog.at_level(logging.WARNING):
++        GPAlgorithmParameters(multi_objective=True,
++                              genetic_scheme_type=GeneticSchemeTypesEnum.steady_state)
++    assert not any('no survival selection' in record.message for record in caplog.records)
+diff --git a/test/unit/optimizers/test_evaluation.py b/test/unit/optimizers/test_evaluation.py
+index 45623ab..a69aee5 100644
+--- a/test/unit/optimizers/test_evaluation.py
++++ b/test/unit/optimizers/test_evaluation.py
+@@ -1,4 +1,5 @@
+ import datetime
++import gc
+ from functools import partial
+ 
+ import pytest
+@@ -102,3 +103,34 @@ def test_n_jobs_for_dispatcher():
+     for n_jobs in (0, -cpu_count() - 1, -cpu_count() - 2):
+         with pytest.raises(ValueError):
+             _ = determine_n_jobs(n_jobs)
++
++
++@pytest.mark.parametrize('dispatcher_class', [SequentialDispatcher, MultiprocessingDispatcher])
++def test_garbage_is_collected_once_per_population(dispatcher_class, monkeypatch):
++    """A full collection walks the whole live heap, so it must not run per
++    individual: on objectives that keep a large working set alive that cost
++    dominates the evaluations themselves."""
++    _, population = set_up_tests()
++    collections = []
++    monkeypatch.setattr(gc, 'collect', lambda *args, **kwargs: collections.append(1))
++
++    dispatcher = dispatcher_class(DirectAdapter())
++    evaluator = dispatcher.dispatch(get_objective)
++    evaluated_population = evaluator(population)
++
++    assert len(evaluated_population) == len(population)
++    assert len(collections) == 1
++
++
++@pytest.mark.parametrize('dispatcher_class', [SequentialDispatcher, MultiprocessingDispatcher])
++def test_garbage_collection_can_be_disabled(dispatcher_class, monkeypatch):
++    _, population = set_up_tests()
++    collections = []
++    monkeypatch.setattr(gc, 'collect', lambda *args, **kwargs: collections.append(1))
++
++    dispatcher = dispatcher_class(DirectAdapter(), collect_garbage=False)
++    evaluator = dispatcher.dispatch(get_objective)
++    evaluated_population = evaluator(population)
++
++    assert len(evaluated_population) == len(population)
++    assert collections == []
