@@ -389,13 +389,19 @@ class Instability(EquationObjective):
       excess-variance heterogeneity, tau^2/(tau^2+mean^2); ``'chi2'`` =
       per-term Nyblom-Hansen cumulative-score-path constancy: global-OLS
       Theta, one path per grid axis, each bulge measured against the
-      term's own signal energy -- the resolver DEFAULT), memoized per
-      equation as ``_cached_alt_instability = (metric, value)``.
+      term's own signal energy, RAW -- no ``yy/rss`` rescale -- the
+      resolver DEFAULT), memoized per equation as
+      ``_cached_alt_instability = (metric, value)``.
 
     The estimator choice affects ONLY this objective; the sparsity
-    keep-rule keeps following ``gram_mode``. Fails loudly: any exception
-    propagates -- a silent fallback value would corrupt the Pareto front
-    invisibly.
+    keep-rule keeps following ``gram_mode``. EXCEPTION by design: under
+    the chi defaults both sides share ONE formula -- this objective sums
+    exactly the scores the keep-rule kills by
+    (``survival.chi2_scores(..., rescale=False)``; the
+    objective/regularizer consistency invariant, with the ``yy/rss``
+    rescale left as an opt-in diagnostic). Fails loudly: any
+    exception propagates -- a silent fallback value would corrupt the
+    Pareto front invisibly.
     """
     name = 'instability'
     value_attr = 'coefficients_stability'
@@ -422,10 +428,20 @@ class Instability(EquationObjective):
                 main_var=equation.main_var_to_explain,
                 fit_intercept=fit_intercept))
         if metric in ('survival', 'tile', 'het', 'chi2'):
-            estimator = {'survival': survival_scores, 'tile': tile_scores,
-                         'het': heterogeneity_scores, 'chi2': chi2_scores}[metric]
-            scores = estimator(features, target, ctx.g_fun_vals, data_shape,
-                               fit_intercept=fit_intercept)
+            if metric == 'chi2':
+                # THE canonical RAW chi2 -- the SAME instability
+                # formula the sparsity keep-rule kills by (the
+                # objective/regularizer consistency invariant; both
+                # delegate to survival.chi2_scores with rescale=False;
+                # the yy/rss rescale is an opt-in diagnostic).
+                scores = chi2_scores(features, target, ctx.g_fun_vals,
+                                     data_shape, fit_intercept=fit_intercept,
+                                     rescale=False)
+            else:
+                estimator = {'survival': survival_scores, 'tile': tile_scores,
+                             'het': heterogeneity_scores}[metric]
+                scores = estimator(features, target, ctx.g_fun_vals,
+                                   data_shape, fit_intercept=fit_intercept)
             value = float(np.sum(scores))
             equation._cached_alt_instability = (metric, value)
             return value

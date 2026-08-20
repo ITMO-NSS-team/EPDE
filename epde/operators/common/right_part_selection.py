@@ -12,6 +12,7 @@ from copy import deepcopy
 import warnings
 
 import epde.globals as global_var
+from epde.evaluators import simple_function_evaluator
 from epde.operators.utils.template import CompoundOperator
 from epde.decorators import HistoryExtender
 from epde.structure.main_structures import Term, Equation
@@ -80,11 +81,11 @@ class EqRightPartSelector(CompoundOperator):
                 objective._gram_super = GramSetup.precompute_super(
                     Z, sample_weights, grid_shape)
             else:
-                # The chi default: no windowed super-Gram -- the keep-rule
-                # scores via ``chi2_scores`` on raw columns. Keep the shared
-                # Z so Tier-3 slicing still skips objective.evaluate per
+                # 'chi2' (the default): no windowed super-Gram -- the chi2
+                # CD scores work on raw columns. Keep the shared Z so
+                # Tier-3 slicing still skips objective.evaluate per
                 # candidate target.
-                objective._gram_super = {'Z': Z, 'mode': 'chi2'}
+                objective._gram_super = {'Z': Z, 'mode': global_var.gram_mode}
             _loop_stats.record('EqRPS.gram_super_built', 1, 1)
         except Exception:
             # Defensive: any unexpected failure (shape mismatch, missing
@@ -264,6 +265,47 @@ class EqRightPartSelector(CompoundOperator):
         if len(equation_terms) <= 1:
             return False
 
+        # Ratio-fit scrub: a nonzero feature term related to the target by
+        # DIVISION in either direction (see ``_term_divides``) makes the
+        # ``Lambda * g * (true identity)`` FD-error soak representable:
+        #
+        # * a COMPONENT (term divides target) -- the wave composite trap
+        #   ``u*u_tt = 3.75*u_tt - 0.15*u_xx + 0.04*u*u_xx`` (g = 1), whose
+        #   padded pair cancels exactly under the true relation;
+        # * a MULTIPLE (target divides term) -- the hitchhiker shape
+        #   ``0.687*u_t*u_tt - 0.0275*u_t*u_xx`` riding on the canonical
+        #   target ``u_tt`` (g = u_t; the coefficient ratio is again
+        #   exactly the true 0.04).
+        #
+        # Scrubbing the target-side member breaks every such family (the
+        # partner alone cannot cancel and dies at the refit -- measured
+        # under both the chi2 and vcoef keep-rules). Component padding
+        # also BLOCKS the common-factor cancellation below; scrubbing it
+        # first lets the surviving reduced identity (which DOES share the
+        # factor) collapse to its canonical form on a later pass.
+        def _soak_related(term_):
+            return (_term_divides(term_, objective.target)
+                    or _term_divides(objective.target, term_))
+        divisors = [term for term in nonzero_terms[:-1]
+                    if _soak_related(term)]
+        if divisors:
+            def _not_soak_related(term_):
+                return not _soak_related(term_)
+            for term in divisors:
+                status = _regen_or_drop_term(
+                    objective, term, max_iter=100,
+                    stats_name='simplify_equation.divisor_scrub',
+                    extra_ok=_not_soak_related)
+                if status in ('target', 'floor'):
+                    # Cannot scrub without degenerating the equation --
+                    # decline and let the outer RPS loop reset/re-select.
+                    return False
+            try:
+                objective.reset_state(reset_right_part=False)
+            except TypeError:
+                objective.reset_state()
+            return True
+
         # Degree reduction: when a SINGLE non-target term remains, the
         # equation is ``coef * f = g`` with f, g products of powered
         # factors. If every factor power in BOTH f and g shares a common
@@ -340,7 +382,6 @@ class EqRightPartSelector(CompoundOperator):
                             min_order = factor.cache_label[1][0]
 
             # Reduce order of common factor in every term; drop zero-power factors.
-            max_iter = 100
             for term in nonzero_terms:
                 factors_simplified = []
                 for factor in term.structure:
@@ -355,13 +396,32 @@ class EqRightPartSelector(CompoundOperator):
                 term.structure = [factor for factor in term.structure if factor not in factors_simplified]
                 term.reset_saved_state()
 
-                # If the term's order became zero (or it now duplicates
-                # another term), regenerate it; if the pool can't yield a
-                # unique, meaningful replacement within the cap, DROP it.
-                # A duplicate must never ride out of RPS -- see the exit
-                # assert in ``apply``.
+            # Reduction collisions are ALWAYS against zero-weight
+            # non-survivors: two NONZERO terms cannot collide by shedding a
+            # factor they both carried (they would have been duplicates
+            # before), so a colliding copy is dead structure -- drop the
+            # copy, keep the reduced carrier (the degree-reduction policy
+            # above). Regenerating the CARRIER instead -- the old policy --
+            # scattered exact identities into random terms and broke the
+            # canonical collapse (the wave ratio-fit chain).
+            keep_ids = {id(t) for t in nonzero_terms}
+            kept_labels = {t.factors_labels for t in nonzero_terms}
+            redundant = [t for t in objective.structure
+                         if id(t) not in keep_ids
+                         and t.factors_labels in kept_labels]
+            for t in redundant:
+                _regen_or_drop_term(
+                    objective, t, max_iter=0,
+                    stats_name='simplify_equation.cancel_collision')
+
+            # A term that consisted of nothing but the common factor is now
+            # empty / non-meaningful: regenerate it; if the pool can't
+            # yield a unique, meaningful replacement within the cap, DROP
+            # it. A duplicate must never ride out of RPS -- see the exit
+            # assert in ``apply``.
+            for term in nonzero_terms:
                 status = _regen_or_drop_term(
-                    objective, term, max_iter=max_iter,
+                    objective, term, max_iter=100,
                     stats_name='simplify_equation.replace_term')
                 if status in ('target', 'floor'):
                     # Offending term is the RPS target, or dropping would
@@ -621,6 +681,33 @@ def _amplification_ratio(objective: Equation) -> float:
     return num / den
 
 
+def _term_divides(term, target_term) -> bool:
+    """True iff ``term`` DIVIDES ``target_term``: every factor of ``term``
+    appears in ``target_term`` (same ``structural_label_without_power``)
+    with at least the same power (``cache_label[1][0]``, the
+    ``simplify_equation`` power convention).
+
+    Used by the ratio-fit scrub in ``simplify_equation``: a divisor
+    feature spans an exact algebraic component of the target (``u_tt``
+    inside the composite target ``u * u_tt``), which is what makes the
+    ``Lambda * (true identity)`` FD-error soak representable. Measured on
+    the wave pool: with the divisor excluded, the leftover padding dies
+    under both the chi2 and vcoef keep-rules, leaving the reduced
+    identity that common-factor cancellation collapses to the canonical
+    form."""
+    for f in term.structure:
+        matched = False
+        for g in target_term.structure:
+            if (g.structural_label_without_power
+                    == f.structural_label_without_power
+                    and g.cache_label[1][0] >= f.cache_label[1][0]):
+                matched = True
+                break
+        if not matched:
+            return False
+    return True
+
+
 def _regen_or_drop_term(equation: Equation, term, *, max_iter: int = 100,
                         min_terms: int = 2,
                         stats_name: str = 'simplify_equation.regen_or_drop',
@@ -710,7 +797,9 @@ def _target_term_in_other_equation(eq_with_target: Equation,
                                    eq_other: Equation):
     """Return ``eq_with_target``'s TARGET-term factor signature iff that
     whole term also appears as a (standalone) term in ``eq_other``'s ACTIVE
-    structure; otherwise ``None``.
+    structure -- or, for a DECORATED target, the signature of its
+    derivative CORE when that core leaks as a standalone term; otherwise
+    ``None``.
 
     This enforces target-term uniqueness across a system: the explained
     right-part term of one equation may not be carried as a complete term
@@ -736,7 +825,28 @@ def _target_term_in_other_equation(eq_with_target: Equation,
     if tgt is None:
         return None
     target_sig = tgt.factors_labels
-    return target_sig if target_sig in eq_other.active_terms_labels else None
+    if target_sig in eq_other.active_terms_labels:
+        return target_sig
+    # DERIV-CORE extension: a DECORATED target must not dodge the ban by
+    # wearing a costume -- a ``dv/dx0 * cos(2t)`` target reserves
+    # ``dv/dx0`` exactly as a bare ``dv/dx0`` target would. The core is
+    # the target's derivative factors taken as a standalone term
+    # (whole-term equality against it, same convention as above -- the
+    # core as a FACTOR of a composite coupling term stays legal).
+    # Measured on lv: the only identity-family members that STRICTLY
+    # DOMINATE the truth (the sum identity and its d/dt lift) carry the
+    # other equation's target core as a standalone term; every
+    # substituted variant (v_tt for v_t, u*v_t for v_t) measurably fails
+    # to dominate. For a PURE target the core equals the whole term and
+    # this clause adds nothing.
+    core_sig = frozenset(
+        f.structural_label for f in tgt.structure
+        if f.is_deriv and f.deriv_code != [None, ]
+        and f.evaluator._evaluator == simple_function_evaluator)
+    if core_sig and core_sig != target_sig \
+            and core_sig in eq_other.active_terms_labels:
+        return core_sig
+    return None
 
 
 def _wrap_term_with_factor(equation: Equation, term: Term, banned_sigs,
@@ -862,13 +972,16 @@ def _break_equation_duplication(equation: Equation, shared_sigs, *,
 class SoEqRightPartSelector(CompoundOperator):
     """Chromosome-level RPS that prevents system-level degeneracy.
 
-    Invariant: no equation's TARGET term may appear as a whole (standalone)
-    term in ANY other equation of the system -- the explained right-part
-    term of one equation is reserved to that equation. This is a whole-term
-    equality rule, NOT a sub-product one: a target derivative appearing only
-    as a FACTOR inside a composite coupling term of another equation (e.g.
-    continuity's ``v_y`` inside the v-momentum convective term ``v*v_y`` of
-    Navier-Stokes) is legitimate physics and is left untouched.
+    Invariant: no equation's TARGET term -- nor, for decorated targets,
+    the target's derivative CORE -- may appear as a whole (standalone)
+    term in ANY other equation of the system: the explained right-part
+    term of one equation is reserved to that equation, costume or no
+    costume (``dv/dx0 * cos(2t)`` reserves ``dv/dx0``). This is a
+    whole-term equality rule, NOT a sub-product one: a target derivative
+    appearing only as a FACTOR inside a composite coupling term of
+    another equation (e.g. continuity's ``v_y`` inside the v-momentum
+    convective term ``v*v_y`` of Navier-Stokes) is legitimate physics and
+    is left untouched.
 
     Cross-equation FACTOR sharing is otherwise allowed: an equation for
     ``v`` may carry ``du/dx0`` inside a composite term even when the

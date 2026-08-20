@@ -46,6 +46,24 @@ def _minmax_normalize_columns(features: np.ndarray) -> np.ndarray:
     return out
 
 
+def _keep_rule_scores(cols, y, sw, grid_shape):
+    """Kill scores for the chi keep-rule: THE canonical raw chi2
+    statistic, ``chi2_scores(..., rescale=False)``.
+
+    The objective and the regularizer MUST use the same instability
+    formula -- the Instability objective sums exactly these scores, and
+    both sides delegate to the one implementation in ``survival``.
+    ``rescale=True`` remains available as an opt-in: the ``yy/rss``
+    factor (from the same weighted OLS that supplies the statistic's
+    Theta) is common to all active terms within one outer round, so it
+    would shift only the threshold magnitude against the ``max_corr``
+    anchor, never the kill order -- and it measured NET HARMFUL live
+    (Aug 2026), hence raw. Exact fits at the eps-floor score zero.
+    """
+    return chi2_scores(cols, y, sw, grid_shape, fit_intercept=False,
+                       rescale=False)
+
+
 class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
     """
     Physics-Informed Lasso using Coordinate Descent and Adaptive CV-Penalties.
@@ -194,10 +212,10 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
                 max_corr = np.max(np.abs(X_T_y[active_mask]))
 
             # CV performs as adaptive alpha. Under the chi default it is
-            # each term's Nyblom-Hansen score-path constancy (bulge measured
-            # against the term's own signal energy); explicit vcoef scores
-            # NC/gamma_0^2 (biased non-constant energy). Either way it
-            # prunes weak / zero / unstable / spuriously-varying terms.
+            # each term's raw Nyblom-Hansen score-path constancy (see
+            # ``_keep_rule_scores``); explicit vcoef scores NC/gamma_0^2
+            # (biased non-constant energy). Either way it prunes weak /
+            # zero / unstable / spuriously-varying terms.
             if is_vcoef:
                 active_cv = gram_setup.score(active_mask)
             elif use_axis_cv:
@@ -211,8 +229,7 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
                 cols = Xf[:, feat_idx]
                 if active_mask[-1]:
                     cols = np.hstack([cols, np.ones((n_samples, 1))])
-                active_cv = chi2_scores(cols, y, sw, self.grid_shape,
-                                        fit_intercept=False)
+                active_cv = _keep_rule_scores(cols, y, sw, self.grid_shape)
 
             # Tackle the most physically unstable feature first.
             active_thresholds = active_cv * max_corr
