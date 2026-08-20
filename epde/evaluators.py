@@ -151,8 +151,23 @@ def simple_function_evaluator(factor,
     for param_idx, param_descr in factor.params_description.items():
         if param_descr['name'] == 'power':
             power_param_idx = param_idx
-        
-    if grids is not None:
+
+    if isinstance(grids, dict):
+        if any([grid is None for grid in grids.values()]):
+            none_cond = True
+        else:
+            assert all([isinstance(key, int) and isinstance(grid, (np.ndarray, list)) for key, grid in grids.items()]), \
+                f'Some domain keys and grids do not match desired types: got {[(type(key), type(grid)) for key, grid in grids.items]}.'
+            none_cond = False
+    elif isinstance(grids, list):
+        if any([grid is None for grid in grids]):
+            none_cond = True
+        else:
+            assert all([isinstance(grid, np.ndarray) for grid in grids]), \
+                f'Some domain reeval grids do not match desired np.ndarray type: got {[type(grid) for grid in grids]}.'
+            none_cond = False
+
+    if not none_cond: # grids is not None or any([for grid in ]):
         if isinstance(grids[0], np.ndarray):
             values = factor.predict_with_ann(grids)
             values = {-1: values**(factor.params[power_param_idx])}
