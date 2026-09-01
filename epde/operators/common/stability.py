@@ -266,11 +266,12 @@ class GramSetup:
         return np.vstack(all_weights)
 
     @classmethod
-    def precompute_super(cls, Z, sample_weights, grid_shape,
+    def precompute_super(cls, Z, sample_weights, grid_shapes,
                          circular_cv: bool = _DEFAULT_CIRCULAR_CV):
         """Build a per-dim super-Gram over ``Z_aug = column_stack(Z, ones)``
-        once. Returns an opaque dict consumed by :meth:`from_full` to
-        derive per-target GramSetup views via pure slicing.
+        once PER TRAJECTORY. Returns an opaque dict consumed by
+        :meth:`from_full` to derive per-target GramSetup views via pure
+        slicing.
 
         Used by EqRightPartSelector's term-sweep: instead of rebuilding
         the windowed XTWX matrix for each candidate target column (which
@@ -279,57 +280,67 @@ class GramSetup:
         sub-blocks. The math is exact -- (Z[:, ~t])^T W Z[:, ~t] is the
         sub-block of (Z_aug)^T W Z_aug at rows/cols ``~t U intercept``.
 
-        ``Z`` is shape (n_samples, n_terms); ``sample_weights`` is the
-        flat per-sample weight vector; ``grid_shape`` is the same shape
-        ``GramSetup.__init__`` consumes. ``circular_cv`` mirrors the
-        ``__init__`` flag -- callers that flow through both paths
-        (PhysicsInformedLasso single-call + EqRPS super-Gram sweep) must
-        keep these values aligned for the per-target views to remain
-        sub-blocks of the super-Gram (the math requires identical window
-        sets across the two passes).
+        MULTISAMPLE: ``Z``, ``sample_weights`` and ``grid_shapes`` are dicts
+        keyed by trajectory ID. Trajectories have DIFFERENT grids and lengths,
+        so each keeps its own super-Gram; ``from_full`` returns the matching
+        dict of per-target views and ``VWSRSparsity`` feeds each one to that
+        trajectory's own fit (the per-sample-fit-then-average design).
+
+        ``circular_cv`` mirrors the ``__init__`` flag -- callers that flow
+        through both paths (PhysicsInformedLasso single-call + EqRPS
+        super-Gram sweep) must keep these values aligned for the per-target
+        views to remain sub-blocks of the super-Gram (the math requires
+        identical window sets across the two passes).
         """
-        n_samples, n_terms = Z.shape
-        Z_aug = np.hstack([Z, np.ones((n_samples, 1))])
-        n_features_aug = n_terms + 1
+        per_sample = {}
+        n_terms = None
+        for key, Z_key in Z.items():
+            grid_shape = tuple(int(n) for n in grid_shapes[key])
+            n_samples, n_terms = Z_key.shape
+            Z_aug = np.hstack([Z_key, np.ones((n_samples, 1))])
+            n_features_aug = n_terms + 1
 
-        Z_grid = Z_aug.reshape(*grid_shape, n_features_aug)
-        sw_grid = sample_weights.reshape(*grid_shape)
-        per_dim_super = []
+            Z_grid = Z_aug.reshape(*grid_shape, n_features_aug)
+            sw_grid = np.asarray(sample_weights[key], dtype=float).reshape(*grid_shape)
+            per_dim_super = []
 
-        for dim in range(len(grid_shape)):
-            window_size = grid_shape[dim] // 2
-            num_horizons = grid_shape[dim] if circular_cv else window_size + 1
-            step_size = max(1, num_horizons // _HORIZON_SUBSAMPLE)
+            for dim in range(len(grid_shape)):
+                window_size = grid_shape[dim] // 2
+                num_horizons = grid_shape[dim] if circular_cv else window_size + 1
+                step_size = max(1, num_horizons // _HORIZON_SUBSAMPLE)
 
-            Z_windows = _windowed_take(Z_grid, dim, window_size,
-                                       num_horizons, step_size, circular_cv)
-            w_windows = _windowed_take(sw_grid, dim, window_size,
-                                       num_horizons, step_size, circular_cv)
+                Z_windows = _windowed_take(Z_grid, dim, window_size,
+                                           num_horizons, step_size, circular_cv)
+                w_windows = _windowed_take(sw_grid, dim, window_size,
+                                           num_horizons, step_size, circular_cv)
 
-            Z_windows = np.moveaxis(Z_windows, dim, 0)
-            w_windows = np.moveaxis(w_windows, dim, 0)
-            Z_windows = np.moveaxis(Z_windows, -2, -1)
+                Z_windows = np.moveaxis(Z_windows, dim, 0)
+                w_windows = np.moveaxis(w_windows, dim, 0)
+                Z_windows = np.moveaxis(Z_windows, -2, -1)
 
-            batch_size = Z_windows.shape[0]
-            Z_batch = Z_windows.reshape(batch_size, -1, n_features_aug)
-            weights_batch = w_windows.reshape(batch_size, -1, 1)
+                batch_size = Z_windows.shape[0]
+                Z_batch = Z_windows.reshape(batch_size, -1, n_features_aug)
+                weights_batch = w_windows.reshape(batch_size, -1, 1)
 
-            ZTW = Z_batch.transpose(0, 2, 1) * weights_batch.transpose(0, 2, 1)
-            XTWX_super = ZTW @ Z_batch
+                ZTW = Z_batch.transpose(0, 2, 1) * weights_batch.transpose(0, 2, 1)
+                XTWX_super = ZTW @ Z_batch
 
-            diag = np.diagonal(XTWX_super, axis1=1, axis2=2)
-            scales_super = np.sqrt(np.maximum(np.abs(diag), _DIAG_FLOOR))
+                diag = np.diagonal(XTWX_super, axis1=1, axis2=2)
+                scales_super = np.sqrt(np.maximum(np.abs(diag), _DIAG_FLOOR))
 
-            per_dim_super.append((XTWX_super, scales_super))
+                per_dim_super.append((XTWX_super, scales_super))
+
+            per_sample[key] = {'per_dim_super': per_dim_super,
+                               'n_features_aug': n_features_aug,
+                               'grid_shape': grid_shape}
 
         return {
-            'per_dim_super': per_dim_super,
-            'n_features_aug': n_features_aug,
-            'grid_shape': grid_shape,
+            'mode': 'axis',
+            'per_sample': per_sample,
             'n_terms': n_terms,
             # Cached so downstream VWSRSparsity can derive per-target
             # ``target`` / ``features`` by slicing instead of re-calling
-            # objective.evaluate(normalize=True) -- which would force
+            # objective.evaluate() -- which would force
             # another vstack + transpose of the same term evaluations
             # for every candidate target_idx in the sweep.
             'Z': Z,
@@ -337,46 +348,48 @@ class GramSetup:
 
     @classmethod
     def from_full(cls, super_data, target_idx_in_terms):
-        """Construct a per-target GramSetup view from precomputed
-        super-Gram data via slicing.
+        """Construct per-target GramSetup views (one PER TRAJECTORY) from
+        precomputed super-Gram data via slicing.
 
         ``super_data`` is the dict returned by :meth:`precompute_super`.
         ``target_idx_in_terms`` is the column index within Z (the terms
         portion) that the caller wants as the regression target; the
         intercept column stays in the feature set automatically.
 
-        The returned object has the same ``n_features_aug``, ``grid_shape``
+        Each returned object has the same ``n_features_aug``, ``grid_shape``
         and ``_per_dim`` shape contract as a regular ``GramSetup`` so
         downstream code (``PhysicsInformedLasso.fit`` -> ``solve``) is
         unchanged.
         """
-        per_dim_super = super_data['per_dim_super']
-        n_features_aug_super = super_data['n_features_aug']
-        grid_shape = super_data['grid_shape']
-
-        if not (0 <= target_idx_in_terms < n_features_aug_super - 1):
+        n_terms = int(super_data['n_terms'])
+        if not (0 <= target_idx_in_terms < n_terms):
             raise IndexError(
                 f'target_idx_in_terms={target_idx_in_terms} out of range '
-                f'[0, {n_features_aug_super - 1}) for super-Gram with '
-                f'{n_features_aug_super - 1} terms (+1 intercept).'
-            )
+                f'[0, {n_terms}) for super-Gram with {n_terms} terms '
+                '(+1 intercept).')
 
-        active = np.ones(n_features_aug_super, dtype=bool)
-        active[target_idx_in_terms] = False
+        instances = {}
+        for key, entry in super_data['per_sample'].items():
+            per_dim_super = entry['per_dim_super']
+            n_features_aug_super = entry['n_features_aug']
 
-        instance = cls.__new__(cls)
-        instance.n_features_aug = int(active.sum())  # n_terms (incl. intercept)
-        instance.grid_shape = grid_shape
-        instance._per_dim = []
-        for XTWX_super, scales_super in per_dim_super:
-            XTWX_target = XTWX_super[:, active, :][:, :, active]
-            # XTWy = (Z_aug[:, ~t])^T W Z[:, t] = column t of XTWX_super
-            # at rows in ``active``.
-            XTWy_target = XTWX_super[:, active,
-                                     target_idx_in_terms:target_idx_in_terms + 1]
-            scales_target = scales_super[:, active]
-            instance._per_dim.append((XTWX_target, XTWy_target, scales_target))
-        return instance
+            active = np.ones(n_features_aug_super, dtype=bool)
+            active[target_idx_in_terms] = False
+
+            instance = cls.__new__(cls)
+            instance.n_features_aug = int(active.sum())  # n_terms (incl. intercept)
+            instance.grid_shape = entry['grid_shape']
+            instance._per_dim = []
+            for XTWX_super, scales_super in per_dim_super:
+                XTWX_target = XTWX_super[:, active, :][:, :, active]
+                # XTWy = (Z_aug[:, ~t])^T W Z[:, t] = column t of XTWX_super
+                # at rows in ``active``.
+                XTWy_target = XTWX_super[:, active,
+                                         target_idx_in_terms:target_idx_in_terms + 1]
+                scales_target = scales_super[:, active]
+                instance._per_dim.append((XTWX_target, XTWy_target, scales_target))
+            instances[key] = instance
+        return instances
 
 
 def taylor_microscale(field: np.ndarray, grid_shape, axis: int,
@@ -449,6 +462,7 @@ def resolve_vc_modes_from_input(grid_shape, main_var=None, sample_key: int = 0,
     cached variable (caller falls back to the target-field path).
     """
     import epde.globals as _gv
+    sample_key = 0 if sample_key is None else sample_key
     key = (tuple(int(n) for n in grid_shape), main_var, 'vc')
     cache = getattr(_gv, 'vc_modes_cache', None)
     if cache is None:
@@ -532,9 +546,32 @@ class VaryingCoefSetup:
 
     is_vcoef = True
 
-    def __init__(self, X, y, sample_weights, grid_shape, main_var: str = None, sample_key=None, 
+    #: Basis resolution cap, per axis. ``_resolve_modes`` derives K_d from the
+    #: Taylor microscale and clamps it here.
+    K_MAX = 6
+
+    #: Scales the frequency ridge ``rho*k^2`` that suppresses noise leakage
+    #: into the non-constant energy.
+    FREQ_COEF = 1.0
+
+    #: Block-diagonalise the mode solve by feature, dropping cross-feature mode
+    #: collinearity so a true constant-coefficient term's region-variation is
+    #: not inflated by collinear grid-modulated cousins (``x*u_xx`` /
+    #: ``sin*u_xx`` sharing ``u_xx``'s mode energy, which pushed the weak true
+    #: term's L1 threshold above its signal -- the ac t0/3 collapse). Extends
+    #: the existing Frisch-Waugh constant-block decoupling to the modes. Set
+    #: False for the legacy joint mode solve.
+    MODE_DECOUPLE = True
+
+    # These three were module-level names in ``epde.globals`` with no setter,
+    # no config key and no writer anywhere -- only ``getattr`` reads with a
+    # duplicated default, one of which (mode decouple: False) contradicted the
+    # declared value (True). They belong to the vcoef estimator, so they live
+    # with it, beside ``_FREQ_RIDGE_BASE`` and ``_DIAG_FLOOR``.
+
+    def __init__(self, X, y, sample_weights, grid_shape, main_var: str = None, sample_key=None,
                  modes=None, k_max=None, freq_coef=None, eps_rel: float = 1e-6,
-                 fit_intercept: bool = True):
+                 fit_intercept: bool = True, mode_decouple=None):
         grid_shape = tuple(int(n) for n in grid_shape)
         X = np.asarray(X, dtype=float)
         if X.ndim == 1:
@@ -569,26 +606,27 @@ class VaryingCoefSetup:
         y_flat = np.asarray(y, dtype=float).reshape(-1)
         self.yWy = float(np.dot(y_flat, w * y_flat))
         self.freq_coef = self._cfg_freq(freq_coef)
+        self.mode_decouple = (self.MODE_DECOUPLE if mode_decouple is None
+                              else bool(mode_decouple))
         self.eps_rel = float(eps_rel)
 
     # ------------------------------------------------------------------ #
     # Config / basis helpers
     # ------------------------------------------------------------------ #
-    @staticmethod
-    def _cfg_freq(freq_coef):
+    @classmethod
+    def _cfg_freq(cls, freq_coef):
         if freq_coef is not None:
             return float(freq_coef)
-        import epde.globals as _gv
-        return float(getattr(_gv, 'vc_freq_coef', 1.0))
+        return float(cls.FREQ_COEF)
 
     @classmethod
-    def _resolve_modes(cls, modes, grid_shape, main_var, k_max, sample_key: int = 0): # , 
+    def _resolve_modes(cls, modes, grid_shape, main_var, k_max, sample_key: int = 0):
         if modes is not None:
             return tuple(int(m) for m in modes)
-        import epde.globals as _gv
+        sample_key = 0 if sample_key is None else sample_key
 
         if k_max is None:
-            k_max = int(getattr(_gv, 'vc_k_max', 6))
+            k_max = int(cls.K_MAX)
         resolved = resolve_vc_modes_from_input(grid_shape, main_var=main_var, k_max=k_max, sample_key=sample_key)   # , 
         if resolved is not None:
             return resolved
@@ -642,65 +680,88 @@ class VaryingCoefSetup:
     # Super-Gram precompute / per-target slicing (EqRPS term sweep)
     # ------------------------------------------------------------------ #
     @classmethod
-    def precompute_super(cls, Z, sample_weights, grid_shape, main_var=None,
+    def precompute_super(cls, Z, sample_weights, grid_shapes, main_var=None,
                          modes=None, k_max=None, freq_coef=None,
-                         eps_rel: float = 1e-6): # , sample_key: int = 0
-        grid_shape = tuple(int(n) for n in grid_shape)
-        for key in Z.keys():
-            n_samples, n_terms = Z[key].shape
-            Z_aug = np.hstack([Z[key], np.ones((n_samples, 1))])
-            modes = cls._resolve_modes(modes, grid_shape[key], main_var, k_max, sample_key = key)
+                         eps_rel: float = 1e-6, mode_decouple=None):
+        """Expanded super-Gram over all terms, built once PER TRAJECTORY.
+
+        ``Z`` / ``sample_weights`` / ``grid_shapes`` are dicts keyed by
+        trajectory ID. Each trajectory owns its own grid (different lengths,
+        different cosine basis) so each gets its own ``G_super``; the modes
+        are resolved per trajectory rather than leaking the first one's
+        resolution to the rest.
+        """
+        per_sample = {}
+        n_terms = None
+        for key, Z_key in Z.items():
+            grid_shape = tuple(int(n) for n in grid_shapes[key])
+            n_samples, n_terms = Z_key.shape
+            Z_aug = np.hstack([Z_key, np.ones((n_samples, 1))])
+            modes_key = cls._resolve_modes(modes, grid_shape, main_var, k_max,
+                                           sample_key=key)
             w = np.asarray(sample_weights[key], dtype=float).reshape(-1)
-            Bvals, mode_k = cls._basis_values(grid_shape[key], modes)
+            Bvals, mode_k = cls._basis_values(grid_shape, modes_key)
             G_super, _, _, B = cls._gram(Z_aug, w, Bvals, mode_k, y=None)
+            per_sample[key] = {'G_super': G_super,
+                               'B': int(B),
+                               'basis_mode_k': mode_k,
+                               'n_features_aug': n_terms + 1,
+                               'grid_shape': grid_shape,
+                               'N_eff': float(np.sum(w))}
         return {'mode': 'vcoef',
-                'G_super': G_super,
-                'B': int(B),
-                'basis_mode_k': mode_k,
-                'n_features_aug': n_terms + 1,
-                'grid_shape': grid_shape,
+                'per_sample': per_sample,
                 'n_terms': n_terms,
-                'N_eff': float(np.sum(w)),
                 'freq_coef': cls._cfg_freq(freq_coef),
+                'mode_decouple': (cls.MODE_DECOUPLE if mode_decouple is None
+                                  else bool(mode_decouple)),
                 'eps_rel': float(eps_rel),
                 'Z': Z}
 
     @classmethod
     def from_full(cls, super_data, target_idx_in_terms):
-        """Per-target view: features = all terms except ``target`` plus the
-        intercept; ``Phi^T W y`` is the target's constant column of the
-        super-Gram (since the target equals its own constant-expansion
-        column). Mirrors ``GramSetup.from_full``.
+        """Per-target views, one PER TRAJECTORY: features = all terms except
+        ``target`` plus the intercept; ``Phi^T W y`` is the target's constant
+        column of that trajectory's super-Gram (the target equals its own
+        constant-expansion column). Mirrors ``GramSetup.from_full``.
         """
-        G_super = super_data['G_super']
-        B = int(super_data['B'])
-        n_feat_super = int(super_data['n_features_aug'])  # n_terms + 1
         n_terms = int(super_data['n_terms'])
         if not (0 <= target_idx_in_terms < n_terms):
             raise IndexError(
                 f'target_idx_in_terms={target_idx_in_terms} out of range '
                 f'[0, {n_terms}) for vcoef super-Gram.')
 
-        active_global = [i for i in range(n_feat_super)
-                         if i != target_idx_in_terms]
-        cols = np.concatenate(
-            [np.arange(i * B, (i + 1) * B) for i in active_global])
-        target_const = target_idx_in_terms * B
+        instances = {}
+        for key, entry in super_data['per_sample'].items():
+            G_super = entry['G_super']
+            B = int(entry['B'])
+            n_feat_super = int(entry['n_features_aug'])  # n_terms + 1
 
-        inst = cls.__new__(cls)
-        inst.is_vcoef = True
-        inst.G = G_super[np.ix_(cols, cols)]
-        inst.Phiy = G_super[cols, target_const].copy()
-        inst.yWy = float(G_super[target_const, target_const])
-        inst.B = B
-        inst.basis_mode_k = super_data['basis_mode_k']
-        inst.n_features = len(active_global)
-        inst.grid_shape = super_data['grid_shape']
-        inst.N_eff = float(super_data['N_eff'])
-        inst.freq_coef = float(super_data['freq_coef'])
-        inst.eps_rel = float(super_data['eps_rel'])
-        inst._Bvals = None     # super path: beta(x) reconstruction unavailable
-        return inst
+            active_global = [i for i in range(n_feat_super)
+                             if i != target_idx_in_terms]
+            cols = np.concatenate(
+                [np.arange(i * B, (i + 1) * B) for i in active_global])
+            target_const = target_idx_in_terms * B
+
+            inst = cls.__new__(cls)
+            inst.is_vcoef = True
+            inst.G = G_super[np.ix_(cols, cols)]
+            inst.Phiy = G_super[cols, target_const].copy()
+            inst.yWy = float(G_super[target_const, target_const])
+            inst.B = B
+            inst.basis_mode_k = entry['basis_mode_k']
+            inst.n_features = len(active_global)
+            inst.grid_shape = entry['grid_shape']
+            inst.N_eff = float(entry['N_eff'])
+            inst.freq_coef = float(super_data['freq_coef'])
+            # ``__new__`` bypasses __init__, so this must be set explicitly:
+            # ``_solve_gammas`` reads it, and a missing attribute would raise
+            # only on the RPS super-Gram path.
+            inst.mode_decouple = bool(super_data.get('mode_decouple',
+                                                     cls.MODE_DECOUPLE))
+            inst.eps_rel = float(super_data['eps_rel'])
+            inst._Bvals = None     # super path: beta(x) reconstruction unavailable
+            instances[key] = inst
+        return instances
 
     # ------------------------------------------------------------------ #
     # Per-term stability score
@@ -778,8 +839,7 @@ class VaryingCoefSetup:
             cm = col_mode[mode_local]
             ridge_m = _FREQ_RIDGE_BASE + self.freq_coef * noise_rel * (cm ** 2 / kmax2)
             AmmN[np.diag_indices_from(AmmN)] += ridge_m
-            import epde.globals as _gv
-            if getattr(_gv, 'vc_mode_decouple', False):
+            if self.mode_decouple:
                 # Block-diagonalise by feature: drop the cross-feature mode
                 # collinearity blocks so each term's modes are fit only to what
                 # ITS OWN modulated columns explain of the constant-fit
@@ -865,10 +925,13 @@ def vc_stability_total_lr(features, target, sample_weights, grid_shape,
     """Equation-level varying-coefficient stability: the SUM over the equation's
     terms of the per-term ``score`` ``NC/gamma_0^2`` (biased non-constant energy;
     the ``gram_mode='vcoef'`` replacement for the inline ``total_lr``).
-    Lower = more stable. Pass non-zero-term features (``evaluate(normalize=
-    False)``) and ``fit_intercept = weights_final[-1] != 0`` so neither
-    zero-weight terms nor a zeroed intercept (a ~0 coefficient that would blow
-    up the 1/gamma_0^2 ratio) enter the sum.
+    Lower = more stable. ``fit_intercept = weights_final[-1] != 0`` keeps a
+    zeroed intercept (a ~0 coefficient that would blow up the 1/gamma_0^2
+    ratio) out of the sum. This docstring originally also asked for the
+    non-zero-term feature matrix (``Equation.evaluate(active_only=True)``, then
+    spelled ``normalize=False``), but the live caller ``Instability.compute``
+    passes the WIDE one -- every non-target term -- so zero-weight columns do
+    reach this sum.
     """
     X = np.asarray(features)
     if X.ndim == 1:

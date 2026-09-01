@@ -3,7 +3,7 @@
 """Block-based instability estimators for the ``Instability`` objective.
 
 Four alternatives to the varying-coefficient (``vcoef``) score, selectable
-via ``epde.globals.instability_metric`` (see ``set_instability_metric``):
+via ``active_config().objectives.instability_metric``:
 
 * ``survival_scores`` -- STATISTICAL axis: B moving-block bootstrap
   refits of the fixed structure; a term is unstable when its coefficient
@@ -451,14 +451,19 @@ def chi2_scores(features, target, sample_weights, grid_shape = None,
     c = _solve_gram(Xa.T @ wXa, Xa.T @ (w * y))
     r = y - Xa @ c
 
-    # Exact-fit floor (the ``heterogeneity_scores`` convention): below it the
-    # residual is accumulated float rounding and the score path is reading
-    # round-off, not physics. An equation that reproduces the target to
-    # machine precision has nothing left to test.
-    rss = float(np.dot(r, w * r))
-    yy = float(np.dot(y, w * y))
-    if not rss > np.finfo(float).eps * max(n_samples, 1) * yy:
-        return np.zeros(p)
+    # NO exact-fit floor. There used to be one -- ``rss <= eps*n*yy`` returned
+    # all-zero scores, on the reading that a machine-precision fit has nothing
+    # left to test. It is unnecessary and, since this statistic also scales the
+    # sparsity keep-rule's L1 threshold, actively harmful: an all-zero vector
+    # is a TIE, the threshold vanishes, coordinate descent degenerates to plain
+    # OLS and dead columns ride along at ~1e-13. On the 5-seed ODE benchmark
+    # that was the difference between 0/5 and 5/5 recoveries.
+    # Unnecessary, because the natural computation already handles the case:
+    # with a round-off residual the numerator is round-off SQUARED while D_j
+    # stays the term's real signal energy, so a true term scores ~1e-30 -- the
+    # same "nothing to test" answer -- while a dead column's collapsing D_j
+    # still lifts it clear of the others. The floor destroyed exactly the
+    # ordering that survives without it.
 
     # Per-observation score contributions s[i, j] = w_i * X_ij * r_i. Their
     # column sums are the weighted normal equations, hence EXACTLY zero --
