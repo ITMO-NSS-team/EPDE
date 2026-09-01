@@ -488,6 +488,7 @@ class MOEADDOptimizer(object):
                     key = lambda pair: pair[1])][:neighbors_number+1]) # срез листа - задаёт регион "близости"
 
         self.best_obj = best_sol_vals
+        self._check_ideal_point_matches_objectives()
         self._hist = []
         # Per-epoch Pareto-level-0 snapshots populated during ``optimize``.
         # Each entry is a list of ``{'text_form', 'obj_fun'}`` dicts -- one
@@ -589,6 +590,41 @@ class MOEADDOptimizer(object):
             return factorial(n) / (factorial(k) * factorial(n - k))
 
         return int(binomial_coefficient(H + weights_num - 1, weights_num - 1))
+
+    def _check_ideal_point_matches_objectives(self) -> None:
+        """Assert the ideal point agrees with the axes the population registered.
+
+        ``best_obj`` is built by the caller from each objective's declared
+        ``ideal_value``; the solutions independently registered their reader
+        functions, which carry the same numbers. If those two ever disagree,
+        the utopia point is describing a front that is not the one being
+        optimized -- the failure mode that used to be reachable by combining
+        the second objective with the old ``use_pic`` bool. Cheap, runs
+        once per optimizer.
+
+        Silent when the readers cannot report an ideal (the
+        ``functools.partial`` wrappers from ``generate_partial`` do not
+        forward attributes): "cannot tell" must stay distinct from a genuine
+        mismatch.
+        """
+        from epde.eq_mo_objectives import objective_ideal_values
+
+        if self.best_obj is None:
+            return
+        solutions = (self.pareto_levels.population
+                     or self.pareto_levels.unplaced_candidates)
+        if not solutions:
+            return
+        derived = objective_ideal_values(solutions[0].obj_funs)
+        if derived is None:
+            return
+        expected = list(np.asarray(self.best_obj, dtype=float))
+        if len(derived) != len(expected) or not np.allclose(derived, expected):
+            raise AssertionError(
+                'MOEA/D ideal point {0} does not match the objectives the '
+                'population registered, whose ideal values are {1}. The '
+                'second Pareto axis and the utopia point have desynced.'.format(
+                    expected, derived))
 
     def pass_best_objectives(self, *args) -> None:
         """

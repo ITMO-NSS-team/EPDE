@@ -19,6 +19,7 @@ sys.path.append(opt[0][1]) # $1 "--path=" pwd  + '/epde'
 
 from epde.interface.equation_translator import translate_equation
 import epde.globals as global_var
+from epde.interface.search_config import active_config
 
 from epde.interface.prepared_tokens import TrigonometricTokens
 from epde.evaluators import simple_function_evaluator, trigonometric_evaluator
@@ -45,7 +46,6 @@ def prepare_basic_inputs():
     u = np.sin(x) + 1.3 * np.cos(x)#np.load('/home/maslyaev/epde/EPDE_main/tests/system/Test_data/fill366.npy')
 
     global_var.init_caches(set_grids = True)
-    global_var.set_time_axis(0)
     global_var.grid_cache.memoryUsageProperties(u, 3, None)
     global_var.tensor_cache.memoryUsageProperties(u, 3, None)
 
@@ -53,7 +53,10 @@ def prepare_basic_inputs():
 
     method = 'poly'; method_kwargs = {'grid' : grids, 'smooth' : False}
     data_tensor, derivatives = Preprocess_derivatives(u, method=method, method_kwargs=method_kwargs)
-    derivs_stacked = prepareVarTensor(u, derivatives, time_axis = global_var.time_axis)
+    # The time axis is a search SETTING, so it comes from the configuration
+    # rather than from a module scalar written by set_time_axis.
+    derivs_stacked = prepareVarTensor(
+        u, derivatives, time_axis = active_config().domain.time_axis)
 
     upload_grids(grids, global_var.grid_cache)
     upload_simple_tokens(deriv_names, global_var.tensor_cache, derivs_stacked)

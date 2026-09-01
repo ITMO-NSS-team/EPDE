@@ -10,6 +10,7 @@ import numpy as np
 from functools import partial
 from sklearn.linear_model import LinearRegression
 import epde.globals as global_var
+from epde.interface.search_config import active_config
 
 
 def generate_partial(obj_function, equation_key):
@@ -45,31 +46,19 @@ def _terms_of_equation(equation):
     """Per-equation ``'terms'`` complexity: the number of active non-target
     terms plus 1 when the fitted intercept is non-zero.
 
-    UNIFORM across the sparsity pairings (the whole point -- the raw
-    ``nnz(weights_internal)`` this replaces counted the intercept slot under
-    VWSR but could not see the intercept under LASSO):
-
-    * VWSR: ``weights_internal`` is length ``m + 1`` (``m`` non-target
-      terms + a trailing intercept slot) -- the intercept state is
-      ``weights_internal[-1] != 0``.
-    * LASSO: ``weights_internal`` is length ``m`` (no intercept slot); the
-      intercept always trails ``weights_final``. On a degenerate-stamped
-      equation (``weights_final_evald`` False) the intercept contributes 0
-      instead of raising -- the discrepancy axis is already LOSS_NAN_VAL
-      there, so the value cannot influence selection.
+    Both live entirely in ``weights_internal`` under the unified layout
+    (``Equation._validate_weight_layout``): the term coefficients occupy
+    ``[:-1]`` and the intercept the trailing slot. The VWSR/LASSO branch this
+    replaces existed because the two sparsity operators used to emit different
+    lengths -- VWSR a bare ``estimator.coef_``, LASSO the same plus a
+    separately-tracked ``weights_final`` intercept -- so the count had to sniff
+    ``len(wi) == m + 1`` and reach across to ``weights_final`` in one arm.
 
     The target term is excluded as ubiquitous. Requires ``weights_internal``
     (raises pre-fit, exactly like the ``'factors'`` core).
     """
     wi = equation.weights_internal
-    m = len(equation.structure) - 1
-    count = int(np.count_nonzero(wi[:m]))
-    if len(wi) == m + 1:                       # VWSR: trailing intercept slot
-        intercept_nonzero = wi[-1] != 0
-    else:                                      # LASSO: intercept in weights_final
-        intercept_nonzero = (bool(getattr(equation, 'weights_final_evald', False))
-                             and equation.weights_final[-1] != 0)
-    return count + (1 if intercept_nonzero else 0)
+    return int(np.count_nonzero(wi[:-1])) + (1 if wi[-1] != 0 else 0)
 
 
 def equation_complexity_by_terms(system, equation_key=None):
@@ -94,23 +83,17 @@ def equation_complexity_by_terms(system, equation_key=None):
 def _complexity_of_equation(equation):
     """Per-equation ``'factors'`` complexity core (the legacy semantics).
 
-    Index by ``weights_internal`` (always length ``len(structure)-1``,
-    one entry per non-target term in structure order) rather than
-    ``weights_final`` (zero-filtered to ``nnz+1`` by ``LASSOSparsity``
-    and ``VWSRSparsity``): structure-position indexing breaks against
-    ``weights_final`` whenever the sparsity step zeros more than one
-    weight.
+    Reads ``weights_internal``, the vector that DECIDES support, via
+    ``Equation.weight_index``. (Both vectors are structure-aligned now, so
+    either would index correctly; ``weights_final`` merely carries the refit
+    magnitudes at the same positions.)
     """
     tgt = equation.target_idx
     eq_compl = 0
     for idx, term in enumerate(equation.structure):
-        if idx < tgt:
-            if not equation.weights_internal[idx] == 0:
-                eq_compl += complexity_deriv(term.structure)
-        elif idx > tgt:
-            if not equation.weights_internal[idx-1] == 0:
-                eq_compl += complexity_deriv(term.structure)
-        else:
+        if idx == tgt:
+            eq_compl += complexity_deriv(term.structure)
+        elif equation.weights_internal[equation.weight_index(idx, tgt)] != 0:
             eq_compl += complexity_deriv(term.structure)
     return eq_compl
 
@@ -142,7 +125,7 @@ def equation_complexity(system, equation_key=None):
     Reads the ``complexity_value`` attribute the ``Complexity`` filler wrote
     when ``complexity_calculated`` is set (the live-search path). Otherwise
     FALLS BACK to lazy computation via the same per-equation cores, routed
-    on ``epde.globals.resolve_complexity_metric()`` -- translated truth
+    on ``active_config().objectives.complexity_metric`` -- translated truth
     systems and the offline tools build SoEqs with no fitness host, and
     complexity is deterministic from structure + weights, so the fallback is
     exact (this is deliberately laxer than the stability reader's assert).
@@ -152,7 +135,7 @@ def equation_complexity(system, equation_key=None):
     def _one(equation):
         if getattr(equation, 'complexity_calculated', False):
             return equation.complexity_value
-        if global_var.resolve_complexity_metric() == 'terms':
+        if active_config().objectives.complexity_metric == 'terms':
             return _terms_of_equation(equation)
         return _complexity_of_equation(equation)
     if equation_key is None:
@@ -192,3 +175,42 @@ def complexity_deriv(term_list: list):
     # 'factors' complexity axis. Pinned by a unit test; any fix must be an
     # explicit, separately-gated change.
     return total*factor.param('power')
+
+
+# ---------------------------------------------------------------------------
+# Ideal values, mirrored from the objective fillers
+# ---------------------------------------------------------------------------
+# These readers are what ``SoEq.set_objective_functions`` receives, so they
+# are the SoEq-side half of the ideal-point lockstep. The numbers are read off
+# the filler classes rather than restated, so there is exactly one place where
+# an objective's ideal is declared (``EquationObjective.ideal_value``).
+def _mirror_ideal_values():
+    from epde.operators.common.objectives import Complexity, Discrepancy, Instability
+
+    equation_fitness.ideal_value = Discrepancy.ideal_value
+    equation_terms_stability.ideal_value = Instability.ideal_value
+    for reader in (equation_complexity, equation_complexity_by_factors,
+                   equation_complexity_by_terms):
+        reader.ideal_value = Complexity.ideal_value
+
+
+_mirror_ideal_values()
+
+
+def objective_ideal_values(obj_funs):
+    """Ideal values for a system's registered objective readers, or ``None``.
+
+    Returns ``None`` when any reader carries no ``ideal_value`` -- notably the
+    ``functools.partial`` wrappers built by ``generate_partial`` for the
+    per-variable single-objective and legacy PIC paths, which do not forward
+    attribute access. Callers use this as a cross-check on an ideal point
+    derived elsewhere, so "cannot tell" must stay distinguishable from a
+    genuine mismatch.
+    """
+    values = []
+    for reader in obj_funs:
+        ideal = getattr(reader, 'ideal_value', None)
+        if ideal is None:
+            return None
+        values.append(float(ideal))
+    return values

@@ -22,13 +22,24 @@ class SystemsPopulationConstructor(object):
         vars_demand_equation (``):
         sparsity_internal (`tuple`): 
     """
-    def __init__(self, pool, use_pic: bool = True, terms_number : int = 8, max_factors_in_term : int = 2, 
-                 obj_functions : Callable = None, sparsity_interval : tuple = (0, 1)):
+    def __init__(self, pool, second_objective: str = None, terms_number : int = 8,
+                 max_factors_in_term : int = 2,
+                 obj_functions : Callable = None,
+                 sparsity_interval : tuple = (1., 1.)):
         self.pool = pool
-        self.use_pic = use_pic 
+        # Which objective occupies the second Pareto axis, or None to defer to
+        # the ``epde.globals.second_objective`` global. Replaces the former
+        # boolean flag, whose only meaning was this same choice.
+        self.second_objective = second_objective 
         self.terms_number = terms_number
         self.max_factors_in_term = max_factors_in_term 
         self.vars_demand_equation = set([family.variable for family in self.pool.families_demand_equation])
+        # Log-uniform seeding range for the ('sparsity', var) metaparameter.
+        # EpdeSearch.fit always passes it, taking the value from the sparsity
+        # operator in use (LASSOSparsity.initial_sparsity_interval) -- only
+        # that operator reads the metaparameter. The degenerate default seeds
+        # the neutral 1.0 rather than the old (0, 1), whose log10(0) made every
+        # unseeded alpha exactly 0 through a -inf.
         self.sparsity_interval = sparsity_interval
         print('self.vars_demand_equation', self.vars_demand_equation)        
 
@@ -36,7 +47,7 @@ class SystemsPopulationConstructor(object):
         try:
             passed_solution.set_objective_functions(kwargs['obj_funs'])
         except KeyError:
-            passed_solution.use_default_multiobjective_function(self.use_pic)
+            passed_solution.use_default_multiobjective_function(self.second_objective)
 
     def create(self, **kwargs):
         sparsity = kwargs.get('sparsity', 10 ** (np.random.uniform(low = np.log10(self.sparsity_interval[0]),
@@ -68,7 +79,7 @@ class SystemsPopulationConstructor(object):
         try:
             created_solution.set_objective_functions(kwargs['obj_funs'])
         except KeyError:
-            created_solution.use_default_multiobjective_function(use_pic=self.use_pic)
+            created_solution.use_default_multiobjective_function(second_objective=self.second_objective)
 
 
 
