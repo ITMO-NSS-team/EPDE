@@ -106,12 +106,21 @@ class CustomEvaluator(EvaluatorTemplate):
             grid_function = np.vectorize(lambda args: funcs(*args, **eval_fun_kwargs))
 
             values = {}
-            for sample_ID in global_var.samples_manager.sampleIDs:
+            # Two single-trajectory assumptions survived the multisample port
+            # here, on the path custom (non-vectorized) evaluators take:
+            #   * ``sampleIDs`` never existed on TrajectoriesManager -- the
+            #     property is ``trajecatoryIDs``. The identical slip is called
+            #     out and fixed in integrate/interface.py; this occurrence was
+            #     missed, so any CustomTokens evaluator raised AttributeError.
+            #   * ``func_args[0]`` indexed the per-sample dict with a literal
+            #     0 while iterating sample IDs, which only happened to work
+            #     when a trajectory was keyed 0.
+            for sample_ID in global_var.samples_manager.trajecatoryIDs:
                 if sample_ID in self.indexes_vect.keys():
                     assert not new_grid, 'Trying to call pre-computed vectorized indexes, while a new grid is passed.'
                 else:
                     self.indexes_vect[sample_ID] = np.empty_like(func_args[sample_ID][0], dtype=object)
-                    for tensor_idx, _ in np.ndenumerate(func_args[0]):
+                    for tensor_idx, _ in np.ndenumerate(func_args[sample_ID][0]):
                         self.indexes_vect[sample_ID][tensor_idx] = tuple([subarg[tensor_idx]
                                                                           for subarg in func_args[sample_ID]])
                 

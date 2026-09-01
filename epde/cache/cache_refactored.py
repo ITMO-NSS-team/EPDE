@@ -215,11 +215,11 @@ class Cache(object):
         if label is None:
             if subcache_ID is None:
                 raise RuntimeError("subcache ID must be passed.")
-            print(f'[subcache_ID]: {subcache_ID}, keys: {self.memory_default.keys()}')
-            print(f'cache.get: self.memory_default.values() {self.memory_default[subcache_ID].values()}')
-            print(f'selection from: {list(self.memory_default[subcache_ID].values())}')
+            # print(f'[subcache_ID]: {subcache_ID}, keys: {self.memory_default.keys()}')
+            # print(f'cache.get: self.memory_default.values() {self.memory_default[subcache_ID].values()}')
+            # print(f'selection from: {list(self.memory_default[subcache_ID].values())}')
             temp1 = random.choice(list(self.memory_default[subcache_ID].values())) # list(iter())
-            print(f'temp1.shape is: {temp1.shape}')
+            # print(f'temp1.shape is: {temp1.shape}')
             return temp1 # np.random.choice(list(next(())))
         
         if normalized:
@@ -244,7 +244,10 @@ class Cache(object):
 
         return keys, tensors
     
-    def getKeys(self) -> list:    # List[Tuple[int, list]]:
+    def getKeys(self, subcache_ID: int = None) -> list:    # List[Tuple[int, list]]:
+        # ``subcache_ID`` was read without being declared -- an
+        # ``UnboundLocalError`` on every call. Mirrors ``get_all``'s
+        # signature: None means "the first registered subcache".
         if subcache_ID is None:
             subcache_ID = next(iter(self.memory_default.keys()))
 

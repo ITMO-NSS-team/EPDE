@@ -335,7 +335,7 @@ class Domain(object): # inheritance from cache objects?
 
         if mode == 'solver':
             for grid_idx in range(len(grids)):
-                for dim_idx, bnd in enumerate(self._boundary_width):
+                for dim_idx, bnd in enumerate(self.boundary_width_per_axis):
                     grids[grid_idx] = np.take(a       = grids[grid_idx], 
                                               indices = np.r_[bnd : grids[grid_idx].shape[dim_idx]-bnd],
                                               axis    = dim_idx)
@@ -366,6 +366,18 @@ class Domain(object): # inheritance from cache objects?
         if self._g_func_mask_cache is None:
             self._g_func_mask_cache = self.g_func != 0
         return self._g_func_mask_cache 
+
+    @property
+    def g_func_mask_flat(self) -> np.ndarray:
+        """``g_func_mask`` flattened, for tensors held as (points, channels).
+
+        Derivatives come back from the preprocessor flat -- ``(n_points,
+        n_derivs)`` -- while the data tensor keeps the grid shape, so the two
+        need different forms of the same mask. They coincide in 1-D, which is
+        why indexing a derivative column with the grid-shaped mask worked for
+        ODEs and raised ``IndexError: too many indices`` for every 2-D system.
+        """
+        return self.g_func_mask.reshape(-1)
 
     @property
     def g_func_masked_val(self) -> np.ndarray:
@@ -404,8 +416,13 @@ class Domain(object): # inheritance from cache objects?
         """
         Setting the number of unaccounted elements at the edges
         """
-        # assert '0' in self.memory_default['numpy'].keys(), 'Boundaries should be specified for grid cache.'
-        shape = self._grid_cache.get('0').shape
+        # ``self.get`` reads THIS domain's subcache. Reading the cache
+        # directly (``self._grid_cache.get('0')``) hit the default subcache
+        # instead, so with several domains registered the fit-check validated
+        # the width against whichever grid happened to be uploaded last --
+        # and, for a scalar width, derived the per-axis form from that grid's
+        # dimensionality rather than this one's.
+        shape = self.get('0').shape
 
         self.initial_shape = shape
         if isinstance(boundary_width, int):
@@ -418,10 +435,14 @@ class Domain(object): # inheritance from cache objects?
             raise TypeError(f'Incorrect type of boundaries: {type(boundary_width)}, instead of expected int or list/tuple')
 
         self.boundary_width = boundary_width
-        if isinstance(boundary_width, int):
-            self.inner_shape = np.array(self.get('0').shape) - 2 * boundary_width
-        elif isinstance(boundary_width, (list, tuple)):
-            self.inner_shape = np.array(self.get('0').shape) - np.multiply(np.array(boundary_width), 2)
+        # Per-axis form, for callers that need to index by dimension.
+        # ``getGrids(mode='solver')`` read a ``_boundary_width`` attribute that
+        # was never assigned (AttributeError on every call), and iterating the
+        # scalar form would have failed even after fixing the name.
+        self.boundary_width_per_axis = ([boundary_width] * len(shape)
+                                        if isinstance(boundary_width, int)
+                                        else list(boundary_width))
+        self.inner_shape = np.array(shape) - 2 * np.array(self.boundary_width_per_axis)
         print(f'Set domain {self} with inner shape of {self.inner_shape}')
 
 
@@ -442,7 +463,10 @@ def _(input_entry: InputEntry, domain: Domain, cache: Cache, trajectory_id: int 
 def _(input_entry: VariableEntry, domain: Domain, cache: Cache, trajectory_id: int = 0):
     deriv_codes = [(input_entry.var_idx, code) for code in input_entry.d_orders]
 
-    derivatives = np.array([derivative[domain.g_func_mask] for derivative in input_entry.derivatives.T]).T
+    # Flat mask: derivatives are (n_points, n_derivs); the data tensor below
+    # keeps the grid shape and takes the grid-shaped mask.
+    derivatives = np.array([derivative[domain.g_func_mask_flat]
+                            for derivative in input_entry.derivatives.T]).T
     # print(f'In addEntryToCache: {derivatives}')
     derivs_stacked = prepareVarTensor(input_entry.data_tensor[domain.g_func_mask], derivatives, time_axis = domain._time_axis)
     
@@ -457,64 +481,120 @@ def _(input_entry: VariableEntry, domain: Domain, cache: Cache, trajectory_id: i
         raise NameError('Cache has not been declared before tensor addition.')      
 
 
-class Trajectory(object): # Pass around in evo. operators or init in globals. Use instead of caches! 
-    def __init__(self, entries: Union[List[VariableEntry], Dict[str, np.ndarray]], 
-                 domain: Domain, cache: Cache, 
+class Trajectory(object): # Pass around in evo. operators or init in globals. Use instead of caches!
+    """One data sample attached to a domain.
+
+    A trajectory carries WHAT is differentiated and evaluated -- the tensors,
+    the domain they live on, the pipeline that differentiates them -- but not
+    HOW MANY derivatives or powers the search may use. Those describe the token
+    pool, which is one shared structure however many trajectories feed it
+    (``create_pool`` reads its families off ``data[0]``), so they belong to
+    ``create_pool``/``fit`` and arrive here through :meth:`build`. Trajectories
+    differ from one another in evaluation only.
+    """
+
+    def __init__(self, entries: Union[List[VariableEntry], Dict[str, np.ndarray]],
+                 domain: Domain, cache: Cache,
                  cache_id = None, # ID: int = 0,
-                 preprocessor_pipeline: PreprocessingPipe = None, 
-                 additional_cached_tokens: Dict[CustomTokens, Dict[str, np.ndarray]] = None, 
-                 derivs: Union[List[np.ndarray], np.ndarray] = None,
-                 max_deriv_order: Union[int, List[int], Tuple[int]] = 1,
-                 data_fun_pow: int = 1, deriv_fun_pow: int = 1):
-        self.max_deriv_order: int       = 0
-        self._data_tokens: List[TokenFamily]    = None 
+                 preprocessor_pipeline: PreprocessingPipe = None,
+                 additional_cached_tokens: Dict[CustomTokens, Dict[str, np.ndarray]] = None,
+                 derivs: Union[List[np.ndarray], np.ndarray] = None):
+        self._data_tokens: List[TokenFamily]    = None
 
         self._domain: Domain = domain
         self._cache_id: int  = cache_id
         self._cache: Cache   = cache
 
+        # Resolved now and kept, so that a later set_preprocessor() does not
+        # retroactively change how already-registered data is differentiated.
+        self._preprocessor_pipeline = preprocessor_pipeline
+        self._derivs = derivs
+        self._additional_cached_tokens = additional_cached_tokens
+
         if additional_cached_tokens is not None and not isinstance(additional_cached_tokens, dict):
             raise TypeError(f'additional_cached_tokens were passed incorrectly, expected dict, got {type(additional_cached_tokens)}')
 
-
-        self.families, self.base_derivs = [], []
-        self.variable_names = []
-
         if isinstance(entries, list):
             for entry in entries:
-                self.variable_names.append(entry.var_name)
                 assert isinstance(entry, VariableEntry), \
                     'Entries have to be passed as list of VariableEntry objects or specific dicts.'
-
-                fam, bd = self.setEntry(entry, preprocessor_pipeline, 
-                                        derivs, max_deriv_order, data_fun_pow, deriv_fun_pow)
-                self.families.extend(fam); self.base_derivs.extend(bd)
+            self._entries = list(entries)
 
         elif isinstance(entries, dict):
+            self._entries = []
             for key_idx, key in enumerate(entries.keys()):
-                self.variable_names.append(key)
                 assert isinstance(key, str) and isinstance(entries[key], np.ndarray), \
                     'Dict of entries has to have str as keys and np.ndarrays as values.'
-                
-                entry_formatted = VariableEntry(key, key_idx, entries[key])
-                
-                fam, bd = self.setEntry(entry_formatted, preprocessor_pipeline, 
-                                        derivs, max_deriv_order, data_fun_pow, deriv_fun_pow)
-                self.families.extend(fam); self.base_derivs.extend(bd)
+                self._entries.append(VariableEntry(key, key_idx, entries[key]))
         else:
             raise TypeError(f'Incorrect type of entries inputs for Trajectory: \
                               expected list[VariableEntry] or dict[str, np.ndarray], instead got {type(entries)}.')
 
-        if additional_cached_tokens is None:
-            return None
-        elif isinstance(additional_cached_tokens, dict):
-            for token_type, tokens_val in additional_cached_tokens.items():
-                token_type.upload(trajectory = tokens_val, cache = self._cache, traj_id = self._cache_id)
-        else:
-            print('Unexpected behavior!')
+        # Available before build(): pool invalidation and the legacy shim both
+        # need to know which variables a trajectory carries.
+        self.variable_names = [entry.var_name for entry in self._entries]
+
+        self.families, self.base_derivs = [], []
+        # Recorded by build(), not left at zero: EpdeSearch keys its
+        # pool-invalidation check on this, and a constant made that check
+        # meaningless -- a pool built for max_deriv_order=1 would be reused
+        # for a request of 3.
+        self.max_deriv_order = None
+        self._built = None
+
+    def build(self, max_deriv_order: Union[int, List[int], Tuple[int]] = 1,
+              data_fun_pow: int = 1, deriv_fun_pow: int = 1) -> 'Trajectory':
+        """Differentiate the data and derive the token families from it.
+
+        Called by ``create_pool`` with the search-level orders and powers, so
+        every trajectory in one pool is described by the same families. Calling
+        it again with the same arguments is a no-op; calling it with different
+        ones recomputes, which is what makes a pool rebuild honest.
+        """
+        request = (max_deriv_order, data_fun_pow, deriv_fun_pow)
+        if self._built == request:
+            return self
+
+        self.max_deriv_order = max_deriv_order
+        self.families, self.base_derivs = [], []
+        for entry in self._entries:
+            fam, bd = self.setEntry(entry, self._preprocessor_pipeline,
+                                    self._derivs, max_deriv_order,
+                                    data_fun_pow, deriv_fun_pow)
+            self.families.extend(fam); self.base_derivs.extend(bd)
+
+        if isinstance(self._additional_cached_tokens, dict):
+            for token_type, tokens_val in self._additional_cached_tokens.items():
+                self.uploadTokenTensors(token_type, tokens_val)
+
+        self._built = request
+        return self
+
+    def uploadTokenTensors(self, family, tensors: Dict[str, np.ndarray]) -> None:
+        """Put a token family's declared tensors into THIS trajectory's subcache.
+
+        The tensors arrive on the full grid, like the variable data, and are
+        masked the same way -- ``addEntryToCache`` does exactly this for the
+        variable itself. Without the mask they keep the untrimmed shape and no
+        longer line up with anything else in the cache.
+        """
+        masked = {label: np.asarray(tensor)[self._domain.g_func_mask]
+                  for label, tensor in tensors.items()}
+        family.upload(trajectory = masked, cache = self._cache,
+                      traj_id = self._cache_id)
+
+    @property
+    def built(self) -> bool:
+        return self._built is not None
 
     @property
     def tokens(self):
+        if self._built is None:
+            raise RuntimeError(
+                'Trajectory.tokens was read before build(): the token families '
+                'follow from max_deriv_order/data_fun_pow/deriv_fun_pow, which '
+                'are create_pool/fit arguments. Pass this trajectory to '
+                'create_pool(...) rather than reading its families directly.')
         return self.families # _data_tokens
 
     def setEntry(self, entry: VariableEntry, preprocessor_pipeline: PreprocessingPipe = None,
@@ -546,8 +626,13 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
     def ID(self) -> int:
         return self._cache_id
 
-    def grids(self) -> np.ndarray:
-        return self._domain.getGrids()
+    def grids(self, mode: Literal['full', 'solver'] = 'full') -> np.ndarray:
+        """``mode='solver'`` trims ``boundary_width`` off every axis -- the
+        INNER domain the cached tensors and ``Equation.evaluate`` live on.
+        ``Domain.getGrids`` has always offered it; the trajectory accessors
+        did not pass it through, so the solver was handed full grids and
+        indexed inner-domain values with full-grid indices."""
+        return self._domain.getGrids(mode=mode)
     
     def gFuncs(self, mode: Literal['d', 'f', 'm', 'dmf', 'dm'] = 'd') -> np.ndarray:
         match mode:
@@ -609,9 +694,14 @@ class TrajectoriesManager(object):
 
     def addTrajectory(self, trajectory: Trajectory, domain: Domain):
         print(f'Added trajectory {trajectory.ID} to exist. traj: {self._traj.keys()}')
-        if trajectory.ID in self._traj.keys():
+        # The guard is against two DIFFERENT samples claiming one cache id --
+        # re-registering the same object is not that, and it happens whenever
+        # a pool is rebuilt for new orders or powers (create_pool called twice
+        # with the same trajectories), which used to raise here.
+        if (trajectory.ID in self._traj.keys()
+                and self._traj[trajectory.ID] is not trajectory):
             raise KeyError(f'Trajectory with key {trajectory.ID}')
-        
+
         self._traj[trajectory.ID] = trajectory
         if domain._ID not in self._domains.keys():
             self._domains[domain._ID] = domain
@@ -641,8 +731,8 @@ class TrajectoriesManager(object):
     def trajecatoryIDs(self) -> List[int]:
         return [key for key in self._traj.keys()]
 
-    def grids(self) -> Dict[int, np.ndarray]:
-        return {key: trajectory.grids() for key, trajectory in self._traj.items()}
+    def grids(self, mode: Literal['full', 'solver'] = 'full') -> Dict[int, np.ndarray]:
+        return {key: trajectory.grids(mode) for key, trajectory in self._traj.items()}
 
     @property
     def grid_keys(self) -> list:
@@ -667,7 +757,7 @@ class TrajectoriesManager(object):
         if sample_key is None:
             return {key : trajectory.get(label, normalized, saved_as, deriv_code) for key, trajectory in self._traj.items()}
         else:
-            {sample_key: self._traj[sample_key].get(label, normalized, saved_as, deriv_code)}
+            return {sample_key: self._traj[sample_key].get(label, normalized, saved_as, deriv_code)}
     
     def getSingleTrajectory(self, label, traj_key, normalized=False, saved_as=None, deriv_code = None) -> Dict[int, np.ndarray]:
         '''

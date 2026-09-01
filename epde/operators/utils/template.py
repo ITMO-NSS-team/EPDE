@@ -40,7 +40,11 @@ def dictZerosLike(ref: Union[Dict[int, np.ndarray], np.ndarray], dim: int = 0) \
     if isinstance(ref, np.ndarray):
         return np.zeros(ref.shape[dim])
     else:
-        return {key: value.shape[dim] for key, value in ref.items()}
+        # Zeros shaped like each sample's ``dim`` axis -- NOT the shape
+        # itself (the pre-multisample single-array branch above returns an
+        # array, and every caller, e.g. Discrepancy._compute_l2's
+        # all-features-zeroed fallback, adds/subtracts the result).
+        return {key: np.zeros(value.shape[dim]) for key, value in ref.items()}
 
 def dictApplyUFunc(func: Union[np.ufunc, Callable], *args: Tuple[Union[np.ndarray, Dict[int, np.ndarray], Any]],
                    suppressed: bool = False) -> Dict[int, np.ndarray]:
@@ -92,7 +96,7 @@ def dictFullLike(ref: Union[Dict[int, np.ndarray], np.ndarray], val) -> Union[Di
     if isinstance(ref, np.ndarray):
         return np.full_like(ref, val)
     else:
-        return {key: np.full_like(value) for key, value in ref.items()}
+        return {key: np.full_like(value, val) for key, value in ref.items()}
     
 def dictAdd(x: Union[Dict[int, np.ndarray], np.ndarray, Any], y: Union[Dict[int, np.ndarray], np.ndarray, Any], 
             suppressed: bool = False) -> Dict[int, np.ndarray]:

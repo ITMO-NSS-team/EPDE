@@ -431,28 +431,43 @@ class CustomTokens(PreparedTokens):
 
 
 class CacheStoredTokens(CustomTokens):
-    def __init__(self, token_type: str, token_labels: list, # token_tensors: Dict[str, List[np.ndarray]],
-                 params_ranges: dict, params_equality_ranges: Union[None, dict], dimensionality: int = 1,
+    """A token family whose values are supplied as tensors rather than computed.
+
+    ``token_tensors`` is declared here, with the family, exactly as before the
+    domain refactor: a family is part of the token POOL, which is one structure
+    however many trajectories feed it. Trajectories differ in evaluation only,
+    so the same declared tensors are uploaded into each trajectory's subcache
+    (masked by that trajectory's domain) when ``create_pool`` runs -- which is
+    the first moment a domain is known. With the single trajectory these
+    families are normally used with, that is the old behaviour exactly.
+    """
+
+    def __init__(self, token_type: str, token_labels: list,
+                 token_tensors: Dict[str, np.ndarray] = None,
+                 params_ranges: dict = None, params_equality_ranges: Union[None, dict] = None,
+                 dimensionality: int = 1,
                  unique_specific_token=True, unique_token_type=True, meaningful=False,non_default_power = True):
-        # token_tensors: {'label': [TokenForTraj1, TokenForTraj2, ...]}
-        
         try:
             assert global_var.samples_manager is not None, 'Unintended logic: sample manager was initialized as None.'
         except AttributeError:
             # TODO: init error handling
             raise NotImplementedError('...')
 
-        # if set(token_labels) != set(list(token_tensors.keys())):
-            # raise KeyError('The labels of tokens do not match the labels of passed tensors')
-        
-        # token_tensors = {key: value[global_var.grid_cache.g_func != 0] for key, value in token_tensors.items()}
-        # upload_simple_tokens(list(token_tensors.keys()), global_var.tensor_cache, list(token_tensors.values()))
+        if token_tensors is not None and set(token_labels) != set(token_tensors.keys()):
+            raise KeyError('The labels of tokens {0} do not match the labels of passed tensors {1}'.format(
+                sorted(token_labels), sorted(token_tensors.keys())))
+
+        #: Declared with the family, uploaded per trajectory by ``create_pool``.
+        self.token_tensors = token_tensors
+
         super().__init__(token_type=token_type, token_labels=token_labels, evaluator=simple_function_evaluator,
                          params_ranges=params_ranges, params_equality_ranges=params_equality_ranges,
                          dimensionality=dimensionality, unique_specific_token=unique_specific_token,
                          unique_token_type=unique_token_type, meaningful=meaningful, non_default_power = non_default_power)
-                         
-    def upload(trajectory: Dict[str, np.ndarray], cache, traj_id: int = 0, *args, **kwargs) -> None:
+
+    def upload(self, trajectory: Dict[str, np.ndarray], cache, traj_id: int = 0, *args, **kwargs) -> None:
+        """``self`` was missing, so every call through ``Trajectory`` raised
+        TypeError on the duplicated ``trajectory`` argument."""
         uploadSimpleTokens(list(trajectory.keys()), cache = cache, tensors = list(trajectory.values()), subcache_ID = traj_id)
 
 
