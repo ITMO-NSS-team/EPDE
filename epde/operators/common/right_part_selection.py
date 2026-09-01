@@ -22,6 +22,7 @@ from epde.supplementary import filter_powers
 from epde.operators.utils.template import CompoundOperator, dictApplyUFunc, dictAdd
 from epde.decorators import HistoryExtender
 from epde.structure.main_structures import Term, Equation
+from epde.evaluators import simple_function_evaluator
 
 from epde.operators.common.stability import (GramSetup, VaryingCoefSetup)
 
@@ -861,6 +862,13 @@ def _target_term_in_other_equation(eq_with_target: Equation,
     inside the v-momentum ``v*v_y`` of true Navier-Stokes) is legitimate
     physics and is left untouched.
 
+    Two signatures can match, and the one RETURNED is the signature of the
+    offending term in ``eq_other`` -- which the caller feeds straight to
+    ``_break_equation_duplication``. For a bare target that is the target's
+    own signature; for a decorated target caught by the deriv-core rule
+    below it is the CORE's, since that is the term ``eq_other`` actually
+    carries.
+
     Directional by construction (``eq_with_target``'s target into
     ``eq_other``); the caller scans both orderings of every pair. The
     target term is re-fetched as ``structure[target_idx]`` (never cached
@@ -873,7 +881,44 @@ def _target_term_in_other_equation(eq_with_target: Equation,
     if tgt is None:
         return None
     target_sig = tgt.factors_labels
-    return target_sig if target_sig in eq_other.active_terms_labels else None
+    if target_sig in eq_other.active_terms_labels:
+        return target_sig
+
+    # DERIV-CORE extension. A DECORATED target reserves its derivative core
+    # exactly as a bare target would: if the v-equation explains
+    # ``dv/dx0 * cos``, a standalone ``dv/dx0`` in the u-equation is the same
+    # leak, because the decoration is the search's own choice and not a
+    # different quantity. Without this the costume is a bypass -- the
+    # Lotka-Volterra coupled-junk pair works precisely by dressing the
+    # v-target in ``cos``, which unlocks standalone ``v_t`` for the
+    # u-equation's dominating sum/differentiated identities.
+    #
+    # Still WHOLE-TERM only, so the Navier-Stokes carve-out is untouched: a
+    # core appearing as a FACTOR of a composite coupling term (``v*v_y``) is
+    # legitimate physics and is not matched here.
+    if len(tgt.structure) > 1:
+        core = _deriv_core_factor(tgt)
+        if core is not None:
+            core_sig = frozenset((core.structural_label,))
+            if core_sig in eq_other.active_terms_labels:
+                return core_sig
+    return None
+
+
+def _deriv_core_factor(term: Term):
+    """The one genuine derivative factor of ``term``, or ``None``.
+
+    "Genuine" is the predicate ``Term.contains_deriv`` already applies
+    (main_structures.py): a derivative factor carrying a real ``deriv_code``
+    whose evaluator is the plain one, so a trig- or grid-decorated token is
+    never mistaken for the derivative it decorates. Ambiguity -- no such
+    factor, or more than one -- returns ``None`` rather than a guess, which
+    is the same "exactly one" rule ``contains_deriv`` enforces.
+    """
+    cores = [factor for factor in term.structure
+             if factor.is_deriv and factor.deriv_code != [None, ]
+             and factor.evaluator._evaluator == simple_function_evaluator]
+    return cores[0] if len(cores) == 1 else None
 
 
 def _wrap_term_with_factor(equation: Equation, term: Term, banned_sigs,
@@ -1064,7 +1109,8 @@ class SoEqRightPartSelector(CompoundOperator):
             # derivative that appears only as a FACTOR inside a composite
             # coupling term of eq j (e.g. continuity's ``v_y`` in ``v*v_y``)
             # is left untouched -- this is whole-term equality, not
-            # sub-product. If the only match is eq j's own target,
+            # sub-product. A decorated target reserves its bare derivative
+            # core on the same whole-term terms. If the only match is eq j's own target,
             # _break_equation_duplication finds no rerollable candidate and
             # returns False, so the pass tolerates it (cannot reroll a
             # target).
