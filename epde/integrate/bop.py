@@ -150,7 +150,10 @@ class BOPElement(object):
             boundary = self.grid
         elif self.grid is None and self.location is not None:
             # _, all_grids = global_var.grid_cache.get_all(mode = 'torch')
-            all_grids = [torch.from_numpy(grid) for grid in global_var.samples_manager.grids[self._domain_idx]]
+            # ``grids`` is a METHOD returning {trajectory: [grids]}; the
+            # pre-multisample spelling subscripted it as a property.
+            all_grids = [torch.from_numpy(np.asarray(grid)) for grid
+                         in global_var.samples_manager.grids(mode='solver')[self._domain_idx]]
 
             abs_loc = self.location * all_grids[0].shape[self.axis]
             if all_grids[0].ndim > 1:
@@ -212,7 +215,7 @@ class PregenBOperator(object):
 
     def generate_default_bc(self, vals: Union[np.ndarray, dict] = None, domain_key: int = 0,
                             grids: List[np.ndarray] = None, allow_high_ords: bool = False,
-                            required_bc_ord: List[int] = None):
+                            required_bc_ord: List[int] = None, device: str = 'cpu'):
         # Implement allow_high_ords - selection of derivatives from
         if required_bc_ord is None:
             required_bc_ord = self.max_deriv_orders
@@ -222,10 +225,19 @@ class PregenBOperator(object):
             val_keys = {key: (key, (1.0,)) for key in self.variables}
 
         if grids is None:
-            grids = global_var.samples_manager.grids[domain_key]    # grid_cache.get_all(mode = 'torch')
+            grids = global_var.samples_manager.grids(mode='solver')[domain_key]
+        # The trajectory's grids come back as numpy; everything below indexes
+        # them and calls ``.detach()``. Same normalisation
+        # ``SystemSolverInterface.use_grids`` performs.
+        grids = [grid if isinstance(grid, torch.Tensor)
+                 else torch.from_numpy(np.asarray(grid)) for grid in grids]
 
-        device = 'cpu'
-        device_on_cpu = (device  == 'cpu')
+        # ``device`` was hardcoded to 'cpu' here (with the standing
+        # "TODO: set devices for all torch objs" below), so every boundary
+        # coordinate and value was built on the CPU while the solver put its
+        # net wherever ``solver.device`` said -- the vendored solver then hit
+        # a device mismatch inside its own Neumann BC evaluation.
+        device_on_cpu = (device == 'cpu')
         relative_bc_location = {0: (), 1: (0,), 2: (0, 1),
                                 3: (0., 0.5, 1.), 4: (0., 1/3., 2/3., 1.)}
 
@@ -250,7 +262,10 @@ class PregenBOperator(object):
                         coords = coords.squeeze()
 
                     if vals is None:
-                        bc_values = global_var.samples_manager.getSingleSample(val_keys[variable])[indexes]
+                        # ``getSingleSample`` never existed; the trajectory
+                        # accessor is ``getSingleTrajectory(label, traj_key)``.
+                        bc_values = global_var.samples_manager.getSingleTrajectory(
+                            val_keys[variable], domain_key).reshape(tensor_shape)[indexes]
                     else:
                         bc_values = vals[indexes]
 

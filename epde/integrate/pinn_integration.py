@@ -349,11 +349,17 @@ class SolverAdapter(object):
             op_gen = PregenBOperator(system=system,
                                      system_of_equation_solver_form=[sf_labeled[1] for sf_labeled
                                                                      in system_solver_forms]) # system.values .vals()
-            op_gen.generate_default_bc(vals = data, domain_key = domain_key, grids = grids)
+            op_gen.generate_default_bc(vals = data, domain_key = domain_key, grids = grids,
+                                       device = self._device)
             boundary_conditions = op_gen.conditions
 
         for condition in boundary_conditions:
-            condition.setDomain(domain_key)
+            # ``PregenBOperator.conditions``'s setter already CALLS each
+            # BOPElement, so what comes back -- and what the combiner below
+            # subscripts as ``cond['bnd_loc']`` -- is a dict, which has no
+            # ``setDomain``. Only a raw BOPElement handed in by a caller does.
+            if hasattr(condition, 'setDomain'):
+                condition.setDomain(domain_key)
 
         bconds_combined = Conditions()
         for cond in boundary_conditions:
@@ -364,7 +370,10 @@ class SolverAdapter(object):
             # grid_var_keys, grids = global_var.grid_cache.get_all(mode = 'torch')
             # grids = [grid[global_var.grid_cache.g_func != 0] for grid in grids]
             grid_var_keys = global_var.samples_manager.grid_keys
-            grids = global_var.samples_manager.grids[domain_key]
+            # 'solver': the inner domain. The cached tensors and every
+            # BC value below are boundary-pruned, so a full grid would
+            # index 100 points into an 80-point array.
+            grids = global_var.samples_manager.grids(mode='solver')[domain_key]
         elif grid_var_keys is None:
             # grid_var_keys, _ = global_var.grid_cache.get_all(mode = 'torch')
             grid_var_keys = global_var.samples_manager.grid_keys

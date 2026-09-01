@@ -122,10 +122,7 @@ class SystemSolverInterface(object):
         tgt = equation.target_idx
         for term_idx, term in enumerate(equation.structure):
             if term_idx != tgt:
-                if term_idx < tgt:
-                    weight = equation.weights_final[term_idx]
-                else:
-                    weight = equation.weights_final[term_idx-1]
+                weight = equation.weights_final[equation.weight_index(term_idx, tgt)]
                 if not np.isclose(weight, 0, rtol = self.coeff_tol):
                     _solver_form[term.name] = self._term_solver_form(term, grids, default_domain, variables)
                     _solver_form[term.name]['coeff'] = _solver_form[term.name]['coeff'] * weight
@@ -159,9 +156,22 @@ class SystemSolverInterface(object):
             self.grids = global_var.samples_manager.grids()[domain_key] # grid_cache.get_all(mode = 'torch')
             self.grids = [grid[global_var.samples_manager.gFunc('m')[domain_key]]
                           for grid in self.grids]
+            # The trajectory stores numpy grids, but every consumer downstream
+            # is torch (``_term_solver_form`` opens with ``torch.ones_like``).
+            # The explicit-grids branch below already converted; this one did
+            # not, so the default path -- the one ``solver_forms()`` takes --
+            # handed numpy straight into torch and raised.
+            self.grids = [torch.from_numpy(np.asarray(subgrid)).to(self._device)
+                          if not isinstance(subgrid, torch.Tensor) else subgrid
+                          for subgrid in self.grids]
             
         elif grids is not None:
-            if len(grids) != len(global_var.samples_manager.grids()[global_var.samples_manager.sampleIDs[0]]):
+            # ``sampleIDs`` never existed on TrajectoriesManager -- the
+            # property is ``trajecatoryIDs`` -- so passing explicit grids raised
+            # AttributeError here instead of validating them.
+            reference = global_var.samples_manager.grids()[
+                global_var.samples_manager.trajecatoryIDs[0]]
+            if len(grids) != len(reference):
                 raise ValueError(
                     'Number of passed grids does not match the problem')
             if isinstance(grids[0], np.ndarray):

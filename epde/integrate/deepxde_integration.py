@@ -23,7 +23,7 @@ class Solver1D(SolverStrategy):
     def solve(self, eq_list, var_names, grids, data_list, adapter):
         t = grids[0]
         geom = dde.geometry.TimeDomain(t.min(), t.max())
-        mask = global_var.grid_cache.g_func_mask
+        mask = adapter.domain_mask
         coords_masked = t[mask].reshape(-1, 1)
 
         eps_t = (t.max() - t.min()) * 1e-5
@@ -86,7 +86,7 @@ class Solver2D(SolverStrategy):
         timedomain = dde.geometry.TimeDomain(t.min(), t.max())
         geomtime = dde.geometry.GeometryXTime(geom, timedomain)
 
-        mask = global_var.grid_cache.g_func_mask
+        mask = adapter.domain_mask
         masked_coords = np.stack([g[mask] for g in grids], axis=1)
         masked_coords_swapped = masked_coords[:, [1, 0]]
         eps_x = (x.max() - x.min()) * 1e-5
@@ -163,7 +163,7 @@ class Solver3D(SolverStrategy):
         timedomain = dde.geometry.TimeDomain(t.min(), t.max())
         geomtime = dde.geometry.GeometryXTime(geom, timedomain)
 
-        mask = global_var.grid_cache.g_func_mask
+        mask = adapter.domain_mask
         masked_coords = np.stack([g[mask] for g in grids], axis=1)
         masked_coords_swapped = masked_coords[:, [1, 2, 0]]
         eps_x = (x.max() - x.min()) * 1e-5
@@ -268,12 +268,29 @@ class DeepXDEAdapter:
         self.coordinate_mapping = self.config.get('coordinate_mapping', None)
         self.coord_names = None
         self.coord_map = None
+        #: Trajectory whose domain the current solve runs on; set by ``solve``.
+        self.domain_key = None
 
         self._solvers = {
             1: Solver1D(),
             2: Solver2D(),
             3: Solver3D(),
         }
+
+    @property
+    def domain_mask(self) -> np.ndarray:
+        """The solved trajectory's inner-domain mask, GRID-SHAPED.
+
+        Was ``global_var.grid_cache.g_func_mask``, an attribute the
+        post-multisample ``Cache`` does not carry -- the mask belongs to a
+        trajectory now, so it has to be keyed by the domain being solved.
+        Grid-shaped rather than flat because the strategies index the grids
+        with it (``g[mask]``), and those keep their grid shape.
+        """
+        key = self.domain_key
+        if key is None:
+            key = global_var.samples_manager.trajecatoryIDs[0]
+        return np.asarray(global_var.samples_manager.gFunc('m')[key])
 
     def _set_coordinate_info(self, coord_names):
         self.coord_names = coord_names
@@ -302,13 +319,21 @@ class DeepXDEAdapter:
                 for term_idx, term in enumerate(all_terms):
                     if term_idx == tgt:
                         continue
-                    coeff = float(eq.weights_final[term_idx]) if use_weights else 1.0
+                    # ``weight_index``: both weight vectors SKIP the target, so
+                    # indexing them by raw structure position read the wrong
+                    # coefficient for every term past it.
+                    coeff = (float(eq.weights_final[eq.weight_index(term_idx, tgt)])
+                             if use_weights else 1.0)
                     term_val = 1.0
                     for factor in term.structure:
                         fv = self._factor_value_with_map(dde, factor, x, y, self.coord_map, var_idx_map)
                         term_val *= fv
                     residual += coeff * term_val
-                if use_weights and len(eq.weights_final) > len(all_terms):
+                # The intercept is ALWAYS the trailing slot (it may be 0.0). The
+                # former ``len(weights_final) > len(all_terms)`` presence sniff
+                # was false under both the old and the unified layout, so the
+                # free coefficient never reached the residual at all.
+                if use_weights:
                     residual += float(eq.weights_final[-1]) * (y[:, 0:1] * 0.0 + 1.0)
                 target = eq.target
                 target_val = 1.0
@@ -368,11 +393,25 @@ class DeepXDEAdapter:
                 return x[:, int(idx):int(idx) + 1]
         return y[:, 0:1] * 0.0 + 1.0
 
-    def solve(self, equation_or_system, grids: list, data):
+    def solve(self, equation_or_system, grids: list, data, domain_key: int = None):
+        """``grids`` is ONE trajectory's per-dimension coordinate list.
+
+        It used to be handed ``samples_manager.grids()`` whole -- a
+        ``{trajectory: [grids]}`` dict -- so ``len(grids)`` counted trajectories
+        and picked the solver by the wrong number.
+        """
+        self.domain_key = (domain_key if domain_key is not None
+                           else global_var.samples_manager.trajecatoryIDs[0])
         dim = len(grids)
         solver = self._solvers.get(dim)
+        if solver is None:
+            raise NotImplementedError(
+                f'DeepXDE integration covers 1-D to 3-D domains; got {dim} '
+                'coordinate axes.')
 
-        keys, _ = global_var.grid_cache.get_all(mode='numpy')
+        # ``grid_cache.get_all(mode='numpy')`` -- the new Cache.get_all takes
+        # (normalized, subcache_ID) and has no ``mode``.
+        keys = global_var.samples_manager.grid_keys
         self._set_coordinate_info(keys)
 
         if isinstance(equation_or_system, Equation):
