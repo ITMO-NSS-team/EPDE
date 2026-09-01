@@ -8,9 +8,11 @@ from epde.operators.utils.template import add_base_param_to_operator
 from epde.operators.common.right_part_selection import (EqRightPartSelector,
                                                         SoEqRightPartSelector)
 from epde.operators.common.fitness import SolverFreeFitness
-from epde.operators.common.objectives import WAPEDiscrepancy, Instability
+from epde.operators.common.objectives import Discrepancy, Instability
 import epde.globals as global_var
-from epde.operators.common.sparsity import LASSOSparsity, VWSRSparsity
+from epde.interface.search_config import active_config
+from epde.operators.common.sparsity import (LASSOSparsity, VWSRSparsity,
+                                            build_sparsity_operator)
 from epde.operators.common.coeff_calculation import LinRegBasedCoeffsEquation
 from epde.operators.singleobjective.mutations import get_singleobjective_mutation
 from epde.operators.singleobjective.variation import get_singleobjective_variation
@@ -22,7 +24,8 @@ class BaselineDirector(OptimizationPatternDirector):
         super().__init__()
         self.builder = StrategyBuilder(EvolutionaryStrategy)
 
-    def use_baseline(self, params: dict, **kwargs):
+    def use_baseline(self, params: dict, sparsity_cls=None,
+                     sparsity_kwargs: dict = None, **kwargs):
         variation_params = params.get('variation_params', {})
         mutation_params = params.get('mutation_params', {})
 
@@ -41,21 +44,33 @@ class BaselineDirector(OptimizationPatternDirector):
         selection = RouletteWheelSelection(['parents_fraction'])
         add_kwarg_to_operator(operator = selection)
 
-        sparsity = VWSRSparsity()
+        # Honours the configured sparsity operator: this branch used to
+        # hardcode VWSR, so EpdeSearch(multiobjective_mode=False,
+        # sparsity_cls='lasso') silently ran the other estimator.
+        sparsity = build_sparsity_operator(sparsity_cls, sparsity_kwargs)
         coeff_calc = LinRegBasedCoeffsEquation()
         # Single-objective fitness: discrepancy is always computed (it
-        # drives diagnostics and any right-part work); when the global
+        # drives diagnostics and any right-part work); when the configured
         # single_objective_metric is 'instability', the instability filler
         # is added too so equation_terms_stability has a value to read.
         # Which attribute the optimizer actually minimises is chosen by
         # SoEq.use_default_singleobjective_function (the objective reader).
-        disc = WAPEDiscrepancy()
+        #
+        # Built BARE, exactly as MOEA/D builds it, so the discrepancy option
+        # resolves from the search configuration at compute time. This branch
+        # used to hardcode a separate WAPE-only filler, which made
+        # EpdeSearch(multiobjective_mode=False, discrepancy_metric=...) a
+        # silent no-op -- the one objective setting that never reached the
+        # single-objective search.
+        disc = Discrepancy()
         objectives = [disc]
-        if getattr(global_var, 'single_objective_metric', 'discrepancy') == 'instability':
+        if active_config().objectives.single_objective_metric == 'instability':
             objectives.append(Instability())
         eq_fitness = SolverFreeFitness(['penalty_coeff'], objectives=objectives, primary=disc)
         add_kwarg_to_operator(operator = eq_fitness)
-        eq_fitness.set_suboperators({'sparsity' : sparsity, 'coeff_calc' : coeff_calc})
+        # No suboperators on the host: it scores an already-fitted equation.
+        # ``sparsity`` / ``coeff_calc`` go onto the right-part selector below,
+        # which fits every candidate target before asking for its score.
 
         fitness_cond = lambda x: not getattr(x, 'fitness_calculated')
         sys_fitness = map_operator_between_levels(eq_fitness, 'gene level', 'chromosome level', 
@@ -63,9 +78,10 @@ class BaselineDirector(OptimizationPatternDirector):
         pop_fitness = map_operator_between_levels(sys_fitness, 'chromosome level', 'population level') # TODO: edit in operator_mappers.py 
         
         # Fitness-based right-part selection with zero-term pruning, the
-        # same machinery MOEA/D uses (EqRightPartSelector sweeps candidate
-        # targets by the discrepancy returned from ``eq_fitness`` with
-        # force_out_of_place=True, then remove_zero_terms prunes). This
+        # same machinery MOEA/D uses (EqRightPartSelector fits each candidate
+        # target with ``sparsity`` + ``coeff_calc``, ranks them by the
+        # discrepancy ``eq_fitness`` returns with force_out_of_place=True,
+        # then remove_zero_terms prunes the winner). This
         # replaces the old RandomRHPSelector: random selection left the
         # structure unpruned, so the in-place fitness saw the full feature
         # matrix against a sparse weight vector (shape mismatch). The
@@ -74,7 +90,9 @@ class BaselineDirector(OptimizationPatternDirector):
         # consistent with the multi-objective one.
         rps_cond = lambda x: any([not elem_eq.right_part_selected for elem_eq in x.vals])
         eq_right_part_selector = EqRightPartSelector()
-        eq_right_part_selector.set_suboperators({'fitness_calculation': eq_fitness})
+        eq_right_part_selector.set_suboperators({'fitness_calculation': eq_fitness,
+                                                 'sparsity': sparsity,
+                                                 'coeff_calc': coeff_calc})
         sys_rps_inner = SoEqRightPartSelector()
         sys_rps_inner.set_suboperators({'eq_right_part_selector': eq_right_part_selector})
         # rps_cond is a per-chromosome predicate; on a chromosome->population

@@ -438,16 +438,31 @@ def regenerate_degenerate_equations(offspring, right_part_selector, chromosome_f
 
 
 def _rps_fitness_regenerate(candidate, right_part_selector, chromosome_fitness,
-                            rps_args, fitness_args):
+                            rps_args, fitness_args, skip_fitness_if=None):
     """Right-part selection, then fitness, then re-roll of any equations the
     fitness host flagged fit-degenerate -- the evaluation sequence every fresh
     or re-created candidate goes through before its verdicts (degenerate?
-    duplicate?) can be read. Shared by the two retry sites of
-    ``InitialParetoLevelSorting``."""
+    duplicate?) can be read. Used by ``InitialParetoLevelSorting``.
+
+    ``skip_fitness_if`` is a predicate on the post-RPS candidate: when it
+    holds, fitness (and the degenerate re-roll that depends on it) is NOT run
+    and ``False`` is returned. That is what keeps the initial population from
+    scoring candidates it is about to throw away -- on the solver path a
+    discarded score is a full PDE solve, and the retry budget is 100.
+
+    Skipping is only sound because RPS is the last step that can change the
+    structure: it fits every candidate target, then prunes the winner
+    (``remove_zero_terms``). The fitness hosts are pure scorers, so the label
+    RPS leaves behind IS the label the scored candidate would carry, and a
+    duplicate verdict read here cannot be overturned by the fit.
+    """
     right_part_selector.apply(objective=candidate, arguments=rps_args)
+    if skip_fitness_if is not None and skip_fitness_if(candidate):
+        return False
     chromosome_fitness.apply(objective=candidate, arguments=fitness_args)
     regenerate_degenerate_equations(candidate, right_part_selector,
                                     chromosome_fitness, rps_args, fitness_args)
+    return True
 
 
 class OffspringUpdater(CompoundOperator):
@@ -512,15 +527,15 @@ class OffspringUpdater(CompoundOperator):
                         self.suboperators['chromosome_fitness'],
                         subop_args['right_part_selector'],
                         subop_args['chromosome_fitness'])
-                    # Fitness physically pruned the zero-weight terms
-                    # (remove_zero_terms), so equations_labels NOW reflects the
-                    # ACTIVE structure. The pre-fit check above keyed the
-                    # UN-pruned candidate, so two distinct candidates that
-                    # sparsify to the same active form both passed it -- re-check
-                    # the post-prune label so a duplicate active form is never
-                    # placed twice (the repeated-objective leak). An offspring
-                    # still degenerate after regeneration is DROPPED, not
-                    # inserted, so LOSS_NAN_VAL never reaches the front/history.
+                    # The pre-fit check above already keyed the PRUNED active
+                    # structure -- ``right_part_selector`` fits and prunes, and
+                    # the fitness host changes neither. What can still move the
+                    # label is ``regenerate_degenerate_equations``: it rerolls
+                    # the degenerate genes and re-runs RPS on them. Re-check, so
+                    # a duplicate active form is never placed twice (the
+                    # repeated-objective leak). An offspring still degenerate
+                    # after regeneration is DROPPED, not inserted, so
+                    # LOSS_NAN_VAL never reaches the front/history.
                     final_label = temp_offspring.equations_labels
                     if (final_label not in objective.history
                             and not has_degenerate_equation(temp_offspring)):
@@ -614,26 +629,50 @@ class InitialParetoLevelSorting(CompoundOperator):
             # slot) still stops the search.
             pool_exhausted = False
             init_collapsed = False
-            for idx, candidate in enumerate(objective.unplaced_candidates):
-                candidate.reset_state(True)
-                # SoEqRightPartSelector resolves system degeneracy inline; the
-                # retry below additionally rejects fit-degenerate candidates and
-                # (while uniques remain) duplicate ACTIVE forms. Fitness must run
-                # first because both verdicts are only known post-sparsification.
-                _rps_fitness_regenerate(
-                    candidate, self.suboperators['right_part_selector'],
-                    self.suboperators['chromosome_fitness'],
-                    subop_args['right_part_selector'], subop_args['chromosome_fitness'])
+            rps_op = self.suboperators['right_part_selector']
+            fitness_op = self.suboperators['chromosome_fitness']
+            rps_args = subop_args['right_part_selector']
+            fitness_args = subop_args['chromosome_fitness']
 
+            for idx, candidate in enumerate(objective.unplaced_candidates):
                 attempts = 0
                 hit_cap = False
                 while True:
-                    # equations_labels is the post-prune ACTIVE structure.
-                    degenerate = has_degenerate_equation(candidate)
+                    candidate.reset_state(True)
+                    # SoEqRightPartSelector resolves system degeneracy inline
+                    # and leaves the pruned ACTIVE structure behind; the retry
+                    # below additionally rejects fit-degenerate candidates and
+                    # (while uniques remain) duplicate ACTIVE forms.
+                    #
+                    # THE DUPLICATE VERDICT IS READ BEFORE FITNESS. Only the
+                    # degeneracy verdict needs the fit; a candidate whose
+                    # post-RPS label is already in history gets re-rolled
+                    # whatever the fit says, so scoring it is pure waste -- one
+                    # discarded PDE solve per attempt on the solver path, with
+                    # ``uniqueness_attempt_limit`` at 100. This mirrors the
+                    # pre-fitness gate ``OffspringUpdater.apply`` already has.
+                    scored = _rps_fitness_regenerate(
+                        candidate, rps_op, fitness_op, rps_args, fitness_args,
+                        skip_fitness_if=(
+                            None if pool_exhausted else
+                            lambda c: c.equations_labels in objective.history))
                     duplicate = candidate.equations_labels in objective.history
+                    # An unscored candidate cannot READ as degenerate: the flag
+                    # is the fitness host's LOSS_NAN_VAL stamp, and scoring was
+                    # skipped precisely because ``duplicate`` already decided
+                    # the retry.
+                    degenerate = scored and has_degenerate_equation(candidate)
                     if not (degenerate or (duplicate and not pool_exhausted)):
                         break
                     if attempts >= uniqueness_attempt_limit:
+                        if not scored:
+                            # This slot is about to be FILLED with the
+                            # duplicate, so it has to carry real objective
+                            # values -- and only the fit can say whether it is
+                            # degenerate as well.
+                            _rps_fitness_regenerate(candidate, rps_op, fitness_op,
+                                                    rps_args, fitness_args)
+                            degenerate = has_degenerate_equation(candidate)
                         if degenerate:
                             # No non-degenerate form found for this slot at all
                             # -> genuine search-space collapse.
@@ -646,11 +685,6 @@ class InitialParetoLevelSorting(CompoundOperator):
                         break
                     attempts += 1
                     candidate.create()
-                    candidate.reset_state(True)
-                    _rps_fitness_regenerate(
-                        candidate, self.suboperators['right_part_selector'],
-                        self.suboperators['chromosome_fitness'],
-                        subop_args['right_part_selector'], subop_args['chromosome_fitness'])
                 system = candidate.equations_labels
                 _loop_stats.record(
                     'InitialParetoLevelSorting.unique_candidate' + ('.FAIL' if hit_cap else ''),

@@ -15,7 +15,7 @@ Two families:
 * **Solver-free** (:class:`EquationObjective`): compute from the fitted
   feature matrix / target on the data grid. The *discrepancy* fillers
   double as the host's "primary" objective -- they own the
-  right-part-selection hooks (``needs_sparsity`` / ``is_degenerate`` /
+  right-part-selection hooks (``is_degenerate`` /
   normalization) and their value is what ``EqRightPartSelector`` ranks
   candidate targets by during its ``force_out_of_place`` term-sweep.
 * **Solver-based**: the solver options of the same :class:`Discrepancy`
@@ -39,6 +39,7 @@ from typing import Union, Dict
 import numpy as np
 
 import epde.globals as global_var
+from epde.interface.search_config import active_config
 from epde.operators.common.stability import calculate_weights, vc_stability_total_lr
 from epde.operators.utils.template import CompoundOperator, dictApplyUFunc, dictZerosLike, dictFullLike, \
     dictAdd, dictSubtr
@@ -49,16 +50,67 @@ from epde.operators.common.survival import (
 LOSS_NAN_VAL = 1e7
 
 
-def _extract_coefs_intercept(equation):
-    """Reconstruct ``(coefs, intercept)`` from ``weights_final`` under the
-    VWSR convention: ``weights_internal[-1]`` is the intercept-presence flag.
-    A zero intercept was dropped from ``weights_final`` (it is then
-    nnz-length); a non-zero one is its trailing entry. ``weights_final`` is
-    sparsity-truncated -- NOT position-indexed like ``weights_internal``.
-    Pinned by TestSparsityWeightsFinalConventions."""
-    if equation.weights_internal[-1]:
-        return equation.weights_final[:-1], equation.weights_final[-1]
-    return equation.weights_final, 0.0
+def _extract_coefs_intercept(equation, features=None):
+    """Reconstruct ``(coefs, intercept)`` from ``weights_final``.
+
+    Under the unified layout (``Equation._validate_weight_layout``)
+    ``weights_final`` is always ``[*one coef per non-target term, intercept]``
+    with zeros retained, so the split is purely positional.
+
+    Pass ``features`` whenever the coefficients are about to be dotted with a
+    feature matrix: ``Equation.evaluate`` emits TWO widths from one structure --
+    the default returns every non-target term (m columns) while
+    ``active_only=True`` returns only the terms with a non-zero
+    ``weights_internal`` slot (nnz columns) -- and ``coefs`` is always m-long.
+    The narrow case is masked by ``equation.active_mask``.
+
+    Before the unification ``weights_final`` was itself zero-filtered to nnz+1
+    by the sparsity operators, which lined up with the narrow width and
+    silently mismatched the wide one unless ``remove_zero_terms`` had already
+    collapsed nnz onto m. The older ``if equation.weights_internal[-1]:`` guard
+    was worse still: it read a presence FLAG that never existed."""
+    coefs = np.asarray(equation.weights_final[:-1])
+    intercept = equation.weights_final[-1]
+    if features is None:
+        return coefs, intercept
+
+    widths = {np.asarray(value).shape[1] for value in features.values()
+              if value is not None and np.asarray(value).ndim > 1}
+    if not widths or widths == {coefs.size}:
+        return coefs, intercept
+    if len(widths) > 1:
+        raise ValueError(
+            f'feature matrices disagree on width across trajectories: {sorted(widths)}')
+    width = widths.pop()
+    mask = equation.active_mask
+    if width != int(mask.sum()):
+        raise ValueError(
+            f'feature matrix has {width} columns, which matches neither the '
+            f'{coefs.size} non-target terms nor the {int(mask.sum())} active '
+            'ones; weights and structure have desynced')
+    return coefs[mask], intercept
+
+
+def _term_weights(equation):
+    """The per-term coefficients of ``weights_internal``, positionally aligned
+    to the non-target terms of ``equation.structure`` -- i.e. everything but
+    the trailing intercept slot, which the unified layout always carries
+    (``Equation._validate_weight_layout``).
+
+    Named rather than inlined because the distinction is load-bearing: a
+    degeneracy test must ask whether every TERM weight is zero, and the raw
+    ``np.all(weights_internal == 0)`` would additionally demand a zero
+    intercept."""
+    return np.asarray(equation.weights_internal[:-1])
+
+
+def _mean_of_sums(per_sample) -> float:
+    """Reduce a per-trajectory dict of per-term score vectors to one scalar:
+    sum within a trajectory, mean across trajectories. ``None`` entries (a
+    sample whose estimator produced nothing) are skipped; an all-``None`` dict
+    reduces to 0.0."""
+    totals = [float(np.sum(v)) for v in per_sample.values() if v is not None]
+    return float(np.mean(totals)) if totals else 0.0
 
 
 def _degenerate_excluding_intercept(filler, equation) -> bool:
@@ -66,7 +118,7 @@ def _degenerate_excluding_intercept(filler, equation) -> bool:
     degenerate iff every non-intercept weight is zero, or the post-fit
     discrepancy exceeds the filler's ``degenerate_threshold``."""
     fv = getattr(equation, 'fitness_value', None)
-    return bool(np.all(equation.weights_internal[:-1] == 0)
+    return bool(np.all(_term_weights(equation) == 0)
                 or (fv is not None and fv > filler.degenerate_threshold))
 
 
@@ -94,6 +146,17 @@ class EquationObjective:
     value_attr = 'fitness_value'
     flag_attr = 'fitness_calculated'
 
+    # The best attainable value on this axis, i.e. this objective's
+    # contribution to MOEA/D's ideal point. It belongs to the objective, not
+    # to whoever assembles the front: ``[0., 1.]`` was never "the ideal for
+    # not-use_pic", it is COMPLEXITY's ideal, because the least complex
+    # equation has one factor. Deriving the ideal point from these attributes
+    # (see ``ideal_point``) is what keeps the three lockstep sites -- filler
+    # assembly, SoEq axis registration, and the ideal point -- from drifting
+    # apart, and means a new second-axis objective only has to declare its own
+    # value here.
+    ideal_value = 0.0
+
     # Whether the host's failure stamps (the unfitted-equation stamp and the
     # post-compute degeneracy verdict, see ``SolverFreeFitness.apply``)
     # overwrite this filler's value with LOSS_NAN_VAL. ``Complexity`` opts
@@ -107,9 +170,6 @@ class EquationObjective:
     stamped_on_failure = True
 
     # -- right-part-selection scaffolding hooks (consulted on the primary) -- #
-    def needs_sparsity(self, equation, for_rps: bool) -> bool:
-        return bool(for_rps or not getattr(equation, 'weights_internal_evald', False))
-
     # A candidate target whose post-fit discrepancy exceeds this is declined
     # during the RPS term-sweep (a degenerate target fits too poorly to be the
     # right part). Checked AFTER compute() has set ``fitness_value`` -- see
@@ -119,7 +179,10 @@ class EquationObjective:
 
     def is_degenerate(self, equation) -> bool:
         fv = getattr(equation, 'fitness_value', None)
-        return bool(np.all(equation.weights_internal == 0)
+        # ``_term_weights``, not the raw vector: the unified layout carries a
+        # trailing intercept slot, and an equation is degenerate when its TERMS
+        # are all zero regardless of whether a constant survived.
+        return bool(np.all(_term_weights(equation) == 0)
                     or (fv is not None and fv > self.degenerate_threshold))
 
     def compute(self, equation, ctx: FitContext) -> float:
@@ -130,7 +193,7 @@ class Discrepancy(EquationObjective):
     """The DISCREPANCY objective family: one filler containing every residual
     metric as an option, BUILT FROM THE SEARCH CONFIGURATION -- ``Discrepancy()``
     constructs bare and resolves its option at compute time from
-    ``epde.globals.resolve_discrepancy_metric()``, which ``EpdeSearch``
+    ``active_config().objectives.discrepancy_metric``, which ``EpdeSearch``
     writes from its ``discrepancy_metric`` kwarg (the same late-dispatch
     convention as :class:`Instability` and :class:`Complexity`). An explicit
     constructor metric exists only as internal wiring for fixed-role hosts.
@@ -139,13 +202,11 @@ class Discrepancy(EquationObjective):
 
     * ``'wape'`` (default) -- normalised absolute residual, the legacy
       ``L2LRFitness`` core: ``sum|target - fit| / sum|target|``. Normalised
-      features in-place, un-normalised during the RPS sweep, the
-      ``weights_internal[-1]`` intercept-presence test, no ``g_func``
+      features in-place, un-normalised during the RPS sweep, no ``g_func``
       weighting and no penalty division.
     * ``'l2'`` -- weighted L2 norm of the residual, the legacy ``L2Fitness``
-      core: un-normalised features, the three-way ``weights_internal`` /
-      ``weights_final`` reconstruction, ``g_func`` weighting, and the
-      all-zero penalty division. NO target-scale normalisation.
+      core: un-normalised features, ``g_func`` weighting, and the all-zero
+      penalty division. NO target-scale normalisation.
     * ``'l2_relative'`` -- ``||target - fit||_2 / ||target||_2``: the L2
       analogue of WAPE (which is the L1 form of the same relative residual).
       Like WAPE, no ``g_func`` weighting.
@@ -187,8 +248,8 @@ class Discrepancy(EquationObjective):
     replaces the silent typo-to-WAPE catch-all the strategy switch had.
 
     Every solver-free option owns the full primary-filler contract
-    (right-part-selection scaffolding): ``needs_sparsity`` is the shared
-    base rule; ``is_degenerate`` branches -- ``'l2'`` keeps its legacy
+    (right-part-selection scaffolding): ``is_degenerate`` branches --
+    ``'l2'`` keeps its legacy
     all-zero-``weights_internal`` test (no threshold), the other three use
     the intercept-excluding test plus the post-fit ``degenerate_threshold``.
     The RPS hooks are never consulted on solver options (the solver host
@@ -210,7 +271,7 @@ class Discrepancy(EquationObjective):
                  penalty_coeff: float = 0.2):
         """``Discrepancy()`` -- the normal construction -- carries NO metric:
         the option is resolved at compute time from
-        ``epde.globals.resolve_discrepancy_metric()``, which ``EpdeSearch``
+        ``active_config().objectives.discrepancy_metric``, which ``EpdeSearch``
         writes from its own configuration. An explicit ``metric`` is
         INTERNAL wiring only, for hosts whose metric is fixed by their role
         (the RPS-sweep's ``'l2_relative'`` lightweight fitness; the solver
@@ -230,20 +291,13 @@ class Discrepancy(EquationObjective):
     def _resolved_metric(self) -> str:
         """Instance override if wired, else the search-level configuration."""
         return (self.metric if self.metric is not None
-                else global_var.resolve_discrepancy_metric())
-
-    # needs_sparsity: the shared base ``for_rps or not weights_internal_evald``
-    # rule (the legacy L2Discrepancy override was identical to the base). In
-    # MOEA/D the in-place pass always has weights_internal_evald=True (RPS set
-    # it); in single-objective mode the ``not weights_internal_evald`` clause
-    # lets the in-place fitness trigger sparsity itself -- and also repairs
-    # the latent L2LRFitness crash when an RPS-exhausted equation arrived
-    # unfitted.
+                else active_config().objectives.discrepancy_metric)
 
     def is_degenerate(self, equation) -> bool:
         if self._resolved_metric() == 'l2':
-            # Legacy L2Fitness contract: all-zero weights only, no threshold.
-            return bool(np.all(equation.weights_internal == 0))
+            # Legacy L2Fitness contract: all-zero TERM weights only, no
+            # threshold (see the base is_degenerate on the intercept slot).
+            return bool(np.all(_term_weights(equation) == 0))
         return _degenerate_excluding_intercept(self, equation)
 
     def compute(self, equation, *args) -> float:
@@ -272,48 +326,57 @@ class Discrepancy(EquationObjective):
         return getattr(self, f'_compute_{metric}')(equation, args[0])
 
     def _compute_wape(self, equation, ctx: FitContext) -> float:
-        # L2LRFitness used un-normalised features only on the RPS sweep
-        # (force_out_of_place), normalised features for the in-place pass.
-        normalize = not ctx.for_rps
-        _, targets, features = equation.evaluate(normalize = normalize, return_val = False)
+        # L2LRFitness restricted the design matrix to the currently ACTIVE
+        # support on the RPS sweep (force_out_of_place) and used every
+        # non-target term on the in-place pass. ``active_only`` selects columns;
+        # nothing here is normalised (see Equation.evaluate).
+        targets, features = equation.evaluate(active_only=ctx.for_rps)
         if features is None:
             discr = dictSubtr(targets, {key: tg.mean() for key, tg in targets.items()})
         else:
-            coefs, intercept = _extract_coefs_intercept(equation)
-            discr = dictSubtr(targets, dictAdd(dictApplyUFunc(np.dot, features, 
-															  equation.weights_final[:-1]),
-											   intercept))
-			# discr = target - (np.dot(features, coefs) + intercept)
-        rl_error = np.sum([np.sum(np.abs(discr[key])) / np.sum(np.abs(targets[key]))
-						   for key in targets.keys()])
+            coefs, intercept = _extract_coefs_intercept(equation, features)
+            discr = dictSubtr(targets,
+                              dictAdd(dictApplyUFunc(np.dot, features, coefs),
+                                      intercept))
+        # MEAN over trajectories, not sum: ``degenerate_threshold`` is a
+        # PER-SAMPLE WAPE bound (1.0), and summing made it n_samples times
+        # stricter -- with three trajectories every RPS candidate above a mean
+        # WAPE of 0.33 was declined, the sweep hit inf fitness and rerolled the
+        # whole equation. Identical to the legacy value when len(targets) == 1.
+        rl_error = np.mean([np.sum(np.abs(discr[key])) / np.sum(np.abs(targets[key]))
+                            for key in targets.keys()])
         return float(rl_error)
 
     def _compute_l2(self, equation, ctx: FitContext) -> float:
-        _, targets, features = equation.evaluate(normalize=False, return_val=False)
+        targets, features = equation.evaluate(active_only=True)
 
-       #  _, targets, features = equation.evaluate(normalize = False, return_val = False)
-        if all([feature is None for feature in features.values()]):
-            discr_feats = 0
+        if features is None or all([feature is None for feature in features.values()]):
+            discr_feats = dictZerosLike(targets, 0)
         else:
-            n_cols = [feature.shape[1] if feature.ndim > 1 else 1
-					  for feature in features.values()][0]
-            mask = equation.weights_internal != 0
-            if n_cols == len(mask):
-                discr_feats = dictApplyUFunc(np.dot, features, equation.weights_final[:-1])
-            elif n_cols == int(mask.sum()):
-                discr_feats = dictApplyUFunc(np.dot, features, equation.weights_final[:-1])
-            else:
-                discr_feats = dictZerosLike(features, 0)
+            # ``_extract_coefs_intercept`` now performs the width match that
+            # this ad-hoc ``n_cols == len(mask) or n_cols == mask.sum()`` test
+            # only checked -- and it NARROWS the coefficients rather than
+            # assuming ``weights_final`` was already zero-filtered to fit.
+            coefs, intercept = _extract_coefs_intercept(equation, features)
+            discr_feats = dictApplyUFunc(np.dot, features, coefs)
 
-        discr = dictSubtr(dictAdd(discr_feats, dictFullLike(targets.shape, equation.weights_final[-1])), targets)
-        
+        # ``dictFullLike`` takes the REFERENCE DICT, not a ``.shape`` (targets is
+        # a per-trajectory dict and has no such attribute).
+        discr = dictSubtr(dictAdd(discr_feats,
+                                  dictFullLike(targets, equation.weights_final[-1])),
+                          targets)
+
         g = ctx.g_fun_vals
-
         if g is not None:
-            discr = dictApplyUFunc(np.multiply, discr, self.g_fun_vals)
-        
-        rl_error = dictApplyUFunc(self.norm_prtl, discr)
-        rl_error = reduce(lambda x, y: x+y, rl_error.values(), 0) # [value for value in rl_error.values()]
+            # ``ctx.g_fun_vals`` IS the weighting; there is no ``self.g_fun_vals``
+            # on a filler (that attribute belonged to the old operator classes).
+            discr = dictApplyUFunc(np.multiply, discr, g)
+
+        # Weighted L2 norm per trajectory, summed -- the legacy L2Fitness core.
+        # ``self.norm_prtl`` never existed on the class (the definition is
+        # commented out at the top of Discrepancy).
+        rl_error = dictApplyUFunc(lambda x: np.linalg.norm(x, ord=2), discr)
+        rl_error = reduce(lambda x, y: x + y, rl_error.values(), 0.)
 
         if np.sum(equation.weights_final[:-1]) == 0:
             rl_error /= ctx.penalty_coeff
@@ -321,28 +384,31 @@ class Discrepancy(EquationObjective):
         return float(rl_error)
 
     def _compute_l2_relative(self, equation, ctx: FitContext) -> float:
-        normalize = not ctx.for_rps
-        _, targets, features = equation.evaluate(normalize=normalize, return_val=False)
-        # target = np.asarray(target, dtype=float)
+        targets, features = equation.evaluate(active_only=ctx.for_rps)
         if features is None:
             discr = dictSubtr(targets, {key: target.mean() for key, target in targets.items()})
         else:
-            coeffs, intercept = _extract_coefs_intercept(equation)
+            coeffs, intercept = _extract_coefs_intercept(equation, features)
             discr = dictSubtr(targets, dictAdd(dictApplyUFunc(np.dot, features, coeffs), intercept))
-        den = float(np.mean([np.linalg.norm(target) for target in targets]))
+        # ``.values()``: iterating the dict itself yields KEYS, so the norm was
+        # taken of the integer sample ID -- 0.0 for a single-sample run, which
+        # made this metric return LOSS_NAN_VAL unconditionally.
+        den = float(np.mean([np.linalg.norm(target) for target in targets.values()]))
         if np.isclose(den, 0.0):
             return float(LOSS_NAN_VAL)
         return float(np.mean([np.linalg.norm(discrepancy) for discrepancy in discr.values()]) / den)
 
     def _compute_scale_invariant(self, equation, ctx: FitContext) -> float:
-        normalize = not ctx.for_rps
-        _, targets, features = equation.evaluate(normalize=normalize, return_val=False)
+        targets, features = equation.evaluate(active_only=ctx.for_rps)
         if features is None:
             # only the target term survives -> a single term cannot cancel.
             return 1.0
-        coeffs, intercept = _extract_coefs_intercept(equation)
+        coeffs, intercept = _extract_coefs_intercept(equation, features)
         contribs = dictApplyUFunc(np.multiply, features, np.asarray(coeffs)[None, :])          # per-term weighted values
-        resid = dictSubtr(targets, dictAdd(contribs.sum(axis=1), intercept))        # |sum_k c_k phi_k|
+        # ``contribs`` is a per-trajectory dict; the term sum has to be taken
+        # INSIDE each sample's array, not on the dict.
+        resid = dictSubtr(targets, dictAdd(dictApplyUFunc(lambda x: x.sum(axis=1), contribs),
+                                           intercept))                          # |sum_k c_k phi_k|
         term_mass = dictAdd(dictApplyUFunc(np.abs, targets),
                             dictAdd(dictApplyUFunc(lambda x: np.abs(x).sum(axis=1), contribs), abs(intercept)))
         rho = dictApplyUFunc(np.divide, dictApplyUFunc(np.abs, resid), term_mass)
@@ -358,10 +424,12 @@ class Discrepancy(EquationObjective):
         ref = global_var.samples_manager.get((eq.main_var_to_explain, (1.0,)))
         ref = {key: reference.reshape(sol[key].shape) for key, reference in ref.items()}
 
-        discr = dictApplyUFunc(np.multiply, dictSubtr(sol, ref), 
-                               {gfunc_vals.reshape(discr[key].shape) for key, gfunc_vals in sctx.g_fun_vals.values()})
-        # discr = np.multiply(discr, sctx.g_fun_vals.reshape(discr.shape))
-        # rl_error = np.mean([item for item in dictApplyUFunc(lambda x: np.linalg.norm(x, ord=2), discr).values()])
+        # The old form was a SET comprehension that unpacked two names from
+        # ``.values()`` and read ``discr`` before it existed.
+        discr = dictSubtr(sol, ref)
+        discr = dictApplyUFunc(np.multiply, discr,
+                               {key: np.asarray(gfunc_vals).reshape(discr[key].shape)
+                                for key, gfunc_vals in sctx.g_fun_vals.items()})
         rl_error = np.mean(list(dictApplyUFunc(lambda x: np.linalg.norm(x, ord=2), discr).values()))
         
         fitness = rl_error + sctx.pinn_loss_mult * float(sctx.loss_add)
@@ -380,8 +448,11 @@ class Discrepancy(EquationObjective):
         ref = global_var.samples_manager.get((eq.main_var_to_explain, (1.0,)))
         ref = {key: reference.reshape(sol[key].shape) for key, reference in ref.items()}
 
-        discr = dictApplyUFunc(np.multiply, dictSubtr(sol, ref), 
-                               {gfunc_vals.reshape(discr[key].shape) for key, gfunc_vals in sctx.g_fun_vals.values()})
+        # See _compute_solver_l2: set comprehension -> per-sample dict.
+        discr = dictSubtr(sol, ref)
+        discr = dictApplyUFunc(np.multiply, discr,
+                               {key: np.asarray(gfunc_vals).reshape(discr[key].shape)
+                                for key, gfunc_vals in sctx.g_fun_vals.items()})
 
         rl_error = np.mean(list(dictApplyUFunc(lambda x: np.mean(x ** 2), discr).values()))
         return float(rl_error + sctx.pinn_loss_mult * float(sctx.loss_add))
@@ -400,7 +471,9 @@ class Discrepancy(EquationObjective):
         #     err = np.sqrt(np.mean((masked_solution - masked_data) ** 2))
 
         if metric == 'l2':
-            err_func = lambda x: np.linalg.norm(x - masked_data, ord=2)
+            # ``dictSubtr`` below already forms (solution - data); subtracting
+            # ``masked_data`` again here double-counted it.
+            err_func = lambda x: np.linalg.norm(x, ord=2)
         elif metric == 'mae':
             err_func = lambda x: np.mean(np.abs(x))
         else:  # 'rmse' default
@@ -412,52 +485,9 @@ class Discrepancy(EquationObjective):
             err /= self.penalty_coeff
         return float(err)
 
-class WAPEDiscrepancy(EquationObjective):
-    """Normalised absolute residual (WAPE), the ``L2LRFitness`` core.
-
-    ``sum|target - fit| / sum|target|``. Reproduces ``L2LRFitness.apply``:
-    normalised features in-place, un-normalised during the RPS sweep, the
-    ``weights_internal[-1]`` intercept-presence test, no ``g_func``
-    weighting and no penalty division.
-    """
-    name = 'discrepancy'
-    value_attr = 'fitness_value'
-    flag_attr = 'fitness_calculated'
-
-    # needs_sparsity: inherits the base ``for_rps or not weights_internal_evald``.
-    # In MOEA/D the in-place pass always has weights_internal_evald=True (RPS
-    # set it), so this is equivalent to the legacy L2LRFitness "sparsity only
-    # on the RPS sweep" behaviour. In single-objective mode (RandomRHPSelector
-    # never runs sparsity) the ``not weights_internal_evald`` clause lets the
-    # in-place fitness trigger sparsity itself -- and also repairs the latent
-    # L2LRFitness crash when an RPS-exhausted equation arrived unfitted.
-
-    def is_degenerate(self, equation) -> bool:
-        return bool(np.all(equation.weights_internal[:-1] == 0))
-
-    def compute(self, equation, ctx: FitContext) -> float:
-        # L2LRFitness used un-normalised features only on the RPS sweep
-        # (force_out_of_place), normalised features for the in-place pass.
-        # normalize = not ctx.for_rps
-        _, targets, features = equation.evaluate(normalize = False, return_val = False)
-
-        if features is None:
-            discr = dictApplyUFunc(lambda x, y: x - y, targets, dictApplyUFunc(np.mean(), targets)) # target - target.mean()
-        else:
-            if equation.weights_internal[-1]:
-                discr_feats = dictApplyUFunc(np.dot, features, equation.weights_final[:-1])
-                discr_feats = dictApplyUFunc(lambda x, y: x+y, discr_feats, equation.weights_final[-1])
-            else:
-                discr_feats = dictApplyUFunc(np.dot, features, equation.weights_final[:-1])
-            discr = dictApplyUFunc(lambda x, y: x-y, targets, discr_feats)
-
-        rl_error = reduce(lambda x, y: x + float(np.sum(np.abs(discr[y])) / np.sum(np.abs(targets[y]))), range(len(discr)), 0.) 
-        return rl_error
-
-
 class Instability(EquationObjective):
     """The instability objective, dispatching on the estimator selected by
-    ``epde.globals.resolve_instability_metric()``:
+    ``active_config().objectives.instability_metric``:
 
     * ``'vcoef'``: fast path sums the per-term ``_cached_vc_score``
       produced by ``PhysicsInformedLasso`` (``VWSRSparsity``); fallback
@@ -481,54 +511,76 @@ class Instability(EquationObjective):
     flag_attr = 'stability_calculated'
 
     def compute(self, equation, ctx: FitContext) -> float:
-        metric = global_var.resolve_instability_metric()
+        metric = active_config().objectives.instability_metric
         if metric == 'vcoef':
             cached = getattr(equation, '_cached_vc_score', None)
             if cached is not None:
-                return float(np.sum(cached))
+                # Per-trajectory dict written by VWSRSparsity: sum each
+                # sample's per-term scores, then average across trajectories --
+                # the same reduction the survival/chi2 branch below uses.
+                return _mean_of_sums(cached)
         elif metric in ('survival', 'tile', 'het', 'chi2'):
             cached = getattr(equation, '_cached_alt_instability', None)
             if cached is not None and cached[0] == metric:
                 return float(cached[1])
         data_shape = ctx.data_shape
-        _, targets, features = equation.evaluate(normalize = True, return_val = False)
+        targets, features = equation.evaluate()
 
         if features is None:
             return 1.0
+        # THE INTERCEPT RULE: a regularized-away intercept is not a column of
+        # any later model. ``weights_internal[-1]`` is the sparsity step's
+        # SUPPORT decision (``weights_final[-1]`` agrees under the unified
+        # layout, but this is the vector that decides). The flag propagates
+        # unchanged into vc_stability_total_lr / calculate_weights / the
+        # survival.py estimators, each of which appends its own ones column
+        # only when it is set.
         fit_intercept = bool(equation.weights_internal[-1] != 0)
         if metric == 'vcoef':
-            return float(vc_stability_total_lr(
-                features, targets, ctx.g_fun_vals, data_shape,
-                main_var=equation.main_var_to_explain,
-                fit_intercept=fit_intercept))
+            estim = partial(vc_stability_total_lr,
+                            main_var=equation.main_var_to_explain,
+                            fit_intercept=fit_intercept)
+            totals = dictApplyUFunc(estim, features, targets, ctx.g_fun_vals,
+                                    data_shape)
+            return float(np.mean([float(v) for v in totals.values()]))
         if metric in ('survival', 'tile', 'het', 'chi2'):
             estimator = {'survival': survival_scores, 'tile': tile_scores,
                          'het': heterogeneity_scores, 'chi2': chi2_scores}[metric]
             estim = partial(estimator, fit_intercept=fit_intercept)
-            scores = dictApplyUFunc(estim, features, targets, ctx.g_fun_vals, data_shape) #estimator(features, targets, ctx.g_fun_vals, data_shape,
-                     #          fit_intercept=fit_intercept)
+            scores = dictApplyUFunc(estim, features, targets, ctx.g_fun_vals, data_shape)
             value = np.mean([float(np.sum(score)) for score in scores.values()])
             equation._cached_alt_instability = (metric, value)
             return value
-        # metric == 'cv': the axis-aligned sliding-window CV.
+        # metric == 'cv': the axis-aligned sliding-window CV, per trajectory.
         sw = getattr(equation, '_cached_sw_weights', None)
         if sw is None:
-            sw = calculate_weights(
-                features, targets, ctx.g_fun_vals, data_shape, fit_intercept,
-                gram_cls=None, gram_kwargs=None)
-        sw_arr = np.array(sw)
-        mu = sw_arr.mean(axis=0)
-        std = sw_arr.std(axis=0, ddof=1)
-        with np.errstate(divide='ignore', invalid='ignore'):
-            cv = (std ** 2) / (mu ** 2)
-            cv[mu == 0] = 0.0
-        return float(np.sum(np.nan_to_num(cv)) / len(data_shape))
+            estim = partial(calculate_weights, fit_intercept=fit_intercept,
+                            gram_cls=None, gram_kwargs=None)
+            sw = dictApplyUFunc(estim, features, targets, ctx.g_fun_vals, data_shape)
+        per_sample = []
+        for key, sw_key in sw.items():
+            if sw_key is None:
+                continue
+            sw_arr = np.asarray(sw_key)
+            mu = sw_arr.mean(axis=0)
+            std = sw_arr.std(axis=0, ddof=1)
+            with np.errstate(divide='ignore', invalid='ignore'):
+                cv = (std ** 2) / (mu ** 2)
+                cv[mu == 0] = 0.0
+            # Divide by that trajectory's GRID DIMENSIONALITY (the number of
+            # per-dim window batches ``calculate_weights`` stacks), not by the
+            # trajectory count.
+            n_dims = max(len(np.atleast_1d(data_shape[key])), 1)
+            per_sample.append(float(np.sum(np.nan_to_num(cv))) / n_dims)
+        if not per_sample:
+            return 1.0
+        return float(np.mean(per_sample))
 
 
 class Complexity(EquationObjective):
     """The COMPLEXITY objective family: parsimony of the fitted structure,
     with the option selected per instance (or, when constructed without one,
-    from the process-level ``epde.globals.complexity_metric``).
+    from the search-level ``objectives.complexity_metric``).
 
     Options:
 
@@ -553,6 +605,9 @@ class Complexity(EquationObjective):
     value_attr = 'complexity_value'
     flag_attr = 'complexity_calculated'
     stamped_on_failure = False
+    # One factor is the least complex an equation can be under either option,
+    # so 1.0 -- not 0.0 -- is the attainable optimum on this axis.
+    ideal_value = 1.0
 
     OPTIONS = ('factors', 'terms')
 
@@ -560,7 +615,7 @@ class Complexity(EquationObjective):
         if metric is not None and metric not in self.OPTIONS:
             raise ValueError(
                 f'complexity metric must be one of {self.OPTIONS} or None '
-                f'(= follow globals.complexity_metric); got {metric!r}')
+                f'(= follow objectives.complexity_metric); got {metric!r}')
         self.metric = metric
 
     def compute(self, equation, ctx: FitContext) -> float:
@@ -570,7 +625,7 @@ class Complexity(EquationObjective):
         from epde.eq_mo_objectives import (_complexity_of_equation,
                                            _terms_of_equation)
         metric = (self.metric if self.metric is not None
-                  else global_var.resolve_complexity_metric())
+                  else active_config().objectives.complexity_metric)
         if metric == 'terms':
             return float(_terms_of_equation(equation))
         return float(_complexity_of_equation(equation))
@@ -636,3 +691,46 @@ def _loss_is_nan(loss_add) -> bool:
 # keeps only the solver context/plumbing shared with the hosts. The former
 # ``SolverObjective`` base and its three subclasses are gone -- a solver
 # error is a discrepancy.
+
+
+# ---------------------------------------------------------------------------
+# The ideal point, owned by the objectives
+# ---------------------------------------------------------------------------
+# MOEA/D needs the best attainable value on each axis. That used to be a
+# literal in ``EpdeSearch._create_optimizer`` selected by the ``use_pic``
+# bool -- so the ideal point could disagree with the axis actually in use
+# (a 'complexity' second objective with ``use_pic=True`` left the ideal
+# at the instability value), and a third second-axis objective would have
+# silently inherited complexity's ideal. Now each objective declares its own
+# ``ideal_value`` and the point is assembled from the names of the objectives
+# in play.
+
+#: Objective family by the name it is selected under. Keys match
+#: ``EquationObjective.name`` and the values accepted by
+#: ``objectives.second_objective`` / ``objectives.instability_metric``.
+OBJECTIVE_REGISTRY = {
+    'discrepancy': Discrepancy,
+    'instability': Instability,
+    'complexity': Complexity,
+}
+
+
+def ideal_point(objective_names):
+    """The ideal objective vector for the axes named in ``objective_names``.
+
+    Args:
+        objective_names: ordered names of the objectives on the front, e.g.
+            ``('discrepancy', 'instability')``. The first axis is always the
+            discrepancy fitness.
+
+    Returns:
+        list of float -- one ``ideal_value`` per axis, in the same order.
+    """
+    unknown = [name for name in objective_names if name not in OBJECTIVE_REGISTRY]
+    if unknown:
+        raise ValueError(
+            'No objective registered under {0}; known objectives are {1}. A '
+            'new objective must be added to OBJECTIVE_REGISTRY and declare '
+            'its own ideal_value.'.format(unknown, sorted(OBJECTIVE_REGISTRY)))
+    return [float(OBJECTIVE_REGISTRY[name].ideal_value)
+            for name in objective_names]

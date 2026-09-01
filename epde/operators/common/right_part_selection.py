@@ -16,6 +16,7 @@ from functools import partial
 from collections import defaultdict
 
 import epde.globals as global_var
+from epde.interface.search_config import active_config
 from epde.supplementary import filter_powers
 
 from epde.operators.utils.template import CompoundOperator, dictApplyUFunc, dictAdd
@@ -25,6 +26,11 @@ from epde.structure.main_structures import Term, Equation
 from epde.operators.common.stability import (GramSetup, VaryingCoefSetup)
 
 from epde import _loop_stats
+
+# One-shot guard so a permanently-broken super-Gram fast path is reported
+# once instead of being silently swallowed on every term sweep.
+_SUPER_GRAM_FAILURE_REPORTED = False
+
 
 def loDs_to_DoLs(arg: List[Dict[int, Any]]) -> Dict[int, list]:
     res = defaultdict(list)
@@ -41,13 +47,23 @@ class EqRightPartSelector(CompoundOperator):
     fitness function value is calculated. The term, corresponding to the separation with the highest FF value is 
     saved as the correct right part. 
     
+    THIS OPERATOR OWNS THE FIT. Each candidate target is sparsified, given
+    coefficients and only then scored (``_fit_and_score``) -- the fitness
+    hosts are pure scorers that neither fit nor prune. It is also the single
+    place that prunes: the one ``remove_zero_terms`` at the end of ``apply``,
+    after the sweep has chosen a winner. (That prune cannot move into the
+    sparsity operator, which runs per candidate and must keep every
+    candidate term.)
+
     Noteable attributes:
     -----------
     suboperators : dict
         Inhereted from the CompoundOperator class
-        key - str, value - instance of a class, inhereted from the CompoundOperator. 
-        Suboperators, performing tasks of equation processing. In this case, only one suboperator is present: 
-        fitness_calculation, dedicated to calculation of fitness function value.
+        key - str, value - instance of a class, inhereted from the CompoundOperator.
+        Suboperators, performing tasks of equation processing. Three are
+        present, applied in this order per candidate target: ``sparsity``
+        (support selection), ``coeff_calc`` (physical magnitudes) and
+        ``fitness_calculation`` (the discrepancy candidates are ranked by).
 
     Methods:
     -----------
@@ -72,12 +88,12 @@ class EqRightPartSelector(CompoundOperator):
         ``VWSRSparsity.apply`` fall back to its legacy per-target path.
         """
         try:
-            if global_var.grid_cache is None:
+            # Guard the source this function actually reads: the per-trajectory
+            # manager (the old ``grid_cache`` check survived the multisample
+            # port but no longer gates anything used below).
+            if getattr(global_var, 'samples_manager', None) is None:
                 objective._gram_super = None
                 return
-            # sample_weights = global_var.grid_cache.g_func[
-            #     global_var.grid_cache.g_func_mask]
-            # grid_shape = global_var.grid_cache.inner_shape
             sample_weights = global_var.samples_manager.gFunc('dm')
             grid_shapes = global_var.samples_manager.inner_shapes
             feats = [term.evaluate() # grids=None
@@ -85,22 +101,60 @@ class EqRightPartSelector(CompoundOperator):
             feats = loDs_to_DoLs(feats)
             
             Z = dictApplyUFunc(lambda x: np.vstack(x).T, feats)
-            if not any([np.all(np.isfinite(z)) for z in Z.values()]):
+            if not all([np.all(np.isfinite(z)) for z in Z.values()]):
                 objective._gram_super = None
                 _loop_stats.record('EqRPS.gram_super_skip', 1, 1)
                 return
-            if global_var.gram_mode == 'vcoef':
+            gram_mode = active_config().objectives.gram_mode
+            if gram_mode == 'vcoef':
                 objective._gram_super = VaryingCoefSetup.precompute_super(Z, sample_weights, grid_shapes,
                                                                           main_var=objective.main_var_to_explain)
-            else:  # 'axis' backup
+            elif gram_mode == 'axis':  # backup
                 objective._gram_super = GramSetup.precompute_super(Z, sample_weights, grid_shapes)
+            else:
+                # Basis-free instability metric: no Gram is needed, but the
+                # cached Z still earns its keep -- it is what lets the sweep
+                # slice out each candidate's target/features without
+                # re-evaluating the terms.
+                objective._gram_super = {'mode': None, 'Z': Z}
             _loop_stats.record('EqRPS.gram_super_built', 1, 1)
-        except Exception:
+        except Exception as exc:
             # Defensive: any unexpected failure (shape mismatch, missing
-            # cache) means we silently fall back -- numerics are
-            # preserved, only the speedup is lost.
+            # cache) means we fall back -- numerics are preserved, only the
+            # speedup is lost. Reported ONCE per process rather than
+            # swallowed: a permanently-throwing fast path is invisible
+            # otherwise (it cost every sweep of the multisample port, where
+            # the dict of inner shapes was iterated as if it were a tuple).
             objective._gram_super = None
             _loop_stats.record('EqRPS.gram_super_skip', 1, 1)
+            global _SUPER_GRAM_FAILURE_REPORTED
+            if not _SUPER_GRAM_FAILURE_REPORTED:
+                _SUPER_GRAM_FAILURE_REPORTED = True
+                warnings.warn(
+                    'EqRightPartSelector._precompute_super_gram: the tier-3 '
+                    f'super-Gram fast path is disabled ({type(exc).__name__}: '
+                    f'{exc}). Falling back to the per-target path for the rest '
+                    'of this run.')
+
+    def _fit_and_score(self, objective: Equation, subop_args: dict):
+        """Fit ``objective`` for its CURRENT ``target_idx``, then score it.
+
+        This operator owns the fit. ``sparsity`` decides the support and
+        ``coeff_calc`` puts physical magnitudes on it; only then is the
+        fitness host -- a pure scorer that neither fits nor prunes -- asked
+        for the candidate's discrepancy. ``None`` comes back for a candidate
+        the host declines (all-zero support, a discrepancy over the degeneracy
+        threshold, or an amplified near-null fit).
+
+        The two ``force_out_of_place`` call sites (the term-sweep and the
+        exit-guarantee probe) must stay identical, which is why they share
+        this helper rather than repeating the three-step sequence.
+        """
+        self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
+        self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
+        return self.suboperators['fitness_calculation'].apply(
+            objective, arguments=subop_args['fitness_calculation'],
+            force_out_of_place=True)
 
     @_loop_stats.timed('EqRPS.apply')
     @HistoryExtender('\n -> The equation structure was detected: ', 'a')
@@ -137,7 +191,8 @@ class EqRightPartSelector(CompoundOperator):
                 break
             objective.reset_state(True)
             min_fitness = np.inf
-            weights_internal = np.zeros(len(objective.structure) - 1)
+            # One slot per non-target term plus the trailing intercept.
+            weights_internal = np.zeros(len(objective.structure))
             min_idx = 0
             inner_attempts = 0
             # ``restore_property(deriv=True)`` injects a derivative-family
@@ -169,7 +224,7 @@ class EqRightPartSelector(CompoundOperator):
                     if not objective.structure[target_idx].contains_deriv(objective.main_var_to_explain):
                         continue
                     objective.target_idx = target_idx
-                    fitness = self.suboperators['fitness_calculation'].apply(objective, arguments = subop_args['fitness_calculation'], force_out_of_place = True)
+                    fitness = self._fit_and_score(objective, subop_args)
                     if fitness is not None and fitness < min_fitness:
                         min_fitness = fitness
                         min_idx = target_idx
@@ -227,12 +282,12 @@ class EqRightPartSelector(CompoundOperator):
             deriv_idxs = [i for i, term in enumerate(objective.structure)
                           if term.contains_deriv(objective.main_var_to_explain)]
             chosen = None
-            if global_var.rps_amplification_cap is not None:
+            # Resolved once per apply, not once per candidate in the sweep.
+            amplification_cap = active_config().search_space.rps_amplification_cap
+            if amplification_cap is not None:
                 for cand_idx in deriv_idxs:
                     objective.target_idx = cand_idx
-                    cand_fit = self.suboperators['fitness_calculation'].apply(
-                        objective, arguments=subop_args['fitness_calculation'],
-                        force_out_of_place=True)
+                    cand_fit = self._fit_and_score(objective, subop_args)
                     objective.weights_internal_evald = False
                     objective.weights_final_evald = False
                     if cand_fit is not None:
@@ -242,6 +297,17 @@ class EqRightPartSelector(CompoundOperator):
                 chosen = deriv_idxs[0] if deriv_idxs else 0
             objective.target_idx = chosen
             _loop_stats.record('EqRPS.exit_target_fallback', 1, 1)
+        # EXIT CONTRACT: an equation leaves this operator FITTED, for the
+        # target that was actually installed. The probe above clears the
+        # weight flags after each candidate it tries and the ``outer_max_iter``
+        # break can leave them down too, so without this the scorer would be
+        # handed an equation with no support decision -- which it now refuses
+        # (SolverFreeFitness.apply) instead of quietly re-sparsifying, as the
+        # retired ``needs_sparsity`` fallback used to. Refitting here also
+        # repairs a real desync on that path: ``chosen`` could be installed
+        # while the weights still described a DIFFERENT candidate target.
+        if not getattr(objective, 'weights_internal_evald', False):
+            self._fit_and_score(objective, subop_args)
         objective.remove_zero_terms()
         # Hard invariant: no duplicate terms may leave RPS. simplify and
         # scrub both regenerate-then-drop, so a surviving duplicate is a
@@ -254,7 +320,11 @@ class EqRightPartSelector(CompoundOperator):
     def simplify_equation(self, objective: Equation):
         # Get nonzero terms
         tgt = objective.target_idx
-        nonzero_terms_mask = np.array([False if weight == 0 else True for weight in objective.weights_internal], dtype=np.int32)
+        # ``[:-1]`` drops the trailing intercept slot explicitly. Without it the
+        # mask is one longer than ``nonrs_terms`` and only the ``zip`` below
+        # hides the mismatch.
+        nonzero_terms_mask = np.array([False if weight == 0 else True
+                                       for weight in objective.weights_internal[:-1]], dtype=np.int32)
         nonrs_terms = [term for i, term in enumerate(objective.structure) if i != tgt]
         nonzero_terms = [item for item, keep in zip(nonrs_terms, nonzero_terms_mask) if keep]
         nonzero_terms.append(objective.target)
@@ -392,6 +462,17 @@ class EqRightPartSelector(CompoundOperator):
         identities -- is never touched, in keeping with the
         no-collinearity-machinery principle.
 
+        MULTISAMPLE SEMANTICS. The coefficient fit is run PER TRAJECTORY and
+        the resulting coefficient vectors are averaged (``VWSRSparsity.apply``),
+        so a rank-deficient solve in ONE sample already corrupts that sample's
+        coefficients and thereby the average. A term is therefore flagged when
+        its column is exactly dependent in ANY sample (union), and a candidate
+        replacement is accepted only when it is independent in EVERY sample.
+        Each sample keeps its OWN basis, normalised by its OWN column norm --
+        the same convention ``_flag_dependent_columns`` uses -- and nothing is
+        ever concatenated across samples: trajectories differ in length and
+        grid, so a stacked residual would not be comparable to ``_LIN_DEP_RTOL``.
+
         Returns True iff the structure changed; the caller's outer RPS loop
         then re-runs the term sweep and re-checks (bounded by its own
         iteration cap).
@@ -402,62 +483,65 @@ class EqRightPartSelector(CompoundOperator):
         cols = loDs_to_DoLs([term.evaluate() for term in feature_terms]) # grids=None
         cols: Dict[int, List[np.ndarray]] = dictApplyUFunc(lambda x: [np.asarray(elem, dtype=float).reshape(-1) for elem in x],
                                                            cols)
-        
-        # cols = [np.asarray(term.evaluate(False, grids=None),
-        #                    dtype=float).reshape(-1)
-        #         for term in feature_terms]
 
-        scan: Dict[Tuple[List[int], List[np.ndarray]]] = dictApplyUFunc(_flag_dependent_columns, cols)
+        scan: Dict[int, Tuple[List[int], List[np.ndarray]]] = dictApplyUFunc(_flag_dependent_columns, cols)
         if any([sc is None for sc in scan.values()]):
             # Non-finite column: dependence undecidable, mirror the
             # super-Gram skip rather than regenerating on a data problem.
             _loop_stats.record('simplify_equation.lin_dep_skip', 1, 1)
             return False
-        flagged_idxs, bases = defaultdict(list), defaultdict(list)
-        for sample_key, elem in scan.items():
-            flagged_idxs[sample_key] = elem[0]
-            bases[sample_key] = elem[1]
-        # flagged_idx, basis = scan
 
-        if not all(flagged_idxs.values()):
+        # Per-sample flagged column indices and per-sample kept bases. The
+        # indices address ``feature_terms``, which is sample-independent, so
+        # they are directly unionisable; the bases are NOT (different lengths).
+        bases: Dict[int, List[np.ndarray]] = {key: elem[1] for key, elem in scan.items()}
+        flagged_union = sorted({idx for elem in scan.values() for idx in elem[0]})
+
+        if not flagged_union:
             return False
 
-        def _independent(term, bases) -> bool:
-            term_evald = term.evaluate() # False,  grids=None
-            col = dictApplyUFunc(lambda x: np.asarray(x, dtype=float).reshape(-1), term_evald)
-            if not all(dictApplyUFunc(lambda x: np.all(np.isfinite(x)), col).values()):     # np.all(np.isfinite(col)):
+        def _independent(term) -> bool:
+            """True iff ``term``'s column is independent of the kept basis in
+            EVERY sample (per-sample unit normalisation, no concatenation)."""
+            col = dictApplyUFunc(lambda x: np.asarray(x, dtype=float).reshape(-1),
+                                 term.evaluate()) # grids=None
+            if set(col.keys()) != set(bases.keys()):
                 return False
-            nrm = np.mean(list(dictApplyUFunc(np.linalg.norm, col).values()))
-            if nrm == 0.0:
-                return False
-            u = np.concat(dictApplyUFunc(lambda x: x / nrm, col).values()) # / nrm
-            K = np.concat(dictApplyUFunc(lambda x: np.stack(x, axis=1), bases).values(), axis = 0)
-            coef, *_ = np.linalg.lstsq(K, u, rcond=None)
-            return np.linalg.norm(u - K @ coef) >= _LIN_DEP_RTOL
-
+            for key, basis in bases.items():
+                u = col[key]
+                if not np.all(np.isfinite(u)):
+                    return False
+                nrm = np.linalg.norm(u)
+                if nrm == 0.0:
+                    return False
+                u = u / nrm
+                K = np.stack(basis, axis=1)
+                coef, *_ = np.linalg.lstsq(K, u, rcond=None)
+                if np.linalg.norm(u - K @ coef) < _LIN_DEP_RTOL:
+                    return False
+            return True
 
         changed = False
-        for flagged_idx in flagged_idx[1:]:
-            assert flagged_idx == flagged_idx[0], 'Mismatching terms flagged idxs.'
-        for i in flagged_idx[0]:
+        for i in flagged_union:
             term = feature_terms[i]
-            indep_func = partial(_independent, bases=bases)
 
             status = _regen_or_drop_term(
                 objective, term, max_iter=100,
                 stats_name='simplify_equation.lin_dep',
-                extra_ok=indep_func)
+                extra_ok=_independent)
             if status == 'floor':
                 break
             if status in ('regenerated', 'dropped'):
                 changed = True
                 if status == 'regenerated':
-                    # The accepted replacement joins the basis so the
+                    # The accepted replacement joins each sample's basis so the
                     # remaining flagged terms are checked against it too.
-                    col = dictApplyUFunc(lambda x: np.asarray(x, dtype=float).reshape(-1), term.evaluate()) # grids=None
-
+                    col = dictApplyUFunc(lambda x: np.asarray(x, dtype=float).reshape(-1),
+                                         term.evaluate()) # grids=None
                     for key in bases.keys():
-                        bases[key].append(col[key] / np.linalg.norm(col[key]))
+                        nrm = np.linalg.norm(col[key])
+                        if nrm > 0.0:
+                            bases[key].append(col[key] / nrm)
         if changed:
             try:
                 objective.reset_state(reset_right_part=False)
@@ -477,13 +561,23 @@ class RandomRHPSelector(CompoundOperator):
     fitness function value is calculated. The term, corresponding to the separation with the highest FF value is 
     saved as the correct right part. 
     
+    THIS OPERATOR OWNS THE FIT. Each candidate target is sparsified, given
+    coefficients and only then scored (``_fit_and_score``) -- the fitness
+    hosts are pure scorers that neither fit nor prune. It is also the single
+    place that prunes: the one ``remove_zero_terms`` at the end of ``apply``,
+    after the sweep has chosen a winner. (That prune cannot move into the
+    sparsity operator, which runs per candidate and must keep every
+    candidate term.)
+
     Noteable attributes:
     -----------
     suboperators : dict
         Inhereted from the CompoundOperator class
-        key - str, value - instance of a class, inhereted from the CompoundOperator. 
-        Suboperators, performing tasks of equation processing. In this case, only one suboperator is present: 
-        fitness_calculation, dedicated to calculation of fitness function value.
+        key - str, value - instance of a class, inhereted from the CompoundOperator.
+        Suboperators, performing tasks of equation processing. Three are
+        present, applied in this order per candidate target: ``sparsity``
+        (support selection), ``coeff_calc`` (physical magnitudes) and
+        ``fitness_calculation`` (the discrepancy candidates are ranked by).
 
     Methods:
     -----------
@@ -597,8 +691,14 @@ def amplification_ratio(objective: Equation) -> float:
         A = sum_j |c_j| * ||col_j||  /  ||target col||
 
     over the nonzero non-target terms plus the fitted intercept
-    (``weights_internal = [*term_coefs, intercept]``, the
-    ``LinRegBasedCoeffsEquation`` layout). A ~ 1 when the terms combine
+    (``weights_internal = [*term_coefs, intercept]``, the unified layout of
+    ``Equation._validate_weight_layout``). The intercept's design column is the
+    constant ones-vector, so its contribution ``|c_0| * sqrt(n)`` is the SAME
+    ``|c_j| * ||col_j||`` rule -- ``sqrt(n) == ||1||_2`` -- just written out
+    because that column is never materialized. It used to be unreachable: the
+    guard was ``len(w) > len(nonrs)``, false while the sparsity operators
+    emitted a length-m ``weights_internal``, so every recorded A (truth anchors
+    1.0-6.65 against the cap of 100.0) was measured WITHOUT it. A ~ 1 when the terms combine
     without cancellation to the target's magnitude (every truth anchor
     measures A in [1.0, 6.65]); A >> 1 is the amplified-identity parasite,
     where near-cancelling giant coefficients fit the target out of the
@@ -620,20 +720,23 @@ def amplification_ratio(objective: Equation) -> float:
     t = dictApplyUFunc(lambda x: np.asarray(x, dtype=float).reshape(-1), 
                        objective.structure[tgt].evaluate()) # grids=()
     den = dictApplyUFunc(np.linalg.norm, t)
-    if (not any(list(dictApplyUFunc(np.isfinite, den).values())) or
+    if (not all(list(dictApplyUFunc(np.isfinite, den).values())) or
         any([d == 0.0 for d in den.values()])):
         return np.inf
     nonrs = [term for i, term in enumerate(objective.structure) if i != tgt]
 
     num = defaultdict(float) # 0.0
-    for wj, term in zip(w[:len(nonrs)], nonrs):
+    for wj, term in zip(w[:-1], nonrs):
         if wj == 0.0:
             continue
         col = dictApplyUFunc(lambda x: np.asarray(x, dtype=float).reshape(-1), term.evaluate()) # grids=()
         num = dictAdd(num, dictApplyUFunc(lambda x: abs(wj) * np.linalg.norm(x), col), suppressed=True)
 
-    if len(w) > len(nonrs) and w[-1] != 0.0:
-        num = dictAdd(num, abs(w[-1]) * np.sqrt(t.size))  # intercept column of ones
+    if w[-1] != 0.0:
+        # Intercept column of ones: its norm is sqrt(n) PER SAMPLE, and ``t`` is
+        # the dict of per-sample target columns -- not a single array.
+        num = dictAdd(num, dictApplyUFunc(lambda x: abs(w[-1]) * np.sqrt(x.size), t),
+                      suppressed=True)
 
     num = dictApplyUFunc(np.divide, num, den)
 
@@ -717,10 +820,25 @@ def _regen_or_drop_term(equation: Equation, term, *, max_iter: int = 100,
     if len(equation.structure) <= min_terms:
         equation._invalidate_label_cache()
         return 'floor'
+    # Capture the dropped term's weight slot BEFORE mutating the structure.
+    drop_idx = next((j for j, t in enumerate(equation.structure) if t is drop_term), None)
+    tgt_idx = equation.target_idx
     equation.structure = [t for t in equation.structure if t is not drop_term]
     # No manual target_idx decrement: the identity-tracked target auto-tracks
     # the surviving target Term (``drop_term`` is never the target -- the
     # branch above reroutes a target collision to the other duplicate).
+    # Drop the matching weight slot from both vectors so they keep describing
+    # the structure they are indexed against (Equation._validate_weight_layout).
+    # Leaving them one slot too long is mostly masked -- the RPS outer loop
+    # re-runs and ``reset_state(True)`` nulls them -- but not on the cap-break
+    # path, where the stale vectors flow straight into ``remove_zero_terms``
+    # off by one for every term past the dropped one.
+    if drop_idx is not None and tgt_idx is not None and drop_idx != tgt_idx:
+        wpos = equation.weight_index(drop_idx, tgt_idx)
+        if getattr(equation, 'weights_internal_evald', False):
+            equation.weights_internal = np.delete(np.asarray(equation.weights_internal), wpos)
+        if getattr(equation, 'weights_final_evald', False):
+            equation.weights_final = np.delete(np.asarray(equation.weights_final), wpos)
     equation._invalidate_label_cache()
     return 'dropped'
 

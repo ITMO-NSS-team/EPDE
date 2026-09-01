@@ -5,13 +5,18 @@ Created on Fri Jun  4 13:20:59 2021
 
 @author: mike_ubuntu
 
-Fitness host operators. Each owns ONE responsibility: run the shared
-scaffolding (sparsity -> coefficient fit -> context) and delegate every
-scalar objective to a pluggable *filler* from
-``epde.operators.common.objectives``.
+Fitness host operators. Each owns ONE responsibility: SCORE an
+already-fitted equation, delegating every scalar objective to a pluggable
+*filler* from ``epde.operators.common.objectives``.
+
+The hosts have no suboperators. Support selection (``sparsity``) and the
+coefficient refit (``coeff_calc``) belong to ``EqRightPartSelector``, which
+runs both before every call into a host -- per candidate target during its
+term-sweep, and once for the winner -- and is the only operator that prunes
+zero-weight terms.
 
 * :class:`SolverFreeFitness` -- gene-level; hosts solver-free fillers
-  (``L2Discrepancy`` / ``WAPEDiscrepancy`` / ``Instability`` / ...).
+  (``Discrepancy`` / ``Instability`` / ``Complexity`` / ...).
   Replaces the former ``L2Fitness`` and ``L2LRFitness``.
 * :class:`SolverBasedFitness` -- chromosome-level; solves the system once
   via a PDE backend (autograd ``SolverAdapter`` or DeepXDE) and hosts
@@ -20,8 +25,9 @@ scalar objective to a pluggable *filler* from
   former ``SolverBasedFitness``, ``PIC`` and ``DeepXDEBasedFitness``.
 
 The metric logic lives in the fillers (single responsibility); the hosts
-only orchestrate the fit and write each filler's value to its attribute.
+only build the scoring context and write each filler's value to its attribute.
 """
+import warnings
 from copy import deepcopy
 
 import numpy as np
@@ -35,8 +41,9 @@ from epde.integrate import SolverAdapter
 # triggering deepxde's import-time backend banner when no DeepXDE solver
 # is used (the solver-free path never imports it).
 from epde.structure.main_structures import SoEq, Equation
-from epde.operators.utils.template import CompoundOperator, dictApplyUFunc
+from epde.operators.utils.template import CompoundOperator
 import epde.globals as global_var
+from epde.interface.search_config import active_config
 # Re-exported so ``from epde.operators.common.fitness import
 # vc_stability_total_lr`` keeps working for external callers
 # (e.g. projects/thesis/_vc_cache_gate.py).
@@ -52,11 +59,18 @@ from epde import _loop_stats
 class SolverFreeFitness(CompoundOperator):
     """Solver-free fitness host (gene level).
 
-    Runs ``sparsity`` (when the primary filler asks) and ``coeff_calc``,
-    then evaluates each configured objective filler and stores its scalar
-    on the equation. The ``primary`` filler (a discrepancy) drives the
-    right-part-selection scaffolding and is the value returned for
+    A PURE SCORER: it has no suboperators, fits nothing and changes no
+    structure. Given an equation whose support and coefficients are already
+    set, it evaluates each configured objective filler and stores that
+    filler's scalar on the equation. The ``primary`` filler (a discrepancy)
+    drives the right-part-selection scaffolding and is the value returned for
     ``EqRightPartSelector``'s ``force_out_of_place`` term-sweep.
+
+    Fitting is :class:`~epde.operators.common.right_part_selection.EqRightPartSelector`'s
+    job: it applies ``sparsity`` then ``coeff_calc`` before every call into
+    here, and is the only operator that prunes (``remove_zero_terms``, once,
+    after its sweep). Scoring an equation with no ``weights_internal``
+    raises rather than quietly fitting it.
 
     Parameters
     ----------
@@ -79,25 +93,29 @@ class SolverFreeFitness(CompoundOperator):
 
     @_loop_stats.timed('SolverFreeFitness.apply')
     def apply(self, objective: Equation, arguments: dict, force_out_of_place: bool = False):
-        self_args, subop_args = self.parse_suboperator_args(arguments=arguments)
-
         penalty_coeff = self.params['penalty_coeff']
         if not (penalty_coeff > 0. and penalty_coeff < 1.):
             raise ValueError('Incorrect penalty coefficient set, value shall be in (0, 1).')
 
         primary = self.primary
-        # Sparsity is run when the primary (discrepancy) filler asks for it:
-        # always during the RPS sweep, and as a fallback in-place when the
-        # equation lacks a valid weights_internal state (see L2Discrepancy /
-        # WAPEDiscrepancy.needs_sparsity, lifted from the old operators).
-        if primary.needs_sparsity(objective, force_out_of_place):
-            self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
-            # During the RPS term-sweep a degenerate (all-zero-weight)
-            # candidate is skipped by returning None; in-place we always
-            # fall through to a finite value.
-            if force_out_of_place and primary.is_degenerate(objective):
-                return None
-        self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
+        # THIS HOST SCORES; IT DOES NOT FIT. The support decision (sparsity)
+        # and the coefficient refit belong to EqRightPartSelector, which runs
+        # both before every call into here -- once per candidate target during
+        # its term-sweep, and once more for the winner. Owning them here is
+        # what let the in-place pass silently re-sparsify an already-fitted
+        # equation and then prune its structure, which in turn made the
+        # post-RPS structural label unreliable for the MOEA/D history dedup.
+        if not getattr(objective, 'weights_internal_evald', False):
+            raise RuntimeError(
+                'SolverFreeFitness: scoring an equation with no support '
+                'decision. Sparsity must run before fitness -- '
+                'EqRightPartSelector owns it (suboperators "sparsity" and '
+                f'"coeff_calc"). target={objective.main_var_to_explain!r}')
+        # During the RPS term-sweep a degenerate (all-zero-weight) candidate is
+        # skipped by returning None; in-place we always fall through to a
+        # finite value.
+        if force_out_of_place and primary.is_degenerate(objective):
+            return None
 
         g_fun_vals = global_var.samples_manager.gFunc('dmf')
         data_shapes = global_var.samples_manager.inner_shapes
@@ -129,23 +147,17 @@ class SolverFreeFitness(CompoundOperator):
                 return None
             return val
 
-        # In-place finalization: weights_internal has selected the sparse
-        # support, so physically prune the now-dead zero-weight terms before
-        # objectives are scored and the structure is stored/rendered -- the
-        # standing in-place counterpart to the remove_zero_terms that
-        # EqRightPartSelector runs after its own sweep. Applied
-        # UNCONDITIONALLY (not just on the sparsity fallback): an equation can
-        # reach the front carrying weights_internal zeros that were never
-        # pruned (a survivor whose support tightened without a following
-        # prune), which otherwise desyncs text_form (it indexes the compacted
-        # weights_final by full-structure position) -- the spurious
-        # cross-equation "leak" render artefact. Safe now that
-        # remove_zero_terms compacts weights_internal in lockstep; scoring is
-        # unaffected (the fillers read weights_final / evaluate()). The RPS
-        # sweep returned above, so this never runs out-of-place (which must
-        # keep every candidate term).
-        if getattr(objective, 'weights_internal_evald', False):
-            objective.remove_zero_terms()
+        # NOTHING IS PRUNED HERE. The single prune in the pipeline is the
+        # ``remove_zero_terms`` at the end of EqRightPartSelector.apply, once
+        # its sweep has chosen a winner; the in-place counterpart that used to
+        # live at this point is gone. Leaving zero-weight terms in the
+        # structure is safe under the unified coefficient layout
+        # (Equation._validate_weight_layout): both weight vectors are
+        # structure-aligned with zeros retained, so text_form / latex_form
+        # index correctly, ``_extract_coefs_intercept`` reconciles the wide and
+        # active_only column widths, and the complexity cores count
+        # weights_internal non-zeros rather than structure length. The comment
+        # that used to defend the prune described the retired nnz+1 layout.
 
         # An equation that RPS left unfitted -- e.g. every candidate target in its
         # term-sweep was declined by the degeneracy check (discrepancy over the
@@ -194,19 +206,19 @@ class SolverFreeFitness(CompoundOperator):
         objective.aic_calculated = True
 
     def use_default_tags(self):
-        self._tags = {'fitness evaluation', 'gene level', 'contains suboperators', 'inplace'}
+        self._tags = {'fitness evaluation', 'gene level', 'no suboperators', 'inplace'}
 
 
 def _amplification_trips(objective) -> bool:
     """True when the CURRENT fit only reaches its target by amplifying the
     residual of a near-null feature combination: guard ratio
-    A = sum|c|*||col|| / ||target|| above ``global_var.rps_amplification_cap``
+    A = sum|c|*||col|| / ||target|| above ``search_space.rps_amplification_cap``
     (None disables). Shared by the RPS-sweep decline (out-of-place -> return
     None, exactly like the all-features-zeroed case) and the in-place
     condemnation stamp, so the verdict is identical no matter which path
     installed the target. Deferred import: the ratio lives with the RPS
     machinery."""
-    cap = getattr(global_var, 'rps_amplification_cap', None)
+    cap = active_config().search_space.rps_amplification_cap
     if cap is None:
         return False
     from epde.operators.common.right_part_selection import amplification_ratio
@@ -237,6 +249,8 @@ class SolverBasedFitness(CompoundOperator):
                  backend: str = 'autograd', masked: bool = False):
         super().__init__(param_keys)
         self.adapter = None
+        #: Resolved in ``set_adapter``; the device the net and the grids share.
+        self.solver_device = 'cpu'
         self.backend = backend
         self.masked = masked
         self.objectives = list(objectives) if objectives else []
@@ -252,6 +266,25 @@ class SolverBasedFitness(CompoundOperator):
         if instability is not None and all(instability is not obj for obj in self.objectives):
             self.objectives.append(instability)
 
+    @staticmethod
+    def _resolved_device() -> str:
+        """The device the solver runs on.
+
+        ``torch.cuda.is_available`` used to be read as a FUNCTION OBJECT and
+        never called -- always truthy -- next to a hardcoded
+        ``explicit_cpu = False``, so this said 'cuda' unconditionally and
+        ignored ``solver.device`` outright. The solver then put its net on cuda
+        while the grids stayed on cpu.
+        """
+        device = active_config().solver.device
+        if str(device).startswith('cuda') and not torch.cuda.is_available():
+            warnings.warn(
+                f"solver.device={device!r} requested but CUDA is not "
+                "available; falling back to cpu.",
+                global_var.EPDEUsageWarning, stacklevel=3)
+            return 'cpu'
+        return device
+
     def set_adapter(self, net=None, pretrained_net=None):
         if self.backend == 'deepxde':
             if self.adapter is None:
@@ -259,25 +292,37 @@ class SolverBasedFitness(CompoundOperator):
                 cfg = self.params.get('deepxde_config', {})
                 self.adapter = DeepXDEAdapter(pretrained_net=pretrained_net, **cfg)
             return
+        # Resolved unconditionally, not just when the adapter is (re)built:
+        # ``_apply_autograd`` has to put its grid stack on the same device the
+        # trained net ends up on.
+        self.solver_device = self._resolved_device()
         if self.adapter is None or net is not None:
             compiling_params = {'mode': 'autograd', 'tol': 0.01, 'lambda_bound': 100}
             optimizer_params = {}
             training_params = {'epochs': 1e3, 'info_string_every': 1e3}
             early_stopping_params = {'patience': 4, 'no_improvement_patience': 250}
-            explicit_cpu = False
-            device = 'cuda' if (torch.cuda.is_available and not explicit_cpu) else 'cpu'
-            self.adapter = SolverAdapter(net=net, use_cache=False, device=device)
+            self.adapter = SolverAdapter(net=net, use_cache=False,
+                                         device=self.solver_device)
             self.adapter.set_compiling_params(**compiling_params)
             self.adapter.set_optimizer_params(**optimizer_params)
             self.adapter.set_early_stopping_params(**early_stopping_params)
             self.adapter.set_training_params(**training_params)
 
     def apply(self, objective: SoEq, arguments: dict, force_out_of_place: bool = False):
-        self_args, subop_args = self.parse_suboperator_args(arguments=arguments)
-        if force_out_of_place:
-            self.suboperators['sparsity'].apply(objective, subop_args['sparsity'])
-        self.suboperators['coeff_calc'].apply(objective, subop_args['coeff_calc'])
-
+        # No suboperators: like SolverFreeFitness this host only scores, and
+        # the system it is handed has already been fitted by
+        # EqRightPartSelector. (The ``force_out_of_place`` sparsity call that
+        # used to sit here was unreachable -- the RPS sweep dispatches to
+        # ``fitness_calculation``, which on the solver path is a separate
+        # lightweight SolverFreeFitness, never this host.)
+        unfitted = [eq.main_var_to_explain for eq in objective.vals
+                    if not getattr(eq, 'weights_internal_evald', False)]
+        if unfitted:
+            raise RuntimeError(
+                'SolverBasedFitness: solving a system whose equations have no '
+                'support decision. Sparsity must run before fitness -- '
+                'EqRightPartSelector owns it (suboperators "sparsity" and '
+                f'"coeff_calc"). unfitted={unfitted}')
         if self.backend == 'deepxde':
             return self._apply_deepxde(objective, force_out_of_place)
         return self._apply_autograd(objective, force_out_of_place)
@@ -293,32 +338,68 @@ class SolverBasedFitness(CompoundOperator):
             data_shape = None
         return g_fun_vals, data_shape
 
+    @staticmethod
+    def _pretrained_net():
+        """The data-representation net, when one was trained.
+
+        ``global_var.solution_guess_nn`` is written only by
+        ``reset_data_repr_nn``, whose two call sites in ``interface.py`` are
+        commented out -- so the name normally does NOT exist, and reading a
+        missing module attribute raises ``AttributeError``. The old guard here
+        caught ``NameError``, which is what a missing *local* raises, so every
+        autograd solve died on its first line.
+        """
+        return deepcopy(getattr(global_var, 'solution_guess_nn', None))
+
+    @staticmethod
+    def _grid_stack(grids):
+        """One trajectory's coordinates as a single ``(n_points, n_dims)``
+        float tensor.
+
+        Fed the ``mode='solver'`` grids: the reference data
+        (``samples_manager.get``) and everything ``Equation.evaluate`` produces
+        live on the INNER domain -- the boundary is pruned away -- so sampling
+        the solution on the FULL grid, as this did, compared 100 points against
+        80 values.
+        """
+        columns = [torch.as_tensor(np.asarray(grid).reshape(-1)) for grid in grids]
+        return torch.stack(columns, dim=1).float()
+
+    # NOTE: the caller moves the stack onto ``self.solver_device`` -- the net
+    # is put there by SolverAdapter.solve, and the original code never moved
+    # the grids at all, so a cuda run died in the first matmul.
+
     def _apply_autograd(self, objective, force_out_of_place):
-        try:
-            net = deepcopy(global_var.solution_guess_nn)
-        except NameError:
-            net = None
-        self.set_adapter(net=net)
+        self.set_adapter(net=self._pretrained_net())
 
         print('solving equation:')
         print(objective.text_form)
-        loss_add, solution_nn = self.adapter.solve_epde_system(
-            system=objective, grids=None, boundary_conditions=None, use_fourier=True)
 
-        # _, grids = global_var.grid_cache.get_all(mode='torch')
-        grids = global_var.samples_manager.grids()
+        samples = global_var.samples_manager
+        grids = samples.grids(mode='solver')
+        # Both branches take the inner-domain weighting now: ``self.masked``
+        # used to pick between the full-grid g and the masked one, but the
+        # reference data has been inner-domain-only since the caches were
+        # pruned, so the full-grid option no longer lines up with anything to
+        # compare against.
+        g_fun_vals = samples.gFunc('dmf')
 
-        if self.masked:
-            # g_mask = global_var.grid_cache.g_func_mask
-            # grids = [grid[g_mask] for grid in grids]
-            # g_fun_vals = global_var.grid_cache.g_func[g_mask]
-            g_fun_vals = global_var.samples_manager.gFunc('dmf')
-        else:
-            g_fun_vals = global_var.samples_manager.gFunc('d')
-        grids = torch.stack([grid.reshape(-1) for grid in grids], dim=1).float()
-        solution = solution_nn(grids).detach().cpu().numpy()
+        # One solve per trajectory: each carries its own domain, and the solver
+        # fillers (Discrepancy's 'solver_l2' / 'pic' options) index
+        # ``sctx.solution`` and ``sctx.g_fun_vals`` by trajectory key.
+        solutions, losses = {}, []
+        for domain_key in samples.trajecatoryIDs:
+            loss_add, solution_nn = self.adapter.solve_epde_system(
+                system=objective, domain_key=domain_key, grids=None,
+                boundary_conditions=None, use_fourier=True)
+            losses.append(loss_add)
+            grid_stack = self._grid_stack(grids[domain_key]).to(self.solver_device)
+            solutions[domain_key] = solution_nn(grid_stack).detach().cpu().numpy()
+        # Mean, not sum: the per-trajectory losses are the same quantity
+        # measured on different samples, and ``pinn_loss_mult`` scales it.
+        loss_add = sum(losses) / len(losses)
 
-        sctx = SolverContext(solution=solution, loss_add=loss_add, g_fun_vals=g_fun_vals,
+        sctx = SolverContext(solution=solutions, loss_add=loss_add, g_fun_vals=g_fun_vals,
                              penalty_coeff=self.params['penalty_coeff'],
                              pinn_loss_mult=self.params['pinn_loss_mult'])
         sw_g, data_shape = self._build_fit_context()
@@ -343,11 +424,7 @@ class SolverBasedFitness(CompoundOperator):
             return sum_err
 
     def _apply_deepxde(self, objective, force_out_of_place):
-        try:
-            pretrained_net = deepcopy(global_var.solution_guess_nn)
-        except Exception:
-            pretrained_net = None
-        self.set_adapter(pretrained_net=pretrained_net)
+        self.set_adapter(pretrained_net=self._pretrained_net())
 
         # Keep the 'deepxde' family option's config in sync with host params
         # (the legacy DeepXDEBasedFitness read these from self.params).
@@ -355,23 +432,35 @@ class SolverBasedFitness(CompoundOperator):
             self.primary.error_metric = self.params.get('error_metric', 'rmse')
             self.primary.penalty_coeff = self.params.get('penalty_coeff', 0.2)
 
-        grids = global_var.samples_manager.grids()
-        mask_flat = dictApplyUFunc(lambda x: x.reshape(-1), global_var.samples_manager.gFunc('m'))
+        samples = global_var.samples_manager
+        grids = samples.grids()
+        masks = samples.gFunc('m')
 
         if isinstance(objective, SoEq):
             eqs = [objective.vals[v] for v in objective.vars_to_describe]
         else:
             eqs = [objective]
-        data_list = []
-        for eq in eqs:
-            _, target, _ = eq.evaluate(normalize=False, return_val=False)
-            data_list.append(target.reshape(-1))
+        # ``evaluate`` returns a per-trajectory dict; the old code called
+        # ``.reshape(-1)`` straight on it.
+        targets = [eq.evaluate(active_only=True)[0] for eq in eqs]
 
+        # One solve per trajectory: DeepXDE builds a single geometry from a
+        # single grid, and the fillers index sctx by trajectory key.
+        solutions, per_sample_data, losses = {}, {}, []
         try:
-            solution_list, loss = self.adapter.solve(
-                equation_or_system=objective, grids=grids, data=data_list)
-            if np.isnan(loss):
-                raise ValueError('NaN loss')
+            for domain_key in samples.trajecatoryIDs:
+                data_list = [np.asarray(target[domain_key]).reshape(-1)
+                             for target in targets]
+                solution_list, loss = self.adapter.solve(
+                    equation_or_system=objective, grids=grids[domain_key],
+                    data=data_list, domain_key=domain_key)
+                if np.isnan(loss):
+                    raise ValueError('NaN loss')
+                flat_mask = np.asarray(masks[domain_key]).reshape(-1)
+                solutions[domain_key] = [np.asarray(sol).reshape(-1)[flat_mask]
+                                         for sol in solution_list]
+                per_sample_data[domain_key] = data_list
+                losses.append(float(loss))
         except Exception as exc:
             print(f'[SolverBasedFitness/deepxde] DeepXDE solve failed: {exc}')
             if force_out_of_place:
@@ -380,16 +469,17 @@ class SolverBasedFitness(CompoundOperator):
                 eq.fitness_value = LOSS_NAN_VAL
                 eq.fitness_calculated = True
             return
+        loss = float(np.mean(losses))
 
         sw_g, data_shape = self._build_fit_context()
         fit_ctx = FitContext(g_fun_vals=sw_g, data_shape=data_shape,
                              penalty_coeff=self.params.get('penalty_coeff', 0.2),
                              for_rps=False)
-        # Pack per-eq masked (solution, data) for DeepXDEError.
-        masked_solutions = [solution_list[i][mask_flat] for i in range(len(eqs))]
-        masked_data = [data_list[i] for i in range(len(eqs))]
-        sctx = SolverContext(solution=masked_solutions, loss_add=loss,
-                             g_fun_vals=masked_data,
+        # DeepXDEError reads sctx.solution[key][eq_idx] against
+        # sctx.g_fun_vals[key][eq_idx] -- masked solution against the
+        # inner-domain data, per trajectory.
+        sctx = SolverContext(solution=solutions, loss_add=loss,
+                             g_fun_vals=per_sample_data,
                              penalty_coeff=self.params.get('penalty_coeff', 0.2),
                              pinn_loss_mult=0.0)
 
@@ -410,7 +500,7 @@ class SolverBasedFitness(CompoundOperator):
             return total_err / max(len(eqs), 1)
 
     def use_default_tags(self):
-        self._tags = {'fitness evaluation', 'chromosome level', 'contains suboperators', 'inplace'}
+        self._tags = {'fitness evaluation', 'chromosome level', 'no suboperators', 'inplace'}
 
 
 def plot_data_vs_solution(grid, data, solution):
