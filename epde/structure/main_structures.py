@@ -78,7 +78,6 @@ class Term(ComplexStructure):
         structure:
         occupied_tokens_labels:
         descr_variable_marker:
-        prev_normalized
     """
     __slots__ = ['_history', 'structure', 'interelement_operator', 'saved', 'saved_as',
                  'pool', 'max_factors_in_term', 'cache_linked', 'occupied_tokens_labels',
@@ -256,7 +255,6 @@ class Term(ComplexStructure):
             values = {key: value.reshape(-1) for key, value in values.items()}
             return values
         else:
-            self.prev_normalized = False
             values = super().evaluate()
             # if normalize:
             # # As normalize is always false, the block seems to be depricated ()
@@ -662,10 +660,11 @@ class Equation(ComplexStructure):
     def remove_zero_terms(self):
         if self.weights_internal_evald:
             wi = self._weights_internal
-            # weights_internal: one coef per non-target term, optionally a
-            # trailing intercept slot (VWSR: len == m+1; legacy LASSO: len == m).
+            # Both weight vectors are length m+1: one coef per non-target term,
+            # then the intercept (Equation._validate_weight_layout). The former
+            # ``has_intercept = len(wi) == m + 1`` sniff existed only because the
+            # sparsity operators used to emit a bare length-m ``estimator.coef_``.
             m = len(self.structure) - 1
-            has_intercept = len(wi) == m + 1
             # Capture the PRE-drop target position once for the weight-index
             # map below. The target Term is never zero-weight-dropped (the
             # ``i == tgt`` skip keeps it), so its identity survives and the
@@ -677,7 +676,7 @@ class Equation(ComplexStructure):
             for i in range(len(self.structure)):
                 if i == tgt:
                     continue
-                idx = i if i < tgt else i - 1
+                idx = self.weight_index(i, tgt)
                 if wi[idx] == 0:
                     zero_terms.append(i)
                     zero_coef_pos.append(idx)
@@ -685,16 +684,18 @@ class Equation(ComplexStructure):
                 self.structure = [term for term_idx, term in enumerate(self.structure) if term_idx not in zero_terms]
                 # No ``self.target_idx -= ...`` -- the identity-tracked target
                 # auto-tracks the surviving target Term.
-                # Compact weights_internal in lockstep with the structure so
-                # later position-indexed reads (active_terms_labels, the
-                # intercept slot, re-prune) stay aligned. weights_final already
-                # holds only the non-zero entries, so it needs no surgery.
-                if has_intercept or zero_coef_pos:
-                    zcp = set(zero_coef_pos)
-                    kept = [wi[j] for j in range(m) if j not in zcp]
-                    if has_intercept:
-                        kept.append(wi[-1])
-                    self._weights_internal = np.array(kept)
+                # Compact BOTH vectors in lockstep with the structure so later
+                # position-indexed reads (active_terms_labels, the renderers,
+                # re-prune) stay aligned, each keeping its own trailing
+                # intercept slot. weights_final used to be skipped here -- "it
+                # already holds only the non-zero entries" was true of the old
+                # zero-filtered nnz+1 layout and is false under the unified one.
+                zcp = set(zero_coef_pos)
+                keep = [j for j in range(m) if j not in zcp]
+                self._weights_internal = np.array([wi[j] for j in keep] + [wi[-1]])
+                if self.weights_final_evald:
+                    wf = self._weights_final
+                    self._weights_final = np.array([wf[j] for j in keep] + [wf[-1]])
                 # ``_invalidate_label_cache`` also wipes _eval_cache, which
                 # is essential here: the right-part-selector's per-target
                 # sweep populates the cache keyed on target_idx, and the
@@ -848,49 +849,56 @@ class Equation(ComplexStructure):
         new_eq.resetSavedState()
         return new_eq
 
+    def _feature_indexes(self, active_only: bool, tgt: int) -> List[int]:
+        """Structure positions that become feature columns, in structure order.
+
+        Every term but the target, or -- under ``active_only`` -- only those the
+        sparsity step left with a non-zero ``weights_internal`` slot. This is
+        what makes ``evaluate`` emit two widths from one structure.
+        ``Equation.active_mask`` is the same predicate expressed over weight
+        positions, so ``weights_final[:-1][active_mask]`` narrows a coefficient
+        vector onto exactly the ``active_only`` column set.
+        """
+        if not active_only:
+            return [idx for idx in range(len(self.structure)) if idx != tgt]
+        return [idx for idx in range(len(self.structure))
+                if idx != tgt and self.weights_internal[self.weight_index(idx, tgt)] != 0]
+
     @_loop_stats.timed('Equation.evaluate')
-    def evaluate(self, normalize: bool = True, return_val: bool = False,
-                 grids: list = None) -> Tuple[Union[None, Dict[int, np.ndarray]], 
-                                              Dict[int, np.ndarray],
-                                              Dict[int, np.ndarray]]:
-        """Evaluate the equation and return (value, target, features).
+    def evaluate(self, *, active_only: bool = False) -> Tuple[Dict[int, np.ndarray],
+                                                              Union[None, Dict[int, np.ndarray]]]:
+        """Evaluate the equation into ``(target, features)``, per trajectory.
 
-        ``target`` is the LHS term values; ``features`` is a 2-D matrix of the
-        non-target term evaluations (``None`` if every other term is zero-weight
-        and ``normalize=False``); ``value`` is the residual when
-        ``return_val=True`` else ``None``.
+        ``target`` holds the LHS term's values; ``features`` is the design
+        matrix of the remaining terms, one column each, or ``None`` when no term
+        qualifies.
 
-        Caching policy: results are cached per
-        (normalize, return_val, grids-is-None, target_idx) when
-        ``grids is None`` AND ``normalize`` is True. The ``normalize=False``
-        branch additionally filters ``feature_indexes`` by the current
-        ``weights_internal`` (lines below); since callers update weights
-        between successive ``evaluate(normalize=False)`` calls, caching that
-        branch would risk returning stale (target, features) tuples with
-        out-of-date feature masks. ``normalize=True`` is weight-independent
-        and is the path benefitting from cache hits (sparsity then L2LRFitness
-        both call ``evaluate(normalize=True)`` in one fitness invocation).
+        ``active_only`` picks the COLUMN SET -- it applies no scaling of any
+        kind. The flag was called ``normalize`` for years, from the days when
+        ``Term`` carried a normalisation flag of its own; ``Term.evaluate`` no
+        longer does (the block survives only commented out, above). ``False``
+        (the default) makes a column of every non-target term; ``True`` keeps
+        only those with a non-zero ``weights_internal`` slot -- the narrow width
+        that ``objectives._extract_coefs_intercept`` masks ``weights_final``
+        down to.
+
+        Caching policy: only the default, wide result is memoized, keyed on
+        ``target_idx``. The ``active_only`` branch reads ``weights_internal``
+        and callers update the weights between successive calls, so caching it
+        would hand back a stale column mask. The wide path is weight-independent
+        and is where the hits are -- the sparsity step and the fitness fillers
+        both take it within one fitness invocation.
         """
         tgt = self.target_idx          # identity-derived position, captured once
-        cacheable = (grids is None) and normalize
-        cache_key = (normalize, return_val, grids is None, tgt)
-        if cacheable and hasattr(self, '_eval_cache') and cache_key in self._eval_cache:
-            return self._eval_cache[cache_key]
+        cacheable = not active_only
+        if cacheable and hasattr(self, '_eval_cache') and tgt in self._eval_cache:
+            return self._eval_cache[tgt]
 
-        targets = self.target.evaluate(grids=grids)
+        targets = self.target.evaluate()
 
-        if normalize:
-            feature_indexes = [i for i in range(len(self.structure)) if i != tgt]
-        else:
-            feature_indexes = []
-            for idx in range(len(self.structure)):
-                if idx == tgt:
-                    continue
-                shifted = idx if idx < tgt else idx - 1
-                if self.weights_internal[shifted] != 0:
-                    feature_indexes.append(idx)
+        feature_indexes = self._feature_indexes(active_only, tgt)
         if len(feature_indexes) > 0:
-            feats_list = [self.structure[idx].evaluate(grids=grids) for idx in feature_indexes] # False, 
+            feats_list = [self.structure[idx].evaluate() for idx in feature_indexes]
 
             samples_by_features: Dict[int, List[np.ndarray]] = dict()
             for feat_idx in range(len(feats_list)):
@@ -923,36 +931,57 @@ class Equation(ComplexStructure):
         else:
             features = None
 
-        if return_val:
-            values: Dict[int, np.ndarray] = dict()
-            for key in features.keys():
-                temp_feats = np.vstack([features[key], np.ones(features[key].shape[1])])
-                temp_feats = np.transpose(temp_feats)
-                self.prev_normalized = normalize
-                if normalize:
-                    elem1 = np.expand_dims(targets[idx], axis=1)
-                    values[key] = np.add(elem1, - reduce(lambda x, y: np.add(x, y), [np.multiply(self.weights_internal[idx_full],
-                                                                                                 temp_feats[:, idx_sparse])
-                                                                                     for idx_sparse, idx_full in enumerate(feature_indexes)]))
-                                                                            # for feature_idx, weight in np.ndenumerate(self.weights_internal)]))
-                else:
-                    elem1 = np.expand_dims(targets[idx], axis=1)
-                    if features is not None:
-                        features_val = reduce(lambda x, y: np.add(x, y), [np.multiply(self.weights_final[idx_full], temp_feats[:, idx_sparse])
-                                                                        for idx_sparse, idx_full in enumerate(feature_indexes)]) # Possible mistake here
-                        features_val = np.expand_dims(features_val, axis=1)
-                    else:
-                        features_val = np.zeros_like(targets[key])
-                    values[key] = np.add(elem1, - features_val)
-            result = (values, targets, features)
-        else:
-            result = (None, targets, features)
-
+        result = (targets, features)
         if cacheable:
             if not hasattr(self, '_eval_cache'):
                 self._eval_cache = {}
-            self._eval_cache[cache_key] = result
+            self._eval_cache[tgt] = result
         return result
+
+    def residual(self, *, active_only: bool = False) -> Dict[int, np.ndarray]:
+        """``target - (features @ coefs + intercept)``, one 1-D array per
+        trajectory.
+
+        Split out of ``evaluate``'s old ``return_val`` flag, which selected no
+        evaluation option but a different operation -- and computed it wrongly.
+        Four defects, every one of them invisible because the only caller
+        (``epde.interface.logger.Logger.add_log``) is itself unreachable:
+
+        * the intercept column was built as ``np.vstack([features, ones])``,
+          appending a ROW to an ``(n_points, n_features)`` matrix, so after the
+          transpose the weighted sum came out ``n_features`` long and the
+          subtraction against an ``(n_points, 1)`` target could only broadcast
+          when the two happened to be equal;
+        * that ones-column was then never read -- the sum ran over the feature
+          indexes alone, so the intercept was silently dropped;
+        * ``targets[idx]`` leaked the ``idx`` of the feature-index loop, where it
+          must be ``targets[key]``, the trajectory;
+        * the weight vectors were indexed by full-STRUCTURE position although
+          both skip the target, so every term past it read its neighbour's
+          coefficient.
+
+        The wide path also read ``weights_internal`` -- the sparsity step's
+        SUPPORT decision -- in place of the fitted magnitudes. ``weights_final``
+        is the only vector a residual can be built from, and serves both column
+        sets here: under the unified layout (``_validate_weight_layout``) it
+        carries one slot per non-target term plus the intercept, so the narrow
+        case is an ``active_mask`` selection and nothing more.
+
+        Not memoized, for the reason ``evaluate`` does not cache its narrow
+        branch: the weights move between calls.
+        """
+        targets, features = self.evaluate(active_only=active_only)
+        weights = self.weights_final
+        intercept = weights[-1]
+        if features is None:
+            return {key: np.asarray(target, dtype=float).reshape(-1) - intercept
+                    for key, target in targets.items()}
+        coefs = np.asarray(weights[:-1], dtype=float)
+        if active_only:
+            coefs = coefs[self.active_mask]
+        return {key: (np.asarray(target, dtype=float).reshape(-1) -
+                      (np.asarray(features[key], dtype=float) @ coefs + intercept))
+                for key, target in targets.items()}
 
     def reset_state(self, reset_right_part: bool = True) -> None:
         """Drop all cached evaluation/fitness state on this Equation.
@@ -1186,6 +1215,86 @@ class Equation(ComplexStructure):
     def aic(self, val):
         self._aic = val
 
+    def _validate_weight_layout(self, weights, name: str):
+        """Enforce THE coefficient-vector contract on every assignment.
+
+        Both ``weights_internal`` and ``weights_final`` are length
+        ``len(structure)`` == ``m + 1`` where ``m = len(structure) - 1`` is the
+        number of NON-TARGET terms::
+
+            index i in 0..m-1  ->  structure term at ``weight_index``-th position
+            index -1 (== m)    ->  the fitted intercept / free coefficient
+
+        Zeros are RETAINED in both vectors -- a term is inactive iff its
+        ``weights_internal`` slot is 0, the intercept is absent iff
+        ``weights_internal[-1]`` is 0. The two vectors differ only in VALUES
+        (support-selection coefficients vs final physical magnitudes).
+
+        This used to be producer-dependent: the sparsity operators emitted
+        ``estimator.coef_`` (length m, NO intercept slot) alongside a
+        zero-filtered ``weights_final`` (length nnz+1), while the translator
+        emitted the full m+1 layout for both -- so every consumer had to sniff
+        the length (``len(wi) == m + 1``) or silently depend on
+        ``remove_zero_terms`` having already collapsed nnz onto m. Validating
+        here is what makes the contract real instead of documented.
+
+        ``None`` passes (``reset_state`` nulls both), and so does an assignment
+        made before ``structure`` exists -- ``__init__`` calls ``reset_state``
+        before building the structure list.
+        """
+        if weights is None:
+            return
+        structure = getattr(self, 'structure', None)
+        if structure is None:
+            return
+        expected = len(structure)
+        actual = len(weights)
+        if actual != expected:
+            raise ValueError(
+                f'{name} must hold one coefficient per non-target term plus a '
+                f'trailing intercept slot: expected length {expected} for a '
+                f'{expected}-term structure, got {actual}. See '
+                'Equation._validate_weight_layout for the contract.')
+
+    def weight_index(self, term_idx: int, tgt: int = None) -> int:
+        """Position of ``structure[term_idx]``'s coefficient inside
+        ``weights_internal`` / ``weights_final``.
+
+        The target term is skipped by both vectors, so every index past it
+        shifts down by one. This shift was open-coded at a dozen call sites
+        (renderers, the complexity cores, the legacy refit, the solver forms);
+        routing them all through here keeps a single definition. Raises for the
+        target itself -- it has no coefficient (its weight is implicitly -1).
+
+        ``tgt`` lets a loop hoist the target lookup: ``target_idx`` is an O(n)
+        identity scan, so calling this per term without it makes the caller
+        O(n^2) (the ``target_idx`` docstring asks callers to capture it).
+        """
+        if tgt is None:
+            tgt = self.target_idx
+        if term_idx == tgt:
+            raise ValueError(
+                f'Term {term_idx} is the target; it carries no weight slot.')
+        return term_idx if term_idx < tgt else term_idx - 1
+
+    @property
+    def active_mask(self):
+        """Boolean mask over the NON-TARGET terms: which ones the sparsity step
+        kept. Length ``len(structure) - 1``, aligned by ``weight_index``.
+
+        ``weights_internal`` is the vector that DECIDES support (the sparsity
+        output); ``weights_final`` merely carries the refit magnitudes at the
+        same positions.
+        """
+        return np.asarray(self.weights_internal[:-1]) != 0
+
+    @property
+    def intercept(self):
+        """The fitted intercept (free coefficient) -- the trailing slot of
+        ``weights_final``. Exactly ``0.0`` when the sparsity step regularized
+        it away; see ``Equation._validate_weight_layout``."""
+        return self.weights_final[-1]
+
     @property
     def weights_internal(self):
         if self.weights_internal_evald:
@@ -1196,6 +1305,7 @@ class Equation(ComplexStructure):
 
     @weights_internal.setter
     def weights_internal(self, weights):
+        self._validate_weight_layout(weights, 'weights_internal')
         self._weights_internal = weights
         # self.weights_internal_evald = True
         # self.weights_final_evald = False
@@ -1210,6 +1320,7 @@ class Equation(ComplexStructure):
 
     @weights_final.setter
     def weights_final(self, weights):
+        self._validate_weight_layout(weights, 'weights_final')
         self._weights_final = weights
         # self.weights_final_evald = True
 
@@ -1221,9 +1332,14 @@ class Equation(ComplexStructure):
                 tgt = self.target_idx
                 for term_idx in range(len(self.structure)):
                     if term_idx != tgt:
-                        form += str(self.weights_final[term_idx]) if term_idx < tgt else str(self.weights_final[term_idx-1])
+                        form += str(self.weights_final[self.weight_index(term_idx, tgt)])
                         form += ' * ' + self.structure[term_idx].name + ' + '
-                form += str(self.weights_internal[-1]) + ' = ' + \
+                # The fitted intercept is the TRAILING entry of weights_final,
+                # guaranteed by Equation._validate_weight_layout. Reading
+                # ``weights_internal[-1]`` (as this used to) printed the last
+                # TERM's coefficient in the constant position, back when the
+                # sparsity producers emitted a bare ``estimator.coef_``.
+                form += str(self.weights_final[-1]) + ' = ' + \
                     self.target.name
             else:
                 for term_idx in range(len(self.structure)):
@@ -1242,15 +1358,21 @@ class Equation(ComplexStructure):
         form = self.target.latex_form + r' = '
         digits_rounding_max = 3
         for idx, term in enumerate(self.structure):
-            idx_corrected = idx if idx < tgt else idx - 1
-            if idx == tgt or self.weights_final[idx_corrected] == 0:
+            if idx == tgt:
+                continue
+            # Skipping zero-weight terms is correct WITHOUT a preceding
+            # remove_zero_terms now: weights_final keeps its zeros and stays
+            # aligned to the full structure (see _validate_weight_layout).
+            idx_corrected = self.weight_index(idx, tgt)
+            if self.weights_final[idx_corrected] == 0:
                 continue
 
             mnt, exp = exp_form(self.weights_final[idx_corrected], digits_rounding_max)
             exp_str = r'\cdot 10^{{{0}}} '.format(str(exp)) if exp != 0 else ''
             form += str(mnt) + exp_str + term.latex_form + r' + '
 
-        mnt, exp = exp_form(self.weights_internal[-1], digits_rounding_max)
+        # Trailing weights_final entry = the fitted intercept (see text_form).
+        mnt, exp = exp_form(self.weights_final[-1], digits_rounding_max)
         exp_str = r'\cdot 10^{{{0}}} '.format(str(exp)) if exp != 0 else ''
 
         form += str(mnt) + exp_str
@@ -1273,8 +1395,7 @@ class Equation(ComplexStructure):
         described = set()
         for term_idx, term in enumerate(self.structure):
             if tgt is not None and term_idx != tgt:
-                weight_idx = term_idx if term_idx < tgt else term_idx - 1
-                if np.isclose(self.weights_internal[weight_idx], 0):
+                if np.isclose(self.weights_internal[self.weight_index(term_idx, tgt)], 0):
                     continue
             term_labels = (term.factors_labels_without_power if drop_power
                            else term.factors_labels)
@@ -1352,13 +1473,15 @@ class EquationIterator(object):
             if self._equation.weights_final_evald:
                 tgt = self._equation.target_idx
                 while True:
-                    idx_in_weights = self._internal_idx if self._internal_idx <= tgt \
-                        else self._internal_idx - 1
-
+                    # Target first, THEN the weight slot: weight_index
+                    # rejects the target (it has no coefficient; its weight
+                    # is implicitly -1). Zero entries are skipped rather
+                    # than absent -- weights_final retains them.
                     if self._internal_idx == tgt:
                         coeff = -1.
                         break
-                    elif self._equation.weights_final[idx_in_weights] == 0:
+                    idx_in_weights = self._equation.weight_index(self._internal_idx, tgt)
+                    if self._equation.weights_final[idx_in_weights] == 0:
                         self._internal_idx += 1
                         if self._internal_idx >= len(self._equation.structure):
                             raise StopIteration
@@ -1432,13 +1555,15 @@ class SoEq(moeadd.MOEADDSolution):
             self.vals = Chromosome(equations, {key: val for key, val in self.metaparameters.items()
                                                if val['optimizable']})
 
-    def use_default_multiobjective_function(self, use_pic: bool = False):
+    def use_default_multiobjective_function(self, second_objective: str = None):
         # Lockstep site #2 of the selectable second axis (the others: the
-        # strategy's filler assembly and the MOEA/D ideal point). The
-        # ``second_objective`` global overrides the use_pic-derived default
-        # when set; unset resolves to exactly the old use_pic branch.
-        import epde.globals as global_var
-        if global_var.resolve_second_objective(use_pic) == 'instability':
+        # strategy's filler assembly and the MOEA/D ideal point). ``None``
+        # defers to the ``second_objective`` global, which resolves to
+        # 'instability' -- what the removed ``use_pic=True`` default meant.
+        from epde.interface.search_config import active_config
+        if second_objective is None:
+            second_objective = active_config().objectives.second_objective
+        if second_objective == 'instability':
             # self.use_pic_multiobjective_function()
             self.use_new_multiobjective_function()
         else:
@@ -1482,10 +1607,10 @@ class SoEq(moeadd.MOEADDSolution):
         # globals.single_objective_metric picks which (already-computed)
         # attribute drives selection: 'discrepancy' -> equation_fitness,
         # 'instability' -> equation_terms_stability.
-        import epde.globals as global_var
+        from epde.interface.search_config import active_config
         from epde.eq_mo_objectives import (generate_partial, equation_fitness,
                                            equation_terms_stability)
-        metric = getattr(global_var, 'single_objective_metric', 'discrepancy')
+        metric = active_config().objectives.single_objective_metric
         objective = equation_terms_stability if metric == 'instability' else equation_fitness
         quality_objectives = [generate_partial(objective, eq_key) for eq_key in self.vars_to_describe]
         self.set_objective_functions(quality_objectives)

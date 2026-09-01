@@ -149,8 +149,12 @@ class ParametricEquation(object):
         self._equation = Equation(pool=self.pool, basic_structure=terms, terms_number=len(terms),
                                   max_factors_in_term=max([len(term.structure) for term in terms]))
         self._equation.target_idx = rpi if rpi >= 0 else len(self._equation.structure) - 1
+        # ``parse_eq_terms`` already yields the unified layout (one weight per
+        # non-target term, then the trailing intercept it appends as 0); make it
+        # an ndarray and un-alias the two vectors.
+        weights = np.asarray(weights, dtype=float)
         self._equation.weights_internal = weights
-        self._equation.weights_final = weights
+        self._equation.weights_final = weights.copy()
         self.equation_set = True
 
     @singledispatchmethod

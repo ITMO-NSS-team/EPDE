@@ -26,10 +26,30 @@ def translate_equation(text_form, pool, all_vars):
     raise NotImplementedError(f'Equation shall be translated from {type(text_form)}')
 
 @translate_equation.register
-def _(text_form : str, pool, all_vars: List[str], use_pic: bool = False):
+def _(text_form : str, pool, all_vars: List[str], second_objective: str = None):
+    """Build a SoEq from a text form.
+
+    ``second_objective`` names the second Pareto axis registered on the
+    resulting system; ``None`` defers to the search configuration via
+    ``active_config().objectives.second_objective``.
+
+    NOTE, behaviour change: this used to take ``use_pic: bool = False``, so a
+    translated equation defaulted to a COMPLEXITY second axis while
+    ``EpdeSearch`` defaulted to INSTABILITY -- meaning a translated truth
+    anchor was scored on different axes from the population it was being
+    compared against. Deferring to the configuration makes the two agree.
+    Pass ``second_objective='complexity'`` to reproduce the old default.
+    """
     parsed_text_form = parse_equation_str(text_form)
     term_list = []
-    weights = np.empty(len(parsed_text_form) - 1)
+    # Collected positionally and assembled into the unified layout below.
+    # ``np.empty(len(parsed_text_form) - 1)`` indexed by PARSED-GROUP position
+    # was wrong three ways: uninitialized garbage in any slot the loop skips
+    # (a term written without an explicit coefficient), one entry SHORT for a
+    # text form with no free-coefficient group ("-1.0 * u = d^2u/dx0^2"), and
+    # misplaced whenever that group is not written last.
+    term_coefs = []
+    free_coef = 0.0
     max_factors = 0
     for idx, term in enumerate(parsed_text_form):
         if (any([not float_convertable(elem) for elem in term]) and
@@ -38,14 +58,19 @@ def _(text_form : str, pool, all_vars: List[str], use_pic: bool = False):
             if len(factors) > max_factors:
                 max_factors = len(factors)
             term_list.append(Term(pool, passed_term=factors, collapse_powers=False))
-            weights[idx] = float(term[0])
+            term_coefs.append(float(term[0]))
         elif float_convertable(term[0]) and len(term) == 1:
-            weights[idx] = float(term[0])
+            free_coef = float(term[0])
         elif all([not float_convertable(elem) for elem in term]):
             factors = [parse_factor(factor, pool, all_vars) for factor in term]
             if len(factors) > max_factors:
                 max_factors = len(factors)
             term_list.append(Term(pool, passed_term=factors, collapse_powers=False))
+            term_coefs.append(1.0)          # written without an explicit coefficient
+
+    # Unified layout: one coefficient per NON-target term in structure order
+    # (the target is installed last, below), then the free coefficient.
+    weights = np.array(term_coefs[:-1] + [free_coef], dtype=float)
 
     metaparameters={'terms_number': {'optimizable': False, 'value': len(term_list)},
                     'max_factors_in_term': {'optimizable': False, 'value': max_factors}}
@@ -57,10 +82,12 @@ def _(text_form : str, pool, all_vars: List[str], use_pic: bool = False):
                         metaparameters=metaparameters)
     equation.target_idx = len(term_list) - 1
     equation.weights_internal = weights
-    equation.weights_final = weights    
+    # Copy: the two vectors are independently mutable (remove_zero_terms
+    # compacts each in place) and must not alias.
+    equation.weights_final = weights.copy()
     
     system = SoEq(pool = pool, metaparameters=metaparameters)
-    system.use_default_multiobjective_function(use_pic = use_pic)
+    system.use_default_multiobjective_function(second_objective = second_objective)
     system.create(passed_equations = [equation,])
     # structure = {'u' : equation}
     # system.vals = Chromosome(structure, params={key: val for key, val in system.metaparameters.items()
@@ -69,12 +96,19 @@ def _(text_form : str, pool, all_vars: List[str], use_pic: bool = False):
     return system
 
 @translate_equation.register
-def _(text_form : dict, pool, all_vars: List[str], use_pic: bool = False):
+def _(text_form : dict, pool, all_vars: List[str], second_objective: str = None):
     equations = []
     for var_key, eq_text_form in text_form.items(): 
         parsed_text_form = parse_equation_str(eq_text_form)
         term_list = []
-        weights = np.empty(len(parsed_text_form) - 1)
+        # Collected positionally and assembled into the unified layout below.
+        # ``np.empty(len(parsed_text_form) - 1)`` indexed by PARSED-GROUP position
+        # was wrong three ways: uninitialized garbage in any slot the loop skips
+        # (a term written without an explicit coefficient), one entry SHORT for a
+        # text form with no free-coefficient group ("-1.0 * u = d^2u/dx0^2"), and
+        # misplaced whenever that group is not written last.
+        term_coefs = []
+        free_coef = 0.0
         max_factors = 0
         for idx, term in enumerate(parsed_text_form):
             if (any([not float_convertable(elem) for elem in term]) and
@@ -83,14 +117,19 @@ def _(text_form : dict, pool, all_vars: List[str], use_pic: bool = False):
                 if len(factors) > max_factors:
                     max_factors = len(factors)
                 term_list.append(Term(pool, passed_term=factors, collapse_powers=False))
-                weights[idx] = float(term[0])
+                term_coefs.append(float(term[0]))
             elif float_convertable(term[0]) and len(term) == 1:
-                weights[idx] = float(term[0])
+                free_coef = float(term[0])
             elif all([not float_convertable(elem) for elem in term]):
                 factors = [parse_factor(factor, pool, all_vars) for factor in term]
                 if len(factors) > max_factors:
                     max_factors = len(factors)
                 term_list.append(Term(pool, passed_term=factors, collapse_powers=False))
+                term_coefs.append(1.0)      # written without an explicit coefficient
+
+        # Unified layout: one coefficient per NON-target term in structure order
+        # (the target is installed last, below), then the free coefficient.
+        weights = np.array(term_coefs[:-1] + [free_coef], dtype=float)
     
         metaparameters={'terms_number': {'optimizable': False, 'value': len(term_list)},
                         'max_factors_in_term': {'optimizable': False, 'value': max_factors}}
@@ -101,13 +140,13 @@ def _(text_form : dict, pool, all_vars: List[str], use_pic: bool = False):
                             metaparameters = metaparameters)
         equation.target_idx = len(term_list) - 1
         equation.weights_internal = weights
-        equation.weights_final = weights
+        equation.weights_final = weights.copy()   # must not alias -- see above
         equations.append(equation)
     
     # structure = {'u' : equation}
 
     system = SoEq(pool = pool, metaparameters=metaparameters)
-    system.use_default_multiobjective_function(use_pic = use_pic)
+    system.use_default_multiobjective_function(second_objective = second_objective)
     system.create(passed_equations = equations)
     # system.vals = Chromosome(structure, params={key: val for key, val in system.metaparameters.items()
     #                                             if val['optimizable']})
@@ -160,7 +199,7 @@ def parse_params_str(param_str):
 
 class CoeffLessEquation():
     def __init__(self, lp_terms : Union[list, tuple, dict], rp_term : Union[list, tuple, dict], 
-                 pool, all_vars, use_pic: bool = False):
+                 pool, all_vars, second_objective: str = None):
         '''
         ``lp_terms''
         '''
@@ -196,7 +235,7 @@ class CoeffLessEquation():
                 equations.append(equation)
 
             self.system = SoEq(pool = pool, metaparameters=metaparameters)
-            self.system.use_default_multiobjective_function(use_pic = use_pic)
+            self.system.use_default_multiobjective_function(second_objective = second_objective)
             self.system.create(equations)
 
         else:
@@ -205,8 +244,15 @@ class CoeffLessEquation():
             self.rp_translated = Term(pool, passed_term = [parse_factor(factor, pool, all_vars) for factor in rp_term], 
                                       collapse_powers=False)
             
-            self.lp_values = np.vstack(list(map(lambda x: x.evaluate(False).reshape(-1), self.lp_terms_translated)))
-            self.rp_value = self.rp_translated.evaluate(False).reshape(-1)
+            # ``Term.evaluate`` takes ``grids`` now (the old positional
+            # ``normalize`` flag is gone) and returns a PER-TRAJECTORY dict.
+            self.lp_values = np.vstack(list(map(
+                lambda x: np.concat([np.asarray(col).reshape(-1)
+                                     for col in x.evaluate().values()], axis=0),
+                self.lp_terms_translated)))
+            self.rp_value = np.concat(
+                [np.asarray(col).reshape(-1)
+                 for col in self.rp_translated.evaluate().values()], axis=0)
             lr = LinearRegression()
             lr.fit(self.lp_values.T, self.rp_value)
             # print(lr.coef_, lr.intercept_, type(lr.coef_))
@@ -226,5 +272,5 @@ class CoeffLessEquation():
             self.equation.weights_internal = np.append(lr.coef_, lr.intercept_)
             self.equation.weights_final = np.append(lr.coef_, lr.intercept_)
             self.system = SoEq(pool = pool, metaparameters=metaparameters)
-            self.system.use_default_multiobjective_function(use_pic = use_pic)
+            self.system.use_default_multiobjective_function(second_objective = second_objective)
             self.system.create(equations)

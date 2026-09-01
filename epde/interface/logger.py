@@ -21,12 +21,10 @@ def equations_match(eq_checked: Equation, eq_ref: Equation):
         term_weights = []
         tgt = equation.target_idx
         for idx, term in enumerate(equation.structure):
-            if idx < tgt:
-                term_weights.append(equation.weights_final[idx])
-            elif idx == tgt:
+            if idx == tgt:
                 term_weights.append(1)
             else:
-                term_weights.append(equation.weights_final[idx-1])
+                term_weights.append(equation.weights_final[equation.weight_index(idx, tgt)])
         print(term_weights)
         return {frozenset({(factor.label, factor.param(name = 'power')) 
                            for factor in term.structure}) 
@@ -73,7 +71,14 @@ class Logger():
     def add_log(self, key, entry, aggregation_key = None, **kwargs):
         match = systems_match(entry, self._referential_equation) if self._referential_equation is not None else (0, 0, 0)
         try:
-            mae = [np.mean(np.abs(eq.evaluate(False, True)[0])) for eq in entry]
+            # ``Equation.residual`` returns a PER-TRAJECTORY dict, so the mean
+            # is taken inside each sample's array and then across samples.
+            # (The old ``np.abs(eq.evaluate(False, True)[0])`` would have
+            # raised on the dict had this ever been reached -- ``add_log``
+            # has no caller in the tree.)
+            mae = [float(np.mean([np.mean(np.abs(res))
+                                  for res in eq.residual().values()]))
+                   for eq in entry]
         except KeyError:
             mae = 0
         
