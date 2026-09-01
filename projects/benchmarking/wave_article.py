@@ -44,8 +44,12 @@ def translate_eq():
 
     test1 = CoeffLessEquation(lp_terms, rp_term, epde_search_obj.pool)
     def map_to_equation(equation, function, function_kwargs = dict()):
-        _, target, features = equation.evaluate(normalize = False, return_val = False)
-        return function(np.abs(np.dot(features, equation.weights_final[:-1]) + 
+        target, features = equation.evaluate(active_only=True)
+        # ``active_only`` emits only the ACTIVE terms, while weights_final
+        # keeps a slot per non-target term (Equation._validate_weight_layout),
+        # so the coefficients are narrowed to match.
+        coefs = np.asarray(equation.weights_final[:-1])[equation.active_mask]
+        return function(np.abs(np.dot(features, coefs) + 
                               np.full(target.shape, equation.weights_final[-1]) - 
                               target), **function_kwargs)    
     

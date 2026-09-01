@@ -47,7 +47,7 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
     for var in all_vars:
         correct_eq.vals[var].main_var_to_explain = var
         correct_eq.vals[var].metaparameters = metaparams
-        correct_eq.vals[var].weights_internal = np.ones(len(correct_eq.vals[var].structure) - 1)
+        correct_eq.vals[var].weights_internal = np.append(np.ones(len(correct_eq.vals[var].structure) - 1), 0.0)
         correct_eq.vals[var].weights_internal_evald = True
         correct_eq.vals[var].weights_final_evald = True
     print(correct_eq.text_form)
@@ -57,7 +57,7 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
     for var in all_vars:
         incorrect_eq.vals[var].main_var_to_explain = var
         incorrect_eq.vals[var].metaparameters = metaparams
-        incorrect_eq.vals[var].weights_internal = np.ones(len(incorrect_eq.vals[var].structure) - 1)
+        incorrect_eq.vals[var].weights_internal = np.append(np.ones(len(incorrect_eq.vals[var].structure) - 1), 0.0)
         incorrect_eq.vals[var].weights_internal_evald = True
         incorrect_eq.vals[var].weights_final_evald = True
     print(incorrect_eq.text_form)
@@ -110,15 +110,16 @@ def AC_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
     print('Shapes:', data.shape, grid[0].shape)
     dimensionality = 1
 
-    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=(5, 12),
-                                 coordinate_tensors=((grid[0], grid[1])), verbose_params={'show_iter_idx': True},
+    epde_search_obj = EpdeSearch(use_solver=False, verbose_params={'show_iter_idx': True},
                                  device='cpu')
+    _, domain = epde_search_obj.createDomain(((grid[0], grid[1])), boundary_width=(5, 12), ID=0)
 
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
 
-    epde_search_obj.create_pool(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 3),
-                                additional_tokens=[], data_nn=data_nn)
+    _, trajectory = epde_search_obj.createTrajectory({'u': noised_data}, domain, cache_id=0)
+    epde_search_obj.create_pool(data=[trajectory], max_deriv_order=(2, 3),
+                                additional_tokens=[])
 
     assert compare_equations(eq_ac_symbolic, eq_ac_incorrect, epde_search_obj)
 
@@ -130,9 +131,8 @@ def ac_discovery(foldername, noise_level):
 
     dimensionality = data.ndim - 1
 
-    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True,
-                                      use_pic=True, boundary=(5, 10),
-                                      coordinate_tensors=grid, device='cuda')
+    epde_search_obj = EpdeSearch(use_solver=True, multiobjective_mode=True, device='cuda', sparsity_cls='vwsr')
+    _, domain = epde_search_obj.createDomain(grid, boundary_width=(5, 10), ID=0)
 
     # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
     #                                     preprocessor_kwargs={'epochs_max' : 1e3})
@@ -143,11 +143,11 @@ def ac_discovery(foldername, noise_level):
     epde_search_obj.set_moeadd_params(population_size=popsize,
                                       training_epochs=1)
 
-    custom_grid_tokens = CacheStoredTokens(token_type='grid',
-                                                token_labels=['t', 'x'],
-                                                token_tensors={'t': grid[0], 'x': grid[1]},
-                                                params_ranges={'power': (1, 1)},
-                                                params_equality_ranges=None)
+    # custom_grid_tokens = CacheStoredTokens(token_type='grid',
+    #                                             token_labels=['t', 'x'],
+    #                                             token_tensors={'t': grid[0], 'x': grid[1]},
+    #                                             params_ranges={'power': (1, 1)},
+    #                                             params_equality_ranges=None)
 
     trig_params_ranges = {'power': (1, 1)}
     trig_params_equal_ranges = {}
@@ -157,11 +157,11 @@ def ac_discovery(foldername, noise_level):
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
     bounds = (1e-12, 1e-0)
-    epde_search_obj.fit(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 3), derivs=None,
-                        equation_terms_max_number=5, data_fun_pow=3,
+    _, trajectory = epde_search_obj.createTrajectory({'u': noised_data}, domain, cache_id=0)
+    epde_search_obj.fit(data=[trajectory], max_deriv_order=(2, 3), data_fun_pow=3,
+                        equation_terms_max_number=5,
                         additional_tokens=[],
-                        equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=bounds, fourier_layers=False) #, data_nn=data_nn
+                        equation_factors_max_number=factors_max_number) #, data_nn=data_nn
 
     epde_search_obj.equations(only_print=True, num=1)
     epde_search_obj.visualize_solutions()
@@ -176,11 +176,11 @@ if __name__ == "__main__":
     print(f"CUDA version linked with PyTorch: {torch.version.cuda}")
     # Operator = fitness.SolverBasedFitness # Replace by the developed PIC-based operator.
     # Operator = fitness.PIC
-    Operator = fitness.L2LRFitness
+    # Operator = fitness.L2LRFitness
     params = EvolutionaryParams()
     operator_params = params.get_default_params_for_operator('DiscrepancyBasedFitnessWithCV') #{"penalty_coeff": 0.2, "pinn_loss_mult": 1e4}
     print('operator_params ', operator_params)
-    fit_operator = prepare_suboperators(Operator(list(operator_params.keys())), operator_params)
+    # fit_operator = prepare_suboperators(Operator(list(operator_params.keys())), operator_params)
 
     # Paths
     directory = os.path.dirname(os.path.realpath(__file__))

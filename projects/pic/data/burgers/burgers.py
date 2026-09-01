@@ -16,6 +16,8 @@ from epde.operators.common.sparsity import LASSOSparsity
 
 from epde.operators.utils.operator_mappers import map_operator_between_levels
 import epde.operators.common.fitness as fitness
+from epde.operators.common.fitness import SolverFreeFitness
+from epde.operators.common.objectives import Discrepancy, Instability
 from epde.operators.utils.template import CompoundOperator
 from scipy.io import loadmat
 
@@ -106,14 +108,15 @@ def burgers_test(operator: CompoundOperator, foldername: str, noise_level: int =
     print('Shapes:', data.shape, grid[0].shape)
     dimensionality = 1
 
-    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=10,
-                                 coordinate_tensors=((grid[0], grid[1])), verbose_params={'show_iter_idx': True},
+    epde_search_obj = EpdeSearch(use_solver=False, verbose_params={'show_iter_idx': True},
                                  device='cpu')
+    _, domain = epde_search_obj.createDomain(((grid[0], grid[1])), boundary_width=10, ID=0)
 
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
 
-    epde_search_obj.create_pool(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 2),
+    _, trajectory = epde_search_obj.createTrajectory({'u': noised_data}, domain, cache_id=0)
+    epde_search_obj.create_pool(data=[trajectory], max_deriv_order=(2, 2),
                                 additional_tokens=[])
 
     assert compare_equations(eq_burgers_symbolic, eq_burgers_incorrect, epde_search_obj)
@@ -126,9 +129,8 @@ def burgers_discovery(foldername, noise_level):
 
     dimensionality = data.ndim - 1
 
-    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True,
-                                      use_pic=True, boundary=20,
-                                      coordinate_tensors=grid, device='cuda')
+    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True, device='cuda')
+    _, domain = epde_search_obj.createDomain(grid, boundary_width=20, ID=0)
 
     # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
     #                                     preprocessor_kwargs={'epochs_max' : 1e3})
@@ -153,11 +155,11 @@ def burgers_discovery(foldername, noise_level):
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
     bounds = (1e-5, 1e2)
-    epde_search_obj.fit(data=noised_data, variable_names=['u', ], max_deriv_order=(2, 3), derivs=None,
-                        equation_terms_max_number=5, data_fun_pow=3,
+    _, trajectory = epde_search_obj.createTrajectory({'u': noised_data}, domain, cache_id=0)
+    epde_search_obj.fit(data=[trajectory], max_deriv_order=(2, 3), data_fun_pow=3,
+                        equation_terms_max_number=5,
                         additional_tokens=[],
-                        equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=bounds, fourier_layers=False) #
+                        equation_factors_max_number=factors_max_number) #
 
     epde_search_obj.equations(only_print=True, num=1)
     epde_search_obj.visualize_solutions()
@@ -171,11 +173,19 @@ if __name__ == "__main__":
     print(torch.cuda.is_available())
     # Operator = fitness.SolverBasedFitness # Replace by the developed PIC-based operator.
     # Operator = fitness.PIC
-    Operator = fitness.L2LRFitness
     params = EvolutionaryParams()
-    operator_params = params.get_default_params_for_operator('DiscrepancyBasedFitnessWithCV') #{"penalty_coeff": 0.2, "pinn_loss_mult": 1e4}
+    operator_params = params.get_default_params_for_operator('SolverFreeFitness') #{"penalty_coeff": 0.2, "pinn_loss_mult": 1e4}
     print('operator_params ', operator_params)
-    fit_operator = prepare_suboperators(Operator(list(operator_params.keys())), operator_params)
+    # L2LRFitness became a SolverFreeFitness host plus pluggable objective
+    # fillers; its WAPE core is the Discrepancy filler's default option.
+    # Both fillers are built bare so they resolve their metric from the
+    # search configuration, i.e. the same way the search scores candidates.
+    discrepancy = Discrepancy()
+    fit_operator = prepare_suboperators(
+        SolverFreeFitness(list(operator_params.keys()),
+                          objectives=[discrepancy, Instability()],
+                          primary=discrepancy),
+        operator_params)
 
     # Paths
     directory = os.path.dirname(os.path.realpath(__file__))

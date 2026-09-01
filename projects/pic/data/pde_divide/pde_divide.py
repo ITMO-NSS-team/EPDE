@@ -10,7 +10,8 @@ from epde.interface.equation_translator import translate_equation
 from epde.interface.interface import EpdeSearch
 from epde.interface.prepared_tokens import CustomEvaluator, CustomTokens
 from epde.operators.common.coeff_calculation import LinRegBasedCoeffsEquation
-from epde.operators.common.fitness import L2LRFitness
+from epde.operators.common.fitness import SolverFreeFitness
+from epde.operators.common.objectives import Discrepancy, Instability
 from epde.operators.common.sparsity import LASSOSparsity
 from epde.operators.utils.default_parameter_loader import EvolutionaryParams
 from epde.operators.utils.operator_mappers import map_operator_between_levels
@@ -86,12 +87,10 @@ class PDEDivideExperiment(PDEAnalysis):
 
         search_obj = EpdeSearch(
             use_solver=False,
-            use_pic=True,
-            boundary=10,
-            coordinate_tensors=(grid[0], grid[1]),
             verbose_params={'show_iter_idx': True},
             device='cuda'
         )
+        _, domain = search_obj.createDomain((grid[0], grid[1]), boundary_width=10, ID=0)
 
         grid_tokens, trig_tokens = self.create_custom_tokens(grid)
         standard_trig_tokens = TrigonometricTokens(
@@ -104,9 +103,9 @@ class PDEDivideExperiment(PDEAnalysis):
             preprocessor_kwargs={}
         )
 
+        _, trajectory = search_obj.createTrajectory({'u': noised_data}, domain, cache_id=0)
         search_obj.create_pool(
-            data=noised_data,
-            variable_names=['u'],
+            data=[trajectory],
             max_deriv_order=(2, 3),
             additional_tokens=[standard_trig_tokens, grid_tokens]
         )
@@ -121,11 +120,9 @@ class PDEDivideExperiment(PDEAnalysis):
 
         search_obj = EpdeSearch(
             use_solver=False,
-            use_pic=True,
-            boundary=20,
-            coordinate_tensors=grid,
             device='cuda'
         )
+        _, domain = search_obj.createDomain(grid, boundary_width=20, ID=0)
 
         search_obj.set_preprocessor(
             default_preprocessor_type='FD',
@@ -152,18 +149,14 @@ class PDEDivideExperiment(PDEAnalysis):
         factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
         bounds = (1e-9, 1e-2)
 
+        _, trajectory = search_obj.createTrajectory({'u': noised_data}, domain, cache_id=0)
         search_obj.fit(
-            data=noised_data,
-            variable_names=['u'],
+            data=[trajectory],
             max_deriv_order=(2, 3),
-            derivs=None,
-            equation_terms_max_number=5,
             data_fun_pow=1,
+            equation_terms_max_number=5,
             additional_tokens=[grid_tokens],
-            equation_factors_max_number=factors_max_number,
-            eq_sparsity_interval=bounds,
-            fourier_layers=False
-        )
+            equation_factors_max_number=factors_max_number)
 
         search_obj.equations(only_print=True, num=1)
         search_obj.visualize_solutions()
@@ -241,9 +234,19 @@ class OperatorFactory:
     """Factory for creating and configuring fitness operators."""
 
     @staticmethod
-    def create_fitness_operator(operator_class, params: dict) -> CompoundOperator:
-        """Create and configure a fitness operator."""
-        fitness_operator = operator_class(list(params.keys()))
+    def create_fitness_operator(params: dict) -> CompoundOperator:
+        """Create and configure the solver-free fitness host.
+
+        It used to take the operator CLASS, because there was one class per
+        scoring rule (``L2LRFitness``, ``L2Fitness``, ``PIC``). Scoring is now
+        a list of pluggable objective fillers on one host, so the choice is
+        which fillers rather than which class. Bare fillers resolve their
+        metric from the search configuration at compute time.
+        """
+        discrepancy = Discrepancy()
+        fitness_operator = SolverFreeFitness(list(params.keys()),
+                                             objectives=[discrepancy, Instability()],
+                                             primary=discrepancy)
         return OperatorFactory._prepare_suboperators(fitness_operator, params)
 
     @staticmethod
@@ -274,10 +277,10 @@ def main():
 
     # Initialize fitness operator
     params = EvolutionaryParams()
-    operator_params = params.get_default_params_for_operator('DiscrepancyBasedFitnessWithCV')
+    operator_params = params.get_default_params_for_operator('SolverFreeFitness')
     print('Operator params:', operator_params)
 
-    fitness_operator = OperatorFactory.create_fitness_operator(L2LRFitness, operator_params)
+    fitness_operator = OperatorFactory.create_fitness_operator(operator_params)
 
     # Set up paths
     directory = os.path.dirname(os.path.realpath(__file__))

@@ -16,6 +16,8 @@ from epde.operators.common.sparsity import LASSOSparsity
 
 from epde.operators.utils.operator_mappers import map_operator_between_levels
 import epde.operators.common.fitness as fitness
+from epde.operators.common.fitness import SolverFreeFitness
+from epde.operators.common.objectives import Discrepancy, Instability
 from epde.operators.utils.template import CompoundOperator
 
 from epde import TrigonometricTokens, GridTokens, CacheStoredTokens
@@ -117,8 +119,8 @@ def darcy_test(operator: CompoundOperator, foldername: str, noise_level: int = 0
 
     dimensionality = 1
 
-    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True, use_pic=True, boundary=0,
-                                 coordinate_tensors=grid, device='cuda')
+    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True, device='cuda')
+    _, domain = epde_search_obj.createDomain(grid, boundary_width=0, ID=0)
 
     # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
     #                                     preprocessor_kwargs={'epochs_max' : 1e3})
@@ -144,7 +146,8 @@ def darcy_test(operator: CompoundOperator, foldername: str, noise_level: int = 0
                                               meaningful=True
                                               )
 
-    epde_search_obj.create_pool(data=noised_data, variable_names=['u',], max_deriv_order=(0, 2, 2),
+    _, trajectory = epde_search_obj.createTrajectory({'u': noised_data}, domain, cache_id=0)
+    epde_search_obj.create_pool(data=[trajectory], max_deriv_order=(0, 2, 2),
                                 additional_tokens = [custom_grid_tokens_nu, custom_grid_tokens_xy]) # , data_nn = data_nn
 
     # np.save(os.path.join(foldername, 'kdv_0_derivs.npy'), epde_search_obj.derivatives)
@@ -164,8 +167,8 @@ def darcy_discovery(foldername, noise_level):
 
     dimensionality = data.ndim - 1
 
-    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=0,
-                                      coordinate_tensors=grid, device='cuda')
+    epde_search_obj = EpdeSearch(use_solver=False, device='cuda')
+    _, domain = epde_search_obj.createDomain(grid, boundary_width=0, ID=0)
 
     # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
     #                                     preprocessor_kwargs={'epochs_max' : 1e3})
@@ -202,11 +205,11 @@ def darcy_discovery(foldername, noise_level):
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.5, 0.5]}
 
     bounds = (1e-12, 1e-2)
-    epde_search_obj.fit(data=noised_data, variable_names=['u', ], max_deriv_order=(0, 2, 2), derivs=None,
-                        equation_terms_max_number=5, data_fun_pow=1,
+    _, trajectory = epde_search_obj.createTrajectory({'u': noised_data}, domain, cache_id=0)
+    epde_search_obj.fit(data=[trajectory], max_deriv_order=(0, 2, 2), data_fun_pow=1,
+                        equation_terms_max_number=5,
                         additional_tokens=[custom_grid_tokens_nu, custom_grid_tokens_xy],
-                        equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=bounds, fourier_layers=False) #, data_nn=data_nn
+                        equation_factors_max_number=factors_max_number) #, data_nn=data_nn
 
     epde_search_obj.equations(only_print=True, num=1)
     epde_search_obj.visualize_solutions()
@@ -220,11 +223,19 @@ if __name__ == "__main__":
     print(torch.cuda.is_available())
     # Operator = fitness.SolverBasedFitness # Replace by the developed PIC-based operator.
     # Operator = fitness.PIC
-    Operator = fitness.L2LRFitness
     params = EvolutionaryParams()
-    operator_params = params.get_default_params_for_operator('DiscrepancyBasedFitnessWithCV') #{"penalty_coeff": 0.2, "pinn_loss_mult": 1e4}
+    operator_params = params.get_default_params_for_operator('SolverFreeFitness') #{"penalty_coeff": 0.2, "pinn_loss_mult": 1e4}
     print('operator_params ', operator_params)
-    fit_operator = prepare_suboperators(Operator(list(operator_params.keys())), operator_params)
+    # L2LRFitness became a SolverFreeFitness host plus pluggable objective
+    # fillers; its WAPE core is the Discrepancy filler's default option.
+    # Both fillers are built bare so they resolve their metric from the
+    # search configuration, i.e. the same way the search scores candidates.
+    discrepancy = Discrepancy()
+    fit_operator = prepare_suboperators(
+        SolverFreeFitness(list(operator_params.keys()),
+                          objectives=[discrepancy, Instability()],
+                          primary=discrepancy),
+        operator_params)
 
     # Paths
     directory = os.path.dirname(os.path.realpath(__file__))

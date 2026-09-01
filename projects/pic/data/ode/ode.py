@@ -48,7 +48,7 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
         correct_eq.vals[var].main_var_to_explain = var
         correct_eq.vals[var].metaparameters = metaparams
         correct_eq.vals[var].simplified = True
-        correct_eq.vals[var].weights_internal = np.ones(len(correct_eq.vals[var].structure) - 1)
+        correct_eq.vals[var].weights_internal = np.append(np.ones(len(correct_eq.vals[var].structure) - 1), 0.0)
         correct_eq.vals[var].weights_internal_evald = True
     print(correct_eq.text_form)
 
@@ -58,7 +58,7 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
         incorrect_eq.vals[var].main_var_to_explain = var
         incorrect_eq.vals[var].metaparameters = metaparams
         incorrect_eq.vals[var].simplified = True
-        incorrect_eq.vals[var].weights_internal = np.ones(len(incorrect_eq.vals[var].structure) - 1)
+        incorrect_eq.vals[var].weights_internal = np.append(np.ones(len(incorrect_eq.vals[var].structure) - 1), 0.0)
         incorrect_eq.vals[var].weights_internal_evald = True
     print(incorrect_eq.text_form)
 
@@ -114,15 +114,16 @@ def ODE_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
                                       dimensionality=dimensionality)
     grid_tokens = GridTokens(['x_0', ], dimensionality=dimensionality, max_power=2)
 
-    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=10,
-                                 coordinate_tensors=[t,], verbose_params={'show_iter_idx': True},
+    epde_search_obj = EpdeSearch(use_solver=False, verbose_params={'show_iter_idx': True},
                                  device='cuda')
+    _, domain = epde_search_obj.createDomain([t,], boundary_width=10, ID=0)
 
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
 
-    epde_search_obj.create_pool(data=noised_data, variable_names=['u', ], max_deriv_order=(2,),
-                                additional_tokens=[grid_tokens, trig_tokens], data_nn=data_nn)
+    _, trajectory = epde_search_obj.createTrajectory({'u': noised_data}, domain, cache_id=0)
+    epde_search_obj.create_pool(data=[trajectory], max_deriv_order=(2,),
+                                additional_tokens=[grid_tokens, trig_tokens])
 
     assert compare_equations(eq_ode_symbolic, eq_ode_incorrect, epde_search_obj)
 
@@ -141,9 +142,9 @@ def ODE_discovery(foldername, noise_level):
                                       dimensionality=dimensionality)
     grid_tokens = GridTokens(['x_0', ], dimensionality=dimensionality, max_power=2)
 
-    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=20,
-                                 coordinate_tensors=[t,], verbose_params={'show_iter_idx': True},
+    epde_search_obj = EpdeSearch(use_solver=False, verbose_params={'show_iter_idx': True},
                                  device='cuda')
+    _, domain = epde_search_obj.createDomain([t,], boundary_width=20, ID=0)
 
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
@@ -153,11 +154,11 @@ def ODE_discovery(foldername, noise_level):
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
-    epde_search_obj.fit(data=[noised_data, ], variable_names=['u', ], max_deriv_order=(2, 3),
-                        equation_terms_max_number=5, data_fun_pow=3,
+    _, trajectory = epde_search_obj.createTrajectory({'u': noised_data}, domain, cache_id=0)
+    epde_search_obj.fit(data=[trajectory], max_deriv_order=(2, 3), data_fun_pow=3,
+                        equation_terms_max_number=5,
                         additional_tokens=[trig_tokens, grid_tokens],
-                        equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-8, 1e-0)) # , data_nn=data_nn
+                        equation_factors_max_number=factors_max_number) # , data_nn=data_nn
 
     epde_search_obj.equations(only_print=True, num=1)
 
@@ -182,23 +183,23 @@ def ODE_simple_discovery(foldername, noise_level):
                                       dimensionality=dimensionality)
     grid_tokens = GridTokens(['x_0', ], dimensionality=dimensionality, max_power=2)
 
-    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=10,
-                                 coordinate_tensors=[t,], verbose_params={'show_iter_idx': True},
+    epde_search_obj = EpdeSearch(use_solver=False, verbose_params={'show_iter_idx': True},
                                  device='cuda')
+    _, domain = epde_search_obj.createDomain([t,], boundary_width=10, ID=0)
 
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
 
     popsize = 8
-    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=5)
+    epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=15)
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
-    epde_search_obj.fit(data=[x, ], variable_names=['u', ], max_deriv_order=(1),
-                        equation_terms_max_number=5, data_fun_pow=3,
+    _, trajectory = epde_search_obj.createTrajectory({'u': x}, domain, cache_id=0)
+    epde_search_obj.fit(data=[trajectory], max_deriv_order=(1), data_fun_pow=3,
+                        equation_terms_max_number=5,
                         additional_tokens=[trig_tokens, grid_tokens],
-                        equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=(1e-4, 1e-0)) #
+                        equation_factors_max_number=factors_max_number) #
 
     epde_search_obj.equations(only_print=True, num=1)
 
@@ -216,11 +217,11 @@ if __name__ == "__main__":
     print(torch.cuda.is_available())
     # Operator = fitness.SolverBasedFitness # Replace by the developed PIC-based operator.
     # Operator = fitness.PIC
-    Operator = fitness.L2LRFitness
+    # Operator = fitness.L2LRFitness
     params = EvolutionaryParams()
     operator_params = params.get_default_params_for_operator('DiscrepancyBasedFitnessWithCV') #{"penalty_coeff": 0.2, "pinn_loss_mult": 1e4}
     print('operator_params ', operator_params)
-    fit_operator = prepare_suboperators(Operator(list(operator_params.keys())), operator_params)
+    # fit_operator = prepare_suboperators(Operator(list(operator_params.keys())), operator_params)
 
     # Paths
     directory = os.path.dirname(os.path.realpath(__file__))

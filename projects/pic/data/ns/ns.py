@@ -16,6 +16,8 @@ from epde.operators.common.sparsity import LASSOSparsity
 
 from epde.operators.utils.operator_mappers import map_operator_between_levels
 import epde.operators.common.fitness as fitness
+from epde.operators.common.fitness import SolverFreeFitness
+from epde.operators.common.objectives import Discrepancy, Instability
 from epde.operators.utils.template import CompoundOperator
 
 from epde import TrigonometricTokens, GridTokens, CacheStoredTokens
@@ -47,7 +49,7 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
     for var in all_vars:
         correct_eq.vals[var].main_var_to_explain = var
         correct_eq.vals[var].metaparameters = metaparams
-        correct_eq.vals[var].weights_internal = np.ones(len(correct_eq.vals[var].structure) - 1)
+        correct_eq.vals[var].weights_internal = np.append(np.ones(len(correct_eq.vals[var].structure) - 1), 0.0)
         correct_eq.vals[var].weights_internal_evald = True
     print(correct_eq.text_form)
 
@@ -56,7 +58,7 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
     for var in all_vars:
         incorrect_eq.vals[var].main_var_to_explain = var
         incorrect_eq.vals[var].metaparameters = metaparams
-        incorrect_eq.vals[var].weights_internal = np.ones(len(incorrect_eq.vals[var].structure) - 1)
+        incorrect_eq.vals[var].weights_internal = np.append(np.ones(len(incorrect_eq.vals[var].structure) - 1), 0.0)
         incorrect_eq.vals[var].weights_internal_evald = True
     print(incorrect_eq.text_form)
 
@@ -124,14 +126,16 @@ def ns_test(operator: CompoundOperator, foldername: str, noise_level: int = 0):
     # print('Shapes:', data.shape, grid[0].shape)
     dimensionality = 1
 
-    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=10,
-                                 coordinate_tensors=grid, verbose_params={'show_iter_idx': True},
+    epde_search_obj = EpdeSearch(use_solver=False, verbose_params={'show_iter_idx': True},
                                  device='cpu')
+    _, domain = epde_search_obj.createDomain(grid, boundary_width=10, ID=0)
 
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
 
-    epde_search_obj.create_pool(data=data, variable_names=["u", "v", "p"], max_deriv_order=(1, 2, 2),
+    _, trajectory = epde_search_obj.createTrajectory(dict(zip(["u", "v", "p"], data)), domain,
+                                                     cache_id=0)
+    epde_search_obj.create_pool(data=[trajectory], max_deriv_order=(1, 2, 2),
                                 additional_tokens=[])#, data_nn=data_nn
 
     assert compare_equations([eq_ac_symbolic] * 3, [eq_ac_incorrect] * 3, epde_search_obj)
@@ -144,9 +148,8 @@ def ns_discovery(foldername, noise_level):
 
     # dimensionality = data.ndim - 1
 
-    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True,
-                                      use_pic=True, boundary=[20, 20, 45],
-                                      coordinate_tensors=grid, device='cuda')
+    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True, device='cuda')
+    _, domain = epde_search_obj.createDomain(grid, boundary_width=[20, 20, 45], ID=0)
 
     # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
     #                                     preprocessor_kwargs={'epochs_max' : 1e3})
@@ -155,7 +158,7 @@ def ns_discovery(foldername, noise_level):
     popsize = 32
 
     epde_search_obj.set_moeadd_params(population_size=popsize,
-                                      training_epochs=30)
+                                      training_epochs=100)
 
     custom_grid_tokens = CacheStoredTokens(token_type='grid',
                                                 token_labels=['t', 'x'],
@@ -171,11 +174,12 @@ def ns_discovery(foldername, noise_level):
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.8, 0.2]}
 
     bounds = (1e-12, 1e-0)
-    epde_search_obj.fit(data=data, variable_names=["u", "v", "p"], max_deriv_order=(1, 2, 2), derivs=None,
-                        equation_terms_max_number=20, data_fun_pow=1,
+    _, trajectory = epde_search_obj.createTrajectory(dict(zip(["u", "v", "p"], data)), domain,
+                                                     cache_id=0)
+    epde_search_obj.fit(data=[trajectory], max_deriv_order=(1, 2, 2), data_fun_pow=1,
+                        equation_terms_max_number=20,
                         additional_tokens=[],
-                        equation_factors_max_number=factors_max_number,
-                        eq_sparsity_interval=bounds, fourier_layers=False) # , data_nn=data_nn
+                        equation_factors_max_number=factors_max_number) # , data_nn=data_nn
 
     epde_search_obj.equations(only_print=True, num=1)
     epde_search_obj.visualize_solutions()
@@ -189,11 +193,19 @@ if __name__ == "__main__":
     print(torch.cuda.is_available())
     # Operator = fitness.SolverBasedFitness # Replace by the developed PIC-based operator.
     # Operator = fitness.PIC
-    Operator = fitness.L2LRFitness
     params = EvolutionaryParams()
-    operator_params = params.get_default_params_for_operator('DiscrepancyBasedFitnessWithCV') #{"penalty_coeff": 0.2, "pinn_loss_mult": 1e4}
+    operator_params = params.get_default_params_for_operator('SolverFreeFitness') #{"penalty_coeff": 0.2, "pinn_loss_mult": 1e4}
     print('operator_params ', operator_params)
-    fit_operator = prepare_suboperators(Operator(list(operator_params.keys())), operator_params)
+    # L2LRFitness became a SolverFreeFitness host plus pluggable objective
+    # fillers; its WAPE core is the Discrepancy filler's default option.
+    # Both fillers are built bare so they resolve their metric from the
+    # search configuration, i.e. the same way the search scores candidates.
+    discrepancy = Discrepancy()
+    fit_operator = prepare_suboperators(
+        SolverFreeFitness(list(operator_params.keys()),
+                          objectives=[discrepancy, Instability()],
+                          primary=discrepancy),
+        operator_params)
 
     # Paths
     directory = os.path.dirname(os.path.realpath(__file__))
