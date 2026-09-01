@@ -43,12 +43,32 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
     ``LASSOSparsity`` sets and ``VWSRSparsity`` leaves unset, so this
     operator can be wired into both pipelines without a strategy flag.
 
-    Output shape matches the upstream sparsity convention:
-    ``np.append(coef_, intercept)`` -- one entry per surviving non-zero
-    feature plus a trailing intercept slot. Downstream consumers
-    (``L2Fitness.apply``, ``L2LRFitness.apply``) need no change.
+    Output shape is the unified layout (``Equation._validate_weight_layout``):
+    one slot per non-target term in structure order, zeros at the terms LASSO
+    killed, then the intercept. The intercept follows THE INTERCEPT RULE -- it
+    is refitted only when the sparsity step kept it.
     '''
     key = 'LinRegCoeffCalc'
+
+    @staticmethod
+    def _sample_keys():
+        """Trajectory IDs in ONE fixed order, shared by every stacking site
+        below so the row order of the features, the target and the sample
+        weights cannot drift apart."""
+        return list(global_var.samples_manager.inner_shapes.keys())
+
+    @classmethod
+    def _stacked_g_func(cls):
+        """Boundary-masked ``g_func`` weights of every trajectory, concatenated
+        in ``_sample_keys`` order to match the stacked design matrix.
+
+        The legacy path used ``global_var.grid_cache.g_func[g_func_mask]``,
+        which is single-sample and is ``None`` outright when the caches were
+        built with ``set_grids=False``.
+        """
+        gfuncs = global_var.samples_manager.gFunc('dm')
+        return np.concat([np.asarray(gfuncs[key]).reshape(-1)
+                          for key in cls._sample_keys()], axis=0)
 
     @staticmethod
     def _legacy_evaluate_nonzero(objective: Equation):
@@ -61,19 +81,16 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
         non-target slot was filtered to zero.
         """
         tgt = objective.target_idx
-        target: Dict[int, np.ndarray] = objective.target.evaluate(False)
-        # target: Dict[int, np.ndarray] = objective.structure[objective.target_idx].evaluate()
-        # print('Before stacking', [array.shape for array in target.values()])
-        target = np.concat([array for array in target.values()], axis = 0)
+        keys = LinRegBasedCoeffsEquation._sample_keys()
+        target: Dict[int, np.ndarray] = objective.target.evaluate()
+        target = np.concat([target[key] for key in keys], axis = 0)
         feats = []
         for term_idx, term in enumerate(objective.structure):
             if term_idx == tgt:
                 continue
-            wi_pos = (term_idx if term_idx < tgt
-                      else term_idx - 1)
-            if objective.weights_internal[wi_pos] != 0:
-                fdict = term.evaluate(False)
-                feats.append(np.concat([array for array in fdict.values()], axis = 0))
+            if objective.weights_internal[objective.weight_index(term_idx, tgt)] != 0:
+                fdict = term.evaluate()
+                feats.append(np.concat([fdict[key] for key in keys], axis = 0))
         if not feats:
             return target, None
         features = np.vstack(feats)
@@ -97,17 +114,42 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
             return
 
         target, features = self._legacy_evaluate_nonzero(objective)
-        if features is None:
-            # No non-zero terms to refit -- leave ``weights_final`` as
-            # set by the upstream sparsity step (just the intercept).
-            objective.weights_final_evald = True
-            setattr(objective, LEGACY_REFIT_MARKER, False)
-            return
+        self.g_fun_vals = self._stacked_g_func()
 
-        self.g_fun_vals = global_var.grid_cache.g_func[global_var.grid_cache.g_func_mask]
-        estimator = LinearRegression(copy_X=True, fit_intercept=True, n_jobs=-1)
-        estimator.fit(features, target, sample_weight=self.g_fun_vals)
-        objective.weights_final = np.append(estimator.coef_, estimator.intercept_)
+        # THE INTERCEPT RULE. ``weights_internal[-1]`` is the sparsity step's
+        # SUPPORT decision for the free coefficient; when LASSO regularized it
+        # away it is not a column of any later model, so the physical refit runs
+        # through the origin and the verdict survives into ``weights_final``.
+        # Either way the intercept is never appended to ``features`` -- sklearn
+        # estimates it internally when the flag is set.
+        fit_intercept = bool(objective.weights_internal[-1] != 0)
+
+        # Full-structure layout: one slot per non-target term, then the
+        # intercept, zeros retained (Equation._validate_weight_layout). The
+        # former ``np.append(estimator.coef_, estimator.intercept_)`` produced a
+        # COMPACT nnz+1 vector that only lined up with the structure because
+        # ``remove_zero_terms`` happened to run first.
+        weights_final = np.zeros(len(objective.structure))
+        if features is None:
+            # Every non-target term was zeroed. What the sparsity step left in
+            # ``weights_final[-1]`` is a MIN-MAX-RESCALED intercept (see
+            # LASSOSparsity), not a physical free coefficient -- re-estimate it
+            # here as the g_func-weighted target mean, or leave it at 0.0 when
+            # the penalty killed it.
+            if fit_intercept:
+                w_sum = float(np.sum(self.g_fun_vals))
+                weights_final[-1] = (float(np.average(target, weights=self.g_fun_vals))
+                                     if w_sum > 0 else float(np.mean(target)))
+        else:
+            estimator = LinearRegression(copy_X=True, fit_intercept=fit_intercept, n_jobs=-1)
+            estimator.fit(features, target, sample_weight=self.g_fun_vals)
+            # ``features`` holds only the LASSO survivors, so ``coef_`` is
+            # nnz-long -- scatter it back onto the surviving full-structure
+            # positions and leave zeros at the killed ones.
+            weights_final[np.flatnonzero(objective.active_mask)] = estimator.coef_
+            # Exactly 0.0 when fit_intercept is False.
+            weights_final[-1] = float(estimator.intercept_)
+        objective.weights_final = weights_final
         objective.weights_final_evald = True
         setattr(objective, LEGACY_REFIT_MARKER, False)
 
