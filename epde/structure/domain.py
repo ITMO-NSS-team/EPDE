@@ -557,9 +557,10 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
 
         self.max_deriv_order = max_deriv_order
         self.families, self.base_derivs = [], []
-        for entry in self._entries:
+        for idx, entry in enumerate(self._entries):
             fam, bd = self.setEntry(entry, self._preprocessor_pipeline,
-                                    self._derivs, max_deriv_order,
+                                    self._entry_derivs(entry, idx),
+                                    max_deriv_order,
                                     data_fun_pow, deriv_fun_pow)
             self.families.extend(fam); self.base_derivs.extend(bd)
 
@@ -569,6 +570,50 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
 
         self._built = request
         return self
+
+    def _entry_derivs(self, entry: VariableEntry, idx: int):
+        """This entry's pre-computed derivative tensor, or ``None``.
+
+        A derivative tensor describes ONE variable -- ``(n_points, n_derivs)``
+        with the columns ordered by ``define_derivatives`` -- so a system of
+        several variables needs one per variable. ``build`` used to hand the
+        whole ``derivs`` argument to every entry, which made the
+        pre-computed-derivative path single-variable only: a list raised
+        ``AttributeError: 'list' object has no attribute 'T'`` in
+        ``addEntryToCache``, and a bare array silently gave EVERY variable the
+        first one's derivatives.
+
+        Accepted forms: ``None`` (differentiate with the preprocessor), a dict
+        keyed by variable name, a list/tuple positionally matching the entries,
+        or a bare array when there is only one variable. A bare array for a
+        multi-variable trajectory raises rather than guessing -- that is the
+        silent case above.
+        """
+        if self._derivs is None:
+            return None
+        if isinstance(self._derivs, dict):
+            try:
+                return self._derivs[entry.var_name]
+            except KeyError:
+                raise KeyError(
+                    'No pre-computed derivatives for variable '
+                    f'{entry.var_name!r}; got keys '
+                    f'{sorted(self._derivs.keys())}.')
+        if isinstance(self._derivs, (list, tuple)):
+            if len(self._derivs) != len(self._entries):
+                raise ValueError(
+                    f'{len(self._derivs)} derivative tensors passed for '
+                    f'{len(self._entries)} variables. Pass one per variable, '
+                    'positionally or as a dict keyed by variable name.')
+            return self._derivs[idx]
+        if len(self._entries) > 1:
+            raise ValueError(
+                'A single derivative tensor was passed for the '
+                f'{len(self._entries)}-variable trajectory '
+                f'{[e.var_name for e in self._entries]}. Every variable would '
+                'receive the same derivatives. Pass a dict keyed by variable '
+                'name, or a list in entry order.')
+        return self._derivs
 
     def uploadTokenTensors(self, family, tensors: Dict[str, np.ndarray]) -> None:
         """Put a token family's declared tensors into THIS trajectory's subcache.
