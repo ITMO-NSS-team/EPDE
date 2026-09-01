@@ -129,3 +129,28 @@ dmypy.json
 .pyre/
 #cache
 /cache/*.tar
+
+# --- Local working notes, deliberately not repo documentation ---
+/ARCHITECTURE.md
+/RIDGE_ALPHA_PLAN.md
+/SEARCH_CONFIG_PLAN.md
+
+# --- IDE ---
+.idea/
+
+# --- Archives: datasets are committed extracted, never zipped ---
+*.rar
+*.zip
+*.pdf
+
+# --- Experiment output ---
+# Thesis workspace holds analysis SCRIPTS; every table, panel and figure in it
+# is generated, so track the .py and nothing else.
+projects/thesis/*
+!projects/thesis/*.py
+projects/**/plots/
+projects/pic/data/**/*_pinn_*.npz
+projects/pic/data/**/_nnm_*.npz
+projects/pic/data/dp/dp_fno.npz
+*.prof
+*.gif
