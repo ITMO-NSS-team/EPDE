@@ -22,7 +22,7 @@ class SystemSolverInterface(object):
 
     @staticmethod
     def _term_solver_form(term, grids, default_domain, variables: List[str] = ['u',], 
-                          device = 'cpu') -> dict:
+                          device = 'cpu', sample_key: int = 0) -> dict:
         deriv_orders = []
         deriv_powers = []
         deriv_vars = []
@@ -72,7 +72,28 @@ class SystemSolverInterface(object):
                 deriv_vars.append(cur_deriv_var)
             else:
                 grid_arg = None if default_domain else grids
-                coeff_tensor = coeff_tensor * factor.evaluate(grids=grid_arg)[-1].to(device) # , torch_mode = True
+                # ``Factor.evaluate`` returns a PER-SAMPLE dict. On the default
+                # domain its keys are trajectory IDs, so the sample being
+                # solved has to be named; an explicitly passed grid LIST is
+                # wrapped by ``Factor.evaluate`` as ``{-1: grids}``, which is
+                # where the literal -1 came from. Using -1 for both meant every
+                # non-derivative factor -- trig, grid and custom tokens, i.e.
+                # any term the ``is_deriv`` branch above does not take -- died
+                # with ``KeyError: -1`` on the default path.
+                values = factor.evaluate(grids=grid_arg)
+                key = sample_key if default_domain else -1
+                try:
+                    value = values[key]
+                except KeyError:
+                    raise KeyError(
+                        f'No evaluated values of factor {factor.name} for '
+                        f'sample {key}; the factor carries {sorted(values)}.')
+                # The tensor cache is numpy while everything here is torch
+                # (``coeff_tensor`` opens as ``torch.ones_like(grids[0])``),
+                # the same seam ``use_grids`` converts at for the grids.
+                if not isinstance(value, torch.Tensor):
+                    value = torch.from_numpy(np.asarray(value))
+                coeff_tensor = coeff_tensor * value.to(device)
         if not derivs_detected:
             deriv_powers = [0,]
             deriv_orders = [[None,],]
@@ -100,7 +121,8 @@ class SystemSolverInterface(object):
     def set_boundary_operator(self, operator_info):
         raise NotImplementedError()
 
-    def _equation_solver_form(self, equation, variables, grids=None, mode = 'NN') -> dict:
+    def _equation_solver_form(self, equation, variables, grids=None, mode = 'NN',
+                              sample_key: int = 0) -> dict:
         assert mode in ['NN', 'autograd', 'mat'], 'Incorrect mode passed. Form available only \
                                                    for "NN", "autograd "and "mat" methods'
         
@@ -124,7 +146,9 @@ class SystemSolverInterface(object):
             if term_idx != tgt:
                 weight = equation.weights_final[equation.weight_index(term_idx, tgt)]
                 if not np.isclose(weight, 0, rtol = self.coeff_tol):
-                    _solver_form[term.name] = self._term_solver_form(term, grids, default_domain, variables)
+                    _solver_form[term.name] = self._term_solver_form(
+                        term, grids, default_domain, variables,
+                        device = self._device, sample_key = sample_key)
                     _solver_form[term.name]['coeff'] = _solver_form[term.name]['coeff'] * weight
                     if isinstance(_solver_form[term.name]['coeff'], torch.Tensor):
                         _solver_form[term.name]['coeff'] = adjust_shape(_solver_form[term.name]['coeff'], mode = mode)
@@ -141,7 +165,9 @@ class SystemSolverInterface(object):
         target_weight = -1 # torch.full_like(input = grids[0], fill_value = -1.).to(self._device)
 
         target_term = equation.target
-        target_form = self._term_solver_form(target_term, grids, default_domain, variables)
+        target_form = self._term_solver_form(
+            target_term, grids, default_domain, variables,
+            device = self._device, sample_key = sample_key)
         target_form['coeff'] = target_form['coeff'] * target_weight
         # target_form['coeff'] = adjust_shape(target_form['coeff'], mode = mode)
         # print(f'target_form shape is {target_form["coeff"].shape}')
@@ -179,12 +205,18 @@ class SystemSolverInterface(object):
             self.grids = grids
             
 
-    def form(self, domain_key: int, grids=None, mode = 'NN'): # -> List[str, ]:
+    def form(self, domain_key: int = 0, grids=None, mode = 'NN'): # -> List[str, ]:
+        """``domain_key`` names the TRAJECTORY being solved -- it selects the
+        grids and, through ``sample_key``, the per-sample tensors every
+        non-derivative factor is evaluated into. It defaults rather than being
+        required because the spectral adapter calls this with ``grids`` only,
+        which used to be a TypeError."""
         self.use_grids(domain_key = domain_key, grids = grids)
         equation_forms = []
 
         for equation in self.adaptee.vals:
             equation_forms.append((equation.main_var_to_explain,
                                    self._equation_solver_form(equation, variables=self.variables,
-                                                              grids=grids, mode = mode)))
+                                                              grids=grids, mode = mode,
+                                                              sample_key = domain_key)))
         return equation_forms
