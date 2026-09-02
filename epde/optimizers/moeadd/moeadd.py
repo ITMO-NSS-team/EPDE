@@ -53,7 +53,8 @@ def checkWeightAssignmentUniqueness(arg: np.ndarray):
         assert np.sum(arg[:, sidx]) == 1, f'Columns of solution assignment in weight matrixes have to contain a single "1", instead got {arg[:, sidx]}.'
 
 
-def randomSolutionAssignment(weights: np.ndarray, solutions: List[MOEADDSolution]):
+def randomSolutionAssignment(weights: np.ndarray, solutions: List[MOEADDSolution],
+                             obj_normalizer=None):
     assert len(solutions) == weights.shape[0], 'Solutions do not match weights in length.'
     indexes = np.random.permutation(len(solutions))
 
@@ -61,15 +62,31 @@ def randomSolutionAssignment(weights: np.ndarray, solutions: List[MOEADDSolution
         solution.set_domain(indexes[idx])
 
 
-def marriageSolutionAssignment(weights: np.ndarray, solutions: List[MOEADDSolution]):
+def marriageSolutionAssignment(weights: np.ndarray, solutions: List[MOEADDSolution],
+                               obj_normalizer=None):
+    """Assign each solution to a weight vector by the acute angle between them.
+
+    The angle is taken on the NORMALIZED objective vector, the same scaling
+    ``penalty_based_intersection`` applies before it selects within a sector.
+    Taking it on the raw vector -- as this used to -- let an axis with a large
+    magnitude decide the direction of every solution: with a discrepancy axis
+    at 1e4-1e5 and an instability axis below 6, the whole population occupied
+    an angular sector of 4.5e-4 rad (1.54 rad once normalized, a 3400x
+    difference), so the assignment carried almost no information and the
+    sectors no longer corresponded to distinct trade-offs.
+    """
     assert len(solutions) == weights.shape[0], f'Solutions do not match weights in length: {len(solutions)} vs {weights.shape[0]}.'
 
     acute_angles = np.empty((weights.shape[0], weights.shape[0]))
 
+    def _objective(solution):
+        obj = np.asarray(solution.obj_fun, dtype=float)
+        return obj if obj_normalizer is None else obj_normalizer(obj)
+
     for i, weight in enumerate(weights):
         weight_full = [item for item in weight for _ in solutions[0].vals]
         for j, solution in enumerate(solutions):
-            acute_angles[i, j] = acute_angle(weight_full, solution.obj_fun)
+            acute_angles[i, j] = acute_angle(weight_full, _objective(solution))
             # acute_angles[i, j] = acute_angle(weight, solution.obj_fun)
 
     w_preferences = np.argsort(acute_angles, axis = 1)
@@ -186,10 +203,17 @@ class ParetoLevels(object):
         self.__dict__ = {key : item for key, item in attributes.items()
                          if key not in except_keys}
     
-    def set_normalizer(self):
-        if not self.population:
+    def set_normalizer(self, over: list = None):
+        """(Re)build the PBI objective normalizer.
+
+        ``over`` names the solutions to take the scale from; it defaults to
+        the placed population. The unplaced candidates are passed explicitly
+        during weight association, when the population is still empty.
+        """
+        source = self.population if over is None else over
+        if not source:
             return
-        objectives = np.stack([elem.obj_fun for elem in self.population], axis = 0)
+        objectives = np.stack([elem.obj_fun for elem in source], axis = 0)
         worst_vals = np.max(objectives, axis = 0)
         # An all-zero objective column (e.g. perfect fitness across the
         # population) must not produce division by zero in the normalizer.
@@ -333,11 +357,13 @@ class ParetoLevels(object):
             if self._weights is None:
                 raise AttributeError('Weights should not be None in the assignment phase.')
             
-            if len(self.population) == 0:
-                self._weights_assigner(self._weights, self.unplaced_candidates)
-            else:
-                self._weights_assigner(self._weights, self.population)
-            
+            assigned = (self.unplaced_candidates if len(self.population) == 0
+                        else self.population)
+            # The assigner compares directions, so it needs the same scaling
+            # PBI uses; build it over exactly the solutions being assigned.
+            self.set_normalizer(over=assigned)
+            self._weights_assigner(self._weights, assigned, self.normalizer)
+
             self._weights_assigned = True
 
 
@@ -746,6 +772,13 @@ class MOEADDOptimizer(object):
                     for order_idx, weight_idx in enumerate(np.random.permutation(n_sectors)):
                         if global_var.verbose.show_iter_idx:
                             print(f'During MO : processing {order_idx + 1}-th sector (of {n_sectors}).')
+                        # Per SECTOR, not just per epoch: every sector inserts
+                        # offspring and evicts, so a once-per-epoch scale went
+                        # stale immediately -- and with training_epochs=1 it
+                        # was never refreshed at all, leaving every offspring
+                        # normalized against the INITIAL population's worst
+                        # values (anything worse normalized above 1).
+                        self.pareto_levels.set_normalizer()
                         sp_kwargs = self.form_processer_args(weight_idx)
                         with _loop_stats.timer('MOEADD.sector'):
                             self.sector_processer.run(population_subset = self.pareto_levels,
