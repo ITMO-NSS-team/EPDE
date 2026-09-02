@@ -132,11 +132,26 @@ class ChromosomeCrossover(CompoundOperator):
                 offspring_1.vals.replace_gene(gene_key = eq_key, value = offspring_2.vals[eq_key])
                 offspring_2.vals.replace_gene(gene_key = eq_key, value = temp_eq)
                 # The swapped equations keep their structure but land in a new
-                # system. Clear only right_part_selected (not simplified /
+                # system. Clear right_part_selected (not simplified /
                 # is_correct_right_part) so the system-level pairwise scan
                 # re-validates the composition without re-running each term-sweep.
-                offspring_1.vals[eq_key].right_part_selected = False
-                offspring_2.vals[eq_key].right_part_selected = False
+                #
+                # The fitness flag must go with it. Re-running RPS re-runs its
+                # term-sweep, and that sweep OVERWRITES ``fitness_value`` with
+                # its own metric (the host's ``force_out_of_place`` branch
+                # assigns it so the degeneracy threshold can read it). Under a
+                # solver-based search the sweep's host is a lightweight
+                # solver-free one, so leaving ``fitness_calculated`` up meant
+                # the solver host declined to re-score and the equation went
+                # onto the front carrying an ``l2_relative`` value while its
+                # neighbours carried solver values -- two different metrics on
+                # one Pareto axis.
+                for offspring in (offspring_1, offspring_2):
+                    equation = offspring.vals[eq_key]
+                    equation.right_part_selected = False
+                    equation.fitness_calculated = False
+                    equation.stability_calculated = False
+                    equation.complexity_calculated = False
             else:
                 temp_eq_1, temp_eq_2 = self.suboperators['equation_crossover'].apply(objective = (offspring_1.vals[eq_key],
                                                                                                   offspring_2.vals[eq_key]),
