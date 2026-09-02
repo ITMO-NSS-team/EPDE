@@ -113,6 +113,24 @@ def _mean_of_sums(per_sample) -> float:
     return float(np.mean(totals)) if totals else 0.0
 
 
+def _relative_norm(residual, reference) -> float:
+    """``||residual|| / ||reference||`` -- the solver discrepancy, made a ratio.
+
+    Falls back to the bare norm when the reference is identically zero (there
+    is no scale to divide by, and 0/0 must not reach the Pareto front).
+    """
+    scale = float(np.linalg.norm(reference, ord=2))
+    value = float(np.linalg.norm(residual, ord=2))
+    return value / scale if scale > 0. else value
+
+
+def _relative_mean_square(residual, reference) -> float:
+    """``mean(residual^2) / mean(reference^2)`` -- the 'pic' counterpart."""
+    scale = float(np.mean(np.asarray(reference) ** 2))
+    value = float(np.mean(np.asarray(residual) ** 2))
+    return value / scale if scale > 0. else value
+
+
 def _degenerate_excluding_intercept(filler, equation) -> bool:
     """Shared ``is_degenerate`` for the VWSR-paired discrepancy fillers:
     degenerate iff every non-intercept weight is zero, or the post-fit
@@ -427,11 +445,21 @@ class Discrepancy(EquationObjective):
         # The old form was a SET comprehension that unpacked two names from
         # ``.values()`` and read ``discr`` before it existed.
         discr = dictSubtr(sol, ref)
-        discr = dictApplyUFunc(np.multiply, discr,
-                               {key: np.asarray(gfunc_vals).reshape(discr[key].shape)
-                                for key, gfunc_vals in sctx.g_fun_vals.items()})
-        rl_error = np.mean(list(dictApplyUFunc(lambda x: np.linalg.norm(x, ord=2), discr).values()))
-        
+        gvals = {key: np.asarray(gfunc_vals).reshape(discr[key].shape)
+                 for key, gfunc_vals in sctx.g_fun_vals.items()}
+        discr = dictApplyUFunc(np.multiply, discr, gvals)
+        # RELATIVE to the reference, not the bare Euclidean norm. The old
+        # unnormalised form grew like sqrt(n_points), so it was neither
+        # grid-independent nor commensurable with the solver-free options
+        # (``wape`` / ``l2_relative``) or with the PINN term it is summed
+        # with. Measured on Allen-Cahn it spanned only 26-62 over truth and
+        # junk alike -- no discrimination -- while ``wape`` on the same
+        # candidates separated 0.003-0.009 (near-truth) from 0.38-1.02 (junk).
+        # As a ratio it is also self-diagnosing: a solve that did not
+        # reproduce the data lands at or above 1.
+        rl_error = float(np.mean([_relative_norm(value, ref[key] * gvals[key])
+                                  for key, value in discr.items()]))
+
         fitness = rl_error + sctx.pinn_loss_mult * float(sctx.loss_add)
         if np.sum(eq.weights_final[:-1]) == 0:
             fitness /= sctx.penalty_coeff
@@ -450,11 +478,15 @@ class Discrepancy(EquationObjective):
 
         # See _compute_solver_l2: set comprehension -> per-sample dict.
         discr = dictSubtr(sol, ref)
-        discr = dictApplyUFunc(np.multiply, discr,
-                               {key: np.asarray(gfunc_vals).reshape(discr[key].shape)
-                                for key, gfunc_vals in sctx.g_fun_vals.items()})
+        gvals = {key: np.asarray(gfunc_vals).reshape(discr[key].shape)
+                 for key, gfunc_vals in sctx.g_fun_vals.items()}
+        discr = dictApplyUFunc(np.multiply, discr, gvals)
 
-        rl_error = np.mean(list(dictApplyUFunc(lambda x: np.mean(x ** 2), discr).values()))
+        # Relative, for the same reason as ``_compute_solver_l2`` -- the two
+        # solver options were on different scales (bare 2-norm there, bare
+        # mean-square here), so the family could not be compared with itself.
+        rl_error = float(np.mean([_relative_mean_square(value, ref[key] * gvals[key])
+                                  for key, value in discr.items()]))
         return float(rl_error + sctx.pinn_loss_mult * float(sctx.loss_add))
 
     def _compute_deepxde(self, eq, eq_idx, sctx):
