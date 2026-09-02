@@ -186,13 +186,19 @@ class TestSingleObjectiveHonoursTheConfig:
 
     @staticmethod
     def _record(monkeypatch, built):
-        """Capture the filler list at assembly time, with the operator-param
-        singleton in the single-objective mode EpdeSearch would have set."""
+        """Capture the filler list at assembly time.
+
+        Only RESET the operator-param singleton here -- it now reads the
+        active config, and the single-objective config is entered by the
+        caller below. Constructing it at this point would capture the
+        multiobjective operator table, which has no
+        ``PopulationLevelCrossover`` block. First use inside the
+        ``using_config`` block builds it against the right one.
+        """
         from epde.operators.utils.default_parameter_loader import EvolutionaryParams
         from epde.optimizers.single_criterion import strategy as so_strategy
 
         EvolutionaryParams.reset()
-        EvolutionaryParams(mode='single objective')
         original = so_strategy.SolverFreeFitness
 
         def _recording(*args, **kwargs):

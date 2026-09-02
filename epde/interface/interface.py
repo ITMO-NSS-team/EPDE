@@ -106,7 +106,7 @@ class EpdeSearch(object):
                  subregion_mating_limitation=UNSET, solution_params=UNSET,
                  director_params=UNSET, operators=UNSET,
                  memory_for_cache=UNSET, verbose_params=UNSET,
-                 params_filename=UNSET, **solver_kwargs):
+                 **solver_kwargs):
         """Build a search from the grouped configuration.
 
         Every setting has a default in
@@ -173,7 +173,7 @@ class EpdeSearch(object):
             subregion_mating_limitation=subregion_mating_limitation,
             solution_params=solution_params, director_params=director_params,
             operators=operators, memory_for_cache=memory_for_cache,
-            verbose_params=verbose_params, params_filename=params_filename)
+            verbose_params=verbose_params)
         overrides.update(solver_kwargs)
         self._config = cfg = load_search_config(config, overrides)
 
@@ -195,9 +195,11 @@ class EpdeSearch(object):
 
         criteria = 'multi objective' if self.multiobjective_mode else 'single objective'
 
-        # Singleton, read during operator initialization below.
+        # Singleton, read during operator initialization below. It reads the
+        # active config set just above, so the per-operator parameters and the
+        # search settings they reference cannot disagree.
         EvolutionaryParams.reset()
-        EvolutionaryParams(parameter_file=cfg.runtime.params_filename, mode=criteria)
+        EvolutionaryParams()
 
         if director is not None:
             self.director = director
@@ -214,16 +216,13 @@ class EpdeSearch(object):
             # add_base_param_to_operator path, and naming a key in both would
             # otherwise be a "got multiple values" TypeError. An explicit
             # operators entry wins, being the more specific statement.
-            operator_overrides = self._solver_operator_overrides(cfg)
-            operator_overrides.update(cfg.evolution.operators)
             self.director.use_baseline(
                 use_solver=cfg.solver.use_solver,
                 second_objective=cfg.objectives.second_objective,
                 solver_backend=cfg.solver.solver_backend,
                 params=cfg.evolution.director_params,
                 sparsity_cls=cfg.objectives.sparsity_cls,
-                sparsity_kwargs=cfg.objectives.sparsity_kwargs,
-                **operator_overrides)
+                sparsity_kwargs=cfg.objectives.sparsity_kwargs)
 
         # The axis the director actually assembled -- a user-supplied director
         # has not been through use_baseline, so fall back to the global. Every
@@ -255,26 +254,6 @@ class EpdeSearch(object):
     def config(self):
         """The resolved :class:`SearchConfig` backing this search."""
         return self._config
-
-    @staticmethod
-    def _solver_operator_overrides(cfg) -> dict:
-        """The ``solver`` keys that are also operator parameters.
-
-        ``pinn_loss_mult`` / ``error_metric`` / ``deepxde_config`` are declared
-        in the ``SolverBasedFitness`` block of the operator JSON, so
-        ``use_baseline``'s existing ``**kwargs`` -> ``add_base_param_to_operator``
-        path already forwards them. Passing them here makes the ``solver``
-        group authoritative while the JSON keeps supplying the fallback.
-
-        Forwarded only for a solver run: ``add_base_param_to_operator`` only
-        adopts keys the target operator's JSON block declares, and
-        ``SolverFreeFitness`` declares none of these.
-        """
-        if not cfg.solver.use_solver:
-            return {}
-        return {'pinn_loss_mult': cfg.solver.pinn_loss_mult,
-                'error_metric': cfg.solver.error_metric,
-                'deepxde_config': cfg.solver.deepxde_config}
 
     def set_memory_properties(self, example_tensor, mem_for_cache_frac=None, mem_for_cache_abs=None):
         """
@@ -1499,7 +1478,7 @@ class EpdeMultisample(EpdeSearch):
                  use_solver: bool = False, verbose_params: dict = {'show_iter_idx' : True},
                  memory_for_cache=5, prune_domain: bool = False, 
                  pivotal_tensor_label=None, pruner=None, threshold: float = 1e-2, 
-                 division_fractions=3, rectangular: bool = True, params_filename: str = None):
+                 division_fractions=3, rectangular: bool = True):
         """
         Args:
             use_default_strategy (`bool`): optional
@@ -1544,8 +1523,7 @@ class EpdeMultisample(EpdeSearch):
                          use_solver = use_solver, verbose_params = verbose_params,
                          coordinate_tensors = None, memory_for_cache = memory_for_cache, prune_domain = prune_domain, 
                          pivotal_tensor_label = pivotal_tensor_label, pruner = pruner, threshold = threshold, 
-                         division_fractions = division_fractions, rectangular = rectangular, 
-                         params_filename = params_filename)
+                         division_fractions = division_fractions, rectangular = rectangular)
         self._memory_for_cache = memory_for_cache
         self._boundary = boundary
         self._function_form = function_form

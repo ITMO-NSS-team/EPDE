@@ -14,14 +14,23 @@ import tempfile
 import pytest
 
 from epde.interface.search_config import (
-    DEFAULT_CONFIG_PATH, GROUP_CLASSES, KEY_GROUP, SPARSITY_REGISTRY,
-    TOKEN_REGISTRY, UNSET, SearchConfig, build_tokens, collect_overrides,
-    load_search_config, resolve_sparsity)
+    GROUP_CLASSES, KEY_GROUP, MULTI_OBJECTIVE_OPERATORS, SPARSITY_REGISTRY,
+    TOKEN_REGISTRY, UNSET, FromConfig, SearchConfig, build_tokens,
+    collect_overrides, load_search_config, resolve_sparsity)
 
 
 # ---------------------------------------------------------------------------
 # helpers
 # ---------------------------------------------------------------------------
+
+def _leaf_keys(payload, depth=0):
+    """Every key name in a nested JSON payload, to two levels."""
+    if not isinstance(payload, dict) or depth > 2:
+        return
+    for key, value in payload.items():
+        yield key
+        yield from _leaf_keys(value, depth + 1)
+
 
 def _write(tmp_path, payload, suffix='.json'):
     path = os.path.join(str(tmp_path), 'cfg' + suffix)
@@ -86,17 +95,30 @@ class TestDefaultPin:
         assert cfg.mode == 'NN'
         assert cfg.use_cache is False
 
-    def test_solver_operator_keys_match_the_operator_json(self):
-        """pinn_loss_mult / error_metric / deepxde_config are declared in both
-        files; the search config is authoritative, so they must agree at rest."""
-        from epde.operators.utils.default_parameter_loader import EvolutionaryParams
-        EvolutionaryParams.reset()
-        params = EvolutionaryParams().get_default_params_for_operator(
-            'SolverBasedFitness')
-        cfg = load_search_config().solver
-        assert cfg.pinn_loss_mult == params['pinn_loss_mult']
-        assert cfg.error_metric == params['error_metric']
-        assert cfg.deepxde_config == params['deepxde_config']
+    def test_solver_keys_reach_the_operator_mapping(self):
+        """pinn_loss_mult / error_metric / deepxde_config are parameters of
+        SolverBasedFitness AND settings of the solver group. They are declared
+        once, in the group, and referenced from the operator block, so they
+        cannot disagree -- they used to be written in two JSON files and did."""
+        cfg = load_search_config()
+        params = cfg.evolution.operators['SolverBasedFitness']
+        assert cfg.solver.pinn_loss_mult == params['pinn_loss_mult']
+        assert cfg.solver.error_metric == params['error_metric']
+        assert cfg.solver.deepxde_config == params['deepxde_config']
+
+    def test_moving_the_setting_moves_the_operator_parameter(self):
+        """The property that makes one declaration real."""
+        cfg = load_search_config(overrides={'pinn_loss_mult': 7.5})
+        assert cfg.solver.pinn_loss_mult == 7.5
+        assert cfg.evolution.operators['SolverBasedFitness']['pinn_loss_mult'] == 7.5
+        assert cfg.evolution.operators['PIC']['pinn_loss_mult'] == 7.5
+
+    def test_an_explicit_operator_override_still_wins(self):
+        """The reference is a default, not a lock."""
+        cfg = load_search_config(overrides={
+            'operators': {'SolverBasedFitness': {'pinn_loss_mult': 2.0}}})
+        assert cfg.solver.pinn_loss_mult == 0.0
+        assert cfg.evolution.operators['SolverBasedFitness']['pinn_loss_mult'] == 2.0
 
     def test_evolution_defaults_are_the_multiobjective_ones(self):
         cfg = load_search_config().evolution
@@ -110,7 +132,7 @@ class TestDefaultPin:
         cfg = load_search_config().runtime
         assert cfg.memory_for_cache == 15
         assert cfg.verbose_params == {'show_iter_idx': True}
-        assert cfg.params_filename is None
+        assert cfg.free_tensor_cache_after_fit is True
 
 
 class TestSingleObjectiveDefaults:
@@ -247,31 +269,67 @@ class TestIsolation:
 class TestKeyGroup:
 
     def test_every_leaf_maps_to_exactly_one_group(self):
-        with open(DEFAULT_CONFIG_PATH, encoding='utf-8') as handle:
-            raw = json.load(handle)
+        from dataclasses import fields
+        raw = {group: [f.name for f in fields(cls)]
+               for group, cls in GROUP_CLASSES.items()}
         seen = {}
         for group, values in raw.items():
-            if group.startswith('_'):
-                continue
             for key in values:
-                if key.startswith('_'):     # an inline comment, not a setting
-                    continue
                 assert key not in seen, (
                     'key %r declared in both %r and %r' % (key, seen[key], group))
                 seen[key] = group
         assert seen == KEY_GROUP
 
-    def test_json_and_dataclasses_agree(self):
-        """The dataclasses are hand-written; this is what stops them drifting
-        from the shipped JSON."""
-        from dataclasses import fields
-        with open(DEFAULT_CONFIG_PATH, encoding='utf-8') as handle:
-            raw = json.load(handle)
-        groups = {g: {k for k in v if not k.startswith('_')}
-                  for g, v in raw.items() if not g.startswith('_')}
-        assert set(groups) == set(GROUP_CLASSES)
+    def test_a_field_default_is_what_a_search_resolves_to(self):
+        """The property the old key-set comparison did NOT check.
+
+        ``pinn_loss_mult`` was 0.0 on the dataclass and 1e4 in the shipped
+        JSON that actually supplied it, and every test passed. Compare VALUES,
+        for every field, so a default that is written but not used cannot
+        exist again.
+        """
+        from dataclasses import MISSING, fields
+        cfg = load_search_config()
         for group, cls in GROUP_CLASSES.items():
-            assert {f.name for f in fields(cls)} == groups[group], group
+            for spec in fields(cls):
+                if spec.default is not MISSING:
+                    declared = spec.default
+                elif spec.default_factory is not MISSING:
+                    declared = spec.default_factory()
+                else:
+                    raise AssertionError('%s.%s has no default' % (group, spec.name))
+                if group == 'evolution' and spec.name == 'operators':
+                    continue    # resolved from the operator tables, not a leaf
+                if group == 'objectives' and spec.name == 'sparsity_cls':
+                    continue    # the name is resolved to the operator class
+                assert getattr(getattr(cfg, group), spec.name) == declared,                     '%s.%s: declared %r, resolved %r' % (
+                        group, spec.name, declared,
+                        getattr(getattr(cfg, group), spec.name))
+
+    def test_no_shipped_json_declares_a_search_setting(self):
+        """Shadowing made impossible by construction, not by vigilance.
+
+        The bug was a second declaration in a data file that quietly won. Any
+        JSON shipped inside the package that names a config key would be one
+        again.
+        """
+        import epde
+        root = os.path.dirname(os.path.abspath(epde.__file__))
+        offenders = []
+        for dirpath, _dirnames, filenames in os.walk(root):
+            for name in filenames:
+                if not name.endswith('.json'):
+                    continue
+                path = os.path.join(dirpath, name)
+                try:
+                    with open(path, encoding='utf-8') as handle:
+                        payload = json.load(handle)
+                except (ValueError, OSError):
+                    continue
+                for key in _leaf_keys(payload):
+                    if key in KEY_GROUP:
+                        offenders.append((os.path.relpath(path, root), key))
+        assert not offenders, offenders
 
     def test_with_overrides_round_trips(self):
         cfg = load_search_config().with_overrides(use_solver=True,
@@ -359,19 +417,6 @@ class TestValidation:
         cfg = load_search_config({'_comment': 'hi',
                                   'domain': {'_note': 'x', 'boundary_width': 3}})
         assert cfg.domain.boundary_width == 3
-
-    def test_comment_keys_in_the_shipped_file_are_ignored_too(self, tmp_path,
-                                                              monkeypatch):
-        """KEY_GROUP is derived from the built-in JSON, so an inline comment
-        leaf there would silently become a settable config key."""
-        import epde.interface.search_config as sc
-        with open(DEFAULT_CONFIG_PATH, encoding='utf-8') as handle:
-            raw = json.load(handle)
-        raw['domain']['_note'] = 'a documented setting that moved elsewhere'
-        path = tmp_path / 'defaults.json'
-        path.write_text(json.dumps(raw), encoding='utf-8')
-        monkeypatch.setattr(sc, 'DEFAULT_CONFIG_PATH', str(path))
-        assert '_note' not in sc._read_default_config()['domain']
 
     def test_group_must_be_a_mapping(self):
         with pytest.raises(ValueError, match='must be a mapping'):

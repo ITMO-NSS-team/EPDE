@@ -57,6 +57,13 @@ LEGACY_DATA_KEYS = frozenset((
 #: the message explaining what to write instead. These raise rather than warn:
 #: silently guessing an equivalent would change what the search optimizes.
 REMOVED_KEYS = {
+    'params_filename': (
+        "params_filename has been removed. It named a JSON file of per-operator "
+        "parameters, which are now declared in epde.interface.search_config "
+        "(MULTI_OBJECTIVE_OPERATORS / SINGLE_OBJECTIVE_OPERATORS) so that a "
+        "setting has exactly one home. Override them per search with "
+        "operators={'EquationMutation': {'r_mutation': 0.4}}, or put the whole "
+        "thing in a config file and pass it as config=."),
     'use_pic': (
         "use_pic has been removed. It was a bool standing in for one choice -- "
         "which objective occupies MOEA/D's second Pareto axis -- so say that "

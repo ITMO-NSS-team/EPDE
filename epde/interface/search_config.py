@@ -4,13 +4,22 @@ The pre-config interface spread its defaults across ``__init__``,
 ``set_preprocessor``, ``set_moeadd_params``, ``set_singleobjective_params``,
 ``createDomain``, ``createTrajectory``, ``create_pool``, ``fit`` and
 ``predict``, so one setting could be spelled differently at different entry
-points and every script restated the defaults. This module lifts the
-``operators/utils/parameters`` JSON pattern to the search level: one grouped
-default file, an optional user config, and explicit kwargs on top.
+points and every script restated the defaults. This module gathers them into
+one grouped declaration, with an optional user config and explicit kwargs on
+top. The per-operator parameters that used to live in
+``operators/utils/parameters/*.json`` are here too, as
+:data:`MULTI_OBJECTIVE_OPERATORS` / :data:`SINGLE_OBJECTIVE_OPERATORS`.
 
 Precedence, strictly::
 
-    parameters/default_search_config.json  <  user config  <  explicit kwargs
+    the dataclass defaults below  <  user config  <  explicit kwargs
+
+**The dataclasses are the only place a default is written.** They used to
+document values that were really supplied by a shipped JSON file, which meant
+editing a field here changed nothing at all -- ``pinn_loss_mult`` was set to
+0.0 in this module while every run kept reading 1e4 from the JSON, with the
+whole unit suite green (the guard compared key *sets*, not values). The file
+is gone; a caller who wants settings in a file passes one as ``config=``.
 
 Groups are by *concern*, not by which method consumes them:
 
@@ -37,8 +46,8 @@ Groups are by *concern*, not by which method consumes them:
 A kwarg always wins, whatever group its key lives in, so
 ``EpdeSearch(use_solver=True)`` enables the solver without the caller needing
 to know that ``use_solver`` is filed under ``solver``. That flat-to-nested
-bridge is :data:`KEY_GROUP`, derived from the JSON at import time so it cannot
-drift from the shipped defaults.
+bridge is :data:`KEY_GROUP`, derived from the group dataclasses at import
+time so it cannot drift from them.
 
 Not configurable here -- these need an object, a tensor or a callable, and are
 passed at the call site: ``gfunction``, ``nds_method``, ``ndl_update_method``,
@@ -50,19 +59,16 @@ families (see :data:`TOKEN_REGISTRY`).
 import copy
 import json
 import os
-from dataclasses import dataclass, fields, replace
+from dataclasses import MISSING, dataclass, field, fields, replace
 from typing import Any, Dict, Optional, Union
 
 __all__ = ['UNSET', 'SearchConfig', 'load_search_config', 'KEY_GROUP',
            'collect_overrides', 'build_tokens', 'resolve_sparsity',
            'sparsity_settings', 'validate_sparsity_kwargs',
-           'DEFAULT_CONFIG_PATH', 'TOKEN_REGISTRY', 'SPARSITY_REGISTRY',
+           'TOKEN_REGISTRY', 'SPARSITY_REGISTRY',
            'GROUP_CLASSES', 'METRIC_MENUS', 'METRIC_ALIASES',
+           'MULTI_OBJECTIVE_OPERATORS', 'SINGLE_OBJECTIVE_OPERATORS',
            'active_config', 'set_active_config', 'reset_active_config']
-
-
-DEFAULT_CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'parameters',
-                                   'default_search_config.json')
 
 
 # ---------------------------------------------------------------------------
@@ -73,8 +79,8 @@ class _UnsetType:
     """Marker for "the caller did not pass this argument".
 
     A plain ``None`` default cannot serve here: ``None`` is a *meaningful*
-    value for several keys (``fourier_params``, ``params_filename``, and every
-    objective metric, where it means "leave the process global alone"). An
+    value for several keys (``fourier_params`` and every objective metric,
+    where it means "leave the process global alone"). An
     explicit ``discrepancy_metric=None`` must therefore beat a config file's
     ``"l2"``, which it can only do if "not passed" is a distinct third state.
     """
@@ -108,28 +114,48 @@ UNSET = _UnsetType()
 # ---------------------------------------------------------------------------
 # Group dataclasses
 # ---------------------------------------------------------------------------
-# Written out rather than generated from the JSON, so that a typo in
-# ``cfg.solver.devcie`` fails at the attribute instead of silently reading a
-# dict, and so the available settings stay greppable. The defaults below are
-# never actually used -- every field is filled from the JSON -- but they
-# document the shipped values inline. ``test_search_config.py`` pins the two
-# against each other so they cannot drift.
+# THE defaults. Written out as dataclasses so a typo in ``cfg.solver.devcie``
+# fails at the attribute instead of silently reading a dict, so the available
+# settings stay greppable, and -- since there is nowhere else a value can come
+# from -- so that editing one here actually changes what a search does.
+#
+# Container-valued fields need ``default_factory``; a bare ``= {}`` is a shared
+# mutable default. These were exactly the fields the deleted JSON was really
+# supplying, because the dataclass could only write ``None`` for them.
 
 @dataclass(frozen=True)
 class DomainConfig:
+    """Geometry of the sampled region.
+
+    ``boundary_width`` is used twice inside ``createDomain`` -- for
+    ``Domain.setBoundaries`` and for the ``BoundaryExclusion`` g-function width
+    -- deliberately: they are one concept and must agree.
+    """
     boundary_width: Union[int, list, tuple] = 5
     time_axis: int = 0
 
 
 @dataclass(frozen=True)
 class PreprocessingConfig:
+    """How the data is smoothed and differentiated.
+
+    ``max_deriv_order`` lives here rather than in ``search_space``: it is what
+    ``preprocesser.run`` actually computes.
+    """
     default_preprocessor_type: str = 'poly'
-    preprocessor_kwargs: dict = None
+    preprocessor_kwargs: dict = field(default_factory=dict)
     max_deriv_order: Union[int, list, tuple] = 1
 
 
 @dataclass(frozen=True)
 class SearchSpaceConfig:
+    """What the search is allowed to build.
+
+    ``data_fun_pow`` / ``deriv_fun_pow`` only set token-family power ranges;
+    the preprocessor never sees them. ``tokens`` declares prepared token
+    families; families needing tensors or callables are passed as objects
+    instead.
+    """
     data_fun_pow: int = 1
     deriv_fun_pow: int = 1
     equation_terms_max_number: int = 6
@@ -151,6 +177,21 @@ _GRAM_BY_INSTABILITY = {'vcoef': 'vcoef', 'cv': 'axis'}
 
 @dataclass(frozen=True)
 class ObjectivesConfig:
+    """How many Pareto axes, and how a candidate is fitted and scored.
+
+    ``second_objective`` replaces the removed ``use_pic`` flag
+    (``use_pic=True`` meant ``'instability'``). A ``None`` value means "do not
+    call the setter, leave whatever is already in ``epde.globals``".
+    ``sparsity_kwargs`` configures the operator named by ``sparsity_cls`` --
+    e.g. ``{'initial_sparsity_interval': [1e-4, 2.5]}`` for ``'lasso'``, the
+    range its alpha metaparameter is seeded from, or
+    ``{'realization': 'knee_ext2'}`` for ``'knee'``, which of the
+    subset-selection rules in ``operators/common/subset_selection.py`` picks
+    the support (``'knee'`` reads no alpha at all -- it selects by the shape of
+    the RSS-versus-size curve, so there is no L1 strength to seed). The Gram
+    construction is NOT a field here: it follows ``instability_metric``, see
+    :attr:`gram_mode`.
+    """
     multiobjective_mode: bool = True
     discrepancy_metric: Optional[str] = 'wape'
     second_objective: Optional[str] = 'instability'
@@ -159,7 +200,7 @@ class ObjectivesConfig:
     single_objective_metric: Optional[str] = 'discrepancy'
     anchor_on_residual: bool = False
     sparsity_cls: Any = 'vwsr'
-    sparsity_kwargs: dict = None
+    sparsity_kwargs: dict = field(default_factory=dict)
 
     @property
     def gram_mode(self):
@@ -177,45 +218,226 @@ class ObjectivesConfig:
         return _GRAM_BY_INSTABILITY.get(self.instability_metric)
 
 
+def _default_deepxde_config() -> dict:
+    return {'net': [95, 100, 95], 'activation': 'tanh', 'optimizer': 'adam',
+            'lr': 1e-3, 'num_domain': 1000, 'num_boundary': 200,
+            'num_initial': 200, 'epochs': 2000}
+
+
 @dataclass(frozen=True)
 class SolverConfig:
+    """Everything the PDE solver needs.
+
+    ``device`` lives here because the GPU is only ever used with the solver --
+    the caches are cpu/numpy by construction. ``pinn_loss_mult`` /
+    ``error_metric`` / ``deepxde_config`` are also parameters of the
+    ``SolverBasedFitness`` operator; they are declared HERE and injected into
+    the operator mapping by :func:`_resolve_operators`, so there is one
+    declaration rather than two that can disagree.
+    """
     use_solver: bool = False
     solver_backend: str = 'autograd'
     device: str = 'cpu'
-    pinn_loss_mult: float = 1e4
+    # 0.0, not the old 1e4: at 1e4 the PINN's own training loss was 99.4-100%
+    # of the discrepancy objective (measured over 30 Allen-Cahn candidates),
+    # so the Pareto axis ranked candidates by how EASY they were for the
+    # solver, not by how well they explained the data -- the best-scoring
+    # candidate of a run was a form with wape 1.001. The data term now stands
+    # alone (and is relative, see Discrepancy._compute_solver_l2); a diverged
+    # solve is already penalised by the bad solution it produces, and a NaN
+    # loss still short-circuits to 2 * LOSS_NAN_VAL. Raise this only to fuse
+    # the two deliberately.
+    pinn_loss_mult: float = 0.0
     error_metric: str = 'rmse'
-    deepxde_config: dict = None
+    deepxde_config: dict = field(default_factory=_default_deepxde_config)
     mode: str = 'NN'
     use_cache: bool = False
     use_fourier: bool = False
     fourier_params: Optional[dict] = None
     use_adaptive_lambdas: bool = False
-    compiling_params: dict = None
-    optimizer_params: dict = None
-    cache_params: dict = None
-    early_stopping_params: dict = None
-    plotting_params: dict = None
-    training_params: dict = None
+    compiling_params: dict = field(default_factory=dict)
+    optimizer_params: dict = field(default_factory=dict)
+    cache_params: dict = field(default_factory=dict)
+    early_stopping_params: dict = field(default_factory=dict)
+    plotting_params: dict = field(default_factory=dict)
+    training_params: dict = field(default_factory=dict)
+
+
+def _default_director_params() -> dict:
+    return {'variation_params': {}, 'mutation_params': {},
+            'sorter_params': {}, 'pareto_combiner_params': {},
+            'pareto_updater_params': {}}
 
 
 @dataclass(frozen=True)
 class EvolutionConfig:
+    """The evolutionary engine.
+
+    ``population_size`` and ``training_epochs`` are the multiobjective
+    defaults; when ``objectives.multiobjective_mode`` is false and neither was
+    set explicitly, the loader substitutes the single-objective defaults
+    (4 / 50) that ``set_singleobjective_params`` used, so switching modes does
+    not silently change them.
+
+    ``operators`` is the per-operator parameter mapping. As DECLARED it holds
+    only what a caller overrode; :func:`load_search_config` resolves it into
+    the full mapping -- :data:`MULTI_OBJECTIVE_OPERATORS` (or the
+    single-objective set) under those overrides, with the cross-referenced
+    keys injected from the group that owns them.
+    """
     population_size: int = 6
     training_epochs: int = 100
     neighbors_number: int = 3
     PBI_penalty: float = 5.0
     subregion_mating_limitation: float = 0.9
-    solution_params: dict = None
-    director_params: dict = None
-    operators: dict = None
+    solution_params: dict = field(default_factory=dict)
+    director_params: dict = field(default_factory=_default_director_params)
+    operators: dict = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
 class RuntimeConfig:
+    """Process-level bookkeeping.
+
+    ``free_tensor_cache_after_fit`` releases the evaluated-term cache when
+    ``fit()`` returns -- it is the bulk of the memory and is rebuildable. The
+    grid, sample and initial-data caches are kept, because ``equations()``,
+    ``predict()``, ``solver_forms()`` and ``visualize_solutions()`` all read
+    them after fit. Use ``EpdeSearch.close()``, or the context-manager form,
+    to release those too.
+    """
     memory_for_cache: Union[int, float] = 15
-    verbose_params: dict = None
-    params_filename: Optional[str] = None
+    verbose_params: dict = field(
+        default_factory=lambda: {'show_iter_idx': True})
     free_tensor_cache_after_fit: bool = True
+
+
+# ---------------------------------------------------------------------------
+# Operator parameters
+# ---------------------------------------------------------------------------
+# What ``operators/utils/parameters/default_parameters_*.json`` used to hold.
+# ``add_base_param_to_operator`` reads the block for an operator's ``key`` and
+# takes exactly the parameters named there, so a block declares BOTH which
+# parameters an operator has and what they default to.
+#
+# Six of those parameters are also search settings. They keep their place in
+# the block -- otherwise the operator would not receive them at all -- but
+# their VALUE is written once, in the group that owns it, and referenced here
+# with :class:`FromConfig`. That is what stops a second declaration from
+# drifting away from the first, which is how ``pinn_loss_mult`` came to be 0.0
+# in one file and 1e4 in two others.
+
+@dataclass(frozen=True)
+class FromConfig:
+    """Placeholder for an operator parameter owned by a config group."""
+    group: str
+    key: str
+
+    def resolve(self, resolved: dict):
+        return resolved[self.group][self.key]
+
+
+MULTI_OBJECTIVE_OPERATORS = {
+    'MOEADDSelection': {'delta': FromConfig('evolution',
+                                            'subregion_mating_limitation'),
+                        'parents_fraction': 0.2},
+    'PopulationUpdater': {'PBI_penalty': FromConfig('evolution',
+                                                    'PBI_penalty')},
+    'SortingBasedNeighborSelector': {
+        'number_of_neighbors': FromConfig('evolution', 'neighbors_number')},
+    'ParetoLevelUpdater': {'mutation_attempt_limit': 3,
+                           'offspring_attempt_limit': 3},
+    'InitialParetoLevelSorting': {'uniqueness_attempt_limit': 100},
+    'SolverFreeFitness': {'penalty_coeff': 0.2},
+    'SolverBasedFitness': {
+        'penalty_coeff': 0.2,
+        'pinn_loss_mult': FromConfig('solver', 'pinn_loss_mult'),
+        'error_metric': FromConfig('solver', 'error_metric'),
+        'deepxde_config': FromConfig('solver', 'deepxde_config'),
+    },
+    # Aliases kept ONLY so the functional harness (tests/functional) can fetch
+    # params by the historical operator names; the production search builds
+    # the SolverFreeFitness / SolverBasedFitness hosts above.
+    'DiscrepancyBasedFitnessWithCV': {'penalty_coeff': 0.2},
+    'PIC': {'penalty_coeff': 0.2,
+            'pinn_loss_mult': FromConfig('solver', 'pinn_loss_mult')},
+    'DeepXDEBasedFitness': {
+        'penalty_coeff': 0.2,
+        'error_metric': FromConfig('solver', 'error_metric'),
+        'deepxde_config': FromConfig('solver', 'deepxde_config'),
+    },
+    'ParetoLevelsCrossover': {},
+    'ChromosomeCrossover': {'equation_exchange_prob': 0.1},
+    'MetaparamerCrossover': {'metaparam_proportion': 0.05},
+    'EquationCrossover': {'crossover_probability': 1},
+    'EquationExchangeCrossover': {},
+    'TermCrossover': {'crossover_probability': 0.3},
+    'TermParamCrossover': {'term_param_proportion': 0.4},
+    'SystemMutation': {'indiv_mutation_prob': 1},
+    'EquationMutation': {'r_mutation': 0.6, 'n_added_terms': 12,
+                         'term_addition_prob': 0.5},
+    'MetaparameterMutation': {'mean': 0.0, 'std': 1.0},
+    'TermMutation': {},
+    'TermParameterMutation': {'r_param_mutation': 0.2, 'multiplier': 0.1,
+                              'strict_restrictions': 1},
+    'LinRegCoeffCalc': {},
+    'LASSOBasedSparsity': {},
+}
+
+SINGLE_OBJECTIVE_OPERATORS = {
+    'RouletteWheelSelection': {'parents_fraction': 0.4},
+    'SizeRestriction': {},
+    'FractionElitism': {
+        'number_of_neighbors': FromConfig('evolution', 'neighbors_number')},
+    'ParetoLevelUpdater': {'attempt_limit': 5},
+    'InitialParetoLevelSorting': {},
+    'SolverFreeFitness': {'penalty_coeff': 0.2},
+    'PopulationLevelCrossover': {},
+    'ChromosomeCrossover': {},
+    'EquationCrossover': {},
+    'TermCrossover': {'crossover_probability': 0.3},
+    'TermParamCrossover': {'term_param_proportion': 0.4},
+    'SystemMutation': {'indiv_mutation_prob': 0.7},
+    'EquationMutation': {'r_mutation': 0.6},
+    'MetaparameterMutation': {'mean': 0.0, 'std': 1e-4},
+    'TermMutation': {},
+    'TermParameterMutation': {'r_param_mutation': 0.2, 'multiplier': 0.1,
+                              'strict_restrictions': 1},
+    'LinRegCoeffCalc': {},
+    'LASSOBasedSparsity': {},
+}
+
+
+def _resolve_operators(resolved: dict) -> dict:
+    """The full per-operator mapping for this configuration.
+
+    The mode's base blocks, under whatever the caller put in
+    ``evolution.operators``, with every :class:`FromConfig` replaced by the
+    value from the group that owns it. A caller override wins over the
+    reference, so ``operators={'SolverBasedFitness': {'pinn_loss_mult': 5}}``
+    still works and is the more specific statement.
+    """
+    base = (MULTI_OBJECTIVE_OPERATORS
+            if resolved['objectives']['multiobjective_mode']
+            else SINGLE_OBJECTIVE_OPERATORS)
+    overrides = resolved['evolution'].get('operators') or {}
+    unknown = set(overrides) - set(base)
+    if unknown:
+        raise ValueError(
+            'operators={0}: no such operator in the {1}-objective set. '
+            'Known operators: {2}.'.format(
+                sorted(unknown),
+                'multi' if resolved['objectives']['multiobjective_mode'] else 'single',
+                ', '.join(sorted(base))))
+
+    out = {}
+    for name, params in base.items():
+        block = dict(params)
+        block.update(overrides.get(name, {}))
+        out[name] = {key: value.resolve(resolved)
+                     if isinstance(value, FromConfig) else value
+                     for key, value in block.items()}
+    return out
 
 
 GROUP_CLASSES = {
@@ -411,18 +633,30 @@ def build_tokens(specs):
 # ---------------------------------------------------------------------------
 
 def _read_default_config() -> dict:
-    # ``_``-prefixed names are comments, at both levels: JSON has no comment
-    # syntax, and the shipped file explains its groups and the odd key inline.
-    # A user config is stripped the same way in ``_apply_file_layer``.
-    with open(DEFAULT_CONFIG_PATH, encoding='utf-8') as handle:
-        raw = json.load(handle)
-    return {group: {key: value for key, value in values.items()
-                    if not key.startswith('_')}
-            for group, values in raw.items() if not group.startswith('_')}
+    """The shipped defaults, read off the dataclasses themselves.
+
+    There is no default file to disagree with: a field's declared default IS
+    the default. ``default_factory`` is called per group so the mutable ones
+    are fresh, and ``load_search_config`` deep-copies again, so no two
+    ``SearchConfig`` objects can share a sub-dict.
+    """
+    defaults = {}
+    for group, cls in GROUP_CLASSES.items():
+        values = {}
+        for spec in fields(cls):
+            if spec.default is not MISSING:
+                values[spec.name] = spec.default
+            elif spec.default_factory is not MISSING:   # noqa: B009
+                values[spec.name] = spec.default_factory()
+            else:
+                raise TypeError(
+                    '{0}.{1} declares no default; every search setting must '
+                    'have one here, since this module is the only place a '
+                    'default is written.'.format(cls.__name__, spec.name))
+        defaults[group] = values
+    return defaults
 
 
-# Parsed once; every resolution deep-copies it, so no two ``SearchConfig``
-# objects can share a mutable sub-dict.
 _DEFAULTS = _read_default_config()
 
 
@@ -675,6 +909,9 @@ def load_search_config(user_config=None, overrides=None) -> SearchConfig:
 
     _normalise_metrics(resolved)
     _check_types(resolved)
+    # After every layer, so a kwarg or a config file can move both a setting
+    # and the operator parameter that references it in one step.
+    resolved['evolution']['operators'] = _resolve_operators(resolved)
     resolved['objectives']['sparsity_cls'] = resolve_sparsity(
         resolved['objectives']['sparsity_cls'])
     resolved['objectives']['sparsity_kwargs'] = validate_sparsity_kwargs(
