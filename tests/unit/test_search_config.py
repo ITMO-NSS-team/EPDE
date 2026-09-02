@@ -15,6 +15,7 @@ import pytest
 
 from epde.interface.search_config import (
     GROUP_CLASSES, KEY_GROUP, MULTI_OBJECTIVE_OPERATORS, SPARSITY_REGISTRY,
+    default_device,
     TOKEN_REGISTRY, UNSET, FromConfig, SearchConfig, build_tokens,
     collect_overrides, load_search_config, resolve_sparsity)
 
@@ -91,9 +92,24 @@ class TestDefaultPin:
         cfg = load_search_config().solver
         assert cfg.use_solver is False
         assert cfg.solver_backend == 'autograd'
-        assert cfg.device == 'cpu'
+        # The GPU is the default when one is usable; a machine without one
+        # resolves to cpu through the same call.
+        assert cfg.device == default_device()
         assert cfg.mode == 'NN'
         assert cfg.use_cache is False
+
+    def test_device_follows_gpu_availability(self, monkeypatch):
+        """cuda when torch reports a usable GPU, cpu when it does not."""
+        import epde.interface.search_config as sc
+        import torch
+        monkeypatch.setattr(torch.cuda, 'is_available', lambda: True)
+        assert sc.default_device() == 'cuda'
+        monkeypatch.setattr(torch.cuda, 'is_available', lambda: False)
+        assert sc.default_device() == 'cpu'
+
+    def test_an_explicit_device_still_wins(self):
+        """Forcing the CPU on a GPU machine -- a bit-identical A/B, say."""
+        assert load_search_config(overrides={'device': 'cpu'}).solver.device == 'cpu'
 
     def test_solver_keys_reach_the_operator_mapping(self):
         """pinn_loss_mult / error_metric / deepxde_config are parameters of

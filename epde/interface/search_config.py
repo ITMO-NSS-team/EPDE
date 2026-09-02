@@ -68,6 +68,7 @@ __all__ = ['UNSET', 'SearchConfig', 'load_search_config', 'KEY_GROUP',
            'TOKEN_REGISTRY', 'SPARSITY_REGISTRY',
            'GROUP_CLASSES', 'METRIC_MENUS', 'METRIC_ALIASES',
            'MULTI_OBJECTIVE_OPERATORS', 'SINGLE_OBJECTIVE_OPERATORS',
+           'default_device',
            'active_config', 'set_active_config', 'reset_active_config']
 
 
@@ -218,6 +219,27 @@ class ObjectivesConfig:
         return _GRAM_BY_INSTABILITY.get(self.instability_metric)
 
 
+def default_device() -> str:
+    """``'cuda'`` when a working GPU is visible, otherwise ``'cpu'``.
+
+    Probed once, when this module is imported (``_DEFAULTS`` calls every
+    ``default_factory`` there), so a search does not re-ask the driver on each
+    construction. ``device='cpu'`` remains a plain kwarg for a caller who wants
+    the CPU on a GPU machine -- for a bit-identical A/B, say, where the two
+    backends do not produce the same rounding.
+
+    A torch that cannot be imported, or a GPU that is present but unusable
+    (busy, wrong driver), reports unavailable and lands on the CPU. Requesting
+    cuda when it is not there is not silent either: ``_resolved_device`` warns
+    and falls back.
+    """
+    try:
+        import torch
+        return 'cuda' if torch.cuda.is_available() else 'cpu'
+    except Exception:                                          # noqa: BLE001
+        return 'cpu'
+
+
 def _default_deepxde_config() -> dict:
     return {'net': [95, 100, 95], 'activation': 'tanh', 'optimizer': 'adam',
             'lr': 1e-3, 'num_domain': 1000, 'num_boundary': 200,
@@ -229,7 +251,9 @@ class SolverConfig:
     """Everything the PDE solver needs.
 
     ``device`` lives here because the GPU is only ever used with the solver --
-    the caches are cpu/numpy by construction. ``pinn_loss_mult`` /
+    the caches are cpu/numpy by construction. It defaults to the GPU when one
+    is available (see :func:`default_device`); pass ``device='cpu'`` to force
+    the CPU. ``pinn_loss_mult`` /
     ``error_metric`` / ``deepxde_config`` are also parameters of the
     ``SolverBasedFitness`` operator; they are declared HERE and injected into
     the operator mapping by :func:`_resolve_operators`, so there is one
@@ -237,7 +261,7 @@ class SolverConfig:
     """
     use_solver: bool = False
     solver_backend: str = 'autograd'
-    device: str = 'cpu'
+    device: str = field(default_factory=default_device)
     # 0.0, not the old 1e4: at 1e4 the PINN's own training loss was 99.4-100%
     # of the discrepancy objective (measured over 30 Allen-Cahn candidates),
     # so the Pareto axis ranked candidates by how EASY they were for the
