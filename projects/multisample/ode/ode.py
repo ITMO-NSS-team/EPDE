@@ -50,10 +50,12 @@ def ODE_discovery():
 
     epde_search_obj = epde.EpdeSearch(use_solver=False, multiobjective_mode=True,  # boundary = bnd,
                                       verbose_params={'show_iter_idx': True},
-                                      device='cpu')  # False for brevity coordinate_tensors = [t,],
-    epde_search_obj.set_preprocessor(default_preprocessor_type='poly',
-                                     preprocessor_kwargs={'use_smoothing': False, 'sigma': 1,
-                                                          'polynomial_window': 3, 'poly_order': 3})
+                                      device='cuda')  # False for brevity coordinate_tensors = [t,],
+    # epde_search_obj.set_preprocessor(default_preprocessor_type='poly',
+    #                                  preprocessor_kwargs={'use_smoothing': False, 'sigma': 1,
+    #                                                       'polynomial_window': 3, 'poly_order': 3})
+    epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
+                                     preprocessor_kwargs={})
     trig_tokens = epde.TrigonometricTokens(freq=(0.999, 1.001), dimensionality=max_axis_idx)
     grid_tokens = epde.GridTokens(['x_0', ], dimensionality=max_axis_idx, max_power=2)
 

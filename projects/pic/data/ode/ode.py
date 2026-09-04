@@ -47,7 +47,6 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
     for var in all_vars:
         correct_eq.vals[var].main_var_to_explain = var
         correct_eq.vals[var].metaparameters = metaparams
-        correct_eq.vals[var].simplified = True
         correct_eq.vals[var].weights_internal = np.append(np.ones(len(correct_eq.vals[var].structure) - 1), 0.0)
         correct_eq.vals[var].weights_internal_evald = True
     print(correct_eq.text_form)
@@ -57,7 +56,6 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
     for var in all_vars:
         incorrect_eq.vals[var].main_var_to_explain = var
         incorrect_eq.vals[var].metaparameters = metaparams
-        incorrect_eq.vals[var].simplified = True
         incorrect_eq.vals[var].weights_internal = np.append(np.ones(len(incorrect_eq.vals[var].structure) - 1), 0.0)
         incorrect_eq.vals[var].weights_internal_evald = True
     print(incorrect_eq.text_form)
@@ -190,7 +188,7 @@ def ODE_simple_discovery(foldername, noise_level):
     epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
 
-    popsize = 8
+    popsize = 16
     epde_search_obj.set_moeadd_params(population_size=popsize, training_epochs=15)
 
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}

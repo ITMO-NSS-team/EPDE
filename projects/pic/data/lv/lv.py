@@ -106,7 +106,7 @@ def lv_discovery(noise_level):
                                  device='cuda')
     _, domain = epde_search_obj.createDomain((t,), boundary_width=15, ID=0)
 
-    epde_search_obj.set_preprocessor(default_preprocessor_type='poly',
+    epde_search_obj.set_preprocessor(default_preprocessor_type='FD',
                                      preprocessor_kwargs={})
 
     popsize = 16
