@@ -32,6 +32,7 @@ from epde.interface.search_config import (load_search_config, resolve_sparsity,
 from epde.operators.common.sparsity import (VWSRSparsity,
                                             build_sparsity_operator,
                                             initial_sparsity_interval)
+from epde.operators.common.coeff_calculation import LinRegBasedCoeffsEquation
 from epde.operators.common.objectives import Discrepancy, FitContext
 from epde.operators.common.subset_selection import (KneeSparsity, REALIZATIONS,
                                                     SOLVER_FREE_DISCREPANCIES,
@@ -335,6 +336,16 @@ class StubEquation:
         return self._target, self._features
 
 
+def _promote(equation):
+    """Run the coefficient step as ``EqRightPartSelector`` wires it for a
+    physical-scale sparsity operator: it promotes ``weights_internal`` and is
+    the sole author of ``weights_final_evald``."""
+    coeff_calc = LinRegBasedCoeffsEquation([])
+    coeff_calc.sparsity_fits_physical = True
+    coeff_calc.apply(equation, {})
+    return equation
+
+
 @pytest.fixture
 def stub_samples(monkeypatch):
     """Install a samples_manager over the trajectories a test declares."""
@@ -379,18 +390,36 @@ class TestKneeSparsityOperator:
         assert weights[-1] == 0.0                      # no constant needed
         assert weights[:3] == pytest.approx([5.0, -4.0, 3.0], abs=2e-3)
 
-    def test_final_and_internal_weights_agree(self, stub_samples):
-        """No legacy refit follows, so the magnitudes ARE the internal ones --
-        and the marker that requests that refit must stay unset."""
+    def test_sparsity_alone_does_not_claim_final_weights(self, stub_samples):
+        """The support decision is this operator's whole output.
+
+        ``weights_final_evald`` has exactly one author -- the coefficient
+        calculation -- so an equation that has only been through sparsity must
+        still read as having no fitted magnitudes.
+        """
         X, y = _library()
         stub_samples({0: (X.shape[0],)})
         equation = StubEquation({0: X}, {0: y})
         with using_config(instability_metric='chi2'):
             KneeSparsity().apply(equation, {})
-        assert np.array_equal(equation.weights_internal, equation.weights_final)
         assert equation.weights_internal_evald is True
+        assert equation.weights_final_evald is False
+
+    def test_the_coefficient_step_promotes_them_unchanged(self, stub_samples):
+        """This operator declares ``fits_physical_scale``, so the coefficient
+        step promotes its vector rather than refitting: the magnitudes ARE the
+        internal ones."""
+        X, y = _library()
+        stub_samples({0: (X.shape[0],)})
+        equation = StubEquation({0: X}, {0: y})
+        with using_config(instability_metric='chi2'):
+            KneeSparsity().apply(equation, {})
+        _promote(equation)
+        assert np.array_equal(equation.weights_internal, equation.weights_final)
         assert equation.weights_final_evald is True
-        assert getattr(equation, '_legacy_refit_pending', False) is False
+
+    def test_the_operator_declares_its_scale(self):
+        assert KneeSparsity.fits_physical_scale is True
 
     def test_the_stale_instability_caches_are_always_overwritten(
             self, stub_samples):
@@ -607,6 +636,9 @@ class TestDiscrepancyCurve:
         with using_config(instability_metric='chi2',
                           discrepancy_metric=metric):
             operator.apply(equation, {})
+        # The filler reads ``weights_final``; only the coefficient step writes
+        # it. For this operator that is a promotion of the vector above.
+        _promote(equation)
         return X, y, equation
 
     @pytest.mark.parametrize('metric', SOLVER_FREE_DISCREPANCIES)
