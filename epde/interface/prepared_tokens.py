@@ -270,7 +270,18 @@ class TrigonometricTokens(PreparedTokens):
                                          ('dim', (0, dimensionality))])
         print(f'trig_token_params: VALUES = {trig_token_params["dim"]}')
         freq_equality_fraction = 0.05  # fraction of allowed frequency interval, that is considered as the same
-        trig_equal_params = {'power': 0, 'freq': (freq[1] - freq[0]) / freq_equality_fraction,
+        # 5% OF the declared interval, hence a MULTIPLICATION. This read
+        # ``/ freq_equality_fraction``, which is 20x the whole interval rather
+        # than a twentieth of it, so every admissible frequency quantised to
+        # bucket 0: ``Factor._quantized_params`` computes
+        # ``int((v - bounds[0]) / tol)`` and the numerator can never reach the
+        # denominator. All sin/cos factors then shared one ``structural_label``,
+        # one ``Term.factors_labels`` and therefore ONE cached tensor -- so the
+        # first frequency evaluated was reused for every later one and the
+        # frequency printed in an equation was not the frequency that had been
+        # scored. It also made the trig tokens mutually "equal" under
+        # ``Factor.__eq__``, which collapses dedup across the whole family.
+        trig_equal_params = {'power': 0, 'freq': (freq[1] - freq[0]) * freq_equality_fraction,
                              'dim': 0}
         self._token_family.set_params(['sin', 'cos'], trig_token_params, trig_equal_params)
         self._token_family.set_evaluator(trigonometric_evaluator)
@@ -308,7 +319,8 @@ class PhasedSine1DTokens(PreparedTokens):
                    + params["phase"][1] + r')'
         
         self._token_family.set_latex_form_constructor(latex_form)
-        sine_equal_params = {'power': 0, 'freq': (freq[1] - freq[0]) / freq_equality_fraction,
+        # Same divide-for-multiply as TrigonometricTokens above; see there.
+        sine_equal_params = {'power': 0, 'freq': (freq[1] - freq[0]) * freq_equality_fraction,
                              'phase': 0.05}
         self._token_family.set_params(['sine',], sine_token_params, sine_equal_params)
         self._token_family.set_evaluator(phased_sine_evaluator)        
