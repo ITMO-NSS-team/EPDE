@@ -165,7 +165,7 @@ class Model_prepare():
             * **best_checkpoint** -- best model with optimizator state.\n
             * **min_loss** -- minimum error in pre-trained error.
         """
-        files = glob.glob(self.cache_dir + '\*.tar')
+        files = glob.glob(self.cache_dir + r'\*.tar')
         if len(files) == 0:
             best_checkpoint = None
             min_loss = torch.tensor([float('inf')])

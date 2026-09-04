@@ -19,7 +19,7 @@ class MOEADDSelection(CompoundOperator):
     key = 'MOEADDSelection'
     
     def apply(self, objective : ParetoLevels, arguments : dict): # pareto_levels
-        '''
+        r'''
         
         The mating operator, designed to select parents for the crossover with respect 
         to the location of the point in the objective functions values space and the 
@@ -104,7 +104,7 @@ class MOEADDSelectionConstrained(CompoundOperator):
     key = 'MOEADDSelectionConstrained'
     
     def apply(self, objective : ParetoLevels, arguments : dict):
-        '''
+        r'''
         
         The mating operator, designed to select parents for the crossover with respect 
         to the location of the point in the objective functions values space and the 

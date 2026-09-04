@@ -8,9 +8,9 @@ from epde.supplementary import BasicDeriv, AutogradDeriv
 
 def prepare_control_inputs(model: Union[torch.nn.Sequential, List[np.ndarray]], grid: torch.Tensor, 
                            args: List[Tuple[Union[int, List]]], diff_method: BasicDeriv = None) -> torch.Tensor:
-    '''
-    Recompute the control ANN arguments tensor from the solutions of 
-    controlled equations $L \mathbf{u}(t, \mathbf{x}, \mathbf{c}) = 0$, 
+    r'''
+    Recompute the control ANN arguments tensor from the solutions of
+    controlled equations $L \mathbf{u}(t, \mathbf{x}, \mathbf{c}) = 0$,
     calculating necessary derivatives, as `args` 
 
     Args:

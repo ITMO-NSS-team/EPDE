@@ -114,7 +114,7 @@ class CachePreprocessing:
             Union[None, dict, torch.Tensor]: best model with optimizator state.
         """
 
-        files = glob.glob(cache_dir + '\*.tar')
+        files = glob.glob(cache_dir + r'\*.tar')
 
         if cache_verbose:
             print(f"The CACHE will be searched among the models in the folder {cache_dir}.")
