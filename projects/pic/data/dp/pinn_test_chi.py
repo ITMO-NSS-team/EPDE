@@ -5,7 +5,7 @@ Same physics term as the baseline (TRUE coefs in the residual), plus a
 RAW Nyblom-Hansen constancy penalty on the GLOBAL OLS recovery of each
 equation's coefficients -- the WINDOWLESS counterpart of pinn_test_cv's
 30-overlapping-window het score (see cv_metric.chi2_per_term; it mirrors
-epde's survival.chi2_scores(..., rescale=False), the production keep-rule
+epde's survival.chi2_scores(...), the production keep-rule
 / Instability formula):
 
     L_phys = sum_eq mean_w mean_{k in w} ( (target_eq(t_k) - features_eq(t_k) @ theta_true_eq) / PHYS_SCALE_eq )^2

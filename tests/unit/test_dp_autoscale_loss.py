@@ -33,9 +33,19 @@ _DP_DIR = os.path.join(_REPO_ROOT, 'projects', 'pic', 'data', 'dp')
 if _DP_DIR not in sys.path:
     sys.path.insert(0, _DP_DIR)
 
-from cv_metric import (HardICWrapper, bounded, chi2_per_term,  # noqa: E402
-                       global_ols, het_per_window, max_corr,
-                       observation_loss)
+# Optional testbed module living under ``projects/``, not in the package.
+# Skip rather than error at COLLECTION when it is absent -- a collection
+# error takes the whole suite down and forces an --ignore flag.
+_cv_metric = pytest.importorskip(
+    "cv_metric",
+    reason="projects/pic/data/dp/cv_metric.py is absent from the tree")
+HardICWrapper = _cv_metric.HardICWrapper
+bounded = _cv_metric.bounded
+chi2_per_term = _cv_metric.chi2_per_term
+global_ols = _cv_metric.global_ols
+het_per_window = _cv_metric.het_per_window
+max_corr = _cv_metric.max_corr
+observation_loss = _cv_metric.observation_loss
 
 
 def _problem(n=600):

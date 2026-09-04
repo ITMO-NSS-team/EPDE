@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Parity of the DP PINN testbed's torch ``chi2_per_term``
 (``projects/pic/data/dp/cv_metric.py``) with the canonical numpy
-``survival.chi2_scores(..., fit_intercept=False, rescale=False)`` --
+``survival.chi2_scores(..., fit_intercept=False)`` --
 plus the torch-only contracts: NaN-free gradients through the exact-fit
 floor and the dead-column 0/0 route, and a LIVE detach boundary on the
 calibration denominator D."""
@@ -21,7 +21,13 @@ _DP_DIR = os.path.join(_REPO_ROOT, 'projects', 'pic', 'data', 'dp')
 if _DP_DIR not in sys.path:
     sys.path.insert(0, _DP_DIR)
 
-from cv_metric import chi2_per_term  # noqa: E402
+# ``cv_metric`` is the DP PINN testbed's torch port and is not part of the
+# package; skip rather than error at COLLECTION when it is absent, which
+# otherwise takes the whole suite down with it and forces an --ignore flag.
+chi2_per_term = pytest.importorskip(
+    "cv_metric",
+    reason="projects/pic/data/dp/cv_metric.py is absent from the tree",
+).chi2_per_term  # noqa: E402
 from epde.operators.common.survival import chi2_scores  # noqa: E402
 
 
@@ -43,8 +49,7 @@ class TestNumpyParity:
         # ridge=0.0 leaves only the absolute float64 tiny (~2.2e-16) in
         # the torch solve vs numpy's unridged _solve_gram -- negligible.
         A, y = _problem()
-        want = chi2_scores(A, y, None, (y.size,), fit_intercept=False,
-                           rescale=False)
+        want = chi2_scores(A, y, None, (y.size,), fit_intercept=False)
         got = chi2_per_term(torch.tensor(y, dtype=torch.float64),
                             torch.tensor(A, dtype=torch.float64),
                             ridge=0.0)["score"].numpy()
@@ -55,8 +60,7 @@ class TestNumpyParity:
         # Realistic training dtype + the default adaptive ridge: loose
         # agreement documents that the statistic survives float32.
         A, y = _problem()
-        want = chi2_scores(A, y, None, (y.size,), fit_intercept=False,
-                           rescale=False)
+        want = chi2_scores(A, y, None, (y.size,), fit_intercept=False)
         got = chi2_per_term(torch.tensor(y, dtype=torch.float32),
                             torch.tensor(A, dtype=torch.float32),
                             )["score"].numpy()
@@ -65,8 +69,7 @@ class TestNumpyParity:
     def test_weighted_parity(self):
         A, y = _problem()
         w = 0.5 + np.linspace(0.0, 1.0, y.size)
-        want = chi2_scores(A, y, w, (y.size,), fit_intercept=False,
-                           rescale=False)
+        want = chi2_scores(A, y, w, (y.size,), fit_intercept=False)
         got = chi2_per_term(torch.tensor(y, dtype=torch.float64),
                             torch.tensor(A, dtype=torch.float64),
                             weights=torch.tensor(w, dtype=torch.float64),

@@ -37,9 +37,25 @@ for _d in (_DATA_DIR, _DP_DIR):
     if _d not in sys.path:
         sys.path.insert(0, _d)
 
-from pinn_common import (arm_table, assert_train_only, contrast,  # noqa: E402
-                         contrast_table, mde, paired_t, seeds_needed,
-                         sign_p, t_crit)
+# Optional testbed module living under ``projects/``, not in the package.
+# Skip rather than error at COLLECTION when it is absent -- a collection error
+# takes the whole suite down and forces an --ignore flag. ``importorskip`` is
+# not enough: these testbed modules load their siblings by explicit path, so a
+# missing one surfaces as FileNotFoundError rather than ImportError.
+try:
+    import pinn_common as _pinn_common
+except (ImportError, OSError) as _exc:      # OSError covers FileNotFoundError
+    pytest.skip(f"projects/pic/data/pinn_common.py is unavailable: {_exc}",
+                allow_module_level=True)
+arm_table = _pinn_common.arm_table
+assert_train_only = _pinn_common.assert_train_only
+contrast = _pinn_common.contrast
+contrast_table = _pinn_common.contrast_table
+mde = _pinn_common.mde
+paired_t = _pinn_common.paired_t
+seeds_needed = _pinn_common.seeds_needed
+sign_p = _pinn_common.sign_p
+t_crit = _pinn_common.t_crit
 
 
 # ============================================================ paired t
