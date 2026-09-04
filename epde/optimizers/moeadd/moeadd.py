@@ -275,6 +275,18 @@ class ParetoLevels(object):
         """
         Deletion of a candidate solution point from the pareto levels and the population list.
 
+        Removing a solution invalidates the non-domination level structure:
+        everything whose only dominator was ``point`` belongs one level
+        shallower, and dropping a level that empties shifts every level below it
+        by one. MOEA/DD requires the structure to be re-derived here -- Algorithm
+        4 line 26, "Use the method suggested in [66] to update the nondomination
+        level structure of P" (repeated at Algorithm 6 line 16). Filtering the
+        point out of each level, as this used to do, is only the first half of
+        that. Measured on a 16-individual / 14-insertion replay, the filtered
+        structure diverged from the true sorting on 13 of 14 insertions, with up
+        to 12 solutions carrying a wrong level at once -- and ``levels[-1]``
+        selects the whole three-way branch of ``PopulationUpdater``.
+
         Args:
             point (`MOEADDSolution`): The point, removed from the candidate solutions pool.
 
@@ -311,8 +323,11 @@ class ParetoLevels(object):
             print('cleared population', [solution.vals for solution in population_cleared], len([solution.vals for solution in self.population]), '\n')
             print(point.vals)
             raise Exception('Deleted something extra')
-        self.levels = new_levels
         self.population = population_cleared
+        # Algorithm 4 line 26. ``new_levels`` above is only used to police the
+        # population/levels consistency invariant; the structure itself is
+        # re-derived from the surviving population.
+        self.levels = self.sort()
 
     def get_stats(self):
         return np.array(flatten_chain([[element.obj_fun for element in level] 

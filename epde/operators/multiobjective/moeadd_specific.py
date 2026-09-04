@@ -58,12 +58,17 @@ def penalty_based_intersection(sol_obj, weight, ideal_obj,
     return d_1 + penalty_factor * d_2
 
 
-def population_to_sectors(population, weights):
+def population_to_sectors(population, weights, obj_normalizer=None):
     '''
     The distribution of the solutions into the domains, defined by weights vectors.
+
+    ``obj_normalizer`` reaches MOEA/DD Eq. (6) through
+    ``MOEADDSolution.get_domain``, so a solution's subregion is decided on the
+    same scale ``penalty_based_intersection`` and ``marriageSolutionAssignment``
+    use. It only affects solutions whose association has not been derived yet.
     '''
     solution_selection = lambda weight_idx: [solution for solution in population
-                                             if solution.get_domain(weights) == weight_idx]
+                                             if solution.get_domain(weights, obj_normalizer) == weight_idx]
     return list(map(solution_selection, np.arange(len(weights))))
 
 
@@ -119,7 +124,8 @@ def decomposition_based_worst(solutions: list, weights: np.ndarray, best_obj: np
     population; equivalent to ``LOCATE_WORST`` (Algorithm 5) since every
     solution lives on the single front.
     '''
-    domain_solutions = population_to_sectors(solutions, weights) if sectors is None else sectors
+    domain_solutions = (population_to_sectors(solutions, weights, obj_normalizer)
+                        if sectors is None else sectors)
     most_crowded_domain = _most_crowded_domain(domain_solutions, weights, best_obj,
                                                penalty_factor, obj_normalizer)
 
@@ -135,7 +141,8 @@ def locate_pareto_worst(levels, weights: np.ndarray, best_obj: np.ndarray, penal
     '''
     Function dedicated to the selection of the worst solution on the Pareto levels.
     '''
-    domain_solutions = population_to_sectors(levels.population, weights) if sectors is None else sectors
+    domain_solutions = (population_to_sectors(levels.population, weights, levels.normalizer)
+                        if sectors is None else sectors)
     most_crowded_domain = _most_crowded_domain(domain_solutions, weights, best_obj,
                                                penalty_factor, levels.normalizer)
 
@@ -179,7 +186,10 @@ class PopulationUpdater(CompoundOperator):
 
         # Sector association is computed once per update and passed into
         # the worst-finders (previously recomputed up to 3x per insertion).
-        population_sectors = population_to_sectors(levels_obj.population, weights)
+        # The normalizer goes with it so Eq. (6) is evaluated on the scale PBI
+        # selects on -- the same scale the initial marriage assignment used.
+        population_sectors = population_to_sectors(levels_obj.population, weights,
+                                                   levels_obj.normalizer)
 
         if len(levels_obj.levels) == 1:
             # Algorithm 4, Case 1: single front — decomposition on entire population
@@ -430,8 +440,8 @@ def regenerate_degenerate_equations(offspring, right_part_selector, chromosome_f
         if not degenerate:
             return
         for eq in degenerate:
+            # ``randomize`` rebuilds through ``__init__``, which resets.
             eq.randomize()
-            eq.reset_state(reset_right_part=True)
         offspring.reset_moeadd_state()
         right_part_selector.apply(objective=offspring, arguments=rps_args)
         chromosome_fitness.apply(objective=offspring, arguments=fitness_args)

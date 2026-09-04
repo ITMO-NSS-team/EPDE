@@ -122,11 +122,21 @@ def ndl_update(new_solution, levels) -> list:   # efficient_ndl_update
                 # Falls through from branch 1, so `not any(dom_over_me)` already holds:
                 # incomparable with every existing element, append to this level.
                 level_new.append(moving_set_elem)
-            elif all(check_dominance(moving_set_elem, s) for s in levels[level_idx]):
-                # NOTE: this branch deliberately checks the ORIGINAL ``levels``
-                # snapshot, not the mutated ``new_levels``, to detect the case
-                # where this element dominates the entire pre-update Pareto
-                # layer and therefore deserves a new layer above it.
+            elif all(dom_by_me):
+                # ``dom_by_me`` is taken against the CURRENT level content, not
+                # the original ``levels`` snapshot. Reading the snapshot here was
+                # wrong: elements appended to this level earlier in the same
+                # moving-set pass are invisible to it, so an element that
+                # dominated the whole PRE-UPDATE layer inserted a new layer above
+                # it and pushed those freshly-placed siblings down with it.
+                # Minimal counterexample (2 objectives) --
+                #   levels: L0 = [(.36,.94), (.65,.59), (.69,.17)], L1 = [(.83,.33)]
+                #   insert (.48,.03), which dominates the last three
+                # (.65,.59) is placed on L1, then (.69,.17) -- which dominates
+                # all of the ORIGINAL L1 = [(.83,.33)] but not (.65,.59) -- opened
+                # a new layer and demoted (.65,.59) to L2, though its only
+                # dominator sits on L0. Pinned by
+                # ``test_ndl_update.py::TestNDLUpdateEquivalence``.
                 temp_levels = new_levels[level_idx:]
                 new_levels[level_idx:] = []
                 new_levels.append([moving_set_elem,])

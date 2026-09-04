@@ -12,29 +12,54 @@ from abc import ABC, abstractmethod
 from epde.optimizers.moeadd.supplementary import acute_angle
 
 
-def get_domain_idx(solution, weights) -> int:
+def get_domain_idx(solution, weights, obj_normalizer=None) -> int:
     """
-    Function, devoted to finding the domain, defined by **weights**, to which the 
-    **solutions** belongs. The belonging is determined by the acute angle between solution and 
+    Function, devoted to finding the domain, defined by **weights**, to which the
+    **solutions** belongs. The belonging is determined by the acute angle between solution and
     the weight vector, defining the domain.
 
+    This is MOEA/DD Eq. (6). ``obj_normalizer`` scales the objective vector
+    before the angle is taken, which is the scaling ``penalty_based_intersection``
+    applies before it selects WITHIN a subregion, and the scaling
+    ``marriageSolutionAssignment`` applies when it hands out the initial
+    associations. Leaving it unset reproduces the paper literally -- Eq. (6) is
+    written on a raw ``F(x)`` -- but the paper never rescales objectives at all,
+    while this optimizer does, and running the two association paths on
+    different scales partitions one objective space two different ways: on a
+    14-offspring Allen-Cahn epoch 5 of the offspring landed in a different
+    subregion under the raw angle than under the normalized one.
+
     Args:
-        solution (`np.ndarray|src.moeadd.moeadd_solution_template.MOEADDSolution`): The candidate solution, for which we are determining the domain, or its objective 
+        solution (`np.ndarray|src.moeadd.moeadd_solution_template.MOEADDSolution`): The candidate solution, for which we are determining the domain, or its objective
             function values, stored in np.ndarray.
-        weights (`np.ndarray`): Numpy ndarray, containing weights from the moeadd optimizer. 
+        weights (`np.ndarray`): Numpy ndarray, containing weights from the moeadd optimizer.
+        obj_normalizer (`callable`): optional, default - None
+            Objective scaler applied before the angle is taken; ``None`` uses the
+            raw objective vector.
 
     Returns:
         idx (`int`): Index of the domain (i.e. index of corresponing weight vector), to which the solution belongs.
     """
 
     if type(solution) == np.ndarray:
-        return np.fromiter(map(lambda x: acute_angle(x, solution), weights), dtype=float).argmin()
+        objective, per_weight_repeats = solution, 1
     elif type(solution.obj_fun) == np.ndarray:
-        return np.fromiter(map(lambda x: acute_angle([item for item in x for _ in solution.vals], solution.obj_fun), weights), dtype=float).argmin()
-        # return np.fromiter(map(lambda x: acute_angle(x, solution.obj_fun), weights), dtype=float).argmin()
+        # A weight carries one component per objective TYPE; the objective
+        # vector carries one entry per (objective, equation) pair.
+        objective, per_weight_repeats = solution.obj_fun, len(solution.vals)
     else:
         raise ValueError(
             'Can not detect the vector of objective function for solution')
+
+    if obj_normalizer is not None:
+        objective = obj_normalizer(np.asarray(objective, dtype=float))
+
+    def angle(weight):
+        expanded = ([item for item in weight for _ in range(per_weight_repeats)]
+                    if per_weight_repeats > 1 else weight)
+        return acute_angle(expanded, objective)
+
+    return np.fromiter(map(angle, weights), dtype=float).argmin()
 
 
 class CrossoverSelectionCounter(object):
@@ -98,12 +123,18 @@ class MOEADDSolution(ABC):
             self.precomputed_value = True
             return self._obj_fun
 
-    def get_domain(self, weights):
+    def get_domain(self, weights, obj_normalizer=None):
         """
         Method that regulates the execution of the function finding the definition area once
 
         Args:
             weights (`np.ndarray`): Numpy ndarray, containing weights from the moeadd optimizer
+            obj_normalizer (`callable`): optional, default - None
+                Passed through to ``get_domain_idx`` (MOEA/DD Eq. (6)) so the
+                association is taken on the same scale PBI selects on. Only read
+                on the first, deriving call -- an association set explicitly by
+                ``set_domain`` (the initial bijection MOEA/DD Algorithm 2 line 17
+                demands) stays put, and a derived one is memoized.
 
         Returns:
             domains (`int`): Index of the domain, to that the solution belongs.
@@ -111,7 +142,7 @@ class MOEADDSolution(ABC):
         if self.precomputed_domain:
             return self._domain
         else:
-            self._domain = get_domain_idx(self, weights)
+            self._domain = get_domain_idx(self, weights, obj_normalizer)
             self.precomputed_domain = True
             return self._domain
 
