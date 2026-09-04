@@ -394,7 +394,6 @@ MULTI_OBJECTIVE_OPERATORS = {
     'ChromosomeCrossover': {'equation_exchange_prob': 0.1},
     'MetaparamerCrossover': {'metaparam_proportion': 0.05},
     'EquationCrossover': {'crossover_probability': 1},
-    'EquationExchangeCrossover': {},
     'TermCrossover': {'crossover_probability': 0.3},
     'TermParamCrossover': {'term_param_proportion': 0.4},
     'SystemMutation': {'indiv_mutation_prob': 1},
@@ -557,15 +556,24 @@ def sparsity_settings(sparsity_cls) -> tuple:
     """The attribute names ``sparsity_kwargs`` may set on ``sparsity_cls``.
 
     Public, non-callable class attributes, minus ``key`` (the operator's
-    registry name, which the parameter loader matches on). Today that is
-    ``initial_sparsity_interval`` for both shipped operators; a custom
-    sparsity class becomes configurable simply by declaring an attribute.
+    registry name, which the parameter loader matches on) and minus
+    ``fits_physical_scale``. Today that is ``initial_sparsity_interval`` for
+    every shipped operator; a custom sparsity class becomes configurable simply
+    by declaring an attribute.
+
+    ``fits_physical_scale`` is excluded because it is a DECLARATION, not a
+    setting: it states whether this estimator's coefficients are already on the
+    physical scale, which ``LinRegBasedCoeffsEquation`` uses to decide between
+    refitting and promoting. Overriding it from ``sparsity_kwargs`` would run
+    the legacy min-max refit over VWSR's or Knee's physical coefficients, or
+    skip it where LASSO needs it -- silently wrong coefficients either way.
     """
     if sparsity_cls is None:
         return ()
+    _NOT_SETTINGS = ('key', 'fits_physical_scale')
     return tuple(sorted(
         name for name in dir(sparsity_cls)
-        if not name.startswith('_') and name != 'key'
+        if not name.startswith('_') and name not in _NOT_SETTINGS
         and not callable(getattr(sparsity_cls, name, None))))
 
 
@@ -812,7 +820,8 @@ def _group_overrides(overrides: dict) -> Dict[str, dict]:
 METRIC_MENUS = {
     'discrepancy_metric': ('wape', 'l2', 'l2_relative', 'scale_invariant'),
     'complexity_metric': ('factors', 'terms'),
-    'instability_metric': ('vcoef', 'cv', 'survival', 'tile', 'het', 'chi2'),
+    'instability_metric': ('vcoef', 'cv', 'survival', 'tile', 'het', 'chi2',
+                           'chi2_centered', 'het_raw'),
     'single_objective_metric': ('discrepancy', 'instability'),
     'second_objective': ('instability', 'complexity'),
 }

@@ -40,12 +40,11 @@ import numpy as np
 
 import epde.globals as global_var
 from epde.interface.search_config import active_config
-from epde.operators.common.stability import calculate_weights, vc_stability_total_lr
+from epde.operators.common.stability import (calculate_weights, cv_scores,
+                                             vc_stability_total_lr)
 from epde.operators.utils.template import CompoundOperator, dictApplyUFunc, dictZerosLike, dictFullLike, \
     dictAdd, dictSubtr
-from epde.operators.common.survival import (
-    chi2_scores, heterogeneity_scores, survival_scores, tile_scores,
-)
+from epde.operators.common.survival import _BASIS_FREE_METRICS
 
 LOSS_NAN_VAL = 1e7
 
@@ -551,7 +550,7 @@ class Instability(EquationObjective):
                 # sample's per-term scores, then average across trajectories --
                 # the same reduction the survival/chi2 branch below uses.
                 return _mean_of_sums(cached)
-        elif metric in ('survival', 'tile', 'het', 'chi2'):
+        elif metric in _BASIS_FREE_METRICS:
             cached = getattr(equation, '_cached_alt_instability', None)
             if cached is not None and cached[0] == metric:
                 return float(cached[1])
@@ -569,15 +568,28 @@ class Instability(EquationObjective):
         # only when it is set.
         fit_intercept = bool(equation.weights_internal[-1] != 0)
         if metric == 'vcoef':
-            estim = partial(vc_stability_total_lr,
-                            main_var=equation.main_var_to_explain,
-                            fit_intercept=fit_intercept)
-            totals = dictApplyUFunc(estim, features, targets, ctx.g_fun_vals,
-                                    data_shape)
+            # Forward the TRAJECTORY KEY. ``VaryingCoefSetup`` resolves its
+            # cosine basis from that sample's own field via the Taylor
+            # microscale, and ``sample_key=None`` silently means trajectory 0
+            # (``stability.resolve_vc_modes_from_input``), so without this
+            # every trajectory was scored on trajectory 0's basis while the
+            # keep-rule (``sparsity.py``, ``subset_selection.py``) already
+            # passed each key -- the two sides resolving one statistic on
+            # different bases. ``dictApplyUFunc`` fans out over dict args
+            # positionally and does not hand the callee its key, so the keys
+            # are passed AS a dict.
+            def _vc_total(feats, tgt, g_vals, shape, key):
+                return vc_stability_total_lr(
+                    feats, tgt, g_vals, shape,
+                    main_var=equation.main_var_to_explain,
+                    fit_intercept=fit_intercept, sample_key=key)
+
+            totals = dictApplyUFunc(_vc_total, features, targets,
+                                    ctx.g_fun_vals, data_shape,
+                                    {key: key for key in features})
             return float(np.mean([float(v) for v in totals.values()]))
-        if metric in ('survival', 'tile', 'het', 'chi2'):
-            estimator = {'survival': survival_scores, 'tile': tile_scores,
-                         'het': heterogeneity_scores, 'chi2': chi2_scores}[metric]
+        if metric in _BASIS_FREE_METRICS:
+            estimator = _BASIS_FREE_METRICS[metric]
             estim = partial(estimator, fit_intercept=fit_intercept)
             scores = dictApplyUFunc(estim, features, targets, ctx.g_fun_vals, data_shape)
             value = np.mean([float(np.sum(score)) for score in scores.values()])
@@ -593,12 +605,12 @@ class Instability(EquationObjective):
         for key, sw_key in sw.items():
             if sw_key is None:
                 continue
-            sw_arr = np.asarray(sw_key)
-            mu = sw_arr.mean(axis=0)
-            std = sw_arr.std(axis=0, ddof=1)
-            with np.errstate(divide='ignore', invalid='ignore'):
-                cv = (std ** 2) / (mu ** 2)
-                cv[mu == 0] = 0.0
+            # THE reduction of the window stack, not a copy of it. This block
+            # used to re-derive ``var / mu^2`` inline, so the keep-rule and
+            # this axis ran two implementations of one statistic and nothing
+            # kept them in step -- exactly the drift the shared estimator
+            # table now prevents for the basis-free metrics.
+            cv = cv_scores(sw_key)
             # Divide by that trajectory's GRID DIMENSIONALITY (the number of
             # per-dim window batches ``calculate_weights`` stacks), not by the
             # trajectory count.

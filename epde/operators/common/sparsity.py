@@ -18,10 +18,10 @@ import epde.globals as global_var
 from epde.interface.search_config import active_config
 from epde.operators.utils.template import CompoundOperator
 from epde.structure.main_structures import Equation
-from epde.operators.common.stability import GramSetup, VaryingCoefSetup  #(calculate_weights, GramSetup,
+from epde.operators.common.stability import (GramSetup, VaryingCoefSetup,
+                                             cv_scores)  #(calculate_weights, GramSetup,
                                                                          # VaryingCoefSetup)
-from epde.operators.common.survival import (chi2_scores, heterogeneity_scores,
-                                            survival_scores, tile_scores)
+from epde.operators.common.survival import _BASIS_FREE_METRICS
 from epde import _loop_stats
 
 # The keep-rule's per-term score, by instability metric. ONE estimator drives
@@ -30,8 +30,11 @@ from epde import _loop_stats
 # variant may be wired into one side only. 'vcoef' and 'cv' are not listed
 # because they come from the Gram setup itself (``VaryingCoefSetup.score`` /
 # ``get_cv``) rather than from the basis-free estimators in ``survival.py``.
-_KEEP_RULE_ESTIMATORS = {'chi2': chi2_scores, 'het': heterogeneity_scores,
-                         'survival': survival_scores, 'tile': tile_scores}
+# THE SHARED TABLE, not a copy of it: one statistic drives both the L1
+# threshold here and the Instability Pareto axis, so the two sides cannot
+# drift apart as metrics are added. 'vcoef' and 'cv' are absent because they
+# come from the Gram setup itself (``VaryingCoefSetup.score`` / ``get_cv``).
+_KEEP_RULE_ESTIMATORS = _BASIS_FREE_METRICS
 
 
 def _minmax_normalize_1d(values: np.ndarray) -> np.ndarray:
@@ -58,29 +61,9 @@ def _minmax_normalize_columns(features: np.ndarray) -> np.ndarray:
     return out
 
 
-def cv_scores(weights):
-    """Per-feature CV-stability metric for the axis backup path:
-    ``(std / mean)^2 = var / mu^2`` across the sliding windows.
-
-    The squared coefficient of variation of each feature's per-window weight.
-    It blows up (large CV) for features whose fitted coefficient is unstable
-    or near-zero-mean across horizons, so the
-    ``active_thresholds = cv * max_corr`` step in
-    :meth:`PhysicsInformedLasso.fit` prunes them first. Only the ``'cv'``
-    instability metric reaches it -- ``'vcoef'`` scores via
-    ``VaryingCoefSetup.score`` and the basis-free estimators need no window
-    stack at all.
-
-    Module level so every consumer of the ``'cv'`` metric shares ONE
-    reduction of the window stack (see :func:`instability_scores`).
-    """
-    weights_arr = np.asarray(weights)
-    with np.errstate(divide='ignore', invalid='ignore'):
-        std = weights_arr.std(axis=0, ddof=1)
-        mu = weights_arr.mean(axis=0)
-        cv = (std ** 2) / (mu ** 2)
-        cv[mu == 0] = 0.0
-    return np.nan_to_num(cv)
+# ``cv_scores`` moved to ``stability`` -- it reduces that module's sliding
+# window stack, and ``objectives`` needs it too without importing this one.
+# Re-exported here because ``subset_selection`` imports it from this module.
 
 
 def instability_scores(metric, X, y, sw, grid_shape, active_mask, n_features,
@@ -244,6 +227,15 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
                 # reads. Without it ``resolve_vc_modes_from_input`` indexed the
                 # per-sample dict with None, raised, was swallowed, and every
                 # equation silently fell back to the fixed K=3 basis.
+                # ``fit_intercept`` is deliberately NOT forwarded here, and
+                # its ``True`` default is load-bearing rather than an
+                # oversight. This Gram is built once and then sliced by
+                # ``score(active_mask)``, and the mask carries one slot per
+                # feature PLUS the intercept, so the basis must contain the
+                # intercept column for the slicing to line up. Whether the
+                # intercept participates is expressed by the MASK, not by the
+                # constructor flag -- unlike the objective path, which builds
+                # a throwaway setup per call and so states it up front.
                 gram_setup = VaryingCoefSetup(
                     X, y, sample_weights, grid_shape,
                     main_var=self.main_var, sample_key=sample_key)
@@ -467,6 +459,11 @@ class LASSOSparsity(CompoundOperator):
     #: reader of the value in the whole tree.
     initial_sparsity_interval = (1e-4, 2.5)
 
+    #: This fit runs on MIN-MAX-RESCALED features and target, so its
+    #: coefficients are a support verdict, not physical magnitudes.
+    #: ``LinRegBasedCoeffsEquation`` reads this and refits un-normalised.
+    fits_physical_scale = False
+
     @_loop_stats.timed('LASSOSparsity.apply')
     def apply(self, objective : Equation, arguments : dict):
         """
@@ -552,20 +549,15 @@ class LASSOSparsity(CompoundOperator):
             features_aug = np.hstack([features, np.ones((features.shape[0], 1))])
             estimator.fit(features_aug, target, self.g_fun_vals)
             coef = estimator.coef_
-        objective.weights_internal = coef
-        objective.weights_internal_evald = True
         # A SELECTION decision only: this fit ran on min-max-rescaled features
         # and target, so ``coef[-1]`` says whether a free constant is needed,
-        # not how big it is. LinRegBasedCoeffsEquation supplies the physical
-        # magnitudes below and honours the zero/non-zero verdict recorded here.
-        objective.weights_final = coef.copy()
-        objective.weights_final_evald = True
-        # Flag the equation for the un-normalised LinearRegression refit
-        # performed by ``LinRegBasedCoeffsEquation`` -- see
-        # ``epde/operators/common/coeff_calculation.py``. VWSRSparsity
-        # does NOT set this marker; only the LASSO path opts into the
-        # legacy two-step (min-max LASSO + linreg-on-survivors) flow.
-        objective._legacy_refit_pending = True
+        # not how big it is. This operator therefore declares
+        # ``fits_physical_scale = False`` and stops here --
+        # ``LinRegBasedCoeffsEquation`` supplies the physical magnitudes and
+        # honours the zero/non-zero verdict recorded above. It, and only it,
+        # raises ``weights_final_evald``.
+        objective.weights_internal = coef
+        objective.weights_internal_evald = True
         # Note: _eval_cache is intentionally NOT wiped here. It stores only the
         # WIDE (target, features) pair, keyed on target_idx -- ``evaluate``
         # refuses to cache its ``active_only`` branch precisely because that one
@@ -595,6 +587,11 @@ class VWSRSparsity(CompoundOperator):
     #: metaparameter keeps the neutral 1.0 of ``main_structures``'s defaults
     #: instead of a random alpha nothing consumes.
     initial_sparsity_interval = (1.0, 1.0)
+
+    #: ``PhysicsInformedLasso`` fits on the physical scale, so the support
+    #: decision and the fitted magnitudes are the same vector.
+    #: ``LinRegBasedCoeffsEquation`` promotes it instead of refitting.
+    fits_physical_scale = True
 
     @_loop_stats.timed('VWSRSparsity.apply')
     def apply(self, objective : Equation, arguments : dict):
@@ -655,15 +652,16 @@ class VWSRSparsity(CompoundOperator):
         # but it keeps the intercept in its slot instead of re-appending it.
         weights = np.mean(np.stack(sampled_full_coefs, axis = 1), axis = 1)
 
+        # PhysicsInformedLasso already fits on the physical scale, so the final
+        # magnitudes ARE the internal ones -- which is what
+        # ``fits_physical_scale = True`` declares. ``LinRegBasedCoeffsEquation``
+        # reads that declaration and promotes this vector instead of refitting;
+        # it stays the sole writer of ``weights_final_evald``. The former
+        # ``np.append([w for w in ... if w != 0], intercept)`` zero-filtering is
+        # gone: weights_final retains its zeros and stays aligned to the full
+        # structure (Equation._validate_weight_layout).
         objective.weights_internal = weights
         objective.weights_internal_evald = True
-        # VWSR runs no un-normalised refit -- PhysicsInformedLasso already fits
-        # on the physical scale -- so the final magnitudes ARE the internal
-        # ones. The former ``np.append([w for w in ... if w != 0], intercept)``
-        # zero-filtering is gone: weights_final retains its zeros and stays
-        # aligned to the full structure (Equation._validate_weight_layout).
-        objective.weights_final = weights.copy()
-        objective.weights_final_evald = True
         # Per-sample stability products are kept PER TRAJECTORY (dicts keyed
         # by sample ID, the tree-wide multisample convention) and reduced by
         # ``Instability.compute``. Assigning ``estimator.cached_*`` after the

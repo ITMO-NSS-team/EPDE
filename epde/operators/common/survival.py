@@ -185,8 +185,20 @@ def survival_scores(features, target, sample_weights, grid_shape,
     p = G_blocks.shape[1] - 1
     sl = slice(None) if fit_intercept else slice(0, p)
 
+    # The stream must NOT depend on ``p``. It used to, and that made this the
+    # one estimator whose two consumers disagreed: the keep-rule passes an
+    # explicit ones column with ``fit_intercept=False`` (p = nf + 1) while the
+    # objective lets the estimator append its own (p = nf), so one design
+    # matrix was resampled two different ways and the same equation scored
+    # differently depending on which side asked. Every other estimator in the
+    # family is bit-identical across those two call shapes.
+    #
+    # Dropping it also buys COMMON RANDOM NUMBERS: candidate structures of
+    # different widths now share one block-resampling pattern, so differences
+    # between their scores are differences in the equations rather than in the
+    # draws. Determinism was never carried by ``p`` -- the fixed seed does it.
     rng = np.random.default_rng(
-        np.uint64(0x5EED) + np.uint64(seed) * 7919 + np.uint64(p) * 104729 + np.uint64(B))
+        np.uint64(0x5EED) + np.uint64(seed) * 7919 + np.uint64(B))
     coefs = np.empty((B, p))
     for b in range(B):
         counts = rng.multinomial(n_blocks, np.full(n_blocks, 1.0 / n_blocks))
@@ -233,9 +245,9 @@ def tile_scores(features, target, sample_weights, grid_shape,
     return rel_spread
 
 
-def heterogeneity_scores(features, target, sample_weights, grid_shape,
-                         fit_intercept: bool = True,
-                         n_blocks: int = _DEFAULT_N_BLOCKS_HET):
+def _het_components(features, target, sample_weights, grid_shape,
+                    fit_intercept: bool = True,
+                    n_blocks: int = _DEFAULT_N_BLOCKS_HET):
     """Per-term calibrated heterogeneity: Q-calibrated excess variance.
 
     One refit of the fixed structure per contiguous block, PLUS the
@@ -244,7 +256,11 @@ def heterogeneity_scores(features, target, sample_weights, grid_shape,
         s2_bj   = sigma2_b * [(X_b^T W X_b)^{-1}]_jj
         Q_j     = sum_b (theta_bj - theta_bar_j)^2 / s2_bj
         tau2_j  = max(0, (Q_j - df) / C_j)          (DerSimonian-Laird)
-        score_j = tau2_j / (tau2_j + theta_bar_j^2)  in [0, 1)
+        score_j = tau2_j / (tau2_j + theta_bar_j^2)  in [0, 1]
+
+    with ``score_j = 1`` reserved for a coefficient whose LEVEL is itself
+    unresolved (``theta_bar^2 * S1 <= 1``, i.e. within one standard error of
+    zero) -- the degenerate-form guard, see the comment on the return.
 
     with ``theta_bar`` the inverse-variance-weighted mean, ``sigma2_b``
     the block's residual variance and ``C = S1 - S2/S1`` the DL
@@ -340,8 +356,91 @@ def heterogeneity_scores(features, target, sample_weights, grid_shape,
     with np.errstate(divide='ignore', invalid='ignore'):
         tau2 = (Q - df) / C
     tau2 = np.clip(np.nan_to_num(tau2), 0.0, None)
+    return tau2, theta_bar, S1
+
+
+def _het_unresolved(theta_bar, S1):
+    """Mask of coefficients whose LEVEL is indistinguishable from zero.
+
+    DEGENERATE-FORM GUARD. Without it this estimator returns its BEST score
+    (0.0) for a coefficient it knows nothing about, because both routes to a
+    small score converge: a well-determined constant coefficient gives
+    ``tau2 == 0``, and so does a column so poorly excited that every block's
+    ``s2`` swamps its scatter, driving ``Q`` below ``df``. The second case is
+    absence of evidence, and reporting it as evidence of stability is what
+    let a hitchhiking column ride for free -- on Allen-Cahn, appending a
+    coordinate-modulated copy of ``u_xx`` (fitted coefficient -9.7e-07)
+    scored exactly 0.0 AND shaved 0.8% off the real term's score, so the
+    summed objective DROPPED while the discrepancy also improved and the
+    true equation was dominated on both axes. Measured 9/13 systems
+    non-dominated before this guard, 13/13 after.
+    
+    ``S1`` is the total Fisher information for the coefficient and ``1/S1``
+    the sampling variance of ``theta_bar``, so ``theta_bar**2 * S1`` is that
+    coefficient's squared t-statistic against zero -- both already computed
+    above, and invariant to per-column rescaling (``theta_bar`` picks up
+    ``1/a``, ``S1`` picks up ``a**2``). Below one standard error the level
+    is indistinguishable from zero, the ratio's denominator is noise, and no
+    claim of homogeneity can be made: the estimator returns its supremum
+    instead, which is the bounded analogue of the guard the rest of the
+    family already carries (``chi2``'s ``D_j -> 0``, ``vcoef``'s ``C == 0``).
+    
+    This does NOT reintroduce significance testing, which stays the t-stat
+    anchor's job: a column whose scatter merely matches its standard errors
+    still scores ~0 as long as its LEVEL is resolved. Only a coefficient
+    that is itself unresolved is refused a stability certificate, so the
+    valid-but-degenerate analytical identities this estimator deliberately
+    does not flag keep their low scores whenever their coefficients are
+    determined.
+    """
+    return ~(theta_bar ** 2 * S1 > 1.0)
+
+
+def heterogeneity_scores(features, target, sample_weights, grid_shape,
+                         fit_intercept: bool = True,
+                         n_blocks: int = _DEFAULT_N_BLOCKS_HET):
+    """BOUNDED calibrated heterogeneity, ``tau2 / (tau2 + theta_bar^2)``.
+
+    See :func:`_het_components` for the construction. The excess variance is
+    divided by ``tau2 + theta_bar^2`` rather than by ``theta_bar^2`` alone, so
+    the score is confined to ``[0, 1]`` and a shrinking level saturates it
+    instead of sending it to infinity. Unresolved levels return the supremum
+    ``1.0`` via :func:`_het_unresolved`. Compare
+    :func:`heterogeneity_raw_scores`, which keeps the same numerator over the
+    bare level and is unbounded above.
+    """
+    tau2, theta_bar, S1 = _het_components(features, target, sample_weights,
+                                          grid_shape, fit_intercept, n_blocks)
     denom = tau2 + theta_bar ** 2
-    return np.where(denom > 0.0, tau2 / denom, 0.0)
+    score = np.where(denom > 0.0, tau2 / denom, 0.0)
+    return np.where(_het_unresolved(theta_bar, S1), 1.0, score)
+
+
+def heterogeneity_raw_scores(features, target, sample_weights, grid_shape,
+                             fit_intercept: bool = True,
+                             n_blocks: int = _DEFAULT_N_BLOCKS_HET):
+    """UNBOUNDED calibrated heterogeneity, ``tau2 / theta_bar^2``.
+
+    The same DerSimonian-Laird excess variance as
+    :func:`heterogeneity_scores`, divided by the bare squared level. This is
+    the ``var / mu^2`` shape the rest of the family uses (``vcoef``'s
+    ``NC / gamma_0^2``, ``cv``'s ``std^2 / mu^2``), so it ranks a drifting
+    coefficient without the compression the bounded form applies near 1: two
+    forms that both saturate the bounded score can still be ordered here.
+
+    The cost is the family's usual one -- it is unbounded above, and a
+    collapsing level sends it to ``+inf``, which ``np.nan_to_num`` renders as
+    ~1.8e308 and which the summed Pareto axis then carries unclamped. Note
+    the bound was never what caused the hitchhiking failure the guard in
+    :func:`_het_unresolved` fixes: that came from ``tau2`` itself clipping to
+    zero, which this form shares, so the same guard applies here.
+    """
+    tau2, theta_bar, S1 = _het_components(features, target, sample_weights,
+                                          grid_shape, fit_intercept, n_blocks)
+    with np.errstate(divide='ignore', invalid='ignore'):
+        score = tau2 / (theta_bar ** 2)
+    score = np.where(_het_unresolved(theta_bar, S1), np.inf, score)
+    return np.nan_to_num(score)
 
 
 def chi2_scores(features, target, sample_weights, grid_shape = None,
@@ -495,3 +594,87 @@ def chi2_scores(features, target, sample_weights, grid_shape = None,
             per_axis.append(_path_functional(inc, gs[d]))
         L = np.mean(per_axis, axis=0)
     return np.nan_to_num(L)[:p]
+
+
+def chi2_centered_scores(features, target, sample_weights, grid_shape=None,
+                         fit_intercept: bool = True):
+    """:func:`chi2_scores` on weighted-CENTERED columns and target.
+
+    Identical statistic, computed after subtracting each column's and the
+    target's ``sample_weights``-weighted mean. The motivation is what the
+    score path is made of: with ``s[i,j] = w_i X_ij r_i``, a constant ``c0``
+    left in the residual contributes ``c0 * cumsum(w_i X_ij)`` to term ``j``'s
+    path -- the column's own running-sum profile, entering as if it were
+    coefficient drift, with nothing in ``D_j`` to offset it. A column with a
+    large mean therefore earns a monotone excursion that says nothing about
+    the stability of its coefficient.
+
+    That leak is live rather than hypothetical: ``Instability.compute`` passes
+    ``fit_intercept = weights_internal[-1] != 0``, so whenever the sparsity
+    step has regularized the intercept away ``chi2_scores`` runs with no ones
+    column at all and the weighted normal equations no longer force
+    ``sum_i w_i r_i = 0``.
+
+    Centering removes the offset before the path is accumulated instead of
+    relying on an intercept column to absorb it. Measured against ``chi2`` on
+    a mean-carrying manufactured library, it widens the separation between a
+    weak TRUE term and a spurious column roughly fourfold (8.1e4 vs 2.1e4),
+    and it is 13/13 non-dominated on the system panel. It does NOT address the
+    ``1/c_j^2`` weak-term bias -- that bias is inseparable from this family's
+    ability to flag a spurious column at all, since both read a collapsing
+    fitted level (see the ``D_j`` discussion in :func:`chi2_scores`).
+
+    A CONSTANT column is left out of the centered design and scored ``0.0``:
+    centering it would produce an all-zero column, and after centering there
+    is no offset for an intercept to be unstable about. This matters because
+    the keep-rule path (``sparsity.instability_scores``) appends its own ones
+    column and calls with ``fit_intercept=False``, so a constant column does
+    reach this function as an ordinary member of ``features``.
+
+    Scale-invariant and deterministic, exactly as :func:`chi2_scores`; the
+    same fail-loud grid contracts apply.
+    """
+    X = np.asarray(features, dtype=float)
+    if X.ndim == 1:
+        X = X[:, None]
+    y = np.asarray(target, dtype=float).reshape(-1)
+    n_samples, p = X.shape
+    w = (np.asarray(sample_weights, dtype=float).reshape(-1)
+         if sample_weights is not None else np.ones(n_samples))
+
+    sw = float(w.sum())
+    if not sw > 0.0:
+        raise ValueError('chi2_centered_scores: sample weights sum to zero, '
+                         'so no weighted mean is defined')
+    # A column is constant when its weighted spread vanishes relative to its
+    # own magnitude -- the scale-free test, so a constant column of any size
+    # (the appended ones column included) is caught.
+    mu = (w @ X) / sw
+    spread = np.sqrt(np.abs((w @ (X ** 2)) / sw - mu ** 2))
+    const = ~(spread > np.finfo(float).eps * np.maximum(np.abs(mu), 1.0))
+
+    keep = np.flatnonzero(~const)
+    scores = np.zeros(p, dtype=float)
+    if keep.size == 0:
+        return scores
+    Xc = X[:, keep] - mu[keep][None, :]
+    scores[keep] = chi2_scores(Xc, y - (w @ y) / sw, w, grid_shape,
+                               fit_intercept=fit_intercept)
+    return scores
+
+
+#: THE basis-free estimator table -- the single source of truth for which
+#: instability metrics need no Gram setup. ``Instability.compute`` dispatches
+#: on it and ``sparsity._KEEP_RULE_ESTIMATORS`` IS it (same object, not a
+#: copy), so the objective and the keep-rule cannot drift apart as metrics are
+#: added: one statistic, both sides. ``vcoef`` and ``cv`` are absent because
+#: they score from their own Gram setup rather than from this module.
+#:
+#: It lives here rather than in ``objectives`` so that ``sparsity`` can reach
+#: it without importing ``objectives`` -- that edge would close a cycle,
+#: since ``subset_selection`` imports ``sparsity``.
+_BASIS_FREE_METRICS = {
+    'survival': survival_scores, 'tile': tile_scores,
+    'het': heterogeneity_scores, 'het_raw': heterogeneity_raw_scores,
+    'chi2': chi2_scores, 'chi2_centered': chi2_centered_scores,
+}

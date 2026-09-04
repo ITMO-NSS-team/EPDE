@@ -522,7 +522,7 @@ class VaryingCoefSetup:
     *non-constant* energy is small relative to its constant part; the
     per-term stability score is
 
-        score_j = (Var(gamma_{j,0}) + NC_j) / gamma_{j,0}^2
+        score_j = NC_j / gamma_{j,0}^2
 
     with ``NC_j = sum_{k>=1} max(gamma_{j,d,k}^2 - lam*Var(gamma_{j,d,k}), 0)``
     the noise-debiased non-constant energy: significance of the constant
@@ -921,7 +921,8 @@ class VaryingCoefSetup:
 
 
 def vc_stability_total_lr(features, target, sample_weights, grid_shape,
-                          main_var: str = None, fit_intercept: bool = True):
+                          main_var: str = None, fit_intercept: bool = True,
+                          sample_key=None):
     """Equation-level varying-coefficient stability: the SUM over the equation's
     terms of the per-term ``score`` ``NC/gamma_0^2`` (biased non-constant energy;
     the ``gram_mode='vcoef'`` replacement for the inline ``total_lr``).
@@ -937,7 +938,8 @@ def vc_stability_total_lr(features, target, sample_weights, grid_shape,
     if X.ndim == 1:
         X = X[:, None]
     setup = VaryingCoefSetup(X, target, sample_weights, grid_shape,
-                             main_var=main_var, fit_intercept=fit_intercept)
+                             main_var=main_var, fit_intercept=fit_intercept,
+                             sample_key=sample_key)
     return float(np.sum(setup.score(None)))
 
 
@@ -972,3 +974,28 @@ def calculate_weights(X, y, sample_weights, grid_shape, fit_intercept=True,
         # branch (which never augmented in the first place).
         active_mask[-1] = False
     return setup.solve(active_mask)
+
+
+def cv_scores(weights):
+    """Per-feature CV-stability metric for the axis backup path:
+    ``(std / mean)^2 = var / mu^2`` across the sliding windows.
+
+    The squared coefficient of variation of each feature's per-window weight.
+    It blows up (large CV) for features whose fitted coefficient is unstable
+    or near-zero-mean across horizons, so the
+    ``active_thresholds = cv * max_corr`` step in
+    :meth:`PhysicsInformedLasso.fit` prunes them first. Only the ``'cv'``
+    instability metric reaches it -- ``'vcoef'`` scores via
+    ``VaryingCoefSetup.score`` and the basis-free estimators need no window
+    stack at all.
+
+    Module level so every consumer of the ``'cv'`` metric shares ONE
+    reduction of the window stack (see :func:`instability_scores`).
+    """
+    weights_arr = np.asarray(weights)
+    with np.errstate(divide='ignore', invalid='ignore'):
+        std = weights_arr.std(axis=0, ddof=1)
+        mu = weights_arr.mean(axis=0)
+        cv = (std ** 2) / (mu ** 2)
+        cv[mu == 0] = 0.0
+    return np.nan_to_num(cv)

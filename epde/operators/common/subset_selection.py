@@ -612,6 +612,11 @@ class KneeSparsity(CompoundOperator):
     #: exactly that -- seeding is a no-op -- exactly as for VWSRSparsity.
     initial_sparsity_interval = (1.0, 1.0)
 
+    #: The relaxed refit behind the chosen support (``subset_coefficients``)
+    #: is an unpenalized weighted OLS on the physical scale, so the support
+    #: decision and the fitted magnitudes are the same vector.
+    fits_physical_scale = True
+
     #: Above this many columns (features + intercept) the exhaustive
     #: enumeration is replaced by :func:`greedy_chain`. 12 columns is 4096
     #: subsets of at most 12x12; live equations carry at most
@@ -829,15 +834,13 @@ class KneeSparsity(CompoundOperator):
     @staticmethod
     def _store(objective, weights, sw_weights, vc_scores):
         """Write the fit onto the equation, in VWSRSparsity's conventions."""
+        # ``subset_coefficients`` already fits on the physical scale, so the
+        # final magnitudes ARE the internal ones -- declared once as
+        # ``fits_physical_scale = True`` and acted on by
+        # ``LinRegBasedCoeffsEquation``, which promotes this vector rather than
+        # refitting and stays the sole writer of ``weights_final_evald``.
         objective.weights_internal = weights
         objective.weights_internal_evald = True
-        # No un-normalised refit follows: subset_coefficients already fits on
-        # the physical scale, so the final magnitudes ARE the internal ones.
-        # ``_legacy_refit_pending`` is therefore NOT set -- that marker opts
-        # into the legacy min-max-LASSO + linreg two-step, which VWSR does not
-        # set either.
-        objective.weights_final = np.asarray(weights).copy()
-        objective.weights_final_evald = True
         # Assigned UNCONDITIONALLY, including the None case: EqRightPartSelector
         # copies both out of the equation during its term sweep, so a skipped
         # assignment would leave the previous candidate target's value behind.

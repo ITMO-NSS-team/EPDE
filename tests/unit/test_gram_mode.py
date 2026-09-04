@@ -125,11 +125,30 @@ class TestConsumersAgree:
         assert '_cached_sw_weights' in source
 
     def test_the_keep_rule_and_the_objective_share_the_estimator(self):
-        """The whole point of the derivation: one statistic, both sides."""
-        import inspect
-        from epde.operators.common.objectives import Instability
+        """The whole point of the derivation: one statistic, both sides.
+
+        This used to grep ``inspect.getsource(Instability.compute)`` for each
+        estimator's ``__name__``. That could only ever see that the name was
+        MENTIONED -- it passed for a dispatch that called the estimator with
+        different arguments, and it broke as soon as the inline dict became a
+        shared table even though the sharing had just become stronger. The
+        two sides are now one object, so assert that.
+        """
+        from epde.operators.common.objectives import _BASIS_FREE_METRICS
         from epde.operators.common.sparsity import _KEEP_RULE_ESTIMATORS
 
-        source = inspect.getsource(Instability.compute)
-        for metric, estimator in _KEEP_RULE_ESTIMATORS.items():
-            assert estimator.__name__ in source, metric
+        assert _KEEP_RULE_ESTIMATORS is _BASIS_FREE_METRICS
+
+    def test_every_menu_metric_has_exactly_one_home(self):
+        """No metric may be listed without an implementation, or implemented
+        without being selectable -- the failure mode a per-side dispatch
+        invites (a ``KeyError`` deep inside the sparsity step for a name the
+        config happily accepted)."""
+        from epde.interface.search_config import METRIC_MENUS
+        from epde.operators.common.objectives import _BASIS_FREE_METRICS
+
+        # vcoef and cv score from their own Gram setup, not the shared table.
+        gram_backed = {'vcoef', 'cv'}
+        menu = set(METRIC_MENUS['instability_metric'])
+        assert gram_backed < menu
+        assert menu - gram_backed == set(_BASIS_FREE_METRICS)
