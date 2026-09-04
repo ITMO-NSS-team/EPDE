@@ -16,47 +16,6 @@ import epde.globals as global_var
 changelog_entry_templates = {}
 
 
-class ResetEquationStatus:
-    def __init__(self, reset_input: bool = False, reset_output: bool = False,
-                 reset_right_part: bool = True):
-        self.reset_input = reset_input
-        self.reset_output = reset_output
-        self.reset_right_part = reset_right_part
-
-    def __call__(self, method):
-        @wraps(method)
-        def wrapper(obj, *args, **kwargs):
-            result = method(obj, *args, **kwargs)
-
-            if self.reset_input:
-                for element in [obj,] + list(args):
-                    if isinstance(element, (list, tuple, set)):
-                        for subelement in element:
-                            try:
-                                subelement.reset_state(self.reset_right_part)
-                            except AttributeError:
-                                pass
-                    else:
-                        try:
-                            element.reset_state(self.reset_right_part)
-                        except AttributeError:
-                            pass
-            if self.reset_output:
-                if isinstance(result, (list, tuple, set)):
-                    for equation in result:
-                        try:
-                            equation.reset_state(self.reset_right_part)
-                        except AttributeError:
-                            pass
-                else:
-                    try:
-                        result.reset_state(self.reset_right_part)
-                    except AttributeError:
-                        pass
-            return result
-        return wrapper
-
-
 class HistoryExtender():
     '''
 

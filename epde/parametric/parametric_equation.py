@@ -155,6 +155,11 @@ class ParametricEquation(object):
         weights = np.asarray(weights, dtype=float)
         self._equation.weights_internal = weights
         self._equation.weights_final = weights.copy()
+        # The setters assign the DATA only; validity is a separate claim that
+        # the coefficient calculation normally makes. A parametric equation is
+        # fitted by construction, so it makes that claim here.
+        self._equation.weights_internal_evald = True
+        self._equation.weights_final_evald = True
         self.equation_set = True
 
     @singledispatchmethod

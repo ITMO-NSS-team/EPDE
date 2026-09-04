@@ -20,7 +20,7 @@ from epde.supplementary import filter_powers
 from epde.operators.utils.template import CompoundOperator, add_base_param_to_operator
 
 
-from epde.decorators import HistoryExtender, ResetEquationStatus
+from epde.decorators import HistoryExtender
 
 
 class SystemMutation(CompoundOperator):
@@ -205,6 +205,13 @@ class TermParameterMutation(CompoundOperator):
                 "leaving last candidate (may duplicate an existing term)."
             )
         term.resetSavedState()
+        # A factor-parameter change is a STRUCTURAL change: it rewrites
+        # ``factors_labels``, so the fitted features are no longer the ones
+        # the weights describe. Invalidating only the label caches left both
+        # ``*_evald`` flags up over a support decision for different columns.
+        # Dormant today -- the mutation builders wire only ``TermMutation`` --
+        # but silently wrong the moment it is re-enabled.
+        objective[1].reset_for_structure_change()
         return term
     
     def use_default_tags(self):

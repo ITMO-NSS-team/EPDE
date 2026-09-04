@@ -85,6 +85,13 @@ def _(text_form : str, pool, all_vars: List[str], second_objective: str = None):
     # Copy: the two vectors are independently mutable (remove_zero_terms
     # compacts each in place) and must not alias.
     equation.weights_final = weights.copy()
+    # The setters assign the DATA only; validity is a separate claim that
+    # the coefficient calculation normally makes. A translated equation is
+    # fitted by construction, so it makes that claim here -- without it
+    # text_form renders the unfitted 'k_0 ...' form, latex_form returns ''
+    # and __eq__ falls to its structure-only branch.
+    equation.weights_internal_evald = True
+    equation.weights_final_evald = True
     
     system = SoEq(pool = pool, metaparameters=metaparameters)
     system.use_default_multiobjective_function(second_objective = second_objective)
@@ -141,6 +148,13 @@ def _(text_form : dict, pool, all_vars: List[str], second_objective: str = None)
         equation.target_idx = len(term_list) - 1
         equation.weights_internal = weights
         equation.weights_final = weights.copy()   # must not alias -- see above
+        # The setters assign the DATA only; validity is a separate claim that
+        # the coefficient calculation normally makes. A translated equation is
+        # fitted by construction, so it makes that claim here -- without it
+        # text_form renders the unfitted 'k_0 ...' form, latex_form returns ''
+        # and __eq__ falls to its structure-only branch.
+        equation.weights_internal_evald = True
+        equation.weights_final_evald = True
         equations.append(equation)
     
     # structure = {'u' : equation}
@@ -232,6 +246,13 @@ class CoeffLessEquation():
                 equation.target_idx = len(terms_aggregated) - 1
                 equation.weights_internal = np.append(lr.coef_, lr.intercept_)
                 equation.weights_final = np.append(lr.coef_, lr.intercept_)
+                # The setters assign the DATA only; validity is a separate claim that
+                # the coefficient calculation normally makes. A translated equation is
+                # fitted by construction, so it makes that claim here -- without it
+                # text_form renders the unfitted 'k_0 ...' form, latex_form returns ''
+                # and __eq__ falls to its structure-only branch.
+                equation.weights_internal_evald = True
+                equation.weights_final_evald = True
                 equations.append(equation)
 
             self.system = SoEq(pool = pool, metaparameters=metaparameters)
@@ -271,6 +292,13 @@ class CoeffLessEquation():
             self.equation.target_idx = len(terms_aggregated) - 1
             self.equation.weights_internal = np.append(lr.coef_, lr.intercept_)
             self.equation.weights_final = np.append(lr.coef_, lr.intercept_)
+            # The setters assign the DATA only; validity is a separate claim that
+            # the coefficient calculation normally makes. A translated equation is
+            # fitted by construction, so it makes that claim here -- without it
+            # text_form renders the unfitted 'k_0 ...' form, latex_form returns ''
+            # and __eq__ falls to its structure-only branch.
+            self.equation.weights_internal_evald = True
+            self.equation.weights_final_evald = True
             self.system = SoEq(pool = pool, metaparameters=metaparameters)
             self.system.use_default_multiobjective_function(second_objective = second_objective)
             self.system.create(equations)

@@ -86,6 +86,11 @@ class FakeEquation:
     def reset_state(self, reset_right_part=True):
         self.resets += 1
 
+    def reset_for_structure_change(self):
+        # What the scrub actually calls now: the term set changed, so the fit
+        # and every structure-keyed cache die together.
+        self.resets += 1
+
 
 def _independent_pair(seed):
     rng = np.random.default_rng(seed)

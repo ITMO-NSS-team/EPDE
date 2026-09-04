@@ -428,7 +428,7 @@ class Term(ComplexStructure):
 # the single source of truth consumed by ``reset_state``,
 # ``_invalidate_label_cache``, ``__deepcopy__`` and ``clone_shell``. Adding a
 # new cache means adding ONE entry here (plus the slot in
-# ``Equation.__slots__``; a characterization test asserts the two stay in
+# ``Equation.__slots__``; TestStateRegistrySync asserts the two stay in
 # sync). Policies:
 #   'structure'  -- keyed on the current structure/target: wiped by BOTH
 #                   ``reset_state`` and ``_invalidate_label_cache``.
@@ -461,11 +461,64 @@ _EQ_STRUCTURE_CACHES = tuple(f for f, p in _EQ_CACHE_FIELDS if p == 'structure')
 _EQ_CACHE_AVOID_COPY = tuple(f for f, _ in _EQ_CACHE_FIELDS if f != '_eval_cache')
 
 
+# Registry of every non-cache Equation slot a reset clears, grouped by the
+# EVENT that invalidates it. The per-group ``reset_*`` primitives below are
+# generated from this table, so adding a flag/value pair means adding ONE entry
+# here (plus the slot in ``Equation.__slots__``; TestStateRegistrySync asserts
+# the two stay in sync). Entries are ``(slot, cleared_value)`` and are written
+# with a plain ``setattr`` -- every one of these slots is either private or
+# backed by a pass-through property setter, so the raw write is equivalent.
+_EQ_STATE_GROUPS = (
+    # The identity-tracked right part. Cleared in lockstep with the weights:
+    # both weight vectors are indexed relative to the target position.
+    ('target', (
+        ('_target_term', None),
+    )),
+    # RPS's durable verdict: "this equation has been through right-part
+    # selection". Read by ``rps_cond`` in both strategy builders to decide
+    # whether the selector runs at all.
+    ('selection', (
+        ('right_part_selected', False),
+    )),
+    # The SUPPORT decision -- which terms survive sparsity.
+    ('weights_internal', (
+        ('weights_internal_evald', False),
+        ('_weights_internal', None),
+    )),
+    # The fitted MAGNITUDES -- the only vector a residual can be built from
+    # (see ``Equation.residual``).
+    ('weights_final', (
+        ('weights_final_evald', False),
+        ('_weights_final', None),
+    )),
+    # Every objective value and its calculated-flag, paired so a stale value
+    # can never outlive its flag.
+    ('scores', (
+        ('fitness_calculated', False),
+        ('_fitness_value', None),
+        ('stability_calculated', False),
+        ('_coefficients_stability', None),
+        ('complexity_calculated', False),
+        ('_complexity_value', None),
+        ('aic_calculated', False),
+        ('_aic', None),
+    )),
+)
+_EQ_STATE_GROUP_SLOTS = {name: slots for name, slots in _EQ_STATE_GROUPS}
+
+
 class Equation(ComplexStructure):
     __slots__ = ['_history', 'structure', 'interelement_operator', 'n_immutable', 'pool',
                   # '_target', '_features', 'saved', 'saved_as','max_factors_in_term', 'operator',
-                 '_target_term', 'right_part_selected', '_weights_final', 'weights_final_evald', 'simplified', 'is_correct_right_part',
-                 '_weights_internal', 'weights_internal_evald', 'fitness_calculated', 'stability_calculated', 'aic_calculated', 'solver_form_defined',
+                 # ``simplified`` / ``is_correct_right_part`` used to live here.
+                 # They are RPS-internal loop control -- written and read only
+                 # by EqRightPartSelector.apply's outer ``while`` -- and are now
+                 # locals of that method. Persisting them let an offspring
+                 # inherit "already simplified", skip the loop body (and with it
+                 # the ``reset_state`` on its first line), and leave RPS still
+                 # carrying its parent's fit.
+                 '_target_term', 'right_part_selected', '_weights_final', 'weights_final_evald',
+                 '_weights_internal', 'weights_internal_evald', 'fitness_calculated', 'stability_calculated', 'aic_calculated',
                  'complexity_calculated',
                  '_fitness_value', '_coefficients_stability', '_aic', '_complexity_value', 'metaparameters', 'main_var_to_explain',
                  '_eval_cache', '_cached_sw_weights', '_cached_vc_score',
@@ -983,42 +1036,89 @@ class Equation(ComplexStructure):
                       (np.asarray(features[key], dtype=float) @ coefs + intercept))
                 for key, target in targets.items()}
 
-    def reset_state(self, reset_right_part: bool = True) -> None:
-        """Drop all cached evaluation/fitness state on this Equation.
+    def _reset_groups(self, *groups: str) -> None:
+        """Clear the named state groups (see ``_EQ_STATE_GROUPS``)."""
+        for group in groups:
+            for slot, cleared in _EQ_STATE_GROUP_SLOTS[group]:
+                setattr(self, slot, cleared)
 
-        Call after any structural mutation (or to discard a stale fitness/AIC
-        evaluation). Set ``reset_right_part=False`` to keep target_idx and
-        weight assignments — useful when only the LHS-derived caches need
-        clearing.
+    def assert_state_invariants(self, where: str) -> None:
+        """Check the fitted-state contract; no-op unless ``EPDE_LOOP_STATS=1``.
+
+        Structure mutation is a raw slot write -- ``structure`` has no property
+        setter, and ``_validate_weight_layout`` fires only when a weight vector
+        is ASSIGNED -- so nothing stops an operator from reshaping the term list
+        under weights that still claim to describe it. These are the invariants
+        that the flag would otherwise be lying about, checked where the contract
+        is consumed (RPS exit, fitness entry) rather than everywhere.
+
+        Gated rather than always-on because the length checks run on the hottest
+        object in the search; ``EPDE_LOOP_STATS`` is the switch the A/B harness
+        already sets.
         """
-        if reset_right_part:
-            self.right_part_selected = False
-            self._target_term = None   # identity-tracked target: cleared in lockstep with the weights below
-            self.is_correct_right_part = False
-            self.simplified = False
-            self.weights_internal_evald = False
-            self.weights_internal = None
-            self.weights_final = None
-        # Deliberate asymmetry: ``weights_final_evald`` drops on EVERY reset,
-        # while the ``_weights_final`` data is nulled only on a hard reset
-        # (reset_right_part=True). A soft reset therefore leaves stale data
-        # behind a lowered flag -- safe-by-guard, because the ``weights_final``
-        # property getter raises while the flag is down. Moving this line into
-        # the if-block would CHANGE behavior (the flag would survive a soft
-        # reset). Pinned by TestResetStateSoftAsymmetry.
-        self.weights_final_evald = False
-        self.fitness_calculated = False
-        self.fitness_value = None
-        self.stability_calculated = False
-        self.coefficients_stability = None
-        self.complexity_calculated = False
-        self.complexity_value = None
-        self.aic_calculated = False
-        self.solver_form_defined = False
+        if not _loop_stats.enabled():
+            return
+        n = len(self.structure)
+        if self.weights_final_evald and not self.weights_internal_evald:
+            raise AssertionError(
+                f'{where}: fitted magnitudes without a support decision '
+                f'({self.main_var_to_explain!r}). weights_final may never '
+                'outlive weights_internal.')
+        for name in ('weights_internal', 'weights_final'):
+            if not getattr(self, f'{name}_evald'):
+                continue
+            vector = getattr(self, f'_{name}')
+            if vector is None:
+                raise AssertionError(
+                    f'{where}: {name}_evald is up with no vector behind it '
+                    f'({self.main_var_to_explain!r}).')
+            if len(vector) != n:
+                raise AssertionError(
+                    f'{where}: {name} has {len(vector)} slots for {n} terms '
+                    f'({self.main_var_to_explain!r}) -- the structure changed '
+                    'under a live fit.')
+            if self.target is None:
+                raise AssertionError(
+                    f'{where}: {name}_evald is up with no installed target '
+                    f'({self.main_var_to_explain!r}); the weights are indexed '
+                    'relative to one.')
+        if self.right_part_selected and self.target is None:
+            raise AssertionError(
+                f'{where}: right_part_selected with no target '
+                f'({self.main_var_to_explain!r}).')
+
+    def reset_for_structure_change(self) -> None:
+        """The equation's term set changed: everything derived from it dies.
+
+        Drops RPS's ``right_part_selected`` verdict, both weight vectors with
+        their flags, every score, and every registered cache -- but KEEPS the
+        installed target, so a caller mid-selection does not lose the right part
+        it is working on. ``reset_state(reset_right_part=False)`` is this.
+
+        This replaces the old soft reset, which kept ``weights_internal_evald``
+        up and its data intact while dropping only the ``weights_final`` flag.
+        That asymmetry is retired: every one of its call sites followed a real
+        structural change, so the retained support decision was stale at all of
+        them, and on the one path the outer RPS loop did not re-enter it flowed
+        into ``remove_zero_terms`` and pruned on the wrong coefficients.
+        """
+        self._reset_groups('selection', 'weights_internal', 'weights_final', 'scores')
         # Wipe EVERY registered cache -- both policies (see _EQ_CACHE_FIELDS
         # for the per-field docs).
         for field, _policy in _EQ_CACHE_FIELDS:
             setattr(self, field, {} if field == '_eval_cache' else None)
+
+    def reset_state(self, reset_right_part: bool = True) -> None:
+        """Drop all cached evaluation/fitness state on this Equation.
+
+        Call after any structural mutation (or to discard a stale fitness/AIC
+        evaluation). ``reset_right_part=False`` keeps the installed target;
+        everything else goes either way -- see
+        :meth:`reset_for_structure_change`.
+        """
+        if reset_right_part:
+            self._reset_groups('target')
+        self.reset_for_structure_change()
 
     def _invalidate_label_cache(self):
         """Drop memoized caches keyed on the current structure; call after
@@ -1101,9 +1201,6 @@ class Equation(ComplexStructure):
         new_equation.stability_calculated = self.stability_calculated
         new_equation.complexity_calculated = getattr(self, 'complexity_calculated', False)
         new_equation.aic_calculated = self.aic_calculated
-        new_equation.simplified = self.simplified
-        new_equation.is_correct_right_part = self.is_correct_right_part
-        new_equation.solver_form_defined = False
 
         try:
             new_equation._fitness_value = self._fitness_value
@@ -1681,7 +1778,7 @@ class SoEq(moeadd.MOEADDSolution):
                 if eq_idx == 0:
                     form += ' / ' + equation.text_form + '\n'
                 elif eq_idx == len(self.vals) - 1:
-                    form += ' \ ' + equation.text_form + '\n'
+                    form += r' \ ' + equation.text_form + '\n'
                 else:
                     form += ' | ' + equation.text_form + '\n'
         else:
@@ -1726,6 +1823,11 @@ class SoEq(moeadd.MOEADDSolution):
         """Forward reset_state to every Equation in this system."""
         for equation in self.vals:
             equation.reset_state(reset_right_part)
+
+    def reset_for_structure_change(self) -> None:
+        """Forward :meth:`Equation.reset_for_structure_change` to every gene."""
+        for equation in self.vals:
+            equation.reset_for_structure_change()
 
     def copy_properties_to(self, objective):
         for eq_label in self.vals.equation_keys:  # Not the best code possible here

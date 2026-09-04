@@ -15,40 +15,40 @@ from epde.operators.utils.template import CompoundOperator
 from epde.structure.main_structures import Equation
 
 
-# Marker attribute set by ``LASSOSparsity.apply`` on the equation
-# instance to indicate that the legacy LASSO post-processing refit
-# (LinearRegression on the LASSO survivors, un-normalised features)
-# should run on this equation. ``VWSRSparsity`` does NOT set this
-# marker; its PhysicsInformedLasso output is already on the physical
-# scale and would be corrupted by the refit. Gating on the equation
-# (rather than on the operator) keeps the strategy wiring untouched.
-LEGACY_REFIT_MARKER = '_legacy_refit_pending'
-
-
 class LinRegBasedCoeffsEquation(CompoundOperator):
     '''
-    Refit the LASSO survivors with ``LinearRegression`` on
-    *un-normalised* features, replacing ``weights_final`` with
-    physically-scaled coefficients.
+    THE SOLE AUTHOR of ``weights_final`` and ``weights_final_evald``.
 
-    Restores the legacy two-step pipeline:
-        1. LASSOSparsity fits Lasso on min-max-normalised features and
-           identifies the surviving (non-zero) terms.
-        2. This operator re-fits those survivors with ordinary least
-           squares on the un-normalised features to recover physical
-           coefficient magnitudes (LASSO coefficients are biased by
-           both L1 shrinkage and the upstream normalisation).
+    The sparsity step decides the SUPPORT and writes ``weights_internal``;
+    this operator turns that support into physical magnitudes. Which of its
+    two branches runs is the sparsity operator's own declaration, read from
+    ``fits_physical_scale`` (see ``LASSOSparsity`` / ``VWSRSparsity`` /
+    ``KneeSparsity``) and pushed onto this instance by
+    ``EqRightPartSelector.set_suboperators``:
 
-    Gated by the per-equation marker ``LEGACY_REFIT_MARKER`` that
-    ``LASSOSparsity`` sets and ``VWSRSparsity`` leaves unset, so this
-    operator can be wired into both pipelines without a strategy flag.
+        * ``False`` (legacy LASSO) -- the sparsity fit ran on min-max-rescaled
+          features and target, so its coefficients are a support verdict, not
+          magnitudes. Refit the survivors with un-normalised
+          ``LinearRegression``.
+        * ``True`` (VWSR, Knee) -- the sparsity fit was already on the physical
+          scale, so the final magnitudes ARE the internal ones. Promote them.
+
+    Every sparsity operator used to raise ``weights_final_evald`` itself, which
+    meant four writers and, on the LASSO path, a window where a rescaled
+    selection vector was flagged as the fitted answer. Now the flag goes up
+    here, once, after the magnitudes exist.
 
     Output shape is the unified layout (``Equation._validate_weight_layout``):
-    one slot per non-target term in structure order, zeros at the terms LASSO
-    killed, then the intercept. The intercept follows THE INTERCEPT RULE -- it
-    is refitted only when the sparsity step kept it.
+    one slot per non-target term in structure order, zeros at the terms the
+    sparsity step killed, then the intercept. The intercept follows THE
+    INTERCEPT RULE -- it is refitted only when the sparsity step kept it.
     '''
     key = 'LinRegCoeffCalc'
+
+    #: Set per run by ``EqRightPartSelector.set_suboperators`` from the wired
+    #: sparsity operator. Defaults to the legacy refit so a directly
+    #: instantiated, unwired operator behaves as it always did.
+    sparsity_fits_physical = False
 
     @staticmethod
     def _sample_keys():
@@ -100,17 +100,21 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
         return target, features
 
     def apply(self, objective : Equation, arguments : dict = None):
-        """Refit LASSO survivors with un-normalised LinearRegression.
+        """Put physical magnitudes on the support the sparsity step chose.
 
-        Skipped unless ``LASSOSparsity`` set ``LEGACY_REFIT_MARKER`` on
-        the equation. The marker is cleared after the refit so a stale
-        marker from a previous run doesn't double-trigger work.
+        Refits un-normalised when that support came from a rescaled fit;
+        promotes ``weights_internal`` when the sparsity operator already fitted
+        on the physical scale. Either way this is where ``weights_final_evald``
+        goes up.
         """
         assert objective.weights_internal_evald, (
             'Trying to calculate final weights before evaluating '
             'intermediate ones (no sparsity).'
         )
-        if not getattr(objective, LEGACY_REFIT_MARKER, False):
+        if getattr(self, 'sparsity_fits_physical', False):
+            objective.weights_final = np.asarray(objective.weights_internal,
+                                                 dtype=float).copy()
+            objective.weights_final_evald = True
             return
 
         target, features = self._legacy_evaluate_nonzero(objective)
@@ -151,7 +155,6 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
             weights_final[-1] = float(estimator.intercept_)
         objective.weights_final = weights_final
         objective.weights_final_evald = True
-        setattr(objective, LEGACY_REFIT_MARKER, False)
 
     def use_default_tags(self):
         self._tags = {'coefficient calculation', 'gene level', 'no suboperators', 'inplace'}

@@ -25,7 +25,7 @@ from functools import partial
 from epde.structure.structure_template import check_uniqueness
 from epde.optimizers.moeadd.moeadd import ParetoLevels
 
-from epde.decorators import HistoryExtender, ResetEquationStatus
+from epde.decorators import HistoryExtender
 
 from epde.operators.utils.template import CompoundOperator, add_base_param_to_operator
 from epde.operators.multiobjective.moeadd_specific import get_basic_populator_updater
@@ -90,8 +90,16 @@ class ParetoLevelsCrossover(CompoundOperator):
             #     raise IndexError('Equations have diffferent number of terms')
             new_system_1 = deepcopy(crossover_pool[pair_idx, 0])
             new_system_2 = deepcopy(crossover_pool[pair_idx, 1])
-            # new_system_1.reset_state(False); new_system_2.reset_state()
-            
+            # OWNERSHIP CONTRACT: an offspring owns no fit and no target.
+            # ``Equation.__deepcopy__`` carries both weight vectors and both
+            # ``*_evald`` flags verbatim, so without this the offspring enters
+            # crossover claiming its parent's coefficients -- and any gene that
+            # neither crossover nor mutation structurally changed would ride all
+            # the way out of RPS still carrying them. This is the boundary where
+            # a candidate stops being its parent, so it is where the fitted
+            # state dies.
+            new_system_1.reset_state(True); new_system_2.reset_state(True)
+
             new_system_1, new_system_2 = self.suboperators['chromosome_crossover'].apply(objective = (new_system_1, new_system_2),
                                                                                          arguments = subop_args['chromosome_crossover'])
 
@@ -131,27 +139,16 @@ class ChromosomeCrossover(CompoundOperator):
                 temp_eq = offspring_1.vals[eq_key]
                 offspring_1.vals.replace_gene(gene_key = eq_key, value = offspring_2.vals[eq_key])
                 offspring_2.vals.replace_gene(gene_key = eq_key, value = temp_eq)
-                # The swapped equations keep their structure but land in a new
-                # system. Clear right_part_selected (not simplified /
-                # is_correct_right_part) so the system-level pairwise scan
-                # re-validates the composition without re-running each term-sweep.
-                #
-                # The fitness flag must go with it. Re-running RPS re-runs its
-                # term-sweep, and that sweep OVERWRITES ``fitness_value`` with
-                # its own metric (the host's ``force_out_of_place`` branch
-                # assigns it so the degeneracy threshold can read it). Under a
-                # solver-based search the sweep's host is a lightweight
-                # solver-free one, so leaving ``fitness_calculated`` up meant
-                # the solver host declined to re-score and the equation went
-                # onto the front carrying an ``l2_relative`` value while its
-                # neighbours carried solver values -- two different metrics on
-                # one Pareto axis.
-                for offspring in (offspring_1, offspring_2):
-                    equation = offspring.vals[eq_key]
-                    equation.right_part_selected = False
-                    equation.fitness_calculated = False
-                    equation.stability_calculated = False
-                    equation.complexity_calculated = False
+                # No flag clearing needed here any more: both offspring were
+                # reset wholesale at the deepcopy site in
+                # ``ParetoLevelsCrossover.apply``, so a swapped gene already
+                # carries no fit, no scores and no right-part verdict. This
+                # block used to clear four flags by hand while deliberately
+                # KEEPING ``simplified`` / ``is_correct_right_part`` to spare
+                # the gene a term-sweep -- but those two are what let RPS skip
+                # its loop body, so the "saving" was the equation silently
+                # keeping its parent's coefficients. They are locals of
+                # ``EqRightPartSelector.apply`` now.
             else:
                 temp_eq_1, temp_eq_2 = self.suboperators['equation_crossover'].apply(objective = (offspring_1.vals[eq_key],
                                                                                                   offspring_2.vals[eq_key]),
@@ -238,15 +235,12 @@ class EquationCrossover(CompoundOperator):
 
         parent1 = objective[0]
         parent2 = objective[1]
-        # Snapshot target term identity (not the term itself) -- the
-        # actual deepcopy is deferred to ``_ensure_target`` and only
-        # pays when the target wasn't already partitioned into the
-        # offspring during assembly. Common case (target shared as an
-        # anchor) saves both deepcopies entirely.
-        p1_target_ref = parent1.target
-        p2_target_ref = parent2.target
-        p1_target_labels = p1_target_ref.factors_labels
-        p2_target_labels = p2_target_ref.factors_labels
+        # No target is read here. Parents arrive from the deepcopy site with
+        # ``_target_term`` already cleared, and RPS re-derives the right part
+        # from scratch on entry -- including the guarantee that a
+        # deriv-carrying term exists at all (its inner ``restore_property(
+        # deriv=True)`` loop). Crossover partitions terms; it does not have an
+        # opinion about which one is the left-hand side.
 
         def factor_signature(term):
             """Factor-function-set signature, ignoring params.
@@ -335,21 +329,12 @@ class EquationCrossover(CompoundOperator):
         for j in e2_unique[n_pairs:]:
             offspring2_terms.append(deepcopy(parent2.structure[j]))
 
-        # Force-include each parent's target term so right-part
-        # validity survives the partition. Anchored / partitioned targets
-        # are already present; the helper is a no-op in that case. When
-        # we DO need to add the target, deepcopy on the spot so the
-        # offspring doesn't alias the parent's term.
-        def _ensure_target(terms, parent_target_term, target_labels):
-            for t in terms:
-                if t.factors_labels == target_labels:
-                    return terms
-            return [deepcopy(parent_target_term)] + terms
-
-        offspring1_terms = _ensure_target(
-            offspring1_terms, p1_target_ref, p1_target_labels)
-        offspring2_terms = _ensure_target(
-            offspring2_terms, p2_target_ref, p2_target_labels)
+        # No target is force-included. RPS already guarantees a deriv-carrying
+        # term on entry -- ``EqRightPartSelector.apply`` loops
+        # ``restore_property(mandatory_family=False, deriv=True)`` until one
+        # exists -- so duplicating that guarantee here only pinned the parent's
+        # target into the offspring and grew the structure by a term. Offspring
+        # length is now purely the partition result.
 
         # Post-assembly dedup gate. A param-blend pair can in principle
         # produce a structural_label that collides with an anchor term, and
@@ -376,21 +361,12 @@ class EquationCrossover(CompoundOperator):
         equation1.structure = offspring1_terms
         equation2.structure = offspring2_terms
 
-        for i, t in enumerate(equation1.structure):
-            if t.factors_labels == p1_target_labels:
-                equation1.target_idx = i
-                break
-        for i, t in enumerate(equation2.structure):
-            if t.factors_labels == p2_target_labels:
-                equation2.target_idx = i
-                break
-
         equation1._invalidate_label_cache()
         equation2._invalidate_label_cache()
-        # The recombined structures sit on clone_shell bodies that inherited
-        # the parents' right-part flags; reset so RPS re-runs. Equations that
-        # did not recombine are returned unchanged earlier (crossover-prob
-        # early return / dedup-revert) and never reach here.
+        # ``clone_shell`` copies the parent's flags onto an EMPTY structure, so
+        # the shells claim valid weights over the term list just assigned. Reset
+        # both. (A target install used to sit above this pair -- it was dead
+        # code: ``reset_state(True)`` nulls ``_target_term`` two lines later.)
         equation1.reset_state(reset_right_part=True)
         equation2.reset_state(reset_right_part=True)
         return equation1, equation2

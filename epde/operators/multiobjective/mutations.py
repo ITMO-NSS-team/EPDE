@@ -30,7 +30,7 @@ from epde.operators.utils.template import CompoundOperator, add_base_param_to_op
 from epde import _loop_stats
 
 
-from epde.decorators import HistoryExtender, ResetEquationStatus
+from epde.decorators import HistoryExtender
 
 # Bounded regenerate-retry budget for TermMutation: how many times a
 # freshly randomized term that duplicates an existing one is re-rolled
@@ -338,6 +338,13 @@ class TermParameterMutation(CompoundOperator):
                 break
         _loop_stats.record('TermParameterMutation.unique', attempts, max_iter)
         term.resetSavedState()
+        # A factor-parameter change is a STRUCTURAL change: it rewrites
+        # ``factors_labels``, so the fitted features are no longer the ones
+        # the weights describe. Invalidating only the label caches left both
+        # ``*_evald`` flags up over a support decision for different columns.
+        # Dormant today -- the mutation builders wire only ``TermMutation`` --
+        # but silently wrong the moment it is re-enabled.
+        equation.reset_for_structure_change()
         return term
     
     def use_default_tags(self):

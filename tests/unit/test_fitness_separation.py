@@ -66,10 +66,17 @@ class TestHostsAreScorersOnly:
 #  ... so an unfitted equation must fail loudly, not get fitted on the sly     #
 # --------------------------------------------------------------------------- #
 class _BareEquation:
-    """Enough of an Equation for the guard, which runs before anything else."""
+    """Enough of an Equation for the guard, which runs before anything else.
 
-    def __init__(self, evald):
+    Both flags, because both are the precondition: the fillers read
+    ``weights_final`` (through ``Equation.residual``), so a support decision
+    alone is not enough to score on. ``final`` defaults to ``support`` so the
+    common "fitted / not fitted" case stays a single argument.
+    """
+
+    def __init__(self, evald, final=None):
         self.weights_internal_evald = evald
+        self.weights_final_evald = evald if final is None else final
         self.main_var_to_explain = 'u'
 
 
@@ -78,8 +85,17 @@ class TestUnfittedEquationRaises:
     def test_solver_free_host_refuses_to_score_it(self):
         host = SolverFreeFitness(['penalty_coeff'])
         host.params = {'penalty_coeff': 0.2}
-        with pytest.raises(RuntimeError, match='no support decision'):
+        with pytest.raises(RuntimeError, match='not fitted'):
             host.apply(_BareEquation(False), {})
+
+    def test_a_support_decision_alone_is_not_enough(self):
+        """The host reads ``weights_final``, so sparsity-without-coefficients
+        is exactly as unscoreable as nothing at all -- and used to slip through
+        a check that only asked about the support."""
+        host = SolverFreeFitness(['penalty_coeff'])
+        host.params = {'penalty_coeff': 0.2}
+        with pytest.raises(RuntimeError, match='not fitted'):
+            host.apply(_BareEquation(True, final=False), {})
 
     def test_the_message_names_the_variable_and_the_owner(self):
         host = SolverFreeFitness(['penalty_coeff'])
@@ -93,7 +109,7 @@ class TestUnfittedEquationRaises:
         host = SolverBasedFitness(['penalty_coeff', 'pinn_loss_mult'])
         system = type('S', (), {'vals': [_BareEquation(True),
                                          _BareEquation(False)]})()
-        with pytest.raises(RuntimeError, match='no support decision'):
+        with pytest.raises(RuntimeError, match='not fitted'):
             host.apply(system, {})
 
 
@@ -115,13 +131,22 @@ class TestRPSOwnsTheFit:
     def test_the_equation_leaves_rps_fitted(self):
         """The probe clears the weight flags after every candidate it tries.
         Without a refit for the installed target the scorer is handed an
-        equation with no support decision -- which used to be papered over by
-        the host's ``needs_sparsity`` fallback and now raises. Reproduced live
-        by the legacy-LASSO pipeline."""
+        unfitted equation -- which used to be papered over by the host's
+        ``needs_sparsity`` fallback and now raises. Reproduced live by the
+        legacy-LASSO pipeline.
+
+        The guard must test BOTH flags: a structural change mid-loop drops the
+        fit wholesale, and on the cap-break path that leaves the support
+        decision up with no coefficients behind it -- which an internal-only
+        test reads as "already fitted".
+        """
         source = inspect.getsource(EqRightPartSelector.apply)
-        guard = "if not getattr(objective, 'weights_internal_evald', False):"
-        assert guard in source
-        assert source.index(guard) < source.index('objective.remove_zero_terms()')
+        refit = 'self._fit_and_score(objective, subop_args)'
+        exit_refit = source.rindex(refit)
+        guard = source.rindex('if not (', 0, exit_refit)
+        assert 'weights_internal_evald' in source[guard:exit_refit]
+        assert 'weights_final_evald' in source[guard:exit_refit]
+        assert exit_refit < source.index('objective.remove_zero_terms()')
 
     def test_the_helper_fits_before_it_scores(self):
         """sparsity -> coeff_calc -> fitness, in that order."""

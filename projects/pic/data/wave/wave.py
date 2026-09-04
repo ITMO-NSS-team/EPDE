@@ -49,7 +49,6 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
     for var in all_vars:
         correct_eq.vals[var].main_var_to_explain = var
         correct_eq.vals[var].metaparameters = metaparams
-        correct_eq.vals[var].simplified = True
     print(correct_eq.text_form)
 
     incorrect_eq = translate_equation(eq_incorrect_symbolic, search_obj.pool,
@@ -57,7 +56,6 @@ def compare_equations(correct_symbolic: str, eq_incorrect_symbolic: str,
     for var in all_vars:
         incorrect_eq.vals[var].main_var_to_explain = var
         incorrect_eq.vals[var].metaparameters = metaparams
-        incorrect_eq.vals[var].simplified = True
     print(incorrect_eq.text_form)
 
     fit_operator.apply(correct_eq, {})

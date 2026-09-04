@@ -105,12 +105,22 @@ class SolverFreeFitness(CompoundOperator):
         # what let the in-place pass silently re-sparsify an already-fitted
         # equation and then prune its structure, which in turn made the
         # post-RPS structural label unreliable for the MOEA/D history dedup.
-        if not getattr(objective, 'weights_internal_evald', False):
+        # BOTH flags, not just the support decision: every filler below reads
+        # ``weights_final`` (through ``Equation.residual``), so the fitted
+        # MAGNITUDES are what this host actually requires. Checking only
+        # ``weights_internal_evald`` let an equation through on the strength of
+        # a support decision it had no coefficients for.
+        if not (getattr(objective, 'weights_internal_evald', False)
+                and getattr(objective, 'weights_final_evald', False)):
             raise RuntimeError(
-                'SolverFreeFitness: scoring an equation with no support '
-                'decision. Sparsity must run before fitness -- '
-                'EqRightPartSelector owns it (suboperators "sparsity" and '
-                f'"coeff_calc"). target={objective.main_var_to_explain!r}')
+                'SolverFreeFitness: scoring an equation that is not fitted. '
+                'Sparsity and the coefficient calculation must both run before '
+                'fitness -- EqRightPartSelector owns them (suboperators '
+                '"sparsity" and "coeff_calc"). '
+                f'target={objective.main_var_to_explain!r} '
+                f'support={getattr(objective, "weights_internal_evald", False)} '
+                f'coefficients={getattr(objective, "weights_final_evald", False)}')
+        objective.assert_state_invariants('SolverFreeFitness.apply entry')
         # During the RPS term-sweep a degenerate (all-zero-weight) candidate is
         # skipped by returning None; in-place we always fall through to a
         # finite value.
@@ -159,24 +169,12 @@ class SolverFreeFitness(CompoundOperator):
         # weights_internal non-zeros rather than structure length. The comment
         # that used to defend the prune described the retired nnz+1 layout.
 
-        # An equation that RPS left unfitted -- e.g. every candidate target in its
-        # term-sweep was declined by the degeneracy check (discrepancy over the
-        # threshold) -- has no final weights. Score it as maximally degenerate so
-        # MOEA/D selects it out, instead of crashing on weights_final access.
-        if not getattr(objective, 'weights_final_evald', False):
-            for filler in self.objectives:
-                # Complexity opts out (stamped_on_failure=False): flag stays
-                # down, so the equation_complexity reader falls back to the
-                # lazy structure-derived cores -- the exact pre-filler
-                # legacy semantics for RPS-exhausted equations.
-                if not getattr(filler, 'stamped_on_failure', True):
-                    continue
-                setattr(objective, filler.value_attr, LOSS_NAN_VAL)
-                setattr(objective, filler.flag_attr, True)
-            objective.aic = None
-            objective.aic_calculated = True
-            return
-
+        # An unfitted equation used to be silently stamped LOSS_NAN_VAL here so
+        # it would be selected out rather than crash on weights_final access.
+        # That path is gone: the precondition above now demands the fitted
+        # magnitudes, and RPS's exit contract guarantees them, so an equation
+        # arriving without them is a bug to report -- not a degenerate form to
+        # quietly bury on the front with no indication of why.
         for filler in self.objectives:
             setattr(objective, filler.value_attr, filler.compute(objective, ctx))
             setattr(objective, filler.flag_attr, True)
@@ -315,14 +313,20 @@ class SolverBasedFitness(CompoundOperator):
         # used to sit here was unreachable -- the RPS sweep dispatches to
         # ``fitness_calculation``, which on the solver path is a separate
         # lightweight SolverFreeFitness, never this host.)
+        # As in SolverFreeFitness: the solver forms are built from the fitted
+        # coefficients, so both flags are the precondition, not just the
+        # support decision.
         unfitted = [eq.main_var_to_explain for eq in objective.vals
-                    if not getattr(eq, 'weights_internal_evald', False)]
+                    if not (getattr(eq, 'weights_internal_evald', False)
+                            and getattr(eq, 'weights_final_evald', False))]
         if unfitted:
             raise RuntimeError(
-                'SolverBasedFitness: solving a system whose equations have no '
-                'support decision. Sparsity must run before fitness -- '
-                'EqRightPartSelector owns it (suboperators "sparsity" and '
-                f'"coeff_calc"). unfitted={unfitted}')
+                'SolverBasedFitness: solving a system whose equations are not '
+                'fitted. Sparsity and the coefficient calculation must both run '
+                'before fitness -- EqRightPartSelector owns them (suboperators '
+                f'"sparsity" and "coeff_calc"). unfitted={unfitted}')
+        for eq in objective.vals:
+            eq.assert_state_invariants('SolverBasedFitness.apply entry')
         if self.backend == 'deepxde':
             return self._apply_deepxde(objective, force_out_of_place)
         return self._apply_autograd(objective, force_out_of_place)

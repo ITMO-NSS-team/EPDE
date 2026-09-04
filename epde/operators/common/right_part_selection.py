@@ -137,6 +137,23 @@ class EqRightPartSelector(CompoundOperator):
                     f'{exc}). Falling back to the per-target path for the rest '
                     'of this run.')
 
+    def set_suboperators(self, operators: dict, probas: dict = {}):
+        """Wire the suboperators, then tell ``coeff_calc`` what scale the
+        support decision it will be handed was fitted on.
+
+        The sparsity operator declares this about itself
+        (``fits_physical_scale``); pushing it across here once per run keeps the
+        two strategy builders -- which already hand this operator both
+        suboperators together -- unaware of the coupling, and keeps
+        ``coeff_calc`` from having to reach back into the equation for a marker.
+        """
+        super().set_suboperators(operators, probas)
+        sparsity = operators.get('sparsity')
+        coeff_calc = operators.get('coeff_calc')
+        if sparsity is not None and coeff_calc is not None:
+            coeff_calc.sparsity_fits_physical = bool(
+                getattr(sparsity, 'fits_physical_scale', False))
+
     def _fit_and_score(self, objective: Equation, subop_args: dict):
         """Fit ``objective`` for its CURRENT ``target_idx``, then score it.
 
@@ -182,7 +199,16 @@ class EqRightPartSelector(CompoundOperator):
         outer_max_iter = 50
         inner_max_iter = 100
         outer_attempts = 0
-        while not (objective.simplified and objective.is_correct_right_part):
+        # Loop control, deliberately LOCAL. These two were Equation attributes;
+        # persisting them meant an offspring could inherit "already simplified /
+        # right part already correct", skip this loop entirely -- including the
+        # ``reset_state(True)`` on its first line -- and leave RPS still carrying
+        # its parent's weights. As locals they start False on every entry, so
+        # the body always runs at least once and the equation is always refitted
+        # for a target this invocation chose.
+        simplified = False
+        correct_right_part = False
+        while not (simplified and correct_right_part):
             outer_attempts += 1
             if outer_attempts > outer_max_iter:
                 warnings.warn(
@@ -254,9 +280,9 @@ class EqRightPartSelector(CompoundOperator):
             objective.target_idx = min_idx
 
             if not self.simplify_equation(objective):
-                objective.simplified = True
+                simplified = True
             if objective.target is not None and objective.target.contains_deriv(objective.main_var_to_explain):
-                objective.is_correct_right_part = True
+                correct_right_part = True
 
         _loop_stats.record('EqRPS.outer', outer_attempts, outer_max_iter)
         # Drop the super-Gram so a downstream consumer (e.g. fitness
@@ -307,9 +333,17 @@ class EqRightPartSelector(CompoundOperator):
         # retired ``needs_sparsity`` fallback used to. Refitting here also
         # repairs a real desync on that path: ``chosen`` could be installed
         # while the weights still described a DIFFERENT candidate target.
-        if not getattr(objective, 'weights_internal_evald', False):
+        #
+        # BOTH flags are tested. The scorer reads ``weights_final``, and a
+        # structural change mid-loop (``simplify_equation``, the linear-
+        # dependence scrub) drops the fit wholesale; on the cap-break path that
+        # left the support decision up with no coefficients behind it, which the
+        # old internal-only test read as "already fitted".
+        if not (getattr(objective, 'weights_internal_evald', False)
+                and getattr(objective, 'weights_final_evald', False)):
             self._fit_and_score(objective, subop_args)
         objective.remove_zero_terms()
+        objective.assert_state_invariants('EqRightPartSelector.apply exit')
         # Hard invariant: no duplicate terms may leave RPS. simplify and
         # scrub both regenerate-then-drop, so a surviving duplicate is a
         # logic error to surface HERE -- not one generation later at the
@@ -381,10 +415,7 @@ class EqRightPartSelector(CompoundOperator):
                         _regen_or_drop_term(
                             objective, t, max_iter=0,
                             stats_name='simplify_equation.degree_reduction')
-                    try:
-                        objective.reset_state(reset_right_part=False)
-                    except TypeError:
-                        objective.reset_state()
+                    objective.reset_for_structure_change()
                     return True
         common_factors = list(frozenset.intersection(*equation_terms))
         if not common_factors:
@@ -434,21 +465,29 @@ class EqRightPartSelector(CompoundOperator):
                     objective, term, max_iter=max_iter,
                     stats_name='simplify_equation.replace_term')
                 if status in ('target', 'floor'):
-                    # Offending term is the RPS target, or dropping would
-                    # degenerate the equation -> decline this
-                    # simplification and let the outer RPS loop reset and
-                    # re-select.
-                    return False
+                    # The offending term is the RPS target, or dropping it
+                    # would degenerate the equation. There is nothing to
+                    # decline: the factor powers were ALREADY reduced above,
+                    # the zero-power factors ALREADY removed, and
+                    # ``_regen_or_drop_term`` may have randomized the term up
+                    # to ``max_iter`` times. None of that is revertible, so
+                    # report the change and let the outer RPS loop reset and
+                    # re-select -- which is what this comment always claimed
+                    # and ``return False`` never did. Returning False here made
+                    # the caller read "nothing to simplify", exit the loop, skip
+                    # the exit-contract refit, and prune in ``remove_zero_terms``
+                    # using coefficients that described the PRE-simplification
+                    # structure.
+                    objective.reset_for_structure_change()
+                    return True
 
             # Structure changed: invalidate stale fitness /
             # weights / AIC caches while leaving RPS to the
             # caller's outer loop.
-            try:
-                objective.reset_state(reset_right_part=False)
-            except TypeError:
-                objective.reset_state()
+            objective.reset_for_structure_change()
             return True
-        return False
+        # Unreachable: the loop body above returns on every path.
+        raise AssertionError('simplify_equation: common-factor loop fell through')
 
     def _regenerate_dependent_terms(self, objective: Equation,
                                     feature_terms) -> bool:
@@ -531,8 +570,18 @@ class EqRightPartSelector(CompoundOperator):
                 stats_name='simplify_equation.lin_dep',
                 extra_ok=_independent)
             if status == 'floor':
+                # ``_regen_or_drop_term`` randomized this term up to max_iter
+                # times looking for an independent replacement and left the last
+                # candidate in place -- the structure DID change, even though no
+                # replacement was accepted. Reporting False here made the caller
+                # treat the equation as clean, exit the outer loop and prune on
+                # coefficients describing the pre-scrub structure.
+                changed = True
                 break
-            if status in ('regenerated', 'dropped'):
+            if status in ('regenerated', 'dropped', 'target'):
+                # 'target' cannot occur today (``feature_terms`` excludes the
+                # target), but it is a structural change like the others and
+                # must not be silently swallowed by an exhaustive-looking test.
                 changed = True
                 if status == 'regenerated':
                     # The accepted replacement joins each sample's basis so the
@@ -544,10 +593,7 @@ class EqRightPartSelector(CompoundOperator):
                         if nrm > 0.0:
                             bases[key].append(col[key] / nrm)
         if changed:
-            try:
-                objective.reset_state(reset_right_part=False)
-            except TypeError:
-                objective.reset_state()
+            objective.reset_for_structure_change()
         return changed
 
     def use_default_tags(self):
@@ -1013,10 +1059,7 @@ def _break_equation_duplication(equation: Equation, shared_sigs, *,
     # rule) instead of rerolling it into unrelated structure. Falls back
     # to the randomize path when the wrap cannot produce a unique term.
     if _wrap_term_with_factor(equation, term, set(shared_sigs)):
-        try:
-            equation.reset_state(reset_right_part=False)
-        except TypeError:
-            equation.reset_state()
+        equation.reset_for_structure_change()
         return True
 
     attempts = 0
@@ -1034,10 +1077,7 @@ def _break_equation_duplication(equation: Equation, shared_sigs, *,
     _regen_or_drop_term(equation, term, max_iter=0,
                         stats_name='break_equation_duplication.drop')
 
-    try:
-        equation.reset_state(reset_right_part=False)
-    except TypeError:
-        equation.reset_state()
+    equation.reset_for_structure_change()
     return True
 
 
@@ -1126,9 +1166,10 @@ class SoEqRightPartSelector(CompoundOperator):
                         eq_j, {leak_sig}, preferred_sigs={leak_sig})
                     if not changed:
                         continue
+                    # ``simplified`` / ``is_correct_right_part`` are locals of
+                    # ``EqRightPartSelector.apply`` now, so re-invoking it is
+                    # the whole mechanism -- it re-enters its loop from scratch.
                     eq_j.right_part_selected = False
-                    eq_j.simplified = False
-                    eq_j.is_correct_right_part = False
                     eq_selector.apply(objective=eq_j, arguments=eq_args)
                     _loop_stats.record('SoEqRPS.target_leak_repair', 1, 1)
                     any_changes = True
