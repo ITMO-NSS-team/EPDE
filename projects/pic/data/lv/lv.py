@@ -48,7 +48,7 @@ def lv_discovery(noise_level):
                                       dimensionality=dimensionality)
     grid_tokens = GridTokens(['x_0', ], dimensionality=dimensionality, max_power=2)
 
-    epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True, use_pic=True, boundary=15,
+    epde_search_obj = EpdeSearch(use_solver=True, multiobjective_mode=True, use_pic=True, boundary=15,
                                  coordinate_tensors=(t,), verbose_params={'show_iter_idx': True},
                                  device='cuda')
 

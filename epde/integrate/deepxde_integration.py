@@ -18,7 +18,6 @@ class SolverStrategy(ABC):
               adapter: 'DeepXDEAdapter') -> Tuple[List[np.ndarray], float]:
         pass
 
-
 class Solver1D(SolverStrategy):
     def solve(self, eq_list, var_names, grids, data_list, adapter):
         t = grids[0]
@@ -63,14 +62,13 @@ class Solver1D(SolverStrategy):
                                 num_boundary=adapter.num_boundary,
                                 num_test=500)
 
-        layer_size = [1] + adapter.net + [len(var_names)]
-        net = dde.nn.FNN(layer_size, adapter.activation, adapter.kernel_initializer)
-        model = dde.Model(data_obj, net)
-        model.compile(adapter.optimizer, lr=adapter.lr)
+        model = adapter._get_or_create_model(data_obj, dim=1, var_count=len(var_names))
         try:
-            losshistory, train_state = model.train(epochs=adapter.epochs)  # <-- ИСПРАВЛЕНО
-            final_loss = float(losshistory.loss_train[-1][0]) if losshistory.loss_train else np.nan
+            losshistory, train_state = model.train(iterations=adapter.iterations, verbose=adapter.verbose)
+            final_loss = float(
+                losshistory.loss_train[-1][0]) if losshistory.loss_train else np.nan
         except Exception as e:
+            print(f"Exception: {e}")
             y_pred = [np.full(data.shape, np.nan) for data in data_list]
             return y_pred, np.nan
 
@@ -117,16 +115,16 @@ class Solver2D(SolverStrategy):
 
             if len(left_idx) > 0:
                 bcs.append(dde.icbc.DirichletBC(geomtime, make_bc_func(left_idx),
-                                                lambda _, on_boundary: on_boundary and np.isclose(_.x[0], x.min(),
+                                                lambda _, on_boundary: on_boundary and np.isclose(_[0], x.min(),
                                                                                                   rtol=1e-5,
                                                                                                   atol=eps_x),
-                                                component=var_idx))
+                                                component=var_idx)) # Заменил _.x[0] на _[0]
             if len(right_idx) > 0:
                 bcs.append(dde.icbc.DirichletBC(geomtime, make_bc_func(right_idx),
-                                                lambda _, on_boundary: on_boundary and np.isclose(_.x[0], x.max(),
+                                                lambda _, on_boundary: on_boundary and np.isclose(_[0], x.max(),
                                                                                                   rtol=1e-5,
                                                                                                   atol=eps_x),
-                                                component=var_idx))
+                                                component=var_idx)) # Заменил _.x[0] на _[0]
             if len(initial_idx) > 0:
                 bcs.append(dde.icbc.IC(geomtime, make_bc_func(initial_idx),
                                        lambda _, on_initial: on_initial,
@@ -139,14 +137,12 @@ class Solver2D(SolverStrategy):
                                     num_initial=adapter.num_initial,
                                     num_test=500)
 
-        layer_size = [geomtime.dim] + adapter.net + [len(var_names)]
-        net = dde.nn.FNN(layer_size, adapter.activation, adapter.kernel_initializer)
-        model = dde.Model(data_obj, net)
-        model.compile(adapter.optimizer, lr=adapter.lr)
+        model = adapter._get_or_create_model(data_obj, dim=2, var_count=len(var_names))
         try:
-            losshistory, train_state = model.train(epochs=adapter.epochs)  # <- исправлено
+            losshistory, train_state = model.train(iterations=adapter.iterations, verbose=adapter.verbose)  # <-- ИСПРАВЛЕНО
             final_loss = float(losshistory.loss_train[-1][0]) if losshistory.loss_train else np.nan
         except Exception as e:
+            print(f"Exception: {e}")
             y_pred = [np.full(data.shape, np.nan) for data in data_list]
             return y_pred, np.nan
 
@@ -197,28 +193,28 @@ class Solver3D(SolverStrategy):
 
             if len(x_min_idx) > 0:
                 bcs.append(dde.icbc.DirichletBC(geomtime, make_bc_func(x_min_idx),
-                                                lambda _, on_boundary: on_boundary and np.isclose(_.x[0], x.min(),
+                                                lambda _, on_boundary: on_boundary and np.isclose(_[0], x.min(),
                                                                                                   rtol=1e-5,
                                                                                                   atol=eps_x),
-                                                component=var_idx))
+                                                component=var_idx)) # Заменил _.x[0] на _[0]
             if len(x_max_idx) > 0:
                 bcs.append(dde.icbc.DirichletBC(geomtime, make_bc_func(x_max_idx),
-                                                lambda _, on_boundary: on_boundary and np.isclose(_.x[0], x.max(),
+                                                lambda _, on_boundary: on_boundary and np.isclose(_[0], x.max(),
                                                                                                   rtol=1e-5,
                                                                                                   atol=eps_x),
-                                                component=var_idx))
+                                                component=var_idx)) # Заменил _.x[0] на _[0]
             if len(y_min_idx) > 0:
                 bcs.append(dde.icbc.DirichletBC(geomtime, make_bc_func(y_min_idx),
-                                                lambda _, on_boundary: on_boundary and np.isclose(_.x[1], y.min(),
+                                                lambda _, on_boundary: on_boundary and np.isclose(_[1], y.min(),
                                                                                                   rtol=1e-5,
                                                                                                   atol=eps_y),
-                                                component=var_idx))
+                                                component=var_idx)) # Заменил _.x[1] на _[1]
             if len(y_max_idx) > 0:
                 bcs.append(dde.icbc.DirichletBC(geomtime, make_bc_func(y_max_idx),
-                                                lambda _, on_boundary: on_boundary and np.isclose(_.x[1], y.max(),
+                                                lambda _, on_boundary: on_boundary and np.isclose(_[1], y.max(),
                                                                                                   rtol=1e-5,
                                                                                                   atol=eps_y),
-                                                component=var_idx))
+                                                component=var_idx)) # Заменил _.x[1] на _[1]
             if len(initial_idx) > 0:
                 bcs.append(dde.icbc.IC(geomtime, make_bc_func(initial_idx),
                                        lambda _, on_initial: on_initial,
@@ -231,14 +227,12 @@ class Solver3D(SolverStrategy):
                                     num_initial=adapter.num_initial,
                                     num_test=500)
 
-        layer_size = [geomtime.dim] + adapter.net + [len(var_names)]
-        net = dde.nn.FNN(layer_size, adapter.activation, adapter.kernel_initializer)
-        model = dde.Model(data_obj, net)
-        model.compile(adapter.optimizer, lr=adapter.lr)
+        model = adapter._get_or_create_model(data_obj, dim=3, var_count=len(var_names))
         try:
-            losshistory, train_state = model.train(epochs=adapter.epochs)  # <- исправлено
+            losshistory, train_state = model.train(iterations=adapter.iterations, verbose=adapter.verbose)  # <-- ИСПРАВЛЕНО
             final_loss = float(losshistory.loss_train[-1][0]) if losshistory.loss_train else np.nan
         except Exception as e:
+            print(f"Exception: {e}")
             y_pred = [np.full(data.shape, np.nan) for data in data_list]
             return y_pred, np.nan
 
@@ -260,10 +254,12 @@ class DeepXDEAdapter:
         self.num_domain = int(self.config.get('num_domain', 2000))
         self.num_boundary = int(self.config.get('num_boundary', 500))
         self.num_initial = int(self.config.get('num_initial', 500))
-        self.epochs = int(self.config.get('epochs', 10000))
+        #self.epochs = int(self.config.get('epochs', 10000))
+        self.iterations = int(self.config.get('iterations', 10000))
         # self.iterations = int(self.config.get('epochs', 5))
         self.bc_type = self.config.get('bc_type', 'Dirichlet')
         self.fallback_bc_value = self.config.get('fallback_bc_value', 0.0)
+        self.verbose = config.get('verbose', False)
 
         self.coordinate_mapping = self.config.get('coordinate_mapping', None)
         self.coord_names = None
@@ -274,6 +270,23 @@ class DeepXDEAdapter:
             2: Solver2D(),
             3: Solver3D(),
         }
+
+        self._model = None
+
+    def _get_or_create_model(self, data_obj, dim, var_count):
+        if self._model is None:
+            layer_size = [dim] + self.net + [var_count]
+            net = dde.nn.FNN(layer_size, self.activation, self.kernel_initializer)
+            model = dde.Model(data_obj, net)
+            model.compile(self.optimizer, lr=self.lr, verbose=self.verbose)
+            self._model = model
+        else:
+            def reset_weights(m):
+                if hasattr(m, 'reset_parameters'):
+                    m.reset_parameters()
+            self._model.net.apply(reset_weights)
+            self._model.data = data_obj
+        return self._model
 
     def _set_coordinate_info(self, coord_names):
         self.coord_names = coord_names
@@ -302,7 +315,10 @@ class DeepXDEAdapter:
                 for term_idx, term in enumerate(all_terms):
                     if term_idx == tgt:
                         continue
-                    coeff = float(eq.weights_final[term_idx]) if use_weights else 1.0
+                    if use_weights and len(eq.weights_final) > term_idx:
+                        coeff = float(eq.weights_final[term_idx])
+                    else:
+                        coeff = 1.0
                     term_val = 1.0
                     for factor in term.structure:
                         fv = self._factor_value_with_map(dde, factor, x, y, self.coord_map, var_idx_map)
@@ -311,11 +327,12 @@ class DeepXDEAdapter:
                 if use_weights and len(eq.weights_final) > len(all_terms):
                     residual += float(eq.weights_final[-1]) * (y[:, 0:1] * 0.0 + 1.0)
                 target = eq.target
-                target_val = 1.0
-                for factor in target.structure:
-                    fv = self._factor_value_with_map(dde, factor, x, y, self.coord_map, var_idx_map)
-                    target_val *= fv
-                residual -= target_val
+                if target is not None:
+                    target_val = 1.0
+                    for factor in target.structure:
+                        fv = self._factor_value_with_map(dde, factor, x, y, self.coord_map, var_idx_map)
+                        target_val *= fv
+                    residual -= target_val
                 residuals.append(residual)
             return residuals
 

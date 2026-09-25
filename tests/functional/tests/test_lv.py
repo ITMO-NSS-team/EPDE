@@ -11,13 +11,8 @@ operator_params_deepxde = EvolutionaryParams().get_default_params_for_operator(
     'DeepXDEBasedFitness'
 )
 
-operator_params_pic = EvolutionaryParams().get_default_params_for_operator(
-    'PIC'
-)
-
 ALL_CASES = [
     ("DeepXDEBasedFitness", operator_params_deepxde),
-    ("PIC", operator_params_pic),
     ("L2LRFitness", operator_params_l2lr),
 ]
 

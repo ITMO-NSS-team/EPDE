@@ -38,7 +38,7 @@ def ODE_discovery(foldername, noise_level):
     t = np.arange(start=0., stop=step * steps_num, step=step)
     data = np.load(os.path.join(foldername, 'ode_data.npy'))
     noised_data = noise_data(data, noise_level)
-    data_nn = load_pretrained_PINN(os.path.join(foldername, 'ode_0_ann.pickle')).cpu()
+    #data_nn = load_pretrained_PINN(os.path.join(foldername, 'ode_0_ann.pickle')).cpu()
 
     dimensionality = 0
 
@@ -46,7 +46,7 @@ def ODE_discovery(foldername, noise_level):
                                       dimensionality=dimensionality)
     grid_tokens = GridTokens(['x_0', ], dimensionality=dimensionality, max_power=2)
 
-    epde_search_obj = EpdeSearch(use_solver=False, use_pic=True, boundary=20,
+    epde_search_obj = EpdeSearch(use_solver=True, use_pic=True, boundary=20,
                                  coordinate_tensors=[t,], verbose_params={'show_iter_idx': True},
                                  device='cuda')
 
