@@ -56,6 +56,10 @@ class AdaptiveFiniteDeriv(AbstractDeriv):
     def __init__(self):
         pass
 
+    def _grad(self, data: np.ndarray, grid: np.ndarray, axis: int) -> np.ndarray:
+        """First derivative along ``axis``: the one place the difference rule is chosen."""
+        return np.gradient(data, grid, axis=axis)
+
     def differentiate(self, data: np.ndarray, max_order: Union[int, list],
                       mixed: bool = False, axis=None, *grids) -> list:
         if isinstance(max_order, int):
@@ -71,7 +75,7 @@ class AdaptiveFiniteDeriv(AbstractDeriv):
             assert np.any(data.shape) == 1
             derivs = []
             dim_idx = 0 if data.shape[1] == 1 else 1
-            grad = np.gradient(data, grids[0], axis=dim_idx)
+            grad = self._grad(data, grids[0], dim_idx)
             derivs.append(grad)
             ord_marker = max_order[dim_idx] if axis is None else max_order[axis]
             if ord_marker > 1:
@@ -84,7 +88,7 @@ class AdaptiveFiniteDeriv(AbstractDeriv):
                 for dim_idx in np.arange(data.ndim):
                     if max_order[dim_idx] == 0:
                         continue
-                    grad = np.gradient(data, grids[dim_idx], axis=dim_idx)
+                    grad = self._grad(data, grids[dim_idx], dim_idx)
                     derivs.append(grad)
                     ord_marker = max_order[dim_idx] if axis is None else max_order[axis]
                     if ord_marker > 1:
@@ -93,7 +97,7 @@ class AdaptiveFiniteDeriv(AbstractDeriv):
                         derivs.extend(self.differentiate(
                             grad, ord_reduced, mixed, higher_ord_der_axis, *grids))
             else:
-                grad = np.gradient(data, grids[axis], axis=axis)
+                grad = self._grad(data, grids[axis], axis)
                 derivs.append(grad)
                 if max_order[axis] > 1:
                     ord_reduced = [ord_ax - 1 for ord_ax in max_order]
@@ -108,6 +112,52 @@ class AdaptiveFiniteDeriv(AbstractDeriv):
         derivs = self.differentiate(data, max_order, mixed, None, *grid_unique)
         derivs = np.vstack([der.reshape(-1) for der in derivs]).T
         return derivs
+
+
+class ForwardIncrementDeriv(AdaptiveFiniteDeriv):
+    """Forward-in-time (Ito) derivatives: ``(u[k+lag] - u[k]) / (t[k+lag] - t[k])`` along the
+    time axis, central differences along every other axis.
+
+    A time-symmetric derivative cannot see a drift that is the gradient of a function of the
+    state once the process is stationary: ``E[u' g(u)] = d/dt E[G(u)] = 0`` for ``g = G'``. So
+    for stochastic data (Langevin dynamics, active particles) confinement and repulsion fit
+    with coefficient ~0 under the central or polynomial preprocessors. A forward increment is
+    not symmetric in time, and ``E[u(t+h) - u(t) | u(t)] / h`` is the drift itself (the first
+    Kramers-Moyal coefficient). ``lag`` > 1 averages over measurement noise.
+
+    Use with an UNSMOOTHED state, as the 'forward' preprocessor does: a smoother mixes future
+    samples into ``u(t)`` and correlates it with the increment it is regressed against.
+
+    The last ``lag * order`` samples along the time axis have no forward increment. They
+    repeat the last defined value and must lie inside the domain boundary;
+    ``Trajectory.build`` refuses a narrower boundary (see ``required_boundary``).
+    """
+
+    def __call__(self, data: np.ndarray, grid: list, max_order: Union[int, list, tuple],
+                 mixed: bool = False, lag: int = 1, time_axis: int = 0) -> np.ndarray:
+        if int(lag) != lag or lag < 1:
+            raise ValueError(f'lag must be a positive integer number of samples, got {lag!r}.')
+        self._lag, self._time_axis = int(lag), time_axis
+        return super().__call__(data, grid, max_order, mixed)
+
+    def _grad(self, data: np.ndarray, grid: np.ndarray, axis: int) -> np.ndarray:
+        if axis != self._time_axis:
+            return super()._grad(data, grid, axis)
+        h = self._lag
+        if data.shape[axis] <= h:
+            raise ValueError(f'{data.shape[axis]} samples along the time axis leave no forward '
+                             f'increment at lag {h}.')
+        u = np.moveaxis(data, axis, 0)
+        step = (np.asarray(grid)[h:] - np.asarray(grid)[:-h]).reshape((-1,) + (1,) * (u.ndim - 1))
+        out = np.empty(u.shape, dtype=float)
+        out[:-h] = (u[h:] - u[:-h]) / step
+        out[-h:] = out[-h - 1]
+        return np.moveaxis(out, 0, axis)
+
+    @staticmethod
+    def required_boundary(lag: int, max_order: int) -> int:
+        """Samples at the end of the time axis without a forward increment of order ``max_order``."""
+        return int(lag) * int(max_order)
 
 
 # class ANNBasedFiniteDifferences(AbstractDeriv):

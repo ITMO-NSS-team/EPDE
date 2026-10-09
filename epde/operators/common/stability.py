@@ -1,19 +1,27 @@
 """Stability-estimation subsystem for the EPDE structural search.
 
-Two coefficient-stability estimators used by the sparsity / fitness /
-right-part operators to score and prune candidate library terms:
+The two Gram-backed coefficient-stability estimators, used by the sparsity /
+fitness / right-part operators to score and prune candidate library terms when
+``objectives.instability_metric`` selects them:
 
-* ``GramSetup`` -- axis-aligned sliding-window CV (the ``gram_mode='axis'``
-  backup), with ``calculate_weights`` as a single-shot wrapper.
-* ``VaryingCoefSetup`` -- the default ``gram_mode='vcoef'`` varying-coefficient
-  stability, summed by ``vc_stability_total_lr``; basis resolution resolved
-  by ``resolve_vc_modes_from_input`` / ``taylor_microscale``.
+* ``GramSetup`` -- axis-aligned sliding-window CV (the ``'cv'`` metric,
+  ``gram_mode='axis'``), with ``calculate_weights`` as a single-shot wrapper.
+* ``VaryingCoefSetup`` -- varying-coefficient stability (the ``'vcoef'``
+  metric, ``gram_mode='vcoef'``), summed by ``vc_stability_total_lr``; basis
+  resolution resolved by ``resolve_vc_modes_from_input`` /
+  ``taylor_microscale``.
+
+Neither is the default. ``gram_mode`` is derived from the metric
+(``{'vcoef': 'vcoef', 'cv': 'axis'}``, else ``None``), and the default
+``'chi2'``, like the other basis-free estimators in ``survival``, builds
+neither.
 
 Relocated verbatim from ``epde.supplementary``. ``import epde.globals`` is
 kept lazy (inside the bodies that use it) to avoid a circular import:
 globals.py imports utilities from supplementary at module top level.
 """
 from functools import partialmethod
+import warnings
 import numpy as np
 from numpy.lib.stride_tricks import sliding_window_view
 
@@ -140,6 +148,11 @@ class GramSetup:
         self._per_dim = []
 
         for dim in range(len(grid_shape)):
+            # A size-1 axis has no window to slide (``window_size = 0`` broke
+            # the padding and aborted the search): it is absent, the way chi2
+            # drops an axis too short for a score path.
+            if grid_shape[dim] < 2:
+                continue
             window_size = grid_shape[dim] // 2
             # Circular: every position along the axis is a valid window
             # start (the input is virtually periodic); linear: only the
@@ -263,6 +276,10 @@ class GramSetup:
             w = w0 + dw_norm * inv_s[:, :, None]
 
             all_weights.append(w.squeeze(-1))
+        if not all_weights:
+            # Every axis is size 1: no window at all. ``cv_scores`` maps this
+            # empty stack as it maps any stack too short to have a spread.
+            return np.empty((0, active_size))
         return np.vstack(all_weights)
 
     @classmethod
@@ -305,6 +322,8 @@ class GramSetup:
             per_dim_super = []
 
             for dim in range(len(grid_shape)):
+                if grid_shape[dim] < 2:   # size-1 axis: absent, see __init__
+                    continue
                 window_size = grid_shape[dim] // 2
                 num_horizons = grid_shape[dim] if circular_cv else window_size + 1
                 step_size = max(1, num_horizons // _HORIZON_SUBSAMPLE)
@@ -399,7 +418,8 @@ def taylor_microscale(field: np.ndarray, grid_shape, axis: int,
 
     ``lambda^2 = <u^2> / <(du/dx)^2>``, with unit grid spacing -- the
     result has units of grid points so it sets the locality scale
-    directly. Constant or near-constant fields produce ``inf``.
+    directly. Constant or near-constant fields produce ``inf``, and so does
+    a size-1 axis.
 
     When ``deriv_field`` is supplied (the already-computed
     ``d(field)/d(axis)``), use it directly instead of ``np.gradient``;
@@ -407,6 +427,11 @@ def taylor_microscale(field: np.ndarray, grid_shape, axis: int,
     data when the EPDE pool stored ANN-smoothed derivatives.
     """
     f = np.asarray(field).reshape(grid_shape)
+    # A size-1 axis has no derivative (``np.gradient`` raises on it, which
+    # aborted a live vcoef search): no variation to resolve, as for a
+    # constant field.
+    if f.shape[axis] < 2:
+        return float('inf')
     if deriv_field is None:
         g = np.gradient(f, axis=axis)
     else:
@@ -444,26 +469,37 @@ def _cached_primary_var_names() -> list:
     return out
 
 
+def _vc_cache_key(grid_shape, main_var, sample_key):
+    """``vc_modes_cache`` key of one basis resolution. The trajectory is part
+    of it: the resolution reads THAT trajectory's field, and without the key
+    the first same-shape trajectory resolved fixed ``K`` for all of them, so
+    vcoef's value depended on trajectory order."""
+    return (tuple(int(n) for n in grid_shape), main_var,
+            0 if sample_key is None else sample_key, 'vc')
+
+
 def resolve_vc_modes_from_input(grid_shape, main_var=None, sample_key: int = 0,
                                 k_max: int = 6, k_min: int = 2):
     """One-shot resolve of per-axis varying-coefficient basis modes ``K_d``
     from the cached source variable's Taylor microscale, cached per
-    ``(grid_shape, main_var)`` so every candidate equation in one run shares
-    the SAME basis resolution.
+    ``(grid_shape, main_var, sample_key)`` so every candidate equation in one
+    run shares the SAME basis resolution on a given trajectory.
 
-    ``K_d = clip(ceil(n_d / lambda_d) + 1, k_min, k_max)``: roughly one
-    cosine mode per coherence length along axis ``d``, ``+1`` for the
-    constant term. The microscale is taken as the *minimum* over variables
-    (fastest-varying wins) so the basis can resolve every variable's
-    structure; constant / near-constant fields (``lambda_d -> inf``)
-    collapse to ``k_min`` (constant + one mode).
+    ``K_d = min(clip(ceil(n_d / lambda_d) + 1, k_min, k_max), n_d)``: roughly
+    one cosine mode per coherence length along axis ``d``, ``+1`` for the
+    constant term, and never more modes than a length-``n_d`` DCT has (a
+    size-1 axis gets ``K_d = 1``: no modes). The microscale is taken as the
+    *minimum* over variables (fastest-varying wins) so the basis can resolve
+    every variable's structure; an axis along which the field is constant
+    (``lambda_d -> inf``) collapses to ``k_min`` (constant + one mode).
 
-    Returns a tuple ``(K_0, ..., K_{D-1})``; ``None`` on cache miss with no
-    cached variable (caller falls back to the target-field path).
+    Returns a tuple ``(K_0, ..., K_{D-1})``; ``None`` when there is no cache,
+    no readable field, or the field is constant along every axis (the caller
+    then falls back to a fixed resolution).
     """
     import epde.globals as _gv
     sample_key = 0 if sample_key is None else sample_key
-    key = (tuple(int(n) for n in grid_shape), main_var, 'vc')
+    key = _vc_cache_key(grid_shape, main_var, sample_key)
     cache = getattr(_gv, 'vc_modes_cache', None)
     if cache is None:
         return None
@@ -503,16 +539,41 @@ def resolve_vc_modes_from_input(grid_shape, main_var=None, sample_key: int = 0,
         else:
             K_d = int(np.ceil(n_d / lam)) + 1
         K_d = max(k_min, min(int(K_d), int(k_max)))
-        modes.append(int(K_d))
+        modes.append(min(int(K_d), n_d))     # see VaryingCoefSetup._resolve_modes
     result = tuple(modes)
     cache[key] = result
     return result
 
 
+def _warn_vc_fallback(grid_shape, main_var, sample_key, modes):
+    """Say that the basis resolution fell back to a fixed ``K``, once per
+    basis-cache key. The marker lives in ``vc_modes_cache`` itself so it is
+    reset with it, per search, instead of silencing a later search. An EPDE
+    category: ``init_verbose`` ignores every plain warning process-wide."""
+    import epde.globals as _gv
+    cache = getattr(_gv, 'vc_modes_cache', None)
+    marker = _vc_cache_key(grid_shape, main_var, sample_key)[:-1] + (
+        'vc_fallback_warned',)
+    if cache is not None:
+        if marker in cache:
+            return
+        cache[marker] = True
+    source = ('the cached primary variables' if main_var is None
+              else repr(main_var))
+    warnings.warn(
+        f'vcoef: could not resolve the varying-coefficient basis from the '
+        f'Taylor microscale of {source} on trajectory {sample_key!r} '
+        f'(grid {tuple(int(n) for n in grid_shape)}): no samples manager, '
+        f'the field lookup failed, or the field is constant along every axis. '
+        f'Falling back to the fixed resolution K={modes}.',
+        _gv.EPDEUsageWarning, stacklevel=4)
+
+
 class VaryingCoefSetup:
-    """Varying-coefficient stability estimator -- the default
-    ``gram_mode='vcoef'`` path, alternative to the axis-aligned
-    ``GramSetup`` (the ``gram_mode='axis'`` backup).
+    """Varying-coefficient stability estimator -- the ``'vcoef'`` instability
+    metric (``gram_mode='vcoef'``; opt-in, the default ``'chi2'`` builds no
+    Gram), alternative to the axis-aligned ``GramSetup`` (``'cv'``,
+    ``gram_mode='axis'``).
 
     Instead of measuring each coefficient's dispersion over local
     sub-regions, model each term's coefficient as a smooth function of
@@ -522,14 +583,13 @@ class VaryingCoefSetup:
     *non-constant* energy is small relative to its constant part; the
     per-term stability score is
 
-        score_j = NC_j / gamma_{j,0}^2
+        score_j = NC_j / gamma_{j,0}^2,   NC_j = sum_{k>=1} gamma_{j,d,k}^2
 
-    with ``NC_j = sum_{k>=1} max(gamma_{j,d,k}^2 - lam*Var(gamma_{j,d,k}), 0)``
-    the noise-debiased non-constant energy: significance of the constant
-    coefficient plus region-variation, over the squared constant part. The
-    locality scale is the basis resolution ``K`` -- resolved once per
-    ``(grid_shape, main_var)`` from the Taylor microscale and shared by every
-    candidate -- so there is no locality hyperparameter to tune per dataset.
+    the biased (not noise-debiased) non-constant energy over the squared
+    constant part; see :meth:`score`. The locality scale is the basis
+    resolution ``K`` -- resolved once per ``(grid_shape, main_var,
+    trajectory)`` from the Taylor microscale and shared by every candidate --
+    so there is no locality hyperparameter to tune per dataset.
 
     Contract: exposes ``score(active_mask)`` returning a length-active vector
     aligned to the active feature columns, a drop-in for
@@ -537,11 +597,12 @@ class VaryingCoefSetup:
     ``from_full`` pair mirrors ``GramSetup`` so the EqRPS term-sweep builds
     the expanded Gram ONCE and slices per candidate target.
 
-    Noise handling: a frequency-scaled ridge ``rho*k^2`` on the gamma solve
-    (smoothing-spline analogue -- high modes shrunk hard) plus a chi-square
-    bias subtraction of the expected noise energy from ``NC_j``, both scaled
-    by the homogeneous-fit residual variance, so a true term's *expected*
-    score is ~0 rather than a positive noise floor.
+    Noise handling: only a frequency-scaled ridge ``rho*k^2`` on the mode
+    solve (smoothing-spline analogue -- high modes shrunk hard), scaled by the
+    homogeneous-fit residual variance. There is no chi-square bias
+    subtraction from ``NC_j`` any more (the significance and debias channels
+    were removed), so on noisy data a true term's score sits on a positive
+    noise floor rather than at ~0.
     """
 
     is_vcoef = True
@@ -621,17 +682,27 @@ class VaryingCoefSetup:
 
     @classmethod
     def _resolve_modes(cls, modes, grid_shape, main_var, k_max, sample_key: int = 0):
+        # A length-n_d DCT-II has exactly n_d modes (k = 0..n_d-1): k = n_d is
+        # a round-off column and k > n_d aliases a lower one, so K_d > n_d made
+        # the per-feature mode block singular and the scores of even the exact
+        # truth reached 1e10-1e12. Clamped for explicit, resolved and fallback
+        # modes alike; a size-1 axis gets K_d = 1, i.e. no modes along it.
+        def clamp(ks):
+            return tuple(min(int(k), int(n)) for k, n in zip(ks, grid_shape))
+
         if modes is not None:
-            return tuple(int(m) for m in modes)
+            return clamp(modes)
         sample_key = 0 if sample_key is None else sample_key
 
         if k_max is None:
             k_max = int(cls.K_MAX)
         resolved = resolve_vc_modes_from_input(grid_shape, main_var=main_var, k_max=k_max, sample_key=sample_key)   # , 
         if resolved is not None:
-            return resolved
+            return clamp(resolved)
         # Fallback (no cached field): a modest fixed resolution per axis.
-        return tuple(min(int(k_max), 3) for _ in grid_shape)
+        fallback = clamp(min(int(k_max), 3) for _ in grid_shape)
+        _warn_vc_fallback(grid_shape, main_var, sample_key, fallback)
+        return fallback
 
     @staticmethod
     def _basis_values(grid_shape, modes):
@@ -959,7 +1030,7 @@ def calculate_weights(X, y, sample_weights, grid_shape, fit_intercept=True,
     ``gram_cls`` selects the construction strategy: default ``None`` ->
     ``GramSetup`` (axis-aligned sliding windows, the backup path).
     ``gram_kwargs`` is forwarded to the chosen class's constructor. The
-    varying-coefficient default (``gram_mode='vcoef'``) does not route
+    varying-coefficient estimator (``gram_mode='vcoef'``) does not route
     through here -- ``PhysicsInformedLasso.fit`` instantiates
     ``VaryingCoefSetup`` directly.
     """

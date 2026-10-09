@@ -141,8 +141,9 @@ class EpdeSearch(object):
 
         Note:
             The objective settings are process globals, so the last search
-            constructed wins for the process -- a long-standing trade-off,
-            unchanged here.
+            constructed -- or fitted, since ``fit`` publishes its own
+            configuration again -- wins for the process: a long-standing
+            trade-off.
         """
         reject_removed(solver_kwargs)
         legacy, solver_kwargs = split_legacy(solver_kwargs, LEGACY_INIT_KEYS)
@@ -663,9 +664,11 @@ class EpdeSearch(object):
         preprocessor_pipeline : PreprocessingPipe, optional
             Pipeline of operators, aimed on preparing all necessary data for equation discovery.
         default_preprocessor_type : str, optional
-            Key for selection of pre-defined preprocessors: **'poly'** matches Savitsky-Golay filtering, 'ANN' if for 
-            neural network data approximation and further finite-difference differentiation, 'spectral' for 
-            spectral differentiation. The default is 'poly'.
+            Key for selection of pre-defined preprocessors: **'poly'** matches Savitsky-Golay filtering, 'ANN' if for
+            neural network data approximation and further finite-difference differentiation, 'spectral' for
+            spectral differentiation, 'forward' for unsmoothed data with forward-increment (Ito) time
+            derivatives -- the drift estimate for stochastic data, kwargs ``lag`` (samples, default 1)
+            and ``time_axis`` (default: the domain config's). The default is 'poly'.
         preprocessor_kwargs : dict, optional
             Keyword arguments for preprocessor setup and operation. The default is an empty dictionary, corresponding to 
             all default parameters of the preprocessors.
@@ -693,10 +696,13 @@ class EpdeSearch(object):
                 setup.build_spectral_preprocessing(**preprocessor_kwargs)
             elif default_preprocessor_type == 'FD':
                 setup.build_FD_preprocessing(**preprocessor_kwargs)
+            elif default_preprocessor_type == 'forward':
+                setup.build_forward_preprocessing(
+                    **{'time_axis': self._config.domain.time_axis, **preprocessor_kwargs})
             else:
                 raise NotImplementedError(
                     f'Incorrect default preprocessor type {default_preprocessor_type!r}. '
-                    "Allowed: 'poly', 'ANN', 'spectral', 'FD'.")
+                    "Allowed: 'poly', 'ANN', 'spectral', 'FD', 'forward'.")
             preprocessor_pipeline = setup.builder.prep_pipeline
 
         if 'max_order' not in preprocessor_pipeline.deriv_calculator_kwargs.keys():
@@ -1043,6 +1049,22 @@ class EpdeSearch(object):
         Returns
         -------
         None.
+
+        Notes
+        -----
+        The search configuration, with this call's term/factor budget and pool
+        structure applied, becomes the active one for the operators (see
+        ``epde.interface.search_config.active_config``). The search's own
+        ``config`` is not changed, so the next ``fit`` starts from the
+        constructor's values again.
+
+        Under ``sparsity_cls='knee'`` with ``sparsity_kwargs={'realization':
+        'complexity'}`` every equation also carries an integer
+        ``('complexity', var)`` budget -- a metaparameter of its own, unrelated
+        to ``('sparsity', var)`` and to ``eq_sparsity_interval`` -- seeded
+        uniformly over ``1 .. (T - 1) * F + 1`` from this call's term and
+        factor maxima and stepped by the multiobjective mutation.
+        Single-objective mode seeds it but cannot evolve it, and warns.
         """
         # TODO: ADD EXPLICITLY SENT POPULATION PROCESSING
         search_space = self._config.search_space
@@ -1073,8 +1095,40 @@ class EpdeSearch(object):
                     getattr(sparsity_cls, '__name__', sparsity_cls)),
                 global_var.EPDEUsageWarning, stacklevel=3)   # 3: @timed wrapper
 
+        # The complexity budget is a separate property, not a reading of the
+        # alpha above, and _run_optimization hands its range to the population
+        # constructor. Single-objective chromosomes carry no metaparameter
+        # genes, so there every equation keeps the budget it was seeded with
+        # -- worth a word here, the one frame that can point at the caller.
+        if (self._complexity_interval(equation_terms_max_number,
+                                      equation_factors_max_number) is not None
+                and not self.multiobjective_mode):
+            warnings.warn(
+                "sparsity_kwargs realization 'complexity' gives every "
+                'equation an integer complexity budget, but single-objective '
+                'mode cannot evolve it: each equation keeps the budget it is '
+                'seeded with for the whole search. Use multiobjective_mode=True '
+                'for the budgets to move.',
+                global_var.EPDEUsageWarning, stacklevel=3)   # 3: @timed wrapper
+
         max_deriv_order, data_fun_pow, deriv_fun_pow = self._pool_structure(
             max_deriv_order, data_fun_pow, deriv_fun_pow)
+
+        # Publish the configuration THIS fit runs under. The constructor's
+        # publish carries the constructor's values, so a fit-time
+        # ``equation_terms_max_number`` reached the population but not
+        # ``active_config()`` -- where ``survival._reference_width`` reads it to
+        # size the tile/het partitions, which therefore stopped being the same
+        # for every candidate -- and a search constructed later had replaced
+        # this one's settings outright. Every config-backed argument goes in,
+        # not only the one read today. The instance config is left alone: a fit
+        # argument is for that fit. (``eq_sparsity_interval`` has no config key;
+        # it travels to the population constructor only.)
+        set_active_config(self._config.with_overrides(
+            equation_terms_max_number=equation_terms_max_number,
+            equation_factors_max_number=equation_factors_max_number,
+            max_deriv_order=max_deriv_order,
+            data_fun_pow=data_fun_pow, deriv_fun_pow=deriv_fun_pow))
 
         additional_tokens = self._resolve_token_families(additional_tokens)
         data = self._as_trajectories(data, legacy_kwargs, 'fit')
@@ -1102,6 +1156,20 @@ class EpdeSearch(object):
 
 
 
+    def _complexity_interval(self, terms_max, factors_max):
+        """The integer range of the ``('complexity', var)`` budget, or None.
+
+        Asked of the configured sparsity operator class
+        (``KneeSparsity.complexity_interval``), with the term/factor maxima
+        this fit resolved. An operator without the hook, or a realization that
+        selects no budget, gives None -- and then no budget exists at all.
+        """
+        objectives = self._config.objectives
+        hook = getattr(objectives.sparsity_cls, 'complexity_interval', None)
+        if hook is None:
+            return None
+        return hook(objectives.sparsity_kwargs, terms_max, factors_max)
+
     def _run_optimization(self, equation_terms_max_number, equation_factors_max_number,
                           eq_sparsity_interval, optimizer=None, population=None):
         """Build the optimizer for the current pool and run it."""
@@ -1111,6 +1179,13 @@ class EpdeSearch(object):
             "max_factors_in_term": equation_factors_max_number,
             "sparsity_interval": eq_sparsity_interval,
             "second_objective": self._second_objective}
+        # Added only under a budget realization, so every other run hands the
+        # population constructors exactly the arguments it always did.
+        complexity_interval = self._complexity_interval(
+            equation_terms_max_number, equation_factors_max_number)
+        if complexity_interval is not None:
+            self.optimizer_init_params['population_instruct'][
+                'complexity_interval'] = complexity_interval
 
         if optimizer is None:
             self.optimizer = self._create_optimizer(

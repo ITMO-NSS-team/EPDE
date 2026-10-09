@@ -44,9 +44,11 @@ from epde.preprocessing.smoothers import NN
 # cache and not a setting. The vcoef estimator's actual knobs (``k_max``,
 # ``freq_coef``, ``mode_decouple``) now live on ``VaryingCoefSetup``.
 
-# Basis resolution per ``(grid_shape, main_var)`` for the varying-coefficient
-# stability estimator, resolved once from the Taylor microscale and reused for
-# every candidate so the basis is identical across individuals. Cleared by
+# Basis resolution per ``(grid_shape, main_var, trajectory)`` for the
+# varying-coefficient stability estimator, resolved once from that trajectory's
+# Taylor microscale and reused for every candidate so the basis is identical
+# across individuals. It also holds the once-per-key markers of the K fallback
+# warning. Cleared by
 # ``init_caches``: a stale per-axis resolution from a previous search must not
 # bleed into a new one, since the source data or grid shape may both differ.
 vc_modes_cache: dict = {}

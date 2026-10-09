@@ -44,6 +44,21 @@ _DEFAULT_EQUATION_METAPARAMETERS = {
     'max_factors_in_term': {'optimizable': False, 'value': 1.},
 }
 
+#: Label of the per-equation complexity budget, keyed ``('complexity', var)``
+#: beside ``('sparsity', var)`` and independent of it. It exists only when the
+#: configured sparsity operator selects by a budget (``KneeSparsity``'s
+#: ``'complexity'`` realization): the population constructors seed it as an
+#: integer with its ``'bounds'``, multiobjective ``SystemMutation`` steps it,
+#: and an equation without it has no budget. Deliberately absent from the
+#: defaults above, so a default run carries exactly the keys it always did.
+COMPLEXITY_METAPARAMETER = 'complexity'
+
+
+def is_complexity_key(key) -> bool:
+    """True for a ``('complexity', var)`` metaparameter key."""
+    return (isinstance(key, tuple) and len(key) == 2
+            and key[0] == COMPLEXITY_METAPARAMETER)
+
 
 def _normalize_metaparameters(mp: dict) -> dict:
     """In-place: accept the legacy ``terms_number`` metaparameter key and
@@ -446,11 +461,11 @@ _EQ_CACHE_FIELDS = (
     ('_gram_super', 'structure'),                        # EqRPS tier-3 super-Gram, one sweep only
     ('_cached_sw_weights', 'reset-only'),                # axis-mode sliding-window weights
     ('_cached_vc_score', 'reset-only'),                  # vcoef per-term stability scores
-    # (metric, value) memo for the survival/tile estimators. UNLIKE the two
-    # sparsity caches above it is a pure Instability.compute memo of the OLD
-    # structure (nothing recomputes it on the converged mask), so it must not
-    # survive a structural mutation. No-op under the default vcoef metric,
-    # which never populates it.
+    # (metric, fit_intercept, value) memo for the six basis-free estimators
+    # (the default chi2 among them). UNLIKE the two sparsity caches above it is
+    # a pure Instability.compute memo of the OLD structure (nothing recomputes
+    # it on the converged mask), so it must not survive a structural mutation.
+    # vcoef and cv never populate it.
     ('_cached_alt_instability', 'structure'),
 )
 _EQ_STRUCTURE_CACHES = tuple(f for f, p in _EQ_CACHE_FIELDS if p == 'structure')
@@ -1595,8 +1610,21 @@ class EquationIterator(object):
             raise StopIteration
 
 def check_metaparameters(metaparameters: dict):
-    metaparam_labels = ['max_terms_number', 'max_factors_in_term', 'sparsity']  # noqa: F841
+    metaparam_labels = ['max_terms_number', 'max_factors_in_term', 'sparsity',  # noqa: F841
+                        COMPLEXITY_METAPARAMETER]
     _normalize_metaparameters(metaparameters)
+    # The budget is the one key whose operator reads more than its 'value':
+    # the mutation reflects its integer step into the 'bounds' the population
+    # constructor stored. An entry built without them would otherwise fail in
+    # the middle of a search rather than here.
+    for key, entry in metaparameters.items():
+        if is_complexity_key(key):
+            bounds = entry.get('bounds')
+            if (bounds is None or len(bounds) != 2
+                    or not 1 <= bounds[0] <= bounds[1]):
+                raise ValueError(
+                    'Metaparameter {0!r} needs integer bounds (lo, hi) with '
+                    '1 <= lo <= hi; got {1!r}.'.format(key, bounds))
     return True
 
 

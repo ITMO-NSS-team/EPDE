@@ -52,6 +52,7 @@ from epde.operators.common.objectives import (
     FitContext, SolverContext, EquationObjective, # SolverObjective,
     Discrepancy, Instability, # L2Discrepancy, 
     LOSS_NAN_VAL, #  SolverL2Discrepancy, PICError, DeepXDEError, 
+    _term_weights,
 )
 from epde import _loop_stats
 
@@ -123,8 +124,12 @@ class SolverFreeFitness(CompoundOperator):
         objective.assert_state_invariants('SolverFreeFitness.apply entry')
         # During the RPS term-sweep a degenerate (all-zero-weight) candidate is
         # skipped by returning None; in-place we always fall through to a
-        # finite value.
-        if force_out_of_place and primary.is_degenerate(objective):
+        # finite value. STRUCTURAL only: ``primary.is_degenerate`` also tests
+        # ``fitness_value`` against the threshold, and before ``compute`` that
+        # value belongs to the PREVIOUS sweep target (or an earlier epoch), so
+        # asking it here declined exact targets on another target's WAPE. The
+        # threshold half is applied after compute, below.
+        if force_out_of_place and np.all(_term_weights(objective) == 0):
             return None
 
         g_fun_vals = global_var.samples_manager.gFunc('dmf')
@@ -152,7 +157,8 @@ class SolverFreeFitness(CompoundOperator):
             # combination (guard ratio above ``rps_amplification_cap``).
             # Either way return None -- exactly like the all-features-zeroed
             # sparsity case above -- so the RPS sweep never considers the
-            # candidate at all.
+            # candidate at all. ``fitness_value`` was written on the line
+            # above, so this reads THIS target's discrepancy.
             if primary.is_degenerate(objective) or _amplification_trips(objective):
                 return None
             return val

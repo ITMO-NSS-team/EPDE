@@ -167,12 +167,14 @@ class SearchSpaceConfig:
 
 #: Which Gram the sparsity keep-rule needs, per instability estimator. The
 #: keep-rule's L1 threshold and the Instability Pareto axis are ONE statistic
-#: (``PhysicsInformedLasso._active_scores``), so what the threshold needs is
-#: whatever that estimator is computed from:
+#: (``sparsity.instability_scores``, which ``PhysicsInformedLasso`` reaches
+#: through ``_keep_rule_scores``), so what the threshold needs is whatever that
+#: estimator is computed from:
 #:   'vcoef' -> VaryingCoefSetup   (its ``score``; also caches _cached_vc_score)
 #:   'cv'    -> GramSetup, 'axis'  (its window stack; caches _cached_sw_weights)
-#:   everything else -> NO Gram at all: 'chi2', 'het', 'tile' and 'survival'
-#:                      score straight from the active columns.
+#:   everything else -> NO Gram at all: 'chi2', 'chi2_centered', 'het',
+#:                      'het_raw', 'tile' and 'survival' score straight from
+#:                      the active columns.
 _GRAM_BY_INSTABILITY = {'vcoef': 'vcoef', 'cv': 'axis'}
 
 
@@ -886,9 +888,13 @@ def _group_overrides(overrides: dict) -> Dict[str, dict]:
 #: only validator.
 #:
 #: The instability menu is documented at length on ``Instability.compute``; in
-#: brief: 'chi2' (default, Nyblom-Hansen score path, no refits), 'vcoef'
+#: brief: 'chi2' (default, Nyblom-Hansen score path, no refits),
+#: 'chi2_centered' (the same on weighted-centred columns), 'vcoef'
 #: (varying-coefficient NC/gamma_0^2), 'cv' (axis-aligned sliding window),
-#: 'survival' / 'tile' / 'het' (resampling-based).
+#: 'survival' (refits on iid resamples of fixed time slabs), 'tile' (one refit
+#: per time slab along storage axis 0), 'het' (per-block refits, calibrated
+#: heterogeneity bounded to [0, 1]) and
+#: 'het_raw' (the same heterogeneity, unbounded tau^2 / theta_bar^2).
 METRIC_MENUS = {
     'discrepancy_metric': ('wape', 'l2', 'l2_relative', 'scale_invariant'),
     'complexity_metric': ('factors', 'terms'),
@@ -1037,16 +1043,17 @@ def load_search_config(user_config=None, overrides=None) -> SearchConfig:
 # ---------------------------------------------------------------------------
 # The active configuration
 # ---------------------------------------------------------------------------
-# One resolved config per process, published by ``EpdeSearch.__init__``. This
-# is where the objective settings used to be: seven mutable scalars in
+# One resolved config per process, published by ``EpdeSearch.__init__`` and
+# again by ``EpdeSearch.fit`` (with that fit's search-space arguments applied).
+# This is where the objective settings used to be: seven mutable scalars in
 # ``epde.globals``, each with its own setter, its own validator and its own
 # default. Consumers now read the resolved config directly, so a setting is
 # declared once (the JSON), validated once (the loader) and read one way.
 #
-# It remains process-level -- the last search constructed wins -- which is the
-# same trade-off as before. What changed is that it is a single immutable
-# object rather than twelve independently mutable names, so the settings cannot
-# drift out of step with each other.
+# It remains process-level -- the last search constructed or fitted wins --
+# which is the same trade-off as before. What changed is that it is a single
+# immutable object rather than twelve independently mutable names, so the
+# settings cannot drift out of step with each other.
 
 _ACTIVE = None
 
@@ -1070,7 +1077,9 @@ def set_active_config(config: SearchConfig) -> None:
 
     Called by ``EpdeSearch.__init__`` before the director is assembled: the
     strategy resolves the second Pareto axis at assembly time, and the fillers
-    it builds are fixed from then on.
+    it builds are fixed from then on. ``EpdeSearch.fit`` publishes again, with
+    its own term/factor budget and pool structure applied, because operators
+    read those during the search (``survival._reference_width``).
     """
     global _ACTIVE
     if not isinstance(config, SearchConfig):

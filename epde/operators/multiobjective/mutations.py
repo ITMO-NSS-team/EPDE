@@ -22,7 +22,7 @@ from typing import Union
 
 from epde.optimizers.moeadd.moeadd import ParetoLevels
 
-from epde.structure.main_structures import Equation, SoEq, Term
+from epde.structure.main_structures import Equation, SoEq, Term, is_complexity_key
 from epde.structure.structure_template import check_uniqueness
 from epde.supplementary import filter_powers
 from epde.operators.utils.template import CompoundOperator, add_base_param_to_operator
@@ -36,6 +36,42 @@ from epde.decorators import HistoryExtender
 # freshly randomized term that duplicates an existing one is re-rolled
 # before falling back to the drop / floor-revert dedup policy.
 MAX_REGEN_RETRIES = 3
+
+
+def _budget_level(value, lo, hi) -> int:
+    """The integer level a budget value stands for, inside ``[lo, hi]``.
+
+    Nearest integer, half up, clipped into the bounds. A non-finite or
+    non-positive value means "no budget" to the sparsity operator, i.e. every
+    term may stay, so it reads as ``hi`` -- the loosest level -- never ``lo``.
+    """
+    value = float(value)
+    if not np.isfinite(value) or value <= 0:
+        return hi
+    return int(min(max(np.floor(value + 0.5), lo), hi))
+
+
+def step_complexity_budget(value, bounds) -> int:
+    """One move of an integer complexity budget: ``c + {-1, 0, +1}``.
+
+    The ``('complexity', var)`` gene does not go through
+    :class:`MetaparameterMutation`. That operator is ``x + N(0, std*|x|)``
+    reflected at 0 -- a multiplicative walk with ``E[log|1 + Z|] < 0`` at the
+    default ``std=1``, which drifts a budget DOWN, and once the value fell
+    below 1 the proportional noise would keep it there: ``c = 1`` absorbing.
+    Here the three steps are equally likely (``np.random``) and a step out of
+    ``bounds`` reflects about the half-integer edge (``lo - 1 -> lo``,
+    ``hi + 1 -> hi``). That keeps the transition matrix symmetric -- no drift,
+    and the uniform distribution the population is seeded from is also the
+    walk's stationary one.
+    """
+    lo, hi = int(bounds[0]), int(bounds[1])
+    proposed = _budget_level(value, lo, hi) + int(np.random.randint(-1, 2))
+    if proposed < lo:
+        proposed = 2 * lo - 1 - proposed
+    elif proposed > hi:
+        proposed = 2 * hi + 1 - proposed
+    return proposed
 
 
 class SystemMutation(CompoundOperator):
@@ -71,16 +107,89 @@ class SystemMutation(CompoundOperator):
                 altered_objective.vals.replace_gene(gene_key = eq_key, value = altered_eq)
 
         for param_key in params_keys:
+            if is_complexity_key(param_key):
+                # An integer budget, stepped by its own rule; it only exists
+                # under a budget realization, so a default run never gets here
+                # and its MetaparameterMutation draws are untouched.
+                self._step_complexity(altered_objective, param_key)
+                continue
             altered_param = self.suboperators['param_mutation'].apply(altered_objective.vals[param_key],
                                                                       subop_args['param_mutation'])
             altered_objective.vals.replace_gene(gene_key = param_key, value = altered_param)
             altered_objective.vals.pass_parametric_gene(key = param_key, value = altered_param)
 
+        if any(is_complexity_key(param_key) for param_key in params_keys):
+            # Budget runs only: a default chromosome has no such gene, so its
+            # metaparameters dicts stay exactly the objects they were.
+            self._reconcile_metaparameters(altered_objective)
         return altered_objective
+
+    @staticmethod
+    def _reconcile_metaparameters(system: SoEq):
+        """Give the system ONE private metaparameters dict, rebuilt from its
+        genes, shared by the system and every equation.
+
+        That is the layout ``SoEq.create`` builds, and crossover breaks it.
+        ``EquationCrossover``'s ``clone_shell`` deep-copies the metaparameters
+        into a fresh dict per offspring equation, and ``ChromosomeCrossover``'s
+        gene swap moves an equation into the other offspring still holding its
+        old system's dict -- which then belongs to two systems at once. The
+        genes and the equations' own dicts stay right (the loop above writes
+        every gene into its equation's dict), but ``system.metaparameters``
+        does not: ``SoEq.text_form`` -- and the ``_pareto_history`` snapshots
+        built from it -- printed a stale budget, and ``SoEq.create`` (the
+        offspring updater's fallback) re-seeded the genes from it AND handed
+        the stale dict, still aliased to the other system's equation, to every
+        fresh equation, so this system's next mutation would rewrite that
+        other system's budget behind its back.
+
+        Rebuilt here, after the loop has written every gene, so the private
+        dict's values ARE the genes and the equations read exactly the values
+        they just received. Entries the genes do not cover (the term and
+        factor caps) come from the system's own dict; for a passed system
+        whose translated equations carried their own caps, the system's caps
+        -- the ones ``SoEq.create`` would give them -- win.
+        """
+        private = deepcopy(system.metaparameters)
+        for param_key in system.vals.params_keys:
+            private[param_key]['value'] = system.vals[param_key]
+        system.metaparameters = private
+        for eq_key in system.vals.equation_keys:
+            system.vals[eq_key].metaparameters = private
+
+    @staticmethod
+    def _step_complexity(system: SoEq, param_key):
+        """Step one equation's complexity budget; re-open its fit if it moved.
+
+        The budget decides which subset the sparsity operator returns, so an
+        equation whose budget changed carries a fit made for a budget it no
+        longer has -- the staleness a changed term set leaves, and reset the
+        way ``EquationMutation`` resets that: RPS runs only while some
+        equation's ``right_part_selected`` is down (the strategy's
+        ``rps_cond``), so without the reset an unchanged structure would keep
+        its old subset under the new gene. "Moved" is judged against the value
+        in the EQUATION's own dict, the one its current fit was read from,
+        rather than the gene, which a gene swap can leave out of step with it.
+        """
+        equation = system.vals[param_key[1]]
+        entry = system.metaparameters[param_key]          # carries the bounds
+        lo, hi = int(entry['bounds'][0]), int(entry['bounds'][1])
+        old = system.vals[param_key]
+        # Typed like the gene: Gene.value's setter keeps the old value without
+        # a word when handed a value of another type.
+        new = type(old)(step_complexity_budget(old, (lo, hi)))
+        fitted_under = equation.metaparameters.get(param_key, {}).get('value')
+        # pass_parametric_gene asserts the key on the equation; one that came
+        # without it (none should) gets the system's entry, no budget so far.
+        equation.metaparameters.setdefault(param_key, dict(entry))
+        system.vals.replace_gene(gene_key=param_key, value=new)
+        system.vals.pass_parametric_gene(key=param_key, value=new)
+        if fitted_under is None or _budget_level(fitted_under, lo, hi) != new:
+            equation.reset_state(reset_right_part=True)
 
     def use_default_tags(self):
         self._tags = {'mutation', 'chromosome level', 'contains suboperators'}
-    
+
 
 class EquationMutation(CompoundOperator):
     key = 'EquationMutation'

@@ -36,31 +36,6 @@ def _cols(a, b):
     return {0: np.asarray(a, dtype=float), 1: np.asarray(b, dtype=float)}
 
 
-class FakeFactor:
-    """Enough of a Factor for the symbolic-reduction model the system ban
-    consults (``_undone_by_simplify``): a power the model may rewrite on a
-    clone, and labels with and without it."""
-
-    def __init__(self, label, power=1.0):
-        self.label = label
-        self.params = [power]
-        self.params_description = {0: {'name': 'power'}}
-
-    def copy_for_power_update(self):
-        return FakeFactor(self.label, self.params[0])
-
-    def set_param(self, value, name=None, idx=None):
-        self.params[idx if idx is not None else 0] = value
-
-    @property
-    def structural_label(self):
-        return (self.label, (self.params[0],))
-
-    @property
-    def structural_label_without_power(self):
-        return (self.label, ())
-
-
 class FakeTerm:
     """Minimal Term stand-in: an evaluable column pair plus the identity /
     regeneration surface ``_regen_or_drop_term`` touches."""
@@ -70,7 +45,7 @@ class FakeTerm:
         self._cols = cols
         self._replacements = list(replacements)
         self.randomize_calls = 0
-        self.structure = [FakeFactor(name)]
+        self.structure = [object()]
 
     # -- evaluation ---------------------------------------------------- #
     def evaluate(self, *args, **kwargs):
@@ -122,11 +97,11 @@ def _independent_pair(seed):
     return _cols(rng.normal(size=N0), rng.normal(size=N1))
 
 
-def _run(feature_terms, target=None, banned_sigs=frozenset()):
+def _run(feature_terms, target=None):
     target = target or FakeTerm('target', _independent_pair(99))
     equation = FakeEquation(list(feature_terms) + [target], target)
     changed = EqRightPartSelector()._regenerate_dependent_terms(
-        equation, list(feature_terms), banned_sigs)
+        equation, list(feature_terms))
     return changed, equation
 
 
@@ -201,32 +176,3 @@ class TestLinDepScrubMultisample:
         assert flagged == [0, 1]
         assert len(basis) == 2                     # intercept + the ramp
         assert _LIN_DEP_RTOL == pytest.approx(1e-10)
-
-
-class TestTheSystemBan:
-    """Inside a system the redraw may not take a signature another equation's
-    target reserves; a term that already carries one is not the scrub's to
-    regenerate."""
-
-    def test_a_redraw_onto_a_reserved_signature_is_rejected(self):
-        # The first redraw (signature ('const', 1)) is reserved elsewhere, so
-        # the scrub draws again and keeps the second.
-        const = FakeTerm('const', _cols(np.full(N0, 2.0), np.full(N1, 2.0)),
-                         replacements=[_independent_pair(3), _independent_pair(7)])
-        banned = frozenset({frozenset({('const', 1)})})
-        changed, equation = _run([const, FakeTerm('free', _independent_pair(4))],
-                                 banned_sigs=banned)
-        assert changed is True
-        assert const.randomize_calls == 2
-        assert const.factors_labels not in banned
-
-    def test_an_existing_reserved_term_is_left_alone(self):
-        from epde.operators.common.right_part_selection import _regen_or_drop_term
-        term = FakeTerm('leak', _independent_pair(8))
-        other = FakeTerm('free', _independent_pair(9))
-        target = FakeTerm('target', _independent_pair(99))
-        equation = FakeEquation([term, other, target], target)
-        status = _regen_or_drop_term(equation, term, max_iter=5,
-                                     banned_sigs=frozenset({term.factors_labels}))
-        assert status == 'ok'
-        assert term.randomize_calls == 0

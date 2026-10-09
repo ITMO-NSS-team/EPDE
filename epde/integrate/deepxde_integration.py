@@ -686,6 +686,14 @@ class DeepXDEAdapter:
         #: decrease it could confirm drops below the loss's rounding noise --
         #: measured on Duffing (see the Sep 29 2026 note in the harness).
         self.shared_fit_precision = self.config.get('shared_fit_precision', 'float32')
+        #: the observation (data) loss. 'mse': u - u_obs, as always. The
+        #: observation equation u = u_obs has two terms, so its scale-invariant
+        #: form divides by their mass: 'sinv_live' by |u| + |u_obs| (the net's
+        #: own value, differentiated; the ratio lies in [0, 1]), 'sinv_data' by
+        #: 2 |u_obs| (frozen; unbounded where the data cross zero). No floor: an
+        #: exact 0/0 counts as satisfied (``residual_terms.cancellation_ratio``).
+        #: The gradient loss weights are taken on this loss, as for ``pde_loss``.
+        self.obs_loss = self.config.get('obs_loss', 'mse')
         #: 'float64': the solve in double precision. The net is still BUILT in
         #: float32 and upcast, so its initial weights equal the float32 arms'.
         self.precision = self.config.get('precision', 'float32')
@@ -750,7 +758,8 @@ class DeepXDEAdapter:
                    'second_order': ('lbfgs', 'lm'),
                    'periodic_embedding': (None, 'auto'),
                    'collocation_density': (None, 'data_gradient', 'flat'),
-                   'shared_fit_precision': ('float32', 'float64')}
+                   'shared_fit_precision': ('float32', 'float64'),
+                   'obs_loss': ('mse', 'sinv_live', 'sinv_data')}
         for key, allowed in choices.items():
             if getattr(self, key) not in allowed:
                 raise DeepXDEConfigError(f'deepxde_config {key} must be one of {allowed}, '
@@ -765,6 +774,9 @@ class DeepXDEAdapter:
         if self.first_order != 'adam' and self.loss_weight_mode == 'gradient_per_step':
             raise DeepXDEConfigError("deepxde_config first_order='dog'/'prodigy' does not "
                                      "combine with loss_weight_mode='gradient_per_step'")
+        if self.second_order == 'lm' and self.obs_loss != 'mse':
+            raise DeepXDEConfigError("deepxde_config second_order='lm' builds the observation "
+                                     "rows itself (u - u_obs); obs_loss must be 'mse'")
         if self.second_order == 'lm' and self.lbfgs_maxiter > 0:
             raise DeepXDEConfigError("deepxde_config second_order='lm' replaces L-BFGS; "
                                      'set lbfgs_maxiter=0')
@@ -1182,15 +1194,15 @@ class DeepXDEAdapter:
         train = split.train
 
         bcs = []
+        self.last_obs_stats = None
         for var_idx, observed in enumerate(data_list):
             observed = np.asarray(observed, dtype=np.float64).reshape(-1)
             if observed.size != inner_coords.shape[0]:
                 raise ValueError(
                     f'observed field for {var_names[var_idx]!r} has {observed.size} '
                     f'values, the inner domain has {inner_coords.shape[0]} points')
-            bcs.append(dde.icbc.PointSetBC(inner_coords[train],
-                                           observed[train].reshape(-1, 1),
-                                           component=var_idx))
+            bcs.append(self._observation_bc(dde, inner_coords[train],
+                                            observed[train].reshape(-1, 1), var_idx))
         loss_weights = self.loss_weights(eq_list, data_list, train)
 
         geom = _geometry(grids)
@@ -1564,6 +1576,29 @@ class DeepXDEAdapter:
                     block.reshape(len(coords[a]), -1).mean(axis=1)
                 out[sel, column[a]] = inverse_cdf(weights, coords[a], u[sel])
         return out.astype(np.asarray(points).dtype)
+
+    def _observation_bc(self, dde, points, values, component):
+        """The observation term of one variable: DeepXDE's PointSetBC, or, under a
+        scale-invariant ``obs_loss``, the same points with the observation
+        equation's cancellation ratio as the error."""
+        if self.obs_loss == 'mse':
+            return dde.icbc.PointSetBC(points, values, component=component)
+        from epde.integrate.residual_terms import cancellation_ratio, mass_diagnostics
+        mode = self.obs_loss
+
+        class _ScaleInvariantPointSetBC(dde.icbc.PointSetBC):
+            def error(self, X, inputs, outputs, beg, end, aux_var=None):
+                r = super().error(X, inputs, outputs, beg, end, aux_var)
+                y = outputs[beg:end, self.component:self.component + 1]
+                v = self.values
+                mass = (y.abs() + v.abs()) if mode == 'sinv_live' else 2.0 * v.abs()
+                return cancellation_ratio(r, mass, _torch)
+
+        stats = getattr(self, 'last_obs_stats', None) or {'obs_loss': mode, 'data_mass': []}
+        stats['data_mass'].append(mass_diagnostics(2.0 * np.abs(np.asarray(values,
+                                                                           dtype=np.float64))))
+        self.last_obs_stats = stats
+        return _ScaleInvariantPointSetBC(points, values, component=component)
 
     @staticmethod
     def _param_digest(net) -> str:

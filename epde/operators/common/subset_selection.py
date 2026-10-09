@@ -37,8 +37,10 @@ import numpy as np
 import epde.globals as global_var
 from epde.interface.search_config import active_config
 from epde.operators.utils.template import CompoundOperator
-from epde.operators.common.sparsity import cv_scores, instability_scores
+from epde.operators.common.sparsity import (_term_tie_label, cv_scores,
+                                            instability_scores)
 from epde.operators.common.stability import GramSetup, VaryingCoefSetup
+from epde.structure.main_structures import COMPLEXITY_METAPARAMETER
 from epde import _loop_stats
 
 #: Selection rules, in increasing order of what they consult. Each is a PURE
@@ -46,6 +48,19 @@ from epde import _loop_stats
 #: against each other without a hybrid confounding the result.
 REALIZATIONS = ('knee', 'knee_ext2', 'knee_ext2_amp', 'ke2_stab',
                 'stab_chain')
+
+#: Realizations that select by a COMPLEXITY BUDGET instead of a chain rule:
+#: the equation carries an integer budget ``c`` in its own
+#: ``('complexity', var)`` metaparameter -- a property separate from the
+#: ``('sparsity', var)`` alpha, which nothing here reads -- and the operator
+#: returns the best-fitting subset at the largest achievable complexity
+#: ``<= c``, leaving the screening to the Pareto front: the candidate
+#: generator of a best-subset study. Kept OUT of :data:`REALIZATIONS` on
+#: purpose: a budget has no chain, and :func:`select_from_chain` falls through
+#: to ``extend2`` for any listed name it does not special-case, so listing it
+#: there would silently run ``knee_ext2`` the day someone dispatched it by
+#: name.
+BUDGET_REALIZATIONS = ('complexity',)
 
 #: How the always-present ones column is handled by :func:`subset_table`.
 #:   'selectable' -- the intercept is column ``p``, an ordinary member of the
@@ -502,10 +517,223 @@ def mask_of(subset, n_cols):
 
 
 # --------------------------------------------------------------------------
+# The complexity budget ('complexity' realization)
+# --------------------------------------------------------------------------
+#: The intercept column's tie-break label in :func:`select_by_budget`. Any
+#: fixed value no term label can equal will do: there is one intercept.
+INTERCEPT_TIE_LABEL = ('<intercept>',)
+
+#: Relative tolerance under which :func:`select_by_budget` reads two subsets'
+#: ``curve`` -- then ``amp`` -- values as TIED. Not an exact comparison: on
+#: clean data every "truth + junk" subset of a level is floored to the same
+#: curve, and their amplifications then differ only in the last few ulps --
+#: the junk coefficients are rounding noise, and the rounding depends on the
+#: column order through the Cholesky solve. Compared exactly, those ulps
+#: decided the pick, and the order-free label key was reached only when two
+#: amplifications happened to round identically (measured: a budget above an
+#: exact truth picked up to five different label sets over 24 column orders).
+#: 1e-9 is ~7 orders above that rounding and far below any difference
+#: between two genuinely different fits.
+BUDGET_TIE_RTOL = 1e-9
+
+
+def _near_minimum(values, pool, rtol=BUDGET_TIE_RTOL):
+    """The members of ``pool`` whose ``values`` entry is within ``rtol`` of
+    the pool's minimum.
+
+    A band anchored at the minimum rather than a rounding of every value:
+    quantising (say, to 9 significant digits) puts a bin edge between two
+    ulp-apart values now and then, which is the order dependence over again;
+    the band always holds both.
+    """
+    vals = values[pool]
+    best = vals.min()
+    # Written as a difference so a best value at the float maximum (an
+    # infinite curve after ``nan_to_num``) cannot overflow the band, with the
+    # equality term keeping an all-infinite pool whole (inf - inf is nan).
+    with np.errstate(over='ignore', invalid='ignore'):
+        keep = (vals == best) | (vals - best <= rtol * abs(best))
+    return pool[keep]
+
+
+def term_atoms(term):
+    """A term's complexity: its number of factors AFTER power collapse.
+
+    ``Term.defined`` and ``Term.randomize`` both end in ``filter_powers``, which
+    merges equal factors into one factor carrying the summed power -- so
+    ``u*u`` is ONE atom ``u^2``, the best-subset study's convention (a power of
+    a variable is an atom costing 1, a product of two atoms costs 2). A trig
+    token, whose frequency is a parameter, a grid token and a derivative token
+    are one factor each. Deliberately not
+    ``eq_mo_objectives._complexity_of_equation``: that weighs a derivative by
+    its order and multiplies the term by its last factor's power, so it is not
+    an atom count.
+    """
+    return len(term.structure)
+
+
+def column_costs(equation):
+    """Per-column costs, aligned to the feature matrix the operator fits.
+
+    The non-target terms in structure order -- the layout of both the tier-3
+    ``Z`` slice and ``Equation.evaluate`` -- then the intercept at cost 1. The
+    target is the fixed left-hand side and costs nothing, as in the study.
+    """
+    atoms = [term_atoms(term) for idx, term in enumerate(equation.structure)
+             if idx != equation.target_idx]
+    return np.append(np.asarray(atoms, dtype=int), 1)
+
+
+def subset_costs(col_costs):
+    """Cost of every column subset, indexed by bitmask (bit j = column j)."""
+    col_costs = np.asarray(col_costs, dtype=int)
+    n_cols = col_costs.size
+    bits = (np.arange(1 << n_cols)[:, None] >> np.arange(n_cols)) & 1
+    return bits @ col_costs
+
+
+def complexity_budget(equation):
+    """The equation's ``('complexity', var)`` metaparameter value, or ``None``.
+
+    The budget is a property of its own: the population constructors seed it
+    only when the configured sparsity operator selects by a budget, and the
+    ``('sparsity', var)`` alpha beside it is never consulted here. An equation
+    without the key -- a translated truth, a standalone ``Equation``, a test
+    stub -- has no budget, which :func:`resolve_budget` reads as "every term
+    may stay".
+    """
+    try:
+        return equation.metaparameters[
+            (COMPLEXITY_METAPARAMETER, equation.main_var_to_explain)]['value']
+    except (AttributeError, KeyError, TypeError):
+        return None
+
+
+def resolve_budget(value, total):
+    """The integer budget a metaparameter value stands for.
+
+    Rounded half up and clipped to ``[1, total]``. The population seeds and
+    the mutation steps integers, but a value set by hand is read by its
+    nearest integer, so ``2.6`` is ``3`` and ``2.5`` is ``3`` (``np.round``
+    would make it ``2``). ``None``, a non-numeric value, a non-finite one or
+    one ``<= 0`` means NO budget, i.e. ``total`` -- never ``1``: refitting an
+    equation that was never given a budget (a translated truth, a standalone
+    equation) at one atom would collapse a correct equation over a gene it
+    does not carry.
+    """
+    try:
+        value = float(value)
+    except (TypeError, ValueError):
+        return int(total)
+    if not np.isfinite(value) or value <= 0:
+        return int(total)
+    return int(min(max(np.floor(value + 0.5), 1), total))
+
+
+def select_by_budget(curve, amp, costs, budget, n_cols, *, amp_cap=None,
+                     labels=None):
+    """The best subset at the largest achievable complexity ``<= budget``.
+
+    Candidates hold at least one FEATURE column: the fitness host declines an
+    equation whose term weights are all zero, so the empty and the
+    intercept-only subsets would be wasted picks. With ``amp_cap`` they are
+    narrowed to the amplification-admissible ones, falling back to all of them
+    when none is admissible (:func:`knee_chain`'s convention). The narrowing
+    comes BEFORE the budget, so the level chosen is the largest one an
+    admissible subset reaches, not an amplified pick the host would decline.
+
+    The level is the highest cost present among the candidates costing
+    ``<= budget``. When none fits -- ``budget=1`` with no single-atom term --
+    it is the CHEAPEST candidate's cost instead, so the realized complexity
+    then EXCEEDS the budget: the alternative is no candidate at all. Within the
+    level the lowest ``curve`` wins.
+
+    Ties are common, not an edge case: on clean data with a budget above the
+    true complexity many "truth + junk" subsets sit on the same machine floor.
+    They break by ``amp``, then by the sorted ``labels`` of the subset's
+    columns (one label per column, the intercept's included), which do not
+    depend on the column order. An equation's structure order is random, so a
+    bitmask tie-break would make the pick depend on it; ``labels=None`` falls
+    back to the bitmask for callers that have no labels. "Tied" means within
+    :data:`BUDGET_TIE_RTOL` of the best, for ``curve`` and ``amp`` alike: the
+    floored subsets' amplifications differ in rounding that itself depends on
+    the column order, so an exact comparison would decide by that order.
+    """
+    if n_cols < 2:
+        raise ValueError('A budget needs at least one feature column besides '
+                         'the intercept; got n_cols={0}.'.format(n_cols))
+    curve = np.nan_to_num(np.asarray(curve, dtype=float), nan=np.inf)
+    amp = (np.zeros(curve.size) if amp is None
+           else np.nan_to_num(np.asarray(amp, dtype=float), nan=np.inf))
+    costs = np.asarray(costs)
+    subsets = np.arange(1 << n_cols)
+    feature_bits = (1 << (n_cols - 1)) - 1          # the intercept is the top bit
+    cand = subsets[(subsets & feature_bits) != 0]
+    if amp_cap is not None:
+        admissible = cand[amp[cand] <= amp_cap]
+        if admissible.size:
+            cand = admissible
+    within = cand[costs[cand] <= budget]
+    if within.size:
+        pool = within[costs[within] == costs[within].max()]
+    else:
+        pool = cand[costs[cand] == costs[cand].min()]
+
+    # Lexicographic with a tolerance band: the near-best curve, then within
+    # those the near-best amplification, then the labels.
+    pool = _near_minimum(amp, _near_minimum(curve, pool))
+    if labels is None:
+        return int(pool.min())
+    return int(min(pool, key=lambda S: tuple(sorted(
+        labels[j] for j in range(n_cols) if (int(S) >> j) & 1))))
+
+
+def budget_prefix(best_sub, col_costs, budget, single_curve):
+    """The greedy fallback's budget pick: the largest nested prefix of a
+    forward chain that fits ``budget``.
+
+    The chain is nested, so its costs never decrease and the last prefix that
+    fits is the largest. Without the exhaustive table this is a heuristic --
+    forward selection need not visit the best subset of a complexity, nor even
+    reach the largest achievable one.
+
+    When no feature-carrying prefix fits, the chain's FIRST pick is already
+    too dear -- a two-atom term at a budget of 1, say -- but a cheaper column
+    may still fit on its own. The pick is then the affordable feature column
+    with the lowest ``single_curve`` (one entry per column: the curve of that
+    column's one-column fit on the same data, as ``greedy_chain(...,
+    singles=True)`` records it), and only when no feature column costs
+    ``<= budget`` the best of the CHEAPEST ones -- the cheapest feature
+    subset, exceeding the budget for the reason :func:`select_by_budget`
+    gives. There is no amplification narrowing at this step: a one-column
+    least-squares fit has ``A = |<x, y>_W| / (||x||_W ||y||_W) <= 1``
+    (Cauchy-Schwarz), admissible under any cap of at least 1.
+    """
+    col_costs = np.asarray(col_costs, dtype=int)
+    n_cols = col_costs.size
+    feature_bits = (1 << (n_cols - 1)) - 1
+
+    def cost(S):
+        return int(sum(col_costs[j] for j in range(n_cols) if (S >> j) & 1))
+
+    carrying = [int(S) for S in best_sub[1:] if int(S) & feature_bits]
+    fitting = [S for S in carrying if cost(S) <= budget]
+    if fitting:
+        return fitting[-1]
+    single_curve = np.nan_to_num(np.asarray(single_curve, dtype=float),
+                                 nan=np.inf)
+    features = np.arange(n_cols - 1)              # the intercept is the last
+    affordable = features[col_costs[features] <= budget]
+    pool = (affordable if affordable.size else
+            features[col_costs[features] == col_costs[features].min()])
+    return 1 << int(pool[np.argmin(single_curve[pool])])
+
+
+# --------------------------------------------------------------------------
 # Greedy fallback for libraries too large to enumerate
 # --------------------------------------------------------------------------
 def greedy_chain(f, t, w, *, intercept: str = 'selectable', amp_cap=None,
-                 discrepancy: str = None):
+                 discrepancy: str = None, singles: bool = False):
     """Forward-selection chain, for ``n_cols > max_exhaustive_columns``.
 
     At each size the column whose addition minimises RSS is taken (preferring
@@ -520,6 +748,10 @@ def greedy_chain(f, t, w, *, intercept: str = 'selectable', amp_cap=None,
     rather than a path the search normally takes.
 
     Returns ``(best_rss, best_sub, d, n_cols)`` in :func:`knee_chain` shape.
+    ``singles=True`` appends ``(curve, amp)``, two length-``n_cols`` arrays
+    holding every column's one-column fit -- the first step scores them all
+    anyway, and :func:`budget_prefix` needs them when the chain's first pick
+    does not fit a budget.
     """
     f = np.asarray(f, dtype=float)
     t = np.asarray(t, dtype=float).reshape(-1)
@@ -566,6 +798,8 @@ def greedy_chain(f, t, w, *, intercept: str = 'selectable', amp_cap=None,
     best_rss[0] = fit([])[0] if forced else max(
         base, dfloor if discrepancy is not None else floor)
     best_sub[0] = 0
+    if singles:
+        single_fits = np.full((2, n_cols), np.inf)
     chosen = []
     for k in range(1, n_cols + 1):
         pick = pick_adm = None
@@ -573,6 +807,8 @@ def greedy_chain(f, t, w, *, intercept: str = 'selectable', amp_cap=None,
             if j in chosen:
                 continue
             r, a = fit(chosen + [j])
+            if singles and k == 1:
+                single_fits[:, j] = r, a
             if pick is None or r < pick[0]:
                 pick = (r, j)
             if amp_cap is not None and a <= amp_cap:
@@ -583,6 +819,8 @@ def greedy_chain(f, t, w, *, intercept: str = 'selectable', amp_cap=None,
         best_rss[k] = r
         best_sub[k] = sum(1 << c for c in chosen)
     d = -np.diff(np.log(best_rss))
+    if singles:
+        return best_rss, best_sub, d, n_cols, (single_fits[0], single_fits[1])
     return best_rss, best_sub, d, n_cols
 
 
@@ -604,6 +842,13 @@ class KneeSparsity(CompoundOperator):
     shape of the RSS-versus-size curve, which is scale-free. The estimator is
     still consulted -- but only by ``'ke2_stab'``, and only to veto an
     extension.
+
+    The opt-in ``'complexity'`` realization (:data:`BUDGET_REALIZATIONS`) is
+    a different kind of rule: no elbow at all, but the best-fitting subset at
+    the largest complexity within a per-equation integer budget, carried by
+    the separate ``('complexity', var)`` metaparameter -- a best-subset
+    candidate generator whose output the Pareto front screens. See
+    :meth:`_apply_budget` and :meth:`complexity_interval`.
     """
     key = 'KneeBasedSparsity'
 
@@ -655,7 +900,8 @@ class KneeSparsity(CompoundOperator):
 
     @property
     def realization(self):
-        """Which rule of :data:`REALIZATIONS` selects the support.
+        """Which rule of :data:`REALIZATIONS` or :data:`BUDGET_REALIZATIONS`
+        selects the support.
 
         A property so an unknown value fails LOUD at configuration time.
         ``search_config.validate_sparsity_kwargs`` checks kwarg NAMES against
@@ -667,11 +913,45 @@ class KneeSparsity(CompoundOperator):
 
     @realization.setter
     def realization(self, value):
-        if value not in REALIZATIONS:
+        if value not in REALIZATIONS + BUDGET_REALIZATIONS:
             raise ValueError(
                 'Unknown knee realization {0!r}; expected one of {1}.'.format(
-                    value, list(REALIZATIONS)))
+                    value, list(REALIZATIONS + BUDGET_REALIZATIONS)))
         self._realization = value
+
+    @classmethod
+    def complexity_interval(cls, sparsity_kwargs, terms_max, factors_max):
+        """The range of the ``('complexity', var)`` budget, or ``None``.
+
+        ``None`` unless ``sparsity_kwargs`` selects a realization of
+        :data:`BUDGET_REALIZATIONS` -- and ``None`` is what keeps a default
+        run's metaparameters, genes and random stream exactly as they were:
+        the population constructors add the budget only when handed an
+        interval. Under a budget it is ``(1, (terms_max - 1) * F + 1)``, the
+        largest complexity one equation can carry: ``terms_max`` counts the
+        target, which costs nothing, every other term holds at most ``F``
+        factors, and the intercept costs 1. ``F`` is ``factors_max`` itself
+        or, for the ``{'factors_num': [...], 'probas': [...]}`` form, its
+        largest entry -- the cap ``Term.randomize`` draws under.
+
+        Asked by ``EpdeSearch.fit`` with the RESOLVED term/factor maxima, which
+        are only known at fit time, and the realization is an INSTANCE setting
+        -- so a class attribute could carry neither. Being a classmethod it is
+        callable, so ``search_config.sparsity_settings`` does not offer it as a
+        setting.
+        """
+        realization = (sparsity_kwargs or {}).get('realization',
+                                                  cls._realization)
+        if realization not in BUDGET_REALIZATIONS:
+            return None
+        if terms_max is None or factors_max is None:
+            raise ValueError(
+                'The {0!r} realization derives its budget range from the '
+                "fit's term and factor maxima; pass terms_max and "
+                'factors_max.'.format(realization))
+        if isinstance(factors_max, dict):
+            factors_max = max(factors_max['factors_num'])
+        return (1, (int(terms_max) - 1) * int(factors_max) + 1)
 
     @_loop_stats.timed('KneeSparsity.apply')
     def apply(self, objective, arguments: dict):
@@ -730,6 +1010,16 @@ class KneeSparsity(CompoundOperator):
         gfuncs = global_var.samples_manager.gFunc('dm')
         grid_shapes = global_var.samples_manager.inner_shapes
 
+        if realization in BUDGET_REALIZATIONS:
+            # No chain to walk: the selection needs every trajectory's table
+            # before it can choose one support for all of them, so it cannot
+            # ride the per-trajectory loop below.
+            self._apply_budget(objective, target, features, gram_setups,
+                               gfuncs, grid_shapes, curve=curve,
+                               amp_cap=amp_cap, metric=metric,
+                               gram_mode=gram_mode)
+            return
+
         sampled_full_coefs = []
         sampled_sw_weights = {}
         sampled_vc_scores = {}
@@ -747,17 +1037,9 @@ class KneeSparsity(CompoundOperator):
                 sampled_vc_scores[key] = None
                 continue
 
-            gram_setup = gram_setups.get(key)
-            if gram_setup is None and gram_mode is not None:
-                # ``sample_key`` selects the trajectory whose field the
-                # Taylor-microscale basis resolution reads -- see the same
-                # note in PhysicsInformedLasso.fit.
-                gram_setup = (
-                    VaryingCoefSetup(X, y, sw, grid_shape,
-                                     main_var=objective.main_var_to_explain,
-                                     sample_key=key)
-                    if gram_mode == 'vcoef'
-                    else GramSetup(X, y, sw, grid_shape))
+            gram_setup = self._trajectory_gram(
+                gram_setups.get(key), X, y, sw, grid_shape, gram_mode,
+                objective.main_var_to_explain, key)
 
             stability = None
             if realization == 'ke2_stab':
@@ -795,18 +1077,150 @@ class KneeSparsity(CompoundOperator):
             full = subset_coefficients(X, y, sw, support)
             sampled_full_coefs.append(full)
 
-            active = full != 0
-            sampled_vc_scores[key] = (
-                gram_setup.score(active)
-                if getattr(gram_setup, 'is_vcoef', False) and active.any()
-                else None)
-            sampled_sw_weights[key] = (
-                gram_setup.solve(active)
-                if metric == 'cv' and gram_setup is not None and active.any()
-                else None)
+            sampled_vc_scores[key], sampled_sw_weights[key] = \
+                self._support_scores(gram_setup, full != 0, metric)
 
         weights = np.mean(np.stack(sampled_full_coefs, axis=1), axis=1)
         self._store(objective, weights, sampled_sw_weights, sampled_vc_scores)
+
+    def _apply_budget(self, objective, target, features, gram_setups, gfuncs,
+                      grid_shapes, *, curve, amp_cap, metric, gram_mode):
+        """The ``'complexity'`` realization: the best subset within a budget.
+
+        Every subset of the equation's non-target terms plus the selectable
+        intercept is priced at its atom count (:func:`column_costs`), the
+        equation's ``('complexity', var)`` budget is read through
+        :func:`complexity_budget` (no key, or a non-positive / non-finite
+        value, means no budget), and :func:`select_by_budget` returns the
+        lowest-curve subset at the LARGEST cost the budget reaches -- the
+        candidate a best-subset study would enumerate at that level. Whether
+        that level was worth its terms is the Pareto front's question, not
+        this operator's: no elbow, no instability, one statistic.
+
+        MULTI-TRAJECTORY. The chain realizations select per trajectory and
+        average, so their support is the UNION of the per-trajectory ones --
+        which can blow straight through a budget. Here one subset is chosen
+        for every trajectory, on the MEAN of the per-trajectory curve and
+        amplification tables, and each trajectory is then refit on that common
+        support before the full vectors are averaged as usual. The mean of
+        per-trajectory curves, each scored at that trajectory's own fit, is
+        what can be tabulated per subset; the filler scores the AVERAGED
+        coefficients, so the two agree exactly for one trajectory and
+        approximately for several.
+
+        Above ``max_exhaustive_columns`` the table is replaced by one forward
+        chain over the row-stacked finite trajectories (LASSOSparsity's
+        multisample convention) and the pick is its largest prefix within the
+        budget (:func:`budget_prefix`), or the best affordable single column
+        of the same stacked data when even the first prefix is too dear -- a
+        safety valve, as for the chains.
+        """
+        col_costs = column_costs(objective)
+        n_cols = col_costs.size
+        budget = resolve_budget(complexity_budget(objective),
+                                int(col_costs.sum()))
+
+        samples = {}
+        for key in target.keys():
+            X = np.asarray(features[key], dtype=float)
+            y = np.asarray(target[key], dtype=float).reshape(-1)
+            sw = np.asarray(gfuncs[key], dtype=float).reshape(-1)
+            if X.shape[1] + 1 != n_cols:
+                # The budget would be priced on the wrong columns.
+                raise ValueError(
+                    'Feature matrix of trajectory {0!r} has {1} columns but '
+                    'the equation has {2} non-target terms.'.format(
+                        key, X.shape[1], n_cols - 1))
+            finite = bool(np.all(np.isfinite(X)) and np.all(np.isfinite(y)))
+            samples[key] = (X, y, sw, finite)
+
+        finite_keys = [key for key, sample in samples.items() if sample[3]]
+        if not finite_keys:
+            self._store(objective, np.zeros(n_cols), None, None)
+            return
+
+        if n_cols <= self.max_exhaustive_columns:
+            tables = [subset_table(*samples[key][:3], discrepancy=curve)
+                      for key in finite_keys]
+            labels = [_term_tie_label(term)
+                      for idx, term in enumerate(objective.structure)
+                      if idx != objective.target_idx] + [INTERCEPT_TIE_LABEL]
+            subset = select_by_budget(
+                np.mean([table[0] for table in tables], axis=0),
+                np.mean([table[1] for table in tables], axis=0),
+                subset_costs(col_costs), budget, n_cols, amp_cap=amp_cap,
+                labels=labels)
+            _loop_stats.record('KneeSparsity.budget_exhaustive', 1, 1)
+        else:
+            # ``singles``: the one-column fits of the first forward step, on
+            # the same stacked data, for budget_prefix's fallback.
+            _, best_sub, _, _, (single_curve, _) = greedy_chain(
+                np.vstack([samples[key][0] for key in finite_keys]),
+                np.concatenate([samples[key][1] for key in finite_keys]),
+                np.concatenate([samples[key][2] for key in finite_keys]),
+                amp_cap=amp_cap, discrepancy=curve, singles=True)
+            subset = budget_prefix(best_sub, col_costs, budget, single_curve)
+            _loop_stats.record('KneeSparsity.budget_greedy', 1, 1)
+
+        support = mask_of(subset, n_cols)
+        if col_costs[support].sum() > budget:
+            # Over budget only when nothing affordable was eligible: on the
+            # exhaustive path no amplification-admissible feature subset (no
+            # feature subset at all, when none is admissible) costs <= budget,
+            # on the greedy path no single feature column does. Both then take
+            # the cheapest feature subset (select_by_budget, budget_prefix) --
+            # recorded, not silent.
+            _loop_stats.record('KneeSparsity.budget_exceeded', 1, 1)
+
+        sampled_full_coefs = []
+        sampled_sw_weights = {}
+        sampled_vc_scores = {}
+        for key, (X, y, sw, finite) in samples.items():
+            if not finite:
+                sampled_full_coefs.append(np.zeros(n_cols))
+                sampled_sw_weights[key] = None
+                sampled_vc_scores[key] = None
+                continue
+            gram_setup = self._trajectory_gram(
+                gram_setups.get(key), X, y, sw, grid_shapes[key], gram_mode,
+                objective.main_var_to_explain, key)
+            full = subset_coefficients(X, y, sw, support)
+            sampled_full_coefs.append(full)
+            sampled_vc_scores[key], sampled_sw_weights[key] = \
+                self._support_scores(gram_setup, full != 0, metric)
+
+        weights = np.mean(np.stack(sampled_full_coefs, axis=1), axis=1)
+        self._store(objective, weights, sampled_sw_weights, sampled_vc_scores)
+
+    @staticmethod
+    def _trajectory_gram(gram_setup, X, y, sw, grid_shape, gram_mode,
+                         main_var, key):
+        """One trajectory's Gram view: the super-Gram's slice when the tier-3
+        path supplied one, else built here for the Gram-coupled metrics, else
+        ``None`` (a basis-free metric needs none)."""
+        if gram_setup is None and gram_mode is not None:
+            # ``sample_key`` selects the trajectory whose field the
+            # Taylor-microscale basis resolution reads -- see the same
+            # note in PhysicsInformedLasso.fit.
+            gram_setup = (
+                VaryingCoefSetup(X, y, sw, grid_shape, main_var=main_var,
+                                 sample_key=key)
+                if gram_mode == 'vcoef'
+                else GramSetup(X, y, sw, grid_shape))
+        return gram_setup
+
+    @staticmethod
+    def _support_scores(gram_setup, active, metric):
+        """``(vc_score, sw_weights)`` of one trajectory's converged support --
+        the two caches the Instability filler reads, in VWSR's conventions."""
+        vc_score = (gram_setup.score(active)
+                    if getattr(gram_setup, 'is_vcoef', False) and active.any()
+                    else None)
+        sw_weights = (gram_setup.solve(active)
+                      if metric == 'cv' and gram_setup is not None
+                      and active.any()
+                      else None)
+        return vc_score, sw_weights
 
     @staticmethod
     def _stability_callback(metric, X, y, sw, grid_shape, n_features,

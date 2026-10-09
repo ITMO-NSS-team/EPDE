@@ -127,13 +127,46 @@ def _term_weights(equation):
     return np.asarray(equation.weights_internal[:-1])
 
 
+# The per-term "worst" value: ``np.nan_to_num(inf)``, which the estimators
+# emit for a dead or unresolved level.
+_CAP = np.finfo(float).max
+
+
+def _absorb_cap(total: float) -> float:
+    """``total``, or ``_CAP`` when it reached the cap, overflowed to ``inf``
+    or is NaN."""
+    return total if total < _CAP else _CAP
+
+
+def _trajectory_total(per_term) -> float:
+    """Sum one trajectory's per-term scores, with the cap ABSORBING: a capped
+    or non-finite term makes the total the cap. A plain sum let the one
+    sentinel take three values -- the cap for one capped term, ``inf`` for
+    two, and (after the mean below) half the cap for one capped trajectory of
+    two -- so the worst value was not the worst any more, and an ``inf`` made
+    MOEA/D's normalised objective NaN."""
+    values = np.asarray(per_term, dtype=float)
+    if not np.all(values < _CAP):              # also catches NaN
+        return _CAP
+    with np.errstate(over='ignore'):           # an overflow is absorbed below
+        return _absorb_cap(float(np.sum(values)))
+
+
+def _mean_over_trajectories(totals) -> float:
+    """Mean of per-trajectory totals; any capped trajectory caps the equation."""
+    if any(not total < _CAP for total in totals):
+        return _CAP
+    with np.errstate(over='ignore'):
+        return _absorb_cap(float(np.mean(totals)))
+
+
 def _mean_of_sums(per_sample) -> float:
     """Reduce a per-trajectory dict of per-term score vectors to one scalar:
-    sum within a trajectory, mean across trajectories. ``None`` entries (a
-    sample whose estimator produced nothing) are skipped; an all-``None`` dict
-    reduces to 0.0."""
-    totals = [float(np.sum(v)) for v in per_sample.values() if v is not None]
-    return float(np.mean(totals)) if totals else 0.0
+    sum within a trajectory, mean across trajectories, the cap absorbing at
+    both levels. ``None`` entries (a sample whose estimator produced nothing)
+    are skipped; an all-``None`` dict reduces to 0.0."""
+    totals = [_trajectory_total(v) for v in per_sample.values() if v is not None]
+    return _mean_over_trajectories(totals) if totals else 0.0
 
 
 def _relative_norm(residual, reference) -> float:
@@ -542,22 +575,40 @@ class Instability(EquationObjective):
     """The instability objective, dispatching on the estimator selected by
     ``active_config().objectives.instability_metric``:
 
-    * ``'vcoef'``: fast path sums the per-term ``_cached_vc_score``
-      produced by ``PhysicsInformedLasso`` (``VWSRSparsity``); fallback
-      (LASSO path, no cache) is ``vc_stability_total_lr``.
-    * ``'cv'``: axis-aligned sliding-window CV via ``calculate_weights``.
-    * ``'survival'`` / ``'tile'`` / ``'het'`` / ``'chi2'``: the estimators
-      from ``epde.operators.common.survival`` (``'het'`` = Q-calibrated
-      excess-variance heterogeneity, tau^2/(tau^2+mean^2); ``'chi2'`` =
-      per-term Nyblom-Hansen cumulative-score-path constancy: global-OLS
-      Theta, one path per grid axis, each bulge measured against the
-      term's own signal energy -- the resolver DEFAULT), memoized per
-      equation as ``_cached_alt_instability = (metric, value)``.
+    * ``'vcoef'``: fast path sums the per-term ``_cached_vc_score`` the
+      sparsity step wrote on the converged mask (``VWSRSparsity`` and
+      ``KneeSparsity`` both write it); fallback (no cache, e.g. the LASSO
+      path) is ``vc_stability_total_lr``.
+    * ``'cv'``: axis-aligned sliding-window CV -- the cached window stack
+      (``_cached_sw_weights``) or ``calculate_weights``, reduced by
+      ``cv_scores``.
+    * ``'survival'`` / ``'tile'`` / ``'het'`` / ``'het_raw'`` / ``'chi2'``
+      / ``'chi2_centered'``: the basis-free estimators of
+      ``epde.operators.common.survival`` (``'chi2'``, per-term
+      Nyblom-Hansen cumulative-score-path constancy, is the DEFAULT),
+      memoized per equation as
+      ``_cached_alt_instability = (metric, fit_intercept, value)``.
 
-    The estimator choice affects ONLY this objective; the sparsity
-    keep-rule keeps following ``gram_mode``. Fails loudly: any exception
-    propagates -- a silent fallback value would corrupt the Pareto front
-    invisibly.
+    The SAME estimator scales the sparsity keep-rule's L1 threshold
+    (``sparsity.instability_scores``) for all eight metrics -- one statistic,
+    both sides. ``gram_mode`` only decides which Gram setup the keep-rule
+    builds (``vcoef`` / ``cv``; none for the basis-free six).
+
+    THE REGULARIZED-INTERCEPT RULE, for all eight: the objective charges the
+    intercept its own instability score iff the intercept survived
+    regularization (``weights_internal[-1] != 0``) and charges nothing for it
+    once the sparsity step drove it to zero. The keep-rule scores and prunes
+    the intercept regardless. ``vcoef`` / ``cv`` follow the rule through
+    their mask (fast path) or ``fit_intercept`` (cold path); the basis-free
+    estimators are called in the keep-rule's own shape -- an explicit ones
+    column with ``fit_intercept=False`` -- so their per-term vector is the
+    keep-rule's.
+
+    Reduction: sum within a trajectory (``cv`` then divides by the grid
+    dimensionality), mean across trajectories, with the cap
+    (``np.finfo(float).max``) absorbing at both levels. Fails loudly: any
+    exception propagates -- a silent fallback value would corrupt the Pareto
+    front invisibly.
     """
     name = 'instability'
     value_attr = 'coefficients_stability'
@@ -568,27 +619,33 @@ class Instability(EquationObjective):
         if metric == 'vcoef':
             cached = getattr(equation, '_cached_vc_score', None)
             if cached is not None:
-                # Per-trajectory dict written by VWSRSparsity: sum each
+                # Per-trajectory dict written by the sparsity step: sum each
                 # sample's per-term scores, then average across trajectories --
-                # the same reduction the survival/chi2 branch below uses.
+                # the same reduction the basis-free branch below uses.
                 return _mean_of_sums(cached)
-        elif metric in _BASIS_FREE_METRICS:
+        # THE INTERCEPT RULE: a regularized-away intercept is not a column of
+        # any later model. ``weights_internal[-1]`` is the sparsity step's
+        # SUPPORT decision (``weights_final[-1]`` agrees under the unified
+        # layout, but this is the vector that decides). The flag propagates
+        # unchanged into vc_stability_total_lr / calculate_weights, and decides
+        # whether the basis-free estimators get a ones column to score.
+        fit_intercept = bool(equation.weights_internal[-1] != 0)
+        if metric in _BASIS_FREE_METRICS:
+            # Keyed by the flag as well: the basis-free value depends on the
+            # structure (whose changes wipe this memo) and on the intercept
+            # flag alone, so a flipped intercept must not be served the value
+            # scored under the other flag. The length test refuses a memo in
+            # the old (metric, value) layout, whose value 0.0 == False would
+            # otherwise pass the key comparison.
             cached = getattr(equation, '_cached_alt_instability', None)
-            if cached is not None and cached[0] == metric:
-                return float(cached[1])
+            if (cached is not None and len(cached) == 3
+                    and cached[:2] == (metric, fit_intercept)):
+                return float(cached[2])
         data_shape = ctx.data_shape
         targets, features = equation.evaluate()
 
         if features is None:
             return 1.0
-        # THE INTERCEPT RULE: a regularized-away intercept is not a column of
-        # any later model. ``weights_internal[-1]`` is the sparsity step's
-        # SUPPORT decision (``weights_final[-1]`` agrees under the unified
-        # layout, but this is the vector that decides). The flag propagates
-        # unchanged into vc_stability_total_lr / calculate_weights / the
-        # survival.py estimators, each of which appends its own ones column
-        # only when it is set.
-        fit_intercept = bool(equation.weights_internal[-1] != 0)
         if metric == 'vcoef':
             # Forward the TRAJECTORY KEY. ``VaryingCoefSetup`` resolves its
             # cosine basis from that sample's own field via the Taylor
@@ -609,13 +666,31 @@ class Instability(EquationObjective):
             totals = dictApplyUFunc(_vc_total, features, targets,
                                     ctx.g_fun_vals, data_shape,
                                     {key: key for key in features})
-            return float(np.mean([float(v) for v in totals.values()]))
+            # Each total arrives already summed, so a capped term shows up as
+            # the cap or as an overflowed inf; both cap the equation.
+            return _mean_over_trajectories([float(v) for v in totals.values()])
         if metric in _BASIS_FREE_METRICS:
             estimator = _BASIS_FREE_METRICS[metric]
-            estim = partial(estimator, fit_intercept=fit_intercept)
-            scores = dictApplyUFunc(estim, features, targets, ctx.g_fun_vals, data_shape)
-            value = np.mean([float(np.sum(score)) for score in scores.values()])
-            equation._cached_alt_instability = (metric, value)
+
+            # The KEEP-RULE call shape (``sparsity.instability_scores``): the
+            # intercept, when it survived, is an explicit ones column scored
+            # like any feature, and its entry is summed. Letting the estimator
+            # fold in its own intercept instead fitted it and then DROPPED its
+            # entry -- discarding a score the keep-rule had just computed for
+            # the same column -- and the folded Gram is a different float path
+            # (het / het_raw up to 6% / 21% apart on per-block ill-conditioned
+            # designs), so the two sides were not one formula.
+            def _scores(feats, tgt, g_vals, shape):
+                X = np.asarray(feats, dtype=float)
+                if X.ndim == 1:
+                    X = X[:, None]
+                if fit_intercept:
+                    X = np.hstack([X, np.ones((X.shape[0], 1))])
+                return estimator(X, tgt, g_vals, shape, fit_intercept=False)
+
+            scores = dictApplyUFunc(_scores, features, targets, ctx.g_fun_vals, data_shape)
+            value = _mean_of_sums(scores)
+            equation._cached_alt_instability = (metric, fit_intercept, value)
             return value
         # metric == 'cv': the axis-aligned sliding-window CV, per trajectory.
         sw = getattr(equation, '_cached_sw_weights', None)
@@ -634,13 +709,16 @@ class Instability(EquationObjective):
             # table now prevents for the basis-free metrics.
             cv = cv_scores(sw_key)
             # Divide by that trajectory's GRID DIMENSIONALITY (the number of
-            # per-dim window batches ``calculate_weights`` stacks), not by the
-            # trajectory count.
-            n_dims = max(len(np.atleast_1d(data_shape[key])), 1)
-            per_sample.append(float(np.sum(np.nan_to_num(cv))) / n_dims)
+            # per-dim window batches ``calculate_weights`` stacks; a size-1 axis
+            # stacks none, so it is not counted), not by the trajectory count
+            # -- but not the cap: a capped trajectory is the cap, not
+            # cap / n_dims.
+            n_dims = max(sum(int(n) >= 2 for n in np.atleast_1d(data_shape[key])), 1)
+            total = _trajectory_total(np.nan_to_num(cv))
+            per_sample.append(total / n_dims if total < _CAP else _CAP)
         if not per_sample:
             return 1.0
-        return float(np.mean(per_sample))
+        return _mean_over_trajectories(per_sample)
 
 
 class Complexity(EquationObjective):

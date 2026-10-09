@@ -619,7 +619,26 @@ class TestNoBiasUnlessTheEquationHasOne:
         assert equation_spec(self._equation(True), {'u': 0}, 1).intercept == 5.0
 
 
-@pytest.mark.usefixtures('solve_on_cpu')
+@pytest.fixture
+def _keep_the_module_search(monkeypatch):
+    """A test that builds its own ``EpdeSearch`` rebinds the runtime globals
+    (caches, trajectory manager, verbose, history) and the active config; put
+    the module ``fitted`` search's back afterwards, or every later test that
+    evaluates it reads another dataset's cache (KeyError on its labels)."""
+    import types
+    import epde.globals as global_var
+    from epde.interface import search_config
+    for name, value in list(vars(global_var).items()):
+        if not (name.startswith('__') or callable(value) or isinstance(value, types.ModuleType)):
+            monkeypatch.setattr(global_var, name, value)
+    monkeypatch.setattr(search_config, '_ACTIVE', search_config._ACTIVE)
+    vc_modes = dict(global_var.vc_modes_cache)                    # cleared in place
+    yield
+    global_var.vc_modes_cache.clear()
+    global_var.vc_modes_cache.update(vc_modes)
+
+
+@pytest.mark.usefixtures('solve_on_cpu', '_keep_the_module_search')
 class TestTheSystemOrderGuard:
 
     def test_an_equation_explaining_another_variable_is_a_setup_error(self, solve_on_cpu):
@@ -648,3 +667,55 @@ class TestTheSystemOrderGuard:
                        'deepxde_config': dict(LBFGS_ONLY)}
         with pytest.raises(DeepXDEConfigError, match='main_var_to_explain'):
             host.apply(system, {})
+
+
+
+# ============================================================ scale-invariant observation loss
+@pytest.mark.usefixtures('solve_on_cpu')
+class TestTheScaleInvariantObservationLoss:
+    """The observation equation u = u_obs as a cancellation ratio."""
+
+    @staticmethod
+    def _error(dxi, mode, y, v):
+        import deepxde as dde
+        adapter = dxi.DeepXDEAdapter(obs_loss=mode)
+        points = np.zeros((len(v), 1))
+        bc = adapter._observation_bc(dde, points, np.asarray(v, dtype=np.float32).reshape(-1, 1), 0)
+        out = torch.tensor(np.asarray(y, dtype=np.float32).reshape(-1, 1), requires_grad=True)
+        return bc.error(None, None, out, 0, len(v)), out, adapter
+
+    def test_live_is_the_bounded_ratio_and_zero_at_zero_over_zero(self, solve_on_cpu):
+        err, out, _ = self._error(solve_on_cpu, 'sinv_live', [2.0, -1.0, 0.0, 3.0], [1.0, 1.0, 0.0, -3.0])
+        want = torch.tensor([[1.0 / 3.0], [-2.0 / 2.0], [0.0], [6.0 / 6.0]])
+        torch.testing.assert_close(err, want, rtol=0, atol=1e-7)
+        assert float(err.abs().max()) <= 1.0
+        (err ** 2).sum().backward()
+        assert torch.isfinite(out.grad).all()
+
+    def test_data_divides_by_the_frozen_data_mass(self, solve_on_cpu):
+        err, _, adapter = self._error(solve_on_cpu, 'sinv_data', [2.0, 0.5, 1.0], [1.0, 0.0, -2.0])
+        want = torch.tensor([[1.0 / 2.0], [0.0], [3.0 / 4.0]])
+        torch.testing.assert_close(err, want, rtol=0, atol=1e-7)
+        stats = adapter.last_obs_stats
+        assert stats['obs_loss'] == 'sinv_data'
+        assert abs(stats['data_mass'][0]['zero_share'] - 1.0 / 3.0) < 1e-12
+
+    def test_mse_keeps_deepxdes_own_error(self, solve_on_cpu):
+        err, _, _ = self._error(solve_on_cpu, 'mse', [2.0, 0.5], [1.0, 0.0])
+        torch.testing.assert_close(err, torch.tensor([[1.0], [0.5]]), rtol=0, atol=0)
+
+    def test_the_options_it_cannot_combine_with_are_refused(self, solve_on_cpu):
+        from epde.integrate.heldout import DeepXDEConfigError
+        with pytest.raises(DeepXDEConfigError, match='obs_loss'):
+            solve_on_cpu.DeepXDEAdapter(obs_loss='sinv_live', second_order='lm', lr=None,
+                                        epochs=0, lbfgs_maxiter=0)
+
+    def test_a_solve_with_it_is_finite(self, fitted, solve_on_cpu):               # noqa: F811
+        solution, loss, _ = _solve(solve_on_cpu, fitted, dict(LBFGS_ONLY, input_transform='affine',
+                                                              obs_loss='sinv_live'))
+        assert np.isfinite(loss) and np.all(np.isfinite(solution))
+
+    def test_the_default_path_is_the_s1_pin(self, fitted, solve_on_cpu):         # noqa: F811
+        solution, loss, _ = _solve(solve_on_cpu, fitted, dict(LBFGS_ONLY, input_transform='affine',
+                                                              obs_loss='mse'))
+        assert _digest(solution, loss) == S1_PIN

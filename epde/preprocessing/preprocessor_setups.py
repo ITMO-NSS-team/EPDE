@@ -7,7 +7,8 @@ Created on Tue Jul 19 20:13:46 2022
 """
 
 from epde.preprocessing.smoothers import GaussianSmoother, ANNSmoother, PlaceholderSmoother
-from epde.preprocessing.deriv_calculators import AdaptiveFiniteDeriv, PolynomialDeriv, SpectralDeriv
+from epde.preprocessing.deriv_calculators import (AdaptiveFiniteDeriv, ForwardIncrementDeriv,
+                                                  PolynomialDeriv, SpectralDeriv)
 
 from epde.preprocessing.preprocessor import ConcretePrepBuilder
 
@@ -47,6 +48,18 @@ class PreprocessorSetup:
 
         self.builder.set_smoother(PlaceholderSmoother, *smoother_args, **smoother_kwargs)        
         self.builder.set_deriv_calculator(AdaptiveFiniteDeriv, *deriv_calculator_args,
+                                          **deriv_calculator_kwargs)
+
+    def build_forward_preprocessing(self, lag=1, time_axis=0):
+        """Unsmoothed data, forward-increment (Ito) time derivatives: see ForwardIncrementDeriv."""
+        smoother_args = ()
+        smoother_kwargs = {}
+
+        deriv_calculator_args = ()
+        deriv_calculator_kwargs = {'grid': None, 'lag': lag, 'time_axis': time_axis}
+
+        self.builder.set_smoother(PlaceholderSmoother, *smoother_args, **smoother_kwargs)
+        self.builder.set_deriv_calculator(ForwardIncrementDeriv, *deriv_calculator_args,
                                           **deriv_calculator_kwargs)
 
     def build_spectral_preprocessing(self, n=None, steepness=1):

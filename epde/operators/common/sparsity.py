@@ -101,13 +101,62 @@ def instability_scores(metric, X, y, sw, grid_shape, active_mask, n_features,
                                          fit_intercept=False)
 
 
+def _tie_ranks(n_features: int, feature_labels=None) -> np.ndarray:
+    """Tie-break rank of every augmented column (the features, then the
+    intercept) for the keep-rule's coordinate-descent sweep.
+
+    With ``feature_labels`` the features rank by label, so exact score ties
+    are visited in the same order whatever order the library lists its terms
+    in; without them they rank by column position. The intercept has no label
+    and ranks after every feature in both cases -- it is the last column.
+    """
+    ranks = np.arange(n_features + 1)
+    if feature_labels is None:
+        return ranks
+    if len(feature_labels) != n_features:
+        raise ValueError(
+            f'feature_labels has {len(feature_labels)} entries for '
+            f'{n_features} feature columns')
+    # ``sorted`` is stable, so equal labels (never produced by an equation,
+    # whose terms are unique) fall back to column order.
+    ranks[sorted(range(n_features), key=lambda j: feature_labels[j])] = \
+        np.arange(n_features)
+    return ranks
+
+
+def _sweep_order(scores, tie_ranks) -> np.ndarray:
+    """Visit order for the coordinate-descent sweep: descending score, exact
+    ties by ascending ``tie_ranks``.
+
+    ``np.argsort(scores)[::-1]`` used to decide this, and its default kind is
+    not stable: tied columns came out in an order that depends on the whole
+    score vector and on the SIMD dispatch, and since the first column driven
+    to zero ends the pass, het's unresolved sentinel and het_raw's overflow
+    made the support depend on the library's column order. NaN still sorts
+    first, where the reversed argsort put it.
+    """
+    scores = np.asarray(scores, dtype=float)
+    return np.lexsort((tie_ranks, -scores, ~np.isnan(scores)))
+
+
+def _term_tie_label(term):
+    """A term's tie-break label: its factor signatures in a canonical order,
+    so the factors' order inside the term does not matter either."""
+    return tuple(sorted(repr(label) for label in term.factors_labels))
+
+
 class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
     """
     Physics-Informed Lasso using Coordinate Descent and Adaptive CV-Penalties.
 
     Features:
-    - Adaptive: Replaces alpha with Coefficient of Variation (CV) from physical priors.
-    - Scale-Invariant: Anchors penalties to the maximum correlation [X.T @ y].
+    - Adaptive: Replaces alpha with each column's instability score under the
+      configured ``instability_metric`` -- the statistic the Instability Pareto
+      axis reads (see :func:`instability_scores`); the CV of sliding-window
+      fits only when that metric is ``'cv'``.
+    - Anchored: penalties are score * max|X.T @ y|, so a global rescaling of
+      the data rescales every threshold alike. The score enters by MAGNITUDE,
+      so instability metrics on different scales prune with different strength.
     - Augmented: Treats the intercept as a penalized feature based on its own stability.
     - Aggressive: Instant elimination of features that hit zero during optimization.
     """
@@ -149,7 +198,12 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
     #     return np.nan_to_num(cv)
 
     @_loop_stats.timed('PhysicsInformedLasso.fit')
-    def fit(self, X, y, sample_key=None, grid_shape=None, sample_weights=None, gram_setup=None):
+    def fit(self, X, y, sample_key=None, grid_shape=None, sample_weights=None, gram_setup=None,
+            feature_labels=None):
+        # ``feature_labels`` (one per column of ``X``, mutually comparable)
+        # only breaks EXACT keep-rule score ties -- see ``_sweep_order``.
+        # ``VWSRSparsity`` passes the terms' labels; without them ties go by
+        # column position.
         # ``grid_shape`` is the trajectory's INNER GRID shape (e.g. (nt, nx)),
         # which the caller reads from ``samples_manager.inner_shapes``. Falling
         # back to ``sample_weights.shape`` only when nothing was supplied: the
@@ -170,6 +224,7 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
         active_mask = np.ones(total_features, dtype=bool)
         self.full_coef_ = np.zeros(total_features)
         self.keep_rule_binding_ = None
+        tie_ranks = _tie_ranks(n_features, feature_labels)
 
         # Precompute the augmented Gram blocks ONCE. The RFE outer loop and the
         # coordinate descent below run entirely in Gram space (slicing these by
@@ -244,8 +299,9 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
                     main_var=self.main_var, sample_key=sample_key)
             else:  # 'axis' backup
                 gram_setup = GramSetup(X, y, sample_weights, grid_shape)
-        # ``None`` when the metric is basis-free ('chi2', 'het', 'tile',
-        # 'survival'): those score straight from the active columns, so
+        # ``None`` when the metric is basis-free ('chi2', 'chi2_centered',
+        # 'het', 'het_raw', 'tile', 'survival'): those score straight from the
+        # active columns, so
         # neither the varying-coefficient mode solve nor the sliding-window
         # stack is built at all.
 
@@ -293,7 +349,7 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
 
             # Tackle the most physically unstable feature first.
             active_thresholds = active_cv * max_corr
-            cv_order = np.argsort(active_cv)[::-1]
+            cv_order = _sweep_order(active_cv, tie_ranks[active_idx])
 
             # KEEP-RULE BINDING DIAGNOSTIC, recorded on the FIRST outer pass
             # (full support) and never afterwards, so this costs one vector per
@@ -408,7 +464,8 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
         _loop_stats.record('PhysicsInformedLasso.RFE_outer', outer_iters_executed, max_outer_iters)
         self.cached_weights_ = weights
         # Per-active-term stability scores on the converged mask, summed as the
-        # stability objective in fitness. ``None`` for the axis backup path.
+        # stability objective in fitness. ``None`` unless the Gram is the
+        # vcoef one: the 'cv' axis Gram and the basis-free metrics leave it.
         self.cached_vc_score_ = (gram_setup.score(active_mask)
                                  if is_vcoef else None)
 
@@ -600,8 +657,9 @@ class VWSRSparsity(CompoundOperator):
 
     Mirrors :class:`LASSOSparsity` but swaps the sklearn ``Lasso`` estimator
     for :class:`PhysicsInformedLasso`, which derives feature-specific L1
-    penalties from the squared coefficient of variation of sliding-window
-    fits. Used as the regression step of the "new" pipeline.
+    penalties from each term's score under the configured instability metric
+    (the squared coefficient of variation of sliding-window fits only for
+    ``'cv'``). Used as the regression step of the "new" pipeline.
     """
     key = 'VWSRBasedSparsity'
 
@@ -654,6 +712,12 @@ class VWSRSparsity(CompoundOperator):
 
         gfuncs = global_var.samples_manager.gFunc('dm')
         grid_shapes = global_var.samples_manager.inner_shapes
+        # Both paths above lay the feature columns out as the non-target
+        # terms in structure order; their labels make the keep-rule's tie
+        # order independent of that (random) order.
+        feature_labels = [_term_tie_label(term)
+                          for idx, term in enumerate(objective.structure)
+                          if idx != objective.target_idx]
 
         sampled_full_coefs = []
         sampled_sw_weights = {}
@@ -663,7 +727,8 @@ class VWSRSparsity(CompoundOperator):
             estimator.fit(features[key], target[key], sample_key=key,
                           grid_shape=grid_shapes[key],
                           sample_weights=gfuncs[key],
-                          gram_setup=gram_setups.get(key))
+                          gram_setup=gram_setups.get(key),
+                          feature_labels=feature_labels)
             # Copy: ``fit`` allocates a fresh ``full_coef_`` per call, but
             # taking a copy keeps that an implementation detail rather than a
             # correctness dependency.

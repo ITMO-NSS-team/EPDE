@@ -138,34 +138,47 @@ class TestChi2Centered:
         b = chi2_centered_scores(X, y, w, GRID, fit_intercept=False)
         assert not np.allclose(a, b, rtol=1e-6)
 
-    def test_scores_a_constant_column_zero_and_keeps_alignment(self):
+    def test_scores_a_constant_column_as_the_intercept_and_keeps_alignment(self):
         """The keep-rule appends its own ones column and calls with
         fit_intercept=False, so a constant column reaches the estimator as an
         ordinary feature. Centering it would zero it out and make the Gram
-        singular; it is excluded and scored 0.0 instead, and the returned
-        vector still has one entry per input column."""
+        singular, so it is excluded from the centered design and scored with
+        the chi2 intercept functional instead -- the entry ``chi2_scores``
+        gives the same ones column (it used to be 0.0, which made the
+        intercept unprunable). The returned vector still has one entry per
+        input column, and the feature entries are untouched."""
         X, y, w = _library()
         Xa = np.hstack([X, np.ones((N, 1))])
         score = chi2_centered_scores(Xa, y, w, GRID, fit_intercept=False)
         assert score.shape == (4,)
-        assert score[3] == 0.0
+        assert np.isfinite(score[3]) and score[3] > 0.0
+        uncentred = chi2_scores(Xa, y, w, GRID, fit_intercept=False)
+        assert score[3] == pytest.approx(uncentred[3], rel=1e-8)
         bare = chi2_centered_scores(X, y, w, GRID, fit_intercept=False)
         assert np.allclose(score[:3], bare, rtol=1e-9, atol=0.0)
 
     def test_a_constant_column_of_any_magnitude_is_caught(self):
-        """The constant test is scale-free, so a large constant column is
-        recognised as one rather than centered into zeros."""
+        """The constant test is exact, so a large constant column is
+        recognised as one rather than centered into zeros, and it scores what
+        the unit ones column scores -- the functional is blind to the value."""
         X, y, w = _library()
+        ones = chi2_centered_scores(np.hstack([X, np.ones((N, 1))]), y, w, GRID,
+                                    fit_intercept=False)
         Xa = np.hstack([X, np.full((N, 1), 1e6)])
         score = chi2_centered_scores(Xa, y, w, GRID, fit_intercept=False)
         assert np.isfinite(score).all()
-        assert score[3] == 0.0
+        assert score[3] > 0.0
+        assert score[3] == pytest.approx(ones[3], rel=1e-9)
 
-    def test_all_constant_library_returns_zeros_rather_than_raising(self):
+    def test_all_constant_library_scores_the_offset_rather_than_raising(self):
+        """No column survives centering: the fit is intercept-only, and the
+        two collinear constants tie on its score instead of the empty centered
+        design raising."""
         X, y, w = _library()
         score = chi2_centered_scores(np.ones((N, 2)), y, w, GRID,
                                      fit_intercept=False)
-        assert np.array_equal(score, np.zeros(2))
+        assert np.isfinite(score).all() and score[0] > 0.0
+        assert score[0] == score[1]
 
     def test_zero_weights_fail_loudly(self):
         X, y, _ = _library()
@@ -217,16 +230,20 @@ class TestFamilyInvariants:
 
 @pytest.mark.parametrize('metric', sorted(_BASIS_FREE_METRICS))
 def test_keep_rule_and_objective_agree_numerically(metric):
-    """One statistic, both sides -- asserted on the NUMBERS.
+    """One statistic, both call shapes -- asserted on the NUMBERS.
 
     Nothing pinned this before. The nearest test grepped
     ``inspect.getsource(Instability.compute)`` for the estimator's name, which
     could only ever see that it was mentioned. The two call shapes genuinely
     differ: the keep-rule (``sparsity.instability_scores``) appends its own
     ones column and passes ``fit_intercept=False``, so the intercept is an
-    ordinary scored column and the vector is one longer; the objective passes
-    ``fit_intercept=True`` and lets the estimator append and then drop it.
-    Both build the same augmented design, so the FEATURE scores must match.
+    ordinary scored column and the vector is one longer; the FOLDED call
+    passes ``fit_intercept=True`` and lets the estimator append and then drop
+    it. Both build the same augmented design, so the FEATURE scores must
+    match. (The ``Instability`` objective itself now uses the keep-rule shape
+    under the regularized-intercept rule -- see
+    ``test_intercept_scoring_rule.py`` -- so this pins the estimators for the
+    offline callers that still fold.)
 
     ``survival`` failed this until its bootstrap stream stopped depending on
     ``p``, which differs between the two shapes (nf + 1 vs nf).
@@ -239,9 +256,9 @@ def test_keep_rule_and_objective_agree_numerically(metric):
 
     keep = np.asarray(instability_scores(metric, X, y, w, GRID, active,
                                          n_features), dtype=float)
-    objective = np.asarray(_BASIS_FREE_METRICS[metric](
+    folded = np.asarray(_BASIS_FREE_METRICS[metric](
         X, y, w, GRID, fit_intercept=True), dtype=float)
 
     assert keep.shape == (n_features + 1,), 'keep-rule also scores the intercept'
-    assert objective.shape == (n_features,), 'the objective drops it'
-    assert np.allclose(keep[:n_features], objective, rtol=1e-9, atol=1e-15)
+    assert folded.shape == (n_features,), 'the folded call drops it'
+    assert np.allclose(keep[:n_features], folded, rtol=1e-9, atol=1e-15)

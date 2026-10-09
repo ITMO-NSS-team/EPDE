@@ -6,15 +6,16 @@ Created on Thu Sep  8 11:57:44 2022
 @author: maslyaev
 """
 
+import numpy as np
 from typing import Callable
 from warnings import warn
 
-from epde.structure.main_structures import SoEq
+from epde.structure.main_structures import SoEq, COMPLEXITY_METAPARAMETER
 
 class SystemsPopulationConstructor(object):
     def __init__(self, pool, terms_number : int = 8, max_factors_in_term : int = 2,
                  obj_functions : Callable = None, sparsity_interval : tuple = (1., 1.),
-                 second_objective: str = None):
+                 second_objective: str = None, complexity_interval : tuple = None):
         # ``second_objective`` is accepted (and ignored) because EpdeSearch.fit
         # injects it into the shared ``population_instruct`` dict used by
         # both the single- and multi-objective population constructors;
@@ -37,17 +38,32 @@ class SystemsPopulationConstructor(object):
             raise ValueError('Trying to use single criterion optimization to discover a system of equations.')
         
         self.sparsity_interval = sparsity_interval
+        # The ('complexity', var) budget range, passed only under a budget
+        # realization (see the multiobjective constructor). Seeded the same
+        # way, uniformly per individual, but NOT optimizable: single-objective
+        # chromosomes carry no metaparameter genes, so each equation keeps its
+        # seeded budget for the whole search. EpdeSearch.fit says so to the
+        # caller once, where the stacklevel can point at the script.
+        self.complexity_interval = (None if complexity_interval is None
+                                    else tuple(int(end) for end in complexity_interval))
 
     def create(self, **kwargs):
         sparsity = kwargs.get('sparsity', self.sparsity_interval[1])
         terms_number = kwargs.get('terms_number', self.terms_number)
         max_factors_in_term = kwargs.get('max_factors_in_term', self.max_factors_in_term)
-        
+        if self.complexity_interval is not None:
+            lo, hi = self.complexity_interval
+            budgets = np.random.randint(lo, hi + 1, size=len(self.vars_demand_equation))
+
         print(f'Creating new equation, sparsity value {sparsity}')
         metaparameters = {'terms_number'        : {'optimizable' : False, 'value' : terms_number},
                           'max_factors_in_term' : {'optimizable' : False, 'value' : max_factors_in_term}}
         for idx, variable in enumerate(self.vars_demand_equation):
             metaparameters[('sparsity', variable)] = {'optimizable' : False, 'value' : sparsity}
+            if self.complexity_interval is not None:
+                metaparameters[(COMPLEXITY_METAPARAMETER, variable)] = {
+                    'optimizable': False, 'value': int(budgets[idx]),
+                    'bounds': (lo, hi)}
 
         created_solution = SoEq(pool = self.pool, metaparameters = metaparameters)
 

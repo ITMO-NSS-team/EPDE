@@ -605,6 +605,7 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
             return self
 
         self.max_deriv_order = max_deriv_order
+        self._check_forward_boundary(max_deriv_order)
         self.families, self.base_derivs = [], []
         for idx, entry in enumerate(self._entries):
             fam, bd = self.setEntry(entry, self._preprocessor_pipeline,
@@ -619,6 +620,26 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
 
         self._built = request
         return self
+
+    def _check_forward_boundary(self, max_deriv_order) -> None:
+        """A forward-increment derivative is undefined on the last ``lag * order`` samples of the
+        time axis (they repeat the last defined value). Those samples must fall inside the
+        boundary the domain excludes from fitting, or the search fits on padded values."""
+        pipe = self._preprocessor_pipeline
+        required = getattr(getattr(pipe, 'deriv_calculator', None), 'required_boundary', None)
+        if self._derivs is not None or required is None:
+            return
+        kwargs = pipe.deriv_calculator_kwargs
+        t_ax = kwargs.get('time_axis', 0)
+        order = (max_deriv_order[t_ax] if isinstance(max_deriv_order, (list, tuple))
+                 else max_deriv_order)
+        need = required(kwargs.get('lag', 1), order)
+        have = self._domain.boundary_width_per_axis[t_ax]
+        if have < need:
+            raise ValueError(
+                f'Forward-increment derivatives of order {order} at lag {kwargs.get("lag", 1)} '
+                f'are undefined on the last {need} samples of time axis {t_ax}, but the domain '
+                f'boundary there is {have}. Create the domain with boundary_width >= {need}.')
 
     def _entry_derivs(self, entry: VariableEntry, idx: int):
         """This entry's pre-computed derivative tensor, or ``None``.

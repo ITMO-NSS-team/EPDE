@@ -36,7 +36,9 @@ class PreparedTokens(ABC):
         self._token_family = TokenFamily(token_type='Placeholder')
 
     def __hash__(self):
-        return self._token_family.ftype
+        # __hash__ must return an int; returning the ftype string made every family unusable as a
+        # dict key, which is how createTrajectory(cached_token_tensors=...) takes per-trajectory tensors.
+        return hash(self._token_family.ftype)
 
     @property
     def token_family(self):

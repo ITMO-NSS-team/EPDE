@@ -294,7 +294,8 @@ class TokenFamily(object):
                     Removed from the equaton search.')
             data_label = (label, (1.0,))
             self.tokens.remove(label)
-            global_var.tensor_cache.delete_entry(data_label)
+            # the live cache is cache_refactored.Cache (globals.py), whose method is deleteEntry
+            global_var.tensor_cache.deleteEntry(data_label)
 
     def evaluate(self, token) -> None:
         """
