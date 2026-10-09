@@ -210,6 +210,22 @@ ARMS["_smoke-c"] = {"backend": "deepxde", "config": dict(
     ARMS["_smoke"]["config"], epochs=0, input_transform="affine",
     collocation_density="data_gradient")}
 
+# ---- Stage 2b: scale-invariant losses on S1 (user, Sep 29: "lets try sinv for
+# data as well"). The observation equation u = u_obs has two terms, so its
+# cancellation ratio is (u - u_obs) / (|u| + |u_obs|), in [0, 1] ('sinv_live');
+# 'sinv_data' divides by the frozen 2|u_obs|. Aggregated as DeepXDE's mean rho^2
+# (L2): the ratio is target-symmetric in L2 as in the objective's L1 (checked,
+# Sep 29). Each is read against G-0000 (== S1 in the Stage-2 code state).
+STAGE2B_LOSSES = {"L-os": {"obs_loss": "sinv_live"},
+                  "L-od": {"obs_loss": "sinv_data"},
+                  "L-ps": {"pde_loss": "sinv_live"},
+                  "L-pos": {"pde_loss": "sinv_live", "obs_loss": "sinv_live"}}
+for _name, _loss in STAGE2B_LOSSES.items():
+    ARMS[_name] = {"backend": "deepxde", "config": dict(ARMS["S1"]["config"], **_loss)}
+ARMS["_smoke-L"] = {"backend": "deepxde", "config": dict(
+    ARMS["_smoke"]["config"], epochs=0, input_transform="affine",
+    pde_loss="sinv_live", obs_loss="sinv_live")}
+
 #: PRE-REGISTERED periodic EPDE axes, checked by `gate.py profile` before any
 #: GPU work: ac / burgers from test_data_profile.py; the 1-D systems have no
 #: spatial axis (time is never tested). ns: None = not pre-registered (an open
@@ -803,6 +819,7 @@ def run_solve(system, arm, form, seed, mode="solve", tag="adhoc", write_trace=Tr
         "lbfgs_exit": getattr(adapter, "last_lbfgs_exit", None),
         "init_stats": getattr(adapter, "last_init_stats", None),
         "sinv_stats": getattr(adapter, "last_sinv_stats", None),
+        "obs_stats": getattr(adapter, "last_obs_stats", None),
         "lr_stats": getattr(adapter, "last_lr_stats", None),
         "lm_stats": getattr(adapter, "last_lm_stats", None),
         "pairing": getattr(adapter, "last_pairing", None),
@@ -1060,7 +1077,8 @@ def show_forms(system):
 #: every (system, arm) the Stage-2 smoke must have run, on seed 0 and both forms
 EXPECTED_SMOKE = ([(s, "_smoke") for s in ("lv", "lorenz", "ns")]
                   + [(s, "_smoke-G") for s in ("ac", "duffing", "burgers", "lv", "lorenz")]
-                  + [("ns", "_smoke-m"), ("ns", "_smoke-c")])
+                  + [("ns", "_smoke-m"), ("ns", "_smoke-c")]
+                  + [(s, "_smoke-L") for s in ("ac", "lv")])
 
 
 def check_rows(tag):

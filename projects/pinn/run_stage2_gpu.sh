@@ -13,6 +13,13 @@
 # bitwise against their reference and reuses the reference's other seeds.
 cd "$(dirname "$0")"
 set -x
+# Code that must go in between the previous batch and this one (it changes files
+# the previous batch's tags record) is applied while this waits: an operator (or
+# a watcher) puts results/STAGE2_HOLD down first and results/STAGE2_GO when done.
+if [ -f results/STAGE2_HOLD ]; then
+  until [ -f results/STAGE2_GO ]; do sleep 60; done
+fi
+LOSSES=L-os,L-ps,L-pos,L-od
 MAIN=G-0000,G-m000,G-0p00,G-00g0,G-00f0,G-000d,G-m00d,G-00gd,G-00fd
 # G-m0fd, G-0pfd, G-mpfd (flat-warp float64 nulls beyond G-00fd) are left out:
 # no contrast reads them and they cost ~4.5 GPU hours
@@ -36,6 +43,9 @@ for s in ac duffing burgers lv lorenz; do
   python gate.py drive --system $s --arms _smoke-G --seeds 0 --mode trace --tag stage2_smoke || exit 1
 done
 python gate.py drive --system ns --arms _smoke-m,_smoke-c --seeds 0 --mode trace --tag stage2_smoke || exit 1
+for s in ac lv; do
+  python gate.py drive --system $s --arms _smoke-L --seeds 0 --mode trace --tag stage2_smoke || exit 1
+done
 python gate.py check --tag stage2_smoke || exit 1
 
 # 2. the candidates Stage 2 solves (no free term unless the form writes one),
@@ -51,6 +61,12 @@ done
 #    every system (the Stage-0 B rows were refit with a free coefficient)
 for s in duffing ac burgers lv lorenz; do
   python gate.py drive --system $s --arms B --seeds 0-2 --tag stage2
+done
+
+# 3b. scale-invariant losses on S1: data (live, data mass), physics, both
+#     (L2, i.e. DeepXDE's mean rho^2; ~6 GPU hours)
+for s in duffing ac burgers lv lorenz; do
+  python gate.py drive --system $s --arms $LOSSES --seeds 0-2 --mode trace --tag stage2
 done
 
 # 4. the grid: the cells behind the pre-registered contrasts on every system

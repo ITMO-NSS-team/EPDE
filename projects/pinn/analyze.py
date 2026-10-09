@@ -119,6 +119,12 @@ CONTRASTS = [
     # the gradient warp widens the residual's dynamic range, where float32 stalls
     ("moments x float64", ("G-m00d", "G-000d"), ("G-m000", "G-0000"), "T_B"),
     ("gradient warp x float64", ("G-00gd", "G-000d"), ("G-00g0", "G-0000"), "T_B"),
+    # Stage 2b: scale-invariant losses on S1, each vs G-0000 (== S1)
+    ("L-os - G-0000  scale-inv data loss, live", "L-os", "G-0000", "T_B"),
+    ("L-od - G-0000  scale-inv data loss, data mass", "L-od", "G-0000", "T_B"),
+    ("L-ps - G-0000  scale-inv physics loss, live (on S1)", "L-ps", "G-0000", "T_B"),
+    ("L-pos - G-0000  both scale-invariant", "L-pos", "G-0000", "T_B"),
+    ("L-pos - L-ps  the data term's share", "L-pos", "L-ps", "T_B"),
 ]
 REPLAY_CAPS = [1000, 2000, 3000, 4000]
 TIE = 0.10
@@ -141,7 +147,21 @@ CONTAMINATED = {("stage1_start", "ac", "B-ctl"), ("stage1", "ac", "B-4k"),
                 # Stage-2 patch tests in a separate worktree, 13:03:52-13:04:09,
                 # 13:05:13-13:07:07 and 13:13:50-13:15:49 (lines 81-82 and 86)
                 ("stage1b", "duffing", "P1", "true", 2), ("stage1b", "duffing", "P1", "wrong", 0),
-                ("stage1b", "duffing", "P2", "true", 1)}
+                ("stage1b", "duffing", "P2", "true", 1),
+                # obs_loss tests in a worktree, ~15:10-15:11 (r_baseline lines 21-22)
+                ("r_baseline", "duffing", "B-ctl", "true", 2),
+                ("r_baseline", "duffing", "B-ctl", "wrong", 0),
+                # loss/objective tests in a worktree, 15:17:19-15:17:30 (line 25)
+                ("r_baseline", "burgers", "B", "true", 0),
+                # target-swap check and obs tests, 15:31-15:36 (lines 33-35)
+                ("r_baseline", "burgers", "B-ctl", "true", 2),
+                ("r_baseline", "burgers", "B-ctl", "wrong", 0),
+                ("r_baseline", "burgers", "B-ctl", "wrong", 1),
+                # 2026-09-30: this analysis at low priority, 14:28:39-14:29:30
+                # (stage2 line 58; the solve logged +19.2 s overhead vs ~5 s)
+                ("stage2", "ac", "L-os", "wrong", 0),
+                # this analysis again, 20:04:14-20:04:56 (stage2 line 190)
+                ("stage2", "duffing", "G-00gd", "wrong", 2)}
 
 
 # ============================================================ trace replay
@@ -498,7 +518,7 @@ def gate_table(system, idx, T_B):
                          f"construction here (seed 0 checked bitwise)")
         if ARMS.get(arm.split("@")[0], {}).get("role") == "null":
             notes.append("placement null: a control, not a candidate (not ranked)")
-        if (inert_reference(system.split(":")[0], arm) and len(seeds) == 1
+        if (arm in ARMS and inert_reference(system.split(":")[0], arm) and len(seeds) == 1
                 and (system.split(":")[0], arm) not in ALIASED):
             notes.append("inert cell NOT resolved: seed 0 only (reference missing, or a "
                          "form failed) -- not eligible")
@@ -639,6 +659,62 @@ def ranking(tables):
               + " ".join(f"{s} {x:+.3f}" for s, x in zip(tables, per)) + tie)
 
 
+def _factor_label(token):
+    """'u{power: 3.0}' -> 'u^3'; the power is shown only when it is not 1."""
+    name = token.split("{")[0]
+    power = token.split("power:")[1].split(",")[0].split("}")[0].strip() if "power:" in token else "1.0"
+    return name if float(power) == 1.0 else f"{name}^{float(power):g}"
+
+
+def true_coefficients(system):
+    """{var: ([(term, coefficient), ...], free_coefficient)} of the TRUE form's
+    text: the ground-truth equation the gate's true candidate is refit from."""
+    forms = system_forms(system)["true"]
+    texts = forms if isinstance(forms, dict) else {SYSTEM_VARS[system][0]: forms}
+    out = {}
+    for var, text in texts.items():
+        lhs = text.split(" = ")[0]
+        terms, free = [], 0.0
+        for group in lhs.split(" + "):
+            parts = group.split(" * ")
+            if len(parts) == 1:
+                free = float(parts[0])
+            else:
+                terms.append((" * ".join(_factor_label(p) for p in parts[1:]), float(parts[0])))
+        out[var] = (terms, free)
+    return out
+
+
+def coefficient_report(rows, systems):
+    """How close the candidate's PDE is to the true equation: the refit
+    coefficients of the TRUE form (fixed before every solve -- the PINN does not
+    change them, so every arm and seed carries the same values) against the true
+    equation's, per term. Printed, and returned for results/coefficients_<rule>.json."""
+    report = {}
+    print("\n================ coefficients: refit true form vs the true equation")
+    for system in systems:
+        row = next((r for r in rows if r["system"] == system and r["form"] == "true"
+                    and r.get("coeffs") is not None), None)
+        if row is None or system not in SYSTEM_VARS:
+            continue
+        refit = row["coeffs"] if isinstance(row["coeffs"], dict) else \
+            {SYSTEM_VARS[system][0]: row["coeffs"]}
+        for var, (terms, free) in true_coefficients(system).items():
+            got = refit[var]
+            entries = []
+            print(f"  {system}:{var}  (true  ->  refit, relative error)")
+            for (term, want), have in zip(terms, got[:-1]):
+                rel = (have - want) / abs(want) if want else float("nan")
+                entries.append({"term": term, "true": want, "refit": have, "rel_error": rel})
+                print(f"    {term:<16} {want:>+12.6g}  ->  {have:>+14.8g}   {rel:>+9.3%}")
+            print(f"    {'free term':<16} {free:>+12.6g}  ->  {got[-1]:>+14.8g}")
+            worst = max((abs(e["rel_error"]) for e in entries), default=float("nan"))
+            print(f"    max |relative error| {worst:.3%}")
+            report[f"{system}:{var}"] = {"terms": entries, "free_true": free,
+                                         "free_refit": got[-1], "max_abs_rel_error": worst}
+    return report
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--tags", default=DEFAULT_TAGS)
@@ -677,6 +753,12 @@ def main(argv=None):
     ranked = {s: t for s, t in tables.items() if bar[s]}
     if len(ranked) > 1:
         ranking(ranked)
+    report = coefficient_report(rows, a.systems.split(","))
+    if report:
+        path = os.path.join(RESULTS, f"coefficients_{rules.pop()}.json")
+        with open(path, "w") as fh:
+            json.dump(report, fh, indent=1)
+        print(f"  -> {path}")
 
 
 if __name__ == "__main__":
