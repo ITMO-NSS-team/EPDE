@@ -1,0 +1,255 @@
+data_00_330_[40_bots_PWM_10_20cw_20ccw_D_41cm].MP4.pickle
+40 robots, PWM 10, arena 41 cm, 20 cw / 20 ccw
+EPDE-format systems, one file per swarm recording, one system per robot.
+
+Each robot's system is assembled from its own EPDE searches:
+  dc/dx0, ds/dx0   heading rotation, from swarm_spin_epde.py (per robot, central derivatives; the
+                   first system of the robot's front, exactly as EPDE printed it)
+  dx/dx0, dy/dx0   drift, from swarm_robot_epde.py (per robot and coordinate, forward increments over
+                   0.4 s, own tokens: c, s, push, wall, vb, own position; the lowest-discrepancy member
+                   of each front that describes the derivative)
+Objective function values: those of the two drift equations, [discrepancy dx, dy, instability dx, dy]
+(EPDE defaults; the instability is large and noisy on these stochastic targets). The spin runs stored
+their front texts only.
+
+
+
+robot 8: spin (phase slope) +2.153 rad/s, EPDE +2.177 / +2.157 rad/s; own propulsion v0 17.4 px/s, theta +56.5 deg
+ / -2.1765506104084635 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.1574402492394795 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 15.62830228079 * push_x{power: 1.0} + 33.76780179381487 * wall_x{power: 1.0} + -9.915016910972106 * push_y{power: 1.0} + -20.067183224183772 * s{power: 1.0} + 0.1925685208377748 * vb_x{power: 1.0} + -16.700056692689472 = dx/dx0{power: 1.0}
+ \ -8.90041652347447 * push_x{power: 1.0} + 27.554819492753854 * push_y{power: 1.0} + -0.1377820057482249 * vb_x{power: 1.0} + 14.533533949747538 * c{power: 1.0} + 9.602430872880904 * s{power: 1.0} + 4.554481329984243 * wall_x{power: 1.0} + 2.8407499134359444 = dy/dx0{power: 1.0} , with objective function values of [0.8809 0.8827 15.06 2151]
+
+robot 11: spin (phase slope) -2.909 rad/s, EPDE -2.815 / -2.701 rad/s; own propulsion v0 46.4 px/s, theta +45.3 deg
+ / 2.8145155931617625 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.7010296610907383 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -23.973470663103605 * s{power: 1.0} + 30.72447545473787 * c{power: 1.0} + 0.20439196449122543 * vb_x{power: 1.0} + -0.025454314945825382 * x{power: 1.0} + 30.894398030843135 * wall_x{power: 1.0} + 28.615312042768963 * push_x{power: 1.0} + 20.598456857362518 = dx/dx0{power: 1.0}
+ \ 34.59183466458425 * s{power: 1.0} + 41.95169756435065 * c{power: 1.0} + 0.19167993911811698 * vb_y{power: 1.0} + 34.82067541151378 * push_y{power: 1.0} + 54.479590886029975 * wall_y{power: 1.0} + -0.36778244147520267 * wall_x{power: 1.0} + -3.648579947395628 = dy/dx0{power: 1.0} , with objective function values of [0.8256 0.7087 49.76 1.367e+04]
+
+robot 12: spin (phase slope) -2.317 rad/s, EPDE -2.249 / -2.327 rad/s; own propulsion v0 48.0 px/s, theta -11.5 deg
+ / 2.248920614013855 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.326685441542729 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 28.787637206351516 * push_x{power: 1.0} + -0.029286774233600456 * x{power: 1.0} + 0.25320768621021594 * vb_x{power: 1.0} + 40.80775146092183 * c{power: 1.0} + -5.847626837393915 = dx/dx0{power: 1.0}
+ \ 31.15941557076945 * push_y{power: 1.0} + -0.015535095362759169 * y{power: 1.0} + 0.22900948320929998 * vb_y{power: 1.0} + 47.019694774731676 * s{power: 1.0} + 29.140999092643987 * wall_y{power: 1.0} + -9.57392916953986 * c{power: 1.0} + 1.7695747322380604 = dy/dx0{power: 1.0} , with objective function values of [0.8021 0.7608 237.9 854.7]
+
+robot 17: spin (phase slope) -3.543 rad/s, EPDE -3.483 / -3.482 rad/s; own propulsion v0 9.1 px/s, theta -42.9 deg
+ / 3.4834944662548475 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.482276286761561 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -0.1435765402979579 * x{power: 1.0} + 29.709562335511933 * push_x{power: 1.0} + 6.656273631077336 * c{power: 1.0} + 43.713863165211954 * wall_y{power: 1.0} + 6.182671853067532 * s{power: 1.0} + 0.11547243535157782 * vb_x{power: 1.0} + -85.78225092353193 = dx/dx0{power: 1.0}
+ \ 21.70655197838795 * push_y{power: 1.0} + -0.15359158297932865 * y{power: 1.0} + 43.25544558023773 * wall_x{power: 1.0} + -0.11419915498610084 * vb_x{power: 1.0} + 0.09192486654454611 * vb_y{power: 1.0} + -14.964177518919396 * push_x{power: 1.0} + -111.95380239714892 = dy/dx0{power: 1.0} , with objective function values of [0.9162 0.9146 194.3 131.6]
+
+robot 18: spin (phase slope) +3.456 rad/s, EPDE +3.452 / +3.401 rad/s; own propulsion v0 129.4 px/s, theta +39.8 deg
+ / -3.4524096401714575 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.4010339385468864 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 91.30172608168928 * c{power: 1.0} + 53.85632926410116 * push_x{power: 1.0} + -0.020071639873186786 * x{power: 1.0} + -86.7022483999507 * s{power: 1.0} + 0.22793438097747679 * vb_x{power: 1.0} + 71.94234842804383 * wall_x{power: 1.0} + 7.605904397107021 = dx/dx0{power: 1.0}
+ \ 78.94966286871546 * c{power: 1.0} + 107.43355734037887 * s{power: 1.0} + 633.9043907062243 * wall_y{power: 1.0} + 0.17020422333662621 * vb_y{power: 1.0} + 93.26341726953055 * wall_x{power: 1.0} + 58.73848418267799 * push_y{power: 1.0} + 0.0 = dy/dx0{power: 1.0} , with objective function values of [0.6292 0.6074 394.6 9.067]
+
+robot 19: spin (phase slope) -1.476 rad/s, EPDE -1.415 / -1.488 rad/s; own propulsion v0 37.0 px/s, theta +57.8 deg
+ / 1.4153222795178282 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.4881286176801694 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -0.014747710077340801 * vb_y{power: 1.0} + 25.76690894252854 * wall_x{power: 1.0} + 18.410697621349083 * push_x{power: 1.0} + 0.28506666759334814 * vb_x{power: 1.0} + 20.190943179117493 * c{power: 1.0} + -30.280593615091803 * s{power: 1.0} + 2.835675395181662 = dx/dx0{power: 1.0}
+ \ 19.28220345617764 * s{power: 1.0} + 20.82175913629696 * push_y{power: 1.0} + 0.2641319043794315 * vb_y{power: 1.0} + 32.38980003125107 * c{power: 1.0} + 27.4071359651861 * wall_y{power: 1.0} + -4.29815399370058 = dy/dx0{power: 1.0} , with objective function values of [0.7302 0.7524 1499 100.6]
+
+robot 20: spin (phase slope) -0.408 rad/s, EPDE -0.393 / -0.426 rad/s; own propulsion v0 1.6 px/s, theta -65.0 deg
+ / 0.3932927586936865 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -0.42581447383730714 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 3.006678656643225 * wall_y{power: 1.0} + 1.458546867069574 * s{power: 1.0} + -0.030196592792473994 * x{power: 1.0} + 0.6792524014512784 * c{power: 1.0} + 0.10903256675451549 * vb_x{power: 1.0} + 14.927736131260566 * push_x{power: 1.0} + 13.506806673093994 = dx/dx0{power: 1.0}
+ \ -1.3618902557390327 * push_x{power: 1.0} + 5.682926226230107 * s{power: 1.0} + 22.27623548063136 * push_y{power: 1.0} + 0.18968437559601928 * vb_y{power: 1.0} + 19.838294911858323 * wall_y{power: 1.0} + -0.08128485428043036 * vb_x{power: 1.0} + 0.06285746084247237 = dy/dx0{power: 1.0} , with objective function values of [0.9656 0.9008 7144 2.438e+05]
+
+robot 22: spin (phase slope) +0.674 rad/s, EPDE +0.686 / +0.660 rad/s; own propulsion v0 40.2 px/s, theta +25.0 deg
+ / -0.6859504080484083 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 0.6597255156058803 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 18.309383330229572 * push_x{power: 1.0} + 20.11587335387181 * wall_x{power: 1.0} + 36.403596506427895 * c{power: 1.0} + 0.3832661929067763 * vb_x{power: 1.0} + 0.08051942607465977 * vb_y{power: 1.0} + -17.04262323541824 * s{power: 1.0} + -2.615333179839631 = dx/dx0{power: 1.0}
+ \ 19.2257687964324 * wall_y{power: 1.0} + 36.43504808373065 * s{power: 1.0} + 18.01543385751873 * push_y{power: 1.0} + -0.009312986831504073 * y{power: 1.0} + 16.955035227367706 * c{power: 1.0} + 0.3300832252315065 * vb_y{power: 1.0} + -0.2899278296105522 = dy/dx0{power: 1.0} , with objective function values of [0.6937 0.7216 1914 4.162e+04]
+
+robot 27: spin (phase slope) +3.586 rad/s, EPDE +3.535 / +3.545 rad/s; own propulsion v0 80.5 px/s, theta -52.2 deg
+ / -3.535014834673108 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.54488088376628 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 47.131416480130426 * wall_x{power: 1.0} + 29.638894321331687 * push_x{power: 1.0} + 43.97703998040513 * c{power: 1.0} + -0.7610419387457479 * wall_y{power: 1.0} + 73.88106139805568 * s{power: 1.0} + -0.022491317102855957 * x{power: 1.0} + -17.6249620437935 = dx/dx0{power: 1.0}
+ \ 30.710133533453465 * push_y{power: 1.0} + 50.10372338380887 * wall_y{power: 1.0} + -53.318105491941424 * c{power: 1.0} + 0.06260533183623791 * vb_x{power: 1.0} + 0.08999558124879754 * vb_y{power: 1.0} + 54.847636099255986 * s{power: 1.0} + 11.111371777701498 = dy/dx0{power: 1.0} , with objective function values of [0.5964 0.5615 4758 140.2]
+
+robot 28: spin (phase slope) +2.803 rad/s, EPDE +2.791 / +2.770 rad/s; own propulsion v0 39.2 px/s, theta -24.7 deg
+ / -2.7910332332401686 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.7695361857207925 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 34.37698093573901 * c{power: 1.0} + 12.476801691358625 * s{power: 1.0} + -0.02719970232940174 * vb_y{power: 1.0} + 30.481416808719167 * push_x{power: 1.0} + -0.012852616095976327 * x{power: 1.0} + 0.18962357825222537 * vb_x{power: 1.0} + 0.0 = dx/dx0{power: 1.0}
+ \ -0.7448686511750436 * push_x{power: 1.0} + -20.270454791526056 * c{power: 1.0} + 36.86946663829229 * s{power: 1.0} + -0.041950325650021894 * y{power: 1.0} + 37.19319712543228 * push_y{power: 1.0} + 0.21561967997138845 * vb_y{power: 1.0} + 16.387216707941782 = dy/dx0{power: 1.0} , with objective function values of [0.827 0.7706 1083 1311]
+
+robot 29: spin (phase slope) -0.929 rad/s, EPDE -0.948 / -0.976 rad/s; own propulsion axis term only (offset not resolved)
+ / 0.9477929629888237 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -0.9755630837629267 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 0.2431884271477257 * vb_x{power: 1.0} + -0.09246390111353449 * x{power: 1.0} + 17.5117591568218 * push_x{power: 1.0} + 23.662017266886647 * c{power: 1.0} + -30.717958275983644 = dx/dx0{power: 1.0}
+ \ 4.420398468046739 * push_x{power: 1.0} + -0.07311261008681706 * y{power: 1.0} + 0.33964380253672394 * vb_y{power: 1.0} + -0.07977298647935786 * vb_x{power: 1.0} + 11.204409552307274 * s{power: 1.0} + 19.971453912440015 * push_y{power: 1.0} + 30.569632091478795 = dy/dx0{power: 1.0} , with objective function values of [0.8483 0.8638 111.7 962.2]
+
+robot 30: spin (phase slope) +2.980 rad/s, EPDE +2.979 / +2.979 rad/s; own propulsion v0 43.8 px/s, theta +65.2 deg
+ / -2.9786023690269503 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.979067187363157 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 54.78572375299776 * wall_x{power: 1.0} + -37.764703848769905 * s{power: 1.0} + 0.297534269016822 * vb_x{power: 1.0} + 21.55366376957587 * c{power: 1.0} + 32.81587463453371 * push_x{power: 1.0} + 0.0 = dx/dx0{power: 1.0}
+ \ 41.68397084488686 * c{power: 1.0} + 0.24268688152636916 * vb_y{power: 1.0} + 24.81570037504773 * push_y{power: 1.0} + 15.167914435386841 * s{power: 1.0} + 30.595273868254214 * wall_y{power: 1.0} + 13.19160791126464 * wall_x{power: 1.0} + 0.0 = dy/dx0{power: 1.0} , with objective function values of [0.7543 0.7973 142.3 961.5]
+
+robot 31: spin (phase slope) +2.562 rad/s, EPDE +2.531 / +2.524 rad/s; own propulsion v0 41.6 px/s, theta -35.3 deg
+ / -2.530646229028602 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.523572762917457 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 29.32833709967416 * s{power: 1.0} + 36.61928392133329 * c{power: 1.0} + 48.26667730498737 * wall_x{power: 1.0} + 36.304698889439905 * push_x{power: 1.0} + 0.1300384020655735 * vb_x{power: 1.0} + 0.40483689542374324 * wall_y{power: 1.0} + -1.7072570350756349 = dx/dx0{power: 1.0}
+ \ -0.3348694717955503 * push_x{power: 1.0} + 39.860437215400374 * wall_y{power: 1.0} + 34.01148740660386 * push_y{power: 1.0} + -18.800794107225176 * c{power: 1.0} + 31.285424702539927 * s{power: 1.0} + 0.21987386154477362 * vb_y{power: 1.0} + 0.0 = dy/dx0{power: 1.0} , with objective function values of [0.8029 0.8577 4.541e+04 4.19e+04]
+
+robot 32: spin (phase slope) +3.036 rad/s, EPDE +3.019 / +2.971 rad/s; own propulsion axis term only (offset not resolved)
+ / -3.0188248811122844 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.970756171919272 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -0.09197845565784309 * x{power: 1.0} + -21.974348518188204 * wall_y{power: 1.0} + 0.14351642503477177 * vb_x{power: 1.0} + 30.097482823430386 * c{power: 1.0} + 30.94888855740018 * push_x{power: 1.0} + -44.39351312174313 = dx/dx0{power: 1.0}
+ \ 31.004649336283187 * s{power: 1.0} + 0.2363355009172588 * vb_y{power: 1.0} + -0.0675241690228262 * y{power: 1.0} + 28.36626653763267 * push_y{power: 1.0} + 14.18808315369491 * wall_y{power: 1.0} + 13.8228260128386 = dy/dx0{power: 1.0} , with objective function values of [0.8596 0.8501 41.3 121.5]
+
+robot 34: spin (phase slope) -3.519 rad/s, EPDE -3.473 / -3.489 rad/s; own propulsion axis term only (offset not resolved)
+ / 3.4731934244708405 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.4890313294359165 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 58.37999667770968 * c{power: 1.0} + 39.678771568442635 * push_x{power: 1.0} + 0.1496683425813551 * vb_x{power: 1.0} + 2.5604736175561427 * wall_y{power: 1.0} + 0.07161898260393243 * push_y{power: 1.0} + 34.27417023073969 * wall_x{power: 1.0} + -5.7259530652948545 = dx/dx0{power: 1.0}
+ \ -0.016398120792958427 * y{power: 1.0} + -0.06133167724489874 * vb_x{power: 1.0} + 28.011113335336304 * wall_y{power: 1.0} + 38.164151312712825 * push_y{power: 1.0} + 53.0113244732836 * s{power: 1.0} + 0.0 = dy/dx0{power: 1.0} , with objective function values of [0.7295 0.7495 9.279e+05 518.8]
+
+robot 36: spin (phase slope) +2.575 rad/s, EPDE +2.552 / +2.525 rad/s; own propulsion v0 63.6 px/s, theta +47.5 deg
+ / -2.551664347394024 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.525469216550857 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 26.844194802760356 * push_x{power: 1.0} + -0.36661732751157156 * push_y{power: 1.0} + 45.20717520209782 * c{power: 1.0} + -0.002925656881670474 * x{power: 1.0} + 0.18202108044843582 * vb_x{power: 1.0} + -54.331365352778775 * s{power: 1.0} + 0.0 = dx/dx0{power: 1.0}
+ \ -0.002489129724122236 * y{power: 1.0} + 0.25068443741357344 * vb_y{power: 1.0} + 31.370575816978597 * push_y{power: 1.0} + 40.65023873617005 * s{power: 1.0} + 39.516911165312465 * c{power: 1.0} + 0.0 = dy/dx0{power: 1.0} , with objective function values of [0.6325 0.6757 1.027e+05 1.014e+04]
+
+robot 37: spin (phase slope) -2.201 rad/s, EPDE -2.145 / -2.129 rad/s; own propulsion v0 82.8 px/s, theta -42.9 deg
+ / 2.144576144807136 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.128549278427262 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 56.77896869162834 * s{power: 1.0} + -32.44137381395334 * wall_x{power: 1.0} + 66.61350094165027 * c{power: 1.0} + 267.2965636224528 * wall_y{power: 1.0} + 0.27405129632812625 * vb_x{power: 1.0} + 31.388865896524795 * push_x{power: 1.0} + 0.0 = dx/dx0{power: 1.0}
+ \ 28.19026470858754 * push_y{power: 1.0} + 54.581952638979736 * s{power: 1.0} + 0.03923226291851279 * vb_x{power: 1.0} + 92.72730121671412 * wall_y{power: 1.0} + -56.032569176590734 * c{power: 1.0} + 0.2669259906745959 * vb_y{power: 1.0} + -0.4042798711817958 = dy/dx0{power: 1.0} , with objective function values of [0.5744 0.5988 34.24 2.641e+04]
+
+robot 38: spin (phase slope) +2.294 rad/s, EPDE +2.296 / +2.270 rad/s; own propulsion v0 22.7 px/s, theta -33.4 deg
+ / -2.2955973299352355 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.2698811892285145 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 17.474094170013537 * wall_x{power: 1.0} + 0.20069391159382333 * vb_x{power: 1.0} + -13.40390193011808 * wall_y{power: 1.0} + 30.553103551134512 * push_x{power: 1.0} + 12.508376617365986 * s{power: 1.0} + 18.985924875275675 * c{power: 1.0} + 0.0 = dx/dx0{power: 1.0}
+ \ 14.087233285153905 * wall_y{power: 1.0} + 6.9435277166060825 * push_x{power: 1.0} + 23.0397118468726 * push_y{power: 1.0} + 0.21158747306211598 * vb_y{power: 1.0} + 23.256198657196066 * s{power: 1.0} + 0.0 = dy/dx0{power: 1.0} , with objective function values of [0.8539 0.8721 326.9 35.07]
+
+robot 41: spin (phase slope) +2.837 rad/s, EPDE +2.808 / +2.782 rad/s; own propulsion v0 133.2 px/s, theta +72.3 deg
+ / -2.807620749425012 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.781742112448893 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 30.851454192706466 * c{power: 1.0} + 0.1512155356535038 * vb_x{power: 1.0} + -143.7314742122914 * s{power: 1.0} + 50.37788389950047 * wall_x{power: 1.0} + 37.83759113899305 * push_x{power: 1.0} + 0.12805846029444343 * vb_y{power: 1.0} + -1.5824712439489068 = dx/dx0{power: 1.0}
+ \ 0.1750817006013392 * vb_y{power: 1.0} + 109.90858084087694 * c{power: 1.0} + 3.8986434220036124 * wall_x{power: 1.0} + 37.69719890592999 * push_y{power: 1.0} + 53.036417743833645 * wall_y{power: 1.0} + 50.282684610079635 * s{power: 1.0} + 4.151425629731539 = dy/dx0{power: 1.0} , with objective function values of [0.4277 0.4866 1640 1192]
+
+robot 42: spin (phase slope) -3.761 rad/s, EPDE -3.690 / -3.625 rad/s; own propulsion v0 18.6 px/s, theta -159.2 deg
+ / 3.6903004631433816 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.624530549899172 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 6.744391499711907 * push_y{power: 1.0} + 28.65715340033791 * wall_x{power: 1.0} + 0.24947872495259962 * vb_x{power: 1.0} + -22.000132645690353 * c{power: 1.0} + 7.143734585646147 * s{power: 1.0} + 27.540137326194305 * push_x{power: 1.0} + 0.922899683395607 = dx/dx0{power: 1.0}
+ \ 21.961097220578118 * wall_y{power: 1.0} + -12.798355096371392 * s{power: 1.0} + 0.0037446568260832485 * y{power: 1.0} + 16.041543644335075 * push_y{power: 1.0} + 0.20851207381529568 * vb_y{power: 1.0} + -6.080559993712454 * c{power: 1.0} + -4.5775655637691175 = dy/dx0{power: 1.0} , with objective function values of [0.8353 0.9221 2031 530.5]
+
+robot 44: spin (phase slope) -2.209 rad/s, EPDE -2.198 / -2.076 rad/s; own propulsion v0 19.7 px/s, theta -141.0 deg
+ / 2.1984331260159125 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.075813592068482 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -11.836837899634272 * c{power: 1.0} + -23.30039831362709 * wall_y{power: 1.0} + 0.0036229652057188574 * vb_y{power: 1.0} + 14.31784247792817 * push_x{power: 1.0} + -0.20367000741011326 * x{power: 1.0} + 5.475089774375079 * push_y{power: 1.0} + -146.5382247399094 = dx/dx0{power: 1.0}
+ \ 25.814640092665016 * push_y{power: 1.0} + 0.1350308790196867 * vb_y{power: 1.0} + 0.07983933294413659 * vb_x{power: 1.0} + -0.06849024275137845 * y{power: 1.0} + -12.41188929492048 * c{power: 1.0} + -15.346958563829977 * s{power: 1.0} + 9.448727699364037 = dy/dx0{power: 1.0} , with objective function values of [0.9603 0.9018 1.975e+04 277.9]
+
+robot 45: spin (phase slope) +1.979 rad/s, EPDE +1.966 / +1.955 rad/s; own propulsion v0 77.6 px/s, theta -102.1 deg
+ / -1.9656387395491415 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 1.9549382967802746 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 75.84841474740468 * s{power: 1.0} + 0.16814555269365014 * vb_x{power: 1.0} + 59.56748533562294 * wall_x{power: 1.0} + 2.083665944008056 * push_y{power: 1.0} + -16.222997488371078 * c{power: 1.0} + 30.78828689967771 * push_x{power: 1.0} + 0.5103410465442774 = dx/dx0{power: 1.0}
+ \ 28.84127684412057 * wall_x{power: 1.0} + 32.43945416198886 * push_y{power: 1.0} + 0.27599465950209484 * vb_y{power: 1.0} + -0.0900945442640769 * vb_x{power: 1.0} + -0.12273060669358844 * y{power: 1.0} + -67.2743546673479 * c{power: 1.0} + 68.6953827773284 = dy/dx0{power: 1.0} , with objective function values of [0.5749 0.6382 1.924e+04 224.7]
+
+robot 50: spin (phase slope) +2.009 rad/s, EPDE +2.006 / +2.041 rad/s; own propulsion v0 23.7 px/s, theta +140.2 deg
+ / -2.0061090052916133 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.041196105129913 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -15.280460709619407 * s{power: 1.0} + -21.487541988218716 * c{power: 1.0} + 34.80936454902454 * wall_x{power: 1.0} + 0.14427231710979943 * vb_x{power: 1.0} + 29.402056509381037 * push_x{power: 1.0} + -1.8531268376869499 = dx/dx0{power: 1.0}
+ \ 0.11598116470305923 * vb_y{power: 1.0} + -14.990452613666138 * s{power: 1.0} + 24.85225162447751 * push_y{power: 1.0} + 15.11492285475271 * c{power: 1.0} + -0.02704380057640928 * y{power: 1.0} + 16.114942972767892 * wall_y{power: 1.0} + 12.194506854011015 = dy/dx0{power: 1.0} , with objective function values of [0.8619 0.8994 4176 332.4]
+
+robot 52: spin (phase slope) +2.086 rad/s, EPDE +2.127 / +2.072 rad/s; own propulsion v0 36.6 px/s, theta -28.7 deg
+ / -2.126503057236304 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.071880807767575 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -0.016721123609874548 * x{power: 1.0} + 22.781765174279297 * s{power: 1.0} + 30.675349873230417 * push_x{power: 1.0} + -1.4686899805586335 * push_y{power: 1.0} + 33.33277716894044 * c{power: 1.0} + 0.26897956025086106 * vb_x{power: 1.0} + 0.0 = dx/dx0{power: 1.0}
+ \ -4.2036201527369315 * push_x{power: 1.0} + -12.427175418293029 * c{power: 1.0} + 30.884304358829546 * s{power: 1.0} + 32.254284456926975 * push_y{power: 1.0} + 0.3190751004282919 * vb_y{power: 1.0} + 0.0 = dy/dx0{power: 1.0} , with objective function values of [0.7948 0.8113 809.4 200.9]
+
+robot 53: spin (phase slope) -0.763 rad/s, EPDE -0.772 / -0.742 rad/s; own propulsion axis term only (offset not resolved)
+ / 0.7718859279704372 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -0.7415982057566397 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 0.14677095674702687 * vb_x{power: 1.0} + 32.492885366406924 * wall_x{power: 1.0} + 17.27992814046691 * s{power: 1.0} + 0.023830199202574277 * x{power: 1.0} + 18.880922229489766 * push_x{power: 1.0} + 0.0 = dx/dx0{power: 1.0}
+ \ -16.081067942579622 * c{power: 1.0} + 0.15347515889016794 * vb_y{power: 1.0} + -0.09702140228300171 * y{power: 1.0} + -14.046903322528316 * wall_x{power: 1.0} + 75.38666425879667 = dy/dx0{power: 1.0} , with objective function values of [0.8654 0.929 19.39 26.21]
+
+robot 54: spin (phase slope) -2.007 rad/s, EPDE -1.945 / -1.907 rad/s; own propulsion v0 35.1 px/s, theta +4.9 deg
+ / 1.9446365305050346 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.9074417686620824 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -0.020811532161447144 * vb_y{power: 1.0} + -3.0284777768127475 * s{power: 1.0} + 24.34973639116364 * wall_x{power: 1.0} + 0.14700305052250662 * vb_x{power: 1.0} + 17.887420762744235 * push_x{power: 1.0} + 35.015067841731266 * c{power: 1.0} + 3.447687697223867 = dx/dx0{power: 1.0}
+ \ 17.68986445409008 * push_y{power: 1.0} + 0.19733787965371385 * vb_y{power: 1.0} + 48.11928788359495 * wall_y{power: 1.0} + -28.48118733183058 * wall_x{power: 1.0} + -0.007143159954532325 * vb_x{power: 1.0} + 37.94027304821181 * s{power: 1.0} + 0.0 = dy/dx0{power: 1.0} , with objective function values of [0.7708 0.7659 1701 6.477e+04]
+
+robot 56: spin (phase slope) +4.006 rad/s, EPDE +3.983 / +4.022 rad/s; own propulsion v0 73.6 px/s, theta +7.0 deg
+ / -3.983430063164873 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 4.021627157482101 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 56.44280189574767 * wall_x{power: 1.0} + -3.610729512297681 * wall_y{power: 1.0} + 76.12382126065356 * c{power: 1.0} + -7.724454222203958 * s{power: 1.0} + 0.1696222738861776 * vb_x{power: 1.0} + 41.71583607533276 * push_x{power: 1.0} + -2.833061020653945 = dx/dx0{power: 1.0}
+ \ 40.21081099750493 * push_y{power: 1.0} + -0.054123177198782735 * y{power: 1.0} + 0.10484246987363938 * vb_y{power: 1.0} + 69.92829800459764 * s{power: 1.0} + 39.67210677380858 * wall_y{power: 1.0} + 10.27337383661186 * c{power: 1.0} + -38.303118058295425 = dy/dx0{power: 1.0} , with objective function values of [0.6603 0.7315 550.4 210.8]
+
+robot 60: spin (phase slope) +2.774 rad/s, EPDE +2.811 / +2.658 rad/s; own propulsion v0 44.9 px/s, theta +16.6 deg
+ / -2.810565693160036 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.6577842727667518 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 0.20313640654447213 * vb_x{power: 1.0} + -0.48833916283823703 * x{power: 1.0} + 33.035654066482095 * c{power: 1.0} + 97.72120917979298 * wall_y{power: 1.0} + 24.53156438036436 * push_x{power: 1.0} + -19.410898133417064 * s{power: 1.0} + -362.29121705090915 = dx/dx0{power: 1.0}
+ \ 53.089748416380125 * s{power: 1.0} + 6.278671622249087 * c{power: 1.0} + -0.02883552150033952 * y{power: 1.0} + 0.15344459706292685 * vb_y{power: 1.0} + 36.70129420287437 * push_y{power: 1.0} + 48.950151433561814 * wall_y{power: 1.0} + -12.088431586428872 = dy/dx0{power: 1.0} , with objective function values of [0.7817 0.7437 28.3 370.8]
+
+robot 62: spin (phase slope) +2.003 rad/s, EPDE +1.953 / +2.020 rad/s; own propulsion v0 63.2 px/s, theta +103.8 deg
+ / -1.9532746441125903 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.020175371864158 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -0.007402483639035422 * vb_y{power: 1.0} + -62.04650785354991 * s{power: 1.0} + -12.45908890097024 * c{power: 1.0} + 0.29941325096536586 * vb_x{power: 1.0} + -0.026708233075165313 * x{power: 1.0} + 21.774803050744108 * push_x{power: 1.0} + -7.102915895823735 = dx/dx0{power: 1.0}
+ \ -1.6723879548312737 * push_x{power: 1.0} + -0.015141890213501919 * y{power: 1.0} + -17.736692418666223 * s{power: 1.0} + 60.73060836651402 * c{power: 1.0} + 0.31650172189372766 * vb_y{power: 1.0} + 22.44876613849734 * push_y{power: 1.0} + 1.3943138629059089 = dy/dx0{power: 1.0} , with objective function values of [0.5768 0.6022 8428 5380]
+
+robot 65: spin (phase slope) -2.617 rad/s, EPDE -2.592 / -2.548 rad/s; own propulsion v0 12.9 px/s, theta -29.8 deg
+ / 2.592154121111345 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.5475830322273487 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 23.747083137481376 * push_x{power: 1.0} + 6.419479473780073 * s{power: 1.0} + 11.218870656790978 * c{power: 1.0} + -0.04713147000315979 * x{power: 1.0} + 18.341479090419703 * wall_x{power: 1.0} + -28.177501702827918 = dx/dx0{power: 1.0}
+ \ 0.11189004480326303 * vb_y{power: 1.0} + -1.0309520160968262 * push_x{power: 1.0} + -1.0561573088943785 * wall_x{power: 1.0} + 53.42440891772024 * wall_y{power: 1.0} + 19.96532166299388 * s{power: 1.0} + 30.56606117898979 * push_y{power: 1.0} + -0.6613859653751593 = dy/dx0{power: 1.0} , with objective function values of [0.9435 0.8886 220.6 1.882e+04]
+
+robot 66: spin (phase slope) -1.164 rad/s, EPDE -1.101 / -1.124 rad/s; own propulsion v0 20.4 px/s, theta +28.8 deg
+ / 1.1014365309169596 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.124177226607633 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 0.283880533139368 * vb_x{power: 1.0} + 15.498403147634797 * wall_x{power: 1.0} + 11.70163480857013 * c{power: 1.0} + 14.052890645118183 * push_x{power: 1.0} + -0.013290986836235953 * x{power: 1.0} + -8.629847108979163 = dx/dx0{power: 1.0}
+ \ 16.579023421724074 * push_y{power: 1.0} + 17.86103899033855 * s{power: 1.0} + 9.808036249713817 * c{power: 1.0} + 0.19223737342402408 * vb_y{power: 1.0} + -0.03923929800848833 * y{power: 1.0} + 3.58784046187537 * wall_x{power: 1.0} + 0.0 = dy/dx0{power: 1.0} , with objective function values of [0.9036 0.8859 63.99 180.6]
+
+robot 72: spin (phase slope) +4.129 rad/s, EPDE +4.109 / +4.062 rad/s; own propulsion v0 33.7 px/s, theta -49.8 deg
+ / -4.109023406135487 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 4.061889147132267 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 34.38781455876346 * push_x{power: 1.0} + 0.22460097155032208 * vb_x{power: 1.0} + 25.69506005735893 * s{power: 1.0} + -109.28091095230984 * wall_y{power: 1.0} + 27.543244415807383 * c{power: 1.0} + 94.8198243501975 * wall_x{power: 1.0} + -5.313056113151645 = dx/dx0{power: 1.0}
+ \ 32.84055598348668 * push_y{power: 1.0} + 15.883773925448068 * s{power: 1.0} + -185.6857296584899 * wall_x{power: 1.0} + 0.1482280320701331 * vb_y{power: 1.0} + -25.740907518934314 * c{power: 1.0} + 377.31487140462156 * wall_y{power: 1.0} + -1.1097280437217794 = dy/dx0{power: 1.0} , with objective function values of [0.8459 0.8791 424 7899]
+
+robot 73: spin (phase slope) -1.009 rad/s, EPDE -1.017 / -1.055 rad/s; own propulsion v0 6.6 px/s, theta +41.3 deg
+ / 1.01736850963853 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.0550991119498139 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 4.922423701358561 * c{power: 1.0} + 0.3411620989148993 * vb_x{power: 1.0} + -4.326344865928803 * s{power: 1.0} + 14.218404369790399 * push_x{power: 1.0} + -0.018410480203647068 * x{power: 1.0} + -0.0148445698881394 * vb_y{power: 1.0} + -9.132033815892989 = dx/dx0{power: 1.0}
+ \ 1.5174629431064879 * push_x{power: 1.0} + -0.10229497231417425 * vb_x{power: 1.0} + 2.2516979488623323 * c{power: 1.0} + 0.34700429050801457 * vb_y{power: 1.0} + -0.010140006112820886 * y{power: 1.0} + 19.38347921298998 * push_y{power: 1.0} + -1.3510773590333345 = dy/dx0{power: 1.0} , with objective function values of [0.9143 0.8817 7728 6688]
+
+robot 74: spin (phase slope) +1.394 rad/s, EPDE +1.379 / +1.385 rad/s; own propulsion v0 48.8 px/s, theta +65.2 deg
+ / -1.379157528918234 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 1.3848420195003737 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 0.34157909039914525 * vb_x{power: 1.0} + 22.426043600258325 * c{power: 1.0} + 22.423815603856493 * push_x{power: 1.0} + 3.438575574993935 * push_y{power: 1.0} + -45.75470197215247 * s{power: 1.0} + -3.047204542030631 = dx/dx0{power: 1.0}
+ \ 0.3166463831570315 * vb_y{power: 1.0} + 18.857337754717832 * push_y{power: 1.0} + -3.9470187862675887 * push_x{power: 1.0} + 18.50708264094986 * s{power: 1.0} + 42.87902539632892 * c{power: 1.0} + -0.002095759457685587 * y{power: 1.0} + 0.0 = dy/dx0{power: 1.0} , with objective function values of [0.6331 0.6832 537.6 1229]
+
+robot 77: spin (phase slope) -1.428 rad/s, EPDE -1.425 / -1.407 rad/s; own propulsion axis term only (offset not resolved)
+ / 1.4253022773706736 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.4068840213048117 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 51.547714605201705 * c{power: 1.0} + -0.030787655610314234 * x{power: 1.0} + 20.806008676606925 * push_x{power: 1.0} + -0.0934228568752325 * vb_y{power: 1.0} + 0.3083835601909924 * vb_x{power: 1.0} + 0.0 = dx/dx0{power: 1.0}
+ \ -29.00589393306926 * wall_x{power: 1.0} + 47.66432150168499 * s{power: 1.0} + 19.40372190899534 * wall_y{power: 1.0} + 23.180775034143345 * push_y{power: 1.0} + 0.2827687395456188 * vb_y{power: 1.0} + -0.037904280983049585 * y{power: 1.0} + -22.342867874531617 = dy/dx0{power: 1.0} , with objective function values of [0.6802 0.7265 62.97 45.14]
+
+robot 78: spin (phase slope) +2.771 rad/s, EPDE +2.750 / +2.691 rad/s; own propulsion v0 49.3 px/s, theta +10.3 deg
+ / -2.7498183271119854 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.6905910106569957 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 51.01162896163796 * wall_x{power: 1.0} + 0.29364541928361615 * push_y{power: 1.0} + 48.19687568548682 * c{power: 1.0} + -6.81141004479292 * s{power: 1.0} + 37.99250053632891 * push_x{power: 1.0} + 0.2269951734079921 * vb_x{power: 1.0} + 2.20425636253341 = dx/dx0{power: 1.0}
+ \ 48.81249140814261 * s{power: 1.0} + -0.060356920242952916 * y{power: 1.0} + 0.23476683514862742 * vb_y{power: 1.0} + 10.856441002018753 * c{power: 1.0} + 28.077066455588284 * push_y{power: 1.0} + -10.796847130854289 * wall_x{power: 1.0} + -23.731895924221718 = dy/dx0{power: 1.0} , with objective function values of [0.7466 0.778 7865 332]
+
+robot 79: spin (phase slope) -2.023 rad/s, EPDE -1.970 / -2.007 rad/s; own propulsion v0 64.2 px/s, theta +31.4 deg
+ / 1.9701571246024778 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.00657583501772 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 58.48975964675143 * c{power: 1.0} + -0.13286011540400702 * vb_y{power: 1.0} + 0.32152617623004043 * vb_x{power: 1.0} + 31.766905648324723 * wall_x{power: 1.0} + 23.641240631642486 * push_x{power: 1.0} + 0.0 = dx/dx0{power: 1.0}
+ \ 0.06128413675326383 * vb_x{power: 1.0} + 0.2046984161462389 * vb_y{power: 1.0} + 54.76593908079549 * s{power: 1.0} + 33.442227594724606 * c{power: 1.0} + 25.810465313558282 * push_y{power: 1.0} + -31.48186984874837 * wall_x{power: 1.0} + 0.0 = dy/dx0{power: 1.0} , with objective function values of [0.6372 0.6338 63.74 215.5]
+
+robot 80: spin (phase slope) -1.080 rad/s, EPDE -1.061 / -1.079 rad/s; own propulsion v0 66.8 px/s, theta -22.6 deg
+ / 1.060650360580434 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.0788158648669635 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 0.41767040615229306 * vb_x{power: 1.0} + 24.779517630249952 * push_x{power: 1.0} + 59.58704352196114 * c{power: 1.0} + 61.60344645451423 * wall_x{power: 1.0} + 15.02491156102822 * wall_y{power: 1.0} + 28.386986033643783 * s{power: 1.0} + 2.0647471712659664 = dx/dx0{power: 1.0}
+ \ 0.38634483373848366 * vb_y{power: 1.0} + 63.707845624158324 * s{power: 1.0} + -22.997555451928914 * c{power: 1.0} + 25.27213739780753 * push_y{power: 1.0} + 47.551604552321116 * wall_y{power: 1.0} + 8.490025180257264 * wall_x{power: 1.0} + -4.065259109971904 = dy/dx0{power: 1.0} , with objective function values of [0.5257 0.5526 1082 592.6]
+
+robot 82: spin (phase slope) -0.581 rad/s, EPDE -0.619 / -0.550 rad/s; own propulsion v0 45.0 px/s, theta +56.5 deg
+ / 0.619083581124137 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -0.5495330306293985 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -39.92018553289374 * s{power: 1.0} + 0.348177669333887 * vb_x{power: 1.0} + -0.012377363227682748 * x{power: 1.0} + 19.019244932891993 * push_x{power: 1.0} + -0.005016452230493677 * vb_y{power: 1.0} + 24.16671948058812 * c{power: 1.0} + -3.4828955642558594 = dx/dx0{power: 1.0}
+ \ 17.286615091937122 * push_y{power: 1.0} + 35.21648128108712 * c{power: 1.0} + 25.472832791286027 * s{power: 1.0} + 0.33730543074506053 * vb_y{power: 1.0} + -45.494045978619745 * wall_x{power: 1.0} + -0.027229838739923476 * y{power: 1.0} + -7.056853001127249 = dy/dx0{power: 1.0} , with objective function values of [0.6769 0.6964 5041 290.9]
+
+robot 83: spin (phase slope) -1.993 rad/s, EPDE -1.943 / -1.938 rad/s; own propulsion v0 89.8 px/s, theta -26.6 deg
+ / 1.9433322614803732 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.9380138050806528 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 0.200085201890483 * vb_x{power: 1.0} + 42.295680339942486 * s{power: 1.0} + -0.015118536129500367 * x{power: 1.0} + 23.184669414951408 * push_x{power: 1.0} + 84.51355838136443 * c{power: 1.0} + -0.021038921890563268 * vb_y{power: 1.0} + -0.34490139632122574 = dx/dx0{power: 1.0}
+ \ -38.18805592821909 * c{power: 1.0} + -0.02109629338713366 * y{power: 1.0} + 76.09960548228517 * s{power: 1.0} + 0.2693987411770268 * vb_y{power: 1.0} + 0.012713562110917379 * vb_x{power: 1.0} + 26.355820725377214 * push_y{power: 1.0} + 0.0 = dy/dx0{power: 1.0} , with objective function values of [0.5198 0.547 3.887e+04 7243]

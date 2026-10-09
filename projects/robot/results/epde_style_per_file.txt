@@ -1,0 +1,1283 @@
+Every law per data file, printed the way EPDE prints a system (search.equations()).
+
+Per robot i of a recording (each robot its own system, its own spin and propulsion tokens):
+    dc/dx0 = -w_i s,   ds/dx0 = w_i c                                 (central derivatives)
+    dx/dx0 = a_i c - b_i s + mu_P push_x + mu_W wall_x + a vb_x + c_x   (forward increment, 0.4 s)
+    dy/dx0 = b_i c + a_i s + mu_P push_y + mu_W wall_y + a vb_y + c_y
+a_i + i b_i = v0_i e^{i theta_i} is the robot's OWN propulsion (speed v0_i, direction theta_i from the
+marker heading); mu_P, mu_W, a, c_x, c_y are shared by the robots of the recording (joint least squares).
+Held out (first half -> second half) this per-robot propulsion raises R2 0.17-0.27 -> 0.31-0.63; per-robot
+push / wall / persistence / constants add < 0.03 (scratchpad per_robot_ablation.py).
+Velocity level (0.08 s windows, d^2x/dx0^2 = dv_x/dt) and the noise law (D = squared increment / 2 dt)
+are per recording, read from results/wide_friction.json and results/diffusion.json (exact
+(WAPE, win14) fronts, stable end = least window-unstable member).
+Objective function values: [WAPE of every equation ..., window instability win14 of every equation ...].
+
+python epde_style.py      -> results/epde_style_per_file.txt (+ printed)
+
+
+====================================================================================================
+N1_PWM10 (lone robot): 1 robot(s); shared drift coefficients mu_P 0.0, mu_W 0.0, a 0.2518, c_x -3.014, c_y -1.9
+  own propulsion v0_i median 3.4 px/s [3.4, 3.4], theta_i median -98.5 deg [-98.5, -98.5]
+
+ robot 1: w = +3.396 rad/s, v0 = 3.4 px/s, theta = -98.5 deg
+ / -3.493 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.437 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -0.4975 * c{power: 1.0} + 3.336 * s{power: 1.0} + 0.2518 * vb_x{power: 1.0} + -3.014 = dx/dx0{power: 1.0}
+ \ -3.336 * c{power: 1.0} + -0.4975 * s{power: 1.0} + 0.2518 * vb_y{power: 1.0} + -1.9 = dy/dx0{power: 1.0} , with objective function values of [0.3226 0.3221 0.9633 0.9546 0.002408 0.001736 17.55 21.95]
+
+ velocity level (0.08 s windows), recording-wide:
+  d^2x/dx0^2: 0-th non-dominated level (2 equations; * = stable end)
+   * -3.953 * dx/dx0{power: 1.0} + 0.0 = d^2x/dx0^2{power: 1.0} , with objective function values of [0.9246 0.01548]
+     -4.094 * dx/dx0{power: 1.0} + -0.5552 * x{power: 1.0} + 0.0 = d^2x/dx0^2{power: 1.0} , with objective function values of [0.9231 1.378]
+  d^2y/dx0^2: 0-th non-dominated level (2 equations; * = stable end)
+   * -4.505 * dy/dx0{power: 1.0} + 0.0 = d^2y/dx0^2{power: 1.0} , with objective function values of [0.9036 0.004205]
+     -4.57 * dy/dx0{power: 1.0} + -0.7066 * t{power: 1.0} + 0.0 = d^2y/dx0^2{power: 1.0} , with objective function values of [0.9013 148.9]
+
+====================================================================================================
+N30_PWM10_D41: 30 robot(s); shared drift coefficients mu_P 28.25, mu_W 30.41, a 0.1308, c_x -1.947, c_y -2.826
+  own propulsion v0_i median 55.3 px/s [9.9, 197.1], theta_i median +18.6 deg [-165.4, +148.5]
+
+ robot 11: w = -3.181 rad/s, v0 = 42.2 px/s, theta = +36.0 deg
+ / 3.011 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.099 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 34.16 * c{power: 1.0} + -24.8 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 30.41 * wall_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ 24.8 * c{power: 1.0} + 34.16 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 30.41 * wall_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.3494 0.3446 0.8033 0.7702 0.0008854 0.001448 5.023 0.8319]
+
+ robot 12: w = -2.057 rad/s, v0 = 161.4 px/s, theta = +14.4 deg
+ / 2.121 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.003 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 156.3 * c{power: 1.0} + -40.19 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 30.41 * wall_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ 40.19 * c{power: 1.0} + 156.3 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 30.41 * wall_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.2853 0.286 0.345 0.3427 0.0001884 0.0001377 71.28 2.079]
+
+ robot 17: w = -4.647 rad/s, v0 = 9.9 px/s, theta = +148.5 deg
+ / 4.503 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -4.689 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -8.464 * c{power: 1.0} + -5.179 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 30.41 * wall_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ 5.179 * c{power: 1.0} + -8.464 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 30.41 * wall_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.3539 0.36 0.9409 0.9391 0.0002625 0.000501 38.59 6.113]
+
+ robot 18: w = +4.202 rad/s, v0 = 183.4 px/s, theta = +51.2 deg
+ / -4.154 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 4.157 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 114.8 * c{power: 1.0} + -143.0 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 30.41 * wall_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ 143.0 * c{power: 1.0} + 114.8 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 30.41 * wall_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.2168 0.2178 0.4541 0.4548 0.000101 0.0001274 324.6 3.802]
+
+ robot 19: w = -1.721 rad/s, v0 = 63.1 px/s, theta = +71.1 deg
+ / 1.785 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.884 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 20.4 * c{power: 1.0} + -59.74 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ 59.74 * c{power: 1.0} + 20.4 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.35 0.3528 0.5812 0.5973 0.0004792 0.0002537 7.454 0.9518]
+
+ robot 27: w = +3.853 rad/s, v0 = 120.3 px/s, theta = -46.3 deg
+ / -3.803 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.885 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 83.17 * c{power: 1.0} + 86.89 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 30.41 * wall_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ -86.89 * c{power: 1.0} + 83.17 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 30.41 * wall_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.2347 0.2397 0.5828 0.5487 0.0002259 7.489e-05 3.01 21.39]
+
+ robot 28: w = +3.154 rad/s, v0 = 46.3 px/s, theta = -11.0 deg
+ / -3.288 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.049 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 45.48 * c{power: 1.0} + 8.839 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 30.41 * wall_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ -8.839 * c{power: 1.0} + 45.48 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 30.41 * wall_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.3278 0.332 0.8513 0.7969 0.0001507 0.0001814 2.14 2.455]
+
+ robot 29: w = -1.320 rad/s, v0 = 28.4 px/s, theta = -4.8 deg
+ / 1.347 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.303 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 28.32 * c{power: 1.0} + 2.383 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ -2.383 * c{power: 1.0} + 28.32 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.5975 0.5954 0.8432 0.8554 0.002483 0.00113 23.62 5.843]
+
+ robot 30: w = +3.666 rad/s, v0 = 49.6 px/s, theta = +74.2 deg
+ / -3.644 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.621 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 13.48 * c{power: 1.0} + -47.78 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 30.41 * wall_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ 47.78 * c{power: 1.0} + 13.48 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 30.41 * wall_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.1433 0.1431 0.6727 0.7877 0.0001425 0.0001669 1.976 1.736]
+
+ robot 31: w = +3.198 rad/s, v0 = 55.5 px/s, theta = -31.1 deg
+ / -3.16 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.163 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 47.55 * c{power: 1.0} + 28.63 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ -28.63 * c{power: 1.0} + 47.55 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.2679 0.2708 0.7412 0.7723 0.00015 0.0002251 0.9745 1.317]
+
+ robot 32: w = +3.618 rad/s, v0 = 41.1 px/s, theta = -17.8 deg
+ / -3.416 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.524 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 39.17 * c{power: 1.0} + 12.56 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 30.41 * wall_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ -12.56 * c{power: 1.0} + 39.17 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 30.41 * wall_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.3144 0.3091 0.8534 0.758 0.0006642 0.0002547 16.82 3.728]
+
+ robot 34: w = -4.024 rad/s, v0 = 89.4 px/s, theta = -2.8 deg
+ / 3.979 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.937 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 89.28 * c{power: 1.0} + 4.35 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 30.41 * wall_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ -4.35 * c{power: 1.0} + 89.28 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 30.41 * wall_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.2156 0.2105 0.5955 0.6688 0.0006691 0.0003404 5.506 2.418]
+
+ robot 38: w = +1.909 rad/s, v0 = 25.3 px/s, theta = +28.0 deg
+ / -1.806 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 1.854 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 22.34 * c{power: 1.0} + -11.88 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 30.41 * wall_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ 11.88 * c{power: 1.0} + 22.34 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 30.41 * wall_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.4623 0.4533 0.9075 0.8986 0.003219 0.001595 4.68 4.544]
+
+ robot 41: w = +2.798 rad/s, v0 = 177.4 px/s, theta = +71.0 deg
+ / -2.714 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.9 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 57.71 * c{power: 1.0} + -167.8 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 30.41 * wall_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ 167.8 * c{power: 1.0} + 57.71 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 30.41 * wall_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.2462 0.2371 0.3552 0.3581 0.0004306 0.000326 3.505 38.84]
+
+ robot 42: w = -3.614 rad/s, v0 = 25.5 px/s, theta = -123.5 deg
+ / 3.56 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.578 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -14.11 * c{power: 1.0} + 21.28 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 30.41 * wall_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ -21.28 * c{power: 1.0} + -14.11 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 30.41 * wall_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.2939 0.2994 0.8678 0.9536 0.002768 0.002956 18.29 90.73]
+
+ robot 44: w = -2.788 rad/s, v0 = 21.0 px/s, theta = -165.4 deg
+ / 2.857 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.81 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -20.35 * c{power: 1.0} + 5.305 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 30.41 * wall_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ -5.305 * c{power: 1.0} + -20.35 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 30.41 * wall_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.3514 0.3429 0.9161 0.9087 0.0002375 0.0001784 4.109 13.82]
+
+ robot 45: w = +2.299 rad/s, v0 = 145.3 px/s, theta = -105.4 deg
+ / -2.351 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.325 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -38.66 * c{power: 1.0} + 140.0 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 30.41 * wall_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ -140.0 * c{power: 1.0} + -38.66 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 30.41 * wall_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.2927 0.2882 0.4532 0.4338 0.001477 0.00094 1.489 1.618]
+
+ robot 50: w = +1.990 rad/s, v0 = 46.6 px/s, theta = +117.0 deg
+ / -1.823 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.156 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -21.19 * c{power: 1.0} + -41.52 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 30.41 * wall_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ 41.52 * c{power: 1.0} + -21.19 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 30.41 * wall_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.5298 0.5113 0.7654 0.741 0.001522 0.001069 4.225 6.923]
+
+ robot 52: w = +2.868 rad/s, v0 = 67.5 px/s, theta = -13.3 deg
+ / -2.779 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.768 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 65.73 * c{power: 1.0} + 15.55 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 30.41 * wall_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ -15.55 * c{power: 1.0} + 65.73 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 30.41 * wall_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.2758 0.2774 0.6656 0.7019 0.0007997 0.001142 0.4756 3.811]
+
+ robot 54: w = -2.161 rad/s, v0 = 58.4 px/s, theta = +28.6 deg
+ / 2.173 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.166 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 51.27 * c{power: 1.0} + -27.97 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ 27.97 * c{power: 1.0} + 51.27 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.3639 0.3698 0.6842 0.663 0.0002237 0.0002069 1.285 1.066]
+
+ robot 62: w = +1.272 rad/s, v0 = 66.6 px/s, theta = +79.9 deg
+ / -1.227 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 1.275 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 11.67 * c{power: 1.0} + -65.62 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 30.41 * wall_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ 65.62 * c{power: 1.0} + 11.67 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 30.41 * wall_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.2859 0.2901 0.5054 0.4761 0.001237 0.0006623 35.45 44.5]
+
+ robot 65: w = -3.063 rad/s, v0 = 39.8 px/s, theta = +6.8 deg
+ / 3.069 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.059 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 39.53 * c{power: 1.0} + -4.696 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 30.41 * wall_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ 4.696 * c{power: 1.0} + 39.53 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 30.41 * wall_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.2651 0.2643 0.8371 0.8696 0.0003363 0.0002136 121 28.82]
+
+ robot 66: w = -1.080 rad/s, v0 = 25.0 px/s, theta = +42.0 deg
+ / 1.035 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -0.9237 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 18.6 * c{power: 1.0} + -16.77 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 30.41 * wall_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ 16.77 * c{power: 1.0} + 18.6 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 30.41 * wall_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.7172 0.7258 0.8677 0.864 0.004369 0.002442 7.908 9.32]
+
+ robot 72: w = +4.396 rad/s, v0 = 47.5 px/s, theta = -88.2 deg
+ / -4.41 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 4.293 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 1.473 * c{power: 1.0} + 47.48 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 30.41 * wall_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ -47.48 * c{power: 1.0} + 1.473 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 30.41 * wall_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.1972 0.1964 0.7831 0.8557 0.0001015 0.0001645 82.58 237.1]
+
+ robot 73: w = -0.898 rad/s, v0 = 55.0 px/s, theta = +136.8 deg
+ / 0.8442 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -0.8339 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -40.09 * c{power: 1.0} + -37.67 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ 37.67 * c{power: 1.0} + -40.09 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.6477 0.6503 0.6987 0.6825 0.0004175 0.001823 1.416 3.174]
+
+ robot 74: w = +2.836 rad/s, v0 = 197.1 px/s, theta = +58.1 deg
+ / -2.773 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.865 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 104.2 * c{power: 1.0} + -167.3 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 30.41 * wall_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ 167.3 * c{power: 1.0} + 104.2 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 30.41 * wall_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.2359 0.231 0.3029 0.2812 0.0006296 0.0006853 1.519 5.919]
+
+ robot 77: w = -1.908 rad/s, v0 = 102.7 px/s, theta = -2.1 deg
+ / 1.94 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.868 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 102.7 * c{power: 1.0} + 3.829 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 30.41 * wall_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ -3.829 * c{power: 1.0} + 102.7 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 30.41 * wall_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.4611 0.4529 0.5014 0.5011 0.002418 0.00225 7.095 20.62]
+
+ robot 78: w = +3.755 rad/s, v0 = 77.4 px/s, theta = +22.7 deg
+ / -3.74 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.403 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 71.44 * c{power: 1.0} + -29.91 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 30.41 * wall_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ 29.91 * c{power: 1.0} + 71.44 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 30.41 * wall_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.3636 0.3903 0.6754 0.6828 0.001235 0.0006975 2.324 11.35]
+
+ robot 79: w = -2.594 rad/s, v0 = 47.1 px/s, theta = +49.2 deg
+ / 2.455 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.438 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 30.77 * c{power: 1.0} + -35.65 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ 35.65 * c{power: 1.0} + 30.77 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.3235 0.3249 0.703 0.6902 0.0006999 0.0004236 0.4068 496.2]
+
+ robot 83: w = -2.296 rad/s, v0 = 88.6 px/s, theta = -15.2 deg
+ / 2.375 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.334 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 85.51 * c{power: 1.0} + 23.19 * s{power: 1.0} + 28.25 * push_x{power: 1.0} + 0.1308 * vb_x{power: 1.0} + -1.947 = dx/dx0{power: 1.0}
+ \ -23.19 * c{power: 1.0} + 85.51 * s{power: 1.0} + 28.25 * push_y{power: 1.0} + 0.1308 * vb_y{power: 1.0} + -2.826 = dy/dx0{power: 1.0} , with objective function values of [0.2578 0.2516 0.4733 0.5074 0.001532 0.0009602 1.903 0.5621]
+
+ velocity level (0.08 s windows), recording-wide:
+  d^2x/dx0^2: 0-th non-dominated level (5 equations; * = stable end)
+   * -3.696 * dx/dx0{power: 1.0} + 0.0 = d^2x/dx0^2{power: 1.0} , with objective function values of [0.9472 0.01181]
+     -4.074 * dx/dx0{power: 1.0} + 204.1 * c{power: 1.0} + 0.0 = d^2x/dx0^2{power: 1.0} , with objective function values of [0.9364 0.1016]
+     -4.138 * dx/dx0{power: 1.0} + 179.5 * push_x{power: 1.0} + 203.8 * c{power: 1.0} + 0.0 = d^2x/dx0^2{power: 1.0} , with objective function values of [0.9309 0.1024]
+     -4.159 * dx/dx0{power: 1.0} + 218.2 * push_x{power: 1.0} + 252.5 * wall_x{power: 1.0} + 204.8 * c{power: 1.0} + 0.0 = d^2x/dx0^2{power: 1.0} , with objective function values of [0.9283 0.1197]
+     -2.427 * dx/dx0{power: 1.0} + 188.2 * push_x{power: 1.0} + 198.6 * c{power: 1.0} + -1.376 * dx/dx0{power: 1.0} * n_contact{power: 1.0} + 0.0 = d^2x/dx0^2{power: 1.0} , with objective function values of [0.9177 0.1352]
+  d^2y/dx0^2: 0-th non-dominated level (4 equations; * = stable end)
+   * -3.672 * dy/dx0{power: 1.0} + 0.0 = d^2y/dx0^2{power: 1.0} , with objective function values of [0.9432 0.01171]
+     -4.05 * dy/dx0{power: 1.0} + 202.3 * s{power: 1.0} + 0.0 = d^2y/dx0^2{power: 1.0} , with objective function values of [0.9318 0.09458]
+     -2.321 * dy/dx0{power: 1.0} + 191.7 * s{power: 1.0} + -1.43 * dy/dx0{power: 1.0} * n_contact{power: 1.0} + 0.0 = d^2y/dx0^2{power: 1.0} , with objective function values of [0.9189 0.1304]
+     -2.351 * dy/dx0{power: 1.0} + 162.2 * push_y{power: 1.0} + 196.4 * s{power: 1.0} + -1.481 * dy/dx0{power: 1.0} * n_contact{power: 1.0} + 0.0 = d^2y/dx0^2{power: 1.0} , with objective function values of [0.9122 0.1329]
+ noise (D per axis, px^2/s), recording-wide:
+  D: 0-th non-dominated level (3 equations; * = stable end)
+   * 10.58 * |vb|{power: 1.0} + 0.0 = D{power: 1.0} , with objective function values of [0.7574 0.01172]
+     198.1 * |w|{power: 1.0} + 0.03681 * |vb|{power: 2.0} + 0.0 = D{power: 1.0} , with objective function values of [0.7288 0.06071]
+     -392.8 * wall{power: 1.0} + 166.5 * |w|{power: 1.0} + 10.87 * |vb|{power: 1.0} + -2.661 * n_contact{power: 1.0} * |vb|{power: 1.0} + 0.0 = D{power: 1.0} , with objective function values of [0.7267 0.2097]
+
+====================================================================================================
+N40_PWM10_D40: 40 robot(s); shared drift coefficients mu_P 25.35, mu_W 29.52, a 0.1548, c_x -0.54, c_y -0.9998
+  own propulsion v0_i median 40.1 px/s [6.9, 96.0], theta_i median +17.4 deg [-139.4, +129.9]
+
+ robot 8: w = +2.446 rad/s, v0 = 26.8 px/s, theta = +67.0 deg
+ / -2.474 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.419 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 10.49 * c{power: 1.0} + -24.69 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ 24.69 * c{power: 1.0} + 10.49 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.2391 0.244 0.9007 0.8578 0.0001728 0.0002291 1937 6.433]
+
+ robot 11: w = -3.086 rad/s, v0 = 37.0 px/s, theta = +28.5 deg
+ / 2.942 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.032 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 32.47 * c{power: 1.0} + -17.64 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ 17.64 * c{power: 1.0} + 32.47 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.3639 0.361 0.8337 0.8319 0.001565 0.003144 0.5512 2.853]
+
+ robot 12: w = -2.006 rad/s, v0 = 61.6 px/s, theta = -13.3 deg
+ / 2.029 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.965 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 59.92 * c{power: 1.0} + 14.13 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ -14.13 * c{power: 1.0} + 59.92 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.3158 0.3058 0.6423 0.7445 0.0002571 0.0001722 0.6332 7.326]
+
+ robot 17: w = -4.205 rad/s, v0 = 7.1 px/s, theta = +125.9 deg
+ / 4.255 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -4.212 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -4.167 * c{power: 1.0} + -5.75 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ 5.75 * c{power: 1.0} + -4.167 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.3584 0.3549 0.9559 0.9308 0.000348 0.0003148 9.005 174.3]
+
+ robot 18: w = +4.154 rad/s, v0 = 84.7 px/s, theta = +59.1 deg
+ / -4.232 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 4.187 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 43.47 * c{power: 1.0} + -72.65 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ 72.65 * c{power: 1.0} + 43.47 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.212 0.2141 0.709 0.7271 1.976e-05 2.789e-05 0.9642 37.25]
+
+ robot 19: w = -1.731 rad/s, v0 = 48.5 px/s, theta = +65.9 deg
+ / 1.689 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.744 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 19.81 * c{power: 1.0} + -44.24 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ 44.24 * c{power: 1.0} + 19.81 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.3431 0.3378 0.761 0.6885 0.002368 0.000758 15.86 8.936]
+
+ robot 20: w = -0.698 rad/s, v0 = 20.9 px/s, theta = -30.6 deg
+ / 0.6784 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -0.6225 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 18.02 * c{power: 1.0} + 10.67 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ -10.67 * c{power: 1.0} + 18.02 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.7861 0.7786 0.8987 0.865 0.00281 0.004159 23.77 3.198]
+
+ robot 22: w = +0.811 rad/s, v0 = 45.5 px/s, theta = +23.1 deg
+ / -0.7833 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 0.7885 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 41.8 * c{power: 1.0} + -17.86 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ 17.86 * c{power: 1.0} + 41.8 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.5768 0.5741 0.8044 0.7749 0.002633 0.003316 2.773 11.57]
+
+ robot 27: w = +3.800 rad/s, v0 = 96.0 px/s, theta = -41.7 deg
+ / -3.841 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.748 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 71.65 * c{power: 1.0} + 63.92 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ -63.92 * c{power: 1.0} + 71.65 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.2385 0.237 0.5816 0.5626 0.0007671 0.00138 8.639 3.193]
+
+ robot 28: w = +2.936 rad/s, v0 = 20.4 px/s, theta = -17.0 deg
+ / -2.935 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.88 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 19.53 * c{power: 1.0} + 5.957 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ -5.957 * c{power: 1.0} + 19.53 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.3385 0.3368 0.9207 0.9128 0.001465 0.0001936 28.61 3.029]
+
+ robot 29: w = -1.277 rad/s, v0 = 23.2 px/s, theta = +9.8 deg
+ / 1.279 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.194 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 22.84 * c{power: 1.0} + -3.941 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ 3.941 * c{power: 1.0} + 22.84 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.608 0.6032 0.83 0.8834 0.001669 0.0003886 9608 3.667]
+
+ robot 30: w = +3.536 rad/s, v0 = 30.2 px/s, theta = +99.3 deg
+ / -3.475 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.468 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -4.872 * c{power: 1.0} + -29.77 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ 29.77 * c{power: 1.0} + -4.872 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.1581 0.1575 0.818 0.9265 0.0003213 9.564e-05 3.685 359.3]
+
+ robot 31: w = +3.180 rad/s, v0 = 48.1 px/s, theta = -28.4 deg
+ / -3.151 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.174 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 42.31 * c{power: 1.0} + 22.83 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ -22.83 * c{power: 1.0} + 42.31 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.2783 0.2783 0.767 0.8021 0.0003838 0.00021 8.949 1.4]
+
+ robot 32: w = +3.562 rad/s, v0 = 34.1 px/s, theta = -8.6 deg
+ / -3.57 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.44 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 33.72 * c{power: 1.0} + 5.094 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ -5.094 * c{power: 1.0} + 33.72 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.34 0.3431 0.823 0.8852 0.0002647 9.452e-05 3.76 8.529]
+
+ robot 34: w = -4.031 rad/s, v0 = 55.0 px/s, theta = -10.2 deg
+ / 3.727 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.966 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 54.14 * c{power: 1.0} + 9.725 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ -9.725 * c{power: 1.0} + 54.14 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.2122 0.2089 0.7958 0.7447 0.0002173 0.0001251 6.753 97.26]
+
+ robot 37: w = -1.350 rad/s, v0 = 20.6 px/s, theta = +16.3 deg
+ / 1.336 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.424 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 19.79 * c{power: 1.0} + -5.798 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ 5.798 * c{power: 1.0} + 19.79 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.6281 0.5897 0.8406 0.8945 0.002756 0.00602 131.4 4.451]
+
+ robot 38: w = +1.768 rad/s, v0 = 20.4 px/s, theta = +35.1 deg
+ / -1.552 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 1.722 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 16.72 * c{power: 1.0} + -11.75 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ 11.75 * c{power: 1.0} + 16.72 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.4996 0.4716 0.917 0.911 0.001183 0.001259 7.597 1.784]
+
+ robot 41: w = +2.550 rad/s, v0 = 94.1 px/s, theta = +68.2 deg
+ / -2.525 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.553 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 34.92 * c{power: 1.0} + -87.38 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ 87.38 * c{power: 1.0} + 34.92 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.2715 0.2787 0.5965 0.5738 0.0004613 0.001195 6.595 2.462]
+
+ robot 42: w = -3.456 rad/s, v0 = 10.0 px/s, theta = -139.4 deg
+ / 3.453 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.465 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -7.62 * c{power: 1.0} + 6.539 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ -6.539 * c{power: 1.0} + -7.62 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.2873 0.2965 0.9396 1.055 0.00133 0.003221 1.88 3.043]
+
+ robot 44: w = -2.028 rad/s, v0 = 6.9 px/s, theta = -126.8 deg
+ / 2.128 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.902 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -4.123 * c{power: 1.0} + 5.518 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ -5.518 * c{power: 1.0} + -4.123 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.3792 0.4241 0.9648 0.9369 0.004434 0.00238 1597 10.8]
+
+ robot 45: w = +2.519 rad/s, v0 = 40.6 px/s, theta = -75.3 deg
+ / -2.498 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.442 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 10.34 * c{power: 1.0} + 39.29 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ -39.29 * c{power: 1.0} + 10.34 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.26 0.2639 0.7654 0.8352 5.225e-05 0.000121 1.495 8.853]
+
+ robot 50: w = +1.945 rad/s, v0 = 21.6 px/s, theta = +126.2 deg
+ / -1.844 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 1.805 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -12.76 * c{power: 1.0} + -17.46 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ 17.46 * c{power: 1.0} + -12.76 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.4989 0.495 0.9742 0.8502 0.002172 0.0004349 4.363 2.902]
+
+ robot 52: w = +2.781 rad/s, v0 = 45.4 px/s, theta = -20.4 deg
+ / -2.782 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.799 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 42.59 * c{power: 1.0} + 15.84 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ -15.84 * c{power: 1.0} + 42.59 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.2924 0.2889 0.8024 0.8179 0.0005547 0.0001442 3.647 5.168]
+
+ robot 53: w = -1.749 rad/s, v0 = 22.3 px/s, theta = -30.0 deg
+ / 1.725 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.734 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 19.33 * c{power: 1.0} + 11.16 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ -11.16 * c{power: 1.0} + 19.33 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.4175 0.4279 0.9055 0.891 0.0001481 0.0003019 12.44 219.8]
+
+ robot 54: w = -2.172 rad/s, v0 = 43.7 px/s, theta = +29.2 deg
+ / 1.97 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.047 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 38.16 * c{power: 1.0} + -21.34 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ 21.34 * c{power: 1.0} + 38.16 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.3833 0.3702 0.7948 0.7478 0.001038 0.0004285 15.25 16.86]
+
+ robot 56: w = +4.574 rad/s, v0 = 47.6 px/s, theta = +18.5 deg
+ / -4.587 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 4.474 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 45.18 * c{power: 1.0} + -15.08 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ 15.08 * c{power: 1.0} + 45.18 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.2358 0.2384 0.761 0.8191 0.0004421 0.0001824 95.6 78.49]
+
+ robot 60: w = +2.712 rad/s, v0 = 39.5 px/s, theta = -8.6 deg
+ / -2.696 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.684 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 39.06 * c{power: 1.0} + 5.907 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ -5.907 * c{power: 1.0} + 39.06 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.4795 0.4948 0.7916 0.8297 0.000288 0.00138 3.593 4.65]
+
+ robot 62: w = +1.251 rad/s, v0 = 43.6 px/s, theta = +97.6 deg
+ / -1.302 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 1.283 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -5.747 * c{power: 1.0} + -43.17 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ 43.17 * c{power: 1.0} + -5.747 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.3155 0.3168 0.687 0.6856 0.0003356 0.0008368 0.7611 0.5222]
+
+ robot 65: w = -3.001 rad/s, v0 = 24.8 px/s, theta = -23.5 deg
+ / 3.05 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.922 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 22.78 * c{power: 1.0} + 9.899 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ -9.899 * c{power: 1.0} + 22.78 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.2607 0.2558 0.9253 0.9106 0.0002994 0.000236 9.301 3.908]
+
+ robot 66: w = -1.114 rad/s, v0 = 14.1 px/s, theta = +32.6 deg
+ / 1.208 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.245 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 11.89 * c{power: 1.0} + -7.606 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ 7.606 * c{power: 1.0} + 11.89 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.6881 0.677 0.9699 0.9124 0.0005713 0.000981 1.586 699.6]
+
+ robot 72: w = +4.251 rad/s, v0 = 29.6 px/s, theta = -76.7 deg
+ / -4.331 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 4.208 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 6.807 * c{power: 1.0} + 28.79 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ -28.79 * c{power: 1.0} + 6.807 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.1999 0.1982 0.8874 0.8841 0.0002902 0.0002361 6.282 27.3]
+
+ robot 73: w = -0.917 rad/s, v0 = 41.3 px/s, theta = +129.9 deg
+ / 0.8843 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.016 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -26.52 * c{power: 1.0} + -31.7 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ 31.7 * c{power: 1.0} + -26.52 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.6371 0.6276 0.7417 0.7569 0.00203 0.0003708 1.547e+04 0.4657]
+
+ robot 74: w = +2.292 rad/s, v0 = 68.6 px/s, theta = +83.1 deg
+ / -2.252 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.268 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 8.213 * c{power: 1.0} + -68.14 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ 68.14 * c{power: 1.0} + 8.213 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.2658 0.2625 0.6249 0.6187 0.001948 0.00119 1.672 16.61]
+
+ robot 77: w = -1.863 rad/s, v0 = 49.7 px/s, theta = +5.4 deg
+ / 1.907 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.812 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 49.51 * c{power: 1.0} + -4.697 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ 4.697 * c{power: 1.0} + 49.51 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.4139 0.406 0.7235 0.7955 0.003262 0.002408 2.559 10.21]
+
+ robot 78: w = +3.693 rad/s, v0 = 47.3 px/s, theta = +23.1 deg
+ / -3.626 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.358 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 43.51 * c{power: 1.0} + -18.59 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ 18.59 * c{power: 1.0} + 43.51 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.3495 0.3592 0.7876 0.8205 0.001567 0.000547 8.968 16.45]
+
+ robot 79: w = -2.332 rad/s, v0 = 31.6 px/s, theta = +47.2 deg
+ / 2.367 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.371 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 21.51 * c{power: 1.0} + -23.21 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ 23.21 * c{power: 1.0} + 21.51 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.3413 0.3424 0.8619 0.7601 0.001356 0.0008686 3.356 2.832]
+
+ robot 80: w = -0.631 rad/s, v0 = 52.9 px/s, theta = -8.3 deg
+ / 0.6379 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -0.6236 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 52.32 * c{power: 1.0} + 7.622 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ -7.622 * c{power: 1.0} + 52.32 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.6877 0.6878 0.7483 0.717 0.005284 0.001836 1.84 19.05]
+
+ robot 82: w = -1.299 rad/s, v0 = 64.0 px/s, theta = +52.7 deg
+ / 1.265 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.271 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 38.74 * c{power: 1.0} + -50.88 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ 50.88 * c{power: 1.0} + 38.74 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.5646 0.585 0.6702 0.5851 0.005099 0.003021 1.796 10.7]
+
+ robot 83: w = -2.203 rad/s, v0 = 58.0 px/s, theta = -21.0 deg
+ / 2.169 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.19 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 54.15 * c{power: 1.0} + 20.84 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 29.52 * wall_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ -20.84 * c{power: 1.0} + 54.15 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 29.52 * wall_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.2666 0.262 0.6887 0.6259 0.0002887 0.0001593 6.419 5.311]
+
+ robot 84: w = +3.180 rad/s, v0 = 25.5 px/s, theta = +68.1 deg
+ / -3.107 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.736 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 9.493 * c{power: 1.0} + -23.65 * s{power: 1.0} + 25.35 * push_x{power: 1.0} + 0.1548 * vb_x{power: 1.0} + -0.54 = dx/dx0{power: 1.0}
+ \ 23.65 * c{power: 1.0} + 9.493 * s{power: 1.0} + 25.35 * push_y{power: 1.0} + 0.1548 * vb_y{power: 1.0} + -0.9998 = dy/dx0{power: 1.0} , with objective function values of [0.4312 0.3803 0.8733 0.8612 0.0005315 0.0003027 0.7683 5.301]
+
+ velocity level (0.08 s windows), recording-wide:
+  d^2x/dx0^2: 0-th non-dominated level (5 equations; * = stable end)
+   * -6.599 * dx/dx0{power: 1.0} + 0.0 = d^2x/dx0^2{power: 1.0} , with objective function values of [0.8729 0.001617]
+     -6.965 * dx/dx0{power: 1.0} + 200.4 * c{power: 1.0} + 0.0 = d^2x/dx0^2{power: 1.0} , with objective function values of [0.8629 0.01418]
+     -7.076 * dx/dx0{power: 1.0} + 139.2 * push_x{power: 1.0} + 211.1 * c{power: 1.0} + 0.0 = d^2x/dx0^2{power: 1.0} , with objective function values of [0.8585 0.0173]
+     -7.146 * dx/dx0{power: 1.0} + 208.3 * push_x{power: 1.0} + 250.2 * wall_x{power: 1.0} + 216.1 * c{power: 1.0} + 0.0 = d^2x/dx0^2{power: 1.0} , with objective function values of [0.8545 0.02897]
+     -7.169 * dx/dx0{power: 1.0} + 211.4 * push_x{power: 1.0} + 255.6 * wall_x{power: 1.0} + 216.7 * c{power: 1.0} + -58.49 * s{power: 1.0} + 0.0 = d^2x/dx0^2{power: 1.0} , with objective function values of [0.8528 0.4752]
+  d^2y/dx0^2: 0-th non-dominated level (5 equations; * = stable end)
+   * -6.451 * dy/dx0{power: 1.0} + 0.0 = d^2y/dx0^2{power: 1.0} , with objective function values of [0.8695 0.000833]
+     -6.806 * dy/dx0{power: 1.0} + 225.0 * s{power: 1.0} + 0.0 = d^2y/dx0^2{power: 1.0} , with objective function values of [0.8607 0.01428]
+     -6.989 * dy/dx0{power: 1.0} + 168.0 * push_y{power: 1.0} + 240.0 * s{power: 1.0} + 0.0 = d^2y/dx0^2{power: 1.0} , with objective function values of [0.8548 0.01814]
+     -7.062 * dy/dx0{power: 1.0} + 235.3 * push_y{power: 1.0} + 255.5 * wall_y{power: 1.0} + 241.7 * s{power: 1.0} + 0.0 = d^2y/dx0^2{power: 1.0} , with objective function values of [0.8516 0.02032]
+     -7.114 * dy/dx0{power: 1.0} + 241.3 * push_y{power: 1.0} + 261.9 * wall_y{power: 1.0} + 87.02 * c{power: 1.0} + 243.7 * s{power: 1.0} + 0.0 = d^2y/dx0^2{power: 1.0} , with objective function values of [0.8493 0.2223]
+ noise (D per axis, px^2/s), recording-wide:
+  D: 0-th non-dominated level (4 equations; * = stable end)
+   * 215.2 * |w|{power: 1.0} + 0.0 = D{power: 1.0} , with objective function values of [0.7935 0.003684]
+     138.7 * |w|{power: 1.0} + 2.969 * |vb|{power: 1.0} + 0.0 = D{power: 1.0} , with objective function values of [0.7804 0.01968]
+     205.6 * |w|{power: 1.0} + 2.782 * |vb|{power: 1.0} + -25.08 * n_contact{power: 1.0} * |w|{power: 1.0} + 0.0 = D{power: 1.0} , with objective function values of [0.7763 0.09521]
+     -162.8 * wall{power: 1.0} + 253.7 * |w|{power: 1.0} + 2.694 * |vb|{power: 1.0} + -35.02 * n_contact{power: 1.0} * |w|{power: 1.0} + 0.0 = D{power: 1.0} , with objective function values of [0.7719 0.267]
+
+====================================================================================================
+N40_PWM10_D41: 40 robot(s); shared drift coefficients mu_P 27.59, mu_W 31.97, a 0.2079, c_x -1.054, c_y -0.9609
+  own propulsion v0_i median 45.2 px/s [4.3, 133.0], theta_i median +9.5 deg [-156.4, +143.9]
+
+ robot 8: w = +2.153 rad/s, v0 = 17.0 px/s, theta = +63.3 deg
+ / -2.261 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.163 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 7.627 * c{power: 1.0} + -15.14 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ 15.14 * c{power: 1.0} + 7.627 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.2248 0.2171 0.899 0.9025 0.0002653 0.0003718 0.9619 1.67]
+
+ robot 11: w = -2.909 rad/s, v0 = 46.7 px/s, theta = +42.8 deg
+ / 2.626 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.645 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 34.27 * c{power: 1.0} + -31.76 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ 31.76 * c{power: 1.0} + 34.27 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.4345 0.4365 0.8449 0.7147 0.02237 0.0225 2.498 0.894]
+
+ robot 12: w = -2.317 rad/s, v0 = 45.9 px/s, theta = -10.7 deg
+ / 2.175 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.261 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 45.1 * c{power: 1.0} + 8.538 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ -8.538 * c{power: 1.0} + 45.1 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.2821 0.2638 0.8028 0.766 0.002663 0.001125 9.132 32.35]
+
+ robot 17: w = -3.543 rad/s, v0 = 6.2 px/s, theta = -61.7 deg
+ / 3.419 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.358 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 2.958 * c{power: 1.0} + 5.486 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ -5.486 * c{power: 1.0} + 2.958 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.376 0.3714 0.9468 0.9685 0.006528 0.005169 1.911 603.2]
+
+ robot 18: w = +3.456 rad/s, v0 = 133.0 px/s, theta = +48.9 deg
+ / -3.505 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.415 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 87.46 * c{power: 1.0} + -100.2 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ 100.2 * c{power: 1.0} + 87.46 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.2285 0.2248 0.6486 0.6352 0.00301 0.001501 3817 2.95]
+
+ robot 19: w = -1.476 rad/s, v0 = 40.8 px/s, theta = +64.3 deg
+ / 1.373 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.504 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 17.71 * c{power: 1.0} + -36.77 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ 36.77 * c{power: 1.0} + 17.71 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.3426 0.3369 0.7432 0.7603 0.01324 0.01206 3.287 0.751]
+
+ robot 20: w = -0.408 rad/s, v0 = 4.3 px/s, theta = -22.6 deg
+ / 0.4629 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -0.4604 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 3.938 * c{power: 1.0} + 1.642 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ -1.642 * c{power: 1.0} + 3.938 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.9455 0.9305 1.045 0.9092 0.01275 0.009174 138 117.4]
+
+ robot 22: w = +0.674 rad/s, v0 = 51.7 px/s, theta = +16.7 deg
+ / -0.6658 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 0.6092 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 49.51 * c{power: 1.0} + -14.88 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ 14.88 * c{power: 1.0} + 49.51 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.6324 0.6442 0.7243 0.7431 0.002043 0.007809 16.36 3.057]
+
+ robot 27: w = +3.586 rad/s, v0 = 83.3 px/s, theta = -39.7 deg
+ / -3.535 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.528 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 64.05 * c{power: 1.0} + 53.25 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ -53.25 * c{power: 1.0} + 64.05 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.2519 0.2496 0.6047 0.5777 0.002317 0.002465 2.349 0.3907]
+
+ robot 28: w = +2.803 rad/s, v0 = 40.1 px/s, theta = -21.2 deg
+ / -2.807 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.699 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 37.34 * c{power: 1.0} + 14.48 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ -14.48 * c{power: 1.0} + 37.34 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.3225 0.3225 0.8311 0.7811 0.0007732 0.000694 355 16.4]
+
+ robot 29: w = -0.929 rad/s, v0 = 20.9 px/s, theta = -5.3 deg
+ / 0.9931 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.006 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 20.81 * c{power: 1.0} + 1.918 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ -1.918 * c{power: 1.0} + 20.81 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.7097 0.7111 0.8726 0.8931 0.003451 0.003682 527.5 23.88]
+
+ robot 30: w = +2.980 rad/s, v0 = 44.4 px/s, theta = +62.1 deg
+ / -2.926 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.89 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 20.79 * c{power: 1.0} + -39.27 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ 39.27 * c{power: 1.0} + 20.79 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.1635 0.1646 0.7607 0.8029 0.0006983 0.0008308 1.908 4.094]
+
+ robot 31: w = +2.562 rad/s, v0 = 40.4 px/s, theta = -30.4 deg
+ / -2.47 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.497 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 34.88 * c{power: 1.0} + 20.46 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ -20.46 * c{power: 1.0} + 34.88 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.3156 0.3182 0.8079 0.8613 0.008619 0.006859 4.502 2.207]
+
+ robot 32: w = +3.036 rad/s, v0 = 30.9 px/s, theta = +11.7 deg
+ / -2.918 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.941 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 30.23 * c{power: 1.0} + -6.284 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ 6.284 * c{power: 1.0} + 30.23 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.3339 0.3353 0.8738 0.8578 0.0004679 0.0005202 16.54 17.17]
+
+ robot 34: w = -3.519 rad/s, v0 = 56.6 px/s, theta = -13.6 deg
+ / 3.549 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.526 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 55.04 * c{power: 1.0} + 13.35 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ -13.35 * c{power: 1.0} + 55.04 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.2158 0.2104 0.7416 0.7666 0.001329 0.002336 43.75 13.29]
+
+ robot 36: w = +2.575 rad/s, v0 = 63.6 px/s, theta = +47.9 deg
+ / -2.573 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.564 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 42.64 * c{power: 1.0} + -47.14 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ 47.14 * c{power: 1.0} + 42.64 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.2887 0.2944 0.6364 0.6824 0.003248 0.001965 4.64 68.33]
+
+ robot 37: w = -2.201 rad/s, v0 = 84.2 px/s, theta = -39.9 deg
+ / 2.151 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.094 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 64.61 * c{power: 1.0} + 54.04 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ -54.04 * c{power: 1.0} + 64.61 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.3433 0.3429 0.5815 0.6056 0.004144 0.003283 20.24 18.63]
+
+ robot 38: w = +2.294 rad/s, v0 = 22.3 px/s, theta = -22.7 deg
+ / -2.228 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.231 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 20.53 * c{power: 1.0} + 8.59 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ -8.59 * c{power: 1.0} + 20.53 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.3707 0.3701 0.8618 0.8775 0.0004611 0.0003832 2.874 3.054]
+
+ robot 41: w = +2.837 rad/s, v0 = 124.5 px/s, theta = +77.9 deg
+ / -2.789 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.817 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 26.03 * c{power: 1.0} + -121.7 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ 121.7 * c{power: 1.0} + 26.03 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.2355 0.2416 0.4457 0.4987 0.0008248 0.0007722 34.15 1.102]
+
+ robot 42: w = -3.761 rad/s, v0 = 18.2 px/s, theta = -156.4 deg
+ / 3.683 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.743 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -16.7 * c{power: 1.0} + 7.31 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ -7.31 * c{power: 1.0} + -16.7 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.3115 0.3257 0.8424 0.9522 0.007392 0.007813 3.048 2.542]
+
+ robot 44: w = -2.209 rad/s, v0 = 14.1 px/s, theta = -152.2 deg
+ / 2.192 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.968 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -12.43 * c{power: 1.0} + 6.555 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ -6.555 * c{power: 1.0} + -12.43 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.4195 0.4661 1.032 0.9123 0.00351 0.007689 2.258e+04 2.514]
+
+ robot 45: w = +1.979 rad/s, v0 = 72.2 px/s, theta = -98.2 deg
+ / -1.953 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 1.983 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -10.28 * c{power: 1.0} + 71.42 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ -71.42 * c{power: 1.0} + -10.28 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.2805 0.2781 0.5809 0.6525 0.005191 0.007279 83.51 397.3]
+
+ robot 50: w = +2.009 rad/s, v0 = 22.7 px/s, theta = +143.9 deg
+ / -1.878 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 1.906 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -18.37 * c{power: 1.0} + -13.41 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ 13.41 * c{power: 1.0} + -18.37 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.5525 0.5491 0.8636 0.9095 0.001253 0.001273 28.37 240.8]
+
+ robot 52: w = +2.086 rad/s, v0 = 38.7 px/s, theta = -30.1 deg
+ / -2.163 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.068 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 33.49 * c{power: 1.0} + 19.39 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ -19.39 * c{power: 1.0} + 33.49 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.4064 0.4126 0.8019 0.8217 0.001075 0.001728 11.07 17.59]
+
+ robot 53: w = -0.763 rad/s, v0 = 17.4 px/s, theta = -66.7 deg
+ / 0.7507 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -0.7167 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 6.887 * c{power: 1.0} + 16.0 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ -16.0 * c{power: 1.0} + 6.887 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.7814 0.7915 0.8746 1.037 0.008513 0.002762 1.569 5.726]
+
+ robot 54: w = -2.007 rad/s, v0 = 35.3 px/s, theta = +7.7 deg
+ / 1.96 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.991 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 34.99 * c{power: 1.0} + -4.736 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ 4.736 * c{power: 1.0} + 34.99 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.4381 0.4444 0.7886 0.7768 0.01199 0.008118 4.007 16.11]
+
+ robot 56: w = +4.006 rad/s, v0 = 76.7 px/s, theta = +15.2 deg
+ / -3.849 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.941 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 73.99 * c{power: 1.0} + -20.14 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ 20.14 * c{power: 1.0} + 73.99 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.2424 0.2421 0.6692 0.7501 0.0004845 0.0004546 1.555 2.171]
+
+ robot 60: w = +2.774 rad/s, v0 = 46.1 px/s, theta = +26.2 deg
+ / -2.88 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.581 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 41.38 * c{power: 1.0} + -20.36 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ 20.36 * c{power: 1.0} + 41.38 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.4149 0.4316 0.84 0.7626 0.005651 0.008264 0.8576 5.186]
+
+ robot 62: w = +2.003 rad/s, v0 = 70.0 px/s, theta = +97.4 deg
+ / -1.902 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 1.95 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -8.985 * c{power: 1.0} + -69.4 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ 69.4 * c{power: 1.0} + -8.985 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.287 0.2918 0.5835 0.6093 0.002535 0.002142 3.717 3.209]
+
+ robot 65: w = -2.617 rad/s, v0 = 15.4 px/s, theta = -25.8 deg
+ / 2.578 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.618 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 13.91 * c{power: 1.0} + 6.716 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ -6.716 * c{power: 1.0} + 13.91 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.2663 0.2711 0.9826 0.8907 0.005278 0.004929 41.22 29.86]
+
+ robot 66: w = -1.164 rad/s, v0 = 18.2 px/s, theta = +29.2 deg
+ / 0.9404 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.093 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 15.85 * c{power: 1.0} + -8.851 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ 8.851 * c{power: 1.0} + 15.85 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.7212 0.7112 0.9434 0.9123 0.009059 0.008629 36.86 20.28]
+
+ robot 72: w = +4.129 rad/s, v0 = 34.7 px/s, theta = -47.3 deg
+ / -4.089 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 4.022 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 23.55 * c{power: 1.0} + 25.49 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ -25.49 * c{power: 1.0} + 23.55 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.2181 0.2175 0.8496 0.893 0.003222 0.003303 4.153 52.88]
+
+ robot 73: w = -1.009 rad/s, v0 = 6.9 px/s, theta = +48.7 deg
+ / 0.9887 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.056 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 4.548 * c{power: 1.0} + -5.18 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ 5.18 * c{power: 1.0} + 4.548 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.5054 0.498 0.9529 0.904 0.003068 0.001096 16.42 112.4]
+
+ robot 74: w = +1.394 rad/s, v0 = 59.2 px/s, theta = +58.2 deg
+ / -1.427 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 1.396 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 31.14 * c{power: 1.0} + -50.33 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ 50.33 * c{power: 1.0} + 31.14 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.2865 0.2777 0.6465 0.699 0.002602 0.002358 0.7043 14.39]
+
+ robot 77: w = -1.428 rad/s, v0 = 53.7 px/s, theta = +11.7 deg
+ / 1.389 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.441 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 52.55 * c{power: 1.0} + -10.93 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ 10.93 * c{power: 1.0} + 52.55 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.4305 0.4322 0.6883 0.7337 0.006953 0.006945 15.62 3.425]
+
+ robot 78: w = +2.771 rad/s, v0 = 50.6 px/s, theta = +11.2 deg
+ / -2.799 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.863 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 49.61 * c{power: 1.0} + -9.857 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ 9.857 * c{power: 1.0} + 49.61 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.3816 0.389 0.7524 0.7818 0.006558 0.007691 8.211 13.06]
+
+ robot 79: w = -2.023 rad/s, v0 = 57.1 px/s, theta = +26.4 deg
+ / 2.008 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.975 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 51.15 * c{power: 1.0} + -25.4 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ 25.4 * c{power: 1.0} + 51.15 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.2832 0.2786 0.6612 0.6445 0.006021 0.00725 3.189 2.429]
+
+ robot 80: w = -1.080 rad/s, v0 = 85.0 px/s, theta = -17.9 deg
+ / 1.068 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.039 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 80.9 * c{power: 1.0} + 26.19 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ -26.19 * c{power: 1.0} + 80.9 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.4185 0.4139 0.5494 0.5715 0.01747 0.01558 3.1 3.343]
+
+ robot 82: w = -0.581 rad/s, v0 = 56.0 px/s, theta = +60.2 deg
+ / 0.6704 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -0.515 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 27.83 * c{power: 1.0} + -48.56 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 31.97 * wall_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ 48.56 * c{power: 1.0} + 27.83 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 31.97 * wall_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.8394 0.8555 0.695 0.7195 0.03359 0.01641 3.795 17.74]
+
+ robot 83: w = -1.993 rad/s, v0 = 91.0 px/s, theta = -24.0 deg
+ / 1.901 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.848 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 83.14 * c{power: 1.0} + 37.02 * s{power: 1.0} + 27.59 * push_x{power: 1.0} + 0.2079 * vb_x{power: 1.0} + -1.054 = dx/dx0{power: 1.0}
+ \ -37.02 * c{power: 1.0} + 83.14 * s{power: 1.0} + 27.59 * push_y{power: 1.0} + 0.2079 * vb_y{power: 1.0} + -0.9609 = dy/dx0{power: 1.0} , with objective function values of [0.3068 0.3125 0.523 0.55 0.01778 0.01758 11.56 1.722]
+
+ velocity level (0.08 s windows), recording-wide:
+  d^2x/dx0^2: 0-th non-dominated level (4 equations; * = stable end)
+   * -5.106 * dx/dx0{power: 1.0} + 0.0 = d^2x/dx0^2{power: 1.0} , with objective function values of [0.9067 0.002644]
+     -5.598 * dx/dx0{power: 1.0} + 231.1 * c{power: 1.0} + 0.0 = d^2x/dx0^2{power: 1.0} , with objective function values of [0.8957 0.04215]
+     -5.791 * dx/dx0{power: 1.0} + 207.4 * push_x{power: 1.0} + 218.0 * wall_x{power: 1.0} + 259.3 * c{power: 1.0} + 0.0 = d^2x/dx0^2{power: 1.0} , with objective function values of [0.8868 0.05587]
+     -3.434 * dx/dx0{power: 1.0} + 155.9 * push_x{power: 1.0} + 253.8 * c{power: 1.0} + -1.123 * dx/dx0{power: 1.0} * n_contact{power: 1.0} + 0.0 = d^2x/dx0^2{power: 1.0} , with objective function values of [0.8839 0.0748]
+  d^2y/dx0^2: 0-th non-dominated level (4 equations; * = stable end)
+   * -5.47 * dy/dx0{power: 1.0} + 0.0 = d^2y/dx0^2{power: 1.0} , with objective function values of [0.9 0.001636]
+     -5.927 * dy/dx0{power: 1.0} + 220.5 * s{power: 1.0} + 0.0 = d^2y/dx0^2{power: 1.0} , with objective function values of [0.8885 0.02703]
+     -6.076 * dy/dx0{power: 1.0} + 170.8 * push_y{power: 1.0} + 244.0 * s{power: 1.0} + 0.0 = d^2y/dx0^2{power: 1.0} , with objective function values of [0.8828 0.02932]
+     -3.87 * dy/dx0{power: 1.0} + 174.9 * push_y{power: 1.0} + 243.3 * s{power: 1.0} + -1.066 * dy/dx0{power: 1.0} * n_contact{power: 1.0} + 0.0 = d^2y/dx0^2{power: 1.0} , with objective function values of [0.8764 0.03784]
+ noise (D per axis, px^2/s), recording-wide:
+  D: 0-th non-dominated level (3 equations; * = stable end)
+   * 7.517 * |vb|{power: 1.0} + 0.0 = D{power: 1.0} , with objective function values of [0.8033 0.00504]
+     155.3 * |w|{power: 1.0} + 4.323 * |vb|{power: 1.0} + 0.0 = D{power: 1.0} , with objective function values of [0.7996 0.02549]
+     174.8 * |w|{power: 1.0} + 6.354 * |vb|{power: 1.0} + -1.862 * n_contact{power: 1.0} * r/R{power: 1.0} * |vb|{power: 1.0} + 0.0 = D{power: 1.0} , with objective function values of [0.7877 0.08029]
+
+====================================================================================================
+N40_PWM20_D40: 40 robot(s); shared drift coefficients mu_P 31.02, mu_W 35.91, a -0.01954, c_x -0.7657, c_y -0.5514
+  own propulsion v0_i median 40.2 px/s [3.6, 94.6], theta_i median +4.2 deg [-70.4, +125.9]
+
+ robot 8: w = +3.581 rad/s, v0 = 40.1 px/s, theta = +82.9 deg
+ / -3.5 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.498 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 4.919 * c{power: 1.0} + -39.77 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ 39.77 * c{power: 1.0} + 4.919 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.2765 0.2787 0.8854 0.8488 0.0004976 0.001392 10.6 26.15]
+
+ robot 11: w = -4.027 rad/s, v0 = 71.2 px/s, theta = +2.2 deg
+ / 4.086 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.888 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 71.16 * c{power: 1.0} + -2.765 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ 2.765 * c{power: 1.0} + 71.16 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.3033 0.3066 0.7985 0.7518 0.0006823 0.000266 2.929 61.67]
+
+ robot 12: w = -2.640 rad/s, v0 = 39.9 px/s, theta = -9.2 deg
+ / 2.56 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.561 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 39.4 * c{power: 1.0} + 6.384 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + 35.91 * wall_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ -6.384 * c{power: 1.0} + 39.4 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + 35.91 * wall_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.3545 0.3523 0.9238 0.8614 0.001253 0.001319 9.429 66.76]
+
+ robot 17: w = -5.936 rad/s, v0 = 16.9 px/s, theta = +42.1 deg
+ / 5.813 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -5.868 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 12.54 * c{power: 1.0} + -11.33 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ 11.33 * c{power: 1.0} + 12.54 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.3142 0.3174 0.926 0.8984 0.0006383 0.0003048 6.534 962.9]
+
+ robot 18: w = +5.626 rad/s, v0 = 67.7 px/s, theta = +81.1 deg
+ / -5.441 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 5.826 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 10.46 * c{power: 1.0} + -66.88 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ 66.88 * c{power: 1.0} + 10.46 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.2135 0.2148 0.8082 0.7677 0.0001126 8.692e-05 5.484 8.806]
+
+ robot 19: w = -2.660 rad/s, v0 = 52.4 px/s, theta = +37.1 deg
+ / 2.68 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.695 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 41.77 * c{power: 1.0} + -31.65 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + 35.91 * wall_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ 31.65 * c{power: 1.0} + 41.77 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + 35.91 * wall_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.3838 0.3753 0.841 0.8079 0.0002709 0.0002177 14.42 517.9]
+
+ robot 20: w = -1.614 rad/s, v0 = 49.9 px/s, theta = -39.6 deg
+ / 1.685 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.34 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 38.42 * c{power: 1.0} + 31.84 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + 35.91 * wall_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ -31.84 * c{power: 1.0} + 38.42 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + 35.91 * wall_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.6931 0.6796 0.8614 0.8187 0.002233 0.002959 1.455 2.085]
+
+ robot 22: w = +1.056 rad/s, v0 = 41.6 px/s, theta = +33.3 deg
+ / -1.097 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 1.191 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 34.78 * c{power: 1.0} + -22.8 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + 35.91 * wall_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ 22.8 * c{power: 1.0} + 34.78 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + 35.91 * wall_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.7218 0.7231 0.896 0.8792 0.003342 0.002727 26.12 89.72]
+
+ robot 27: w = +5.030 rad/s, v0 = 94.6 px/s, theta = -34.9 deg
+ / -5.047 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 4.983 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 77.56 * c{power: 1.0} + 54.17 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + 35.91 * wall_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ -54.17 * c{power: 1.0} + 77.56 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + 35.91 * wall_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.2544 0.2516 0.6616 0.6655 0.0001336 0.0001391 12.16 1657]
+
+ robot 28: w = +4.318 rad/s, v0 = 22.7 px/s, theta = -4.4 deg
+ / -4.452 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 4.332 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 22.66 * c{power: 1.0} + 1.743 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + 35.91 * wall_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ -1.743 * c{power: 1.0} + 22.66 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + 35.91 * wall_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.3292 0.3214 0.9384 0.9024 0.000544 0.0001754 7.926 3.45]
+
+ robot 29: w = -2.774 rad/s, v0 = 25.6 px/s, theta = +61.0 deg
+ / 2.773 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.627 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 12.4 * c{power: 1.0} + -22.38 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + 35.91 * wall_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ 22.38 * c{power: 1.0} + 12.4 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + 35.91 * wall_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.5324 0.5472 0.96 0.8867 0.001941 0.00285 0.7333 1.285]
+
+ robot 30: w = +5.288 rad/s, v0 = 33.5 px/s, theta = +101.0 deg
+ / -5.181 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 5.277 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -6.421 * c{power: 1.0} + -32.9 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + 35.91 * wall_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ 32.9 * c{power: 1.0} + -6.421 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + 35.91 * wall_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.1675 0.1733 0.8483 0.9323 0.000176 0.0002743 8.836 1.198]
+
+ robot 31: w = +4.561 rad/s, v0 = 25.2 px/s, theta = -44.3 deg
+ / -4.548 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 4.594 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 18.01 * c{power: 1.0} + 17.57 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + 35.91 * wall_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ -17.57 * c{power: 1.0} + 18.01 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + 35.91 * wall_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.2901 0.2916 0.8937 0.9271 0.0006458 0.0008776 10.92 2.032]
+
+ robot 32: w = +4.610 rad/s, v0 = 29.2 px/s, theta = +3.4 deg
+ / -4.574 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 4.496 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 29.14 * c{power: 1.0} + -1.73 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + 35.91 * wall_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ 1.73 * c{power: 1.0} + 29.14 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + 35.91 * wall_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.3447 0.357 0.9051 0.8963 0.0003654 0.0002087 8.918 1.248]
+
+ robot 34: w = -5.565 rad/s, v0 = 41.9 px/s, theta = -18.6 deg
+ / 5.592 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -5.557 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 39.7 * c{power: 1.0} + 13.39 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + 35.91 * wall_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ -13.39 * c{power: 1.0} + 39.7 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + 35.91 * wall_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.2187 0.216 0.8458 0.8056 0.0003483 0.0005498 0.9106 1.122]
+
+ robot 37: w = -2.426 rad/s, v0 = 11.5 px/s, theta = -6.4 deg
+ / 2.272 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.47 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 11.38 * c{power: 1.0} + 1.27 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + 35.91 * wall_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ -1.27 * c{power: 1.0} + 11.38 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + 35.91 * wall_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.5776 0.5549 0.9158 0.9784 0.001066 0.001079 45.94 1.681]
+
+ robot 38: w = +3.238 rad/s, v0 = 28.1 px/s, theta = +94.1 deg
+ / -3.398 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.326 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -1.993 * c{power: 1.0} + -27.99 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + 35.91 * wall_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ 27.99 * c{power: 1.0} + -1.993 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + 35.91 * wall_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.3994 0.3886 0.9141 0.9048 0.0006557 0.00224 2967 25.41]
+
+ robot 41: w = +3.666 rad/s, v0 = 79.4 px/s, theta = +73.8 deg
+ / -3.694 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.717 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 22.21 * c{power: 1.0} + -76.22 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + 35.91 * wall_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ 76.22 * c{power: 1.0} + 22.21 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + 35.91 * wall_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.2259 0.2301 0.7269 0.6682 0.001055 0.0004305 1.036 719.2]
+
+ robot 42: w = -5.332 rad/s, v0 = 17.9 px/s, theta = +2.1 deg
+ / 5.335 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -5.458 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 17.93 * c{power: 1.0} + -0.6503 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + 35.91 * wall_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ 0.6503 * c{power: 1.0} + 17.93 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + 35.91 * wall_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.2877 0.2954 0.942 0.9 0.0003469 0.001464 5.884 1.389]
+
+ robot 44: w = -3.794 rad/s, v0 = 3.6 px/s, theta = -60.7 deg
+ / 3.786 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.899 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 1.783 * c{power: 1.0} + 3.171 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ -3.171 * c{power: 1.0} + 1.783 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.2966 0.3032 0.9803 0.9512 0.0003617 0.0007801 1126 442.2]
+
+ robot 45: w = +5.072 rad/s, v0 = 53.1 px/s, theta = -70.4 deg
+ / -5.102 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 4.973 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 17.82 * c{power: 1.0} + 50.07 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + 35.91 * wall_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ -50.07 * c{power: 1.0} + 17.82 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + 35.91 * wall_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.2189 0.2148 0.7869 0.8189 0.0005132 0.0001689 8.924 0.6078]
+
+ robot 50: w = +3.039 rad/s, v0 = 22.1 px/s, theta = +125.9 deg
+ / -3.01 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.128 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -12.94 * c{power: 1.0} + -17.91 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + 35.91 * wall_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ 17.91 * c{power: 1.0} + -12.94 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + 35.91 * wall_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.4295 0.4329 0.8903 0.981 0.001725 0.0005672 14.19 1.469]
+
+ robot 52: w = +3.685 rad/s, v0 = 49.7 px/s, theta = -13.7 deg
+ / -3.693 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.704 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 48.23 * c{power: 1.0} + 11.79 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + 35.91 * wall_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ -11.79 * c{power: 1.0} + 48.23 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + 35.91 * wall_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.3 0.2948 0.8394 0.8308 0.001517 0.0005395 87.01 1.924]
+
+ robot 53: w = -2.997 rad/s, v0 = 41.0 px/s, theta = -63.8 deg
+ / 2.953 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.099 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 18.1 * c{power: 1.0} + 36.77 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ -36.77 * c{power: 1.0} + 18.1 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.3498 0.3568 0.8572 0.8316 0.0009758 0.0002155 1.092 2.071]
+
+ robot 54: w = -3.565 rad/s, v0 = 53.3 px/s, theta = -2.1 deg
+ / 3.71 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.373 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 53.24 * c{power: 1.0} + 1.929 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + 35.91 * wall_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ -1.929 * c{power: 1.0} + 53.24 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + 35.91 * wall_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.3971 0.4011 0.8304 0.8146 0.0009639 0.0002415 18.68 332.3]
+
+ robot 56: w = +6.614 rad/s, v0 = 47.8 px/s, theta = +23.7 deg
+ / -6.487 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 6.561 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 43.81 * c{power: 1.0} + -19.22 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ 19.22 * c{power: 1.0} + 43.81 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.2019 0.2099 0.8376 0.8276 9.17e-05 4.586e-05 17.73 3999]
+
+ robot 60: w = +4.056 rad/s, v0 = 35.7 px/s, theta = +10.2 deg
+ / -3.978 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 4.036 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 35.14 * c{power: 1.0} + -6.296 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ 6.296 * c{power: 1.0} + 35.14 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.3961 0.3877 0.8928 0.8917 0.0009669 0.0009984 3.708e+04 1.643]
+
+ robot 62: w = +2.319 rad/s, v0 = 43.6 px/s, theta = +110.9 deg
+ / -2.355 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.316 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -15.53 * c{power: 1.0} + -40.74 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + 35.91 * wall_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ 40.74 * c{power: 1.0} + -15.53 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + 35.91 * wall_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.333 0.3347 0.7482 0.9772 0.0002755 0.000299 1.167 4.751]
+
+ robot 65: w = -4.579 rad/s, v0 = 29.5 px/s, theta = -13.3 deg
+ / 4.423 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -4.512 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 28.68 * c{power: 1.0} + 6.791 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + 35.91 * wall_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ -6.791 * c{power: 1.0} + 28.68 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + 35.91 * wall_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.2826 0.2784 0.8721 0.9009 0.0002801 0.0002827 8.014 2.261]
+
+ robot 66: w = -2.259 rad/s, v0 = 31.1 px/s, theta = +2.6 deg
+ / 2.039 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.362 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 31.03 * c{power: 1.0} + -1.396 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ 1.396 * c{power: 1.0} + 31.03 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.5882 0.5913 0.9121 0.8926 0.001853 0.002225 52.48 6.644]
+
+ robot 72: w = +6.435 rad/s, v0 = 23.8 px/s, theta = -49.2 deg
+ / -6.224 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 6.305 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 15.55 * c{power: 1.0} + 18.05 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ -18.05 * c{power: 1.0} + 15.55 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.2165 0.2182 0.8832 0.8906 0.0004763 0.0005243 1.315 1.292]
+
+ robot 73: w = -1.530 rad/s, v0 = 28.3 px/s, theta = +108.1 deg
+ / 1.587 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.522 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -8.769 * c{power: 1.0} + -26.91 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + 35.91 * wall_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ 26.91 * c{power: 1.0} + -8.769 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + 35.91 * wall_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.6739 0.6618 0.8577 0.9681 0.00247 0.004344 5.186 0.987]
+
+ robot 74: w = +3.265 rad/s, v0 = 76.2 px/s, theta = +90.0 deg
+ / -3.323 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.368 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 0.04821 * c{power: 1.0} + -76.2 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ 76.2 * c{power: 1.0} + 0.04821 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.2374 0.245 0.7237 0.6647 0.0003201 0.0007339 24.47 205.5]
+
+ robot 77: w = -3.166 rad/s, v0 = 63.6 px/s, theta = +6.0 deg
+ / 3.127 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.201 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 63.23 * c{power: 1.0} + -6.678 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ 6.678 * c{power: 1.0} + 63.23 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.3534 0.3567 0.7964 0.7659 0.0007071 0.0001568 45.1 16.38]
+
+ robot 78: w = +5.042 rad/s, v0 = 46.1 px/s, theta = +20.3 deg
+ / -4.953 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 4.978 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 43.26 * c{power: 1.0} + -16.0 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ 16.0 * c{power: 1.0} + 43.26 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.351 0.3531 0.8512 0.8624 0.001023 0.0007382 30.28 0.7586]
+
+ robot 79: w = -3.681 rad/s, v0 = 21.1 px/s, theta = +4.9 deg
+ / 3.731 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.78 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 21.02 * c{power: 1.0} + -1.811 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + 35.91 * wall_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ 1.811 * c{power: 1.0} + 21.02 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + 35.91 * wall_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.3598 0.3801 0.9578 0.8999 0.001231 0.002031 49.92 860.4]
+
+ robot 80: w = -1.244 rad/s, v0 = 40.3 px/s, theta = -27.4 deg
+ / 1.089 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.137 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 35.73 * c{power: 1.0} + 18.53 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ -18.53 * c{power: 1.0} + 35.73 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.7728 0.7311 0.8987 0.8923 0.01035 0.002375 202.3 58.64]
+
+ robot 82: w = -2.087 rad/s, v0 = 82.0 px/s, theta = +49.5 deg
+ / 2.149 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.184 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 53.27 * c{power: 1.0} + -62.37 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ 62.37 * c{power: 1.0} + 53.27 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.4636 0.4643 0.703 0.7439 0.001595 0.0007784 0.6329 17.04]
+
+ robot 83: w = -3.757 rad/s, v0 = 76.5 px/s, theta = -34.5 deg
+ / 3.633 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.634 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 63.03 * c{power: 1.0} + 43.29 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ -43.29 * c{power: 1.0} + 63.03 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.242 0.2405 0.6721 0.7378 0.0001221 0.0005758 1.855 1.593]
+
+ robot 84: w = +4.780 rad/s, v0 = 21.2 px/s, theta = +61.0 deg
+ / -4.323 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 5.036 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 10.31 * c{power: 1.0} + -18.57 * s{power: 1.0} + 31.02 * push_x{power: 1.0} + -0.01954 * vb_x{power: 1.0} + -0.7657 = dx/dx0{power: 1.0}
+ \ 18.57 * c{power: 1.0} + 10.31 * s{power: 1.0} + 31.02 * push_y{power: 1.0} + -0.01954 * vb_y{power: 1.0} + -0.5514 = dy/dx0{power: 1.0} , with objective function values of [0.3743 0.3047 0.9252 0.9224 0.000278 0.0004646 1.925 42.23]
+
+ velocity level (0.08 s windows), recording-wide:
+  d^2x/dx0^2: 0-th non-dominated level (4 equations; * = stable end)
+   * -7.76 * dx/dx0{power: 1.0} + 0.0 = d^2x/dx0^2{power: 1.0} , with objective function values of [0.8497 0.0002458]
+     -8.148 * dx/dx0{power: 1.0} + 465.1 * push_x{power: 1.0} + 514.5 * wall_x{power: 1.0} + 0.0 = d^2x/dx0^2{power: 1.0} , with objective function values of [0.8334 0.003491]
+     -8.398 * dx/dx0{power: 1.0} + 479.2 * push_x{power: 1.0} + 527.6 * wall_x{power: 1.0} + 231.7 * c{power: 1.0} + 0.0 = d^2x/dx0^2{power: 1.0} , with objective function values of [0.8246 0.0198]
+     -8.439 * dx/dx0{power: 1.0} + 485.5 * push_x{power: 1.0} + 533.5 * wall_x{power: 1.0} + 232.4 * c{power: 1.0} + -110.7 * s{power: 1.0} + 0.0 = d^2x/dx0^2{power: 1.0} , with objective function values of [0.8233 0.2649]
+  d^2y/dx0^2: 0-th non-dominated level (3 equations; * = stable end)
+   * -7.762 * dy/dx0{power: 1.0} + 0.0 = d^2y/dx0^2{power: 1.0} , with objective function values of [0.8451 0.0006914]
+     -8.504 * dy/dx0{power: 1.0} + 479.4 * push_y{power: 1.0} + 484.8 * wall_y{power: 1.0} + 301.6 * s{power: 1.0} + 0.0 = d^2y/dx0^2{power: 1.0} , with objective function values of [0.8188 0.01146]
+     -8.531 * dy/dx0{power: 1.0} + 485.3 * push_y{power: 1.0} + 490.4 * wall_y{power: 1.0} + 82.24 * c{power: 1.0} + 303.4 * s{power: 1.0} + 0.0 = d^2y/dx0^2{power: 1.0} , with objective function values of [0.8178 0.3973]
+ noise (D per axis, px^2/s), recording-wide:
+  D: 0-th non-dominated level (3 equations; * = stable end)
+   * 208.8 * |w|{power: 1.0} + 0.0 = D{power: 1.0} , with objective function values of [0.7756 0.002718]
+     138.3 * |w|{power: 1.0} + 3.353 * |vb|{power: 1.0} + 0.0 = D{power: 1.0} , with objective function values of [0.7683 0.02575]
+     -164.3 * wall{power: 1.0} + 370.1 * |w|{power: 1.0} + 1.985 * |vb|{power: 1.0} + -40.17 * |w|{power: 2.0} + 0.0 = D{power: 1.0} , with objective function values of [0.7646 0.1515]
+
+====================================================================================================
+N40_PWM20_D41: 40 robot(s); shared drift coefficients mu_P 34.75, mu_W 38.47, a 0.02711, c_x -1.037, c_y -0.7992
+  own propulsion v0_i median 45.3 px/s [10.1, 117.7], theta_i median +6.0 deg [-103.0, +126.4]
+
+ robot 8: w = +3.258 rad/s, v0 = 36.3 px/s, theta = +74.2 deg
+ / -3.311 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.286 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 9.886 * c{power: 1.0} + -34.97 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ 34.97 * c{power: 1.0} + 9.886 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.2675 0.2617 0.8318 0.9279 7.282e-05 7.602e-05 10.63 6.472]
+
+ robot 11: w = -3.799 rad/s, v0 = 82.4 px/s, theta = +6.4 deg
+ / 4.056 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.774 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 81.86 * c{power: 1.0} + -9.175 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ 9.175 * c{power: 1.0} + 81.86 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.3091 0.3043 0.7533 0.7585 0.0006669 0.0007988 10.9 302.4]
+
+ robot 12: w = -3.421 rad/s, v0 = 68.6 px/s, theta = -5.8 deg
+ / 3.444 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.411 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 68.29 * c{power: 1.0} + 6.935 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ -6.935 * c{power: 1.0} + 68.29 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.2676 0.2642 0.7877 0.7737 0.0002183 0.0008739 4.073 8.939]
+
+ robot 17: w = -5.837 rad/s, v0 = 15.5 px/s, theta = +35.2 deg
+ / 5.682 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -5.594 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 12.64 * c{power: 1.0} + -8.914 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ 8.914 * c{power: 1.0} + 12.64 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.3167 0.3174 0.9153 0.9316 0.001572 0.001106 9.566 200.4]
+
+ robot 18: w = +5.466 rad/s, v0 = 99.8 px/s, theta = +74.9 deg
+ / -5.319 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 5.257 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 25.99 * c{power: 1.0} + -96.36 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ 96.36 * c{power: 1.0} + 25.99 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.2088 0.2093 0.7452 0.6917 0.0005239 0.0002726 27.61 37.36]
+
+ robot 19: w = -2.657 rad/s, v0 = 49.9 px/s, theta = +36.1 deg
+ / 2.489 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.559 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 40.33 * c{power: 1.0} + -29.42 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ 29.42 * c{power: 1.0} + 40.33 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.3459 0.3382 0.7702 0.9479 0.0008927 0.0005966 5.42 2.012]
+
+ robot 20: w = -0.710 rad/s, v0 = 41.2 px/s, theta = -31.1 deg
+ / 0.7847 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -0.811 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 35.27 * c{power: 1.0} + 21.29 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ -21.29 * c{power: 1.0} + 35.27 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.9285 0.9188 0.9465 0.8447 0.01057 0.008477 5843 8.201]
+
+ robot 22: w = +1.006 rad/s, v0 = 56.1 px/s, theta = +33.4 deg
+ / -1.031 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 1.045 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 46.88 * c{power: 1.0} + -30.9 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ 30.9 * c{power: 1.0} + 46.88 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.7317 0.7083 0.8208 0.8228 0.004703 0.005124 2.743e+07 2.197]
+
+ robot 27: w = +4.923 rad/s, v0 = 100.8 px/s, theta = -34.3 deg
+ / -4.786 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 4.953 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 83.3 * c{power: 1.0} + 56.76 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ -56.76 * c{power: 1.0} + 83.3 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.2601 0.2548 0.6758 0.6394 0.0001827 8.083e-05 7.029 10.65]
+
+ robot 28: w = +4.030 rad/s, v0 = 29.2 px/s, theta = -5.4 deg
+ / -4.208 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 4.039 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 29.12 * c{power: 1.0} + 2.736 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ -2.736 * c{power: 1.0} + 29.12 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.3445 0.3441 0.9089 0.8884 0.0005753 0.001547 8.522e+04 870.5]
+
+ robot 29: w = -2.630 rad/s, v0 = 23.8 px/s, theta = +41.4 deg
+ / 2.229 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.537 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 17.83 * c{power: 1.0} + -15.74 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ 15.74 * c{power: 1.0} + 17.83 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.5459 0.5168 0.8979 0.9089 0.000483 0.0004046 7.588 1.147]
+
+ robot 30: w = +5.030 rad/s, v0 = 53.5 px/s, theta = +74.8 deg
+ / -5.133 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 5.039 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 14.02 * c{power: 1.0} + -51.67 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ 51.67 * c{power: 1.0} + 14.02 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.1757 0.1726 0.7915 0.8077 0.0007634 0.0004059 1.636 3.646]
+
+ robot 31: w = +4.655 rad/s, v0 = 31.9 px/s, theta = -37.9 deg
+ / -4.474 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 4.46 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 25.16 * c{power: 1.0} + 19.55 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ -19.55 * c{power: 1.0} + 25.16 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.283 0.2874 0.8915 0.9167 0.004505 0.004102 5.908 3.458]
+
+ robot 32: w = +4.615 rad/s, v0 = 33.7 px/s, theta = +5.6 deg
+ / -4.643 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 4.592 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 33.52 * c{power: 1.0} + -3.269 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ 3.269 * c{power: 1.0} + 33.52 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.3194 0.3245 0.8881 0.8798 0.0009773 0.000915 5.084e+04 11.46]
+
+ robot 34: w = -5.183 rad/s, v0 = 53.4 px/s, theta = -8.6 deg
+ / 4.959 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -5.192 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 52.79 * c{power: 1.0} + 8.026 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ -8.026 * c{power: 1.0} + 52.79 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.2148 0.2158 0.8372 0.7922 0.0001393 0.0006004 1236 7.095]
+
+ robot 37: w = -2.370 rad/s, v0 = 20.3 px/s, theta = +12.0 deg
+ / 2.535 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.496 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 19.87 * c{power: 1.0} + -4.215 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ 4.215 * c{power: 1.0} + 19.87 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.5659 0.5794 0.9791 0.9138 0.004885 0.004969 6.997 24.14]
+
+ robot 38: w = +2.985 rad/s, v0 = 47.4 px/s, theta = +82.4 deg
+ / -2.869 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.872 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 6.289 * c{power: 1.0} + -46.94 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ 46.94 * c{power: 1.0} + 6.289 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.416 0.4305 0.8141 0.8367 0.001063 0.001587 5.295 18.15]
+
+ robot 41: w = +3.764 rad/s, v0 = 108.5 px/s, theta = +73.2 deg
+ / -3.72 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.725 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 31.38 * c{power: 1.0} + -103.8 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ 103.8 * c{power: 1.0} + 31.38 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.2055 0.205 0.571 0.5863 4.99e-05 0.0001116 10.87 1931]
+
+ robot 42: w = -5.024 rad/s, v0 = 22.6 px/s, theta = -22.6 deg
+ / 4.631 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -4.783 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 20.91 * c{power: 1.0} + 8.705 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ -8.705 * c{power: 1.0} + 20.91 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.2813 0.2823 0.9122 0.8994 0.0005442 0.0007818 4.008 3.037]
+
+ robot 44: w = -3.432 rad/s, v0 = 10.1 px/s, theta = -47.7 deg
+ / 3.429 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.563 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 6.766 * c{power: 1.0} + 7.438 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ -7.438 * c{power: 1.0} + 6.766 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.3318 0.3329 0.9595 0.9129 0.003593 0.002873 8.202 6.773]
+
+ robot 45: w = +4.929 rad/s, v0 = 117.7 px/s, theta = -103.0 deg
+ / -4.89 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 4.833 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -26.55 * c{power: 1.0} + 114.7 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ -114.7 * c{power: 1.0} + -26.55 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.2138 0.2118 0.5992 0.7159 0.002236 0.001815 46.35 15.4]
+
+ robot 50: w = +3.055 rad/s, v0 = 43.3 px/s, theta = +98.5 deg
+ / -3.196 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.177 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -6.376 * c{power: 1.0} + -42.86 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ 42.86 * c{power: 1.0} + -6.376 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.4559 0.4531 0.8761 0.8337 0.0006196 0.001086 1.698 345.3]
+
+ robot 52: w = +3.223 rad/s, v0 = 38.0 px/s, theta = -10.4 deg
+ / -3.131 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.064 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 37.42 * c{power: 1.0} + 6.854 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ -6.854 * c{power: 1.0} + 37.42 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.3212 0.3268 0.877 0.8714 0.0007401 0.001042 8.2 361.4]
+
+ robot 53: w = -3.029 rad/s, v0 = 43.3 px/s, theta = -67.2 deg
+ / 3.112 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.066 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 16.79 * c{power: 1.0} + 39.88 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ -39.88 * c{power: 1.0} + 16.79 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.3611 0.3577 0.8245 0.8575 0.002093 0.001356 2.628 272.6]
+
+ robot 54: w = -3.539 rad/s, v0 = 58.5 px/s, theta = -3.2 deg
+ / 3.427 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.559 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 58.43 * c{power: 1.0} + 3.276 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ -3.276 * c{power: 1.0} + 58.43 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.3886 0.3938 0.8416 0.7861 0.0004234 0.0003502 9.216 26.12]
+
+ robot 56: w = +6.385 rad/s, v0 = 54.0 px/s, theta = +29.3 deg
+ / -6.352 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 6.55 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 47.13 * c{power: 1.0} + -26.45 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ 26.45 * c{power: 1.0} + 47.13 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.2097 0.2129 0.7563 0.8717 0.0003905 0.0001369 1.567 0.3447]
+
+ robot 60: w = +4.089 rad/s, v0 = 37.4 px/s, theta = +7.8 deg
+ / -4.138 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 4.155 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 37.0 * c{power: 1.0} + -5.097 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ 5.097 * c{power: 1.0} + 37.0 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.4054 0.4031 0.8955 0.8733 0.002197 0.002901 42.57 0.6551]
+
+ robot 62: w = +2.412 rad/s, v0 = 71.3 px/s, theta = +97.9 deg
+ / -2.475 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 2.509 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -9.821 * c{power: 1.0} + -70.65 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ 70.65 * c{power: 1.0} + -9.821 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.3009 0.3046 0.685 0.6749 0.001071 0.0007252 5.798 9049]
+
+ robot 65: w = -4.329 rad/s, v0 = 31.0 px/s, theta = +0.9 deg
+ / 4.289 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -4.245 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 31.01 * c{power: 1.0} + -0.5126 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ 0.5126 * c{power: 1.0} + 31.01 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.2862 0.2921 0.8506 0.9084 0.0006943 0.0008046 11.31 5.858]
+
+ robot 66: w = -2.186 rad/s, v0 = 33.8 px/s, theta = -0.9 deg
+ / 1.977 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -2.096 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 33.82 * c{power: 1.0} + 0.5488 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ -0.5488 * c{power: 1.0} + 33.82 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.649 0.6643 0.9478 0.8709 0.0007346 0.008162 1.118 77.21]
+
+ robot 72: w = +6.126 rad/s, v0 = 27.8 px/s, theta = -57.3 deg
+ / -5.899 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 6.045 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 15.04 * c{power: 1.0} + 23.38 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ -23.38 * c{power: 1.0} + 15.04 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.2214 0.2219 0.8904 0.9081 0.0002327 0.0005426 0.9752 30]
+
+ robot 73: w = -1.679 rad/s, v0 = 37.4 px/s, theta = +126.4 deg
+ / 1.764 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.806 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | -22.18 * c{power: 1.0} + -30.05 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ 30.05 * c{power: 1.0} + -22.18 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.6568 0.655 0.8776 0.8812 0.002292 0.00204 29 194.5]
+
+ robot 74: w = +3.265 rad/s, v0 = 100.0 px/s, theta = +82.1 deg
+ / -3.347 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 3.219 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 13.74 * c{power: 1.0} + -99.04 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ 99.04 * c{power: 1.0} + 13.74 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.2201 0.2152 0.6225 0.6421 0.000482 0.0003588 8.03 2.92]
+
+ robot 77: w = -3.151 rad/s, v0 = 70.3 px/s, theta = +3.6 deg
+ / 3.089 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.082 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 70.15 * c{power: 1.0} + -4.415 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ 4.415 * c{power: 1.0} + 70.15 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.3622 0.36 0.8888 0.7049 0.002872 0.004079 1.438 336.4]
+
+ robot 78: w = +4.825 rad/s, v0 = 49.8 px/s, theta = +31.4 deg
+ / -4.634 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 4.748 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 42.48 * c{power: 1.0} + -25.91 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ 25.91 * c{power: 1.0} + 42.48 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.3585 0.3469 0.8534 0.8366 0.0008443 0.002418 1.147 2.635]
+
+ robot 79: w = -3.470 rad/s, v0 = 32.4 px/s, theta = +3.1 deg
+ / 3.554 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.441 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 32.32 * c{power: 1.0} + -1.777 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ 1.777 * c{power: 1.0} + 32.32 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.3842 0.3816 0.8714 0.9038 0.004447 0.004739 192.3 27.51]
+
+ robot 80: w = -1.527 rad/s, v0 = 51.1 px/s, theta = -35.0 deg
+ / 1.508 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.731 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 41.85 * c{power: 1.0} + 29.25 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 38.47 * wall_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ -29.25 * c{power: 1.0} + 41.85 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 38.47 * wall_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.6056 0.5952 0.7694 0.9651 0.0112 0.003815 1.768 0.662]
+
+ robot 82: w = -1.461 rad/s, v0 = 53.7 px/s, theta = +45.4 deg
+ / 1.542 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -1.43 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 37.71 * c{power: 1.0} + -38.28 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ 38.28 * c{power: 1.0} + 37.71 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.5811 0.5831 0.8273 0.8408 0.01364 0.0084 4.539 5.132]
+
+ robot 83: w = -3.495 rad/s, v0 = 85.4 px/s, theta = -28.3 deg
+ / 3.499 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | -3.619 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 75.25 * c{power: 1.0} + 40.47 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ -40.47 * c{power: 1.0} + 75.25 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.2469 0.2473 0.6826 0.683 0.0009031 0.001159 6.189 5.238]
+
+ robot 84: w = +4.910 rad/s, v0 = 28.3 px/s, theta = +63.7 deg
+ / -4.837 * s{power: 1.0} + 0.0 = dc/dx0{power: 1.0}
+ | 4.842 * c{power: 1.0} + 0.0 = ds/dx0{power: 1.0}
+ | 12.53 * c{power: 1.0} + -25.38 * s{power: 1.0} + 34.75 * push_x{power: 1.0} + 0.02711 * vb_x{power: 1.0} + -1.037 = dx/dx0{power: 1.0}
+ \ 25.38 * c{power: 1.0} + 12.53 * s{power: 1.0} + 34.75 * push_y{power: 1.0} + 0.02711 * vb_y{power: 1.0} + -0.7992 = dy/dx0{power: 1.0} , with objective function values of [0.2845 0.2799 0.8824 0.8969 0.001372 0.001546 15.06 1.544]
+
+ velocity level (0.08 s windows), recording-wide:
+  d^2x/dx0^2: 0-th non-dominated level (4 equations; * = stable end)
+   * -6.199 * dx/dx0{power: 1.0} + 0.0 = d^2x/dx0^2{power: 1.0} , with objective function values of [0.88 0.0008566]
+     -6.425 * dx/dx0{power: 1.0} + 332.9 * push_x{power: 1.0} + 0.0 = d^2x/dx0^2{power: 1.0} , with objective function values of [0.87 0.006679]
+     -6.894 * dx/dx0{power: 1.0} + 449.5 * push_x{power: 1.0} + 408.9 * wall_x{power: 1.0} + 285.3 * c{power: 1.0} + 0.0 = d^2x/dx0^2{power: 1.0} , with objective function values of [0.8528 0.02547]
+     -6.931 * dx/dx0{power: 1.0} + 455.0 * push_x{power: 1.0} + 419.2 * wall_x{power: 1.0} + 286.9 * c{power: 1.0} + -97.93 * s{power: 1.0} + 0.0 = d^2x/dx0^2{power: 1.0} , with objective function values of [0.8509 0.2465]
+  d^2y/dx0^2: 0-th non-dominated level (4 equations; * = stable end)
+   * -6.389 * dy/dx0{power: 1.0} + 0.0 = d^2y/dx0^2{power: 1.0} , with objective function values of [0.874 0.0004492]
+     -6.664 * dy/dx0{power: 1.0} + 332.9 * push_y{power: 1.0} + 0.0 = d^2y/dx0^2{power: 1.0} , with objective function values of [0.8628 0.007214]
+     -7.075 * dy/dx0{power: 1.0} + 451.3 * push_y{power: 1.0} + 424.9 * wall_y{power: 1.0} + 261.0 * s{power: 1.0} + 0.0 = d^2y/dx0^2{power: 1.0} , with objective function values of [0.8448 0.02492]
+     -7.119 * dy/dx0{power: 1.0} + 459.5 * push_y{power: 1.0} + 435.3 * wall_y{power: 1.0} + 96.5 * c{power: 1.0} + 263.3 * s{power: 1.0} + 0.0 = d^2y/dx0^2{power: 1.0} , with objective function values of [0.8429 0.1847]
+ noise (D per axis, px^2/s), recording-wide:
+  D: 0-th non-dominated level (3 equations; * = stable end)
+   * 267.0 * |w|{power: 1.0} + 0.0 = D{power: 1.0} , with objective function values of [0.7877 0.003801]
+     174.5 * |w|{power: 1.0} + 3.788 * |vb|{power: 1.0} + 0.0 = D{power: 1.0} , with objective function values of [0.7751 0.01585]
+     288.2 * n_contact{power: 1.0} + -314.1 * wall{power: 1.0} + 399.7 * |w|{power: 1.0} + -118.3 * n_contact{power: 1.0} * |w|{power: 1.0} + 0.0 = D{power: 1.0} , with objective function values of [0.7704 0.09539]
