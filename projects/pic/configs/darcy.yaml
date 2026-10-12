@@ -1,6 +1,6 @@
-# Darcy flow, ported from the old darcy.py; UNTESTED because the data files
-# are missing. Stationary problem on a dummy 2-level time axis: no time
-# derivatives, no boundary trimming (as the old script did).
+# Darcy flow, ported from the group's original script; untested because the
+# data files are missing. Stationary problem on a dummy 2-level time axis: no
+# time derivatives, no boundary trimming.
 search:
   domain: {boundary_width: 0}
   preprocessing: {max_deriv_order: [0, 2, 2]}

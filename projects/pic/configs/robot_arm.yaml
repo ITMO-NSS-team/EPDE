@@ -1,5 +1,5 @@
 # DaISy robot arm; the input torque is a forcing token added by the loader.
-# Settings from the former robot_arm.yaml.
+# Settings from the group's former configuration.
 search:
   domain: {boundary_width: 30}
   preprocessing:

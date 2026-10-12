@@ -21,6 +21,7 @@ resumes where it stopped (``--retry-errors`` also redoes failed ones).
 
 import json
 import os
+import signal
 import subprocess
 import sys
 import time
@@ -54,19 +55,38 @@ def _memory_refusal(out: Path) -> bool:
 def _kill_tree(pid: int) -> None:
     """Kill a process and all its descendants. Killing only ``pid`` is not
     enough on Windows: a venv's ``python.exe`` is a launcher that runs the
-    real interpreter as a child, which would keep computing after a timeout."""
+    real interpreter as a child, which would keep computing after a timeout.
+
+    Listing processes can be refused (sandboxes deny ``psutil`` access to the
+    process table); the run is then killed directly together with its process
+    group, so a timeout never leaves a search computing in the background."""
     import psutil
+    procs = []
     try:
         parent = psutil.Process(pid)
+        procs = parent.children(recursive=True) + [parent]
     except psutil.NoSuchProcess:
         return
-    procs = parent.children(recursive=True) + [parent]
+    except psutil.Error:
+        pass
     for p in procs:
         try:
             p.kill()
-        except psutil.NoSuchProcess:
+        except psutil.Error:
             pass
-    psutil.wait_procs(procs, timeout=30)
+    if os.name != 'nt':
+        try:
+            os.killpg(pid, signal.SIGKILL)   # runs start in their own session
+        except OSError:
+            pass
+    try:
+        os.kill(pid, getattr(signal, 'SIGKILL', signal.SIGTERM))
+    except OSError:
+        pass
+    try:
+        psutil.wait_procs(procs, timeout=30)
+    except psutil.Error:
+        pass
 
 
 def run_stem(variant: str, noise: float, seed: int) -> str:
@@ -133,7 +153,8 @@ def _run_job(root: Path, job, sets, timeout, planned=None):
         with open(log, 'w', encoding='utf-8') as fh:
             try:
                 proc = subprocess.Popen(cmd, stdout=fh, stderr=subprocess.STDOUT,
-                                        cwd=str(REPO_ROOT), env=child_env)
+                                        cwd=str(REPO_ROOT), env=child_env,
+                                        start_new_session=os.name != 'nt')
             except OSError as exc:
                 out.write_text(json.dumps(dict(planned, status='error', error=str(exc))), encoding='utf-8')
                 break
@@ -183,12 +204,17 @@ def run_campaign(args) -> int:
             'environment': env.environment_info(REPO_ROOT, probe_cuda=False)}
     if not manifest.exists():
         manifest.write_text(json.dumps(meta, indent=1), encoding='utf-8')
-    done = 0
+    done, failed = 0, False
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
-        futures = [pool.submit(_run_job, root, job, args.set, args.timeout, plan) for job, plan in todo]
+        futures = {pool.submit(_run_job, root, job, args.set, args.timeout, plan): job
+                   for job, plan in todo}
         for fut in as_completed(futures):
-            job, status, seconds = fut.result()
+            try:
+                job, status, seconds = fut.result()
+            except Exception as exc:  # one broken run must not stop the others' bookkeeping
+                job, status, seconds = futures[fut], f'error ({exc})', 0.
+                failed = True
             done += 1
             print(f'[{done}/{len(todo)}] {job[0]:16} {job[1]:11} noise {job[2]:g} seed {job[3]}: '
                   f'{status} ({seconds:.0f} s)', flush=True)
-    return 0
+    return 1 if failed else 0

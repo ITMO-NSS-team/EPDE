@@ -1,0 +1,305 @@
+// Views. Clicking an element that has its own view opens it, so the model can be explored
+// from the landscape down to single operators. Dynamic views show the order of calls.
+
+views {
+
+  view index {
+    title 'Landscape'
+    description 'Who uses EPDE and through what: the library, the data-set and benchmark layer, the external comparison benchmark.'
+    include researcher, epde, pic, decomp, numpyStack, torch, deepxde, pysindy
+    autoLayout TopBottom
+  }
+
+  view epdeOverview of epde {
+    title 'EPDE: packages'
+    description 'Packages of the library and how they depend on each other.'
+    include *
+    autoLayout TopBottom
+  }
+
+  view interfaceView of epde.interface {
+    title 'EPDE: interface'
+    include *
+    include epde.interface.epdeSearch.*
+    include epde.interface.searchConfig.*
+    autoLayout LeftRight
+  }
+
+  view epdeSearchView of epde.interface.epdeSearch {
+    title 'Search object: user workflow'
+    include *
+    autoLayout LeftRight
+  }
+
+  view searchConfigView of epde.interface.searchConfig {
+    title 'Search configuration: groups and readers'
+    include *
+    autoLayout LeftRight
+  }
+
+  view structureView of epde.structure {
+    title 'EPDE: data structures and genotype'
+    include *
+    autoLayout TopBottom
+  }
+
+  view preprocessingView of epde.preprocessing {
+    title 'EPDE: preprocessing'
+    include *
+    autoLayout LeftRight
+  }
+
+  view stateView of epde.state {
+    title 'EPDE: caches and global state'
+    include *
+    autoLayout LeftRight
+  }
+
+  view optimizersView of epde.optimizers {
+    title 'EPDE: optimizers'
+    include *
+    autoLayout TopBottom
+  }
+
+  view operatorsView of epde.operators {
+    title 'EPDE: evolutionary operators'
+    description 'The four blocks of an epoch (initial sorting, selection, variation, offspring update) and the fit of one candidate (right-part selection with sparsity, coefficients and fitness).'
+    include *
+    autoLayout TopBottom
+  }
+
+  view selectionView of epde.operators.selection {
+    title 'Operators: selection'
+    include *
+  }
+
+  view variationView of epde.operators.variation {
+    title 'Operators: variation'
+    include *
+    autoLayout TopBottom
+  }
+
+  view mutationView of epde.operators.mutation {
+    title 'Operators: mutation'
+    include *
+    autoLayout TopBottom
+  }
+
+  view populationUpdateView of epde.operators.populationUpdate {
+    title 'Operators: population update'
+    include *
+    autoLayout TopBottom
+  }
+
+  view rpsView of epde.operators.rps {
+    title 'Operators: fit of one candidate'
+    include *
+    autoLayout LeftRight
+  }
+
+  view sparsityView of epde.operators.sparsity {
+    title 'Operators: sparsity'
+    include *
+    autoLayout LeftRight
+  }
+
+  view fitnessView of epde.operators.fitness {
+    title 'Operators: fitness'
+    include *
+    autoLayout LeftRight
+  }
+
+  view objectivesView of epde.operators.objectives {
+    title 'Operators: objectives'
+    include *
+    autoLayout LeftRight
+  }
+
+  view stabilityView of epde.operators.stabilityEstimators {
+    title 'Operators: stability estimators'
+    include *
+    autoLayout LeftRight
+  }
+
+  view integrateView of epde.integrate {
+    title 'EPDE: solving candidate equations'
+    include *
+    autoLayout TopBottom
+  }
+
+  view extrasView of epde.extras {
+    title 'EPDE: other packages'
+    include *
+  }
+
+  view picView of pic {
+    title 'projects/pic'
+    include *
+    autoLayout TopBottom
+  }
+
+  view benchView of pic.bench {
+    title 'Benchmark package'
+    include *
+    autoLayout TopBottom
+  }
+
+  // ---------------------------------------------------------------- dynamic views
+
+  dynamic view workflow {
+    title 'Sequence: one search from data to equations'
+    researcher -> epde.state.activeConfig 'create the search: settings validated and published'
+    researcher -> epde.interface.epdeSearch.createDomain 'create the domain from the grids'
+    epde.interface.epdeSearch.createDomain -> epde.structure.domain 'grid, boundary'
+    researcher -> epde.interface.epdeSearch.createTrajectory 'attach the data of every variable'
+    epde.interface.epdeSearch.createTrajectory -> epde.structure.trajectory 'sample'
+    epde.structure.trajectory -> epde.preprocessing.pipe 'smooth and differentiate'
+    epde.structure.trajectory -> epde.state.tensorCache 'fields and derivatives'
+    researcher -> epde.interface.epdeSearch.fit 'run the search with additional token families'
+    epde.interface.epdeSearch.fit -> epde.interface.epdeSearch.createPool 'build pool'
+    epde.interface.epdeSearch.createPool -> epde.interface.tokenFamily 'families of the data and of the user'
+    epde.interface.epdeSearch.fit -> epde.optimizers.moeaddDirector 'assemble operators'
+    epde.interface.epdeSearch.fit -> epde.optimizers.moeadd 'run the evolution'
+    epde.optimizers.moeadd -> epde.optimizers.populationConstructor 'initial population'
+    epde.optimizers.populationConstructor -> epde.structure.soeq 'random systems'
+    epde.optimizers.moeadd -> epde.operators.populationUpdate.initialSorter 'fit, score, sort'
+    epde.optimizers.moeadd -> epde.operators.selection.moeaddSelection 'every epoch: see "epoch"'
+    epde.optimizers.moeadd -> epde.optimizers.paretoLevels 'final levels'
+    researcher -> epde.interface.epdeSearch.equations 'read the result'
+    epde.interface.epdeSearch.equations -> epde.optimizers.paretoLevels 'first Pareto level'
+    autoLayout LeftRight
+  }
+
+  dynamic view epoch {
+    title 'Sequence: one epoch of the evolution'
+    epde.optimizers.moeadd -> epde.operators.selection.moeaddSelection 'choose parents'
+    epde.operators.selection.moeaddSelection -> epde.operators.selection.neighborSelector 'neighbours of a weight vector'
+    epde.optimizers.moeadd -> epde.operators.variation.plCrossover 'offspring'
+    epde.operators.variation.plCrossover -> epde.operators.variation.chromosomeCrossover 'exchange equations'
+    epde.operators.variation.chromosomeCrossover -> epde.operators.variation.equationCrossover 'exchange terms'
+    epde.operators.variation.chromosomeCrossover -> epde.operators.variation.metaCrossover 'blend metaparameters'
+    epde.optimizers.moeadd -> epde.operators.populationUpdate.offspringUpdater 'for every offspring'
+    epde.operators.populationUpdate.offspringUpdater -> epde.operators.mutation.systemMutation '1. mutate'
+    epde.operators.mutation.systemMutation -> epde.operators.mutation.equationMutation 'replace or add terms'
+    epde.operators.populationUpdate.offspringUpdater -> epde.operators.rps.soeqRps '2. fit: see "candidate"'
+    epde.operators.populationUpdate.offspringUpdater -> epde.operators.fitness.solverFree '3. objective vector'
+    epde.operators.populationUpdate.offspringUpdater -> epde.operators.populationUpdate.paretoUpdater '4. insert, drop the worst'
+    epde.operators.populationUpdate.paretoUpdater -> epde.optimizers.paretoLevels 'updated levels'
+    autoLayout LeftRight
+  }
+
+  dynamic view candidate {
+    title 'Sequence: fit and score of one candidate system'
+    epde.operators.rps.soeqRps -> epde.operators.rps.eqRps 'each equation'
+    epde.operators.rps.eqRps -> epde.structure.equation 'evaluate all terms'
+    epde.structure.equation -> epde.state.tensorCache 'token tensors'
+    epde.operators.rps.eqRps -> epde.operators.stabilityEstimators.gram 'Gram matrix over all terms, once'
+    epde.operators.rps.eqRps -> epde.operators.sparsity.vwsr 'for each candidate left-hand side: a. support'
+    epde.operators.sparsity.vwsr -> epde.operators.sparsity.piLasso 'per-term penalties, soft thresholding'
+    epde.operators.sparsity.piLasso -> epde.operators.stabilityEstimators.windows 'variation across windows'
+    epde.operators.rps.eqRps -> epde.operators.coeffs 'b. coefficients'
+    epde.operators.rps.eqRps -> epde.operators.fitness.solverFree 'c. score this split'
+    epde.operators.fitness.solverFree -> epde.operators.objectives.discrepancy 'objective 1'
+    epde.operators.fitness.solverFree -> epde.operators.objectives.instability 'objective 2'
+    epde.operators.objectives.instability -> epde.operators.stabilityEstimators.survival 'constancy statistic'
+    epde.operators.rps.eqRps -> epde.structure.equation 'keep the best split, drop zero terms'
+    epde.operators.rps.soeqRps -> epde.structure.soeq 're-roll equations that repeat another one'
+    autoLayout LeftRight
+  }
+
+  dynamic view benchmarkRun {
+    title 'Sequence: one benchmark run in projects/pic'
+    researcher -> pic.cli 'run one record with noise, seed and method variant'
+    pic.cli -> pic.bench.runner 'one run'
+    pic.bench.runner -> pic.bench.datasets 'load Problem'
+    pic.bench.datasets -> pic.data 'files'
+    pic.bench.runner -> pic.bench.config 'protocol + record + variant + overrides'
+    pic.bench.config -> pic.configs 'YAML'
+    pic.bench.runner -> epde.interface.epdeSearch.fit 'domain, data, search'
+    epde.interface.epdeSearch.fit -> epde.optimizers.moeadd 'evolution'
+    pic.bench.runner -> pic.bench.metrics 'score against the known law'
+    pic.bench.runner -> pic.results 'JSON record with identity'
+    researcher -> pic.notebooks 'open the worked example'
+    pic.notebooks -> pic.bench.reconstruction 'equation against data'
+    autoLayout LeftRight
+  }
+
+  // ---------------------------------------------------------------- compact views for the app
+  // One stage each, few elements, left to right: readable inside a page column.
+
+  view stageSettings {
+    title 'Stage: search settings'
+    include researcher, epde.interface.searchConfig, epde.state.activeConfig, epde.interface.epdeSearch,
+      epde.preprocessing, epde.operators, epde.optimizers
+    autoLayout LeftRight
+  }
+
+  view stageData {
+    title 'Stage: domain, data and derivatives'
+    include epde.interface.epdeSearch.createDomain, epde.interface.epdeSearch.createTrajectory,
+      epde.structure.domain, epde.structure.trajectory, epde.preprocessing.pipe,
+      epde.preprocessing.smoothers, epde.preprocessing.derivCalculators, epde.state.tensorCache
+    autoLayout LeftRight
+  }
+
+  view stagePool {
+    title 'Stage: token pool'
+    include epde.interface.epdeSearch.createPool, epde.interface.tokenFamily, epde.interface.preparedTokens,
+      epde.structure.trajectory, epde.interface.searchConfig.registries
+    autoLayout LeftRight
+  }
+
+  view stagePopulation {
+    title 'Stage: initial population'
+    include epde.optimizers.moeadd, epde.optimizers.populationConstructor, epde.interface.tokenFamily,
+      epde.structure.soeq, epde.structure.equation, epde.structure.term, epde.structure.factor
+    autoLayout LeftRight
+  }
+
+  view stageFit {
+    title 'Stage: fit of a candidate'
+    include epde.operators.rps.soeqRps, epde.operators.rps.eqRps, epde.structure.equation,
+      epde.operators.sparsity.vwsr, epde.operators.coeffs, epde.operators.fitness.solverFree,
+      epde.operators.stabilityEstimators.gram
+    autoLayout LeftRight
+  }
+
+  view stageSparsity {
+    title 'Stage: sparsity'
+    include epde.operators.rps.eqRps, epde.operators.sparsity.vwsr, epde.operators.sparsity.piLasso,
+      epde.operators.sparsity.lasso, epde.operators.sparsity.knee, epde.operators.stabilityEstimators.windows
+    autoLayout LeftRight
+  }
+
+  view stageObjectives {
+    title 'Stage: objectives'
+    include epde.operators.fitness.solverFree, epde.operators.objectives.discrepancy,
+      epde.operators.objectives.instability, epde.operators.objectives.complexity,
+      epde.operators.stabilityEstimators.survival, epde.operators.stabilityEstimators.windows,
+      epde.state.activeConfig
+    autoLayout LeftRight
+  }
+
+  view stageEvolution {
+    title 'Stage: one epoch'
+    include epde.optimizers.moeadd, epde.operators.selection.moeaddSelection, epde.operators.variation.plCrossover,
+      epde.operators.populationUpdate.offspringUpdater, epde.operators.mutation.systemMutation,
+      epde.operators.rps.soeqRps, epde.operators.populationUpdate.paretoUpdater, epde.optimizers.paretoLevels
+    autoLayout LeftRight
+  }
+
+  view stageFront {
+    title 'Stage: Pareto front'
+    include researcher, epde.interface.epdeSearch.equations, epde.optimizers.paretoLevels,
+      epde.operators.populationUpdate.paretoUpdater, epde.operators.populationUpdate.initialSorter
+    autoLayout LeftRight
+  }
+
+  view stageSolve {
+    title 'Stage: solving a discovered equation'
+    include epde.interface.epdeSearch.predict, epde.operators.fitness.solverBased, epde.integrate.systemSolver,
+      epde.integrate.bop, epde.integrate.autogradAdapter, epde.integrate.deepxdeAdapter,
+      epde.integrate.basisAdapter, epde.integrate.odeAdapter
+    autoLayout LeftRight
+  }
+}

@@ -4,4 +4,4 @@ search:
   search_space:
     tokens:
       - {family: grid, labels: [x], max_power: 2}
-      - {family: fixed_trigonometric, freq: 1.0}
+      - {family: fixed_trigonometric, freq: 1.0, meaningful: true}

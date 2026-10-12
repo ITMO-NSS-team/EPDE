@@ -76,6 +76,21 @@ def cached_run(name: str, variant: str = 'default', noise: float = 0.0, seed: in
     return record
 
 
+def print_run(record: dict) -> None:
+    """Status, fit time, the final Pareto front (compromise pick marked) and
+    the structural metrics of one record."""
+    origin = '(from cache)' if record.get('from_cache') else ''
+    print(record['status'], f"fit {record.get('fit_seconds', 0):.0f} s", origin)
+    selected = record.get('metrics', {}).get('selected_index')
+    for i, system in enumerate(record.get('front', [])):
+        print(f'[{i}]' + (' <- compromise pick' if i == selected else ''))
+        for eq in system:
+            print('    ', eq)
+    print({k: v for k, v in record.get('metrics', {}).items() if k != 'best_index'})
+    if record['status'] != 'ok':
+        print('Search needs attention:', record.get('error', record['status']))
+
+
 def _flatten(overrides: Optional[dict], prefix: str = ''):
     """``{'search': {'evolution': {'training_epochs': 2}}}`` ->
     ``['search.evolution.training_epochs=2']`` for ``bench.py run --set``."""

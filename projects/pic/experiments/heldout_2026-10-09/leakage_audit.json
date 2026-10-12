@@ -1,0 +1,26 @@
+{
+  "protocol": "Two real EPDE runs with same seed/config; only held-out observations replaced",
+  "mutation": "u[224:] = 10000 + 100 * arange(96)",
+  "same_training_sha256": true,
+  "same_front_equations_and_coefficients": true,
+  "same_selected_equation_and_coefficients": true,
+  "same_train_candidate_scores": true,
+  "identical_forecast_values": true,
+  "forecast_sha256_original": "c880845725411efde8d589780e30f795eb4cc1f9b0274f8ad48eb59b58afa6de",
+  "forecast_sha256_changed_test": "c880845725411efde8d589780e30f795eb4cc1f9b0274f8ad48eb59b58afa6de",
+  "original_test_metrics": {
+    "u": {
+      "rmse": 0.01992835372894183,
+      "mae": 0.014939868267107281,
+      "r2": 0.9998324293217595
+    }
+  },
+  "mutated_test_metrics": {
+    "u": {
+      "rmse": 15002.669967391532,
+      "mae": 14744.654321422007,
+      "r2": -28.31048587960566
+    }
+  },
+  "heldout_source_sha256": "3cd82fa2bf18ecd58d0ff524c6584d9dab8a5c1cb5cf9c47402636edc4db5c1b"
+}

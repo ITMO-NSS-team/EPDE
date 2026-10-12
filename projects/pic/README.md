@@ -1,273 +1,177 @@
-# projects/pic -- наборы данных и скрипты запуска EPDE
+# Data sets, runs and benchmark for EPDE
 
-Всё, что нужно, чтобы запускать EPDE на наборах из `data/`, смотреть результаты и
-менять настройки метода, одинаково в Windows, Linux и macOS.
+This project collects the data sets of the repository in one place and gives one way
+to work with all of them: load a record, check that its known law is visible in the
+data, run the search, score and inspect the result, compare methods. It works the same
+on Windows, Linux and macOS, from the command line and the notebooks.
 
-```
-projects/pic/
-├── bench.py                 командная строка: list | info | check | run
-├── configs/
-│   ├── _base.yaml           общий протокол (один пул токенов для всех задач)
-│   ├── <набор>.yaml         что нужно набору сверх протокола
-│   └── variants.yaml        варианты методов, которые сравнивает бенчмарк
-├── epde_bench/              пакет, на котором стоят bench.py и scripts/
-│   ├── datasets.py          загрузчик на каждый набор: данные, сетки, истина, заметки
-│   ├── config.py            слои YAML -> EpdeSearch(config=...)
-│   ├── runner.py            один запуск: discover() и run_one() -> JSON-запись
-│   ├── metrics.py           структурные метрики (перенесены из projects/thesis в main)
-│   ├── truthcheck.py        проверка сигнала: выполняется ли закон на данных
-│   ├── library.py           производные и «кирпичи» на данных (для check)
-│   ├── tokens.py            токены, которым нужны массивы/функции; sin/cos с фиксированной частотой
-│   └── plotting.py, env.py, paths.py, problem.py, script.py
-├── scripts/<имя>.py         по скрипту на папку данных, одинаковые опции
-├── data/                    данные и исходные исследовательские скрипты -- НЕ изменены
-├── DATASETS.md              все наборы: класс, форма, истина, файлы, заметки
-├── CHANGELOG.md             исправления перед отправкой и причины
-└── requirements-bench.txt   дополнительные пакеты (pip)
-```
+What it consists of:
 
-**Что не тронуто.** Исходные скрипты в `data/<папка>/` (ode.py, burgers.py, kdv.py,
-ks.py, ns.py, ...), PINN-исследования (`pinn_test_*.py`, `cv_metric.py`,
-`pinn_common.py`, `stat_common.py`) и сама библиотека `epde/` не изменены. Всё новое
-лежит рядом: `bench.py`, `epde_bench/`, `configs/`, `scripts/`.
+- **a collection of 29 records**: synthetic ordinary and partial differential
+  equations with known laws and measured records (pendulums, a robot arm, a ball on a
+  beam, sea surface temperature). Each record comes with its grid, its known law and
+  the equivalent forms of that law that also count as correct;
+- **layered settings**: one shared protocol with a single broad token pool for every
+  problem, a short file per record with only what that problem needs, method variants
+  for comparisons, and changes given at run time;
+- **a command line, short scripts per data folder and notebooks**, all on top
+  of the same code;
+- **a benchmark**: series of runs in parallel processes that resume after an
+  interruption, with reports and confidence intervals.
 
-## Установка
+The library itself and the group's original research scripts are not changed; all of
+this lives next to them.
 
+## Installation
 
-Python 3.11-3.13. Из корня репозитория:
+### With pip
+
+Python 3.11–3.13, from the repository root:
 
 ```bash
 python -m venv .venv
 # Windows: .venv\Scripts\activate      Linux/macOS: source .venv/bin/activate
-pip install torch                       # или CUDA-сборка с pytorch.org
+pip install torch                       # or a CUDA build from pytorch.org
 pip install -e .
-pip install -r requirements.txt         # setup.py не объявляет зависимости, этот шаг обязателен
+pip install -r requirements.txt         # required: the package declares no dependencies
 pip install -r projects/pic/requirements-bench.txt
 ```
 
-EPDE на `domain_refactor` работает с numpy 2.5 (проверено). Команды и модули берут EPDE из рабочей копии, в которой лежат, даже если
-в окружении установлен editable-пакет из другой папки.
+The commands always use EPDE from the working copy they belong to, even when another
+copy is installed in the environment.
 
-## Быстрый старт
+## Quick start
 
 ```bash
-python projects/pic/bench.py list                    # все наборы
-python projects/pic/bench.py info burgers            # данные, истина, итоговый конфиг
-python projects/pic/bench.py check ac --noise 0,1,5  # виден ли закон в данных
+python projects/pic/bench.py list                    # every record
+python projects/pic/bench.py info burgers            # data, known law, final settings
+python projects/pic/bench.py check ac --noise 0,1,5  # is the law visible in the data
 python projects/pic/bench.py run burgers --noise 1 --seed 0
-python projects/pic/scripts/kdv.py --dataset kdv_cossin --plot
+python projects/pic/scripts/kdv.py --plot
 ```
 
-У каждого скрипта в `scripts/` одинаковые опции: `--noise`, `--seed`, `--variant`,
-`--set key.path=value`, `--check`, `--plot`, `--out` (и `--dataset`, если в папке
-несколько записей). Пути считаются от самих файлов, поэтому рабочая папка любая.
+The short scripts accept the same options as the command line (noise, seed, method
+variant, changed settings, signal check, plots, output file) and can be started from
+any folder.
 
-Из Python (из папки `projects/pic`, либо добавив её в `sys.path`):
+## Settings
 
-```python
-from epde_bench import datasets, load_config, resolve_for_problem, discover
-problem = datasets.load('burgers')                    # сетки, данные, истина, заметки
-cfg = load_config('burgers', variant='poly')          # база + набор + вариант
-search, front, objectives, seconds = discover(problem, resolve_for_problem(cfg, problem))
-```
+A run is configured in layers; a later layer wins:
 
-## Конфигурация
+1. the **shared protocol**: coordinates and sine/cosine of frequency 2 in every pool,
+   powers of the variable up to 3 and of its derivatives up to 2, up to 10 terms of up
+   to 2 factors, population 16, 5 epochs, finite differences — the setup of the group's
+   former benchmark;
+2. the **file of the record**: a larger population for systems, first derivatives for
+   first-order systems, smoothing for measured data, special tokens;
+3. a **method variant** compared by the benchmark;
+4. **changes given at run time**.
 
-Слои, более поздний побеждает: `configs/_base.yaml` -> `configs/<имя>.yaml` ->
-`configs/variants.yaml[вариант]` -> правки `--set`. Секция `search` -- это
-собственный сгруппированный конфиг EPDE (`domain`, `preprocessing`, `search_space`,
-`objectives`, `solver`, `evolution`, `runtime`; см. `epde/interface/search_config.py`),
-ключи используют API `EpdeSearch(config=...)`. Семейства токенов создаются адаптером
-и передаются через `additional_tokens`, чтобы избежать их двойной регистрации. Под набор подставляются три
-значения: `boundary_width: auto` (10 % каждой оси), `max_deriv_order: auto` (2 по
-времени, 4 по каждой оси пространства) и `dimensionality` у семейства токенов.
+Three values are filled for each record automatically: the boundary excluded from
+fitting (10 % of every axis), the highest derivative orders (2 in time, 4 in space)
+and the dimensionality of the token families.
 
-Базовый протокол повторяет прежний бенчмарк группы (`projects/thesis` в `main`):
-координаты и sin/cos(2x) в каждом пуле, `data_fun_pow 3`, `deriv_fun_pow 2`, до 10
-членов по 2 множителя, популяция 16, 5 эпох, конечные разности. Файлы наборов
-добавляют только необходимое: популяцию для систем, первые производные для систем
-первого порядка, сглаживание для реальных данных, особые токены.
+## Data sets
 
-## Наборы данных
+The full list with classes, shapes, laws and notes is in [DATASETS.md](DATASETS.md):
 
-29 записей, см. `DATASETS.md`:
-- **core** -- 15 синтетических задач с известным законом (14 из прежнего бенчмарка и
-  Дуффинг с вынуждающей силой);
-- **extended** -- ещё 3 синтетические;
-- **real** -- 4 записи измерений;
-- **other** -- загружаются, но в бенчмарк не входят (нет истины, нет файлов или
-  слишком большой объём для рядового запуска).
+- **core** — 15 synthetic problems with a known law, the main benchmark tables;
+- **extended** — 3 more synthetic problems;
+- **real** — 4 measured records;
+- **other** — load, but are not benchmarked (no known law, missing files, or too large
+  for a routine run).
 
-## Как добавить набор данных
+A new record needs its files in the data folder, a loader that returns grids, fields
+and (if known) the law in EPDE's text form, and a short settings file with what
+differs from the shared protocol. The documentation and the script for the record are
+then regenerated, and the signal check should confirm on clean data that the law holds
+before any search is run.
 
-1. Положить файлы в `data/<папка>/`.
-2. Добавить загрузчик в `epde_bench/datasets.py` с декоратором `@dataset(...)`:
-   вернуть сетки (`mesh(t, x, ...)`), `{переменная: массив}`, истину в текстовой форме
-   EPDE (если известна) и `token_groups` для внешних полей (вынуждающая сила,
-   коэффициенты).
-3. Добавить `configs/<имя>.yaml` только с тем, что отличается от `_base.yaml`.
-4. Из `projects/pic` выполнить `python -m epde_bench._make_scripts` и
-   `python -m epde_bench._make_docs`: они пересоздадут скрипт в `scripts/` и
-   `DATASETS.md` (описание на русском добавить в `DOC_RU` в `_make_docs.py`).
-5. `python projects/pic/bench.py check <имя>`: если закон не выполняется даже на чистых
-   данных, сначала исправить загрузчик (оси, сетку, единицы).
+## Signal check
 
-## Что обнаружилось по ходу работы
-
-* **Тригонометрические токены на узком интервале частот.** Все скрипты здесь
-  использовали `TrigonometricTokens(freq=(2 - 1e-8, 2 + 1e-8))`. В `domain_refactor`
-  допуск равенства частот равен 5 % интервала, поэтому одна функция превращается в 20
-  численно одинаковых токенов, и поиск выдаёт тождества вида
-  `a u' sin(2t) + b u' sin(2t) = u' sin(2t)` с нулевой ошибкой и нулевой
-  нестабильностью. На `ode` (сиды 0-2): 0 из 3 верных со штатным семейством (вариант
-  `trig_native`) и 3 из 3 с фиксированной частотой
-  (`epde_bench.tokens.fixed_trigonometric`).
-* **Проверка памяти в кэше.** `memory_for_cache` по умолчанию 15 % ОЗУ, а `Cache.add`
-  при каждой загрузке требует 5 % свободной памяти. Несколько запусков на машине с 16 ГБ
-  падают на старте. В базовом конфиге стоит 2 %.
-* В `setup.py` нет `install_requires`: после `pip install -e .` без
-  `requirements.txt` EPDE не импортируется.
-* CI-воркфлоу `discovery.yml` вызывает `tests/functional`, которых в этой ветке нет.
-* Исходные скрипты (не исправлялись, только отмечено):
-  * `ks.py`, `ns.py`, `darcy.py` открывают файлы относительно рабочей папки;
-  * в `burgers_test`, `ks_test`, `ns_test` стоит уравнение Аллена-Кана (копипаста);
-  * в `hl_test`/`hs_test` -- коэффициенты-заглушки и цель не на той оси, а `hl_discovery`
-    строит лазерный источник с перепутанными осями;
-  * некоторые `*_discovery` загружают pickle другой системы;
-  * `noise_data` берёт глобальный генератор без сида;
-  * `device='cuda'` и `pickle.load(...).cuda()` прописаны жёстко.
-* Нет данных: `darcy/darcy_1.0.npy`, `darcy/darcy_nu_1.0.npy` (загрузчик перенесён, не
-  проверен). Адаптеры прежнего бенчмарка `lv_real` (рысь-заяц, `lv/lv_real.py`) и
-  `cylinder_piv` ссылаются на файлы, которых нет в этой ветке.
-* `sst/sst_l4.nc` -- ZIP-архив, а не NetCDF; `kdv_sindy/kdv.mat` дублирует
-  `kdv/kdv_sindy.mat`; `trajectories-2` пустой.
-
-
-## Проверка данных и известного закона
-
-`check` использует ту же фабрику нативного препроцессора EPDE, что и поиск:
-FD — последовательные `np.gradient` с реальными координатами; poly — аналитические
-производные локального полинома. Если включено сглаживание, степени поля также
-строятся по обработанному полю. Готовые производные загрузчика используются
-без повторного численного дифференцирования, в том же порядке столбцов.
+The check evaluates the terms of the known law on the data, prepared exactly as the
+search prepares them, and fits their coefficients by least squares. It reports how
+much of the left-hand side the true structure explains and how much each term
+contributes. A term that explains almost nothing cannot be identified under this
+preprocessing. This is a diagnostic of the data, not a proof that no method can
+recover the law.
 
 ```bash
 python projects/pic/bench.py check pend_single --noise 0
-python projects/pic/bench.py check ode --noise 0,1,5 --variant poly \
-    --set search.preprocessing.preprocessor_kwargs.mp_poolsize=1
-python projects/pic/scripts/ode.py --check --variant poly
-python projects/pic/bench.py check jhtdb_plane --noise 0
+python projects/pic/bench.py check ode --noise 0,1,5 --variant poly
 ```
 
-R² здесь оценивает подгонку коэффициентов известной структуры с дополнительной
-константой, а не невязку при заранее фиксированных физических коэффициентах.
-Потеря R² при удалении члена — диагностика его различимости в этой конкретной
-регрессии и при выбранной подготовке данных. Это не доказательство невозможности
-восстановления закона любым другим методом. Структурные метрики игнорируют
-константы и коэффициенты; ошибку коэффициентов нужно читать отдельно.
+Notes on particular records:
 
-Особенности данных:
+- **Turbulence slice:** the derivatives and external fields come from the direct
+  numerical simulation. Artificial noise is not allowed: noisy fields would be compared
+  with noise-free gradients.
+- **Sea surface temperature:** by default the largest rectangular ocean region that is
+  finite on every day is used; the original box with land masked can be loaded for
+  plotting. The governing law is not known.
+- **Darcy flow:** the data files are missing; the loader is kept as an unverified
+  prototype.
 
-- **JHTDB:** `w`, `u_z`, `v_z` находятся в разных семействах; `w` — meaningful-токен,
-  поэтому поиск может собрать оба члена `w*u_z` и `w*v_z`. Производные и внешние
-  поля получены из DNS. Искусственный шум запрещён для задач с готовыми
-  производными: иначе получалось бы сравнение шумного сигнала с чистыми градиентами.
-  Для эксперимента с шумом нужен согласованный отдельный протокол данных.
-  `Problem.deriv_orders` описывает порядок готовых столбцов по осям; несовпадающий
-  `max_deriv_order`, неверная форма или NaN/Inf в производных отклоняются и
-  проверкой сигнала, и поиском. Для JHTDB допустима схема `[1, 1, 1]`.
-- **SST:** по умолчанию выбирается максимальный прямоугольный океанический участок,
-  конечный во всех кадрах. Координаты обрезаются вместе с полем; границы участка
-  записаны в `Problem.meta`. `--set loader.crop_ocean=false` загружает исходный
-  участок с маской суши для просмотра. Поиск на данных с NaN/Inf отклоняется с
-  объяснением. Само наличие конечного участка не подтверждает физическую модель
-  температуры моря; это исследовательская задача без известной истины.
-- **Darcy:** файлы отсутствуют; адаптер сохранён как непроверенный прототип.
-  Он не входит в проверенные запуски.
+Shapes, finiteness of the data and a non-empty region after the boundary are checked
+before every search.
 
-Перед поиском проверяются формы сеток и данных, конечность наблюдений и наличие
-непустой области после исключения границ. `--variant`, `--set` и `--config`
-применяются и к `bench.py check`; короткие скрипты передают вариант и overrides
-при `--check`, а `--plot` учитывает настройки загрузчика. Явно указанный
-несуществующий `--config` вызывает ошибку; дробные или отрицательные порядки
-производных также отклоняются.
+## Comparing methods
 
-## Проверки перед отправкой
+Besides EPDE, a sparse-regression baseline (PySINDy) runs on a library built from the
+same fields, derivatives and extra tokens. Problems it cannot represent (a coefficient
+in front of the time derivative, the continuity equation of Navier–Stokes) are reported
+as unsupported, not as failures.
 
 ```bash
-python -m unittest discover -s projects/pic/tests -v
-cd projects/pic
-python -m epde_bench._selfcheck
-python -m epde_bench._poolcheck
-```
-
-Регрессионные тесты не запускают эволюцию. Проверка JHTDB автоматически пропускается,
-если соответствующего файла нет. `_selfcheck` и `_poolcheck` возвращают ненулевой
-код при ошибке; отсутствие файлов Darcy отмечается отдельным ожидаемым пропуском
-в проверке всего реестра. Полный benchmark не входит в этот PR.
-
-## Почему исходные скрипты сохранены
-
-Рабочий вход для discovery — `scripts/`, `bench.py` и YAML-конфиги. Скрипты в
-`data/` сохранены как исследовательские материалы: они содержат также специальные
-`*_test`, PINN/solver-эксперименты и прежние настройки. Их механическая замена
-могла бы удалить уникальные исследования и затруднить воспроизведение старых
-результатов. Известные ошибки этих файлов перечислены выше; новый интерфейс их
-не использует. Сопроводительные ноутбуки будут отдельным PR.
-
-## Сравнение методов и серии запусков
-
-Вариант `pysindy` использует STLSQ на библиотеке признаков из тех же полей,
-производных и дополнительных токенов. По умолчанию производные и сглаживание
-совпадают с EPDE. Для отдельного эксперимента можно явно выбрать
-`--set pysindy.differentiation=finite_difference`; вместе с готовыми производными
-такой протокол отклоняется. Для JHTDB используется `--noise 0`.
-
-`pde_divide` и `ns` имеют постановки, которые текущий baseline не представляет:
-коэффициент перед временной производной и пространственное условие неразрывности.
-Они получают статус `unsupported` с объяснением, а не обычную неудачу поиска.
-
-```bash
-python projects/pic/bench.py run ode --variant pysindy --noise 0
 python projects/pic/bench.py campaign --datasets ode,lorenz \
     --variants default,pysindy --noise 0,1 --seeds 0-2 --workers 2 --name comparison
 python projects/pic/bench.py report projects/pic/results/comparison
 ```
 
-Каждый опыт выполняется в отдельном процессе. Кампания сохраняет всю запрошенную
-сетку в `campaign.json`, записи в `runs/` и логи в `logs/`. Повтор команды продолжает
-ту же кампанию; `--retry-errors` повторяет ошибки и таймауты. Изменение настроек,
-исходников, входных файлов, зависимостей или сетки требует нового имени кампании:
-существующие результаты и описание не перезаписываются.
+Every run of a campaign is a separate process. Repeating the command continues the same
+campaign; failed runs can be retried. A run is identified by its settings, data, code
+and dependency versions: changing any of them requires a new campaign, so old and new
+results are never mixed.
 
-Идентичность опыта определяется настройками, dataset/variant/noise/seed,
-содержимым вычислительного кода и входных файлов, версиями зависимостей.
-Незакоммиченные изменения кода учитываются. Коммит и правки Markdown сами по себе
-не меняют вычисления. Близкие уровни шума имеют разные имена файлов.
+The report shows the success rates with 95 % Wilson intervals, a ranking by problem
+class on the problems every variant supports, and run times. Planned and unsupported
+runs are listed separately; errors and timeouts count as failures.
 
-Отчёт сохраняет задачи даже при таймаутах всех запусков. `pending` означает, что
-опыт ещё не выполнен, `unsupported` — что метод или протокол не поддерживает задачу;
-оба статуса показаны отдельно. Ошибки и таймауты учитываются как неудачи.
-Рейтинг сравнивает варианты на общей поддерживаемой группе задач. В CSV есть число
-выполненных, ожидающих и неподдерживаемых опытов; в таблицах успеха — интервалы Уилсона.
+## Notebooks
 
-## Ноутбуки
+| notebook | content |
+|---|---|
+| 00 · Quick start | one complete run, step by step, and how to read the result |
+| 01 · Search settings | the search object, its settings and defaults, settings stored in files |
+| 02 · Preprocessing | domain, data, derivatives, supplied derivatives, signal check |
+| 03 · Search space and fit | token families, the search, the Pareto front and its scoring |
+| 04 · Evolutionary optimizer | the evolutionary loop, objectives, sparsity, budget |
+| 05 · ODEs | forced, Van der Pol and Duffing oscillators |
+| 06 · ODE systems | Lotka–Volterra and Lorenz systems |
+| 07 · PDEs in 1-D | equations in one space dimension |
+| 08 · PDEs in 2-D and 3-D | equations in two and three space dimensions |
+| 09 · Measured data | pendulums, robot arm, ball on a beam, sea surface temperature |
+| 10 · Benchmark | comparison of methods |
 
-В `notebooks/` находятся восемь примеров: интерфейс EPDE, параметры, ОДУ,
-системы, УЧП с одной/несколькими пространственными осями, прикладные данные
-и сравнение методов. Все 29 записей реестра имеют раздел или явное объяснение
-пропуска. Для Darcy указано отсутствие файлов; долгие поиски сопровождаются
-командой отдельного запуска.
+The tutorials separate data inspection, checks of the known law, discovery and
+reconstruction. Where a search is performed, its selected equation is compared with
+the data: the left-hand side computed from the data against the value predicted by
+the equation and, for ordinary differential equations, the integrated solution
+against the record. Reconstruction starts at the first retained interior point.
+The oscillator lesson also demonstrates discovery on the first 70% of raw samples
+and forecasting the remaining 30%, with candidate selection using training data only.
 
-Откройте готовый `.ipynb` в Jupyter или VS Code и выберите Python подготовленного
-окружения. Ячейки используют EPDE из этой рабочей копии и сами выполняют недостающий
-поиск. Результат берётся из кеша только при полном совпадении идентичности опыта. Старый кеш, изменение данных или исходников,
-другой seed и таймаут не могут незаметно подменить новый результат.
+The notebooks run missing searches themselves and reuse a saved result only when its
+settings, data, code and dependencies match exactly. Long searches are not run inside
+the notebooks.
 
-`00_epde_interface` показывает ручные вызовы API. Повтор ручной эволюции можно
-включить `EPDE_NOTEBOOK_MANUAL_SEARCH=1`; по умолчанию показан результат общего
-запуска, чтобы не дублировать расчёт. `06_real_data` содержит разбор ball-and-beam:
-известная физическая гипотеза `y'' = a*u_in`, обучение на первых 70% записи,
-отдельная подготовка производных на последних 30%, ошибки ускорения и вынужденной
-траектории. Этот пример явно отделяет исследовательский поиск на полном файле
-от проверки заранее заданной модели на отложенной части.
+## Checks
+
+```bash
+python -m unittest discover -s projects/pic/tests -v
+```
+
+Tests cover data, term parsing, metrics, run identity, process lifecycle and small
+executable optimizer lessons. Full dataset campaigns run separately. Checks that
+need files missing from the repository are skipped and reported as such.
+
