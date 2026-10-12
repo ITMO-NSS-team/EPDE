@@ -1,6 +1,6 @@
 # JHTDB slice: exact derivatives are passed by the loader (numerical ones are
 # aliased at this resolution); pressure, viscous and out-of-plane terms enter
-# as exact tokens. Settings from the group's former config jhtdb_plane.yaml.
+# as exact tokens. Settings from the group's former configuration.
 search:
   domain: {boundary_width: 4}
   preprocessing:

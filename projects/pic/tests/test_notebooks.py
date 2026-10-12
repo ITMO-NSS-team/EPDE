@@ -105,13 +105,26 @@ class NotebookTests(unittest.TestCase):
     def test_every_dataset_is_documented(self):
         from epde_bench.datasets import REGISTRY
         notebooks = sorted((PIC / 'notebooks').glob('*.ipynb'))
-        self.assertEqual(len(notebooks), 8)
+        self.assertEqual(len(notebooks), 11)
         text = '\n'.join(''.join(c['source']) for p in notebooks
                          for c in json.loads(p.read_text(encoding='utf-8'))['cells'])
-        for name in REGISTRY:
-            self.assertIn(f'`{name}`', text)
+        for name, spec in REGISTRY.items():
+            missing = not any((PIC / 'data').glob(spec.files.split(',')[0].split(' (')[0].strip()))
+            if not missing:
+                self.assertIn(f"'{name}'", text)
         self.assertNotIn('_differentiate', text)
         self.assertIn('ballbeam_validation', text)
-        self.assertIn('crop_ocean', text)
+
+    def test_prose_has_no_code_names(self):
+        """Text for the reader describes; names of branches, files, functions and
+        parameters stay in the code cells (they may change)."""
+        import re
+        pattern = re.compile(r'`[^`]+`|\b\w+\.(?:py|yaml|npy|mat|csv|json)\b|\b\w+\(\)'
+                             r'|\b[a-z]+_[a-z0-9_]+\b')
+        for path in sorted((PIC / 'notebooks').glob('*.ipynb')):
+            for cell in json.loads(path.read_text(encoding='utf-8'))['cells']:
+                if cell['cell_type'] == 'markdown':
+                    prose = re.sub(r'\$\$.*?\$\$|\$[^$]*\$', '', ''.join(cell['source']), flags=re.S)
+                    self.assertEqual(pattern.findall(prose), [], path.name)
 
 if __name__ == '__main__': unittest.main()

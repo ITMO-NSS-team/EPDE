@@ -1,2 +1,2 @@
-# u_t = (u u_x)_x written out: needs (u_x)^2, i.e. deriv_fun_pow 2 (base).
+# u_t = (u u_x)_x written out: needs (u_x)^2, i.e. squared derivatives (base).
 search: {}
