@@ -1,0 +1,128 @@
+// projects/pic: the data-set collection, runners, benchmark and notebooks built on top of EPDE,
+// and the external comparison benchmark of other equation-discovery frameworks.
+
+model {
+
+  pysindy = external 'PySINDy' {
+    description 'Sparse regression baseline (STLSQ) on the same building blocks.'
+  }
+
+  decomp = external 'DEComp benchmark (PDEComp)' {
+    description 'Separate benchmark of equation-discovery frameworks (EPDE, PySINDy, DeepMoD, DISCOVER, EDL) on shared data, shared candidate libraries and a shared noise protocol; fixed and native protocols.'
+    link https://github.com/emil817/PDEComp
+  }
+
+  pic = system 'Data sets and benchmark layer' {
+    description 'Unified access to the data sets of the repository, one command line and one configuration scheme for runs, method comparison and worked notebooks.'
+
+    data = artifact 'Data sets' {
+      description '29 records: synthetic ODEs, systems and PDEs with known laws, measured records (pendulums, robot arm, ball on a beam, sea surface temperature), original research scripts.'
+    }
+    configs = artifact 'Layered settings' {
+      description 'Shared protocol (one token pool for all problems), one file per record with only its additions, method variants.'
+    }
+    cli = component 'Command line' {
+      description 'Command line: list, info, check, run, campaign, report.'
+    }
+    scripts = component 'Per-record scripts' {
+      description 'One short script per data folder with identical options.'
+    }
+    notebooks = artifact 'Notebooks' {
+      description 'Quick start; search settings; preprocessing; search space and fit; evolutionary optimizer; worked examples by problem class; measured data; benchmark.'
+    }
+    app = component 'Visual app' {
+      description 'Pages grouped by step: exploring data (data sets, signal check, derivatives), finding equations (running a search with its options, uploaded data), reviewing (saved results, benchmark) and the stages of the algorithm. Every search runs as a separate process and saves the same record as the command line.'
+    }
+    results = artifact 'Results' {
+      description 'Run records (JSON), campaigns, reports, notebook cache.'
+    }
+
+    bench = module 'Benchmark package' {
+
+      datasets = component 'Data-set registry' {
+        description 'One loader per record returns a Problem: grids, data, known law with equivalent forms, extra fields, supplied derivatives, notes.'
+      }
+      config = component 'Configuration layers' {
+        description 'Merges protocol, record, variant and overrides; fills automatic values; builds token families once.'
+      }
+      tokens = component 'Additional token families' {
+        description 'Fixed-frequency sine and cosine; stored fields of a problem as token families.'
+      }
+      prep = component 'Shared preprocessing' {
+        description 'The same EPDE pipeline for the search, the signal check and the baseline; building blocks evaluated on the data.'
+      }
+      runner = component 'Runner' {
+        description 'One discovery run: build the search, fit, read the Pareto front, score, write a JSON record.'
+      }
+      truthcheck = component 'Signal check' {
+        description 'Least squares on the terms of the known law: is the law still visible at this noise level, how much each term contributes.'
+      }
+      metrics = component 'Structural metrics' {
+        description 'Equations compared as sets of terms: success on the front, success of the compromise pick, Hamming distance, coefficient error, Wilson intervals.'
+      }
+      reconstruction = component 'Equation against data' {
+        description 'Side-by-side comparison of an equation with the data: left-hand side from data against the prediction of the right-hand side; integrated solution for ODEs.'
+      }
+      baselines = component 'Sparse-regression baseline' {
+        description 'PySINDy on the same building blocks and derivatives; marks problems it cannot represent as unsupported.'
+      }
+      campaign = component 'Campaigns' {
+        description 'Resumable grids of runs in separate processes; identity of a run from settings, code, data and dependencies.'
+      }
+      report = component 'Reports' {
+        description 'Tables with confidence intervals, rankings by problem class, figures.'
+      }
+      nbcache = component 'Notebook cache' {
+        description 'Reuses a run only when its identity matches; precomputes notebook runs in parallel.'
+      }
+    }
+  }
+
+  // ==================================================================== relationships
+
+  researcher -[calls]-> pic.cli 'run, check, compare'
+  researcher -[reads]-> pic.notebooks 'learn and reproduce'
+  researcher -[calls]-> pic.app 'explore, run, compare'
+  pic.app -[calls]-> pic.cli 'searches and campaigns in separate processes'
+  pic.app -[calls]-> pic.bench.truthcheck 'signal check'
+  pic.app -[calls]-> pic.bench.reconstruction 'equation against data'
+  pic.app -[reads]-> pic.results 'saved runs and reports'
+
+  pic.cli -[calls]-> pic.bench.runner 'run'
+  pic.cli -[calls]-> pic.bench.truthcheck 'check'
+  pic.cli -[calls]-> pic.bench.campaign 'campaign'
+  pic.cli -[calls]-> pic.bench.report 'report'
+  pic.scripts -[calls]-> pic.bench.runner 'same options for every record'
+  pic.notebooks -[calls]-> pic.bench.nbcache 'cached runs'
+  pic.notebooks -[calls]-> pic.bench.reconstruction 'equation against data'
+  pic.notebooks -[calls]-> epde.interface.epdeSearch 'step-by-step use of the API'
+
+  pic.bench.datasets -[reads]-> pic.data 'load'
+  pic.bench.config -[reads]-> pic.configs 'merge layers'
+  pic.bench.config -[calls]-> pic.bench.tokens 'build families'
+  pic.bench.runner -[calls]-> pic.bench.datasets 'Problem'
+  pic.bench.runner -[calls]-> pic.bench.config 'search settings'
+  pic.bench.runner -[calls]-> pic.bench.metrics 'score'
+  pic.bench.runner -[calls]-> pic.bench.baselines 'baseline variant'
+  pic.bench.runner -[data]-> pic.results 'JSON record'
+  pic.bench.campaign -[calls]-> pic.bench.runner 'one process per run'
+  pic.bench.campaign -[data]-> pic.results 'campaign folder'
+  pic.bench.report -[reads]-> pic.results 'runs'
+  pic.bench.nbcache -[calls]-> pic.bench.campaign 'identity'
+  pic.bench.nbcache -[data]-> pic.results 'notebook cache'
+  pic.bench.truthcheck -[calls]-> pic.bench.prep 'building blocks'
+  pic.bench.reconstruction -[calls]-> pic.bench.prep 'terms on data'
+  pic.bench.baselines -[calls]-> pic.bench.prep 'same derivatives'
+  pic.bench.baselines -[calls]-> pysindy 'STLSQ'
+  pic.bench.reconstruction -[calls]-> numpyStack 'integration'
+
+  // into EPDE
+  pic.bench.runner -[calls]-> epde.interface.epdeSearch 'domain, data, search'
+  pic.bench.config -[data]-> epde.interface.searchConfig 'search section'
+  pic.bench.tokens -[builds]-> epde.interface.preparedTokens 'stored and fixed-frequency families'
+  pic.bench.prep -[calls]-> epde.preprocessing.setups 'the same pipeline as the search'
+
+  // external benchmark
+  decomp -[calls]-> epde.interface.epdeSearch 'EPDE wrapper'
+  decomp -[calls]-> pysindy 'baseline'
+}

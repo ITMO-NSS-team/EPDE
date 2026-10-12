@@ -72,7 +72,7 @@ def _blocks(problem, data, search, method="epde"):
             for axis, grid in enumerate(problem.grids):
                 for fn, label in ((np.sin, 'sin'), (np.cos, 'cos')):
                     blocks.append((f'{label}{{power: 1.0, freq: {f:.1f}, dim: {axis:.1f}}}',
-                                   fn(f * np.asarray(grid)), 'trig', False, 0))
+                                   fn(f * np.asarray(grid)), 'trig', bool(spec.get('meaningful', False)), 0))
     for label, (array, meaningful) in problem.named_arrays.items():
         blocks.append((f'{label}{{power: 1.0}}', array, f'extra:{label}', meaningful, 0))
     return blocks, lhs

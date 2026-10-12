@@ -117,8 +117,8 @@ def load_duffing():
     return _problem(
         'duffing', mesh(d['t']), {'u': d['x'].astype(np.float64)}, ('t',),
         truth=[truth], meta=p,
-        notes="u'' + delta u' + alpha u + beta u^3 = gamma cos(omega t); "
-              'parameters stored in the file (as in projects/pinn/gate.py).')
+        notes="u'' + delta u' + alpha u + beta u^3 = gamma cos(omega t); the parameters are stored "
+              'in the data file.')
 
 
 # =========================================================================
@@ -140,8 +140,8 @@ def load_lv(n_points: int = None):
             '-1.0 * dv/dx0{power: 1.0} + 20.0 * u{power: 1.0} + -20.0 * v{power: 1.0} = du/dx0{power: 1.0}',
             '20.0 * du/dx0{power: 1.0} + -20.0 * dv/dx0{power: 1.0} + -1.0 * d^2u/dx0^2{power: 1.0}'
             ' = d^2v/dx0^2{power: 1.0}']],
-        notes='alpha = beta = gamma = delta = 20, all 301 samples (lv.py used the first 150; '
-              'gate.py explains why the full record is preferable).')
+        notes='alpha = beta = gamma = delta = 20, all 301 samples: with only the first half of the '
+              'record the system is not identifiable.')
 
 
 @dataset('lorenz', 'Lorenz-63 system', 'ode_system', 'synthetic', 'core',
@@ -160,8 +160,7 @@ def load_lorenz(i0: int = 20000, n: int = 1041, step: int = 5):
                ' = dw/dx0{power: 1.0}'],
         meta={'i0': i0, 'n': n, 'step': step},
         notes='sigma = 10, rho = 28, beta = 8/3. Window t in [20.0, 25.2] of the stored run, every '
-              '5th sample (gate.py): on the attractor. lorenz.py and the old benchmark used t[:1000], '
-              'an off-attractor transient.')
+              '5th sample: on the attractor, not the initial transient.')
 
 
 # =========================================================================
@@ -188,8 +187,7 @@ def load_burgers():
         'burgers', grids, {'u': np.transpose(np.real(m['usol']))}, ('t', 'x'),
         truth=['-1.0 * u{power: 1.0} * du/dx1{power: 1.0} + 0.1 * d^2u/dx1^2{power: 1.0}'
                ' = du/dx0{power: 1.0}'],
-        notes='u_t = -u u_x + 0.1 u_xx, periodic in x. (burgers_test in the old burgers.py held '
-              'the Allen-Cahn equation by mistake.)')
+        notes='u_t = -u u_x + 0.1 u_xx, periodic in x.')
 
 
 @dataset('burgers_inviscid', 'Inviscid Burgers equation', 'pde_1d', 'synthetic', 'core',
@@ -245,7 +243,7 @@ def load_kdv():
             ['-0.3333333333 * u{power: 1.0} * du/dx0{power: 1.0} + -0.3333333333 * du/dx1{power: 1.0}'
              ' * d^2u/dx1^2{power: 1.0} = u{power: 2.0} * du/dx1{power: 1.0}']],
         notes='u_t = -6 u u_x - u_xxx. The record is a soliton family, so three identities of it '
-              'are also exact and accepted. (kdv_sindy/kdv.mat is a byte-identical copy.)')
+              'are also exact and accepted.')
 
 
 @dataset('kdv_cossin', 'KdV with a cos(t)sin(x) source', 'pde_1d', 'synthetic', 'core',
@@ -270,7 +268,7 @@ def load_kdv_homogen():
         'kdv_homogen', grids, {'u': np.load(data_path('kdv', 'data_kdv_homogen.npy'))}, ('t', 'x'),
         truth=['-6.0 * du/dx1{power: 1.0} * u{power: 1.0} + -1.0 * d^3u/dx1^3{power: 1.0}'
                ' = du/dx0{power: 1.0}'],
-        notes='Truth from KdV_h_test in the old kdv.py.')
+        notes="Same law on a short interval, as in the group's original experiments.")
 
 
 @dataset('kdv_sga', 'KdV, SGA-PDE record (u_t = -u u_x - 0.0025 u_xxx)', 'pde_1d', 'synthetic',
@@ -282,7 +280,7 @@ def load_kdv_sga():
         'kdv_sga', grids, {'u': m['uu'].T}, ('t', 'x'),
         truth=['-1.0 * du/dx1{power: 1.0} * u{power: 1.0} + -0.0025 * d^3u/dx1^3{power: 1.0}'
                ' = du/dx0{power: 1.0}'],
-        notes='Truth from KdV_sga_test in the old kdv.py.')
+        notes='The record used in the symbolic genetic algorithm study.')
 
 
 @dataset('ks', 'Kuramoto-Sivashinsky equation', 'pde_1d', 'synthetic', 'core',
@@ -296,8 +294,7 @@ def load_ks(t_stride: int = 1, x_stride: int = 1):
         truth=['-1.0 * u{power: 1.0} * du/dx1{power: 1.0} + -1.0 * d^2u/dx1^2{power: 1.0}'
                ' + -1.0 * d^4u/dx1^4{power: 1.0} = du/dx0{power: 1.0}'],
         meta={'t_stride': t_stride, 'x_stride': x_stride},
-        notes='u_t = -u u_x - u_xx - u_xxxx; chaotic, needs a 4th derivative. The old ks.py opened '
-              'the file relative to the working directory.')
+        notes='u_t = -u u_x - u_xx - u_xxxx; chaotic, needs a 4th derivative.')
 
 
 def _pde_unit_grid():
@@ -360,9 +357,9 @@ def load_ns(subset: str = 'gate'):
                ' + 0.01 * d^2v/dx1^2{power: 1.0} = dv/dx0{power: 1.0}',
                '-1.0 * dv/dx1{power: 1.0} = du/dx2{power: 1.0}'],
         meta={'subset': subset},
-        notes="Axes (t, y, x): dx1 = d/dy, dx2 = d/dx. Two momentum equations (nu = 0.01) and "
-              "continuity. Default subset = gate.py's (36k points); 'full50' is the old ns.py "
-              'window (250k points per variable).')
+        notes='Axes (t, y, x): dx1 = d/dy, dx2 = d/dx. Two momentum equations (nu = 0.01) and '
+              'continuity. By default a subset of about 36 thousand points; the full window has 250'
+              ' thousand points per variable.')
 
 
 @dataset('heat_solar_1d', 'Heat in soil under solar forcing, 1-D', 'pde_1d', 'synthetic', 'other',
@@ -373,7 +370,7 @@ def load_heat_solar_1d():
         'heat_solar_1d', mesh(d['t'], d['x']), {'u': d['u'].squeeze().T}, ('t', 'x'),
         notes='Simulated soil temperature with a periodic surface flux. Expected law: the heat '
               'equation u_t = a u_xx in the interior (coefficient not stored), so no truth is '
-              'scored. The file also stores du.')
+              'scored. The data also hold the time derivative.')
 
 
 @dataset('heat_solar_2d', 'Heat in soil under solar forcing, 2-D', 'pde_2d', 'synthetic', 'other',
@@ -398,9 +395,9 @@ def load_heat_laser(xy_stride: int = 4):
         'heat_laser', mesh(d['t'], d['x'][::xy_stride], d['y'][::xy_stride], d['z']), {'u': u},
         ('t', 'x', 'y', 'z'), token_groups=[('laser', {'L': laser}, True)],
         meta={'xy_stride': xy_stride},
-        notes='Only 3 points along z and 20 in t, so z- and t-derivatives are crude. The source L '
-              'is laser.npy (t, x, y), assumed uniform in z -- the old script rebuilt it from a '
-              'formula with mismatched axes. No truth is scored.')
+        notes='Only 3 points along z and 20 in t, so z- and t-derivatives are crude. The laser '
+              'source is supplied as a field in (t, x, y), assumed uniform in z. No truth is '
+              'scored.')
 
 
 @dataset('jhtdb_plane', 'Isotropic turbulence, 2-D slice of JHTDB', 'pde_2d', 'synthetic',
@@ -537,8 +534,8 @@ def load_dp_video(trial: int = 1):
     return _problem(
         'dp_video', mesh(upper[0]), {'theta1': upper[1], 'theta2': lower[1]}, ('t',),
         meta={'trial': trial},
-        notes='Mean link angles from video markers (row 0 = time, row 1 = angle). Noisier than '
-              'the encoder record; dp_encoder is the preferred source.')
+        notes='Mean link angles from video markers. Noisier than the encoder record, which is the '
+              'preferred source.')
 
 
 def _finite_rectangle(mask):
@@ -592,10 +589,9 @@ def load_sst(variable: str = 'analysed_sst', crop_ocean: bool = True):
         'sst', mesh(time, lat, lon), {'T': field}, ('t', 'lat', 'lon'),
         meta={'crop_ocean': crop_ocean, 'lat_indices': [crop[0].start, crop[0].stop],
               'lon_indices': [crop[1].start, crop[1].stop]},
-        notes='Daily analysed SST (K), 90 days. By default the largest rectangular ocean region '
-              'finite at every frame is used; crop_ocean=False loads the original NaN-masked box '
-              'for plotting only. sst/sst_l4.nc is a ZIP archive of the same daily '
-              'files despite its extension.')
+        notes='Daily analysed sea surface temperature (K), 90 days. By default the largest '
+              'rectangular ocean region finite on every day is used; the original box with land '
+              'masked can be loaded for plotting only.')
 
 
 @dataset('darcy', 'Darcy flow -div(nu grad u) = 1 (data files missing)', 'pde_2d', 'synthetic',

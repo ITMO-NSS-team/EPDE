@@ -1,105 +1,19 @@
 """Write projects/pic/DATASETS.md from the registry: python -m epde_bench._make_docs
 
-The document is in Russian, like the rest of the project's documentation;
-the Russian titles and notes live here (DOC_RU), the loaders keep English ones.
+Titles and notes come from the loaders in datasets.py, so the document and
+``Problem.summary()`` never disagree.
 """
 
 from .datasets import REGISTRY, load
 from .paths import PIC_DIR
+from .problem import KINDS
 
-KINDS_RU = {'ode': 'ОДУ', 'ode_system': 'система ОДУ', 'pde_1d': 'УЧП, 1 измерение',
-            'pde_2d': 'УЧП, 2 измерения', 'pde_3d': 'УЧП, 3 измерения'}
-SOURCE_RU = {'synthetic': 'синтетика', 'real': 'измерения'}
+SOURCES = {'synthetic': 'synthetic', 'real': 'measured'}
 SUITES = {
-    'core': 'синтетика с известной истиной -- основные таблицы бенчмарка',
-    'extended': 'синтетика с известной истиной, медленнее или менее стандартная',
-    'real': 'реальные измерения',
-    'other': 'загружается, но в бенчмарк не входит',
-}
-
-#: name -> (title, notes)
-DOC_RU = {
-    'ode': ('Вынужденный осциллятор с переменным затуханием',
-            "u'' + sin(2t) u' + 4u = 1.5t, t в [0, 16), dt = 0.05."),
-    'vdp': ('Осциллятор Ван дер Поля (mu = 0.2)', "u'' = 0.2 (1 - u^2) u' - u, t в [0, 16), dt = 0.05."),
-    'duffing': ('Осциллятор Дуффинга с вынуждающей силой',
-                "u'' + delta u' + alpha u + beta u^3 = gamma cos(omega t); параметры хранятся в самом "
-                'файле (как в projects/pinn/gate.py).'),
-    'lv': ('Лотка-Вольтерра (хищник-жертва)',
-           'alpha = beta = gamma = delta = 20, все 301 точка (lv.py брал первые 150; почему лучше вся '
-           'запись -- объяснено в gate.py).'),
-    'lorenz': ('Система Лоренца-63',
-               'sigma = 10, rho = 28, beta = 8/3. Окно t в [20.0, 25.2] сохранённого расчёта, каждая '
-               '5-я точка (как в gate.py): траектория на аттракторе. lorenz.py и прежний бенчмарк брали '
-               't[:1000] -- переходный процесс вне аттрактора.'),
-    'ac': ('Уравнение Аллена-Кана',
-           'u_t = 1e-4 u_xx + 5u - 5u^3. Диффузионный член очень мал, его трудно отличить от шума.'),
-    'burgers': ('Вязкое уравнение Бюргерса (данные PDE-FIND)',
-                'u_t = -u u_x + 0.1 u_xx, периодично по x. (В burgers_test исходного burgers.py по '
-                'ошибке стоит уравнение Аллена-Кана.)'),
-    'burgers_inviscid': ('Невязкое уравнение Бюргерса',
-                         'Запись -- автомодельное решение u = x / (t + c), поэтому кроме УЧП выполняются '
-                         'два тождества; они тоже засчитываются.'),
-    'wave': ('Волновое уравнение',
-             'u_tt = 0.04 u_xx. Альтернативы -- волновое уравнение, умноженное на другой множитель; '
-             'засчитываются, как в прежнем бенчмарке группы.'),
-    'kdv': ('Уравнение Кортевега-де Фриза (данные PDE-FIND)',
-            'u_t = -6 u u_x - u_xxx. Запись -- семейство солитонов, поэтому три его тождества тоже точны '
-            'и засчитываются. (kdv_sindy/kdv.mat -- побайтовая копия.)'),
-    'kdv_cossin': ('KdV с источником cos(t)sin(x)', 'Источник входит как один токен-произведение cos(t)sin(x).'),
-    'kdv_homogen': ('KdV, однородное, x в [-3, 3]', 'Истина из KdV_h_test исходного kdv.py.'),
-    'kdv_sga': ('KdV, запись SGA-PDE (u_t = -u u_x - 0.0025 u_xxx)', 'Истина из KdV_sga_test исходного kdv.py.'),
-    'ks': ('Уравнение Курамото-Сивашинского',
-           'u_t = -u u_x - u_xx - u_xxxx; хаотическое, нужна 4-я производная. Исходный ks.py открывал '
-           'файл относительно рабочей папки.'),
-    'pde_compound': ('Нелинейная диффузия u_t = (u u_x)_x', 'u_t = u_x^2 + u u_xx, t в [0, 0.5], x в [1, 2].'),
-    'pde_divide': ('УЧП с коэффициентом 1/x',
-                   'x u_t = -2 u_x + 0.5 x u_xx, т.е. u_t = -2 u_x / x + 0.5 u_xx (нужен токен координаты x).'),
-    'ns': ('Навье-Стокс, след за цилиндром (Re = 100)',
-           "Оси (t, y, x): dx1 = d/dy, dx2 = d/dx. Два уравнения импульса (nu = 0.01) и неразрывность. "
-           "По умолчанию подвыборка из gate.py (36 тыс. точек); 'full50' -- окно исходного ns.py "
-           '(250 тыс. точек на переменную).'),
-    'heat_solar_1d': ('Теплоперенос в почве при солнечном нагреве, 1-D',
-                      'Моделирование температуры почвы с периодическим потоком на поверхности. Ожидаемый '
-                      'закон -- уравнение теплопроводности u_t = a u_xx (коэффициент в файле не хранится), '
-                      'поэтому истина не оценивается. В файле есть также du.'),
-    'heat_solar_2d': ('Теплоперенос в почве при солнечном нагреве, 2-D',
-                      'Двумерный вариант heat_solar_1d (576 x 51 x 51 до прореживания по t).'),
-    'heat_laser': ('Теплопроводность с движущимся лазерным источником, 3-D',
-                   'По z всего 3 точки, по t -- 20, производные по z и t грубые. Источник L -- laser.npy '
-                   '(t, x, y), предполагается однородным по z; исходный скрипт строил его по формуле с '
-                   'перепутанными осями. Истина не оценивается.'),
-    'jhtdb_plane': ('Изотропная турбулентность, 2-D срез JHTDB',
-                    'Срез 48 x 48 (каждый 8-й узел сетки DNS), 40 кадров. Для численных производных слишком '
-                    'грубо (алиасинг), поэтому передаются точные градиенты с сервера; внеплоскостные члены '
-                    'и давление входят как точные токены. w, u_z, v_z разделены по семействам, '
-                    'чтобы w*u_z и w*v_z были доступны. Использовать noise=0: искусственный шум '
-                    'с готовыми чистыми производными запрещён.'),
-    'pend_single': ('Реальный одиночный маятник (энкодер, стенд HardwareX)',
-                    'Малые колебания около нижнего положения, угол центрирован (theta - pi): линейный '
-                    'осциллятор с затуханием, -64.8 = -g/l. Форма без затухания тоже засчитывается.'),
-    'dp_encoder': ('Реальный двойной маятник (энкодер, стенд HardwareX)',
-                   'Связанные уравнения Лагранжа с cos/sin разности углов; точные коэффициенты неизвестны, '
-                   'запуск не оценивается. sin(theta) и множители связи входят как токены.'),
-    'robot_arm': ('DaISy: гибкая рука робота (момент -> ускорение)',
-                  'Истина неизвестна (гибкая конструкция ~5-го порядка). Шаг dt в файле не указан; принят '
-                  '0.01 с (от него зависят коэффициенты, но не структура).'),
-    'ballbeam': ('DaISy: шар на балке (угол балки -> положение шара)',
-                 "Истина неизвестна; в идеализированной физике y'' пропорционально углу балки. Шаг 0.1 с "
-                 'по описанию DaISy.'),
-    'dp_sim': ('Двойной маятник, моделирование',
-               'Используется в PINN-исследованиях в dp/. Уравнения движения требуют токенов связи и здесь '
-               'в токенной форме не записаны.'),
-    'dp_video': ('Реальный двойной маятник (видеотрекинг)',
-                 'Средние углы звеньев по видеомаркерам. Шумнее записи энкодера; предпочтительный источник '
-                 '-- dp_encoder.'),
-    'sst': ('Температура поверхности моря, ESA CCI L4 (янв-мар 2025)',
-            'Суточная SST (K), 90 суток. По умолчанию выбирается максимальный прямоугольник '
-            'океана без NaN во всех кадрах; поле и координаты обрезаются вместе. '
-            'crop_ocean=False сохраняет исходную маску для просмотра. sst/sst_l4.nc, несмотря на расширение, -- ZIP-архив тех же суточных файлов.'),
-    'darcy': ('Течение Дарси -div(nu grad u) = 1 (нет файлов данных)',
-              'Перенос исходного darcy.py, не проверен: файлов данных нет в репозитории. Стационарная '
-              'задача; поле коэффициента и его градиенты входят как токены-множители.'),
+    'core': 'synthetic with a known law; the main benchmark tables',
+    'extended': 'synthetic with a known law, slower or less standard',
+    'real': 'measurements',
+    'other': 'loads, but is not part of the benchmark',
 }
 
 
@@ -109,60 +23,44 @@ def main():
         for name, spec in REGISTRY.items():
             if spec.suite != suite:
                 continue
-            title, notes = DOC_RU.get(name, (spec.title, ''))
+            title = spec.title
             try:
                 p = load(name)
                 shape = ' x '.join(map(str, p.shape))
                 variables = ', '.join(p.variables)
-                truth = 'есть' if p.truth else 'неизвестна'
+                truth = 'known' if p.truth else 'unknown'
                 if p.truth and p.truth_alternatives:
-                    truth += f' (+{len(p.truth_alternatives)} альт.)'
-                body = [f'- **класс:** {KINDS_RU[p.kind]}; **источник:** {SOURCE_RU[p.source]}; **набор:** {suite}',
-                        f'- **оси:** {", ".join(p.axis_names)}; **форма:** {shape}; **переменные:** {variables}',
-                        f'- **файлы:** `projects/pic/data/{spec.files}`',
-                        f'- **конфиг:** `configs/{name}.yaml`']
+                    truth += f' (+{len(p.truth_alternatives)} alt.)'
+                body = [f'- **class:** {KINDS[p.kind]}; **source:** {SOURCES[p.source]}; **suite:** {suite}',
+                        f'- **axes:** {", ".join(p.axis_names)}; **shape:** {shape}; **variables:** {variables}']
                 if p.truth:
-                    body.append('- **истина:**')
+                    body.append('- **law:**')
                     body += [f'  - `{eq}`' for eq in p.truth]
                     for alt in p.truth_alternatives:
-                        body.append('  - принимается также: ' + '; '.join(f'`{eq}`' for eq in alt))
+                        body.append('  - also accepted: ' + '; '.join(f'`{eq}`' for eq in alt))
                 if p.token_groups or p.extra_arrays:
                     labels = [lbl for _, t, _ in p.token_groups for lbl in t] + list(p.extra_arrays)
-                    body.append(f'- **дополнительные токены:** {", ".join(labels)}')
+                    body.append(f'- **extra tokens:** {", ".join(labels)}')
                 if p.derivs is not None:
-                    body.append('- **производные:** точные, передаются в EPDE (без численного дифференцирования)')
-                body.append(f'- **заметки:** {notes}')
-            except FileNotFoundError as exc:
-                shape, variables, truth = '-', '-', 'нет файлов'
-                body = [f'- **файлы:** `projects/pic/data/{spec.files}`', '- **статус:** Файлы отсутствуют; загрузка и поиск не проверены.',
-                        f'- **заметки:** {notes}']
-            rows.append(f'| `{name}` | {suite} | {KINDS_RU[spec.kind]} | {SOURCE_RU[spec.source]} | '
+                    body.append('- **derivatives:** supplied with the data and passed to EPDE as given')
+                body.append(f'- **notes:** {p.notes}')
+            except FileNotFoundError:
+                shape, variables, truth = '-', '-', 'no files'
+                body = ['- **status:** the data files are missing; loading and search are not verified.']
+            rows.append(f'| `{name}` | {suite} | {KINDS[spec.kind]} | {SOURCES[spec.source]} | '
                         f'{shape} | {variables} | {truth} | {title} |')
             sections.append(f'### `{name}` -- {title}\n\n' + '\n'.join(body))
-    text = ['# Наборы данных в projects/pic/data', '',
-            'Файл сгенерирован из `epde_bench/datasets.py` командой `python -m epde_bench._make_docs` '
-            '(из папки `projects/pic`); правьте загрузчики и генератор, а не этот файл. Любой набор '
-            'загружается через `epde_bench.datasets.load(имя)` и запускается командой '
-            '`python projects/pic/bench.py run <имя>`.', '',
-            'Наборы: ' + '; '.join(f'**{k}** -- {v}' for k, v in SUITES.items()) + '.', '',
-            'Уравнения записаны в текстовой форме EPDE: `dx0` -- время, `dx1`, `dx2`, ... -- '
-            'пространственные оси в порядке, указанном в «оси»; `x{power: p, dim: k}` -- k-я координата '
-            'в степени p. Оценивается только набор членов, коэффициенты справочные.', '',
-            '| имя | набор | класс | источник | форма | переменные | истина | название |',
+    text = ['# Data sets in projects/pic/data', '',
+            'Generated from the data-set loaders; edit the loaders, not this file. The name in the '
+            'first column is what the command line, the scripts and the notebooks use to refer to a '
+            'record.', '',
+            'Suites: ' + '; '.join(f'**{k}** -- {v}' for k, v in SUITES.items()) + '.', '',
+            'Equations are written in EPDE text form: `dx0` is time, `dx1`, `dx2`, ... are the space '
+            'axes in the order given under "axes"; `x{power: p, dim: k}` is the k-th coordinate to the '
+            'power p. Only the set of terms is scored; coefficients are for reference.', '',
+            '| name | suite | class | source | shape | variables | law | title |',
             '|---|---|---|---|---|---|---|---|', *rows, '',
-            '## Файлы без отдельной записи', '',
-            '- `kdv_sindy/kdv.mat` -- побайтовая копия `kdv/kdv_sindy.mat` (проверено по SHA-256).',
-            '- `trajectories-2` -- пустой файл.',
-            '- `sst/sst_l4.nc` -- несмотря на расширение, ZIP-архив 90 суточных файлов из '
-            '`sst/sst_l4_files/` (загрузчик читает их).',
-            '- `*/pinn_test_*.py`, `*/cv_metric.py`, `dp/fno_test.py`, `pinn_common.py`, `stat_common.py`, '
-            '`lv/lv_rps_amplification_check.py`, `dp/MultiArm_Pendulum/*.py` -- исследования решателя/PINN '
-            '(см. projects/pinn); эти инструменты их не используют и не меняют.',
-            '- Исходные скрипты `<папка>/<имя>.py` (ode.py, burgers.py, kdv.py, ...) оставлены без '
-            'изменений; их аналоги на общем коде -- в `projects/pic/scripts/`.',
-            '- `*_ann_pretrained.pickle`, `*_0_ann.pickle` -- предобученные сети для ANN-препроцессора '
-            '(исходные скрипты переносили их на CUDA); здесь не используются.', '',
-            '## Подробно', '', '\n\n'.join(sections), '']
+            '## Details', '', '\n\n'.join(sections), '']
     (PIC_DIR / 'DATASETS.md').write_text('\n'.join(text), encoding='utf-8', newline='\n')
     print('wrote', PIC_DIR / 'DATASETS.md')
 

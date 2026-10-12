@@ -1,10 +1,8 @@
 """Structural metrics: does a discovered system have the right terms?
 
-Ported unchanged in logic from projects/thesis/thesis_metrics.py (the
-group's former benchmark, retired from domain_refactor and kept on
-main), so numbers stay comparable with the reports written with it.
-Only the module docstring and :func:`score_run` / :func:`select_compromise`
-(bottom) are new.
+Adapted from projects/thesis/thesis_metrics.py (the group's former
+benchmark), retaining its term-set comparison and adding numerical
+coefficient errors and a truth-free compromise selection.
 
 Equations are compared as SETS OF TERMS: coefficients, term order and the
 choice of target side are ignored, factor parameters (power, freq, dim) are
@@ -28,6 +26,16 @@ from typing import Iterable, List, Sequence
 _FACTOR_RE = re.compile(r'([A-Za-z0-9_\^/\(\)]+)\s*\{([^}]*)\}')
 _PARAM_RE = re.compile(r'([A-Za-z_][A-Za-z0-9_]*)\s*:\s*([^,]+)')
 _PARAM_ROUND_DIGITS = 3
+
+
+def _strip_system_prefix(text: str) -> str:
+    """Remove EPDE's leading system brace decoration, keeping numeric signs."""
+    return re.sub(r'^\s*[/|\\]+\s*', '', text)
+
+
+def _split_sum(text: str):
+    """Split EPDE's additive terms without splitting positive exponents."""
+    return re.split(r'(?<![eE])\+', text)
 
 
 def _round_param(value: str):
@@ -105,10 +113,10 @@ def _canonical_equation(eq_text: str):
     """
     if '=' not in eq_text:
         return None
-    left, right = eq_text.split('=', 1)
+    left, right = _strip_system_prefix(eq_text).split('=', 1)
     target_term = _parse_term(right)
     rhs_terms = []
-    for term_text in left.split('+'):
+    for term_text in _split_sum(left):
         term = _parse_term(term_text)
         if term is not None:
             rhs_terms.append(term)
@@ -330,13 +338,13 @@ def _equation_term_coefs(eq_text: str):
     """
     if '=' not in eq_text:
         return None
-    lhs, rhs = eq_text.split('=', 1)
+    lhs, rhs = _strip_system_prefix(eq_text).split('=', 1)
     target = _parse_term_with_coef(rhs)
     if target is None:
         return None
     target_key, target_coef = target
     coef_by_term: dict = {}
-    for term_text in lhs.split('+'):
+    for term_text in _split_sum(lhs):
         parsed = _parse_term_with_coef(term_text)
         if parsed is None:
             continue
@@ -455,30 +463,38 @@ def coefficient_error_best(discovered_eq_texts: Sequence[str],
 # ---------------------------------------------------------------------------
 
 
-def select_compromise(objectives) -> int:
-    """Index of the front member with the smallest sum of min-max normalised
-    objective values: a truth-free pick of ONE equation from the front.
+def select_compromise(objectives) -> int | None:
+    """Pick the smallest sum of min-max normalised finite objective values.
 
-    "Truth on the front" (the benchmark's main metric, inherited from the
-    group's runner) credits a run when any of possibly many front members is
-    correct, which grows easier as the front grows. A user without the truth
-    has to pick one, so the compromise pick is reported alongside.
-    Returns 0 when objective vectors are missing or ragged.
+    Invalid or missing vectors are excluded; indices refer to the original
+    front. Empty vectors or inconsistent dimensions have no valid compromise,
+    and an entirely invalid front returns None. Ties keep front order.
     """
-    vectors = [list(v) for v in objectives if v is not None]
-    if len(vectors) != len(objectives) or not vectors:
-        return 0
-    width = len(vectors[0])
-    if any(len(v) != width for v in vectors):
-        return 0
+    vectors = []
+    for index, vector in enumerate(objectives):
+        try:
+            values = [float(value) for value in vector]
+        except (TypeError, ValueError, OverflowError):
+            continue
+        if values and all(math.isfinite(value) for value in values):
+            vectors.append((index, values))
+    if not vectors:
+        return None
+    width = len(vectors[0][1])
+    if any(len(values) != width for _, values in vectors):
+        return None
     scores = [0.0] * len(vectors)
     for k in range(width):
-        column = [v[k] for v in vectors]
+        column = [values[k] for _, values in vectors]
         lo, hi = min(column), max(column)
+        # Scaling first avoids overflow for finite values near float limits.
+        scale = max(abs(lo), abs(hi)) or 1.0
+        lo, hi = lo / scale, hi / scale
         span = hi - lo
         for i, value in enumerate(column):
-            scores[i] += 0.0 if span <= 0 or not math.isfinite(value) else (value - lo) / span
-    return min(range(len(scores)), key=lambda i: scores[i])
+            scores[i] += 0.0 if span <= 0 else (value / scale - lo) / span
+    best = min(range(len(scores)), key=lambda i: scores[i])
+    return vectors[best][0]
 
 
 def score_run(front: Sequence[Sequence[str]], objectives: Sequence, truth_systems) -> dict:
@@ -491,6 +507,8 @@ def score_run(front: Sequence[Sequence[str]], objectives: Sequence, truth_system
     """
     canon = [canonical_tokens(sol) for sol in front]
     selected = select_compromise(objectives) if front else None
+    if selected is not None and selected >= len(front):
+        selected = None
     out = {'front_size': len(front), 'selected_index': selected}
     if not truth_systems:
         return out
@@ -503,8 +521,9 @@ def score_run(front: Sequence[Sequence[str]], objectives: Sequence, truth_system
     best = min(range(len(hammings)), key=lambda i: hammings[i])
     coef = coefficient_error_best(front[best], truth_systems) if hammings[best] == 0 else None
     out.update(success_front=hammings[best] == 0,
-               success_selected=hammings[selected] == 0,
-               hamming_min=hammings[best], hamming_selected=hammings[selected],
+               success_selected=selected is not None and hammings[selected] == 0,
+               hamming_min=hammings[best],
+               hamming_selected=hammings[selected] if selected is not None else None,
                best_index=best,
                coef_error=None if coef is None or coef != coef else coef)
     return out

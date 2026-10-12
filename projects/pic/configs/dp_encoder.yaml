@@ -1,5 +1,5 @@
 # Real double pendulum. sin(theta_i) and the coupling factors cos/sin(theta1 -
-# theta2) are added by the loader. Settings from the former dp_real.yaml.
+# theta2) are added by the loader. Settings from the group's former configuration.
 search:
   domain: {boundary_width: 60}
   preprocessing:

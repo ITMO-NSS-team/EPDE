@@ -1,5 +1,5 @@
 # DaISy ball and beam; the beam angle is a forcing token added by the loader.
-# Same settings as robot_arm (no earlier config existed).
+# Same settings as the robot arm.
 search:
   domain: {boundary_width: 30}
   preprocessing:

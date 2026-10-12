@@ -1,6 +1,6 @@
 # Real single pendulum: a long smoothing window for the encoder noise and a
 # small pool (no trigonometric family: at this amplitude sin(theta) = theta).
-# Settings from the group's former config pend_single.yaml.
+# Settings from the group's former configuration.
 search:
   domain: {boundary_width: 60}
   preprocessing:

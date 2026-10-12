@@ -1,0 +1,81 @@
+// EPDE architecture: element kinds, tags and relationship kinds.
+
+specification {
+  element actor {
+    style {
+      shape person
+      color secondary
+    }
+  }
+  element system {
+    style {
+      color primary
+    }
+  }
+  element external {
+    notation 'External system or library'
+    style {
+      color muted
+    }
+  }
+  element module {
+    notation 'Package (folder of the code base)'
+    style {
+      color indigo
+    }
+  }
+  element component {
+    notation 'Class or group of functions'
+    style {
+      color sky
+    }
+  }
+  element operator {
+    notation 'Evolutionary operator (CompoundOperator)'
+    style {
+      color green
+    }
+  }
+  element config {
+    notation 'Settings / registry'
+    style {
+      color amber
+      shape browser
+    }
+  }
+  element store {
+    notation 'In-memory store'
+    style {
+      shape storage
+      color slate
+    }
+  }
+  element artifact {
+    notation 'Files: data, configs, notebooks, results'
+    style {
+      shape cylinder
+      color gray
+    }
+  }
+
+  tag legacy
+  tag optional
+  tag default
+  tag hotspot
+
+  relationship calls {
+    color gray
+  }
+  relationship data {
+    color blue
+    line dashed
+  }
+  relationship builds {
+    color green
+    line dotted
+  }
+  relationship reads {
+    color amber
+    line dashed
+  }
+}
