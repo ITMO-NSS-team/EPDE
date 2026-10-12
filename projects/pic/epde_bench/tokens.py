@@ -44,7 +44,7 @@ def stored_groups(problem) -> list:
 # ---------------------------------------------------------------------------
 #
 # Why not TrigonometricTokens(freq=(2 - 1e-8, 2 + 1e-8)), as every script in
-# data/ does? On domain_refactor the frequency-equality tolerance became 5 %
+# data/ does? The library's frequency-equality tolerance is 5 %
 # of the declared interval (prepared_tokens.py, "freq_equality_fraction").
 # For a deliberately narrow interval that splits ONE function into 20
 # "different" tokens -- sin(2.000000004 t) and sin(1.999999999 t) -- whose

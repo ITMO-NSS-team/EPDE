@@ -33,6 +33,10 @@ VARIANTS_FILE = 'variants.yaml'
 
 def deep_merge(base: dict, override: dict) -> dict:
     out = copy.deepcopy(base)
+    # Builder arguments belong to one preprocessor and cannot cross method changes.
+    if ('default_preprocessor_type' in (override or {})
+            and override['default_preprocessor_type'] != base.get('default_preprocessor_type')):
+        out['preprocessor_kwargs'] = {}
     for key, value in (override or {}).items():
         if isinstance(value, dict) and isinstance(out.get(key), dict):
             out[key] = deep_merge(out[key], value)
@@ -115,7 +119,7 @@ def split_bench_tokens(search: dict):
     empty ``search_space.tokens``. Returns ``(search, families)``.
 
     Two reasons. (1) Families only this package knows (``tokens.BENCH_FAMILIES``)
-    cannot go through EPDE's registry. (2) On domain_refactor, families declared
+    cannot go through EPDE's registry. (2) Families declared
     in ``search_space.tokens`` end up in the pool TWICE when ``fit()`` is used:
     ``fit`` merges them into ``additional_tokens`` and ``create_pool`` merges
     them again (both call ``_resolve_token_families``), which duplicates e.g.

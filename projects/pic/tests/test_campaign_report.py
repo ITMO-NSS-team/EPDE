@@ -1,5 +1,6 @@
 """Campaign accounting and content identity regressions (no search needed)."""
 import json
+import os
 import sys
 import tempfile
 import unittest
@@ -127,6 +128,21 @@ class CampaignReportTests(unittest.TestCase):
             self.assertEqual(record['identity'], plan['identity'])
             self.assertTrue(record['problem']['truth_known'])
             self.assertEqual(record['problem']['kind'], 'pde_1d')
+
+    def test_timeout_kills_run_when_process_table_is_refused(self):
+        import psutil
+        import subprocess
+        import sys
+        from epde_bench import campaign
+        proc = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(60)'],
+                                start_new_session=os.name != 'nt')
+        try:
+            with patch.object(psutil.Process, 'children', side_effect=psutil.AccessDenied(proc.pid)):
+                campaign._kill_tree(proc.pid)
+            proc.wait(timeout=10)
+        finally:
+            if proc.poll() is None:
+                proc.kill()
 
     def test_identity_tracks_source_data_config_and_dependencies(self):
         from epde_bench import identity

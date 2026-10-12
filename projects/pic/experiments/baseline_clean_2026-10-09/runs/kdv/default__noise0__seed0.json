@@ -1,0 +1,273 @@
+{
+ "dataset": "kdv",
+ "variant": "default",
+ "method": "epde",
+ "noise": 0.0,
+ "seed": 0,
+ "started": "2026-10-09T13:43:28+00:00",
+ "config": {
+  "loader": {},
+  "search": {
+   "domain": {
+    "boundary_width": "auto"
+   },
+   "preprocessing": {
+    "default_preprocessor_type": "FD",
+    "preprocessor_kwargs": {},
+    "max_deriv_order": "auto"
+   },
+   "search_space": {
+    "data_fun_pow": 3,
+    "deriv_fun_pow": 2,
+    "equation_terms_max_number": 10,
+    "equation_factors_max_number": {
+     "factors_num": [
+      1,
+      2
+     ],
+     "probas": [
+      0.65,
+      0.35
+     ]
+    },
+    "tokens": [
+     {
+      "family": "grid",
+      "labels": [
+       "x"
+      ],
+      "max_power": 2
+     },
+     {
+      "family": "fixed_trigonometric",
+      "freq": 2.0
+     }
+    ]
+   },
+   "objectives": {},
+   "solver": {
+    "use_solver": false,
+    "device": "cpu"
+   },
+   "evolution": {
+    "population_size": 16,
+    "training_epochs": 5
+   },
+   "runtime": {
+    "verbose_params": {
+     "show_iter_idx": false
+    },
+    "memory_for_cache": 2
+   }
+  },
+  "dataset": "kdv",
+  "variant": "default",
+  "method": "epde"
+ },
+ "environment": {
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.13.7",
+  "machine": "arm64",
+  "cpu_count": 10,
+  "epde_commit": "unknown",
+  "blas_threads": "1",
+  "numpy": "2.3.4",
+  "scipy": "1.16.2",
+  "torch": "2.9.0",
+  "pysindy": "2.1.0",
+  "cuda": false
+ },
+ "identity": {
+  "schema": 1,
+  "job": {
+   "dataset": "kdv",
+   "variant": "default",
+   "noise": 0.0,
+   "seed": 0
+  },
+  "config": {
+   "loader": {},
+   "search": {
+    "domain": {
+     "boundary_width": "auto"
+    },
+    "preprocessing": {
+     "default_preprocessor_type": "FD",
+     "preprocessor_kwargs": {},
+     "max_deriv_order": "auto"
+    },
+    "search_space": {
+     "data_fun_pow": 3,
+     "deriv_fun_pow": 2,
+     "equation_terms_max_number": 10,
+     "equation_factors_max_number": {
+      "factors_num": [
+       1,
+       2
+      ],
+      "probas": [
+       0.65,
+       0.35
+      ]
+     },
+     "tokens": [
+      {
+       "family": "grid",
+       "labels": [
+        "x"
+       ],
+       "max_power": 2
+      },
+      {
+       "family": "fixed_trigonometric",
+       "freq": 2.0
+      }
+     ]
+    },
+    "objectives": {},
+    "solver": {
+     "use_solver": false,
+     "device": "cpu"
+    },
+    "evolution": {
+     "population_size": 16,
+     "training_epochs": 5
+    },
+    "runtime": {
+     "verbose_params": {
+      "show_iter_idx": false
+     },
+     "memory_for_cache": 2
+    }
+   },
+   "dataset": "kdv",
+   "variant": "default",
+   "method": "epde"
+  },
+  "source_sha256": "9e213a88371bed42376fd17fa31b236c6d7d920b91003fb1e5d7e82921b876d0",
+  "data_sha256": "097470017259af699301ec0aa5c2e42125863092f7270b26580ab78444d0c46f",
+  "dependencies": {
+   "python": "3.13.7",
+   "numpy": "2.3.4",
+   "scipy": "1.16.2",
+   "pandas": "2.3.3",
+   "sympy": "1.14.0",
+   "torch": "2.9.0",
+   "pysindy": "2.1.0",
+   "scikit-learn": "1.7.2",
+   "PyYAML": "6.0.3",
+   "psutil": "7.1.0",
+   "epde": null,
+   "netCDF4": "1.7.4",
+   "h5py": null,
+   "numba": null,
+   "tedeous": null
+  },
+  "sha256": "c449fce3262fb1759c238edcc7ec24afc10addfe9dd60a9ea7d6bc3ca14d46d5"
+ },
+ "problem": {
+  "title": "Korteweg-de Vries equation (PDE-FIND data)",
+  "kind": "pde_1d",
+  "source": "synthetic",
+  "shape": [
+   201,
+   512
+  ],
+  "variables": [
+   "u"
+  ],
+  "meta": {},
+  "truth": [
+   "-6.0 * du/dx1{power: 1.0} * u{power: 1.0} + -1.0 * d^3u/dx1^3{power: 1.0} = du/dx0{power: 1.0}"
+  ],
+  "n_truth_alternatives": 3
+ },
+ "search_config": {
+  "domain": {
+   "boundary_width": [
+    20,
+    51
+   ]
+  },
+  "preprocessing": {
+   "default_preprocessor_type": "FD",
+   "preprocessor_kwargs": {},
+   "max_deriv_order": [
+    2,
+    4
+   ]
+  },
+  "search_space": {
+   "data_fun_pow": 3,
+   "deriv_fun_pow": 2,
+   "equation_terms_max_number": 10,
+   "equation_factors_max_number": {
+    "factors_num": [
+     1,
+     2
+    ],
+    "probas": [
+     0.65,
+     0.35
+    ]
+   },
+   "tokens": [
+    {
+     "family": "grid",
+     "labels": [
+      "x"
+     ],
+     "max_power": 2,
+     "dimensionality": 1
+    },
+    {
+     "family": "fixed_trigonometric",
+     "freq": 2.0,
+     "dimensionality": 1
+    }
+   ]
+  },
+  "objectives": {},
+  "solver": {
+   "use_solver": false,
+   "device": "cpu"
+  },
+  "evolution": {
+   "population_size": 16,
+   "training_epochs": 5
+  },
+  "runtime": {
+   "verbose_params": {
+    "show_iter_idx": false
+   },
+   "memory_for_cache": 2
+  }
+ },
+ "status": "ok",
+ "fit_seconds": 179.97524133299885,
+ "front": [
+  [
+   "-1.5009254280938245 * du/dx0{power: 1.0} * du/dx1{power: 1.0} + -0.5006666207700626 * du/dx1{power: 2.0} + 0.0 = du/dx0{power: 2.0}"
+  ]
+ ],
+ "objectives": [
+  [
+   0.00026722304674031,
+   4.2551399815521826e-08
+  ]
+ ],
+ "metrics": {
+  "front_size": 1,
+  "selected_index": 0,
+  "success_front": false,
+  "success_selected": false,
+  "hamming_min": 4,
+  "hamming_selected": 4,
+  "best_index": 0,
+  "coef_error": null
+ },
+ "selected": [
+  "-1.5009254280938245 * du/dx0{power: 1.0} * du/dx1{power: 1.0} + -0.5006666207700626 * du/dx1{power: 2.0} + 0.0 = du/dx0{power: 2.0}"
+ ],
+ "total_seconds": 181.63020012500056
+}

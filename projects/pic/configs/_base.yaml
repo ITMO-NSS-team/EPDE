@@ -1,13 +1,13 @@
 # Common protocol for every data set.
 #
-# The idea (from the group's former benchmark, projects/thesis on main): one
+# The idea (from the group's former benchmark): one
 # broad token pool and one set of evolutionary settings for all problems, so
 # the user does not tune the pool per problem. Data-set files only add what a
 # problem cannot do without (a special token, a longer boundary, a bigger
 # population for coupled systems).
 #
-# `search` is passed to EpdeSearch(config=...) unchanged; see
-# epde/interface/search_config.py for every key and its default.
+# The search section is passed to the search object unchanged; every key has a
+# documented default in the library.
 
 loader: {}                       # keyword arguments of the data-set loader
 
@@ -27,8 +27,8 @@ search:
       probas: [0.65, 0.35]
     tokens:
       - {family: grid, labels: [x], max_power: 2}                       # coordinates x^1, x^2
-      - {family: fixed_trigonometric, freq: 2.0}                        # sin/cos(2 x_k), see epde_bench/tokens.py
-  objectives: {}                 # shipped defaults: wape + instability(chi2) + vwsr
+      - {family: fixed_trigonometric, freq: 2.0}                        # sin/cos(2 x_k) with exactly one frequency
+  objectives: {}                 # shipped defaults: percentage discrepancy, instability, variance-weighted sparsity
   solver:
     use_solver: false
     device: cpu                  # the solver is off, so the GPU is not used anyway
@@ -36,7 +36,9 @@ search:
     population_size: 16
     training_epochs: 5
   runtime:
-    verbose_params: {show_iter_idx: false}
+    # candidate_objectives: EPDE's per-offspring debug output; it does not affect
+    # the search and would flood notebook outputs and run logs.
+    verbose_params: {show_iter_idx: false, candidate_objectives: false}
     # Cache for evaluated terms, % of TOTAL RAM per process. EPDE's default
     # (15) asserts that much is free at start, which fails as soon as several
     # runs share a 16 GB machine; 2 % (~330 MB there) is enough for the

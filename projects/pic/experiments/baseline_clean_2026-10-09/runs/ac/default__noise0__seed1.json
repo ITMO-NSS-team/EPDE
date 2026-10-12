@@ -1,0 +1,287 @@
+{
+ "dataset": "ac",
+ "variant": "default",
+ "method": "epde",
+ "noise": 0.0,
+ "seed": 1,
+ "started": "2026-10-09T13:28:46+00:00",
+ "config": {
+  "loader": {},
+  "search": {
+   "domain": {
+    "boundary_width": "auto"
+   },
+   "preprocessing": {
+    "default_preprocessor_type": "FD",
+    "preprocessor_kwargs": {},
+    "max_deriv_order": "auto"
+   },
+   "search_space": {
+    "data_fun_pow": 3,
+    "deriv_fun_pow": 2,
+    "equation_terms_max_number": 10,
+    "equation_factors_max_number": {
+     "factors_num": [
+      1,
+      2
+     ],
+     "probas": [
+      0.65,
+      0.35
+     ]
+    },
+    "tokens": [
+     {
+      "family": "grid",
+      "labels": [
+       "x"
+      ],
+      "max_power": 2
+     },
+     {
+      "family": "fixed_trigonometric",
+      "freq": 2.0
+     }
+    ]
+   },
+   "objectives": {},
+   "solver": {
+    "use_solver": false,
+    "device": "cpu"
+   },
+   "evolution": {
+    "population_size": 16,
+    "training_epochs": 5
+   },
+   "runtime": {
+    "verbose_params": {
+     "show_iter_idx": false
+    },
+    "memory_for_cache": 2
+   }
+  },
+  "dataset": "ac",
+  "variant": "default",
+  "method": "epde"
+ },
+ "environment": {
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.13.7",
+  "machine": "arm64",
+  "cpu_count": 10,
+  "epde_commit": "unknown",
+  "blas_threads": "1",
+  "numpy": "2.3.4",
+  "scipy": "1.16.2",
+  "torch": "2.9.0",
+  "pysindy": "2.1.0",
+  "cuda": false
+ },
+ "identity": {
+  "schema": 1,
+  "job": {
+   "dataset": "ac",
+   "variant": "default",
+   "noise": 0.0,
+   "seed": 1
+  },
+  "config": {
+   "loader": {},
+   "search": {
+    "domain": {
+     "boundary_width": "auto"
+    },
+    "preprocessing": {
+     "default_preprocessor_type": "FD",
+     "preprocessor_kwargs": {},
+     "max_deriv_order": "auto"
+    },
+    "search_space": {
+     "data_fun_pow": 3,
+     "deriv_fun_pow": 2,
+     "equation_terms_max_number": 10,
+     "equation_factors_max_number": {
+      "factors_num": [
+       1,
+       2
+      ],
+      "probas": [
+       0.65,
+       0.35
+      ]
+     },
+     "tokens": [
+      {
+       "family": "grid",
+       "labels": [
+        "x"
+       ],
+       "max_power": 2
+      },
+      {
+       "family": "fixed_trigonometric",
+       "freq": 2.0
+      }
+     ]
+    },
+    "objectives": {},
+    "solver": {
+     "use_solver": false,
+     "device": "cpu"
+    },
+    "evolution": {
+     "population_size": 16,
+     "training_epochs": 5
+    },
+    "runtime": {
+     "verbose_params": {
+      "show_iter_idx": false
+     },
+     "memory_for_cache": 2
+    }
+   },
+   "dataset": "ac",
+   "variant": "default",
+   "method": "epde"
+  },
+  "source_sha256": "9e213a88371bed42376fd17fa31b236c6d7d920b91003fb1e5d7e82921b876d0",
+  "data_sha256": "7d0610fdab699671a11c80d1574df8a897f6282bb527a75bf278a6b1b3f9646e",
+  "dependencies": {
+   "python": "3.13.7",
+   "numpy": "2.3.4",
+   "scipy": "1.16.2",
+   "pandas": "2.3.3",
+   "sympy": "1.14.0",
+   "torch": "2.9.0",
+   "pysindy": "2.1.0",
+   "scikit-learn": "1.7.2",
+   "PyYAML": "6.0.3",
+   "psutil": "7.1.0",
+   "epde": null,
+   "netCDF4": "1.7.4",
+   "h5py": null,
+   "numba": null,
+   "tedeous": null
+  },
+  "sha256": "67047df6a84da8904c27456a14da60386794f81614cec31c5d4591ed7b40fd7a"
+ },
+ "problem": {
+  "title": "Allen-Cahn equation",
+  "kind": "pde_1d",
+  "source": "synthetic",
+  "shape": [
+   51,
+   128
+  ],
+  "variables": [
+   "u"
+  ],
+  "meta": {},
+  "truth": [
+   "0.0001 * d^2u/dx1^2{power: 1.0} + -5.0 * u{power: 3.0} + 5.0 * u{power: 1.0} = du/dx0{power: 1.0}"
+  ],
+  "n_truth_alternatives": 0
+ },
+ "search_config": {
+  "domain": {
+   "boundary_width": [
+    5,
+    12
+   ]
+  },
+  "preprocessing": {
+   "default_preprocessor_type": "FD",
+   "preprocessor_kwargs": {},
+   "max_deriv_order": [
+    2,
+    4
+   ]
+  },
+  "search_space": {
+   "data_fun_pow": 3,
+   "deriv_fun_pow": 2,
+   "equation_terms_max_number": 10,
+   "equation_factors_max_number": {
+    "factors_num": [
+     1,
+     2
+    ],
+    "probas": [
+     0.65,
+     0.35
+    ]
+   },
+   "tokens": [
+    {
+     "family": "grid",
+     "labels": [
+      "x"
+     ],
+     "max_power": 2,
+     "dimensionality": 1
+    },
+    {
+     "family": "fixed_trigonometric",
+     "freq": 2.0,
+     "dimensionality": 1
+    }
+   ]
+  },
+  "objectives": {},
+  "solver": {
+   "use_solver": false,
+   "device": "cpu"
+  },
+  "evolution": {
+   "population_size": 16,
+   "training_epochs": 5
+  },
+  "runtime": {
+   "verbose_params": {
+    "show_iter_idx": false
+   },
+   "memory_for_cache": 2
+  }
+ },
+ "status": "ok",
+ "fit_seconds": 39.70132554099837,
+ "front": [
+  [
+   "4.9957896387798755 * u{power: 1.0} + 0.0001362984258684375 * d^2u/dx1^2{power: 1.0} + -4.992722202877194 * u{power: 3.0} + 0.0 = du/dx0{power: 1.0}"
+  ],
+  [
+   "4.968611741148638 * u{power: 1.0} + -4.968266844831164 * u{power: 3.0} + 0.0 = du/dx0{power: 1.0}"
+  ],
+  [
+   "4.9909936600269935 * u{power: 1.0} + -4.98791062731409 * u{power: 3.0} + 0.00016460848763711497 * x{power: 1.0, dim: 0.0} * d^2u/dx1^2{power: 1.0} + 0.0 = du/dx0{power: 1.0}"
+  ]
+ ],
+ "objectives": [
+  [
+   0.0027713355728680275,
+   0.008168538298187538
+  ],
+  [
+   0.00739845525263909,
+   0.00016305109640019048
+  ],
+  [
+   0.0028685953370968997,
+   0.004553680607827653
+  ]
+ ],
+ "metrics": {
+  "front_size": 3,
+  "selected_index": 2,
+  "success_front": true,
+  "success_selected": false,
+  "hamming_min": 0,
+  "hamming_selected": 2,
+  "best_index": 0,
+  "coef_error": 0.12176063011765369
+ },
+ "selected": [
+  "4.9909936600269935 * u{power: 1.0} + -4.98791062731409 * u{power: 3.0} + 0.00016460848763711497 * x{power: 1.0, dim: 0.0} * d^2u/dx1^2{power: 1.0} + 0.0 = du/dx0{power: 1.0}"
+ ],
+ "total_seconds": 41.22667695800192
+}

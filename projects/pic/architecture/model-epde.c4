@@ -1,0 +1,500 @@
+// EPDE: data-driven discovery of differential equations by multiobjective evolution.
+
+model {
+
+  researcher = actor 'Researcher' {
+    description 'Prepares data and a configuration, runs the search, reads and checks the discovered equations.'
+  }
+
+  numpyStack = external 'NumPy / SciPy / scikit-learn' {
+    description 'Arrays, linear algebra, least squares and sparse regression used by every stage.'
+  }
+  torch = external 'PyTorch' {
+    description 'Neural smoothing of data, neural derivatives, the built-in PDE solver.'
+  }
+  deepxde = external 'DeepXDE' {
+    #optional
+    description 'Optional physics-informed network backend for solving candidate equations.'
+  }
+
+  epde = system 'EPDE framework' {
+    description 'Finds the differential equation (or system) that governs data: builds candidate terms from tokens, searches equation structures with a multiobjective evolutionary algorithm and returns a Pareto front.'
+    link https://github.com/ITMO-NSS-team/EPDE
+
+    // ------------------------------------------------------------------ interface
+    interface = module 'Interface' {
+      description 'Public entry point: the search object, its configuration, token families and conversion of equations to and from text.'
+
+      epdeSearch = component 'Search object' {
+        description 'Facade of the library. Holds the resolved configuration, the domains and trajectories, the token pool and the optimizer; exposes the user workflow.'
+
+        createDomain = component 'Create domain' {
+          description 'Registers a grid (one array per axis, time first) and the boundary excluded from fitting.'
+        }
+        createTrajectory = component 'Attach data' {
+          description 'Attaches data of all variables to a domain; derivatives are computed here by the preprocessing pipeline.'
+        }
+        createPool = component 'Build token pool' {
+          description 'Builds the token pool: variable and derivative families from the trajectories plus additional families supplied by the user.'
+        }
+        fit = component 'Run the search' {
+          description 'Resolves pool parameters, creates the pool if needed, builds the optimizer through the strategy director and runs the evolution.'
+        }
+        equations = component 'Read the result' {
+          description 'Returns or prints the final population: Pareto levels in multiobjective mode, the sorted population otherwise.'
+        }
+        predict = component 'Solve a discovered equation' {
+          description 'Solves a discovered equation with the built-in solver; returns equations in solver form.'
+        }
+      }
+
+      searchConfig = config 'Search configuration' {
+        description 'Grouped settings with documented defaults, loaded from a dict, JSON or YAML; keyword arguments override the file. Validates metric names and sparsity options.'
+
+        domainCfg = config 'domain' {
+          description 'Boundary width per axis, time axis.'
+        }
+        preprocessingCfg = config 'preprocessing' {
+          description 'Preprocessor type (finite differences, polynomial, spectral, neural network), its options, maximum derivative orders.'
+        }
+        searchSpaceCfg = config 'search space' {
+          description 'Maximum powers of the variable and of its derivatives, maximum terms per equation and factors per term, declarative token families.'
+        }
+        objectivesCfg = config 'objectives' {
+          description 'Multiobjective mode, discrepancy metric, second objective (instability or complexity), instability metric, sparsity operator and its options.'
+        }
+        solverCfg = config 'solver' {
+          description 'Whether candidates are solved, backend (autograd, DeepXDE, basis), device, solver options.'
+        }
+        evolutionCfg = config 'evolution' {
+          description 'Population size, epochs, neighbourhood size, penalty of the decomposition, parameters of every operator.'
+        }
+        runtimeCfg = config 'runtime' {
+          description 'Share of memory for cached tensors, logging, cache release after fit.'
+        }
+        registries = config 'Registries and menus' {
+          description 'Names accepted in the configuration: declarative token families, sparsity operators (vwsr, lasso, knee), metric menus and aliases.'
+        }
+      }
+
+      legacyApi = component 'Legacy call translation' {
+        #legacy
+        description 'Maps the former keyword-based constructor and fit arguments onto domains, trajectories and the configuration, with deprecation warnings.'
+      }
+
+      preparedTokens = component 'Prepared token families' {
+        description 'Ready-made families: grid coordinates, trigonometric, phased sine, constants, logarithms, data polynomials and signs, stored arrays (forcing, coefficient fields), external derivatives, control variables, custom evaluators.'
+      }
+
+      tokenFamily = component 'Token families and pool' {
+        description 'A family declares token labels, parameter ranges, equality tolerances, evaluator and status (meaningful, unique, requires an equation). The pool groups families and samples tokens for new terms.'
+      }
+
+      translator = component 'Equation translator' {
+        description 'Parses the text form of equations back into systems; used to evaluate given equations and to restart searches.'
+      }
+
+      multisample = component 'Several samples and experiments' {
+        #optional
+        description 'Search over several samples of one process; combining results of several experiments.'
+      }
+
+      logger = component 'Run log' {
+        #optional
+        description 'Records discovered equations and objective values of runs; compares them with reference equations.'
+      }
+    }
+
+    // ------------------------------------------------------------------ data structures
+    structure = module 'Data structures' {
+      description 'Domains, trajectories and the genotype of a candidate: factor -> term -> equation -> system.'
+
+      domain = component 'Domain' {
+        description 'Grid of one experiment, boundary, inner shape used for fitting.'
+      }
+      trajectory = component 'Data sample' {
+        description 'One data sample on a domain: variables, their derivatives from the preprocessing pipeline, the token families they define, uploaded stored tensors.'
+      }
+      samplesManager = component 'Registry of samples' {
+        description 'Global registry of trajectories; routes token evaluation to every sample, provides inner shapes and weighting functions.'
+      }
+      factor = component 'Factor (token)' {
+        description 'Elementary function with parameters (power, frequency, axis); evaluates itself through the family evaluator and the tensor cache.'
+      }
+      term = component 'Term' {
+        description 'Product of factors; the unit that crossover and mutation exchange or replace.'
+      }
+      equation = component 'Equation' {
+        description 'Set of terms, the index of the term used as the left-hand side, internal and final weights, cached objective values and flags.'
+      }
+      soeq = component 'System of equations' {
+        description 'One equation per variable plus metaparameters (sparsity, number of terms, factors per term); the solution object of the optimizer, with its objective vector.'
+      }
+      encoding = component 'Chromosome encoding' {
+        description 'Generic chromosome container used by the solution objects.'
+      }
+    }
+
+    // ------------------------------------------------------------------ preprocessing
+    preprocessing = module 'Preprocessing' {
+      description 'Turns raw fields into smoothed fields and derivative stacks: smoother followed by a derivative calculator.'
+
+      setups = component 'Preprocessor assembly' {
+        description 'Assembles a pipeline for the configured type: finite differences, polynomial, spectral or neural network.'
+      }
+      pipe = component 'Preprocessing pipeline' {
+        description 'Runs smoother then derivative calculator; returns the processed field and the axis-major derivative stack.'
+      }
+      smoothers = component 'Smoothers' {
+        description 'No smoothing, Gaussian filter, neural network fitted to the data.'
+      }
+      derivCalculators = component 'Derivative calculators' {
+        description 'Adaptive finite differences, local Chebyshev polynomials, spectral differentiation with a cut-off, total variation; derivatives of the neural smoother.'
+      }
+      pruning = component 'Domain pruning' {
+        #optional
+        description 'Optional selection of subdomains with informative data.'
+      }
+    }
+
+    // ------------------------------------------------------------------ cache and global state
+    state = module 'Caches and global state' {
+      description 'Process-wide stores shared by all stages.'
+
+      tensorCache = store 'Tensor cache' {
+        description 'Evaluated token tensors keyed by label and parameters, limited by the memory share from the runtime settings.'
+      }
+      gridCache = store 'Grid cache' {
+        description 'Coordinate tensors of the domains.'
+      }
+      activeConfig = store 'Active configuration' {
+        description 'Configuration of the running search; operators read metric names and options from it at compute time.'
+      }
+      history = store 'Training history / verbosity' {
+        description 'Optional history of the search and verbosity settings.'
+      }
+    }
+
+    // ------------------------------------------------------------------ optimizers
+    optimizers = module 'Optimizers' {
+      description 'Evolutionary engines and the builder that wires operators into a strategy.'
+
+      builder = component 'Strategy builder' {
+        description 'A strategy is a chain of blocks; each block applies one operator to the population.'
+      }
+      moeaddDirector = component 'Multiobjective strategy assembly' {
+        description 'Assembles the multiobjective strategy: initial sorting -> selection -> variation -> offspring update, and wires sparsity, coefficients and fitness into the right-part selector.'
+      }
+      moeadd = component 'Multiobjective optimizer (MOEA/DD)' {
+        #default
+        description 'Multiobjective evolution by decomposition with dominance (MOEA/DD): weight vectors, neighbourhoods, penalty-based intersection, Pareto levels.'
+      }
+      paretoLevels = component 'Pareto levels' {
+        description 'Population sorted into non-dominated levels; the first level is the result of the search.'
+      }
+      populationConstructor = component 'Initial population' {
+        description 'Creates random systems from the token pool within the size limits and initial metaparameters.'
+      }
+      singleDirector = component 'Single-objective optimizer' {
+        description 'Single-objective evolution: roulette selection, elitism, stop conditions.'
+      }
+    }
+
+    // ------------------------------------------------------------------ operators
+    operators = module 'Evolutionary operators' {
+      description 'Every step of the evolution is an operator with parameters and nested operators, applied at gene (equation) or chromosome (system) level.'
+
+      template = component 'Operator template' {
+        description 'Base class with parameters and suboperators; mappers lift an equation-level operator to the system level and add conditions.'
+      }
+
+      selection = module 'Selection' {
+        moeaddSelection = operator 'Parent selection' {
+          description 'Chooses parents from neighbouring subproblems with probability delta, otherwise from the whole population.'
+        }
+        neighborSelector = operator 'Neighbourhood' {
+          description 'Neighbourhood of a weight vector.'
+        }
+      }
+
+      variation = module 'Variation (crossover)' {
+        plCrossover = operator 'Pairing of parents' {
+          description 'Pairs the selected parents and produces offspring.'
+        }
+        chromosomeCrossover = operator 'Exchange of equations' {
+          description 'Exchanges equations between two systems.'
+        }
+        equationCrossover = operator 'Exchange of terms' {
+          description 'Exchanges terms between two equations of the same variable.'
+        }
+        termCrossover = operator 'Term and parameter crossover' {
+          description 'Swaps whole terms or blends the parameters of matching terms.'
+        }
+        metaCrossover = operator 'Metaparameter crossover' {
+          description 'Blends metaparameters (sparsity, sizes) of the parents.'
+        }
+      }
+
+      mutation = module 'Mutation' {
+        systemMutation = operator 'System mutation' {
+          description 'Mutates each equation of a system with a given probability.'
+        }
+        equationMutation = operator 'Equation mutation' {
+          description 'Replaces terms or adds new ones sampled from the pool.'
+        }
+        termMutation = operator 'Term and parameter mutation' {
+          description 'New random term, or perturbed parameters of factors.'
+        }
+        metaMutation = operator 'Metaparameter mutation' {
+          description 'Gaussian perturbation of metaparameters.'
+        }
+      }
+
+      populationUpdate = module 'Population update' {
+        initialSorter = operator 'Initial sorting' {
+          description 'Evaluates the initial population and sorts it into Pareto levels.'
+        }
+        offspringUpdater = operator 'Offspring update' {
+          description 'For every offspring: mutation, right-part selection, fitness, insertion into the Pareto levels; regenerates degenerate systems and repeated right-hand sides.'
+        }
+        paretoUpdater = operator 'Insertion into Pareto levels' {
+          description 'Inserts a solution and removes the worst one by decomposition and dominance.'
+        }
+      }
+
+      rps = module 'Right-part selection (fit of a candidate)' {
+        description 'Owns the fit: every term of an equation is tried as the left-hand side; for each choice the support is sparsified, coefficients are computed and the result is scored.'
+        soeqRps = operator 'Fit of a system' {
+          description 'Runs the selector for each equation of a system and re-rolls equations that duplicate another equation of the system.'
+        }
+        eqRps = operator 'Fit of an equation (left-hand side sweep)' {
+          #hotspot
+          description 'Term sweep: precomputes a Gram matrix over all terms once, then for each candidate target runs sparsity -> coefficients -> fitness and keeps the best split; prunes zero terms at the end.'
+        }
+      }
+
+      sparsity = module 'Sparsity' {
+        description 'Decides which terms stay in an equation.'
+        vwsr = operator 'Variance-weighted sparse regression' {
+          #default
+          description 'Variance-weighted sparse regression: L1 penalty of each term derived from the variability of its coefficient across windows; physical-scale coefficients.'
+        }
+        piLasso = component 'Per-term penalised regression' {
+          description 'Estimator behind the variance-weighted sparse regression: windowed fits, coefficient-of-variation scores, soft thresholding with per-term penalties.'
+        }
+        lasso = operator 'LASSO' {
+          #legacy
+          description 'Plain LASSO with the sparsity metaparameter as alpha.'
+        }
+        knee = operator 'Knee of the error curve' {
+          description 'Builds a chain of supports and picks the knee of the error-versus-size curve.'
+        }
+      }
+
+      coeffs = operator 'Coefficients' {
+        description 'Final coefficients of the kept terms by least squares (or promoted from the sparsity step when it already fits the physical scale).'
+      }
+
+      fitness = module 'Fitness' {
+        solverFree = operator 'Fitness on the data' {
+          #default
+          description 'Scores an equation on the data without solving it: discrepancy plus the second objective.'
+        }
+        solverBased = operator 'Fitness by solving' {
+          #optional
+          description 'Solves the candidate with a backend and scores the solution against the data.'
+        }
+      }
+
+      objectives = module 'Objectives' {
+        description 'Values that span the Pareto front.'
+        discrepancy = component 'Discrepancy' {
+          description 'Mismatch of the two sides: weighted absolute percentage, squared, relative, scale-invariant; or solution error for solver backends.'
+        }
+        instability = component 'Instability' {
+          #default
+          description 'How much coefficients change across parts of the domain; the estimator is chosen in the objectives settings.'
+        }
+        complexity = component 'Complexity' {
+          description 'Number of terms or factors.'
+        }
+      }
+
+      stabilityEstimators = module 'Stability estimators' {
+        gram = component 'Windowed Gram matrices' {
+          description 'Windowed Gram matrices along the axes or on a cosine basis of varying coefficients.'
+        }
+        windows = component 'Window statistics' {
+          description 'Coefficient of variation of windowed fits, cross-validation scores.'
+        }
+        survival = component 'Constancy tests' {
+          description 'Cumulative score paths (chi-square), survival, tiles, heterogeneity.'
+        }
+      }
+    }
+
+    // ------------------------------------------------------------------ solvers
+    integrate = module 'Solving candidate equations' {
+      #optional
+      description 'Adapters that solve a discovered system for prediction or for solver-based fitness.'
+
+      systemSolver = component 'Solver interface' {
+        description 'Converts a system into the solver form and builds evaluation functions.'
+      }
+      bop = component 'Boundary conditions' {
+        description 'Boundary and initial operators derived from the data.'
+      }
+      autogradAdapter = component 'Built-in solver adapter' {
+        description 'Physics-informed network or matrix solver of the built-in PDE solver.'
+      }
+      deepxdeAdapter = component 'DeepXDE adapter' {
+        description 'Solves with DeepXDE, fixed coefficients, scored on a held-out time tail.'
+      }
+      basisAdapter = component 'Basis-function adapter' {
+        description 'Solution on Chebyshev or Fourier bases.'
+      }
+      odeAdapter = component 'Classical and spectral integration' {
+        description 'Classical integration of ordinary equations; spectral solver.'
+      }
+      solverCore = component 'Built-in PDE solver' {
+        description 'Torch-based solver: models, losses, derivatives (autograd, finite differences, matrices), optimizers, callbacks.'
+      }
+    }
+
+    extras = module 'Other packages' {
+      #optional
+      parametric = component 'Parametric equations' {
+        description 'Equations with parametric factors and their optimisation.'
+      }
+      control = component 'Control' {
+        description 'Search for control laws with constraints.'
+      }
+      loader = component 'Saving and loading' {
+        description 'Saving and loading search objects and populations.'
+      }
+    }
+  }
+
+  // ==================================================================== relationships
+
+  researcher -[calls]-> epde.interface.epdeSearch 'configures, adds data, fits, reads equations'
+  researcher -[data]-> epde.interface.searchConfig 'dict / JSON / YAML'
+
+  // configuration
+  epde.interface.epdeSearch -[reads]-> epde.interface.searchConfig 'load and validate'
+  epde.interface.searchConfig -[data]-> epde.state.activeConfig 'published for operators'
+  epde.interface.searchConfig.registries -[builds]-> epde.interface.preparedTokens 'declarative families by name'
+  epde.interface.epdeSearch -[calls]-> epde.interface.legacyApi 'translates old arguments'
+
+  // domain and data
+  epde.interface.epdeSearch.createDomain -[builds]-> epde.structure.domain 'grid, boundary'
+  epde.structure.domain -[data]-> epde.state.gridCache 'coordinate tensors'
+  epde.interface.epdeSearch.createTrajectory -[builds]-> epde.structure.trajectory 'data of all variables'
+  epde.structure.trajectory -[calls]-> epde.preprocessing.pipe 'derivatives'
+  epde.interface.searchConfig.preprocessingCfg -[reads]-> epde.preprocessing.setups 'preprocessor type and options'
+  epde.preprocessing.setups -[builds]-> epde.preprocessing.pipe 'pipeline'
+  epde.preprocessing.pipe -[calls]-> epde.preprocessing.smoothers 'smooth'
+  epde.preprocessing.pipe -[calls]-> epde.preprocessing.derivCalculators 'differentiate'
+  epde.preprocessing.smoothers -[calls]-> torch 'neural smoothing'
+  epde.preprocessing.derivCalculators -[calls]-> numpyStack 'gradients, polynomial fits, FFT'
+  epde.structure.trajectory -[data]-> epde.state.tensorCache 'fields and derivatives'
+  epde.structure.trajectory -[data]-> epde.structure.samplesManager 'registered sample'
+
+  // pool
+  epde.interface.epdeSearch.createPool -[builds]-> epde.interface.tokenFamily 'pool'
+  epde.structure.trajectory -[data]-> epde.interface.tokenFamily 'variable and derivative families'
+  epde.interface.preparedTokens -[builds]-> epde.interface.tokenFamily 'additional families'
+  epde.interface.searchConfig.searchSpaceCfg -[reads]-> epde.interface.tokenFamily 'powers, families'
+
+  // genotype
+  epde.structure.factor -[data]-> epde.state.tensorCache 'evaluated tokens'
+  epde.structure.factor -[calls]-> epde.structure.samplesManager 'evaluate on every sample'
+  epde.structure.term -[calls]-> epde.structure.factor 'product of factors'
+  epde.structure.equation -[calls]-> epde.structure.term 'terms, left-hand side, weights'
+  epde.structure.soeq -[calls]-> epde.structure.equation 'one per variable'
+  epde.structure.soeq -[calls]-> epde.structure.encoding 'chromosome'
+
+  // fit -> optimizer
+  epde.interface.epdeSearch.fit -[calls]-> epde.interface.epdeSearch.createPool 'if the pool is missing or changed'
+  epde.interface.epdeSearch.fit -[builds]-> epde.optimizers.moeaddDirector 'strategy'
+  epde.interface.epdeSearch.fit -[builds]-> epde.optimizers.singleDirector 'single-objective mode'
+  epde.interface.epdeSearch.fit -[calls]-> epde.optimizers.moeadd 'run the evolution'
+  epde.interface.searchConfig.evolutionCfg -[reads]-> epde.optimizers.moeadd 'population, epochs, neighbourhood'
+  epde.interface.searchConfig.objectivesCfg -[reads]-> epde.optimizers.moeaddDirector 'second objective, sparsity operator'
+  epde.optimizers.moeaddDirector -[calls]-> epde.optimizers.builder 'chain of blocks'
+  epde.optimizers.moeaddDirector -[builds]-> epde.operators.populationUpdate.initialSorter 'block 1'
+  epde.optimizers.moeaddDirector -[builds]-> epde.operators.selection.moeaddSelection 'block 2'
+  epde.optimizers.moeaddDirector -[builds]-> epde.operators.variation.plCrossover 'block 3'
+  epde.optimizers.moeaddDirector -[builds]-> epde.operators.populationUpdate.offspringUpdater 'block 4'
+  epde.optimizers.moeaddDirector -[builds]-> epde.operators.rps.soeqRps 'wires sparsity, coefficients, fitness'
+  epde.optimizers.moeadd -[calls]-> epde.optimizers.populationConstructor 'initial population'
+  epde.optimizers.populationConstructor -[calls]-> epde.interface.tokenFamily 'sample tokens'
+  epde.optimizers.populationConstructor -[builds]-> epde.structure.soeq 'random systems'
+  epde.optimizers.moeadd -[calls]-> epde.optimizers.builder 'run strategy each epoch'
+  epde.optimizers.moeadd -[data]-> epde.optimizers.paretoLevels 'population'
+  epde.interface.epdeSearch.equations -[reads]-> epde.optimizers.paretoLevels 'first level'
+
+  // evolutionary loop
+  epde.operators.populationUpdate.initialSorter -[calls]-> epde.operators.rps.soeqRps 'fit every system'
+  epde.operators.populationUpdate.initialSorter -[calls]-> epde.operators.fitness.solverFree 'objective vector'
+  epde.operators.populationUpdate.initialSorter -[data]-> epde.optimizers.paretoLevels 'sort'
+  epde.operators.selection.moeaddSelection -[calls]-> epde.operators.selection.neighborSelector 'neighbours'
+  epde.operators.selection.moeaddSelection -[reads]-> epde.optimizers.paretoLevels 'parents'
+  epde.operators.variation.plCrossover -[calls]-> epde.operators.variation.chromosomeCrossover ''
+  epde.operators.variation.chromosomeCrossover -[calls]-> epde.operators.variation.equationCrossover ''
+  epde.operators.variation.chromosomeCrossover -[calls]-> epde.operators.variation.metaCrossover ''
+  epde.operators.variation.equationCrossover -[calls]-> epde.operators.variation.termCrossover ''
+  epde.operators.populationUpdate.offspringUpdater -[calls]-> epde.operators.mutation.systemMutation '1. mutate'
+  epde.operators.mutation.systemMutation -[calls]-> epde.operators.mutation.equationMutation ''
+  epde.operators.mutation.systemMutation -[calls]-> epde.operators.mutation.metaMutation ''
+  epde.operators.mutation.equationMutation -[calls]-> epde.operators.mutation.termMutation ''
+  epde.operators.mutation.termMutation -[calls]-> epde.interface.tokenFamily 'new tokens'
+  epde.operators.populationUpdate.offspringUpdater -[calls]-> epde.operators.rps.soeqRps '2. fit'
+  epde.operators.populationUpdate.offspringUpdater -[calls]-> epde.operators.fitness.solverFree '3. score'
+  epde.operators.populationUpdate.offspringUpdater -[calls]-> epde.operators.populationUpdate.paretoUpdater '4. insert'
+  epde.operators.populationUpdate.paretoUpdater -[data]-> epde.optimizers.paretoLevels 'update levels'
+
+  // fit of one candidate
+  epde.operators.rps.soeqRps -[calls]-> epde.operators.rps.eqRps 'each equation'
+  epde.operators.rps.eqRps -[calls]-> epde.structure.equation 'evaluate terms, set left-hand side'
+  epde.operators.rps.eqRps -[calls]-> epde.operators.stabilityEstimators.gram 'Gram matrix over all terms'
+  epde.operators.rps.eqRps -[calls]-> epde.operators.sparsity.vwsr 'a. support'
+  epde.operators.rps.eqRps -[calls]-> epde.operators.sparsity.lasso 'a. support (legacy)'
+  epde.operators.rps.eqRps -[calls]-> epde.operators.sparsity.knee 'a. support (knee)'
+  epde.operators.rps.eqRps -[calls]-> epde.operators.coeffs 'b. coefficients'
+  epde.operators.rps.eqRps -[calls]-> epde.operators.fitness.solverFree 'c. score each split'
+  epde.operators.sparsity.vwsr -[calls]-> epde.operators.sparsity.piLasso 'per sample'
+  epde.operators.sparsity.piLasso -[calls]-> epde.operators.stabilityEstimators.windows 'coefficient variation'
+  epde.operators.sparsity.lasso -[calls]-> numpyStack 'LASSO'
+  epde.operators.coeffs -[calls]-> numpyStack 'least squares'
+  epde.interface.searchConfig.objectivesCfg -[reads]-> epde.operators.sparsity 'operator and options'
+
+  // scoring
+  epde.operators.fitness.solverFree -[calls]-> epde.operators.objectives.discrepancy 'objective 1'
+  epde.operators.fitness.solverFree -[calls]-> epde.operators.objectives.instability 'objective 2 (default)'
+  epde.operators.fitness.solverFree -[calls]-> epde.operators.objectives.complexity 'objective 2 (alternative)'
+  epde.operators.objectives.instability -[reads]-> epde.state.activeConfig 'instability metric'
+  epde.operators.objectives.discrepancy -[reads]-> epde.state.activeConfig 'discrepancy metric'
+  epde.operators.objectives.instability -[calls]-> epde.operators.stabilityEstimators.survival 'chi-square and others'
+  epde.operators.objectives.instability -[calls]-> epde.operators.stabilityEstimators.windows 'cv, vcoef'
+  epde.operators.fitness.solverBased -[calls]-> epde.integrate.systemSolver 'solve candidate'
+  epde.operators.fitness.solverBased -[calls]-> epde.operators.objectives.discrepancy 'solution error'
+  epde.interface.searchConfig.solverCfg -[reads]-> epde.operators.fitness.solverBased 'backend, device'
+
+  // solvers
+  epde.interface.epdeSearch.predict -[calls]-> epde.integrate.systemSolver 'solve discovered system'
+  epde.integrate.systemSolver -[calls]-> epde.integrate.bop 'conditions from data'
+  epde.integrate.systemSolver -[calls]-> epde.integrate.autogradAdapter 'autograd backend'
+  epde.integrate.systemSolver -[calls]-> epde.integrate.deepxdeAdapter 'deepxde backend'
+  epde.integrate.systemSolver -[calls]-> epde.integrate.basisAdapter 'basis backend'
+  epde.integrate.systemSolver -[calls]-> epde.integrate.odeAdapter 'ordinary equations'
+  epde.integrate.autogradAdapter -[calls]-> epde.integrate.solverCore ''
+  epde.integrate.solverCore -[calls]-> torch ''
+  epde.integrate.deepxdeAdapter -[calls]-> deepxde ''
+
+  // other
+  epde.interface.translator -[builds]-> epde.structure.soeq 'from text'
+  epde.structure.soeq -[data]-> epde.interface.translator 'text form'
+  epde.extras.loader -[data]-> epde.interface.epdeSearch 'save / load'
+  epde.interface.multisample -[calls]-> epde.interface.epdeSearch 'several samples'
+}

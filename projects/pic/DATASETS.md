@@ -1,342 +1,275 @@
-# Наборы данных в projects/pic/data
+# Data sets in projects/pic/data
 
-Файл сгенерирован из `epde_bench/datasets.py` командой `python -m epde_bench._make_docs` (из папки `projects/pic`); правьте загрузчики и генератор, а не этот файл. Любой набор загружается через `epde_bench.datasets.load(имя)` и запускается командой `python projects/pic/bench.py run <имя>`.
+Generated from the data-set loaders; edit the loaders, not this file. The name in the first column is what the command line, the scripts and the notebooks use to refer to a record.
 
-Наборы: **core** -- синтетика с известной истиной -- основные таблицы бенчмарка; **extended** -- синтетика с известной истиной, медленнее или менее стандартная; **real** -- реальные измерения; **other** -- загружается, но в бенчмарк не входит.
+Suites: **core** -- synthetic with a known law; the main benchmark tables; **extended** -- synthetic with a known law, slower or less standard; **real** -- measurements; **other** -- loads, but is not part of the benchmark.
 
-Уравнения записаны в текстовой форме EPDE: `dx0` -- время, `dx1`, `dx2`, ... -- пространственные оси в порядке, указанном в «оси»; `x{power: p, dim: k}` -- k-я координата в степени p. Оценивается только набор членов, коэффициенты справочные.
+Equations are written in EPDE text form: `dx0` is time, `dx1`, `dx2`, ... are the space axes in the order given under "axes"; `x{power: p, dim: k}` is the k-th coordinate to the power p. Only the set of terms is scored; coefficients are for reference.
 
-| имя | набор | класс | источник | форма | переменные | истина | название |
+| name | suite | class | source | shape | variables | law | title |
 |---|---|---|---|---|---|---|---|
-| `ode` | core | ОДУ | синтетика | 320 | u | есть | Вынужденный осциллятор с переменным затуханием |
-| `vdp` | core | ОДУ | синтетика | 320 | u | есть | Осциллятор Ван дер Поля (mu = 0.2) |
-| `duffing` | core | ОДУ | синтетика | 1001 | u | есть | Осциллятор Дуффинга с вынуждающей силой |
-| `lv` | core | система ОДУ | синтетика | 301 | u, v | есть (+1 альт.) | Лотка-Вольтерра (хищник-жертва) |
-| `lorenz` | core | система ОДУ | синтетика | 1041 | u, v, w | есть | Система Лоренца-63 |
-| `ac` | core | УЧП, 1 измерение | синтетика | 51 x 128 | u | есть | Уравнение Аллена-Кана |
-| `burgers` | core | УЧП, 1 измерение | синтетика | 101 x 256 | u | есть | Вязкое уравнение Бюргерса (данные PDE-FIND) |
-| `burgers_inviscid` | core | УЧП, 1 измерение | синтетика | 101 x 101 | u | есть (+2 альт.) | Невязкое уравнение Бюргерса |
-| `wave` | core | УЧП, 1 измерение | синтетика | 81 x 81 | u | есть (+4 альт.) | Волновое уравнение |
-| `kdv` | core | УЧП, 1 измерение | синтетика | 201 x 512 | u | есть (+3 альт.) | Уравнение Кортевега-де Фриза (данные PDE-FIND) |
-| `kdv_cossin` | core | УЧП, 1 измерение | синтетика | 81 x 81 | u | есть | KdV с источником cos(t)sin(x) |
-| `ks` | core | УЧП, 1 измерение | синтетика | 251 x 1024 | u | есть | Уравнение Курамото-Сивашинского |
-| `pde_compound` | core | УЧП, 1 измерение | синтетика | 251 x 100 | u | есть | Нелинейная диффузия u_t = (u u_x)_x |
-| `pde_divide` | core | УЧП, 1 измерение | синтетика | 251 x 100 | u | есть | УЧП с коэффициентом 1/x |
-| `ns` | core | УЧП, 2 измерения | синтетика | 50 x 20 x 36 | u, v, p | есть | Навье-Стокс, след за цилиндром (Re = 100) |
-| `kdv_homogen` | extended | УЧП, 1 измерение | синтетика | 120 x 480 | u | есть | KdV, однородное, x в [-3, 3] |
-| `kdv_sga` | extended | УЧП, 1 измерение | синтетика | 201 x 512 | u | есть | KdV, запись SGA-PDE (u_t = -u u_x - 0.0025 u_xxx) |
-| `jhtdb_plane` | extended | УЧП, 2 измерения | синтетика | 40 x 48 x 48 | u, v | есть | Изотропная турбулентность, 2-D срез JHTDB |
-| `pend_single` | real | ОДУ | измерения | 5000 | theta | есть (+1 альт.) | Реальный одиночный маятник (энкодер, стенд HardwareX) |
-| `dp_encoder` | real | система ОДУ | измерения | 6000 | theta1, theta2 | неизвестна | Реальный двойной маятник (энкодер, стенд HardwareX) |
-| `robot_arm` | real | ОДУ | измерения | 1024 | y | неизвестна | DaISy: гибкая рука робота (момент -> ускорение) |
-| `ballbeam` | real | ОДУ | измерения | 1000 | y | неизвестна | DaISy: шар на балке (угол балки -> положение шара) |
-| `heat_solar_1d` | other | УЧП, 1 измерение | синтетика | 576 x 51 | u | неизвестна | Теплоперенос в почве при солнечном нагреве, 1-D |
-| `heat_solar_2d` | other | УЧП, 2 измерения | синтетика | 144 x 51 x 51 | u | неизвестна | Теплоперенос в почве при солнечном нагреве, 2-D |
-| `heat_laser` | other | УЧП, 3 измерения | синтетика | 20 x 51 x 51 x 3 | u | неизвестна | Теплопроводность с движущимся лазерным источником, 3-D |
-| `dp_sim` | other | система ОДУ | синтетика | 1001 | theta1, theta2 | неизвестна | Двойной маятник, моделирование |
-| `dp_video` | other | система ОДУ | измерения | 38827 | theta1, theta2 | неизвестна | Реальный двойной маятник (видеотрекинг) |
-| `sst` | other | УЧП, 2 измерения | измерения | 90 x 268 x 384 | T | неизвестна | Температура поверхности моря, ESA CCI L4 (янв-мар 2025) |
-| `darcy` | other | УЧП, 2 измерения | синтетика | - | - | нет файлов | Течение Дарси -div(nu grad u) = 1 (нет файлов данных) |
+| `ode` | core | ODE (one equation) | synthetic | 320 | u | known | Forced oscillator with time-dependent damping |
+| `vdp` | core | ODE (one equation) | synthetic | 320 | u | known | Van der Pol oscillator (mu = 0.2) |
+| `duffing` | core | ODE (one equation) | synthetic | 1001 | u | known | Forced Duffing oscillator |
+| `lv` | core | system of ODEs | synthetic | 301 | u, v | known (+1 alt.) | Lotka-Volterra predator-prey |
+| `lorenz` | core | system of ODEs | synthetic | 1041 | u, v, w | known | Lorenz-63 system |
+| `ac` | core | PDE, 1 space dimension | synthetic | 51 x 128 | u | known | Allen-Cahn equation |
+| `burgers` | core | PDE, 1 space dimension | synthetic | 101 x 256 | u | known | Viscous Burgers equation (PDE-FIND data) |
+| `burgers_inviscid` | core | PDE, 1 space dimension | synthetic | 101 x 101 | u | known (+2 alt.) | Inviscid Burgers equation |
+| `wave` | core | PDE, 1 space dimension | synthetic | 81 x 81 | u | known (+4 alt.) | Wave equation |
+| `kdv` | core | PDE, 1 space dimension | synthetic | 201 x 512 | u | known (+3 alt.) | Korteweg-de Vries equation (PDE-FIND data) |
+| `kdv_cossin` | core | PDE, 1 space dimension | synthetic | 81 x 81 | u | known | KdV with a cos(t)sin(x) source |
+| `ks` | core | PDE, 1 space dimension | synthetic | 251 x 1024 | u | known | Kuramoto-Sivashinsky equation |
+| `pde_compound` | core | PDE, 1 space dimension | synthetic | 251 x 100 | u | known | Nonlinear diffusion u_t = (u u_x)_x |
+| `pde_divide` | core | PDE, 1 space dimension | synthetic | 251 x 100 | u | known | PDE with a 1/x coefficient |
+| `ns` | core | PDE, 2 space dimensions | synthetic | 50 x 20 x 36 | u, v, p | known | Navier-Stokes, cylinder wake (Re = 100) |
+| `kdv_homogen` | extended | PDE, 1 space dimension | synthetic | 120 x 480 | u | known | KdV, homogeneous, x in [-3, 3] |
+| `kdv_sga` | extended | PDE, 1 space dimension | synthetic | 201 x 512 | u | known | KdV, SGA-PDE record (u_t = -u u_x - 0.0025 u_xxx) |
+| `jhtdb_plane` | extended | PDE, 2 space dimensions | synthetic | 40 x 48 x 48 | u, v | known | Isotropic turbulence, 2-D slice of JHTDB |
+| `pend_single` | real | ODE (one equation) | measured | 5000 | theta | known (+1 alt.) | Real single pendulum (encoder, HardwareX rig) |
+| `dp_encoder` | real | system of ODEs | measured | 6000 | theta1, theta2 | unknown | Real double pendulum (encoder, HardwareX rig) |
+| `robot_arm` | real | ODE (one equation) | measured | 1024 | y | unknown | DaISy flexible robot arm (input torque -> acceleration) |
+| `ballbeam` | real | ODE (one equation) | measured | 1000 | y | unknown | DaISy ball and beam (beam angle -> ball position) |
+| `heat_solar_1d` | other | PDE, 1 space dimension | synthetic | 576 x 51 | u | unknown | Heat in soil under solar forcing, 1-D |
+| `heat_solar_2d` | other | PDE, 2 space dimensions | synthetic | 144 x 51 x 51 | u | unknown | Heat in soil under solar forcing, 2-D |
+| `heat_laser` | other | PDE, 3 space dimensions | synthetic | 20 x 51 x 51 x 3 | u | unknown | Heat equation with a moving laser source, 3-D |
+| `dp_sim` | other | system of ODEs | synthetic | 1001 | theta1, theta2 | unknown | Simulated double pendulum |
+| `dp_video` | other | system of ODEs | measured | 38827 | theta1, theta2 | unknown | Real double pendulum (video tracking) |
+| `sst` | other | PDE, 2 space dimensions | measured | 90 x 268 x 384 | T | unknown | Sea surface temperature, ESA CCI L4 (Jan-Mar 2025) |
+| `darcy` | other | PDE, 2 space dimensions | synthetic | - | - | no files | Darcy flow -div(nu grad u) = 1 (data files missing) |
 
-## Файлы без отдельной записи
+## Details
 
-- `kdv_sindy/kdv.mat` -- побайтовая копия `kdv/kdv_sindy.mat` (проверено по SHA-256).
-- `trajectories-2` -- пустой файл.
-- `sst/sst_l4.nc` -- несмотря на расширение, ZIP-архив 90 суточных файлов из `sst/sst_l4_files/` (загрузчик читает их).
-- `*/pinn_test_*.py`, `*/cv_metric.py`, `dp/fno_test.py`, `pinn_common.py`, `stat_common.py`, `lv/lv_rps_amplification_check.py`, `dp/MultiArm_Pendulum/*.py` -- исследования решателя/PINN (см. projects/pinn); эти инструменты их не используют и не меняют.
-- Исходные скрипты `<папка>/<имя>.py` (ode.py, burgers.py, kdv.py, ...) оставлены без изменений; их аналоги на общем коде -- в `projects/pic/scripts/`.
-- `*_ann_pretrained.pickle`, `*_0_ann.pickle` -- предобученные сети для ANN-препроцессора (исходные скрипты переносили их на CUDA); здесь не используются.
+### `ode` -- Forced oscillator with time-dependent damping
 
-## Подробно
-
-### `ode` -- Вынужденный осциллятор с переменным затуханием
-
-- **класс:** ОДУ; **источник:** синтетика; **набор:** core
-- **оси:** t; **форма:** 320; **переменные:** u
-- **файлы:** `projects/pic/data/ode/ode_data.npy`
-- **конфиг:** `configs/ode.yaml`
-- **истина:**
+- **class:** ODE (one equation); **source:** synthetic; **suite:** core
+- **axes:** t; **shape:** 320; **variables:** u
+- **law:**
   - `-4.0 * u{power: 1.0} + -1.0 * du/dx0{power: 1.0} * sin{power: 1.0, freq: 2.0, dim: 0.0} + 1.5 * x{power: 1.0, dim: 0.0} = d^2u/dx0^2{power: 1.0}`
-- **заметки:** u'' + sin(2t) u' + 4u = 1.5t, t в [0, 16), dt = 0.05.
+- **notes:** u'' + sin(2t) u' + 4u = 1.5t on t in [0, 16), dt = 0.05.
 
-### `vdp` -- Осциллятор Ван дер Поля (mu = 0.2)
+### `vdp` -- Van der Pol oscillator (mu = 0.2)
 
-- **класс:** ОДУ; **источник:** синтетика; **набор:** core
-- **оси:** t; **форма:** 320; **переменные:** u
-- **файлы:** `projects/pic/data/vdp/vdp_data.npy`
-- **конфиг:** `configs/vdp.yaml`
-- **истина:**
+- **class:** ODE (one equation); **source:** synthetic; **suite:** core
+- **axes:** t; **shape:** 320; **variables:** u
+- **law:**
   - `-0.2 * u{power: 2.0} * du/dx0{power: 1.0} + 0.2 * du/dx0{power: 1.0} + -1.0 * u{power: 1.0} = d^2u/dx0^2{power: 1.0}`
-- **заметки:** u'' = 0.2 (1 - u^2) u' - u, t в [0, 16), dt = 0.05.
+- **notes:** u'' = 0.2 (1 - u^2) u' - u on t in [0, 16), dt = 0.05.
 
-### `duffing` -- Осциллятор Дуффинга с вынуждающей силой
+### `duffing` -- Forced Duffing oscillator
 
-- **класс:** ОДУ; **источник:** синтетика; **набор:** core
-- **оси:** t; **форма:** 1001; **переменные:** u
-- **файлы:** `projects/pic/data/duffing/duffing.npz`
-- **конфиг:** `configs/duffing.yaml`
-- **истина:**
+- **class:** ODE (one equation); **source:** synthetic; **suite:** core
+- **axes:** t; **shape:** 1001; **variables:** u
+- **law:**
   - `-0.20000000298023224 * du/dx0{power: 1.0} + -1.0 * u{power: 1.0} + -1.0 * u{power: 3.0} + 0.30000001192092896 * cos{power: 1.0, freq: 1.0, dim: 0.0} = d^2u/dx0^2{power: 1.0}`
-- **заметки:** u'' + delta u' + alpha u + beta u^3 = gamma cos(omega t); параметры хранятся в самом файле (как в projects/pinn/gate.py).
+- **notes:** u'' + delta u' + alpha u + beta u^3 = gamma cos(omega t); the parameters are stored in the data file.
 
-### `lv` -- Лотка-Вольтерра (хищник-жертва)
+### `lv` -- Lotka-Volterra predator-prey
 
-- **класс:** система ОДУ; **источник:** синтетика; **набор:** core
-- **оси:** t; **форма:** 301; **переменные:** u, v
-- **файлы:** `projects/pic/data/lv/t_20.npy, lv/data_20.npy`
-- **конфиг:** `configs/lv.yaml`
-- **истина:**
+- **class:** system of ODEs; **source:** synthetic; **suite:** core
+- **axes:** t; **shape:** 301; **variables:** u, v
+- **law:**
   - `20.0 * u{power: 1.0} + -20.0 * u{power: 1.0} * v{power: 1.0} = du/dx0{power: 1.0}`
   - `20.0 * u{power: 1.0} * v{power: 1.0} + -20.0 * v{power: 1.0} = dv/dx0{power: 1.0}`
-  - принимается также: `-1.0 * dv/dx0{power: 1.0} + 20.0 * u{power: 1.0} + -20.0 * v{power: 1.0} = du/dx0{power: 1.0}`; `20.0 * du/dx0{power: 1.0} + -20.0 * dv/dx0{power: 1.0} + -1.0 * d^2u/dx0^2{power: 1.0} = d^2v/dx0^2{power: 1.0}`
-- **заметки:** alpha = beta = gamma = delta = 20, все 301 точка (lv.py брал первые 150; почему лучше вся запись -- объяснено в gate.py).
+  - also accepted: `-1.0 * dv/dx0{power: 1.0} + 20.0 * u{power: 1.0} + -20.0 * v{power: 1.0} = du/dx0{power: 1.0}`; `20.0 * du/dx0{power: 1.0} + -20.0 * dv/dx0{power: 1.0} + -1.0 * d^2u/dx0^2{power: 1.0} = d^2v/dx0^2{power: 1.0}`
+- **notes:** alpha = beta = gamma = delta = 20, all 301 samples: with only the first half of the record the system is not identifiable.
 
-### `lorenz` -- Система Лоренца-63
+### `lorenz` -- Lorenz-63 system
 
-- **класс:** система ОДУ; **источник:** синтетика; **набор:** core
-- **оси:** t; **форма:** 1041; **переменные:** u, v, w
-- **файлы:** `projects/pic/data/lorenz/t.npy, lorenz/lorenz.npy`
-- **конфиг:** `configs/lorenz.yaml`
-- **истина:**
+- **class:** system of ODEs; **source:** synthetic; **suite:** core
+- **axes:** t; **shape:** 1041; **variables:** u, v, w
+- **law:**
   - `10.0 * v{power: 1.0} + -10.0 * u{power: 1.0} = du/dx0{power: 1.0}`
   - `28.0 * u{power: 1.0} + -1.0 * u{power: 1.0} * w{power: 1.0} + -1.0 * v{power: 1.0} = dv/dx0{power: 1.0}`
   - `1.0 * u{power: 1.0} * v{power: 1.0} + -2.6666666666666665 * w{power: 1.0} = dw/dx0{power: 1.0}`
-- **заметки:** sigma = 10, rho = 28, beta = 8/3. Окно t в [20.0, 25.2] сохранённого расчёта, каждая 5-я точка (как в gate.py): траектория на аттракторе. lorenz.py и прежний бенчмарк брали t[:1000] -- переходный процесс вне аттрактора.
+- **notes:** sigma = 10, rho = 28, beta = 8/3. Window t in [20.0, 25.2] of the stored run, every 5th sample: on the attractor, not the initial transient.
 
-### `ac` -- Уравнение Аллена-Кана
+### `ac` -- Allen-Cahn equation
 
-- **класс:** УЧП, 1 измерение; **источник:** синтетика; **набор:** core
-- **оси:** t, x; **форма:** 51 x 128; **переменные:** u
-- **файлы:** `projects/pic/data/ac/ac_data.npy`
-- **конфиг:** `configs/ac.yaml`
-- **истина:**
+- **class:** PDE, 1 space dimension; **source:** synthetic; **suite:** core
+- **axes:** t, x; **shape:** 51 x 128; **variables:** u
+- **law:**
   - `0.0001 * d^2u/dx1^2{power: 1.0} + -5.0 * u{power: 3.0} + 5.0 * u{power: 1.0} = du/dx0{power: 1.0}`
-- **заметки:** u_t = 1e-4 u_xx + 5u - 5u^3. Диффузионный член очень мал, его трудно отличить от шума.
+- **notes:** u_t = 1e-4 u_xx + 5u - 5u^3. The diffusion term is tiny, which makes it hard to separate from noise.
 
-### `burgers` -- Вязкое уравнение Бюргерса (данные PDE-FIND)
+### `burgers` -- Viscous Burgers equation (PDE-FIND data)
 
-- **класс:** УЧП, 1 измерение; **источник:** синтетика; **набор:** core
-- **оси:** t, x; **форма:** 101 x 256; **переменные:** u
-- **файлы:** `projects/pic/data/burgers/burgers.mat`
-- **конфиг:** `configs/burgers.yaml`
-- **истина:**
+- **class:** PDE, 1 space dimension; **source:** synthetic; **suite:** core
+- **axes:** t, x; **shape:** 101 x 256; **variables:** u
+- **law:**
   - `-1.0 * u{power: 1.0} * du/dx1{power: 1.0} + 0.1 * d^2u/dx1^2{power: 1.0} = du/dx0{power: 1.0}`
-- **заметки:** u_t = -u u_x + 0.1 u_xx, периодично по x. (В burgers_test исходного burgers.py по ошибке стоит уравнение Аллена-Кана.)
+- **notes:** u_t = -u u_x + 0.1 u_xx, periodic in x.
 
-### `burgers_inviscid` -- Невязкое уравнение Бюргерса
+### `burgers_inviscid` -- Inviscid Burgers equation
 
-- **класс:** УЧП, 1 измерение; **источник:** синтетика; **набор:** core
-- **оси:** t, x; **форма:** 101 x 101; **переменные:** u
-- **файлы:** `projects/pic/data/burgers/burgers_sln_100.csv`
-- **конфиг:** `configs/burgers_inviscid.yaml`
-- **истина:**
+- **class:** PDE, 1 space dimension; **source:** synthetic; **suite:** core
+- **axes:** t, x; **shape:** 101 x 101; **variables:** u
+- **law:**
   - `-1.0 * u{power: 1.0} * du/dx1{power: 1.0} = du/dx0{power: 1.0}`
-  - принимается также: `1.0 * u{power: 1.0} = x{power: 1.0, dim: 1.0} * du/dx1{power: 1.0}`
-  - принимается также: `0.5 * x{power: 1.0, dim: 0.0} * u{power: 1.0} + -0.5 * x{power: 1.0, dim: 1.0} = du/dx1{power: 1.0} * x{power: 1.0, dim: 1.0}`
-- **заметки:** Запись -- автомодельное решение u = x / (t + c), поэтому кроме УЧП выполняются два тождества; они тоже засчитываются.
+  - also accepted: `1.0 * u{power: 1.0} = x{power: 1.0, dim: 1.0} * du/dx1{power: 1.0}`
+  - also accepted: `0.5 * x{power: 1.0, dim: 0.0} * u{power: 1.0} + -0.5 * x{power: 1.0, dim: 1.0} = du/dx1{power: 1.0} * x{power: 1.0, dim: 1.0}`
+- **notes:** The record is the similarity solution u = x / (t + c), so two identities hold as well as the PDE and count as correct.
 
-### `wave` -- Волновое уравнение
+### `wave` -- Wave equation
 
-- **класс:** УЧП, 1 измерение; **источник:** синтетика; **набор:** core
-- **оси:** t, x; **форма:** 81 x 81; **переменные:** u
-- **файлы:** `projects/pic/data/wave/wave_sln_80.csv`
-- **конфиг:** `configs/wave.yaml`
-- **истина:**
+- **class:** PDE, 1 space dimension; **source:** synthetic; **suite:** core
+- **axes:** t, x; **shape:** 81 x 81; **variables:** u
+- **law:**
   - `0.04 * d^2u/dx1^2{power: 1.0} = d^2u/dx0^2{power: 1.0}`
-  - принимается также: `48.67869238111131 * d^2u/dx1^2{power: 1.0} * d^2u/dx0^2{power: 1.0} + -591.9797844706457 * d^2u/dx0^2{power: 2.0} = d^2u/dx1^2{power: 2.0}`
-  - принимается также: `0.04012 * d^2u/dx1^2{power: 1.0} + 1.08338 * d^2u/dx0^2{power: 1.0} * sin{power: 1.0, freq: 2.0, dim: 0.0} + -0.04347 * d^2u/dx1^2{power: 1.0} * sin{power: 1.0, freq: 2.0, dim: 0.0} = d^2u/dx0^2{power: 1.0}`
-  - принимается также: `0.04012 * d^2u/dx1^2{power: 1.0} + 0.68737 * du/dx0{power: 1.0} * d^2u/dx0^2{power: 1.0} + -0.02751 * d^2u/dx1^2{power: 1.0} * du/dx0{power: 1.0} = d^2u/dx0^2{power: 1.0}`
-  - принимается также: `0.46769 * u{power: 1.0} * d^2u/dx0^2{power: 1.0} + -0.01878 * u{power: 1.0} * d^2u/dx1^2{power: 1.0} + 0.04029 * d^2u/dx1^2{power: 1.0} = d^2u/dx0^2{power: 1.0}`
-- **заметки:** u_tt = 0.04 u_xx. Альтернативы -- волновое уравнение, умноженное на другой множитель; засчитываются, как в прежнем бенчмарке группы.
+  - also accepted: `48.67869238111131 * d^2u/dx1^2{power: 1.0} * d^2u/dx0^2{power: 1.0} + -591.9797844706457 * d^2u/dx0^2{power: 2.0} = d^2u/dx1^2{power: 2.0}`
+  - also accepted: `0.04012 * d^2u/dx1^2{power: 1.0} + 1.08338 * d^2u/dx0^2{power: 1.0} * sin{power: 1.0, freq: 2.0, dim: 0.0} + -0.04347 * d^2u/dx1^2{power: 1.0} * sin{power: 1.0, freq: 2.0, dim: 0.0} = d^2u/dx0^2{power: 1.0}`
+  - also accepted: `0.04012 * d^2u/dx1^2{power: 1.0} + 0.68737 * du/dx0{power: 1.0} * d^2u/dx0^2{power: 1.0} + -0.02751 * d^2u/dx1^2{power: 1.0} * du/dx0{power: 1.0} = d^2u/dx0^2{power: 1.0}`
+  - also accepted: `0.46769 * u{power: 1.0} * d^2u/dx0^2{power: 1.0} + -0.01878 * u{power: 1.0} * d^2u/dx1^2{power: 1.0} + 0.04029 * d^2u/dx1^2{power: 1.0} = d^2u/dx0^2{power: 1.0}`
+- **notes:** u_tt = 0.04 u_xx. The alternatives are the wave equation multiplied by another factor; they are accepted as in the group's former benchmark.
 
-### `kdv` -- Уравнение Кортевега-де Фриза (данные PDE-FIND)
+### `kdv` -- Korteweg-de Vries equation (PDE-FIND data)
 
-- **класс:** УЧП, 1 измерение; **источник:** синтетика; **набор:** core
-- **оси:** t, x; **форма:** 201 x 512; **переменные:** u
-- **файлы:** `projects/pic/data/kdv/kdv_sindy.mat`
-- **конфиг:** `configs/kdv.yaml`
-- **истина:**
+- **class:** PDE, 1 space dimension; **source:** synthetic; **suite:** core
+- **axes:** t, x; **shape:** 201 x 512; **variables:** u
+- **law:**
   - `-6.0 * du/dx1{power: 1.0} * u{power: 1.0} + -1.0 * d^3u/dx1^3{power: 1.0} = du/dx0{power: 1.0}`
-  - принимается также: `-1.0 * u{power: 3.0} + 1.0 * du/dx1{power: 2.0} = u{power: 1.0} * d^2u/dx1^2{power: 1.0}`
-  - принимается также: `-3.0 * u{power: 2.0} * du/dx1{power: 1.0} + 1.0 * du/dx1{power: 1.0} * d^2u/dx1^2{power: 1.0} = d^3u/dx1^3{power: 1.0} * u{power: 1.0}`
-  - принимается также: `-0.3333333333 * u{power: 1.0} * du/dx0{power: 1.0} + -0.3333333333 * du/dx1{power: 1.0} * d^2u/dx1^2{power: 1.0} = u{power: 2.0} * du/dx1{power: 1.0}`
-- **заметки:** u_t = -6 u u_x - u_xxx. Запись -- семейство солитонов, поэтому три его тождества тоже точны и засчитываются. (kdv_sindy/kdv.mat -- побайтовая копия.)
+  - also accepted: `-1.0 * u{power: 3.0} + 1.0 * du/dx1{power: 2.0} = u{power: 1.0} * d^2u/dx1^2{power: 1.0}`
+  - also accepted: `-3.0 * u{power: 2.0} * du/dx1{power: 1.0} + 1.0 * du/dx1{power: 1.0} * d^2u/dx1^2{power: 1.0} = d^3u/dx1^3{power: 1.0} * u{power: 1.0}`
+  - also accepted: `-0.3333333333 * u{power: 1.0} * du/dx0{power: 1.0} + -0.3333333333 * du/dx1{power: 1.0} * d^2u/dx1^2{power: 1.0} = u{power: 2.0} * du/dx1{power: 1.0}`
+- **notes:** u_t = -6 u u_x - u_xxx. The record is a soliton family, so three identities of it are also exact and accepted.
 
-### `kdv_cossin` -- KdV с источником cos(t)sin(x)
+### `kdv_cossin` -- KdV with a cos(t)sin(x) source
 
-- **класс:** УЧП, 1 измерение; **источник:** синтетика; **набор:** core
-- **оси:** t, x; **форма:** 81 x 81; **переменные:** u
-- **файлы:** `projects/pic/data/kdv/data.csv`
-- **конфиг:** `configs/kdv_cossin.yaml`
-- **истина:**
+- **class:** PDE, 1 space dimension; **source:** synthetic; **suite:** core
+- **axes:** t, x; **shape:** 81 x 81; **variables:** u
+- **law:**
   - `-6.0 * du/dx1{power: 1.0} * u{power: 1.0} + -1.0 * d^3u/dx1^3{power: 1.0} + 1.0 * cos(t)sin(x){power: 1.0} = du/dx0{power: 1.0}`
-- **дополнительные токены:** cos(t)sin(x)
-- **заметки:** Источник входит как один токен-произведение cos(t)sin(x).
+- **extra tokens:** cos(t)sin(x)
+- **notes:** The source enters as one product token cos(t)sin(x).
 
-### `ks` -- Уравнение Курамото-Сивашинского
+### `ks` -- Kuramoto-Sivashinsky equation
 
-- **класс:** УЧП, 1 измерение; **источник:** синтетика; **набор:** core
-- **оси:** t, x; **форма:** 251 x 1024; **переменные:** u
-- **файлы:** `projects/pic/data/ks/kuramoto_sivishinky.mat`
-- **конфиг:** `configs/ks.yaml`
-- **истина:**
+- **class:** PDE, 1 space dimension; **source:** synthetic; **suite:** core
+- **axes:** t, x; **shape:** 251 x 1024; **variables:** u
+- **law:**
   - `-1.0 * u{power: 1.0} * du/dx1{power: 1.0} + -1.0 * d^2u/dx1^2{power: 1.0} + -1.0 * d^4u/dx1^4{power: 1.0} = du/dx0{power: 1.0}`
-- **заметки:** u_t = -u u_x - u_xx - u_xxxx; хаотическое, нужна 4-я производная. Исходный ks.py открывал файл относительно рабочей папки.
+- **notes:** u_t = -u u_x - u_xx - u_xxxx; chaotic, needs a 4th derivative.
 
-### `pde_compound` -- Нелинейная диффузия u_t = (u u_x)_x
+### `pde_compound` -- Nonlinear diffusion u_t = (u u_x)_x
 
-- **класс:** УЧП, 1 измерение; **источник:** синтетика; **набор:** core
-- **оси:** t, x; **форма:** 251 x 100; **переменные:** u
-- **файлы:** `projects/pic/data/pde_compound/PDE_compound.npy`
-- **конфиг:** `configs/pde_compound.yaml`
-- **истина:**
+- **class:** PDE, 1 space dimension; **source:** synthetic; **suite:** core
+- **axes:** t, x; **shape:** 251 x 100; **variables:** u
+- **law:**
   - `1.0 * du/dx1{power: 2.0} + 1.0 * d^2u/dx1^2{power: 1.0} * u{power: 1.0} = du/dx0{power: 1.0}`
-- **заметки:** u_t = u_x^2 + u u_xx, t в [0, 0.5], x в [1, 2].
+- **notes:** u_t = u_x^2 + u u_xx on t in [0, 0.5], x in [1, 2].
 
-### `pde_divide` -- УЧП с коэффициентом 1/x
+### `pde_divide` -- PDE with a 1/x coefficient
 
-- **класс:** УЧП, 1 измерение; **источник:** синтетика; **набор:** core
-- **оси:** t, x; **форма:** 251 x 100; **переменные:** u
-- **файлы:** `projects/pic/data/pde_divide/PDE_divide.npy`
-- **конфиг:** `configs/pde_divide.yaml`
-- **истина:**
+- **class:** PDE, 1 space dimension; **source:** synthetic; **suite:** core
+- **axes:** t, x; **shape:** 251 x 100; **variables:** u
+- **law:**
   - `-2.0 * du/dx1{power: 1.0} + 0.5 * d^2u/dx1^2{power: 1.0} * x{power: 1.0, dim: 1.0} = du/dx0{power: 1.0} * x{power: 1.0, dim: 1.0}`
-- **заметки:** x u_t = -2 u_x + 0.5 x u_xx, т.е. u_t = -2 u_x / x + 0.5 u_xx (нужен токен координаты x).
+- **notes:** x u_t = -2 u_x + 0.5 x u_xx, i.e. u_t = -2 u_x / x + 0.5 u_xx (needs the x token).
 
-### `ns` -- Навье-Стокс, след за цилиндром (Re = 100)
+### `ns` -- Navier-Stokes, cylinder wake (Re = 100)
 
-- **класс:** УЧП, 2 измерения; **источник:** синтетика; **набор:** core
-- **оси:** t, y, x; **форма:** 50 x 20 x 36; **переменные:** u, v, p
-- **файлы:** `projects/pic/data/ns/cylinder_nektar_wake.mat`
-- **конфиг:** `configs/ns.yaml`
-- **истина:**
+- **class:** PDE, 2 space dimensions; **source:** synthetic; **suite:** core
+- **axes:** t, y, x; **shape:** 50 x 20 x 36; **variables:** u, v, p
+- **law:**
   - `-1.0 * u{power: 1.0} * du/dx2{power: 1.0} + -1.0 * v{power: 1.0} * du/dx1{power: 1.0} + -1.0 * dp/dx2{power: 1.0} + 0.01 * d^2u/dx2^2{power: 1.0} + 0.01 * d^2u/dx1^2{power: 1.0} = du/dx0{power: 1.0}`
   - `-1.0 * u{power: 1.0} * dv/dx2{power: 1.0} + -1.0 * v{power: 1.0} * dv/dx1{power: 1.0} + -1.0 * dp/dx1{power: 1.0} + 0.01 * d^2v/dx2^2{power: 1.0} + 0.01 * d^2v/dx1^2{power: 1.0} = dv/dx0{power: 1.0}`
   - `-1.0 * dv/dx1{power: 1.0} = du/dx2{power: 1.0}`
-- **заметки:** Оси (t, y, x): dx1 = d/dy, dx2 = d/dx. Два уравнения импульса (nu = 0.01) и неразрывность. По умолчанию подвыборка из gate.py (36 тыс. точек); 'full50' -- окно исходного ns.py (250 тыс. точек на переменную).
+- **notes:** Axes (t, y, x): dx1 = d/dy, dx2 = d/dx. Two momentum equations (nu = 0.01) and continuity. By default a subset of about 36 thousand points; the full window has 250 thousand points per variable.
 
-### `kdv_homogen` -- KdV, однородное, x в [-3, 3]
+### `kdv_homogen` -- KdV, homogeneous, x in [-3, 3]
 
-- **класс:** УЧП, 1 измерение; **источник:** синтетика; **набор:** extended
-- **оси:** t, x; **форма:** 120 x 480; **переменные:** u
-- **файлы:** `projects/pic/data/kdv/data_kdv_homogen.npy`
-- **конфиг:** `configs/kdv_homogen.yaml`
-- **истина:**
+- **class:** PDE, 1 space dimension; **source:** synthetic; **suite:** extended
+- **axes:** t, x; **shape:** 120 x 480; **variables:** u
+- **law:**
   - `-6.0 * du/dx1{power: 1.0} * u{power: 1.0} + -1.0 * d^3u/dx1^3{power: 1.0} = du/dx0{power: 1.0}`
-- **заметки:** Истина из KdV_h_test исходного kdv.py.
+- **notes:** Same law on a short interval, as in the group's original experiments.
 
-### `kdv_sga` -- KdV, запись SGA-PDE (u_t = -u u_x - 0.0025 u_xxx)
+### `kdv_sga` -- KdV, SGA-PDE record (u_t = -u u_x - 0.0025 u_xxx)
 
-- **класс:** УЧП, 1 измерение; **источник:** синтетика; **набор:** extended
-- **оси:** t, x; **форма:** 201 x 512; **переменные:** u
-- **файлы:** `projects/pic/data/kdv/Kdv.mat`
-- **конфиг:** `configs/kdv_sga.yaml`
-- **истина:**
+- **class:** PDE, 1 space dimension; **source:** synthetic; **suite:** extended
+- **axes:** t, x; **shape:** 201 x 512; **variables:** u
+- **law:**
   - `-1.0 * du/dx1{power: 1.0} * u{power: 1.0} + -0.0025 * d^3u/dx1^3{power: 1.0} = du/dx0{power: 1.0}`
-- **заметки:** Истина из KdV_sga_test исходного kdv.py.
+- **notes:** The record used in the symbolic genetic algorithm study.
 
-### `jhtdb_plane` -- Изотропная турбулентность, 2-D срез JHTDB
+### `jhtdb_plane` -- Isotropic turbulence, 2-D slice of JHTDB
 
-- **класс:** УЧП, 2 измерения; **источник:** синтетика; **набор:** extended
-- **оси:** t, y, x; **форма:** 40 x 48 x 48; **переменные:** u, v
-- **файлы:** `projects/pic/data/jhtdb/jhtdb_pilot_plane.npz`
-- **конфиг:** `configs/jhtdb_plane.yaml`
-- **истина:**
+- **class:** PDE, 2 space dimensions; **source:** synthetic; **suite:** extended
+- **axes:** t, y, x; **shape:** 40 x 48 x 48; **variables:** u, v
+- **law:**
   - `-1.0 * u{power: 1.0} * du/dx2{power: 1.0} + -1.0 * v{power: 1.0} * du/dx1{power: 1.0} + -1.0 * w{power: 1.0} * u_z{power: 1.0} + -1.0 * p_x{power: 1.0} + 1.0 * nu_lap_u{power: 1.0} = du/dx0{power: 1.0}`
   - `-1.0 * u{power: 1.0} * dv/dx2{power: 1.0} + -1.0 * v{power: 1.0} * dv/dx1{power: 1.0} + -1.0 * w{power: 1.0} * v_z{power: 1.0} + -1.0 * p_y{power: 1.0} + 1.0 * nu_lap_v{power: 1.0} = dv/dx0{power: 1.0}`
-- **дополнительные токены:** p_x, p_y, nu_lap_u, nu_lap_v, w, u_z, v_z
-- **производные:** точные, передаются в EPDE (без численного дифференцирования)
-- **заметки:** Срез 48 x 48 (каждый 8-й узел сетки DNS), 40 кадров. Для численных производных слишком грубо (алиасинг), поэтому передаются точные градиенты с сервера; внеплоскостные члены и давление входят как точные токены. w, u_z, v_z разделены по семействам, чтобы w*u_z и w*v_z были доступны. Использовать noise=0: искусственный шум с готовыми чистыми производными запрещён.
+- **extra tokens:** p_x, p_y, nu_lap_u, nu_lap_v, w, u_z, v_z
+- **derivatives:** supplied with the data and passed to EPDE as given
+- **notes:** 48 x 48 slice (stride 8 of the DNS grid), 40 frames. Too coarse for numerical derivatives (aliased), so the exact server-side gradients are passed instead; out-of-plane and pressure terms enter as exact tokens. Artificial noise is unsupported with these supplied derivatives; use noise=0.
 
-### `pend_single` -- Реальный одиночный маятник (энкодер, стенд HardwareX)
+### `pend_single` -- Real single pendulum (encoder, HardwareX rig)
 
-- **класс:** ОДУ; **источник:** измерения; **набор:** real
-- **оси:** t; **форма:** 5000; **переменные:** theta
-- **файлы:** `projects/pic/data/dp/MultiArm_Pendulum/Single_FreeSwing_1.mat`
-- **конфиг:** `configs/pend_single.yaml`
-- **истина:**
+- **class:** ODE (one equation); **source:** measured; **suite:** real
+- **axes:** t; **shape:** 5000; **variables:** theta
+- **law:**
   - `-64.8 * theta{power: 1.0} + -0.65 * dtheta/dx0{power: 1.0} = d^2theta/dx0^2{power: 1.0}`
-  - принимается также: `-64.8 * theta{power: 1.0} = d^2theta/dx0^2{power: 1.0}`
-- **заметки:** Малые колебания около нижнего положения, угол центрирован (theta - pi): линейный осциллятор с затуханием, -64.8 = -g/l. Форма без затухания тоже засчитывается.
+  - also accepted: `-64.8 * theta{power: 1.0} = d^2theta/dx0^2{power: 1.0}`
+- **notes:** Small swing about the hanging position, angle centred (theta - pi): a damped linear oscillator, -64.8 = -g/l. The undamped form also counts (damping is weak).
 
-### `dp_encoder` -- Реальный двойной маятник (энкодер, стенд HardwareX)
+### `dp_encoder` -- Real double pendulum (encoder, HardwareX rig)
 
-- **класс:** система ОДУ; **источник:** измерения; **набор:** real
-- **оси:** t; **форма:** 6000; **переменные:** theta1, theta2
-- **файлы:** `projects/pic/data/dp/MultiArm_Pendulum/Double_FreeSwing_1.mat`
-- **конфиг:** `configs/dp_encoder.yaml`
-- **дополнительные токены:** sin_th1, sin_th2, cos_delta, sin_delta
-- **заметки:** Связанные уравнения Лагранжа с cos/sin разности углов; точные коэффициенты неизвестны, запуск не оценивается. sin(theta) и множители связи входят как токены.
+- **class:** system of ODEs; **source:** measured; **suite:** real
+- **axes:** t; **shape:** 6000; **variables:** theta1, theta2
+- **extra tokens:** sin_th1, sin_th2, cos_delta, sin_delta
+- **notes:** Coupled Lagrangian equations with cos/sin of the angle difference; their exact coefficients are not known, so the run is not scored. sin(theta) and the coupling factors enter as tokens.
 
-### `robot_arm` -- DaISy: гибкая рука робота (момент -> ускорение)
+### `robot_arm` -- DaISy flexible robot arm (input torque -> acceleration)
 
-- **класс:** ОДУ; **источник:** измерения; **набор:** real
-- **оси:** t; **форма:** 1024; **переменные:** y
-- **файлы:** `projects/pic/data/daisy/robot_arm.dat.gz`
-- **конфиг:** `configs/robot_arm.yaml`
-- **дополнительные токены:** u_in
-- **заметки:** Истина неизвестна (гибкая конструкция ~5-го порядка). Шаг dt в файле не указан; принят 0.01 с (от него зависят коэффициенты, но не структура).
+- **class:** ODE (one equation); **source:** measured; **suite:** real
+- **axes:** t; **shape:** 1024; **variables:** y
+- **extra tokens:** u_in
+- **notes:** Unknown truth (a ~5th-order flexible structure). dt is not distributed with the file; 0.01 s is assumed (coefficients scale with it, structure does not).
 
-### `ballbeam` -- DaISy: шар на балке (угол балки -> положение шара)
+### `ballbeam` -- DaISy ball and beam (beam angle -> ball position)
 
-- **класс:** ОДУ; **источник:** измерения; **набор:** real
-- **оси:** t; **форма:** 1000; **переменные:** y
-- **файлы:** `projects/pic/data/daisy/ballbeam.dat.gz`
-- **конфиг:** `configs/ballbeam.yaml`
-- **дополнительные токены:** u_in
-- **заметки:** Истина неизвестна; в идеализированной физике y'' пропорционально углу балки. Шаг 0.1 с по описанию DaISy.
+- **class:** ODE (one equation); **source:** measured; **suite:** real
+- **axes:** t; **shape:** 1000; **variables:** y
+- **extra tokens:** u_in
+- **notes:** Unknown truth; idealised physics is y'' proportional to the beam angle. Sampling period 0.1 s per the DaISy description.
 
-### `heat_solar_1d` -- Теплоперенос в почве при солнечном нагреве, 1-D
+### `heat_solar_1d` -- Heat in soil under solar forcing, 1-D
 
-- **класс:** УЧП, 1 измерение; **источник:** синтетика; **набор:** other
-- **оси:** t, x; **форма:** 576 x 51; **переменные:** u
-- **файлы:** `projects/pic/data/heat_solar/heat_soil_uniform_1d_p1.npz`
-- **конфиг:** `configs/heat_solar_1d.yaml`
-- **заметки:** Моделирование температуры почвы с периодическим потоком на поверхности. Ожидаемый закон -- уравнение теплопроводности u_t = a u_xx (коэффициент в файле не хранится), поэтому истина не оценивается. В файле есть также du.
+- **class:** PDE, 1 space dimension; **source:** synthetic; **suite:** other
+- **axes:** t, x; **shape:** 576 x 51; **variables:** u
+- **notes:** Simulated soil temperature with a periodic surface flux. Expected law: the heat equation u_t = a u_xx in the interior (coefficient not stored), so no truth is scored. The data also hold the time derivative.
 
-### `heat_solar_2d` -- Теплоперенос в почве при солнечном нагреве, 2-D
+### `heat_solar_2d` -- Heat in soil under solar forcing, 2-D
 
-- **класс:** УЧП, 2 измерения; **источник:** синтетика; **набор:** other
-- **оси:** t, x, y; **форма:** 144 x 51 x 51; **переменные:** u
-- **файлы:** `projects/pic/data/heat_solar/heat_soil_uniform_2d_p1.npz`
-- **конфиг:** `configs/heat_solar_2d.yaml`
-- **заметки:** Двумерный вариант heat_solar_1d (576 x 51 x 51 до прореживания по t).
+- **class:** PDE, 2 space dimensions; **source:** synthetic; **suite:** other
+- **axes:** t, x, y; **shape:** 144 x 51 x 51; **variables:** u
+- **notes:** 2-D version of heat_solar_1d (576 x 51 x 51 before striding in t).
 
-### `heat_laser` -- Теплопроводность с движущимся лазерным источником, 3-D
+### `heat_laser` -- Heat equation with a moving laser source, 3-D
 
-- **класс:** УЧП, 3 измерения; **источник:** синтетика; **набор:** other
-- **оси:** t, x, y, z; **форма:** 20 x 51 x 51 x 3; **переменные:** u
-- **файлы:** `projects/pic/data/heat_laser/heat_laser.npz`
-- **конфиг:** `configs/heat_laser.yaml`
-- **дополнительные токены:** L
-- **заметки:** По z всего 3 точки, по t -- 20, производные по z и t грубые. Источник L -- laser.npy (t, x, y), предполагается однородным по z; исходный скрипт строил его по формуле с перепутанными осями. Истина не оценивается.
+- **class:** PDE, 3 space dimensions; **source:** synthetic; **suite:** other
+- **axes:** t, x, y, z; **shape:** 20 x 51 x 51 x 3; **variables:** u
+- **extra tokens:** L
+- **notes:** Only 3 points along z and 20 in t, so z- and t-derivatives are crude. The laser source is supplied as a field in (t, x, y), assumed uniform in z. No truth is scored.
 
-### `dp_sim` -- Двойной маятник, моделирование
+### `dp_sim` -- Simulated double pendulum
 
-- **класс:** система ОДУ; **источник:** синтетика; **набор:** other
-- **оси:** t; **форма:** 1001; **переменные:** theta1, theta2
-- **файлы:** `projects/pic/data/dp/dp.npz`
-- **конфиг:** `configs/dp_sim.yaml`
-- **заметки:** Используется в PINN-исследованиях в dp/. Уравнения движения требуют токенов связи и здесь в токенной форме не записаны.
+- **class:** system of ODEs; **source:** synthetic; **suite:** other
+- **axes:** t; **shape:** 1001; **variables:** theta1, theta2
+- **notes:** Used by the PINN studies in dp/. The equations of motion need coupling tokens and are not written in token form here.
 
-### `dp_video` -- Реальный двойной маятник (видеотрекинг)
+### `dp_video` -- Real double pendulum (video tracking)
 
-- **класс:** система ОДУ; **источник:** измерения; **набор:** other
-- **оси:** t; **форма:** 38827; **переменные:** theta1, theta2
-- **файлы:** `projects/pic/data/dp/Video_Tracking_Data/Video_Tracking_Data/Trial*/DPmean_data_RB*.npy`
-- **конфиг:** `configs/dp_video.yaml`
-- **заметки:** Средние углы звеньев по видеомаркерам. Шумнее записи энкодера; предпочтительный источник -- dp_encoder.
+- **class:** system of ODEs; **source:** measured; **suite:** other
+- **axes:** t; **shape:** 38827; **variables:** theta1, theta2
+- **notes:** Mean link angles from video markers. Noisier than the encoder record, which is the preferred source.
 
-### `sst` -- Температура поверхности моря, ESA CCI L4 (янв-мар 2025)
+### `sst` -- Sea surface temperature, ESA CCI L4 (Jan-Mar 2025)
 
-- **класс:** УЧП, 2 измерения; **источник:** измерения; **набор:** other
-- **оси:** t, lat, lon; **форма:** 90 x 268 x 384; **переменные:** T
-- **файлы:** `projects/pic/data/sst/sst_l4_files/*.nc (90 daily files)`
-- **конфиг:** `configs/sst.yaml`
-- **заметки:** Суточная SST (K), 90 суток. По умолчанию выбирается максимальный прямоугольник океана без NaN во всех кадрах; поле и координаты обрезаются вместе. crop_ocean=False сохраняет исходную маску для просмотра. sst/sst_l4.nc, несмотря на расширение, -- ZIP-архив тех же суточных файлов.
+- **class:** PDE, 2 space dimensions; **source:** measured; **suite:** other
+- **axes:** t, lat, lon; **shape:** 90 x 268 x 384; **variables:** T
+- **notes:** Daily analysed sea surface temperature (K), 90 days. By default the largest rectangular ocean region finite on every day is used; the original box with land masked can be loaded for plotting only.
 
-### `darcy` -- Течение Дарси -div(nu grad u) = 1 (нет файлов данных)
+### `darcy` -- Darcy flow -div(nu grad u) = 1 (data files missing)
 
-- **файлы:** `projects/pic/data/darcy/darcy_1.0.npy, darcy/darcy_nu_1.0.npy (not in the repository)`
-- **статус:** Файлы отсутствуют; загрузка и поиск не проверены.
-- **заметки:** Перенос исходного darcy.py, не проверен: файлов данных нет в репозитории. Стационарная задача; поле коэффициента и его градиенты входят как токены-множители.
+- **status:** the data files are missing; loading and search are not verified.

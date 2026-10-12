@@ -19,9 +19,9 @@ from pathlib import Path
 from .metrics import wilson_ci
 
 CLASS_ORDER = ['ode', 'ode_system', 'pde_1d', 'pde_2d', 'pde_3d']
-#: class names as printed in summary.md (Russian, like the rest of the docs)
-KINDS_RU = {'ode': 'ОДУ', 'ode_system': 'система ОДУ', 'pde_1d': 'УЧП 1-D',
-            'pde_2d': 'УЧП 2-D', 'pde_3d': 'УЧП 3-D'}
+#: class names as printed in summary.md
+KIND_NAMES = {'ode': 'ODE', 'ode_system': 'ODE system', 'pde_1d': 'PDE 1-D',
+              'pde_2d': 'PDE 2-D', 'pde_3d': 'PDE 3-D'}
 
 
 def load_runs(campaign: Path):
@@ -101,14 +101,13 @@ def make_report(campaign: Path, formats: str = 'png') -> Path:
     known = df[df.truth_known].copy()
     scored = known[known.status.isin(['ok', 'error', 'timeout'])].copy()
 
-    # summary.md is user-facing documentation, written in Russian
-    md = [f'# Кампания `{campaign.name}`', '',
-          f'Запусков: {len(df)} (' + ', '.join(f'{k}: {v}' for k, v in df.status.value_counts().items()) + ').',
-          'Успех -- истинная структура (или принятая эквивалентная форма) есть на итоговом фронте '
-          'Парето; «выбор» -- уравнение, выбранное с фронта без знания истины (компромисс), верно. '
-          'В ячейках: k/n (доля, 95 % интервал Уилсона). Ошибки и таймауты считаются промахами. '
-          'pending — запланировано, ещё не выполнено; unsupported — метод не поддерживает задачу. '
-          'Эти два статуса исключены из знаменателей успеха.', '']
+    md = [f'# Campaign `{campaign.name}`', '',
+          f'Runs: {len(df)} (' + ', '.join(f'{k}: {v}' for k, v in df.status.value_counts().items()) + ').',
+          'Success: the true structure (or an accepted equivalent form) is on the final Pareto '
+          'front; "pick": the equation chosen from the front without knowing the truth '
+          '(compromise) is correct. Cells: k/n (rate, 95 % Wilson interval). Errors and timeouts '
+          'count as misses. pending: planned, not yet run; unsupported: the method cannot represent '
+          'the problem. These two statuses are excluded from the denominators.', '']
 
     tables = {}
     for noise, part in scored.groupby('noise'):
@@ -116,10 +115,10 @@ def make_report(campaign: Path, formats: str = 'png') -> Path:
                                  aggfunc=_rate)
         pick = part.pivot_table(index='dataset', columns='variant', values='success_selected',
                                 aggfunc=_rate)
-        front.index.name = pick.index.name = 'набор'
+        front.index.name = pick.index.name = 'dataset'
         tables[noise] = front
-        md += [f'## Шум {noise:g} %', '', '### Истина на фронте Парето', '', _md_table(front), '',
-               '### Компромиссный выбор верен', '', _md_table(pick), '']
+        md += [f'## Noise {noise:g} %', '', '### Truth on the Pareto front', '', _md_table(front), '',
+               '### Compromise pick is correct', '', _md_table(pick), '']
 
     long = []
     def median(values):
@@ -161,51 +160,51 @@ def make_report(campaign: Path, formats: str = 'png') -> Path:
                 .sort_values(['kind', 'noise', 'success_front', 'success_selected', 'median_fit_s'],
                              ascending=[True, True, False, False, True]))
         rank.to_csv(out / 'ranking.csv', index=False)
-        md += ['## Лучший вариант по классу задач', '',
-               'Среднее по общим поддерживаемым наборам класса от доли успехов на наборе; '
-               'набор исключён из рейтинга, если хотя бы один вариант имеет unsupported '
-               'или ещё не имеет выполненных запусков. При равенстве решает '
-               'компромиссный выбор, затем скорость.', '']
+        md += ['## Best variant per problem class', '',
+               'Mean over the data sets of the class supported by every variant of the per-set '
+               'success rate; a data set is left out of the ranking when any variant is '
+               'unsupported on it or has no finished runs yet. Ties are broken by the '
+               'compromise pick, then by speed.', '']
         best = rank.groupby(['kind', 'noise']).head(1)
-        lines = ['| класс | шум, % | лучший вариант | успех (фронт) | успех (выбор) | медиана времени, с |',
+        lines = ['| class | noise, % | best variant | success (front) | success (pick) | median time, s |',
                  '|---|---|---|---|---|---|']
         for _, r in best.sort_values(['kind', 'noise'], key=lambda s: s.map(
                 {k: i for i, k in enumerate(CLASS_ORDER)}) if s.name == 'kind' else s).iterrows():
-            lines.append(f"| {KINDS_RU.get(r.kind, r.kind)} | {r.noise:g} | {r.variant} | "
+            lines.append(f"| {KIND_NAMES.get(r.kind, r.kind)} | {r.noise:g} | {r.variant} | "
                          f"{r.success_front:.0%} | {r.success_selected:.0%} | {r.median_fit_s:.0f} |")
         md += lines + ['']
 
         overall = (comparable.groupby(['variant', 'noise']).success_front.mean().unstack('noise')
                    .sort_values(by=min(comparable.noise.unique()), ascending=False)) if not comparable.empty else pd.DataFrame()
-        overall.index.name = 'вариант'
-        md += ['## Все наборы вместе (средний успех на фронте)', '',
+        overall.index.name = 'variant'
+        md += ['## All data sets together (mean success on the front)', '',
                _md_table(overall.map(lambda v: f'{v:.0%}')), '']
 
     times = df[(df.status == 'ok') & df.fit_seconds.notna()].pivot_table(index='dataset', columns='variant',
                                               values='fit_seconds', aggfunc='median')
     if not times.empty:
-        times.index.name = 'набор'
-        md += ['## Медианное время поиска, с', '', _md_table(times.round(1)), '']
+        times.index.name = 'dataset'
+        md += ['## Median search time, s', '', _md_table(times.round(1)), '']
 
     unknown = df[~df.truth_known & (df.status == 'ok')]
     if not unknown.empty:
-        md += ['## Наборы без известной истины: компромиссный выбор', '']
+        md += ['## Data sets without a known law: compromise pick', '']
         for _, r in unknown.sort_values(['dataset', 'variant', 'noise', 'seed']).iterrows():
-            md.append(f'- **{r.dataset}** / {r.variant} / шум {r.noise:g} / сид {r.seed}: '
+            md.append(f'- **{r.dataset}** / {r.variant} / noise {r.noise:g} / seed {r.seed}: '
                       f'`{r.selected}`')
         md.append('')
 
     failed = df[df.status.isin(['error', 'timeout'])]
     if not failed.empty:
-        md += ['## Неудачные запуски', '']
-        md += [f'- {r.dataset} / {r.variant} / шум {r.noise:g} / сид {r.seed}: {r.status} '
+        md += ['## Failed runs', '']
+        md += [f'- {r.dataset} / {r.variant} / noise {r.noise:g} / seed {r.seed}: {r.status} '
                f'{(r.error or "")[:160]}' for _, r in failed.iterrows()]
         md.append('')
 
     unavailable = df[df.status.isin(['pending', 'unsupported'])]
     if not unavailable.empty:
-        md += ['## Ожидающие и неподдерживаемые запуски', '']
-        md += [f'- {r.dataset} / {r.variant} / шум {r.noise:g} / сид {r.seed}: '
+        md += ['## Pending and unsupported runs', '']
+        md += [f'- {r.dataset} / {r.variant} / noise {r.noise:g} / seed {r.seed}: '
                f'{r.status} {r.error}' for _, r in unavailable.iterrows()]
         md.append('')
 

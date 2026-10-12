@@ -1,3 +1,3 @@
 # Kuramoto-Sivashinsky: 1024 x 251 points and a 4th derivative -- the slowest
-# 1-D problem. loader: {x_stride: 2} halves the cost for quick looks.
+# 1-D problem. The loader can keep every second x point for quick looks.
 search: {}
