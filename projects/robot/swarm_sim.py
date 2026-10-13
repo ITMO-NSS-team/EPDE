@@ -88,7 +88,8 @@ def recording(path):
         d[np.diag_indices_from(d)] = np.inf
         nn.append(d.min(1))
     r_all = np.hypot(pos[..., 0] - xc, pos[..., 1] - yc)
-    return dict(tag=swarm_meta(path)["tag"], ids=[int(i) for i in ids], tok=tok, fx=fx, fy=fy, w=w,
+    return dict(tag=swarm_meta(path)["tag"], arena_cm=swarm_meta(path)["arena_cm"], ids=[int(i) for i in ids],
+                tok=tok, fx=fx, fy=fy, w=w,
                 dt=LAG * dt, xc=xc, yc=yc, r_env=r_env, pos=pos, phi=phi[samp],
                 sd_phi=dphi.std(0), core=float(np.percentile(np.concatenate(nn), 1)),
                 r_max=float(np.percentile(r_all, 99.9)))
@@ -306,6 +307,82 @@ def residual_sd_contact(R, K, Knp, NP, Kb, BP):
     return np.stack([(R["fx"] - px).std(0), (R["fy"] - py).std(0)], -1)
 
 
+# ------------------------------------------------------------------ spin friction of the caps
+#: The robots are spinning cylinders (cap 48.7 mm across, 19.2 mm high). Sliding friction at a contact
+#: point acts along the contact tangent. With u_ji the unit vector from j to i and t = z x u_ji:
+#:   gear       sum over touching j of (w_i + w_j) t     (the caps' relative surface speed at contact)
+#:   gear_sign  sum over touching j of sign(w_i + w_j) t (Coulomb friction: the direction only)
+#:   roll       at the wall, w_i (z x r_hat_i)           (the cap rolling along the wall)
+#:   roll_sign  at the wall, sign(w_i) (z x r_hat_i)
+SPIN_TOK = ["gear", "gear_sign", "roll", "roll_sign"]
+CAP_CM = 4.87
+
+
+def px_per_cm():
+    """One camera scale for every recording: the arena diameters D (40 / 41 cm) against the tracked
+    envelope radii of robot centres, R_env = s (D/2 - cap/2), least squares over the recordings
+    (cached in results/arena_scale.json)."""
+    path = os.path.join(HERE, "results", "arena_scale.json")
+    if os.path.exists(path):
+        return json.load(open(path))["px_per_cm"]
+    rows = []
+    for f in swarm_files():
+        t, x, y, phi, ids = load_swarm(f)
+        rows.append((swarm_meta(f)["tag"], swarm_meta(f)["arena_cm"] / 2 - CAP_CM / 2, arena_envelope(x, y)[2]))
+    L, Rv = np.array([r[1] for r in rows]), np.array([r[2] for r in rows])
+    s = float(Rv @ L / (L @ L))
+    json.dump(dict(px_per_cm=s, cap_px=CAP_CM * s, recordings={tag: dict(reach_cm=l, r_env_px=float(r),
+                                                                      own_px_per_cm=float(r / l), residual_px=float(r - s * l))
+                                                                for tag, l, r in rows}),
+              open(path, "w"), indent=1)
+    return s
+
+
+def cap_px(R):
+    """The cap diameter in px at the common camera scale."""
+    return CAP_CM * px_per_cm()
+
+
+def spin_tokens(r, w, R):
+    """r (..., N, 2), w (N,) spin rates -> (..., N, 4, 2)."""
+    d = r[..., None, :, :] - r[..., :, None, :]              # [i, j] = r_j - r_i
+    D = np.linalg.norm(d, axis=-1)
+    n = D.shape[-1]
+    D[..., np.arange(n), np.arange(n)] = np.inf
+    C = (D < 1.1 * SIGMA).astype(float)
+    u = -d / D[..., None]                                   # unit vector from j to i
+    t = np.stack([-u[..., 1], u[..., 0]], -1)               # z x u
+    S = w[:, None] + w[None, :]
+    gear = np.einsum("...ij,...ijk->...ik", C * S, t)
+    gsgn = np.einsum("...ij,...ijk->...ik", C * np.sign(S), t)
+    rel = r - np.array([R["xc"], R["yc"]])
+    rr = np.linalg.norm(rel, axis=-1)
+    on = (rr > R["r_env"] - 0.25 * SIGMA).astype(float)
+    tw = np.stack([-rel[..., 1], rel[..., 0]], -1) / rr[..., None]
+    roll, rsgn = (on * w)[..., None] * tw, (on * np.sign(w))[..., None] * tw
+    return np.stack([gear, gsgn, roll, rsgn], -2)
+
+
+def recording_spin_tokens(R):
+    """The recording's spin-friction tokens (T_rows, N, 4, 2)."""
+    pos = np.stack([R["tok"][..., TI["x"]] + R["xc"], R["tok"][..., TI["y"]] + R["yc"]], -1)
+    out = np.zeros(pos.shape[:2] + (len(SPIN_TOK), 2))
+    for t0 in range(0, len(pos), 500):
+        sl = slice(t0, min(len(pos), t0 + 500))
+        out[sl] = spin_tokens(pos[sl], R["w"], R)
+    return out
+
+
+def fit_spin(R, resid_x, resid_y, ST, which, rows=slice(None)):
+    """Shared isotropic coefficients of the spin tokens `which` on given residuals -> Ks (4,)."""
+    A = np.vstack([ST[rows][..., list(which), 0].reshape(-1, len(which)),
+                   ST[rows][..., list(which), 1].reshape(-1, len(which))])
+    coef = np.linalg.lstsq(A, np.concatenate([resid_x.ravel(), resid_y.ravel()]), rcond=None)[0]
+    Ks = np.zeros(len(SPIN_TOK))
+    Ks[list(which)] = coef
+    return Ks
+
+
 def predict(R, K, rows=slice(None)):
     return (np.einsum("tik,ik->ti", R["tok"][rows], K[:, 0]), np.einsum("tik,ik->ti", R["tok"][rows], K[:, 1]))
 
@@ -371,17 +448,18 @@ def shared_noise(r, rng, lam, ell):
 
 
 def simulate(R, K, sd, rng, shared=None, track=False, phi_replay=False, Knp=None, Ksrc=None, Kb=None,
-             core=None):
+             core=None, Ks=None, return_phi=False):
     """From the recorded state after HIST steps of history, to the end of the recording.
     shared = (lam, ell): neighbour-correlated noise (see shared_noise). track: also return each
     step's residual of the law (realised step velocity minus the law's prediction). phi_replay:
     headings taken from the recording instead of the constant-spin model (a diagnostic).
     Knp: coefficients of the neighbour-drive tokens, the neighbours' propulsion read from law Ksrc.
-    Kb: push correction per distance band (band_push). core: pair-projection distance (0 = none)."""
+    Kb: push correction per distance band (band_push). core: pair-projection distance (0 = none).
+    Ks: coefficients of the spin-friction tokens (spin_tokens). return_phi: also return the headings."""
     dt = R["dt"]
     hist = list(R["pos"][:HIST + 1].copy())               # positions of the last HIST steps and now
     phi = R["phi"][HIST].copy()
-    resid = []
+    resid, phis = [], [phi.copy()]
     for k in range(len(R["pos"]) - HIST - 1):
         if phi_replay:
             phi = R["phi"][HIST + k]
@@ -396,12 +474,17 @@ def simulate(R, K, sd, rng, shared=None, track=False, phi_replay=False, Knp=None
             v = v + np.stack([(Knp[:, 0] * dtok).sum(1), (Knp[:, 1] * dtok).sum(1)], -1)
         if Kb is not None:
             v = v + np.einsum("ibk,b->ik", band_push(r), Kb)
+        if Ks is not None:
+            v = v + np.einsum("ibk,b->ik", spin_tokens(r, R["w"], R), Ks)
         xi = rng.standard_normal(r.shape) if shared is None else shared_noise(r, rng, *shared)
         hist.append(project(r + dt * v + dt * sd * xi, R, core=core))
         if track:
             resid.append((hist[-1] - r) / dt - v)
         phi = phi + R["w"] * dt + R["sd_phi"] * rng.standard_normal(len(phi))
+        phis.append(phi.copy())
     pos = np.array(hist[HIST:])
+    if return_phi:
+        return pos, np.array(phis)
     return (pos, np.array(resid)) if track else pos
 
 

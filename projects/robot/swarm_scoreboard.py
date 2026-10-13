@@ -2,8 +2,9 @@ r"""Which simulated swarm dynamics matches the experiment best? One scoreboard o
 
 Reads results/swarm_sim.json (laws +/- slow memory), results/swarm_shared_noise.json (shared noise),
 results/swarm_heading_replay.json (recorded heading, a diagnostic: the heading is not simulated),
-results/swarm_neighbour_drive.json (neighbour-drive tokens) and results/swarm_contact_law.json (the
-learned contact law in place of the hard-disk projection), when present.
+results/swarm_neighbour_drive.json (neighbour-drive tokens), results/swarm_contact_law.json (the
+learned contact law in place of the hard-disk projection) and results/swarm_spin_contact.json (the
+cap's hard core, spin friction), when present.
 Per law, averaged over the 5 recordings:
   per-robot correlation sim vs experiment   MSD over 10 s, mean radius, mean tangential velocity
   MSD error            mean |ln(sim / exp)| over lags 0.4 .. 100 s
@@ -42,7 +43,18 @@ def main():
     drive = json.load(open(drive_path)) if os.path.exists(drive_path) else {}
     contact_path = os.path.join(RES, "swarm_contact_law.json")
     contact = json.load(open(contact_path)) if os.path.exists(contact_path) else {}
+    spin_path = os.path.join(RES, "swarm_spin_contact.json")
+    spin = json.load(open(spin_path)) if os.path.exists(spin_path) else {}
+    own_path = os.path.join(RES, "swarm_spin_contact_own_prop.json")
+    own = json.load(open(own_path)) if os.path.exists(own_path) else {}
     rows = {}
+    for tag, r in sim.items():
+        for law, c in spin.get(tag, {}).get("test", {}).items():
+            if "cap core" in law or "spin friction" in law:
+                rows.setdefault(f"epde + {law}", []).append(measures(c, r["data"]))
+        for law, c in own.get(tag, {}).get("test", {}).items():
+            if "cap core" in law:
+                rows.setdefault(f"own_prop + {law}", []).append(measures(c, r["data"]))
     for tag, r in sim.items():
         data = r["data"]
         for law, c in drive.get(tag, {}).get("test", {}).items():

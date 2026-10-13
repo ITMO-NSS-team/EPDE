@@ -1,0 +1,518 @@
+<title>Vibrobot Swarm Replay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo:wght@500;700&family=Chivo+Mono:wght@400;500&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+/* Layout: one lab-notebook column; the two arenas side by side as the page's subject, statistics below. */
+:root {
+  --bg: #f3f5f3; --surface: #ffffff; --fg: #1a2023; --muted: #5a6669; --line: #d3dad7; --line-strong: #8f9b98;
+  --arena: #e9edeb; --ccw: #c4642a; --cw: #2a7c92; --tick: #ffffff;
+  --g1: #1c637a; --g2: #86c0cf; --g3: #e9ab84; --g4: #a8481a;
+  --m0: #6d55a3; --m1: #c43d52; --m2: #7d8f2e; --m3: #d4922f; --m4: #b04a8f; --m5: #3d6fc4; --good: #2f7d4f; --focus: #2a7c92;
+  --font-display: "Chivo", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --font-data: "Chivo Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0e1315; --surface: #151c1f; --fg: #e2e8e6; --muted: #97a3a1; --line: #29343a; --line-strong: #5f6d70;
+  --arena: #0a0f11; --ccw: #e0884d; --cw: #4fa9c0; --tick: #0a0f11;
+  --g1: #62bdd4; --g2: #2c6474; --g3: #87502e; --g4: #f39a5e;
+  --m0: #a38ce0; --m1: #ef7184; --m2: #b5c55d; --m3: #f0b862; --m4: #e38bc7; --m5: #86aef0; --good: #6cc48f; --focus: #4fa9c0; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0e1315; --surface: #151c1f; --fg: #e2e8e6; --muted: #97a3a1; --line: #29343a; --line-strong: #5f6d70;
+  --arena: #0a0f11; --ccw: #e0884d; --cw: #4fa9c0; --tick: #0a0f11;
+  --g1: #62bdd4; --g2: #2c6474; --g3: #87502e; --g4: #f39a5e;
+  --m0: #a38ce0; --m1: #ef7184; --m2: #b5c55d; --m3: #f0b862; --m4: #e38bc7; --m5: #86aef0; --good: #6cc48f; --focus: #4fa9c0; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font: 16px/1.5 var(--font-body); }
+.wrap { max-width: 1200px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 48px; display: grid; gap: 28px; }
+h1 { font: 700 clamp(1.6rem, 3vw, 2.2rem)/1.15 var(--font-display); margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+h2 { font: 700 1.05rem/1.3 var(--font-display); margin: 0; text-wrap: balance; }
+.lede { margin: 8px 0 0; max-width: 68ch; color: var(--muted); }
+.label { font: 500 0.72rem/1.2 var(--font-data); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.controls { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: end; padding: 14px 16px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+.field { display: grid; gap: 4px; min-width: 0; }
+select, button { font: 500 0.95rem var(--font-body); color: var(--fg); background: var(--bg); border: 1px solid var(--line-strong);
+  border-radius: 6px; padding: 6px 10px; }
+button { cursor: pointer; min-width: 88px; }
+button:hover, select:hover { border-color: var(--fg); }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.check { display: flex; gap: 6px; align-items: center; font-size: 0.95rem; }
+.timeline { flex: 1 1 260px; display: grid; gap: 4px; min-width: 0; }
+input[type=range] { width: 100%; accent-color: var(--fg); }
+.time { font: 500 0.95rem var(--font-data); font-variant-numeric: tabular-nums; }
+.arenas { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+.arena { display: grid; gap: 8px; min-width: 0; }
+.arena-head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.arena-head h2 span { color: var(--muted); font-weight: 500; }
+canvas.board { width: 100%; max-width: 100%; aspect-ratio: 1; display: block; border-radius: 8px; background: var(--arena); }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 0.9rem; color: var(--muted); }
+.sw { display: inline-block; width: 12px; height: 12px; border-radius: 50%; vertical-align: -1px; margin-right: 6px; }
+/* Shared chart legends: one compact block per chart group instead of a legend inside every plot. */
+.chartlegend { grid-column: 1 / -1; display: grid; gap: 2px; }
+.legend.mini { font-size: 0.8rem; gap: 2px 14px; }
+.legend.mini b { color: var(--fg); font-weight: 600; }
+.legend.mini .on { color: var(--fg); font-weight: 600; }
+.ln { display: inline-block; width: 18px; height: 0; vertical-align: middle; margin-right: 5px; }
+.defs { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px 28px; }
+.defs h3 { font: 600 0.95rem/1.3 var(--font-display); margin: 0 0 6px; }
+.defs dl { margin: 0; display: grid; gap: 2px; }
+.defs dt { font-weight: 600; color: var(--fg); font-size: 0.92rem; }
+.defs dd { margin: 0 0 6px; color: var(--muted); font-size: 0.88rem; max-width: 60ch; }
+a { color: var(--focus); }
+.facts { display: flex; flex-wrap: wrap; gap: 6px 22px; font: 400 0.9rem var(--font-data); font-variant-numeric: tabular-nums; color: var(--muted); }
+.facts b { color: var(--fg); font-weight: 500; }
+.charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px 10px; display: grid; gap: 6px; min-width: 0; }
+.card p { margin: 0; font-size: 0.88rem; color: var(--muted); }
+.chartbox { position: relative; height: 240px; }
+.tablewrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th, td { padding: 8px 12px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--line); }
+th:first-child, td:first-child { text-align: left; }
+th { font: 500 0.72rem/1.2 var(--font-data); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+td { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+td:first-child { font-family: var(--font-body); }
+tr.sel td { background: color-mix(in srgb, var(--fg) 6%, transparent); }
+td.best { color: var(--good); font-weight: 500; }
+.notes { display: grid; gap: 6px; font-size: 0.92rem; color: var(--muted); max-width: 80ch; }
+.notes p { margin: 0; }
+.notes b { color: var(--fg); font-weight: 600; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="label">Vibrobot swarm · experiment beside simulation</div>
+    <h1>Vibrobot swarm replay</h1>
+    <p class="lede">The recorded swarm (left) and a simulation (right) that starts from the same positions at t = 9.6 s.
+      The simulated robots follow either their own EPDE laws or one common system with each robot's own propulsion,
+      both with the learned contact law. Robots are drawn at the cap's real size, 48.7 mm across (219.5 px at 45.08 px/cm).
+      Symbols and measures are explained under <a href="#defs">Definitions</a>.</p>
+  </header>
+
+  <section class="controls" aria-label="Playback">
+    <div class="field"><label class="label" for="rec">Recording</label><select id="rec"></select></div>
+    <div class="field"><label class="label" for="model">Simulation</label><select id="model"></select></div>
+    <div class="field"><span class="label">Playback</span><button id="play" type="button">Play</button></div>
+    <div class="field"><label class="label" for="speed">Speed</label>
+      <select id="speed"><option value="2">2×</option><option value="5">5×</option><option value="10" selected>10×</option><option value="25">25×</option></select></div>
+    <div class="field"><label class="label" for="colorby">Colour robots by</label>
+      <select id="colorby"><option value="spin" selected>spin direction</option><option value="group">spin-rate group</option></select></div>
+    <label class="check"><input id="trails" type="checkbox" checked> Trails (last 10 s)</label>
+    <div class="timeline">
+      <div class="time" id="time">t = 0.0 s</div>
+      <input id="scrub" type="range" min="0" max="1" value="0" aria-label="Time">
+    </div>
+  </section>
+
+  <section class="arenas">
+    <figure class="arena" style="margin:0">
+      <div class="arena-head"><h2>Experiment</h2><span class="label" id="expnote">tracked video</span></div>
+      <canvas class="board" id="cexp" aria-label="Recorded swarm"></canvas>
+    </figure>
+    <figure class="arena" style="margin:0">
+      <div class="arena-head"><h2>Simulation <span id="modelname"></span></h2><span class="label">seed 0</span></div>
+      <canvas class="board" id="csim" aria-label="Simulated swarm"></canvas>
+    </figure>
+  </section>
+  <div class="legend">
+    <span id="colorlegend" style="display:contents"></span>
+    <span>tick = marker heading φ</span>
+    <span id="scalebar"></span>
+  </div>
+  <div class="facts" id="facts"></div>
+
+  <section class="charts">
+    <div class="chartlegend" id="statlegend"></div>
+    <div class="card"><h2>Mean squared displacement</h2><p>All simulations against the experiment, cm² over lag.</p><div class="chartbox"><canvas id="ch-msd"></canvas></div></div>
+    <div class="card"><h2>Nearest-neighbour distance</h2><p id="gapnote">Share of robot-time; the cap is 48.7 mm.</p><div class="chartbox"><canvas id="ch-gap"></canvas></div></div>
+    <div class="card"><h2>Touching neighbours</h2><p>Share of robot-time with 0 … 4+ neighbours within 1.1 robot diameters.</p><div class="chartbox"><canvas id="ch-contacts"></canvas></div></div>
+    <div class="card"><h2>Radial layering</h2><p>Share of robot-time by distance from the centre, r/R.</p><div class="chartbox"><canvas id="ch-radial"></canvas></div></div>
+    <div class="card"><h2>Speed by contact number</h2><p>Mean speed over 0.4 s steps, mm/s.</p><div class="chartbox"><canvas id="ch-speed"></canvas></div></div>
+    <div class="card"><h2>What each contact term adds</h2><p>Held-out R² gain of the per-robot EPDE laws (first half fits, second half scores): the contact law over the bare law, then each spin-friction term over the contact law. Size on a log scale; green = better, red = worse.</p><div class="chartbox"><canvas id="ch-spin"></canvas></div></div>
+  </section>
+
+  <section style="display:grid; gap:10px">
+    <h2>How close each simulation gets</h2>
+    <div class="tablewrap"><table id="summary"></table></div>
+    <p class="facts" id="fitline" style="margin:0"></p>
+    <p class="notes" style="margin:0">Errors are against this recording (lower is better; green marks the best). MSD error is the mean |ln(sim/exp)| over lags 0.4–100 s; TV is the total variation distance of a distribution; the correlations are per robot, simulation against experiment.</p>
+  </section>
+
+  <section style="display:grid; gap:10px" id="fieldsec">
+    <h2>Field equations</h2>
+    <p class="notes" style="margin:0">The swarm as smooth fields inside the square inscribed in the arena, smoothed over one cap diameter:
+      density ρ (share of floor covered by caps), polarization P of the propulsion direction, and W, the polarization weighted by each robot's spin rate.
+      These laws were found for this recording. The field simulation steps them every 0.08 s from the recorded start, adding the laws' recorded residual fields as noise.
+      The agent simulations' trajectories are smoothed into fields the same way.
+      In the spin-rate group model each spin direction is split into its slower- and faster-spinning half (four groups), each group has its own polarization field P_b,
+      and the laws are found the same way for ρ and every P_b; P and W are then the sums over groups.</p>
+    <div class="facts" id="fieldlaws" style="display:grid; gap:4px"></div>
+  </section>
+  <section class="charts" id="fieldcharts">
+    <div class="chartlegend"><div class="legend mini" id="fieldlegend"></div></div>
+    <div class="card" id="groupcard"><h2>Spin-rate groups</h2><p>Every robot's mean spin rate, sorted (positive = counter-clockwise). Each spin direction is split into its slower- and faster-spinning half.
+      Solid line: the group's measured mean rate; dashed: the rotation rate in the group's field law.</p>
+      <div class="legend mini" id="grouplegend"></div><div class="chartbox"><canvas id="ch-groups"></canvas></div></div>
+    <div class="card"><h2>Polarization autocorrelation</h2><p>C_P(τ) = ⟨P(t)·P(t+τ)⟩ / ⟨|P|²⟩, every 0.4 s.</p><div class="chartbox"><canvas id="ch-cp"></canvas></div></div>
+    <div class="card"><h2>Spin-weighted polarization autocorrelation</h2><p>C_W(τ), the same for W.</p><div class="chartbox"><canvas id="ch-cw"></canvas></div></div>
+    <div class="card"><h2>Density change over time</h2><p>⟨(ρ(t+τ) − ρ(t))²⟩; it levels off when density fluctuations stay bounded.</p><div class="chartbox"><canvas id="ch-srho"></canvas></div></div>
+    <div class="card"><h2>Field amplitudes</h2><p>Root mean square over grid and time; C error = mean |C(τ) − C_experiment(τ)| over 0.4–10 s.</p><div class="tablewrap" style="border:0"><table id="famp"></table></div></div>
+  </section>
+
+  <section id="defs" style="display:grid; gap:12px">
+    <h2>Definitions</h2>
+    <div class="defs">
+      <div><h3>Robots and arena</h3><dl>
+        <dt>φ</dt><dd>Marker heading from the video tracking (the tick on each robot).</dd>
+        <dt>ω</dt><dd>A robot's spin rate: the slope of φ over the whole recording, rad/s; positive = counter-clockwise.</dd>
+        <dt>θ, p</dt><dd>θ is the robot's drive direction relative to its marker; p = (cos(φ+θ), sin(φ+θ)) is the direction it propels itself.</dd>
+        <dt>cap</dt><dd>The cylindrical top, 48.7 mm across and 19.2 mm high; rigid caps cannot overlap. One camera scale, 45.08 px/cm, fits both arena diameters (40 and 41 cm).</dd>
+        <dt>σ</dt><dd>230 px ≈ 5.1 cm, the typical centre distance of two touching robots; contact counts use it.</dd>
+      </dl></div>
+      <div><h3>Simulations</h3><dl>
+        <dt>per-robot EPDE laws</dt><dd>Every robot runs the equations EPDE found for that robot alone.</dd>
+        <dt>common system</dt><dd>One law for the whole recording. Push, wall, persistence and the constants are shared; only each robot's own propulsion (speed and direction relative to its marker) is its own.</dd>
+        <dt>contact law</dt><dd>A push that grows as two robots close in, plus half the drive a neighbour pushes into the robot.</dd>
+        <dt>guard</dt><dd>Pairs are only kept from overlapping more deeply than the closest distance ever recorded (about 0.88–0.90 σ).</dd>
+        <dt>cap core</dt><dd>Caps cannot overlap: centres stay at least one cap diameter apart, as rigid cylinders do.</dd>
+        <dt>+ spin friction</dt><dd>Adds sliding friction between touching spinning caps and along the wall, with fitted coefficients. It has no measurable effect.</dd>
+        <dt>clock</dt><dd>Positions every 0.4 s, starting from the recorded positions at t = 9.6 s; the replay shows seed 0.</dd>
+      </dl></div>
+      <div><h3>Swarm statistics</h3><dl>
+        <dt>MSD</dt><dd>Mean squared displacement ⟨|r(t+τ) − r(t)|²⟩ over robots and start times. MSD error = mean |ln(MSD_sim / MSD_exp)| over lags 0.4–100 s.</dd>
+        <dt>NN distance</dt><dd>Distance from a robot's centre to its nearest neighbour's centre.</dd>
+        <dt>touching neighbours</dt><dd>Neighbours whose centres are closer than 1.1 σ (4 or more pooled).</dd>
+        <dt>radial layering</dt><dd>Distribution of r/R: r is the distance from the arena centre, R the largest distance a robot centre reaches.</dd>
+        <dt>speed by contact number</dt><dd>Mean of |Δr| / 0.4 s, grouped by the number of touching neighbours. Speed error = mean |ln(sim / exp)| over those groups.</dd>
+        <dt>TV</dt><dd>Total variation distance between two distributions, ½ Σ |p_k − q_k|: 0 when equal, 1 when disjoint.</dd>
+        <dt>corr MSD 10 s, radius, circulation</dt><dd>Correlation across robots, simulation against experiment, of each robot's 10 s MSD, its mean r/R, and its mean velocity around the arena centre.</dd>
+        <dt>held-out R²</dt><dd>A law fitted on the first half of the recording and scored on the second, on 0.4 s step velocities; the R² gain is the difference between two laws.</dd>
+      </dl></div>
+      <div><h3>Fields</h3><dl>
+        <dt>K, grid</dt><dd>Gaussian kernel with standard deviation one cap diameter (4.87 cm); fields on a 14 × 14 grid over the square inscribed in the arena, every 0.08 s.</dd>
+        <dt>ρ</dt><dd>Σ A K(r − r_i), A = cap area: the share of floor covered by caps.</dd>
+        <dt>P</dt><dd>Σ A p_i K(r − r_i): the local polarization of the propulsion directions.</dd>
+        <dt>W</dt><dd>Σ A ω_i p_i K(r − r_i): the polarization weighted by spin rate, rad/s.</dd>
+        <dt>spin-rate groups, P_b</dt><dd>Each spin direction split into its faster- and slower-spinning half (four groups); P_b is P over the robots of group b only, and P = Σ_b P_b.</dd>
+      </dl></div>
+      <div><h3>Field laws</h3><dl>
+        <dt>∂ₜf</dt><dd>Forward increment (f(t + 0.08 s) − f(t)) / 0.08 s.</dd>
+        <dt>∂ₓ, ∂ᵧ, ∇·, ∇²</dt><dd>Central differences on the grid; ∇·P = ∂ₓPₓ + ∂ᵧPᵧ, ∇² = ∂ₓ² + ∂ᵧ².</dd>
+        <dt>ẑ×P</dt><dd>P turned by +90°, (−Pᵧ, Pₓ); ∂ₜP = ω ẑ×P rotates P at rate ω.</dd>
+        <dt>balanced law</dt><dd>The member of the found front that is both precise and stable: its error (WAPE = Σ|y − ŷ| / Σ|y|) and its window instability (on a log scale) are each rescaled to 0–1 over the front, and the law closest to (0, 0) is chosen.</dd>
+        <dt>window instability</dt><dd>The law refit on windows a quarter of each axis long (time and both space directions); the summed squared relative spread (variance / mean²) of its coefficients.</dd>
+        <dt>v₀</dt><dd>Transport speed in ∂ₜρ = −v₀ ∇·P, cm/s.</dd>
+        <dt>D_r, ω_b, D_b</dt><dd>Decay rate of the polarization (1/s); rotation rate (rad/s) and decay rate (1/s) of group b's polarization, read from the eigenvalue of its 0.08 s step, which removes the step's own ω²·0.08/2.</dd>
+        <dt>κ, ρ̄(r), D</dt><dd>Density relaxation −κ(ρ − ρ̄(r)) toward each point's time-mean density ρ̄(r), and density diffusion D ∇²ρ (D in cm²/s).</dd>
+        <dt>noise</dt><dd>Each 0.08 s step of a field simulation adds the laws' recorded residual fields from one randomly drawn instant.</dd>
+      </dl></div>
+      <div><h3>Field statistics</h3><dl>
+        <dt>C_P(τ), C_W(τ)</dt><dd>⟨P(t)·P(t+τ)⟩ / ⟨|P|²⟩ over grid and time, sampled every 0.4 s; the same for W.</dd>
+        <dt>⟨Δρ²⟩(τ)</dt><dd>⟨(ρ(t+τ) − ρ(t))²⟩; it levels off when density fluctuations stay bounded.</dd>
+        <dt>δρ, |P|, |W|</dt><dd>Root mean square of the density's deviation from its time mean at each point, of |P| and of |W|.</dd>
+        <dt>C error</dt><dd>Mean |C(τ) − C_experiment(τ)| over lags 0.4–10 s.</dd>
+      </dl></div>
+    </div>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+<script>
+const RECS = /*PAYLOAD*/null;
+const DEFAULT_MODEL = "per-robot EPDE laws · contact law, cap core";
+const state = { rec: 0, model: 0, frame: 0, playing: false, speed: 10, trails: true, colorBy: "spin" };
+const $ = (id) => document.getElementById(id);
+const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const MODEL_VARS = ["--m0", "--m1", "--m2", "--m3", "--m4", "--m5"];
+
+function decode(rec) {
+  if (!rec.arr) {
+    const bin = atob(rec.b64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    rec.arr = new Int16Array(bytes.buffer);
+  }
+  return rec.arr;
+}
+
+function sizeCanvas(c) {
+  const dpr = window.devicePixelRatio || 1;
+  const w = Math.max(1, Math.round(c.clientWidth * dpr));
+  if (c.width !== w || c.height !== w) { c.width = w; c.height = w; }
+  return w;
+}
+
+function drawBoard(canvas, rec, traj, frame) {
+  const W = sizeCanvas(canvas), ctx = canvas.getContext("2d");
+  const arr = decode(rec), N = rec.robots, T = rec.frames;
+  const wall = rec.r_env + rec.cap / 2, s = (W / 2 - 6) / wall, c0 = W / 2;
+  ctx.fillStyle = css("--arena"); ctx.fillRect(0, 0, W, W);
+  ctx.strokeStyle = css("--line-strong"); ctx.lineWidth = Math.max(1, W / 400);
+  ctx.beginPath(); ctx.arc(c0, c0, wall * s, 0, 2 * Math.PI); ctx.stroke();
+  const at = (k, i, j) => arr[((traj * T + k) * N + i) * 3 + j];
+  const byGroup = state.colorBy === "group" && rec.group;
+  const palette = byGroup ? [1, 2, 3, 4].map((b) => css(`--g${b}`)) : [css("--cw"), css("--ccw")];
+  const col = (i) => byGroup ? palette[rec.group[i]] : palette[rec.spin[i] > 0 ? 1 : 0];
+  if (state.trails) {
+    const L = Math.round(10 / rec.dt), k0 = Math.max(0, frame - L);
+    ctx.lineWidth = Math.max(1, W / 500); ctx.globalAlpha = 0.45;
+    for (let i = 0; i < N; i++) {
+      ctx.strokeStyle = col(i); ctx.beginPath();
+      for (let k = k0; k <= frame; k++) {
+        const x = c0 + at(k, i, 0) * s, y = c0 + at(k, i, 1) * s;
+        k === k0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+  const rr = rec.cap / 2 * s;
+  for (let i = 0; i < N; i++) {
+    const x = c0 + at(frame, i, 0) * s, y = c0 + at(frame, i, 1) * s, ph = at(frame, i, 2) / 1000;
+    ctx.fillStyle = col(i); ctx.globalAlpha = 0.88;
+    ctx.beginPath(); ctx.arc(x, y, rr, 0, 2 * Math.PI); ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = css("--tick"); ctx.lineWidth = Math.max(1.5, W / 300);
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + Math.cos(ph) * rr * 0.92, y + Math.sin(ph) * rr * 0.92); ctx.stroke();
+  }
+}
+
+function drawFrame() {
+  const rec = RECS[state.rec];
+  drawBoard($("cexp"), rec, 0, state.frame);
+  drawBoard($("csim"), rec, state.model + 1, state.frame);
+  const t = rec.t0 + state.frame * rec.dt;
+  $("time").textContent = `t = ${t.toFixed(1)} s of ${(rec.t0 + (rec.frames - 1) * rec.dt).toFixed(0)} s`;
+  $("scrub").value = state.frame;
+}
+
+let last = null, carry = 0;
+function tick(ts) {
+  if (!state.playing) { last = null; return; }
+  if (last !== null) {
+    const rec = RECS[state.rec];
+    carry += (ts - last) / 1000 * state.speed / rec.dt;
+    const step = Math.floor(carry); carry -= step;
+    if (step > 0) { state.frame = (state.frame + step) % rec.frames; drawFrame(); }
+  }
+  last = ts;
+  requestAnimationFrame(tick);
+}
+
+let charts = [];
+function chartColors() {
+  return { fg: css("--fg"), muted: css("--muted"), line: css("--line"), models: MODEL_VARS.map(css) };
+}
+function baseOptions(c, extra) {
+  return Object.assign({
+    responsive: true, maintainAspectRatio: false, animation: false,
+    plugins: { legend: { display: false } },              // shared HTML legends above the charts
+    scales: {
+      x: { ticks: { color: c.muted }, grid: { color: c.line } },
+      y: { ticks: { color: c.muted }, grid: { color: c.line }, beginAtZero: true }
+    }
+  }, extra || {});
+}
+function pairChart(id, labels, expData, modData, c, yTitle) {
+  const name = RECS[state.rec].names[state.model];
+  return new Chart($(id), {
+    type: "bar",
+    data: { labels, datasets: [
+      { label: "experiment", data: expData, backgroundColor: c.fg },
+      { label: name, data: modData, backgroundColor: c.models[state.model] }] },
+    options: baseOptions(c, { scales: {
+      x: { ticks: { color: c.muted }, grid: { display: false } },
+      y: { ticks: { color: c.muted }, grid: { color: c.line }, beginAtZero: true,
+           title: { display: !!yTitle, text: yTitle, color: c.muted } } } })
+  });
+}
+
+const lineSwatch = (v, dashed) => `<i class="ln" style="border-top:3px ${dashed ? "dashed" : "solid"} var(${v})"></i>`;
+function buildStatLegend() {
+  const rec = RECS[state.rec], byLaw = {};
+  rec.names.forEach((n, k) => { const [law, variant] = n.split(" · "); (byLaw[law] = byLaw[law] || []).push([k, variant || n]); });
+  $("statlegend").innerHTML = `<div class="legend mini"><span>${lineSwatch("--fg")}experiment</span>` +
+      `<span>bars: experiment beside the selected simulation (bold)</span></div>` +
+    Object.entries(byLaw).map(([law, vs]) => `<div class="legend mini"><span><b>${law}:</b></span>` +
+      vs.map(([k, v]) => `<span class="${k === state.model ? "on" : ""}">${lineSwatch(MODEL_VARS[k], k !== state.model)}${v}</span>`).join("") +
+      "</div>").join("");
+}
+
+function buildCharts() {
+  if (typeof Chart === "undefined") return;
+  charts.forEach((ch) => ch.destroy()); charts = [];
+  buildStatLegend();
+  const rec = RECS[state.rec], c = chartColors(), m = rec.models[state.model];
+  Chart.defaults.font.family = css("--font-data");
+  const msdSets = [{ label: "experiment", data: rec.exp.msd.map((v, i) => ({ x: rec.lags[i], y: v })),
+                     borderColor: c.fg, backgroundColor: c.fg, borderWidth: 3, pointRadius: 3 }];
+  rec.models.forEach((mod, k) => msdSets.push({
+    label: mod.name, data: mod.msd.map((v, i) => ({ x: rec.lags[i], y: v })),
+    borderColor: c.models[k], backgroundColor: c.models[k], borderWidth: k === state.model ? 2.5 : 1.2,
+    borderDash: k === state.model ? [] : [5, 4], pointRadius: k === state.model ? 2.5 : 0 }));
+  charts.push(new Chart($("ch-msd"), { type: "line", data: { datasets: msdSets }, options: baseOptions(c, {
+    scales: { x: { type: "logarithmic", ticks: { color: c.muted }, grid: { color: c.line }, title: { display: true, text: "lag (s)", color: c.muted } },
+              y: { type: "logarithmic", ticks: { color: c.muted }, grid: { color: c.line }, title: { display: true, text: "cm²", color: c.muted } } } }) }));
+  const g = rec.gap_mm, gl = [`<${g[0]}`].concat(g.slice(1).map((v, i) => `${g[i]}–${v}`), [`>${g[g.length - 1]}`]);
+  charts.push(pairChart("ch-gap", gl, rec.exp.gap, m.gap, c, "share"));
+  charts.push(pairChart("ch-contacts", ["0", "1", "2", "3", "4+"], rec.exp.contacts, m.contacts, c, "share"));
+  const rb = rec.rbins, rl = rb.slice(1).map((v, i) => `${rb[i]}–${v}`);
+  charts.push(pairChart("ch-radial", rl, rec.exp.rhist, m.rhist, c, "share"));
+  charts.push(pairChart("ch-speed", ["0", "1", "2", "3", "4+"], rec.exp.speed, m.speed, c, "mm/s"));
+  const h = rec.heldout, keys = Object.keys(h).filter((k) => k !== "contact law" && k !== "law");
+  const gains = [h["contact law"] - h["law"]].concat(keys.map((k) => h[k] - h["contact law"]));
+  const good = css("--good"), bad = css("--m1");
+  charts.push(new Chart($("ch-spin"), { type: "bar",
+    data: { labels: ["contact law"].concat(keys.map((k) => "+ " + k)),
+      datasets: [{ label: "|held-out R² gain|", data: gains.map((g) => Math.max(Math.abs(g), 1e-6)),
+        backgroundColor: gains.map((g) => g >= 0 ? good : bad) }] },
+    options: baseOptions(c, { plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: (ctx) => `R² gain ${gains[ctx.dataIndex] >= 0 ? "+" : ""}${gains[ctx.dataIndex].toExponential(1)}` } } },
+      scales: { x: { ticks: { color: c.muted }, grid: { display: false } },
+        y: { type: "logarithmic", min: 1e-6, max: 0.2, ticks: { color: c.muted }, grid: { color: c.line },
+             title: { display: true, text: "|R² gain|, log scale", color: c.muted } } } }) }));
+  buildFieldCharts(c);
+}
+
+const FIELD_COLORS = { "experiment": "--fg", "agents: per-robot EPDE laws": "--m0", "agents: common system": "--m4",
+                       "field laws": "--m1", "field laws + density relaxation": "--m3",
+                       "field laws, spin-rate groups + density relaxation": "--m2" };
+const signed = (v, d = 2) => (v >= 0 ? "+" : "−") + Math.abs(v).toFixed(d);
+/* Groups b = 0 .. 2k-1 run from the highest clockwise to the highest counter-clockwise spin rate. */
+function groupName(b, k) {
+  const cw = b < k, r = cw ? b : 2 * k - 1 - b;
+  return `${k === 2 ? ["faster", "slower"][r] : "spin-rate rank " + (r + 1)} ${cw ? "clockwise" : "counter-clockwise"} spinners`;
+}
+function buildLegend() {
+  const rec = RECS[state.rec], g = rec.fields && (rec.fields.groups || [])[0];
+  const items = state.colorBy === "group" && rec.group && g
+    ? g.measured.map((w, b) => [`--g${b + 1}`, `${groupName(b, g.k)} (${signed(w, 1)} rad/s)`])
+    : [["--ccw", "spins counter-clockwise"], ["--cw", "spins clockwise"]];
+  $("colorlegend").innerHTML = items.map(([v, t]) => `<span><i class="sw" style="background:var(${v})"></i>${t}</span>`).join("");
+}
+function buildGroupChart(c, rec, g) {
+  $("groupcard").hidden = !(g && rec.group);
+  if (!(g && rec.group)) return;
+  const order = rec.wrate.map((w, i) => i).sort((a, b) => rec.wrate[a] - rec.wrate[b]);
+  const rank = []; order.forEach((i, r) => { rank[i] = r + 1; });
+  const nb = g.measured.length, members = (b) => order.filter((i) => rec.group[i] === b);
+  $("grouplegend").innerHTML = [...Array(nb).keys()].map((b) =>
+      `<span><i class="sw" style="background:var(--g${b + 1})"></i>${groupName(b, g.k)}</span>`).join("") +
+    `<span>${lineSwatch("--fg")}measured mean</span><span>${lineSwatch("--fg", true)}rate in the law</span>`;
+  const dots = [...Array(nb).keys()].map((b) => ({ label: groupName(b, g.k),
+    data: members(b).map((i) => ({ x: rank[i], y: rec.wrate[i] })),
+    backgroundColor: css(`--g${b + 1}`), borderColor: css(`--g${b + 1}`), pointRadius: 3.5, pointHoverRadius: 5 }));
+  const segments = (vals, label, dash) => ({ label, showLine: true, spanGaps: false, pointRadius: 0, borderWidth: 1.8,
+    borderColor: c.fg, backgroundColor: c.fg, borderDash: dash,
+    data: [...Array(nb).keys()].flatMap((b) => { const rs = members(b).map((i) => rank[i]);
+      return [{ x: Math.min(...rs) - 0.4, y: vals[b] }, { x: Math.max(...rs) + 0.4, y: vals[b] }, { x: Math.max(...rs) + 0.5, y: null }]; }) });
+  charts.push(new Chart($("ch-groups"), { type: "scatter",
+    data: { datasets: [...dots, segments(g.measured, "group mean, measured", []), segments(g.rates, "rate in the group's law", [5, 4])] },
+    options: baseOptions(c, { scales: {
+      x: { type: "linear", min: 0, max: order.length + 1, ticks: { color: c.muted }, grid: { display: false },
+           title: { display: true, text: "robots, sorted by spin rate", color: c.muted } },
+      y: { ticks: { color: c.muted }, grid: { color: c.line }, title: { display: true, text: "spin rate (rad/s)", color: c.muted } } } }) }));
+}
+function buildFieldCharts(c) {
+  const rec = RECS[state.rec], fd = rec.fields;
+  $("fieldsec").hidden = !fd; $("fieldcharts").hidden = !fd;
+  if (!fd) return;
+  const g = (fd.groups || [])[0];
+  $("fieldlaws").innerHTML = fd.laws.map((l) => `<span><b>${l}</b></span>`).join("") +
+    `<span>density with relaxation: <b>${fd.relaxation}</b></span>` +
+    (g ? `<span>spin-rate groups, each its own polarization field: <b>∂ₜP_b = ω_b ẑ×P_b − D_b P_b</b></span>` +
+      g.rates.map((r, b) => `<span>&nbsp;&nbsp;${groupName(b, g.k)} (${g.sizes[b]} robots): ω_b <b>${signed(r)}</b> rad/s ` +
+        `(measured ${signed(g.measured[b])}), D_b <b>${g.damping[b].toFixed(2)}</b> /s</span>`).join("") : "");
+  buildGroupChart(c, rec, g);
+  const names = Object.keys(fd.sources);
+  $("fieldlegend").innerHTML = names.map((n) => `<span>${lineSwatch(FIELD_COLORS[n], n.startsWith("field"))}${n}</span>`).join("");
+  const line = (key, lags) => names.map((n) => ({ label: n, data: fd.sources[n][key].map((v, i) => ({ x: lags[i], y: v })),
+    borderColor: css(FIELD_COLORS[n]), backgroundColor: css(FIELD_COLORS[n]), borderWidth: n === "experiment" ? 3 : 1.6,
+    borderDash: n.startsWith("field") ? [5, 4] : [], pointRadius: n === "experiment" ? 2 : 0 }));
+  const lin = (t) => baseOptions(c, { scales: {
+    x: { type: "linear", ticks: { color: c.muted }, grid: { color: c.line }, title: { display: true, text: "lag (s)", color: c.muted } },
+    y: { ticks: { color: c.muted }, grid: { color: c.line }, min: -1, max: 1, title: { display: true, text: t, color: c.muted } } } });
+  charts.push(new Chart($("ch-cp"), { type: "line", data: { datasets: line("C_P", fd.cp_lags) }, options: lin("C_P") }));
+  charts.push(new Chart($("ch-cw"), { type: "line", data: { datasets: line("C_W", fd.cp_lags) }, options: lin("C_W") }));
+  charts.push(new Chart($("ch-srho"), { type: "line", data: { datasets: line("S_rho", fd.s_lags) }, options: baseOptions(c, {
+    scales: { x: { type: "logarithmic", ticks: { color: c.muted }, grid: { color: c.line }, title: { display: true, text: "lag (s)", color: c.muted } },
+              y: { type: "logarithmic", ticks: { color: c.muted }, grid: { color: c.line }, title: { display: true, text: "⟨Δρ²⟩", color: c.muted } } } }) }));
+  const ref = fd.sources["experiment"];
+  const cerr = (s, key) => s[key].slice(1).reduce((a, v, i) => a + Math.abs(v - ref[key][i + 1]), 0) / (s[key].length - 1);
+  $("famp").innerHTML = "<thead><tr><th>Source</th><th>δρ</th><th>|P|</th><th>|W| (rad/s)</th><th>C_P error</th><th>C_W error</th></tr></thead><tbody>" +
+    names.map((n) => { const s = fd.sources[n];
+      return `<tr><td><i class="sw" style="background:var(${FIELD_COLORS[n]})"></i>${n}</td><td>${s.rms_rho.toPrecision(3)}</td><td>${s.rms_P.toPrecision(3)}</td><td>${s.rms_W.toPrecision(3)}</td>` +
+        `<td>${n === "experiment" ? "—" : cerr(s, "C_P").toFixed(3)}</td><td>${n === "experiment" ? "—" : cerr(s, "C_W").toFixed(3)}</td></tr>`; }).join("") + "</tbody>";
+}
+
+function buildTable() {
+  const rec = RECS[state.rec];
+  const cols = [["msd_err", "MSD error", -1], ["contact_tv", "Contacts TV", -1], ["gap_tv", "NN distance TV", -1],
+                ["layer_tv", "Layering TV", -1], ["speed_err", "Speed error", -1],
+                ["r_msd10", "corr MSD 10 s", 1], ["r_radius", "corr radius", 1], ["r_tang", "corr circulation", 1]];
+  const best = {};
+  cols.forEach(([k, , dir]) => { best[k] = rec.models.reduce((b, m) => (dir < 0 ? Math.min(b, m.summary[k]) : Math.max(b, m.summary[k])), dir < 0 ? Infinity : -Infinity); });
+  let html = "<thead><tr><th>Simulation</th>" + cols.map(([, t]) => `<th>${t}</th>`).join("") + "</tr></thead><tbody>";
+  rec.models.forEach((m, k) => {
+    html += `<tr class="${k === state.model ? "sel" : ""}"><td><i class="sw" style="background:var(${MODEL_VARS[k]})"></i>${m.name}</td>`;
+    html += cols.map(([key, , dir]) => {
+      const v = m.summary[key];
+      return `<td class="${v === best[key] ? "best" : ""}">${dir > 0 ? (v >= 0 ? "+" : "") : ""}${v.toFixed(3)}</td>`;
+    }).join("") + "</tr>";
+  });
+  $("summary").innerHTML = html + "</tbody>";
+  $("fitline").innerHTML = "<span>Held-out R² of the step velocity (first half fits, second half scores):</span>" +
+    Object.entries(rec.fit).map(([k, v]) => `<span>${k} <b>${v.law.toFixed(3)}</b>, with contact law <b>${v.contact.toFixed(3)}</b></span>`).join("");
+}
+
+function buildFacts() {
+  const r = RECS[state.rec];
+  $("facts").innerHTML = [
+    `<span><b>${r.n}</b> robots</span>`, `<span>PWM <b>${r.pwm}</b></span>`, `<span>arena <b>${r.arena_cm} cm</b></span>`,
+    `<span><b>${r.nccw}</b> ccw / <b>${r.ncw}</b> cw</span>`, `<span>cap 48.7 mm = <b>${r.cap.toFixed(0)} px</b></span>`,
+    `<span>scale <b>${r.scale.toFixed(2)} px/cm</b></span>`, `<span>${r.frames} frames of ${r.dt.toFixed(1)} s</span>`].join("");
+  $("gapnote").textContent = `Share of robot-time, mm. The cap is 48.7 mm (${r.cap.toFixed(0)} px); centres closer than that are tracking noise.`;
+  $("scalebar").textContent = `arena wall ${r.arena_cm} cm across`;
+}
+
+function selectRecording(i) {
+  state.rec = i; const rec = RECS[i];
+  const sel = $("model"); sel.innerHTML = "";
+  rec.names.forEach((n, k) => { const o = document.createElement("option"); o.value = k; o.textContent = n; sel.appendChild(o); });
+  let k = rec.names.indexOf(state.modelName || DEFAULT_MODEL);
+  if (k < 0) k = Math.max(0, rec.names.indexOf(DEFAULT_MODEL));
+  state.model = k; state.modelName = rec.names[k];
+  sel.value = state.model;
+  $("scrub").max = rec.frames - 1;
+  state.frame = Math.min(state.frame, rec.frames - 1);
+  $("modelname").textContent = "· " + rec.names[state.model];
+  $("colorby").querySelector('option[value="group"]').disabled = !rec.group;
+  if (!rec.group) { state.colorBy = "spin"; $("colorby").value = "spin"; }
+  buildFacts(); buildLegend(); buildTable(); buildCharts(); drawFrame();
+}
+
+function init() {
+  const rs = $("rec");
+  RECS.forEach((r, i) => { const o = document.createElement("option"); o.value = i;
+    o.textContent = `${r.n} robots · PWM ${r.pwm} · ${r.arena_cm} cm`; rs.appendChild(o); });
+  rs.addEventListener("change", () => selectRecording(+rs.value));
+  $("model").addEventListener("change", (e) => { state.model = +e.target.value; state.modelName = RECS[state.rec].names[state.model];
+    $("modelname").textContent = "· " + RECS[state.rec].names[state.model]; buildTable(); buildCharts(); drawFrame(); });
+  $("play").addEventListener("click", () => { state.playing = !state.playing; $("play").textContent = state.playing ? "Pause" : "Play";
+    if (state.playing) requestAnimationFrame(tick); });
+  $("speed").addEventListener("change", (e) => { state.speed = +e.target.value; });
+  $("trails").addEventListener("change", (e) => { state.trails = e.target.checked; drawFrame(); });
+  $("colorby").addEventListener("change", (e) => { state.colorBy = e.target.value; buildLegend(); drawFrame(); });
+  $("scrub").addEventListener("input", (e) => { state.frame = +e.target.value; drawFrame(); });
+  window.addEventListener("resize", drawFrame);
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  const redraw = () => { buildCharts(); drawFrame(); };
+  mq.addEventListener ? mq.addEventListener("change", redraw) : mq.addListener(redraw);
+  new MutationObserver(redraw).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  state.frame = Math.round(RECS[0].frames * 0.5);
+  selectRecording(0);
+}
+init();
+</script>

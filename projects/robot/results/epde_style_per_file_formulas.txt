@@ -1,0 +1,1307 @@
+Tokens written as formulas (robot i at time t):
+  cos φ_i, sin φ_i     heading of the robot's marker
+  x_i, y_i             centre position relative to the arena centre (lone robot: to its track mean);
+                       r_i = (x_i, y_i), ρ_i = |r_i|, R = arena radius of robot centres
+  r_ij = |r_i − r_j|   centre distance to robot j;  σ = 230 px, the robot diameter (≈ 5 cm)
+  H(z)                 step: 1 for z > 0, else 0
+  τ = 0.4 s (10 frames), w = 0.08 s (2 frames); ω_i = the robot's own mean spin rate
+  f_i                  the drift law's prediction of (r_i(t+τ)−r_i(t))/τ (noise law only)
+Token -> formula:
+  c, s                 cos φ_i, sin φ_i
+  push_x, push_y       Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij,  Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij
+  wall_x, wall_y       H(ρ_i−R+σ/4)·(−x_i/ρ_i),  H(ρ_i−R+σ/4)·(−y_i/ρ_i)
+  vb_x, vb_y           (x_i(t)−x_i(t−τ))/τ,  (y_i(t)−y_i(t−τ))/τ
+  x, y                 x_i, y_i
+  dc/dx0, ds/dx0       d(cos φ_i)/dt, d(sin φ_i)/dt   (central derivatives)
+  dx/dx0, dy/dx0       robot systems: (x_i(t+τ)−x_i(t))/τ,  (y_i(t+τ)−y_i(t))/τ   (forward increments)
+                       velocity level: (x_i(t+w)−x_i(t))/w,  (y_i(t+w)−y_i(t))/w
+  d^2x/dx0^2           (x_i(t+2w)−2x_i(t+w)+x_i(t))/w²   (and the same in y)
+  n_contact            Σ_j H(1.1σ−r_ij)   (number of touching neighbours)
+  wall, r/R            H(ρ_i−R+σ/4),  ρ_i/R
+  |vb|, |w|            |r_i(t)−r_i(t−τ)|/τ,  |ω_i|
+  D                    (τ/4)·|(r_i(t+τ)−r_i(t))/τ − f_i|²   (diffusion, px^2/s)
+Units: positions px, velocities px/s, rates rad/s. Coefficients are EPDE's, unchanged.
+
+Every law per data file, printed the way EPDE prints a system (search.equations()).
+
+Per robot i of a recording (each robot its own system, its own spin and propulsion tokens):
+    dc/dx0 = -w_i s,   ds/dx0 = w_i c                                 (central derivatives)
+    dx/dx0 = a_i c - b_i s + mu_P push_x + mu_W wall_x + a vb_x + c_x   (forward increment, 0.4 s)
+    dy/dx0 = b_i c + a_i s + mu_P push_y + mu_W wall_y + a vb_y + c_y
+a_i + i b_i = v0_i e^{i theta_i} is the robot's OWN propulsion (speed v0_i, direction theta_i from the
+marker heading); mu_P, mu_W, a, c_x, c_y are shared by the robots of the recording (joint least squares).
+Held out (first half -> second half) this per-robot propulsion raises R2 0.17-0.27 -> 0.31-0.63; per-robot
+push / wall / persistence / constants add < 0.03 (scratchpad per_robot_ablation.py).
+Velocity level (0.08 s windows, d^2x/dx0^2 = dv_x/dt) and the noise law (D = squared increment / 2 dt)
+are per recording, read from results/wide_friction.json and results/diffusion.json (exact
+(WAPE, win14) fronts, stable end = least window-unstable member).
+Objective function values: [WAPE of every equation ..., window instability win14 of every equation ...].
+
+python epde_style.py      -> results/epde_style_per_file.txt (+ printed)
+
+
+====================================================================================================
+N1_PWM10 (lone robot): 1 robot(s); shared drift coefficients mu_P 0.0, mu_W 0.0, a 0.2518, c_x -3.014, c_y -1.9
+  own propulsion v0_i median 3.4 px/s [3.4, 3.4], theta_i median -98.5 deg [-98.5, -98.5]
+
+ robot 1: w = +3.396 rad/s, v0 = 3.4 px/s, theta = -98.5 deg
+ / -3.493 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.437 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -0.4975 * cos φ_i + 3.336 * sin φ_i + 0.2518 * [(x_i(t)−x_i(t−τ))/τ] + -3.014 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -3.336 * cos φ_i + -0.4975 * sin φ_i + 0.2518 * [(y_i(t)−y_i(t−τ))/τ] + -1.9 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3226 0.3221 0.9633 0.9546 0.002408 0.001736 17.55 21.95]
+
+ velocity level (0.08 s windows), recording-wide:
+  d^2x/dx0^2: 0-th non-dominated level (2 equations; * = stable end)
+   * -3.953 * [(x_i(t+w)−x_i(t))/w] + 0.0 = [(x_i(t+2w)−2x_i(t+w)+x_i(t))/w²] , with objective function values of [0.9246 0.01548]
+     -4.094 * [(x_i(t+w)−x_i(t))/w] + -0.5552 * x_i + 0.0 = [(x_i(t+2w)−2x_i(t+w)+x_i(t))/w²] , with objective function values of [0.9231 1.378]
+  d^2y/dx0^2: 0-th non-dominated level (2 equations; * = stable end)
+   * -4.505 * [(y_i(t+w)−y_i(t))/w] + 0.0 = [(y_i(t+2w)−2y_i(t+w)+y_i(t))/w²] , with objective function values of [0.9036 0.004205]
+     -4.57 * [(y_i(t+w)−y_i(t))/w] + -0.7066 * t + 0.0 = [(y_i(t+2w)−2y_i(t+w)+y_i(t))/w²] , with objective function values of [0.9013 148.9]
+
+====================================================================================================
+N30_PWM10_D41: 30 robot(s); shared drift coefficients mu_P 28.25, mu_W 30.41, a 0.1308, c_x -1.947, c_y -2.826
+  own propulsion v0_i median 55.3 px/s [9.9, 197.1], theta_i median +18.6 deg [-165.4, +148.5]
+
+ robot 11: w = -3.181 rad/s, v0 = 42.2 px/s, theta = +36.0 deg
+ / 3.011 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -3.099 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 34.16 * cos φ_i + -24.8 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 24.8 * cos φ_i + 34.16 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3494 0.3446 0.8033 0.7702 0.0008854 0.001448 5.023 0.8319]
+
+ robot 12: w = -2.057 rad/s, v0 = 161.4 px/s, theta = +14.4 deg
+ / 2.121 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -2.003 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 156.3 * cos φ_i + -40.19 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 40.19 * cos φ_i + 156.3 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2853 0.286 0.345 0.3427 0.0001884 0.0001377 71.28 2.079]
+
+ robot 17: w = -4.647 rad/s, v0 = 9.9 px/s, theta = +148.5 deg
+ / 4.503 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -4.689 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -8.464 * cos φ_i + -5.179 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 5.179 * cos φ_i + -8.464 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3539 0.36 0.9409 0.9391 0.0002625 0.000501 38.59 6.113]
+
+ robot 18: w = +4.202 rad/s, v0 = 183.4 px/s, theta = +51.2 deg
+ / -4.154 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 4.157 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 114.8 * cos φ_i + -143.0 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 143.0 * cos φ_i + 114.8 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2168 0.2178 0.4541 0.4548 0.000101 0.0001274 324.6 3.802]
+
+ robot 19: w = -1.721 rad/s, v0 = 63.1 px/s, theta = +71.1 deg
+ / 1.785 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.884 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 20.4 * cos φ_i + -59.74 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 59.74 * cos φ_i + 20.4 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.35 0.3528 0.5812 0.5973 0.0004792 0.0002537 7.454 0.9518]
+
+ robot 27: w = +3.853 rad/s, v0 = 120.3 px/s, theta = -46.3 deg
+ / -3.803 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.885 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 83.17 * cos φ_i + 86.89 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -86.89 * cos φ_i + 83.17 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2347 0.2397 0.5828 0.5487 0.0002259 7.489e-05 3.01 21.39]
+
+ robot 28: w = +3.154 rad/s, v0 = 46.3 px/s, theta = -11.0 deg
+ / -3.288 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.049 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 45.48 * cos φ_i + 8.839 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -8.839 * cos φ_i + 45.48 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3278 0.332 0.8513 0.7969 0.0001507 0.0001814 2.14 2.455]
+
+ robot 29: w = -1.320 rad/s, v0 = 28.4 px/s, theta = -4.8 deg
+ / 1.347 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.303 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 28.32 * cos φ_i + 2.383 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -2.383 * cos φ_i + 28.32 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.5975 0.5954 0.8432 0.8554 0.002483 0.00113 23.62 5.843]
+
+ robot 30: w = +3.666 rad/s, v0 = 49.6 px/s, theta = +74.2 deg
+ / -3.644 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.621 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 13.48 * cos φ_i + -47.78 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 47.78 * cos φ_i + 13.48 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.1433 0.1431 0.6727 0.7877 0.0001425 0.0001669 1.976 1.736]
+
+ robot 31: w = +3.198 rad/s, v0 = 55.5 px/s, theta = -31.1 deg
+ / -3.16 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.163 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 47.55 * cos φ_i + 28.63 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -28.63 * cos φ_i + 47.55 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2679 0.2708 0.7412 0.7723 0.00015 0.0002251 0.9745 1.317]
+
+ robot 32: w = +3.618 rad/s, v0 = 41.1 px/s, theta = -17.8 deg
+ / -3.416 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.524 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 39.17 * cos φ_i + 12.56 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -12.56 * cos φ_i + 39.17 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3144 0.3091 0.8534 0.758 0.0006642 0.0002547 16.82 3.728]
+
+ robot 34: w = -4.024 rad/s, v0 = 89.4 px/s, theta = -2.8 deg
+ / 3.979 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -3.937 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 89.28 * cos φ_i + 4.35 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -4.35 * cos φ_i + 89.28 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2156 0.2105 0.5955 0.6688 0.0006691 0.0003404 5.506 2.418]
+
+ robot 38: w = +1.909 rad/s, v0 = 25.3 px/s, theta = +28.0 deg
+ / -1.806 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 1.854 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 22.34 * cos φ_i + -11.88 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 11.88 * cos φ_i + 22.34 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.4623 0.4533 0.9075 0.8986 0.003219 0.001595 4.68 4.544]
+
+ robot 41: w = +2.798 rad/s, v0 = 177.4 px/s, theta = +71.0 deg
+ / -2.714 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 2.9 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 57.71 * cos φ_i + -167.8 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 167.8 * cos φ_i + 57.71 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2462 0.2371 0.3552 0.3581 0.0004306 0.000326 3.505 38.84]
+
+ robot 42: w = -3.614 rad/s, v0 = 25.5 px/s, theta = -123.5 deg
+ / 3.56 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -3.578 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -14.11 * cos φ_i + 21.28 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -21.28 * cos φ_i + -14.11 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2939 0.2994 0.8678 0.9536 0.002768 0.002956 18.29 90.73]
+
+ robot 44: w = -2.788 rad/s, v0 = 21.0 px/s, theta = -165.4 deg
+ / 2.857 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -2.81 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -20.35 * cos φ_i + 5.305 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -5.305 * cos φ_i + -20.35 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3514 0.3429 0.9161 0.9087 0.0002375 0.0001784 4.109 13.82]
+
+ robot 45: w = +2.299 rad/s, v0 = 145.3 px/s, theta = -105.4 deg
+ / -2.351 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 2.325 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -38.66 * cos φ_i + 140.0 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -140.0 * cos φ_i + -38.66 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2927 0.2882 0.4532 0.4338 0.001477 0.00094 1.489 1.618]
+
+ robot 50: w = +1.990 rad/s, v0 = 46.6 px/s, theta = +117.0 deg
+ / -1.823 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 2.156 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -21.19 * cos φ_i + -41.52 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 41.52 * cos φ_i + -21.19 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.5298 0.5113 0.7654 0.741 0.001522 0.001069 4.225 6.923]
+
+ robot 52: w = +2.868 rad/s, v0 = 67.5 px/s, theta = -13.3 deg
+ / -2.779 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 2.768 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 65.73 * cos φ_i + 15.55 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -15.55 * cos φ_i + 65.73 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2758 0.2774 0.6656 0.7019 0.0007997 0.001142 0.4756 3.811]
+
+ robot 54: w = -2.161 rad/s, v0 = 58.4 px/s, theta = +28.6 deg
+ / 2.173 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -2.166 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 51.27 * cos φ_i + -27.97 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 27.97 * cos φ_i + 51.27 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3639 0.3698 0.6842 0.663 0.0002237 0.0002069 1.285 1.066]
+
+ robot 62: w = +1.272 rad/s, v0 = 66.6 px/s, theta = +79.9 deg
+ / -1.227 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 1.275 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 11.67 * cos φ_i + -65.62 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 65.62 * cos φ_i + 11.67 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2859 0.2901 0.5054 0.4761 0.001237 0.0006623 35.45 44.5]
+
+ robot 65: w = -3.063 rad/s, v0 = 39.8 px/s, theta = +6.8 deg
+ / 3.069 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -3.059 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 39.53 * cos φ_i + -4.696 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 4.696 * cos φ_i + 39.53 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2651 0.2643 0.8371 0.8696 0.0003363 0.0002136 121 28.82]
+
+ robot 66: w = -1.080 rad/s, v0 = 25.0 px/s, theta = +42.0 deg
+ / 1.035 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -0.9237 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 18.6 * cos φ_i + -16.77 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 16.77 * cos φ_i + 18.6 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.7172 0.7258 0.8677 0.864 0.004369 0.002442 7.908 9.32]
+
+ robot 72: w = +4.396 rad/s, v0 = 47.5 px/s, theta = -88.2 deg
+ / -4.41 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 4.293 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 1.473 * cos φ_i + 47.48 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -47.48 * cos φ_i + 1.473 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.1972 0.1964 0.7831 0.8557 0.0001015 0.0001645 82.58 237.1]
+
+ robot 73: w = -0.898 rad/s, v0 = 55.0 px/s, theta = +136.8 deg
+ / 0.8442 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -0.8339 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -40.09 * cos φ_i + -37.67 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 37.67 * cos φ_i + -40.09 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.6477 0.6503 0.6987 0.6825 0.0004175 0.001823 1.416 3.174]
+
+ robot 74: w = +2.836 rad/s, v0 = 197.1 px/s, theta = +58.1 deg
+ / -2.773 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 2.865 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 104.2 * cos φ_i + -167.3 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 167.3 * cos φ_i + 104.2 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2359 0.231 0.3029 0.2812 0.0006296 0.0006853 1.519 5.919]
+
+ robot 77: w = -1.908 rad/s, v0 = 102.7 px/s, theta = -2.1 deg
+ / 1.94 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.868 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 102.7 * cos φ_i + 3.829 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -3.829 * cos φ_i + 102.7 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.4611 0.4529 0.5014 0.5011 0.002418 0.00225 7.095 20.62]
+
+ robot 78: w = +3.755 rad/s, v0 = 77.4 px/s, theta = +22.7 deg
+ / -3.74 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.403 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 71.44 * cos φ_i + -29.91 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 29.91 * cos φ_i + 71.44 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 30.41 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3636 0.3903 0.6754 0.6828 0.001235 0.0006975 2.324 11.35]
+
+ robot 79: w = -2.594 rad/s, v0 = 47.1 px/s, theta = +49.2 deg
+ / 2.455 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -2.438 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 30.77 * cos φ_i + -35.65 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 35.65 * cos φ_i + 30.77 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3235 0.3249 0.703 0.6902 0.0006999 0.0004236 0.4068 496.2]
+
+ robot 83: w = -2.296 rad/s, v0 = 88.6 px/s, theta = -15.2 deg
+ / 2.375 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -2.334 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 85.51 * cos φ_i + 23.19 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.1308 * [(x_i(t)−x_i(t−τ))/τ] + -1.947 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -23.19 * cos φ_i + 85.51 * sin φ_i + 28.25 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.1308 * [(y_i(t)−y_i(t−τ))/τ] + -2.826 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2578 0.2516 0.4733 0.5074 0.001532 0.0009602 1.903 0.5621]
+
+ velocity level (0.08 s windows), recording-wide:
+  d^2x/dx0^2: 0-th non-dominated level (5 equations; * = stable end)
+   * -3.696 * [(x_i(t+w)−x_i(t))/w] + 0.0 = [(x_i(t+2w)−2x_i(t+w)+x_i(t))/w²] , with objective function values of [0.9472 0.01181]
+     -4.074 * [(x_i(t+w)−x_i(t))/w] + 204.1 * cos φ_i + 0.0 = [(x_i(t+2w)−2x_i(t+w)+x_i(t))/w²] , with objective function values of [0.9364 0.1016]
+     -4.138 * [(x_i(t+w)−x_i(t))/w] + 179.5 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 203.8 * cos φ_i + 0.0 = [(x_i(t+2w)−2x_i(t+w)+x_i(t))/w²] , with objective function values of [0.9309 0.1024]
+     -4.159 * [(x_i(t+w)−x_i(t))/w] + 218.2 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 252.5 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 204.8 * cos φ_i + 0.0 = [(x_i(t+2w)−2x_i(t+w)+x_i(t))/w²] , with objective function values of [0.9283 0.1197]
+     -2.427 * [(x_i(t+w)−x_i(t))/w] + 188.2 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 198.6 * cos φ_i + -1.376 * [(x_i(t+w)−x_i(t))/w] * [Σ_j H(1.1σ−r_ij)] + 0.0 = [(x_i(t+2w)−2x_i(t+w)+x_i(t))/w²] , with objective function values of [0.9177 0.1352]
+  d^2y/dx0^2: 0-th non-dominated level (4 equations; * = stable end)
+   * -3.672 * [(y_i(t+w)−y_i(t))/w] + 0.0 = [(y_i(t+2w)−2y_i(t+w)+y_i(t))/w²] , with objective function values of [0.9432 0.01171]
+     -4.05 * [(y_i(t+w)−y_i(t))/w] + 202.3 * sin φ_i + 0.0 = [(y_i(t+2w)−2y_i(t+w)+y_i(t))/w²] , with objective function values of [0.9318 0.09458]
+     -2.321 * [(y_i(t+w)−y_i(t))/w] + 191.7 * sin φ_i + -1.43 * [(y_i(t+w)−y_i(t))/w] * [Σ_j H(1.1σ−r_ij)] + 0.0 = [(y_i(t+2w)−2y_i(t+w)+y_i(t))/w²] , with objective function values of [0.9189 0.1304]
+     -2.351 * [(y_i(t+w)−y_i(t))/w] + 162.2 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 196.4 * sin φ_i + -1.481 * [(y_i(t+w)−y_i(t))/w] * [Σ_j H(1.1σ−r_ij)] + 0.0 = [(y_i(t+2w)−2y_i(t+w)+y_i(t))/w²] , with objective function values of [0.9122 0.1329]
+ noise (D per axis, px^2/s), recording-wide:
+  D: 0-th non-dominated level (3 equations; * = stable end)
+   * 10.58 * [|r_i(t)−r_i(t−τ)|/τ] + 0.0 = [(τ/4)·|(r_i(t+τ)−r_i(t))/τ − f_i|²] , with objective function values of [0.7574 0.01172]
+     198.1 * |ω_i| + 0.03681 * (|r_i(t)−r_i(t−τ)|/τ)² + 0.0 = [(τ/4)·|(r_i(t+τ)−r_i(t))/τ − f_i|²] , with objective function values of [0.7288 0.06071]
+     -392.8 * [H(ρ_i−R+σ/4)] + 166.5 * |ω_i| + 10.87 * [|r_i(t)−r_i(t−τ)|/τ] + -2.661 * [Σ_j H(1.1σ−r_ij)] * [|r_i(t)−r_i(t−τ)|/τ] + 0.0 = [(τ/4)·|(r_i(t+τ)−r_i(t))/τ − f_i|²] , with objective function values of [0.7267 0.2097]
+
+====================================================================================================
+N40_PWM10_D40: 40 robot(s); shared drift coefficients mu_P 25.35, mu_W 29.52, a 0.1548, c_x -0.54, c_y -0.9998
+  own propulsion v0_i median 40.1 px/s [6.9, 96.0], theta_i median +17.4 deg [-139.4, +129.9]
+
+ robot 8: w = +2.446 rad/s, v0 = 26.8 px/s, theta = +67.0 deg
+ / -2.474 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 2.419 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 10.49 * cos φ_i + -24.69 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 24.69 * cos φ_i + 10.49 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2391 0.244 0.9007 0.8578 0.0001728 0.0002291 1937 6.433]
+
+ robot 11: w = -3.086 rad/s, v0 = 37.0 px/s, theta = +28.5 deg
+ / 2.942 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -3.032 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 32.47 * cos φ_i + -17.64 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 17.64 * cos φ_i + 32.47 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3639 0.361 0.8337 0.8319 0.001565 0.003144 0.5512 2.853]
+
+ robot 12: w = -2.006 rad/s, v0 = 61.6 px/s, theta = -13.3 deg
+ / 2.029 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.965 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 59.92 * cos φ_i + 14.13 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -14.13 * cos φ_i + 59.92 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3158 0.3058 0.6423 0.7445 0.0002571 0.0001722 0.6332 7.326]
+
+ robot 17: w = -4.205 rad/s, v0 = 7.1 px/s, theta = +125.9 deg
+ / 4.255 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -4.212 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -4.167 * cos φ_i + -5.75 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 5.75 * cos φ_i + -4.167 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3584 0.3549 0.9559 0.9308 0.000348 0.0003148 9.005 174.3]
+
+ robot 18: w = +4.154 rad/s, v0 = 84.7 px/s, theta = +59.1 deg
+ / -4.232 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 4.187 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 43.47 * cos φ_i + -72.65 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 72.65 * cos φ_i + 43.47 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.212 0.2141 0.709 0.7271 1.976e-05 2.789e-05 0.9642 37.25]
+
+ robot 19: w = -1.731 rad/s, v0 = 48.5 px/s, theta = +65.9 deg
+ / 1.689 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.744 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 19.81 * cos φ_i + -44.24 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 44.24 * cos φ_i + 19.81 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3431 0.3378 0.761 0.6885 0.002368 0.000758 15.86 8.936]
+
+ robot 20: w = -0.698 rad/s, v0 = 20.9 px/s, theta = -30.6 deg
+ / 0.6784 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -0.6225 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 18.02 * cos φ_i + 10.67 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -10.67 * cos φ_i + 18.02 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.7861 0.7786 0.8987 0.865 0.00281 0.004159 23.77 3.198]
+
+ robot 22: w = +0.811 rad/s, v0 = 45.5 px/s, theta = +23.1 deg
+ / -0.7833 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 0.7885 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 41.8 * cos φ_i + -17.86 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 17.86 * cos φ_i + 41.8 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.5768 0.5741 0.8044 0.7749 0.002633 0.003316 2.773 11.57]
+
+ robot 27: w = +3.800 rad/s, v0 = 96.0 px/s, theta = -41.7 deg
+ / -3.841 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.748 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 71.65 * cos φ_i + 63.92 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -63.92 * cos φ_i + 71.65 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2385 0.237 0.5816 0.5626 0.0007671 0.00138 8.639 3.193]
+
+ robot 28: w = +2.936 rad/s, v0 = 20.4 px/s, theta = -17.0 deg
+ / -2.935 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 2.88 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 19.53 * cos φ_i + 5.957 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -5.957 * cos φ_i + 19.53 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3385 0.3368 0.9207 0.9128 0.001465 0.0001936 28.61 3.029]
+
+ robot 29: w = -1.277 rad/s, v0 = 23.2 px/s, theta = +9.8 deg
+ / 1.279 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.194 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 22.84 * cos φ_i + -3.941 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 3.941 * cos φ_i + 22.84 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.608 0.6032 0.83 0.8834 0.001669 0.0003886 9608 3.667]
+
+ robot 30: w = +3.536 rad/s, v0 = 30.2 px/s, theta = +99.3 deg
+ / -3.475 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.468 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -4.872 * cos φ_i + -29.77 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 29.77 * cos φ_i + -4.872 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.1581 0.1575 0.818 0.9265 0.0003213 9.564e-05 3.685 359.3]
+
+ robot 31: w = +3.180 rad/s, v0 = 48.1 px/s, theta = -28.4 deg
+ / -3.151 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.174 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 42.31 * cos φ_i + 22.83 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -22.83 * cos φ_i + 42.31 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2783 0.2783 0.767 0.8021 0.0003838 0.00021 8.949 1.4]
+
+ robot 32: w = +3.562 rad/s, v0 = 34.1 px/s, theta = -8.6 deg
+ / -3.57 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.44 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 33.72 * cos φ_i + 5.094 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -5.094 * cos φ_i + 33.72 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.34 0.3431 0.823 0.8852 0.0002647 9.452e-05 3.76 8.529]
+
+ robot 34: w = -4.031 rad/s, v0 = 55.0 px/s, theta = -10.2 deg
+ / 3.727 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -3.966 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 54.14 * cos φ_i + 9.725 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -9.725 * cos φ_i + 54.14 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2122 0.2089 0.7958 0.7447 0.0002173 0.0001251 6.753 97.26]
+
+ robot 37: w = -1.350 rad/s, v0 = 20.6 px/s, theta = +16.3 deg
+ / 1.336 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.424 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 19.79 * cos φ_i + -5.798 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 5.798 * cos φ_i + 19.79 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.6281 0.5897 0.8406 0.8945 0.002756 0.00602 131.4 4.451]
+
+ robot 38: w = +1.768 rad/s, v0 = 20.4 px/s, theta = +35.1 deg
+ / -1.552 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 1.722 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 16.72 * cos φ_i + -11.75 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 11.75 * cos φ_i + 16.72 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.4996 0.4716 0.917 0.911 0.001183 0.001259 7.597 1.784]
+
+ robot 41: w = +2.550 rad/s, v0 = 94.1 px/s, theta = +68.2 deg
+ / -2.525 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 2.553 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 34.92 * cos φ_i + -87.38 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 87.38 * cos φ_i + 34.92 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2715 0.2787 0.5965 0.5738 0.0004613 0.001195 6.595 2.462]
+
+ robot 42: w = -3.456 rad/s, v0 = 10.0 px/s, theta = -139.4 deg
+ / 3.453 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -3.465 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -7.62 * cos φ_i + 6.539 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -6.539 * cos φ_i + -7.62 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2873 0.2965 0.9396 1.055 0.00133 0.003221 1.88 3.043]
+
+ robot 44: w = -2.028 rad/s, v0 = 6.9 px/s, theta = -126.8 deg
+ / 2.128 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.902 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -4.123 * cos φ_i + 5.518 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -5.518 * cos φ_i + -4.123 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3792 0.4241 0.9648 0.9369 0.004434 0.00238 1597 10.8]
+
+ robot 45: w = +2.519 rad/s, v0 = 40.6 px/s, theta = -75.3 deg
+ / -2.498 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 2.442 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 10.34 * cos φ_i + 39.29 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -39.29 * cos φ_i + 10.34 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.26 0.2639 0.7654 0.8352 5.225e-05 0.000121 1.495 8.853]
+
+ robot 50: w = +1.945 rad/s, v0 = 21.6 px/s, theta = +126.2 deg
+ / -1.844 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 1.805 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -12.76 * cos φ_i + -17.46 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 17.46 * cos φ_i + -12.76 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.4989 0.495 0.9742 0.8502 0.002172 0.0004349 4.363 2.902]
+
+ robot 52: w = +2.781 rad/s, v0 = 45.4 px/s, theta = -20.4 deg
+ / -2.782 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 2.799 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 42.59 * cos φ_i + 15.84 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -15.84 * cos φ_i + 42.59 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2924 0.2889 0.8024 0.8179 0.0005547 0.0001442 3.647 5.168]
+
+ robot 53: w = -1.749 rad/s, v0 = 22.3 px/s, theta = -30.0 deg
+ / 1.725 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.734 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 19.33 * cos φ_i + 11.16 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -11.16 * cos φ_i + 19.33 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.4175 0.4279 0.9055 0.891 0.0001481 0.0003019 12.44 219.8]
+
+ robot 54: w = -2.172 rad/s, v0 = 43.7 px/s, theta = +29.2 deg
+ / 1.97 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -2.047 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 38.16 * cos φ_i + -21.34 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 21.34 * cos φ_i + 38.16 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3833 0.3702 0.7948 0.7478 0.001038 0.0004285 15.25 16.86]
+
+ robot 56: w = +4.574 rad/s, v0 = 47.6 px/s, theta = +18.5 deg
+ / -4.587 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 4.474 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 45.18 * cos φ_i + -15.08 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 15.08 * cos φ_i + 45.18 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2358 0.2384 0.761 0.8191 0.0004421 0.0001824 95.6 78.49]
+
+ robot 60: w = +2.712 rad/s, v0 = 39.5 px/s, theta = -8.6 deg
+ / -2.696 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 2.684 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 39.06 * cos φ_i + 5.907 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -5.907 * cos φ_i + 39.06 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.4795 0.4948 0.7916 0.8297 0.000288 0.00138 3.593 4.65]
+
+ robot 62: w = +1.251 rad/s, v0 = 43.6 px/s, theta = +97.6 deg
+ / -1.302 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 1.283 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -5.747 * cos φ_i + -43.17 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 43.17 * cos φ_i + -5.747 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3155 0.3168 0.687 0.6856 0.0003356 0.0008368 0.7611 0.5222]
+
+ robot 65: w = -3.001 rad/s, v0 = 24.8 px/s, theta = -23.5 deg
+ / 3.05 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -2.922 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 22.78 * cos φ_i + 9.899 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -9.899 * cos φ_i + 22.78 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2607 0.2558 0.9253 0.9106 0.0002994 0.000236 9.301 3.908]
+
+ robot 66: w = -1.114 rad/s, v0 = 14.1 px/s, theta = +32.6 deg
+ / 1.208 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.245 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 11.89 * cos φ_i + -7.606 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 7.606 * cos φ_i + 11.89 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.6881 0.677 0.9699 0.9124 0.0005713 0.000981 1.586 699.6]
+
+ robot 72: w = +4.251 rad/s, v0 = 29.6 px/s, theta = -76.7 deg
+ / -4.331 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 4.208 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 6.807 * cos φ_i + 28.79 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -28.79 * cos φ_i + 6.807 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.1999 0.1982 0.8874 0.8841 0.0002902 0.0002361 6.282 27.3]
+
+ robot 73: w = -0.917 rad/s, v0 = 41.3 px/s, theta = +129.9 deg
+ / 0.8843 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.016 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -26.52 * cos φ_i + -31.7 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 31.7 * cos φ_i + -26.52 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.6371 0.6276 0.7417 0.7569 0.00203 0.0003708 1.547e+04 0.4657]
+
+ robot 74: w = +2.292 rad/s, v0 = 68.6 px/s, theta = +83.1 deg
+ / -2.252 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 2.268 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 8.213 * cos φ_i + -68.14 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 68.14 * cos φ_i + 8.213 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2658 0.2625 0.6249 0.6187 0.001948 0.00119 1.672 16.61]
+
+ robot 77: w = -1.863 rad/s, v0 = 49.7 px/s, theta = +5.4 deg
+ / 1.907 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.812 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 49.51 * cos φ_i + -4.697 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 4.697 * cos φ_i + 49.51 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.4139 0.406 0.7235 0.7955 0.003262 0.002408 2.559 10.21]
+
+ robot 78: w = +3.693 rad/s, v0 = 47.3 px/s, theta = +23.1 deg
+ / -3.626 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.358 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 43.51 * cos φ_i + -18.59 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 18.59 * cos φ_i + 43.51 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3495 0.3592 0.7876 0.8205 0.001567 0.000547 8.968 16.45]
+
+ robot 79: w = -2.332 rad/s, v0 = 31.6 px/s, theta = +47.2 deg
+ / 2.367 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -2.371 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 21.51 * cos φ_i + -23.21 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 23.21 * cos φ_i + 21.51 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3413 0.3424 0.8619 0.7601 0.001356 0.0008686 3.356 2.832]
+
+ robot 80: w = -0.631 rad/s, v0 = 52.9 px/s, theta = -8.3 deg
+ / 0.6379 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -0.6236 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 52.32 * cos φ_i + 7.622 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -7.622 * cos φ_i + 52.32 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.6877 0.6878 0.7483 0.717 0.005284 0.001836 1.84 19.05]
+
+ robot 82: w = -1.299 rad/s, v0 = 64.0 px/s, theta = +52.7 deg
+ / 1.265 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.271 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 38.74 * cos φ_i + -50.88 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 50.88 * cos φ_i + 38.74 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.5646 0.585 0.6702 0.5851 0.005099 0.003021 1.796 10.7]
+
+ robot 83: w = -2.203 rad/s, v0 = 58.0 px/s, theta = -21.0 deg
+ / 2.169 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -2.19 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 54.15 * cos φ_i + 20.84 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -20.84 * cos φ_i + 54.15 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 29.52 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2666 0.262 0.6887 0.6259 0.0002887 0.0001593 6.419 5.311]
+
+ robot 84: w = +3.180 rad/s, v0 = 25.5 px/s, theta = +68.1 deg
+ / -3.107 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.736 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 9.493 * cos φ_i + -23.65 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.1548 * [(x_i(t)−x_i(t−τ))/τ] + -0.54 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 23.65 * cos φ_i + 9.493 * sin φ_i + 25.35 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.1548 * [(y_i(t)−y_i(t−τ))/τ] + -0.9998 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.4312 0.3803 0.8733 0.8612 0.0005315 0.0003027 0.7683 5.301]
+
+ velocity level (0.08 s windows), recording-wide:
+  d^2x/dx0^2: 0-th non-dominated level (5 equations; * = stable end)
+   * -6.599 * [(x_i(t+w)−x_i(t))/w] + 0.0 = [(x_i(t+2w)−2x_i(t+w)+x_i(t))/w²] , with objective function values of [0.8729 0.001617]
+     -6.965 * [(x_i(t+w)−x_i(t))/w] + 200.4 * cos φ_i + 0.0 = [(x_i(t+2w)−2x_i(t+w)+x_i(t))/w²] , with objective function values of [0.8629 0.01418]
+     -7.076 * [(x_i(t+w)−x_i(t))/w] + 139.2 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 211.1 * cos φ_i + 0.0 = [(x_i(t+2w)−2x_i(t+w)+x_i(t))/w²] , with objective function values of [0.8585 0.0173]
+     -7.146 * [(x_i(t+w)−x_i(t))/w] + 208.3 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 250.2 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 216.1 * cos φ_i + 0.0 = [(x_i(t+2w)−2x_i(t+w)+x_i(t))/w²] , with objective function values of [0.8545 0.02897]
+     -7.169 * [(x_i(t+w)−x_i(t))/w] + 211.4 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 255.6 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 216.7 * cos φ_i + -58.49 * sin φ_i + 0.0 = [(x_i(t+2w)−2x_i(t+w)+x_i(t))/w²] , with objective function values of [0.8528 0.4752]
+  d^2y/dx0^2: 0-th non-dominated level (5 equations; * = stable end)
+   * -6.451 * [(y_i(t+w)−y_i(t))/w] + 0.0 = [(y_i(t+2w)−2y_i(t+w)+y_i(t))/w²] , with objective function values of [0.8695 0.000833]
+     -6.806 * [(y_i(t+w)−y_i(t))/w] + 225.0 * sin φ_i + 0.0 = [(y_i(t+2w)−2y_i(t+w)+y_i(t))/w²] , with objective function values of [0.8607 0.01428]
+     -6.989 * [(y_i(t+w)−y_i(t))/w] + 168.0 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 240.0 * sin φ_i + 0.0 = [(y_i(t+2w)−2y_i(t+w)+y_i(t))/w²] , with objective function values of [0.8548 0.01814]
+     -7.062 * [(y_i(t+w)−y_i(t))/w] + 235.3 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 255.5 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 241.7 * sin φ_i + 0.0 = [(y_i(t+2w)−2y_i(t+w)+y_i(t))/w²] , with objective function values of [0.8516 0.02032]
+     -7.114 * [(y_i(t+w)−y_i(t))/w] + 241.3 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 261.9 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 87.02 * cos φ_i + 243.7 * sin φ_i + 0.0 = [(y_i(t+2w)−2y_i(t+w)+y_i(t))/w²] , with objective function values of [0.8493 0.2223]
+ noise (D per axis, px^2/s), recording-wide:
+  D: 0-th non-dominated level (4 equations; * = stable end)
+   * 215.2 * |ω_i| + 0.0 = [(τ/4)·|(r_i(t+τ)−r_i(t))/τ − f_i|²] , with objective function values of [0.7935 0.003684]
+     138.7 * |ω_i| + 2.969 * [|r_i(t)−r_i(t−τ)|/τ] + 0.0 = [(τ/4)·|(r_i(t+τ)−r_i(t))/τ − f_i|²] , with objective function values of [0.7804 0.01968]
+     205.6 * |ω_i| + 2.782 * [|r_i(t)−r_i(t−τ)|/τ] + -25.08 * [Σ_j H(1.1σ−r_ij)] * |ω_i| + 0.0 = [(τ/4)·|(r_i(t+τ)−r_i(t))/τ − f_i|²] , with objective function values of [0.7763 0.09521]
+     -162.8 * [H(ρ_i−R+σ/4)] + 253.7 * |ω_i| + 2.694 * [|r_i(t)−r_i(t−τ)|/τ] + -35.02 * [Σ_j H(1.1σ−r_ij)] * |ω_i| + 0.0 = [(τ/4)·|(r_i(t+τ)−r_i(t))/τ − f_i|²] , with objective function values of [0.7719 0.267]
+
+====================================================================================================
+N40_PWM10_D41: 40 robot(s); shared drift coefficients mu_P 27.59, mu_W 31.97, a 0.2079, c_x -1.054, c_y -0.9609
+  own propulsion v0_i median 45.2 px/s [4.3, 133.0], theta_i median +9.5 deg [-156.4, +143.9]
+
+ robot 8: w = +2.153 rad/s, v0 = 17.0 px/s, theta = +63.3 deg
+ / -2.261 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 2.163 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 7.627 * cos φ_i + -15.14 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 15.14 * cos φ_i + 7.627 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2248 0.2171 0.899 0.9025 0.0002653 0.0003718 0.9619 1.67]
+
+ robot 11: w = -2.909 rad/s, v0 = 46.7 px/s, theta = +42.8 deg
+ / 2.626 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -2.645 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 34.27 * cos φ_i + -31.76 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 31.76 * cos φ_i + 34.27 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.4345 0.4365 0.8449 0.7147 0.02237 0.0225 2.498 0.894]
+
+ robot 12: w = -2.317 rad/s, v0 = 45.9 px/s, theta = -10.7 deg
+ / 2.175 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -2.261 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 45.1 * cos φ_i + 8.538 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -8.538 * cos φ_i + 45.1 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2821 0.2638 0.8028 0.766 0.002663 0.001125 9.132 32.35]
+
+ robot 17: w = -3.543 rad/s, v0 = 6.2 px/s, theta = -61.7 deg
+ / 3.419 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -3.358 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 2.958 * cos φ_i + 5.486 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -5.486 * cos φ_i + 2.958 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.376 0.3714 0.9468 0.9685 0.006528 0.005169 1.911 603.2]
+
+ robot 18: w = +3.456 rad/s, v0 = 133.0 px/s, theta = +48.9 deg
+ / -3.505 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.415 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 87.46 * cos φ_i + -100.2 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 100.2 * cos φ_i + 87.46 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2285 0.2248 0.6486 0.6352 0.00301 0.001501 3817 2.95]
+
+ robot 19: w = -1.476 rad/s, v0 = 40.8 px/s, theta = +64.3 deg
+ / 1.373 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.504 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 17.71 * cos φ_i + -36.77 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 36.77 * cos φ_i + 17.71 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3426 0.3369 0.7432 0.7603 0.01324 0.01206 3.287 0.751]
+
+ robot 20: w = -0.408 rad/s, v0 = 4.3 px/s, theta = -22.6 deg
+ / 0.4629 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -0.4604 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 3.938 * cos φ_i + 1.642 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -1.642 * cos φ_i + 3.938 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.9455 0.9305 1.045 0.9092 0.01275 0.009174 138 117.4]
+
+ robot 22: w = +0.674 rad/s, v0 = 51.7 px/s, theta = +16.7 deg
+ / -0.6658 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 0.6092 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 49.51 * cos φ_i + -14.88 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 14.88 * cos φ_i + 49.51 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.6324 0.6442 0.7243 0.7431 0.002043 0.007809 16.36 3.057]
+
+ robot 27: w = +3.586 rad/s, v0 = 83.3 px/s, theta = -39.7 deg
+ / -3.535 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.528 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 64.05 * cos φ_i + 53.25 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -53.25 * cos φ_i + 64.05 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2519 0.2496 0.6047 0.5777 0.002317 0.002465 2.349 0.3907]
+
+ robot 28: w = +2.803 rad/s, v0 = 40.1 px/s, theta = -21.2 deg
+ / -2.807 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 2.699 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 37.34 * cos φ_i + 14.48 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -14.48 * cos φ_i + 37.34 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3225 0.3225 0.8311 0.7811 0.0007732 0.000694 355 16.4]
+
+ robot 29: w = -0.929 rad/s, v0 = 20.9 px/s, theta = -5.3 deg
+ / 0.9931 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.006 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 20.81 * cos φ_i + 1.918 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -1.918 * cos φ_i + 20.81 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.7097 0.7111 0.8726 0.8931 0.003451 0.003682 527.5 23.88]
+
+ robot 30: w = +2.980 rad/s, v0 = 44.4 px/s, theta = +62.1 deg
+ / -2.926 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 2.89 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 20.79 * cos φ_i + -39.27 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 39.27 * cos φ_i + 20.79 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.1635 0.1646 0.7607 0.8029 0.0006983 0.0008308 1.908 4.094]
+
+ robot 31: w = +2.562 rad/s, v0 = 40.4 px/s, theta = -30.4 deg
+ / -2.47 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 2.497 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 34.88 * cos φ_i + 20.46 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -20.46 * cos φ_i + 34.88 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3156 0.3182 0.8079 0.8613 0.008619 0.006859 4.502 2.207]
+
+ robot 32: w = +3.036 rad/s, v0 = 30.9 px/s, theta = +11.7 deg
+ / -2.918 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 2.941 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 30.23 * cos φ_i + -6.284 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 6.284 * cos φ_i + 30.23 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3339 0.3353 0.8738 0.8578 0.0004679 0.0005202 16.54 17.17]
+
+ robot 34: w = -3.519 rad/s, v0 = 56.6 px/s, theta = -13.6 deg
+ / 3.549 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -3.526 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 55.04 * cos φ_i + 13.35 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -13.35 * cos φ_i + 55.04 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2158 0.2104 0.7416 0.7666 0.001329 0.002336 43.75 13.29]
+
+ robot 36: w = +2.575 rad/s, v0 = 63.6 px/s, theta = +47.9 deg
+ / -2.573 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 2.564 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 42.64 * cos φ_i + -47.14 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 47.14 * cos φ_i + 42.64 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2887 0.2944 0.6364 0.6824 0.003248 0.001965 4.64 68.33]
+
+ robot 37: w = -2.201 rad/s, v0 = 84.2 px/s, theta = -39.9 deg
+ / 2.151 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -2.094 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 64.61 * cos φ_i + 54.04 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -54.04 * cos φ_i + 64.61 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3433 0.3429 0.5815 0.6056 0.004144 0.003283 20.24 18.63]
+
+ robot 38: w = +2.294 rad/s, v0 = 22.3 px/s, theta = -22.7 deg
+ / -2.228 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 2.231 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 20.53 * cos φ_i + 8.59 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -8.59 * cos φ_i + 20.53 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3707 0.3701 0.8618 0.8775 0.0004611 0.0003832 2.874 3.054]
+
+ robot 41: w = +2.837 rad/s, v0 = 124.5 px/s, theta = +77.9 deg
+ / -2.789 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 2.817 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 26.03 * cos φ_i + -121.7 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 121.7 * cos φ_i + 26.03 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2355 0.2416 0.4457 0.4987 0.0008248 0.0007722 34.15 1.102]
+
+ robot 42: w = -3.761 rad/s, v0 = 18.2 px/s, theta = -156.4 deg
+ / 3.683 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -3.743 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -16.7 * cos φ_i + 7.31 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -7.31 * cos φ_i + -16.7 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3115 0.3257 0.8424 0.9522 0.007392 0.007813 3.048 2.542]
+
+ robot 44: w = -2.209 rad/s, v0 = 14.1 px/s, theta = -152.2 deg
+ / 2.192 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.968 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -12.43 * cos φ_i + 6.555 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -6.555 * cos φ_i + -12.43 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.4195 0.4661 1.032 0.9123 0.00351 0.007689 2.258e+04 2.514]
+
+ robot 45: w = +1.979 rad/s, v0 = 72.2 px/s, theta = -98.2 deg
+ / -1.953 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 1.983 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -10.28 * cos φ_i + 71.42 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -71.42 * cos φ_i + -10.28 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2805 0.2781 0.5809 0.6525 0.005191 0.007279 83.51 397.3]
+
+ robot 50: w = +2.009 rad/s, v0 = 22.7 px/s, theta = +143.9 deg
+ / -1.878 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 1.906 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -18.37 * cos φ_i + -13.41 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 13.41 * cos φ_i + -18.37 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.5525 0.5491 0.8636 0.9095 0.001253 0.001273 28.37 240.8]
+
+ robot 52: w = +2.086 rad/s, v0 = 38.7 px/s, theta = -30.1 deg
+ / -2.163 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 2.068 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 33.49 * cos φ_i + 19.39 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -19.39 * cos φ_i + 33.49 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.4064 0.4126 0.8019 0.8217 0.001075 0.001728 11.07 17.59]
+
+ robot 53: w = -0.763 rad/s, v0 = 17.4 px/s, theta = -66.7 deg
+ / 0.7507 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -0.7167 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 6.887 * cos φ_i + 16.0 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -16.0 * cos φ_i + 6.887 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.7814 0.7915 0.8746 1.037 0.008513 0.002762 1.569 5.726]
+
+ robot 54: w = -2.007 rad/s, v0 = 35.3 px/s, theta = +7.7 deg
+ / 1.96 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.991 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 34.99 * cos φ_i + -4.736 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 4.736 * cos φ_i + 34.99 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.4381 0.4444 0.7886 0.7768 0.01199 0.008118 4.007 16.11]
+
+ robot 56: w = +4.006 rad/s, v0 = 76.7 px/s, theta = +15.2 deg
+ / -3.849 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.941 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 73.99 * cos φ_i + -20.14 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 20.14 * cos φ_i + 73.99 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2424 0.2421 0.6692 0.7501 0.0004845 0.0004546 1.555 2.171]
+
+ robot 60: w = +2.774 rad/s, v0 = 46.1 px/s, theta = +26.2 deg
+ / -2.88 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 2.581 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 41.38 * cos φ_i + -20.36 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 20.36 * cos φ_i + 41.38 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.4149 0.4316 0.84 0.7626 0.005651 0.008264 0.8576 5.186]
+
+ robot 62: w = +2.003 rad/s, v0 = 70.0 px/s, theta = +97.4 deg
+ / -1.902 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 1.95 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -8.985 * cos φ_i + -69.4 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 69.4 * cos φ_i + -8.985 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.287 0.2918 0.5835 0.6093 0.002535 0.002142 3.717 3.209]
+
+ robot 65: w = -2.617 rad/s, v0 = 15.4 px/s, theta = -25.8 deg
+ / 2.578 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -2.618 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 13.91 * cos φ_i + 6.716 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -6.716 * cos φ_i + 13.91 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2663 0.2711 0.9826 0.8907 0.005278 0.004929 41.22 29.86]
+
+ robot 66: w = -1.164 rad/s, v0 = 18.2 px/s, theta = +29.2 deg
+ / 0.9404 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.093 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 15.85 * cos φ_i + -8.851 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 8.851 * cos φ_i + 15.85 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.7212 0.7112 0.9434 0.9123 0.009059 0.008629 36.86 20.28]
+
+ robot 72: w = +4.129 rad/s, v0 = 34.7 px/s, theta = -47.3 deg
+ / -4.089 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 4.022 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 23.55 * cos φ_i + 25.49 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -25.49 * cos φ_i + 23.55 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2181 0.2175 0.8496 0.893 0.003222 0.003303 4.153 52.88]
+
+ robot 73: w = -1.009 rad/s, v0 = 6.9 px/s, theta = +48.7 deg
+ / 0.9887 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.056 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 4.548 * cos φ_i + -5.18 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 5.18 * cos φ_i + 4.548 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.5054 0.498 0.9529 0.904 0.003068 0.001096 16.42 112.4]
+
+ robot 74: w = +1.394 rad/s, v0 = 59.2 px/s, theta = +58.2 deg
+ / -1.427 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 1.396 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 31.14 * cos φ_i + -50.33 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 50.33 * cos φ_i + 31.14 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2865 0.2777 0.6465 0.699 0.002602 0.002358 0.7043 14.39]
+
+ robot 77: w = -1.428 rad/s, v0 = 53.7 px/s, theta = +11.7 deg
+ / 1.389 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.441 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 52.55 * cos φ_i + -10.93 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 10.93 * cos φ_i + 52.55 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.4305 0.4322 0.6883 0.7337 0.006953 0.006945 15.62 3.425]
+
+ robot 78: w = +2.771 rad/s, v0 = 50.6 px/s, theta = +11.2 deg
+ / -2.799 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 2.863 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 49.61 * cos φ_i + -9.857 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 9.857 * cos φ_i + 49.61 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3816 0.389 0.7524 0.7818 0.006558 0.007691 8.211 13.06]
+
+ robot 79: w = -2.023 rad/s, v0 = 57.1 px/s, theta = +26.4 deg
+ / 2.008 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.975 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 51.15 * cos φ_i + -25.4 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 25.4 * cos φ_i + 51.15 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2832 0.2786 0.6612 0.6445 0.006021 0.00725 3.189 2.429]
+
+ robot 80: w = -1.080 rad/s, v0 = 85.0 px/s, theta = -17.9 deg
+ / 1.068 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.039 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 80.9 * cos φ_i + 26.19 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -26.19 * cos φ_i + 80.9 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.4185 0.4139 0.5494 0.5715 0.01747 0.01558 3.1 3.343]
+
+ robot 82: w = -0.581 rad/s, v0 = 56.0 px/s, theta = +60.2 deg
+ / 0.6704 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -0.515 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 27.83 * cos φ_i + -48.56 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 48.56 * cos φ_i + 27.83 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 31.97 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.8394 0.8555 0.695 0.7195 0.03359 0.01641 3.795 17.74]
+
+ robot 83: w = -1.993 rad/s, v0 = 91.0 px/s, theta = -24.0 deg
+ / 1.901 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.848 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 83.14 * cos φ_i + 37.02 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.2079 * [(x_i(t)−x_i(t−τ))/τ] + -1.054 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -37.02 * cos φ_i + 83.14 * sin φ_i + 27.59 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.2079 * [(y_i(t)−y_i(t−τ))/τ] + -0.9609 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3068 0.3125 0.523 0.55 0.01778 0.01758 11.56 1.722]
+
+ velocity level (0.08 s windows), recording-wide:
+  d^2x/dx0^2: 0-th non-dominated level (4 equations; * = stable end)
+   * -5.106 * [(x_i(t+w)−x_i(t))/w] + 0.0 = [(x_i(t+2w)−2x_i(t+w)+x_i(t))/w²] , with objective function values of [0.9067 0.002644]
+     -5.598 * [(x_i(t+w)−x_i(t))/w] + 231.1 * cos φ_i + 0.0 = [(x_i(t+2w)−2x_i(t+w)+x_i(t))/w²] , with objective function values of [0.8957 0.04215]
+     -5.791 * [(x_i(t+w)−x_i(t))/w] + 207.4 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 218.0 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 259.3 * cos φ_i + 0.0 = [(x_i(t+2w)−2x_i(t+w)+x_i(t))/w²] , with objective function values of [0.8868 0.05587]
+     -3.434 * [(x_i(t+w)−x_i(t))/w] + 155.9 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 253.8 * cos φ_i + -1.123 * [(x_i(t+w)−x_i(t))/w] * [Σ_j H(1.1σ−r_ij)] + 0.0 = [(x_i(t+2w)−2x_i(t+w)+x_i(t))/w²] , with objective function values of [0.8839 0.0748]
+  d^2y/dx0^2: 0-th non-dominated level (4 equations; * = stable end)
+   * -5.47 * [(y_i(t+w)−y_i(t))/w] + 0.0 = [(y_i(t+2w)−2y_i(t+w)+y_i(t))/w²] , with objective function values of [0.9 0.001636]
+     -5.927 * [(y_i(t+w)−y_i(t))/w] + 220.5 * sin φ_i + 0.0 = [(y_i(t+2w)−2y_i(t+w)+y_i(t))/w²] , with objective function values of [0.8885 0.02703]
+     -6.076 * [(y_i(t+w)−y_i(t))/w] + 170.8 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 244.0 * sin φ_i + 0.0 = [(y_i(t+2w)−2y_i(t+w)+y_i(t))/w²] , with objective function values of [0.8828 0.02932]
+     -3.87 * [(y_i(t+w)−y_i(t))/w] + 174.9 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 243.3 * sin φ_i + -1.066 * [(y_i(t+w)−y_i(t))/w] * [Σ_j H(1.1σ−r_ij)] + 0.0 = [(y_i(t+2w)−2y_i(t+w)+y_i(t))/w²] , with objective function values of [0.8764 0.03784]
+ noise (D per axis, px^2/s), recording-wide:
+  D: 0-th non-dominated level (3 equations; * = stable end)
+   * 7.517 * [|r_i(t)−r_i(t−τ)|/τ] + 0.0 = [(τ/4)·|(r_i(t+τ)−r_i(t))/τ − f_i|²] , with objective function values of [0.8033 0.00504]
+     155.3 * |ω_i| + 4.323 * [|r_i(t)−r_i(t−τ)|/τ] + 0.0 = [(τ/4)·|(r_i(t+τ)−r_i(t))/τ − f_i|²] , with objective function values of [0.7996 0.02549]
+     174.8 * |ω_i| + 6.354 * [|r_i(t)−r_i(t−τ)|/τ] + -1.862 * [Σ_j H(1.1σ−r_ij)] * [ρ_i/R] * [|r_i(t)−r_i(t−τ)|/τ] + 0.0 = [(τ/4)·|(r_i(t+τ)−r_i(t))/τ − f_i|²] , with objective function values of [0.7877 0.08029]
+
+====================================================================================================
+N40_PWM20_D40: 40 robot(s); shared drift coefficients mu_P 31.02, mu_W 35.91, a -0.01954, c_x -0.7657, c_y -0.5514
+  own propulsion v0_i median 40.2 px/s [3.6, 94.6], theta_i median +4.2 deg [-70.4, +125.9]
+
+ robot 8: w = +3.581 rad/s, v0 = 40.1 px/s, theta = +82.9 deg
+ / -3.5 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.498 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 4.919 * cos φ_i + -39.77 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 39.77 * cos φ_i + 4.919 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2765 0.2787 0.8854 0.8488 0.0004976 0.001392 10.6 26.15]
+
+ robot 11: w = -4.027 rad/s, v0 = 71.2 px/s, theta = +2.2 deg
+ / 4.086 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -3.888 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 71.16 * cos φ_i + -2.765 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 2.765 * cos φ_i + 71.16 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3033 0.3066 0.7985 0.7518 0.0006823 0.000266 2.929 61.67]
+
+ robot 12: w = -2.640 rad/s, v0 = 39.9 px/s, theta = -9.2 deg
+ / 2.56 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -2.561 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 39.4 * cos φ_i + 6.384 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -6.384 * cos φ_i + 39.4 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3545 0.3523 0.9238 0.8614 0.001253 0.001319 9.429 66.76]
+
+ robot 17: w = -5.936 rad/s, v0 = 16.9 px/s, theta = +42.1 deg
+ / 5.813 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -5.868 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 12.54 * cos φ_i + -11.33 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 11.33 * cos φ_i + 12.54 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3142 0.3174 0.926 0.8984 0.0006383 0.0003048 6.534 962.9]
+
+ robot 18: w = +5.626 rad/s, v0 = 67.7 px/s, theta = +81.1 deg
+ / -5.441 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 5.826 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 10.46 * cos φ_i + -66.88 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 66.88 * cos φ_i + 10.46 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2135 0.2148 0.8082 0.7677 0.0001126 8.692e-05 5.484 8.806]
+
+ robot 19: w = -2.660 rad/s, v0 = 52.4 px/s, theta = +37.1 deg
+ / 2.68 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -2.695 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 41.77 * cos φ_i + -31.65 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 31.65 * cos φ_i + 41.77 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3838 0.3753 0.841 0.8079 0.0002709 0.0002177 14.42 517.9]
+
+ robot 20: w = -1.614 rad/s, v0 = 49.9 px/s, theta = -39.6 deg
+ / 1.685 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.34 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 38.42 * cos φ_i + 31.84 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -31.84 * cos φ_i + 38.42 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.6931 0.6796 0.8614 0.8187 0.002233 0.002959 1.455 2.085]
+
+ robot 22: w = +1.056 rad/s, v0 = 41.6 px/s, theta = +33.3 deg
+ / -1.097 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 1.191 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 34.78 * cos φ_i + -22.8 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 22.8 * cos φ_i + 34.78 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.7218 0.7231 0.896 0.8792 0.003342 0.002727 26.12 89.72]
+
+ robot 27: w = +5.030 rad/s, v0 = 94.6 px/s, theta = -34.9 deg
+ / -5.047 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 4.983 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 77.56 * cos φ_i + 54.17 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -54.17 * cos φ_i + 77.56 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2544 0.2516 0.6616 0.6655 0.0001336 0.0001391 12.16 1657]
+
+ robot 28: w = +4.318 rad/s, v0 = 22.7 px/s, theta = -4.4 deg
+ / -4.452 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 4.332 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 22.66 * cos φ_i + 1.743 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -1.743 * cos φ_i + 22.66 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3292 0.3214 0.9384 0.9024 0.000544 0.0001754 7.926 3.45]
+
+ robot 29: w = -2.774 rad/s, v0 = 25.6 px/s, theta = +61.0 deg
+ / 2.773 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -2.627 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 12.4 * cos φ_i + -22.38 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 22.38 * cos φ_i + 12.4 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.5324 0.5472 0.96 0.8867 0.001941 0.00285 0.7333 1.285]
+
+ robot 30: w = +5.288 rad/s, v0 = 33.5 px/s, theta = +101.0 deg
+ / -5.181 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 5.277 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -6.421 * cos φ_i + -32.9 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 32.9 * cos φ_i + -6.421 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.1675 0.1733 0.8483 0.9323 0.000176 0.0002743 8.836 1.198]
+
+ robot 31: w = +4.561 rad/s, v0 = 25.2 px/s, theta = -44.3 deg
+ / -4.548 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 4.594 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 18.01 * cos φ_i + 17.57 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -17.57 * cos φ_i + 18.01 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2901 0.2916 0.8937 0.9271 0.0006458 0.0008776 10.92 2.032]
+
+ robot 32: w = +4.610 rad/s, v0 = 29.2 px/s, theta = +3.4 deg
+ / -4.574 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 4.496 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 29.14 * cos φ_i + -1.73 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 1.73 * cos φ_i + 29.14 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3447 0.357 0.9051 0.8963 0.0003654 0.0002087 8.918 1.248]
+
+ robot 34: w = -5.565 rad/s, v0 = 41.9 px/s, theta = -18.6 deg
+ / 5.592 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -5.557 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 39.7 * cos φ_i + 13.39 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -13.39 * cos φ_i + 39.7 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2187 0.216 0.8458 0.8056 0.0003483 0.0005498 0.9106 1.122]
+
+ robot 37: w = -2.426 rad/s, v0 = 11.5 px/s, theta = -6.4 deg
+ / 2.272 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -2.47 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 11.38 * cos φ_i + 1.27 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -1.27 * cos φ_i + 11.38 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.5776 0.5549 0.9158 0.9784 0.001066 0.001079 45.94 1.681]
+
+ robot 38: w = +3.238 rad/s, v0 = 28.1 px/s, theta = +94.1 deg
+ / -3.398 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.326 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -1.993 * cos φ_i + -27.99 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 27.99 * cos φ_i + -1.993 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3994 0.3886 0.9141 0.9048 0.0006557 0.00224 2967 25.41]
+
+ robot 41: w = +3.666 rad/s, v0 = 79.4 px/s, theta = +73.8 deg
+ / -3.694 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.717 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 22.21 * cos φ_i + -76.22 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 76.22 * cos φ_i + 22.21 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2259 0.2301 0.7269 0.6682 0.001055 0.0004305 1.036 719.2]
+
+ robot 42: w = -5.332 rad/s, v0 = 17.9 px/s, theta = +2.1 deg
+ / 5.335 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -5.458 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 17.93 * cos φ_i + -0.6503 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 0.6503 * cos φ_i + 17.93 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2877 0.2954 0.942 0.9 0.0003469 0.001464 5.884 1.389]
+
+ robot 44: w = -3.794 rad/s, v0 = 3.6 px/s, theta = -60.7 deg
+ / 3.786 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -3.899 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 1.783 * cos φ_i + 3.171 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -3.171 * cos φ_i + 1.783 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2966 0.3032 0.9803 0.9512 0.0003617 0.0007801 1126 442.2]
+
+ robot 45: w = +5.072 rad/s, v0 = 53.1 px/s, theta = -70.4 deg
+ / -5.102 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 4.973 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 17.82 * cos φ_i + 50.07 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -50.07 * cos φ_i + 17.82 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2189 0.2148 0.7869 0.8189 0.0005132 0.0001689 8.924 0.6078]
+
+ robot 50: w = +3.039 rad/s, v0 = 22.1 px/s, theta = +125.9 deg
+ / -3.01 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.128 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -12.94 * cos φ_i + -17.91 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 17.91 * cos φ_i + -12.94 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.4295 0.4329 0.8903 0.981 0.001725 0.0005672 14.19 1.469]
+
+ robot 52: w = +3.685 rad/s, v0 = 49.7 px/s, theta = -13.7 deg
+ / -3.693 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.704 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 48.23 * cos φ_i + 11.79 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -11.79 * cos φ_i + 48.23 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3 0.2948 0.8394 0.8308 0.001517 0.0005395 87.01 1.924]
+
+ robot 53: w = -2.997 rad/s, v0 = 41.0 px/s, theta = -63.8 deg
+ / 2.953 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -3.099 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 18.1 * cos φ_i + 36.77 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -36.77 * cos φ_i + 18.1 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3498 0.3568 0.8572 0.8316 0.0009758 0.0002155 1.092 2.071]
+
+ robot 54: w = -3.565 rad/s, v0 = 53.3 px/s, theta = -2.1 deg
+ / 3.71 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -3.373 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 53.24 * cos φ_i + 1.929 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -1.929 * cos φ_i + 53.24 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3971 0.4011 0.8304 0.8146 0.0009639 0.0002415 18.68 332.3]
+
+ robot 56: w = +6.614 rad/s, v0 = 47.8 px/s, theta = +23.7 deg
+ / -6.487 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 6.561 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 43.81 * cos φ_i + -19.22 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 19.22 * cos φ_i + 43.81 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2019 0.2099 0.8376 0.8276 9.17e-05 4.586e-05 17.73 3999]
+
+ robot 60: w = +4.056 rad/s, v0 = 35.7 px/s, theta = +10.2 deg
+ / -3.978 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 4.036 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 35.14 * cos φ_i + -6.296 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 6.296 * cos φ_i + 35.14 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3961 0.3877 0.8928 0.8917 0.0009669 0.0009984 3.708e+04 1.643]
+
+ robot 62: w = +2.319 rad/s, v0 = 43.6 px/s, theta = +110.9 deg
+ / -2.355 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 2.316 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -15.53 * cos φ_i + -40.74 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 40.74 * cos φ_i + -15.53 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.333 0.3347 0.7482 0.9772 0.0002755 0.000299 1.167 4.751]
+
+ robot 65: w = -4.579 rad/s, v0 = 29.5 px/s, theta = -13.3 deg
+ / 4.423 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -4.512 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 28.68 * cos φ_i + 6.791 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -6.791 * cos φ_i + 28.68 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2826 0.2784 0.8721 0.9009 0.0002801 0.0002827 8.014 2.261]
+
+ robot 66: w = -2.259 rad/s, v0 = 31.1 px/s, theta = +2.6 deg
+ / 2.039 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -2.362 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 31.03 * cos φ_i + -1.396 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 1.396 * cos φ_i + 31.03 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.5882 0.5913 0.9121 0.8926 0.001853 0.002225 52.48 6.644]
+
+ robot 72: w = +6.435 rad/s, v0 = 23.8 px/s, theta = -49.2 deg
+ / -6.224 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 6.305 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 15.55 * cos φ_i + 18.05 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -18.05 * cos φ_i + 15.55 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2165 0.2182 0.8832 0.8906 0.0004763 0.0005243 1.315 1.292]
+
+ robot 73: w = -1.530 rad/s, v0 = 28.3 px/s, theta = +108.1 deg
+ / 1.587 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.522 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -8.769 * cos φ_i + -26.91 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 26.91 * cos φ_i + -8.769 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.6739 0.6618 0.8577 0.9681 0.00247 0.004344 5.186 0.987]
+
+ robot 74: w = +3.265 rad/s, v0 = 76.2 px/s, theta = +90.0 deg
+ / -3.323 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.368 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 0.04821 * cos φ_i + -76.2 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 76.2 * cos φ_i + 0.04821 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2374 0.245 0.7237 0.6647 0.0003201 0.0007339 24.47 205.5]
+
+ robot 77: w = -3.166 rad/s, v0 = 63.6 px/s, theta = +6.0 deg
+ / 3.127 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -3.201 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 63.23 * cos φ_i + -6.678 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 6.678 * cos φ_i + 63.23 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3534 0.3567 0.7964 0.7659 0.0007071 0.0001568 45.1 16.38]
+
+ robot 78: w = +5.042 rad/s, v0 = 46.1 px/s, theta = +20.3 deg
+ / -4.953 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 4.978 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 43.26 * cos φ_i + -16.0 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 16.0 * cos φ_i + 43.26 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.351 0.3531 0.8512 0.8624 0.001023 0.0007382 30.28 0.7586]
+
+ robot 79: w = -3.681 rad/s, v0 = 21.1 px/s, theta = +4.9 deg
+ / 3.731 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -3.78 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 21.02 * cos φ_i + -1.811 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 1.811 * cos φ_i + 21.02 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 35.91 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3598 0.3801 0.9578 0.8999 0.001231 0.002031 49.92 860.4]
+
+ robot 80: w = -1.244 rad/s, v0 = 40.3 px/s, theta = -27.4 deg
+ / 1.089 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.137 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 35.73 * cos φ_i + 18.53 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -18.53 * cos φ_i + 35.73 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.7728 0.7311 0.8987 0.8923 0.01035 0.002375 202.3 58.64]
+
+ robot 82: w = -2.087 rad/s, v0 = 82.0 px/s, theta = +49.5 deg
+ / 2.149 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -2.184 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 53.27 * cos φ_i + -62.37 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 62.37 * cos φ_i + 53.27 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.4636 0.4643 0.703 0.7439 0.001595 0.0007784 0.6329 17.04]
+
+ robot 83: w = -3.757 rad/s, v0 = 76.5 px/s, theta = -34.5 deg
+ / 3.633 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -3.634 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 63.03 * cos φ_i + 43.29 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -43.29 * cos φ_i + 63.03 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.242 0.2405 0.6721 0.7378 0.0001221 0.0005758 1.855 1.593]
+
+ robot 84: w = +4.780 rad/s, v0 = 21.2 px/s, theta = +61.0 deg
+ / -4.323 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 5.036 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 10.31 * cos φ_i + -18.57 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + -0.01954 * [(x_i(t)−x_i(t−τ))/τ] + -0.7657 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 18.57 * cos φ_i + 10.31 * sin φ_i + 31.02 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + -0.01954 * [(y_i(t)−y_i(t−τ))/τ] + -0.5514 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3743 0.3047 0.9252 0.9224 0.000278 0.0004646 1.925 42.23]
+
+ velocity level (0.08 s windows), recording-wide:
+  d^2x/dx0^2: 0-th non-dominated level (4 equations; * = stable end)
+   * -7.76 * [(x_i(t+w)−x_i(t))/w] + 0.0 = [(x_i(t+2w)−2x_i(t+w)+x_i(t))/w²] , with objective function values of [0.8497 0.0002458]
+     -8.148 * [(x_i(t+w)−x_i(t))/w] + 465.1 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 514.5 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.0 = [(x_i(t+2w)−2x_i(t+w)+x_i(t))/w²] , with objective function values of [0.8334 0.003491]
+     -8.398 * [(x_i(t+w)−x_i(t))/w] + 479.2 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 527.6 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 231.7 * cos φ_i + 0.0 = [(x_i(t+2w)−2x_i(t+w)+x_i(t))/w²] , with objective function values of [0.8246 0.0198]
+     -8.439 * [(x_i(t+w)−x_i(t))/w] + 485.5 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 533.5 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 232.4 * cos φ_i + -110.7 * sin φ_i + 0.0 = [(x_i(t+2w)−2x_i(t+w)+x_i(t))/w²] , with objective function values of [0.8233 0.2649]
+  d^2y/dx0^2: 0-th non-dominated level (3 equations; * = stable end)
+   * -7.762 * [(y_i(t+w)−y_i(t))/w] + 0.0 = [(y_i(t+2w)−2y_i(t+w)+y_i(t))/w²] , with objective function values of [0.8451 0.0006914]
+     -8.504 * [(y_i(t+w)−y_i(t))/w] + 479.4 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 484.8 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 301.6 * sin φ_i + 0.0 = [(y_i(t+2w)−2y_i(t+w)+y_i(t))/w²] , with objective function values of [0.8188 0.01146]
+     -8.531 * [(y_i(t+w)−y_i(t))/w] + 485.3 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 490.4 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 82.24 * cos φ_i + 303.4 * sin φ_i + 0.0 = [(y_i(t+2w)−2y_i(t+w)+y_i(t))/w²] , with objective function values of [0.8178 0.3973]
+ noise (D per axis, px^2/s), recording-wide:
+  D: 0-th non-dominated level (3 equations; * = stable end)
+   * 208.8 * |ω_i| + 0.0 = [(τ/4)·|(r_i(t+τ)−r_i(t))/τ − f_i|²] , with objective function values of [0.7756 0.002718]
+     138.3 * |ω_i| + 3.353 * [|r_i(t)−r_i(t−τ)|/τ] + 0.0 = [(τ/4)·|(r_i(t+τ)−r_i(t))/τ − f_i|²] , with objective function values of [0.7683 0.02575]
+     -164.3 * [H(ρ_i−R+σ/4)] + 370.1 * |ω_i| + 1.985 * [|r_i(t)−r_i(t−τ)|/τ] + -40.17 * (|ω_i|)² + 0.0 = [(τ/4)·|(r_i(t+τ)−r_i(t))/τ − f_i|²] , with objective function values of [0.7646 0.1515]
+
+====================================================================================================
+N40_PWM20_D41: 40 robot(s); shared drift coefficients mu_P 34.75, mu_W 38.47, a 0.02711, c_x -1.037, c_y -0.7992
+  own propulsion v0_i median 45.3 px/s [10.1, 117.7], theta_i median +6.0 deg [-103.0, +126.4]
+
+ robot 8: w = +3.258 rad/s, v0 = 36.3 px/s, theta = +74.2 deg
+ / -3.311 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.286 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 9.886 * cos φ_i + -34.97 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 34.97 * cos φ_i + 9.886 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2675 0.2617 0.8318 0.9279 7.282e-05 7.602e-05 10.63 6.472]
+
+ robot 11: w = -3.799 rad/s, v0 = 82.4 px/s, theta = +6.4 deg
+ / 4.056 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -3.774 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 81.86 * cos φ_i + -9.175 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 9.175 * cos φ_i + 81.86 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3091 0.3043 0.7533 0.7585 0.0006669 0.0007988 10.9 302.4]
+
+ robot 12: w = -3.421 rad/s, v0 = 68.6 px/s, theta = -5.8 deg
+ / 3.444 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -3.411 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 68.29 * cos φ_i + 6.935 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -6.935 * cos φ_i + 68.29 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2676 0.2642 0.7877 0.7737 0.0002183 0.0008739 4.073 8.939]
+
+ robot 17: w = -5.837 rad/s, v0 = 15.5 px/s, theta = +35.2 deg
+ / 5.682 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -5.594 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 12.64 * cos φ_i + -8.914 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 8.914 * cos φ_i + 12.64 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3167 0.3174 0.9153 0.9316 0.001572 0.001106 9.566 200.4]
+
+ robot 18: w = +5.466 rad/s, v0 = 99.8 px/s, theta = +74.9 deg
+ / -5.319 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 5.257 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 25.99 * cos φ_i + -96.36 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 96.36 * cos φ_i + 25.99 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2088 0.2093 0.7452 0.6917 0.0005239 0.0002726 27.61 37.36]
+
+ robot 19: w = -2.657 rad/s, v0 = 49.9 px/s, theta = +36.1 deg
+ / 2.489 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -2.559 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 40.33 * cos φ_i + -29.42 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 29.42 * cos φ_i + 40.33 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3459 0.3382 0.7702 0.9479 0.0008927 0.0005966 5.42 2.012]
+
+ robot 20: w = -0.710 rad/s, v0 = 41.2 px/s, theta = -31.1 deg
+ / 0.7847 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -0.811 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 35.27 * cos φ_i + 21.29 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -21.29 * cos φ_i + 35.27 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.9285 0.9188 0.9465 0.8447 0.01057 0.008477 5843 8.201]
+
+ robot 22: w = +1.006 rad/s, v0 = 56.1 px/s, theta = +33.4 deg
+ / -1.031 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 1.045 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 46.88 * cos φ_i + -30.9 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 30.9 * cos φ_i + 46.88 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.7317 0.7083 0.8208 0.8228 0.004703 0.005124 2.743e+07 2.197]
+
+ robot 27: w = +4.923 rad/s, v0 = 100.8 px/s, theta = -34.3 deg
+ / -4.786 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 4.953 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 83.3 * cos φ_i + 56.76 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -56.76 * cos φ_i + 83.3 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2601 0.2548 0.6758 0.6394 0.0001827 8.083e-05 7.029 10.65]
+
+ robot 28: w = +4.030 rad/s, v0 = 29.2 px/s, theta = -5.4 deg
+ / -4.208 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 4.039 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 29.12 * cos φ_i + 2.736 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -2.736 * cos φ_i + 29.12 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3445 0.3441 0.9089 0.8884 0.0005753 0.001547 8.522e+04 870.5]
+
+ robot 29: w = -2.630 rad/s, v0 = 23.8 px/s, theta = +41.4 deg
+ / 2.229 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -2.537 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 17.83 * cos φ_i + -15.74 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 15.74 * cos φ_i + 17.83 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.5459 0.5168 0.8979 0.9089 0.000483 0.0004046 7.588 1.147]
+
+ robot 30: w = +5.030 rad/s, v0 = 53.5 px/s, theta = +74.8 deg
+ / -5.133 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 5.039 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 14.02 * cos φ_i + -51.67 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 51.67 * cos φ_i + 14.02 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.1757 0.1726 0.7915 0.8077 0.0007634 0.0004059 1.636 3.646]
+
+ robot 31: w = +4.655 rad/s, v0 = 31.9 px/s, theta = -37.9 deg
+ / -4.474 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 4.46 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 25.16 * cos φ_i + 19.55 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -19.55 * cos φ_i + 25.16 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.283 0.2874 0.8915 0.9167 0.004505 0.004102 5.908 3.458]
+
+ robot 32: w = +4.615 rad/s, v0 = 33.7 px/s, theta = +5.6 deg
+ / -4.643 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 4.592 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 33.52 * cos φ_i + -3.269 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 3.269 * cos φ_i + 33.52 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3194 0.3245 0.8881 0.8798 0.0009773 0.000915 5.084e+04 11.46]
+
+ robot 34: w = -5.183 rad/s, v0 = 53.4 px/s, theta = -8.6 deg
+ / 4.959 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -5.192 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 52.79 * cos φ_i + 8.026 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -8.026 * cos φ_i + 52.79 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2148 0.2158 0.8372 0.7922 0.0001393 0.0006004 1236 7.095]
+
+ robot 37: w = -2.370 rad/s, v0 = 20.3 px/s, theta = +12.0 deg
+ / 2.535 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -2.496 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 19.87 * cos φ_i + -4.215 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 4.215 * cos φ_i + 19.87 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.5659 0.5794 0.9791 0.9138 0.004885 0.004969 6.997 24.14]
+
+ robot 38: w = +2.985 rad/s, v0 = 47.4 px/s, theta = +82.4 deg
+ / -2.869 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 2.872 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 6.289 * cos φ_i + -46.94 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 46.94 * cos φ_i + 6.289 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.416 0.4305 0.8141 0.8367 0.001063 0.001587 5.295 18.15]
+
+ robot 41: w = +3.764 rad/s, v0 = 108.5 px/s, theta = +73.2 deg
+ / -3.72 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.725 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 31.38 * cos φ_i + -103.8 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 103.8 * cos φ_i + 31.38 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2055 0.205 0.571 0.5863 4.99e-05 0.0001116 10.87 1931]
+
+ robot 42: w = -5.024 rad/s, v0 = 22.6 px/s, theta = -22.6 deg
+ / 4.631 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -4.783 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 20.91 * cos φ_i + 8.705 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -8.705 * cos φ_i + 20.91 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2813 0.2823 0.9122 0.8994 0.0005442 0.0007818 4.008 3.037]
+
+ robot 44: w = -3.432 rad/s, v0 = 10.1 px/s, theta = -47.7 deg
+ / 3.429 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -3.563 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 6.766 * cos φ_i + 7.438 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -7.438 * cos φ_i + 6.766 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3318 0.3329 0.9595 0.9129 0.003593 0.002873 8.202 6.773]
+
+ robot 45: w = +4.929 rad/s, v0 = 117.7 px/s, theta = -103.0 deg
+ / -4.89 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 4.833 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -26.55 * cos φ_i + 114.7 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -114.7 * cos φ_i + -26.55 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2138 0.2118 0.5992 0.7159 0.002236 0.001815 46.35 15.4]
+
+ robot 50: w = +3.055 rad/s, v0 = 43.3 px/s, theta = +98.5 deg
+ / -3.196 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.177 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -6.376 * cos φ_i + -42.86 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 42.86 * cos φ_i + -6.376 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.4559 0.4531 0.8761 0.8337 0.0006196 0.001086 1.698 345.3]
+
+ robot 52: w = +3.223 rad/s, v0 = 38.0 px/s, theta = -10.4 deg
+ / -3.131 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.064 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 37.42 * cos φ_i + 6.854 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -6.854 * cos φ_i + 37.42 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3212 0.3268 0.877 0.8714 0.0007401 0.001042 8.2 361.4]
+
+ robot 53: w = -3.029 rad/s, v0 = 43.3 px/s, theta = -67.2 deg
+ / 3.112 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -3.066 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 16.79 * cos φ_i + 39.88 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -39.88 * cos φ_i + 16.79 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3611 0.3577 0.8245 0.8575 0.002093 0.001356 2.628 272.6]
+
+ robot 54: w = -3.539 rad/s, v0 = 58.5 px/s, theta = -3.2 deg
+ / 3.427 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -3.559 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 58.43 * cos φ_i + 3.276 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -3.276 * cos φ_i + 58.43 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3886 0.3938 0.8416 0.7861 0.0004234 0.0003502 9.216 26.12]
+
+ robot 56: w = +6.385 rad/s, v0 = 54.0 px/s, theta = +29.3 deg
+ / -6.352 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 6.55 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 47.13 * cos φ_i + -26.45 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 26.45 * cos φ_i + 47.13 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2097 0.2129 0.7563 0.8717 0.0003905 0.0001369 1.567 0.3447]
+
+ robot 60: w = +4.089 rad/s, v0 = 37.4 px/s, theta = +7.8 deg
+ / -4.138 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 4.155 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 37.0 * cos φ_i + -5.097 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 5.097 * cos φ_i + 37.0 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.4054 0.4031 0.8955 0.8733 0.002197 0.002901 42.57 0.6551]
+
+ robot 62: w = +2.412 rad/s, v0 = 71.3 px/s, theta = +97.9 deg
+ / -2.475 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 2.509 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -9.821 * cos φ_i + -70.65 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 70.65 * cos φ_i + -9.821 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3009 0.3046 0.685 0.6749 0.001071 0.0007252 5.798 9049]
+
+ robot 65: w = -4.329 rad/s, v0 = 31.0 px/s, theta = +0.9 deg
+ / 4.289 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -4.245 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 31.01 * cos φ_i + -0.5126 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 0.5126 * cos φ_i + 31.01 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2862 0.2921 0.8506 0.9084 0.0006943 0.0008046 11.31 5.858]
+
+ robot 66: w = -2.186 rad/s, v0 = 33.8 px/s, theta = -0.9 deg
+ / 1.977 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -2.096 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 33.82 * cos φ_i + 0.5488 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -0.5488 * cos φ_i + 33.82 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.649 0.6643 0.9478 0.8709 0.0007346 0.008162 1.118 77.21]
+
+ robot 72: w = +6.126 rad/s, v0 = 27.8 px/s, theta = -57.3 deg
+ / -5.899 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 6.045 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 15.04 * cos φ_i + 23.38 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -23.38 * cos φ_i + 15.04 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2214 0.2219 0.8904 0.9081 0.0002327 0.0005426 0.9752 30]
+
+ robot 73: w = -1.679 rad/s, v0 = 37.4 px/s, theta = +126.4 deg
+ / 1.764 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.806 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | -22.18 * cos φ_i + -30.05 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 30.05 * cos φ_i + -22.18 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.6568 0.655 0.8776 0.8812 0.002292 0.00204 29 194.5]
+
+ robot 74: w = +3.265 rad/s, v0 = 100.0 px/s, theta = +82.1 deg
+ / -3.347 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 3.219 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 13.74 * cos φ_i + -99.04 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 99.04 * cos φ_i + 13.74 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2201 0.2152 0.6225 0.6421 0.000482 0.0003588 8.03 2.92]
+
+ robot 77: w = -3.151 rad/s, v0 = 70.3 px/s, theta = +3.6 deg
+ / 3.089 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -3.082 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 70.15 * cos φ_i + -4.415 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 4.415 * cos φ_i + 70.15 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3622 0.36 0.8888 0.7049 0.002872 0.004079 1.438 336.4]
+
+ robot 78: w = +4.825 rad/s, v0 = 49.8 px/s, theta = +31.4 deg
+ / -4.634 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 4.748 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 42.48 * cos φ_i + -25.91 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 25.91 * cos φ_i + 42.48 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3585 0.3469 0.8534 0.8366 0.0008443 0.002418 1.147 2.635]
+
+ robot 79: w = -3.470 rad/s, v0 = 32.4 px/s, theta = +3.1 deg
+ / 3.554 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -3.441 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 32.32 * cos φ_i + -1.777 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 1.777 * cos φ_i + 32.32 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.3842 0.3816 0.8714 0.9038 0.004447 0.004739 192.3 27.51]
+
+ robot 80: w = -1.527 rad/s, v0 = 51.1 px/s, theta = -35.0 deg
+ / 1.508 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.731 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 41.85 * cos φ_i + 29.25 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -29.25 * cos φ_i + 41.85 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 38.47 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.6056 0.5952 0.7694 0.9651 0.0112 0.003815 1.768 0.662]
+
+ robot 82: w = -1.461 rad/s, v0 = 53.7 px/s, theta = +45.4 deg
+ / 1.542 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -1.43 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 37.71 * cos φ_i + -38.28 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 38.28 * cos φ_i + 37.71 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.5811 0.5831 0.8273 0.8408 0.01364 0.0084 4.539 5.132]
+
+ robot 83: w = -3.495 rad/s, v0 = 85.4 px/s, theta = -28.3 deg
+ / 3.499 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | -3.619 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 75.25 * cos φ_i + 40.47 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ -40.47 * cos φ_i + 75.25 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2469 0.2473 0.6826 0.683 0.0009031 0.001159 6.189 5.238]
+
+ robot 84: w = +4.910 rad/s, v0 = 28.3 px/s, theta = +63.7 deg
+ / -4.837 * sin φ_i + 0.0 = [d(cos φ_i)/dt]
+ | 4.842 * cos φ_i + 0.0 = [d(sin φ_i)/dt]
+ | 12.53 * cos φ_i + -25.38 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.02711 * [(x_i(t)−x_i(t−τ))/τ] + -1.037 = [(x_i(t+τ)−x_i(t))/τ]
+ \ 25.38 * cos φ_i + 12.53 * sin φ_i + 34.75 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.02711 * [(y_i(t)−y_i(t−τ))/τ] + -0.7992 = [(y_i(t+τ)−y_i(t))/τ] , with objective function values of [0.2845 0.2799 0.8824 0.8969 0.001372 0.001546 15.06 1.544]
+
+ velocity level (0.08 s windows), recording-wide:
+  d^2x/dx0^2: 0-th non-dominated level (4 equations; * = stable end)
+   * -6.199 * [(x_i(t+w)−x_i(t))/w] + 0.0 = [(x_i(t+2w)−2x_i(t+w)+x_i(t))/w²] , with objective function values of [0.88 0.0008566]
+     -6.425 * [(x_i(t+w)−x_i(t))/w] + 332.9 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 0.0 = [(x_i(t+2w)−2x_i(t+w)+x_i(t))/w²] , with objective function values of [0.87 0.006679]
+     -6.894 * [(x_i(t+w)−x_i(t))/w] + 449.5 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 408.9 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 285.3 * cos φ_i + 0.0 = [(x_i(t+2w)−2x_i(t+w)+x_i(t))/w²] , with objective function values of [0.8528 0.02547]
+     -6.931 * [(x_i(t+w)−x_i(t))/w] + 455.0 * [Σ_{j: r_ij<1.1σ} (x_i−x_j)/r_ij] + 419.2 * [H(ρ_i−R+σ/4)·(−x_i/ρ_i)] + 286.9 * cos φ_i + -97.93 * sin φ_i + 0.0 = [(x_i(t+2w)−2x_i(t+w)+x_i(t))/w²] , with objective function values of [0.8509 0.2465]
+  d^2y/dx0^2: 0-th non-dominated level (4 equations; * = stable end)
+   * -6.389 * [(y_i(t+w)−y_i(t))/w] + 0.0 = [(y_i(t+2w)−2y_i(t+w)+y_i(t))/w²] , with objective function values of [0.874 0.0004492]
+     -6.664 * [(y_i(t+w)−y_i(t))/w] + 332.9 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 0.0 = [(y_i(t+2w)−2y_i(t+w)+y_i(t))/w²] , with objective function values of [0.8628 0.007214]
+     -7.075 * [(y_i(t+w)−y_i(t))/w] + 451.3 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 424.9 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 261.0 * sin φ_i + 0.0 = [(y_i(t+2w)−2y_i(t+w)+y_i(t))/w²] , with objective function values of [0.8448 0.02492]
+     -7.119 * [(y_i(t+w)−y_i(t))/w] + 459.5 * [Σ_{j: r_ij<1.1σ} (y_i−y_j)/r_ij] + 435.3 * [H(ρ_i−R+σ/4)·(−y_i/ρ_i)] + 96.5 * cos φ_i + 263.3 * sin φ_i + 0.0 = [(y_i(t+2w)−2y_i(t+w)+y_i(t))/w²] , with objective function values of [0.8429 0.1847]
+ noise (D per axis, px^2/s), recording-wide:
+  D: 0-th non-dominated level (3 equations; * = stable end)
+   * 267.0 * |ω_i| + 0.0 = [(τ/4)·|(r_i(t+τ)−r_i(t))/τ − f_i|²] , with objective function values of [0.7877 0.003801]
+     174.5 * |ω_i| + 3.788 * [|r_i(t)−r_i(t−τ)|/τ] + 0.0 = [(τ/4)·|(r_i(t+τ)−r_i(t))/τ − f_i|²] , with objective function values of [0.7751 0.01585]
+     288.2 * [Σ_j H(1.1σ−r_ij)] + -314.1 * [H(ρ_i−R+σ/4)] + 399.7 * |ω_i| + -118.3 * [Σ_j H(1.1σ−r_ij)] * |ω_i| + 0.0 = [(τ/4)·|(r_i(t+τ)−r_i(t))/τ − f_i|²] , with objective function values of [0.7704 0.09539]
