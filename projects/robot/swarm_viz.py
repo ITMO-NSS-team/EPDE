@@ -83,9 +83,10 @@ def recording_payload(tag, md, allres):
                 b64=base64.b64encode(buf.tobytes()).decode("ascii"))
 
 
-FIELD_SOURCES = ["experiment", "agents: per-robot EPDE laws", "agents: common system", "field laws",
-                 "field laws + density relaxation"]
-FIELD_NAMES = {"rho": "ρ", "Px": "Pₓ", "Py": "Pᵧ", "Wx": "Wₓ", "Wy": "Wᵧ"}
+FIELD_NAMES = {"rho": "ρ", "Px": "Pₓ", "Py": "Pᵧ", "Wx": "Wₓ", "Wy": "Wᵧ",
+               "Pr": "P_r", "Pt": "P_θ", "Wr": "W_r", "Wt": "W_θ",
+               **{f"P{b}{c}": f"P{b}{'ₓ' if c == 'x' else 'ᵧ'}" for b in range(1, 7) for c in "xy"}}
+STATIC_NAMES = {"inv_r": "1/r", "one": "1"}
 
 
 def pretty(name):
@@ -95,6 +96,10 @@ def pretty(name):
             return "∇²ρ"
         if f == "delta_self":
             return "(ρ − ρ̄)"
+        if f == "rho_bar":
+            return "ρ̄"
+        if f in STATIC_NAMES:
+            return STATIC_NAMES[f]
         p = ""
         if "^" in f and not f.startswith("d^2"):
             f, e = f.rsplit("^", 1)
@@ -116,6 +121,14 @@ def pretty(name):
                 return f"∂ₓ²{s}" + p
             if f == f"d^2{v}/dx2^2":
                 return f"∂ᵧ²{s}" + p
+            if f in (f"{v}_r", f"d{v}/dr"):                                    # polar components
+                return f"∂_r{s}" + p
+            if f in (f"{v}_t", f"d{v}/dt"):
+                return f"(1/r)∂_θ{s}" + p
+            if f == f"d^2{v}/dr^2":
+                return f"∂_r²{s}" + p
+            if f == f"d^2{v}/dt^2":
+                return f"(1/r²)∂_θ²{s}" + p
         return f + p
     return "·".join(one(f) for f in name.split("*"))
 
@@ -128,28 +141,59 @@ def law_text(var, terms):
     return f"∂ₜ{FIELD_NAMES[var]} = " + " ".join(parts)
 
 
-def group_label(k):
-    return "field laws, spin-rate groups + density relaxation" if k == "2" else \
-        f"field laws, {k} spin-rate groups per direction + density relaxation"
+STAT_KEYS = ("C_P", "C_W", "S_rho", "rms_rho", "rms_P", "rms_W")
 
 
-def group_summary(k, rec):
-    """Measured mean spin rate of each group beside the rotation rate and damping of its law (from the
-    stepped map's eigenvalue, swarm_fields_binned.group_map)."""
-    return dict(k=int(k), label=group_label(k), sizes=rec["sizes"], measured=rec["wbar"],
-                rates=[m["rate"] for m in rec["maps"]], damping=[m["damping"] for m in rec["maps"]])
+PROFILE_KEYS = ("rho_r", "Pr_r", "Pt_r", "Wt_r")                 # radial profiles (polar fields)
 
 
-def field_payload(fs, fb):
-    fb = {k: rec for k, rec in fb.items() if k in GROUPS_SHOWN}
-    sources = {k: fs["sources"][k] for k in FIELD_SOURCES if k in fs["sources"]}
-    for k, rec in sorted(fb.items()):
-        sources[group_label(k)] = rec["sources"][f"field laws, {k} rate groups per spin direction + density relaxation"]
-    return dict(laws=[law_text(v, fs["laws"][v]) for v in ("rho", "Px", "Py", "Wx", "Wy")],
-                relaxation=law_text("rho", fs["density_relaxation"]),
-                groups=[group_summary(k, rec) for k, rec in sorted(fb.items())],
-                cp_lags=[0.4 * L for L in range(26)], s_lags=[0.4 * L for L in (1, 2, 5, 10, 25, 50, 100, 250)],
-                sources=sources)
+def stats_payload(st):
+    return None if st is None else {k: st[k] for k in STAT_KEYS + PROFILE_KEYS if k in st}
+
+
+def summary_of(s, exp):
+    """[C_P error, C_W error, <drho^2>(100 s) ratio, drho ratio, |P| ratio, |W| ratio] against the experiment."""
+    err = lambda k: float(np.mean(np.abs(np.array(s[k][1:]) - np.array(exp[k][1:]))))         # noqa: E731
+    return [round(err("C_P"), 4), round(err("C_W"), 4), round(s["S_rho"][-1] / exp["S_rho"][-1], 3),
+            round(s["rms_rho"] / exp["rms_rho"], 3), round(s["rms_P"] / exp["rms_P"], 3), round(s["rms_W"] / exp["rms_W"], 3)]
+
+
+def hypotheses_payload(rec):
+    """Hypothesis systems on the polar fields (swarm_fields_polar --hypotheses): per hypothesis whether the
+    fronts support it, each law as math text with its place on its non-dominated front and its scores, and
+    the simulated statistics against the experiment (None when not supported or diverging)."""
+    exp = rec["sources"]["experiment"]
+    hyps = []
+    for key, h in rec["hypotheses"].items():
+        st = h.get("stats")
+        hyps.append(dict(key=key, description=h["description"], supported=h["supported"],
+                         missing=[FIELD_NAMES[v] for v in h["missing"]], diverged=bool(h.get("diverged")),
+                         laws=[dict(law=law_text(v, t), **h["scores"][v]) for v, t in h["laws"].items()],
+                         stats=stats_payload(st), summary=None if st is None else summary_of(st, exp)))
+    return dict(r=rec["r"], ref=stats_payload(exp), hypotheses=hyps,
+                agents={k: stats_payload(v) for k, v in rec["sources"].items() if k.startswith("agents")})
+
+
+def group_rates(rec, dt=0.4):
+    """Per spin-rate group: the measured mean spin rate and the range of rotation rates over every law on
+    the fronts of its two polarization equations (each with the other equations at their balanced laws)."""
+    import swarm_fields_binned as SB
+    base = rec["base"]["laws"]
+    lo, hi = [], []
+    for b in range(len(rec["wbar"])):
+        rates = [SB.group_map(dict(base, **{v: m["terms"]}), b, dt)["rate"]
+                 for v in (f"P{b + 1}x", f"P{b + 1}y") for m in rec["fronts"][v]]
+        lo.append(min(rates))
+        hi.append(max(rates))
+    return dict(k=int(rec["k"]), sizes=rec["sizes"], measured=rec["wbar"], rate_lo=lo, rate_hi=hi)
+
+
+def field_payload(hyp, fg):
+    """Field section: the hypothesis systems with the experiment and the agent simulations (polar fields);
+    the spin-rate groups' measured rates for the replay's colouring."""
+    g = fg.get(GROUPS_SHOWN[0])
+    return dict(hyp=hypotheses_payload(hyp), groups=group_rates(g) if g else None,
+                cp_lags=[0.4 * L for L in range(26)], s_lags=[0.4 * L for L in (1, 2, 5, 10, 25, 50, 100, 250)])
 
 
 def main():
@@ -158,17 +202,15 @@ def main():
     a = ap.parse_args()
     allres = {law: json.load(open(os.path.join(HERE, "results", f"swarm_spin_contact{suf}.json")))
               for law, (suf, _) in LAWS.items()}
-    fpath = os.path.join(HERE, "results", "swarm_field_sim.json")
-    fsim = json.load(open(fpath)) if os.path.exists(fpath) else {}
-    bpath = os.path.join(HERE, "results", "swarm_fields_binned.json")
-    fbin = json.load(open(bpath)) if os.path.exists(bpath) else {}
+    load = lambda name: json.load(open(p)) if os.path.exists(p := os.path.join(HERE, "results", name)) else {}  # noqa: E731
+    hyp, fg = load("swarm_field_hypotheses_polar.json"), load("swarm_fields_binned_tau5_fronts.json")
     recs = []
     for f in swarm_files():
         md = swarm_meta(f)
         if all(md["tag"] in r for r in allres.values()):
             recs.append(recording_payload(md["tag"], md, allres))
-            if md["tag"] in fsim:
-                recs[-1]["fields"] = field_payload(fsim[md["tag"]], fbin.get(md["tag"], {}))
+            if md["tag"] in hyp:
+                recs[-1]["fields"] = field_payload(hyp[md["tag"]], fg.get(md["tag"], {}))
     html = open(TEMPLATE, encoding="utf-8").read().replace("/*PAYLOAD*/null", json.dumps(recs))
     with open(a.out, "w", encoding="utf-8") as fh:
         fh.write(html)

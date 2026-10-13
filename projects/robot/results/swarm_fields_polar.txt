@@ -1,0 +1,188 @@
+Polar fields about the arena centre: the swarm's density and polarization on rings and angles over the
+whole arena (out to the wall), their laws, and their simulation.
+
+Grid: NR rings r = R_IN .. R (R = the radius robot centres reach, arena_envelope) and NT angles. Gaussian
+kernel of one cap diameter (as swarm_fields.py), fields every 0.08 s, then every 0.4 s (TAU):
+    rho          area fraction
+    P_r, P_t     the polarization P resolved along r_hat (outward) and t_hat (the direction of increasing
+                 angle in the image frame, x right / y down) at each grid point
+    W_r, W_t     the same for the spin-weighted polarization
+A law with fixed coefficients in these components is the same in every direction about the centre, so no
+x / y pairing is needed; the radial and the tangential laws may differ.
+Library per target: own field f and d f/dr, (1/r) d f/dtheta, d^2 f/dr^2, (1/r^2) d^2 f/dtheta^2; the other
+fields, their d/dr, (1/r) d/dtheta and polar Laplacian; static maps rho_bar (each point's time-mean density),
+r, 1/r and 1 (so a law can change with the distance from the centre); products of <= 2 atoms. Fit on 0.4 s
+increments over every angle and every ring but the first and the last, pipeline and front exactly as
+swarm_fields.run (subset_search + cxfast, exact (WAPE, win14) front, held-out R2).
+Simulation: explicit 0.4 s steps, periodic in angle, mirrored beyond the inner and the outer ring, the laws'
+recorded residual fields (one random recorded instant per step) as noise; no law is selected: every front law
+of every equation is simulated one at a time with the other equations at their balanced laws (as
+swarm_field_sim --fronts). Statistics area-weighted (by r), plus radial profiles (time and angle means).
+
+
+
+====================================================================================================
+N30_PWM10_D41
+  drho/dx0 front (324 columns), most stable first: [WAPE, win14] held-out R2
+    -1.843 Pr_r   [0.9033 0.016] R2 0.207
+    -1.699 Pr_r -0.143 Pt_t*r   [0.8099 0.0259] R2 0.364
+    -1.786 Pr_r -2.15 Pt_t -2.05 Pr*inv_r   [0.7594 0.063] R2 0.440
+    -0.4023 rho -1.7 Pr_r -2.03 Pt_t +0.4026 rho_bar -1.929 Pr*inv_r   [0.7178 0.0688] R2 0.500
+  dPr/dx0 front (324 columns), most stable first: [WAPE, win14] held-out R2
+    -0.6736 Wt   [0.6663 0.000391] R2 0.530
+    -1.384 Pr -0.6832 Wt   [0.4157 0.00458] R2 0.815
+    -1.393 Pr -0.682 Wt -0.7767 Wr*inv_r   [0.3954 0.0377] R2 0.836
+    -1.403 Pr +0.3429 Wr_r -0.6823 Wt -0.7839 Wr*inv_r   [0.3930 0.0847] R2 0.840
+    -1.404 Pr +0.1155 Pt +0.3396 Wr_r -0.6829 Wt -0.7863 Wr*inv_r   [0.3894 0.164] R2 0.842
+  dPt/dx0 front (324 columns), most stable first: [WAPE, win14] held-out R2
+    +0.6911 Wr   [0.6599 0.000335] R2 0.545
+    -1.327 Pt +0.6947 Wr   [0.4217 0.00545] R2 0.817
+    -1.343 Pt +0.6959 Wr -0.727 Wt*inv_r   [0.3997 0.0402] R2 0.840
+    -1.343 Pt +1.19 lap_Pr +0.6946 Wr -0.729 Wt*inv_r   [0.3962 0.0906] R2 0.842
+    -1.354 Pt +1.192 lap_Pr +0.6944 Wr +0.2841 Wt_r -0.7378 Wt*inv_r   [0.3944 0.165] R2 0.845
+  dWr/dx0 front (324 columns), most stable first: [WAPE, win14] held-out R2
+    -5.315 Pt   [0.7749 0.00383] R2 0.379
+    -1.881 Wr -5.277 Pt   [0.4870 0.00611] R2 0.768
+    -1.886 Wr -5.332 Pt -5.417 Pr*inv_r -2.515 Wt*inv_r   [0.4514 0.0863] R2 0.807
+  dWt/dx0 front (324 columns), most stable first: [WAPE, win14] held-out R2
+    +5.603 Pr   [0.7697 0.0032] R2 0.386
+    -1.932 Wt +5.495 Pr   [0.4812 0.00516] R2 0.777
+    -1.941 Wt +5.435 Pr +0.4387 Wr   [0.4609 0.0819] R2 0.798
+    -1.957 Wt +5.437 Pr +0.4421 Wr -5.544 Pt*inv_r   [0.4450 0.116] R2 0.812
+    -1.967 Wt +5.429 Pr +3.013 Pt_r +0.4454 Wr -5.429 Pt*inv_r   [0.4431 0.139] R2 0.814
+
+====================================================================================================
+N40_PWM10_D40
+  drho/dx0 front (324 columns), most stable first: [WAPE, win14] held-out R2
+    -1.091 Pr_r   [0.9309 0.00476] R2 0.105
+    -0.5433 rho -0.9948 Pr_r +0.5432 rho_bar -0.08355 Pt_t*r   [0.8080 0.0115] R2 0.314
+    -0.5511 rho -0.9989 Pr_r -1.184 Pt_t +0.5504 rho_bar -1.039 Pr*inv_r   [0.7861 0.0301] R2 0.348
+  dPr/dx0 front (324 columns), most stable first: [WAPE, win14] held-out R2
+    -0.6834 Wt   [0.6622 0.000278] R2 0.537
+    -1.265 Pr -0.6893 Wt   [0.4380 0.00139] R2 0.791
+    -1.21 Pr -0.1283 Wr -0.6907 Wt   [0.4124 0.0733] R2 0.808
+    -1.208 Pr +0.07927 Pt -0.1286 Wr -0.6961 Wt   [0.4105 0.459] R2 0.808
+    -1.208 Pr -0.3741 rho_r +0.07842 Pt -0.1287 Wr -0.6956 Wt   [0.4098 0.531] R2 0.808
+    -1.212 Pr +0.07685 Pt -0.129 Wr -0.696 Wt +5.089 rho_t*Wr   [0.4092 0.778] R2 0.809
+  dPt/dx0 front (324 columns), most stable first: [WAPE, win14] held-out R2
+    +0.6932 Wr   [0.6607 0.000166] R2 0.536
+    -1.27 Pt +0.6947 Wr   [0.4381 0.00136] R2 0.794
+    -1.205 Pt +0.6928 Wr -0.1334 Wt   [0.4128 0.0732] R2 0.811
+    -1.205 Pt +0.6929 Wr -0.1343 Wt +0.008636 one   [0.4126 0.31] R2 0.812
+    -1.206 Pt -0.05094 Pr +0.6961 Wr -0.1344 Wt +0.008527 one   [0.4110 0.594] R2 0.812
+  dWr/dx0 front (324 columns), most stable first: [WAPE, win14] held-out R2
+    -5.076 Pt   [0.7890 0.00068] R2 0.358
+    -1.831 Wr -5.061 Pt   [0.5087 0.00217] R2 0.744
+    -1.839 Wr -4.819 Pt -0.4938 Wt   [0.4807 0.0615] R2 0.765
+    -1.801 Wr -0.6192 Pr -4.83 Pt -0.4954 Wt   [0.4720 0.198] R2 0.766
+    -1.804 Wr -0.6686 dWr/dr -0.6185 Pr -4.833 Pt -0.4966 Wt   [0.4716 0.326] R2 0.765
+    -1.823 Wr -0.6603 dWr/dr -5.11 rho_t -0.6037 Pr -4.841 Pt -0.5003 Wt   [0.4713 0.545] R2 0.766
+  dWt/dx0 front (324 columns), most stable first: [WAPE, win14] held-out R2
+    -1.905 Wt   [0.8009 0.00117] R2 0.380
+    -1.881 Wt +5.01 Pr   [0.5095 0.00213] R2 0.743
+    -1.876 Wt +4.803 Pr +0.4794 Wr   [0.4816 0.0581] R2 0.765
+    -1.823 Wt +4.788 Pr -0.773 Pt +0.482 Wr   [0.4725 0.218] R2 0.767
+    -1.83 Wt -7.774 lap_rho +4.796 Pr -0.7695 Pt +0.4828 Wr   [0.4709 0.264] R2 0.768
+    -1.832 Wt -0.5165 dWt/dr -7.486 lap_rho +4.797 Pr -0.7687 Pt +0.4832 Wr   [0.4709 0.392] R2 0.768
+
+====================================================================================================
+N40_PWM10_D41
+  drho/dx0 front (324 columns), most stable first: [WAPE, win14] held-out R2
+    -1.261 Pr_r   [0.9283 0.00645] R2 0.148
+    -0.4562 rho -1.221 Pr_r -1.412 Pt_t +0.4549 rho_bar -1.256 Pr*inv_r   [0.7764 0.0297] R2 0.419
+  dPr/dx0 front (324 columns), most stable first: [WAPE, win14] held-out R2
+    -0.7381 Wt   [0.6105 0.000377] R2 0.608
+    -0.9819 Pr -0.7362 Wt   [0.4265 0.00357] R2 0.816
+    -0.9259 Pr -0.1214 Wr -0.7337 Wt   [0.4059 0.0132] R2 0.827
+    -0.9279 Pr -0.529 dPr/dr -0.1222 Wr -0.7334 Wt   [0.4051 0.102] R2 0.828
+    -2.017 Pr -0.1208 Wr -0.7337 Wt +1.971 Pr*rho_bar   [0.4030 0.114] R2 0.830
+    -2.102 Pr -0.6138 dPr/dr -0.1216 Wr -0.7334 Wt +2.121 Pr*rho_bar   [0.4019 0.187] R2 0.831
+  dPt/dx0 front (324 columns), most stable first: [WAPE, win14] held-out R2
+    +0.7373 Wr   [0.6103 0.000245] R2 0.603
+    -1.02 Pt +0.7368 Wr   [0.4230 0.00318] R2 0.817
+    -0.961 Pt +0.7394 Wr -0.1209 Wt   [0.4058 0.0197] R2 0.826
+    -0.9623 Pt -0.3956 dPt/dr +0.7391 Wr -0.1211 Wt   [0.4050 0.111] R2 0.827
+    -2.055 Pt +0.7394 Wr -0.1202 Wt +1.977 Pt*rho_bar   [0.4027 0.117] R2 0.829
+    -2.13 Pt -0.4875 dPt/dr +0.739 Wr -0.1204 Wt +2.11 Pt*rho_bar   [0.4015 0.184] R2 0.830
+  dWr/dx0 front (324 columns), most stable first: [WAPE, win14] held-out R2
+    -4.331 Pt   [0.7642 0.00149] R2 0.408
+    -1.537 Wr -4.335 Pt   [0.5340 0.00386] R2 0.735
+    -1.527 Wr -4.111 Pt -0.463 Wt   [0.5090 0.0182] R2 0.753
+    -1.488 Wr -0.4686 Pr -4.117 Pt -0.4624 Wt   [0.5044 0.0627] R2 0.754
+    -1.488 Wr -0.4691 Pr -7.6 Pt -0.4601 Wt +6.295 Pt*rho_bar   [0.5010 0.215] R2 0.757
+  dWt/dx0 front (324 columns), most stable first: [WAPE, win14] held-out R2
+    +4.148 Pr   [0.7679 0.00175] R2 0.408
+    -1.531 Wt +4.164 Pr   [0.5421 0.00357] R2 0.730
+    -1.54 Wt +3.956 Pr +0.4505 Wr   [0.5160 0.0122] R2 0.752
+    -1.501 Wt +3.951 Pr -0.4496 Pt +0.4499 Wr   [0.5113 0.0609] R2 0.752
+    -1.508 Wt +3.959 Pr -0.4408 Pt +0.4509 Wr +0.003769 r   [0.5096 0.0736] R2 0.754
+    -1.509 Wt +3.964 Pr +1.451 Pr_r -0.4418 Pt +0.4531 Wr +0.003804 r   [0.5085 0.182] R2 0.755
+
+====================================================================================================
+N40_PWM20_D40
+  drho/dx0 front (324 columns), most stable first: [WAPE, win14] held-out R2
+    -1.064 rho +1.065 rho_bar   [0.8828 0.00156] R2 0.221
+    -1.021 rho -0.8287 Pr_r +1.022 rho_bar   [0.8504 0.00787] R2 0.276
+    -0.9784 rho -0.7958 Pr_r +0.9788 rho_bar -0.07414 Pt_t*r   [0.8119 0.01] R2 0.334
+    -0.973 rho -0.8179 Pr_r -1.01 Pt_t +0.9732 rho_bar -0.9038 Pr*inv_r   [0.8012 0.0317] R2 0.355
+  dPr/dx0 front (324 columns), most stable first: [WAPE, win14] held-out R2
+    -2.362 Pr   [0.7273 0.00124] R2 0.476
+    -2.379 Pr -0.446 Wt   [0.4998 0.0024] R2 0.744
+    -2.345 Pr -0.1159 Wr -0.4445 Wt   [0.4788 0.0535] R2 0.766
+    -2.346 Pr +0.2546 Pt -0.1167 Wr -0.4508 Wt   [0.4716 0.169] R2 0.773
+    -2.338 Pr +0.2573 Pt -0.1155 Wr -0.4507 Wt +7.969 rho_t*Wr   [0.4701 0.292] R2 0.773
+  dPt/dx0 front (324 columns), most stable first: [WAPE, win14] held-out R2
+    -2.354 Pt   [0.7235 0.0013] R2 0.480
+    -2.38 Pt +0.443 Wr   [0.4980 0.00277] R2 0.751
+    -2.331 Pt +0.4443 Wr -0.112 Wt   [0.4769 0.052] R2 0.770
+    -2.33 Pt -0.293 Pr +0.4493 Wr -0.1127 Wt   [0.4693 0.144] R2 0.778
+    -2.323 Pt -0.294 Pr +0.4495 Wr -0.1101 Wt +8.918 rho_t*Wt   [0.4673 0.196] R2 0.778
+  dWr/dx0 front (324 columns), most stable first: [WAPE, win14] held-out R2
+    -3.186 Wr   [0.6109 0.000741] R2 0.632
+    -3.162 Wr -7.345 Pt   [0.4033 0.000964] R2 0.841
+    -3.134 Wr -1.632 Pr -7.342 Pt   [0.3883 0.0525] R2 0.853
+    -3.132 Wr -1.641 Pr -7.259 Pt -0.1885 Wt   [0.3851 0.0811] R2 0.856
+    -3.148 Wr -11.18 rho_t -1.608 Pr -7.29 Pt -0.1913 Wt   [0.3843 0.0983] R2 0.856
+    -3.152 Wr -11.03 rho_t -1.586 Pr +2.456 Pr_r -7.291 Pt -0.1928 Wt   [0.3837 0.191] R2 0.857
+  dWt/dx0 front (324 columns), most stable first: [WAPE, win14] held-out R2
+    -3.15 Wt   [0.6116 0.000817] R2 0.635
+    -3.135 Wt +7.259 Pr   [0.4078 0.00121] R2 0.837
+    -3.097 Wt +7.264 Pr -1.501 Pt   [0.3933 0.0555] R2 0.848
+    -3.1 Wt +7.202 Pr -1.512 Pt +0.2116 Wr   [0.3901 0.0775] R2 0.851
+    -3.106 Wt +7.2 Pr -1.488 Pt +3.182 Pt_r +0.2143 Wr   [0.3891 0.178] R2 0.852
+    -3.11 Wt -12.21 rho_t +7.236 Pr -1.521 Pt +3.249 Pt_r +0.1968 Wr   [0.3888 0.442] R2 0.852
+
+====================================================================================================
+N40_PWM20_D41
+  drho/dx0 front (324 columns), most stable first: [WAPE, win14] held-out R2
+    -0.9314 rho +0.9323 rho_bar   [0.8986 0.00131] R2 0.197
+    -0.8911 rho -1.075 Pr_r +0.8916 rho_bar   [0.8549 0.00611] R2 0.272
+    -0.84 rho -1.005 Pr_r +0.8405 rho_bar -0.09549 Pt_t*r   [0.8074 0.0076] R2 0.352
+    -0.8528 rho -1 Pr_r -1.301 Pt_t +0.8529 rho_bar -1.144 Pr*inv_r   [0.7889 0.0185] R2 0.379
+  dPr/dx0 front (324 columns), most stable first: [WAPE, win14] held-out R2
+    -2.271 Pr   [0.7440 0.00141] R2 0.467
+    -2.241 Pr -0.4782 Wt   [0.4753 0.00313] R2 0.765
+    -2.188 Pr -0.1059 Wr -0.4807 Wt   [0.4581 0.077] R2 0.780
+    -2.194 Pr +0.2146 Pt -0.1046 Wr -0.4877 Wt   [0.4531 0.162] R2 0.784
+    -2.193 Pr +0.2085 Pt -0.1047 Wr -0.4888 Wt -3.653 rho_t*Wt   [0.4528 0.518] R2 0.784
+  dPt/dx0 front (324 columns), most stable first: [WAPE, win14] held-out R2
+    -2.299 Pt   [0.7407 0.0014] R2 0.469
+    -2.253 Pt +0.4894 Wr   [0.4680 0.00285] R2 0.769
+    -2.194 Pt +0.4872 Wr -0.1161 Wt   [0.4481 0.078] R2 0.787
+    -2.188 Pt -0.1976 Pr +0.4934 Wr -0.1153 Wt   [0.4438 0.12] R2 0.791
+    -2.194 Pt -1.468 rho_t -0.1949 Pr +0.491 Wr -0.1156 Wt   [0.4436 0.302] R2 0.792
+    -2.184 Pt -0.1978 Pr +0.4934 Wr -0.3232 Wt +0.3602 rho*Wt   [0.4433 0.666] R2 0.792
+  dWr/dx0 front (324 columns), most stable first: [WAPE, win14] held-out R2
+    -2.93 Wr   [0.6364 0.00107] R2 0.615
+    -2.972 Wr -7.354 Pt   [0.3966 0.00145] R2 0.841
+    -2.931 Wr -1.327 Pr -7.316 Pt   [0.3865 0.0315] R2 0.849
+    -2.936 Wr -1.312 Pr -7.19 Pt -0.2453 Wt   [0.3821 0.096] R2 0.851
+    -2.948 Wr -7.316 rho_t -1.299 Pr -7.216 Pt -0.2471 Wt   [0.3815 0.193] R2 0.852
+    -2.945 Wr +0.301 dWr/dr -7.291 rho_t -1.293 Pr -7.212 Pt -0.2474 Wt   [0.3813 0.816] R2 0.852
+  dWt/dx0 front (324 columns), most stable first: [WAPE, win14] held-out R2
+    -2.972 Wt   [0.6388 0.00111] R2 0.617
+    -3.003 Wt +7.474 Pr   [0.3989 0.00144] R2 0.842
+    -2.959 Wt +7.506 Pr -1.333 Pt   [0.3892 0.0356] R2 0.850
+    -2.955 Wt +7.412 Pr -1.315 Pt +0.1886 Wr   [0.3862 0.118] R2 0.850
+    -2.959 Wt -10.7 lap_rho +7.425 Pr -1.307 Pt +0.1883 Wr   [0.3852 0.128] R2 0.851
+    -2.955 Wt +0.3749 dWt/dr -10.87 lap_rho +7.423 Pr -1.303 Pt +0.1889 Wr   [0.3849 0.444] R2 0.851

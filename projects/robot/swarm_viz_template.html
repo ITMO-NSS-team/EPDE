@@ -8,6 +8,7 @@
   --bg: #f3f5f3; --surface: #ffffff; --fg: #1a2023; --muted: #5a6669; --line: #d3dad7; --line-strong: #8f9b98;
   --arena: #e9edeb; --ccw: #c4642a; --cw: #2a7c92; --tick: #ffffff;
   --g1: #1c637a; --g2: #86c0cf; --g3: #e9ab84; --g4: #a8481a;
+  --d1: #b9a3d6; --d2: #9a7fc4; --d3: #7c5cb1; --d4: #613f98; --d5: #47287a; --d6: #2f165a;
   --m0: #6d55a3; --m1: #c43d52; --m2: #7d8f2e; --m3: #d4922f; --m4: #b04a8f; --m5: #3d6fc4; --good: #2f7d4f; --focus: #2a7c92;
   --font-display: "Chivo", "Segoe UI", system-ui, sans-serif;
   --font-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
@@ -17,11 +18,13 @@
   --bg: #0e1315; --surface: #151c1f; --fg: #e2e8e6; --muted: #97a3a1; --line: #29343a; --line-strong: #5f6d70;
   --arena: #0a0f11; --ccw: #e0884d; --cw: #4fa9c0; --tick: #0a0f11;
   --g1: #62bdd4; --g2: #2c6474; --g3: #87502e; --g4: #f39a5e;
+  --d1: #4b3a6b; --d2: #654e8f; --d3: #8064b3; --d4: #9c82cf; --d5: #b9a3e3; --d6: #d6c6f2;
   --m0: #a38ce0; --m1: #ef7184; --m2: #b5c55d; --m3: #f0b862; --m4: #e38bc7; --m5: #86aef0; --good: #6cc48f; --focus: #4fa9c0; color-scheme: dark } }
 :root[data-theme="dark"] {
   --bg: #0e1315; --surface: #151c1f; --fg: #e2e8e6; --muted: #97a3a1; --line: #29343a; --line-strong: #5f6d70;
   --arena: #0a0f11; --ccw: #e0884d; --cw: #4fa9c0; --tick: #0a0f11;
   --g1: #62bdd4; --g2: #2c6474; --g3: #87502e; --g4: #f39a5e;
+  --d1: #4b3a6b; --d2: #654e8f; --d3: #8064b3; --d4: #9c82cf; --d5: #b9a3e3; --d6: #d6c6f2;
   --m0: #a38ce0; --m1: #ef7184; --m2: #b5c55d; --m3: #f0b862; --m4: #e38bc7; --m5: #86aef0; --good: #6cc48f; --focus: #4fa9c0; color-scheme: dark }
 body { background: var(--bg); color: var(--fg); font: 16px/1.5 var(--font-body); }
 .wrap { max-width: 1200px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 48px; display: grid; gap: 28px; }
@@ -50,6 +53,11 @@ canvas.board { width: 100%; max-width: 100%; aspect-ratio: 1; display: block; bo
 .sw { display: inline-block; width: 12px; height: 12px; border-radius: 50%; vertical-align: -1px; margin-right: 6px; }
 /* Shared chart legends: one compact block per chart group instead of a legend inside every plot. */
 .chartlegend { grid-column: 1 / -1; display: grid; gap: 2px; }
+.subhead { grid-column: 1 / -1; margin: 10px 0 -8px; font: 700 0.98rem/1.3 var(--font-display); }
+.varyrow { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+tr.eqhead td { background: color-mix(in srgb, var(--fg) 4%, transparent); font-family: var(--font-body); font-weight: 600; }
+td.diverged { color: var(--m1); font-family: var(--font-body); }
+td.law { white-space: normal; min-width: 18ch; }
 .legend.mini { font-size: 0.8rem; gap: 2px 14px; }
 .legend.mini b { color: var(--fg); font-weight: 600; }
 .legend.mini .on { color: var(--fg); font-weight: 600; }
@@ -141,24 +149,23 @@ td.best { color: var(--good); font-weight: 500; }
   </section>
 
   <section style="display:grid; gap:10px" id="fieldsec">
-    <h2>Field equations</h2>
-    <p class="notes" style="margin:0">The swarm as smooth fields inside the square inscribed in the arena, smoothed over one cap diameter:
-      density ρ (share of floor covered by caps), polarization P of the propulsion direction, and W, the polarization weighted by each robot's spin rate.
-      These laws were found for this recording. The field simulation steps them every 0.08 s from the recorded start, adding the laws' recorded residual fields as noise.
-      The agent simulations' trajectories are smoothed into fields the same way.
-      In the spin-rate group model each spin direction is split into its slower- and faster-spinning half (four groups), each group has its own polarization field P_b,
-      and the laws are found the same way for ρ and every P_b; P and W are then the sums over groups.</p>
-    <div class="facts" id="fieldlaws" style="display:grid; gap:4px"></div>
+    <h2>Field equations: hypothesis systems</h2>
+    <p class="notes" style="margin:0">The swarm as smooth fields over the whole arena, on rings and angles about its centre: density ρ (share of floor covered by caps),
+      the polarization P of the propulsion direction split into its outward part P_r and its part around the centre P_θ, and W, the polarization weighted by each robot's spin rate, split the same way.
+      Each hypothesis is a complete set of laws, one per field. Every law is a member of its equation's non-dominated front found by the search: the most stable front law with the hypothesis's property.
+      A hypothesis no front law supports is marked so and not simulated. Each supported system is stepped every 0.4 s from the recorded start, with the laws' recorded residual fields, their time mean removed, as noise,
+      so every steady structure comes from the laws. The agent simulations' trajectories are smoothed into fields the same way.</p>
+    <div class="facts" id="hyplaws" style="display:grid; gap:8px"></div>
   </section>
   <section class="charts" id="fieldcharts">
-    <div class="chartlegend"><div class="legend mini" id="fieldlegend"></div></div>
-    <div class="card" id="groupcard"><h2>Spin-rate groups</h2><p>Every robot's mean spin rate, sorted (positive = counter-clockwise). Each spin direction is split into its slower- and faster-spinning half.
-      Solid line: the group's measured mean rate; dashed: the rotation rate in the group's field law.</p>
-      <div class="legend mini" id="grouplegend"></div><div class="chartbox"><canvas id="ch-groups"></canvas></div></div>
-    <div class="card"><h2>Polarization autocorrelation</h2><p>C_P(τ) = ⟨P(t)·P(t+τ)⟩ / ⟨|P|²⟩, every 0.4 s.</p><div class="chartbox"><canvas id="ch-cp"></canvas></div></div>
-    <div class="card"><h2>Spin-weighted polarization autocorrelation</h2><p>C_W(τ), the same for W.</p><div class="chartbox"><canvas id="ch-cw"></canvas></div></div>
-    <div class="card"><h2>Density change over time</h2><p>⟨(ρ(t+τ) − ρ(t))²⟩; it levels off when density fluctuations stay bounded.</p><div class="chartbox"><canvas id="ch-srho"></canvas></div></div>
-    <div class="card"><h2>Field amplitudes</h2><p>Root mean square over grid and time; C error = mean |C(τ) − C_experiment(τ)| over 0.4–10 s.</p><div class="tablewrap" style="border:0"><table id="famp"></table></div></div>
+    <div class="chartlegend"><div class="legend mini" id="hyplegend"></div></div>
+    <div class="card"><h2>Spin-weighted circulation across the arena</h2><p>Mean tangential spin-weighted polarization W_θ(r), from the centre to the wall.</p><div class="chartbox"><canvas id="ch-hyp-wtr"></canvas></div></div>
+    <div class="card"><h2>Density across the arena</h2><p>Mean density ρ(r). A law with −κ(ρ − ρ̄) relaxes toward the recorded mean map ρ̄, so it matches by construction.</p><div class="chartbox"><canvas id="ch-hyp-rhor"></canvas></div></div>
+    <div class="card"><h2>Density change over time</h2><p>⟨(ρ(t+τ) − ρ(t))²⟩, area-weighted; it levels off when density fluctuations stay bounded.</p><div class="chartbox"><canvas id="ch-hyp-srho"></canvas></div></div>
+    <div class="card"><h2>Polarization autocorrelation</h2><p>C_P(τ) of (P_r, P_θ), area-weighted over the arena.</p><div class="chartbox"><canvas id="ch-hyp-cp"></canvas></div></div>
+    <div class="card"><h2>Spin-weighted polarization autocorrelation</h2><p>C_W(τ), the same for W.</p><div class="chartbox"><canvas id="ch-hyp-cw"></canvas></div></div>
+    <div class="card" style="grid-column: 1 / -1"><h2>Hypotheses against the experiment</h2><p>Ratios are simulation / experiment; C error = mean |C(τ) − C_experiment(τ)| over 0.4–10 s.</p>
+      <div class="tablewrap" style="border:0"><table id="hyptable"></table></div></div>
   </section>
 
   <section id="defs" style="display:grid; gap:12px">
@@ -191,27 +198,28 @@ td.best { color: var(--good); font-weight: 500; }
         <dt>held-out R²</dt><dd>A law fitted on the first half of the recording and scored on the second, on 0.4 s step velocities; the R² gain is the difference between two laws.</dd>
       </dl></div>
       <div><h3>Fields</h3><dl>
-        <dt>K, grid</dt><dd>Gaussian kernel with standard deviation one cap diameter (4.87 cm); fields on a 14 × 14 grid over the square inscribed in the arena, every 0.08 s.</dd>
+        <dt>K, grid</dt><dd>Gaussian kernel with standard deviation one cap diameter (4.87 cm); fields on 10 rings, from 1 cm out to R (the largest distance a robot centre reaches from the arena centre), × 24 angles, every 0.08 s and used every 0.4 s.</dd>
         <dt>ρ</dt><dd>Σ A K(r − r_i), A = cap area: the share of floor covered by caps.</dd>
-        <dt>P</dt><dd>Σ A p_i K(r − r_i): the local polarization of the propulsion directions.</dd>
-        <dt>W</dt><dd>Σ A ω_i p_i K(r − r_i): the polarization weighted by spin rate, rad/s.</dd>
-        <dt>spin-rate groups, P_b</dt><dd>Each spin direction split into its faster- and slower-spinning half (four groups); P_b is P over the robots of group b only, and P = Σ_b P_b.</dd>
+        <dt>P, P_r, P_θ</dt><dd>P = Σ A p_i K(r − r_i), the local polarization of the propulsion directions; P_r is its outward component at each grid point, P_θ its component around the centre (the direction of increasing angle in the image).</dd>
+        <dt>W, W_r, W_θ</dt><dd>Σ A ω_i p_i K(r − r_i): the polarization weighted by spin rate (rad/s), split the same way. A mean W_θ above zero near the wall is a spin-weighted circulation along the wall.</dd>
       </dl></div>
       <div><h3>Field laws</h3><dl>
-        <dt>∂ₜf</dt><dd>Forward increment (f(t + 0.08 s) − f(t)) / 0.08 s.</dd>
-        <dt>∂ₓ, ∂ᵧ, ∇·, ∇²</dt><dd>Central differences on the grid; ∇·P = ∂ₓPₓ + ∂ᵧPᵧ, ∇² = ∂ₓ² + ∂ᵧ².</dd>
-        <dt>ẑ×P</dt><dd>P turned by +90°, (−Pᵧ, Pₓ); ∂ₜP = ω ẑ×P rotates P at rate ω.</dd>
-        <dt>balanced law</dt><dd>The member of the found front that is both precise and stable: its error (WAPE = Σ|y − ŷ| / Σ|y|) and its window instability (on a log scale) are each rescaled to 0–1 over the front, and the law closest to (0, 0) is chosen.</dd>
-        <dt>window instability</dt><dd>The law refit on windows a quarter of each axis long (time and both space directions); the summed squared relative spread (variance / mean²) of its coefficients.</dd>
-        <dt>v₀</dt><dd>Transport speed in ∂ₜρ = −v₀ ∇·P, cm/s.</dd>
-        <dt>D_r, ω_b, D_b</dt><dd>Decay rate of the polarization (1/s); rotation rate (rad/s) and decay rate (1/s) of group b's polarization, read from the eigenvalue of its 0.08 s step, which removes the step's own ω²·0.08/2.</dd>
-        <dt>κ, ρ̄(r), D</dt><dd>Density relaxation −κ(ρ − ρ̄(r)) toward each point's time-mean density ρ̄(r), and density diffusion D ∇²ρ (D in cm²/s).</dd>
-        <dt>noise</dt><dd>Each 0.08 s step of a field simulation adds the laws' recorded residual fields from one randomly drawn instant.</dd>
+        <dt>∂ₜf</dt><dd>Forward increment (f(t + Δt) − f(t)) / Δt over the fit step Δt = 0.4 s. A law fitted at Δt is stepped at Δt.</dd>
+        <dt>fit step</dt><dd>A one-step fit sees only what changes within Δt. At 0.08 s it misses decays that build up over about a second (polarization drifting out of phase, the density's restoring).</dd>
+        <dt>∂_r, (1/r)∂_θ, ∇·P, ∇²</dt><dd>Radial and angular differences on the polar grid (periodic in angle, one-sided at the first and the last ring); ∇·P = ∂_rP_r + P_r/r + (1/r)∂_θP_θ, ∇² = ∂_r² + (1/r)∂_r + (1/r²)∂_θ².</dd>
+        <dt>rotation coupling</dt><dd>∂ₜP_r = … − c W_θ and ∂ₜP_θ = … + c W_r turn P with the spin (ẑ×W in polar components); the same pair links W back to P.</dd>
+        <dt>front</dt><dd>The search's laws for one field that no other law beats on both error (WAPE = Σ|y − ŷ| / Σ|y|) and window instability, listed from most stable to most precise.</dd>
+        <dt>window instability</dt><dd>The law refit on windows a quarter of each axis long (time, rings and angles); the summed squared relative spread (variance / mean²) of its coefficients.</dd>
+        <dt>hypothesis system</dt><dd>One law per field, each the most stable front law with the hypothesis's property. H1: density carried by ∇·P without relaxation; P and W decay and rotate into each other. H2: H1 with −κ(ρ − ρ̄). H3: H2 with a W_θ law driven by the density's shape (∂ρ, ∇²ρ) or the distance from the centre (r, 1/r, a constant).</dd>
+        <dt>κ, ρ̄(r)</dt><dd>Density relaxation −κ(ρ − ρ̄(r)) toward each point's time-mean density ρ̄(r); the search finds it with equal and opposite coefficients on ρ and ρ̄.</dd>
+        <dt>noise</dt><dd>Each 0.4 s step adds the laws' recorded residual fields from one randomly drawn instant, with each field's time mean removed (that mean is the laws' systematic misfit).</dd>
+        <dt>diverges</dt><dd>The law, stepped every 0.4 s, makes a field grow without bound (|field| above 100).</dd>
       </dl></div>
       <div><h3>Field statistics</h3><dl>
-        <dt>C_P(τ), C_W(τ)</dt><dd>⟨P(t)·P(t+τ)⟩ / ⟨|P|²⟩ over grid and time, sampled every 0.4 s; the same for W.</dd>
-        <dt>⟨Δρ²⟩(τ)</dt><dd>⟨(ρ(t+τ) − ρ(t))²⟩; it levels off when density fluctuations stay bounded.</dd>
+        <dt>C_P(τ), C_W(τ)</dt><dd>⟨P(t)·P(t+τ)⟩ / ⟨|P|²⟩, area-weighted over the arena, sampled every 0.4 s; the same for W.</dd>
+        <dt>⟨Δρ²⟩(τ)</dt><dd>⟨(ρ(t+τ) − ρ(t))²⟩, area-weighted; it levels off when density fluctuations stay bounded.</dd>
         <dt>δρ, |P|, |W|</dt><dd>Root mean square of the density's deviation from its time mean at each point, of |P| and of |W|.</dd>
+        <dt>ρ(r), W_θ(r)</dt><dd>Radial profiles: means over time and angle on each ring.</dd>
         <dt>C error</dt><dd>Mean |C(τ) − C_experiment(τ)| over lags 0.4–10 s.</dd>
       </dl></div>
     </div>
@@ -376,9 +384,7 @@ function buildCharts() {
   buildFieldCharts(c);
 }
 
-const FIELD_COLORS = { "experiment": "--fg", "agents: per-robot EPDE laws": "--m0", "agents: common system": "--m4",
-                       "field laws": "--m1", "field laws + density relaxation": "--m3",
-                       "field laws, spin-rate groups + density relaxation": "--m2" };
+const FIELD_COLORS = { "experiment": "--fg", "agents: per-robot EPDE laws": "--m0", "agents: common system": "--m4" };
 const signed = (v, d = 2) => (v >= 0 ? "+" : "−") + Math.abs(v).toFixed(d);
 /* Groups b = 0 .. 2k-1 run from the highest clockwise to the highest counter-clockwise spin rate. */
 function groupName(b, k) {
@@ -386,65 +392,54 @@ function groupName(b, k) {
   return `${k === 2 ? ["faster", "slower"][r] : "spin-rate rank " + (r + 1)} ${cw ? "clockwise" : "counter-clockwise"} spinners`;
 }
 function buildLegend() {
-  const rec = RECS[state.rec], g = rec.fields && (rec.fields.groups || [])[0];
+  const rec = RECS[state.rec], g = rec.fields && rec.fields.groups;
   const items = state.colorBy === "group" && rec.group && g
     ? g.measured.map((w, b) => [`--g${b + 1}`, `${groupName(b, g.k)} (${signed(w, 1)} rad/s)`])
     : [["--ccw", "spins counter-clockwise"], ["--cw", "spins clockwise"]];
   $("colorlegend").innerHTML = items.map(([v, t]) => `<span><i class="sw" style="background:var(${v})"></i>${t}</span>`).join("");
 }
-function buildGroupChart(c, rec, g) {
-  $("groupcard").hidden = !(g && rec.group);
-  if (!(g && rec.group)) return;
-  const order = rec.wrate.map((w, i) => i).sort((a, b) => rec.wrate[a] - rec.wrate[b]);
-  const rank = []; order.forEach((i, r) => { rank[i] = r + 1; });
-  const nb = g.measured.length, members = (b) => order.filter((i) => rec.group[i] === b);
-  $("grouplegend").innerHTML = [...Array(nb).keys()].map((b) =>
-      `<span><i class="sw" style="background:var(--g${b + 1})"></i>${groupName(b, g.k)}</span>`).join("") +
-    `<span>${lineSwatch("--fg")}measured mean</span><span>${lineSwatch("--fg", true)}rate in the law</span>`;
-  const dots = [...Array(nb).keys()].map((b) => ({ label: groupName(b, g.k),
-    data: members(b).map((i) => ({ x: rank[i], y: rec.wrate[i] })),
-    backgroundColor: css(`--g${b + 1}`), borderColor: css(`--g${b + 1}`), pointRadius: 3.5, pointHoverRadius: 5 }));
-  const segments = (vals, label, dash) => ({ label, showLine: true, spanGaps: false, pointRadius: 0, borderWidth: 1.8,
-    borderColor: c.fg, backgroundColor: c.fg, borderDash: dash,
-    data: [...Array(nb).keys()].flatMap((b) => { const rs = members(b).map((i) => rank[i]);
-      return [{ x: Math.min(...rs) - 0.4, y: vals[b] }, { x: Math.max(...rs) + 0.4, y: vals[b] }, { x: Math.max(...rs) + 0.5, y: null }]; }) });
-  charts.push(new Chart($("ch-groups"), { type: "scatter",
-    data: { datasets: [...dots, segments(g.measured, "group mean, measured", []), segments(g.rates, "rate in the group's law", [5, 4])] },
-    options: baseOptions(c, { scales: {
-      x: { type: "linear", min: 0, max: order.length + 1, ticks: { color: c.muted }, grid: { display: false },
-           title: { display: true, text: "robots, sorted by spin rate", color: c.muted } },
-      y: { ticks: { color: c.muted }, grid: { color: c.line }, title: { display: true, text: "spin rate (rad/s)", color: c.muted } } } }) }));
-}
+const HYP_COLORS = { H1: "--m1", H2: "--m3", H3: "--m2" };
+/* Hypothesis systems on the polar fields: experiment, agents and every supported, finite hypothesis on the
+   same charts; each hypothesis's laws with their place on their fronts; the comparison table. */
 function buildFieldCharts(c) {
   const rec = RECS[state.rec], fd = rec.fields;
   $("fieldsec").hidden = !fd; $("fieldcharts").hidden = !fd;
   if (!fd) return;
-  const g = (fd.groups || [])[0];
-  $("fieldlaws").innerHTML = fd.laws.map((l) => `<span><b>${l}</b></span>`).join("") +
-    `<span>density with relaxation: <b>${fd.relaxation}</b></span>` +
-    (g ? `<span>spin-rate groups, each its own polarization field: <b>∂ₜP_b = ω_b ẑ×P_b − D_b P_b</b></span>` +
-      g.rates.map((r, b) => `<span>&nbsp;&nbsp;${groupName(b, g.k)} (${g.sizes[b]} robots): ω_b <b>${signed(r)}</b> rad/s ` +
-        `(measured ${signed(g.measured[b])}), D_b <b>${g.damping[b].toFixed(2)}</b> /s</span>`).join("") : "");
-  buildGroupChart(c, rec, g);
-  const names = Object.keys(fd.sources);
-  $("fieldlegend").innerHTML = names.map((n) => `<span>${lineSwatch(FIELD_COLORS[n], n.startsWith("field"))}${n}</span>`).join("");
-  const line = (key, lags) => names.map((n) => ({ label: n, data: fd.sources[n][key].map((v, i) => ({ x: lags[i], y: v })),
-    borderColor: css(FIELD_COLORS[n]), backgroundColor: css(FIELD_COLORS[n]), borderWidth: n === "experiment" ? 3 : 1.6,
-    borderDash: n.startsWith("field") ? [5, 4] : [], pointRadius: n === "experiment" ? 2 : 0 }));
-  const lin = (t) => baseOptions(c, { scales: {
-    x: { type: "linear", ticks: { color: c.muted }, grid: { color: c.line }, title: { display: true, text: "lag (s)", color: c.muted } },
-    y: { ticks: { color: c.muted }, grid: { color: c.line }, min: -1, max: 1, title: { display: true, text: t, color: c.muted } } } });
-  charts.push(new Chart($("ch-cp"), { type: "line", data: { datasets: line("C_P", fd.cp_lags) }, options: lin("C_P") }));
-  charts.push(new Chart($("ch-cw"), { type: "line", data: { datasets: line("C_W", fd.cp_lags) }, options: lin("C_W") }));
-  charts.push(new Chart($("ch-srho"), { type: "line", data: { datasets: line("S_rho", fd.s_lags) }, options: baseOptions(c, {
-    scales: { x: { type: "logarithmic", ticks: { color: c.muted }, grid: { color: c.line }, title: { display: true, text: "lag (s)", color: c.muted } },
-              y: { type: "logarithmic", ticks: { color: c.muted }, grid: { color: c.line }, title: { display: true, text: "⟨Δρ²⟩", color: c.muted } } } }) }));
-  const ref = fd.sources["experiment"];
-  const cerr = (s, key) => s[key].slice(1).reduce((a, v, i) => a + Math.abs(v - ref[key][i + 1]), 0) / (s[key].length - 1);
-  $("famp").innerHTML = "<thead><tr><th>Source</th><th>δρ</th><th>|P|</th><th>|W| (rad/s)</th><th>C_P error</th><th>C_W error</th></tr></thead><tbody>" +
-    names.map((n) => { const s = fd.sources[n];
-      return `<tr><td><i class="sw" style="background:var(${FIELD_COLORS[n]})"></i>${n}</td><td>${s.rms_rho.toPrecision(3)}</td><td>${s.rms_P.toPrecision(3)}</td><td>${s.rms_W.toPrecision(3)}</td>` +
-        `<td>${n === "experiment" ? "—" : cerr(s, "C_P").toFixed(3)}</td><td>${n === "experiment" ? "—" : cerr(s, "C_W").toFixed(3)}</td></tr>`; }).join("") + "</tbody>";
+  const H = fd.hyp, ref = H.ref, hyps = H.hypotheses, shown = hyps.filter((h) => h.stats);
+  const warn = (t) => ` — <span style="color:var(--m1)">${t}</span>`;
+  $("hyplaws").innerHTML = hyps.map((h) => `<div><b>${h.key}: ${h.description}</b>` +
+    (!h.supported ? warn(`not supported: no front law for ${h.missing.join(", ")}`) : h.diverged ? warn("diverges when simulated") : "") +
+    h.laws.map((l) => `<div style="padding-left:14px">${l.law} <span style="color:var(--muted)">(front law ${l.position} of ${l.front}, ` +
+      `most stable first; WAPE ${l.wape.toFixed(3)}, instability ${l.win14.toPrecision(2)}, held-out R² ${l.r2.toFixed(3)})</span></div>`).join("") + "</div>").join("");
+  const agents = Object.entries(H.agents);
+  $("hyplegend").innerHTML = `<span>${lineSwatch("--fg")}experiment</span>` +
+    agents.map(([n]) => `<span>${lineSwatch(FIELD_COLORS[n])}${n}</span>`).join("") +
+    hyps.map((h) => `<span>${lineSwatch(HYP_COLORS[h.key], true)}${h.key}${h.stats ? "" : h.supported ? " (diverges)" : " (not supported)"}</span>`).join("");
+  const line = (label, ys, xs, col, w, dash) => ({ label, data: ys.map((y, j) => ({ x: xs[j], y })), borderColor: col, backgroundColor: col,
+    borderWidth: w, borderDash: dash, pointRadius: label === "experiment" ? 2 : 0 });
+  const sets = (key, xs) => [line("experiment", ref[key], xs, c.fg, 3, [])]
+    .concat(agents.map(([n, st]) => line(n, st[key], xs, css(FIELD_COLORS[n]), 1.6, [])))
+    .concat(shown.map((h) => line(h.key, h.stats[key], xs, css(HYP_COLORS[h.key]), 2.2, [5, 4])));
+  const ax = (t, log, extra) => Object.assign({ type: log ? "logarithmic" : "linear", ticks: { color: c.muted }, grid: { color: c.line },
+    title: { display: true, text: t, color: c.muted } }, extra || {});
+  const opts = (xt, yt, log, yextra) => baseOptions(c, { scales: { x: ax(xt, log), y: ax(yt, log, yextra) } });
+  charts.push(new Chart($("ch-hyp-wtr"), { type: "line", data: { datasets: sets("Wt_r", H.r) }, options: opts("r (cm)", "W_θ (rad/s)", false, { beginAtZero: false }) }));
+  charts.push(new Chart($("ch-hyp-rhor"), { type: "line", data: { datasets: sets("rho_r", H.r) }, options: opts("r (cm)", "ρ", false, { beginAtZero: false }) }));
+  charts.push(new Chart($("ch-hyp-srho"), { type: "line", data: { datasets: sets("S_rho", fd.s_lags) }, options: opts("lag (s)", "⟨Δρ²⟩", true) }));
+  charts.push(new Chart($("ch-hyp-cp"), { type: "line", data: { datasets: sets("C_P", fd.cp_lags) }, options: opts("lag (s)", "C_P", false, { min: -1, max: 1 }) }));
+  charts.push(new Chart($("ch-hyp-cw"), { type: "line", data: { datasets: sets("C_W", fd.cp_lags) }, options: opts("lag (s)", "C_W", false, { min: -1, max: 1 }) }));
+  const cerr = (st, key) => st[key].slice(1).reduce((a, v, i) => a + Math.abs(v - ref[key][i + 1]), 0) / (st[key].length - 1);
+  const last = (a) => a[a.length - 1], ratio = (a, b) => `${(a / b).toFixed(2)}×`;
+  const sw = (col, dashed) => `<i class="ln" style="border-top:3px ${dashed ? "dashed" : "solid"} var(${col})"></i>`;
+  const row = (name, st, col, dashed) => `<tr><td class="law">${sw(col, dashed)}${name}</td><td>${cerr(st, "C_P").toFixed(3)}</td><td>${cerr(st, "C_W").toFixed(3)}</td>` +
+    `<td>${ratio(st.rms_rho, ref.rms_rho)}</td><td>${ratio(st.rms_P, ref.rms_P)}</td><td>${ratio(st.rms_W, ref.rms_W)}</td>` +
+    `<td>${ratio(last(st.S_rho), last(ref.S_rho))}</td><td>${signed(last(st.Wt_r), 3)}</td></tr>`;
+  $("hyptable").innerHTML = "<thead><tr><th>System</th><th>C_P error</th><th>C_W error</th><th>δρ</th><th>|P|</th><th>|W|</th><th>⟨Δρ²⟩ 100 s</th><th>W_θ at the wall (rad/s)</th></tr></thead><tbody>" +
+    `<tr><td class="law">${sw("--fg", false)}experiment</td><td>—</td><td>—</td><td>1×</td><td>1×</td><td>1×</td><td>1×</td><td>${signed(last(ref.Wt_r), 3)}</td></tr>` +
+    agents.map(([n, st]) => row(n, st, FIELD_COLORS[n], false)).join("") +
+    hyps.map((h) => h.stats ? row(`${h.key}: ${h.description}`, h.stats, HYP_COLORS[h.key], true) :
+      `<tr><td class="law">${sw(HYP_COLORS[h.key], true)}${h.key}: ${h.description}</td><td class="diverged" colspan="7">` +
+      (h.supported ? "diverges when simulated" : `not supported by the fronts (no front law for ${h.missing.join(", ")})`) + "</td></tr>").join("") + "</tbody>";
 }
 
 function buildTable() {
@@ -505,7 +500,8 @@ function init() {
   $("speed").addEventListener("change", (e) => { state.speed = +e.target.value; });
   $("trails").addEventListener("change", (e) => { state.trails = e.target.checked; drawFrame(); });
   $("colorby").addEventListener("change", (e) => { state.colorBy = e.target.value; buildLegend(); drawFrame(); });
-  $("scrub").addEventListener("input", (e) => { state.frame = +e.target.value; drawFrame(); });
+  
+   $("scrub").addEventListener("input", (e) => { state.frame = +e.target.value; drawFrame(); });
   window.addEventListener("resize", drawFrame);
   const mq = window.matchMedia("(prefers-color-scheme: dark)");
   const redraw = () => { buildCharts(); drawFrame(); };

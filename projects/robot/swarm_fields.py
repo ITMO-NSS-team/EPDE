@@ -20,7 +20,11 @@ For independent spinning self-propelled discs the expectation is
     rho_t = -v0 div P + D lap rho,   P_t = z x W - D_r P + ...,   W_t = <w^2> z x P + ...
 (scored the same way as 'expected form').
 
-python swarm_fields.py [--workers 7 --cmax 6]   -> results/swarm_fields.json, results/swarm_fields.txt
+--tau 5 fits on 0.4 s increments of the fields sampled every 0.4 s (the agent simulations' clock) and
+adds rho_bar, each point's time-mean density, to the library (coarse_time).
+
+python swarm_fields.py [--workers 7 --cmax 6] [--tau 5]
+                         -> results/swarm_fields[_tau5].json, results/swarm_fields[_tau5].txt
 """
 import os
 
@@ -81,6 +85,17 @@ def build_fields(path):
     return F
 
 
+def coarse_time(F, tau):
+    """The fields every tau-th step (tau = 5: 0.4 s, the agent simulations' clock), plus rho_bar, each
+    point's time-mean density: a static field the laws may use (relaxation of the packing). A one-step
+    fit at 0.08 s misses decays that build up over ~1 s (dephasing inside a spin-rate group, the
+    density's restoring)."""
+    G = dict(F, **{k: v[::tau] for k, v in F.items() if isinstance(v, np.ndarray) and v.ndim == 3})
+    G["t"] = F["t"][::tau]
+    G["rho_bar"] = F["rho"].mean(0)
+    return G
+
+
 def spatial(F, a, axis):
     return np.gradient(a, F["g"], axis=axis, edge_order=2)
 
@@ -97,6 +112,8 @@ def atoms_for(F, var, fields=VARS):
             continue
         gx, gy = spatial(F, F[v], 1), spatial(F, F[v], 2)
         out += [(v, F[v]), (f"{v}_x", gx), (f"{v}_y", gy), (f"lap_{v}", spatial(F, gx, 1) + spatial(F, gy, 2))]
+    if "rho_bar" in F:
+        out.append(("rho_bar", np.broadcast_to(F["rho_bar"], u.shape)))
     return out
 
 
@@ -108,6 +125,8 @@ def atom(F, var, name, fields=VARS):
            f"d^2{var}/dx2^2": lambda: spatial(F, spatial(F, u, 2), 2)}
     if name in own:
         return own[name]()
+    if name == "rho_bar" and "rho_bar" in F:
+        return np.broadcast_to(F["rho_bar"], u.shape)
     for v in fields:
         if v == var:
             continue
@@ -127,7 +146,7 @@ def inner(a):
     return a[: -max(b, LAG)][:, b:-b, b:-b] if a.ndim == 3 else a
 
 
-def problem(F, var, fields=VARS):
+def problem(F, var, fields=VARS, lat_stride=LAT_STRIDE):
     """Target, atoms and lattice on the inner domain, rows ordered (t, x, y)."""
     u = F[var]
     y = (u[LAG:] - u[:-LAG]) / (F["t"][LAG:] - F["t"][:-LAG])[:, None, None]
@@ -135,7 +154,7 @@ def problem(F, var, fields=VARS):
     yi = inner(y)
     grid = yi.shape
     atoms = [(n, inner(a).ravel()) for n, a in atoms_for(F, var, fields)]
-    lat = (np.arange(0, grid[0], LAT_STRIDE)[:, None] * grid[1] * grid[2]
+    lat = (np.arange(0, grid[0], lat_stride)[:, None] * grid[1] * grid[2]
            + np.arange(grid[1] * grid[2])[None, :]).ravel()
     return dict(target=f"d{var}/dx0", y=yi.ravel(), atoms=atoms, grid=grid, lattice=lat)
 
@@ -150,8 +169,8 @@ def heldout_r2(A, y, grid):
     return float(1 - e @ e / np.sum((y[te] - y[te].mean()) ** 2))
 
 
-def run(F, var, cmax, workers, fields=VARS, expected=None):
-    P = problem(F, var, fields)
+def run(F, var, cmax, workers, fields=VARS, expected=None, lat_stride=LAT_STRIDE):
+    P = problem(F, var, fields, lat_stride)
     lib = RW.Library(P["atoms"], P["lattice"], max_atoms=2)
     y, lat, grid = P["y"], P["lattice"], P["grid"]
     gm = SUB.Gram(lib.Xl, y[lat])
@@ -204,8 +223,15 @@ def epde_text(terms, target, atoms):
     return body + f"0.0 = {target}{{power: 1.0}}"
 
 
-def report(out):
+def suffix(tau):
+    return f"_tau{tau}" if tau > 1 else ""
+
+
+def report(out, tau=1):
     lines = [__doc__.split("python swarm_fields")[0]]
+    if tau > 1:
+        lines.append(f"TIME STEP: fields every {tau} steps ({0.08 * tau:.2f} s); targets are the {0.08 * tau:.2f} s "
+                     "forward increments; rho_bar (each point's time-mean density) is in every library.")
     for tag, rec in out.items():
         lines.append(f"\n{'=' * 100}\n{tag}: <rho> {rec['rho_mean']:.3f} (area fraction), <|P|> {rec['P_mean']:.3f}, "
                      f"mean v0 {rec['v0_mean']:.2f} cm/s, <w^2> {rec['w2_mean']:.2f} rad^2/s^2")
@@ -228,7 +254,7 @@ def report(out):
             lines.append(f"    expected: {epde_text(e['terms'], f'd{var}/dx0', atoms)} , [{e['wape']:.4g} "
                          f"{e['win14']:.4g}]   R2 {e['r2']:.3f}")
     text = "\n".join(lines) + "\n"
-    open(os.path.join(HERE, "results", "swarm_fields.txt"), "w", encoding="utf-8").write(text)
+    open(os.path.join(HERE, "results", f"swarm_fields{suffix(tau)}.txt"), "w", encoding="utf-8").write(text)
     print(text)
 
 
@@ -236,25 +262,29 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--workers", type=int, default=7)
     ap.add_argument("--cmax", type=int, default=6)
+    ap.add_argument("--tau", type=int, default=1, help="fit step in field steps of 0.08 s (5: 0.4 s)")
     ap.add_argument("--report", action="store_true", help="only rewrite the text from results/swarm_fields.json")
     a = ap.parse_args()
-    path_json = os.path.join(HERE, "results", "swarm_fields.json")
+    path_json = os.path.join(HERE, "results", f"swarm_fields{suffix(a.tau)}.json")
     out = json.load(open(path_json)) if os.path.exists(path_json) else {}
+    lat_stride = max(1, round(LAT_STRIDE / a.tau))
     if not a.report:
         for f in swarm_files():
             tag = swarm_meta(f)["tag"]
             F = build_fields(f)
+            if a.tau > 1:
+                F = coarse_time(F, a.tau)
             rec = dict(rho_mean=float(F["rho"].mean()), P_mean=float(np.hypot(F["Px"], F["Py"]).mean()),
-                       v0_mean=float(F["v0"].mean()), w2_mean=float(np.mean(F["w"] ** 2)), eqs={})
+                       v0_mean=float(F["v0"].mean()), w2_mean=float(np.mean(F["w"] ** 2)), tau=a.tau, eqs={})
             for var in VARS:
-                rec["eqs"][var] = run(F, var, a.cmax, a.workers)
+                rec["eqs"][var] = run(F, var, a.cmax, a.workers, lat_stride=lat_stride)
                 st = rec["eqs"][var]
                 bal = st["cands"][balanced(st["cands"], st["front"])]
                 print(f"{tag} d{var}/dx0: {st['seconds']}s, front {len(st['front'])}, balanced "
                       f"{bal['terms']} R2 {bal['r2']:.3f}", flush=True)
             out[tag] = rec
             json.dump(out, open(path_json, "w"), indent=1)
-    report(out)
+    report(out, a.tau)
 
 
 if __name__ == "__main__":

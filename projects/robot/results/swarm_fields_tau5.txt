@@ -1,0 +1,280 @@
+Mesoscale: field equations of the swarm's coarse-grained density and polarization, per recording.
+
+Fields on the square inscribed in the arena (away from the wall), Gaussian kernel K of width one cap
+diameter (4.87 cm), every 2 frames (0.08 s), positions in cm (common camera scale), time in s:
+    rho(t, r) = sum_i A K(r - r_i(t))               area fraction, A = cap area pi (2.435 cm)^2
+    P(t, r)   = sum_i A p_i K(r - r_i)              polarization of the self-propulsion direction
+                                                     p_i = (cos(phi_i + theta_i), sin(phi_i + theta_i)),
+                                                     theta_i = the robot's own offset (common-system law)
+    W(t, r)   = sum_i A w_i p_i K(r - r_i)          spin-weighted polarization [rad/s], w_i own spin rate
+Targets: forward increments over 0.08 s of rho, Px, Py, Wx, Wy (d<f>/dx0; x0 = t, x1 = x, x2 = y).
+Library per target: the target field and its spatial derivatives (central differences), the other
+fields, their first derivatives (<f>_x, <f>_y) and Laplacians (lap_<f>); every product of <= 2 atoms
+(cost = atom count). Pipeline (subset_search.py, cxfast.py): the exact best support per complexity
+c = 1..CMAX, OLS on a lattice (every 8th time step, all grid points), WAPE on the whole inner domain,
+window-refit instability win14, the exact (WAPE, win14) front; each member also refit on the first
+half and scored on the second (held-out R2). Reported law: the BALANCED member, both precise and
+stable (WAPE and log10 win14 rescaled to [0, 1] over the front, closest to the ideal corner). EPDE itself picks its own left-hand side here (a spatial
+second derivative) and has no setting that pins the time derivative, so the pipeline is used.
+For independent spinning self-propelled discs the expectation is
+    rho_t = -v0 div P + D lap rho,   P_t = z x W - D_r P + ...,   W_t = <w^2> z x P + ...
+(scored the same way as 'expected form').
+
+--tau 5 fits on 0.4 s increments of the fields sampled every 0.4 s (the agent simulations' clock) and
+adds rho_bar, each point's time-mean density, to the library (coarse_time).
+
+
+TIME STEP: fields every 5 steps (0.40 s); targets are the 0.40 s forward increments; rho_bar (each point's time-mean density) is in every library.
+
+====================================================================================================
+N30_PWM10_D41: <rho> 0.445 (area fraction), <|P|> 0.153, mean v0 1.63 cm/s, <w^2> 8.69 rad^2/s^2
+ balanced laws (precise and stable; held-out R2):
+   -1.963 * Px_x{power: 1.0} + -2.007 * Py_y{power: 1.0} + 0.0 = drho/dx0{power: 1.0}   R2 0.453
+   -1.285 * Px{power: 1.0} + -0.6767 * Wy{power: 1.0} + 0.0 = dPx/dx0{power: 1.0}   R2 0.803
+   -1.245 * Py{power: 1.0} + 0.7206 * Wx{power: 1.0} + 0.0 = dPy/dx0{power: 1.0}   R2 0.806
+   -1.755 * Wx{power: 1.0} + -4.916 * Py{power: 1.0} + 0.0 = dWx/dx0{power: 1.0}   R2 0.747
+   -1.95 * Wy{power: 1.0} + 5.235 * Px{power: 1.0} + 0.0 = dWy/dx0{power: 1.0}   R2 0.761
+
+ drho/dx0: 275 columns, front of 5 (> = balanced, precise and stable); [WAPE, win14] and held-out R2
+    -2.025 * Py_y{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , with objective function values of [0.8841 0.009217]   R2 0.230
+  > -1.963 * Px_x{power: 1.0} + -2.007 * Py_y{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , with objective function values of [0.7527 0.01909]   R2 0.453
+    -0.4171 * rho{power: 1.0} + -1.859 * Px_x{power: 1.0} + -1.903 * Py_y{power: 1.0} + 0.4186 * rho_bar{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , with objective function values of [0.7077 0.0263]   R2 0.514
+    -0.4023 * rho{power: 1.0} + -1.862 * Px_x{power: 1.0} + -1.898 * Py_y{power: 1.0} + -0.2111 * Wx_x{power: 1.0} + 0.4037 * rho_bar{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , with objective function values of [0.6955 0.05675]   R2 0.533
+    -0.3892 * rho{power: 1.0} + -1.862 * Px_x{power: 1.0} + -1.91 * Py_y{power: 1.0} + -0.219 * Wx_x{power: 1.0} + -0.1737 * Wy_y{power: 1.0} + 0.3907 * rho_bar{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , with objective function values of [0.6861 0.09276]   R2 0.549
+    expected: -1.928 * Px_x{power: 1.0} + -1.981 * Py_y{power: 1.0} + 2.511 * d^2rho/dx1^2{power: 1.0} + 2.506 * d^2rho/dx2^2{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , [0.7324 0.1534]   R2 0.481
+
+ dPx/dx0: 275 columns, front of 5 (> = balanced, precise and stable); [WAPE, win14] and held-out R2
+    -0.6567 * Wy{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , with objective function values of [0.6605 0.0004004]   R2 0.544
+  > -1.285 * Px{power: 1.0} + -0.6767 * Wy{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , with objective function values of [0.4303 0.003996]   R2 0.803
+    -1.294 * Px{power: 1.0} + -0.1318 * Wx{power: 1.0} + -0.6768 * Wy{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , with objective function values of [0.4053 0.0399]   R2 0.826
+    -1.294 * Px{power: 1.0} + 0.165 * Py{power: 1.0} + -0.131 * Wx{power: 1.0} + -0.6746 * Wy{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , with objective function values of [0.3972 0.06294]   R2 0.831
+    -1.298 * Px{power: 1.0} + 0.1639 * Py{power: 1.0} + -0.1307 * Wx{power: 1.0} + -0.6741 * Wy{power: 1.0} + 2.267 * Py{power: 1.0} * Wy_y{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , with objective function values of [0.3948 0.07854]   R2 0.833
+    expected: -0.6778 * Wy{power: 1.0} + -1.376 * Px{power: 1.0} + -2.294 * d^2Px/dx1^2{power: 1.0} + -2.2 * d^2Px/dx2^2{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , [0.4285 0.3807]   R2 0.804
+
+ dPy/dx0: 275 columns, front of 6 (> = balanced, precise and stable); [WAPE, win14] and held-out R2
+    0.7268 * Wx{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.6585 0.0002916]   R2 0.542
+  > -1.245 * Py{power: 1.0} + 0.7206 * Wx{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.4281 0.004413]   R2 0.806
+    -1.257 * Py{power: 1.0} + 0.7206 * Wx{power: 1.0} + -0.1282 * Wy{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.4019 0.03336]   R2 0.831
+    -1.258 * Py{power: 1.0} + -0.1374 * Px{power: 1.0} + 0.7193 * Wx{power: 1.0} + -0.1304 * Wy{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.3973 0.08678]   R2 0.834
+    -1.264 * Py{power: 1.0} + -0.5902 * dPy/dx1{power: 1.0} + -0.1398 * Px{power: 1.0} + 0.7192 * Wx{power: 1.0} + -0.1276 * Wy{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.3959 0.3003]   R2 0.835
+    -2.213 * Py{power: 1.0} + -0.137 * Px{power: 1.0} + 0.7195 * Wx{power: 1.0} + -0.1233 * Wy{power: 1.0} + 1.909 * Py{power: 1.0} * rho_bar{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.3951 0.7102]   R2 0.837
+    expected: 0.7205 * Wx{power: 1.0} + -1.303 * Py{power: 1.0} + -1.775 * d^2Py/dx1^2{power: 1.0} + -1.182 * d^2Py/dx2^2{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , [0.4273 0.8157]   R2 0.806
+
+ dWx/dx0: 275 columns, front of 6 (> = balanced, precise and stable); [WAPE, win14] and held-out R2
+    -4.852 * Py{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.7771 0.003116]   R2 0.378
+  > -1.755 * Wx{power: 1.0} + -4.916 * Py{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.5074 0.005159]   R2 0.747
+    -1.755 * Wx{power: 1.0} + -4.96 * Py{power: 1.0} + -0.468 * Wy{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.4766 0.03237]   R2 0.781
+    -1.764 * Wx{power: 1.0} + -1.001 * Px{power: 1.0} + -4.965 * Py{power: 1.0} + -0.4836 * Wy{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.4596 0.07668]   R2 0.796
+    -1.771 * Wx{power: 1.0} + 0.08344 * rho{power: 1.0} + -1.009 * Px{power: 1.0} + -4.966 * Py{power: 1.0} + -0.4804 * Wy{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.4584 0.1665]   R2 0.798
+    -1.763 * Wx{power: 1.0} + -1.005 * Px{power: 1.0} + -8.05 * Py{power: 1.0} + -0.4563 * Wy{power: 1.0} + 6.111 * rho{power: 1.0} * Py{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.458 0.4428]   R2 0.800
+    expected: -4.914 * Py{power: 1.0} + -1.789 * Wx{power: 1.0} + -0.5885 * d^2Wx/dx1^2{power: 1.0} + -1.287 * d^2Wx/dx2^2{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , [0.5069 3.281]   R2 0.747
+
+ dWy/dx0: 275 columns, front of 6 (> = balanced, precise and stable); [WAPE, win14] and held-out R2
+    -2.032 * Wy{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.8037 0.001635]   R2 0.386
+  > -1.95 * Wy{power: 1.0} + 5.235 * Px{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.495 0.004727]   R2 0.761
+    -1.95 * Wy{power: 1.0} + 5.266 * Px{power: 1.0} + 0.4541 * Wx{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.4696 0.04263]   R2 0.787
+    -1.964 * Wy{power: 1.0} + 5.261 * Px{power: 1.0} + -1.036 * Py{power: 1.0} + 0.4488 * Wx{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.4497 0.06766]   R2 0.805
+    -1.96 * Wy{power: 1.0} + 5.615 * Px{power: 1.0} + 8.803 * lap_Px{power: 1.0} + -1.031 * Py{power: 1.0} + 0.4429 * Wx{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.4479 0.1707]   R2 0.806
+    -1.963 * Wy{power: 1.0} + -0.07282 * rho{power: 1.0} + 5.625 * Px{power: 1.0} + 8.876 * lap_Px{power: 1.0} + -1.03 * Py{power: 1.0} + 0.4485 * Wx{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.4463 0.2525]   R2 0.807
+    expected: 5.229 * Px{power: 1.0} + -2.035 * Wy{power: 1.0} + -1.911 * d^2Wy/dx1^2{power: 1.0} + -2.635 * d^2Wy/dx2^2{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , [0.4944 19]   R2 0.761
+
+====================================================================================================
+N40_PWM10_D40: <rho> 0.575 (area fraction), <|P|> 0.175, mean v0 0.89 cm/s, <w^2> 7.30 rad^2/s^2
+ balanced laws (precise and stable; held-out R2):
+   -0.5812 * rho{power: 1.0} + -1.054 * Px_x{power: 1.0} + -1.124 * Py_y{power: 1.0} + 0.5806 * rho_bar{power: 1.0} + 0.0 = drho/dx0{power: 1.0}   R2 0.338
+   -1.25 * Px{power: 1.0} + -0.6907 * Wy{power: 1.0} + 0.0 = dPx/dx0{power: 1.0}   R2 0.787
+   -1.228 * Py{power: 1.0} + 0.6953 * Wx{power: 1.0} + 0.0 = dPy/dx0{power: 1.0}   R2 0.782
+   -1.795 * Wx{power: 1.0} + -4.978 * Py{power: 1.0} + 0.0 = dWx/dx0{power: 1.0}   R2 0.735
+   -1.855 * Wy{power: 1.0} + 4.928 * Px{power: 1.0} + 0.0 = dWy/dx0{power: 1.0}   R2 0.735
+
+ drho/dx0: 275 columns, front of 5 (> = balanced, precise and stable); [WAPE, win14] and held-out R2
+    -1.159 * Py_y{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , with objective function values of [0.9152 0.004081]   R2 0.130
+    -1.093 * Px_x{power: 1.0} + -1.145 * Py_y{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , with objective function values of [0.848 0.01202]   R2 0.232
+  > -0.5812 * rho{power: 1.0} + -1.054 * Px_x{power: 1.0} + -1.124 * Py_y{power: 1.0} + 0.5806 * rho_bar{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , with objective function values of [0.7799 0.01386]   R2 0.338
+    -0.575 * rho{power: 1.0} + -1.003 * Px_x{power: 1.0} + -1.125 * Py_y{power: 1.0} + -0.09465 * Wx_x{power: 1.0} + 0.5743 * rho_bar{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , with objective function values of [0.7761 0.04469]   R2 0.342
+    -0.4796 * rho{power: 1.0} + 3.344 * d^2rho/dx2^2{power: 1.0} + -1.006 * Px_x{power: 1.0} + -1.129 * Py_y{power: 1.0} + -0.09494 * Wx_x{power: 1.0} + 0.4861 * rho_bar{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , with objective function values of [0.775 0.1043]   R2 0.338
+    expected: -1.091 * Px_x{power: 1.0} + -1.15 * Py_y{power: 1.0} + 2.304 * d^2rho/dx1^2{power: 1.0} + 3.756 * d^2rho/dx2^2{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , [0.8243 0.3329]   R2 0.261
+
+ dPx/dx0: 275 columns, front of 5 (> = balanced, precise and stable); [WAPE, win14] and held-out R2
+    -0.6806 * Wy{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , with objective function values of [0.6626 0.0002859]   R2 0.535
+  > -1.25 * Px{power: 1.0} + -0.6907 * Wy{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , with objective function values of [0.4427 0.002528]   R2 0.787
+    -1.189 * Px{power: 1.0} + -0.1495 * Wx{power: 1.0} + -0.6959 * Wy{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , with objective function values of [0.4107 0.02682]   R2 0.805
+    -1.186 * Px{power: 1.0} + -1.734 * lap_Py{power: 1.0} + -0.1491 * Wx{power: 1.0} + -0.6993 * Wy{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , with objective function values of [0.4091 0.2027]   R2 0.805
+    -1.187 * Px{power: 1.0} + -0.1484 * Wx{power: 1.0} + -8.352 * Wx_y{power: 1.0} + -0.6957 * Wy{power: 1.0} + 13.74 * Wx_y{power: 1.0} * rho_bar{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , with objective function values of [0.4067 0.2426]   R2 0.808
+    expected: -0.691 * Wy{power: 1.0} + -1.267 * Px{power: 1.0} + 0.7321 * d^2Px/dx1^2{power: 1.0} + -1.561 * d^2Px/dx2^2{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , [0.4425 15.33]   R2 0.786
+
+ dPy/dx0: 275 columns, front of 4 (> = balanced, precise and stable); [WAPE, win14] and held-out R2
+    0.699 * Wx{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.6567 0.0002843]   R2 0.532
+  > -1.228 * Py{power: 1.0} + 0.6953 * Wx{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.4367 0.001967]   R2 0.782
+    -1.169 * Py{power: 1.0} + 0.6903 * Wx{power: 1.0} + -0.1353 * Wy{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.41 0.03755]   R2 0.796
+    -1.16 * Py{power: 1.0} + 0.6904 * Wx{power: 1.0} + -0.1349 * Wy{power: 1.0} + -9.343 * Wy_y{power: 1.0} + 15.6 * Wy_y{power: 1.0} * rho_bar{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.4046 0.1687]   R2 0.801
+    expected: 0.6954 * Wx{power: 1.0} + -1.241 * Py{power: 1.0} + 1.402 * d^2Py/dx1^2{power: 1.0} + -1.974 * d^2Py/dx2^2{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , [0.436 3.357]   R2 0.782
+
+ dWx/dx0: 275 columns, front of 6 (> = balanced, precise and stable); [WAPE, win14] and held-out R2
+    -4.939 * Py{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.7813 0.001344]   R2 0.356
+  > -1.795 * Wx{power: 1.0} + -4.978 * Py{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.5087 0.002593]   R2 0.735
+    -1.813 * Wx{power: 1.0} + -4.76 * Py{power: 1.0} + -0.4915 * Wy{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.4785 0.0272]   R2 0.756
+    -1.769 * Wx{power: 1.0} + -0.7447 * Px{power: 1.0} + -4.786 * Py{power: 1.0} + -0.4943 * Wy{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.466 0.08632]   R2 0.754
+    -1.772 * Wx{power: 1.0} + -0.7474 * Px{power: 1.0} + -1.971 * Px_x{power: 1.0} + -4.788 * Py{power: 1.0} + -0.4939 * Wy{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.4646 0.4206]   R2 0.755
+    -1.769 * Wx{power: 1.0} + -0.7475 * Px{power: 1.0} + -1.975 * Px_x{power: 1.0} + -4.783 * Py{power: 1.0} + -0.4896 * Wy{power: 1.0} + 0.6999 * Wy_y{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.4638 0.9702]   R2 0.756
+    expected: -4.978 * Py{power: 1.0} + -1.79 * Wx{power: 1.0} + 0.1396 * d^2Wx/dx1^2{power: 1.0} + 0.112 * d^2Wx/dx2^2{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , [0.5087 8.805]   R2 0.735
+
+ dWy/dx0: 275 columns, front of 6 (> = balanced, precise and stable); [WAPE, win14] and held-out R2
+    5.031 * Px{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.79 0.002035]   R2 0.354
+  > -1.855 * Wy{power: 1.0} + 4.928 * Px{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.5126 0.003366]   R2 0.735
+    -1.835 * Wy{power: 1.0} + 4.699 * Px{power: 1.0} + 0.5637 * Wx{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.4768 0.02671]   R2 0.755
+    -1.788 * Wy{power: 1.0} + 4.674 * Px{power: 1.0} + -0.7618 * Py{power: 1.0} + 0.5647 * Wx{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.4681 0.1093]   R2 0.754
+    -1.789 * Wy{power: 1.0} + 4.678 * Px{power: 1.0} + -0.7692 * Py{power: 1.0} + -2.146 * Py_x{power: 1.0} + 0.5613 * Wx{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.4675 0.3009]   R2 0.755
+    -1.781 * Wy{power: 1.0} + 4.652 * Px{power: 1.0} + -0.7553 * Py{power: 1.0} + 4.215 * Wx{power: 1.0} + -5.964 * Wx{power: 1.0} * rho_bar{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.4661 3.316]   R2 0.756
+    expected: 4.928 * Px{power: 1.0} + -1.865 * Wy{power: 1.0} + 0.2961 * d^2Wy/dx1^2{power: 1.0} + -0.83 * d^2Wy/dx2^2{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , [0.5125 26.58]   R2 0.735
+
+====================================================================================================
+N40_PWM10_D41: <rho> 0.546 (area fraction), <|P|> 0.169, mean v0 1.06 cm/s, <w^2> 6.01 rad^2/s^2
+ balanced laws (precise and stable; held-out R2):
+   -1.259 * Px_x{power: 1.0} + -1.399 * Py_y{power: 1.0} + 0.0 = drho/dx0{power: 1.0}   R2 0.340
+   -0.9299 * Px{power: 1.0} + -0.7488 * Wy{power: 1.0} + 0.0 = dPx/dx0{power: 1.0}   R2 0.820
+   -1.001 * Py{power: 1.0} + 0.7312 * Wx{power: 1.0} + 0.0 = dPy/dx0{power: 1.0}   R2 0.826
+   -1.531 * Wx{power: 1.0} + -4.193 * Py{power: 1.0} + 0.0 = dWx/dx0{power: 1.0}   R2 0.742
+   -1.481 * Wy{power: 1.0} + 4.09 * Px{power: 1.0} + 0.0 = dWy/dx0{power: 1.0}   R2 0.730
+
+ drho/dx0: 275 columns, front of 4 (> = balanced, precise and stable); [WAPE, win14] and held-out R2
+    -1.381 * Py_y{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , with objective function values of [0.917 0.005144]   R2 0.183
+  > -1.259 * Px_x{power: 1.0} + -1.399 * Py_y{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , with objective function values of [0.8236 0.006214]   R2 0.340
+    -0.4723 * rho{power: 1.0} + -1.23 * Px_x{power: 1.0} + -1.416 * Py_y{power: 1.0} + 0.4712 * rho_bar{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , with objective function values of [0.7658 0.01357]   R2 0.438
+    -0.4717 * rho{power: 1.0} + -1.23 * Px_x{power: 1.0} + -1.591 * Py_y{power: 1.0} + 0.4709 * rho_bar{power: 1.0} + -145.6 * d^2rho/dx1^2{power: 1.0} * Py_y{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , with objective function values of [0.7611 0.01975]   R2 0.444
+    expected: -1.259 * Px_x{power: 1.0} + -1.425 * Py_y{power: 1.0} + 3.1 * d^2rho/dx1^2{power: 1.0} + 3.31 * d^2rho/dx2^2{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , [0.7966 0.1546]   R2 0.385
+
+ dPx/dx0: 275 columns, front of 5 (> = balanced, precise and stable); [WAPE, win14] and held-out R2
+    -0.7494 * Wy{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , with objective function values of [0.5957 0.0005241]   R2 0.621
+  > -0.9299 * Px{power: 1.0} + -0.7488 * Wy{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , with objective function values of [0.4225 0.004543]   R2 0.820
+    -0.8547 * Px{power: 1.0} + -0.1462 * Wx{power: 1.0} + -0.7498 * Wy{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , with objective function values of [0.3971 0.01677]   R2 0.836
+    -3.152 * Px{power: 1.0} + -0.1404 * Wx{power: 1.0} + -0.75 * Wy{power: 1.0} + 3.95 * Px{power: 1.0} * rho_bar{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , with objective function values of [0.3937 0.185]   R2 0.839
+    -3.169 * Px{power: 1.0} + -0.4385 * dPx/dx1{power: 1.0} + -0.1388 * Wx{power: 1.0} + -0.7498 * Wy{power: 1.0} + 3.974 * Px{power: 1.0} * rho_bar{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , with objective function values of [0.3931 0.374]   R2 0.840
+    expected: -0.7486 * Wy{power: 1.0} + -0.9503 * Px{power: 1.0} + -0.4655 * d^2Px/dx1^2{power: 1.0} + -0.5749 * d^2Px/dx2^2{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , [0.4224 39.71]   R2 0.820
+
+ dPy/dx0: 275 columns, front of 6 (> = balanced, precise and stable); [WAPE, win14] and held-out R2
+    0.7323 * Wx{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.6152 0.0005239]   R2 0.616
+  > -1.001 * Py{power: 1.0} + 0.7312 * Wx{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.4304 0.005029]   R2 0.826
+    -0.9261 * Py{power: 1.0} + 0.7303 * Wx{power: 1.0} + -0.1356 * Wy{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.4054 0.01189]   R2 0.841
+    -0.9281 * Py{power: 1.0} + -0.407 * dPy/dx1{power: 1.0} + 0.7311 * Wx{power: 1.0} + -0.135 * Wy{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.4048 0.08677]   R2 0.842
+    -3.435 * Py{power: 1.0} + 0.7305 * Wx{power: 1.0} + -0.129 * Wy{power: 1.0} + 4.321 * Py{power: 1.0} * rho_bar{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.4026 0.3468]   R2 0.844
+    -3.414 * Py{power: 1.0} + -0.3914 * dPy/dx1{power: 1.0} + 0.7312 * Wx{power: 1.0} + -0.1285 * Wy{power: 1.0} + 4.282 * Py{power: 1.0} * rho_bar{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.4021 0.4218]   R2 0.845
+    expected: 0.7309 * Wx{power: 1.0} + -1.037 * Py{power: 1.0} + -0.1409 * d^2Py/dx1^2{power: 1.0} + -1.621 * d^2Py/dx2^2{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , [0.4299 28.22]   R2 0.826
+
+ dWx/dx0: 275 columns, front of 6 (> = balanced, precise and stable); [WAPE, win14] and held-out R2
+    -4.183 * Py{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.7708 0.00297]   R2 0.420
+  > -1.531 * Wx{power: 1.0} + -4.193 * Py{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.5476 0.005775]   R2 0.742
+    -1.534 * Wx{power: 1.0} + -3.902 * Py{power: 1.0} + -0.5249 * Wy{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.5118 0.01178]   R2 0.775
+    -1.493 * Wx{power: 1.0} + -0.4012 * Px{power: 1.0} + -3.898 * Py{power: 1.0} + -0.5247 * Wy{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.5078 0.1014]   R2 0.771
+    -1.491 * Wx{power: 1.0} + -0.5923 * dWx/dx1{power: 1.0} + -0.3978 * Px{power: 1.0} + -3.903 * Py{power: 1.0} + -0.5282 * Wy{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.5064 0.1298]   R2 0.769
+    -1.492 * Wx{power: 1.0} + -0.4036 * Px{power: 1.0} + -12.92 * Py{power: 1.0} + -0.501 * Wy{power: 1.0} + 15.53 * Py{power: 1.0} * rho_bar{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.504 0.526]   R2 0.774
+    expected: -4.192 * Py{power: 1.0} + -1.552 * Wx{power: 1.0} + -0.08565 * d^2Wx/dx1^2{power: 1.0} + -1.076 * d^2Wx/dx2^2{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , [0.5472 1.697]   R2 0.742
+
+ dWy/dx0: 275 columns, front of 5 (> = balanced, precise and stable); [WAPE, win14] and held-out R2
+    4.085 * Px{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.7675 0.002241]   R2 0.423
+  > -1.481 * Wy{power: 1.0} + 4.09 * Px{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.5451 0.00399]   R2 0.730
+    -1.477 * Wy{power: 1.0} + 3.82 * Px{power: 1.0} + 0.5249 * Wx{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.5112 0.01624]   R2 0.754
+    -1.418 * Wy{power: 1.0} + 3.826 * Px{power: 1.0} + -0.6176 * Py{power: 1.0} + 0.524 * Wx{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.5034 0.05352]   R2 0.759
+    -1.418 * Wy{power: 1.0} + 11.53 * Px{power: 1.0} + -0.6163 * Py{power: 1.0} + 0.5045 * Wx{power: 1.0} + -13.24 * Px{power: 1.0} * rho_bar{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.4996 0.4313]   R2 0.763
+    expected: 4.09 * Px{power: 1.0} + -1.465 * Wy{power: 1.0} + 1.478 * d^2Wy/dx1^2{power: 1.0} + -0.641 * d^2Wy/dx2^2{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , [0.5451 2.679]   R2 0.729
+
+====================================================================================================
+N40_PWM20_D40: <rho> 0.594 (area fraction), <|P|> 0.177, mean v0 0.93 cm/s, <w^2> 16.18 rad^2/s^2
+ balanced laws (precise and stable; held-out R2):
+   -1.006 * rho{power: 1.0} + -0.8422 * Px_x{power: 1.0} + -0.9206 * Py_y{power: 1.0} + 1.007 * rho_bar{power: 1.0} + 0.0 = drho/dx0{power: 1.0}   R2 0.357
+   -2.391 * Px{power: 1.0} + -0.4357 * Wy{power: 1.0} + 0.0 = dPx/dx0{power: 1.0}   R2 0.739
+   -2.38 * Py{power: 1.0} + 0.4333 * Wx{power: 1.0} + 0.0 = dPy/dx0{power: 1.0}   R2 0.731
+   -3.179 * Wx{power: 1.0} + -7.323 * Py{power: 1.0} + 0.0 = dWx/dx0{power: 1.0}   R2 0.831
+   -3.187 * Wy{power: 1.0} + 7.057 * Px{power: 1.0} + 0.0 = dWy/dx0{power: 1.0}   R2 0.843
+
+ drho/dx0: 275 columns, front of 5 (> = balanced, precise and stable); [WAPE, win14] and held-out R2
+    -1.097 * rho{power: 1.0} + 1.098 * rho_bar{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , with objective function values of [0.8764 0.0009705]   R2 0.231
+    -1.048 * rho{power: 1.0} + -0.9173 * Py_y{power: 1.0} + 1.048 * rho_bar{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , with objective function values of [0.8342 0.004645]   R2 0.295
+  > -1.006 * rho{power: 1.0} + -0.8422 * Px_x{power: 1.0} + -0.9206 * Py_y{power: 1.0} + 1.007 * rho_bar{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , with objective function values of [0.7983 0.009364]   R2 0.357
+    -0.9506 * rho{power: 1.0} + 2.078 * d^2rho/dx1^2{power: 1.0} + -0.8408 * Px_x{power: 1.0} + -0.9242 * Py_y{power: 1.0} + 0.9555 * rho_bar{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , with objective function values of [0.7966 0.1022]   R2 0.360
+    -0.9286 * rho{power: 1.0} + 2.158 * d^2rho/dx1^2{power: 1.0} + -0.8441 * Px_x{power: 1.0} + -0.9253 * Py_y{power: 1.0} + -0.03167 * Wx_y{power: 1.0} + 0.9335 * rho_bar{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , with objective function values of [0.7963 0.1895]   R2 0.361
+    expected: -0.9236 * Px_x{power: 1.0} + -1.017 * Py_y{power: 1.0} + 3.209 * d^2rho/dx1^2{power: 1.0} + 2.984 * d^2rho/dx2^2{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , [0.8912 0.5184]   R2 0.194
+
+ dPx/dx0: 275 columns, front of 5 (> = balanced, precise and stable); [WAPE, win14] and held-out R2
+    -2.361 * Px{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , with objective function values of [0.7196 0.001336]   R2 0.490
+  > -2.391 * Px{power: 1.0} + -0.4357 * Wy{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , with objective function values of [0.5037 0.002699]   R2 0.739
+    -2.36 * Px{power: 1.0} + -0.1289 * Wx{power: 1.0} + -0.4408 * Wy{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , with objective function values of [0.479 0.04156]   R2 0.765
+    -2.356 * Px{power: 1.0} + 0.2849 * Py{power: 1.0} + -0.1298 * Wx{power: 1.0} + -0.4471 * Wy{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , with objective function values of [0.4711 0.1194]   R2 0.774
+    -2.354 * Px{power: 1.0} + 0.2826 * Py{power: 1.0} + -0.135 * Wx{power: 1.0} + -0.4463 * Wy{power: 1.0} + 112.1 * rho_y{power: 1.0} * lap_Wx{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , with objective function values of [0.4695 0.1843]   R2 0.775
+    expected: -0.4359 * Wy{power: 1.0} + -2.335 * Px{power: 1.0} + 3.511 * d^2Px/dx1^2{power: 1.0} + -0.6575 * d^2Px/dx2^2{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , [0.5037 3.905]   R2 0.738
+
+ dPy/dx0: 275 columns, front of 5 (> = balanced, precise and stable); [WAPE, win14] and held-out R2
+    -2.367 * Py{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.7213 0.001354]   R2 0.471
+  > -2.38 * Py{power: 1.0} + 0.4333 * Wx{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.5096 0.002575]   R2 0.731
+    -2.336 * Py{power: 1.0} + 0.4288 * Wx{power: 1.0} + -0.1079 * Wy{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.4883 0.06512]   R2 0.754
+    -2.341 * Py{power: 1.0} + -0.3127 * Px{power: 1.0} + 0.4331 * Wx{power: 1.0} + -0.1089 * Wy{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.4784 0.1322]   R2 0.762
+    -2.339 * Py{power: 1.0} + -0.3185 * Px{power: 1.0} + 0.4328 * Wx{power: 1.0} + -0.115 * Wy{power: 1.0} + 144.6 * rho_y{power: 1.0} * lap_Wy{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.4763 0.234]   R2 0.764
+    expected: 0.4333 * Wx{power: 1.0} + -2.395 * Py{power: 1.0} + 0.3003 * d^2Py/dx1^2{power: 1.0} + -1.049 * d^2Py/dx2^2{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , [0.5096 240.8]   R2 0.731
+
+ dWx/dx0: 275 columns, front of 5 (> = balanced, precise and stable); [WAPE, win14] and held-out R2
+    -3.192 * Wx{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.6021 0.0006156]   R2 0.636
+  > -3.179 * Wx{power: 1.0} + -7.323 * Py{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.4106 0.000964]   R2 0.831
+    -3.156 * Wx{power: 1.0} + -1.656 * Px{power: 1.0} + -7.349 * Py{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.3938 0.03587]   R2 0.846
+    -3.165 * Wx{power: 1.0} + -1.667 * Px{power: 1.0} + -7.269 * Py{power: 1.0} + -0.1971 * Wy{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.3914 0.07717]   R2 0.848
+    -3.165 * Wx{power: 1.0} + -1.808 * Px{power: 1.0} + -7.27 * Py{power: 1.0} + -0.2018 * Wy{power: 1.0} + -92.29 * rho_y{power: 1.0} * Px{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.39 0.151]   R2 0.849
+    expected: -7.319 * Py{power: 1.0} + -3.132 * Wx{power: 1.0} + 0.491 * d^2Wx/dx1^2{power: 1.0} + 1.864 * d^2Wx/dx2^2{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , [0.4106 31.36]   R2 0.830
+
+ dWy/dx0: 275 columns, front of 6 (> = balanced, precise and stable); [WAPE, win14] and held-out R2
+    -3.214 * Wy{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.5974 0.0006677]   R2 0.653
+  > -3.187 * Wy{power: 1.0} + 7.057 * Px{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.4019 0.0009941]   R2 0.843
+    -3.147 * Wy{power: 1.0} + 7.033 * Px{power: 1.0} + -1.788 * Py{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.3847 0.03568]   R2 0.856
+    -3.138 * Wy{power: 1.0} + 6.98 * Px{power: 1.0} + -1.799 * Py{power: 1.0} + 0.2207 * Wx{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.3808 0.06746]   R2 0.859
+    -3.145 * Wy{power: 1.0} + 6.979 * Px{power: 1.0} + -1.806 * Py{power: 1.0} + -3.757 * Py_x{power: 1.0} + 0.2228 * Wx{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.3798 0.2564]   R2 0.859
+    -3.101 * Wy{power: 1.0} + 6.974 * Px{power: 1.0} + -1.822 * Py{power: 1.0} + 0.2225 * Wx{power: 1.0} + -694.5 * d^2Wy/dx1^2{power: 1.0} * rho_x{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.3803 0.1869]   R2 0.859
+    expected: 7.058 * Px{power: 1.0} + -3.128 * Wy{power: 1.0} + 2.458 * d^2Wy/dx1^2{power: 1.0} + 0.575 * d^2Wy/dx2^2{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , [0.402 26.86]   R2 0.843
+
+====================================================================================================
+N40_PWM20_D41: <rho> 0.563 (area fraction), <|P|> 0.173, mean v0 1.14 cm/s, <w^2> 15.18 rad^2/s^2
+ balanced laws (precise and stable; held-out R2):
+   -0.8797 * rho{power: 1.0} + -1.069 * Px_x{power: 1.0} + -1.197 * Py_y{power: 1.0} + 0.8801 * rho_bar{power: 1.0} + 0.0 = drho/dx0{power: 1.0}   R2 0.390
+   -2.234 * Px{power: 1.0} + -0.4828 * Wy{power: 1.0} + 0.0 = dPx/dx0{power: 1.0}   R2 0.763
+   -2.237 * Py{power: 1.0} + 0.4856 * Wx{power: 1.0} + 0.0 = dPy/dx0{power: 1.0}   R2 0.770
+   -2.977 * Wx{power: 1.0} + -7.358 * Py{power: 1.0} + 0.0 = dWx/dx0{power: 1.0}   R2 0.845
+   -2.998 * Wy{power: 1.0} + 7.453 * Px{power: 1.0} + 0.0 = dWy/dx0{power: 1.0}   R2 0.843
+
+ drho/dx0: 275 columns, front of 5 (> = balanced, precise and stable); [WAPE, win14] and held-out R2
+    -1.34 * Py_y{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , with objective function values of [0.9334 0.003427]   R2 0.120
+    -0.9034 * rho{power: 1.0} + -1.233 * Py_y{power: 1.0} + 0.9044 * rho_bar{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , with objective function values of [0.8347 0.004722]   R2 0.298
+  > -0.8797 * rho{power: 1.0} + -1.069 * Px_x{power: 1.0} + -1.197 * Py_y{power: 1.0} + 0.8801 * rho_bar{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , with objective function values of [0.7832 0.006864]   R2 0.390
+    -0.8001 * rho{power: 1.0} + 2.977 * d^2rho/dx1^2{power: 1.0} + -1.062 * Px_x{power: 1.0} + -1.2 * Py_y{power: 1.0} + 0.807 * rho_bar{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , with objective function values of [0.7812 0.05142]   R2 0.391
+    -0.7628 * rho{power: 1.0} + 2.479 * d^2rho/dx1^2{power: 1.0} + 1.861 * d^2rho/dx2^2{power: 1.0} + -1.068 * Px_x{power: 1.0} + -1.2 * Py_y{power: 1.0} + 0.7725 * rho_bar{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , with objective function values of [0.7805 0.1231]   R2 0.393
+    expected: -1.123 * Px_x{power: 1.0} + -1.282 * Py_y{power: 1.0} + 4.05 * d^2rho/dx1^2{power: 1.0} + 4.018 * d^2rho/dx2^2{power: 1.0} + 0.0 = drho/dx0{power: 1.0} , [0.8531 0.252]   R2 0.280
+
+ dPx/dx0: 275 columns, front of 5 (> = balanced, precise and stable); [WAPE, win14] and held-out R2
+    -2.261 * Px{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , with objective function values of [0.745 0.001237]   R2 0.467
+  > -2.234 * Px{power: 1.0} + -0.4828 * Wy{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , with objective function values of [0.4778 0.002186]   R2 0.763
+    -2.189 * Px{power: 1.0} + -0.1038 * Wx{power: 1.0} + -0.4863 * Wy{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , with objective function values of [0.4615 0.06732]   R2 0.775
+    -2.19 * Px{power: 1.0} + 0.1807 * Py{power: 1.0} + -0.1028 * Wx{power: 1.0} + -0.4945 * Wy{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , with objective function values of [0.4578 0.122]   R2 0.778
+    -2.146 * Px{power: 1.0} + 0.1802 * Py{power: 1.0} + -1.402 * Wx{power: 1.0} + -0.4933 * Wy{power: 1.0} + 2.155 * Wx{power: 1.0} * rho_bar{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , with objective function values of [0.4542 0.5356]   R2 0.780
+    expected: -0.482 * Wy{power: 1.0} + -2.269 * Px{power: 1.0} + 0.8758 * d^2Px/dx1^2{power: 1.0} + -2.663 * d^2Px/dx2^2{power: 1.0} + 0.0 = dPx/dx0{power: 1.0} , [0.4776 2.927]   R2 0.763
+
+ dPy/dx0: 275 columns, front of 6 (> = balanced, precise and stable); [WAPE, win14] and held-out R2
+    -2.29 * Py{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.7451 0.001562]   R2 0.470
+  > -2.237 * Py{power: 1.0} + 0.4856 * Wx{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.4673 0.002874]   R2 0.770
+    -2.155 * Py{power: 1.0} + 0.4825 * Wx{power: 1.0} + -0.1235 * Wy{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.4469 0.05791]   R2 0.787
+    -2.154 * Py{power: 1.0} + -0.2463 * Px{power: 1.0} + 0.4887 * Wx{power: 1.0} + -0.1224 * Wy{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.4406 0.1102]   R2 0.792
+    -2.134 * Py{power: 1.0} + -0.2503 * Px{power: 1.0} + 0.4895 * Wx{power: 1.0} + -0.1234 * Wy{power: 1.0} + -0.2913 * Wy_x{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.4392 0.1928]   R2 0.794
+    -2.122 * Py{power: 1.0} + -0.2485 * Px{power: 1.0} + 0.4894 * Wx{power: 1.0} + -0.1031 * Wy{power: 1.0} + 7.096 * rho_x{power: 1.0} * Wy{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , with objective function values of [0.437 0.2433]   R2 0.796
+    expected: 0.4855 * Wx{power: 1.0} + -2.261 * Py{power: 1.0} + 0.4474 * d^2Py/dx1^2{power: 1.0} + -1.594 * d^2Py/dx2^2{power: 1.0} + 0.0 = dPy/dx0{power: 1.0} , [0.467 41.53]   R2 0.771
+
+ dWx/dx0: 275 columns, front of 5 (> = balanced, precise and stable); [WAPE, win14] and held-out R2
+    -2.927 * Wx{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.6399 0.0008637]   R2 0.615
+  > -2.977 * Wx{power: 1.0} + -7.358 * Py{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.3938 0.001444]   R2 0.845
+    -2.941 * Wx{power: 1.0} + -1.448 * Px{power: 1.0} + -7.347 * Py{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.3838 0.0268]   R2 0.853
+    -2.947 * Wx{power: 1.0} + -1.432 * Px{power: 1.0} + -7.184 * Py{power: 1.0} + -0.2447 * Wy{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.3807 0.08928]   R2 0.854
+    -2.977 * Wx{power: 1.0} + -1.412 * Px{power: 1.0} + -7.194 * Py{power: 1.0} + -0.2483 * Wy{power: 1.0} + -20.91 * Wx{power: 1.0} * rho_y{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , with objective function values of [0.3791 0.1519]   R2 0.855
+    expected: -7.354 * Py{power: 1.0} + -2.996 * Wx{power: 1.0} + 0.1269 * d^2Wx/dx1^2{power: 1.0} + -1.188 * d^2Wx/dx2^2{power: 1.0} + 0.0 = dWx/dx0{power: 1.0} , [0.3937 46.12]   R2 0.845
+
+ dWy/dx0: 275 columns, front of 6 (> = balanced, precise and stable); [WAPE, win14] and held-out R2
+    -2.97 * Wy{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.6369 0.0008106]   R2 0.621
+  > -2.998 * Wy{power: 1.0} + 7.453 * Px{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.4022 0.00121]   R2 0.843
+    -2.942 * Wy{power: 1.0} + 7.456 * Px{power: 1.0} + -1.222 * Py{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.393 0.0231]   R2 0.848
+    -2.935 * Wy{power: 1.0} + 7.36 * Px{power: 1.0} + -1.202 * Py{power: 1.0} + 0.2231 * Wx{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.3891 0.07441]   R2 0.850
+    -2.927 * Wy{power: 1.0} + 0.7953 * dWy/dx2{power: 1.0} + 7.348 * Px{power: 1.0} + -1.188 * Py{power: 1.0} + 0.2252 * Wx{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.3887 0.1298]   R2 0.850
+    -2.963 * Wy{power: 1.0} + 7.342 * Px{power: 1.0} + -1.195 * Py{power: 1.0} + 0.2201 * Wx{power: 1.0} + -20.04 * Wy{power: 1.0} * rho_y{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , with objective function values of [0.3877 0.1573]   R2 0.851
+    expected: 7.453 * Px{power: 1.0} + -2.982 * Wy{power: 1.0} + 1.043 * d^2Wy/dx1^2{power: 1.0} + -0.2739 * d^2Wy/dx2^2{power: 1.0} + 0.0 = dWy/dx0{power: 1.0} , [0.4021 1.65]   R2 0.842

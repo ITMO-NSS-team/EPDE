@@ -23,9 +23,21 @@ relaxation") -sum_b (v_bx d_x P_bx + v_by d_y P_by) + D lap rho - kappa (rho - <
 on the totals P = sum_b P_b and W = sum_b w_b P_b, w_b = the group's mean spin rate (the experiment's
 W with group means is reported beside the exact one).
 
-python swarm_fields_binned.py --k 2 [--tags ...] [--stage fit|sim|all] [--workers 7 --cmax 6 --seeds 4]
-                                       -> results/swarm_fields_bins<K>_<tag>.json
-python swarm_fields_binned.py --merge  -> results/swarm_fields_binned.json, results/swarm_fields_binned.txt
+--tau 5: fields every 0.4 s (with rho_bar), laws fitted on 0.4 s increments and stepped every 0.4 s; the
+density laws then come from swarm_fields.py --tau 5.
+
+python swarm_fields_binned.py --k 2 [--tags ...] [--stage fit|sim|all] [--tau 5] [--workers 7 --cmax 6 --seeds 4]
+                                       -> results/swarm_fields_bins<K>[_tau5]_<tag>.json
+python swarm_fields_binned.py --merge [--tau 5]
+                                       -> results/swarm_fields_binned[_tau5].json, .txt
+python swarm_fields_binned.py --isotropic --k 2 --tau 5 [--tags ...] [--merge]
+        every isotropic system of the group laws (each group's y law its x law turned by 90 degrees, the
+        density law unchanged by the turn) -> results/swarm_fields_bins2_tau5_iso_<tag>.json, merged
+        results/swarm_fields_binned_tau5_iso.json
+python swarm_fields_binned.py --fronts --k 2 --tau 5 [--tags ...] [--merge]
+        no law selected: every front member of every group-system equation, one equation at a time with the
+        others at their balanced members -> results/swarm_fields_bins2_tau5_fronts_<tag>.json,
+        merged results/swarm_fields_binned_tau5_fronts.json
 """
 import os
 
@@ -116,10 +128,10 @@ def perpendicular(var):
     return var[:-1] + ("y" if var[-1] == "x" else "x")
 
 
-def rotation_law(B, var, names):
+def rotation_law(B, var, names, lat_stride=SF.LAT_STRIDE):
     """The group law in its rotation-damping form, P_bc,t = a P_bc + b P_b(other c): OLS on the
     pipeline's lattice (as every pipeline candidate)."""
-    P = SF.problem(B, var, names)
+    P = SF.problem(B, var, names, lat_stride)
     named = dict(P["atoms"])
     terms = [var, perpendicular(var)]
     A = np.column_stack([named[n] for n in terms])[P["lattice"]]
@@ -141,66 +153,84 @@ def group_map(laws, b, dt):
 
 
 # ------------------------------------------------------------------ one recording
-def part_path(k, tag):
-    return os.path.join(HERE, "results", f"swarm_fields_bins{k}_{tag}.json")
+def part_path(k, tag, tau=1):
+    return os.path.join(HERE, "results", f"swarm_fields_bins{k}{SF.suffix(tau)}_{tag}.json")
 
 
-def fit_recording(path, k, cmax, workers):
+def lat_stride_for(tau):
+    return max(1, round(SF.LAT_STRIDE / tau))
+
+
+def fields_at(path, k, tau):
+    """Group fields, every tau-th field step (with rho_bar) when tau > 1."""
+    B = build_groups(path, k)
+    return SF.coarse_time(B, tau) if tau > 1 else B
+
+
+def fit_recording(path, k, cmax, workers, tau=1):
     tag = swarm_meta(path)["tag"]
     SF.build_fields(path)
-    B = build_groups(path, k)
+    B = fields_at(path, k, tau)
     nb, names = 2 * k, field_names(2 * k)
-    rec = dict(k=k, wbar=B["wbar"].tolist(), sizes=np.bincount(B["labels"], minlength=nb).tolist(),
+    rec = dict(k=k, tau=tau, wbar=B["wbar"].tolist(), sizes=np.bincount(B["labels"], minlength=nb).tolist(),
                sd_in_group=[float(B["w"][B["labels"] == b].std()) for b in range(nb)], eqs={})
     for var in names:
-        st = SF.run(B, var, cmax, workers, fields=names, expected=expected(var, nb))
+        st = SF.run(B, var, cmax, workers, fields=names, expected=expected(var, nb), lat_stride=lat_stride_for(tau))
         rec["eqs"][var] = st
         bal = st["cands"][SF.balanced(st["cands"], st["front"])]
         print(f"{tag} K={k} d{var}/dx0: {st['n_columns']} cols, {st['seconds']}s, balanced {bal['terms']} "
               f"R2 {bal['r2']:.3f}", flush=True)
-    json.dump({tag: rec}, open(part_path(k, tag), "w"), indent=1)
+    json.dump({tag: rec}, open(part_path(k, tag, tau), "w"), indent=1)
     return rec
 
 
+RHO_ATOMS = {"rho", "rho_bar", "drho/dx1", "drho/dx2", "d^2rho/dx1^2", "d^2rho/dx2^2", "lap_self", "delta_self"}
+
+
 def density_on_groups(terms, nb):
-    """A density law of swarm_fields.py (terms Px_x, Py_y, ...) written on the group fields:
-    d_x P_x = sum_b d_x P_bx, the same law since rho is the same field and P = sum_b P_b."""
+    """A density law of swarm_fields.py (terms Px_x, Py_y, and terms of rho and rho_bar alone) written
+    on the group fields: d_x P_x = sum_b d_x P_bx, the same law since rho is the same field and
+    P = sum_b P_b."""
     out = {}
     for n, c in terms.items():
+        factors = [f if f in RHO_ATOMS else f.rsplit("^", 1)[0] for f in n.split("*")]
         if n in ("Px_x", "Py_y"):
             for b in range(nb):
                 out[f"P{b + 1}{n[1]}_{n[-1]}"] = c
-        elif n.startswith("d^2rho") or n in ("lap_self", "delta_self"):
+        elif all(f in RHO_ATOMS for f in factors):
             out[n] = c
         else:
             raise ValueError(f"density term {n} has no group form")
     return out
 
 
-def sim_recording(path, k, seeds):
+def sim_recording(path, k, seeds, tau=1):
     """Simulate from the saved fit. Groups: the rotation-damping form (the balanced member's form for
     most group fields; a balanced member that keeps the rotation but drops the damping makes the
     stepped map grow, |lambda| > 1). Density: the same laws as the two-field model (its balanced law,
     or its relaxation law), so only the polarization dynamics differ; the per-group relaxation fit
     is kept for the report (its kappa is ~0 at N30 and can come out negative)."""
     tag = swarm_meta(path)["tag"]
-    rec = json.load(open(part_path(k, tag)))[tag]
+    rec = json.load(open(part_path(k, tag, tau)))[tag]
     F = SF.build_fields(path)
-    B = build_groups(path, k)
+    G = SF.coarse_time(F, tau) if tau > 1 else F
+    B = fields_at(path, k, tau)
     nb, names = 2 * k, field_names(2 * k)
     dt = float(np.median(np.diff(B["t"])))
     balanced = {v: rec["eqs"][v]["cands"][SF.balanced(rec["eqs"][v]["cands"], rec["eqs"][v]["front"])]["terms"]
                 for v in names}
-    eqs5 = json.load(open(os.path.join(HERE, "results", "swarm_fields.json")))[tag]["eqs"]
+    eqs5 = json.load(open(os.path.join(HERE, "results", f"swarm_fields{SF.suffix(tau)}.json")))[tag]["eqs"]
     rho5 = eqs5["rho"]["cands"][SF.balanced(eqs5["rho"]["cands"], eqs5["rho"]["front"])]["terms"]
-    laws = {"rho": density_on_groups(rho5, nb), **{v: rotation_law(B, v, names) for v in names[1:]}}
-    laws_D = dict(laws, rho=density_on_groups(FS.fit_relaxation(F), nb))
+    laws = {"rho": density_on_groups(rho5, nb),
+            **{v: rotation_law(B, v, names, lat_stride_for(tau)) for v in names[1:]}}
+    laws_D = dict(laws, rho=density_on_groups(FS.fit_relaxation(G), nb))
     rec.update(balanced=balanced, laws=laws, density_relaxation=laws_D["rho"],
                density_relaxation_per_group=FS.fit_relaxation(B, names),
                balanced_is_rotation_form={v: sorted(balanced[v]) == sorted(laws[v]) for v in names[1:]},
                balanced_maps=[group_map({**laws, **{v: balanced[v] for v in names[1:]}}, b, dt) for b in range(nb)],
                maps=[group_map(laws, b, dt) for b in range(nb)], sources={})
-    sub = lambda fl: {v: fl[v][::FS.SUB_STEP] for v in fl if v in names}      # noqa: E731
+    step = max(1, FS.SUB_STEP // tau)                                          # -> the 0.4 s clock
+    sub = lambda fl: {v: fl[v][::step] for v in fl if v in names}             # noqa: E731
     rec["sources"]["experiment (W from group means)"] = FS.stats(totals(sub(B), B["wbar"]))
     for label, L in ((f"field laws, {k} rate groups per spin direction", laws),
                      (f"field laws, {k} rate groups per spin direction + density relaxation", laws_D)):
@@ -210,8 +240,65 @@ def sim_recording(path, k, seeds):
                 for s in range(seeds)]
         rec["sources"][label] = FS.average(runs)
         print(f"{tag} K={k} simulated '{label}' x{seeds} in {time.time() - t0:.0f}s", flush=True)
-    json.dump({tag: rec}, open(part_path(k, tag), "w"), indent=1)
+    json.dump({tag: rec}, open(part_path(k, tag, tau), "w"), indent=1)
     return rec
+
+
+def fronts_path(k, tag, tau=1):
+    return os.path.join(HERE, "results", f"swarm_fields_bins{k}{SF.suffix(tau)}_fronts_{tag}.json")
+
+
+def sim_fronts(path, k, seeds, tau=1):
+    """No law selected: every front member of every equation of the group system (density from this
+    fit's own front), one equation at a time with the others at their balanced members, simulated as
+    found (swarm_field_sim.simulate_fronts); each group's rotation rate and decay from the base laws."""
+    tag = swarm_meta(path)["tag"]
+    rec = json.load(open(part_path(k, tag, tau)))[tag]
+    B = fields_at(path, k, tau)
+    nb, names = 2 * k, field_names(2 * k)
+    dt = float(np.median(np.diff(B["t"])))
+    step = max(1, FS.SUB_STEP // tau)
+    sub = lambda fl: {v: fl[v][::step] for v in fl if v in names}             # noqa: E731
+    print(f"{tag} K={k}: fronts", flush=True)
+    res = FS.simulate_fronts(B, rec["eqs"], names, seeds, sub, lambda fl: totals(fl, B["wbar"]))
+    res["base"]["maps"] = [group_map(res["base"]["laws"], b, dt) for b in range(nb)]
+    out = dict(k=k, tau=tau, wbar=rec["wbar"], sizes=rec["sizes"], **res)
+    json.dump({tag: out}, open(fronts_path(k, tag, tau), "w"), indent=1)
+    return out
+
+
+def iso_path(k, tag, tau=1):
+    return os.path.join(HERE, "results", f"swarm_fields_bins{k}{SF.suffix(tau)}_iso_{tag}.json")
+
+
+def sim_iso(path, k, seeds, tau=1):
+    """Every isotropic system of the group laws (swarm_field_sim.isotropic_combinations: each group's y law
+    is its x law turned by 90 degrees, the density law unchanged by the turn), simulated as found."""
+    tag = swarm_meta(path)["tag"]
+    rec = json.load(open(part_path(k, tag, tau)))[tag]
+    F = SF.build_fields(path)
+    B = fields_at(path, k, tau)
+    nb, names = 2 * k, field_names(2 * k)
+    step = max(1, FS.SUB_STEP // tau)
+    sub = lambda fl: {v: fl[v][::step] for v in fl if v in names}             # noqa: E731
+    combos, matched = FS.isotropic_combinations(rec["eqs"], [(f"P{b + 1}x", f"P{b + 1}y") for b in range(nb)])
+    print(f"{tag} K={k}: {len(combos)} isotropic systems", flush=True)
+    res = dict(k=k, tau=tau, wbar=rec["wbar"], sizes=rec["sizes"], fronts=FS.front_table(rec["eqs"], names),
+               experiment=FS.stats(FS.experiment_fields_04(path, F)), pairs=matched,
+               combos=FS.simulate_combinations(B, rec["eqs"], names, seeds, sub,
+                                               totals=lambda fl: totals(fl, B["wbar"]), combos=combos))
+    json.dump({tag: res}, open(iso_path(k, tag, tau), "w"))
+    return res
+
+
+def merge_fronts(tau=1):
+    out = {}
+    for p in sorted(glob.glob(os.path.join(HERE, "results", f"swarm_fields_bins?{SF.suffix(tau)}_fronts_N*.json"))):
+        for tag, rec in json.load(open(p)).items():
+            out.setdefault(tag, {})[str(rec["k"])] = rec
+    json.dump(out, open(os.path.join(HERE, "results", f"swarm_fields_binned{SF.suffix(tau)}_fronts.json"), "w"),
+              indent=1)
+    print(f"merged fronts of {len(out)} recordings")
 
 
 # ------------------------------------------------------------------ report
@@ -224,13 +311,14 @@ def law_line(var, terms):
     return f"d{var}/dx0 = " + " ".join(f"{v:+.4g} {n}" for n, v in terms.items())
 
 
-def merge():
+def merge(tau=1):
+    sfx = SF.suffix(tau)
     out = {}
-    for p in sorted(glob.glob(os.path.join(HERE, "results", "swarm_fields_bins*_N*.json"))):
+    for p in sorted(glob.glob(os.path.join(HERE, "results", f"swarm_fields_bins?{sfx}_N*.json"))):
         for tag, rec in json.load(open(p)).items():
             out.setdefault(tag, {})[str(rec["k"])] = rec
-    json.dump(out, open(os.path.join(HERE, "results", "swarm_fields_binned.json"), "w"), indent=1)
-    base = json.load(open(os.path.join(HERE, "results", "swarm_field_sim.json")))
+    json.dump(out, open(os.path.join(HERE, "results", f"swarm_fields_binned{sfx}.json"), "w"), indent=1)
+    base = json.load(open(os.path.join(HERE, "results", f"swarm_field_sim{sfx}.json")))
     lines = [__doc__.split("python swarm_fields_binned")[0]]
     for tag, byk in out.items():
         lines.append(f"\n{'=' * 100}\n{tag}")
@@ -269,7 +357,7 @@ def merge():
         lines.append("\n  source                                                              rms rho  |P|     |W|    "
                      "C_P 0.4/0.8/2/4 s        C_W 0.4/0.8/2/4 s        err C_P  err C_W   S_rho 4/40/100 s")
         for n, s in srcs.items():
-            if n == "experiment (0.08 s fields)":
+            if n.startswith("experiment (") and n.endswith(" s fields)"):
                 continue
             lines.append(f"  {n:68s} {s['rms_rho']:.4f}  {s['rms_P']:.4f}  {s['rms_W']:.3f}  "
                          + " ".join(f"{s['C_P'][L]:+.2f}" for L in (1, 2, 5, 10)) + "  "
@@ -277,7 +365,7 @@ def merge():
                          + f"{corr_error(s, ref, 'C_P'):7.3f}  {corr_error(s, ref, 'C_W'):7.3f}   "
                          + " ".join(f"{s['S_rho'][i]:.2e}" for i in (3, 6, len(s["S_rho"]) - 1)))
     text = "\n".join(lines) + "\n"
-    open(os.path.join(HERE, "results", "swarm_fields_binned.txt"), "w", encoding="utf-8").write(text)
+    open(os.path.join(HERE, "results", f"swarm_fields_binned{sfx}.txt"), "w", encoding="utf-8").write(text)
     print(text)
 
 
@@ -288,19 +376,37 @@ def main():
     ap.add_argument("--workers", type=int, default=7)
     ap.add_argument("--cmax", type=int, default=6)
     ap.add_argument("--seeds", type=int, default=4)
+    ap.add_argument("--tau", type=int, default=1, help="fit and step every tau field steps (5: 0.4 s)")
     ap.add_argument("--stage", choices=["fit", "sim", "all"], default="all")
+    ap.add_argument("--fronts", action="store_true",
+                    help="no law selected: every front member of every equation (needs the fit)")
+    ap.add_argument("--isotropic", action="store_true",
+                    help="every isotropic system of the group laws (needs the fit)")
     ap.add_argument("--merge", action="store_true")
     a = ap.parse_args()
+    if a.isotropic:
+        if a.merge:
+            return FS.merge_combos(os.path.join(HERE, "results", f"swarm_fields_bins{a.k}{SF.suffix(a.tau)}_iso_N*.json"),
+                                   os.path.join(HERE, "results", f"swarm_fields_binned{SF.suffix(a.tau)}_iso.json"))
+        for path in swarm_files():
+            if not a.tags or swarm_meta(path)["tag"] in a.tags.split(","):
+                sim_iso(path, a.k, a.seeds, a.tau)
+        return
     if a.merge:
-        return merge()
+        return merge_fronts(a.tau) if a.fronts else merge(a.tau)
+    if a.fronts:
+        for path in swarm_files():
+            if not a.tags or swarm_meta(path)["tag"] in a.tags.split(","):
+                sim_fronts(path, a.k, a.seeds, a.tau)
+        return
     tags = [t for t in a.tags.split(",") if t]
     for path in swarm_files():
         if tags and swarm_meta(path)["tag"] not in tags:
             continue
         if a.stage in ("fit", "all"):
-            fit_recording(path, a.k, a.cmax, a.workers)
+            fit_recording(path, a.k, a.cmax, a.workers, a.tau)
         if a.stage in ("sim", "all"):
-            sim_recording(path, a.k, a.seeds)
+            sim_recording(path, a.k, a.seeds, a.tau)
 
 
 if __name__ == "__main__":

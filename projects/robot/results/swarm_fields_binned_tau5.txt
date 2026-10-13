@@ -1,0 +1,239 @@
+Mesoscale with the spin spread kept: polarization fields per spin-rate group, their laws, and the
+field simulation.
+
+The (P, W) closure of swarm_fields.py behaves like two spin rates, w+ and w-; inside each spin
+direction the robots' rates spread by sd 0.8-1.3 rad/s, which dephases a group's polarization within
+~2 s. Here each spin direction is split into K groups of (nearly) equal size by spin rate; groups
+b = 1 .. 2K are ordered from the fastest clockwise to the fastest counter-clockwise, and each group
+gets its own polarization field next to the total density:
+    rho(t, r)  = sum_i A K(r - r_i)                   area fraction
+    P_b(t, r)  = sum_{i in b} A p_i K(r - r_i)         polarization of group b
+(kernel, grid, time step and p_i as in swarm_fields.py). Pipeline per field as in swarm_fields.py:
+library = own field and its derivatives, the other fields, their gradients and Laplacians, products
+of <= 2 atoms; exact (WAPE, win14) front; reported law = the balanced member. Expected for
+independent spinners:
+    rho_t = -sum_b v_b div P_b,     P_b,t = w_b z x P_b - D_r P_b.
+Field simulation as in swarm_field_sim.py (bootstrapped residual fields, mirrored edges). Group laws
+in the simulation: the rotation-damping form P_bc,t = a P_bc + b P_b(other c), refit by OLS -- the
+balanced member's form for most group fields, but where the balanced member keeps the rotation and
+drops the damping the stepped map grows (|lambda| > 1) and the simulation diverges. Rate and damping
+are read from the stepped map's eigenvalue lambda = exp((-D + i w) dt), which removes the w^2 dt / 2 a
+forward-increment fit adds to the own-field coefficient. Density: the balanced law, or ("+ density
+relaxation") -sum_b (v_bx d_x P_bx + v_by d_y P_by) + D lap rho - kappa (rho - <rho>(r)). Statistics
+on the totals P = sum_b P_b and W = sum_b w_b P_b, w_b = the group's mean spin rate (the experiment's
+W with group means is reported beside the exact one).
+
+--tau 5: fields every 0.4 s (with rho_bar), laws fitted on 0.4 s increments and stepped every 0.4 s; the
+density laws then come from swarm_fields.py --tau 5.
+
+
+
+====================================================================================================
+N30_PWM10_D41
+
+ K = 2 groups per spin direction: sizes [8, 7, 8, 7], mean rates -3.28, -1.59, +2.39, +3.81 rad/s, sd inside groups 0.73, 0.46, 0.59, 0.37
+  group  measured w | stepped map of the simulated law: rate  damping  |lambda| | balanced member: rotation form? (x / y), |lambda|, held-out R2 (x / y)
+      1      -3.28  |              -2.85    0.190   0.9270 | yes / yes  0.9270  0.868 / 0.874
+      2      -1.59  |              -1.56    0.120   0.9530 | yes / yes  0.9530  0.786 / 0.769
+      3      +2.39  |              +2.33    0.171   0.9339 | yes / yes  0.9339  0.867 / 0.870
+      4      +3.81  |              +3.78    0.131   0.9491 | yes / yes  0.9491  0.946 / 0.948
+  balanced laws (pipeline):
+   drho/dx0 = -2.95 P3x_x -3.039 P3y_y -2.626 P4x_x
+   dP1x/dx0 = -1.49 P1x +2.079 P1y
+   dP1y/dx0 = -1.579 P1y -2.136 P1x
+   dP2x/dx0 = -0.5522 P2x +1.409 P2y
+   dP2y/dx0 = -0.5825 P2y -1.378 P2x
+   dP3x/dx0 = -1.11 P3x -1.876 P3y
+   dP3y/dx0 = -1.111 P3y +1.876 P3x
+   dP4x/dx0 = -2.361 P4x -2.353 P4y
+   dP4y/dx0 = -2.356 P4y +2.384 P4x
+  simulated group laws (rotation-damping form):
+   dP1x/dx0 = -1.49 P1x +2.079 P1y
+   dP1y/dx0 = -1.579 P1y -2.136 P1x
+   dP2x/dx0 = -0.5522 P2x +1.409 P2y
+   dP2y/dx0 = -0.5825 P2y -1.378 P2x
+   dP3x/dx0 = -1.11 P3x -1.876 P3y
+   dP3y/dx0 = -1.111 P3y +1.876 P3x
+   dP4x/dx0 = -2.361 P4x -2.353 P4y
+   dP4y/dx0 = -2.356 P4y +2.384 P4x
+   density (simulation, as the two-field model): drho/dx0 = -1.963 P1x_x -1.963 P2x_x -1.963 P3x_x -1.963 P4x_x -2.007 P1y_y -2.007 P2y_y -2.007 P3y_y -2.007 P4y_y
+   density with relaxation (as the two-field model): drho/dx0 = -1.832 P1x_x -1.832 P2x_x -1.832 P3x_x -1.832 P4x_x -1.87 P1y_y -1.87 P2y_y -1.87 P3y_y -1.87 P4y_y +0.7367 lap_self -0.3724 delta_self
+   per-group relaxation fit (report only): drho/dx0 = -1.277 P1x_x -1.25 P1y_y -1.491 P2x_x -1.663 P2y_y -2.666 P3x_x -2.852 P3y_y -2.306 P4x_x -2.09 P4y_y +0.7168 lap_self -0.3484 delta_self
+
+  source                                                              rms rho  |P|     |W|    C_P 0.4/0.8/2/4 s        C_W 0.4/0.8/2/4 s        err C_P  err C_W   S_rho 4/40/100 s
+  experiment                                                           0.0401  0.1719  0.488  +0.44 -0.33 -0.01 -0.11  +0.22 -0.63 +0.11 -0.14    0.000    0.000   2.63e-03 3.27e-03 3.29e-03
+  agents: per-robot EPDE laws                                          0.0399  0.1681  0.472  +0.44 -0.32 -0.03 -0.07  +0.23 -0.63 +0.10 -0.10    0.017    0.015   2.21e-03 3.02e-03 3.04e-03
+  agents: common system                                                0.0427  0.1686  0.488  +0.42 -0.35 -0.06 -0.12  +0.19 -0.66 +0.05 -0.14    0.031    0.039   2.54e-03 3.25e-03 3.90e-03
+  field laws                                                           0.2859  0.1781  0.479  +0.49 -0.32 +0.25 -0.01  +0.26 -0.50 +0.34 +0.04    0.092    0.105   6.28e-03 5.75e-02 1.45e-01
+  field laws + density relaxation                                      0.0434  0.1781  0.479  +0.49 -0.32 +0.25 -0.01  +0.26 -0.50 +0.34 +0.04    0.092    0.105   3.37e-03 3.78e-03 3.72e-03
+  experiment (W from group means)                                      0.0404  0.1717  0.489  +0.44 -0.33 -0.02 -0.11  +0.28 -0.57 +0.13 -0.14    0.002    0.031   2.64e-03 3.29e-03 3.35e-03
+  field laws, 2 rate groups per spin direction                         0.2570  0.1788  0.515  +0.45 -0.34 -0.01 +0.02  +0.31 -0.59 +0.24 -0.15    0.095    0.090   5.12e-03 4.39e-02 1.16e-01
+  field laws, 2 rate groups per spin direction + density relaxation    0.0418  0.1788  0.515  +0.45 -0.34 -0.01 +0.02  +0.31 -0.59 +0.24 -0.15    0.095    0.090   2.95e-03 3.46e-03 3.48e-03
+
+====================================================================================================
+N40_PWM10_D40
+
+ K = 2 groups per spin direction: sizes [10, 10, 10, 10], mean rates -2.85, -1.26, +2.11, +3.69 rad/s, sd inside groups 0.79, 0.41, 0.62, 0.50
+  group  measured w | stepped map of the simulated law: rate  damping  |lambda| | balanced member: rotation form? (x / y), |lambda|, held-out R2 (x / y)
+      1      -2.85  |              -2.63    0.244   0.9071 | yes / yes  0.9071  0.797 / 0.790
+      2      -1.26  |              -1.27    0.114   0.9553 |  no / yes  0.8421  0.748 / 0.747
+      3      +2.11  |              +2.34    0.145   0.9435 | yes / yes  0.9435  0.894 / 0.892
+      4      +3.69  |              +3.83    0.167   0.9356 | yes / yes  0.9356  0.932 / 0.928
+  balanced laws (pipeline):
+   drho/dx0 = -0.617 rho -1.37 P3x_x -1.397 P3y_y +0.6164 rho_bar
+   dP1x/dx0 = -1.406 P1x +2.004 P1y
+   dP1y/dx0 = -1.345 P1y -1.936 P1x
+   dP2x/dx0 = -0.3948 P2x +1.917 P2y*rho_bar
+   dP2y/dx0 = -0.4289 P2y -1.149 P2x
+   dP3x/dx0 = -1.085 P3x -1.904 P3y
+   dP3y/dx0 = -1.112 P3y +1.891 P3x
+   dP4x/dx0 = -2.405 P4x -2.365 P4y
+   dP4y/dx0 = -2.407 P4y +2.31 P4x
+  simulated group laws (rotation-damping form):
+   dP1x/dx0 = -1.406 P1x +2.004 P1y
+   dP1y/dx0 = -1.345 P1y -1.936 P1x
+   dP2x/dx0 = -0.3953 P2x +1.171 P2y
+   dP2y/dx0 = -0.4289 P2y -1.149 P2x
+   dP3x/dx0 = -1.085 P3x -1.904 P3y
+   dP3y/dx0 = -1.112 P3y +1.891 P3x
+   dP4x/dx0 = -2.405 P4x -2.365 P4y
+   dP4y/dx0 = -2.407 P4y +2.31 P4x
+   density (simulation, as the two-field model): drho/dx0 = -0.5812 rho -1.054 P1x_x -1.054 P2x_x -1.054 P3x_x -1.054 P4x_x -1.124 P1y_y -1.124 P2y_y -1.124 P3y_y -1.124 P4y_y +0.5806 rho_bar
+   density with relaxation (as the two-field model): drho/dx0 = -1.014 P1x_x -1.014 P2x_x -1.014 P3x_x -1.014 P4x_x -1.111 P1y_y -1.111 P2y_y -1.111 P3y_y -1.111 P4y_y +0.8234 lap_self -0.5493 delta_self
+   per-group relaxation fit (report only): drho/dx0 = -0.7485 P1x_x -1.022 P1y_y -0.7776 P2x_x -0.8568 P2y_y -1.281 P3x_x -1.271 P3y_y -1.214 P4x_x -1.349 P4y_y +0.8031 lap_self -0.5383 delta_self
+
+  source                                                              rms rho  |P|     |W|    C_P 0.4/0.8/2/4 s        C_W 0.4/0.8/2/4 s        err C_P  err C_W   S_rho 4/40/100 s
+  experiment                                                           0.0311  0.1951  0.523  +0.49 -0.22 -0.07 -0.10  +0.25 -0.59 +0.04 -0.08    0.000    0.000   1.92e-03 1.89e-03 1.97e-03
+  agents: per-robot EPDE laws                                          0.0316  0.1941  0.522  +0.49 -0.24 -0.08 -0.16  +0.24 -0.60 +0.01 -0.12    0.030    0.029   1.76e-03 1.91e-03 2.01e-03
+  agents: common system                                                0.0319  0.1921  0.515  +0.49 -0.23 -0.09 -0.18  +0.24 -0.61 -0.01 -0.15    0.029    0.034   1.78e-03 1.97e-03 2.13e-03
+  field laws                                                           0.0314  0.1958  0.524  +0.51 -0.29 +0.21 -0.04  +0.26 -0.48 +0.30 +0.00    0.087    0.101   1.87e-03 1.97e-03 1.99e-03
+  field laws + density relaxation                                      0.0308  0.1958  0.524  +0.51 -0.29 +0.21 -0.04  +0.26 -0.48 +0.30 +0.00    0.087    0.101   1.81e-03 1.89e-03 1.92e-03
+  experiment (W from group means)                                      0.0312  0.1951  0.509  +0.50 -0.22 -0.07 -0.10  +0.32 -0.51 +0.06 -0.08    0.002    0.040   1.91e-03 1.88e-03 1.97e-03
+  field laws, 2 rate groups per spin direction                         0.0310  0.1917  0.496  +0.48 -0.25 -0.07 -0.26  +0.30 -0.55 +0.11 -0.37    0.097    0.125   1.86e-03 1.93e-03 1.93e-03
+  field laws, 2 rate groups per spin direction + density relaxation    0.0305  0.1917  0.496  +0.48 -0.25 -0.07 -0.26  +0.30 -0.55 +0.11 -0.37    0.097    0.125   1.80e-03 1.86e-03 1.87e-03
+
+====================================================================================================
+N40_PWM10_D41
+
+ K = 2 groups per spin direction: sizes [10, 10, 10, 10], mean rates -2.71, -1.08, +1.97, +3.24 rad/s, sd inside groups 0.64, 0.44, 0.54, 0.49
+  group  measured w | stepped map of the simulated law: rate  damping  |lambda| | balanced member: rotation form? (x / y), |lambda|, held-out R2 (x / y)
+      1      -2.71  |              -2.38    0.146   0.9432 | yes / yes  0.9432  0.867 / 0.874
+      2      -1.08  |              -1.13    0.103   0.9597 | yes / yes  0.9597  0.657 / 0.668
+      3      +1.97  |              +1.82    0.135   0.9474 | yes / yes  0.9474  0.804 / 0.806
+      4      +3.24  |              +3.28    0.140   0.9456 | yes / yes  0.9456  0.933 / 0.934
+  balanced laws (pipeline):
+   drho/dx0 = -1.64 P4x_x -1.825 P4y_y
+   dP1x/dx0 = -1.122 P1x +1.904 P1y
+   dP1y/dx0 = -1.138 P1y -1.935 P1x
+   dP2x/dx0 = -0.3554 P2x +1.037 P2y
+   dP2y/dx0 = -0.3282 P2y -1.059 P2x
+   dP3x/dx0 = -0.7125 P3x -1.603 P3y
+   dP3y/dx0 = -0.7547 P3y +1.553 P3x
+   dP4x/dx0 = -1.893 P4x -2.286 P4y
+   dP4y/dx0 = -1.89 P4y +2.283 P4x
+  simulated group laws (rotation-damping form):
+   dP1x/dx0 = -1.122 P1x +1.904 P1y
+   dP1y/dx0 = -1.138 P1y -1.935 P1x
+   dP2x/dx0 = -0.3554 P2x +1.037 P2y
+   dP2y/dx0 = -0.3282 P2y -1.059 P2x
+   dP3x/dx0 = -0.7125 P3x -1.603 P3y
+   dP3y/dx0 = -0.7547 P3y +1.553 P3x
+   dP4x/dx0 = -1.893 P4x -2.286 P4y
+   dP4y/dx0 = -1.89 P4y +2.283 P4x
+   density (simulation, as the two-field model): drho/dx0 = -1.259 P1x_x -1.259 P2x_x -1.259 P3x_x -1.259 P4x_x -1.399 P1y_y -1.399 P2y_y -1.399 P3y_y -1.399 P4y_y
+   density with relaxation (as the two-field model): drho/dx0 = -1.281 P1x_x -1.281 P2x_x -1.281 P3x_x -1.281 P4x_x -1.426 P1y_y -1.426 P2y_y -1.426 P3y_y -1.426 P4y_y +0.8838 lap_self -0.4282 delta_self
+   per-group relaxation fit (report only): drho/dx0 = -1.064 P1x_x -1.267 P1y_y -1.217 P2x_x -1.308 P2y_y -1.249 P3x_x -1.374 P3y_y -1.608 P4x_x -1.731 P4y_y +0.8489 lap_self -0.4182 delta_self
+
+  source                                                              rms rho  |P|     |W|    C_P 0.4/0.8/2/4 s        C_W 0.4/0.8/2/4 s        err C_P  err C_W   S_rho 4/40/100 s
+  experiment                                                           0.0386  0.1882  0.452  +0.58 -0.10 -0.03 -0.14  +0.38 -0.49 +0.15 -0.09    0.000    0.000   2.85e-03 2.92e-03 2.92e-03
+  agents: per-robot EPDE laws                                          0.0382  0.1884  0.458  +0.57 -0.11 -0.05 -0.16  +0.33 -0.54 +0.14 -0.14    0.040    0.067   2.31e-03 2.76e-03 2.82e-03
+  agents: common system                                                0.0401  0.1880  0.461  +0.56 -0.12 -0.08 -0.16  +0.32 -0.54 +0.10 -0.16    0.046    0.066   2.44e-03 3.08e-03 3.26e-03
+  field laws                                                           0.2804  0.1931  0.456  +0.61 -0.12 -0.07 -0.22  +0.40 -0.33 +0.06 -0.23    0.104    0.118   5.18e-03 4.90e-02 1.34e-01
+  field laws + density relaxation                                      0.0379  0.1931  0.456  +0.61 -0.12 -0.07 -0.22  +0.40 -0.33 +0.06 -0.23    0.104    0.118   2.72e-03 2.83e-03 2.90e-03
+  experiment (W from group means)                                      0.0391  0.1885  0.447  +0.59 -0.09 -0.03 -0.15  +0.45 -0.38 +0.14 -0.08    0.004    0.030   2.86e-03 2.98e-03 3.00e-03
+  field laws, 2 rate groups per spin direction                         0.2657  0.1918  0.460  +0.59 -0.10 -0.10 +0.03  +0.45 -0.40 +0.21 +0.10    0.113    0.149   4.94e-03 4.36e-02 1.20e-01
+  field laws, 2 rate groups per spin direction + density relaxation    0.0383  0.1918  0.460  +0.59 -0.10 -0.10 +0.03  +0.45 -0.40 +0.21 +0.10    0.113    0.149   2.78e-03 2.87e-03 3.00e-03
+
+====================================================================================================
+N40_PWM20_D40
+
+ K = 2 groups per spin direction: sizes [10, 10, 10, 10], mean rates -4.34, -2.22, +3.22, +5.31 rad/s, sd inside groups 0.91, 0.56, 0.89, 0.68
+  group  measured w | stepped map of the simulated law: rate  damping  |lambda| | balanced member: rotation form? (x / y), |lambda|, held-out R2 (x / y)
+      1      -4.34  |              -4.13    0.493   0.8209 | yes / yes  0.8209  0.855 / 0.850
+      2      -2.22  |              -2.23    0.267   0.8987 | yes / yes  0.8987  0.786 / 0.780
+      3      +3.22  |              +3.22    0.375   0.8608 | yes / yes  0.8608  0.833 / 0.844
+      4      +5.31  |              +5.54    0.344   0.8715 | yes / yes  0.8715  0.921 / 0.925
+  balanced laws (pipeline):
+   drho/dx0 = -1.068 rho -0.8863 P1y_y -1.113 P3y_y +1.068 rho_bar
+   dP1x/dx0 = -2.643 P1x +2.074 P1y
+   dP1y/dx0 = -2.689 P1y -2.018 P1x
+   dP2x/dx0 = -1.113 P2x +1.756 P2y
+   dP2y/dx0 = -1.068 P2y -1.744 P2x
+   dP3x/dx0 = -1.927 P3x -2.063 P3y
+   dP3y/dx0 = -1.873 P3y +2.07 P3x
+   dP4x/dx0 = -3.81 P4x -1.778 P4y
+   dP4y/dx0 = -3.803 P4y +1.709 P4x
+  simulated group laws (rotation-damping form):
+   dP1x/dx0 = -2.643 P1x +2.074 P1y
+   dP1y/dx0 = -2.689 P1y -2.018 P1x
+   dP2x/dx0 = -1.113 P2x +1.756 P2y
+   dP2y/dx0 = -1.068 P2y -1.744 P2x
+   dP3x/dx0 = -1.927 P3x -2.063 P3y
+   dP3y/dx0 = -1.873 P3y +2.07 P3x
+   dP4x/dx0 = -3.81 P4x -1.778 P4y
+   dP4y/dx0 = -3.803 P4y +1.709 P4x
+   density (simulation, as the two-field model): drho/dx0 = -1.006 rho -0.8422 P1x_x -0.8422 P2x_x -0.8422 P3x_x -0.8422 P4x_x -0.9206 P1y_y -0.9206 P2y_y -0.9206 P3y_y -0.9206 P4y_y +1.007 rho_bar
+   density with relaxation (as the two-field model): drho/dx0 = -0.825 P1x_x -0.825 P2x_x -0.825 P3x_x -0.825 P4x_x -0.9336 P1y_y -0.9336 P2y_y -0.9336 P3y_y -0.9336 P4y_y +0.687 lap_self -1.027 delta_self
+   per-group relaxation fit (report only): drho/dx0 = -0.7367 P1x_x -0.932 P1y_y -0.8746 P2x_x -0.9305 P2y_y -0.7226 P3x_x -0.9102 P3y_y -0.9527 P4x_x -0.956 P4y_y +0.6887 lap_self -1.025 delta_self
+
+  source                                                              rms rho  |P|     |W|    C_P 0.4/0.8/2/4 s        C_W 0.4/0.8/2/4 s        err C_P  err C_W   S_rho 4/40/100 s
+  experiment                                                           0.0273  0.1968  0.807  +0.04 -0.41 +0.08 +0.00  -0.26 -0.36 +0.09 +0.01    0.000    0.000   1.38e-03 1.47e-03 1.47e-03
+  agents: per-robot EPDE laws                                          0.0289  0.1937  0.802  +0.04 -0.42 +0.08 -0.01  -0.28 -0.34 +0.12 +0.01    0.024    0.029   1.30e-03 1.59e-03 1.65e-03
+  agents: common system                                                0.0299  0.1962  0.784  +0.08 -0.44 +0.13 -0.04  -0.23 -0.37 +0.17 -0.03    0.029    0.036   1.37e-03 1.85e-03 1.78e-03
+  field laws                                                           0.0273  0.1926  0.785  +0.05 -0.50 -0.09 -0.01  -0.27 -0.43 -0.15 +0.01    0.057    0.054   1.48e-03 1.50e-03 1.55e-03
+  field laws + density relaxation                                      0.0267  0.1926  0.785  +0.05 -0.50 -0.09 -0.01  -0.27 -0.43 -0.15 +0.01    0.057    0.054   1.42e-03 1.43e-03 1.48e-03
+  experiment (W from group means)                                      0.0275  0.1969  0.788  +0.04 -0.41 +0.08 +0.00  -0.16 -0.42 +0.04 +0.01    0.002    0.022   1.38e-03 1.48e-03 1.49e-03
+  field laws, 2 rate groups per spin direction                         0.0271  0.1909  0.760  +0.04 -0.42 +0.06 -0.10  -0.18 -0.41 +0.04 -0.13    0.049    0.064   1.49e-03 1.48e-03 1.53e-03
+  field laws, 2 rate groups per spin direction + density relaxation    0.0266  0.1909  0.760  +0.04 -0.42 +0.06 -0.10  -0.18 -0.41 +0.04 -0.13    0.049    0.064   1.43e-03 1.42e-03 1.47e-03
+
+====================================================================================================
+N40_PWM20_D41
+
+ K = 2 groups per spin direction: sizes [10, 10, 10, 10], mean rates -4.15, -2.14, +3.11, +5.19 rad/s, sd inside groups 0.85, 0.74, 0.85, 0.58
+  group  measured w | stepped map of the simulated law: rate  damping  |lambda| | balanced member: rotation form? (x / y), |lambda|, held-out R2 (x / y)
+      1      -4.15  |              -3.95    0.301   0.8867 |  no / yes  0.8873  0.896 / 0.891
+      2      -2.14  |              -2.27    0.289   0.8910 | yes / no   0.5530  0.778 / 0.789
+      3      +3.11  |              +2.89    0.374   0.8609 | yes / no   0.9838  0.810 / 0.473
+      4      +5.19  |              +5.25    0.256   0.9028 | yes / yes  0.9028  0.930 / 0.931
+  balanced laws (pipeline):
+   drho/dx0 = -0.9451 rho -1.368 P3x_x -1.542 P3y_y +0.946 rho_bar
+   dP1x/dx0 = +2.206 P1y -4.226 P1x*rho_bar
+   dP1y/dx0 = -2.495 P1y -2.224 P1x
+   dP2x/dx0 = -1.117 P2x +1.717 P2y
+   dP2y/dx0 = -1.14 P2y -2.941 P2x*rho_bar
+   dP3x/dx0 = -1.642 P3x -1.987 P3y
+   dP3y/dx0 = +1.965 P3x
+   dP4x/dx0 = -3.65 P4x -1.949 P4y
+   dP4y/dx0 = -3.625 P4y +1.949 P4x
+  simulated group laws (rotation-damping form):
+   dP1x/dx0 = -2.545 P1x +2.21 P1y
+   dP1y/dx0 = -2.495 P1y -2.224 P1x
+   dP2x/dx0 = -1.117 P2x +1.717 P2y
+   dP2y/dx0 = -1.139 P2y -1.794 P2x
+   dP3x/dx0 = -1.642 P3x -1.987 P3y
+   dP3y/dx0 = -1.624 P3y +1.954 P3x
+   dP4x/dx0 = -3.65 P4x -1.949 P4y
+   dP4y/dx0 = -3.625 P4y +1.949 P4x
+   density (simulation, as the two-field model): drho/dx0 = -0.8797 rho -1.069 P1x_x -1.069 P2x_x -1.069 P3x_x -1.069 P4x_x -1.197 P1y_y -1.197 P2y_y -1.197 P3y_y -1.197 P4y_y +0.8801 rho_bar
+   density with relaxation (as the two-field model): drho/dx0 = -1.093 P1x_x -1.093 P2x_x -1.093 P3x_x -1.093 P4x_x -1.172 P1y_y -1.172 P2y_y -1.172 P3y_y -1.172 P4y_y +1.045 lap_self -0.8441 delta_self
+   per-group relaxation fit (report only): drho/dx0 = -1.103 P1x_x -0.9622 P1y_y -0.9011 P2x_x -1.136 P2y_y -1.312 P3x_x -1.367 P3y_y -1.031 P4x_x -1.187 P4y_y +1.054 lap_self -0.8452 delta_self
+
+  source                                                              rms rho  |P|     |W|    C_P 0.4/0.8/2/4 s        C_W 0.4/0.8/2/4 s        err C_P  err C_W   S_rho 4/40/100 s
+  experiment                                                           0.0316  0.1920  0.756  +0.08 -0.45 +0.07 +0.07  -0.19 -0.49 +0.02 +0.08    0.000    0.000   1.85e-03 1.92e-03 1.93e-03
+  agents: per-robot EPDE laws                                          0.0331  0.1920  0.748  +0.09 -0.45 +0.06 +0.13  -0.20 -0.51 +0.00 +0.13    0.028    0.032   1.67e-03 2.23e-03 2.44e-03
+  agents: common system                                                0.0336  0.1904  0.743  +0.08 -0.49 +0.05 +0.12  -0.19 -0.51 -0.01 +0.11    0.028    0.030   1.70e-03 2.30e-03 2.34e-03
+  field laws                                                           0.0318  0.1886  0.740  +0.10 -0.56 -0.03 -0.04  -0.19 -0.53 -0.11 -0.03    0.074    0.071   2.01e-03 2.05e-03 2.04e-03
+  field laws + density relaxation                                      0.0315  0.1886  0.740  +0.10 -0.56 -0.03 -0.04  -0.19 -0.53 -0.11 -0.03    0.074    0.071   1.96e-03 2.01e-03 2.00e-03
+  experiment (W from group means)                                      0.0316  0.1921  0.748  +0.08 -0.46 +0.07 +0.07  -0.12 -0.50 -0.02 +0.08    0.003    0.020   1.84e-03 1.92e-03 1.92e-03
+  field laws, 2 rate groups per spin direction                         0.0317  0.1948  0.762  +0.07 -0.49 -0.01 -0.18  -0.13 -0.52 -0.08 -0.20    0.075    0.073   2.03e-03 2.02e-03 2.01e-03
+  field laws, 2 rate groups per spin direction + density relaxation    0.0313  0.1948  0.762  +0.07 -0.49 -0.01 -0.18  -0.13 -0.52 -0.08 -0.20    0.075    0.073   1.98e-03 1.97e-03 1.97e-03
