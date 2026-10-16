@@ -1,0 +1,6 @@
+# Three coupled first-order equations on a window of the attractor chosen by
+# the loader. Boundary as in the group's solver studies.
+search:
+  domain: {boundary_width: 10}
+  preprocessing: {max_deriv_order: [1]}
+  evolution: {population_size: 48}

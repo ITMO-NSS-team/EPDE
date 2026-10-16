@@ -1,0 +1,2 @@
+# u'' + sin(2t) u' + 4u = 1.5t. The base pool already holds sin(2t) and t.
+search: {}

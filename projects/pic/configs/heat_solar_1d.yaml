@@ -1,0 +1,7 @@
+# Simulated soil temperature (no scored truth). Second derivatives in t and x.
+search:
+  preprocessing: {max_deriv_order: [2, 2]}
+  search_space:
+    data_fun_pow: 1
+    tokens:
+      - {family: grid, labels: [x], max_power: 2}

@@ -1,0 +1,8 @@
+# 2-D soil temperature, every 4th time level (loader default).
+search:
+  domain: {boundary_width: [25, 5, 5]}
+  preprocessing: {max_deriv_order: [1, 2, 2]}
+  search_space:
+    data_fun_pow: 1
+    tokens:
+      - {family: grid, labels: [x], max_power: 2}

@@ -1,0 +1,5 @@
+# Two coupled first-order equations: first derivatives suffice, and a coupled
+# system needs more weight vectors to cover its Pareto front.
+search:
+  preprocessing: {max_deriv_order: [1]}
+  evolution: {population_size: 32}

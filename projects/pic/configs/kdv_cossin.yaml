@@ -1,0 +1,2 @@
+# KdV with a cos(t)sin(x) source; the source token is added by the loader.
+search: {}

@@ -1,0 +1,17 @@
+# JHTDB slice: exact derivatives are passed by the loader (numerical ones are
+# aliased at this resolution); pressure, viscous and out-of-plane terms enter
+# as exact tokens. Settings from the group's former configuration.
+search:
+  domain: {boundary_width: 4}
+  preprocessing:
+    default_preprocessor_type: poly
+    preprocessor_kwargs: {polynomial_window: 9, poly_order: 4}
+    max_deriv_order: [1, 1, 1]
+  search_space:
+    data_fun_pow: 1
+    deriv_fun_pow: 1
+    equation_terms_max_number: 6
+    equation_factors_max_number: {factors_num: [1, 2], probas: [0.5, 0.5]}
+    tokens:
+      - {family: grid, labels: [x], max_power: 2}
+  evolution: {population_size: 48, training_epochs: 8}

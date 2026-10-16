@@ -1,0 +1,7 @@
+# Navier-Stokes cylinder wake on the subset of the group's solver studies
+# (loader default). First derivative in t, second in space; the wide boundary
+# along x keeps the scored region away from the open inflow.
+search:
+  domain: {boundary_width: [2, 2, 7]}
+  preprocessing: {max_deriv_order: [1, 2, 2]}
+  evolution: {population_size: 48}

@@ -1,0 +1,45 @@
+# Method variants compared by the benchmark. Each entry is merged on top of the
+# shared protocol and the file of the record. The default variant changes
+# nothing: EPDE as shipped (percentage discrepancy, instability as the second
+# Pareto axis, variance-weighted sparsity) with the finite differences of the
+# shared protocol.
+
+default: {}
+
+# Old EPDE: L2 discrepancy, LASSO sparsity, complexity as the second axis
+# (the earlier pipeline of the group's former benchmark).
+legacy:
+  search:
+    objectives:
+      discrepancy_metric: l2
+      sparsity_cls: lasso
+      sparsity_kwargs: {initial_sparsity_interval: [1.0e-12, 1.0e-4]}
+      second_objective: complexity
+
+# Derivatives from local polynomial fits instead of finite differences.
+poly:
+  search:
+    preprocessing:
+      default_preprocessor_type: poly
+
+# Support chosen by the knee of the residual-vs-size curve.
+knee:
+  search:
+    objectives:
+      sparsity_cls: knee
+
+# Instability measured by cross-validation over windows.
+instab_cv:
+  search:
+    objectives:
+      instability_metric: cv
+
+# The trigonometric family exactly as the group's original scripts declare it:
+# the library's family on a narrow interval around 2. Measures how numerically
+# equal tokens of nearby frequencies affect the search.
+trig_native:
+  search:
+    search_space:
+      tokens:
+        - {family: grid, labels: [x], max_power: 2}
+        - {family: trigonometric, freq: [1.99999999, 2.00000001]}

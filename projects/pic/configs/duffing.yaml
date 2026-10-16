@@ -1,0 +1,7 @@
+# Forced Duffing: the forcing is cos(t), so the trigonometric family is
+# centred on frequency 1 instead of the base protocol's 2.
+search:
+  search_space:
+    tokens:
+      - {family: grid, labels: [x], max_power: 2}
+      - {family: fixed_trigonometric, freq: 1.0, meaningful: true}

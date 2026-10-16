@@ -1,0 +1,11 @@
+# Heat equation with a laser source on a (t, x, y, z) = 20 x 51 x 51 x 3 grid
+# (every 4th x and y node). The source L enters as a token from the loader.
+# Exploratory: no truth is scored.
+search:
+  domain: {boundary_width: [1, 2, 2, 0]}
+  preprocessing: {max_deriv_order: [1, 2, 2, 2]}
+  search_space:
+    data_fun_pow: 1
+    equation_terms_max_number: 10
+    equation_factors_max_number: {factors_num: [1, 2], probas: [0.8, 0.2]}
+    tokens: []
