@@ -3,3 +3,6 @@
 pyyaml>=6.0
 netCDF4>=1.6          # optional: only the `sst` data set
 pysindy>=2.0          # baseline; needs numpy >= 2
+nbformat>=5.9         # notebooks: generation
+nbclient>=0.10        # notebooks: execution
+ipykernel>=6.29

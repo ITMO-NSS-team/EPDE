@@ -1,0 +1,241 @@
+{
+  "protocol": "chronological EPDE discovery and frozen-equation forecast",
+  "dataset": "ode",
+  "seed": 0,
+  "started": "2026-10-09T13:30:43.856973+00:00",
+  "config": {
+    "loader": {},
+    "search": {
+      "domain": {
+        "boundary_width": "auto"
+      },
+      "preprocessing": {
+        "default_preprocessor_type": "FD",
+        "preprocessor_kwargs": {},
+        "max_deriv_order": "auto"
+      },
+      "search_space": {
+        "data_fun_pow": 3,
+        "deriv_fun_pow": 2,
+        "equation_terms_max_number": 10,
+        "equation_factors_max_number": {
+          "factors_num": [
+            1,
+            2
+          ],
+          "probas": [
+            0.65,
+            0.35
+          ]
+        },
+        "tokens": [
+          {
+            "family": "grid",
+            "labels": [
+              "x"
+            ],
+            "max_power": 2
+          },
+          {
+            "family": "fixed_trigonometric",
+            "freq": 2.0
+          }
+        ]
+      },
+      "objectives": {},
+      "solver": {
+        "use_solver": false,
+        "device": "cpu"
+      },
+      "evolution": {
+        "population_size": 16,
+        "training_epochs": 5
+      },
+      "runtime": {
+        "verbose_params": {
+          "show_iter_idx": false
+        },
+        "memory_for_cache": 2
+      }
+    },
+    "dataset": "ode",
+    "variant": "default",
+    "method": "epde"
+  },
+  "search_config": {
+    "domain": {
+      "boundary_width": 22
+    },
+    "preprocessing": {
+      "default_preprocessor_type": "FD",
+      "preprocessor_kwargs": {},
+      "max_deriv_order": [
+        2
+      ]
+    },
+    "search_space": {
+      "data_fun_pow": 3,
+      "deriv_fun_pow": 2,
+      "equation_terms_max_number": 10,
+      "equation_factors_max_number": {
+        "factors_num": [
+          1,
+          2
+        ],
+        "probas": [
+          0.65,
+          0.35
+        ]
+      },
+      "tokens": [
+        {
+          "family": "grid",
+          "labels": [
+            "x"
+          ],
+          "max_power": 2,
+          "dimensionality": 0
+        },
+        {
+          "family": "fixed_trigonometric",
+          "freq": 2.0,
+          "dimensionality": 0
+        }
+      ]
+    },
+    "objectives": {},
+    "solver": {
+      "use_solver": false,
+      "device": "cpu"
+    },
+    "evolution": {
+      "population_size": 16,
+      "training_epochs": 5
+    },
+    "runtime": {
+      "verbose_params": {
+        "show_iter_idx": false
+      },
+      "memory_for_cache": 2
+    }
+  },
+  "train_fraction_requested": 0.7,
+  "split_index": 224,
+  "total_points": 320,
+  "train": {
+    "n_points": 224,
+    "time_range": [
+      0.0,
+      11.15
+    ],
+    "data_sha256": "c89f495def6bbfcff4ff17144c6ca67feba732b82b91c3f6f4289c5544e92508",
+    "derivative_r2": 0.9999806660792105,
+    "integration_success": true,
+    "coverage": 1.0,
+    "metrics": {
+      "u": {
+        "rmse": 0.013632543743436195,
+        "mae": 0.009535346504356116,
+        "r2": 0.9999214238341396
+      }
+    }
+  },
+  "test": {
+    "n_points": 96,
+    "time_range": [
+      11.200000000000001,
+      15.950000000000001
+    ],
+    "integration_success": true,
+    "coverage": 1.0,
+    "message": "The solver successfully reached the end of the integration interval.",
+    "metrics": {
+      "u": {
+        "rmse": 0.01992835372894183,
+        "mae": 0.014939868267107281,
+        "r2": 0.9998324293217595
+      }
+    }
+  },
+  "leakage_controls": [
+    "raw chronological split before preprocessing/build_search",
+    "training-only EPDE coefficients and candidate selection",
+    "frozen equation before future observations accessed for scoring",
+    "initial value and one-sided local-polynomial derivatives from last training samples",
+    "no test tuning; truth equation excluded from training Problem"
+  ],
+  "environment": {
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "python": "3.13.7",
+    "machine": "arm64",
+    "cpu_count": 10,
+    "epde_commit": "14f4917-dirty",
+    "blas_threads": "1",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "torch": "2.9.0",
+    "pysindy": "2.1.0",
+    "cuda": false
+  },
+  "front": [
+    [
+      "1.4936857038297406 * x{power: 1.0, dim: 0.0} + -0.993407007387657 * du/dx0{power: 1.0} * sin{power: 1.0, freq: 2.0, dim: 0.0} + -3.978688610584224 * u{power: 1.0} + 0.0 = d^2u/dx0^2{power: 1.0}"
+    ],
+    [
+      "0.017647649750561357 * du/dx0{power: 2.0} + 1.495474001982838 * x{power: 1.0, dim: 0.0} + -3.9939040258839977 * u{power: 1.0} + -0.948093386704414 * du/dx0{power: 1.0} * sin{power: 1.0, freq: 2.0, dim: 0.0} + 0.0 = d^2u/dx0^2{power: 1.0}"
+    ],
+    [
+      "1.4799526235707288 * x{power: 1.0, dim: 0.0} + 0.003316077975989993 * x{power: 1.0, dim: 0.0} * u{power: 2.0} + -0.97870347835724 * du/dx0{power: 1.0} * sin{power: 1.0, freq: 2.0, dim: 0.0} + -0.0063542541299997325 * u{power: 3.0} + -3.9429034288192746 * u{power: 1.0} + 0.0 = d^2u/dx0^2{power: 1.0}"
+    ]
+  ],
+  "objectives": [
+    [
+      0.012161820976181686,
+      0.0001274562162234241
+    ],
+    [
+      0.004135250968666421,
+      0.02100694506849573
+    ],
+    [
+      0.010527063345724128,
+      0.00243015918855645
+    ]
+  ],
+  "fit_seconds": 22.083371125001577,
+  "candidates": [
+    {
+      "index": 0,
+      "oriented": [
+        "1.4936857038297406 * x{dim: 0.0, power: 1.0} + -0.99340700738765697 * du/dx0{power: 1.0} * sin{dim: 0.0, freq: 2.0, power: 1.0} + -3.9786886105842241 * u{power: 1.0} + 0 = d^2u/dx0^2{power: 1.0}"
+      ],
+      "train_relative_mse": 0.00016366916951271628
+    },
+    {
+      "index": 1,
+      "oriented": [
+        "0.017647649750561357 * du/dx0{power: 2.0} + 1.4954740019828381 * x{dim: 0.0, power: 1.0} + -3.9939040258839977 * u{power: 1.0} + -0.94809338670441401 * du/dx0{power: 1.0} * sin{dim: 0.0, freq: 2.0, power: 1.0} + 0 = d^2u/dx0^2{power: 1.0}"
+      ],
+      "train_relative_mse": 1.9329924830954275e-05
+    },
+    {
+      "index": 2,
+      "oriented": [
+        "1.4799526235707288 * x{dim: 0.0, power: 1.0} + 0.003316077975989993 * x{dim: 0.0, power: 1.0} * u{power: 2.0} + -0.97870347835724003 * du/dx0{power: 1.0} * sin{dim: 0.0, freq: 2.0, power: 1.0} + -0.0063542541299997325 * u{power: 3.0} + -3.9429034288192746 * u{power: 1.0} + 0 = d^2u/dx0^2{power: 1.0}"
+      ],
+      "train_relative_mse": 0.00012334499068641588
+    }
+  ],
+  "selected_index": 1,
+  "selected": [
+    "0.017647649750561357 * du/dx0{power: 2.0} + 1.4954740019828381 * x{dim: 0.0, power: 1.0} + -3.9939040258839977 * u{power: 1.0} + -0.94809338670441401 * du/dx0{power: 1.0} * sin{dim: 0.0, freq: 2.0, power: 1.0} + 0 = d^2u/dx0^2{power: 1.0}"
+  ],
+  "selection_rule": "minimum relative derivative MSE on training interior; ties by Pareto index",
+  "status": "ok",
+  "total_seconds": 25.41312020800251,
+  "artifacts": {
+    "record.json": "<repo>/projects/pic/results/heldout_2026-10-09/record.json",
+    "trajectory.png": "<repo>/projects/pic/results/heldout_2026-10-09/trajectory.png",
+    "trajectory.npz": "<repo>/projects/pic/results/heldout_2026-10-09/trajectory.npz"
+  }
+}

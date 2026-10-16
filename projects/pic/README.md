@@ -3,7 +3,7 @@
 This project collects the data sets of the repository in one place and gives one way
 to work with all of them: load a record, check that its known law is visible in the
 data, run the search, score and inspect the result, compare methods. It works the same
-on Windows, Linux and macOS, from the command line.
+on Windows, Linux and macOS, from the command line and the notebooks.
 
 What it consists of:
 
@@ -14,7 +14,7 @@ What it consists of:
 - **layered settings**: one shared protocol with a single broad token pool for every
   problem, a short file per record with only what that problem needs, method variants
   for comparisons, and changes given at run time;
-- **a command line and short scripts per data folder**, all on top
+- **a command line, short scripts per data folder and notebooks**, all on top
   of the same code;
 - **a benchmark**: series of runs in parallel processes that resume after an
   interruption, with reports and confidence intervals.
@@ -137,12 +137,41 @@ The report shows the success rates with 95 % Wilson intervals, a ranking by prob
 class on the problems every variant supports, and run times. Planned and unsupported
 runs are listed separately; errors and timeouts count as failures.
 
+## Notebooks
+
+| notebook | content |
+|---|---|
+| 00 · Quick start | one complete run, step by step, and how to read the result |
+| 01 · Search settings | the search object, its settings and defaults, settings stored in files |
+| 02 · Preprocessing | domain, data, derivatives, supplied derivatives, signal check |
+| 03 · Search space and fit | token families, the search, the Pareto front and its scoring |
+| 04 · Evolutionary optimizer | the evolutionary loop, objectives, sparsity, budget |
+| 05 · ODEs | forced, Van der Pol and Duffing oscillators |
+| 06 · ODE systems | Lotka–Volterra and Lorenz systems |
+| 07 · PDEs in 1-D | equations in one space dimension |
+| 08 · PDEs in 2-D and 3-D | equations in two and three space dimensions |
+| 09 · Measured data | pendulums, robot arm, ball on a beam, sea surface temperature |
+| 10 · Benchmark | comparison of methods |
+
+The tutorials separate data inspection, checks of the known law, discovery and
+reconstruction. Where a search is performed, its selected equation is compared with
+the data: the left-hand side computed from the data against the value predicted by
+the equation and, for ordinary differential equations, the integrated solution
+against the record. Reconstruction starts at the first retained interior point.
+The oscillator lesson also demonstrates discovery on the first 70% of raw samples
+and forecasting the remaining 30%, with candidate selection using training data only.
+
+The notebooks run missing searches themselves and reuse a saved result only when its
+settings, data, code and dependencies match exactly. Long searches are not run inside
+the notebooks.
+
 ## Checks
 
 ```bash
 python -m unittest discover -s projects/pic/tests -v
 ```
 
-Tests cover the available data, term parsing, metrics and run protocol. Checks that
+Tests cover data, term parsing, metrics, run identity, process lifecycle and small
+executable optimizer lessons. Full dataset campaigns run separately. Checks that
 need files missing from the repository are skipped and reported as such.
 
