@@ -24,6 +24,23 @@ this lives next to them.
 
 ## Installation
 
+### With uv
+
+Choose one PyTorch build and keep it in every command:
+
+```bash
+cd projects/pic
+uv sync --locked --extra cpu
+uv run --locked --extra cpu python bench.py list
+uv run --locked --extra cpu python bench.py run ode --noise 0
+uv run --locked --extra cpu python -m ipykernel install --user --name epde-pic --display-name "EPDE PIC"
+```
+
+For NVIDIA GPUs with CUDA 12.8 use `cu128` instead of `cpu`, both for the installation
+and in every run; the two options exclude each other. A run without the option may
+remove PyTorch from the environment, so every example names it. The lock file pins all
+versions; EPDE is installed in editable mode from this working copy.
+
 ### With pip
 
 Python 3.11–3.13, from the repository root:

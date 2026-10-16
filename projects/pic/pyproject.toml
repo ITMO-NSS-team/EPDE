@@ -1,0 +1,59 @@
+# Environment for projects/pic: EPDE from this checkout + benchmark and notebooks.
+# Versions are pinned in uv.lock (Windows, Linux, macOS).
+#
+#   uv sync --extra cpu      # no GPU (any OS)
+#   uv sync --extra cu128    # NVIDIA GPU, CUDA 12.8 (Windows, Linux)
+#   uv run --extra cpu python bench.py list
+#
+# torch is split into mutually exclusive extras: CPU and CUDA wheels live on
+# different PyTorch indexes, and the user picks one.
+
+[project]
+name = "epde-pic"
+version = "0.1.0"
+description = "Data sets, run scripts, notebooks and benchmark for EPDE (projects/pic)"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+    "epde",
+    # EPDE's own requirements.txt (setup.py declares none)
+    "numpy>=2.0",
+    "scipy>=1.12",
+    "scikit-learn>=1.4",
+    "matplotlib>=3.8",
+    "pandas>=2.0",
+    "psutil>=5.9",
+    "seaborn>=0.13",
+    "dill>=0.3",
+    # benchmark and notebooks
+    "pyyaml>=6.0",
+    "pysindy>=2.0",
+    "nbformat>=5.9",
+    "nbclient>=0.10",
+    "ipykernel>=6.29",
+    "netCDF4>=1.6",
+]
+
+[project.optional-dependencies]
+cpu = ["torch>=2.4"]
+cu128 = ["torch>=2.4"]
+
+[tool.uv]
+package = false
+conflicts = [[{ extra = "cpu" }, { extra = "cu128" }]]
+
+[tool.uv.sources]
+epde = { path = "../..", editable = true }
+torch = [
+    { index = "pytorch-cpu", extra = "cpu" },
+    { index = "pytorch-cu128", extra = "cu128", marker = "sys_platform != 'darwin'" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
