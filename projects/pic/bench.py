@@ -6,6 +6,8 @@ Linux and macOS; run from anywhere (paths are resolved from this file).
     python projects/pic/bench.py info ac
     python projects/pic/bench.py check ac --noise 0,1,5
     python projects/pic/bench.py run ac --noise 1 --seed 0 [--variant poly] [--set search.evolution.training_epochs=10]
+    python projects/pic/bench.py campaign --suite core --variants default,poly --noise 0,1,5 --seeds 0-2 --workers 8 --name my_campaign
+    python projects/pic/bench.py report results/my_campaign
 
 See projects/pic/README.md for the full description.
 """
@@ -24,6 +26,18 @@ env.pin_blas_threads(1)
 
 # Prefer this checkout over another editable EPDE installed in the environment.
 sys.path.insert(0, str(HERE.parent.parent))
+
+
+def _int_list(text: str):
+    """'0-4' -> [0..4]; '0,2,5' -> [0, 2, 5]."""
+    out = []
+    for part in text.split(','):
+        if '-' in part.strip()[1:]:
+            lo, hi = part.split('-', 1)
+            out.extend(range(int(lo), int(hi) + 1))
+        else:
+            out.append(int(part))
+    return out
 
 
 def _float_list(text: str):
@@ -60,7 +74,7 @@ def cmd_run(args):
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(json.dumps(record, indent=1, default=str), encoding='utf-8')
     _print_record(record)
-    return 0 if record['status'] == 'ok' else 1
+    return 0 if record['status'] in ('ok', 'unsupported') else 1
 
 
 def _print_record(record):
@@ -68,7 +82,7 @@ def _print_record(record):
             f"seed {record['seed']} | {record['status']}")
     print('\n' + head)
     if record['status'] != 'ok':
-        print(record.get('traceback', record.get('error')))
+        print(record.get('reason') or record.get('traceback') or record.get('error'))
         return
     m = record['metrics']
     print(f"fit {record['fit_seconds']:.1f} s, Pareto front: {m['front_size']} solutions")
@@ -92,6 +106,16 @@ def cmd_check(args):
     problem, report = check(args.dataset, args.noise, args.seed, variant=args.variant,
                             overrides=parse_set(args.set), config_path=args.config)
     print_check(problem, report)
+
+
+def cmd_campaign(args):
+    from epde_bench.campaign import run_campaign
+    return run_campaign(args)
+
+
+def cmd_report(args):
+    from epde_bench.report import make_report
+    make_report(Path(args.campaign), formats=args.formats)
 
 
 def main(argv=None):
@@ -126,6 +150,25 @@ def main(argv=None):
     p.add_argument('--set', action='append', default=[], metavar='KEY=VALUE')
     p.add_argument('--config', help='use this YAML instead of configs/<dataset>.yaml')
     p.set_defaults(func=cmd_check)
+
+    p = sub.add_parser('campaign', help='many runs in parallel processes, resumable')
+    p.add_argument('--suite', default='core')
+    p.add_argument('--datasets', help='comma-separated names (instead of --suite)')
+    p.add_argument('--variants', default='default')
+    p.add_argument('--noise', type=_float_list, default=[0.0])
+    p.add_argument('--seeds', type=_int_list, default=[0])
+    p.add_argument('--workers', type=int, default=1)
+    p.add_argument('--timeout', type=float, default=3 * 3600, help='seconds per run')
+    p.add_argument('--name', required=True, help='results/<name>/ (or EPDE_BENCH_RESULTS/<name>)')
+    p.add_argument('--set', action='append', default=[], metavar='KEY=VALUE')
+    p.add_argument('--retry-errors', action='store_true')
+    p.add_argument('--dry-run', action='store_true')
+    p.set_defaults(func=cmd_campaign)
+
+    p = sub.add_parser('report', help='tables and figures from a campaign directory')
+    p.add_argument('campaign')
+    p.add_argument('--formats', default='png', help='figure formats, e.g. png,pdf')
+    p.set_defaults(func=cmd_report)
 
     args = ap.parse_args(argv)
     return args.func(args) or 0

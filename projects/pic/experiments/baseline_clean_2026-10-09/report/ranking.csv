@@ -1,0 +1,7 @@
+kind,noise,variant,success_front,success_selected,median_fit_s
+ode,0.0,pysindy,1.0,1.0,1.4544945410016226
+ode,0.0,default,0.9333333333333332,0.8666666666666667,26.401164875001996
+ode_system,0.0,pysindy,1.0,1.0,1.9224025000003166
+ode_system,0.0,default,0.2,0.2,109.73194539600809
+pde_1d,0.0,default,0.775,0.625,94.47713333299907
+pde_1d,0.0,pysindy,0.625,0.625,17.27346239599865

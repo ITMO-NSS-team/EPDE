@@ -2,3 +2,4 @@
 #   pip install -r requirements.txt -r projects/pic/requirements-bench.txt
 pyyaml>=6.0
 netCDF4>=1.6          # optional: only the `sst` data set
+pysindy>=2.0          # baseline; needs numpy >= 2

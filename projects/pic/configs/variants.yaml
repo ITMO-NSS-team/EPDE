@@ -43,3 +43,12 @@ trig_native:
       tokens:
         - {family: grid, labels: [x], max_power: 2}
         - {family: trigonometric, freq: [1.99999999, 2.00000001]}
+
+# Baseline outside EPDE: sparse regression (PySINDy's STLSQ) on a fixed
+# library built from the same building blocks as the EPDE pool.
+pysindy:
+  method: pysindy
+  pysindy:
+    differentiation: epde                # same native preprocessing as EPDE; alternatives are explicit
+    threshold: auto                      # chosen on a held-out tail of the record
+    max_terms_product: 2

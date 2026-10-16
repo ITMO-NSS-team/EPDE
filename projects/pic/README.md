@@ -1,8 +1,8 @@
-# Data sets and runs for EPDE
+# Data sets, runs and benchmark for EPDE
 
 This project collects the data sets of the repository in one place and gives one way
 to work with all of them: load a record, check that its known law is visible in the
-data, run the search, score and inspect the result. It works the same
+data, run the search, score and inspect the result, compare methods. It works the same
 on Windows, Linux and macOS, from the command line.
 
 What it consists of:
@@ -16,7 +16,8 @@ What it consists of:
   for comparisons, and changes given at run time;
 - **a command line and short scripts per data folder**, all on top
   of the same code;
-
+- **a benchmark**: series of runs in parallel processes that resume after an
+  interruption, with reports and confidence intervals.
 
 The library itself and the group's original research scripts are not changed; all of
 this lives next to them.
@@ -113,6 +114,28 @@ Notes on particular records:
 
 Shapes, finiteness of the data and a non-empty region after the boundary are checked
 before every search.
+
+## Comparing methods
+
+Besides EPDE, a sparse-regression baseline (PySINDy) runs on a library built from the
+same fields, derivatives and extra tokens. Problems it cannot represent (a coefficient
+in front of the time derivative, the continuity equation of Navier–Stokes) are reported
+as unsupported, not as failures.
+
+```bash
+python projects/pic/bench.py campaign --datasets ode,lorenz \
+    --variants default,pysindy --noise 0,1 --seeds 0-2 --workers 2 --name comparison
+python projects/pic/bench.py report projects/pic/results/comparison
+```
+
+Every run of a campaign is a separate process. Repeating the command continues the same
+campaign; failed runs can be retried. A run is identified by its settings, data, code
+and dependency versions: changing any of them requires a new campaign, so old and new
+results are never mixed.
+
+The report shows the success rates with 95 % Wilson intervals, a ranking by problem
+class on the problems every variant supports, and run times. Planned and unsupported
+runs are listed separately; errors and timeouts count as failures.
 
 ## Checks
 

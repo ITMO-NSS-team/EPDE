@@ -79,6 +79,8 @@ def discover(problem: Problem, search_cfg: dict, data: Optional[dict] = None):
 def run_one(dataset: str, variant: str = 'default', noise: float = 0.0, seed: int = 0,
             overrides: Optional[dict] = None, config_path=None) -> dict:
     """One scored run. Never raises: errors end up in the record."""
+    from .baselines import UnsupportedProblem
+    from .identity import experiment_identity
     cfg = load_config(dataset, variant, overrides, config_path)
     record = {'dataset': dataset, 'variant': variant, 'method': cfg['method'],
               'noise': noise, 'seed': seed,
@@ -86,6 +88,7 @@ def run_one(dataset: str, variant: str = 'default', noise: float = 0.0, seed: in
               'config': cfg, 'environment': env.environment_info(REPO_ROOT)}
     t_start = time.perf_counter()
     try:
+        record['identity'] = experiment_identity(dataset, variant, noise, seed, overrides, config_path)
         env.seed_everything(seed)
         problem = load(dataset, **cfg.get('loader', {}))
         record['problem'] = {'title': problem.title, 'kind': problem.kind,
@@ -93,17 +96,26 @@ def run_one(dataset: str, variant: str = 'default', noise: float = 0.0, seed: in
                              'variables': problem.variables, 'meta': problem.meta,
                              'truth': problem.truth,
                              'n_truth_alternatives': len(problem.truth_alternatives)}
+        if noise > 0 and problem.derivs is not None:
+            raise UnsupportedProblem(dataset, 'Artificial noise with supplied derivatives requires '
+                                     'a consistent noisy field/gradient protocol; use noise=0.')
         data = problem.noisy(noise, seed)
         if cfg['method'] == 'epde':
             search_cfg = resolve_for_problem(cfg, problem)
             record['search_config'] = search_cfg
             _, texts, objectives, fit_seconds = discover(problem, search_cfg, data)
+        elif cfg['method'] == 'pysindy':
+            from .baselines import run_pysindy
+            texts, objectives, fit_seconds, info = run_pysindy(problem, data, cfg, seed)
+            record['baseline'] = info
         else:
             raise ValueError(f"unknown method {cfg['method']!r}")
         record.update(status='ok', fit_seconds=fit_seconds, front=texts, objectives=objectives)
         record['metrics'] = metrics.score_run(texts, objectives, problem.truth_systems)
         sel = record['metrics'].get('selected_index')
         record['selected'] = texts[sel] if texts and sel is not None else None
+    except UnsupportedProblem as exc:
+        record.update(status='unsupported', reason=exc.reason)
     except Exception as exc:                                   # noqa: BLE001
         record.update(status='error', error=repr(exc), traceback=traceback.format_exc())
     record['total_seconds'] = time.perf_counter() - t_start
