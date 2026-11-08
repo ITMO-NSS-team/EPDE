@@ -336,7 +336,9 @@ class ParetoVisualizer(object):
             for front_idx, solution in all_solutions:
                 equation = solution.vals[var]
                 try:
-                    key = equation.terms_labels
+                    # ``terms_labels`` outside system_rps_mode='plain'; there
+                    # S, S+{1} and another target are different points.
+                    key = getattr(equation, 'candidate_label', None) or equation.terms_labels
                 except AttributeError:
                     key = getattr(equation, 'text_form', repr(equation))
                 if key not in unique_equations:

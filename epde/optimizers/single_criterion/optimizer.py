@@ -47,9 +47,12 @@ class EvolutionaryStrategy(Strategy):
         """
         self._stop_criterion.reset(**stop_criterion_params)
         population = initial_population
+        observe = getattr(self._stop_criterion, 'observe', None)
         while not self._stop_criterion.check():
             self.linked_blocks.traversal(population, EA_kwargs)
             population = self.linked_blocks.output
+            if observe is not None:
+                observe(population)
         self.run_performed = True
 
 class Population(object):
@@ -132,17 +135,21 @@ class SimpleOptimizer(object):
     """
     
     """
-    def __init__(self, population_instruct, pop_size, solution_params, sorting_method = simple_sorting, 
-                 passed_population: Union[Population, List] = None): 
+    def __init__(self, population_instruct, pop_size, solution_params, sorting_method = simple_sorting,
+                 passed_population: Union[Population, List] = None, population_floor: int = None):
+        """``population_floor`` (``population_size='auto'``): ``pop_size`` is the ceiling, and once
+        that many individuals exist, a slot that finds no new one in the hard attempt limit ends the
+        population instead of raising."""
         soluton_creation_attempts_softmax = 10
         soluton_creation_attempts_hardmax = 100
 
         pop_constructor = SystemsPopulationConstructor(**population_instruct)
-        
+
         assert type(solution_params) == type(None) or type(solution_params) == dict, 'The solution parameters, passed into population constructor must be in dictionary'
         if (passed_population is None) or isinstance(passed_population, list):
             initial_population = [] if passed_population is None else passed_population
 
+            exhausted = False
             for _ in range(pop_size):
                 solution_gen_idx = 0
                 while True:
@@ -156,9 +163,16 @@ class SimpleOptimizer(object):
                         print('solutions tried:', solution_gen_idx)
                         warnings.warn('Too many failed attempts to create unique solutions for multiobjective optimization. Change solution parameters to allow more diversity.')
                     if solution_gen_idx == soluton_creation_attempts_hardmax:
+                        if population_floor is not None and len(initial_population) >= population_floor:
+                            exhausted = True
+                            break
                         raise RuntimeError('Can not place an individual into the population even with many attempts.')
                     solution_gen_idx += 1
-                    
+                if exhausted:
+                    print(f'Population size: {len(initial_population)} distinct individuals (no further '
+                          f'one in {soluton_creation_attempts_hardmax} attempts).')
+                    break
+
             self.population = Population(elements = initial_population, sorting_method = sorting_method)
 
         else:
@@ -172,8 +186,11 @@ class SimpleOptimizer(object):
         builder.assemble(True)
         self.strategy = builder.processer
         
-    def optimize(self, EA_kwargs: dict = {},  epochs: int = None):
+    def optimize(self, EA_kwargs: dict = {},  epochs: int = None, patience: int = None):
+        """``patience`` (``early_stopping_patience``): also stop once the best individual's
+        structure is unchanged for that many iterations."""
         scp = {'limit' : epochs} if epochs is not None else {'limit' : 50}
+        scp['patience'] = patience
         global_var.reset_hist()
         
         self.strategy.run(initial_population = self.population, EA_kwargs = EA_kwargs, 

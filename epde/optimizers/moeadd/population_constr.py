@@ -6,10 +6,19 @@ Created on Thu Sep  8 11:57:44 2022
 @author: maslyaev
 """
 
+import warnings
+
 import numpy as np
 from typing import Callable
 
-from epde.structure.main_structures import SoEq, COMPLEXITY_METAPARAMETER, is_complexity_key
+import epde.globals as global_var
+from epde.structure.main_structures import SoEq
+
+#: Label of the retired ``('complexity', var)`` budget metaparameter, which
+#: ``sparsity_cls='knee'``'s ``'complexity'`` realization seeded and evolved
+#: until both were removed. Kept only so a system saved from such a run can
+#: still be passed in (``SystemsPopulationConstructor._strip_retired_budget``).
+_RETIRED_BUDGET_LABEL = 'complexity'
 
 class SystemsPopulationConstructor(object):
     """
@@ -21,14 +30,11 @@ class SystemsPopulationConstructor(object):
         max_factors_in_term (`int`):
         vars_demand_equation (``):
         sparsity_internal (`tuple`):
-        complexity_interval (`tuple` or None): integer range of the
-            ``('complexity', var)`` budget, or None for no budget at all.
     """
     def __init__(self, pool, second_objective: str = None, terms_number : int = 8,
                  max_factors_in_term : int = 2,
                  obj_functions : Callable = None,
-                 sparsity_interval : tuple = (1., 1.),
-                 complexity_interval : tuple = None):
+                 sparsity_interval : tuple = (1., 1.)):
         self.pool = pool
         # Which objective occupies the second Pareto axis, or None to defer to
         # the ``epde.globals.second_objective`` global. Replaces the former
@@ -44,13 +50,6 @@ class SystemsPopulationConstructor(object):
         # the neutral 1.0 rather than the old (0, 1), whose log10(0) made every
         # unseeded alpha exactly 0 through a -inf.
         self.sparsity_interval = sparsity_interval
-        # Integer range (1, Cmax) of the per-equation ('complexity', var)
-        # budget -- a property of its own, not a reading of the sparsity alpha.
-        # EpdeSearch.fit passes it only when the sparsity operator selects by a
-        # budget (KneeSparsity.complexity_interval); None adds no key and draws
-        # no random number, so every other run is seeded exactly as before.
-        self.complexity_interval = (None if complexity_interval is None
-                                    else tuple(int(end) for end in complexity_interval))
         print('self.vars_demand_equation', self.vars_demand_equation)
 
     def applyToPassed(self, passed_solution: SoEq, **kwargs):
@@ -58,76 +57,57 @@ class SystemsPopulationConstructor(object):
             passed_solution.set_objective_functions(kwargs['obj_funs'])
         except KeyError:
             passed_solution.use_default_multiobjective_function(self.second_objective)
-        # Reconciled in BOTH directions: ``ChromosomeCrossover`` asserts that
-        # both parents share one encoding, so a passed system must carry the
-        # budget gene exactly when the seeded ones do.
-        if self.complexity_interval is not None:
-            self._give_budget(passed_solution)
-        else:
-            self._drop_budget(passed_solution)
-
-    def _give_budget(self, solution: SoEq):
-        """Give a passed system the budget gene the seeded ones carry, under
-        THIS search's bounds.
-
-        A passed system without ``('complexity', var)`` -- a translated truth,
-        say -- would end the search at its first crossover. It joins at the
-        CEILING, the loosest budget, which leaves any equation within the
-        search's term and factor caps its full support; the mutation then
-        moves it like any other.
-
-        A system that already carries the key -- one from an earlier budget
-        run -- keeps its value, but read as the integer level it stands for
-        and clipped into this search's ``(1, Cmax)``, and its ``'bounds'`` are
-        replaced by those: the mutation reflects its step into the stored
-        bounds, so an earlier run's wider range would let this system's budget
-        wander past the levels every seeded system is confined to.
-        """
-        # Deferred: mutations imports moeadd.moeadd, which imports this module.
-        from epde.operators.multiobjective.mutations import _budget_level
-        lo, hi = self.complexity_interval
-        rebuild = False
-        for variable in solution.vars_to_describe:
-            key = (COMPLEXITY_METAPARAMETER, variable)
-            current = solution.metaparameters.get(key)
-            value = hi if current is None else _budget_level(current.get('value', hi), lo, hi)
-            entry = {'optimizable': True, 'value': value, 'bounds': (lo, hi)}
-            if current != entry:
-                # A fresh entry rather than an in-place edit: a passed entry
-                # may be shared with a system this search does not own.
-                solution.metaparameters[key] = entry
-                rebuild = True
-            # The gene writes into the EQUATION's dict, which need not be the
-            # system's (each translated equation of a system has its own), so
-            # it gets the same entry; the gene is built from the system's.
-            equation_mp = solution.vals[variable].metaparameters
-            if equation_mp.get(key) != entry:
-                equation_mp[key] = dict(entry)
-        if rebuild:
-            # Rebuild the chromosome so the gene carries the entry's value.
-            solution.create(passed_equations=[solution.vals[variable]
-                                              for variable in solution.vars_to_describe])
+        self._strip_retired_budget(passed_solution)
+        self._seed_target_genes(passed_solution)
 
     @staticmethod
-    def _drop_budget(solution: SoEq):
-        """Strip ``('complexity', var)`` from a passed system in a run without
-        budgets.
+    def _seed_target_genes(solution: SoEq):
+        """system_rps_mode='plain': a passed system keeps the right parts it
+        came with. The initial sorting resets every candidate's target before
+        its fit, so the target is first written into the equation's target
+        gene, which the plain fit reads. No other mode has the gene."""
+        from epde.interface.search_config import active_config
+        if active_config().search_space.system_rps_mode != 'plain':
+            return
+        from epde.operators.common.plain_fit import target_gene
+        for equation in solution.vals:
+            if equation.target is not None and getattr(equation, '_plain_genes', None) is None:
+                equation._plain_genes = target_gene(equation.target)
 
-        A system from an earlier budget run carries the gene, the seeded ones
-        here do not, and ``ChromosomeCrossover``'s encoding assertion would
-        end the search at their first crossover. Its equations lose the key as
-        well, so no stale budget is left for a budget reader to find. A system
-        whose own dict has no such key -- every system of a default run --
-        carries no budget gene and is not touched at all: no edit, no rebuild.
+    @staticmethod
+    def _strip_retired_budget(solution: SoEq):
+        """Strip the retired ``('complexity', var)`` budget from a passed
+        system, and say so.
+
+        A system saved from a ``sparsity_cls='knee'`` budget run still carries
+        the budget as a gene, which no seeded system has any more:
+        ``ChromosomeCrossover``'s encoding assertion would end the search at
+        their first crossover, and ``SystemMutation`` would walk the integer
+        budget with the alpha's proportional step. Nothing reads the budget
+        now, so dropping it changes no fit; the structure and every other
+        metaparameter are kept, and the equations lose the key too. A system
+        whose own dict has no such key -- every system of a current run -- is
+        not touched at all: no edit, no rebuild, no warning.
         """
-        system_keys = [key for key in solution.metaparameters if is_complexity_key(key)]
+        def retired(key):
+            return (isinstance(key, tuple) and len(key) == 2
+                    and key[0] == _RETIRED_BUDGET_LABEL)
+
+        system_keys = [key for key in solution.metaparameters if retired(key)]
         if not system_keys:
             return
+        warnings.warn(
+            'A passed system carries the {0} metaparameter(s) of the removed '
+            "complexity budget (sparsity_cls='knee', realization "
+            "'complexity'); they are dropped and the system joins the search "
+            'with its structure and its other metaparameters.'.format(
+                sorted(system_keys, key=repr)),
+            global_var.EPDEUsageWarning, stacklevel=2)
         for key in system_keys:
             del solution.metaparameters[key]
         for variable in solution.vars_to_describe:
             equation_mp = solution.vals[variable].metaparameters
-            for key in [key for key in equation_mp if is_complexity_key(key)]:
+            for key in [key for key in equation_mp if retired(key)]:
                 del equation_mp[key]
         # The chromosome's genes are built from the system's dict.
         solution.create(passed_equations=[solution.vals[variable]
@@ -148,27 +128,12 @@ class SystemsPopulationConstructor(object):
         #                                                            size=len(self.vars_demand_equation))))
         terms_number = kwargs.get('terms_number', self.terms_number)
         max_factors_in_term = kwargs.get('max_factors_in_term', self.max_factors_in_term)
-        # Every budget level equally likely, independently per equation -- the
-        # way a best-subset study enumerates every complexity. Drawn after the
-        # sparsity alpha, so that draw is the same one with or without budgets.
-        if self.complexity_interval is not None:
-            lo, hi = self.complexity_interval
-            budgets = np.random.randint(lo, hi + 1, size=len(self.vars_demand_equation))
 
         # print(f'Creating new equation, sparsity value {sparsity}')
         metaparameters = {'max_terms_number'    : {'optimizable' : False, 'value' : terms_number},
                           'max_factors_in_term' : {'optimizable' : False, 'value' : max_factors_in_term}}
         for idx, variable in enumerate(self.vars_demand_equation):
             metaparameters[('sparsity', variable)] = {'optimizable' : True, 'value' : sparsity[idx]}
-            if self.complexity_interval is not None:
-                # A python int: Gene.value's setter silently keeps the old
-                # value when a new one is not of the seeded type, and the
-                # integer step in multiobjective SystemMutation returns ints.
-                # The bounds travel with the value, so the step needs no
-                # configuration lookup.
-                metaparameters[(COMPLEXITY_METAPARAMETER, variable)] = {
-                    'optimizable': True, 'value': int(budgets[idx]),
-                    'bounds': (lo, hi)}
             # metaparameters[('nonzero_terms', variable)] = {'optimizable': True, 'value': nonzero_terms[idx]}
             # metaparameters[('threshold', variable)] = {'optimizable': True, 'value': threshold[idx]}
             # metaparameters[('nu', variable)] = {'optimizable': True, 'value': nu[idx]}

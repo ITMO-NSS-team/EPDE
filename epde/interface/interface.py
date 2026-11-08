@@ -24,8 +24,9 @@ from functools import reduce, singledispatchmethod
 
 import epde.globals as global_var
 from epde.operators.common.objectives import ideal_point
-from epde.interface.search_config import (UNSET, build_tokens, collect_overrides,
-                                          load_search_config, set_active_config)
+from epde.interface.search_config import (UNSET, active_config, build_tokens, check_auto_settings,
+                                          check_rps_params, collect_overrides, load_search_config,
+                                          set_active_config)
 from epde.interface.legacy_api import (LEGACY_DATA_KEYS, LEGACY_INIT_KEYS,
                                        reject_removed, split_legacy, warn_legacy)
 
@@ -38,6 +39,7 @@ from epde.optimizers.moeadd.moeadd import *
 from epde.optimizers.moeadd.supplementary import *
 from epde.optimizers.moeadd.strategy import MOEADDDirector
 from epde.optimizers.moeadd.strategy_elems import MOEADDSectorProcesser
+from epde.optimizers.nsga import NSGADirector, NSGAOptimizer
 
 from epde.optimizers.single_criterion.optimizer import EvolutionaryStrategy, SimpleOptimizer, Population
 from epde.optimizers.single_criterion.strategy import BaselineDirector
@@ -55,17 +57,39 @@ from epde.cache.cache_refactored import Cache # upload_simple_tokens, upload_gri
 from epde.preprocessing.preprocessor_setups import PreprocessorSetup
 from epde.preprocessing.preprocessor import ConcretePrepBuilder, PreprocessingPipe
 
-from epde.structure.domain import VariableEntry, Trajectory, TrajectoriesManager, Domain
+from epde.structure.domain import (VariableEntry, Trajectory, TrajectoriesManager, Domain,
+                                   resolve_evaluation_stride)
 from epde.structure.main_structures import Equation, SoEq
 
 from epde.interface.token_family import TFPool, TokenFamily
 from epde.interface.type_checks import *
-from epde.interface.prepared_tokens import PreparedTokens, CustomTokens, DataPolynomials
+from epde.interface.prepared_tokens import (PreparedTokens, CustomTokens, DataPolynomials,
+                                            ControlVarTokens)
 from epde.integrate import BoundaryConditions, SolverAdapter, SystemSolverInterface
 
 
 def simple_selector(sorted_neighbors, number_of_neighbors=4):
     return sorted_neighbors[:number_of_neighbors]
+
+
+class _Same(object):
+    """Compares by identity. Puts an object that has no usable value equality
+    (an evaluator, an array of tensors) into the pool key; holding the
+    reference keeps its identity from being reused."""
+    __slots__ = ('obj',)
+
+    def __init__(self, obj):
+        self.obj = obj
+
+    def __eq__(self, other):
+        return isinstance(other, _Same) and other.obj is self.obj
+
+    def __hash__(self):
+        return id(self.obj)
+
+    def __repr__(self):
+        return f'_Same({type(self.obj).__name__} at {id(self.obj):#x})'
+
 
 class EpdeSearch(object):
     """
@@ -95,16 +119,20 @@ class EpdeSearch(object):
                  sparsity_kwargs=UNSET,
                  use_solver=UNSET, solver_backend=UNSET, device=UNSET,
                  boundary_width=UNSET, time_axis=UNSET,
+                 evaluation_stride=UNSET, evaluation_form=UNSET,
                  default_preprocessor_type=UNSET, preprocessor_kwargs=UNSET,
                  max_deriv_order=UNSET,
                  data_fun_pow=UNSET, deriv_fun_pow=UNSET,
                  equation_terms_max_number=UNSET,
                  equation_factors_max_number=UNSET,
                  rps_amplification_cap=UNSET, tokens=UNSET,
+                 system_rps_mode=UNSET, system_rps_params=UNSET,
                  population_size=UNSET, training_epochs=UNSET,
+                 early_stopping_patience=UNSET,
                  neighbors_number=UNSET, PBI_penalty=UNSET,
                  subregion_mating_limitation=UNSET, solution_params=UNSET,
                  director_params=UNSET, operators=UNSET,
+                 niching=UNSET, complementary_mating_prob=UNSET, engine=UNSET,
                  memory_for_cache=UNSET, verbose_params=UNSET,
                  **solver_kwargs):
         """Build a search from the grouped configuration.
@@ -162,6 +190,7 @@ class EpdeSearch(object):
             sparsity_cls=sparsity_cls, sparsity_kwargs=sparsity_kwargs,
             use_solver=use_solver, solver_backend=solver_backend, device=device,
             boundary_width=boundary_width, time_axis=time_axis,
+            evaluation_stride=evaluation_stride, evaluation_form=evaluation_form,
             default_preprocessor_type=default_preprocessor_type,
             preprocessor_kwargs=preprocessor_kwargs,
             max_deriv_order=max_deriv_order,
@@ -169,14 +198,23 @@ class EpdeSearch(object):
             equation_terms_max_number=equation_terms_max_number,
             equation_factors_max_number=equation_factors_max_number,
             rps_amplification_cap=rps_amplification_cap, tokens=tokens,
+            system_rps_mode=system_rps_mode, system_rps_params=system_rps_params,
             population_size=population_size, training_epochs=training_epochs,
+            early_stopping_patience=early_stopping_patience,
             neighbors_number=neighbors_number, PBI_penalty=PBI_penalty,
             subregion_mating_limitation=subregion_mating_limitation,
             solution_params=solution_params, director_params=director_params,
-            operators=operators, memory_for_cache=memory_for_cache,
-            verbose_params=verbose_params)
+            operators=operators, niching=niching,
+            complementary_mating_prob=complementary_mating_prob, engine=engine,
+            memory_for_cache=memory_for_cache, verbose_params=verbose_params)
         overrides.update(solver_kwargs)
         self._config = cfg = load_search_config(config, overrides)
+        if isinstance(self, EpdeMultisample) and (
+                cfg.search_space.system_rps_mode == 'plain' or cfg.evolution.engine != 'moeadd'):
+            # EpdeMultisample.fit builds its optimizer without the single
+            # search's fit path (the plain term cap, the engine choice).
+            raise ValueError("EpdeMultisample supports neither search_space.system_rps_mode='plain' "
+                             "nor evolution.engine='nsga2'.")
 
         self.multiobjective_mode = cfg.objectives.multiobjective_mode
 
@@ -206,7 +244,9 @@ class EpdeSearch(object):
             self.director = director
         else:
             if self.multiobjective_mode:
-                self.director = MOEADDDirector()
+                # Both engines run the same chain of blocks (MOEADDSectorProcesser);
+                # NSGA-II swaps its selection and survival in.
+                self.director = NSGADirector() if cfg.evolution.engine == 'nsga2' else MOEADDDirector()
                 builder = StrategyBuilder(MOEADDSectorProcesser)
             else:
                 self.director = BaselineDirector()
@@ -238,6 +278,7 @@ class EpdeSearch(object):
             self.set_singleobjective_params()
 
         self.pool = None
+        self._pool_data = None              # the Trajectory objects the pool was built on
         self.search_conducted = False
 
         # Legacy: a search used to own exactly one implicit domain, built from
@@ -293,14 +334,18 @@ class EpdeSearch(object):
                           ndl_update_method: Callable = ndl_update,
                           subregion_mating_limitation=UNSET,
                           PBI_penalty=UNSET, training_epochs=UNSET,
-                          early_stopping_callback: Callable = None):
+                          early_stopping_callback: Callable = None,
+                          early_stopping_patience=UNSET):
         r"""
         Setting the parameters of the multiobjective evolutionary algorithm. declaration of
         the default values is held in the initialization of EpdeSearch object.
 
         Args:
-            population_size (`int`): optional
-                The size of the population of solutions, created during MO - optimization, default 6.
+            population_size (`int` or `'auto'`): optional
+                The size of the population of solutions, created during MO - optimization. The
+                default 'auto' seeds as many distinct systems as the pool yields, between
+                ``search_config.AUTO_POPULATION_FLOOR`` and ``AUTO_POPULATION_CEILING``
+                (``EvolutionConfig``).
             solution_params (`dict`): optional
                 Dictionary, containing additional parameters to be sent into the newly created solutions.
             H (`float`): optional
@@ -330,9 +375,11 @@ class EpdeSearch(object):
                 subregions (adjacent to the weight vector domain). :math:`\delta \in [0., 1.)`,
                 default value is 0.9, as in the MOEA/DD paper.
             training_epochs (`int`): optional
-                Maximum number of iterations, during that the optimization will be held.
-                Note, that if the algorithm converges to a single Pareto frontier,
-                the optimization is stopped.
+                The most epochs the fit runs (``EvolutionConfig``; default 100).
+            early_stopping_patience (`int` or None): optional
+                Stop earlier, once the structures on the first Pareto level are unchanged
+                for this many epochs in a row (default 5); None runs every epoch. A given
+                ``early_stopping_callback`` is still asked each epoch.
             PBI_penalty (`float`):  optional
                 The penalty parameter :math:`\\theta`, used in penalty based intersection
                 calculation, default value is 5.0, as in the MOEA/DD paper.
@@ -353,19 +400,25 @@ class EpdeSearch(object):
             PBI_penalty = evolution.PBI_penalty
         if training_epochs is UNSET:
             training_epochs = evolution.training_epochs
+        if early_stopping_patience is UNSET:
+            early_stopping_patience = evolution.early_stopping_patience
+        check_auto_settings('auto', population_size, training_epochs, early_stopping_patience)
 
         # H is always population_size - 1: for the two-objective weight space
         # EPDE uses, that keeps the Das-Dennis weight vectors equal in number
         # to the population, as MOEA/DD requires. It used to be a parameter
         # that was accepted and then immediately overwritten by exactly this.
+        # 'auto' sizes (and epochs) are resolved per fit, in _run_optimization.
         self.optimizer_init_params = {'pop_size': population_size,
-                              'H': population_size-1, 'neighbors_number': neighbors_number,
+                              'H': None if population_size == 'auto' else population_size-1,
+                              'neighbors_number': neighbors_number,
                               'solution_params': solution_params,
                               'nds_method' : nds_method,
                               'ndl_update' : ndl_update_method}
 
         self.optimizer_exec_params = {'epochs' : training_epochs,
-                                      'early_stopping_callback' : early_stopping_callback}
+                                      'early_stopping_callback' : early_stopping_callback,
+                                      'patience' : early_stopping_patience}
 
         # Forward the user-facing MOEA/DD parameters to the operators of the
         # strategy assembled in __init__ (previously these arguments were
@@ -389,19 +442,22 @@ class EpdeSearch(object):
 
     def set_singleobjective_params(self, population_size=UNSET, solution_params=UNSET,
                                    sorting_method: Callable = simple_sorting,
-                                   training_epochs=UNSET):
+                                   training_epochs=UNSET, early_stopping_patience=UNSET):
         """
         Setting parameters for singelobjective optimization.
 
         Args:
-            population_size (`int`): optional, default - 4
-                Size of population.
+            population_size (`int` or `'auto'`): optional, default - 'auto'
+                Size of population; 'auto' as in :meth:`set_moeadd_params`.
             solution_params (`dict`):
                 Parameters, guiding candidate solution creation.
             sorting_method(`callable`): optional, default - `simple_sorting`
                 Method for sorting of individs in population.
-            trainig_epochs (`int`): optional, default - 50
-                Maximum number of iterations, during that the optimization will be held.
+            training_epochs (`int`): optional, default - 100
+                The most iterations.
+            early_stopping_patience (`int` or None): optional, default - 5
+                Stop earlier, once the best individual's structure is unchanged for this many
+                iterations; None runs every iteration.
         Returns:
             None
         """
@@ -412,11 +468,14 @@ class EpdeSearch(object):
             solution_params = evolution.solution_params
         if training_epochs is UNSET:
             training_epochs = evolution.training_epochs
+        if early_stopping_patience is UNSET:
+            early_stopping_patience = evolution.early_stopping_patience
+        check_auto_settings('auto', population_size, training_epochs, early_stopping_patience)
 
         self.optimizer_init_params = {'pop_size' : population_size, 'solution_params': solution_params,
                                       'sorting_method' : sorting_method}
-        
-        self.optimizer_exec_params = {'epochs' : training_epochs}        
+
+        self.optimizer_exec_params = {'epochs' : training_epochs, 'patience' : early_stopping_patience}
 
 
     def _create_caches(self, memory_for_cache: Union[int, float]): # , coordinate_tensors, memory_for_cache):
@@ -456,18 +515,35 @@ class EpdeSearch(object):
         ``inner_shape``, while the points are actually excluded once, by
         ``g_func_mask``. If the two ever diverged, ``inner_shape`` would
         misdescribe the masked data.
+
+        The row budget (``domain.evaluation_stride``) has no keyword here: it
+        comes from the config only, so a domain never
+        carries a budget the search's config does not state (``fit`` checks).
+
+        ``boundary_width='auto'`` (the config default) is decided when the pool
+        is first built from this domain's data (``create_pool`` / ``fit``,
+        :meth:`_resolve_auto_boundaries`): until then the domain has no
+        boundary and its ``inner_shape`` is not final. An array ``gfunction``
+        has a fixed support, so it needs an explicit width.
         """
         domain_cfg = self._config.domain
         if time_axis is UNSET:
             time_axis = domain_cfg.time_axis
         if boundary_width is UNSET:
             boundary_width = domain_cfg.boundary_width
+        auto = isinstance(boundary_width, str) and boundary_width == 'auto'
+        if auto and isinstance(gfunction, (np.ndarray, list)):
+            raise ValueError("boundary_width='auto' needs a callable (or no) gfunction: an array "
+                             'test function fixes the excluded samples itself. Pass boundary_width.')
 
         self.set_memory_properties(grids[0], mem_for_cache_frac=self._mem_for_cache)
 
-        domain = Domain(grids, self.grid_cache, time_axis, ID, boundary=boundary_width)
-        domain.g_func = self._get_g_func(gfunction, boundary_width)
-        domain.validateTestFunction()
+        domain = Domain(grids, self.grid_cache, time_axis, ID, boundary=boundary_width,
+                        evaluation_stride=domain_cfg.evaluation_stride)
+        domain.g_func_form = gfunction
+        if not auto:
+            domain.g_func = self._get_g_func(gfunction, boundary_width)
+            domain.validateTestFunction()
         self._warn_if_grid_non_uniform(grids)
         # TODO: consider implementing domain.set_pruner()
         
@@ -664,11 +740,21 @@ class EpdeSearch(object):
         preprocessor_pipeline : PreprocessingPipe, optional
             Pipeline of operators, aimed on preparing all necessary data for equation discovery.
         default_preprocessor_type : str, optional
-            Key for selection of pre-defined preprocessors: **'poly'** matches Savitsky-Golay filtering, 'ANN' if for
+            Key for selection of pre-defined preprocessors: **'poly'** matches Savitsky-Golay filtering (kwargs
+            ``polynomial_window``: odd, default 'auto' = 9, wider for a higher degree, narrower on a short
+            axis; ``poly_order``: default derivative order + 1; both checked against ``max_deriv_order``
+            when the pool is built), 'ANN' if for
             neural network data approximation and further finite-difference differentiation, 'spectral' for
-            spectral differentiation, 'forward' for unsmoothed data with forward-increment (Ito) time
-            derivatives -- the drift estimate for stochastic data, kwargs ``lag`` (samples, default 1)
-            and ``time_axis`` (default: the domain config's). The default is 'poly'.
+            Fourier differentiation (kwargs ``periodic``: one value or one per axis, default 'auto' =
+            decided from the data by a seam test, True / 'included' = periodic, False = boundary-corrected
+            even extension; ``n`` and ``steepness``: optional Butterworth low-pass, default none),
+            'FD' for finite differences on the unsmoothed data (kwargs ``scheme``: the rule along the
+            time axis, 'central' (default, as every other axis), 'forward' -- the forward-increment
+            (Ito) derivative, the drift estimate for stochastic data -- or 'backward'; ``lag`` (samples,
+            default 1) and ``time_axis`` (default: the domain config's) for the one-sided schemes;
+            ``accuracy``: the order of the central differences, 4 (default; the five-point stencil,
+            second order on an axis it cannot serve) or 2). 'forward' is kept
+            as a deprecated name of 'FD' with ``scheme='forward'``. The default is 'poly'.
         preprocessor_kwargs : dict, optional
             Keyword arguments for preprocessor setup and operation. The default is an empty dictionary, corresponding to 
             all default parameters of the preprocessors.
@@ -695,10 +781,14 @@ class EpdeSearch(object):
             elif default_preprocessor_type == 'spectral':
                 setup.build_spectral_preprocessing(**preprocessor_kwargs)
             elif default_preprocessor_type == 'FD':
-                setup.build_FD_preprocessing(**preprocessor_kwargs)
-            elif default_preprocessor_type == 'forward':
-                setup.build_forward_preprocessing(
+                setup.build_FD_preprocessing(
                     **{'time_axis': self._config.domain.time_axis, **preprocessor_kwargs})
+            elif default_preprocessor_type == 'forward':
+                warnings.warn("default_preprocessor_type='forward' is 'FD' with scheme='forward': use "
+                              "default_preprocessor_type='FD', preprocessor_kwargs={'scheme': 'forward', ...}.",
+                              global_var.EPDEDeprecationWarning, stacklevel=2)
+                setup.build_FD_preprocessing(
+                    **{'time_axis': self._config.domain.time_axis, **preprocessor_kwargs, 'scheme': 'forward'})
             else:
                 raise NotImplementedError(
                     f'Incorrect default preprocessor type {default_preprocessor_type!r}. '
@@ -742,11 +832,105 @@ class EpdeSearch(object):
 
         additional_tokens = self._resolve_token_families(additional_tokens)
         data = self._as_trajectories(data, legacy_kwargs, 'create_pool')
+        if isinstance(data, Trajectory):
+            data = [data,]
+        self._install_dimensionality(additional_tokens, data)
+        self._resolve_auto_boundaries(data, max_deriv_order)
+        self._check_evaluation_lattice(data)
+        self._build_pool(data, additional_tokens, max_deriv_order, data_fun_pow, deriv_fun_pow)
+
+    def _build_pool(self, data, additional_tokens, max_deriv_order, data_fun_pow, deriv_fun_pow) -> None:
+        """``create_pool``'s work, on token families that are already resolved.
+
+        ``fit`` resolves the families once (config-declared ones included) and
+        calls this directly. Going through ``create_pool`` resolved them a
+        second time: every config family entered the pool twice, and the key
+        ``fit`` compares differed from the key stored here, so the pool was
+        rebuilt on every fit.
+
+        When the families differ from those of the current pool, the
+        trajectories are rebuilt from scratch: their subcaches hold the old
+        families' tensors and evaluated terms under labels the new families can
+        reuse (a CacheStoredTokens label, a continuous-parameter bucket), and the
+        cache never overwrites a label.
+        """
+        strided = [trajectory for trajectory in data
+                   if getattr(getattr(trajectory, '_domain', None), 'evaluation_stride', None) is not None]
+        if strided and any(isinstance(family, ControlVarTokens) for family in additional_tokens):
+            # Its tensors go into the cache unmasked, so they would not line up
+            # with the lattice rows.
+            raise ValueError('ControlVarTokens are not supported under a row budget '
+                             '(domain.evaluation_stride).')
+        force = (self._pool_params(data, additional_tokens, max_deriv_order, data_fun_pow, deriv_fun_pow)
+                 != getattr(self, 'pool_params', None))
+        self._prepare_trajectories(data, additional_tokens, max_deriv_order, data_fun_pow, deriv_fun_pow,
+                                   force=force)
+        # A family whose frequencies are found in the data (freq_from_data)
+        # gets them now: the trajectories are built and nothing has been drawn.
+        # Before pool_params is set, so a failure leaves the previous pool and
+        # its key consistent.
+        # Every family's frequencies are found first and installed only when all
+        # were found, so one failing family leaves the others untouched.
+        from_data = [family for family in additional_tokens
+                     if getattr(family, '_freq_from_data', None) is not None]
+        found = [family.frequencies_from_data(data) for family in from_data]
+        resolved = [(family.token_family.ftype, family.install_frequencies(values))
+                    for family, values in zip(from_data, found)]
+        deferred = [family for family in additional_tokens
+                    if getattr(family if isinstance(family, TokenFamily) else family._token_family,
+                               'deferred_params', None)]
+        if deferred:
+            raise ValueError('These token families still wait for values from the data and nothing resolves '
+                             f'them: {[getattr(f, "ftype", None) or f._token_family.ftype for f in deferred]}.')
+        # TODO: refactor! It is neccessary. Each sample must have a separate ANN?
+        if self._config.solver.use_solver:
+            warnings.warn('Missing code for ANN pretraining!')
+
+        self._register_trajectories(data)
+        self.pool = TFPool(data[0].tokens + [tf if isinstance(tf, TokenFamily) else tf.token_family
+                                             for tf in additional_tokens])
+        #TODO: add check, if all trajectories have the same tokens 
+        print(f'The cardinality of defined token pool is {self.pool.families_cardinality()}')
+        print(f'Among them, the pool contains {self.pool.families_cardinality(meaningful_only=True)}')
+        for ftype, values in resolved:
+            if isinstance(values, dict):
+                print(f'Frequencies of {ftype} found in the data, per axis: '
+                      f'{ {axis: list(axis_values) for axis, axis_values in values.items()} }')
+            else:
+                print(f'Frequencies of {ftype} found in the data: {list(values)}')
+        before = {id(family): list(family.tokens) for family in self.pool.families} if strided else None
+        for family in self.pool.families:
+            family.chech_constancy()
+        if strided:
+            # Constancy is judged on the kept rows -- right for every scorer,
+            # which sees only those, but worth saying.
+            removed = [label for family in self.pool.families
+                       for label in before[id(family)] if label not in family.tokens]
+            if removed:
+                warnings.warn(f'Constant on the row-budget lattice, removed from the pool: {removed}.',
+                              global_var.EPDEUsageWarning, stacklevel=3)
+            self._warn_lattice_nyquist(strided, additional_tokens)
+        # The key last: if anything above raised, the next fit must not take the
+        # half-built pool for the one this key describes.
+        self._pool_data = list(data)
+        self.pool_params = self._pool_params(
+            data, additional_tokens, max_deriv_order, data_fun_pow, deriv_fun_pow)
+
+    @staticmethod
+    def _prepare_trajectories(data, additional_tokens, max_deriv_order, data_fun_pow, deriv_fun_pow,
+                              force: bool = False) -> None:
+        """Build every trajectory for the request (from scratch with ``force``)
+        and put the families' own tensors into it."""
         assert isinstance(data, list), f'On this stage, data has to be a list of Trajectory objs., instead got {type(data)}.'
+        bad = [tf for tf in additional_tokens
+               if not isinstance(tf, (TokenFamily, PreparedTokens))]
+        if bad:
+            raise TypeError('Incorrect type of additional tokens: expected '
+                            f'TokenFamily/PreparedTokens objects, got {type(bad[0])}.')
         for trajectory in data:
             assert isinstance(trajectory, Trajectory), \
                 f'Individual trajectories have to be passed as Trajectory objects, instead got {type(trajectory)}.'
-            trajectory.build(max_deriv_order, data_fun_pow, deriv_fun_pow)
+            trajectory.build(max_deriv_order, data_fun_pow, deriv_fun_pow, force=force)
             # A family that ships its own tensors (CacheStoredTokens) declares
             # them once, with the family, because a family is pool structure.
             # Evaluation is per trajectory, so the tensors land in every
@@ -756,83 +940,182 @@ class EpdeSearch(object):
                 tensors = getattr(family, 'token_tensors', None)
                 if tensors:
                     trajectory.uploadTokenTensors(family, tensors)
-        self.pool_params = cur_params = self._pool_params(
-            data, additional_tokens, max_deriv_order, data_fun_pow, deriv_fun_pow)
 
-        if isinstance(data, Trajectory):
-            data_tokens = data.families
-            base_derivs = data.base_derivs
-        elif isinstance(data, (list, tuple)):
-            # data_tokens = []
-            # for entry in data:
-            assert isinstance(data[0], Trajectory), \
-                f'Individual trajectories have to be passed as Trajectory objects, instead got {type(data[0])}.'
-            data_tokens = data[0].families
-            base_derivs = data[0].base_derivs
+    @staticmethod
+    def _register_trajectories(data) -> None:
+        """The samples manager holds exactly these trajectories. Evaluators,
+        fitness and the right-part selection walk every registered sample, so
+        one left from an earlier fit would join this fit's data -- or, its
+        tensors released, raise."""
+        global_var.samples_manager.reset()
+        for trajectory in data:
+            global_var.samples_manager.addTrajectory(trajectory, domain=trajectory._domain)
 
-        # if isinstance(data, np.ndarray):
-        #     data = [data,]
+    @staticmethod
+    def _install_dimensionality(additional_tokens, trajectories) -> None:
+        """Size every ``dimensionality='auto'`` family (``TrigonometricTokens``, ``GridTokens``)
+        to the data: ``dim`` in 0 .. ndim - 1. Before the pool key is taken, so the key -- which
+        holds the families' parameters -- is the same on every fit of the same data."""
+        families = [family for family in additional_tokens
+                    if getattr(family, '_auto_dimensionality', False)]
+        if not families:
+            return
+        ndims = {len(trajectory._domain.initial_shape) for trajectory in trajectories}
+        if len(ndims) != 1:
+            raise ValueError(f"dimensionality='auto' token families need trajectories of one "
+                             f'dimensionality, got {sorted(ndims) or "none"}.')
+        ndim = ndims.pop()
+        for family in families:
+            family.install_dimensionality(ndim)
 
-        # if derivs is None:
-        #     if len(data) != len(variable_names):
-        #         msg = f'Mismatching nums of data tensors {len(data)} and the names of the variables { len(variable_names)}'
-        #         raise ValueError(msg)
-        # else:
-        #     if not (len(data) == len(variable_names) == len(derivs)):
-        #         raise ValueError('Mismatching lengths of data tensors, names of the variables and passed derivatives')
+    #: The boundary given to an 'auto' domain whose preprocessing cannot say how far its edge
+    #: error reaches (a custom calculator or smoother without ``edge_reach``): the old default.
+    FALLBACK_BOUNDARY = 5
 
-        # if not self.preprocessor_set:
-        #     self.set_preprocessor()
+    def _resolve_auto_boundaries(self, trajectories, max_deriv_order) -> None:
+        """Give every 'auto' domain under ``trajectories`` its boundary: per axis, the widest edge
+        reach of the preprocessing of the trajectories on it (``Trajectory.edge_reach``), with the
+        test function rebuilt to exclude exactly that. It is set once; a later build reaching
+        further raises, since the cached rows, inner shape and strides follow from it. An explicit
+        width narrower than the reach only warns: it is the caller's to choose."""
+        groups = {}
+        for trajectory in trajectories:
+            domain = getattr(trajectory, '_domain', None)
+            if domain is not None:
+                groups.setdefault(id(domain), (domain, []))[1].append(trajectory)
+        for domain, members in groups.values():
+            reaches = [trajectory.edge_reach(max_deriv_order) for trajectory in members]
+            known = [reach for reach in reaches if reach is not None]
+            reach = [max(axis) for axis in zip(*known)] if known else [0] * len(domain.initial_shape)
+            if domain.boundary_pending:
+                if len(known) < len(reaches):
+                    warnings.warn(
+                        f"boundary_width='auto': the preprocessing of domain {domain.ID} does not "
+                        'say how far its edge error reaches (no edge_reach on its calculator or '
+                        f'smoother); using {self.FALLBACK_BOUNDARY} samples per end.',
+                        global_var.EPDEUsageWarning, stacklevel=3)
+                    reach = [max(r, self.FALLBACK_BOUNDARY) for r in reach]
+                domain.resolve_boundary(reach, self._get_g_func(domain.g_func_form, reach))
+                continue
+            have = list(domain.boundary_width_per_axis)
+            short = [axis for axis, (need, got) in enumerate(zip(reach, have)) if need > got]
+            if not short or len(known) < len(reaches):
+                continue
+            if domain.boundary_auto:
+                raise ValueError(
+                    f'Domain {domain.ID} took its boundary {have} automatically from an earlier '
+                    f'build, but this one corrupts {reach} samples per end (a higher derivative '
+                    'order or another preprocessor). Create the domain again, or pass '
+                    'boundary_width.')
+            warnings.warn(
+                f'boundary_width {domain.boundary_width} of domain {domain.ID} is narrower than '
+                f'the edge reach of its preprocessing, {reach} samples per end, on axes {short}: '
+                'the derivatives kept there come from the edge treatment (one-sided stencils) '
+                "rather than the scheme itself. boundary_width='auto' excludes them.",
+                global_var.EPDEUsageWarning, stacklevel=3)
 
-        # if self._mode_info['solver_fitness']: 
-        #     base_derivs = []
-            
-        # for data_elem_idx, data_tensor in enumerate(data):
-        #     entry = VariableEntry(var_name=variable_names[data_elem_idx], var_idx=data_elem_idx,
-        #                            data_tensor=data_tensor, boundary=self.cache[0].g_func)
-        #     derivs_tensor = derivs[data_elem_idx] if derivs is not None else None
-        #     entry.setDerivatives(preprocesser=self.preprocessor_pipeline, deriv_tensors=derivs_tensor,
-        #                           grid=grid, max_order=max_deriv_order)
-        #     # entry.use_global_cache()
+    def _check_evaluation_lattice(self, trajectories, search_space=None) -> None:
+        """Every trajectory's domain carries exactly the row budget this
+        search's config states, and under a budget the instability metric's
+        partition still has the rows it needs.
 
-        #     self.save_derivatives(variable=variable_names[data_elem_idx], deriv=entry.derivatives)  
-        #     entry.create_derivs_family(max_deriv_power=deriv_fun_pow)
-        #     entry.create_polynomial_family(max_power=data_fun_pow)
-        #     if self._mode_info['solver_fitness']:
-        #         base_derivs.extend(entry.matched_derivs(max_order = 2)) # TODO: add setup of Sobolev learning order
-                
-        #     data_tokens.extend(entry.get_families())
+        ``createDomain`` takes the budget from the config, but a domain built
+        by another search, built directly, or before ``config`` changed would
+        otherwise be evaluated with a budget nobody asked for -- or without the
+        one asked for -- and nothing would say so. Both directions raise.
 
-        # TODO: refactor! It is neccessary. Each sample must have a separate ANN?
-        if self._config.solver.use_solver:
-            warnings.warn('Missing code for ANN pretraining!')
-        
-        #     if data_nn is not None:
-        #         print('Using pre-trained ANN')
-        #         global_var.reset_data_repr_nn(data = data, derivs = base_derivs, train = False, 
-        #                                       grids = grid, predefined_ann = data_nn, device = self._device)
-        #     else:
-        #         pass
-        #         # epochs_max = 1e5 # 1e4
-                # global_var.reset_data_repr_nn(data = data, derivs = base_derivs, epochs_max=ann_epochs_max,
-                #                               grids = grid, predefined_ann = None, device = self._device,
-                #                               use_fourier = fourier_layers, fourier_params = fourier_params)
+        ``search_space``: the one the run will score under (``fit`` passes the
+        configuration it publishes); this search's own by default. Never the
+        process-global one, which the last search constructed may own.
+        """
+        cfg = self._config.domain
+        configured = cfg.evaluation_stride is not None
+        strided = []
+        for trajectory in trajectories:
+            domain = getattr(trajectory, '_domain', None)
+            actual = getattr(domain, 'evaluation_stride', None)
+            if domain is None or (not configured and actual is None):
+                # Not a trajectory: the type check downstream says so.
+                continue
+            expected = resolve_evaluation_stride(domain.initial_shape, domain.boundary_width_per_axis,
+                                                 cfg.evaluation_stride)
+            if expected != actual:
+                raise ValueError(
+                    f'Trajectory {trajectory.ID} is evaluated with evaluation_stride {actual}, but '
+                    f"this search's config (domain.evaluation_stride={cfg.evaluation_stride}) "
+                    f'gives {expected} for its domain. '
+                    'Build the domain with this search\'s createDomain.')
+            if actual is not None:
+                strided.append(trajectory)
+        if not strided:
+            return
+        from epde.operators.common.survival import configured_width, row_floor
+        metric = self._config.objectives.instability_metric
+        width = configured_width(self._config.search_space if search_space is None else search_space)
+        for trajectory in strided:
+            reason = row_floor(metric, trajectory.inner_shape, width)
+            if reason is not None:
+                raise ValueError(
+                    f'Trajectory {trajectory.ID} keeps too few rows under the row budget '
+                    f'(evaluation_stride {trajectory._domain.evaluation_stride}): {reason}. '
+                    'Lower domain.evaluation_stride.')
 
-        for traj in data:
-            global_var.samples_manager.addTrajectory(traj, domain = traj._domain)
+    @staticmethod
+    def _warn_lattice_nyquist(trajectories, additional_tokens) -> None:
+        """Say when a trigonometric family's highest frequency is at or above
+        the Nyquist frequency of a strided axis: on the kept points its columns
+        alias -- they may turn constant or collinear, and the fit drops them.
 
-        bad = [tf for tf in additional_tokens
-               if not isinstance(tf, (TokenFamily, PreparedTokens))]
-        if bad:
-            raise TypeError('Incorrect type of additional tokens: expected '
-                            f'TokenFamily/PreparedTokens objects, got {type(bad[0])}.')
-        self.pool = TFPool(data[0].tokens + [tf if isinstance(tf, TokenFamily) else tf.token_family
-                                             for tf in additional_tokens])
-        #TODO: add check, if all trajectories have the same tokens 
-        print(f'The cardinality of defined token pool is {self.pool.families_cardinality()}')
-        print(f'Among them, the pool contains {self.pool.families_cardinality(meaningful_only=True)}')
-        for family in self.pool.families:
-            family.chech_constancy()
+        ``'trigonometric'`` is ``sin(f x_d)``, an angular frequency on the axes
+        of its ``dim`` range; ``'phased_sine_1d'`` is ``sin(2 pi f x_0 + ...)``,
+        a cyclic one on axis 0. The frequencies are the family's grid when it
+        has one (a frequency band found in the data keeps the band as bounds),
+        else the upper bound of its continuous range.
+        """
+        for family in additional_tokens:
+            tf = family if isinstance(family, TokenFamily) else family.token_family
+            if tf.ftype == 'trigonometric':
+                dims = tf.token_params.get('dim', (0, 0))
+                axes, half_turn = range(int(dims[0]), int(dims[1]) + 1), np.pi
+            elif tf.ftype == 'phased_sine_1d':
+                axes, half_turn = (0,), 0.5
+            else:
+                continue
+            grid = (getattr(tf, 'param_grids', None) or {}).get('freq')
+            if isinstance(grid, dict):
+                highest = None                      # per axis, below
+            else:
+                highest = float(np.max(grid)) if grid is not None and len(grid) else float(tf.token_params['freq'][1])
+            for trajectory in trajectories:
+                domain = trajectory._domain
+                grids = domain.getGrids()
+                for axis in axes:
+                    if axis >= len(grids) or domain.evaluation_stride[axis] == 1:
+                        continue
+                    if isinstance(grid, dict):      # a grid per axis: this axis's own frequencies
+                        if axis not in grid:
+                            continue
+                        highest = float(np.max(grid[axis]))
+                    step = float(np.median(np.abs(np.diff(np.asarray(grids[axis]), axis=axis))))
+                    if highest * domain.evaluation_stride[axis] * step >= half_turn:
+                        warnings.warn(
+                            f'{tf.ftype}: frequency {highest:.4g} is at or above the Nyquist frequency '
+                            f'{half_turn / (domain.evaluation_stride[axis] * step):.4g} of axis {axis} on '
+                            f'trajectory {trajectory.ID}\'s row-budget lattice (stride '
+                            f'{domain.evaluation_stride[axis]}); its columns alias on the kept points.',
+                            global_var.EPDEUsageWarning, stacklevel=3)
+
+    def _pool_built_on(self, data) -> bool:
+        """The current pool was built on exactly these Trajectory objects, they
+        are the registered samples, and their tensors are still cached (the
+        end-of-fit release drops them). Otherwise reusing it would evaluate
+        other data, or none."""
+        built_on = getattr(self, '_pool_data', None)
+        registered = list(global_var.samples_manager._traj.values())
+        return (built_on is not None and len(built_on) == len(data) == len(registered)
+                and all(old is new for old, new in zip(built_on, data))
+                and all(any(sample is trajectory for sample in registered) for trajectory in data)
+                and all(trajectory.tensors_cached for trajectory in data))
         
     def _as_trajectories(self, data, legacy_kwargs: dict, where: str):
         """Accept the pre-refactor data form and return Trajectory objects.
@@ -915,9 +1198,11 @@ class EpdeSearch(object):
         built for; all three change which token families exist, so all three
         have to invalidate it.
 
-        ``ftype`` is read off either a bare ``TokenFamily`` or a
-        ``PreparedTokens`` wrapper: ``create_pool`` accepts both, while this
-        key used to assume the wrapper and raise AttributeError on the former.
+        Each additional family enters as a fingerprint (``_family_key``) read
+        off either a bare ``TokenFamily`` or a ``PreparedTokens`` wrapper, not
+        as its ``ftype`` alone: two trigonometric families with different
+        ranges or frequency grids are different pools. The data itself is not
+        in the key -- ``fit`` checks it by identity (``_pool_built_on``).
         """
         if data is None:
             return None
@@ -925,10 +1210,42 @@ class EpdeSearch(object):
                 'max_deriv_order': max_deriv_order,
                 'data_fun_pow': data_fun_pow,
                 'deriv_fun_pow': deriv_fun_pow,
-                'additional_tokens': [
-                    (family if isinstance(family, TokenFamily)
-                     else family.token_family).ftype
-                    for family in additional_tokens]}
+                'additional_tokens': [EpdeSearch._family_key(family) for family in additional_tokens]}
+
+    @staticmethod
+    def _family_key(family) -> tuple:
+        """What makes a token family the family it is: its type, labels, the
+        ranges, equality ranges and grids of its parameters, and -- compared by
+        identity -- its evaluation function and the tensors it ships. Computed
+        when asked, so a grid installed in place (``install_param_grid``)
+        changes it."""
+        tf = family if isinstance(family, TokenFamily) else family.token_family
+
+        def plain(value):
+            if isinstance(value, np.ndarray):
+                return _Same(value)
+            if isinstance(value, (list, tuple)):
+                return tuple(plain(v) for v in value)
+            if isinstance(value, dict):         # a grid per axis
+                return items(value)
+            return value
+
+        def items(mapping):
+            return tuple(sorted(((key, plain(value)) for key, value in (mapping or {}).items()),
+                                key=lambda pair: str(pair[0])))
+
+        def function(evaluator):
+            return _Same(getattr(evaluator, '_evaluator', evaluator))
+
+        deriv_evaluators = getattr(tf, '_deriv_evaluators', None) or {}
+        return (type(family).__name__, tf.ftype, getattr(tf, 'variable', None), tuple(getattr(tf, 'tokens', ())),
+                items(getattr(tf, 'status', None)),
+                items(getattr(tf, 'token_params', None)), items(getattr(tf, 'equality_ranges', None)),
+                items(getattr(tf, 'param_grids', None)), items(getattr(tf, 'derivs_ords', None)),
+                function(getattr(tf, '_evaluator', None)),
+                tuple(sorted(((str(key), function(value)) for key, value in deriv_evaluators.items()),
+                             key=lambda pair: pair[0])),
+                _Same(getattr(family, 'token_tensors', None)))
 
     def _resolve_token_families(self, additional_tokens) -> list:
         """Configured token families plus the ones passed at the call site.
@@ -981,6 +1298,42 @@ class EpdeSearch(object):
             print('Trying to get derivatives before their calculation. Call EPDESearch.create_pool() to calculate derivatives')
             return None
 
+    def _seeding_interval(self, eq_sparsity_interval, stacklevel: int) -> tuple:
+        """The interval a new population seeds the ``('sparsity', var)``
+        metaparameter -- the legacy LASSO alpha -- from. It is the sparsity
+        operator's parameter, not the search space's (only ``LASSOSparsity``
+        reads the value): ``objectives.sparsity_kwargs['initial_sparsity_interval']``,
+        else the class's own ``initial_sparsity_interval``.
+
+        ``eq_sparsity_interval``, the deprecated ``fit`` argument, still
+        overrides it for that fit. Equal ends on the CLASS are that operator
+        saying it does not tune a sparsity constant at all, which makes a
+        passed interval inert -- worth a word, because it looks like it is
+        doing something. ``stacklevel`` lands the warning on the caller's line.
+        """
+        from epde.operators.common.sparsity import initial_sparsity_interval
+        objectives = self._config.objectives
+        sparsity_cls = objectives.sparsity_cls
+        class_interval = initial_sparsity_interval(sparsity_cls)
+        if eq_sparsity_interval is UNSET:
+            configured = objectives.sparsity_kwargs.get('initial_sparsity_interval')
+            return class_interval if configured is None else tuple(configured)
+        name = getattr(sparsity_cls, '__name__', sparsity_cls)
+        if class_interval[0] == class_interval[1]:
+            warnings.warn(
+                'eq_sparsity_interval seeds the LASSO alpha metaparameter, and '
+                '{0} never reads it -- the value is ignored. Pass '
+                "sparsity_cls='lasso' to run the pipeline it configures, and its interval "
+                "as sparsity_kwargs={{'initial_sparsity_interval': ...}}.".format(name),
+                global_var.EPDEUsageWarning, stacklevel=stacklevel)
+        else:
+            warnings.warn(
+                'fit(eq_sparsity_interval=...) is deprecated: the interval is a parameter of '
+                "{0} only. Pass EpdeSearch(sparsity_kwargs={{'initial_sparsity_interval': "
+                '{1}}}) instead.'.format(name, tuple(eq_sparsity_interval)),
+                global_var.EPDEDeprecationWarning, stacklevel=stacklevel)
+        return tuple(eq_sparsity_interval)
+
     @_loop_stats.timed('EpdeSearch.fit')
     def fit(self, data: Union[Trajectory, List[Trajectory]] = None,
             equation_terms_max_number=UNSET, equation_factors_max_number=UNSET,
@@ -999,24 +1352,29 @@ class EpdeSearch(object):
             multiple variables are not supported yet, use older interfaces. Default value is None, but it 
             shall be used only for retraining, when the pool argument is passed.
         equation_terms_max_number  : int, optional
-            The maximum number of terms, present in the derived equations, the default is 6.
+            The maximum number of terms an equation holds, the target included, in every
+            ``system_rps_mode`` -- the terms its right part is chosen from, and so also the most a
+            derived equation keeps unless ``'assignment'`` mode's ``selected_terms_max_number``
+            (``system_rps_params``) caps that lower. A new equation draws its number of terms
+            uniformly from 2 to it. The default is 6.
         equation_factors_max_number : int, optional
             The maximum number of factors (token functions; real-valued coefficients are not counted here),
             present in terms of the equaton, the default is 1.
         variable_names : list | str, optional
             Names of the independent variables, passed into search mechanism. Length of the list must correspond
-            to the number of np.ndarrays, sent with in ``data`` parameter. In case of system of differential equation discovery, 
+            to the number of np.ndarrays, sent with in ``data`` parameter. In case of system of differential equation discovery,
             all variables shall be named here, default - ``['u',]``, representing a single variable *u*.
         eq_sparsity_interval : tuple, optional
-            Interval the ``('sparsity', var)`` metaparameter -- the legacy LASSO
-            ``alpha`` -- is seeded from, log-uniformly, when the population is
-            created. Only ``LASSOSparsity`` reads that value, so the interval is
-            the sparse-regression operator's parameter and its default comes
-            from ``LASSOSparsity.initial_sparsity_interval`` ((1e-4, 2.5)),
-            not from the search-space configuration. It is an initial range
-            only: metaparameter mutation and crossover move alpha outside it
-            during the search. Under the default VWSR sparsity, which derives
-            its penalties from the data, passing this warns and changes nothing.
+            Deprecated: the interval is a parameter of the legacy LASSO
+            operator only -- pass ``EpdeSearch(sparsity_cls='lasso',
+            sparsity_kwargs={'initial_sparsity_interval': (lo, hi)})``. It
+            seeds the ``('sparsity', var)`` metaparameter -- the LASSO
+            ``alpha`` -- log-uniformly when the population is created (an
+            initial range only: metaparameter mutation and crossover move alpha
+            outside it), and only ``LASSOSparsity`` reads that value. Passed
+            here it still overrides the operator's interval for this fit, with
+            a deprecation warning; under the default VWSR sparsity, which
+            derives its penalties from the data, it warns and changes nothing.
         max_deriv_order : int | list | tuple, optional
             Highest order of calculated derivatives, and therefore the highest
             derivative offered as a token. It describes the POOL, not any one
@@ -1057,59 +1415,22 @@ class EpdeSearch(object):
         ``epde.interface.search_config.active_config``). The search's own
         ``config`` is not changed, so the next ``fit`` starts from the
         constructor's values again.
-
-        Under ``sparsity_cls='knee'`` with ``sparsity_kwargs={'realization':
-        'complexity'}`` every equation also carries an integer
-        ``('complexity', var)`` budget -- a metaparameter of its own, unrelated
-        to ``('sparsity', var)`` and to ``eq_sparsity_interval`` -- seeded
-        uniformly over ``1 .. (T - 1) * F + 1`` from this call's term and
-        factor maxima and stepped by the multiobjective mutation.
-        Single-objective mode seeds it but cannot evolve it, and warns.
         """
         # TODO: ADD EXPLICITLY SENT POPULATION PROCESSING
+        # A removed argument (e.g. the subset caps, now system_rps_params)
+        # raises before this fit publishes anything.
+        reject_removed(legacy_kwargs)
         search_space = self._config.search_space
         if equation_terms_max_number is UNSET:
             equation_terms_max_number = search_space.equation_terms_max_number
         if equation_factors_max_number is UNSET:
             equation_factors_max_number = search_space.equation_factors_max_number
-        # The seeding interval belongs to the sparsity operator rather than
-        # to the space of equations being searched, so it is read from the
-        # operator: objectives.sparsity_kwargs if configured there, else the
-        # class default. Equal ends on the CLASS are that operator saying it
-        # does not tune a sparsity constant at all, which makes an explicitly
-        # passed interval inert -- worth a word, because it looks like it is
-        # doing something.
-        from epde.operators.common.sparsity import initial_sparsity_interval
-        objectives = self._config.objectives
-        sparsity_cls = objectives.sparsity_cls
-        class_interval = initial_sparsity_interval(sparsity_cls)
-        configured = objectives.sparsity_kwargs.get('initial_sparsity_interval')
-        if eq_sparsity_interval is UNSET:
-            eq_sparsity_interval = (class_interval if configured is None
-                                    else tuple(configured))
-        elif class_interval[0] == class_interval[1]:
-            warnings.warn(
-                'eq_sparsity_interval seeds the LASSO alpha metaparameter, and '
-                '{0} never reads it -- the value is ignored. Pass '
-                "sparsity_cls='lasso' to run the pipeline it configures.".format(
-                    getattr(sparsity_cls, '__name__', sparsity_cls)),
-                global_var.EPDEUsageWarning, stacklevel=3)   # 3: @timed wrapper
-
-        # The complexity budget is a separate property, not a reading of the
-        # alpha above, and _run_optimization hands its range to the population
-        # constructor. Single-objective chromosomes carry no metaparameter
-        # genes, so there every equation keeps the budget it was seeded with
-        # -- worth a word here, the one frame that can point at the caller.
-        if (self._complexity_interval(equation_terms_max_number,
-                                      equation_factors_max_number) is not None
-                and not self.multiobjective_mode):
-            warnings.warn(
-                "sparsity_kwargs realization 'complexity' gives every "
-                'equation an integer complexity budget, but single-objective '
-                'mode cannot evolve it: each equation keeps the budget it is '
-                'seeded with for the whole search. Use multiobjective_mode=True '
-                'for the budgets to move.',
-                global_var.EPDEUsageWarning, stacklevel=3)   # 3: @timed wrapper
+        # with_overrides below does not validate, and the structure bound with
+        # the mode's caps decides what the assignment-mode subset search may cost.
+        check_rps_params(search_space.system_rps_mode, equation_terms_max_number,
+                         search_space.system_rps_params)
+        eq_sparsity_interval = self._seeding_interval(eq_sparsity_interval,
+                                                      stacklevel=4)   # 4: @timed wrapper
 
         max_deriv_order, data_fun_pow, deriv_fun_pow = self._pool_structure(
             max_deriv_order, data_fun_pow, deriv_fun_pow)
@@ -1138,37 +1459,71 @@ class EpdeSearch(object):
         if data is None and pool is None:
             raise ValueError('Data has to be specified beforehand or passed in '
                              'fit as an argument.')
+        if data is not None:
+            self._resolve_auto_boundaries(data, max_deriv_order)
+            self._check_evaluation_lattice(data, active_config().search_space)
+        self._install_dimensionality(additional_tokens, data if data is not None else
+                                     list(global_var.samples_manager._traj.values()))
 
         cur_params = self._pool_params(data, additional_tokens, max_deriv_order,
                                        data_fun_pow, deriv_fun_pow)
 
+        # Frequencies found in the data belong to that data: the reuse key does not
+        # see the data, so such a pool is rebuilt on every fit.
+        from_data = any(getattr(family, '_freq_from_data', None) is not None for family in additional_tokens)
+        # The key describes the pool, not the data: the pool is reused only when
+        # it was built on these very trajectories and their tensors survive.
         if pool is None:
-            if self.pool is None or self.pool_params != cur_params:
-                self.create_pool(data = data, additional_tokens=additional_tokens,
-                                 max_deriv_order=max_deriv_order,
-                                 data_fun_pow=data_fun_pow,
-                                 deriv_fun_pow=deriv_fun_pow)
+            if (self.pool is None or self.pool_params != cur_params or from_data
+                    or not self._pool_built_on(data)):
+                self._build_pool(data, additional_tokens, max_deriv_order, data_fun_pow, deriv_fun_pow)
         else:
-            self.pool = pool; self.pool_params = cur_params
+            # No key for a pool built elsewhere: the next fit without one rebuilds.
+            self.pool = pool; self.pool_params = None
+            if data is not None:
+                # A passed pool still needs this fit's samples built and
+                # registered: evaluation reads them from the samples manager,
+                # not from fit's arguments. From scratch, since the cached term
+                # tensors may belong to other families.
+                self._prepare_trajectories(data, additional_tokens, max_deriv_order,
+                                           data_fun_pow, deriv_fun_pow, force=True)
+                self._register_trajectories(data)
+                self._pool_data = list(data)
 
+        # Again on what will actually be evaluated: a passed pool may come with
+        # samples registered by an earlier fit.
+        self._check_evaluation_lattice(list(global_var.samples_manager._traj.values()),
+                                       active_config().search_space)
+        self._prepare_weak_rows()
         self._run_optimization(equation_terms_max_number, equation_factors_max_number,
                                eq_sparsity_interval, optimizer, population)
 
+    def _prepare_weak_rows(self) -> None:
+        """Install this fit's rows on the samples manager.
+
+        Strong rows clear any weak rows a previous fit left. Weak rows
+        (``domain.evaluation_form='weak'``) get one window per trajectory and
+        equation slot, picked from the raw data of the registered trajectories
+        (:func:`epde.structure.weak_rows.build_weak_rows`). The pick respects
+        the instability metric's row floor at the configured equation width."""
+        manager = global_var.samples_manager
+        manager.weak = None
+        cfg = active_config()
+        if cfg.domain.evaluation_form != 'weak':
+            return
+        from time import perf_counter
+        from epde.operators.common.survival import configured_width, row_floor
+        from epde.structure.weak_rows import build_weak_rows
+        metric = cfg.objectives.instability_metric
+        width = configured_width(cfg.search_space)
+        start = perf_counter()
+        weak = build_weak_rows(self.pool, manager, lambda shape: row_floor(metric, shape, width) is None)
+        manager.weak = weak
+        print(f'Weak-form windows ({perf_counter() - start:.1f} s):')
+        for (key, slot), plan in weak.plans.items():
+            print(f'  trajectory {key}, slot {slot}: {plan}')
 
 
-    def _complexity_interval(self, terms_max, factors_max):
-        """The integer range of the ``('complexity', var)`` budget, or None.
-
-        Asked of the configured sparsity operator class
-        (``KneeSparsity.complexity_interval``), with the term/factor maxima
-        this fit resolved. An operator without the hook, or a realization that
-        selects no budget, gives None -- and then no budget exists at all.
-        """
-        objectives = self._config.objectives
-        hook = getattr(objectives.sparsity_cls, 'complexity_interval', None)
-        if hook is None:
-            return None
-        return hook(objectives.sparsity_kwargs, terms_max, factors_max)
 
     def _run_optimization(self, equation_terms_max_number, equation_factors_max_number,
                           eq_sparsity_interval, optimizer=None, population=None):
@@ -1179,17 +1534,11 @@ class EpdeSearch(object):
             "max_factors_in_term": equation_factors_max_number,
             "sparsity_interval": eq_sparsity_interval,
             "second_objective": self._second_objective}
-        # Added only under a budget realization, so every other run hands the
-        # population constructors exactly the arguments it always did.
-        complexity_interval = self._complexity_interval(
-            equation_terms_max_number, equation_factors_max_number)
-        if complexity_interval is not None:
-            self.optimizer_init_params['population_instruct'][
-                'complexity_interval'] = complexity_interval
 
+        init_params, exec_params = self._resolved_budget()
         if optimizer is None:
             self.optimizer = self._create_optimizer(
-                self.multiobjective_mode, self.optimizer_init_params,
+                self.multiobjective_mode, init_params,
                 self.director, population, self._second_objective)
         else:
             self.optimizer = optimizer
@@ -1199,7 +1548,7 @@ class EpdeSearch(object):
         # MOEA/D-only exec param that set_moeadd_params leaves behind when an
         # EpdeSearch built multiobjective-by-default is run single-objective).
         _exec_keys = set(inspect.signature(self.optimizer.optimize).parameters) - {'self'}
-        _exec_params = {k: v for k, v in self.optimizer_exec_params.items() if k in _exec_keys}
+        _exec_params = {k: v for k, v in exec_params.items() if k in _exec_keys}
         self.optimizer.optimize(**_exec_params)
 
         print('The optimization has been conducted.')
@@ -1213,6 +1562,72 @@ class EpdeSearch(object):
             # them AFTER fit returns, so releasing those here would break most
             # of the post-fit API. ``close()`` releases everything.
             global_var.release_tensor_cache()
+
+    def _resolved_budget(self) -> tuple:
+        """``(init_params, exec_params)`` of this fit's optimizer: copies of
+        ``optimizer_init_params`` / ``optimizer_exec_params`` with an 'auto'
+        population size resolved and the early stop installed
+        (``EvolutionConfig``). The stored params keep 'auto', so every fit
+        resolves it again."""
+        from epde.interface.search_config import AUTO_POPULATION_CEILING, AUTO_POPULATION_FLOOR
+        init_params = dict(self.optimizer_init_params)
+        exec_params = dict(self.optimizer_exec_params)
+        if self.multiobjective_mode and (self._config.search_space.system_rps_mode == 'plain'
+                                         or self._config.evolution.engine == 'nsga2'):
+            # The same terms solved for different targets never dominate each
+            # other there, which makes dominance cycles possible: sort without
+            # losing their members (unless a caller chose its own sorts).
+            if init_params.get('nds_method') is fast_non_dominated_sorting:
+                init_params['nds_method'] = cycle_safe_nds
+            if init_params.get('ndl_update') is ndl_update:
+                init_params['ndl_update'] = cycle_safe_ndl_update
+        if init_params.get('pop_size') == 'auto':
+            floor = AUTO_POPULATION_FLOOR
+            if self.multiobjective_mode:
+                floor = max(floor, int(init_params.get('neighbors_number', 0)) + 1)
+                n_eqs = len(self.pool.families_demand_equation) if self.pool is not None else 1
+                if self._config.evolution.niching == 'per_equation' and n_eqs > 1:
+                    floor = max(floor, 2 * n_eqs)    # weight vector k serves equation k mod n
+            ceiling = max(AUTO_POPULATION_CEILING, floor)
+            init_params.update(pop_size=ceiling, population_floor=floor)
+            if 'H' in init_params:
+                init_params['H'] = ceiling - 1
+        # early_stopping_patience: the multi-objective optimizers stop through
+        # the stagnation callback, the single-objective one takes the patience.
+        if self.multiobjective_mode:
+            patience = exec_params.pop('patience', None)
+            if patience is not None:
+                exec_params['early_stopping_callback'] = self._stagnation_callback(
+                    patience, exec_params.get('early_stopping_callback'))
+        return init_params, exec_params
+
+    def _stagnation_callback(self, patience: int, user_callback: Callable = None) -> Callable:
+        """An ``early_stopping_callback`` stopping once the set of structures
+        on the first Pareto level (``SoEq.equations_labels``, never the
+        coefficient-bearing text form) has not changed for ``patience`` epochs
+        in a row. ``user_callback``, if any, is still asked every other epoch."""
+        state = {'key': None, 'still': 0}
+
+        def callback(snapshot, epoch_idx):
+            # NSGA-II reports its archive; MOEA/DD its first level. Keyed on
+            # structures (``SoEq.structure_labels``, the same labels as
+            # ``equations_labels`` outside plain mode), so a system re-solved
+            # for another target does not count as a change.
+            if hasattr(self.optimizer, 'reported_front'):
+                front = self.optimizer.reported_front()
+            else:
+                levels = self.optimizer.pareto_levels.levels
+                front = levels[0] if levels else []
+            key = frozenset(solution.structure_labels for solution in front)
+            state['still'] = state['still'] + 1 if key == state['key'] else 0
+            state['key'] = key
+            if state['still'] >= patience:
+                print(f'early_stopping_patience={patience}: the first Pareto level has not changed '
+                      f'for {patience} epochs; stopping after epoch {int(epoch_idx) + 1}.')
+                return True
+            return False if user_callback is None else user_callback(snapshot, epoch_idx)
+
+        return callback
 
     @staticmethod
     def _create_optimizer(multiobjective_mode: bool, optimizer_init_params: dict,
@@ -1233,7 +1648,9 @@ class EpdeSearch(object):
             best_sol_vals = ideal_point(axes)
             optimizer_init_params['best_sol_vals'] = best_sol_vals
             optimizer_init_params['passed_population'] = population
-            optimizer = MOEADDOptimizer(**optimizer_init_params)
+            engine = (NSGAOptimizer if active_config().evolution.engine == 'nsga2'
+                      else MOEADDOptimizer)
+            optimizer = engine(**optimizer_init_params)
             optimizer.pass_best_objectives(*best_sol_vals)
         else:
             optimizer_init_params['passed_population'] = population
@@ -1380,7 +1797,8 @@ class EpdeSearch(object):
     def pareto_history(self):
         """Per-epoch Pareto-level-0 snapshots, populated during ``fit``.
 
-        Returns a list of length ``training_epochs``; each element is a
+        Returns one entry per epoch run (``training_epochs`` at most; fewer
+        after an early stop, ``early_stopping_patience``); each element is a
         list of ``{'text_form': str, 'obj_fun': list}`` dicts -- one per
         solution on the non-dominated front at the end of that epoch.
         Empty list when the optimizer hasn't been run or doesn't track
@@ -1801,7 +2219,7 @@ class EpdeMultisample(EpdeSearch):
 
 
     def fit(self, samples: List[Tuple], equation_terms_max_number=6, equation_factors_max_number=1, variable_names=['u',], 
-            eq_sparsity_interval=(1e-4, 2.5), derivs=None, max_deriv_order=1, additional_tokens=[], 
+            eq_sparsity_interval=UNSET, derivs=None, max_deriv_order=1, additional_tokens=[],
             data_fun_pow: int = 1, deriv_fun_pow: int = 1, optimizer: Union[SimpleOptimizer, MOEADDOptimizer] = None, 
             pool: TFPool = None, population: Union[ParetoLevels, Population] = None):
         """
@@ -1824,8 +2242,9 @@ class EpdeMultisample(EpdeSearch):
             to the number of np.ndarrays, sent with in ``data`` parameter. In case of system of differential equation discovery, 
             all variables shall be named here, default - ``['u',]``, representing a single variable *u*.
         eq_sparsity_interval : tuple, optional
-            The left and right boundaries of interval with sparse regression values. Undirectly influences the 
-            number of active terms in the equation, the default is ``(1e-4, 2.5)``.
+            Deprecated, as in :meth:`EpdeSearch.fit`: the interval seeding the legacy LASSO alpha is that
+            operator's parameter, ``sparsity_kwargs={'initial_sparsity_interval': (lo, hi)}`` (by default
+            ``LASSOSparsity.initial_sparsity_interval``, (1e-4, 2.5)).
         derivs : list or list of lists of np.ndarrays, optional
             Pre-computed values of derivatives. If ``None`` is passed, the derivatives are calculated in the
             method. Recommended to use, if the computations of derivatives take too long. For further information
@@ -1880,7 +2299,10 @@ class EpdeMultisample(EpdeSearch):
                              additional_tokens = additional_tokens, data_fun_pow = data_fun_pow, deriv_fun_pow=deriv_fun_pow)
         else:
             self.pool = pool; self.pool_params = cur_params
+        self._check_evaluation_lattice(list(global_var.samples_manager._traj.values()))
+        self._prepare_weak_rows()
 
+        eq_sparsity_interval = self._seeding_interval(eq_sparsity_interval, stacklevel=3)
         self.optimizer_init_params['population_instruct'] = {"pool": self.pool, "terms_number": equation_terms_max_number,
                                                              "max_factors_in_term": equation_factors_max_number,
                                                              "sparsity_interval": eq_sparsity_interval}

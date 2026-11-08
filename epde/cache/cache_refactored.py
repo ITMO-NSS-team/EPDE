@@ -53,14 +53,41 @@ class Cache(object):
 
         self.initMemory()
 
-        self._deriv_codes = [] # Elements of this list must be tuples with the first element - 
-                               # deriv code ([var, term]) like ([1], [0]) for dy/dt in LV, and the second - cache label in 
-                               # standard form ('dy/dx1', (1.0,))
-
     def initMemory(self) -> None:
         self.memory_default    = dict() # In this dict, keys should be IDs of domains, arguments - matching types of tensors/arrays
-        self.memory_normalized = dict() # 
+        self.memory_normalized = dict() #
         # self.memory_anns       = dict() # Maybe, initialize storage for trained NNs
+        # Elements of this list must be tuples with the first element - deriv
+        # code ([var, term]) like ([1], [0]) for dy/dt in LV, and the second -
+        # cache label in standard form ('dy/dx1', (1.0,)). Emptied with the
+        # memory: the codes name tensors, and kept they only piled up again on
+        # every rebuild.
+        self._deriv_codes = []
+        # subcache ID -> the object (a Trajectory) whose build filled it. A
+        # subcache is not proof of ownership: every trajectory build also
+        # copies its variables into subcache 0.
+        self._owners = {}
+
+    def drop_subcache(self, subcache_ID) -> None:
+        """Forget every tensor of one subcache (a trajectory's, or a domain's grids) and its owner."""
+        self.memory_default.pop(subcache_ID, None)
+        self.memory_normalized.pop(subcache_ID, None)
+        getattr(self, '_owners', {}).pop(subcache_ID, None)
+
+    def claim_subcache(self, subcache_ID, owner) -> None:
+        self._owners[subcache_ID] = owner
+
+    def subcache_owner(self, subcache_ID):
+        return getattr(self, '_owners', {}).get(subcache_ID)
+
+    def _subcache(self, subcache_ID):
+        """``None`` names the None subcache when one exists -- a trajectory made
+        without a cache id keeps its tensors there -- and otherwise the first
+        registered one. Taking the first unconditionally only worked while the
+        None subcache happened to be first, which a rebuild changes."""
+        if subcache_ID is None and None not in self.memory_default:
+            return next(iter(self.memory_default.keys()))
+        return subcache_ID
 
     # ---------------------- Commented due to the method's logic being transfered to the Domain class ----------------------
     #
@@ -205,16 +232,13 @@ class Cache(object):
                 pass    
 
     def get(self, label: tuple = None, subcache_ID: int = None, normalized: bool = False, deriv_code = None) -> np.ndarray:
-        if subcache_ID is None:
-            subcache_ID = next(iter(self.memory_default.keys()))
-        
+        subcache_ID = self._subcache(subcache_ID)
+
         if deriv_code is not None: # Condition not verified in rework due to looking plausible
             assert label is None, 'Get method got both deriv_code and explicit label'
             label = [elem[1] for elem in self._deriv_codes if elem[0] == deriv_code][0]
 
         if label is None:
-            if subcache_ID is None:
-                raise RuntimeError("subcache ID must be passed.")
             # print(f'[subcache_ID]: {subcache_ID}, keys: {self.memory_default.keys()}')
             # print(f'cache.get: self.memory_default.values() {self.memory_default[subcache_ID].values()}')
             # print(f'selection from: {list(self.memory_default[subcache_ID].values())}')
@@ -228,8 +252,7 @@ class Cache(object):
             return self.memory_default[subcache_ID][label]
 
     def get_all(self, normalized: bool = False, subcache_ID: int = None):
-        if subcache_ID is None:
-            subcache_ID = next(iter(self.memory_default.keys()))
+        subcache_ID = self._subcache(subcache_ID)
 
         if normalized:
             processed_mem = self.memory_normalized[subcache_ID]
@@ -247,9 +270,8 @@ class Cache(object):
     def getKeys(self, subcache_ID: int = None) -> list:    # List[Tuple[int, list]]:
         # ``subcache_ID`` was read without being declared -- an
         # ``UnboundLocalError`` on every call. Mirrors ``get_all``'s
-        # signature: None means "the first registered subcache".
-        if subcache_ID is None:
-            subcache_ID = next(iter(self.memory_default.keys()))
+        # signature: None means the None subcache, else "the first registered subcache".
+        subcache_ID = self._subcache(subcache_ID)
 
         return list(self.memory_default[subcache_ID].keys())
 

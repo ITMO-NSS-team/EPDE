@@ -8,6 +8,7 @@ Created on Thu Mar  5 13:16:43 2020
 
 import numpy as np
 import copy
+import warnings
 import torch
 from typing import Callable, Dict, List, Union
 
@@ -21,6 +22,22 @@ from epde.structure.Tokens import TerminalToken
 from epde.supplementary import factor_params_to_str, train_ann, use_ann_to_predict, exp_form
 from epde.structure.structure_template import _deepcopy_slots
 from epde.evaluators import simple_function_evaluator
+
+
+# A parameter declared with a grid (``TokenFamily.set_params(param_grids=...)``,
+# e.g. ``np.linspace(lo, hi, num)``) takes only the grid's values. Every value
+# a factor holds is one of the stored grid floats, so equal grid points are
+# bit-equal and carry one label (the value itself).
+
+def grid_index(value, grid) -> int:
+    """Index of the grid value nearest to ``value`` (the lower one on a tie)."""
+    return int(np.argmin(np.abs(np.asarray(grid, dtype=float) - value)))
+
+
+def snap_to_grid(value, grid):
+    """The grid value nearest to ``value``."""
+    return grid[grid_index(value, grid)]
+
 
 class EvaluatorContained(object):
     """
@@ -155,12 +172,30 @@ class Factor(TerminalToken):
         self._status = status_dict
 
     def set_parameters(self, params_description: dict, equality_ranges: dict,
-                       random=True, **kwargs):
+                       random=True, param_grids: dict = None, **kwargs):
         '''
 
-        Avoid periodic parameters (e.g. phase shift) 
+        Avoid periodic parameters (e.g. phase shift)
+
+        ``param_grids`` maps a parameter name to its grid values (see
+        ``TokenFamily.set_params``). A gridded parameter is drawn as a grid
+        index (one draw while the grid has more than one value) and its
+        description carries ``'grid'``. An explicitly passed value of a
+        gridded parameter is moved to its nearest grid value, with an
+        ``EPDEUsageWarning`` when that changes it: a gridded parameter is
+        labelled by its value, which must be a grid value (labelling an
+        off-grid one raises). Without grids nothing here changes.
+
+        A grid given per axis (``{dim value: grid}``, ``TokenFamily.
+        install_param_grid``) holds the values of the factor's own axis: a drawn
+        factor takes its axis first, among those with a grid, then a value of
+        that axis's grid; an explicit one is snapped to the grid of its ``dim``.
+        Either way the description carries that axis's grid, which the
+        operators that shift or blend the parameter snap to.
 
         '''
+        grids = {name: grid for name, grid in (param_grids or {}).items() if grid is not None}
+        per_axis = [grid for grid in grids.values() if isinstance(grid, dict)]
         _params_description = {}
         if not random:
             _params = np.empty(len(kwargs))
@@ -172,16 +207,44 @@ class Factor(TerminalToken):
                 _params[param_idx] = param_info[1]
                 _params_description[param_idx] = {'name': param_info[0],
                                                   'bounds': params_description[param_info[0]]}
+                if param_info[0] in grids:
+                    grid = grids[param_info[0]]
+                    if isinstance(grid, dict):
+                        axis = int(round(float(kwargs['dim'])))
+                        if axis not in grid:
+                            raise ValueError(f'{self.label}: no {param_info[0]} along axis {axis}; the axes '
+                                             f'with one are {sorted(grid)}.')
+                        grid = grid[axis]
+                    _params_description[param_idx]['grid'] = grid
+                    snapped = snap_to_grid(param_info[1], grid)
+                    if snapped != param_info[1]:
+                        warnings.warn(f'{self.label}: {param_info[0]}={param_info[1]} is not one of its grid '
+                                      f'values {list(grid)}; using {snapped}.',
+                                      global_var.EPDEUsageWarning, stacklevel=2)
+                    _params[param_idx] = snapped
         else:
             _params = np.empty(len(params_description))
+            axis = None
+            if per_axis:
+                axes = sorted(set.intersection(*(set(grid) for grid in per_axis)))
+                axis = axes[np.random.randint(0, len(axes))] if len(axes) > 1 else axes[0]
             for param_idx, param_info in enumerate(params_description.items()):
-                if param_info[0] != 'power' or self.status['non_default_power']:
+                grid = grids.get(param_info[0])
+                if isinstance(grid, dict):
+                    grid = grid[axis]
+                if param_info[0] == 'dim' and axis is not None:
+                    _params[param_idx] = axis
+                elif grid is not None and (param_info[0] != 'power' or self.status['non_default_power']):
+                    _params[param_idx] = grid[np.random.randint(0, len(grid)) if len(grid) > 1 else 0]
+                elif param_info[0] != 'power' or self.status['non_default_power']:
                     _params[param_idx] = (np.random.randint(param_info[1][0], param_info[1][1] + 1) if isinstance(param_info[1][0], int)
                                           else np.random.uniform(param_info[1][0], param_info[1][1])) if param_info[1][1] > param_info[1][0] else param_info[1][0]
                 else:
                     _params[param_idx] = 1
                 _params_description[param_idx] = {'name': param_info[0],
                                                   'bounds': param_info[1]}
+                if grid is not None:
+                    _params_description[param_idx]['grid'] = grid
         self.equality_ranges = equality_ranges
         super().__init__(number_params=_params.size, params_description=_params_description,
                          params=_params)
@@ -327,6 +390,16 @@ class Factor(TerminalToken):
         TerminalToken.params.fset(self, params)
         self._invalidate_label_cache()
 
+    def grid_snap(self, value, idx: int):
+        """``value`` for parameter ``idx`` moved to its nearest grid value when
+        that parameter has a grid; otherwise ``value`` itself, untouched.
+        Operators that blend or shift parameters (crossover, parameter
+        mutation) write through this so a gridded parameter stays on its grid."""
+        grid = self.params_description[idx].get('grid')
+        if grid is None:
+            return value
+        return snap_to_grid(value, grid)
+
     def set_param(self, param, name=None, idx=None):
         # Single-parameter mutation path. ``TerminalToken.set_param``
         # writes to ``self._params[idx]`` in place and clears
@@ -343,11 +416,14 @@ class Factor(TerminalToken):
 
     def _quantized_params(self, drop_power: bool = False) -> tuple:
         """Return params with continuous-tolerance ones quantized into bucket
-        indices and exact-equality ones passed through. Continuous params
-        (those with ``equality_ranges[name] > 0``, e.g. trig ``freq``) get
-        ``int((v - bounds[0]) / equality_ranges[name])``; exact-equality
-        params (``power``, ``dim``) stay numeric. When ``drop_power=True``
-        the param named ``'power'`` is omitted from the result tuple.
+        indices and exact-equality ones passed through. A gridded param (its
+        description carries ``'grid'``) is labelled by its value, which must be a grid value.
+        Other continuous params (those with ``equality_ranges[name] > 0``,
+        e.g. trig ``freq`` without a grid) get
+        ``int((v - bounds[0]) / equality_ranges[name])``;
+        exact-equality params (``power``, ``dim``) stay numeric. When
+        ``drop_power=True`` the param named ``'power'`` is omitted from the
+        result tuple.
         """
         parts = []
         for i in range(len(self.params)):
@@ -356,7 +432,19 @@ class Factor(TerminalToken):
                 continue
             v = self.params[i]
             tol = self.equality_ranges.get(name, 0)
-            if tol > 0:
+            grid = self.params_description[i].get('grid')
+            if grid is not None:
+                # A gridded parameter is labelled by its value, which is always
+                # one of the stored grid floats: the label does not depend on
+                # which grid it came from (a grid found in the data changes from
+                # fit to fit), and a writer that skipped the snap fails here
+                # instead of silently sharing a grid point's cached tensor.
+                value = float(v)
+                if value not in grid:
+                    raise ValueError(f'{self.label}: {name}={value} is not one of its grid values {list(grid)}; '
+                                     'a writer of a gridded parameter must snap it (Factor.grid_snap).')
+                parts.append(value)
+            elif tol > 0:
                 origin = self.params_description[i]['bounds'][0]
                 parts.append(int((v - origin) / tol))
             else:

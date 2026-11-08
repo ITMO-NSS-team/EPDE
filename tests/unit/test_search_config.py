@@ -54,7 +54,7 @@ class TestDefaultPin:
 
     def test_domain_and_preprocessing(self):
         cfg = load_search_config()
-        assert cfg.domain.boundary_width == 5        # createDomain
+        assert cfg.domain.boundary_width == 'auto'   # createDomain; was 5
         assert cfg.domain.time_axis == 0
         assert cfg.preprocessing.default_preprocessor_type == 'poly'
         assert cfg.preprocessing.preprocessor_kwargs == {}
@@ -77,7 +77,7 @@ class TestDefaultPin:
         cfg = load_search_config().objectives
         assert cfg.discrepancy_metric == 'wape'
         assert cfg.complexity_metric == 'factors'
-        assert cfg.instability_metric == 'chi2'
+        assert cfg.instability_metric == 'dyad'
         assert cfg.single_objective_metric == 'discrepancy'
         assert cfg.anchor_on_residual is False
         assert cfg.multiobjective_mode is True
@@ -136,10 +136,11 @@ class TestDefaultPin:
         assert cfg.solver.pinn_loss_mult == 0.0
         assert cfg.evolution.operators['SolverBasedFitness']['pinn_loss_mult'] == 2.0
 
-    def test_evolution_defaults_are_the_multiobjective_ones(self):
+    def test_evolution_defaults(self):
         cfg = load_search_config().evolution
-        assert cfg.population_size == 6      # set_moeadd_params
-        assert cfg.training_epochs == 100
+        assert cfg.population_size == 'auto'      # set_moeadd_params; was 6
+        assert cfg.training_epochs == 100         # the most epochs (no 'auto')
+        assert cfg.early_stopping_patience == 5
         assert cfg.neighbors_number == 3
         assert cfg.PBI_penalty == 5.0
         assert cfg.subregion_mating_limitation == 0.9
@@ -152,20 +153,22 @@ class TestDefaultPin:
 
 
 class TestSingleObjectiveDefaults:
-    """``set_singleobjective_params`` used 4 / 50 where MOEA/D used 6 / 100.
-    Flipping the mode must not silently change them."""
+    """``set_singleobjective_params`` used 4 / 50 where MOEA/D used 6 / 100, and
+    the loader substituted them on a mode flip. Both modes now share the
+    defaults (population 'auto', resolved per mode at fit time; at most 100
+    epochs, patience 5), so nothing is substituted."""
 
-    def test_mode_flip_restores_the_single_objective_values(self):
+    def test_mode_flip_keeps_auto(self):
         cfg = load_search_config(
             overrides=collect_overrides(multiobjective_mode=False))
-        assert cfg.evolution.population_size == 4
-        assert cfg.evolution.training_epochs == 50
+        assert cfg.evolution.population_size == 'auto'
+        assert (cfg.evolution.training_epochs, cfg.evolution.early_stopping_patience) == (100, 5)
 
     def test_explicit_kwarg_still_wins(self):
         cfg = load_search_config(overrides=collect_overrides(
             multiobjective_mode=False, population_size=11))
         assert cfg.evolution.population_size == 11
-        assert cfg.evolution.training_epochs == 50
+        assert cfg.evolution.training_epochs == 100
 
     def test_explicit_file_value_still_wins(self, tmp_path):
         path = _write(tmp_path, {'evolution': {'population_size': 9}})
@@ -353,7 +356,7 @@ class TestKeyGroup:
                                                   population_size=UNSET)
         assert cfg.solver.use_solver is True
         assert cfg.domain.boundary_width == 7
-        assert cfg.evolution.population_size == 6
+        assert cfg.evolution.population_size == 'auto'
 
 
 class TestCoverageTotality:
@@ -379,8 +382,9 @@ class TestCoverageTotality:
         # reporting, not search configuration
         'only_print', 'only_str', 'num', 'dimensions',
         # owned by the operator that reads it: the default comes from
-        # LASSOSparsity.initial_sparsity_interval and this is a per-run
-        # override of it, not a description of the search space
+        # LASSOSparsity.initial_sparsity_interval (configured through
+        # sparsity_kwargs) and this is a deprecated per-run override of
+        # it, not a description of the search space
         # (see test_sparsity_interval.py).
         'eq_sparsity_interval',
     }
@@ -485,6 +489,14 @@ class TestSparsityRegistry:
     def test_bogus_name_is_rejected(self):
         with pytest.raises(ValueError, match='Unknown sparsity'):
             resolve_sparsity('elasticnet')
+
+    def test_the_removed_knee_operator_is_refused_by_name(self):
+        """``sparsity_cls='knee'`` and its complexity budget were removed; a
+        config that still names it fails loud instead of falling back."""
+        with pytest.raises(ValueError, match='Unknown sparsity'):
+            resolve_sparsity('knee')
+        with pytest.raises(ValueError, match='Unknown sparsity'):
+            load_search_config(overrides={'sparsity_cls': 'knee'})
 
 
 class TestTokenRegistry:

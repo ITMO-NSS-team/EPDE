@@ -35,6 +35,7 @@ from epde.preprocessing.domain_pruning import DomainPruner
 from epde.structure.encoding import Chromosome
 from epde.structure.factor import Factor
 from epde.structure.structure_template import ComplexStructure, check_uniqueness, _deepcopy_slots
+from epde.structure.weak_rows import slot_of, term_columns
 from epde.supplementary import filter_powers, normalize_ts, population_sort, flatten, rts, exp_form, minmax_normalize, retry_until_unique
 
 
@@ -43,21 +44,6 @@ _DEFAULT_EQUATION_METAPARAMETERS = {
     'max_terms_number':    {'optimizable': False, 'value': 5.},
     'max_factors_in_term': {'optimizable': False, 'value': 1.},
 }
-
-#: Label of the per-equation complexity budget, keyed ``('complexity', var)``
-#: beside ``('sparsity', var)`` and independent of it. It exists only when the
-#: configured sparsity operator selects by a budget (``KneeSparsity``'s
-#: ``'complexity'`` realization): the population constructors seed it as an
-#: integer with its ``'bounds'``, multiobjective ``SystemMutation`` steps it,
-#: and an equation without it has no budget. Deliberately absent from the
-#: defaults above, so a default run carries exactly the keys it always did.
-COMPLEXITY_METAPARAMETER = 'complexity'
-
-
-def is_complexity_key(key) -> bool:
-    """True for a ``('complexity', var)`` metaparameter key."""
-    return (isinstance(key, tuple) and len(key) == 2
-            and key[0] == COMPLEXITY_METAPARAMETER)
 
 
 def _normalize_metaparameters(mp: dict) -> dict:
@@ -258,11 +244,26 @@ class Term(ComplexStructure):
             raise ValueError('Described variable marker shall be a family label (i.e. "u") of "False"')
 
     @_loop_stats.timed('Term.evaluate')
-    def evaluate(self, grids: Union[List[np.ndarray], Dict[int, List[np.ndarray]]] = None) -> Dict[int, np.ndarray]:
+    def evaluate(self, grids: Union[List[np.ndarray], Dict[int, List[np.ndarray]]] = None,
+                 slot: str = None) -> Dict[int, np.ndarray]:
+        """The term's column per trajectory.
+
+        Strong rows (the default): the pointwise values on the interior box, flattened. Weak rows
+        (``domain.evaluation_form='weak'``): the term's weak column on the window of equation slot ``slot``
+        (the variable the equation explains). Every slot has its own window, so in weak mode a call without
+        ``slot`` raises rather than guess which rows the caller pairs it with."""
         # assert global_var.samples_manager is not None, 'Currently working only with connected cache'
         if grids is not None:
             # FIX! grids are not used in the process...
             raise NotImplementedError("Trying to call Term.evaluate(grids != None), which is not yet implemented.")
+        weak = getattr(global_var.samples_manager, 'weak', None)
+        if weak is not None:
+            if slot is None:
+                raise RuntimeError(
+                    f"Term.evaluate() of {self.name} without an equation slot under "
+                    "domain.evaluation_form='weak': weak rows are set per slot. Pass "
+                    'slot=<equation>.main_var_to_explain.')
+            return weak.columns(self, slot)
 
         if self.saved[False] or (self.factors_labels, False) in global_var.samples_manager:
             values = global_var.samples_manager.get(self.factors_labels, normalized=False,
@@ -455,7 +456,7 @@ class Term(ComplexStructure):
 #                   right after the prune (fitness.py). Pinned by
 #                   TestSparsityCachePreservation.
 _EQ_CACHE_FIELDS = (
-    ('_eval_cache', 'structure'),                        # evaluate() memo, wiped to a FRESH {}
+    ('_eval_cache', 'structure'),                        # evaluate() memo, wiped to a FRESH {}; released after scoring
     ('_terms_labels_cache', 'structure'),
     ('_terms_labels_without_power_cache', 'structure'),
     ('_gram_super', 'structure'),                        # EqRPS tier-3 super-Gram, one sweep only
@@ -469,11 +470,11 @@ _EQ_CACHE_FIELDS = (
     ('_cached_alt_instability', 'structure'),
 )
 _EQ_STRUCTURE_CACHES = tuple(f for f, p in _EQ_CACHE_FIELDS if p == 'structure')
-# Slots skipped by the copy paths. ``_eval_cache`` is exempt: it is traversed
-# by ``_deepcopy_slots`` and then replaced with a fresh dict, so the copy owns
-# an EMPTY-but-equal dict (pinned by
-# test_eval_cache_after_deepcopy_is_fresh_dict).
-_EQ_CACHE_AVOID_COPY = tuple(f for f, _ in _EQ_CACHE_FIELDS if f != '_eval_cache')
+# Slots skipped by the copy paths -- every cache. ``_eval_cache`` included: its
+# arrays (the full design matrix) are not copied only to be thrown away; the
+# copy paths then give the copy a fresh empty dict of its own (pinned by
+# test_equation_evaluate.py::test_the_cache_survives_a_deepcopy_as_a_fresh_dict).
+_EQ_CACHE_AVOID_COPY = tuple(f for f, _ in _EQ_CACHE_FIELDS)
 
 
 # Registry of every non-cache Equation slot a reset clears, grouped by the
@@ -521,6 +522,15 @@ _EQ_STATE_GROUPS = (
 )
 _EQ_STATE_GROUP_SLOTS = {name: slots for name, slots in _EQ_STATE_GROUPS}
 
+# Genotype slots: what a candidate CARRIES from generation to generation, as
+# opposed to state derived from it. No reset clears them (an offspring keeps
+# them through ``reset_state`` and both copy paths); only a re-birth
+# (``__init__``, hence ``randomize``) does.
+#   '_plain_genes' -- ``system_rps_mode='plain'``: ``{'target': signature}``,
+#                     the ``factors_labels`` of the term the equation is solved
+#                     for. None outside plain mode.
+_EQ_GENOTYPE_SLOTS = ('_plain_genes',)
+
 
 class Equation(ComplexStructure):
     __slots__ = ['_history', 'structure', 'interelement_operator', 'n_immutable', 'pool',
@@ -539,7 +549,7 @@ class Equation(ComplexStructure):
                  '_eval_cache', '_cached_sw_weights', '_cached_vc_score',
                  '_cached_alt_instability',
                  '_terms_labels_cache', '_terms_labels_without_power_cache',
-                 '_gram_super'] # , '_solver_form'
+                 '_gram_super', '_plain_genes'] # , '_solver_form'
 
 
     def __init__(self, pool: TFPool, basic_structure: Union[list, tuple, set], var_to_explain: str = None,
@@ -581,6 +591,7 @@ class Equation(ComplexStructure):
         """
         super().__init__(interelement_operator)
         self._target_term = None   # identity-tracked right-part target (see ``target`` property)
+        self._plain_genes = None   # genotype, see _EQ_GENOTYPE_SLOTS
         self.reset_state()
 
         if metaparameters is None:
@@ -955,18 +966,20 @@ class Equation(ComplexStructure):
         and callers update the weights between successive calls, so caching it
         would hand back a stale column mask. The wide path is weight-independent
         and is where the hits are -- the sparsity step and the fitness fillers
-        both take it within one fitness invocation.
+        both take it within one fitness invocation. The fitness hosts drop the
+        memo once they have scored (:meth:`release_eval_cache`).
         """
         tgt = self.target_idx          # identity-derived position, captured once
         cacheable = not active_only
         if cacheable and hasattr(self, '_eval_cache') and tgt in self._eval_cache:
             return self._eval_cache[tgt]
 
-        targets = self.target.evaluate()
+        slot = slot_of(self)
+        targets = term_columns(self.target, slot)
 
         feature_indexes = self._feature_indexes(active_only, tgt)
         if len(feature_indexes) > 0:
-            feats_list = [self.structure[idx].evaluate() for idx in feature_indexes]
+            feats_list = [term_columns(self.structure[idx], slot) for idx in feature_indexes]
 
             samples_by_features: Dict[int, List[np.ndarray]] = dict()
             for feat_idx in range(len(feats_list)):
@@ -1156,6 +1169,21 @@ class Equation(ComplexStructure):
                     self._eval_cache = {}
             else:
                 setattr(self, field, None)
+
+    def release_eval_cache(self) -> None:
+        """Drop :meth:`evaluate`'s memo and nothing else; the fitness hosts call
+        it once they have scored the equation.
+
+        The memo holds the design matrix -- one column per non-target term, the
+        full row count -- and every hit it serves comes inside one fit: the
+        sparsity step and the fitness fillers read the same wide evaluation.
+        Kept past the fit it is never read again, yet every live equation went
+        on holding it, so memory grew with the number of systems alive: on the
+        100k-row lorenz record, plain mode under NSGA-II held ~1.3 MB per
+        equation, three per system, and grew ~30 MB a minute until the run
+        died (Oct 2026). A later :meth:`evaluate` rebuilds the same arrays from
+        the terms' cached tensors."""
+        self._eval_cache = {}
 
 
     @HistoryExtender('\n -> was copied by deepcopy(self)', 'n')
@@ -1442,17 +1470,20 @@ class Equation(ComplexStructure):
             form = ''
             if self.weights_final_evald:
                 tgt = self.target_idx
-                for term_idx in range(len(self.structure)):
-                    if term_idx != tgt:
-                        form += str(self.weights_final[self.weight_index(term_idx, tgt)])
-                        form += ' * ' + self.structure[term_idx].name + ' + '
+                parts = [str(self.weights_final[self.weight_index(term_idx, tgt)])
+                         + ' * ' + self.structure[term_idx].name
+                         for term_idx in range(len(self.structure)) if term_idx != tgt]
                 # The fitted intercept is the TRAILING entry of weights_final,
                 # guaranteed by Equation._validate_weight_layout. Reading
                 # ``weights_internal[-1]`` (as this used to) printed the last
                 # TERM's coefficient in the constant position, back when the
-                # sparsity producers emitted a bare ``estimator.coef_``.
-                form += str(self.weights_final[-1]) + ' = ' + \
-                    self.target.name
+                # sparsity producers emitted a bare ``estimator.coef_``. An
+                # equation without an intercept (exactly 0, the layout's "absent")
+                # shows none; ``translate_equation`` reads such a form back with
+                # a zero free coefficient.
+                if self.weights_final[-1] != 0 or not parts:
+                    parts.append(str(self.weights_final[-1]))
+                form = ' + '.join(parts) + ' = ' + self.target.name
             else:
                 for term_idx in range(len(self.structure)):
                     form += 'k_' + str(term_idx) + ' ' + \
@@ -1467,8 +1498,8 @@ class Equation(ComplexStructure):
         if self.target is None or not self.weights_final_evald:
             return ''
         tgt = self.target_idx
-        form = self.target.latex_form + r' = '
         digits_rounding_max = 3
+        parts = []
         for idx, term in enumerate(self.structure):
             if idx == tgt:
                 continue
@@ -1481,14 +1512,15 @@ class Equation(ComplexStructure):
 
             mnt, exp = exp_form(self.weights_final[idx_corrected], digits_rounding_max)
             exp_str = r'\cdot 10^{{{0}}} '.format(str(exp)) if exp != 0 else ''
-            form += str(mnt) + exp_str + term.latex_form + r' + '
+            parts.append(str(mnt) + exp_str + term.latex_form)
 
-        # Trailing weights_final entry = the fitted intercept (see text_form).
-        mnt, exp = exp_form(self.weights_final[-1], digits_rounding_max)
-        exp_str = r'\cdot 10^{{{0}}} '.format(str(exp)) if exp != 0 else ''
-
-        form += str(mnt) + exp_str
-        return form
+        # Trailing weights_final entry = the fitted intercept (see text_form);
+        # shown only when the equation has one (or nothing else is left).
+        if self.weights_final[-1] != 0 or not parts:
+            mnt, exp = exp_form(self.weights_final[-1], digits_rounding_max)
+            exp_str = r'\cdot 10^{{{0}}} '.format(str(exp)) if exp != 0 else ''
+            parts.append(str(mnt) + exp_str)
+        return self.target.latex_form + r' = ' + r' + '.join(parts)
 
     @property
     def state(self):
@@ -1555,6 +1587,39 @@ class Equation(ComplexStructure):
         return result
 
     @property
+    def structure_label(self):
+        """What makes two equations the SAME equation on a front: two with equal
+        labels never dominate each other (``check_dominance``).
+
+        ``terms_labels`` itself -- the same object -- outside
+        ``system_rps_mode='plain'``. In plain mode the constant is part of the
+        support: ``(terms_labels, has_constant)``, read off the fit
+        (``weights_internal[-1] != 0``), so S and S+{1} are different
+        equations. The target is not part of it: the same terms solved for a
+        different term are the same equation.
+        """
+        labels = self.terms_labels
+        if getattr(self, '_plain_genes', None) is None:
+            return labels
+        weights = (getattr(self, '_weights_internal', None)
+                   if getattr(self, 'weights_internal_evald', False) else None)
+        return (labels, weights is not None and len(weights) > 0 and bool(weights[-1] != 0))
+
+    @property
+    def candidate_label(self):
+        """What makes two equations the same CANDIDATE, so that one is not
+        evaluated twice (``SoEq.equations_labels``, the search history).
+
+        :attr:`structure_label`, in every mode. The same terms solved for
+        another term are the same equation (USER, Oct 23 2026: one arrangement
+        per structure), so in plain mode a target-swapped twin is the same
+        candidate: it enters only by replacing the arrangement held, when its
+        own objectives dominate that one's (``OffspringUpdater._swap_arrangement``,
+        ``NSGAOptimizer._archive_insert``).
+        """
+        return self.structure_label
+
+    @property
     def active_terms_labels(self) -> frozenset:
         """Frozenset of per-term factor-label sets for the equation's ACTIVE
         structure: the target term plus every non-target term with a nonzero
@@ -1610,21 +1675,8 @@ class EquationIterator(object):
             raise StopIteration
 
 def check_metaparameters(metaparameters: dict):
-    metaparam_labels = ['max_terms_number', 'max_factors_in_term', 'sparsity',  # noqa: F841
-                        COMPLEXITY_METAPARAMETER]
+    metaparam_labels = ['max_terms_number', 'max_factors_in_term', 'sparsity']  # noqa: F841
     _normalize_metaparameters(metaparameters)
-    # The budget is the one key whose operator reads more than its 'value':
-    # the mutation reflects its integer step into the 'bounds' the population
-    # constructor stored. An entry built without them would otherwise fail in
-    # the middle of a search rather than here.
-    for key, entry in metaparameters.items():
-        if is_complexity_key(key):
-            bounds = entry.get('bounds')
-            if (bounds is None or len(bounds) != 2
-                    or not 1 <= bounds[0] <= bounds[1]):
-                raise ValueError(
-                    'Metaparameter {0!r} needs integer bounds (lo, hi) with '
-                    '1 <= lo <= hi; got {1!r}.'.format(key, bounds))
     return True
 
 
@@ -1839,12 +1891,19 @@ class SoEq(moeadd.MOEADDSolution):
         # perturb any future hash-based iteration order.
         return hash(self.vals.hash_descr)
 
+    #: Attributes a copy shares with its original: the population-wide token
+    #: families, read-only once the pool is built (``create_pool`` / ``fit``
+    #: install their parameters and grids before any system exists), which
+    #: every equation's ``pool`` and every factor's evaluator already alias.
+    #: Copying them cost each copy its own families and evaluators.
+    _SHARED_ON_COPY = ('tokens_for_eq', 'tokens_supp')
+
     def __deepcopy__(self, memo=None):
         # SoEq has no own __slots__; the helper iterates the inherited
         # (likely empty) ABC slots harmlessly. Then carry the __dict__ over.
         new_struct = _deepcopy_slots(self, memo)
         for k, v in self.__dict__.items():
-            setattr(new_struct, k, copy.deepcopy(v, memo))
+            setattr(new_struct, k, v if k in self._SHARED_ON_COPY else copy.deepcopy(v, memo))
         return new_struct
 
     def reset_state(self, reset_right_part: bool = True) -> None:
@@ -1871,7 +1930,8 @@ class SoEq(moeadd.MOEADDSolution):
     def _equation_label_tuple(self, *, drop_power: bool) -> Tuple[frozenset, ...]:
         """Per-equation label frozensets in ``self.vars_to_describe`` order.
         ``drop_power`` selects each equation's ``terms_labels_without_power``
-        (True) vs ``terms_labels`` (False)."""
+        (True) vs ``terms_labels`` (False). ``equations_labels`` no longer goes
+        through here: it reads ``Equation.candidate_label``."""
         return tuple(eq.terms_labels_without_power if drop_power else eq.terms_labels
                      for eq in self.vals)
 
@@ -1886,12 +1946,27 @@ class SoEq(moeadd.MOEADDSolution):
 
     @property
     def equations_labels(self) -> Tuple[frozenset, ...]:
-        """Tuple of ``Equation.terms_labels`` for each equation in the system.
+        """Tuple of ``Equation.candidate_label`` for each equation in the system
+        -- ``Equation.terms_labels`` outside ``system_rps_mode='plain'``.
 
         Element order matches ``self.vars_to_describe``. The hashable per-equation
-        frozensets enable ``system in objective.history`` membership checks.
+        labels enable ``system in objective.history`` membership checks.
         """
-        return self._equation_label_tuple(drop_power=False)
+        return tuple(eq.candidate_label for eq in self.vals)
+
+    @property
+    def structure_labels(self) -> tuple:
+        """Tuple of ``Equation.structure_label`` for each equation, in
+        ``self.vars_to_describe`` order: the same as :attr:`equations_labels`
+        (the targets are left out of both, so a system re-solved for other
+        terms keeps its key)."""
+        return tuple(eq.structure_label for eq in self.vals)
+
+    @property
+    def targets_labels(self) -> tuple:
+        """Tuple of each equation's target signature (``None`` without one):
+        what tells apart two arrangements of the same structures."""
+        return tuple(None if eq.target is None else eq.target.factors_labels for eq in self.vals)
 
 
 class SoEqIterator(object):

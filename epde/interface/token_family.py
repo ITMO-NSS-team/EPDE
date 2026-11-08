@@ -86,6 +86,10 @@ class TokenFamily(object):
         self.params_set = False
         self.cache_set = False
         self.deriv_evaluator_set = True
+        # Parameters whose values are known only from the fit data (a frequency
+        # grid found in the spectrum); ``create`` refuses to draw until
+        # ``install_param_grid`` supplies them.
+        self.deferred_params = set()
         self.set_latex_form_constructor()
 
     def __len__(self) -> int:
@@ -120,7 +124,8 @@ class TokenFamily(object):
         self.status['requires_grid'] = requires_grid
         self.status['non_default_power'] = non_default_power
 
-    def set_params(self, tokens, token_params, equality_ranges, derivs_solver_orders=None) -> None:
+    def set_params(self, tokens, token_params, equality_ranges, derivs_solver_orders=None,
+                   param_grids: dict = None) -> None:
         """
         Define the token family with list of tokens and their parameters
 
@@ -132,6 +137,13 @@ class TokenFamily(object):
                 if int - the parameters will be integer, if float - float.
             equality_ranges (`dict`): error for equality of token parameters, key is name of parameter
             derivs_solver_orders (`list`): keys for derivatides on `int` format for `solver`
+            param_grids (`dict`): optional, parameter name -> its grid values, e.g. np.linspace(lo, hi, num).
+                A gridded parameter takes only those values (drawn, crossed over, mutated and labelled by
+                value on the grid; explicitly given values are moved to the nearest grid value), and its
+                equality range becomes half the smallest gap between grid values. The values must lie within
+                the parameter's (lower, higher) range. Not for 'power' or 'dim'. Parameters without a grid keep
+                the continuous behaviour. A grid known only from the data is installed later with
+                ``install_param_grid``.
 
         Example:
         ----------
@@ -149,12 +161,122 @@ class TokenFamily(object):
             self.derivs_ords = {token: derivs_solver_orders[idx] for idx, token in enumerate(tokens)}
         self.params_set = True
         self.equality_ranges = equality_ranges
+        grids = self._validated_grids(token_params, param_grids)
+        if grids:
+            self.equality_ranges = dict(equality_ranges)
+            self.equality_ranges.update({name: self._grid_tolerance(grid) for name, grid in grids.items()})
+        self.param_grids = grids
 
         # if self.family_of_derivs:
         #     print(f'self.tokens is {self.tokens}')
         #     print(f'Here, derivs order is {self.derivs_ords}')
         if self.evaluator_set:
             self.test_evaluator()
+
+    @staticmethod
+    def _validated_grids(token_params, param_grids) -> dict:
+        """``{name: sorted tuple of unique floats}`` for the gridded parameters,
+        checked against the family's parameters and their (lower, higher) ranges."""
+        grids = {}
+        if not param_grids:
+            return grids
+        unknown = set(param_grids) - set(token_params)
+        if unknown:
+            raise ValueError(f'param_grids names parameters the family does not have: {sorted(unknown)}')
+        # power is rewritten by power merging and RPS (filter_powers, the
+        # root / min-order steps) without a snap, and dim is an index.
+        fixed = {'power', 'dim'} & {name for name, grid in param_grids.items() if grid is not None}
+        if fixed:
+            raise ValueError(f'{sorted(fixed)} cannot take a grid; only continuous parameters can.')
+        for name, values in param_grids.items():
+            if values is None:
+                continue
+            grid = tuple(sorted({float(v) for v in np.asarray(values, dtype=float).ravel()}))
+            if not grid or not np.all(np.isfinite(grid)):
+                raise ValueError(f'The grid of parameter {name!r} must hold finite values, got {values!r}.')
+            lo, hi = token_params[name]
+            if grid[0] < lo or grid[-1] > hi:
+                raise ValueError(f'The grid of parameter {name!r} leaves its range ({lo}, {hi}): {grid}.')
+            grids[name] = grid
+        return grids
+
+    @staticmethod
+    def _grid_tolerance(grid) -> float:
+        # Grid values are stored floats, so two of them are equal or at least the
+        # smallest gap apart: half that gap makes Factor.__eq__ agree with the
+        # grid-value labels (0 for a single value).
+        return float(np.min(np.diff(grid))) / 2. if len(grid) > 1 else 0.
+
+    def install_param_grid(self, name: str, values, bounds: tuple = None):
+        """Put parameter ``name`` on the grid ``values`` after the family was set
+        up -- the frequencies found in the data, which exist only once the pool is
+        built. ``bounds`` is the parameter's new (lower, higher) range (default: the
+        grid's ends). New ``token_params`` / ``equality_ranges`` / ``param_grids``
+        dicts are built rather than edited: factors from an earlier fit hold the old
+        ``equality_ranges`` by reference. Unlike ``set_params`` this draws no test
+        factor. Clears ``name`` from ``deferred_params``. Returns the grid.
+
+        ``values`` may map axes -- values of the family's ``dim`` parameter -- to
+        each axis's own grid (the frequencies of each axis's spectrum): a factor
+        then draws its axis among these and its value from that axis's grid
+        (``Factor.set_parameters``)."""
+        if isinstance(values, dict):
+            if 'dim' not in self.token_params:
+                raise ValueError(f'A grid of {name!r} per axis needs a dim parameter; {self.ftype} has none.')
+            lo, hi = self.token_params['dim']
+            per_axis = {int(axis): tuple(sorted({float(v) for v in np.asarray(axis_values, dtype=float).ravel()}))
+                        for axis, axis_values in values.items()}
+            if not per_axis or not all(per_axis.values()):
+                raise ValueError(f'The grid of parameter {name!r} is empty on some axis: {per_axis}.')
+            outside = sorted(axis for axis in per_axis if not lo <= axis <= hi)
+            if outside:
+                raise ValueError(f'Axes {outside} of the grid of {name!r} are outside dim ({lo}, {hi}).')
+            grid = tuple(sorted(set().union(*per_axis.values())))
+        else:
+            grid = tuple(sorted({float(v) for v in np.asarray(values, dtype=float).ravel()}))
+            if not grid:
+                raise ValueError(f'The grid of parameter {name!r} is empty.')
+        token_params = type(self.token_params)(self.token_params)
+        token_params[name] = ((float(bounds[0]), float(bounds[1])) if bounds is not None
+                              else (grid[0], grid[-1]))
+        grids = self._validated_grids(token_params, {name: grid})
+        equality_ranges = dict(self.equality_ranges)
+        equality_ranges[name] = self._grid_tolerance(grids[name])
+        if isinstance(values, dict):
+            grids = {name: per_axis}
+        self.token_params = token_params
+        self.equality_ranges = equality_ranges
+        self.param_grids = {**getattr(self, 'param_grids', {}), **grids}
+        self.deferred_params = set(getattr(self, 'deferred_params', set())) - {name}
+        return grids[name]
+
+    def fix_token_params(self, fixed: dict) -> None:
+        """Give some tokens fixed parameter values: ``{label: {param: value}}``. A factor of such a
+        label drawn by :meth:`create` takes these values instead of random ones (the draw itself is
+        unchanged, so the random stream is too); parameters passed explicitly to ``create`` are
+        kept as given. ``GridTokens`` ties each of several labels to its own axis this way: with a
+        free ``dim``, two labels evaluate the same axis and make identical columns."""
+        for label, params in fixed.items():
+            if label not in self.tokens:
+                raise ValueError(f'{self.ftype} has no token {label!r}.')
+            unknown = set(params) - set(self.token_params)
+            if unknown:
+                raise ValueError(f'{self.ftype} has no parameter(s) {sorted(unknown)}.')
+        self.token_fixed_params = {label: dict(params) for label, params in fixed.items()}
+
+    def install_param_range(self, name: str, bounds: tuple) -> tuple:
+        """Set parameter ``name``'s (lower, higher) range after the family was set up -- the axis
+        index ``dim`` of a family sized to the data (``dimensionality='auto'``), known once the
+        trajectories are. A new ``token_params`` dict is built, in the same key order (factors from
+        an earlier fit hold the old one by reference); no test factor is drawn. Clears ``name`` from
+        ``deferred_params``. Returns the range."""
+        if name not in self.token_params:
+            raise ValueError(f'The family has no parameter {name!r}.')
+        token_params = type(self.token_params)(self.token_params)
+        token_params[name] = tuple(bounds)
+        self.token_params = token_params
+        self.deferred_params = set(getattr(self, 'deferred_params', set())) - {name}
+        return token_params[name]
 
     def set_evaluator(self, eval_function, suppress_eval_test=True) -> None:
         """
@@ -324,6 +446,10 @@ class TokenFamily(object):
             occupied_by_factor (`dict`): information about blocked elements after cteated the factor
             new_factor (`Factor`): resulting factor for that token family
         """
+        deferred = getattr(self, 'deferred_params', None)     # absent on families pickled before it existed
+        if deferred:
+            raise RuntimeError(f'{self.ftype}: {sorted(deferred)} come from the fit data and are resolved when '
+                               'the pool is built (EpdeSearch.create_pool / fit); no factor can be drawn before.')
         if token_status is None or token_status == {}:
             token_status = {label: (0, self.token_params['power'][1], False)
                             for label in self.tokens}
@@ -332,7 +458,7 @@ class TokenFamily(object):
                 if create_derivs:
                     label = np.random.choice([token for token in self.tokens
                                               if (not token_status[token][0] + 1 > token_status[token][1]
-                                                  and self.derivs_ords[token][0] is not None)])
+                                                  and self.is_derivative_token(token))])
                 else:
                     label = np.random.choice([token for token in self.tokens
                                               if not token_status[token][0] + 1 > token_status[token][1]])
@@ -353,26 +479,40 @@ class TokenFamily(object):
             occupied_by_factor = {label: self.token_params['power'][1]}
         else:
             occupied_by_factor = {label: 1}
+        # A family pickled before param_grids existed has no attribute.
+        param_grids = getattr(self, 'param_grids', None)
         if len(factor_params) == 0:
             new_factor.set_parameters(params_description=self.token_params,
                                       equality_ranges=self.equality_ranges,
-                                      random=True)
+                                      random=True, param_grids=param_grids)
+            # Absent on families pickled before it existed.
+            for name, value in getattr(self, 'token_fixed_params', {}).get(label, {}).items():
+                new_factor.set_param(value, name=name)
         else:
             new_factor.set_parameters(params_description=self.token_params,
                                       equality_ranges=self.equality_ranges,
-                                      random=False,
+                                      random=False, param_grids=param_grids,
                                       **factor_params)
         new_factor.evaluator = self._evaluator
 
         return occupied_by_factor, new_factor
 
-    def cardinality(self, token_status: Union[dict, None] = None) -> int:
+    def is_derivative_token(self, token: str) -> bool:
+        """True iff ``token`` is a derivative: the family is a family of
+        derivatives and the token's derivative code is not ``[None,]`` (the
+        variable itself). Families of grids, trigonometric functions etc. have
+        no ``derivs_ords`` at all, so they offer no derivative token."""
+        return bool(self.family_of_derivs) and self.derivs_ords[token][0] is not None
+
+    def cardinality(self, token_status: Union[dict, None] = None, derivs_only: bool = False) -> int:
         """
         Method for getting number of free place for creating new factors for that token family
 
         Args:
-           token_status (`dict`):  information about usage of all tokens that belong to this family, 
+           token_status (`dict`):  information about usage of all tokens that belong to this family,
                 Example: (number of used, max number for using, flag about permission to use)
+           derivs_only (`boolean`): count only the derivative tokens (:meth:`is_derivative_token`),
+                the ones ``create(create_derivs=True)`` can draw
 
         Returns:
             number of place (`int`)
@@ -380,7 +520,8 @@ class TokenFamily(object):
         if token_status is None or token_status == {}:
             token_status = {label: (0, self.token_params['power'][1], False)
                             for label in self.tokens}
-        return len([token for token in self.tokens if token_status[token][0] < token_status[token][1]])
+        return len([token for token in self.tokens if token_status[token][0] < token_status[token][1]
+                    and (not derivs_only or self.is_derivative_token(token))])
 
     def evaluate_all(self, all_vars: List[str]) -> None:
         """
@@ -465,21 +606,24 @@ class TFPool(object):
         return overview
 
     def families_cardinality(self, meaningful_only: bool = False,
-                             token_status: Union[dict, None] = None):
+                             token_status: Union[dict, None] = None, derivs_only: bool = False):
         """
         Getting number of free place for creating new factors for each token family
 
         Args:
             meaningful_only (`boolean`): using only meaningful families
             token_status (`dict`): information about usage of all tokens that belong to all families of the class
+            derivs_only (`boolean`): count only derivative tokens (see ``TokenFamily.cardinality``)
 
         Returns:
             numpy.array with integer values (number of free place in each `self.families`)
         """
         if meaningful_only:
-            return np.array([family.cardinality(token_status) for family in self.families_meaningful])
+            return np.array([family.cardinality(token_status, derivs_only=derivs_only)
+                             for family in self.families_meaningful])
         else:
-            return np.array([family.cardinality(token_status) for family in self.families])
+            return np.array([family.cardinality(token_status, derivs_only=derivs_only)
+                             for family in self.families])
 
     def create(self, label=None, create_meaningful: bool = False, token_status=None,
                create_derivs: bool = False, **kwargs) -> Union[str, Factor]:
@@ -490,29 +634,34 @@ class TFPool(object):
             label (`str`): if noe None, that create token with name == label
             create_meaningful (`boolean`): the choice of the token to create is selected from meaningful family
             token_status (`dict`): information about status of all families
-            create_derivs (`boolean`): flag about the presence of derivatives in the token structure
-        
+            create_derivs (`boolean`): flag about the presence of derivatives in the token structure.
+                The family is then drawn among those that can still offer a derivative token, in
+                proportion to how many they can offer: a family without one (grids, trigonometric
+                functions, the variable itself) cannot serve the draw.
+
         Returns:
-            created `Factor` 
+            created `Factor`
         """
         if label is None:
             if create_meaningful:
-                if np.sum(self.families_cardinality(True, token_status)) == 0:
+                cardinality = self.families_cardinality(True, token_status, derivs_only=create_derivs)
+                if np.sum(cardinality) == 0:
                     raise ValueError(
                         'Tring to create a term from an empty pool')
 
-                probabilities = (self.families_cardinality(True, token_status) /
-                                 np.sum(self.families_cardinality(True, token_status)))
+                probabilities = cardinality / np.sum(cardinality)
                 return np.random.choice(a=self.families_meaningful,
                                         p=probabilities).create(label=None,
                                                                 token_status=token_status,
                                                                 create_derivs=create_derivs,
-                                                                all_vars = [family.variable for family in 
-                                                                            self.families_demand_equation], 
+                                                                all_vars = [family.variable for family in
+                                                                            self.families_demand_equation],
                                                                 **kwargs)
             else:
-                probabilities = (self.families_cardinality(False, token_status) /
-                                 np.sum(self.families_cardinality(False, token_status)))
+                cardinality = self.families_cardinality(False, token_status, derivs_only=create_derivs)
+                if create_derivs and np.sum(cardinality) == 0:
+                    raise ValueError('No family can offer a derivative token for the term')
+                probabilities = cardinality / np.sum(cardinality)
                 return np.random.choice(a=self.families,
                                         p=probabilities).create(label=None,
                                                                 token_status=token_status,

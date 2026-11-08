@@ -23,6 +23,11 @@ class AbstractSmoother(ABC):
     def __call__(self, data, *args, **kwargs):
         raise NotImplementedError('Calling abstract smoothing object')
 
+    def edge_reach(self, shape: tuple, **kwargs):
+        """How many samples from each end of every axis the smoothing biases (one int per axis),
+        given the kwargs it is called with. None: unknown (a smoother that does not say)."""
+        return None
+
 
 class PlaceholderSmoother(AbstractSmoother):
     def __init__(self):
@@ -30,6 +35,9 @@ class PlaceholderSmoother(AbstractSmoother):
 
     def __call__(self, data, *args, **kwargs):
         return data
+
+    def edge_reach(self, shape: tuple, **kwargs) -> list:
+        return [0] * len(shape)
 
 
 def baseline_ann(dim):
@@ -238,6 +246,10 @@ class ANNSmoother(AbstractSmoother):
         super().__init__()  # Optional depending on AbstractSmoother
         self.model = None
 
+    def edge_reach(self, shape: tuple, **kwargs) -> list:
+        """0: the network's fit error is global, not tied to the samples near the ends."""
+        return [0] * len(shape)
+
     def __call__(self, data, grid, epochs_max=1000, loss_mean=1000, loss_threshold=1e-8,
                  batch_frac=0.5, val_frac=0.1, learning_rate=1e-3, return_ann=False, device='cpu'):
         if torch.cuda.is_available():
@@ -339,6 +351,19 @@ class ANNSmoother(AbstractSmoother):
 class GaussianSmoother(AbstractSmoother):
     def __init__(self):
         pass
+
+    def edge_reach(self, shape: tuple, kernel_fun='gaussian', **kwargs) -> list:
+        """The kernel radius ``int(4 sigma + 0.5)`` (``gaussian_filter``'s, whose 'reflect' edges
+        bias that many samples) on the smoothed axes: every axis but the first unless
+        ``include_time`` or 1-D data, as in :meth:`__call__`."""
+        ndim = len(shape)
+        smoothed = list(range(ndim)) if kwargs.get('include_time') or ndim <= 1 else list(range(1, ndim))
+        sigma = kwargs.get('sigma', 1)
+        sigmas = [sigma] * len(smoothed) if np.ndim(sigma) == 0 else list(sigma)
+        reach = [0] * ndim
+        for axis, sd in zip(smoothed, sigmas):
+            reach[axis] = int(4.0 * float(sd) + 0.5)
+        return reach
 
     def __call__(self, data, kernel_fun='gaussian', **kwargs):
         smoothed_data = np.empty_like(data)

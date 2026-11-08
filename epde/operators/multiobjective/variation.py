@@ -32,6 +32,37 @@ from epde.operators.multiobjective.moeadd_specific import get_basic_populator_up
 from epde.operators.multiobjective.mutations import get_basic_mutation
 
 from epde import _loop_stats
+from epde.interface.search_config import active_config, plain_kept_terms_cap
+
+#: Draws of a plain-mode offspring's unique terms before the length-preserving exchange is used.
+MAX_SPLIT_DRAWS = 10
+
+
+def _split_unique_terms(unique1, unique2, shared: int):
+    """``system_rps_mode='plain'``: each offspring takes each unique term of the parents (``unique1`` +
+    ``unique2``) with probability 1/2, independently of the other offspring, so an offspring can shrink
+    to the terms its parents share -- the truth two parents carry with different extra terms -- or take
+    both parents' extras. An offspring keeps ``shared`` terms plus its draw, between 2 and the plain cap
+    plus its target; a draw outside that is redrawn up to ``MAX_SPLIT_DRAWS`` times. Returns the two
+    offsprings' unique terms, or None (no unique term, or no admissible draw): the length-preserving
+    exchange then runs."""
+    pool = list(unique1) + list(unique2)
+    if not pool:
+        return None
+    space = active_config().search_space
+    most = plain_kept_terms_cap(space.equation_terms_max_number) + 1
+    drawn = []
+    for _ in range(2):
+        for _ in range(MAX_SPLIT_DRAWS):
+            take = np.random.random(len(pool)) < 0.5
+            if 2 <= shared + int(take.sum()) <= most:
+                drawn.append([term for term, taken in zip(pool, take) if taken])
+                break
+        else:
+            _loop_stats.record('EquationCrossover.plain_split.FALLBACK', 1, 1)
+            return None
+    _loop_stats.record('EquationCrossover.plain_split', 1, 1)
+    return drawn[0], drawn[1]
 
 
 class ParetoLevelsCrossover(CompoundOperator):
@@ -79,7 +110,22 @@ class ParetoLevelsCrossover(CompoundOperator):
 
         if len(crossover_pool) == 0:
             raise ValueError('crossover pool not created, probably solution.crossover_selected_times error')
+        # evolution.complementary_mating_prob: the selection may have forced
+        # one pair of complementary mates; it is paired first and the rest of
+        # the pool is shuffled as usual. Without it this is the old code path.
+        forced = getattr(objective, 'forced_pair', None)
+        objective.forced_pair = None
+        head = []
+        if forced is not None:
+            for mate in forced:
+                position = next((k for k, sol in enumerate(crossover_pool) if sol is mate), None)
+                if position is not None:
+                    head.append(crossover_pool.pop(position))
+            if len(head) != 2:
+                crossover_pool.extend(head)
+                head = []
         np.random.shuffle(crossover_pool)
+        crossover_pool = head + crossover_pool
         if len(crossover_pool) % 2:
             crossover_pool = crossover_pool[:-1]
         crossover_pool = np.array(crossover_pool, dtype = object).reshape((-1,2))
@@ -215,7 +261,10 @@ class EquationCrossover(CompoundOperator):
             ``term_crossover`` sub-operator, which swaps the terms
             between offspring with its ``crossover_probability``.
             Unpaired leftovers stay with their originating parent, so
-            the exchange is length-preserving.
+            the exchange is length-preserving. Under
+            ``system_rps_mode='plain'`` each offspring instead takes each
+            unique term at random (:func:`_split_unique_terms`), so an
+            offspring can shrink to the shared terms or grow.
 
         The whole operator is gated by ``crossover_probability``: with
         probability ``1 - crossover_probability`` the parents are
@@ -310,24 +359,33 @@ class EquationCrossover(CompoundOperator):
             offspring1_terms.append(blended1)
             offspring2_terms.append(blended2)
 
-        e1_unique = list(remaining_e1)
-        e2_unique = list(remaining_e2)
-        np.random.shuffle(e1_unique)
-        np.random.shuffle(e2_unique)
-        n_pairs = min(len(e1_unique), len(e2_unique))
-        for k in range(n_pairs):
-            t1 = deepcopy(parent1.structure[e1_unique[k]])
-            t2 = deepcopy(parent2.structure[e2_unique[k]])
-            t1, t2 = self.suboperators['term_crossover'].apply(
-                objective=(t1, t2),
-                arguments=subop_args['term_crossover'],
-            )
-            offspring1_terms.append(t1)
-            offspring2_terms.append(t2)
-        for i in e1_unique[n_pairs:]:
-            offspring1_terms.append(deepcopy(parent1.structure[i]))
-        for j in e2_unique[n_pairs:]:
-            offspring2_terms.append(deepcopy(parent2.structure[j]))
+        split = None
+        if active_config().search_space.system_rps_mode == 'plain':
+            split = _split_unique_terms([parent1.structure[i] for i in remaining_e1],
+                                        [parent2.structure[j] for j in remaining_e2],
+                                        len(offspring1_terms))
+        if split is not None:
+            offspring1_terms.extend(deepcopy(term) for term in split[0])
+            offspring2_terms.extend(deepcopy(term) for term in split[1])
+        else:
+            e1_unique = list(remaining_e1)
+            e2_unique = list(remaining_e2)
+            np.random.shuffle(e1_unique)
+            np.random.shuffle(e2_unique)
+            n_pairs = min(len(e1_unique), len(e2_unique))
+            for k in range(n_pairs):
+                t1 = deepcopy(parent1.structure[e1_unique[k]])
+                t2 = deepcopy(parent2.structure[e2_unique[k]])
+                t1, t2 = self.suboperators['term_crossover'].apply(
+                    objective=(t1, t2),
+                    arguments=subop_args['term_crossover'],
+                )
+                offspring1_terms.append(t1)
+                offspring2_terms.append(t2)
+            for i in e1_unique[n_pairs:]:
+                offspring1_terms.append(deepcopy(parent1.structure[i]))
+            for j in e2_unique[n_pairs:]:
+                offspring2_terms.append(deepcopy(parent2.structure[j]))
 
         # No target is force-included. RPS already guarantees a deriv-carrying
         # term on entry -- ``EqRightPartSelector.apply`` loops
@@ -441,8 +499,10 @@ class TermParamCrossover(CompoundOperator):
                     new_v1 = v1 + proportion * (v2 - v1)
                     new_v2 = v1 + (1 - proportion) * (v2 - v1)
                     try:
-                        factor1.set_param(new_v1, idx=param_idx)
-                        factor2.set_param(new_v2, idx=param_idx)
+                        # A gridded parameter (TokenFamily param_grids) is
+                        # put back on its grid; any other passes unchanged.
+                        factor1.set_param(factor1.grid_snap(new_v1, param_idx), idx=param_idx)
+                        factor2.set_param(factor2.grid_snap(new_v2, param_idx), idx=param_idx)
                     except KeyError:
                         print([(token.label, token.params) for token in objective[0].structure], [(token.label, token.params) for token in objective[1].structure])
                         raise Exception('Wrong set of parameters:', factor1.params_description, factor2.params_description)

@@ -13,6 +13,54 @@ from epde.optimizers.moeadd.moeadd import ParetoLevels
 from epde.optimizers.moeadd.supplementary import Constraint
 
 from epde.operators.utils.template import CompoundOperator
+from epde import _loop_stats
+
+
+def _plane_domains(population, eq_idx, weights, normalizer):
+    """Each system's subregion in equation ``eq_idx``'s own plane: MOEA/DD
+    Eq. (6) on that equation's objective values alone, on the same scale the
+    rest of the optimizer uses."""
+    from epde.optimizers.moeadd.solution_template import get_domain_idx
+    n_eq = len(population[0].vals)
+    domains = []
+    for system in population:
+        obj = np.asarray(system.obj_fun, dtype=float)
+        if normalizer is not None:
+            obj = normalizer(obj)
+        n_types = obj.size // n_eq
+        plane = obj[[t * n_eq + eq_idx for t in range(n_types)]]
+        domains.append(get_domain_idx(plane, weights))
+    return domains
+
+
+def _complementary_partner(population, parent_idxs):
+    """``evolution.complementary_mating_prob``: with that probability the second
+    parent is redrawn from the systems holding some equation's own front where
+    the first parent does not, so a crossover can bring, e.g., an exact u and
+    an exact v together. ``0`` (the default) draws nothing.
+
+    Returns ``(parent_idxs, pair)``; ``pair`` holds the two forced mates'
+    indices, which the crossover pairs with each other before it shuffles the
+    rest of the pool (``ParetoLevels.forced_pair``), or None."""
+    from epde.interface.search_config import active_config
+    prob = active_config().evolution.complementary_mating_prob
+    if not prob or len(population) < 2 or len(population[0].vals) < 2 or parent_idxs.size < 2:
+        return parent_idxs, None
+    if np.random.uniform() >= prob:
+        return parent_idxs, None
+    from epde.operators.multiobjective.moeadd_specific import equation_front_holders
+    holders = equation_front_holders(population)
+    first = int(parent_idxs.reshape(-1)[0])
+    partners = [i for i in range(len(population)) if i != first
+                and any(i in held and first not in held for held in holders)]
+    if not partners:
+        _loop_stats.record('Mating.no_complement', 1, 1)
+        return parent_idxs, None
+    _loop_stats.record('Mating.complement', 1, 1)
+    parent_idxs = np.array(parent_idxs, copy=True)
+    partner = int(np.random.choice(partners))
+    parent_idxs.reshape(-1)[1] = partner
+    return parent_idxs, (first, partner)
 
 
 class MOEADDSelection(CompoundOperator):
@@ -64,12 +112,28 @@ class MOEADDSelection(CompoundOperator):
         
         parents_number = min(max(2, parents_number_counted), len(objective.population))
                              
+        from epde.operators.multiobjective.moeadd_specific import niching_per_equation
+        from epde.operators.common.right_part_selection import set_mating_sector
+        per_equation = niching_per_equation(objective.population)
+        # The sector the next offspring belong to, for variant_pick='sector'
+        # (read by the system right-part selector; no random draw here).
+        set_mating_sector(self_args['weights'][self_args['weight_idx']], objective.normalizer,
+                          self_args['weight_idx'] % len(objective.population[0].vals)
+                          if per_equation else None)
         if np.random.uniform() < self.params['delta']:
             selected_regions_idxs = self.suboperators['neighborhood_selector'].apply(self_args['neighborhood_vectors'][self_args['weight_idx']],
                                                                                      arguments = subop_args['neighborhood_selector'])
 
-            candidate_solution_domains = [candidate.get_domain(self_args['weights'])
-                                          for candidate in objective.population]
+            if per_equation:
+                # niching='per_equation': weight vector k serves equation
+                # k mod n, in that equation's own (discrepancy, instability)
+                # plane, so every equation gets its own spread of directions.
+                candidate_solution_domains = _plane_domains(
+                    objective.population, self_args['weight_idx'] % len(objective.population[0].vals),
+                    self_args['weights'], objective.normalizer)
+            else:
+                candidate_solution_domains = [candidate.get_domain(self_args['weights'])
+                                              for candidate in objective.population]
             solution_mask = [domain in selected_regions_idxs for domain in candidate_solution_domains]
             available_in_proximity = sum(solution_mask)
             if available_in_proximity == 0:
@@ -88,6 +152,10 @@ class MOEADDSelection(CompoundOperator):
                                                replace = available_in_proximity < parents_number)
         else:
             parent_idxs = np.random.choice(np.arange(len(objective.population)), size = parents_number, replace = False)
+        parent_idxs, pair = _complementary_partner(objective.population, parent_idxs)
+        # The crossover pairs these two before shuffling the rest of its pool.
+        objective.forced_pair = (None if pair is None else
+                                 (objective.population[pair[0]], objective.population[pair[1]]))
         for idx in parent_idxs.reshape(-1):
             objective.population[int(idx)].incr_counter()
         return objective

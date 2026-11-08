@@ -210,9 +210,8 @@ class TestTheMemoizationPolicy:
         assert eq._eval_cache == {}
 
     def test_the_cache_survives_a_deepcopy_as_a_fresh_dict(self):
-        """Cited by ``_EQ_CACHE_AVOID_COPY``'s comment as
-        ``test_eval_cache_after_deepcopy_is_fresh_dict``, which is not in this
-        tree."""
+        """Cited by ``_EQ_CACHE_AVOID_COPY``'s comment: the memo is not copied,
+        and the copy gets a fresh empty dict of its own."""
         eq = _equation([2.0, -1.0])
         eq.evaluate()
         assert eq._eval_cache

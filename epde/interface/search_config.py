@@ -60,6 +60,7 @@ import copy
 import json
 import os
 from dataclasses import MISSING, dataclass, field, fields, replace
+from numbers import Integral
 from typing import Any, Dict, Optional, Union
 
 __all__ = ['UNSET', 'SearchConfig', 'load_search_config', 'KEY_GROUP',
@@ -130,10 +131,43 @@ class DomainConfig:
 
     ``boundary_width`` is used twice inside ``createDomain`` -- for
     ``Domain.setBoundaries`` and for the ``BoundaryExclusion`` g-function width
-    -- deliberately: they are one concept and must agree.
+    -- deliberately: they are one concept and must agree. ``'auto'`` (the
+    default) excludes, per axis, exactly the samples the preprocessor's edge
+    error reaches (``PreprocessingPipe.edge_reach``: the derivative order for
+    finite differences, the polynomial window's one-sided band for 'poly',
+    nothing on a periodic spectral axis, ...); it is resolved once, when the
+    pool is first built (``create_pool`` / ``fit``), because only then are the
+    preprocessor and ``max_deriv_order`` known.
+
+    ``evaluation_stride`` is the opt-in row budget: the search scores every
+    candidate on a regular sub-lattice of the interior box (every ``k``-th
+    point per axis, an int strides every axis; see
+    :func:`epde.structure.domain.resolve_evaluation_stride`) instead of on
+    every interior point. Each axis is thinned only by its own stride, so time
+    and space are never traded against each other. Derivatives are still
+    computed on the full grid, so a kept point carries exactly the value it has
+    without the budget. It does not work with the solver.
+    The budget applies per trajectory, and the weights stay point values: a
+    fit that stacks several trajectories' rows (the subset screen, the legacy
+    LASSO and its refit) counts each by its kept rows, so trajectories thinned
+    by different strides count differently than they would unthinned. Fits
+    made per trajectory and then averaged do not.
+
+    ``evaluation_form`` selects the rows the solver-free search fits and scores on.
+    - ``'strong'`` (the default) uses pointwise values on the interior box.
+    - ``'weak'`` uses window averages against compact test functions, after
+      integration by parts (:mod:`epde.preprocessing.weak_form`). Each equation
+      slot gets one window per trajectory, chosen once per fit from the data, and
+      every candidate of the slot is fitted and scored on that window's rows.
+      Weak rows are computed from the RAW fields, so the preprocessor's smoothing
+      does not enter them. They work neither with the solver nor with
+      ``evaluation_stride`` (weak picks its own lattice), and they do not work
+      with ``instability_metric='vcoef'``, which reads pointwise fields.
     """
-    boundary_width: Union[int, list, tuple] = 5
+    boundary_width: Union[str, int, list, tuple] = 'auto'
     time_axis: int = 0
+    evaluation_stride: Union[None, int, list, tuple] = None
+    evaluation_form: str = 'strong'
 
 
 @dataclass(frozen=True)
@@ -156,6 +190,80 @@ class SearchSpaceConfig:
     the preprocessor never sees them. ``tokens`` declares prepared token
     families; families needing tensors or callables are passed as objects
     instead.
+
+    ``system_rps_mode`` decides how a system's right parts (targets) and
+    supports are chosen (one of :data:`SYSTEM_RPS_MODES`), and
+    ``system_rps_params`` holds that mode's own settings
+    (:data:`SYSTEM_RPS_PARAMS` names them, with their defaults). A key the
+    mode does not have is refused; the loaded configuration carries every
+    setting of the mode, defaults filled in (:func:`resolve_rps_params`).
+
+    * ``'repair'`` -- each equation selects its target on its own (best
+      discrepancy over its derivative terms, support from the sparsity
+      operator), then cross-equation conflicts are repaired by rerolling.
+      No settings.
+    * ``'assignment'`` -- the whole system is chosen at once. Every
+      assignment of one own-derivative target per equation is enumerated; in
+      each equation the terms equal to another equation's chosen target are
+      removed; every subset of the remaining terms (and the constant) -- of
+      at most ``selected_terms_max_number`` columns when that is set, and
+      only the best of each size by least squares under ``screen_size`` --
+      is fitted, and each equation keeps its non-dominated (discrepancy,
+      instability) subsets. Systems already in the search history are
+      skipped, the remaining variants are compared by dominance, and one
+      non-dominated variant is taken (``variant_pick``). No sparsity
+      threshold is involved: the keep-rule is replaced by the exhaustive
+      search. Not available with the solver-based fitness.
+    * ``'plain'`` -- no subset search at all: every candidate equation is
+      fitted once, by weighted least squares, on exactly its own terms, and
+      the evolution does the selection (add, drop and swap mutations). The
+      target is a gene the candidate carries from generation to generation;
+      no two equations share one, and the terms equal to another equation's
+      target are removed, as in ``'assignment'``. The constant is not a gene:
+      each candidate is fitted without it and with it, the version that
+      dominates the other on (discrepancy, instability) is kept, and when
+      neither does both enter the population. ``equation_terms_max_number``
+      alone bounds it, as in every mode: an equation keeps every term it
+      holds, at most ``equation_terms_max_number - 1`` besides its target, the
+      constant counting 1. With no subset search the mode has no settings.
+      Not available with the solver-based fitness.
+
+    ``equation_terms_max_number`` bounds an equation's STRUCTURE in every
+    mode: the terms it holds, the target included -- the library
+    ``'assignment'`` mode chooses a right part from, the whole candidate in
+    ``'plain'`` mode. A new equation draws its number of terms uniformly from
+    2 to that bound (``Equation.__init__``).
+
+    ``'assignment'`` mode's settings (``system_rps_params``):
+
+    * ``selected_terms_max_number`` bounds what the right part KEEPS: at most
+      that many columns of the right-hand side, each term counting 1 whatever
+      its factors and the constant counting 1, the target not counted.
+      ``None`` (the default) keeps every subset. The subset search then
+      scores only the subsets within the cap, so a structure can hold more
+      terms than the ``2**12``-subset ceiling would otherwise allow
+      (:func:`assignment_subset_count`).
+    * ``screen_size`` screens those subsets: of each size, only the
+      ``screen_size`` best by weighted least squares are scored with the
+      objectives (``epde.operators.common.subset_search``; every subset is
+      still visited, at a rank-one update each, up to
+      :data:`ASSIGNMENT_MAX_VISITED`). ``None`` (the default) scores every
+      subset within the cap. It needs the cap, and gives up the guarantee
+      that the Pareto axes see every subset: a subset with a worse
+      least-squares fit but a better WAPE or instability can be screened
+      out. The ranking pools an equation's trajectories, and it comes before
+      the candidate rules (``rps_amplification_cap``, supports reducible by a
+      factor shared with the target or by a common power, exactly
+      rank-deficient supports): the subsets those rules refuse keep their
+      slots, so a narrow screen can leave fewer candidates -- or none, and an
+      equation without a candidate for every target leaves its system
+      degenerate.
+    * ``variant_pick`` decides which of several non-dominated variants a
+      system takes (one of :data:`VARIANT_PICKS`): ``'random'`` (the default)
+      draws one uniformly; ``'sector'`` takes the one closest, by PBI in each
+      equation's own plane, to the weight direction of the MOEA/DD sector the
+      offspring were generated for (random before any sector exists, i.e. for
+      the initial population).
     """
     data_fun_pow: int = 1
     deriv_fun_pow: int = 1
@@ -163,6 +271,203 @@ class SearchSpaceConfig:
     equation_factors_max_number: Union[int, dict] = 1
     rps_amplification_cap: float = 100.0
     tokens: tuple = ()
+    system_rps_mode: str = 'repair'
+    system_rps_params: dict = field(default_factory=dict)
+
+
+#: How a system's right parts are chosen; see
+#: :attr:`SearchSpaceConfig.system_rps_mode`.
+SYSTEM_RPS_MODES = ('repair', 'assignment', 'plain')
+#: Each mode's settings (``search_space.system_rps_params``) and their
+#: defaults; see :class:`SearchSpaceConfig`.
+SYSTEM_RPS_PARAMS = {
+    'repair': {},
+    'assignment': {'selected_terms_max_number': None, 'screen_size': None,
+                   'variant_pick': 'random'},
+    'plain': {},
+}
+assert tuple(SYSTEM_RPS_PARAMS) == SYSTEM_RPS_MODES
+#: Which non-dominated variant a system takes in ``'assignment'`` mode
+#: (its ``variant_pick`` setting).
+VARIANT_PICKS = ('random', 'sector')
+#: The most subsets ``'assignment'`` mode scores per equation, target and
+#: removed set: every non-empty subset of 12 columns, as many as the uncapped
+#: search has always scored at most. It bounds the NUMBER of subsets only.
+#: Under ``instability_metric='dyad'`` memory also grows with the slab
+#: Grams of all the columns -- the slab count, finer under a small
+#: ``selected_terms_max_number``, times the column count squared --
+#: so a large ``equation_terms_max_number`` with a cap of 1 or 2 on a long
+#: record can pass this count and still need gigabytes.
+ASSIGNMENT_MAX_SUBSETS = (1 << 12) - 1
+#: The most subsets ``screen_size``'s exact search VISITS per
+#: equation, target and removed set (every subset of at most
+#: ``selected_terms_max_number`` columns, at a rank-one update each):
+#: about ten seconds at the ~1e7 subsets per second measured on Navier-Stokes,
+#: e.g. 60 columns with at most 6 kept (5.6e7). Above it the screen is refused.
+ASSIGNMENT_MAX_VISITED = 10 ** 8
+
+
+def assignment_subset_count(n_cols: int, selected_max=None, screen_size=None) -> int:
+    """How many subsets ``'assignment'`` mode scores for an equation of
+    ``n_cols`` columns (the constant among them): every non-empty subset of at
+    most ``selected_max`` columns (every one when it is None), or under
+    ``screen_size`` at most that many of each size."""
+    from math import comb
+    top = n_cols if selected_max is None else min(int(selected_max), n_cols)
+    if screen_size is None:
+        return sum(comb(n_cols, k) for k in range(1, top + 1))
+    return sum(min(comb(n_cols, k), int(screen_size)) for k in range(1, top + 1))
+
+
+def _positive_int_or_none(value) -> bool:
+    return value is None or (isinstance(value, Integral) and not isinstance(value, bool)
+                             and value >= 1)
+
+
+def check_evaluation_budget(stride, use_solver) -> None:
+    """The row budget's refusals (``domain.evaluation_stride``): positive
+    integers, and never with the solver -- a solution is defined on the whole
+    grid, not on a sub-lattice of it. Checks that need the grid run when the
+    domain is built (:func:`epde.structure.domain.resolve_evaluation_stride`)."""
+    entries = stride if isinstance(stride, (list, tuple)) else (stride,)
+    if (isinstance(stride, (list, tuple)) and not stride) \
+            or not all(_positive_int_or_none(k) for k in entries) \
+            or (isinstance(stride, (list, tuple)) and any(k is None for k in entries)):
+        raise ValueError('domain.evaluation_stride must be a positive integer, a list of '
+                         'positive integers (one per axis) or None, instead got {0!r}.'.format(stride))
+    if use_solver and stride is not None:
+        raise ValueError('domain.evaluation_stride is not supported with solver.use_solver=True: '
+                         'the solver needs the whole grid, the row budget keeps a sub-lattice of it.')
+
+
+#: ``domain.evaluation_form`` values.
+EVALUATION_FORMS = ('strong', 'weak')
+
+
+def check_evaluation_form(form, stride, use_solver, instability_metric) -> None:
+    """``domain.evaluation_form`` refusals.
+
+    - It must be one of :data:`EVALUATION_FORMS`.
+    - ``'weak'`` refuses the solver: a solution is compared with the data
+      pointwise, not window by window.
+    - ``'weak'`` refuses ``evaluation_stride``: the weak window sets its own
+      row lattice.
+    - ``'weak'`` refuses ``instability_metric='vcoef'``: its basis is resolved
+      from the pointwise fields of the interior box."""
+    if form not in EVALUATION_FORMS:
+        raise ValueError('domain.evaluation_form must be one of {0}, instead got {1!r}.'.format(
+            list(EVALUATION_FORMS), form))
+    if form != 'weak':
+        return
+    if use_solver:
+        raise ValueError("domain.evaluation_form='weak' is not supported with solver.use_solver=True: "
+                         'the solver compares its solution with the data pointwise.')
+    if stride is not None:
+        raise ValueError("domain.evaluation_form='weak' is not supported with domain.evaluation_stride: "
+                         'the weak window sets its own row lattice.')
+    if instability_metric == 'vcoef':
+        raise ValueError("domain.evaluation_form='weak' is not supported with "
+                         "objectives.instability_metric='vcoef': its basis is resolved from the "
+                         'pointwise fields.')
+
+
+def plain_kept_terms_cap(terms) -> int:
+    """``'plain'`` mode's cap on what an equation keeps besides its target --
+    its other terms plus the constant, each counting 1: the ``terms - 1``
+    other terms a structure of ``equation_terms_max_number`` can hold. Plain
+    mode searches no subsets, so no subset setting enters it."""
+    return int(terms) - 1
+
+
+def resolve_rps_params(rps_mode, params) -> dict:
+    """``search_space.system_rps_params`` for ``rps_mode``: every setting the
+    mode has (:data:`SYSTEM_RPS_PARAMS`), the given values over the defaults.
+    A key the mode does not have is refused, naming the modes that have it."""
+    if rps_mode not in SYSTEM_RPS_PARAMS:
+        raise ValueError(
+            'search_space.system_rps_mode must be one of {0}, instead got '
+            '{1!r}.'.format(list(SYSTEM_RPS_MODES), rps_mode))
+    if params is None:
+        params = {}
+    if not isinstance(params, dict):
+        raise ValueError('search_space.system_rps_params must be a mapping, instead got '
+                         '{0!r}.'.format(params))
+    allowed = SYSTEM_RPS_PARAMS[rps_mode]
+    unknown = sorted(set(params) - set(allowed))
+    if unknown:
+        owners = {key: [mode for mode, settings in SYSTEM_RPS_PARAMS.items() if key in settings]
+                  for key in unknown}
+        raise ValueError(
+            'Unknown search_space.system_rps_params {0} for system_rps_mode={1!r}; it accepts '
+            '{2}.{3}'.format(
+                unknown, rps_mode, sorted(allowed) or 'no settings',
+                ''.join(' {0} is a setting of system_rps_mode {1}.'.format(
+                    key, ' / '.join(repr(mode) for mode in modes))
+                    for key, modes in owners.items() if modes)))
+    resolved = dict(allowed)
+    resolved.update(params)
+    return resolved
+
+
+def rps_param(search_space, key):
+    """The ``key`` setting of ``search_space``'s mode: its
+    ``system_rps_params`` value, else the mode's default; None when the mode
+    has no such setting (``'plain'`` mode has no selected-terms cap)."""
+    defaults = SYSTEM_RPS_PARAMS.get(search_space.system_rps_mode, {})
+    return search_space.system_rps_params.get(key, defaults.get(key))
+
+
+def check_rps_params(rps_mode, terms, params) -> None:
+    """The mode settings' refusals, shared by the config load and ``fit``
+    (``params`` resolved by :func:`resolve_rps_params`). ``'assignment'``
+    mode: the selected-terms cap and the screen size are positive integers or
+    None, the screen needs the cap, ``variant_pick`` is one of
+    :data:`VARIANT_PICKS`, and the subset search scores at most
+    :data:`ASSIGNMENT_MAX_SUBSETS` subsets of an equation's ``terms`` columns
+    (``terms - 1`` features and the constant)."""
+    if rps_mode != 'assignment':
+        return
+    selected, screen = params['selected_terms_max_number'], params['screen_size']
+    for key, value in (('selected_terms_max_number', selected), ('screen_size', screen)):
+        if not _positive_int_or_none(value):
+            raise ValueError('search_space.system_rps_params[{0!r}] must be a positive integer '
+                             'or None, instead got {1!r}.'.format(key, value))
+    if params['variant_pick'] not in VARIANT_PICKS:
+        raise ValueError(
+            "search_space.system_rps_params['variant_pick'] must be one of {0}, instead got "
+            '{1!r}.'.format(list(VARIANT_PICKS), params['variant_pick']))
+    if screen is not None and selected is None:
+        raise ValueError(
+            "search_space.system_rps_params['screen_size'] ranks the subsets of each size up "
+            "to 'selected_terms_max_number'; set that cap too.")
+    if isinstance(terms, bool) or not isinstance(terms, Integral):
+        return
+    if selected is None:
+        if terms > 12:
+            raise ValueError(
+                "search_space.system_rps_mode='assignment' enumerates every subset "
+                'of an equation\'s terms; equation_terms_max_number must be at most '
+                '12, instead got {0}.'.format(terms))
+        return
+    if screen is not None:
+        visited = assignment_subset_count(terms, selected)
+        if visited > ASSIGNMENT_MAX_VISITED:
+            raise ValueError(
+                "search_space.system_rps_params['screen_size'] visits every subset of at most "
+                "{0} of an equation's {1} columns: {2:.3g} subsets, more than {3:.3g}. Lower "
+                "equation_terms_max_number or 'selected_terms_max_number'.".format(
+                    selected, terms, visited, ASSIGNMENT_MAX_VISITED))
+    count = assignment_subset_count(terms, selected, screen)
+    if count > ASSIGNMENT_MAX_SUBSETS:
+        raise ValueError(
+            "search_space.system_rps_mode='assignment' scores {0} subsets of at most "
+            '{1} of an equation\'s {2} columns{3}: more than {4}. Lower '
+            "equation_terms_max_number or 'selected_terms_max_number'{5}.".format(
+                count, selected, terms,
+                '' if screen is None else ' ({0} of each size)'.format(screen),
+                ASSIGNMENT_MAX_SUBSETS,
+                ", or set 'screen_size'" if screen is None else
+                ", or lower 'screen_size'"))
 
 
 #: Which Gram the sparsity keep-rule needs, per instability estimator. The
@@ -173,8 +478,8 @@ class SearchSpaceConfig:
 #:   'vcoef' -> VaryingCoefSetup   (its ``score``; also caches _cached_vc_score)
 #:   'cv'    -> GramSetup, 'axis'  (its window stack; caches _cached_sw_weights)
 #:   everything else -> NO Gram at all: 'chi2', 'chi2_centered', 'het',
-#:                      'het_raw', 'tile' and 'survival' score straight from
-#:                      the active columns.
+#:                      'het_raw', 'tile', 'dyad' and 'survival' score
+#:                      straight from the active columns.
 _GRAM_BY_INSTABILITY = {'vcoef': 'vcoef', 'cv': 'axis'}
 
 
@@ -187,19 +492,14 @@ class ObjectivesConfig:
     call the setter, leave whatever is already in ``epde.globals``".
     ``sparsity_kwargs`` configures the operator named by ``sparsity_cls`` --
     e.g. ``{'initial_sparsity_interval': [1e-4, 2.5]}`` for ``'lasso'``, the
-    range its alpha metaparameter is seeded from, or
-    ``{'realization': 'knee_ext2'}`` for ``'knee'``, which of the
-    subset-selection rules in ``operators/common/subset_selection.py`` picks
-    the support (``'knee'`` reads no alpha at all -- it selects by the shape of
-    the RSS-versus-size curve, so there is no L1 strength to seed). The Gram
-    construction is NOT a field here: it follows ``instability_metric``, see
-    :attr:`gram_mode`.
+    range its alpha metaparameter is seeded from. The Gram construction is NOT
+    a field here: it follows ``instability_metric``, see :attr:`gram_mode`.
     """
     multiobjective_mode: bool = True
     discrepancy_metric: Optional[str] = 'wape'
     second_objective: Optional[str] = 'instability'
     complexity_metric: Optional[str] = 'factors'
-    instability_metric: Optional[str] = 'chi2'
+    instability_metric: Optional[str] = 'dyad'
     single_objective_metric: Optional[str] = 'discrepancy'
     anchor_on_residual: bool = False
     sparsity_cls: Any = 'vwsr'
@@ -370,26 +670,125 @@ def _default_director_params() -> dict:
 class EvolutionConfig:
     """The evolutionary engine.
 
-    ``population_size`` and ``training_epochs`` are the multiobjective
-    defaults; when ``objectives.multiobjective_mode`` is false and neither was
-    set explicitly, the loader substitutes the single-objective defaults
-    (4 / 50) that ``set_singleobjective_params`` used, so switching modes does
-    not silently change them.
+    ``population_size`` takes an int, or ``'auto'`` (the default, in either
+    mode): it seeds as many distinct initial systems as the token pool yields
+    -- up to :data:`AUTO_POPULATION_CEILING`, stopping at the first slot where
+    ``uniqueness_attempt_limit`` consecutive draws find no new structure -- but
+    never fewer than :data:`AUTO_POPULATION_FLOOR` (below it the slots are
+    filled as with an explicit size). It is not derived from the size of the
+    search space.
+
+    ``training_epochs`` is the most epochs a fit runs (an int >= 0), and
+    ``early_stopping_patience`` stops it earlier: once the set of structures on
+    the first Pareto level (NSGA-II's archive; the best individual's structure
+    in single-objective mode) has not changed for that many epochs in a row.
+    ``None`` runs every epoch. Either engine, either mode, any limit.
 
     ``operators`` is the per-operator parameter mapping. As DECLARED it holds
     only what a caller overrode; :func:`load_search_config` resolves it into
     the full mapping -- :data:`MULTI_OBJECTIVE_OPERATORS` (or the
     single-objective set) under those overrides, with the cross-referenced
     keys injected from the group that owns them.
+
+    ``niching`` decides how a multi-equation system survives and mates (one of
+    :data:`NICHING_MODES`):
+
+    * ``'system'`` -- MOEA/DD as published: one 2-D weight direction, repeated
+      over the equations, places and ranks the whole system.
+    * ``'per_equation'`` -- each equation has its own (discrepancy,
+      instability) plane. Survival protects every system that holds a
+      structure on some equation's own front (one holder per structure: the
+      same structure is the same equation); the victim is taken from the
+      unprotected systems, the one whose best per-equation non-domination rank
+      is the worst (ranks are compared, errors are never added up), or, when
+      every system is protected, the one on the fewest equation fronts, ties
+      by crowding within its own plane. Mating serves equation ``k mod n`` at
+      weight vector ``k``, in that equation's own plane. A single-equation
+      system keeps ``'system'``.
+
+    ``complementary_mating_prob`` is the probability that the second parent is
+    drawn from the systems holding some equation's front where the first
+    parent does not (e.g. an exact-v system for an exact-u one), so crossover
+    can combine them. ``0`` leaves mating untouched.
+
+    ``engine`` is the multi-objective algorithm (one of :data:`ENGINES`):
+    ``'moeadd'`` (MOEA/DD, the default) or ``'nsga2'`` -- NSGA-II: binary
+    tournaments on (level, crowding), then the parents and offspring are
+    sorted and cut back to the population size, crowding measured in each
+    equation's own plane. Its archive keeps every system no archived system
+    dominates and is sorted into the result after the fit, so a system found
+    once is never crowded out (for one equation the first Pareto level is
+    exactly the archive). One of its epochs runs as many offspring as a
+    MOEA/DD epoch does for the same population, so ``training_epochs`` means
+    the same budget. ``'assignment'`` mode's ``variant_pick='sector'``
+    belongs to MOEA/DD's weight vectors and is refused with it. ``niching='per_equation'`` has an NSGA-II
+    form: the truncation keeps the systems holding a structure on some
+    equation's own front first (one holder per structure; when they alone
+    overflow, those on more fronts, then the less crowded), and the tournament
+    compares the systems' per-equation plane ranks. ``complementary_mating_prob``
+    forces one complementary pair per generation, as in MOEA/DD.
+
+    Whatever the engine, the initial population keeps at most half its
+    members on the first Pareto level: a population that ends with more
+    there grows past ``population_size`` (an explicit one too) until it does
+    not, or until the pool yields no further system.
     """
-    population_size: int = 6
+    population_size: Union[str, int] = 'auto'
     training_epochs: int = 100
+    early_stopping_patience: Optional[int] = 5
     neighbors_number: int = 3
     PBI_penalty: float = 5.0
     subregion_mating_limitation: float = 0.9
     solution_params: dict = field(default_factory=dict)
     director_params: dict = field(default_factory=_default_director_params)
     operators: dict = field(default_factory=dict)
+    niching: str = 'system'
+    complementary_mating_prob: float = 0.0
+    engine: str = 'moeadd'
+
+
+#: How a multi-equation system survives and mates; see
+#: :attr:`EvolutionConfig.niching`.
+NICHING_MODES = ('system', 'per_equation')
+#: The multi-objective algorithm; see :attr:`EvolutionConfig.engine`.
+ENGINES = ('moeadd', 'nsga2')
+#: ``population_size='auto'``: the fewest systems seeded (raised to twice the
+#: equation count under ``niching='per_equation'``, where weight vector ``k``
+#: serves equation ``k mod n``, and above ``neighbors_number``) and the most.
+AUTO_POPULATION_FLOOR = 8
+AUTO_POPULATION_CEILING = 32
+
+
+def check_auto_settings(boundary_width, population_size, training_epochs,
+                        early_stopping_patience=None) -> None:
+    """Refuse values of the settings that take ``'auto'`` other than ``'auto'``
+    or what each accepts besides: a non-negative int (or one per axis) for
+    ``boundary_width`` and an int >= 2 for ``population_size``; and the budget,
+    an int >= 0 for ``training_epochs`` and an int >= 1 or None for
+    ``early_stopping_patience``."""
+    def integral(value, low):
+        return isinstance(value, Integral) and not isinstance(value, bool) and value >= low
+
+    if not (boundary_width == 'auto' if isinstance(boundary_width, str) else
+            integral(boundary_width, 0) or (isinstance(boundary_width, (list, tuple))
+                                            and all(integral(b, 0) for b in boundary_width))):
+        raise ValueError(
+            "domain.boundary_width must be 'auto', a non-negative int or one per "
+            'axis, instead got {0!r}.'.format(boundary_width))
+    if not (population_size == 'auto' if isinstance(population_size, str)
+            else integral(population_size, 2)):
+        raise ValueError(
+            "evolution.population_size must be 'auto' or an int >= 2, instead got "
+            '{0!r}.'.format(population_size))
+    if not integral(training_epochs, 0):
+        raise ValueError(
+            'evolution.training_epochs must be an int >= 0 -- the most epochs; '
+            'evolution.early_stopping_patience stops earlier -- instead got '
+            '{0!r}.'.format(training_epochs))
+    if not (early_stopping_patience is None or integral(early_stopping_patience, 1)):
+        raise ValueError(
+            'evolution.early_stopping_patience must be an int >= 1 or None, instead '
+            'got {0!r}.'.format(early_stopping_patience))
 
 
 @dataclass(frozen=True)
@@ -440,6 +839,10 @@ MULTI_OBJECTIVE_OPERATORS = {
                         'parents_fraction': 0.2},
     'PopulationUpdater': {'PBI_penalty': FromConfig('evolution',
                                                     'PBI_penalty')},
+    # evolution.engine='nsga2': every member enters a binary tournament, so as
+    # many parents are drawn as the population holds.
+    'NSGASelection': {'parents_fraction': 1.0},
+    'AppendUpdater': {},
     'SortingBasedNeighborSelector': {
         'number_of_neighbors': FromConfig('evolution', 'neighbors_number')},
     'ParetoLevelUpdater': {'mutation_attempt_limit': 3,
@@ -586,19 +989,11 @@ class SearchConfig:
 # The kwarg layer always replaces wholesale -- see ``load_search_config``.
 _MERGED_DICT_KEYS = frozenset((
     'preprocessor_kwargs', 'verbose_params', 'director_params', 'operators',
-    'sparsity_kwargs',
+    'sparsity_kwargs', 'system_rps_params',
     'deepxde_config', 'basis_config', 'solution_params', 'compiling_params',
     'optimizer_params', 'cache_params', 'early_stopping_params',
     'plotting_params', 'training_params',
 ))
-
-# Single-objective mode used to carry its own defaults
-# (``set_singleobjective_params(population_size=4, training_epochs=50)`` versus
-# the multiobjective ``6`` / ``100``). The JSON can hold only one value, so
-# these are substituted when the mode is single-objective AND the caller left
-# the key alone -- otherwise flipping ``multiobjective_mode`` would silently
-# change the population size.
-_SINGLE_OBJECTIVE_DEFAULTS = {'population_size': 4, 'training_epochs': 50}
 
 # ---------------------------------------------------------------------------
 # Registries
@@ -606,10 +1001,11 @@ _SINGLE_OBJECTIVE_DEFAULTS = {'population_size': 4, 'training_epochs': 50}
 
 #: Sparsity operator by name. Imported lazily -- ``operators.common.sparsity``
 #: pulls in sklearn and the whole stability stack.
-SPARSITY_REGISTRY = ('vwsr', 'lasso', 'knee')
+SPARSITY_REGISTRY = ('vwsr', 'lasso')
 
 #: Prepared token families that are fully declarative, i.e. whose constructors
-#: take only scalars and so survive a JSON round trip. Families needing a
+#: take only scalars and number lists (e.g. ``freq_values``) and so survive a
+#: JSON round trip. Families needing a
 #: tensor or a callable (``CustomTokens``, ``CacheStoredTokens``,
 #: ``ExternalDerivativesTokens``, ``ControlVarTokens``,
 #: ``ArbitraryDataFunction``, ``DerivSignFunction``) cannot be declared and are
@@ -639,8 +1035,8 @@ def sparsity_settings(sparsity_cls) -> tuple:
     setting: it states whether this estimator's coefficients are already on the
     physical scale, which ``LinRegBasedCoeffsEquation`` uses to decide between
     refitting and promoting. Overriding it from ``sparsity_kwargs`` would run
-    the legacy min-max refit over VWSR's or Knee's physical coefficients, or
-    skip it where LASSO needs it -- silently wrong coefficients either way.
+    the legacy min-max refit over VWSR's physical coefficients, or skip it
+    where LASSO needs it -- silently wrong coefficients either way.
     """
     if sparsity_cls is None:
         return ()
@@ -677,7 +1073,7 @@ def validate_sparsity_kwargs(sparsity_cls, kwargs: dict) -> dict:
 
 
 def resolve_sparsity(value):
-    """Map ``'vwsr'`` / ``'lasso'`` / ``'knee'`` to the operator class.
+    """Map ``'vwsr'`` / ``'lasso'`` to the operator class.
 
     A class or ``None`` passes through untouched, so a caller can still hand in
     their own operator.
@@ -690,9 +1086,7 @@ def resolve_sparsity(value):
             'Unknown sparsity {0!r}; expected one of {1} or an operator '
             'class.'.format(value, list(SPARSITY_REGISTRY)))
     from epde.operators.common.sparsity import LASSOSparsity, VWSRSparsity
-    from epde.operators.common.subset_selection import KneeSparsity
-    return {'vwsr': VWSRSparsity, 'lasso': LASSOSparsity,
-            'knee': KneeSparsity}[key]
+    return {'vwsr': VWSRSparsity, 'lasso': LASSOSparsity}[key]
 
 
 def build_tokens(specs):
@@ -727,10 +1121,10 @@ def build_tokens(specs):
         cls = getattr(prepared, TOKEN_REGISTRY[family])
         try:
             built.append(cls(**spec))
-        except TypeError as exc:
+        except (TypeError, ValueError) as exc:
             raise ValueError(
                 'Could not build token family {0!r} from {1!r}: {2}'.format(
-                    family, spec, exc))
+                    family, spec, exc)) from exc
     return built
 
 
@@ -888,18 +1282,20 @@ def _group_overrides(overrides: dict) -> Dict[str, dict]:
 #: only validator.
 #:
 #: The instability menu is documented at length on ``Instability.compute``; in
-#: brief: 'chi2' (default, Nyblom-Hansen score path, no refits),
+#: brief: 'chi2' (Nyblom-Hansen score path, no refits),
 #: 'chi2_centered' (the same on weighted-centred columns), 'vcoef'
 #: (varying-coefficient NC/gamma_0^2), 'cv' (axis-aligned sliding window),
 #: 'survival' (refits on iid resamples of fixed time slabs), 'tile' (one refit
-#: per time slab along storage axis 0), 'het' (per-block refits, calibrated
-#: heterogeneity bounded to [0, 1]) and
+#: per time slab along storage axis 0), 'dyad' (tile's statistic averaged
+#: over every dyadic partition of every grid axis in turn, then over the
+#: axes; parameter-free; the default), 'het' (per-block refits,
+#: calibrated heterogeneity bounded to [0, 1]) and
 #: 'het_raw' (the same heterogeneity, unbounded tau^2 / theta_bar^2).
 METRIC_MENUS = {
     'discrepancy_metric': ('wape', 'l2', 'l2_relative', 'scale_invariant'),
     'complexity_metric': ('factors', 'terms'),
     'instability_metric': ('vcoef', 'cv', 'survival', 'tile', 'het', 'chi2',
-                           'chi2_centered', 'het_raw'),
+                           'chi2_centered', 'het_raw', 'dyad'),
     'single_objective_metric': ('discrepancy', 'instability'),
     'second_objective': ('instability', 'complexity'),
 }
@@ -975,6 +1371,84 @@ def _check_types(resolved: dict) -> None:
             'strategy has no solver-based fitness, so the solver would be '
             'silently ignored.')
 
+    space = resolved['search_space']
+    rps_mode = space['system_rps_mode']
+    # The mode's settings, defaults filled in; a key of another mode raises.
+    space['system_rps_params'] = resolve_rps_params(rps_mode, space['system_rps_params'])
+    pick = space['system_rps_params'].get('variant_pick')
+    niching = resolved['evolution']['niching']
+    if niching not in NICHING_MODES:
+        raise ValueError(
+            'evolution.niching must be one of {0}, instead got {1!r}.'.format(
+                list(NICHING_MODES), niching))
+    mating = resolved['evolution']['complementary_mating_prob']
+    if isinstance(mating, bool) or not isinstance(mating, (int, float)) \
+            or not 0.0 <= mating <= 1.0:
+        raise ValueError(
+            'evolution.complementary_mating_prob must be a number in [0, 1], '
+            'instead got {0!r}.'.format(mating))
+    if rps_mode in ('assignment', 'plain'):
+        if resolved['solver']['use_solver']:
+            # The variants are compared on per-equation objectives scored
+            # without a solve; the solver-based fitness scores the system jointly.
+            raise ValueError(
+                "search_space.system_rps_mode={0!r} is not supported with "
+                'solver.use_solver=True: its variants are compared on '
+                'solver-free per-equation objectives.'.format(rps_mode))
+        objectives = resolved['objectives']
+        if not objectives['multiobjective_mode'] \
+                or objectives['second_objective'] != 'instability':
+            # Each equation's subsets are screened on (discrepancy, instability)
+            # -- the run's own Pareto axes only in this configuration. With one
+            # objective the densest fit would always win.
+            raise ValueError(
+                "search_space.system_rps_mode={0!r} requires "
+                "objectives.multiobjective_mode=True and "
+                "objectives.second_objective='instability'.".format(rps_mode))
+    engine = resolved['evolution']['engine']
+    if engine not in ENGINES:
+        raise ValueError(
+            'evolution.engine must be one of {0}, instead got {1!r}.'.format(
+                list(ENGINES), engine))
+    if engine == 'nsga2':
+        if not resolved['objectives']['multiobjective_mode']:
+            raise ValueError(
+                "evolution.engine='nsga2' requires objectives.multiobjective_mode=True.")
+        # The sector pick lives inside MOEA/DD's weight vectors. Per-equation
+        # niching and complementary mating have NSGA-II forms (the truncation
+        # and the tournament, epde.optimizers.nsga).
+        if pick == 'sector':
+            raise ValueError(
+                "search_space.system_rps_params['variant_pick']='sector' is a MOEA/DD "
+                "setting, not supported with evolution.engine='nsga2'.")
+    check_rps_params(rps_mode, space['equation_terms_max_number'], space['system_rps_params'])
+    check_evaluation_budget(resolved['domain']['evaluation_stride'],
+                            resolved['solver']['use_solver'])
+    check_evaluation_form(resolved['domain']['evaluation_form'],
+                          resolved['domain']['evaluation_stride'],
+                          resolved['solver']['use_solver'],
+                          resolved['objectives']['instability_metric'])
+    check_auto_settings(resolved['domain']['boundary_width'],
+                        resolved['evolution']['population_size'],
+                        resolved['evolution']['training_epochs'],
+                        resolved['evolution']['early_stopping_patience'])
+
+
+def check_plain_sparsity(resolved: dict) -> None:
+    """``'plain'`` mode keeps the weighted least-squares fit of a candidate's
+    own terms. Refused with a sparsity class that does not declare its weights
+    physical (``fits_physical_scale``; e.g. ``'lasso'``), since the
+    coefficient step would then refit them."""
+    if resolved['search_space']['system_rps_mode'] != 'plain':
+        return
+    sparsity_cls = resolved['objectives']['sparsity_cls']
+    name = getattr(sparsity_cls, '__name__', sparsity_cls)
+    if not getattr(sparsity_cls, 'fits_physical_scale', False):
+        raise ValueError(
+            "search_space.system_rps_mode='plain' keeps the least-squares fit of each "
+            'candidate; objectives.sparsity_cls={0!r} would have it refitted. Use a sparsity '
+            "class whose weights are physical (the default 'vwsr').".format(name))
+
 
 def load_search_config(user_config=None, overrides=None) -> SearchConfig:
     """Resolve the shipped defaults, a user config and explicit kwargs.
@@ -1007,17 +1481,6 @@ def load_search_config(user_config=None, overrides=None) -> SearchConfig:
     for group, values in grouped.items():
         resolved[group].update(values)
 
-    # Restore the single-objective population defaults when the mode is
-    # single-objective and the caller said nothing about them.
-    if not resolved['objectives']['multiobjective_mode']:
-        file_keys = set()
-        for group_values in file_layer.values():
-            if isinstance(group_values, dict):
-                file_keys.update(group_values)
-        for key, value in _SINGLE_OBJECTIVE_DEFAULTS.items():
-            if key not in overrides and key not in file_keys:
-                resolved['evolution'][key] = value
-
     _normalise_metrics(resolved)
     _check_types(resolved)
     # After every layer, so a kwarg or a config file can move both a setting
@@ -1028,6 +1491,7 @@ def load_search_config(user_config=None, overrides=None) -> SearchConfig:
     resolved['objectives']['sparsity_kwargs'] = validate_sparsity_kwargs(
         resolved['objectives']['sparsity_cls'],
         resolved['objectives']['sparsity_kwargs'])
+    check_plain_sparsity(resolved)
 
     config = SearchConfig(**{group: cls(**resolved[group])
                              for group, cls in GROUP_CLASSES.items()})

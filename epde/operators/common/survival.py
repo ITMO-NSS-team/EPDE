@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Block-based instability estimators for the ``Instability`` objective.
 
-The six basis-free estimators (``_BASIS_FREE_METRICS`` below), selectable
+The seven basis-free estimators (``_BASIS_FREE_METRICS`` below), selectable
 via ``active_config().objectives.instability_metric`` beside the Gram-backed
 ``vcoef`` and ``cv``:
 
@@ -17,6 +17,13 @@ via ``active_config().objectives.instability_metric`` beside the Gram-backed
   along axis >= 1 only through the axis-0 drift it induces in the per-slab
   fit, so a purely spatial coefficient modulation on a separable field can
   be invisible to it.
+* ``dyad_scores`` -- ``tile``'s statistic averaged over EVERY dyadic
+  partition (2, 4, 8, ... slabs down to the same samples-per-unknown floor)
+  of every grid axis in turn, averaged over the axes, so no slab count is
+  chosen and a coefficient drifting along space is seen as well as one
+  drifting in time. Parameter-free. Its one-axis component,
+  ``dyad_t_scores`` (the partitions of storage axis 0), is not a metric of
+  its own.
 * ``heterogeneity_scores`` / ``heterogeneity_raw_scores`` -- CALIBRATED
   heterogeneity (Cochran's Q / DerSimonian-Laird): per-block refits like
   ``tile``, but the between-block dispersion is measured against the
@@ -42,8 +49,8 @@ weighted by ``sample_weights``), so the data-sized work is one pass and
 every refit is a small (p+1) solve. Aggregation is robust
 (median / MAD) or chi-square-calibrated (``het``). Per-term scores are
 dimensionless and invariant to rescaling the target. ``survival``, ``tile``,
-``chi2`` and ``chi2_centered`` are also invariant to per-column and weight
-rescaling (to round-off); ``het`` / ``het_raw`` are NOT -- their block ridge
+``dyad``, ``chi2`` and ``chi2_centered`` are also invariant to per-column and
+weight rescaling (to round-off); ``het`` / ``het_raw`` are NOT -- their block ridge
 sits on the raw, non-equilibrated Gram, so one column's scale moves the
 ridge every other column sees, and the weight scale enters their residual
 degrees of freedom through ``sum(w)``.
@@ -59,6 +66,8 @@ same equation re-estimates the same coefficients).
 
 from __future__ import annotations
 
+import functools
+
 import numpy as np
 
 from epde import _loop_stats
@@ -70,18 +79,19 @@ from epde import _loop_stats
 _DEFAULT_BOOTSTRAP_DRAWS = 32     # B: block-bootstrap refits per equation
 _DEFAULT_N_BLOCKS = 16            # survival: contiguous time-slab count
 _DEFAULT_N_TILES = 8              # tile: time slabs along storage axis 0
-_DEFAULT_N_BLOCKS_HET = 16        # het: refit blocks (clamped by sample count)
+_DEFAULT_N_BLOCKS_HET = 16        # het: refit blocks (clamped by the axis-0 levels)
 
 
 def _reference_width(p: int) -> int:
     """The candidate width the block-count clamp is allowed to depend on.
 
-    ``tile`` and ``het`` size their partition as ``n_samples // (4*(w+1))`` so
-    every block keeps >= 4 samples per unknown. Using the CANDIDATE's own ``p``
-    for ``w`` made the partition candidate-dependent, and in the one direction
-    that flatters complexity: a wider equation got fewer, larger blocks, hence
-    lower between-block dispersion, hence a BETTER instability score. That is a
-    combinatorial reward for adding terms, paid on the Pareto axis.
+    ``tile`` and ``het`` size their partition so every block keeps
+    ``4*(w+1)`` rows, >= 4 samples per unknown (:func:`_level_slab_capacity`).
+    Using the CANDIDATE's own ``p`` for ``w`` made the partition
+    candidate-dependent, and in the one direction that flatters complexity: a
+    wider equation got fewer, larger blocks, hence lower between-block
+    dispersion, hence a BETTER instability score. That is a combinatorial
+    reward for adding terms, paid on the Pareto axis.
 
     ``survival_scores`` already refuses to let ``p`` reach its randomness for
     the same reason -- see the common-random-numbers note there. This is the
@@ -93,13 +103,93 @@ def _reference_width(p: int) -> int:
     ``max`` with the candidate's own ``p`` keeps the >= 4-samples-per-unknown
     guarantee intact when a caller hands over a matrix wider than the
     configured cap -- offline analysis tools do.
+
+    Under ``'assignment'`` mode's ``selected_terms_max_number`` no fit is
+    wider than that cap (the constant included), so the widest equation is
+    the smaller of the two caps: a structure holding more terms to choose from
+    leaves the partition of every candidate as it was.
     """
     try:
         from epde.interface.search_config import active_config
-        configured = int(active_config().search_space.equation_terms_max_number)
+        configured = configured_width(active_config().search_space)
     except Exception:
         configured = 0
     return max(int(p), configured)
+
+
+def configured_width(search_space) -> int:
+    """The widest equation a search configuration can fit: its
+    ``equation_terms_max_number``, or its mode's ``selected_terms_max_number``
+    when that is smaller (see :func:`_reference_width`)."""
+    from epde.interface.search_config import rps_param
+    configured = int(search_space.equation_terms_max_number)
+    selected = rps_param(search_space, 'selected_terms_max_number')
+    if selected is not None:
+        configured = min(configured, int(selected))
+    return configured
+
+
+def row_floor(metric: str, grid_shape, w_ref: int):
+    """Why a grid of ``grid_shape`` is too small for ``metric``'s partition at
+    reference width ``w_ref``, or ``None`` when it is not.
+
+    The estimators clamp their partitions rather than refuse (``tile`` and
+    ``dyad`` to two slabs), so a short grid degrades them silently; the row
+    budget asks first. Every block or slab must keep ``4 (w_ref + 1)`` rows --
+    measured on the partition the estimator actually cuts, at whole levels of
+    axis 0, not on the row total. Each estimator takes its block count from
+    the axis-0 levels (:func:`_level_slab_capacity`), so a slab falls below
+    the floor only where the estimator's minimum count (two slabs, three
+    blocks) overrides it. ``chi2`` needs three levels along some axis. Other
+    metrics need no floor here.
+
+    The block floors are monotone along every axis but the first, and along
+    the first from two levels on. A single axis-0 level is off that scale:
+    the estimators cut it as one row per level (:func:`_axis0_layout`), so it
+    gets the verdict of the 1-D grid of the same rows. For ``tile`` and
+    ``dyad`` that still fits -- two flat slabs need twice the rows two whole
+    levels do -- but ``het`` cuts three flat blocks from one level holding
+    three blocks' rows, where two levels make at most two blocks: at width 6
+    ``(1, 100)`` passes, ``(2, 100)`` is refused and ``(3, 100)`` passes.
+
+    Two-level grids under ``het`` / ``het_raw`` are the one case the level
+    count refuses that the row-total count passed: it measured only the two
+    slabs :func:`_slab_edges` clamps two levels to. ``het`` raised on them
+    anyway (fewer than three usable blocks), so the row budget now refuses
+    them at fit start instead of the search failing at its first ``het``
+    score. Under a row budget that takes an interior box two levels long
+    along axis 0: the stride resolver keeps three levels per axis otherwise.
+    """
+    shape = tuple(int(n) for n in grid_shape)
+    rows = int(np.prod(shape))
+    block = 4 * (int(w_ref) + 1)
+    if metric in ('chi2', 'chi2_centered'):
+        if not any(n >= 3 for n in shape):
+            return f'{metric} needs 3 levels along some axis, the grid is {shape}'
+        return None
+    if metric in ('het', 'het_raw'):
+        capacity = _level_slab_capacity(rows, shape, block)
+        if capacity < 3:
+            n_0, stride = _axis0_layout(rows, shape)
+            levels = -(-block // stride)
+            return (f'{metric} needs 3 blocks of {block} rows at whole levels of axis 0 '
+                    f'({3 * levels * stride} rows, {3 * levels} levels of {stride}), '
+                    f'the grid has {rows} ({n_0} levels)')
+        parts = [_slab_edges(rows, shape, max(3, min(_DEFAULT_N_BLOCKS_HET, capacity)))]
+    elif metric == 'tile':
+        capacity = _level_slab_capacity(rows, shape, block)
+        parts = [_slab_edges(rows, shape, max(2, min(_DEFAULT_N_TILES, capacity)))]
+    elif metric == 'dyad':
+        # Every axis dyad cuts (_axis_layouts), each as storage axis 0.
+        parts = [edges for _axis, _order, moved in _axis_layouts(rows, shape)
+                 for edges in _dyadic_slab_edges(rows, moved, block)]
+    else:
+        return None
+    smallest = min(int(np.min(np.diff(edges))) for edges in parts)
+    if smallest < block:
+        return (f'{metric} cuts the grid {shape} into blocks along axis 0 as small as {smallest} rows, '
+                f'below {block} = 4 * (width {int(w_ref)} + 1)')
+    return None
 # chi2 needs no size knob: one score path per grid axis, each accumulated
 # at that axis's own level resolution, so there is nothing to tune.
 
@@ -110,9 +200,10 @@ def _slab_edges(n_samples: int, grid_shape, n_blocks: int):
     When the flat sample count matches ``prod(grid_shape)`` (the standard
     case: C-ordered flattening of the grid), boundaries are aligned to
     whole steps of the FIRST grid axis -- time -- so each slab is a
-    physically contiguous space-time chunk; otherwise plain contiguous
-    index slabs are used. ``n_blocks`` is clamped to what the axis can
-    support. Returns the ``(n_blocks + 1,)`` edge array.
+    physically contiguous space-time chunk; otherwise, or when that axis has
+    a single level, plain contiguous index slabs are used. ``n_blocks`` is
+    clamped to what the axis can support. Returns the ``(n_blocks + 1,)``
+    edge array.
     """
     grid_shape = tuple(int(s) for s in (() if grid_shape is None else grid_shape))
     if grid_shape and int(np.prod(grid_shape)) == n_samples and grid_shape[0] > 1:
@@ -130,10 +221,11 @@ def block_gram_partition(features, target, sample_weights, grid_shape,
 
     Splits the sample axis into ``n_blocks`` contiguous slabs. When the
     flat sample count matches ``prod(grid_shape)`` (the standard case:
-    C-ordered flattening of the grid), slab boundaries are aligned to
-    whole steps of the first grid axis (time slabs) so each block is a
-    physically contiguous space-time chunk; otherwise plain contiguous
-    index slabs are used.
+    C-ordered flattening of the grid) and the first grid axis has two or
+    more levels, slab boundaries are aligned to whole steps of that axis
+    (time slabs) so each block is a physically contiguous space-time chunk;
+    otherwise -- a single axis-0 level included -- plain contiguous index
+    slabs are used (:func:`_slab_edges`).
 
     Returns ``(G_blocks, Gy_blocks)`` with shapes ``(B, p+1, p+1)`` and
     ``(B, p+1)``; the last row/column is the folded intercept (the
@@ -142,6 +234,18 @@ def block_gram_partition(features, target, sample_weights, grid_shape,
     per-block weighted target energies ``y^T W y`` is appended (needed by
     the residual-variance computation in ``heterogeneity_scores``).
     """
+    n_samples = np.shape(features)[0]
+    # grid_shape may arrive as a tuple, list, or ndarray (ctx.data_shape in
+    # the live fitness path) -- avoid ambiguous ndarray truth tests.
+    edges = _slab_edges(n_samples, grid_shape, n_blocks)
+    return _edge_gram_blocks(features, target, sample_weights, edges,
+                             return_yy=return_yy)
+
+
+def _edge_gram_blocks(features, target, sample_weights, edges,
+                      return_yy: bool = False):
+    """:func:`block_gram_partition`'s per-block augmented Gram stacks over the
+    flat-index slabs ``[edges[b], edges[b+1])`` given explicitly."""
     X = np.asarray(features, dtype=float)
     if X.ndim == 1:
         X = X[:, None]
@@ -149,27 +253,31 @@ def block_gram_partition(features, target, sample_weights, grid_shape,
     n_samples, p = X.shape
     sw = (np.asarray(sample_weights, dtype=float).reshape(-1)
           if sample_weights is not None else np.ones(n_samples))
-
-    # grid_shape may arrive as a tuple, list, or ndarray (ctx.data_shape in
-    # the live fitness path) -- avoid ambiguous ndarray truth tests.
-    edges = _slab_edges(n_samples, grid_shape, n_blocks)
     n_blocks = edges.size - 1
 
     G_blocks = np.zeros((n_blocks, p + 1, p + 1))
     Gy_blocks = np.zeros((n_blocks, p + 1))
     yy_blocks = np.zeros(n_blocks)
+    # The weighted products are formed once, outside the slab loop: being
+    # elementwise, their slices equal the per-slab products bit for bit, and
+    # every slab keeps the same reductions on views of the same layout. The
+    # Grams are unchanged to the last bit; the loop does a third fewer numpy
+    # calls per slab, which is what dyad_t's one-row-per-level fallback spends
+    # its time on (32 slabs per keep-rule call on an ODE).
+    wX = sw[:, None] * X
+    swy = sw * y
     for b in range(n_blocks):
         lo, hi = edges[b], edges[b + 1]
-        Xb, yb, swb = X[lo:hi], y[lo:hi], sw[lo:hi]
-        wXb = swb[:, None] * Xb
+        Xb, wXb, swyb = X[lo:hi], wX[lo:hi], swy[lo:hi]
         G_blocks[b, :p, :p] = Xb.T @ wXb
         ws = wXb.sum(axis=0)
         G_blocks[b, :p, -1] = ws
         G_blocks[b, -1, :p] = ws
-        G_blocks[b, -1, -1] = float(swb.sum())
-        Gy_blocks[b, :p] = Xb.T @ (swb * yb)
-        Gy_blocks[b, -1] = float((swb * yb).sum())
-        yy_blocks[b] = float(np.dot(yb, swb * yb))
+        G_blocks[b, -1, -1] = float(sw[lo:hi].sum())
+        Gy_blocks[b, :p] = Xb.T @ swyb
+        Gy_blocks[b, -1] = float(swyb.sum())
+        if return_yy:
+            yy_blocks[b] = float(np.dot(y[lo:hi], swyb))
     if return_yy:
         return G_blocks, Gy_blocks, yy_blocks
     return G_blocks, Gy_blocks
@@ -275,15 +383,18 @@ def tile_scores(features, target, sample_weights, grid_shape,
     transposing the storage flips which axis it sees.
 
     ``n_tiles`` is clamped so each tile keeps >= 4 samples per unknown
-    (else the per-tile solves are meaninglessly under-determined). The width
-    that clamp reads is the SEARCH's widest allowed equation, not this
-    candidate's -- see :func:`_reference_width`.
+    (else the per-tile solves are meaninglessly under-determined), counted
+    in whole levels of axis 0 as the tiles are cut
+    (:func:`_level_slab_capacity`); below two tiles' worth of levels the
+    two-tile floor wins. The width that clamp reads is the SEARCH's widest
+    allowed equation, not this candidate's -- see :func:`_reference_width`.
     """
     X = np.asarray(features, dtype=float)
     if X.ndim == 1:
         X = X[:, None]
     n_samples, p = X.shape
-    max_tiles = max(2, n_samples // (4 * (_reference_width(p) + 1)))
+    max_tiles = max(2, _level_slab_capacity(n_samples, grid_shape,
+                                            4 * (_reference_width(p) + 1)))
     n_tiles = max(2, min(int(n_tiles), max_tiles))
 
     G_blocks, Gy_blocks = block_gram_partition(
@@ -297,6 +408,713 @@ def tile_scores(features, target, sample_weights, grid_shape,
 
     rel_spread, _ = _robust_dispersion(coefs)
     return rel_spread
+
+
+def _dyadic_slab_edges(n_samples: int, grid_shape, min_rows: int):
+    """Flat-index edges of the dyadic partitions of storage axis 0.
+
+    Partition ``s`` (``s = 1, 2, ...``) cuts axis 0 into ``2**s`` equal slabs,
+    ``np.linspace(0, n_0, 2**s + 1).round()`` levels, for as long as every slab
+    keeps at least ``ceil(min_rows / rows_per_level)`` levels. The level
+    edges are nested (each coarser edge is an edge of every finer partition),
+    so the finest partition's block Grams sum to every coarser one's. When
+    the flat sample count matches ``prod(grid_shape)`` and the first grid
+    axis has two or more levels, the slabs are whole steps of that axis
+    (time); otherwise -- a single axis-0 level included, read as the 1-D grid
+    of its rows (:func:`_axis0_layout`) -- plain contiguous index slabs with
+    ``min_rows`` samples each. At least one partition (two slabs) is always
+    returned, like ``tile``'s two-tile floor.
+
+    Memoized on the three arguments, which are all the partitions depend on:
+    dyad_t asks for them on every keep-rule call and rebuilding them was a
+    measurable share of its cost. The arrays are shared between calls, so
+    they come back READ-ONLY.
+    """
+    shape = tuple(int(s) for s in (() if grid_shape is None else grid_shape))
+    return list(_dyadic_slab_edges_cached(int(n_samples), shape, int(min_rows)))
+
+
+@functools.lru_cache(maxsize=256)
+def _dyadic_slab_edges_cached(n_samples: int, grid_shape: tuple, min_rows: int):
+    n_0, stride = _axis0_layout(n_samples, grid_shape)
+    n_max = max(2, _level_slab_capacity(n_samples, grid_shape, min_rows))
+    parts = []
+    s = 1
+    while 2 ** s <= n_max:
+        edges = np.linspace(0, n_0, 2 ** s + 1).round().astype(int) * stride
+        edges.setflags(write=False)
+        parts.append(edges)
+        s += 1
+    return tuple(parts)
+
+
+def _axis0_layout(n_samples: int, grid_shape):
+    """``(levels along storage axis 0, rows per level)``: the grid's first axis
+    when the flat sample count matches ``prod(grid_shape)`` (C-ordered
+    flattening) and that axis has two or more levels, else one row per level
+    -- so a single axis-0 level is read as the 1-D grid of its rows, as
+    :func:`_slab_edges` cuts it."""
+    grid_shape = tuple(int(s) for s in (() if grid_shape is None else grid_shape))
+    if grid_shape and int(np.prod(grid_shape)) == n_samples and grid_shape[0] > 1:
+        return grid_shape[0], n_samples // grid_shape[0]
+    return n_samples, 1
+
+
+def _level_slab_capacity(n_samples: int, grid_shape, min_rows: int) -> int:
+    """The most contiguous slabs of storage axis 0 that keep ``min_rows`` rows
+    each when cut at whole levels: ``n_0 // ceil(min_rows / rows_per_level)``
+    (:func:`_axis0_layout`; one row per level when the flat sample count does
+    not match the grid). ``dyad_t``, ``tile`` and ``het`` all size their
+    partitions by it. :func:`_slab_edges` cuts at most this many slabs at
+    least that many levels each, so every slab keeps ``min_rows``.
+
+    Counting the ROW total instead (``n_samples // min_rows``, ``tile``'s and
+    ``het``'s old rule) agrees wherever ``min_rows`` is a whole number of
+    levels, but on a coarse axis 0 the level rounding cut slabs below the
+    floor -- (13, 3, 3) at width 6 gave four slabs of 27, 27, 27 and 36 rows
+    under a 28-row floor -- and made :func:`row_floor` non-monotone (that grid
+    failed where (12, 3, 3) passed).
+    """
+    n_0, stride = _axis0_layout(n_samples, grid_shape)
+    return n_0 // max(1, -(-int(min_rows) // stride))
+
+
+#: Above this many doubles the one-row-per-level outer-product stack of
+#: :func:`_level_gram_blocks` is not built and the slab loop is used instead.
+_MAX_OUTER_PRODUCT_DOUBLES = 4_000_000
+#: The most gathered slab-Gram entries :func:`dyad_t_subset_scores` solves in
+#: one batch; more subsets of one size are solved in chunks.
+_DYAD_SUBSET_CHUNK_DOUBLES = 4_000_000
+
+
+#: The 1-D outer-product Grams kept for the paired version (``_level_gram_blocks``):
+#: the latest few, from this many rows up (below, the comparisons would cost
+#: about what they save).
+_PAIRED_GRAMS = []
+_PAIRED_GRAMS_KEPT = 2
+_PAIRED_MIN_ROWS = 10_000
+
+
+def _same_bits(a, b) -> bool:
+    """``a`` and ``b`` hold the same doubles bit for bit: equal values with equal
+    signs, so a -0.0 against a 0.0 differs (a NaN never matches)."""
+    return a.shape == b.shape and np.array_equal(a, b) and np.array_equal(np.signbit(a), np.signbit(b))
+
+
+def _level_gram_blocks(X, y, sample_weights, grid_shape, edges, append_constant: bool = True):
+    """:func:`_edge_gram_blocks` for slab edges that are whole axis-0 levels,
+    in one batched multiply: the per-level augmented Grams (one per step of
+    the first grid axis, all the same size) summed over each slab with
+    ``reduceat``. One row per level (a 1-D grid, or no grid) sums the per-row
+    outer products the same way, while that stack stays under
+    ``_MAX_OUTER_PRODUCT_DOUBLES`` -- a rule on the augmented width ``p + 1``
+    whatever ``append_constant`` says, as the two paths round differently;
+    larger inputs keep the slab loop.
+
+    ``append_constant=False`` leaves the folded constant out: the Grams are
+    ``p`` wide, each entry the same bytes as in the augmented Gram (the same
+    products, summed in the same order). On the 1-D outer path from
+    ``_PAIRED_MIN_ROWS`` rows, a design without a ones column (plain mode's S)
+    is still built with the folded constant and kept, and a design equal to
+    it bit for bit, ones column and all (its S+{1}), with the same target,
+    weights and slabs, is served that Gram instead of building its own.
+
+    The row-wise path sums the same products in a different order than the
+    slab loop, so it agrees with it to round-off, not bit for bit. On the
+    exhaustive-pool study (Oct 2026) it gave the same dominance verdicts as
+    the loop everywhere, and its errors against an exact SVD reference were
+    no larger (median 3.1e-8 vs 3.5e-8 on LV, 2.0e-9 vs 2.2e-9 on Lorenz)."""
+    n_samples, p = X.shape
+    width = p + 1 if append_constant else p
+    n_0, stride = _axis0_layout(n_samples, grid_shape)
+    if stride == 1:
+        if n_samples * (p + 1) ** 2 > _MAX_OUTER_PRODUCT_DOUBLES:
+            G, Gy = _edge_gram_blocks(X, y, sample_weights, edges)
+            return (G, Gy) if append_constant else (G[:, :p, :p], Gy[:, :p])
+        sw = (np.asarray(sample_weights, dtype=float).reshape(-1)
+              if sample_weights is not None else np.ones(n_samples))
+        X = np.asarray(X, dtype=float)
+        y = np.asarray(y, dtype=float).reshape(-1)
+        pos = np.asarray(edges[:-1])
+        share = not append_constant and n_samples >= _PAIRED_MIN_ROWS and p > 0
+        if share and np.all(X[:, -1] == 1.0):
+            for A, y_kept, sw_kept, pos_kept, G, Gy in _PAIRED_GRAMS:
+                if (A.shape == X.shape and np.array_equal(pos_kept, pos) and _same_bits(y_kept, y)
+                        and _same_bits(sw_kept, sw) and _same_bits(A, X)):
+                    return G, Gy
+            share = False
+        A = np.hstack([X, np.ones((n_samples, 1))]) if append_constant or share else X
+        wA = sw[:, None] * A
+        G = np.add.reduceat(A[:, :, None] * wA[:, None, :], pos, axis=0)
+        Gy = np.add.reduceat(wA * y[:, None], pos, axis=0)
+        if share:
+            G.setflags(write=False)
+            Gy.setflags(write=False)
+            _PAIRED_GRAMS.insert(0, (A, y.copy(), sw.copy(), pos.copy(), G, Gy))
+            del _PAIRED_GRAMS[_PAIRED_GRAMS_KEPT:]
+            return G[:, :p, :p], Gy[:, :p]
+        return G, Gy
+    sw = (np.asarray(sample_weights, dtype=float).reshape(-1)
+          if sample_weights is not None else np.ones(n_samples))
+    A = np.hstack([X, np.ones((n_samples, 1))]).reshape(n_0, stride, p + 1)
+    wA = sw.reshape(n_0, stride, 1) * A
+    G_levels = np.matmul(A.transpose(0, 2, 1), wA)
+    Gy_levels = np.einsum('lsk,ls->lk', wA, np.asarray(y, dtype=float).reshape(n_0, stride))
+    pos = edges[:-1] // stride
+    G, Gy = np.add.reduceat(G_levels, pos, axis=0), np.add.reduceat(Gy_levels, pos, axis=0)
+    return (G, Gy) if width == p + 1 else (G[:, :p, :p], Gy[:, :p])
+
+
+_DYAD_RCOND = 1e-12               # dyad_t: min-norm cut of the unit-diagonal slab Gram
+#: dyad_t's batched slab solve. Private: the A/B switch of the benchmark
+#: harness, not a user setting. ``'csne'`` is the default (Oct 2026): the
+#: Gram solves move 17-25% of lorenz's subset scores by more than 1e-3 under
+#: a 1e-14 perturbation of the data, csne none, at less than eigh's cost.
+#:   ``'eigh'``      every slab by eigendecomposition of its Gram;
+#:   ``'cholesky'``  :func:`_solve_min_norm_cholesky`: the same solution, to
+#:                   round-off, where a bound certifies no eigenvalue is cut;
+#:                   eigh elsewhere;
+#:   ``'hybrid'``    :func:`_solve_min_norm_hybrid`: the Cholesky solution
+#:                   where the bound certifies a well-conditioned slab
+#:                   (``_HYBRID_RATIO``), elsewhere the same rule evaluated
+#:                   from the slab's design (:func:`_solve_min_norm_design`),
+#:                   which does not square the slab's conditioning;
+#:   ``'csne'``      :func:`_solve_min_norm_csne`: the hybrid's accuracy at the
+#:                   Gram solve's cost -- the Cholesky solution down to
+#:                   ``_CSNE_RATIO``, corrected by one refinement step from the
+#:                   slab design below ``_HYBRID_RATIO``; the design solve only
+#:                   under ``_CSNE_RATIO``.
+_DYAD_SOLVE = 'csne'
+#: The solves that read the slab designs (:func:`dyad_t_design_factors`).
+_DESIGN_SOLVES = ('hybrid', 'csne')
+#: The certificate's margin over the cut: a slab takes the Cholesky solve only
+#: when its smallest eigenvalue is provably above ``_CERT_MARGIN`` times the
+#: cut, far from where round-off in the bound could matter.
+_CERT_MARGIN = 100.0
+#: Under ``'hybrid'``: a slab keeps the Gram (Cholesky) solve only when its
+#: unit-diagonal Gram provably has ``lambda_min / lambda_max >=
+#: _HYBRID_RATIO`` -- there the Gram's round-off (an absolute ~1e-15) costs at
+#: most ~1e-11 relative -- and is solved from its design otherwise.
+_HYBRID_RATIO = 1e-4
+#: Under ``'csne'``: the certified ratio down to which a slab keeps the
+#: Cholesky solution (refined once below ``_HYBRID_RATIO``); slabs it does not
+#: certify are solved from their design. A hundred times the cut
+#: (``_DYAD_RCOND``), so a certified slab has nothing to cut, and far enough
+#: above round-off that one refinement step reaches the design solve's
+#: accuracy (the Cholesky solution is good to ~eps / ratio <= 1e-6 there).
+_CSNE_RATIO = 1e-10
+
+
+def _solve_min_norm(G, Gy, design=None):
+    """Min-norm least squares of a stack of Gram systems: see
+    :func:`_solve_min_norm_eigh`; under ``_DYAD_SOLVE = 'cholesky'`` the
+    certified slabs are solved by :func:`_solve_min_norm_cholesky`, under
+    ``'hybrid'`` by :func:`_solve_min_norm_hybrid` and under ``'csne'`` by
+    :func:`_solve_min_norm_csne`, which need ``design``: a callable giving,
+    for stack rows ``rows``, the slab designs' R factors restricted to the
+    stack's columns and to its target (:func:`dyad_t_design_factors`)."""
+    if _DYAD_SOLVE == 'cholesky':
+        return _solve_min_norm_cholesky(G, Gy)
+    if _DYAD_SOLVE in _DESIGN_SOLVES:
+        if design is None:
+            raise ValueError(f"_DYAD_SOLVE={_DYAD_SOLVE!r} needs the slab designs (dyad_t_design_factors).")
+        if _DYAD_SOLVE == 'csne':
+            return _solve_min_norm_csne(G, Gy, design)
+        return _solve_min_norm_hybrid(G, Gy, design)
+    return _solve_min_norm_eigh(G, Gy)
+
+
+def _solve_min_norm_cholesky(G, Gy):
+    """:func:`_solve_min_norm_eigh`'s solution, slab by slab, from a
+    vectorised Cholesky of the unit-diagonal Gram wherever no eigenvalue can
+    be cut.
+
+    Each slab Gram is equilibrated as in the eigh solve (``C = G / d d^T``).
+    The Cholesky factor ``L`` and its inverse are formed elementwise across
+    the stack (no per-matrix LAPACK call), and ``trace(C^-1) = ||L^-1||_F^2``
+    bounds the smallest eigenvalue from below: ``lambda_min >= 1 /
+    trace(C^-1)``, while ``lambda_max <= trace(C) <= k``. A slab whose bound
+    clears ``_CERT_MARGIN * _DYAD_RCOND * k`` has nothing for the eigh solve to
+    cut, so its min-norm solution is ``C^-1 g`` and the Cholesky solve gives
+    it (to round-off). Every other slab -- rank-deficient, near the cut, a
+    zero column, a non-finite entry -- goes to the eigh solve unchanged."""
+    G = np.asarray(G, dtype=float)
+    Gy = np.asarray(Gy, dtype=float)
+    theta, certified = _cholesky_certified(G, Gy, _CERT_MARGIN * _DYAD_RCOND)
+    if not np.all(certified):
+        rest = ~certified
+        theta[rest] = _solve_min_norm_eigh(G[rest], Gy[rest], total=len(G))
+    return theta
+
+
+def _solve_min_norm_hybrid(G, Gy, design):
+    """The min-norm rule of :func:`_solve_min_norm_eigh`, evaluated
+    accurately: the Cholesky solve of the Gram where the bound of
+    :func:`_cholesky_certified` proves ``lambda_min / lambda_max >=
+    _HYBRID_RATIO`` (the Gram's round-off is negligible there), and
+    :func:`_solve_min_norm_design` on every other slab -- near-singular,
+    rank-deficient, a zero column, a non-finite entry. ``design(rows)`` gives
+    those slabs' ``(R[:, S], R[:, y])``."""
+    G = np.asarray(G, dtype=float)
+    Gy = np.asarray(Gy, dtype=float)
+    theta, certified = _cholesky_certified(G, Gy, _HYBRID_RATIO)
+    if not np.all(certified):
+        rest = np.flatnonzero(~certified)
+        M, rhs = design(rest)
+        theta[rest] = _solve_min_norm_design(M, rhs, total=len(G))
+    return theta
+
+
+def _solve_min_norm_csne(G, Gy, design):
+    """The hybrid's rule and accuracy (:func:`_solve_min_norm_hybrid`) at
+    about the Gram solve's cost, by corrected semi-normal equations.
+
+    The bound of :func:`_cholesky_certified` sorts the slabs into three bands
+    of the unit-diagonal Gram's ``lambda_min / lambda_max``:
+
+    * ``>= _HYBRID_RATIO``: the Cholesky solution, as in the hybrid;
+    * ``>= _CSNE_RATIO``: the Cholesky solution plus ONE refinement step whose
+      residual comes from the slab design, not the Gram --
+      ``r = R[:, y] - R[:, S] theta``, ``theta += C^-1 (R[:, S]^T r)``
+      (equilibrated) -- which shrinks the Gram's round-off error (~eps /
+      ratio, at most ~1e-6 relative here) to the design solve's level;
+    * below, or uncertified (rank-deficient, a zero column, a non-finite
+      entry): :func:`_solve_min_norm_design`, as in the hybrid.
+
+    Every certified slab is far above the cut, so in exact arithmetic this
+    is the eigh solve's min-norm rule. ``design(rows)`` gives the refined and
+    the uncertified slabs' ``(R[:, S], R[:, y])`` in one call.
+
+    Taking the step's residual from the slab's raw weighted rows instead
+    (``r = w y - w X_S theta``, the textbook form, no factor for a refined
+    slab) was measured slower (Oct 2026: csne time 2.3 -> 3.0 s on burgers,
+    2.2 -> 3.1 s on pde_compound): with :class:`_SlabFactors` only the read
+    slabs are factored, and their QR costs less than gathering their rows."""
+    G = np.asarray(G, dtype=float)
+    Gy = np.asarray(Gy, dtype=float)
+    k = G.shape[1]
+    Linv, d, ok, trace_inv = _cholesky_factors(G)
+    with np.errstate(all='ignore'):        # uncertified slabs are recomputed below
+        certified = ok & (trace_inv * (_CSNE_RATIO * k) < 1.0)
+        plain = certified & (trace_inv * (_HYBRID_RATIO * k) < 1.0)
+        theta = (_apply_unit_inverse(Linv, (Gy / d).T) / d.T).T
+    rows = np.flatnonzero(~plain)
+    if rows.size:
+        M, rhs = design(rows)
+        refine = certified[rows]
+        if refine.any():
+            at, Ms = rows[refine], M[refine]
+            r = rhs[refine] - np.einsum('mqk,mk->mq', Ms, theta[at])
+            step = _apply_unit_inverse(Linv[:, :, at], (np.einsum('mqk,mq->mk', Ms, r) / d[at]).T)
+            theta[at] += (step / d[at].T).T
+        if not refine.all():
+            theta[rows[~refine]] = _solve_min_norm_design(M[~refine], rhs[~refine], total=len(G))
+    return theta
+
+
+def _solve_min_norm_design(M, rhs, total=None):
+    """:func:`_solve_min_norm_eigh`'s rule on the slab DESIGN instead of its
+    Gram: for each stack row, the min-norm least-squares solution of ``M x =
+    rhs`` (``M`` the ``(q, k)`` R-factor columns of the slab's weighted
+    design, ``rhs`` its target column; :func:`dyad_t_design_factors`),
+    columns scaled to unit norm, singular values with ``sigma^2 <=
+    _DYAD_RCOND * sigma_max^2`` cut -- in exact arithmetic exactly the eigh
+    solve's ``lambda <= _DYAD_RCOND * lambda_max`` on the unit-diagonal Gram.
+    The singular values carry round-off relative to ``sigma_max`` (not to
+    ``lambda_max``), so the cut sits far above it. Non-finite input fails
+    loudly (the SVD does not converge)."""
+    M = np.asarray(M, dtype=float)
+    d = np.linalg.norm(M, axis=1)
+    d = np.where(d > 0, d, 1.0)
+    U, s, Vt = np.linalg.svd(M / d[:, None, :], full_matrices=False)
+    keep = s * s > _DYAD_RCOND * (s[:, :1] * s[:, :1])
+    n_deficient = int(np.count_nonzero(~keep.all(axis=1)))
+    if n_deficient:
+        _loop_stats.record('dyad_t.rank_deficient_slabs', n_deficient,
+                           M.shape[0] if total is None else total)
+    inv = np.where(keep, 1.0 / np.where(keep, s, 1.0), 0.0)
+    proj = np.einsum('mji,mj->mi', U, rhs)
+    return np.einsum('mji,mj->mi', Vt, inv * proj) / d
+
+
+def dyad_t_design_factors(B, sample_weights, parts):
+    """The R factor of every slab's weighted design rows ``sqrt(w) * B``, for
+    every partition in ``parts`` in their order (the slab order of
+    :func:`dyad_t_blocks`' stacks): ``(n_slabs, q, q)``, ``q`` B's columns.
+    Since ``Q`` is orthonormal, ``||B_S x - b_y|| = ||R[:, S] x - R[:, y]||``
+    for any columns ``S`` and ``y`` of ``B``, so one factor serves every
+    subset and target, as one Gram does."""
+    B = np.asarray(B, dtype=float)
+    n, q = B.shape
+    sw = np.ones(n) if sample_weights is None else np.asarray(sample_weights, dtype=float).reshape(-1)
+    W = np.sqrt(sw)[:, None] * B
+    out = []
+    for edges in parts:
+        sizes = np.diff(edges)
+        rows = max(int(sizes.max()), q)
+        P = np.zeros((len(sizes), rows, q))
+        for b in range(len(sizes)):
+            P[b, :sizes[b]] = W[edges[b]:edges[b + 1]]
+        out.append(np.linalg.qr(P, mode='r')[:, :q, :])
+    return np.concatenate(out)
+
+
+class _SlabFactors(object):
+    """:func:`dyad_t_design_factors`, slab by slab on first use: ``factors(slabs)``
+    gives the R factors of those slabs (stack indices, repeats allowed) and
+    keeps them. The design solves read a slab's design only where the Cholesky
+    solve is not certified, and most slabs are certified, so the eager build
+    factored mostly slabs nobody read. Each slab's factor is the eager one bit
+    for bit: the same rows, padded to the same height (its partition's tallest
+    slab, at least ``q``), through the same batched LAPACK QR, whose result
+    for one matrix does not depend on the others in the batch. ``B`` is the
+    design or a callable building it, so a call that reads no slab does not
+    assemble it either."""
+
+    def __init__(self, B, sample_weights, parts):
+        self._B = B
+        self._sample_weights = sample_weights
+        self._parts = parts
+        self._W = None
+        self._done = np.zeros(sum(edges.size - 1 for edges in parts), dtype=bool)
+
+    def _weighted_design(self):
+        B = np.asarray(self._B() if callable(self._B) else self._B, dtype=float)
+        sw = (np.ones(B.shape[0]) if self._sample_weights is None
+              else np.asarray(self._sample_weights, dtype=float).reshape(-1))
+        self._W = np.sqrt(sw)[:, None] * B
+        q = B.shape[1]
+        self._lo = np.concatenate([edges[:-1] for edges in self._parts])
+        self._hi = np.concatenate([edges[1:] for edges in self._parts])
+        self._height = np.concatenate([np.full(edges.size - 1, max(int(np.diff(edges).max()), q))
+                                       for edges in self._parts])
+        self._R = np.empty((self._done.size, q, q))
+
+    def __call__(self, slabs):
+        slabs = np.asarray(slabs, dtype=int)
+        todo = np.unique(slabs[~self._done[slabs]])
+        if todo.size:
+            if self._W is None:
+                self._weighted_design()
+            q = self._W.shape[1]
+            levels = np.arange(int(self._height[todo].max()))
+            for height in np.unique(self._height[todo]):
+                group = todo[self._height[todo] == height]
+                # Every slab's rows in one gather, padded with zero rows to the
+                # height (the rows past a slab's end are clipped, then zeroed):
+                # the stack dyad_t_design_factors fills row by row.
+                rows = levels[:height]
+                P = np.take(self._W, self._lo[group][:, None] + rows[None, :], axis=0, mode='clip')
+                P[rows[None, :] >= (self._hi[group] - self._lo[group])[:, None]] = 0.0
+                self._R[group] = np.linalg.qr(P, mode='r')[:, :q, :]
+            self._done[todo] = True
+        return self._R[slabs]
+
+
+def _cholesky_certified(G, Gy, bound):
+    """The vectorised Cholesky solve of the unit-diagonal Gram stack, and
+    which slabs it is certified for: ``trace(C^-1) = ||L^-1||_F^2`` bounds
+    ``lambda_min >= 1 / trace(C^-1)``, ``lambda_max <= trace(C) <= k``, so a
+    slab with ``trace(C^-1) * bound * k < 1`` has ``lambda_min / lambda_max >
+    bound``. Uncertified slabs' solutions are not meaningful."""
+    k = G.shape[1]
+    Linv, d, ok, trace_inv = _cholesky_factors(G)
+    with np.errstate(all='ignore'):        # uncertified slabs are recomputed by the caller
+        certified = ok & (trace_inv * (bound * k) < 1.0)
+        theta = (_apply_unit_inverse(Linv, (Gy / d).T) / d.T).T
+    return theta, certified
+
+
+def _apply_unit_inverse(Linv, g):
+    """``C^-1 g = L^-T L^-1 g`` for every slab of the stack: ``Linv`` the
+    ``(k, k, m)`` inverse Cholesky factors of :func:`_cholesky_factors`, ``g``
+    ``(k, m)``."""
+    g = np.ascontiguousarray(g)
+    with np.errstate(all='ignore'):
+        w = np.einsum('ijm,jm->im', Linv, g)
+        return np.einsum('jim,jm->im', Linv, w)
+
+
+def _cholesky_factors(G):
+    """The vectorised Cholesky factorisation of the unit-diagonal Gram stack
+    ``C = G / d d^T`` (``d`` the square roots of the diagonal): the inverse
+    factors ``L^-1`` ``(k, k, m)``, formed elementwise across the stack (no
+    per-matrix LAPACK call), ``d`` ``(m, k)``, whether every pivot stayed
+    positive with a finite ``trace(C^-1) = ||L^-1||_F^2``, and that trace --
+    what :func:`_cholesky_certified`'s bound reads."""
+    m, k, _ = G.shape
+    dg = np.diagonal(G, axis1=-2, axis2=-1)
+    d = np.sqrt(np.where(dg > 0, dg, 1.0))
+    with np.errstate(all='ignore'):        # failed slabs are flagged, never used
+        C = np.ascontiguousarray((G / (d[:, :, None] * d[:, None, :])).transpose(1, 2, 0))   # (k, k, m)
+        L = np.zeros((k, k, m))
+        ok = np.ones(m, dtype=bool)
+        for j in range(k):
+            s = C[j, j] - np.sum(L[j, :j] * L[j, :j], axis=0)
+            ok &= s > 0
+            L[j, j] = np.sqrt(np.where(s > 0, s, 1.0))
+            for i in range(j + 1, k):
+                L[i, j] = (C[i, j] - np.sum(L[i, :j] * L[j, :j], axis=0)) / L[j, j]
+        Linv = np.zeros((k, k, m))
+        for j in range(k):
+            Linv[j, j] = 1.0 / L[j, j]
+            for i in range(j + 1, k):
+                Linv[i, j] = -np.sum(L[i, j:i] * Linv[j:i, j], axis=0) / L[i, i]
+        trace_inv = np.sum(Linv * Linv, axis=(0, 1))
+    return Linv, d, ok & np.isfinite(trace_inv), trace_inv
+
+
+def _solve_min_norm_eigh(G, Gy, total=None):
+    """Min-norm least squares of a STACK of Gram systems ``(m, k, k)``,
+    ``(m, k)`` in one batched ``eigh``: each Gram made unit-diagonal first (a
+    term's units cannot steer the solve), eigenvalues ``<= _DYAD_RCOND *
+    lambda_max`` cut -- the solution ``lstsq(G, Gy, rcond=_DYAD_RCOND)`` gives
+    on a symmetric PSD Gram, at one call instead of one per slab.
+
+    A thin slab can make the design EXACTLY rank-deficient -- on a one-level
+    time slab ``t * f(x)`` is ``f(x)`` times a constant -- and
+    ``np.linalg.solve`` does not raise there: round-off leaves a tiny pivot
+    and it returns huge, meaningless coefficients. The min-norm solution
+    splits the unidentified direction instead; a full-rank slab gets the
+    plain solve (to round-off). A call with rank-deficient slabs is recorded
+    in ``_loop_stats`` (``'dyad_t.rank_deficient_slabs'``: their count out of
+    the slabs solved -- ``total`` of them when this solves the remainder of a
+    larger stack), as ``survival`` records its lstsq fallbacks."""
+    dg = np.diagonal(G, axis1=-2, axis2=-1)
+    d = np.sqrt(np.where(dg > 0, dg, 1.0))
+    lam, V = np.linalg.eigh(G / (d[:, :, None] * d[:, None, :]))
+    keep = np.abs(lam) > _DYAD_RCOND * np.abs(lam).max(axis=1, keepdims=True)
+    n_deficient = int(np.count_nonzero(~keep.all(axis=1)))
+    if n_deficient:
+        _loop_stats.record('dyad_t.rank_deficient_slabs', n_deficient,
+                           G.shape[0] if total is None else total)
+    inv = np.where(keep, 1.0 / np.where(keep, lam, 1.0), 0.0)
+    proj = np.einsum('mji,mj->mi', V, Gy / d)
+    return np.einsum('mij,mj->mi', V, inv * proj) / d
+
+
+def _median_axis0(a):
+    """``np.median(a, axis=0)`` of a small 2-D stack, by one sort.
+
+    The same values: an odd count takes the middle element and an even count
+    halves the sum of the two middle ones, which is what np.median's
+    partition-then-mean computes. It skips np.median's per-call overhead,
+    which dominated dyad_t's ten medians per score on these few-row stacks.
+    Non-finite input goes to np.median itself, for its NaN propagation.
+    """
+    if not np.all(np.isfinite(a)):
+        return np.median(a, axis=0)
+    s = np.sort(a, axis=0)
+    m = s.shape[0] // 2
+    if s.shape[0] % 2:
+        return s[m]
+    return (s[m - 1] + s[m]) / 2.0
+
+
+def dyad_t_scores(features, target, sample_weights, grid_shape,
+                  fit_intercept: bool = True):
+    """Per-term instability: ``tile``'s statistic averaged over EVERY dyadic
+    partition of storage axis 0.
+
+    For each partition ``s`` (2, 4, 8, ... equal time slabs; see
+    :func:`_dyadic_slab_edges`) the fixed structure is refitted on every slab
+    and the term scores the robust between-slab dispersion
+    ``MAD_b(c_bj) / |median_b c_bj|``; the per-term score is the mean of that
+    over the partitions. A constant-coefficient term agrees across slabs at
+    every scale -> ~0; a drifting one disagrees at whichever scales resolve
+    the drift, so no single slab count has to be guessed (``tile``'s
+    ``n_tiles``). The slab floor is ``tile``'s: >= 4 samples per unknown of
+    the SEARCH's widest equation (:func:`_reference_width`), so every
+    candidate in one search is scored on the same partitions.
+
+    Slab coefficients come from the per-slab Gram stacks
+    (:func:`block_gram_partition` convention: weighted by ``sample_weights``,
+    intercept folded block-wise; built in one pass over the data,
+    :func:`_level_gram_blocks`), every slab of every partition solved in one
+    batched equilibrated min-norm solve (:func:`_solve_min_norm`). A column whose
+    slab coefficients are all zero scores 0.0 (``tile``'s dead-column
+    convention); a zero median under nonzero spread scores the cap
+    (``np.finfo(float).max``), as does any partition doing so for that term.
+    Parameter-free: the partitions follow from the grid and the floor alone.
+    Like ``tile`` it sees axis >= 1 only through the axis-0 drift a spatial
+    modulation induces in the per-slab fit.
+    """
+    X = np.asarray(features, dtype=float)
+    if X.ndim == 1:
+        X = X[:, None]
+    n_samples, p = X.shape
+    min_rows = 4 * (_reference_width(p) + 1)
+    parts = _dyadic_slab_edges(n_samples, grid_shape, min_rows)
+    fine = parts[-1]
+    # As wide as the fit: the folded constant only with ``fit_intercept``.
+    G_fine, Gy_fine = _level_gram_blocks(X, target, sample_weights, grid_shape, fine,
+                                         append_constant=fit_intercept)
+
+    G_all, Gy_all = [], []
+    for edges in parts:
+        pos = np.searchsorted(fine, edges[:-1])
+        G_all.append(np.add.reduceat(G_fine, pos, axis=0))
+        Gy_all.append(np.add.reduceat(Gy_fine, pos, axis=0))
+    design = None
+    if _DYAD_SOLVE in _DESIGN_SOLVES:
+        factors = _SlabFactors(lambda: np.hstack([X, np.ones((n_samples, 1)),
+                                                  np.asarray(target, dtype=float).reshape(-1, 1)]),
+                               sample_weights, parts)
+        cols = np.arange(p + 1 if fit_intercept else p)
+
+        def design(rows):
+            R = factors(rows)
+            return R[:, :, cols], R[:, :, p + 1]
+    theta = _solve_min_norm(np.concatenate(G_all), np.concatenate(Gy_all), design)[:, :p]
+
+    total = np.zeros(p)
+    start = 0
+    for edges in parts:
+        coefs = theta[start:start + edges.size - 1]
+        start += edges.size - 1
+        med = _median_axis0(coefs)
+        mad = _median_axis0(np.abs(coefs - med[None, :]))
+        with np.errstate(divide='ignore', invalid='ignore'):
+            rel = mad / np.abs(med)
+        total += np.where(np.isnan(rel), 0.0, rel)
+    with np.errstate(over='ignore'):
+        return np.nan_to_num(total / len(parts))
+
+
+def _median_axis1(a):
+    """The median along axis 1 of a ``(m, n, k)`` stack: :func:`_median_axis0`
+    for ``m`` stacks at once (same values; non-finite input goes to
+    ``np.median``)."""
+    if not np.all(np.isfinite(a)):
+        return np.median(a, axis=1)
+    s = np.sort(a, axis=1)
+    m = s.shape[1] // 2
+    if s.shape[1] % 2:
+        return s[:, m]
+    return (s[:, m - 1] + s[:, m]) / 2.0
+
+
+def dyad_t_subset_scores(features, target, sample_weights, grid_shape, subsets, per_term=False):
+    """``sum(dyad_t_scores(features[:, S], target, sample_weights, grid_shape,
+    fit_intercept=False))`` for MANY column subsets ``S`` at once: the slabs
+    of storage axis 0, one axis of :func:`dyad_subset_scores`.
+
+    The same statistic, built once: a subset's per-slab Gram is a sub-block of
+    the Gram of all the columns, so the slab Grams of every partition are
+    formed once and sliced per subset (equal to the per-subset build to
+    round-off), and all subsets of one size are solved in one batched
+    equilibrated min-norm ``eigh`` with vectorised medians. ``features`` must
+    already carry any constant column the subsets select (the keep-rule's
+    explicit ones column); ``subsets`` is a sequence of column-index lists.
+    Returns one summed score per subset (``nan_to_num`` per term, as the
+    table does), or under ``per_term`` a list of each subset's per-term
+    scores (``None`` for the empty subset).
+    """
+    X = np.asarray(features, dtype=float)
+    if X.ndim == 1:
+        X = X[:, None]
+    y = np.asarray(target, dtype=float).reshape(-1)
+    n_samples = X.shape[0]
+    out = [None] * len(subsets) if per_term else np.zeros(len(subsets))
+    by_size = {}
+    for k, S in enumerate(subsets):
+        by_size.setdefault(len(S), []).append(k)
+    blocks = {}
+    for size, idxs in sorted(by_size.items()):
+        if size == 0:
+            if not per_term:
+                out[idxs] = np.inf
+            continue
+        # dyad_t_scores reads its partition floor off the candidate's width,
+        # through the search-wide reference width.
+        min_rows = dyad_t_min_rows(size)
+        if min_rows not in blocks:
+            parts, G_all, Gy_all = dyad_t_blocks(X, y, sample_weights, grid_shape, n_samples, min_rows)
+            design = None
+            if _DYAD_SOLVE in _DESIGN_SOLVES:
+                design = (_SlabFactors(lambda: np.hstack([X, y[:, None]]), sample_weights, parts), X.shape[1])
+            blocks[min_rows] = (parts, G_all, Gy_all, design)
+        parts, G_all, Gy_all, design = blocks[min_rows]
+        scores = dyad_t_scores_from_blocks(parts, G_all, Gy_all, [subsets[k] for k in idxs], design,
+                                           per_term=per_term)
+        if per_term:
+            for k, row in zip(idxs, scores):
+                out[k] = row
+        else:
+            out[idxs] = scores
+    return out
+
+
+def dyad_t_min_rows(size: int) -> int:
+    """:func:`dyad_t_subset_scores`' slab floor for a subset of ``size``
+    columns: ``tile``'s 4 rows per unknown of the search-wide reference
+    width."""
+    return 4 * (_reference_width(size) + 1)
+
+
+def dyad_t_blocks(X, y, sample_weights, grid_shape, n_samples, min_rows):
+    """The slab Grams of every dyadic partition of ``X`` (``(n_slabs, p + 1,
+    p + 1)``, the appended constant last) and their cross moments with ``y``,
+    with the partitions: what :func:`dyad_t_scores_from_blocks` slices per
+    subset. A subset of ``X``'s columns is scored from these sub-blocks."""
+    parts = _dyadic_slab_edges(n_samples, grid_shape, min_rows)
+    fine = parts[-1]
+    G_fine, Gy_fine = _level_gram_blocks(X, y, sample_weights, grid_shape, fine)
+    G_all, Gy_all = [], []
+    for edges in parts:
+        pos = np.searchsorted(fine, edges[:-1])
+        G_all.append(np.add.reduceat(G_fine, pos, axis=0))
+        Gy_all.append(np.add.reduceat(Gy_fine, pos, axis=0))
+    return parts, np.concatenate(G_all), np.concatenate(Gy_all)
+
+
+def dyad_t_scores_from_blocks(parts, G_all, Gy_all, subsets, design=None, per_term=False):
+    """The summed dyad_t score of each subset (column-index lists of ONE
+    size) from :func:`dyad_t_blocks`' slab Grams: every slab of every
+    partition solved by :func:`_solve_min_norm`, the between-slab medians
+    taken per subset. ``design`` -- ``(R, y column)``, R the stack of
+    :func:`dyad_t_design_factors` or a :class:`_SlabFactors`, the subsets
+    indexing R's columns -- is what the solves of ``_DESIGN_SOLVES`` read
+    slabs from. ``per_term``: the ``(n_subsets, size)`` per-term scores
+    instead of their sums."""
+    size = len(subsets[0])
+    n_slabs = G_all.shape[0]
+    out = np.zeros((len(subsets), size)) if per_term else np.zeros(len(subsets))
+    # The subsets in chunks of at most _DYAD_SUBSET_CHUNK_DOUBLES gathered Gram
+    # entries: every slab is solved and every subset's medians are taken on
+    # their own, so the scores are the one-batch scores, but memory no longer
+    # grows with the number of subsets.
+    step = max(1, _DYAD_SUBSET_CHUNK_DOUBLES // (n_slabs * size * size))
+    for lo in range(0, len(subsets), step):
+        cols = np.array(subsets[lo:lo + step], dtype=int)                 # (m, size)
+        G = G_all[:, cols[:, :, None], cols[:, None, :]].transpose(1, 0, 2, 3)
+        Gy = Gy_all[:, cols].transpose(1, 0, 2)
+        gather = None
+        if design is not None:
+            R, ycol = design
+
+            def gather(rows, cols=cols, R=R, ycol=ycol):
+                sub, slab = np.divmod(rows, n_slabs)                   # stack row = subset * n_slabs + slab
+                F = R(slab) if callable(R) else R[slab]
+                M = F[np.arange(slab.size)[:, None, None], np.arange(F.shape[1])[None, :, None],
+                      cols[sub][:, None, :]]
+                return M, F[:, :, ycol]
+        theta = _solve_min_norm(G.reshape(-1, size, size), Gy.reshape(-1, size),
+                                gather).reshape(len(cols), n_slabs, size)
+        total = np.zeros((len(cols), size))
+        start = 0
+        for edges in parts:
+            coefs = theta[:, start:start + edges.size - 1, :]
+            start += edges.size - 1
+            med = _median_axis1(coefs)
+            mad = _median_axis1(np.abs(coefs - med[:, None, :]))
+            with np.errstate(divide='ignore', invalid='ignore'):
+                rel = mad / np.abs(med)
+            total += np.where(np.isnan(rel), 0.0, rel)
+        with np.errstate(over='ignore'):
+            terms = np.nan_to_num(total / len(parts))
+        out[lo:lo + len(cols)] = terms if per_term else np.sum(np.nan_to_num(terms), axis=1)
+    return out
 
 
 def _het_components(features, target, sample_weights, grid_shape,
@@ -356,12 +1174,18 @@ def _het_components(features, target, sample_weights, grid_shape,
         X = X[:, None]
     n_samples, p = X.shape
     k = p + 1 if fit_intercept else p
-    max_blocks = n_samples // (4 * (_reference_width(p) + 1))
+    # Blocks are cut at whole levels of axis 0, so their count is too
+    # (:func:`_level_slab_capacity`): every block keeps 4*(w+1) samples.
+    max_blocks = _level_slab_capacity(n_samples, grid_shape,
+                                      4 * (_reference_width(p) + 1))
     if max_blocks < 3:
+        n_0, stride = _axis0_layout(n_samples, grid_shape)
         raise ValueError(
-            'heterogeneity_scores needs >= 3 blocks of >= 4*(w+1) samples '
-            f'to calibrate; got n_samples={n_samples} with p={p} and reference '
-            f'width w={_reference_width(p)} (equation_terms_max_number)')
+            'heterogeneity_scores needs >= 3 blocks of >= 4*(w+1) samples, '
+            'cut at whole levels of storage axis 0, to calibrate; got '
+            f'n_samples={n_samples} ({n_0} levels of {stride}) with p={p} and '
+            f'reference width w={_reference_width(p)} (equation_terms_max_number, or '
+            "system_rps_params['selected_terms_max_number'] when that is smaller)")
     n_blocks = max(3, min(int(n_blocks), max_blocks))
 
     G_blocks, Gy_blocks, yy_blocks = block_gram_partition(
@@ -785,6 +1609,98 @@ def chi2_centered_scores(features, target, sample_weights, grid_shape=None,
 
 
 #: THE basis-free estimator table -- the single source of truth for which
+def _axis_layouts(n_samples: int, grid_shape) -> list:
+    """``[(axis, row order, grid shape)]``: the rows reordered so each grid axis
+    with two or more levels becomes storage axis 0 (C-ordered flattening). One
+    entry, the rows as they are, when the grid has one such axis or the rows are
+    not the flattening of ``grid_shape`` (a strided row budget)."""
+    shape = tuple(int(s) for s in (() if grid_shape is None else grid_shape))
+    axes = [a for a, levels in enumerate(shape) if levels >= 2]
+    if len(axes) < 2 or int(np.prod(shape)) != int(n_samples):
+        return [(0, None, grid_shape)]
+    index = np.arange(int(n_samples)).reshape(shape)
+    layouts = []
+    for a in axes:
+        moved = (shape[a],) + tuple(s for k, s in enumerate(shape) if k != a)
+        layouts.append((a, None if a == 0 else np.moveaxis(index, a, 0).reshape(-1), moved))
+    return layouts
+
+
+def _combine_axes(scores):
+    """The per-axis per-term scores ``(n_axes, ...)`` as one: their mean over
+    the axes, the cap (``np.finfo(float).max``) for a term capped on any axis."""
+    cap = np.finfo(float).max
+    capped = np.any(scores >= cap, axis=0)
+    return np.where(capped, cap, np.sum(np.where(capped, 0.0, scores) / scores.shape[0], axis=0))
+
+
+def dyad_scores(features, target, sample_weights, grid_shape, fit_intercept: bool = True):
+    """Per-term instability: :func:`dyad_t_scores` (the dyadic slabs of storage
+    axis 0) along EVERY grid axis in turn (the rows reordered so the axis is
+    storage axis 0, :func:`_axis_layouts`), averaged over the axes; a capped
+    score on any axis caps the term.
+
+    Slabs along one axis each span the whole of every other axis, so a
+    coefficient that drifts along another axis is averaged out inside every
+    slab. A finite-difference error term is the case in point: one term
+    standing in for a mix of error terms, whose best coefficient changes with x
+    as the field's shape does. On pde_compound under second-order differences
+    ``truth + u_x u_xxx`` scored 5.6e-3 on time slabs against the truth's
+    7.3e-3, and 0.39 against 1.7e-3 on x slabs. Parameter-free: the partitions
+    follow from the grid and the slab floor alone. One axis, or rows that are
+    not the grid's flattening, are cut along storage axis 0 alone."""
+    X = np.asarray(features, dtype=float)
+    if X.ndim == 1:
+        X = X[:, None]
+    layouts = _axis_layouts(X.shape[0], grid_shape)
+    if len(layouts) == 1:
+        return dyad_t_scores(X, target, sample_weights, grid_shape, fit_intercept=fit_intercept)
+    y = np.asarray(target, dtype=float).reshape(-1)
+    w = np.asarray(sample_weights, dtype=float).reshape(-1)
+    scores = []
+    for _axis, order, shape in layouts:
+        if order is None:
+            scores.append(np.asarray(dyad_t_scores(X, y, w, shape, fit_intercept=fit_intercept), dtype=float))
+        else:
+            scores.append(np.asarray(dyad_t_scores(X[order], y[order], w[order], shape,
+                                                   fit_intercept=fit_intercept), dtype=float))
+    return _combine_axes(np.stack(scores))
+
+
+def dyad_subset_scores(features, target, sample_weights, grid_shape, subsets):
+    """``sum(dyad_scores(features[:, S], target, sample_weights, grid_shape,
+    fit_intercept=False))`` for MANY column subsets ``S`` at once -- the
+    per-subset instability ``subset_selection.instability_table`` tabulates,
+    for the exhaustive subset search of ``system_rps_mode='assignment'``:
+    :func:`dyad_t_subset_scores` along every grid axis in turn
+    (:func:`_axis_layouts`), each subset's per-term scores combined over the
+    axes as :func:`dyad_scores` combines them (:func:`_combine_axes`) and
+    summed (``nan_to_num`` per term). ``inf`` for the empty subset."""
+    X = np.asarray(features, dtype=float)
+    if X.ndim == 1:
+        X = X[:, None]
+    y = np.asarray(target, dtype=float).reshape(-1)
+    w = None if sample_weights is None else np.asarray(sample_weights, dtype=float).reshape(-1)
+    layouts = _axis_layouts(X.shape[0], grid_shape)
+    if len(layouts) == 1:
+        return dyad_t_subset_scores(X, y, w, grid_shape, subsets)
+    per_axis = [dyad_t_subset_scores(X if order is None else X[order], y if order is None else y[order],
+                                     w if order is None or w is None else w[order], shape, subsets,
+                                     per_term=True)
+                for _axis, order, shape in layouts]
+    out = np.full(len(subsets), np.inf)
+    by_size = {}
+    for k, S in enumerate(subsets):
+        if len(S):
+            by_size.setdefault(len(S), []).append(k)
+    for idxs in by_size.values():
+        scores = np.stack([np.stack([axis[k] for k in idxs]) for axis in per_axis])      # (axes, m, size)
+        with np.errstate(over='ignore'):
+            out[idxs] = np.sum(np.nan_to_num(_combine_axes(scores)), axis=1)
+    return out
+
+
+#: THE basis-free estimator table -- the single source of truth for which
 #: instability metrics need no Gram setup. ``Instability.compute`` dispatches
 #: on it and ``sparsity._KEEP_RULE_ESTIMATORS`` IS it (same object, not a
 #: copy), so the objective and the keep-rule cannot drift apart as metrics are
@@ -795,7 +1711,7 @@ def chi2_centered_scores(features, target, sample_weights, grid_shape=None,
 #: it without importing ``objectives`` -- that edge would close a cycle,
 #: since ``subset_selection`` imports ``sparsity``.
 _BASIS_FREE_METRICS = {
-    'survival': survival_scores, 'tile': tile_scores,
+    'survival': survival_scores, 'tile': tile_scores, 'dyad': dyad_scores,
     'het': heterogeneity_scores, 'het_raw': heterogeneity_raw_scores,
     'chi2': chi2_scores, 'chi2_centered': chi2_centered_scores,
 }

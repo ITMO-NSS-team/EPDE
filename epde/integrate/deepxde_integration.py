@@ -876,6 +876,7 @@ class DeepXDEAdapter:
         key = self.domain_key
         if key is None:
             key = global_var.samples_manager.trajecatoryIDs[0]
+        global_var.samples_manager.require_unstrided('the deepxde backend')
         return np.asarray(global_var.samples_manager.gFunc('m')[key])
 
     def _set_coordinate_info(self, coord_names):

@@ -143,7 +143,7 @@ class TestGramIsBuiltOnlyWhenNeeded:
             PhysicsInformedLasso().fit(X, y, grid_shape=grid_shape,
                                        sample_weights=sw)  # must not raise
 
-    @pytest.mark.parametrize('metric', ['het', 'tile', 'survival'])
+    @pytest.mark.parametrize('metric', ['het', 'tile', 'dyad', 'survival'])
     def test_the_other_basis_free_metrics_build_nothing_either(
             self, metric, problem, monkeypatch):
         self._spy_setups(monkeypatch)
@@ -168,6 +168,75 @@ class TestGramIsBuiltOnlyWhenNeeded:
             estimator = PhysicsInformedLasso().fit(X, y, grid_shape=grid_shape,
                                                    sample_weights=sw)
         assert estimator.cached_weights_ is not None
+
+
+def _probe_library(*names):
+    """``u = sin 2t + 0.3 t`` on the 117 inner points of linspace(0, 8, 119),
+    its exact derivative as the target, and the named columns of the library
+    u, x_0, x_0^2, u*x_0."""
+    t = np.linspace(0, 8, 119)[1:-1]
+    u = np.sin(2 * t) + 0.3 * t
+    columns = {'u': u, 'x_0': t, 'x_0^2': t ** 2, 'u*x_0': u * t}
+    return (np.column_stack([columns[name] for name in names]),
+            2 * np.cos(2 * t) + 0.3)
+
+
+def _stub_scores(monkeypatch, feature_scores, intercept_score):
+    """Fixed per-column scores: these tests check what the CD/RFE loop does
+    with a score, not how the score is computed."""
+    full = np.append(np.asarray(feature_scores, dtype=float), intercept_score)
+
+    def scores(self, metric, gram_setup, weights, X, y, sw, grid_shape,
+               active_mask, n_features):
+        return full[active_mask]
+
+    monkeypatch.setattr(PhysicsInformedLasso, '_keep_rule_scores', scores)
+
+
+def _ols(X, y, support, intercept):
+    """Unpenalized least squares on ``support`` (plus the ones column when
+    ``intercept``), laid out like ``full_coef_``."""
+    cols = [X[:, j] for j in support] + ([np.ones(X.shape[0])] if intercept else [])
+    beta = np.linalg.lstsq(np.column_stack(cols), y, rcond=None)[0]
+    full = np.zeros(X.shape[1] + 1)
+    full[list(support) + ([X.shape[1]] if intercept else [])] = beta
+    return full
+
+
+def _fit_probe(X, y):
+    n = X.shape[0]
+    return PhysicsInformedLasso().fit(X, y, grid_shape=(n,),
+                                      sample_weights=np.ones(n))
+
+
+class TestTheEliminationLoop:
+    """What the CD/RFE loop does with a score, for every metric (the score is
+    stubbed): a column whose threshold reaches its correlation is zeroed, the
+    loop restarts on the smaller set, and the survivors carry the unpenalized
+    refit (relaxed-refit normal equations against lstsq, hence 1e-9)."""
+
+    def test_a_kill_beside_another_feature_leaves_the_refit(self, monkeypatch):
+        _stub_scores(monkeypatch, [1e3, 0.0], 0.0)
+        X, du = _probe_library('u', 'x_0')
+        np.testing.assert_allclose(_fit_probe(X, du).full_coef_,
+                                   _ols(X, du, [1], intercept=True), rtol=1e-9)
+
+    def test_two_survivors_carry_the_refit(self, monkeypatch):
+        _stub_scores(monkeypatch, [1e3, 1e3, 0.0, 0.0], 0.0)
+        X, du = _probe_library('u', 'x_0', 'x_0^2', 'u*x_0')
+        np.testing.assert_allclose(_fit_probe(X, du).full_coef_,
+                                   _ols(X, du, [2, 3], intercept=True), rtol=1e-9)
+
+    @pytest.mark.parametrize('score', [1.5, 1e3])
+    def test_the_last_feature_column_has_no_exemption(self, monkeypatch, score):
+        """The rule may end a fit with no term: the last column standing faces
+        the same threshold as any other. That fit reaches the host, which
+        declines it, and the population operators redraw the equation
+        (``regenerate_degenerate_equations``). A last-feature exemption was
+        tried and dropped: it let one-term junk through."""
+        _stub_scores(monkeypatch, [score], 1e3)
+        X, du = _probe_library('x_0')
+        assert not np.any(_fit_probe(X, du).full_coef_[:-1])
 
 
 class TestNoExactFitFloor:

@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Multisample semantics of ``EqRightPartSelector._regenerate_dependent_terms``
+"""Multisample semantics of ``EqRightPartSelector._drop_dependent_terms``
 -- the exact-linear-dependence scrub.
 
 The coefficient fit runs PER TRAJECTORY and the resulting vectors are averaged
 (``VWSRSparsity.apply``), so a rank-deficient solve in ONE sample already
 corrupts that sample's coefficients and therefore the average. The scrub
-consequently:
-
-* flags a term whose column is exactly dependent in ANY sample (union), and
-* accepts a regenerated replacement only when it is independent in EVERY
-  sample.
+consequently flags a term whose column is exactly dependent in ANY sample
+(union), and DROPS it: right-part selection uses only its input, so nothing is
+drawn in its place (it used to regenerate the term until a replacement was
+independent in every sample). A flagged term that cannot go without leaving
+fewer than two terms declines the candidate.
 
 Trajectories legitimately differ in length and grid, so nothing may be
 concatenated across samples and no cross-sample agreement may be asserted.
@@ -22,7 +22,7 @@ import numpy as np
 import pytest
 
 from epde.operators.common.right_part_selection import (
-    EqRightPartSelector, _flag_dependent_columns, _LIN_DEP_RTOL)
+    DECLINED, EqRightPartSelector, _flag_dependent_columns, _LIN_DEP_RTOL)
 
 
 # Two trajectories of DIFFERENT length: any implementation that stacks their
@@ -37,13 +37,13 @@ def _cols(a, b):
 
 
 class FakeTerm:
-    """Minimal Term stand-in: an evaluable column pair plus the identity /
-    regeneration surface ``_regen_or_drop_term`` touches."""
+    """Minimal Term stand-in: an evaluable column pair plus the identity
+    surface the scrub touches. ``randomize`` only counts: the scrub must never
+    call it."""
 
-    def __init__(self, name, cols, replacements=()):
+    def __init__(self, name, cols):
         self.name = name
         self._cols = cols
-        self._replacements = list(replacements)
         self.randomize_calls = 0
         self.structure = [object()]
 
@@ -59,11 +59,9 @@ class FakeTerm:
     def contains_meaningful(self):
         return True
 
-    # -- regeneration -------------------------------------------------- #
+    # -- regeneration (must stay unused) -------------------------------- #
     def randomize(self):
         self.randomize_calls += 1
-        if self._replacements:
-            self._cols = self._replacements.pop(0)
 
     def resetSavedState(self):
         pass
@@ -100,9 +98,13 @@ def _independent_pair(seed):
 def _run(feature_terms, target=None):
     target = target or FakeTerm('target', _independent_pair(99))
     equation = FakeEquation(list(feature_terms) + [target], target)
-    changed = EqRightPartSelector()._regenerate_dependent_terms(
+    changed = EqRightPartSelector()._drop_dependent_terms(
         equation, list(feature_terms))
     return changed, equation
+
+
+def _kept(equation):
+    return [term.name for term in equation.structure]
 
 
 class TestLinDepScrubMultisample:
@@ -113,18 +115,19 @@ class TestLinDepScrubMultisample:
         changed, equation = _run(terms)
         assert changed is False
         assert equation.resets == 0
+        assert _kept(equation) == ['a', 'b', 'target']
         assert all(term.randomize_calls == 0 for term in terms)
 
     def test_constant_column_flagged_in_every_sample(self):
         # A constant column is exactly dependent on the intercept, which
         # ``_flag_dependent_columns`` seeds the basis with.
-        const = FakeTerm('const', _cols(np.full(N0, 2.0), np.full(N1, 2.0)),
-                         replacements=[_independent_pair(3)])
+        const = FakeTerm('const', _cols(np.full(N0, 2.0), np.full(N1, 2.0)))
         free = FakeTerm('free', _independent_pair(4))
         changed, equation = _run([const, free])
         assert changed is True
-        assert const.randomize_calls == 1
-        assert free.randomize_calls == 0
+        assert equation.resets == 1
+        assert _kept(equation) == ['free', 'target']
+        assert const.randomize_calls == 0 and free.randomize_calls == 0
 
     def test_dependence_in_a_single_sample_is_enough(self):
         # Varies in sample 0, constant in sample 1 -> dependent in sample 1
@@ -132,25 +135,34 @@ class TestLinDepScrubMultisample:
         # assert (or an all()-guard) would let it ride.
         rng = np.random.default_rng(5)
         partial = FakeTerm('partial',
-                           _cols(rng.normal(size=N0), np.full(N1, -1.5)),
-                           replacements=[_independent_pair(6)])
-        changed, equation = _run([partial])
+                           _cols(rng.normal(size=N0), np.full(N1, -1.5)))
+        free = FakeTerm('free', _independent_pair(6))
+        changed, equation = _run([partial, free])
         assert changed is True
-        assert partial.randomize_calls == 1
+        assert _kept(equation) == ['free', 'target']
+        assert partial.randomize_calls == 0
 
-    def test_replacement_must_be_independent_in_every_sample(self):
-        # First draw is independent in sample 0 but CONSTANT in sample 1 --
-        # rejected. Second draw is independent in both -- accepted.
-        rng = np.random.default_rng(7)
-        half_good = _cols(rng.normal(size=N0), np.full(N1, 4.0))
-        good = _independent_pair(8)
-        const = FakeTerm('const', _cols(np.zeros(N0), np.zeros(N1)),
-                         replacements=[half_good, good])
-        changed, equation = _run([const])
+    def test_every_flagged_term_is_dropped_and_nothing_drawn(self):
+        # A zero column and a constant one: both flagged, both dropped, and
+        # the structure is the input minus them -- the same objects.
+        zero = FakeTerm('zero', _cols(np.zeros(N0), np.zeros(N1)))
+        const = FakeTerm('const', _cols(np.full(N0, 4.0), np.full(N1, 4.0)))
+        free = FakeTerm('free', _independent_pair(8))
+        before = {id(term) for term in (zero, const, free)}
+        changed, equation = _run([zero, free, const])
         assert changed is True
-        assert const.randomize_calls == 2
-        for key in KEYS:
-            np.testing.assert_allclose(const.evaluate()[key], good[key])
+        assert _kept(equation) == ['free', 'target']
+        assert {id(term) for term in equation.structure[:-1]} <= before
+        assert all(term.randomize_calls == 0 for term in (zero, const, free))
+
+    def test_a_flagged_term_at_the_floor_declines(self):
+        # Target plus one constant feature: the feature cannot go (two terms
+        # are the floor), so the candidate is declined, untouched.
+        const = FakeTerm('const', _cols(np.full(N0, 2.0), np.full(N1, 2.0)))
+        changed, equation = _run([const])
+        assert changed == DECLINED
+        assert _kept(equation) == ['const', 'target']
+        assert const.randomize_calls == 0
 
     def test_samples_of_different_length_never_concatenated(self):
         # Purely structural: a column pair whose lengths differ must be
@@ -161,10 +173,11 @@ class TestLinDepScrubMultisample:
         changed, _ = _run(terms)
         assert changed is False
 
-    def test_non_finite_column_skips_rather_than_regenerates(self):
+    def test_non_finite_column_skips_rather_than_drops(self):
         bad = FakeTerm('bad', _cols(np.full(N0, np.nan), np.ones(N1)))
         changed, equation = _run([bad])
         assert changed is False
+        assert _kept(equation) == ['bad', 'target']
         assert bad.randomize_calls == 0
 
     def test_flag_dependent_columns_contract_unchanged(self):

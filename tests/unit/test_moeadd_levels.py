@@ -162,6 +162,71 @@ class TestNDLUpdateEquivalence:
         assert [list(lvl) for lvl in levels] == snapshot
 
 
+def _pairwise_sort(population):
+    """Deb's sort calling ``check_dominance`` for every comparison: what
+    ``fast_non_dominated_sorting`` computed before it read each member once."""
+    from epde.optimizers.moeadd.supplementary import check_dominance
+    n = len(population)
+    count = [sum(check_dominance(population[j], population[i]) for j in range(n) if j != i) for i in range(n)]
+    beats = [[j for j in range(n) if j != i and not check_dominance(population[j], population[i])
+              and check_dominance(population[i], population[j])] for i in range(n)]
+    current = [i for i in range(n) if count[i] == 0]
+    levels = [[population[i] for i in current]]
+    while current:
+        following = []
+        for i in current:
+            for j in beats[i]:
+                count[j] -= 1
+                if count[j] == 0:
+                    following.append(j)
+        if following:
+            levels.append([population[i] for i in following])
+        current = following
+    return levels
+
+
+class _CountingSol(Sol):
+    """A Sol whose objective vector counts its reads, with chosen labels per
+    equation (shared labels switch the same-structure skip on)."""
+
+    def __init__(self, tag, obj, labels):
+        self.tag = tag
+        self._obj = np.asarray(obj, dtype=float)
+        self.vals = _Chromosome(tag, len(labels))
+        for key, label in zip(self.vals.equation_keys, labels):
+            self.vals._genes[key] = _Gene((label,))
+        self.precomputed_domain = False
+        self._domain = None
+        self.reads = 0
+
+    @property
+    def obj_fun(self):
+        self.reads += 1
+        return self._obj
+
+
+class TestTheSortReadsEachMemberOnce:
+    """The sort reads each member's objectives and labels once
+    (``_dominance_view``) and compares those: the levels ``check_dominance``
+    gives pair by pair, in the same order."""
+
+    @pytest.mark.parametrize('n_eq', [1, 2])
+    def test_it_is_the_pairwise_sort(self, n_eq):
+        rng = np.random.default_rng(7 + n_eq)
+        for trial in range(150):
+            n = int(rng.integers(2, 16))
+            population = [_CountingSol(f'p{i}', rng.integers(0, 4, 2 * n_eq) / 4.0,
+                                       [f'L{rng.integers(3)}' for _ in range(n_eq)]) for i in range(n)]
+            got = fast_non_dominated_sorting(population)
+            want = _pairwise_sort(population)
+            assert [[s.tag for s in lvl] for lvl in got] == [[s.tag for s in lvl] for lvl in want], trial
+
+    def test_each_member_is_read_once(self):
+        population = [_CountingSol(f'p{i}', (i / 5, 1 - i / 5), ['a']) for i in range(6)]
+        fast_non_dominated_sorting(population)
+        assert [s.reads for s in population] == [1] * 6
+
+
 def _levels_obj(population):
     levels = ParetoLevels.__new__(ParetoLevels)
     levels._weights = np.array([[1.0, 0.0], [0.5, 0.5], [0.0, 1.0]])

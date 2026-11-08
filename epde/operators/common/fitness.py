@@ -41,6 +41,7 @@ from epde.integrate import SolverAdapter
 # triggering deepxde's import-time backend banner when no DeepXDE solver
 # is used (the solver-free path never imports it).
 from epde.structure.main_structures import SoEq, Equation
+from epde.structure.weak_rows import slot_of
 from epde.operators.utils.template import CompoundOperator
 import epde.globals as global_var
 from epde.interface.search_config import active_config
@@ -132,8 +133,8 @@ class SolverFreeFitness(CompoundOperator):
         if force_out_of_place and np.all(_term_weights(objective) == 0):
             return None
 
-        g_fun_vals = global_var.samples_manager.gFunc('dmf')
-        data_shapes = global_var.samples_manager.inner_shapes
+        g_fun_vals = global_var.samples_manager.row_weights(slot_of(objective), 'dmf')
+        data_shapes = global_var.samples_manager.row_shapes(slot_of(objective))
         # print(data_shapes)
         # try:
         #     g_fun_vals = global_var.samples_manager.gFunc('dmf')
@@ -181,9 +182,24 @@ class SolverFreeFitness(CompoundOperator):
         # magnitudes, and RPS's exit contract guarantees them, so an equation
         # arriving without them is a bug to report -- not a degenerate form to
         # quietly bury on the front with no indication of why.
+        #
+        # STAMP FIRST (``_stamp_first``): the verdict below reads only the
+        # primary's ``fitness_value`` and the fit, so where the primary is the
+        # first filler it is taken right after the primary, and the fillers the
+        # stamp overwrites (the instability) are not computed for a condemned
+        # form at all -- their values are the stamp either way, and their errors
+        # no longer surface on such a form. Only where the primary itself fills
+        # the evaluate() memo the others read: what they skip is then a memo hit.
+        stamp_first = self._stamp_first()
+        condemned = None
         for filler in self.objectives:
-            setattr(objective, filler.value_attr, filler.compute(objective, ctx))
+            if condemned and getattr(filler, 'stamped_on_failure', True):
+                setattr(objective, filler.value_attr, LOSS_NAN_VAL)
+            else:
+                setattr(objective, filler.value_attr, filler.compute(objective, ctx))
             setattr(objective, filler.flag_attr, True)
+            if stamp_first and filler is primary:
+                condemned = primary.is_degenerate(objective) or _amplification_trips(objective)
         # The RPS-time is_degenerate check (fitness.py force_out_of_place branch)
         # only declines candidate TARGETS; it cannot evict an already-fitted form
         # that is non-dominated via an artificially-low instability (e.g. a single
@@ -192,12 +208,14 @@ class SolverFreeFitness(CompoundOperator):
         # in-place discrepancy -- so a degenerate form is dominated out of the front.
         # An amplified fit (``_amplification_trips``: e.g. the LV
         # ``Lambda*(du+dv-alpha*u+gamma*v) = d^2u`` parasite) is degenerate
-        # NO MATTER which path installed its target: the term-sweep already
-        # returns None for such candidates, but the sweep's exit-guarantee
-        # fallback can still install one -- this backstop keeps the amplified
-        # fit off the front regardless of how its weights arose.
-        if primary is not None and (primary.is_degenerate(objective)
-                                    or _amplification_trips(objective)):
+        # NO MATTER which path installed its target. The term-sweep already
+        # returns None for such candidates, so a winner it selected does not
+        # trip this; the check is the backstop that keeps an amplified fit off
+        # the front however its weights arose.
+        if condemned is None:
+            condemned = primary is not None and (primary.is_degenerate(objective)
+                                                 or _amplification_trips(objective))
+        if condemned:
             for filler in self.objectives:
                 # Complexity opts out (stamped_on_failure=False): its value
                 # is structure-derived and stays real -- stamping it would
@@ -208,6 +226,28 @@ class SolverFreeFitness(CompoundOperator):
         # the legacy WAPE operator set so downstream readers don't assert.
         objective.aic = None
         objective.aic_calculated = True
+        # Scored: the evaluate() memo has served its hits (the RPS sweep's
+        # out-of-place calls above keep theirs for the winner's pass here).
+        objective.release_eval_cache()
+
+    def _stamp_first(self) -> bool:
+        """The degeneracy verdict can be taken before the other fillers run:
+        the primary is the first filler and writes ``fitness_value`` (what
+        ``is_degenerate`` reads), its compute fills the wide evaluate() memo
+        (``Discrepancy.reads_wide_evaluate``; not under ``'l2'``, which leaves
+        the zero-weight terms to the instability, so skipping it would change
+        what the term cache holds), and no other filler writes the primary's
+        attributes."""
+        primary = self.primary
+        if primary is None or not self.objectives or self.objectives[0] is not primary:
+            return False
+        if primary.value_attr != 'fitness_value':
+            return False
+        reads_wide = getattr(primary, 'reads_wide_evaluate', None)
+        if reads_wide is None or not reads_wide():
+            return False
+        taken = {primary.value_attr, primary.flag_attr}
+        return all(not ({filler.value_attr, filler.flag_attr} & taken) for filler in self.objectives[1:])
 
     def use_default_tags(self):
         self._tags = {'fitness evaluation', 'gene level', 'no suboperators', 'inplace'}
@@ -337,6 +377,9 @@ class SolverBasedFitness(CompoundOperator):
             self.adapter.set_training_params(**training_params)
 
     def apply(self, objective: SoEq, arguments: dict, force_out_of_place: bool = False):
+        # Keyed on this operator, not on the config flag: a custom director can
+        # assemble it without use_solver.
+        global_var.samples_manager.require_unstrided('SolverBasedFitness')
         # No suboperators: like SolverFreeFitness this host only scores, and
         # the system it is handed has already been fitted by
         # EqRightPartSelector. (The ``force_out_of_place`` sparsity call that
@@ -357,9 +400,29 @@ class SolverBasedFitness(CompoundOperator):
                 f'"sparsity" and "coeff_calc"). unfitted={unfitted}')
         for eq in objective.vals:
             eq.assert_state_invariants('SolverBasedFitness.apply entry')
-        if self.backend in ('deepxde', 'basis'):
-            return self._apply_deepxde(objective, force_out_of_place)
-        return self._apply_autograd(objective, force_out_of_place)
+        # A system holding a DECLINED equation is not solved. Right-part
+        # selection found no fitted form for it and stamped it LOSS_NAN_VAL
+        # (``_rps_declined``: ``EqRightPartSelector._decline``, the assignment
+        # and plain modes' ``_mark_unassignable``); its zero weights and
+        # placeholder target are no equation to integrate. Solving would write
+        # a finite error over the stamp for every equation, and the declined
+        # one would then read as fitted and be placed. The stamp stands: the
+        # system is degenerate for the population operators, which redraw that
+        # equation (``regenerate_degenerate_equations``) or drop the system,
+        # and the other equations are scored once the system can be solved.
+        from epde.operators.common.right_part_selection import _rps_declined
+        if any(_rps_declined(eq) for eq in objective.vals):
+            _loop_stats.record('SolverBasedFitness.declined_system', 1, 1)
+            return LOSS_NAN_VAL if force_out_of_place else None
+        try:
+            if self.backend in ('deepxde', 'basis'):
+                return self._apply_deepxde(objective, force_out_of_place)
+            return self._apply_autograd(objective, force_out_of_place)
+        finally:
+            # As SolverFreeFitness: the solve and the fillers have read the
+            # evaluate() memos they needed (Equation.release_eval_cache).
+            for eq in objective.vals:
+                eq.release_eval_cache()
 
     def _build_fit_context(self):
         try:

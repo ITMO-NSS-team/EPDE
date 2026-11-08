@@ -54,6 +54,8 @@ central_diff = _cv_metric.central_diff
 fd_core = _cv_metric.fd_core
 spectral_diff = _cv_metric.spectral_diff
 combine_loss = _cv_metric.combine_loss
+tls_fit = _cv_metric.tls_fit
+tls_scales = _cv_metric.tls_scales
 
 
 def _problem(n=600):
@@ -566,3 +568,141 @@ class TestDataTermWiring:
                 == "combine_loss"), f"{system}: total_loss bypasses combine_loss"
         assert any(isinstance(a, ast.Name) and a.id == "LOSS_FORM"
                    for a in call.args), f"{system}: LOSS_FORM not passed"
+
+    @pytest.mark.parametrize("system", SCRIPTS)
+    def test_tls_physics_is_wired_through_the_shared_helper(self, system):
+        # COEF_SOURCE='tls' must reach l_phys through the ONE tls_fit, with
+        # the column yardsticks built by tls_scales from the FD design --
+        # never a per-script reimplementation of the eigenproblem.
+        tree = self._tree(system)
+        fn = [n for n in tree.body if isinstance(n, ast.FunctionDef)
+              and n.name == "physics_and_stat_loss"]
+        assert len(fn) == 1
+        body = ast.dump(fn[0])
+        assert "'tls'" in body and "tls_fit" in body and "TLS_SCALE" in body, \
+            f"{system}: tls arm not routed through tls_fit"
+        scale = [n for n in tree.body if isinstance(n, ast.Assign)
+                 and any(getattr(t, "id", None) == "TLS_SCALE"
+                         for t in n.targets)]
+        assert len(scale) == 1 and "tls_scales" in ast.dump(scale[0]), \
+            f"{system}: TLS_SCALE not built by tls_scales"
+        src = ast.unparse(tree)
+        assert "'tls': '_tls'" in src, f"{system}: tls arm has no artifact suffix"
+
+
+def _exact_problem(n=500, seed=0):
+    g = torch.Generator().manual_seed(seed)
+    A = torch.randn(n, 3, generator=g, dtype=torch.float64)
+    c = torch.tensor([2.0, -0.5, 3.0], dtype=torch.float64)
+    return A, A @ c, c
+
+
+def _noisy_problem(n=500, seed=1, sigma=0.05):
+    A, y, c = _exact_problem(n, seed)
+    g = torch.Generator().manual_seed(seed + 100)
+    noise = sigma * torch.randn(n, 4, generator=g, dtype=torch.float64)
+    return A + noise[:, 1:], y + noise[:, 0], c
+
+
+class TestTls:
+    """``tls_fit``: the target-free physics term (COEF_SOURCE='tls') --
+    smallest eigenvalue of the column-scaled [target | features] Gram."""
+
+    def test_exact_relation_scores_zero_and_recovers_the_coefficients(self):
+        A, y, c = _exact_problem()
+        lam, theta, w0 = tls_fit(y, A, tls_scales(y, A))
+        assert float(lam) < 1e-25
+        assert torch.allclose(theta, c, rtol=1e-10, atol=0.0)
+        assert w0 > 0.1
+
+    def test_lam_is_the_smallest_eigenvalue_of_the_scaled_gram(self):
+        A, y, _ = _noisy_problem()
+        s = tls_scales(y, A)
+        lam, _, _ = tls_fit(y, A, s)
+        Z = (torch.cat([y.unsqueeze(1), A], dim=1) / s).numpy()
+        ref = np.linalg.eigvalsh(Z.T @ Z / Z.shape[0])[0]
+        assert float(lam) == pytest.approx(ref, rel=1e-10)
+
+    def test_scales_are_the_uncentred_column_rms(self):
+        A, y, _ = _noisy_problem()
+        A = A + 3.0                                   # a non-zero mean
+        Z = np.column_stack([y.numpy(), A.numpy()])
+        ref = np.sqrt((Z ** 2).mean(axis=0))
+        assert np.allclose(tls_scales(y, A).numpy(), ref, rtol=1e-14)
+
+    def test_scales_floor_a_dead_column_at_tiny_not_eps(self):
+        A, y, _ = _exact_problem()
+        A[:, 1] = 0.0
+        s = tls_scales(y, A)
+        assert float(s[2]) == torch.finfo(torch.float64).tiny
+
+    def test_never_above_the_ols_loss_in_the_same_units(self):
+        # OLS pins the target's coefficient at 1; TLS minimises over every
+        # direction, so in the same scaled units it can only be lower.
+        A, y, _ = _noisy_problem()
+        s = tls_scales(y, A)
+        lam, _, _ = tls_fit(y, A, s)
+        c, r = global_ols(y, A, ridge=0.0)
+        ols = float((r ** 2).mean()) / float(s[0]) ** 2
+        assert float(lam) < ols
+
+    def test_target_free_swapping_the_target_changes_nothing(self):
+        A, y, _ = _noisy_problem()
+        s = tls_scales(y, A)
+        lam, _, _ = tls_fit(y, A, s)
+        # column 1 of A becomes the "target", y moves into the library
+        A2 = torch.stack([y, A[:, 0], A[:, 2]], dim=1)
+        s2 = torch.stack([s[2], s[0], s[1], s[3]])
+        lam2, _, _ = tls_fit(A[:, 1], A2, s2)
+        assert float(lam2) == pytest.approx(float(lam), rel=1e-12)
+
+    def test_invariant_under_rescaling_the_equation(self):
+        # The column yardsticks come from the same data, so a common or
+        # per-column rescale moves nothing: weight 1 stays meaningful.
+        A, y, _ = _noisy_problem()
+        lam, theta, _ = tls_fit(y, A, tls_scales(y, A))
+        a, b = 1e-3, torch.tensor([1.0, 7.0, 1.0], dtype=torch.float64)
+        y2, A2 = a * y, a * A * b
+        lam2, theta2, _ = tls_fit(y2, A2, tls_scales(y2, A2))
+        assert float(lam2) == pytest.approx(float(lam), rel=1e-10)
+        assert torch.allclose(theta2, theta / b, rtol=1e-10, atol=0.0)
+
+    def test_gradient_is_the_eigenvalue_derivative(self):
+        # v is detached; by the envelope theorem the gradient through Z
+        # alone IS d lambda_min -- checked against central differences.
+        A, y, _ = _noisy_problem(n=200)
+        s = tls_scales(y, A)
+        yv = y.clone().requires_grad_(True)
+        Av = A.clone().requires_grad_(True)
+        lam, _, _ = tls_fit(yv, Av, s)
+        lam.backward()
+        g = torch.Generator().manual_seed(7)
+        dy = torch.randn(y.shape, generator=g, dtype=torch.float64)
+        dA = torch.randn(A.shape, generator=g, dtype=torch.float64)
+        h = 1e-6
+        up = float(tls_fit(y + h * dy, A + h * dA, s)[0])
+        dn = float(tls_fit(y - h * dy, A - h * dA, s)[0])
+        fd = (up - dn) / (2 * h)
+        an = float((yv.grad * dy).sum() + (Av.grad * dA).sum())
+        assert an == pytest.approx(fd, rel=1e-6)
+
+    def test_an_identity_without_the_target_drives_w0_to_zero(self):
+        # The failure mode OLS cannot have: the design's null direction
+        # does not involve the target, so theta is undefined -- w0 says so.
+        g = torch.Generator().manual_seed(3)
+        f = torch.randn(400, 2, generator=g, dtype=torch.float64)
+        A = torch.stack([f[:, 0], f[:, 1], f[:, 0] + f[:, 1]], dim=1)
+        y = torch.randn(400, generator=g, dtype=torch.float64)
+        lam, _, w0 = tls_fit(y, A, tls_scales(y, A))
+        assert float(lam) < 1e-25
+        assert w0 < 1e-8
+
+    def test_float32_design_keeps_its_dtype_and_stays_finite(self):
+        A, y, c = _noisy_problem()
+        A32, y32 = A.float(), y.float()
+        s = tls_scales(y32, A32)
+        lam, theta, w0 = tls_fit(y32, A32, s)
+        assert lam.dtype == torch.float32 and theta.dtype == torch.float64
+        lam64, theta64, _ = tls_fit(y, A, tls_scales(y, A))
+        assert float(lam) == pytest.approx(float(lam64), rel=1e-4)
+        assert torch.allclose(theta, theta64, rtol=1e-4, atol=0.0)

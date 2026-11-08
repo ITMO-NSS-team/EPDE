@@ -367,6 +367,17 @@ class ParetoLevels(object):
         #if neccessary, implement additional logic into setter
         self._weights = weights
 
+    #: ``population_size='auto'``: the size the initial population may be cut to when the pool
+    #: yields no further distinct system (``InitialParetoLevelSorting``); None keeps every slot.
+    population_floor = None
+
+    def resize_weights(self, size: int) -> None:
+        """One Das-Dennis weight vector per member of a population cut to ``size`` (``H = size - 1``,
+        as ``EpdeSearch`` sets it for a fixed size), before the weights are assigned."""
+        axes = self._weights.shape[1]
+        self.set_weights(np.array(MOEADDOptimizer.weights_generation(axes, size - 1)))
+        self._resized = True
+
     def associate_weights(self):
         if not self._weights_assigned:
             if self._weights is None:
@@ -435,9 +446,10 @@ class MOEADDOptimizer(object):
     
     """
     def __init__(self, population_instruct, pop_size, solution_params,
-                 H: int, neighbors_number: int, nds_method = fast_non_dominated_sorting, 
+                 H: int, neighbors_number: int, nds_method = fast_non_dominated_sorting,
                  ndl_update = ndl_update, passed_population: Union[List, ParetoLevels] = None,
-                 best_sol_vals = None, weights_assigner: str = 'marriage'):
+                 best_sol_vals = None, weights_assigner: str = 'marriage',
+                 population_floor: int = None):
         """
         Initialization of the evolutionary optimizer is done with the introduction of 
         initial population of candidate solutions, divided into Pareto non-dominated 
@@ -474,8 +486,13 @@ class MOEADDOptimizer(object):
             Pre-generated initial guess of the population. Can be passed as a ``list`` of candidate solutions or as a ``ParetoLevels`` object.
             If the number of passed candidates is lower, than the required size of the population, additional solutions will be created.
         solution_assignment : str, optional
-            Method of initial weight allocation to candidate solutions. Existing options are 'random' for legacy random allocation and 
+            Method of initial weight allocation to candidate solutions. Existing options are 'random' for legacy random allocation and
             'marriage' for Gale-Shapley algorithm. The default - 'marriage'
+        population_floor : int, optional
+            ``population_size='auto'``: ``pop_size`` is then the ceiling, and the initial sorting
+            cuts the population to the systems placed so far once the pool yields no new one,
+            provided at least ``population_floor`` are placed (``ParetoLevels.population_floor``).
+            The weights and neighbourhoods follow the cut. None keeps every slot.
         """
         self.abbreviated_search_executed = False
 
@@ -512,21 +529,19 @@ class MOEADDOptimizer(object):
             else:
                 warnings.warn(f'Get unimplemented method of weights assignment {weights_assigner_method}')
             self.pareto_levels = ParetoLevels(population, weights=self.weights,
-                                              sorting_method = nds_method, 
+                                              sorting_method = nds_method,
                                               update_method = ndl_update,
                                               weights_assigner=weights_assigner_method)
+            if population_floor is not None:
+                self.pareto_levels.population_floor = int(population_floor)
         else:
             if not isinstance(passed_population, ParetoLevels):
                 raise TypeError(f'Incorrect type of the population passed. Expected ParetoLevels object, instead got \
                                  {type(passed_population)}')
             self.pareto_levels = passed_population
 
-        self.neighborhood_lists = []
-        weights_num = self.weights.shape[0]
-        for weights_idx in range(weights_num):
-            self.neighborhood_lists.append([elem_idx for elem_idx, _ in sorted(
-                    list(zip(np.arange(weights_num), [np.linalg.norm(self.weights[weights_idx, :] - self.weights[weights_idx_inner, :]) for weights_idx_inner in np.arange(weights_num)])), 
-                    key = lambda pair: pair[1])][:neighbors_number+1]) # срез листа - задаёт регион "близости"
+        self._neighbors_number = neighbors_number
+        self.neighborhood_lists = self._neighborhoods(self.weights, neighbors_number)
 
         self.best_obj = best_sol_vals
         self._check_ideal_point_matches_objectives()
@@ -535,6 +550,26 @@ class MOEADDOptimizer(object):
         # Each entry is a list of ``{'text_form', 'obj_fun'}`` dicts -- one
         # per solution on the non-dominated front at the end of that epoch.
         self._pareto_history = []
+
+    @staticmethod
+    def _neighborhoods(weights: np.ndarray, neighbors_number: int) -> list:
+        """For every weight vector, the indices of the ``neighbors_number`` + 1 closest ones (itself
+        first)."""
+        neighborhood_lists = []
+        weights_num = weights.shape[0]
+        for weights_idx in range(weights_num):
+            neighborhood_lists.append([elem_idx for elem_idx, _ in sorted(
+                    list(zip(np.arange(weights_num), [np.linalg.norm(weights[weights_idx, :] - weights[weights_idx_inner, :]) for weights_idx_inner in np.arange(weights_num)])),
+                    key = lambda pair: pair[1])][:neighbors_number+1]) # срез листа - задаёт регион "близости"
+        return neighborhood_lists
+
+    def _sync_weights(self) -> None:
+        """Adopt the weights of the Pareto levels when the initial sorting cut the population
+        (``population_size='auto'``): one weight vector per member, neighbourhoods rebuilt."""
+        if getattr(self.pareto_levels, '_resized', False):
+            self.weights = self.pareto_levels._weights
+            self.neighborhood_lists = self._neighborhoods(self.weights, self._neighbors_number)
+            self.pareto_levels._resized = False
 
     def abbreviated_search(self, population, sorting_method, update_method):
         """
@@ -722,7 +757,8 @@ class MOEADDOptimizer(object):
                 ground-truth structure). Default ``None`` runs the full ``epochs`` budget.
 
         Note:
-            that if the algorithm converges to a single Pareto frontier, the optimization is stopped.
+            ``EpdeSearch`` with ``early_stopping_patience`` set passes a callback that stops once
+            the structures on Pareto level 0 are unchanged for that many epochs.
 
         """
         if not self.abbreviated_search_executed:
@@ -748,6 +784,7 @@ class MOEADDOptimizer(object):
                 linked.reset_traversal_cond()
                 linked.initial[0][1].set_output(self.pareto_levels)
                 init_block.apply(self.form_processer_args(0))
+                self._sync_weights()
             if getattr(self.pareto_levels, '_init_collapsed', False):
                 # Init flagged a search-space collapse (see
                 # ``InitialParetoLevelSorting.apply``). Skip the epoch loop --

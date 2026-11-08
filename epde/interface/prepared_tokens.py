@@ -5,6 +5,7 @@ Created on Wed Jul 14 13:26:56 2021
 
 @author: mike_ubuntu
 """
+import inspect
 from abc import ABC
 from collections import OrderedDict
 from typing import Union, Callable, List, Tuple, Dict
@@ -19,6 +20,7 @@ from epde.preprocessing.preprocessor import ConcretePrepBuilder, PreprocessingPi
 import epde.globals as global_var
 # from epde.structure.domain import Domain
 from epde.interface.token_family import TokenFamily
+from epde.interface.token_frequencies import frequency_grid
 from epde.cache.cache_refactored import uploadSimpleTokens, prepareVarTensor #upload_simple_tokens, prepareVarTensor  # np_ndarray_section,
 
 from epde.evaluators import CustomEvaluator, EvaluatorTemplate, trigonometric_evaluator, \
@@ -225,23 +227,134 @@ class ControlVarTokens(PreparedTokens):
 
         self._token_family.set_evaluator(eval)
 
-class TrigonometricTokens(PreparedTokens):
+#: The default frequency interval. Compared by identity, so a caller passing
+#: ``freq`` explicitly (even the same numbers, or a JSON list) is told apart.
+_DEFAULT_FREQ = (np.pi/2., 2*np.pi)
+
+_FREQUENCY_KINDS_DOC = """\
+The frequency is defined by ONE of these keyword sets (the others left None):
+    freq=(lo, hi) alone              continuous: any value in the interval (the default)
+    freq_num=n                       np.linspace(lo, hi, n) of freq=(lo, hi)
+    freq_num=n, freq_spacing='log'   np.geomspace(lo, hi, n)
+    freq_step=s                      lo, lo + s, ..., up to hi
+    freq_values=[f1, f2, ...]        exactly these values (freq not passed)
+    freq_base=f0, freq_num=n         harmonics f0, 2*f0, ..., n*f0 (freq not passed)
+    freq_from_data=n                 the n strongest spectral peaks of the fit data, found when the pool
+                                     is built; freq=(lo, hi), if given, bounds them. Needs a record of a
+                                     few periods: a shorter one has no resolvable tone. With several axes
+                                     each axis takes the n strongest of its own spectrum, and a factor
+                                     draws its axis first, then one of that axis's frequencies.
+On a grid (every kind but continuous) equal values are one factor (one label, one cached tensor),
+different values are different factors, and every value is positive; freq=(f, f) with freq_num=1
+fixes the frequency."""
+
+
+class _FrequencyFromData(object):
+    """A family whose frequency grid is found in the fit data (``freq_from_data``).
+    ``EpdeSearch.create_pool`` calls ``resolve_from_data`` once the trajectories
+    are built, before any factor is drawn."""
+    _freq_from_data = None          # n, set only by the data kind; never cleared
+    _freq_band = None
+    _freq_axes = (0,)
+    _freq_unit = 'angular'
+
+    def _defer_frequencies(self, n, band, axes, unit):
+        self._freq_from_data, self._freq_band = int(n), band
+        self._freq_axes, self._freq_unit = tuple(axes), unit
+        self._token_family.deferred_params = {'freq'}
+
+    def frequencies_from_data(self, trajectories):
+        """The ``freq_from_data`` strongest frequencies of ``trajectories``, in this family's unit:
+        a tuple for a family of one axis, ``{axis: frequencies}`` from each axis's own spectrum for
+        a family of several (``dominant_frequencies(per_axis=True)``). Changes nothing:
+        ``create_pool`` finds every family's frequencies before installing any."""
+        from epde.interface.token_frequencies import dominant_frequencies
+        return dominant_frequencies(trajectories, axes=self._freq_axes, n=self._freq_from_data,
+                                    unit=self._freq_unit, band=self._freq_band,
+                                    per_axis=len(self._freq_axes) > 1)
+
+    def install_frequencies(self, values) -> tuple:
+        return self._token_family.install_param_grid('freq', values, bounds=self._freq_band)
+
+    def resolve_from_data(self, trajectories) -> tuple:
+        """Find and install the frequencies of ``trajectories``; returns the grid."""
+        return self.install_frequencies(self.frequencies_from_data(trajectories))
+
+
+class _DimensionFromData(object):
+    """A family whose axis index range (``dim``, 0 .. ndim - 1) follows the fit data
+    (``dimensionality='auto'``). ``EpdeSearch.create_pool`` / ``fit`` install it from the
+    trajectories, before the pool key is taken, on every call -- so the same object follows the
+    data it is used with."""
+    _auto_dimensionality = False
+
+    def _defer_dimensionality(self):
+        self._auto_dimensionality = True
+        self._token_family.deferred_params = set(self._token_family.deferred_params) | {'dim'}
+
+    def install_dimensionality(self, ndim: int) -> int:
+        """Install ``dim`` in (0, ``ndim`` - 1); returns that dimensionality."""
+        dimensionality = int(ndim) - 1
+        self._dimensionality_installed(dimensionality)
+        self._token_family.install_param_range('dim', (0, dimensionality))
+        return dimensionality
+
+    def _dimensionality_installed(self, dimensionality: int) -> None:
+        pass
+
+
+def _checked_dimensionality(dimensionality):
+    """True for 'auto'; refuses anything but 'auto' or a non-negative int."""
+    if isinstance(dimensionality, str):
+        if dimensionality != 'auto':
+            raise ValueError(f"dimensionality must be 'auto' or a non-negative int, got {dimensionality!r}.")
+        return True
+    if int(dimensionality) != dimensionality or dimensionality < 0:
+        raise ValueError(f"dimensionality must be 'auto' or a non-negative int, got {dimensionality!r}.")
+    return False
+
+
+class TrigonometricTokens(_DimensionFromData, _FrequencyFromData, PreparedTokens):
     """
     Class for prepared tokens, that belongs to the trigonometric family
     """
-    def __init__(self, freq: tuple = (np.pi/2., 2*np.pi), dimensionality: int = 1, meaningful: bool = False):
+    def __init__(self, freq: tuple = _DEFAULT_FREQ, dimensionality='auto', meaningful: bool = False,
+                 freq_num: int = None, freq_spacing: str = None, freq_step: float = None,
+                 freq_values: list = None, freq_base: float = None, freq_from_data: int = None):
         """
         Initialization of class
 
         Args:
             freq (`tuple`): optional, default - (pi/2., 2*pi)
-                interval for parameter frequency in trigonometric token.
-            dimensionality (`int`): optional, default - 1
-                data dimension.
+                interval for parameter frequency in trigonometric token: sin(freq * x), so an ANGULAR
+                frequency.
+            dimensionality (`int` or 'auto'): optional, default - 'auto'
+                the largest axis index the tokens take their argument from (the data dimension - 1);
+                'auto' takes it from the data when the pool is built.
             meaningful (`bool`): optional, defaule - False
                 flag, if the token can be used as a separate term or term-forming factor in the equation.
+            freq_num, freq_spacing, freq_step, freq_values, freq_base, freq_from_data: optional, default - None
+                how the frequency is defined; see the table below.
         """
-        assert freq[1] > freq[0] and len(freq) == 2, 'The tuple, defining frequncy interval, shall contain 2 elements with first - the left boundary of interval and the second - the right one. '
+        if freq is None:                        # JSON null: the same as not passing it
+            freq = _DEFAULT_FREQ
+        auto_dim = _checked_dimensionality(dimensionality)
+        if auto_dim:
+            dimensionality = 0                  # placeholder until the data is known
+        kind, bounds, grid = frequency_grid(freq, freq is not _DEFAULT_FREQ, freq_num=freq_num,
+                                            freq_spacing=freq_spacing, freq_step=freq_step,
+                                            freq_values=freq_values, freq_base=freq_base,
+                                            freq_from_data=freq_from_data)
+        if kind == 'continuous':
+            assert freq[1] > freq[0] and len(freq) == 2, 'The tuple, defining frequncy interval, shall contain 2 elements with first - the left boundary of interval and the second - the right one. '
+            # Float bounds: integer ones (a JSON [1, 3]) sent the draw and the
+            # parameter mutation to their integer branches, so only whole
+            # frequencies were ever tried.
+            freq = (float(freq[0]), float(freq[1]))
+        else:
+            # The grid kinds' bounds are floats already. The data kind's
+            # placeholder is the band (or 0..inf) until the pool is built.
+            freq = bounds if bounds is not None else (0.0, np.inf)
 
         self._token_family = TokenFamily(token_type='trigonometric')
         self._token_family.set_status(unique_specific_token=True, unique_token_type=True,
@@ -283,14 +396,52 @@ class TrigonometricTokens(PreparedTokens):
         # frequency printed in an equation was not the frequency that had been
         # scored. It also made the trig tokens mutually "equal" under
         # ``Factor.__eq__``, which collapses dedup across the whole family.
-        trig_equal_params = {'power': 0, 'freq': (freq[1] - freq[0]) * freq_equality_fraction,
+        trig_equal_params = {'power': 0,
+                             'freq': 0. if kind == 'data' else (freq[1] - freq[0]) * freq_equality_fraction,
                              'dim': 0}
-        self._token_family.set_params(['sin', 'cos'], trig_token_params, trig_equal_params)
+        # With a grid the family replaces the freq equality range by half the grid's gap.
+        self._token_family.set_params(['sin', 'cos'], trig_token_params, trig_equal_params,
+                                      param_grids=None if grid is None else {'freq': grid})
         self._token_family.set_evaluator(trigonometric_evaluator)
+        if kind == 'data':
+            self._defer_frequencies(freq_from_data, bounds, axes=range(dimensionality + 1), unit='angular')
+        if auto_dim:
+            self._defer_dimensionality()
+
+    def _dimensionality_installed(self, dimensionality: int) -> None:
+        if self._freq_from_data is not None:
+            self._freq_axes = tuple(range(dimensionality + 1))
 
 
-class PhasedSine1DTokens(PreparedTokens):
-    def __init__(self, freq: tuple = (np.pi/2., 2*np.pi)):
+class PhasedSine1DTokens(_FrequencyFromData, PreparedTokens):
+    def __init__(self, freq: tuple = _DEFAULT_FREQ, freq_num: int = None, freq_spacing: str = None,
+                 freq_step: float = None, freq_values: list = None, freq_base: float = None,
+                 freq_from_data: int = None):
+        """
+        sin(2*pi*freq*(x + phase/freq)) along the first axis, so ``freq`` is a CYCLIC
+        frequency; ``phase`` stays continuous in (0, 1).
+
+        Args:
+            freq (`tuple`): optional, default - (pi/2., 2*pi)
+            freq_num, freq_spacing, freq_step, freq_values, freq_base, freq_from_data: optional, default - None
+                how the frequency is defined; see the table below.
+        """
+        if freq is None:                        # JSON null: the same as not passing it
+            freq = _DEFAULT_FREQ
+        kind, bounds, grid = frequency_grid(freq, freq is not _DEFAULT_FREQ, freq_num=freq_num,
+                                            freq_spacing=freq_spacing, freq_step=freq_step,
+                                            freq_values=freq_values, freq_base=freq_base,
+                                            freq_from_data=freq_from_data)
+        if kind == 'continuous':
+            try:
+                ok = len(freq) == 2 and freq[1] >= freq[0]
+            except TypeError:
+                ok = False
+            if not ok:
+                raise ValueError(f'freq must be (low, high) with low <= high, got {freq!r}.')
+            freq = (float(freq[0]), float(freq[1]))       # see TrigonometricTokens: integer bounds draw integers
+        else:
+            freq = bounds if bounds is not None else (0.0, np.inf)
         self._token_family = TokenFamily(token_type='phased_sine_1d')
         self._token_family.set_status(unique_specific_token=True, unique_token_type=True,
                                       meaningful=False)
@@ -316,40 +467,61 @@ class PhasedSine1DTokens(PreparedTokens):
             form : str
                 LaTeX-styled text form of token.
             '''            
+            # phased_sine_1d_np evaluates sin(2*pi*freq*(x + phase/freq)) on the
+            # first axis, i.e. sin(2*pi*(freq*x_0 + phase)): cyclic freq, phase in
+            # cycles. Mathtext-safe, for the Pareto plots' $...$.
             pwr_sign = r'^{{{0}}}'.format(params["power"][1]) if params["power"][0] != 1 else ''
-            return label + pwr_sign + r'(' + params["freq"][1] + r' x_{1} + ' \
-                   + params["phase"][1] + r')'
+            return (r'\sin' + pwr_sign + r'\left(2\pi\left(' + params["freq"][1] + r'\,x_{0} + '
+                    + params["phase"][1] + r'\right)\right)')
         
         self._token_family.set_latex_form_constructor(latex_form)
         # Same divide-for-multiply as TrigonometricTokens above; see there.
-        sine_equal_params = {'power': 0, 'freq': (freq[1] - freq[0]) * freq_equality_fraction,
+        sine_equal_params = {'power': 0,
+                             'freq': 0. if kind == 'data' else (freq[1] - freq[0]) * freq_equality_fraction,
                              'phase': 0.05}
-        self._token_family.set_params(['sine',], sine_token_params, sine_equal_params)
-        self._token_family.set_evaluator(phased_sine_evaluator)        
+        self._token_family.set_params(['sine',], sine_token_params, sine_equal_params,
+                                      param_grids=None if grid is None else {'freq': grid})
+        self._token_family.set_evaluator(phased_sine_evaluator)
+        if kind == 'data':
+            self._defer_frequencies(freq_from_data, bounds, axes=(0,), unit='cyclic')
 
 
-class GridTokens(PreparedTokens):
+for _cls in (TrigonometricTokens, PhasedSine1DTokens):
+    if _cls.__init__.__doc__:                       # None under python -OO
+        # cleandoc: Python 3.13+ already dedents docstrings, older versions do not.
+        _cls.__init__.__doc__ = inspect.cleandoc(_cls.__init__.__doc__) + '\n\n' + _FREQUENCY_KINDS_DOC
+del _cls
+
+
+class GridTokens(_DimensionFromData, PreparedTokens):
     """
     Class for prepared tokens, that describe family of grids as values
     """
-    def __init__(self, labels = ['t',], max_power: int = 1, dimensionality=1):
+    def __init__(self, labels = ['t',], max_power: int = 1, dimensionality='auto'):
         """
         Initialization of class
 
         Args:
-            dimensionality (`int`): optional, default - 1
-                data dimension
+            labels (`list`): optional, default - ['t']
+                one name, whose ``dim`` parameter picks the axis (any axis); or one name per axis,
+                ``labels[k]`` being the coordinate of axis ``k`` (``['t', 'x']``).
+            dimensionality (`int` or 'auto'): optional, default - 'auto'
+                the largest axis index a grid token takes (the data dimension - 1); 'auto' takes
+                it from the data when the pool is built.
         """
-        # Two valid configurations:
-        # 1. One label per axis (legacy): ``['x_0', ..., 'x_N']`` with
-        #    ``len == dimensionality + 1``. Each axis is its own token,
-        #    plus the ``dim`` param redundantly encodes the same axis.
-        # 2. Single label (consolidated): ``['x']`` representing a single
-        #    family where the ``dim`` parameter is the ONLY axis
-        #    discriminator. Removes the redundant ``x_N`` prefix.
-        # ``set_status(unique_token_type=True)`` already restricts to one
-        # grid factor per term in either configuration, so behaviour is
-        # identical -- the consolidation is a labelling cleanup.
+        self._labels = list(labels)
+        auto_dim = _checked_dimensionality(dimensionality)
+        if auto_dim:
+            dimensionality = max(len(labels) - 1, 0)      # placeholder until the data is known
+        # Two configurations:
+        # 1. Single label (``['x']``): the ``dim`` parameter is the axis.
+        # 2. One label per axis (``['t', 'x']``, ``['x_0', ..., 'x_N']``): label k
+        #    IS axis k -- its ``dim`` is fixed to k (TokenFamily.fix_token_params).
+        #    With ``dim`` drawn freely, as it used to be, ``x`` on axis 0 was the
+        #    same column as ``t`` on axis 0, and identities such as
+        #    ``x u_t = t u_t`` fitted exactly and took the first Pareto level.
+        # ``set_status(unique_token_type=True)`` restricts to one grid factor per
+        # term in either configuration.
         assert 1 <= len(labels) <= dimensionality + 1, (
             f'Grid labels must be either a single name or one per axis; '
             f'got {len(labels)} labels for dimensionality={dimensionality}'
@@ -385,7 +557,16 @@ class GridTokens(PreparedTokens):
 
         grid_equal_params = {'power': 0, 'dim': 0}
         self._token_family.set_params(labels, grid_token_params, grid_equal_params)
+        if len(labels) > 1:
+            self._token_family.fix_token_params({label: {'dim': axis} for axis, label in enumerate(labels)})
         self._token_family.set_evaluator(grid_evaluator)
+        if auto_dim:
+            self._defer_dimensionality()
+
+    def _dimensionality_installed(self, dimensionality: int) -> None:
+        if not 1 <= len(self._labels) <= dimensionality + 1:
+            raise ValueError(f'Grid labels must be either a single name or one per axis; got '
+                             f'{len(self._labels)} labels for data of {dimensionality + 1} axes.')
 
 
 class LogfunTokens(PreparedTokens):
@@ -553,7 +734,10 @@ class ConstantToken(PreparedTokens):
             value_equal_range = 0.1
         else:
             val_equality_fraction = 0.01
-            value_equal_range = (values_range[1] - values_range[0]) / val_equality_fraction
+            # 1% OF the range, a multiplication. Dividing made it 100x the whole
+            # range: every value quantised to one bucket -- one label, one cached
+            # tensor -- the TrigonometricTokens bug, fixed there before.
+            value_equal_range = (values_range[1] - values_range[0]) * val_equality_fraction
         const_equal_params = {'power': 0, 'value': value_equal_range}
         print('Conducting init procedure for ConstantToken:')
         self._token_family.set_params(['const'], const_token_params, const_equal_params)
@@ -578,7 +762,8 @@ class VelocityHEQTokens(PreparedTokens):
         # print(token_params)
 
         p_equality_fraction = 0.05  # fraction of allowed frequency interval, that is considered as the same
-        opt_params_equality = {'p' + str(idx+1): (p_range[1] - p_range[0]) / p_equality_fraction for idx, p_range in enumerate(param_ranges)}
+        # 5% OF each range (a multiplication; dividing gave 20x the range, one bucket -- see ConstantToken).
+        opt_params_equality = {'p' + str(idx+1): (p_range[1] - p_range[0]) * p_equality_fraction for idx, p_range in enumerate(param_ranges)}
         equal_params = {'power': 0}
         equal_params.update(opt_params_equality)
         self._token_family.set_params(['v'], token_params, equal_params)

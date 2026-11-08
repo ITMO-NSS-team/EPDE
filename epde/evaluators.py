@@ -54,8 +54,18 @@ class CustomEvaluator(EvaluatorTemplate):
         self.eval_fun_params_labels = eval_fun_params_labels
         self.native_vectorized = native_vectorized
 
-    def __call__(self, factor, func_args: Dict[int, List[np.ndarray]] = None, 
+    def __call__(self, factor, func_args: Dict[int, List[np.ndarray]] = None,
                  **kwargs) -> Dict[int, np.ndarray]:
+        """The factor's values on each trajectory's interior box, flattened: :meth:`full_grid` under the
+        boundary mask."""
+        values = self.full_grid(factor, func_args)
+        gfunc_masks = global_var.samples_manager.gFunc('m')
+        return {sample_ID: value[gfunc_masks[sample_ID]].reshape(-1) for sample_ID, value in values.items()}
+
+    def full_grid(self, factor, func_args: Dict[int, List[np.ndarray]] = None) -> Dict[int, np.ndarray]:
+        """The factor's values on EVERY point of each trajectory's grid, grid-shaped (no boundary mask).
+        Default arguments are the trajectories' full coordinate grids. The weak rows
+        (``domain.evaluation_form='weak'``) integrate these values over their windows."""
         # if torch_mode: # TODO: rewrite
         #     torch_mode_explicit = True
         if not self._single_function_token and factor.label not in self._evaluation_functions_np.keys():
@@ -90,8 +100,6 @@ class CustomEvaluator(EvaluatorTemplate):
 
             new_grid = True
 
-        gfunc_masks = global_var.samples_manager.gFunc('m')
-
         if self.native_vectorized:
             # Fast path: call funcs once with the full grid arrays. The
             # built-in numpy evaluators (trig, sign, grid, inverse,
@@ -99,7 +107,7 @@ class CustomEvaluator(EvaluatorTemplate):
             # ``func_args[0].shape``. This skips an N-element
             # ``np.vectorize`` loop that on Wave (65k samples)
             # dominated evaluator self-time at ~35 s per run.
-            values = {sample_ID: funcs(*func_arg, **eval_fun_kwargs)[gfunc_masks[sample_ID]].reshape(-1)
+            values = {sample_ID: funcs(*func_arg, **eval_fun_kwargs)
                       for sample_ID, func_arg in func_args.items()}
             return values
         else:
@@ -124,7 +132,7 @@ class CustomEvaluator(EvaluatorTemplate):
                         self.indexes_vect[sample_ID][tensor_idx] = tuple([subarg[tensor_idx]
                                                                           for subarg in func_args[sample_ID]])
                 
-                values[sample_ID] = grid_function(self.indexes_vect[sample_ID])[gfunc_masks[sample_ID]].reshape(-1)
+                values[sample_ID] = grid_function(self.indexes_vect[sample_ID])
             return values
 
 

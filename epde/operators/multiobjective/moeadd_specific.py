@@ -167,6 +167,152 @@ def locate_pareto_worst(levels, weights: np.ndarray, best_obj: np.ndarray, penal
                          penalty_factor, levels.normalizer)
 
 
+# ---------------------------------------------------------------------------
+# evolution.niching='per_equation': every equation is ranked in its own
+# (discrepancy, instability) plane; nothing is summed across equations.
+# ---------------------------------------------------------------------------
+def niching_per_equation(population) -> bool:
+    """True when ``evolution.niching='per_equation'`` applies: the setting is on
+    and the systems hold more than one equation (a single-equation system keeps
+    the published MOEA/DD)."""
+    from epde.interface.search_config import active_config
+    return (active_config().evolution.niching == 'per_equation'
+            and len(population) > 0 and len(population[0].vals) > 1)
+
+
+def equation_planes(population):
+    """``(planes, labels)``. ``planes[e]`` is an array with one row per system:
+    that system's values of equation ``e``'s objectives only (``SoEq.obj_fun``
+    is grouped by objective type, then by equation). ``labels[e]`` holds each
+    system's structure of equation ``e`` -- ``check_dominance``'s own
+    (``supplementary._structure_label``): the terms, and in plain mode whether
+    the constant is in, so S and S+{1} are two structures there."""
+    from epde.optimizers.moeadd.supplementary import _structure_label
+    n_eq = len(population[0].vals)
+    keys = population[0].vals.equation_keys
+    objs = [np.asarray(system.obj_fun, dtype=float) for system in population]
+    n_types = objs[0].size // n_eq
+    planes = [np.array([obj[[t * n_eq + e for t in range(n_types)]] for obj in objs])
+              for e in range(n_eq)]
+    labels = [[_structure_label(system.vals[keys[e]]) for system in population]
+              for e in range(n_eq)]
+    return planes, labels
+
+
+def plane_levels(points, labels) -> np.ndarray:
+    """Non-domination level of every system in ONE equation's plane. Two
+    systems holding the same structure of that equation never dominate each
+    other: the same structure is the same equation (``check_dominance``)."""
+    points = np.asarray(points, dtype=float)
+    levels = np.full(len(points), -1, dtype=int)
+    remaining = list(range(len(points)))
+    level = 0
+    while remaining:
+        current = [i for i in remaining
+                   if not any(labels[j] != labels[i]
+                              and np.all(points[j] <= points[i])
+                              and np.any(points[j] < points[i])
+                              for j in remaining if j != i)]
+        for i in current:
+            levels[i] = level
+        current_set = set(current)
+        remaining = [i for i in remaining if i not in current_set]
+        level += 1
+    return levels
+
+
+def equation_front_holders(population, system_level=None) -> list:
+    """For each equation, the indices of the systems that HOLD a structure on
+    that equation's own front. One holder per structure -- the same structure
+    is the same equation -- the copy on the shallowest system level
+    (``system_level(i)``, when given), then the first in population order."""
+    planes, labels = equation_planes(population)
+    holders = []
+    for points, labs in zip(planes, labels):
+        levels = plane_levels(points, labs)
+        chosen = {}
+        for i, lab in enumerate(labs):
+            if levels[i] != 0:
+                continue
+            rank = (system_level(i) if system_level is not None else 0, i)
+            if lab not in chosen or rank < chosen[lab][0]:
+                chosen[lab] = (rank, i)
+        holders.append({i for _, i in chosen.values()})
+    return holders
+
+
+def _crowding_distances(points) -> np.ndarray:
+    """NSGA-II crowding distance of points on one front (larger = sparser)."""
+    points = np.asarray(points, dtype=float)
+    n = len(points)
+    distance = np.zeros(n)
+    if n <= 2:
+        return np.full(n, np.inf)
+    for col in range(points.shape[1]):
+        order = np.argsort(points[:, col], kind='stable')
+        span = points[order[-1], col] - points[order[0], col]
+        distance[order[0]] = distance[order[-1]] = np.inf
+        if span > 0:
+            gaps = (points[order[2:], col] - points[order[:-2], col]) / span
+            distance[order[1:-1]] += gaps
+    return distance
+
+
+def per_equation_worst(levels_obj):
+    """The system to delete under ``niching='per_equation'``.
+
+    Systems holding a structure on some equation's own front are protected.
+    Among the rest, the victim is the one whose BEST per-equation plane rank is
+    the worst (its sorted ranks compared lexicographically, then the deeper
+    system level, then the later position): a system good in one equation
+    outlives one that is mediocre everywhere, and no errors are added across
+    equations. When every system is protected, the victim holds the fewest
+    equation fronts and, among those, sits most crowded in its own plane
+    (smallest crowding distance; ties to the later position).
+    """
+    population = levels_obj.population
+    level_of = {id(system): idx for idx, level in enumerate(levels_obj.levels)
+                for system in level}
+    system_level = lambda i: level_of.get(id(population[i]), 0)          # noqa: E731
+    planes, labels = equation_planes(population)
+    ranks = np.array([plane_levels(points, labs)
+                      for points, labs in zip(planes, labels)]).T      # (systems, equations)
+    # The same structure is the same equation: in each plane only one copy of
+    # a structure -- the shallowest system, then the first -- keeps its rank.
+    # Every other copy brings nothing of its own there and ranks last, so a
+    # clone never outlives a system with an equation of its own.
+    for e, labs in enumerate(labels):
+        representative = {}
+        for i, lab in enumerate(labs):
+            key = (system_level(i), i)
+            if lab not in representative or key < representative[lab][0]:
+                representative[lab] = (key, i)
+        keep = {i for _, i in representative.values()}
+        for i in range(len(population)):
+            if i not in keep:
+                ranks[i, e] = len(population)
+    holders = equation_front_holders(population, system_level)
+    counts = [sum(i in held for held in holders) for i in range(len(population))]
+    unprotected = [i for i, count in enumerate(counts) if count == 0]
+    if unprotected:
+        _loop_stats.record('PerEqSurvival.unprotected_victim', 1, 1)
+        victim = max(unprotected,
+                     key=lambda i: (tuple(sorted(ranks[i])), system_level(i), i))
+        return population[victim]
+    _loop_stats.record('PerEqSurvival.all_protected', 1, 1)
+    fewest = min(counts)
+    tied = [i for i, count in enumerate(counts) if count == fewest]
+    crowding = {}
+    for e, held in enumerate(holders):
+        members = sorted(held)
+        distances = _crowding_distances(planes[e][members])
+        for i, dist in zip(members, distances):
+            if i in tied:
+                crowding[i] = min(crowding.get(i, np.inf), dist)
+    victim = min(tied, key=lambda i: (crowding.get(i, np.inf), -i))
+    return population[victim]
+
+
 class PopulationUpdater(CompoundOperator):
     key = 'PopulationUpdater'
 
@@ -183,6 +329,10 @@ class PopulationUpdater(CompoundOperator):
 
         # Add offspring to population and update non-dominated levels
         levels_obj.update(objective[0])
+
+        if niching_per_equation(levels_obj.population):
+            levels_obj.delete_point(per_equation_worst(levels_obj))
+            return
 
         # Sector association is computed once per update and passed into
         # the worst-finders (previously recomputed up to 3x per insertion).
@@ -418,33 +568,150 @@ def has_degenerate_equation(offspring) -> bool:
     return any(_equation_is_degenerate(eq) for eq in offspring.vals)
 
 
-def regenerate_degenerate_equations(offspring, right_part_selector, chromosome_fitness,
-                                    rps_args, fitness_args, max_passes: int = 3):
-    """Re-roll ONLY the fit-degenerate equations of ``offspring`` in place.
+class _FirstLevelCount(object):
+    """The first Pareto level of the systems placed so far, kept as each
+    system's count of placed systems dominating it (``check_dominance``):
+    level 0 is the systems with a count of 0, as in Deb's sort."""
 
-    The in-place fitness host marks an equation whose discrepancy is degenerate
-    (e.g. sparsity collapsed it to a single uncancellable term) with
-    ``LOSS_NAN_VAL`` on every objective. Rather than discard the whole system --
-    wasting its non-degenerate equations -- randomize ONLY the flagged genes,
-    re-run RPS + fitness, and repeat up to ``max_passes``. Equations still
-    degenerate after the passes keep their penalty, and the caller is expected
-    to DROP the offspring (rather than place a ``LOSS_NAN_VAL`` form). A
-    single-equation system degrades to a plain re-roll of that equation.
+    def __init__(self):
+        self.members, self.dominators = [], []
+
+    def place(self, system) -> None:
+        from epde.optimizers.moeadd.supplementary import check_dominance
+        count = 0
+        for k, other in enumerate(self.members):
+            if check_dominance(other, system):
+                count += 1
+            elif check_dominance(system, other):
+                self.dominators[k] += 1
+        self.members.append(system)
+        self.dominators.append(count)
+
+    @property
+    def size(self) -> int:
+        return sum(1 for count in self.dominators if count == 0)
+
+    def holds(self) -> bool:
+        """At most half the placed systems on the first level."""
+        return 2 * self.size <= len(self.members)
+
+
+#: Redraws :func:`regenerate_degenerate_equations` gives one equation that
+#: right-part selection DECLINED (``EqRightPartSelector._decline``) before its
+#: system is given up.
+#:
+#: The selector used to redraw such an equation itself, in place
+#: (``objective.randomize()``), up to its outer cap of 50 passes per call. It
+#: now declines, so its output is a function of its input, and this budget
+#: moves that redraw to the caller at the same size. Measured on Lorenz under
+#: the chi2 keep rule (seed 0, 5 epochs, the selector that still redrew): 12422
+#: in-place redraws over 2629 selector calls, about 4.7 per call. That puts
+#: the acceptance of one redraw at 0.18 at most. The declined equations that
+#: three plain redraw passes left unplaced (4279 of 6296) put it near 0.12. At those
+#: rates all 50 redraws of one equation fail with probability 1e-4 to 2e-3,
+#: and the mean cost is 6 to 8 redraws. Three passes, the budget before, lost
+#: 68% of the declined equations. Two of three seeds lost their initial
+#: population, and the third placed 171 offspring where the selector that
+#: redrew placed 480.
+RESAMPLE_BUDGET = 50
+
+
+def _declined_by_selection(eq) -> bool:
+    """A fit-degenerate equation that right-part selection DECLINED, as opposed
+    to a fitted one the fitness host stamped (a discrepancy over the
+    degeneracy threshold, an amplified fit, a failed solve). The decline
+    zeroes every weight (``right_part_selection._mark_unassignable``); a fit
+    the sweep accepted keeps a non-zero term weight, since the sweep declines
+    an all-zero support."""
+    weights = getattr(eq, 'weights_internal', None)
+    return (_equation_is_degenerate(eq) and weights is not None
+            and not np.any(np.asarray(weights)))
+
+
+def regenerate_degenerate_equations(offspring, right_part_selector, chromosome_fitness,
+                                    rps_args, fitness_args, max_passes: int = 3,
+                                    budget: int = None) -> bool:
+    """Redraw ONLY the fit-degenerate equations of ``offspring`` in place;
+    True when none is left.
+
+    A degenerate equation carries ``LOSS_NAN_VAL`` on every objective. Rather
+    than discard the whole system -- wasting its healthy equations -- each one
+    is redrawn (``randomize``), the system is selected and scored again, and
+    this repeats until no equation is degenerate or a budget runs out:
+
+    * an equation right-part selection DECLINED (:func:`_declined_by_selection`;
+      in ``'repair'`` mode, where the selector used to redraw it in place) gets
+      up to ``budget`` redraws, :data:`RESAMPLE_BUDGET` by default;
+    * any other degenerate equation -- a fit the fitness host stamped, or in
+      ``'assignment'`` / ``'plain'`` mode an equation the system-level choice
+      left unassigned -- shares ``max_passes`` redraw passes, as before.
+
+    Either budget running out loses the system, whatever the other equations
+    do, and nothing more is redrawn. With ``max_passes=0`` (the
+    single-objective search) a stamped fit therefore gives the system up
+    before any redraw, a declined equation beside it included: the fit is
+    kept, so its stamp stands whatever the redraws give.
+
+    The redraw is selected inside ``resample_scope``: the equations still
+    fitted keep their fits, so a pass fits only the redrawn equations. The
+    chromosome fitness then scores the system as it always does. With every
+    other equation scored, a redraw declined again is not scored at all. A
+    solver host does not solve a system that holds a declined equation.
+
+    Equations still degenerate when a budget runs out keep their stamp, and
+    the caller is expected to DROP the offspring (rather than place a
+    ``LOSS_NAN_VAL`` form) or, in the initial population, draw a new system. A
+    system with no degenerate equation is returned untouched -- no draw, no
+    selection, no scoring. A single-equation system degrades to a plain
+    redraw of that equation.
 
     Shared by ``OffspringUpdater`` and ``InitialParetoLevelSorting`` so the
     initial population is held to the same no-degenerate-forms contract as the
-    per-epoch offspring.
+    per-epoch offspring, and by the single-objective search
+    (``so_specific.ResamplingRightPartSelector``).
     """
-    for _ in range(max_passes):
-        degenerate = [eq for eq in offspring.vals if _equation_is_degenerate(eq)]
+    from epde.interface.search_config import active_config
+    from epde.operators.common.right_part_selection import resample_scope
+    if budget is None:
+        budget = RESAMPLE_BUDGET
+    repair = active_config().search_space.system_rps_mode == 'repair'
+    redraws = {}        # equation position -> redraws its declines used
+    passes = 0          # passes spent on the other degenerate equations
+    while True:
+        equations = list(offspring.vals)
+        degenerate = [i for i, eq in enumerate(equations) if _equation_is_degenerate(eq)]
         if not degenerate:
-            return
-        for eq in degenerate:
+            break
+        declined = {i for i in degenerate if repair and _declined_by_selection(equations[i])}
+        # One equation out of redraws loses the system, whatever the others do.
+        if any(redraws.get(i, 0) >= budget for i in declined):
+            break
+        if len(declined) < len(degenerate):
+            if passes >= max_passes:
+                break
+            passes += 1
+        for i in degenerate:
             # ``randomize`` rebuilds through ``__init__``, which resets.
-            eq.randomize()
+            equations[i].randomize()
+            if i in declined:
+                redraws[i] = redraws.get(i, 0) + 1
         offspring.reset_moeadd_state()
-        right_part_selector.apply(objective=offspring, arguments=rps_args)
+        with resample_scope():
+            right_part_selector.apply(objective=offspring, arguments=rps_args)
         chromosome_fitness.apply(objective=offspring, arguments=fitness_args)
+
+    left = {i for i, eq in enumerate(offspring.vals) if _equation_is_degenerate(eq)}
+    for i, used in redraws.items():
+        _loop_stats.record('regenerate_degenerate_equations.redraws', used, budget)
+    if passes:
+        _loop_stats.record('regenerate_degenerate_equations.passes', passes, max_passes)
+    # Every system that came in degenerate records its outcome, one given up
+    # before any redraw too: with nothing spent, ``left`` is empty unless the
+    # system came in degenerate.
+    if redraws or passes or left:
+        _loop_stats.record('regenerate_degenerate_equations.'
+                           + ('exhausted' if left else 'resampled'), 1, 1)
+    return not left
 
 
 def _rps_fitness_regenerate(candidate, right_part_selector, chromosome_fitness,
@@ -479,6 +746,14 @@ class OffspringUpdater(CompoundOperator):
     key = 'ParetoLevelUpdater'
 
     def apply(self, objective: ParetoLevels, arguments: dict):
+        # The system right-part selector in ``system_rps_mode='assignment'``
+        # skips the variants this population has already seen; 'repair' mode
+        # does not read the history.
+        from epde.operators.common.right_part_selection import system_history
+        with system_history(objective.history):
+            return self._update(objective, arguments)
+
+    def _update(self, objective: ParetoLevels, arguments: dict):
         self_args, subop_args = self.parse_suboperator_args(arguments=arguments)
 
         while objective.unplaced_candidates:
@@ -517,20 +792,25 @@ class OffspringUpdater(CompoundOperator):
                 # from the post-mutation objectives.
                 temp_offspring.reset_moeadd_state()
                 # SoEqRightPartSelector resolves system degeneracy inline
-                # (no two equations may share an identical active
-                # structure), so no post-hoc ``enforce_rps_uniqueness``
-                # retry loop is needed here.
+                # (no equation carries another's target as a standalone term,
+                # and no two equations share an identical active structure),
+                # so no post-hoc ``enforce_rps_uniqueness`` retry loop is
+                # needed here.
                 self.suboperators['right_part_selector'].apply(objective=temp_offspring,
                                                                arguments=subop_args['right_part_selector'])
 
                 system = temp_offspring.equations_labels
+                if system in objective.history and self._swap_arrangement(temp_offspring, objective,
+                                                                          subop_args):
+                    break
                 if system not in objective.history:
                     self.suboperators['chromosome_fitness'].apply(objective=temp_offspring,
                                                                   arguments=subop_args['chromosome_fitness'])
-                    # Re-roll ONLY the equations the fitness host flagged
-                    # fit-degenerate (sparsity collapsed them to LOSS_NAN_VAL),
-                    # leaving the system's good equations intact -- a single bad
-                    # gene no longer dominates the whole offspring out.
+                    # Redraw ONLY the fit-degenerate equations (declined by
+                    # right-part selection or stamped by the fitness host),
+                    # each within its budget, leaving the system's good
+                    # equations and their fits intact -- a single bad gene no
+                    # longer dominates the whole offspring out.
                     regenerate_degenerate_equations(
                         temp_offspring,
                         self.suboperators['right_part_selector'],
@@ -540,7 +820,7 @@ class OffspringUpdater(CompoundOperator):
                     # The pre-fit check above already keyed the PRUNED active
                     # structure -- ``right_part_selector`` fits and prunes, and
                     # the fitness host changes neither. What can still move the
-                    # label is ``regenerate_degenerate_equations``: it rerolls
+                    # label is ``regenerate_degenerate_equations``: it redraws
                     # the degenerate genes and re-runs RPS on them. Re-check, so
                     # a duplicate active form is never placed twice (the
                     # repeated-objective leak). An offspring still degenerate
@@ -554,11 +834,13 @@ class OffspringUpdater(CompoundOperator):
                         objective.history.add(final_label)
                         if global_var.verbose.candidate_objectives:
                             print(temp_offspring.obj_fun)
+                        self._place_siblings(temp_offspring, objective, subop_args)
                         break
                     # Duplicate active form or unrecoverable degenerate: record
                     # the active label so an identical pruned candidate
                     # short-circuits, then keep searching for a novel one.
                     objective.history.add(final_label)
+                self._place_siblings(temp_offspring, objective, subop_args)
                 if replaced == offspring_attempt_limit:
                     hit_offspring_cap = True
                     if global_var.verbose.candidate_objectives:
@@ -579,18 +861,76 @@ class OffspringUpdater(CompoundOperator):
             )
         return objective
 
+    def _place_siblings(self, offspring, objective, subop_args) -> None:
+        """system_rps_mode='plain': the S+{1} versions of ``offspring`` that its
+        fit could not rank against S enter the population too -- each one not
+        yet in the history and not degenerate, through the same level updater.
+        Nothing is handed over in any other mode."""
+        from epde.operators.common.plain_fit import take_siblings
+        for sibling in take_siblings(offspring):
+            label = sibling.equations_labels
+            if label in objective.history or has_degenerate_equation(sibling):
+                continue
+            sibling.reset_moeadd_state()
+            self.suboperators['pareto_level_updater'].apply(objective=(sibling, objective),
+                                                            arguments=subop_args['pareto_level_updater'])
+            objective.history.add(label)
+
+    def _swap_arrangement(self, offspring, objective, subop_args) -> bool:
+        """system_rps_mode='plain': one arrangement per structure (USER, Oct 23
+        2026). An offspring whose structures a population member already holds,
+        solved for other targets, replaces that member when its own objectives
+        dominate the member's -- compared value by value, since
+        ``check_dominance`` never compares the same structure. True when it did;
+        otherwise the offspring is a duplicate, as any candidate in the history.
+
+        MOEA/DD re-derives the levels (``delete_point``, ``update``); NSGA-II
+        swaps the member in its population, which it sorts once per generation."""
+        from epde.interface.search_config import active_config
+        config = active_config()
+        if config.search_space.system_rps_mode != 'plain':
+            return False
+        label = offspring.equations_labels
+        incumbent = next((member for member in objective.population
+                          if member.equations_labels == label), None)
+        if incumbent is None or incumbent.targets_labels == offspring.targets_labels:
+            return False
+        self.suboperators['chromosome_fitness'].apply(objective=offspring,
+                                                      arguments=subop_args['chromosome_fitness'])
+        if has_degenerate_equation(offspring) or offspring.equations_labels != label:
+            return False
+        new, old = np.asarray(offspring.obj_fun, dtype=float), np.asarray(incumbent.obj_fun, dtype=float)
+        if not (new.shape == old.shape and np.all(new <= old) and np.any(new < old)):
+            _loop_stats.record('OffspringUpdater.arrangement_kept', 1, 1)
+            return False
+        _loop_stats.record('OffspringUpdater.arrangement_swapped', 1, 1)
+        offspring.reset_moeadd_state()
+        if config.evolution.engine == 'nsga2':
+            objective.population = [offspring if member is incumbent else member
+                                    for member in objective.population]
+            objective.levels = [[offspring if member is incumbent else member for member in level]
+                                for level in objective.levels]
+        else:
+            objective.delete_point(incumbent)
+            objective.update(offspring)
+        return True
+
 def get_pareto_levels_updater(right_part_selector : CompoundOperator, chromosome_fitness : CompoundOperator,
                               sparsity : CompoundOperator,
-                              mutation : CompoundOperator = None, constrained : bool = False, 
-                              mutation_params : dict = {}, pl_updater_params : dict = {}, 
-                              combiner_params : dict = {}):
+                              mutation : CompoundOperator = None, constrained : bool = False,
+                              mutation_params : dict = {}, pl_updater_params : dict = {},
+                              combiner_params : dict = {}, pl_updater : CompoundOperator = None):
+    """``pl_updater`` replaces the level updater MOEA/DD's survival uses
+    (``PopulationUpdater``), e.g. with ``evolution.engine='nsga2'``'s
+    ``AppendUpdater``; None builds the default."""
     add_kwarg_to_updater = partial(add_base_param_to_operator, target_dict = combiner_params)
     updater = OffspringUpdater()
     add_kwarg_to_updater(operator = updater)
-    
+
     if mutation is None:
         mutation = get_basic_mutation(mutation_params)
-    pl_updater = get_basic_populator_updater(pl_updater_params)
+    if pl_updater is None:
+        pl_updater = get_basic_populator_updater(pl_updater_params)
     updater.set_suboperators(operators = {'chromosome_mutation' : mutation,
                                           'pareto_level_updater' : pl_updater,
                                           # Dormant hook retained for the legacy
@@ -603,9 +943,31 @@ def get_pareto_levels_updater(right_part_selector : CompoundOperator, chromosome
     return updater
 
 class InitialParetoLevelSorting(CompoundOperator):
-    key = 'InitialParetoLevelSorting'  
-    
+    key = 'InitialParetoLevelSorting'
+
     def apply(self, objective : ParetoLevels, arguments : dict):
+        # See OffspringUpdater.apply: the history is read only by the
+        # 'assignment' system right-part selector. A new initial population
+        # never inherits the previous fit's mating sector (variant_pick='sector').
+        from epde.operators.common.right_part_selection import system_history, set_mating_sector
+        if len(objective.population) == 0:
+            set_mating_sector(None)
+        with system_history(objective.history):
+            return self._sort(objective, arguments)
+
+    @staticmethod
+    def _grow_if_crowded(objective, idx, candidate, first_level, extension, pool_exhausted) -> None:
+        """Past the last slot, while more than half the placed systems are on
+        the first Pareto level and new systems can still be drawn, one more
+        slot: a fresh random system (``SoEq.create``), drawn like any other."""
+        if idx != len(objective.unplaced_candidates) - 1 or pool_exhausted or first_level.holds():
+            return
+        extra = copy.deepcopy(candidate)
+        extra.create()
+        objective.unplaced_candidates.append(extra)
+        extension.add(id(extra))
+
+    def _sort(self, objective : ParetoLevels, arguments : dict):
         '''
         Initial sorting of the candidates in pareto levels. 
 
@@ -639,12 +1001,41 @@ class InitialParetoLevelSorting(CompoundOperator):
             # slot) still stops the search.
             pool_exhausted = False
             init_collapsed = False
+            # population_size='auto' (``ParetoLevels.population_floor`` set): once
+            # at least that many systems are placed, the first slot that finds no
+            # new one within the attempt limit ends the population instead -- it is
+            # as large as the pool's distinct systems allow, up to the ceiling.
+            floor = getattr(objective, 'population_floor', None)
+            cut_at = None
             rps_op = self.suboperators['right_part_selector']
             fitness_op = self.suboperators['chromosome_fitness']
             rps_args = subop_args['right_part_selector']
             fitness_args = subop_args['chromosome_fitness']
+            # At most half the initial population on the first Pareto level,
+            # whatever the size asked for: past the last slot, fresh systems are
+            # drawn while more than half are non-dominated (``extension``), and
+            # an extension slot that finds no new system is dropped.
+            requested = len(objective.unplaced_candidates)
+            first_level = _FirstLevelCount()
+            extension = set()
+            # system_rps_mode='plain': a placed system's S+{1} versions that its
+            # fit could not rank against S (``plain_fit.take_siblings``) take the
+            # next slots, already fitted.
+            from epde.operators.common.plain_fit import take_siblings
+            fitted_siblings = set()
 
             for idx, candidate in enumerate(objective.unplaced_candidates):
+                if pool_exhausted and floor is not None and idx >= floor:
+                    # population_size='auto' whose pool ran dry below the floor:
+                    # duplicates fill the slots up to the floor, not to the ceiling.
+                    cut_at = idx
+                    break
+                if id(candidate) in fitted_siblings:
+                    objective.history.add(candidate.equations_labels)
+                    first_level.place(candidate)
+                    self._grow_if_crowded(objective, idx, candidate, first_level, extension,
+                                          pool_exhausted)
+                    continue
                 attempts = 0
                 hit_cap = False
                 while True:
@@ -674,6 +1065,10 @@ class InitialParetoLevelSorting(CompoundOperator):
                     degenerate = scored and has_degenerate_equation(candidate)
                     if not (degenerate or (duplicate and not pool_exhausted)):
                         break
+                    if attempts >= uniqueness_attempt_limit and (
+                            id(candidate) in extension or (floor is not None and idx >= floor)):
+                        cut_at = idx
+                        break
                     if attempts >= uniqueness_attempt_limit:
                         if not scored:
                             # This slot is about to be FILLED with the
@@ -695,6 +1090,10 @@ class InitialParetoLevelSorting(CompoundOperator):
                         break
                     attempts += 1
                     candidate.create()
+                if cut_at is not None:
+                    _loop_stats.record('InitialParetoLevelSorting.unique_candidate.CUT',
+                                       attempts, uniqueness_attempt_limit)
+                    break
                 system = candidate.equations_labels
                 _loop_stats.record(
                     'InitialParetoLevelSorting.unique_candidate' + ('.FAIL' if hit_cap else ''),
@@ -703,8 +1102,9 @@ class InitialParetoLevelSorting(CompoundOperator):
                 if hit_cap:
                     # Search-space collapse: every one of
                     # ``uniqueness_attempt_limit`` consecutive create() outputs
-                    # stayed fit-degenerate even after regeneration, so this slot
-                    # has no valid (non-LOSS_NAN_VAL) form to seed. (Duplicates
+                    # stayed fit-degenerate even after regeneration (each
+                    # declined equation redrawn up to RESAMPLE_BUDGET times),
+                    # so this slot has no valid (non-LOSS_NAN_VAL) form to seed. (Duplicates
                     # do NOT trigger this -- they are filled, see pool_exhausted.)
                     # Diagnostic builds want to observe the partial population's
                     # objective values rather than abort. Policy:
@@ -735,13 +1135,53 @@ class InitialParetoLevelSorting(CompoundOperator):
                 # Fitness already computed inside the uniqueness/degeneracy loop;
                 # ``system`` is the placed candidate's active structure.
                 objective.history.add(system)
+                first_level.place(candidate)
                 if global_var.verbose.candidate_objectives:
                     print(candidate.obj_fun)
+                inserted = 0
+                for sibling in take_siblings(candidate):
+                    if (sibling.equations_labels in objective.history
+                            or has_degenerate_equation(sibling)):
+                        continue
+                    inserted += 1
+                    objective.unplaced_candidates.insert(idx + inserted, sibling)
+                    fitted_siblings.add(id(sibling))
+                    # The sibling takes a slot a fresh draw would have had: the
+                    # last one still waiting, if there is one.
+                    waiting = [j for j in range(idx + inserted + 1, len(objective.unplaced_candidates))
+                               if id(objective.unplaced_candidates[j]) not in fitted_siblings]
+                    if waiting:
+                        del objective.unplaced_candidates[waiting[-1]]
+                self._grow_if_crowded(objective, idx, candidate, first_level, extension,
+                                      pool_exhausted)
             if init_collapsed:
                 if global_var.verbose.show_iter_idx:
                     print(f'\n*** Search-space collapse: stopping early with '
                           f'{len(objective.levels[0])} placed candidates. ***')
                 return
+            if cut_at is not None:
+                allowed = len(objective.unplaced_candidates)
+                objective.unplaced_candidates = list(objective.unplaced_candidates[:cut_at])
+                # Below the floor a dry pool fills slots with duplicates, so the
+                # slots are not all distinct systems: say how many are.
+                distinct = len({c.equations_labels for c in objective.unplaced_candidates})
+                print(f'Population size: {cut_at} systems, {distinct} distinct (the pool yields no '
+                      f'further one in {uniqueness_attempt_limit} attempts; up to {allowed} allowed).')
+            final = len(objective.unplaced_candidates)
+            if final != requested:
+                # One weight vector per member: the optimizer adopts the resized
+                # weights after this call (MOEADDOptimizer._sync_weights).
+                objective.resize_weights(final)
+            if extension and first_level.holds():
+                warnings.warn(
+                    f'Initial population extended from {requested} to {final} systems so that at '
+                    f'most half are on the first Pareto level ({first_level.size} of {final}).',
+                    global_var.EPDEUsageWarning)
+            elif not first_level.holds():
+                warnings.warn(
+                    f'Initial population: {first_level.size} of {final} systems are on the first '
+                    'Pareto level, more than half, and the pool yields no further system.',
+                    global_var.EPDEUsageWarning)
             if global_var.verbose.show_iter_idx:
                 print('\n========== Marriage (weight assignment) ==========')
             objective.associate_weights()
@@ -781,21 +1221,26 @@ def has_subset_pair(collection_of_sets):
 
 def _debug_assert_rps_unique(objective) -> list:
     """Debug helper: scan an SoEq's equations pairwise and return a
-    per-equation list of bools flagging equations whose ACTIVE structure
+    per-equation list of bools flagging the two states that
+    ``SoEqRightPartSelector`` resolves during RPS dispatch: an equation
+    carrying another equation's target as a whole, standalone term
+    (``_carries_target_of``), and an equation whose ACTIVE structure
     (target + nonzero-weight terms, ``Equation.active_terms_labels``)
-    coincides with an EARLIER equation's -- i.e. the system carries the
-    same law twice (rearranged), the degenerate state that
-    ``SoEqRightPartSelector`` resolves during RPS dispatch.
+    coincides with an EARLIER equation's -- the same law twice, rearranged.
 
-    Cross-equation term sharing is NOT flagged: an equation for ``v``
-    keeping ``du/dx0`` as a coupling term is legitimate. A correctly-
-    implemented pipeline must produce an all-False result here. Use this
-    in tests or temporary asserts to catch regressions; do NOT wire it
-    back into the operator graph as a repair step.
+    Other cross-equation sharing is NOT flagged: a common coupling term, or
+    another equation's target as a FACTOR of a product (``v*dv/dx0`` in the
+    u-equation), is legitimate. A correctly-implemented pipeline must produce
+    an all-False result here. Use this in tests or temporary asserts to catch
+    regressions; do NOT wire it back into the operator graph as a repair step.
     """
+    # Local import: right_part_selection sits above this module's imports.
+    from epde.operators.common.right_part_selection import _carries_target_of
     equations = list(objective.vals)
     sigs = [eq.active_terms_labels for eq in equations]
-    flagged = [False] * len(equations)
+    flagged = [any(_carries_target_of(owner, carrier)
+                   for owner in equations if owner is not carrier)
+               for carrier in equations]
 
     for eq_idx in range(1, len(equations)):
         for other_idx in range(eq_idx):
@@ -807,8 +1252,9 @@ def _debug_assert_rps_unique(objective) -> list:
 
 def is_rps_in_other_equation(objective):
     """Deprecated alias. The post-hoc uniqueness repair has been replaced
-    by ``SoEqRightPartSelector`` (system-degeneracy resolution: no two
-    equations may share an identical active structure), so this is now a
+    by ``SoEqRightPartSelector`` (system-degeneracy resolution: no equation
+    carries another's target as a standalone term, and no two equations share
+    an identical active structure), so this is now a
     pure assertion helper that returns a per-equation flag list without
     mutating anything. External callers should migrate to using the new
     operator and remove their ``while any(is_rps_in_other_equation(...))``

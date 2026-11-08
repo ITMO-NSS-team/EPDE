@@ -366,10 +366,21 @@ class Discrepancy(EquationObjective):
         self.error_metric = error_metric
         self.penalty_coeff = penalty_coeff
 
+    #: The solver-free options whose in-place compute reads the wide
+    #: ``evaluate()`` (every term, memoised). ``'l2'`` reads the active terms
+    #: only, unmemoised, so the fillers after it evaluate the zero-weight terms.
+    WIDE_EVALUATE = ('wape', 'l2_relative', 'scale_invariant')
+
     def _resolved_metric(self) -> str:
         """Instance override if wired, else the search-level configuration."""
         return (self.metric if self.metric is not None
                 else active_config().objectives.discrepancy_metric)
+
+    def reads_wide_evaluate(self) -> bool:
+        """The in-place compute fills the evaluate() memo the other fillers
+        read (``SolverFreeFitness._stamp_first`` takes its verdict early only
+        then)."""
+        return self._resolved_metric() in self.WIDE_EVALUATE
 
     def is_degenerate(self, equation) -> bool:
         if self._resolved_metric() == 'l2':
@@ -576,25 +587,26 @@ class Instability(EquationObjective):
     ``active_config().objectives.instability_metric``:
 
     * ``'vcoef'``: fast path sums the per-term ``_cached_vc_score`` the
-      sparsity step wrote on the converged mask (``VWSRSparsity`` and
-      ``KneeSparsity`` both write it); fallback (no cache, e.g. the LASSO
+      sparsity step wrote on the converged mask (``VWSRSparsity`` writes it,
+      and so do the assignment and plain modes' subset fits through
+      ``subset_selection.store_fit``); fallback (no cache, e.g. the LASSO
       path) is ``vc_stability_total_lr``.
     * ``'cv'``: axis-aligned sliding-window CV -- the cached window stack
       (``_cached_sw_weights``) or ``calculate_weights``, reduced by
       ``cv_scores``.
-    * ``'survival'`` / ``'tile'`` / ``'het'`` / ``'het_raw'`` / ``'chi2'``
-      / ``'chi2_centered'``: the basis-free estimators of
+    * ``'survival'`` / ``'tile'`` / ``'dyad'`` / ``'het'`` / ``'het_raw'``
+      / ``'chi2'`` / ``'chi2_centered'``: the basis-free estimators of
       ``epde.operators.common.survival`` (``'chi2'``, per-term
       Nyblom-Hansen cumulative-score-path constancy, is the DEFAULT),
       memoized per equation as
       ``_cached_alt_instability = (metric, fit_intercept, value)``.
 
     The SAME estimator scales the sparsity keep-rule's L1 threshold
-    (``sparsity.instability_scores``) for all eight metrics -- one statistic,
+    (``sparsity.instability_scores``) for all nine metrics -- one statistic,
     both sides. ``gram_mode`` only decides which Gram setup the keep-rule
-    builds (``vcoef`` / ``cv``; none for the basis-free six).
+    builds (``vcoef`` / ``cv``; none for the basis-free seven).
 
-    THE REGULARIZED-INTERCEPT RULE, for all eight: the objective charges the
+    THE REGULARIZED-INTERCEPT RULE, for all nine: the objective charges the
     intercept its own instability score iff the intercept survived
     regularization (``weights_internal[-1] != 0``) and charges nothing for it
     once the sparsity step drove it to zero. The keep-rule scores and prunes

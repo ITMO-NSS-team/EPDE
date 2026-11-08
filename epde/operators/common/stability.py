@@ -469,13 +469,17 @@ def _cached_primary_var_names() -> list:
     return out
 
 
-def _vc_cache_key(grid_shape, main_var, sample_key):
+def _vc_cache_key(grid_shape, main_var, sample_key, lattice=None):
     """``vc_modes_cache`` key of one basis resolution. The trajectory is part
     of it: the resolution reads THAT trajectory's field, and without the key
     the first same-shape trajectory resolved fixed ``K`` for all of them, so
-    vcoef's value depended on trajectory order."""
-    return (tuple(int(n) for n in grid_shape), main_var,
-            0 if sample_key is None else sample_key, 'vc')
+    vcoef's value depended on trajectory order.
+
+    ``lattice``: ``(stride, box_shape)`` under a row budget. The lattice
+    shape alone does not identify the field -- every long record thins to
+    about the same row count -- so the key names the box it was taken from."""
+    return ((tuple(int(n) for n in grid_shape), main_var, 0 if sample_key is None else sample_key)
+            + (() if lattice is None else (lattice,)) + ('vc',))
 
 
 def resolve_vc_modes_from_input(grid_shape, main_var=None, sample_key: int = 0,
@@ -499,7 +503,16 @@ def resolve_vc_modes_from_input(grid_shape, main_var=None, sample_key: int = 0,
     """
     import epde.globals as _gv
     sample_key = 0 if sample_key is None else sample_key
-    key = _vc_cache_key(grid_shape, main_var, sample_key)
+    # Under a row budget the cached field is a lattice of the box: np.gradient
+    # on it would be a coarser scheme. The microscale is taken from the whole
+    # box, as without the budget, and expressed in lattice steps.
+    try:
+        domain = _gv.samples_manager[sample_key]._domain
+        stride = domain.evaluation_stride
+    except Exception:
+        stride = None
+    lattice = None if stride is None else (stride, tuple(int(n) for n in domain.box_shape))
+    key = _vc_cache_key(grid_shape, main_var, sample_key, lattice)
     cache = getattr(_gv, 'vc_modes_cache', None)
     if cache is None:
         return None
@@ -519,12 +532,18 @@ def resolve_vc_modes_from_input(grid_shape, main_var=None, sample_key: int = 0,
     for var in var_names:
         try:
             # raise RuntimeError('FIX FURTHER CODE!!!')
-            temp = _gv.samples_manager.get((var, (1.0,)), 0) # , sample_key=sample_key
-            field = temp[sample_key]
+            if stride is None:
+                temp = _gv.samples_manager.get((var, (1.0,)), 0) # , sample_key=sample_key
+                field, shape = temp[sample_key], grid_shape
+            else:
+                field = _gv.samples_manager.box_field(var, sample_key)
+                shape = tuple(int(n) for n in domain.box_shape)
         except Exception:
             continue
         for d in range(D):
-            lam = taylor_microscale(field, grid_shape, d) # , sample_key=sample_key
+            lam = taylor_microscale(field, shape, d) # , sample_key=sample_key
+            if stride is not None:
+                lam = lam / stride[d]
             if lam < lam_min[d]:
                 lam_min[d] = lam
     if all(not np.isfinite(l) for l in lam_min):
@@ -571,7 +590,7 @@ def _warn_vc_fallback(grid_shape, main_var, sample_key, modes):
 
 class VaryingCoefSetup:
     """Varying-coefficient stability estimator -- the ``'vcoef'`` instability
-    metric (``gram_mode='vcoef'``; opt-in, the default ``'chi2'`` builds no
+    metric (``gram_mode='vcoef'``; opt-in, the default ``'dyad'`` builds no
     Gram), alternative to the axis-aligned ``GramSetup`` (``'cv'``,
     ``gram_mode='axis'``).
 

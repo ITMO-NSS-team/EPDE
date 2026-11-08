@@ -11,12 +11,13 @@ The contract around them:
   site in ``ParetoLevelsCrossover`` resets wholesale. Pinned in
   ``test_solver_discrepancy_scale.py``;
 * **``weights_internal_evald`` goes up only inside right-part selection.** The
-  three sparsity operators are reachable only as ``EqRightPartSelector``
-  suboperators;
+  two sparsity operators are reachable only as ``EqRightPartSelector``
+  suboperators, and ``subset_selection.store_fit`` -- the assignment and
+  plain modes' writer -- only from ``right_part_selection``;
 * **``weights_final_evald`` has exactly ONE author**, the coefficient
   calculation -- whether it refits (legacy LASSO, whose support decision came
-  from a min-max-rescaled fit) or promotes ``weights_internal`` (VWSR, Knee,
-  which already fit on the physical scale);
+  from a min-max-rescaled fit) or promotes ``weights_internal`` (VWSR and the
+  subset fits, which already fit on the physical scale);
 * **fitness requires the fitted magnitudes**, not merely the support decision,
   because every filler reads ``weights_final`` through ``Equation.residual``.
 
@@ -34,19 +35,20 @@ import pytest
 
 from epde.operators.common.coeff_calculation import LinRegBasedCoeffsEquation
 from epde.operators.common.sparsity import LASSOSparsity, VWSRSparsity
-from epde.operators.common.subset_selection import KneeSparsity
 from epde.structure.main_structures import (Equation, _EQ_CACHE_FIELDS,
-                                            _EQ_STATE_GROUPS,
+                                            _EQ_GENOTYPE_SLOTS, _EQ_STATE_GROUPS,
                                             _EQ_STATE_GROUP_SLOTS)
 
 
 #: Slots that are the equation's identity or its inputs, not derived state, so
 #: no reset may touch them. Everything else must belong to a state group or a
-#: cache -- that is the whole point of TestStateRegistrySync.
+#: cache -- that is the whole point of TestStateRegistrySync. The genotype
+#: slots (``_EQ_GENOTYPE_SLOTS``, e.g. plain mode's target gene) are carried
+#: across resets on purpose.
 _NOT_DERIVED_STATE = frozenset({
     '_history', 'structure', 'interelement_operator', 'n_immutable', 'pool',
     'metaparameters', 'main_var_to_explain',
-})
+}) | frozenset(_EQ_GENOTYPE_SLOTS)
 
 
 def _fitted_equation(n_terms=3, target_pos=2):
@@ -253,8 +255,7 @@ class TestSparsityCachePreservation:
 class TestCoeffCalcOwnsFinalWeights:
 
     @pytest.mark.parametrize('cls, physical', [(LASSOSparsity, False),
-                                               (VWSRSparsity, True),
-                                               (KneeSparsity, True)])
+                                               (VWSRSparsity, True)])
     def test_each_operator_declares_the_scale_it_fits_on(self, cls, physical):
         """The declaration is what ``LinRegBasedCoeffsEquation`` reads to
         choose between refitting and promoting."""
@@ -264,7 +265,7 @@ class TestCoeffCalcOwnsFinalWeights:
         """Overriding it from ``sparsity_kwargs`` would run the legacy min-max
         refit over physical coefficients, or skip it where LASSO needs it."""
         from epde.interface.search_config import sparsity_settings
-        for cls in (LASSOSparsity, VWSRSparsity, KneeSparsity):
+        for cls in (LASSOSparsity, VWSRSparsity):
             assert 'fits_physical_scale' not in sparsity_settings(cls)
 
     def test_the_selector_pushes_the_declaration_onto_coeff_calc(self):

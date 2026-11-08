@@ -1,8 +1,10 @@
+import warnings
+
 import numpy as np
 import torch
 from collections import OrderedDict
 
-from typing import Callable, Tuple, List, Union, Literal, Dict
+from typing import Callable, Tuple, List, Union, Literal, Dict, Optional
 from functools import singledispatchmethod, singledispatch
 
 from epde.cache.cache_refactored import Cache, prepareVarTensor, uploadSimpleTokens, uploadGrids
@@ -12,7 +14,7 @@ from epde.preprocessing.domain_pruning import DomainPruner
 from epde.supplementary import define_derivatives
 from epde.evaluators import simple_function_evaluator # , trigonometric_evaluator
 
-from epde.interface.prepared_tokens import DataPolynomials, CustomTokens
+from epde.interface.prepared_tokens import DataPolynomials, CustomTokens, ExternalDerivativesTokens
 from epde.interface.type_checks import *
 from epde.interface.token_family import TFPool, TokenFamily
 
@@ -21,6 +23,61 @@ from epde.preprocessing.preprocessor import ConcretePrepBuilder, PreprocessingPi
 
 RELATIVE_BC_LOC_DIR = {0: (), 1: (0.,), 2: (0., 1.),
                        3: (0., 0., 1.), 4: (0., 0., 1., 1.)}
+
+#: An evaluation stride never thins an axis below this many levels (or below
+#: its whole box, when the box is shorter): the dyad, tile and chi2 partitions
+#: need at least three levels along an axis.
+LATTICE_MIN_LEN = 3
+
+
+def _lattice_len(box_len: int, stride: int) -> int:
+    """Levels a stride keeps of a box: ``len(range(0, box_len, stride))``."""
+    return -(-int(box_len) // int(stride))
+
+
+def _is_positive_int(value) -> bool:
+    return isinstance(value, (int, np.integer)) and not isinstance(value, bool) and value >= 1
+
+
+def resolve_evaluation_stride(shape, boundary_per_axis, stride=None) -> Union[None, Tuple[int, ...]]:
+    """The per-axis evaluation strides, or ``None`` for every interior point.
+
+    The interior box of a grid of ``shape`` with ``boundary_per_axis`` cut off
+    each end keeps, along axis ``i``, the points ``b_i, b_i + k_i, ...`` below
+    ``n_i - b_i``: ``ceil((n_i - 2 b_i) / k_i)`` levels. No axis goes below
+    ``min(box_i, LATTICE_MIN_LEN)`` levels.
+
+    ``stride``: the strides as given (an int strides every axis); each axis is
+    thinned only by its own stride, so time and space are never traded against
+    each other. Derivatives come from the full grid, so a stride drops rows and
+    never coarsens a stencil. A result of all ones is ``None``.
+    """
+    shape = tuple(int(n) for n in shape)
+    bnd = tuple(int(b) for b in boundary_per_axis)
+    if len(bnd) != len(shape):
+        raise ValueError(f'{len(bnd)} boundary widths for a {len(shape)}-axis grid.')
+    box = tuple(n - 2 * b for n, b in zip(shape, bnd))
+    floor = tuple(min(n, LATTICE_MIN_LEN) for n in box)
+    if stride is None:
+        return None
+    strides = tuple(stride) if isinstance(stride, (list, tuple)) else (stride,) * len(box)
+    if len(strides) != len(box) or not all(_is_positive_int(k) for k in strides):
+        raise ValueError(f'evaluation_stride must be a positive integer or {len(box)} of '
+                         f'them (one per axis), instead got {stride!r}.')
+    strides = tuple(int(k) for k in strides)
+    short = [axis for axis, (n, k) in enumerate(zip(box, strides))
+             if _lattice_len(n, k) < floor[axis]]
+    if short:
+        raise ValueError(
+            f'evaluation_stride {strides} keeps fewer than {LATTICE_MIN_LEN} levels along '
+            f'axes {short} of the interior box {box}.')
+    return None if all(k == 1 for k in strides) else strides
+
+
+def _lattice_slices(shape, boundary_per_axis, stride) -> tuple:
+    """Full-grid slices of the kept points: ``b_i : n_i - b_i : k_i`` per axis."""
+    return tuple(slice(int(b), int(n) - int(b), int(k))
+                 for n, b, k in zip(shape, boundary_per_axis, stride))
 
 # class Subdomain(object):
 #     def __init__(self, grid: Union[np.ndarray, List[np.ndarray]]):
@@ -266,17 +323,35 @@ class Domain(object): # inheritance from cache objects?
                  grid_cache: Cache,
                  time_axis: int = 0,
                  ID: int = 0,
-                 boundary: Union[int, List[int], Tuple[int]] = 0):
+                 boundary: Union[int, List[int], Tuple[int]] = 0,
+                 evaluation_stride: Union[None, int, List[int], Tuple[int]] = None):
+        """``evaluation_stride``: the opt-in per-axis row budget (see
+        :func:`resolve_evaluation_stride`), fixed for the life of the domain.
+        ``EpdeSearch.createDomain`` passes the ``domain`` config group's value.
+
+        ``boundary='auto'`` leaves the width to the preprocessing: the domain
+        has no boundary (and no test function) until :meth:`resolve_boundary`
+        sets the width the pool build asks for (``boundary_pending`` until
+        then); the inner shape and the row-budget strides follow from it, and
+        stay fixed from then on."""
         self._ID = ID
         self._time_axis = time_axis
-        
+        self._boundary_auto = isinstance(boundary, str) and boundary == 'auto'
+        self._boundary_resolved = not self._boundary_auto
+        #: The test function form ``createDomain`` was given, for an 'auto'
+        #: boundary to rebuild the boundary-excluding g-function from.
+        self.g_func_form = None
+
         self._g_func = None
         self._g_func_val_cache = None
         self._g_func_flat_cache = None
-        self._g_func_mask_cache = None        
-        
+        self._g_func_mask_cache = None
+
         self._pruner = None
         self.inner_shape = None
+        self.box_shape = None
+        self._eval_request = evaluation_stride
+        self._eval_stride = None
 
         if isinstance(grids, np.ndarray): # or (isinstance(grid, (list, tuple)) and len(grid) == 1):
             self._dim = 1
@@ -286,7 +361,34 @@ class Domain(object): # inheritance from cache objects?
         
         self._grid_cache: Cache = grid_cache
         uploadGrids(grids, grid_cache, domain_id = self._ID)
-        self.setBoundaries(boundary)
+        self.setBoundaries(0 if self._boundary_auto else boundary)
+
+    @property
+    def boundary_auto(self) -> bool:
+        """The domain was created with ``boundary='auto'``."""
+        return getattr(self, '_boundary_auto', False)      # a domain restored from before 'auto'
+
+    @property
+    def boundary_pending(self) -> bool:
+        """An 'auto' boundary not resolved yet: no width, inner shape or test
+        function is final."""
+        return not getattr(self, '_boundary_resolved', True)
+
+    def resolve_boundary(self, boundary_width: Union[int, List[int], Tuple[int]],
+                         g_func: Union[Callable, np.ndarray, list]) -> None:
+        """Set an 'auto' domain's boundary once, with the test function that
+        excludes it (``EpdeSearch`` builds both from the preprocessing's edge
+        reach), and validate the pair as ``createDomain`` does."""
+        if not self.boundary_pending:
+            raise RuntimeError(f'Domain {self._ID} has no pending boundary to resolve.')
+        self._boundary_resolved = True
+        try:
+            self.setBoundaries(boundary_width)
+            self.g_func = g_func
+            self.validateTestFunction()
+        except Exception:
+            self._boundary_resolved = False
+            raise
 
     def set_pruner(self, pivotal_tensor: np.ndarray, pruner: DomainPruner = None,
                    threshold : float = 1e-5, division_fractions = 3,
@@ -339,6 +441,11 @@ class Domain(object): # inheritance from cache objects?
         _, grids = self._grid_cache.get_all(subcache_ID = self._ID)
 
         if mode == 'solver':
+            if self._eval_stride is not None:
+                raise ValueError(
+                    f'Domain {self._ID} evaluates on a sub-lattice (evaluation_stride '
+                    f'{self._eval_stride}), so it has no solver grid: a solution is defined on '
+                    'the whole interior. Build the domain without a row budget to use the solver.')
             for grid_idx in range(len(grids)):
                 for dim_idx, bnd in enumerate(self.boundary_width_per_axis):
                     grids[grid_idx] = np.take(a       = grids[grid_idx], 
@@ -380,9 +487,42 @@ class Domain(object): # inheritance from cache objects?
 
     @property
     def g_func_mask(self) -> np.ndarray:
+        """The points that become cache rows. Under a row budget, only the
+        kept lattice points of the box: the weights (``g_func_masked_val``)
+        and ``inner_shape`` follow from the same stride, so every scorer sees
+        the same rows, weights and shape."""
         if self._g_func_mask_cache is None:
-            self._g_func_mask_cache = self.g_func != 0
-        return self._g_func_mask_cache 
+            mask = self.g_func != 0
+            if self._eval_stride is not None:
+                mask = mask & self._lattice_mask()
+            self._g_func_mask_cache = mask
+        return self._g_func_mask_cache
+
+    def _lattice_mask(self) -> np.ndarray:
+        lattice = np.zeros(self.initial_shape, dtype=bool)
+        lattice[_lattice_slices(self.initial_shape, self.boundary_width_per_axis,
+                                self._eval_stride)] = True
+        return lattice
+
+    def _box_mask(self) -> np.ndarray:
+        box = np.zeros(self.initial_shape, dtype=bool)
+        box[self.box_slices()] = True
+        return box
+
+    @property
+    def evaluation_stride(self) -> Union[None, Tuple[int, ...]]:
+        """The per-axis strides of the kept lattice; ``None`` without a row budget."""
+        return self._eval_stride
+
+    @property
+    def evaluation_request(self):
+        """``evaluation_stride`` as passed to the constructor."""
+        return self._eval_request
+
+    def box_slices(self) -> tuple:
+        """Full-grid slices of the interior box, every point."""
+        return _lattice_slices(self.initial_shape, self.boundary_width_per_axis,
+                               (1,) * len(self.initial_shape))
 
     @property
     def g_func_mask_flat(self) -> np.ndarray:
@@ -459,8 +599,30 @@ class Domain(object): # inheritance from cache objects?
         self.boundary_width_per_axis = ([boundary_width] * len(shape)
                                         if isinstance(boundary_width, int)
                                         else list(boundary_width))
-        self.inner_shape = np.array(shape) - 2 * np.array(self.boundary_width_per_axis)
-        print(f'Set domain {self} with inner shape of {self.inner_shape}')
+        self.box_shape = np.array(shape) - 2 * np.array(self.boundary_width_per_axis)
+        # The row budget: the stride, the mask (g_func_mask) and the shape all
+        # follow from this one resolution.
+        self._eval_stride = resolve_evaluation_stride(shape, self.boundary_width_per_axis,
+                                                      self._eval_request)
+        self._g_func_mask_cache = None
+        if self._eval_stride is None:
+            self.inner_shape = np.array(shape) - 2 * np.array(self.boundary_width_per_axis)
+        elif self.boundary_pending:
+            # The provisional box of an 'auto' boundary: nothing to announce yet.
+            stride = np.array(self._eval_stride)
+            self.inner_shape = (self.box_shape + stride - 1) // stride
+        else:
+            stride = np.array(self._eval_stride)
+            self.inner_shape = (self.box_shape + stride - 1) // stride
+            from epde.globals import EPDEUsageWarning
+            warnings.warn(
+                f'Domain {self._ID} evaluates on a sub-lattice of its interior box '
+                f'{tuple(int(n) for n in self.box_shape)}: every {self._eval_stride} points, '
+                f'shape {tuple(int(n) for n in self.inner_shape)}, '
+                f'{int(np.prod(self.inner_shape))} of {int(np.prod(self.box_shape))} rows.',
+                EPDEUsageWarning, stacklevel=2)
+        if not self.boundary_pending:
+            print(f'Set domain {self} with inner shape of {self.inner_shape}')
 
     def validateTestFunction(self) -> None:
         """Check the two things every downstream reshape silently assumes.
@@ -481,7 +643,17 @@ class Domain(object): # inheritance from cache objects?
         before the boundary margin -- which is exactly what the shipped-but-
         disabled ``baseline_exp_function`` bump does at the axis extremes.
         Fail loudly here rather than degrade there.
+
+        Under a row budget the count alone would let a shifted box through
+        (the lattice of a shifted box can keep as many points), so the
+        test function's support must also be the box itself.
         """
+        if self._eval_stride is not None and not np.array_equal(self.g_func != 0, self._box_mask()):
+            raise ValueError(
+                'The test function is not nonzero exactly on the interior box '
+                f'(boundary_width={self.boundary_width}). Under a row budget '
+                f'(evaluation_stride {self._eval_stride}) the kept rows are a lattice of '
+                'that box, so its support must be the box itself.')
         kept = int(np.count_nonzero(self.g_func_mask))
         expected = int(np.prod(self.inner_shape))
         if kept != expected:
@@ -592,18 +764,25 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
         self._built = None
 
     def build(self, max_deriv_order: Union[int, List[int], Tuple[int]] = 1,
-              data_fun_pow: int = 1, deriv_fun_pow: int = 1) -> 'Trajectory':
+              data_fun_pow: int = 1, deriv_fun_pow: int = 1, force: bool = False) -> 'Trajectory':
         """Differentiate the data and derive the token families from it.
 
         Called by ``create_pool`` with the search-level orders and powers, so
         every trajectory in one pool is described by the same families. Calling
-        it again with the same arguments is a no-op; calling it with different
-        ones recomputes, which is what makes a pool rebuild honest.
+        it again with the same arguments is a no-op while its tensors are still
+        cached; calling it with different ones, after the tensors were released
+        or taken over, or with ``force`` (a pool of other families, whose cached
+        term tensors no longer apply) recomputes, which is what makes a pool
+        rebuild honest.
         """
         request = (max_deriv_order, data_fun_pow, deriv_fun_pow)
-        if self._built == request:
+        if not force and self._built == request and self.tensors_cached:
             return self
 
+        # A real build starts from an empty subcache. The cache never overwrites
+        # a label, so tensors left by an earlier build -- or by another sample
+        # that used this cache id -- would be read in place of the new ones.
+        self._cache.drop_subcache(self.ID)
         self.max_deriv_order = max_deriv_order
         self._check_forward_boundary(max_deriv_order)
         self.families, self.base_derivs = [], []
@@ -619,7 +798,24 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
                 self.uploadTokenTensors(token_type, tokens_val)
 
         self._built = request
+        self._cache.claim_subcache(self.ID, self)
         return self
+
+    def edge_reach(self, max_deriv_order) -> Union[None, List[int]]:
+        """Samples per end of every axis whose derivatives the preprocessing corrupts at the edges
+        (``PreprocessingPipe.edge_reach`` on each variable, the widest per axis); a variable with
+        pre-computed derivatives is neither smoothed nor differentiated, so it adds nothing. None
+        when the pipeline does not say."""
+        reach = [0] * len(self._domain.initial_shape)
+        for idx, entry in enumerate(self._entries):
+            if self._entry_derivs(entry, idx) is not None:
+                continue
+            pipe = self._preprocessor_pipeline
+            own = None if pipe is None else pipe.edge_reach(entry.data_tensor, max_deriv_order)
+            if own is None:
+                return None
+            reach = [max(int(a), int(b)) for a, b in zip(reach, own)]
+        return reach
 
     def _check_forward_boundary(self, max_deriv_order) -> None:
         """A forward-increment derivative is undefined on the last ``lag * order`` samples of the
@@ -636,10 +832,12 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
         need = required(kwargs.get('lag', 1), order)
         have = self._domain.boundary_width_per_axis[t_ax]
         if have < need:
+            end = getattr(pipe.deriv_calculator, 'undefined_end', 'last')
             raise ValueError(
-                f'Forward-increment derivatives of order {order} at lag {kwargs.get("lag", 1)} '
-                f'are undefined on the last {need} samples of time axis {t_ax}, but the domain '
-                f'boundary there is {have}. Create the domain with boundary_width >= {need}.')
+                f'{"Forward" if end == "last" else "Backward"}-increment derivatives of order {order} '
+                f'at lag {kwargs.get("lag", 1)} are undefined on the {end} {need} samples of time '
+                f'axis {t_ax}, but the domain boundary there is {have}. Create the domain with '
+                f'boundary_width >= {need}.')
 
     def _entry_derivs(self, entry: VariableEntry, idx: int):
         """This entry's pre-computed derivative tensor, or ``None``.
@@ -692,7 +890,18 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
         masked the same way -- ``addEntryToCache`` does exactly this for the
         variable itself. Without the mask they keep the untrimmed shape and no
         longer line up with anything else in the cache.
+
+        External derivative tokens are refused under a row budget: they are
+        differentiated from the masked tensors, which on a lattice would be a
+        coarser scheme than the full-grid derivatives of the variables.
         """
+        if (self._domain.evaluation_stride is not None
+                and isinstance(family, ExternalDerivativesTokens)):
+            raise ValueError(
+                f'{type(family).__name__} differentiates its tensors after the domain mask, so '
+                f'under a row budget (evaluation_stride {self._domain.evaluation_stride}) its '
+                'derivatives would come from the sub-lattice. Build the domain without a row '
+                'budget to use them.')
         masked = {label: np.asarray(tensor)[self._domain.g_func_mask]
                   for label, tensor in tensors.items()}
         family.upload(trajectory = masked, cache = self._cache,
@@ -701,6 +910,16 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
     @property
     def built(self) -> bool:
         return self._built is not None
+
+    @property
+    def tensors_cached(self) -> bool:
+        """This trajectory's own build filled its subcache and the tensors are
+        still there. The end-of-fit release (``free_tensor_cache_after_fit``)
+        empties the cache, and another sample with this cache id may have taken
+        the subcache over; a non-empty subcache alone proves neither -- every
+        build also copies its variables into subcache 0."""
+        return (self._cache.subcache_owner(self.ID) is self
+                and bool(self._cache.memory_default.get(self.ID)))
 
     @property
     def tokens(self):
@@ -747,6 +966,16 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
         for entry in self._entries:
             if entry.var_name == var_name:
                 return entry.raw_tensor
+        raise KeyError(f'no variable {var_name!r} in trajectory {self.ID}; '
+                       f'has {self.variable_names}')
+
+    def box_field(self, var_name: str) -> np.ndarray:
+        """The preprocessed field of ``var_name`` on EVERY point of the
+        interior box, grid-shaped -- what the cache holds without a row budget,
+        whatever lattice of it the cache holds now."""
+        for entry in self._entries:
+            if entry.var_name == var_name:
+                return np.asarray(entry.data_tensor)[self._domain.box_slices()]
         raise KeyError(f'no variable {var_name!r} in trajectory {self.ID}; '
                        f'has {self.variable_names}')
 
@@ -815,6 +1044,35 @@ class TrajectoriesManager(object):
     def reset(self):
         self._traj: Dict[int, Trajectory] = dict()
         self._domains: Dict[int, Domain] = dict()
+        self._axis_ranges_memo = None                 # (grid state, ranges): axis_ranges()
+        #: The weak rows of the current fit (``epde.structure.weak_rows.WeakRows``), or ``None`` for
+        #: strong (pointwise) rows. Set by ``EpdeSearch.fit`` (``_prepare_weak_rows``).
+        self.weak = None
+
+    @property
+    def weak_mode(self) -> bool:
+        return getattr(self, 'weak', None) is not None
+
+    def _refuse_in_weak_mode(self, what: str) -> None:
+        if self.weak_mode:
+            raise RuntimeError(
+                f"{what} holds the strong (pointwise) rows, but this fit evaluates weak rows "
+                "(domain.evaluation_form='weak'), which are set per equation slot. Use "
+                'row_weights(slot, mode) / row_shapes(slot).')
+
+    def row_weights(self, slot: str, mode: Literal['dm', 'dmf'] = 'dm') -> Dict[int, np.ndarray]:
+        """The row weights of equation slot ``slot`` per trajectory. Strong rows: the boundary-masked
+        test function (``gFunc(mode)``). Weak rows: ones, one per row of the slot's window lattice."""
+        if self.weak_mode:
+            return self.weak.weights(slot)
+        return self.gFunc(mode)
+
+    def row_shapes(self, slot: str) -> Dict[int, tuple]:
+        """The row lattice of equation slot ``slot`` per trajectory: the interior box (strong rows) or the
+        slot's window lattice (weak rows)."""
+        if self.weak_mode:
+            return self.weak.shapes(slot)
+        return self.inner_shapes
 
     def addTrajectory(self, trajectory: Trajectory, domain: Domain):
         print(f'Added trajectory {trajectory.ID} to exist. traj: {self._traj.keys()}')
@@ -827,6 +1085,7 @@ class TrajectoriesManager(object):
             raise KeyError(f'Trajectory with key {trajectory.ID}')
 
         self._traj[trajectory.ID] = trajectory
+        self._axis_ranges_memo = None
         if domain._ID not in self._domains.keys():
             self._domains[domain._ID] = domain
         else:
@@ -834,7 +1093,28 @@ class TrajectoriesManager(object):
 
     @property
     def inner_shapes(self):
+        self._refuse_in_weak_mode('inner_shapes')
         return {key: trajectory.inner_shape for key, trajectory in self._traj.items()}
+
+    @property
+    def evaluation_strided(self) -> bool:
+        """Some registered trajectory is evaluated on a row-budget lattice."""
+        return any(getattr(trajectory._domain, 'evaluation_stride', None) is not None
+                   for trajectory in self._traj.values())
+
+    def require_unstrided(self, where: str) -> None:
+        """Refuse a whole-grid consumer (the solver) on lattice-evaluated data."""
+        strided = {key: trajectory._domain.evaluation_stride for key, trajectory in self._traj.items()
+                   if getattr(trajectory._domain, 'evaluation_stride', None) is not None}
+        if strided:
+            raise ValueError(
+                f'{where} needs the whole grid, but trajectories {sorted(strided)} are evaluated '
+                f'on a sub-lattice (evaluation_stride {strided}). Build their domains without a '
+                'row budget (domain.evaluation_stride None).')
+
+    def box_field(self, var_name: str, key: int) -> np.ndarray:
+        """Trajectory ``key``'s preprocessed ``var_name`` on every interior point."""
+        return self._traj[key].box_field(var_name)
 
     def __getitem__(self, key) -> np.ndarray:
         if key not in self._traj:
@@ -858,6 +1138,48 @@ class TrajectoriesManager(object):
     def grids(self, mode: Literal['full', 'solver'] = 'full') -> Dict[int, np.ndarray]:
         return {key: trajectory.grids(mode) for key, trajectory in self._traj.items()}
 
+    def _grid_state(self) -> list:
+        """What :meth:`axis_ranges` reads, per trajectory: its key, its domain, the domain's cached
+        grid arrays (held, so a rebuilt grid is another object), boundary widths and evaluation
+        stride."""
+        state = []
+        for key, trajectory in self._traj.items():
+            domain = trajectory._domain
+            _, grids = domain._grid_cache.get_all(subcache_ID=domain._ID)
+            state.append((key, domain, grids, list(domain.boundary_width_per_axis), domain._eval_stride))
+        return state
+
+    @staticmethod
+    def _same_grid_state(old: list, new: list) -> bool:
+        return len(old) == len(new) and all(
+            k_old == k_new and d_old is d_new and len(g_old) == len(g_new)
+            and all(a is b for a, b in zip(g_old, g_new)) and w_old == w_new and s_old == s_new
+            for (k_old, d_old, g_old, w_old, s_old), (k_new, d_new, g_new, w_new, s_new) in zip(old, new))
+
+    def axis_ranges(self) -> Optional[list]:
+        """``(min, max)`` of every axis over the trajectories' solver (inner) grids; None with no
+        trajectory, or when one has no solver grid (a row-budget lattice). Memoised on
+        :meth:`_grid_state` -- the system-redundancy test asks on every fit -- and dropped by
+        :meth:`reset` and :meth:`addTrajectory`."""
+        try:
+            state = self._grid_state()
+        except Exception:
+            return None
+        memo = getattr(self, '_axis_ranges_memo', None)
+        if memo is not None and self._same_grid_state(memo[0], state):
+            return None if memo[1] is None else list(memo[1])
+        try:
+            grids = self.grids(mode='solver')
+        except Exception:
+            grids = {}
+        ranges = None
+        for axes in grids.values():
+            current = [(float(np.min(axis)), float(np.max(axis))) for axis in axes]
+            ranges = current if ranges is None else [(min(lo, c[0]), max(hi, c[1]))
+                                                     for (lo, hi), c in zip(ranges, current)]
+        self._axis_ranges_memo = (state, ranges)
+        return None if ranges is None else list(ranges)
+
     @property
     def grid_keys(self) -> list:
         # A bit too hard-coded as: 
@@ -875,6 +1197,8 @@ class TrajectoriesManager(object):
         return {name: trajectory.raw_field(name) for name in trajectory.variable_names}
 
     def gFunc(self, mode_key: Literal['d', 'f', 'm', 'dmf', 'dm']) -> Dict[int, np.ndarray]:
+        if mode_key in ('dm', 'dmf'):
+            self._refuse_in_weak_mode(f'gFunc({mode_key!r})')
         return {key: trajectory.gFuncs(mode_key) for key, trajectory in self._traj.items()}
 
     def get(self, label, normalized=False, saved_as=None, deriv_code = None, sample_key: int = None, ) -> Dict[int, np.ndarray]:

@@ -222,6 +222,8 @@ class PregenBOperator(object):
         assert set(self.variables) == set(required_bc_ord.keys()), 'Some conditions miss required orders.'
 
         if vals is None:
+            # The cached rows are read back as a whole-grid field below.
+            global_var.samples_manager.require_unstrided('PregenBOperator.generate_default_bc')
             val_keys = {key: (key, (1.0,)) for key in self.variables}
 
         if grids is None:

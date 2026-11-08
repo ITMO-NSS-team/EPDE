@@ -119,7 +119,7 @@ class TestTheConfigIsTheSourceOfTruth:
         Python-level duplicate."""
         reset_active_config()
         objectives = active_config().objectives
-        assert objectives.instability_metric == 'chi2'
+        assert objectives.instability_metric == 'dyad'
         assert objectives.discrepancy_metric == 'wape'
         assert objectives.second_objective == 'instability'
 

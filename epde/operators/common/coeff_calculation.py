@@ -13,6 +13,7 @@ from sklearn.linear_model import LinearRegression
 import epde.globals as global_var
 from epde.operators.utils.template import CompoundOperator
 from epde.structure.main_structures import Equation
+from epde.structure.weak_rows import slot_of, term_columns
 
 
 class LinRegBasedCoeffsEquation(CompoundOperator):
@@ -22,15 +23,15 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
     The sparsity step decides the SUPPORT and writes ``weights_internal``;
     this operator turns that support into physical magnitudes. Which of its
     two branches runs is the sparsity operator's own declaration, read from
-    ``fits_physical_scale`` (see ``LASSOSparsity`` / ``VWSRSparsity`` /
-    ``KneeSparsity``) and pushed onto this instance by
+    ``fits_physical_scale`` (see ``LASSOSparsity`` / ``VWSRSparsity``) and
+    pushed onto this instance by
     ``EqRightPartSelector.set_suboperators``:
 
         * ``False`` (legacy LASSO) -- the sparsity fit ran on min-max-rescaled
           features and target, so its coefficients are a support verdict, not
           magnitudes. Refit the survivors with un-normalised
           ``LinearRegression``.
-        * ``True`` (VWSR, Knee) -- the sparsity fit was already on the physical
+        * ``True`` (VWSR) -- the sparsity fit was already on the physical
           scale, so the final magnitudes ARE the internal ones. Promote them.
 
     Every sparsity operator used to raise ``weights_final_evald`` itself, which
@@ -55,18 +56,20 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
         """Trajectory IDs in ONE fixed order, shared by every stacking site
         below so the row order of the features, the target and the sample
         weights cannot drift apart."""
-        return list(global_var.samples_manager.inner_shapes.keys())
+        return list(global_var.samples_manager.trajecatoryIDs)
 
     @classmethod
-    def _stacked_g_func(cls):
-        """Boundary-masked ``g_func`` weights of every trajectory, concatenated
-        in ``_sample_keys`` order to match the stacked design matrix.
+    def _stacked_g_func(cls, slot=None):
+        """Row weights of every trajectory for equation slot ``slot``,
+        concatenated in ``_sample_keys`` order to match the stacked design
+        matrix: the boundary-masked ``g_func`` (strong rows) or ones (weak
+        rows, ``samples_manager.row_weights``).
 
         The legacy path used ``global_var.grid_cache.g_func[g_func_mask]``,
         which is single-sample and is ``None`` outright when the caches were
         built with ``set_grids=False``.
         """
-        gfuncs = global_var.samples_manager.gFunc('dm')
+        gfuncs = global_var.samples_manager.row_weights(slot, 'dm')
         return np.concat([np.asarray(gfuncs[key]).reshape(-1)
                           for key in cls._sample_keys()], axis=0)
 
@@ -81,15 +84,16 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
         non-target slot was filtered to zero.
         """
         tgt = objective.target_idx
+        slot = slot_of(objective)
         keys = LinRegBasedCoeffsEquation._sample_keys()
-        target: Dict[int, np.ndarray] = objective.target.evaluate()
+        target: Dict[int, np.ndarray] = term_columns(objective.target, slot)
         target = np.concat([target[key] for key in keys], axis = 0)
         feats = []
         for term_idx, term in enumerate(objective.structure):
             if term_idx == tgt:
                 continue
             if objective.weights_internal[objective.weight_index(term_idx, tgt)] != 0:
-                fdict = term.evaluate()
+                fdict = term_columns(term, slot)
                 feats.append(np.concat([fdict[key] for key in keys], axis = 0))
         if not feats:
             return target, None
@@ -118,7 +122,7 @@ class LinRegBasedCoeffsEquation(CompoundOperator):
             return
 
         target, features = self._legacy_evaluate_nonzero(objective)
-        self.g_fun_vals = self._stacked_g_func()
+        self.g_fun_vals = self._stacked_g_func(slot_of(objective))
 
         # THE INTERCEPT RULE. ``weights_internal[-1]`` is the sparsity step's
         # SUPPORT decision for the free coefficient; when LASSO regularized it

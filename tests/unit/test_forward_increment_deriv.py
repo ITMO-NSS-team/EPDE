@@ -1,22 +1,26 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Forward-increment (Ito) time derivatives: the 'forward' preprocessor.
+"""The 'FD' preprocessor's schemes: forward-increment (Ito) time derivatives,
+backward increments, and the fourth-order central rule.
 
 For stochastic data a time-symmetric derivative cannot see a drift that is the
 gradient of a function of the state: at stationarity
 ``E[u' g(u)] = d/dt E[G(u)] = 0`` for ``g = G'``, so confinement or repulsion
 fits with coefficient ~0 under the central/polynomial preprocessors. The
 forward increment ``(u[k+lag] - u[k]) / (lag dt)`` is not symmetric in time and
-estimates the drift. These tests pin the difference rule, keep the central rule
+estimates the drift. These tests pin the difference rules, keep the central rule
 bit-identical, show the drift-visibility property on an Ornstein-Uhlenbeck
-process, and check the boundary guard that keeps the undefined tail out of fits.
+process, check the boundary guard that keeps the undefined tail out of fits, and
+keep 'forward' as a deprecated name of 'FD' with ``scheme='forward'``.
 """
 
 import numpy as np
 import pytest
 
 import epde
-from epde.preprocessing.deriv_calculators import AdaptiveFiniteDeriv, ForwardIncrementDeriv
+import epde.globals as global_var
+from epde.preprocessing.deriv_calculators import (AdaptiveFiniteDeriv, BackwardIncrementDeriv,
+                                                  ForwardIncrementDeriv)
 
 
 def _forward(u, t, order=1, lag=1, time_axis=0):
@@ -60,6 +64,47 @@ class TestDifferenceRule:
             _forward(t, t, lag=lag)
 
 
+class TestBackwardAndAccuracy:
+
+    def test_backward_matches_the_backward_quotient(self):
+        t = np.linspace(0.0, 1.0, 101)
+        dt, lag = t[1] - t[0], 3
+        d = BackwardIncrementDeriv()(t ** 2, [t], 1, lag=lag, time_axis=0)[:, 0]
+        assert np.allclose(d[lag:], 2 * t[lag:] - lag * dt)
+        assert np.all(d[:lag] == d[lag])                   # the undefined head repeats the first value
+        assert BackwardIncrementDeriv().edge_reach(np.zeros((40, 50)), (2, 1), lag=2, time_axis=0) == [4, 1]
+
+    def test_the_five_point_stencil_is_exact_on_a_quartic(self):
+        t = np.linspace(0.0, 2.0, 41)
+        d = AdaptiveFiniteDeriv()(t ** 4, [t], 1, accuracy=4)[:, 0]
+        assert np.allclose(d[2:-2], 4 * t[2:-2] ** 3, rtol=0, atol=1e-10)
+        assert not np.allclose(AdaptiveFiniteDeriv()(t ** 4, [t], 1)[2:-2, 0], 4 * t[2:-2] ** 3, atol=1e-6)
+
+    def test_fourth_order_cuts_the_error_on_a_smooth_field(self):
+        t = np.linspace(0.0, 2 * np.pi, 201)
+        exact = np.cos(t)
+        second = np.abs(AdaptiveFiniteDeriv()(np.sin(t), [t], 1)[4:-4, 0] - exact[4:-4]).max()
+        fourth = np.abs(AdaptiveFiniteDeriv()(np.sin(t), [t], 1, accuracy=4)[4:-4, 0] - exact[4:-4]).max()
+        assert fourth < second / 100
+
+    def test_its_reach_is_two_per_order_and_an_axis_it_cannot_serve_is_second_order(self):
+        assert AdaptiveFiniteDeriv().edge_reach(np.zeros((40, 50)), (1, 3), accuracy=4) == [2, 6]
+        bent = np.linspace(0.0, 1.0, 20) ** 2
+        with pytest.warns(global_var.EPDEUsageWarning, match='uneven grid'):
+            d = AdaptiveFiniteDeriv()(bent, [bent], 1, accuracy=4)[:, 0]
+        assert np.array_equal(d, np.gradient(bent, bent))
+        short = np.linspace(0.0, 1.0, 4)
+        with pytest.warns(global_var.EPDEUsageWarning, match='4 samples'):
+            AdaptiveFiniteDeriv()(short ** 2, [short], 1, accuracy=4)
+
+    def test_the_one_sided_schemes_keep_it_on_the_other_axes(self):
+        t, x = np.linspace(0.0, 1.0, 30), np.linspace(0.0, 2 * np.pi, 81)
+        u = np.outer(t, np.sin(x))
+        d = ForwardIncrementDeriv()(u, [t, x], (1, 1), lag=1, time_axis=0, accuracy=4)
+        central4 = AdaptiveFiniteDeriv()(u, [t, x], (0, 1), accuracy=4)[:, 0]
+        assert np.allclose(d[:, 1], central4)
+
+
 def test_central_rule_is_unchanged():
     """``AdaptiveFiniteDeriv`` now routes through ``_grad``; its output must stay np.gradient's."""
     t = np.linspace(0.0, 1.0, 50)
@@ -92,9 +137,9 @@ def test_gradient_drift_is_visible_forward_and_invisible_central():
     assert abs(central) < 0.6                    # ~0 by time symmetry
 
 
-def _search(boundary, lag):
+def _search(boundary, lag, scheme='forward'):
     search = epde.EpdeSearch(use_solver=False, multiobjective_mode=True, device='cpu')
-    search.set_preprocessor(default_preprocessor_type='forward', preprocessor_kwargs={'lag': lag})
+    search.set_preprocessor(default_preprocessor_type='FD', preprocessor_kwargs={'scheme': scheme, 'lag': lag})
     t = np.linspace(0.0, 1.0, 80)
     _, domain = search.createDomain((t,), boundary_width=boundary, ID=0)
     _, trajectory = search.createTrajectory({'u': np.sin(3 * t)}, domain, cache_id=0)
@@ -103,13 +148,43 @@ def _search(boundary, lag):
 
 class TestInterfaceAndBoundary:
 
-    def test_forward_key_builds_the_unsmoothed_forward_pipeline(self):
+    def test_forward_scheme_builds_the_unsmoothed_forward_pipeline(self):
         search, _ = _search(boundary=3, lag=3)
         pipe = search.preprocessor_pipeline
         assert isinstance(pipe.deriv_calculator, ForwardIncrementDeriv)
         assert pipe.deriv_calculator_kwargs['lag'] == 3
         assert pipe.deriv_calculator_kwargs['time_axis'] == 0
         assert type(pipe.smoother).__name__ == 'PlaceholderSmoother'
+
+    def test_the_forward_key_is_a_deprecated_name_of_it(self):
+        search = epde.EpdeSearch(use_solver=False, multiobjective_mode=True, device='cpu')
+        with pytest.warns(global_var.EPDEDeprecationWarning, match="scheme='forward'"):
+            search.set_preprocessor(default_preprocessor_type='forward', preprocessor_kwargs={'lag': 2})
+        pipe = search.preprocessor_pipeline
+        assert isinstance(pipe.deriv_calculator, ForwardIncrementDeriv)
+        assert pipe.deriv_calculator_kwargs == {'grid': None, 'lag': 2, 'time_axis': 0, 'accuracy': 4,
+                                                'max_order': None}
+
+    def test_the_central_default_is_the_five_point_stencil(self):
+        search = epde.EpdeSearch(use_solver=False, multiobjective_mode=True, device='cpu')
+        search.set_preprocessor(default_preprocessor_type='FD', preprocessor_kwargs={})
+        pipe = search.preprocessor_pipeline
+        assert type(pipe.deriv_calculator) is AdaptiveFiniteDeriv
+        assert pipe.deriv_calculator_kwargs == {'grid': None, 'accuracy': 4, 'max_order': None}
+        search.set_preprocessor(default_preprocessor_type='FD', preprocessor_kwargs={'accuracy': 2})
+        assert search.preprocessor_pipeline.deriv_calculator_kwargs == {'grid': None, 'max_order': None}
+
+    @pytest.mark.parametrize('kwargs, match', [({'scheme': 'upwind'}, 'scheme'), ({'accuracy': 3}, 'accuracy'),
+                                               ({'scheme': 'backward', 'lag': 0}, 'positive integer')])
+    def test_bad_settings_are_refused(self, kwargs, match):
+        search = epde.EpdeSearch(use_solver=False, multiobjective_mode=True, device='cpu')
+        with pytest.raises(ValueError, match=match):
+            search.set_preprocessor(default_preprocessor_type='FD', preprocessor_kwargs=kwargs)
+
+    def test_a_backward_head_narrower_than_the_boundary_raises(self):
+        _, trajectory = _search(boundary=2, lag=3, scheme='backward')
+        with pytest.raises(ValueError, match='first 3 samples.*boundary_width >= 3'):
+            trajectory.build(max_deriv_order=(1,), data_fun_pow=1, deriv_fun_pow=1)
 
     def test_boundary_narrower_than_the_undefined_tail_raises(self):
         _, trajectory = _search(boundary=2, lag=3)

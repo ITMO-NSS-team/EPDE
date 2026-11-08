@@ -2,16 +2,18 @@
 # -*- coding: utf-8 -*-
 """The duplicate-equation guard of ``SoEqRightPartSelector``.
 
-Its one cross-equation invariant: no two equations of a system may share an
-IDENTICAL active structure (target plus nonzero-weight terms, powers kept) --
-that is one law rearranged, and the system is left with fewer independent
-equations than variables. The later equation of such a pair has one shared
-term rerolled and its right part re-selected.
+Its invariant: no two equations of a system may share an IDENTICAL active
+structure (target plus nonzero-weight terms, powers kept) -- that is one law
+rearranged, and the system is left with fewer independent equations than
+variables. The later equation of such a pair has one shared term rerolled and
+its right part re-selected.
 
-Nothing else is constrained across equations. A strict superset is coupling,
-and so is one equation carrying another's TARGET as a standalone term: the
-stricter target-term uniqueness rule that used to ban that is retired, and a
-negative pin below keeps it from creeping back.
+Equal active sets always carry each other's targets, so in a live run the
+target-term rule (test_target_term_rule.py) repairs every duplicate first and
+this guard is a backstop. The operator tests here therefore switch that rule
+off (``no_target_rule``) to see the guard alone. The guard never touches a
+strict superset of another equation's active set; such a superset holds the
+other equation's target, so the target-term rule repairs it.
 """
 
 import warnings
@@ -81,11 +83,14 @@ def _system(pool, texts, weights):
     return system
 
 
-def _soeq_selector():
+def _soeq_selector(on_apply=None):
     """The chromosome-level selector with a per-equation selector that
     records its calls and changes nothing, so the guard's repair is the only
     thing acting. Its ``apply`` takes no extra keyword: a call that still
-    handed the per-equation selection a system ban would raise here."""
+    handed the per-equation selection a system ban would raise here.
+
+    ``on_apply(equation, call_no)`` scripts a re-selection instead; ``call_no``
+    counts the calls for that equation's variable, the forward pass's first."""
     from epde.operators.common.right_part_selection import SoEqRightPartSelector
     from epde.operators.utils.template import CompoundOperator
 
@@ -98,6 +103,8 @@ def _soeq_selector():
 
         def apply(self, objective, arguments):
             self.calls.append(objective.main_var_to_explain)
+            if on_apply is not None:
+                on_apply(objective, self.calls.count(objective.main_var_to_explain))
 
         def use_default_tags(self):
             self._tags = {'custom level', 'no suboperators', 'inplace'}
@@ -118,14 +125,14 @@ def _run(selector, system):
 
 def _scripted_term_draws(monkeypatch, pool, labels):
     """``Term.randomize`` draws ``labels`` in turn (the last one repeats) and
-    records which term it was called on."""
+    records which term it was called on. ``'a*b'`` draws a product."""
     from epde.structure.main_structures import Term
     made = []
 
     def scripted_randomize(self, *args, **kwargs):
         made.append(self)
         label = labels[min(len(made), len(labels)) - 1]
-        self.structure = [pool.create(label=label)[1]]
+        self.structure = [pool.create(label=part)[1] for part in label.split('*')]
 
     monkeypatch.setattr(Term, 'randomize', scripted_randomize)
     return made
@@ -133,6 +140,12 @@ def _scripted_term_draws(monkeypatch, pool, labels):
 
 def _names(eq):
     return [term.name for term in eq.structure]
+
+
+@pytest.fixture
+def no_target_rule(monkeypatch):
+    """Switch the target-term rule off, so the guard is the only repair."""
+    monkeypatch.setattr(rps, '_carries_target_of', lambda owner, carrier: False)
 
 
 # ---------------------------------------------------------------------------
@@ -145,7 +158,8 @@ class TestThePredicate:
         # The same law solved for two quantities.
         ({'u': f'0.5 * {DV} + 0.0 = {DU}', 'v': f'2.0 * {DU} + 0.0 = {DV}'},
          {'u': [0.5, 0.0], 'v': [2.0, 0.0]}, True),
-        # u's active set is a strict superset of v's: coupling, not a duplicate.
+        # u's active set is a strict superset of v's: not a duplicate (it holds
+        # v's target, which is the target-term rule's business).
         ({'u': f'0.5 * {DV} + 0.3 * {V_TOKEN} + 0.0 = {DU}',
           'v': f'2.0 * {DU} + 0.0 = {DV}'},
          {'u': [0.5, 0.3, 0.0], 'v': [2.0, 0.0]}, False),
@@ -174,6 +188,7 @@ class TestThePredicate:
 # The repair inside SoEqRightPartSelector.
 # ---------------------------------------------------------------------------
 
+@pytest.mark.usefixtures('no_target_rule')
 class TestTheGuard:
 
     def test_only_the_later_equation_is_repaired(self, uv_pool, monkeypatch):
@@ -278,8 +293,9 @@ class TestTheGuard:
     ], ids=['target-as-standalone-term', 'shared-composite-target'])
     def test_sharing_without_an_identical_law_is_not_repaired(
             self, uv_pool, monkeypatch, texts, weights):
-        """NEGATIVE pin. The retired target-term rule rerolled exactly these;
-        the guard must leave them alone, since the active sets differ."""
+        """NEGATIVE pin. The active sets differ, so the guard leaves these
+        alone; both break the target-term rule, which repairs them instead
+        (test_target_term_rule.py)."""
         from epde.structure.main_structures import Term
         system = _system(uv_pool, texts, weights)
         before = {var: _names(system.vals[var]) for var in texts}
@@ -318,9 +334,11 @@ class TestTheGuard:
         assert not any('duplicate-equation guard' in m for m in messages), messages
 
 
+@pytest.mark.usefixtures('no_target_rule')
 class TestAnUnrepairableDuplicate:
     """``du/dx0*dv/dx0 = const`` twice: the shared structure is carried by the
-    target alone, so there is no non-target term to reroll."""
+    target alone, so the guard has no non-target term to reroll. (The
+    target-term rule rerolls the later equation's target instead.)"""
 
     @staticmethod
     def _target_only_pair(pool):

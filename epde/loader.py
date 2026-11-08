@@ -222,7 +222,9 @@ class LoaderAssistant(object):
                 'Equation' : {'pool' : pool,
                               'latex_form' : None,
                               '_history' : None,
-                              '_target_term' : None},
+                              '_target_term' : None,
+                              # absent from pickles older than plain mode
+                              '_plain_genes' : None},
                 'Term'     : {'pool' : pool,
                               'latex_form' : None},
                 'Factor'   : {'_latex_constructor' : None,
@@ -245,7 +247,9 @@ class LoaderAssistant(object):
                 'Equation' : {'pool' : pool,
                               'latex_form' : None,
                               '_history' : None,
-                              '_target_term' : None},
+                              '_target_term' : None,
+                              # absent from pickles older than plain mode
+                              '_plain_genes' : None},
                 'Term'     : {'pool' : pool,
                               'latex_form' : None},
                 'Factor'   : {'_latex_constructor' : None,
@@ -260,7 +264,9 @@ class LoaderAssistant(object):
                 'Equation' : {'pool' : pool,
                               'latex_form' : None,
                               '_history' : None,
-                              '_target_term' : None},
+                              '_target_term' : None,
+                              # absent from pickles older than plain mode
+                              '_plain_genes' : None},
                 'Term'     : {'pool' : pool,
                               'latex_form' : None},
                 'Factor'   : {'_latex_constructor' : None,

@@ -170,6 +170,16 @@ class TestRenderersNeedNoPrune:
         assert '0.5 * t3' in form
         assert '7.0 = t1' in form
 
+    def test_no_intercept_is_not_printed(self):
+        """USER: no ``0.0`` in the text when the equation has no intercept."""
+        eq = _equation(4, 1, term_coefs=[-1.0, 0.0, 0.5], intercept=0.0)
+        assert eq.text_form == '-1.0 * t0 + 0.0 * t2 + 0.5 * t3 = t1'
+        for term in eq.structure:
+            term.latex_form = term.name
+        latex = eq.latex_form
+        # t0 and t3 (the zero t2 is skipped), and nothing after t3.
+        assert latex.startswith('t1 = ') and latex.count(' + ') == 1 and latex.endswith('t3')
+
     def test_iterator_pairs_coefficients_with_terms(self):
         eq = self._eq()
         pairs = {}

@@ -17,7 +17,8 @@ from epde.operators.common.coeff_calculation import LinRegBasedCoeffsEquation
 from epde.operators.singleobjective.mutations import get_singleobjective_mutation
 from epde.operators.singleobjective.variation import get_singleobjective_variation
 from epde.operators.singleobjective.selections import RouletteWheelSelection
-from epde.operators.singleobjective.so_specific import SizeRestriction, FractionElitism
+from epde.operators.singleobjective.so_specific import (SizeRestriction, FractionElitism,
+                                                        ResamplingRightPartSelector)
 
 class BaselineDirector(OptimizationPatternDirector):
     def __init__(self) -> None:
@@ -95,10 +96,16 @@ class BaselineDirector(OptimizationPatternDirector):
                                                  'coeff_calc': coeff_calc})
         sys_rps_inner = SoEqRightPartSelector()
         sys_rps_inner.set_suboperators({'eq_right_part_selector': eq_right_part_selector})
+        # The selector declines an equation it cannot fit; the redraw it once
+        # made in place is the caller's, as in the multi-objective search:
+        # a declined equation is redrawn within RESAMPLE_BUDGET right here.
+        sys_rps = ResamplingRightPartSelector()
+        sys_rps.set_suboperators({'right_part_selector': sys_rps_inner,
+                                  'chromosome_fitness': sys_fitness})
         # rps_cond is a per-chromosome predicate; on a chromosome->population
         # map it is the element_condition (objective_condition would be
         # handed the population object, which has no ``.vals``).
-        pop_rps = map_operator_between_levels(sys_rps_inner, 'chromosome level', 'population level',
+        pop_rps = map_operator_between_levels(sys_rps, 'chromosome level', 'population level',
                                               element_condition = rps_cond) # TODO: edit in operator_mappers.py
 
         population_pruner = SizeRestriction()

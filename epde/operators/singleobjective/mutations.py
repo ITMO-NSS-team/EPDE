@@ -193,6 +193,9 @@ class TermParameterMutation(CompoundOperator):
                             parameter_selection[param_idx] = np.min((np.max((parameter_selection[param_idx] + shift, interval[0])), interval[1]))
                         else:
                             parameter_selection[param_idx] = parameter_selection[param_idx] + shift
+                        # A gridded parameter (TokenFamily param_grids) is put
+                        # back on its grid; any other passes unchanged.
+                        parameter_selection[param_idx] = factor.grid_snap(parameter_selection[param_idx], param_idx)
                     factor.params = parameter_selection
             term.structure = filter_powers(term.structure)
             objective[1]._invalidate_label_cache()

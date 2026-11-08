@@ -317,7 +317,8 @@ def _vwsr_support(order, monkeypatch):
     columns, target = _tie_library()
     monkeypatch.setattr(sparsity, 'instability_scores', _tie_scores)
     monkeypatch.setattr(global_var, 'samples_manager', SimpleNamespace(
-        gFunc=lambda mode: {0: np.ones(_N)}, inner_shapes={0: (_N,)}),
+        gFunc=lambda mode: {0: np.ones(_N)}, inner_shapes={0: (_N,)},
+        row_weights=lambda slot, mode='dm': {0: np.ones(_N)}, row_shapes=lambda slot: {0: (_N,)}),
         raising=False)
     terms = [_Term(name) for name in order] + [_Term('y')]
     Z = np.column_stack([columns[name] for name in order] + [target])

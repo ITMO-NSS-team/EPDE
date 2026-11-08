@@ -78,6 +78,20 @@ REMOVED_KEYS = {
         'fitness_cls has been removed. Choose the discrepancy with '
         "discrepancy_metric=..., and the solver with use_solver=True / "
         'solver_backend=...'),
+    # The subset settings of system_rps_mode='assignment' became that mode's
+    # own parameters (search_config.SYSTEM_RPS_PARAMS; USER, Oct 27 2026).
+    'equation_selected_terms_max_number': (
+        "equation_selected_terms_max_number is now a setting of system_rps_mode='assignment': "
+        "pass EpdeSearch(system_rps_mode='assignment', system_rps_params="
+        "{'selected_terms_max_number': ...}). 'plain' mode has no subset search and no cap; "
+        'equation_terms_max_number bounds its equations.'),
+    'equation_screen_size': (
+        "equation_screen_size is now a setting of system_rps_mode='assignment': pass "
+        "EpdeSearch(system_rps_mode='assignment', system_rps_params="
+        "{'selected_terms_max_number': ..., 'screen_size': ...})."),
+    'variant_pick': (
+        "variant_pick is now a setting of system_rps_mode='assignment': pass "
+        "EpdeSearch(system_rps_mode='assignment', system_rps_params={'variant_pick': ...})."),
 }
 
 #: Accepted, then ignored -- the pipeline has no such stage any more. Warned

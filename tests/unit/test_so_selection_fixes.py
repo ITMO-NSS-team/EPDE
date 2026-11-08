@@ -161,8 +161,8 @@ class TestRouletteZeroObjective:
 # --------------------------------------------------------------------------
 class TestStampedFormsRankLast:
     def _population(self):
-        # A legitimate wrong form above 1e7 (reachable under vcoef / chi2 /
-        # het_raw with sparsity_cls='knee'), a stamped form, and two others.
+        # A legitimate wrong form above 1e7 (a vcoef / chi2 / het_raw
+        # instability can reach it), a stamped form, and two others.
         return [_Stub('big_legit', [5e7]), _stamped('stamped'),
                 _Stub('good', [0.01]), _Stub('mid', [3.0])]
 

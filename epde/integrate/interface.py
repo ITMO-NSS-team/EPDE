@@ -179,6 +179,7 @@ class SystemSolverInterface(object):
     def use_grids(self, domain_key: int = 0, grids=None): # 
         if grids is None and self.grids is None:
             assert domain_key is not None, 'Domain index is '
+            global_var.samples_manager.require_unstrided('SystemSolverInterface.use_grids')
             self.grids = global_var.samples_manager.grids()[domain_key] # grid_cache.get_all(mode = 'torch')
             self.grids = [grid[global_var.samples_manager.gFunc('m')[domain_key]]
                           for grid in self.grids]

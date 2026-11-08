@@ -295,6 +295,7 @@ class BasisAdapter:
             raise ValueError(f"{len(data_list)} observed fields for {len(var_names)} variables")
 
         # ---- where the observation term looks, and the train window
+        samples.require_unstrided('the basis backend')
         mask = np.asarray(samples.gFunc("m")[key]).reshape(grids[0].shape).astype(bool)
         t_inner = grids[0][mask]
         split = time_split(t_inner, self.train_frac, 0.0)

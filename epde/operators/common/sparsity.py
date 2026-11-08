@@ -18,6 +18,7 @@ import epde.globals as global_var
 from epde.interface.search_config import active_config
 from epde.operators.utils.template import CompoundOperator
 from epde.structure.main_structures import Equation
+from epde.structure.weak_rows import slot_of, term_columns
 from epde.operators.common.stability import (GramSetup, VaryingCoefSetup,
                                              cv_scores)  #(calculate_weights, GramSetup,
                                                                          # VaryingCoefSetup)
@@ -76,8 +77,9 @@ def instability_scores(metric, X, y, sw, grid_shape, active_mask, n_features,
     search that prunes by one statistic and then scores the survivors by
     another is optimizing against its own regularizer.
     ``objectives.instability_metric`` therefore picks both, and a new
-    selection rule (see ``subset_selection.KneeSparsity``) gets the same
-    estimator by calling this rather than choosing one of its own.
+    selection rule (see ``subset_selection.instability_table``, the
+    assignment mode's per-subset axis) gets the same estimator by calling this
+    rather than choosing one of its own.
 
     ``'vcoef'`` and ``'cv'`` read the score off the Gram setup that produced
     them (``'cv'`` through ``cv_reducer``, the caller's reduction of the
@@ -300,7 +302,7 @@ class PhysicsInformedLasso(BaseEstimator, RegressorMixin):
             else:  # 'axis' backup
                 gram_setup = GramSetup(X, y, sample_weights, grid_shape)
         # ``None`` when the metric is basis-free ('chi2', 'chi2_centered',
-        # 'het', 'het_raw', 'tile', 'survival'): those score straight from the
+        # 'het', 'het_raw', 'tile', 'dyad', 'survival'): those score straight from the
         # active columns, so
         # neither the varying-coefficient mode solve nor the sliding-window
         # stack is built at all.
@@ -583,14 +585,14 @@ class LASSOSparsity(CompoundOperator):
         # stacked row-wise -- the same convention
         # ``LinRegBasedCoeffsEquation._legacy_evaluate_nonzero`` uses for the
         # follow-up refit, so both steps see identical row ordering.
-        keys = list(global_var.samples_manager.inner_shapes.keys())
+        keys = list(global_var.samples_manager.trajecatoryIDs)
         target = (np.concat([np.asarray(targets[key]).reshape(-1) for key in keys], axis=0)
                   if targets is not None else None)
         features = (np.concat([np.asarray(features[key]) for key in keys], axis=0)
                     if features is not None else None)
+        row_weights = global_var.samples_manager.row_weights(slot_of(objective), 'dm')
         self.g_fun_vals = np.concat(
-            [np.asarray(global_var.samples_manager.gFunc('dm')[key]).reshape(-1)
-             for key in keys], axis=0)
+            [np.asarray(row_weights[key]).reshape(-1) for key in keys], axis=0)
 
         # Legacy LASSO step: min-max-rescale target + each feature
         # column to [-1, 1] before the L1 fit, so the alpha penalty is
@@ -710,8 +712,8 @@ class VWSRSparsity(CompoundOperator):
             'Unexpected behavior: target and features, obtained from obj.evaluate '
             f'have to be dicts, instead got: {type(target)} and {type(features)}.')
 
-        gfuncs = global_var.samples_manager.gFunc('dm')
-        grid_shapes = global_var.samples_manager.inner_shapes
+        gfuncs = global_var.samples_manager.row_weights(slot_of(objective), 'dm')
+        grid_shapes = global_var.samples_manager.row_shapes(slot_of(objective))
         # Both paths above lay the feature columns out as the non-target
         # terms in structure order; their labels make the keep-rule's tie
         # order independent of that (random) order.

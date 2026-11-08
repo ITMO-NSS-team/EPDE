@@ -258,14 +258,16 @@ class TermParamCrossover(CompoundOperator):
                         new_v1 = (factor1.params[param_idx]
                                   + self.params['term_param_proportion']
                                   * (factor2.params[param_idx] - factor1.params[param_idx]))
-                        factor1.set_param(new_v1, idx=param_idx)
+                        # A gridded parameter (TokenFamily param_grids) is
+                        # put back on its grid; any other passes unchanged.
+                        factor1.set_param(factor1.grid_snap(new_v1, param_idx), idx=param_idx)
                     except KeyError:
                         print([(token.label, token.params) for token in objective[0].structure], [(token.label, token.params) for token in objective[1].structure])
                         raise Exception('Wrong set of parameters:', factor1.params_description, factor2.params_description)
                     new_v2 = (factor1.params[param_idx]
                               + (1 - self.params['term_param_proportion'])
                               * (factor2.params[param_idx] - factor1.params[param_idx]))
-                    factor2.set_param(new_v2, idx=param_idx)
+                    factor2.set_param(factor2.grid_snap(new_v2, param_idx), idx=param_idx)
         objective[0].reset_occupied_tokens(); objective[1].reset_occupied_tokens()
         return objective[0], objective[1]
 

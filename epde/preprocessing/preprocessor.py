@@ -117,6 +117,25 @@ class PreprocessingPipe(object):
         if 'grid' in self.deriv_calculator_kwargs.keys():
             self.deriv_calculator_kwargs['grid'] = grid
 
+    def edge_reach(self, data, max_order: Union[list, int] = 1):
+        """Samples per end of every axis whose derivatives the pipeline corrupts at the edges (one
+        int per axis): the smoother's bias reach plus the calculator's own, both asked of the
+        objects with the kwargs they run with. None when either does not say (no ``edge_reach``,
+        or it returns None)."""
+        shape = np.shape(data)
+        if self.smoother is None:
+            smoothed = [0] * len(shape)
+        else:
+            hook = getattr(self.smoother, 'edge_reach', None)
+            smoothed = None if hook is None else hook(shape, **self.smoother_kwargs)
+        hook = getattr(self.deriv_calculator, 'edge_reach', None)
+        kwargs = {key: value for key, value in self.deriv_calculator_kwargs.items()
+                  if key not in ('grid', 'max_order')}
+        own = None if hook is None else hook(data, max_order, **kwargs)
+        if smoothed is None or own is None:
+            return None
+        return [int(s) + int(o) for s, o in zip(smoothed, own)]
+
     def run(self, data, grid=None, max_order: Union[list, int] = 1):
         """
         Method that runs process of calculation derivatives. 

@@ -120,6 +120,7 @@ def optimize_parametric_form(terms: list, pool, method='L-BFGS-B', **kwargs):
                 factor.set_parameters(params_description=cur_family.token_params,
                                       equality_ranges=cur_family.equality_ranges,
                                       random=False,
+                                      param_grids=getattr(cur_family, 'param_grids', None),
                                       **params_vals)
                 factor.evaluator = cur_family._evaluator
                 temp_factors_defined[factor.hash_descr] = factor

@@ -38,7 +38,12 @@ class MOEADDDirector(OptimizationPatternDirector):
                      variation_params : dict = {}, mutation_params : dict = {},
                      sorter_params : dict = {}, pareto_combiner_params : dict = {},
                      pareto_updater_params : dict = {}, params : dict = None,
-                     solver_backend : str = 'autograd', **kwargs):
+                     solver_backend : str = 'autograd', selection=None, level_updater=None,
+                     **kwargs):
+        # ``selection`` / ``level_updater`` replace MOEA/DD's mating selection
+        # and its survival (``PopulationUpdater``) -- what another engine on the
+        # same fitness, right-part selection and variation swaps out
+        # (``epde.optimizers.nsga``). None builds MOEA/DD's own.
         # ``params`` is the bundled director_params dict the interface passes;
         # per key it wins over the individually named ``*_params`` (kept for
         # direct callers). Declaring it as a named parameter also keeps the
@@ -88,7 +93,8 @@ class MOEADDDirector(OptimizationPatternDirector):
         neighborhood_selector = SimpleNeighborSelector(['number_of_neighbors'])
         add_kwarg_to_operator(operator = neighborhood_selector)
 
-        selection = MOEADDSelection(['delta', 'parents_fraction'])
+        if selection is None:
+            selection = MOEADDSelection(['delta', 'parents_fraction'])
         add_kwarg_to_operator(operator = selection)
         selection.set_suboperators({'neighborhood_selector' : neighborhood_selector})
 
@@ -163,11 +169,12 @@ class MOEADDDirector(OptimizationPatternDirector):
 
             sparsity_c = map_operator_between_levels(sparsity, 'gene level', 'chromosome level')
 
-        # Chromosome-level RPS that resolves system degeneracy: after the
-        # per-equation sweeps it rerolls any equation whose ACTIVE structure
-        # coincides with another equation's (the same law rearranged), while
-        # allowing legitimate cross-equation coupling terms. The SoEq comes
-        # out degeneracy-clean by construction.
+        # Chromosome-level RPS that enforces the cross-equation rules: after
+        # the per-equation sweeps it rerolls a term that is another equation's
+        # target (the whole-term rule; the target as a factor of a product
+        # stays legal), and, as a backstop, a term of an equation whose ACTIVE
+        # structure coincides with another's (the same law rearranged). It
+        # warns if its pass budget runs out with a violation left.
         sys_rps_inner = SoEqRightPartSelector()
         sys_rps_inner.set_suboperators({'eq_right_part_selector': right_part_selector})
         rps_cond = lambda x: any([not elem_eq.right_part_selected for elem_eq in x.vals])
@@ -178,9 +185,10 @@ class MOEADDDirector(OptimizationPatternDirector):
                                             sorter_params = sorter_params)
         population_updater = get_pareto_levels_updater(right_part_selector = sys_rps, chromosome_fitness = fitness,
                                                        sparsity=sparsity_c,
-                                                       constrained = False, mutation_params = mutation_params, 
-                                                       pl_updater_params = pareto_updater_params, 
-                                                       combiner_params = pareto_combiner_params)
+                                                       constrained = False, mutation_params = mutation_params,
+                                                       pl_updater_params = pareto_updater_params,
+                                                       combiner_params = pareto_combiner_params,
+                                                       pl_updater = level_updater)
 
         self.builder = add_sequential_operators(self.builder, [('initial_sorter', initial_sorter),
                                                                # ('pareto_updater_initial', population_updater),

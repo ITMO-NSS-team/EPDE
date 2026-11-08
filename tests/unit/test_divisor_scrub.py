@@ -140,6 +140,11 @@ def _related_features(eq):
             if term is not eq.target and _related_to_target(term, eq.target)]
 
 
+def _no_draw(self, *args, **kwargs):
+    """``Term.randomize`` stand-in: right-part selection draws no terms."""
+    raise AssertionError('simplify_equation drew a term')
+
+
 U_XX = 'd^2u/dx1^2{power: 1.0}'
 U_TT = 'd^2u/dx0^2{power: 1.0}'
 U_T = 'du/dx0{power: 1.0}'
@@ -163,21 +168,24 @@ class TestTheScrubInSimplify:
         (f'-0.15 * {U_XX} + 3.75 * {U_TT} + 0.04 * {U} * {U_XX}'
          f' + 0.0 = {U_TT} * {U}', [-0.15, 3.75, 0.04, 0.0], U_TT),
     ], ids=['multiple', 'component'])
-    def test_a_related_feature_is_regenerated_and_nothing_else(
-            self, wave_pool, text, weights, related):
-        np.random.seed(0)
+    def test_a_related_feature_is_dropped_and_nothing_else(
+            self, wave_pool, monkeypatch, text, weights, related):
+        """The related feature leaves the structure; nothing is drawn in its
+        place (right-part selection uses only its input)."""
+        from epde.structure.main_structures import Term
+        monkeypatch.setattr(Term, 'randomize', _no_draw)
         eq = _equation(wave_pool, text, weights)
         target = eq.target
-        untouched = {term.name: term for term in eq.structure
-                     if term is not target and term.name != related}
+        untouched = [term for term in eq.structure if term.name != related]
         assert _related_features(eq) == [related]
 
         assert _simplify(eq) is True
         assert eq.target is target
         assert _related_features(eq) == []
-        # Its unrelated partners are the same objects with the same structure.
-        for name, term in untouched.items():
-            assert any(t is term for t in eq.structure) and term.name == name
+        # Exactly the input minus the related term: the same objects with the
+        # same structure, in order.
+        assert [id(t) for t in eq.structure] == [id(t) for t in untouched]
+        assert [t.name for t in eq.structure] == [t.name for t in untouched]
         # The structure changed, so the fit is gone.
         assert not eq.weights_internal_evald and not eq.weights_final_evald
 
@@ -196,49 +204,45 @@ class TestTheScrubInSimplify:
         assert not any(t is dead_copy for t in eq.structure)
         assert any(t is bystander for t in eq.structure)
 
-    def test_an_unscrubbable_term_is_dropped_with_its_weight_slot(
+    def test_every_related_term_is_dropped_with_its_weight_slot(
             self, wave_pool, monkeypatch):
-        """Every regeneration draws another multiple of the target, so both
-        related terms are dropped -- and the weight vector loses the matching
-        slot each time instead of drifting out of step with the structure."""
+        """Both multiples of the target are dropped, and the weight vector
+        loses the matching slot each time instead of drifting out of step with
+        the structure."""
+        import epde.operators.common.right_part_selection as rps
         from epde.structure.main_structures import Term
+        monkeypatch.setattr(Term, 'randomize', _no_draw)
         eq = _equation(wave_pool,
                        f'0.04 * {U_XX} + 0.5 * {U_T} * {U_TT} + 0.7 * {U} * {U_TT}'
                        f' + 0.0 * {U_X} + 0.0 = {U_TT}', [0.04, 0.5, 0.7, 0.0, 0.0])
         target = eq.target
-        extra = wave_pool.create(label='u')[1]
         layouts = []
+        stock_drop = rps._drop_term
 
-        def draw_a_multiple(self, *args, **kwargs):
-            self.structure = list(target.structure) + [extra]
-            layouts.append((len(eq.structure), len(eq._weights_internal)))
+        def spy_drop(equation, term, **kwargs):
+            status = stock_drop(equation, term, **kwargs)
+            layouts.append((status, len(equation.structure),
+                            len(equation._weights_internal), len(equation._weights_final)))
+            return status
 
-        monkeypatch.setattr(Term, 'randomize', draw_a_multiple)
+        monkeypatch.setattr(rps, '_drop_term', spy_drop)
         assert _simplify(eq) is True
-        assert layouts and all(n == w for n, w in layouts)
+        assert [status for status, *_ in layouts] == ['dropped', 'dropped']
+        assert all(n == wi == wf for _, n, wi, wf in layouts)
         assert eq.target is target
-        assert sorted(t.name for t in eq.structure) == sorted([U_XX, U_X, U_TT])
+        assert [t.name for t in eq.structure] == [U_XX, U_X, U_TT]
 
-    def test_a_scrub_that_hits_the_floor_still_reports_a_change(
-            self, wave_pool, monkeypatch):
-        """Two terms cannot lose one, so the related term stays as whatever the
-        last regeneration left. That IS a structural change: reporting False
-        would end the RPS loop on a fit describing the old structure."""
+    def test_a_scrub_at_the_floor_declines(self, wave_pool, monkeypatch):
+        """Two terms cannot lose one: the candidate is the soak alone (the
+        target and a multiple of it), so it is declined -- untouched, with
+        nothing drawn in the related term's place."""
+        from epde.operators.common.right_part_selection import DECLINED
         from epde.structure.main_structures import Term
+        monkeypatch.setattr(Term, 'randomize', _no_draw)
         eq = _equation(wave_pool, f'0.5 * {U_T} * {U_TT} + 0.0 = {U_TT}', [0.5, 0.0])
-        target = eq.target
-        feature = eq.structure[0]
-        draws = []
+        before = list(eq.structure)
+        names = [t.name for t in before]
 
-        def draw_the_target(self, *args, **kwargs):
-            draws.append(self is feature)
-            self.structure = list(target.structure)
-
-        monkeypatch.setattr(Term, 'randomize', draw_the_target)
-        assert _simplify(eq) is True
-        # The FEATURE was regenerated; the target kept its structure (the
-        # common-factor branch would have reduced the target instead).
-        assert draws == [True] * 100
-        assert eq.target is target and target.name == U_TT
-        assert len(eq.structure) == 2 and any(t is feature for t in eq.structure)
-        assert not eq.weights_internal_evald
+        assert _simplify(eq) == DECLINED
+        assert [id(t) for t in eq.structure] == [id(t) for t in before]
+        assert [t.name for t in eq.structure] == names
