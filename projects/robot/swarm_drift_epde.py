@@ -47,12 +47,16 @@ def pooled_ols(x, y, feats, robots, lag, dt):
 
 
 def drift_discovery(file_key="N40_PWM20_D41", robots=10, lag=10, popsize=8, epochs=10,
-                    terms=5, preprocessor="forward", sparsity="knee", kinds=("push", "wall", "gear"),
+                    terms=5, preprocessor="forward", sparsity="vwsr", kinds=("push", "wall", "gear"),
                     instability=None):
-    """``sparsity``: the default 'vwsr' derives each term's penalty from its coefficient stability
-    over sliding windows. For drift estimation from stochastic data every window is noise-dominated
-    (per-sample R^2 ~0.1 at best), so it can prune every term, leaving the equation degenerate.
-    'knee' selects terms by the shape of the RSS-vs-support curve instead.
+    """``sparsity``: 'vwsr' (EPDE's default) derives each term's penalty from its coefficient
+    stability over sliding windows. For drift estimation from stochastic data every window is
+    noise-dominated (per-sample R^2 ~0.1 at best), so it used to prune every term, leaving the
+    equation degenerate; this function defaulted to 'knee' for that reason, an operator since
+    removed from EPDE. vwsr, the default keep rule, no longer spares the last feature column
+    (that Oct 21 2026 exemption has been removed). Whether vwsr keeps the drift terms on this
+    data is untested; an equation with every feature
+    pruned is declined and redrawn, at most RESAMPLE_BUDGET (50) times.
     ``kinds``: which interaction token pairs to offer (push, wall, gear)."""
     labels = [lab for lab in LABELS if lab.split('_')[0] in kinds]
     path = next(p for p in swarm_files() if swarm_meta(p)["tag"] == file_key)
@@ -102,7 +106,7 @@ if __name__ == "__main__":
     ap.add_argument("--popsize", type=int, default=8)
     ap.add_argument("--epochs", type=int, default=10)
     ap.add_argument("--preprocessor", default="forward", choices=["forward", "poly"])
-    ap.add_argument("--sparsity", default="knee", choices=["knee", "vwsr", "lasso"])
+    ap.add_argument("--sparsity", default="vwsr", choices=["vwsr", "lasso"])
     ap.add_argument("--kinds", default="push,wall,gear", help="comma-separated subset of push,wall,gear")
     ap.add_argument("--instability", default=None, help="instability metric, e.g. cv (default: chi2)")
     a = ap.parse_args()

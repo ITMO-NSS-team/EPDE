@@ -67,6 +67,8 @@ from stat_common import (                    # shared, from dp/cv_metric.py
     het_per_window,
     max_corr,
     observation_loss,
+    tls_fit,
+    tls_scales,
     anchor_penalty,
     anchor_scales,
     central_diff,
@@ -101,7 +103,11 @@ EPS = 1e-12
 DIFFUSION     = True        # library [u_xx, u, u^3] (True) | [u, u^3]
 PHYS_AGG      = "mean"      # structural here, as on wave
 PHYS_NORM     = "var"       # 'var' | 'max'
-COEF_SOURCE = "ols"   # 'ols' | 'fd' | 'true'
+COEF_SOURCE = "ols"   # 'ols' | 'fd' | 'true' | 'tls'
+# 'tls' = TARGET-FREE physics term: l_phys is the smallest eigenvalue of the
+# column-scaled [target | library] Gram (tls_fit), i.e. total least squares
+# on the net's own field instead of OLS against the target. Columns are
+# scaled by their RMS on the FD design (TLS_SCALE), computed once.
 IC_MODE = "none"   # 'scaled' | 'none': 'none' drops l_ic AND l_bc
 STAT          = "none"      # 'none' | 'het' | 'chi'
 STAT_BOUND    = False       # False = raw chi / tau2/theta_bar^2; see dp
@@ -121,7 +127,7 @@ DATA_TERM = True   # pointwise supervision on the observed u
 TRAIN_FRAC    = 0.8         # the loss sees ONLY t <= t_split (all x)
 
 _SUFFIX = ("" if DIFFUSION else "_nodiff") \
-    + ({"ols": "", "fd": f"_cfd{FD_STRIDE}", "true": "_true"}[COEF_SOURCE]) \
+    + ({"ols": "", "fd": f"_cfd{FD_STRIDE}", "true": "_true", "tls": "_tls"}[COEF_SOURCE]) \
     + ("" if STAT == "none" else f"_{STAT}") \
     + ("_raw" if (STAT != "none" and not STAT_BOUND) else "") \
     + ("" if ANCHOR == "none" else f"_afd{FD_STRIDE}") \
@@ -234,6 +240,9 @@ PHYS_VAR = float(_y_fd.var(unbiased=False)) + EPS
 PHYS_DIV = (PHYS_SCALE if PHYS_NORM == "max" else float(np.sqrt(PHYS_VAR)))
 IC_NORM_U = float(U[:, :n_train].var()) + EPS
 IC_NORM_UX = float(_ux_fd.var(unbiased=False)) + EPS
+# TLS column yardsticks: RMS of [u_t | library] on the SAME FD design.
+# Always built (cheap) so BOTH readouts are reported in every arm.
+TLS_SCALE = tls_scales(_y_fd, _A_fd).to(device=device, dtype=torch.float32)
 
 X_train = torch.tensor(
     np.stack([XX[:, :n_train].ravel(), TT[:, :n_train].ravel()], axis=1),
@@ -321,17 +330,23 @@ def physics_and_stat_loss(net, X_coll):
             per = per * score.detach().to(per.dtype)
         l_anch = per.sum().to(y.dtype)
 
-    if COEF_SOURCE == "true":
-        c_phys = THETA_TRUE
-    elif COEF_SOURCE == "fd":
-        c_phys = THETA_FD
+    w0 = float("nan")
+    if COEF_SOURCE == "tls":
+        # Target-free: the smallest eigenvalue of the scaled design, no
+        # residual against the target. The logged recovery is the TLS one.
+        l_phys, c_hat, w0 = tls_fit(y, A, TLS_SCALE)
     else:
-        c_phys = c_hat.to(y.dtype)
-    r = (y - A @ c_phys) / PHYS_DIV
-    l_phys = (r ** 2).mean()
+        if COEF_SOURCE == "true":
+            c_phys = THETA_TRUE
+        elif COEF_SOURCE == "fd":
+            c_phys = THETA_FD
+        else:
+            c_phys = c_hat.to(y.dtype)
+        r = (y - A @ c_phys) / PHYS_DIV
+        l_phys = (r ** 2).mean()
 
     return dict(phys=l_phys, stat=l_stat, anch=l_anch,
-                c_hat=c_hat.detach())
+                c_hat=c_hat.detach(), w0=w0)
 
 
 def ic_loss(net):
@@ -435,7 +450,9 @@ def _log(it, cur, terms, ml, gsh):
           f"dat={_f(terms['dat']):.3e}  "
           f"|g| phys={gsh['phys']:.2e} dat={gsh['dat']:.2e} "
           f"(phys share {grad_share(gsh):.0%})  "
-          f"c_hat={ml['c_hat'].cpu().numpy().round(6).tolist()}", flush=True)
+          f"c_hat={ml['c_hat'].cpu().numpy().round(6).tolist()}"
+          + (f"  w0={ml['w0']:.3f}" if COEF_SOURCE == "tls" else ""),
+          flush=True)
 
 
 best = Checkpoint(
@@ -469,7 +486,16 @@ u_e, _ux_e, ut_e, uxx_e = field_derivs(net, X_eval)
 y_e = ut_e.detach()
 A_e = build_features(u_e.detach(), uxx_e.detach())
 c_hat_t, _res = global_ols(y_e, A_e, ridge=EPS)
-c_hat = c_hat_t.cpu().numpy().astype(np.float64)
+c_hat_ols = c_hat_t.cpu().numpy().astype(np.float64)
+# The TLS readout on the same field, reported in EVERY arm so the
+# estimator and the loss can be separated.
+with torch.no_grad():
+    _lam_e, _c_tls_t, tls_w0_eval = tls_fit(y_e, A_e, TLS_SCALE)
+tls_lam_eval = float(_lam_e)
+c_hat_tls = _c_tls_t.cpu().numpy().astype(np.float64)
+# The ARM's own readout -- the estimator its loss trained. Drives the
+# headline error and the integration test.
+c_hat = c_hat_tls if COEF_SOURCE == "tls" else c_hat_ols
 res_rmse_eval = float(torch.sqrt(((y_e - A_e @ c_hat_t) ** 2).mean()))
 res_rmse_eval_true = float(torch.sqrt(((y_e - A_e @ THETA_TRUE) ** 2).mean()))
 
@@ -487,6 +513,8 @@ with torch.no_grad():
     anchor_scale = float(max_corr(y_e, A_e))
 
 net_err = rel_l1(c_hat, THETA_TRUE_NP)
+net_err_ols = rel_l1(c_hat_ols, THETA_TRUE_NP)
+net_err_tls = rel_l1(c_hat_tls, THETA_TRUE_NP)
 
 # ---------------------------------------------------- test by INTEGRATION
 # The net past t_split measures nothing (never trained there). Integrate
@@ -559,6 +587,9 @@ for name, r in TEST.items():
           f"RMSE {r['rmse']:.4e}   RMSE(t=1) {r['rmse_t1']:.4e}")
 print(f"  c_hat = {np.round(c_hat, 6).tolist()}   "
       f"true = {THETA_TRUE_NP.tolist()}   rel-L1 err = {net_err:.4e}")
+print(f"  readouts: OLS {np.round(c_hat_ols, 6).tolist()} (rel-L1 {net_err_ols:.4e})"
+      f"   TLS {np.round(c_hat_tls, 6).tolist()} (rel-L1 {net_err_tls:.4e})"
+      f"   TLS lam={tls_lam_eval:.3e} w0={tls_w0_eval:.4f}")
 print(f"  residual RMSE on eval collocation: OLS {res_rmse_eval:.4e}   "
       f"true coefs {res_rmse_eval_true:.4e}")
 if ANCHOR_ERR is not None:
@@ -575,6 +606,10 @@ np.savez(out_path,
          U_data=U, U_pred=U_pred, U_final=U_final, x=x_grid, t=t_grid,
          diffusion=np.bool_(DIFFUSION), feature_names=np.array(FEATURE_NAMES),
          c_hat=c_hat, c_true=THETA_TRUE_NP, net_err=np.float64(net_err),
+         c_hat_ols=c_hat_ols, c_hat_tls=c_hat_tls,
+         net_err_ols=np.float64(net_err_ols), net_err_tls=np.float64(net_err_tls),
+         tls_lam=np.float64(tls_lam_eval), tls_w0=np.float64(tls_w0_eval),
+         tls_scale=TLS_SCALE.cpu().numpy(),
          c_fd=(THETA_FD.cpu().numpy() if THETA_FD is not None
                else np.full(len(FEATURE_NAMES), np.nan)),
          rel_l2=np.float32(rel_l2), rel_l2_final=np.float32(rel_final),

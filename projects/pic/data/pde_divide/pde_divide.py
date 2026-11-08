@@ -73,11 +73,19 @@ class PDEDivideExperiment(PDEAnalysis):
 
     def run_test(self, noise_level: int = 0) -> bool:
         """Run the PDE divide test scenario comparing known correct and incorrect equations."""
+        # u_t = -u_x / x + 0.25 u_xx, times x. The data was generated over twice the time
+        # span of the grid used here (t in [0, 0.5]), so on this grid both coefficients
+        # double: x u_t = -2 u_x + 0.5 x u_xx (FD residual on the data ~1e-4; the old
+        # '1.0 * du/dx1 + 0.25 * ...' left ~0.74).
         correct_eq = (
-            '1.0 * du/dx1{power: 1.0} + 0.25 * d^2u/dx1^2{power: 1.0} * x{power: 1.0} + '
+            '0.5 * d^2u/dx1^2{power: 1.0} * x{power: 1.0} + -2.0 * du/dx1{power: 1.0} + '
             '0.0 = du/dx0{power: 1.0} * x{power: 1.0}'
         )
-        incorrect_eq = '0.04 * d^2u/dx1^2{power: 1} + 0. = d^2u/dx0^2{power: 1}'
+        # The reference without its convection term -- a near miss the pool can score. The
+        # old '0.04 * d^2u/dx1^2 = d^2u/dx0^2' scored as degenerate (LOSS_NAN_VAL), so
+        # the comparison was won by default and tested nothing.
+        incorrect_eq = ('0.5 * d^2u/dx1^2{power: 1.0} * x{power: 1.0} + '
+                        '0.0 = du/dx0{power: 1.0} * x{power: 1.0}')
 
         grid, data = self.load_data(os.path.join(self.foldername, 'PDE_divide.npy'))
         noised_data = DataHandler.add_noise(data, noise_level)

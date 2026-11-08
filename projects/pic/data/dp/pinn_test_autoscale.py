@@ -167,6 +167,8 @@ from cv_metric import (
     combine_loss,
     fd_core,
     network_derivatives_dp,
+    tls_fit,
+    tls_scales,
     set_gravity,
 )
 
@@ -214,6 +216,11 @@ MAKE_GIF = False       # off by default: these cells run as a sweep
 #            stops being free (measured: it rises to ~1.8e-2 as the
 #            anchor bites).
 #   'true' = the oracle THETA_TRUE (reference cell only)
+#   'tls'  = TARGET-FREE: per equation, l_phys is the smallest eigenvalue
+#            of the column-scaled [target | library] Gram (tls_fit) --
+#            total least squares on the net's own field instead of OLS
+#            against the target. Columns scaled by their RMS on the FD
+#            design (TLS_SCALE), computed once.
 # ANCHOR='fd' is the OTHER way to use the same THETA_FD -- a pull on the
 # net's own recovery rather than the residual's coefficients. It moves
 # theta_hat only by moving the whole trajectory, so it is SLOW: at iter
@@ -362,7 +369,7 @@ LOSS_FORM = "sum"
 # of the loss -- measures what the physics term costs or buys the fit.
 PHYS_TERM = True
 
-_SUFFIX = ({"ols": "", "fd": f"_cfd{FD_STRIDE}", "true": "_true"}[COEF_SOURCE]) \
+_SUFFIX = ({"ols": "", "fd": f"_cfd{FD_STRIDE}", "true": "_true", "tls": "_tls"}[COEF_SOURCE]) \
     + ("_hardic" if IC_MODE == "hard" else "") \
     + ("_noicbc" if IC_MODE == "none" else "") \
     + ("" if STAT == "none" else f"_{STAT}") \
@@ -385,9 +392,12 @@ if IC_MODE == "none" and not DATA_TERM:
     raise ValueError("IC_MODE='none' removes the only anchor on the solution "
                      "family unless DATA_TERM supervises the field")
 
-if COEF_SOURCE not in ("fd", "ols", "true"):
-    raise ValueError("COEF_SOURCE must be 'fd', 'ols' or 'true', got "
+if COEF_SOURCE not in ("fd", "ols", "true", "tls"):
+    raise ValueError("COEF_SOURCE must be 'fd', 'ols', 'true' or 'tls', got "
                      f"{COEF_SOURCE!r}")
+if COEF_SOURCE == "tls" and PHYS_AGG != "mean":
+    raise ValueError("COEF_SOURCE='tls' is one global eigenproblem per "
+                     "equation; PHYS_AGG='window' has no TLS counterpart")
 if IC_MODE not in ("scaled", "hard", "none"):
     raise ValueError(f"IC_MODE must be 'scaled', 'hard' or 'none', got {IC_MODE!r}")
 if STAT not in ("none", "het", "chi"):
@@ -535,6 +545,10 @@ def _fd_anchor_scales(stride):
 
 
 ANCHOR_SCALES = _fd_anchor_scales(FD_STRIDE) if ANCHOR == "fd" else None
+# TLS column yardsticks per equation: RMS of [target | library] on the SAME
+# FD field. Always built (cheap) so BOTH readouts are reported in every arm.
+TLS_SCALE = {eq["name"]: tls_scales(*eq["target_and_features"](_fd_field()))
+             .to(device=device, dtype=torch.float32) for eq in EQUATIONS}
 THETA_FD = (_fd_anchor(FD_STRIDE)
             if (ANCHOR == "fd" or COEF_SOURCE == "fd") else None)
 
@@ -610,6 +624,7 @@ def physics_and_stat_loss(net, T_coll):
     theta_means = {}
     theta_hats = {}
     conds = {}
+    w0s = {}
     for eq in EQUATIONS:
         nm = eq["name"]
         _theta_pw, theta_mean = results[nm]
@@ -635,27 +650,32 @@ def physics_and_stat_loss(net, T_coll):
                 per = per * score.detach().to(per.dtype)
             l_anch = l_anch + per.sum().to(th_model.dtype)
 
-        if COEF_SOURCE == "true":
-            c_phys = THETA_TRUE[nm]
-        elif COEF_SOURCE == "fd":
-            c_phys = THETA_FD[nm]           # fixed -> a real force
+        if COEF_SOURCE == "tls":
+            # Target-free: the smallest eigenvalue of the scaled design,
+            # no residual against the target. Logged recovery = TLS's.
+            eq_mse, c_tls, w0s[nm] = tls_fit(y, A, TLS_SCALE[nm])
         else:
-            c_phys = c_hat.to(th_model.dtype)   # vacuous, see the warning
-        r = (y - A @ c_phys) / PHYS_DIV[nm]
-        eq_mse = ((r ** 2).mean() if PHYS_AGG == "mean"
-                  else ((mask @ (r ** 2)) / cnt).mean())
+            if COEF_SOURCE == "true":
+                c_phys = THETA_TRUE[nm]
+            elif COEF_SOURCE == "fd":
+                c_phys = THETA_FD[nm]           # fixed -> a real force
+            else:
+                c_phys = c_hat.to(th_model.dtype)   # vacuous, see the warning
+            r = (y - A @ c_phys) / PHYS_DIV[nm]
+            eq_mse = ((r ** 2).mean() if PHYS_AGG == "mean"
+                      else ((mask @ (r ** 2)) / cnt).mean())
         l_phys = l_phys + eq_mse
 
         per_eq_residual[nm] = eq_mse
         theta_means[nm] = theta_mean
-        theta_hats[nm] = c_hat.detach()
+        theta_hats[nm] = (c_tls if COEF_SOURCE == "tls" else c_hat).detach()
         # Kept as the Gram, not as cond(): the SVD is only worth paying
         # for on print iterations.
         conds[nm] = (A.t() @ A).detach()
 
     return dict(phys=l_phys, stat=l_stat, anch=l_anch, per_eq=per_eq_residual,
                 theta_means=theta_means, theta_hats=theta_hats,
-                grams=conds, th_model=th_model)
+                grams=conds, th_model=th_model, w0=w0s)
 
 
 def ic_loss(net):
@@ -786,6 +806,7 @@ def _log(it, cur, terms, ml, gsh):
     diag = "  ".join(
         f"{nm}: |c|={ml['theta_hats'][nm].abs().sum().item():.2e} "
         f"cond={float(torch.linalg.cond(ml['grams'][nm].double())):.1e}"
+        + (f" w0={ml['w0'][nm]:.3f}" if COEF_SOURCE == "tls" else "")
         for nm in EQ_NAMES)
     print(f"[adam {it:5d}] tot={cur:.3e}  phys={ml['phys'].item():.3e}  "
           f"stat={_f(ml['stat']):.3e}  anch={_f(ml['anch']):.3e}  "
@@ -844,6 +865,10 @@ het_by_eq = {}
 chi_by_eq = {}
 anchor_by_eq = {}
 theta_hat_final = {}
+theta_hat_ols_final = {}
+theta_hat_tls_final = {}
+tls_lam_final = {}
+tls_w0_final = {}
 with torch.no_grad():
     for eq in EQUATIONS:
         nm = eq["name"]
@@ -853,7 +878,16 @@ with torch.no_grad():
         out_e = chi2_per_term(y_e.double(), A_e.double(), ridge=EPS,
                               use_floor=STAT_FLOOR)
         chi_by_eq[nm] = {k: v.cpu().numpy() for k, v in out_e.items()}
-        theta_hat_final[nm] = out_e["theta"].cpu().numpy()
+        theta_hat_ols_final[nm] = out_e["theta"].cpu().numpy()
+        # The TLS readout on the same field, reported in EVERY arm so the
+        # estimator and the loss can be separated.
+        _lam_e, _c_tls_t, tls_w0_final[nm] = tls_fit(y_e, A_e, TLS_SCALE[nm])
+        tls_lam_final[nm] = float(_lam_e)
+        theta_hat_tls_final[nm] = _c_tls_t.cpu().numpy()
+        # The ARM's own readout -- the estimator its loss trained. Drives
+        # coef_err_final and the integration test.
+        theta_hat_final[nm] = (theta_hat_tls_final[nm] if COEF_SOURCE == "tls"
+                               else theta_hat_ols_final[nm])
         # The sparsity.py scale anchor, carried as a diagnostic so the
         # score x anchor product stays comparable with the production rule.
         anchor_by_eq[nm] = float(max_corr(y_e, A_e))
@@ -861,10 +895,16 @@ with torch.no_grad():
 grid_d = evaluate_on_grid(net, T_obs)
 res_by_eq = grid_equation_residuals(grid_d, theta_means_final)
 
-coef_err_final = sum(
-    float(np.abs(theta_hat_final[nm] - THETA_TRUE[nm].cpu().numpy())
-          .sum() / np.abs(THETA_TRUE[nm].cpu().numpy()).sum())
-    for nm in EQ_NAMES)
+def _coef_err(by_eq):
+    return sum(
+        float(np.abs(by_eq[nm] - THETA_TRUE[nm].cpu().numpy())
+              .sum() / np.abs(THETA_TRUE[nm].cpu().numpy()).sum())
+        for nm in EQ_NAMES)
+
+
+coef_err_final = _coef_err(theta_hat_final)
+coef_err_final_ols = _coef_err(theta_hat_ols_final)
+coef_err_final_tls = _coef_err(theta_hat_tls_final)
 
 # ---------------------------------------------------- test by INTEGRATION
 # rel L2 test above evaluates the NET past t_split, where it was never
@@ -969,6 +1009,9 @@ for eq in EQUATIONS:
     nm = eq["name"]
     print(f"  {nm:>4}: theta_hat = {theta_hat_final[nm].round(4).tolist()}   "
           f"true = {eq['theta_true'].tolist()}")
+    print(f"        readouts: OLS {theta_hat_ols_final[nm].round(5).tolist()}   "
+          f"TLS {theta_hat_tls_final[nm].round(5).tolist()}   "
+          f"TLS lam={tls_lam_final[nm]:.3e} w0={tls_w0_final[nm]:.4f}")
     if ANCHOR_ERR is not None:
         # The cell's headline: did physics + consistency IMPROVE on the
         # estimate they were handed, or merely reproduce it?
@@ -1007,6 +1050,8 @@ save_kwargs = dict(
     rel_l2_th2_test=np.float32(rel_l2_th2_test),
     rel_l2_final=np.array(final_rel, dtype=np.float32),
     coef_err_final=np.float32(coef_err_final),
+    coef_err_final_ols=np.float64(coef_err_final_ols),
+    coef_err_final_tls=np.float64(coef_err_final_tls),
     rel_l2_test_int=np.array(rel_l2_test_int, dtype=np.float32),
     rel_l2_test_int_true=np.array(rel_l2_test_int_true, dtype=np.float32),
     th_test_int=th_int.astype(np.float32),
@@ -1029,6 +1074,11 @@ save_kwargs = dict(
 for nm in EQ_NAMES:
     save_kwargs[f"theta_{nm}_per_window"] = theta_per_window[nm]
     save_kwargs[f"theta_hat_{nm}"]        = theta_hat_final[nm]
+    save_kwargs[f"theta_hat_ols_{nm}"]    = theta_hat_ols_final[nm]
+    save_kwargs[f"theta_hat_tls_{nm}"]    = theta_hat_tls_final[nm]
+    save_kwargs[f"tls_lam_{nm}"]          = np.float64(tls_lam_final[nm])
+    save_kwargs[f"tls_w0_{nm}"]           = np.float64(tls_w0_final[nm])
+    save_kwargs[f"tls_scale_{nm}"]        = TLS_SCALE[nm].cpu().numpy()
     save_kwargs[f"residual_{nm}_grid"]    = res_by_eq[nm]
     save_kwargs[f"phys_scale_{nm}"]       = np.float32(PHYS_SCALE[nm])
     save_kwargs[f"phys_var_{nm}"]         = np.float32(PHYS_VAR[nm])

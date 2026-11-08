@@ -97,6 +97,8 @@ from stat_common import (                    # shared, from dp/cv_metric.py
     het_per_window,
     max_corr,
     observation_loss,
+    tls_fit,
+    tls_scales,
     anchor_penalty,
     anchor_scales,
     central_diff,
@@ -137,7 +139,11 @@ EPS = 1e-12
 # as dp/duffing, where it is a real switch.
 PHYS_AGG      = "mean"     # structural on wave
 PHYS_NORM     = "var"       # 'var' | 'max'
-COEF_SOURCE = "ols"   # 'ols' | 'fd' | 'true'
+COEF_SOURCE = "ols"   # 'ols' | 'fd' | 'true' | 'tls'
+# 'tls' = TARGET-FREE physics term: l_phys is the smallest eigenvalue of the
+# column-scaled [target | library] Gram (tls_fit), i.e. total least squares
+# on the net's own field instead of OLS against the target. Columns are
+# scaled by their RMS on the FD design (TLS_SCALE), computed once.
 IC_MODE = "none"   # 'scaled' | 'none': 'none' drops l_ic AND l_bc,
                         # because l_data already supervises u on the whole
                         # train block -- the boundary columns and the t=0
@@ -163,7 +169,7 @@ TRAIN_FRAC    = 0.8         # temporal split, mirroring dp: the loss --
                             # anything, so error there is genuine
                             # extrapolation from the learned equation.
 
-_SUFFIX = ({"ols": "", "fd": f"_cfd{FD_STRIDE}", "true": "_true"}[COEF_SOURCE]) \
+_SUFFIX = ({"ols": "", "fd": f"_cfd{FD_STRIDE}", "true": "_true", "tls": "_tls"}[COEF_SOURCE]) \
     + ("" if STAT == "none" else f"_{STAT}") \
     + ("_raw" if (STAT != "none" and not STAT_BOUND) else "") \
     + ("" if ANCHOR == "none" else f"_afd{FD_STRIDE}") \
@@ -270,6 +276,9 @@ PHYS_DIV = (PHYS_SCALE if PHYS_NORM == "max"
             else float(np.sqrt(PHYS_VAR)))
 IC_NORM_U = float(U[:, :n_train].var()) + EPS
 IC_NORM_UT = float(_ut_fd.var(unbiased=False)) + EPS
+# TLS column yardsticks: RMS of [u_tt | u_xx] on the SAME FD design.
+# Always built (cheap) so BOTH readouts are reported in every arm.
+TLS_SCALE = tls_scales(_y_fd, _A_fd).to(device=device, dtype=torch.float32)
 
 # Train sub-grid for l_data: every x, t < t_split. Physics uses the
 # samplers, which are bounded by t_split as well.
@@ -364,17 +373,23 @@ def physics_and_stat_loss(net, X_coll):
             per = per * score.detach().to(per.dtype)
         l_anch = per.sum().to(y.dtype)
 
-    if COEF_SOURCE == "true":
-        c_phys = C2_T
-    elif COEF_SOURCE == "fd":
-        c_phys = THETA_FD
+    w0 = float("nan")
+    if COEF_SOURCE == "tls":
+        # Target-free: the smallest eigenvalue of the scaled design, no
+        # residual against the target. The logged recovery is the TLS one.
+        l_phys, c_hat, w0 = tls_fit(y, A, TLS_SCALE)
     else:
-        c_phys = c_hat.to(y.dtype)
-    r = (y - A @ c_phys) / PHYS_DIV
-    l_phys = (r ** 2).mean()
+        if COEF_SOURCE == "true":
+            c_phys = C2_T
+        elif COEF_SOURCE == "fd":
+            c_phys = THETA_FD
+        else:
+            c_phys = c_hat.to(y.dtype)
+        r = (y - A @ c_phys) / PHYS_DIV
+        l_phys = (r ** 2).mean()
 
     return dict(phys=l_phys, stat=l_stat, anch=l_anch,
-                c_hat=c_hat.detach())
+                c_hat=c_hat.detach(), w0=w0)
 
 
 def ic_loss(net):
@@ -483,7 +498,9 @@ def _log(it, cur, terms, ml, gsh):
           f"dat={_f(terms['dat']):.3e}  "
           f"|g| phys={gsh['phys']:.2e} dat={gsh['dat']:.2e} "
           f"(phys share {grad_share(gsh):.0%})  "
-          f"c2_hat={float(ml['c_hat']):.5f}", flush=True)
+          f"c2_hat={float(ml['c_hat']):.5f}"
+          + (f"  w0={ml['w0']:.3f}" if COEF_SOURCE == "tls" else ""),
+          flush=True)
 
 
 best = Checkpoint(
@@ -515,8 +532,15 @@ rel_l2_test = (_rl2(slice(n_train, Nt)) if n_train < Nt else float("nan"))
 X_eval = sample_collocation(torch.Generator(device=device).manual_seed(SEED + 1))
 u_xx_e, u_tt_e = second_derivs(net, X_eval)
 y_e, A_e = u_tt_e.detach(), u_xx_e.detach().unsqueeze(1)
-c_hat, _ = global_ols(y_e, A_e, ridge=EPS)
-c_hat = float(c_hat)
+c_hat_ols = float(global_ols(y_e, A_e, ridge=EPS)[0])
+# The TLS readout on the same field, reported in EVERY arm so the
+# estimator and the loss can be separated.
+with torch.no_grad():
+    _lam_e, _c_tls_t, tls_w0_eval = tls_fit(y_e, A_e, TLS_SCALE)
+tls_lam_eval = float(_lam_e)
+c_hat_tls = float(_c_tls_t)
+# The ARM's own readout -- the estimator its loss trained.
+c_hat = c_hat_tls if COEF_SOURCE == "tls" else c_hat_ols
 
 x_e, t_e = X_eval[:, 0], X_eval[:, 1]
 in_t = (t_e.unsqueeze(0) >= T_LO) & (t_e.unsqueeze(0) < T_HI)
@@ -534,6 +558,8 @@ with torch.no_grad():
     anchor_scale = float(max_corr(y_e, A_e))
 
 net_err = abs(c_hat - C2_TRUE) / C2_TRUE
+net_err_ols = abs(c_hat_ols - C2_TRUE) / C2_TRUE
+net_err_tls = abs(c_hat_tls - C2_TRUE) / C2_TRUE
 
 # ---------------------------------------------------- test by INTEGRATION
 # Evaluating the NET past t_split measures nothing: it was trained only
@@ -625,6 +651,9 @@ print(f"rel L2 TEST  (INTEGRATED recovered eq) = {rel_l2_test_int:.4e}")
 print(f"   same handover, TRUE c2              = {rel_l2_test_int_true:.4e}"
       f"   <- the floor set by the t_split state + scheme alone")
 print(f"  c2_hat = {c_hat:.6f}   true = {C2_TRUE}   rel err = {net_err:.4e}")
+print(f"  readouts: OLS {c_hat_ols:.6f} (rel err {net_err_ols:.4e})   "
+      f"TLS {c_hat_tls:.6f} (rel err {net_err_tls:.4e})   "
+      f"TLS lam={tls_lam_eval:.3e} w0={tls_w0_eval:.4f}")
 if ANCHOR_ERR is not None:
     print(f"  anchor = {float(THETA_FD):.6f}  rel err {ANCHOR_ERR:.4e}   "
           f"({'IMPROVED' if net_err < ANCHOR_ERR else 'no gain'})")
@@ -637,6 +666,10 @@ np.savez(out_path,
          U_data=U, U_pred=U_pred, U_final=U_final,
          x=x_grid, t=t_grid,
          c2_hat=np.float32(c_hat), c2_true=np.float32(C2_TRUE),
+         c2_hat_ols=np.float64(c_hat_ols), c2_hat_tls=np.float64(c_hat_tls),
+         net_err_ols=np.float64(net_err_ols), net_err_tls=np.float64(net_err_tls),
+         tls_lam=np.float64(tls_lam_eval), tls_w0=np.float64(tls_w0_eval),
+         tls_scale=TLS_SCALE.cpu().numpy(),
          c2_fd=np.float32(float(THETA_FD) if THETA_FD is not None else np.nan),
          anchor_err=np.float32(ANCHOR_ERR if ANCHOR_ERR is not None else np.nan),
          net_err=np.float32(net_err),

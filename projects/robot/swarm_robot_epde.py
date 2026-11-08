@@ -14,6 +14,14 @@ Every robot runs in a fresh interpreter (EPDE keeps process-global caches) under
     python swarm_robot_epde.py                          # all robots, results/swarm_robot_epde.jsonl
     python swarm_robot_epde.py --one N30_PWM10_D41 12 x  # one robot, one coordinate, printed
     python swarm_robot_epde.py --summary
+
+Sparsity defaults to EPDE's own default, 'vwsr'. This script used to default to 'knee', an
+operator since removed from EPDE together with its 'budget' realization (the best subset within
+an evolved complexity budget): knee's extension rule let one dominant propulsion term shut out
+push / wall / the heading offset for good. 'vwsr' could prune every term of these noise-dominated
+drift fits, leaving the equation degenerate. The Oct 21 2026 rule that kept the last feature column
+standing was withdrawn on Oct 22: right-part selection declines an equation with every feature
+pruned, and the search redraws it, at most RESAMPLE_BUDGET (50) times. Not tested on this data.
 """
 import argparse
 import json
@@ -90,17 +98,12 @@ def ols_reference(t, x, y, phi, tokens):
 
 
 # ------------------------------------------------------------------ one EPDE run
-def run_robot(tag, robot_id, var, popsize=10, epochs=15, terms=7, sparsity="knee"):
+def run_robot(tag, robot_id, var, popsize=10, epochs=15, terms=7, sparsity="vwsr"):
     from epde.interface.interface import EpdeSearch
     from epde import CacheStoredTokens
     t, x, y, phi, tokens = robot_data(tag, robot_id)
     t0 = time.time()
-    # 'budget': best subset within each equation's evolved ('complexity', var) budget. The default knee
-    # rule keeps an extension only if its RSS drop matches the weakest accepted one, and one dominant
-    # propulsion term then shuts out push / wall / the heading offset for good.
-    sp = (dict(sparsity_cls="knee", sparsity_kwargs={"realization": "complexity"}) if sparsity == "budget"
-          else dict(sparsity_cls=sparsity))
-    search = EpdeSearch(multiobjective_mode=True, use_solver=False, **sp,
+    search = EpdeSearch(multiobjective_mode=True, use_solver=False, sparsity_cls=sparsity,
                         boundary_width=LAG + 1,                 # forward tail and the vb head
                         default_preprocessor_type="forward", preprocessor_kwargs={"lag": LAG},
                         population_size=popsize, training_epochs=epochs,
@@ -302,7 +305,7 @@ if __name__ == "__main__":
     ap.add_argument("--popsize", type=int, default=10)
     ap.add_argument("--epochs", type=int, default=15)
     ap.add_argument("--terms", type=int, default=7)
-    ap.add_argument("--sparsity", default="knee", choices=["knee", "budget", "lasso", "vwsr"])
+    ap.add_argument("--sparsity", default="vwsr", choices=["vwsr", "lasso"])
     ap.add_argument("--one", nargs=3, metavar=("TAG", "ROBOT_ID", "VAR"))
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--summary", action="store_true")

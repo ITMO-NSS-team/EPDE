@@ -9,9 +9,15 @@ process-global caches -- under a hard timeout. Results go to results/swarm_spin_
     python swarm_spin_epde.py --one N30_PWM10_D41 38  # a single robot, printed
     python swarm_spin_epde.py --summary               # PWM scaling / replicate tables from the CSV
 
-Sparsity defaults to 'knee': the default 'vwsr' penalises terms by sliding-window coefficient
+Sparsity defaults to EPDE's own default, 'vwsr'. This script used to default to 'knee', an
+operator since removed from EPDE: 'vwsr' penalises terms by sliding-window coefficient
 instability, and for robots whose spin is irregular (jammed, many contacts) it pruned the
-rotation term, left the equation degenerate and stalled initialisation for 15-35 minutes.
+rotation term, left the equation degenerate and stalled initialisation for 15-35 minutes. The
+Oct 21 2026 exemption that kept the last feature column standing has been removed. The vwsr keep
+rule sets each term's L1 threshold from its score under the instability metric. Whether vwsr
+keeps the rotation term on this data is untested. Right-part selection
+declines an equation with every feature pruned, and the search redraws it, at most
+RESAMPLE_BUDGET (50) times. Watch the timeouts.
 """
 import argparse
 import csv
@@ -41,7 +47,7 @@ FIELDS = ["tag", "pwm", "n_bots", "arena_cm", "robot_id", "omega_phase", "omega_
 WINDOW = 9  # SG window: spins reach 6.6 rad/s, so 15 frames would span ~4 rad of a period
 
 
-def run_robot(tag, robot_id, sparsity="knee"):
+def run_robot(tag, robot_id, sparsity="vwsr"):
     from epde.interface.interface import EpdeSearch
     path = next(p for p in swarm_files() if swarm_meta(p)['tag'] == tag)
     md = swarm_meta(path)
@@ -86,7 +92,7 @@ def _run_subprocess(tag, robot_id, sparsity, timeout):
                 seconds=round(time.time() - t0, 1), omega_c=np.nan, omega_s=np.nan, front='')
 
 
-def run_all(workers=6, sparsity="knee", timeout=300):
+def run_all(workers=6, sparsity="vwsr", timeout=300):
     jobs, phase = [], {}  # each pickle is read once here
     for path in swarm_files():
         md = swarm_meta(path)
@@ -184,7 +190,7 @@ def summary():
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--workers", type=int, default=6)
-    ap.add_argument("--sparsity", default="knee", choices=["knee", "vwsr", "lasso"])
+    ap.add_argument("--sparsity", default="vwsr", choices=["vwsr", "lasso"])
     ap.add_argument("--timeout", type=int, default=300, help="seconds per robot")
     ap.add_argument("--one", nargs=2, metavar=("TAG", "ROBOT_ID"))
     ap.add_argument("--json", action="store_true", help="with --one: print the row as JSON")

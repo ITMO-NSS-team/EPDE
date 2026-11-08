@@ -373,6 +373,66 @@ def global_ols(target, features, weights=None, ridge=EPS):
     return c, y - A @ c
 
 
+def tls_scales(target, features):
+    """Column yardsticks for ``tls_fit``: the RMS of every column of
+    ``[target | features]``, computed ONCE from the OBSERVED (finite-
+    difference) design -- never from the net's field, for the reason
+    ``anchor_scales`` gives (a net-derived yardstick is a free variable the
+    net can game). Uncentred, because the TLS relation has no intercept.
+    Floored at the dtype's smallest positive value, not at EPS, so the
+    scale-invariance that licenses weight 1 survives a rescaled equation.
+    """
+    Z = torch.cat([target.unsqueeze(1), features], dim=1)
+    rms = (Z ** 2).mean(dim=0).sqrt()
+    return rms.clamp(min=float(torch.finfo(Z.dtype).tiny))
+
+
+def tls_fit(target, features, col_scale):
+    """Total least squares on ``[target | features] / col_scale``.
+
+    The target-free counterpart of ``global_ols``: OLS fixes the target's
+    coefficient at 1 and charges the whole residual to the target column;
+    TLS treats every column alike and returns the direction the scaled
+    design is closest to annihilating. Returns ``(lam, theta, w0)``:
+
+    lam    mean((Z v)^2) with Z the scaled design and v the unit right-
+           singular vector of its smallest singular value, i.e. the
+           smallest eigenvalue of ``Z^T Z / N``. Gradient-bearing through
+           Z ONLY. v is solved detached: it minimises the Rayleigh quotient
+           over the unit sphere, so the path through v contributes exactly
+           zero (envelope theorem -- the same argument that lets
+           ``global_ols``'s theta stay attached as a mere convention), and
+           detaching drops a term that is analytically zero but
+           numerically ill-conditioned when two eigenvalues approach.
+           Computed as a residual, not as an eigenvalue, so its precision
+           is the residual's (no condition-number squaring).
+           Each scaled column has mean square 1 on the data, so the trace
+           of ``Z^T Z / N`` is K+1 there and lam <= 1: dimensionless,
+           weight 1, like every other term.
+    theta  target-gauge coefficients (detached, float64): with
+           w = v / col_scale, ``y ~= A @ theta`` for ``theta = -w[1:] /
+           w[0]``. Defined only while the target takes part in the
+           relation.
+    w0     |v[0]|, the target's share of the null direction. Near 0 the
+           relation the design is closest to satisfying does not involve
+           the target at all (a library identity), and theta blows up --
+           the TLS failure mode OLS cannot have, logged as a diagnostic.
+
+    target (N,), features (N, K), col_scale (K+1,) from ``tls_scales``.
+    """
+    Z = torch.cat([target.unsqueeze(1), features], dim=1) / col_scale
+    with torch.no_grad():
+        Zd = Z.double()
+        # (K+1)x(K+1) Gram in float64, eigh on the CPU: K <= 4 here, so the
+        # small solve is cheaper than a device SVD of the (N, K+1) design.
+        evals, evecs = torch.linalg.eigh((Zd.t() @ Zd).cpu())
+        v = evecs[:, 0].to(Z.device)
+        w = v / col_scale.double()
+        theta = -w[1:] / w[0]
+    r = Z @ v.to(Z.dtype)
+    return (r ** 2).mean(), theta, float(v[0].abs())
+
+
 class HardICWrapper(torch.nn.Module):
     """Impose the initial condition EXACTLY, so no IC loss term exists.
 

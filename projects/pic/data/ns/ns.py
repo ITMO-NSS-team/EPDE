@@ -149,7 +149,10 @@ def ns_discovery(foldername, noise_level):
     # dimensionality = data.ndim - 1
 
     epde_search_obj = EpdeSearch(use_solver=False, multiobjective_mode=True, device='cuda')
-    _, domain = epde_search_obj.createDomain(grid, boundary_width=[20, 20, 45], ID=0)
+    # A 40 x 40 x 80 interior (t, y, x). The old [20, 20, 45] left 10 x 10 x 10, where a
+    # product pair (u*u_xx + v_yy*v_x) stood in for the small viscous terms and dominated
+    # the true x-momentum under every discrepancy; on this interior nothing dominates it.
+    _, domain = epde_search_obj.createDomain(grid, boundary_width=[5, 5, 10], ID=0)
 
     # epde_search_obj.set_preprocessor(default_preprocessor_type='ANN',
     #                                     preprocessor_kwargs={'epochs_max' : 1e3})

@@ -1,12 +1,19 @@
 """Score exact drift equations through EPDE's own operators (no evolution).
 
-Builds the same search as ``swarm_drift_epde.py`` (forward increments, knee sparsity, 10 robots
+Builds the same search as ``swarm_drift_epde.py`` (forward increments, vwsr sparsity, 10 robots
 of one recording, all interaction tokens), creates the pool, then for each candidate form:
 
   (a) FIXED support: OLS refit on the written structure (LinRegBasedCoeffsEquation), then the
       fitness host -- the objective values the form would carry if it reached the front;
   (b) RPS: the right-part selector's own fit step (sparsity -> coefficients -> score) for the
-      dx/dt (dy/dt) target -- does knee keep every written term, and is the target accepted?
+      dx/dt (dy/dt) target -- does the sparsity step keep every written term, and is the target
+      accepted?
+
+Both scripts used to default to 'knee', an operator since removed from EPDE, because vwsr pruned
+every term of these noise-dominated drift fits. The default keep rule is vwsr, and it no longer
+spares the last feature column (that Oct 21 2026 exemption has been removed). It sets each term's
+L1 threshold from the term's score under the instability metric. Whether vwsr keeps these drift
+terms is untested: if it prunes every one, the target is declined -- (b) is the check.
 
     python score_drift_forms.py --file N40_PWM20_D41 --robots 10 --lag 10
 """
@@ -124,7 +131,7 @@ if __name__ == "__main__":
     ap.add_argument("--file", default="N40_PWM20_D41")
     ap.add_argument("--robots", type=int, default=10)
     ap.add_argument("--lag", type=int, default=10)
-    ap.add_argument("--sparsity", default="knee")
+    ap.add_argument("--sparsity", default="vwsr", choices=["vwsr", "lasso"])
     ap.add_argument("--instability", default=None, help="instability metric, e.g. cv (default: chi2)")
     a = ap.parse_args()
     search = build(a.file, a.robots, a.lag, a.sparsity, a.instability)

@@ -153,7 +153,7 @@ def ODE_discovery(foldername, noise_level):
     factors_max_number = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
 
     _, trajectory = epde_search_obj.createTrajectory({'u': noised_data}, domain, cache_id=0)
-    epde_search_obj.fit(data=[trajectory], max_deriv_order=(2, 3), data_fun_pow=3,
+    epde_search_obj.fit(data=[trajectory], max_deriv_order=(2,), data_fun_pow=3,
                         equation_terms_max_number=5,
                         additional_tokens=[trig_tokens, grid_tokens],
                         equation_factors_max_number=factors_max_number) # , data_nn=data_nn

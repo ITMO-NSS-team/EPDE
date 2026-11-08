@@ -98,6 +98,8 @@ from stat_common import (                    # shared, from dp/cv_metric.py
     het_per_window,
     max_corr,
     observation_loss,
+    tls_fit,
+    tls_scales,
     anchor_penalty,
     anchor_scales,
     central_diff,
@@ -144,7 +146,11 @@ EPS = 1e-12
 #              under 'mean' they are het-diagnostic-only.
 PHYS_AGG      = "mean"     # 'mean' | 'window'
 PHYS_NORM     = "var"       # 'var' | 'max'
-COEF_SOURCE = "ols"   # 'ols' | 'fd' | 'true'
+COEF_SOURCE = "ols"   # 'ols' | 'fd' | 'true' | 'tls'
+# 'tls' = TARGET-FREE physics term: l_phys is the smallest eigenvalue of the
+# column-scaled [x_tt | library] Gram (tls_fit), i.e. total least squares on
+# the net's own field instead of OLS with x_tt as the target. Columns are
+# scaled by their RMS on the FD design (TLS_SCALE), computed once.
 IC_MODE = "none"   # 'scaled' | 'hard' | 'none' (l_data supervises)
 STAT          = "none"      # 'none' | 'het' | 'chi'
 STAT_BOUND    = False       # False = raw chi / tau2/theta_bar^2; see dp
@@ -167,7 +173,8 @@ TRAIN_FRAC    = 0.8         # temporal split, mirroring dp: the loss --
                             # anything, so test error there is genuine
                             # extrapolation from the learned equation.
 
-_SUFFIX = ({"ols": "", "fd": f"_cfd{FD_STRIDE}", "true": "_true"}[COEF_SOURCE]) \
+_SUFFIX = ({"ols": "", "fd": f"_cfd{FD_STRIDE}", "true": "_true",
+            "tls": "_tls"}[COEF_SOURCE]) \
     + ("_hardic" if IC_MODE == "hard" else "") \
     + ("_noicbc" if IC_MODE == "none" else "") \
     + ("" if STAT == "none" else f"_{STAT}") \
@@ -190,8 +197,11 @@ if IC_MODE == "none" and not DATA_TERM:
     raise ValueError("IC_MODE='none' removes the only anchor on the solution "
                      "family unless DATA_TERM supervises the field")
 
-if COEF_SOURCE not in ("fd", "ols", "true"):
+if COEF_SOURCE not in ("fd", "ols", "true", "tls"):
     raise ValueError(f"bad COEF_SOURCE {COEF_SOURCE!r}")
+if COEF_SOURCE == "tls" and PHYS_AGG != "mean":
+    raise ValueError("COEF_SOURCE='tls' is one global eigenproblem; "
+                     "PHYS_AGG='window' has no TLS counterpart")
 if ANCHOR_WEIGHT != "none" and (ANCHOR == "none" or STAT == "none"):
     raise ValueError("ANCHOR_WEIGHT='stat' requires ANCHOR='fd' and a STAT")
 if not 0.0 < TRAIN_FRAC <= 1.0:
@@ -269,6 +279,10 @@ PHYS_DIV = (PHYS_SCALE if PHYS_NORM == "max"
             else float(np.sqrt(PHYS_VAR)))
 
 # IC yardsticks: the variance each channel actually explores.
+# TLS column yardsticks: RMS of [x_tt | library] on the SAME FD design.
+# Always built (cheap) so BOTH readouts are reported in every arm.
+TLS_SCALE = tls_scales(_y_fd, _A_fd).to(device=device, dtype=torch.float32)
+
 IC_NORM_X = float(np.var(x_data[:n_train])) + EPS
 IC_NORM_V = float(np.var(v_data[:n_train])) + EPS
 T_SPAN = t_split - T_MIN
@@ -326,19 +340,26 @@ def physics_and_stat_loss(net, T_coll):
             per = per * score.detach().to(per.dtype)
         l_anch = per.sum().to(y.dtype)
 
-    if COEF_SOURCE == "true":
-        c_phys = THETA_TRUE
-    elif COEF_SOURCE == "fd":
-        c_phys = THETA_FD
+    w0 = float("nan")
+    if COEF_SOURCE == "tls":
+        # Target-free: no residual against x_tt, the smallest eigenvalue of
+        # the scaled design instead. The logged recovery is the TLS one.
+        l_phys, c_log, w0 = tls_fit(y, A, TLS_SCALE)
     else:
-        c_phys = c_hat.to(y.dtype)
-    r = (y - A @ c_phys) / PHYS_DIV
-    l_phys = ((r ** 2).mean() if PHYS_AGG == "mean"
-              else ((mask @ (r ** 2))
-                    / mask.sum(dim=1).clamp(min=1.0)).mean())
+        if COEF_SOURCE == "true":
+            c_phys = THETA_TRUE
+        elif COEF_SOURCE == "fd":
+            c_phys = THETA_FD
+        else:
+            c_phys = c_hat.to(y.dtype)
+        r = (y - A @ c_phys) / PHYS_DIV
+        l_phys = ((r ** 2).mean() if PHYS_AGG == "mean"
+                  else ((mask @ (r ** 2))
+                        / mask.sum(dim=1).clamp(min=1.0)).mean())
+        c_log = c_hat
 
     return dict(phys=l_phys, stat=l_stat, anch=l_anch,
-                theta_hat=c_hat.detach(), x=x.detach(),
+                theta_hat=c_log.detach(), x=x.detach(), w0=w0,
                 gram=(A.t() @ A).detach())
 
 
@@ -423,7 +444,8 @@ def _log(it, cur, terms, ml, gsh):
           f"|g| phys={gsh['phys']:.2e} dat={gsh['dat']:.2e} "
           f"(phys share {grad_share(gsh):.0%})  | theta_hat="
           f"{ml['theta_hat'].cpu().numpy().round(4).tolist()}  "
-          f"cond={float(torch.linalg.cond(ml['gram'].double())):.1e}",
+          f"cond={float(torch.linalg.cond(ml['gram'].double())):.1e}"
+          + (f"  w0={ml['w0']:.3f}" if COEF_SOURCE == "tls" else ""),
           flush=True)
 
 
@@ -466,8 +488,18 @@ _tr = slice(0, n_train)
 A_eval = build_features(T_train[:, 0], torch.tensor(x_g[_tr], device=device),
                         torch.tensor(v_g[_tr], device=device), OMEGA)
 y_eval = torch.tensor(a_g[_tr], device=device)
-theta_hat, res_eval = global_ols(y_eval, A_eval, ridge=EPS)
-theta_hat = theta_hat.cpu().numpy()
+theta_ols_t, res_eval = global_ols(y_eval, A_eval, ridge=EPS)
+theta_hat_ols = theta_ols_t.cpu().numpy()
+# The TLS readout on the same train-window field, reported in EVERY arm so
+# the estimator and the loss can be separated: (ols loss, tls readout) and
+# (tls loss, ols readout) are the cross terms.
+with torch.no_grad():
+    _lam_eval, _theta_tls_t, tls_w0_eval = tls_fit(y_eval, A_eval, TLS_SCALE)
+tls_lam_eval = float(_lam_eval)
+theta_hat_tls = _theta_tls_t.cpu().numpy()
+# The ARM's own readout -- the estimator its loss trained. Drives the
+# headline error and the integration test.
+theta_hat = theta_hat_tls if COEF_SOURCE == "tls" else theta_hat_ols
 
 in_t = (T_train[:, 0].unsqueeze(0) >= T_LO) & (T_train[:, 0].unsqueeze(0) < T_HI)
 mask_eval = in_t.to(A_eval.dtype)
@@ -480,6 +512,8 @@ with torch.no_grad():
     anchor_scale = float(max_corr(y_eval, A_eval))
 
 net_err = _rel_l1(theta_hat, THETA_TRUE.cpu().numpy())
+net_err_ols = _rel_l1(theta_hat_ols, THETA_TRUE.cpu().numpy())
+net_err_tls = _rel_l1(theta_hat_tls, THETA_TRUE.cpu().numpy())
 
 
 # ---------------------------------------------- test by INTEGRATION
@@ -549,6 +583,9 @@ print(f"  max|err| = {stats['max_abs']:.4e}   "
 print(f"  theta_hat = {theta_hat.round(4).tolist()}   "
       f"({', '.join(COEF_NAMES)})")
 print(f"  true      = {THETA_TRUE.cpu().numpy().round(4).tolist()}")
+print(f"  readouts  : OLS {theta_hat_ols.round(5).tolist()} (rel-L1 {net_err_ols:.4e})"
+      f"   TLS {theta_hat_tls.round(5).tolist()} (rel-L1 {net_err_tls:.4e})"
+      f"   TLS lam={tls_lam_eval:.3e} w0={tls_w0_eval:.4f}")
 if ANCHOR_ERR is not None:
     print(f"  anchor    = {THETA_FD.cpu().numpy().round(4).tolist()}   "
           f"rel-L1 err: net {net_err:.4e}  vs anchor {ANCHOR_ERR:.4e}   "
@@ -567,6 +604,10 @@ np.savez(out_path,
          t=t_grid, x_data=x_data, x_pred=x_pred, x_pred_final=x_pred_final,
          v_pred=v_g, a_pred=a_g,
          theta_hat=theta_hat, theta_true=THETA_TRUE.cpu().numpy(),
+         theta_hat_ols=theta_hat_ols, theta_hat_tls=theta_hat_tls,
+         net_err_ols=np.float64(net_err_ols), net_err_tls=np.float64(net_err_tls),
+         tls_lam=np.float64(tls_lam_eval), tls_w0=np.float64(tls_w0_eval),
+         tls_scale=TLS_SCALE.cpu().numpy(),
          theta_fd=(THETA_FD.cpu().numpy() if THETA_FD is not None
                    else np.zeros(0, dtype=np.float32)),
          anchor_err=np.float32(ANCHOR_ERR if ANCHOR_ERR is not None else np.nan),
