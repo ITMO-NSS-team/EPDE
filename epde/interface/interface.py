@@ -26,6 +26,7 @@ import epde.globals as global_var
 from epde.operators.common.objectives import ideal_point
 from epde.interface.search_config import (UNSET, active_config, build_tokens, check_auto_settings,
                                           check_rps_params, collect_overrides, load_search_config,
+                                          resolve_patience, resolve_plain_params,
                                           set_active_config)
 from epde.interface.legacy_api import (LEGACY_DATA_KEYS, LEGACY_INIT_KEYS,
                                        reject_removed, split_legacy, warn_legacy)
@@ -376,9 +377,10 @@ class EpdeSearch(object):
                 default value is 0.9, as in the MOEA/DD paper.
             training_epochs (`int`): optional
                 The most epochs the fit runs (``EvolutionConfig``; default 100).
-            early_stopping_patience (`int` or None): optional
+            early_stopping_patience (`int`, None or `'auto'`): optional
                 Stop earlier, once the structures on the first Pareto level are unchanged
-                for this many epochs in a row (default 5); None runs every epoch. A given
+                for this many epochs in a row; None runs every epoch. Default: the
+                search's (``'auto'``: None for plain-mode NSGA-II, 5 otherwise). A given
                 ``early_stopping_callback`` is still asked each epoch.
             PBI_penalty (`float`):  optional
                 The penalty parameter :math:`\\theta`, used in penalty based intersection
@@ -402,6 +404,8 @@ class EpdeSearch(object):
             training_epochs = evolution.training_epochs
         if early_stopping_patience is UNSET:
             early_stopping_patience = evolution.early_stopping_patience
+        early_stopping_patience = resolve_patience(
+            early_stopping_patience, self._config.search_space.system_rps_mode, evolution.engine)
         check_auto_settings('auto', population_size, training_epochs, early_stopping_patience)
 
         # H is always population_size - 1: for the two-objective weight space
@@ -455,7 +459,8 @@ class EpdeSearch(object):
                 Method for sorting of individs in population.
             training_epochs (`int`): optional, default - 100
                 The most iterations.
-            early_stopping_patience (`int` or None): optional, default - 5
+            early_stopping_patience (`int`, None or `'auto'`): optional, default - the
+                search's (``'auto'``: 5)
                 Stop earlier, once the best individual's structure is unchanged for this many
                 iterations; None runs every iteration.
         Returns:
@@ -470,6 +475,8 @@ class EpdeSearch(object):
             training_epochs = evolution.training_epochs
         if early_stopping_patience is UNSET:
             early_stopping_patience = evolution.early_stopping_patience
+        early_stopping_patience = resolve_patience(
+            early_stopping_patience, self._config.search_space.system_rps_mode, evolution.engine)
         check_auto_settings('auto', population_size, training_epochs, early_stopping_patience)
 
         self.optimizer_init_params = {'pop_size' : population_size, 'solution_params': solution_params,
@@ -1536,6 +1543,11 @@ class EpdeSearch(object):
             "second_objective": self._second_objective}
 
         init_params, exec_params = self._resolved_budget()
+        if active_config().search_space.system_rps_mode == 'plain':
+            # Plain mode's variable order draws from a generator of its own,
+            # seeded once per fit (system_rps_params['variable_order_seed']).
+            from epde.operators.common.plain_fit import start_variable_order
+            start_variable_order(resolve_plain_params(active_config())['variable_order_seed'])
         if optimizer is None:
             self.optimizer = self._create_optimizer(
                 self.multiobjective_mode, init_params,

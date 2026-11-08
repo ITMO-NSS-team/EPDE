@@ -14,6 +14,9 @@ member of a dominance cycle (``supplementary.cycle_safe_nds``). Under
 ``evolution.niching='per_equation'`` the truncation keeps the holders of every
 equation's own front first (``NSGAOptimizer._protected_first``) and the
 tournament compares per-equation plane ranks (``operators.plane_ranks``).
+Under ``evolution.niching='per_variable'`` (the default of plain mode) every
+equation is ranked in its own plane only -- truncation, tournaments, the
+assembly crossover and the initial population (``per_variable``).
 
 An archive keeps every evaluated system that no archived system dominates,
 and after the fit the archive is sorted in with the last generation, so a
@@ -194,7 +197,11 @@ class NSGAOptimizer(MOEADDOptimizer):
 
     def _truncate(self) -> None:
         from epde.operators.multiobjective.moeadd_specific import niching_per_equation
+        from epde.optimizers.nsga.per_variable import niching_per_variable, truncate
         levels_obj = self.pareto_levels
+        if niching_per_variable(levels_obj.population):
+            truncate(self)
+            return
         levels = cycle_safe_nds(levels_obj.population)
         if niching_per_equation(levels_obj.population):
             survivors = self._protected_first(levels_obj.population, levels)

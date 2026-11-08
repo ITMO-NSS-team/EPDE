@@ -60,7 +60,7 @@ import copy
 import json
 import os
 from dataclasses import MISSING, dataclass, field, fields, replace
-from numbers import Integral
+from numbers import Integral, Real
 from typing import Any, Dict, Optional, Union
 
 __all__ = ['UNSET', 'SearchConfig', 'load_search_config', 'KEY_GROUP',
@@ -225,8 +225,39 @@ class SearchSpaceConfig:
       neither does both enter the population. ``equation_terms_max_number``
       alone bounds it, as in every mode: an equation keeps every term it
       holds, at most ``equation_terms_max_number - 1`` besides its target, the
-      constant counting 1. With no subset search the mode has no settings.
-      Not available with the solver-based fitness.
+      constant counting 1. Not available with the solver-based fitness.
+
+    ``'plain'`` mode's settings (``system_rps_params``) make up its universal
+    search. The ``'auto'`` ones resolve by :func:`resolve_plain_params`: on
+    under ``evolution.engine='nsga2'`` (with ``niching='per_variable'``, the
+    combination measured on 13 systems, clean and with 5% noise), off under
+    MOEA/DD, which keeps the bare mode.
+
+    * ``fill_probability`` -- the chance that a mutation's move is replaced by
+      the fill-and-prune move: an exact weighted least-squares beam over the
+      whole library fills the equation, a probabilistic prune weighted by the
+      fit loss thins it (``epde.operators.common.fill_prune``). ``'auto'``:
+      0.25 / 0. Its parameters: ``fill_beam_width`` (1000) supports kept per
+      size, ``fill_top`` (20) best ones the fill is drawn from,
+      ``fill_prune_alpha`` (0.3) the prune's removal scale, and
+      ``fill_levels`` -- ``'all'`` draws the fill's size uniformly up to the
+      cap, ``'max'`` always fills to the cap.
+    * ``product_rule_decline`` -- ``'off'``, ``'plain'`` or ``'trig'``:
+      decline a fitted version whose target is one member of a product-rule
+      pair, which integration by parts makes nearly collinear on weak rows
+      (``epde.operators.common.product_rule``; ``'trig'`` also reads sin /
+      cos factors). Weak rows only. ``'auto'``: ``'trig'`` on weak rows under
+      NSGA-II, ``'off'`` otherwise.
+    * ``variable_order`` -- ``'fixed'`` or ``'random'``: the order in which
+      the equations claim their targets and are tested for redundancy, a
+      random permutation per fit drawn from a generator of its own, seeded by
+      ``variable_order_seed`` (None: from the global random state).
+      ``'auto'``: ``'random'`` / ``'fixed'``.
+    * ``plain_target`` -- restrict every target to a plain own-derivative
+      token (one derivative factor of power 1). ``'auto'``: True / False.
+    * ``factor_move_probability`` -- the chance that a mutation edits one
+      factor of a term instead (power +-1, add or drop a factor).
+      ``'auto'``: 1/6 / 0.
 
     ``equation_terms_max_number`` bounds an equation's STRUCTURE in every
     mode: the terms it holds, the target included -- the library
@@ -284,9 +315,24 @@ SYSTEM_RPS_PARAMS = {
     'repair': {},
     'assignment': {'selected_terms_max_number': None, 'screen_size': None,
                    'variant_pick': 'random'},
-    'plain': {},
+    'plain': {'fill_probability': 'auto', 'fill_beam_width': 1000, 'fill_top': 20,
+              'fill_prune_alpha': 0.3, 'fill_levels': 'all', 'product_rule_decline': 'auto',
+              'variable_order': 'auto', 'variable_order_seed': None, 'plain_target': 'auto',
+              'factor_move_probability': 'auto'},
 }
 assert tuple(SYSTEM_RPS_PARAMS) == SYSTEM_RPS_MODES
+#: ``'plain'`` mode's ``'auto'`` settings: ``'universal'`` under
+#: ``evolution.engine='nsga2'`` (the universal search), ``'bare'`` otherwise;
+#: see :func:`resolve_plain_params`.
+PLAIN_AUTO = {
+    'universal': {'fill_probability': 0.25, 'variable_order': 'random', 'plain_target': True,
+                  'factor_move_probability': 1.0 / 6.0},
+    'bare': {'fill_probability': 0.0, 'variable_order': 'fixed', 'plain_target': False,
+             'factor_move_probability': 0.0},
+}
+#: ``fill_levels`` values, ``variable_order`` values (resolved).
+FILL_LEVELS = ('all', 'max')
+VARIABLE_ORDERS = ('fixed', 'random')
 #: Which non-dominated variant a system takes in ``'assignment'`` mode
 #: (its ``variant_pick`` setting).
 VARIANT_PICKS = ('random', 'sector')
@@ -409,6 +455,76 @@ def resolve_rps_params(rps_mode, params) -> dict:
     return resolved
 
 
+def resolve_plain_params(config) -> dict:
+    """``'plain'`` mode's settings of ``config`` (a :class:`SearchConfig`)
+    with every ``'auto'`` resolved: the universal search's values
+    (:data:`PLAIN_AUTO` ``['universal']``) under plain-mode NSGA-II, the bare
+    mode's otherwise; ``product_rule_decline`` is ``'trig'`` on weak rows
+    under plain-mode NSGA-II and ``'off'`` otherwise. Any other mode's
+    configuration gives the plain defaults so resolved (the bare mode)."""
+    space = config.search_space
+    params = dict(SYSTEM_RPS_PARAMS['plain'])
+    if space.system_rps_mode == 'plain':
+        params.update(space.system_rps_params)
+    return _resolve_plain_autos(params, _plain_nsga2(space.system_rps_mode, config.evolution.engine),
+                                config.domain.evaluation_form == 'weak')
+
+
+def _resolve_plain_autos(params, universal, weak) -> dict:
+    """``params`` (``'plain'`` mode's settings) with every ``'auto'``
+    replaced, a new dict; ``universal``: plain-mode NSGA-II. See
+    :func:`resolve_plain_params`."""
+    params = dict(params)
+    auto = PLAIN_AUTO['universal' if universal else 'bare']
+    for key, value in auto.items():
+        if isinstance(params[key], str) and params[key] == 'auto':
+            params[key] = value
+    if params['product_rule_decline'] == 'auto':
+        params['product_rule_decline'] = 'trig' if (weak and universal) else 'off'
+    return params
+
+
+def check_plain_params(params) -> None:
+    """``'plain'`` mode's settings: the probabilities in [0, 1] (or
+    ``'auto'``), the beam width and the top count positive integers, the prune
+    scale positive, ``fill_levels`` one of :data:`FILL_LEVELS`,
+    ``product_rule_decline`` one of ``DECLINE_MODES`` (or ``'auto'``),
+    ``variable_order`` one of :data:`VARIABLE_ORDERS` (or ``'auto'``),
+    ``plain_target`` a bool (or ``'auto'``) and ``variable_order_seed`` an int
+    or None."""
+    from epde.operators.common.product_rule import DECLINE_MODES
+
+    def refuse(key, what):
+        raise ValueError("search_space.system_rps_params[{0!r}] must be {1}, instead got "
+                         '{2!r}.'.format(key, what, params[key]))
+
+    for key in ('fill_probability', 'factor_move_probability'):
+        value = params[key]
+        if value == 'auto' and isinstance(value, str):
+            continue
+        if isinstance(value, bool) or not isinstance(value, Real) or not 0.0 <= value <= 1.0:
+            refuse(key, "'auto' or a number in [0, 1]")
+    for key in ('fill_beam_width', 'fill_top'):
+        if params[key] is None or not _positive_int_or_none(params[key]):
+            refuse(key, 'a positive integer')
+    alpha = params['fill_prune_alpha']
+    if isinstance(alpha, bool) or not isinstance(alpha, Real) or not alpha > 0:
+        refuse('fill_prune_alpha', 'a positive number')
+    choices = (('fill_levels', FILL_LEVELS, False),
+               ('product_rule_decline', DECLINE_MODES, True),
+               ('variable_order', VARIABLE_ORDERS, True))
+    for key, menu, auto in choices:
+        value = params[key]
+        if not (isinstance(value, str) and (value in menu or (auto and value == 'auto'))):
+            refuse(key, 'one of {0}'.format(list(menu) + (['auto'] if auto else [])))
+    target = params['plain_target']
+    if not (isinstance(target, bool) or (isinstance(target, str) and target == 'auto')):
+        refuse('plain_target', "a bool or 'auto'")
+    seed = params['variable_order_seed']
+    if not (seed is None or (isinstance(seed, Integral) and not isinstance(seed, bool))):
+        refuse('variable_order_seed', 'an int or None')
+
+
 def rps_param(search_space, key):
     """The ``key`` setting of ``search_space``'s mode: its
     ``system_rps_params`` value, else the mode's default; None when the mode
@@ -424,7 +540,11 @@ def check_rps_params(rps_mode, terms, params) -> None:
     None, the screen needs the cap, ``variant_pick`` is one of
     :data:`VARIANT_PICKS`, and the subset search scores at most
     :data:`ASSIGNMENT_MAX_SUBSETS` subsets of an equation's ``terms`` columns
-    (``terms - 1`` features and the constant)."""
+    (``terms - 1`` features and the constant). ``'plain'`` mode:
+    :func:`check_plain_params`."""
+    if rps_mode == 'plain':
+        check_plain_params(params)
+        return
     if rps_mode != 'assignment':
         return
     selected, screen = params['selected_terms_max_number'], params['screen_size']
@@ -683,6 +803,9 @@ class EvolutionConfig:
     the first Pareto level (NSGA-II's archive; the best individual's structure
     in single-objective mode) has not changed for that many epochs in a row.
     ``None`` runs every epoch. Either engine, either mode, any limit.
+    ``'auto'`` (the default) is ``None`` for plain-mode NSGA-II, whose
+    universal search was measured over its full epochs, and 5 otherwise
+    (:func:`resolve_patience`).
 
     ``operators`` is the per-operator parameter mapping. As DECLARED it holds
     only what a caller overrode; :func:`load_search_config` resolves it into
@@ -705,6 +828,18 @@ class EvolutionConfig:
       by crowding within its own plane. Mating serves equation ``k mod n`` at
       weight vector ``k``, in that equation's own plane. A single-equation
       system keeps ``'system'``.
+    * ``'per_variable'`` -- NSGA-II in plain mode only: every equation is
+      ranked in its own plane and nothing is compared across planes but the
+      ranks and the number of plane fronts held. The truncation goes round
+      the planes (one copy of every front equation first), the tournaments
+      run in single planes, and each mating pair also makes an ASSEMBLED
+      child: one parent with the other's equation of the other plane, which
+      enters its first fit unmutated. The initial population keeps at most
+      half its members on level 0 of every plane
+      (``epde.optimizers.nsga.per_variable``). A single-equation system keeps
+      ``'system'``.
+    * ``'auto'`` (the default) -- ``'per_variable'`` for plain-mode NSGA-II,
+      ``'system'`` otherwise (:func:`resolve_niching`).
 
     ``complementary_mating_prob`` is the probability that the second parent is
     drawn from the systems holding some equation's front where the first
@@ -735,23 +870,47 @@ class EvolutionConfig:
     """
     population_size: Union[str, int] = 'auto'
     training_epochs: int = 100
-    early_stopping_patience: Optional[int] = 5
+    early_stopping_patience: Union[str, int, None] = 'auto'
     neighbors_number: int = 3
     PBI_penalty: float = 5.0
     subregion_mating_limitation: float = 0.9
     solution_params: dict = field(default_factory=dict)
     director_params: dict = field(default_factory=_default_director_params)
     operators: dict = field(default_factory=dict)
-    niching: str = 'system'
+    niching: str = 'auto'
     complementary_mating_prob: float = 0.0
     engine: str = 'moeadd'
 
 
 #: How a multi-equation system survives and mates; see
 #: :attr:`EvolutionConfig.niching`.
-NICHING_MODES = ('system', 'per_equation')
+NICHING_MODES = ('system', 'per_equation', 'per_variable')
 #: The multi-objective algorithm; see :attr:`EvolutionConfig.engine`.
 ENGINES = ('moeadd', 'nsga2')
+#: ``early_stopping_patience='auto'`` outside plain-mode NSGA-II.
+DEFAULT_PATIENCE = 5
+
+
+def _plain_nsga2(rps_mode, engine) -> bool:
+    return rps_mode == 'plain' and engine == 'nsga2'
+
+
+def resolve_niching(niching, rps_mode, engine) -> str:
+    """``evolution.niching`` with ``'auto'`` resolved: ``'per_variable'`` for
+    plain-mode NSGA-II, ``'system'`` otherwise."""
+    if niching != 'auto':
+        return niching
+    return 'per_variable' if _plain_nsga2(rps_mode, engine) else 'system'
+
+
+def resolve_patience(patience, rps_mode, engine):
+    """``evolution.early_stopping_patience`` with ``'auto'`` resolved: None
+    (every epoch) for plain-mode NSGA-II, :data:`DEFAULT_PATIENCE` otherwise."""
+    if patience != 'auto':
+        return patience
+    return None if _plain_nsga2(rps_mode, engine) else DEFAULT_PATIENCE
+
+
 #: ``population_size='auto'``: the fewest systems seeded (raised to twice the
 #: equation count under ``niching='per_equation'``, where weight vector ``k``
 #: serves equation ``k mod n``, and above ``neighbors_number``) and the most.
@@ -764,8 +923,8 @@ def check_auto_settings(boundary_width, population_size, training_epochs,
     """Refuse values of the settings that take ``'auto'`` other than ``'auto'``
     or what each accepts besides: a non-negative int (or one per axis) for
     ``boundary_width`` and an int >= 2 for ``population_size``; and the budget,
-    an int >= 0 for ``training_epochs`` and an int >= 1 or None for
-    ``early_stopping_patience``."""
+    an int >= 0 for ``training_epochs`` and ``'auto'``, an int >= 1 or None
+    for ``early_stopping_patience``."""
     def integral(value, low):
         return isinstance(value, Integral) and not isinstance(value, bool) and value >= low
 
@@ -785,9 +944,10 @@ def check_auto_settings(boundary_width, population_size, training_epochs,
             'evolution.training_epochs must be an int >= 0 -- the most epochs; '
             'evolution.early_stopping_patience stops earlier -- instead got '
             '{0!r}.'.format(training_epochs))
-    if not (early_stopping_patience is None or integral(early_stopping_patience, 1)):
+    if not (early_stopping_patience is None or integral(early_stopping_patience, 1)
+            or (isinstance(early_stopping_patience, str) and early_stopping_patience == 'auto')):
         raise ValueError(
-            'evolution.early_stopping_patience must be an int >= 1 or None, instead '
+            "evolution.early_stopping_patience must be 'auto', an int >= 1 or None, instead "
             'got {0!r}.'.format(early_stopping_patience))
 
 
@@ -1377,10 +1537,10 @@ def _check_types(resolved: dict) -> None:
     space['system_rps_params'] = resolve_rps_params(rps_mode, space['system_rps_params'])
     pick = space['system_rps_params'].get('variant_pick')
     niching = resolved['evolution']['niching']
-    if niching not in NICHING_MODES:
+    if niching not in NICHING_MODES + ('auto',):
         raise ValueError(
             'evolution.niching must be one of {0}, instead got {1!r}.'.format(
-                list(NICHING_MODES), niching))
+                list(NICHING_MODES) + ['auto'], niching))
     mating = resolved['evolution']['complementary_mating_prob']
     if isinstance(mating, bool) or not isinstance(mating, (int, float)) \
             or not 0.0 <= mating <= 1.0:
@@ -1421,7 +1581,28 @@ def _check_types(resolved: dict) -> None:
             raise ValueError(
                 "search_space.system_rps_params['variant_pick']='sector' is a MOEA/DD "
                 "setting, not supported with evolution.engine='nsga2'.")
+    # The 'auto' settings follow the mode and the engine (EvolutionConfig,
+    # SearchSpaceConfig). The config keeps 'auto'; each reader resolves it
+    # (resolve_niching, resolve_patience, resolve_plain_params).
+    niching = resolve_niching(niching, rps_mode, engine)
+    if niching == 'per_variable':
+        if not _plain_nsga2(rps_mode, engine):
+            raise ValueError(
+                "evolution.niching='per_variable' requires search_space.system_rps_mode="
+                "'plain' and evolution.engine='nsga2'.")
+        if mating > 0:
+            # Its mating pairs are planned plane by plane, with no forced pair.
+            raise ValueError(
+                "evolution.complementary_mating_prob is not supported with "
+                "evolution.niching='per_variable', whose selection pairs the planes itself.")
     check_rps_params(rps_mode, space['equation_terms_max_number'], space['system_rps_params'])
+    if rps_mode == 'plain':
+        weak = resolved['domain']['evaluation_form'] == 'weak'
+        plain = _resolve_plain_autos(space['system_rps_params'], _plain_nsga2(rps_mode, engine), weak)
+        if plain['product_rule_decline'] != 'off' and not weak:
+            raise ValueError(
+                "search_space.system_rps_params['product_rule_decline'] reads the weak rows' "
+                "integration by parts; it requires domain.evaluation_form='weak'.")
     check_evaluation_budget(resolved['domain']['evaluation_stride'],
                             resolved['solver']['use_solver'])
     check_evaluation_form(resolved['domain']['evaluation_form'],

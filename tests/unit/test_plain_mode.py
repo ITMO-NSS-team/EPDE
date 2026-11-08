@@ -79,10 +79,13 @@ def _signatures(equation):
 
 class TestTheSettings:
 
-    def test_plain_has_no_settings(self):
+    def test_plain_settings_default_to_their_declared_values(self):
+        # Plain mode's settings make up the universal search (test_universal_search); the
+        # config keeps the declared values, 'auto' included.
+        from epde.interface.search_config import SYSTEM_RPS_PARAMS
         cfg = load_search_config(overrides={'system_rps_mode': 'plain'})
         assert cfg.search_space.system_rps_mode == 'plain'
-        assert cfg.search_space.system_rps_params == {}
+        assert cfg.search_space.system_rps_params == SYSTEM_RPS_PARAMS['plain']
 
     @pytest.mark.parametrize('key, value', [('selected_terms_max_number', 4),
                                             ('screen_size', 5), ('variant_pick', 'random')])

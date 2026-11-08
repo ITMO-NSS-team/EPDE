@@ -1016,7 +1016,11 @@ class InitialParetoLevelSorting(CompoundOperator):
             # drawn while more than half are non-dominated (``extension``), and
             # an extension slot that finds no new system is dropped.
             requested = len(objective.unplaced_candidates)
-            first_level = _FirstLevelCount()
+            # evolution.niching='per_variable': at most half on level 0 of
+            # every equation's own plane.
+            from epde.optimizers.nsga.per_variable import PerPlaneFirstLevelCount, niching_per_variable
+            first_level = (PerPlaneFirstLevelCount() if niching_per_variable(objective.unplaced_candidates)
+                           else _FirstLevelCount())
             extension = set()
             # system_rps_mode='plain': a placed system's S+{1} versions that its
             # fit could not rank against S (``plain_fit.take_siblings``) take the

@@ -17,7 +17,7 @@ from epde.interface.search_config import (
     GROUP_CLASSES, KEY_GROUP, MULTI_OBJECTIVE_OPERATORS, SPARSITY_REGISTRY,
     default_device,
     TOKEN_REGISTRY, UNSET, FromConfig, SearchConfig, build_tokens,
-    collect_overrides, load_search_config, resolve_sparsity)
+    collect_overrides, load_search_config, resolve_patience, resolve_sparsity)
 
 
 # ---------------------------------------------------------------------------
@@ -140,7 +140,8 @@ class TestDefaultPin:
         cfg = load_search_config().evolution
         assert cfg.population_size == 'auto'      # set_moeadd_params; was 6
         assert cfg.training_epochs == 100         # the most epochs (no 'auto')
-        assert cfg.early_stopping_patience == 5
+        assert cfg.early_stopping_patience == 'auto'  # 5, None for plain NSGA-II
+        assert resolve_patience(cfg.early_stopping_patience, 'repair', cfg.engine) == 5
         assert cfg.neighbors_number == 3
         assert cfg.PBI_penalty == 5.0
         assert cfg.subregion_mating_limitation == 0.9
@@ -156,13 +157,15 @@ class TestSingleObjectiveDefaults:
     """``set_singleobjective_params`` used 4 / 50 where MOEA/D used 6 / 100, and
     the loader substituted them on a mode flip. Both modes now share the
     defaults (population 'auto', resolved per mode at fit time; at most 100
-    epochs, patience 5), so nothing is substituted."""
+    epochs, patience 'auto'), so nothing is substituted."""
 
     def test_mode_flip_keeps_auto(self):
         cfg = load_search_config(
             overrides=collect_overrides(multiobjective_mode=False))
         assert cfg.evolution.population_size == 'auto'
-        assert (cfg.evolution.training_epochs, cfg.evolution.early_stopping_patience) == (100, 5)
+        assert (cfg.evolution.training_epochs, cfg.evolution.early_stopping_patience) == (100, 'auto')
+        assert resolve_patience(cfg.evolution.early_stopping_patience,
+                                cfg.search_space.system_rps_mode, cfg.evolution.engine) == 5
 
     def test_explicit_kwarg_still_wins(self):
         cfg = load_search_config(overrides=collect_overrides(

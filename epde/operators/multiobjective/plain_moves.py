@@ -17,12 +17,26 @@ moves that apply to the equation:
 The target is the term the equation's gene names (``plain_fit.gene_term``),
 so swap, drop and nudge never touch it. The constant has no move: the fit
 evaluates every candidate with and without it.
+
+Two settings of ``search_space.system_rps_params`` add moves (on by default
+under ``evolution.engine='nsga2'``, ``search_config.resolve_plain_params``):
+
+* ``factor_move_probability`` -- with this probability, drawn first, one
+  factor of a non-target term is edited instead: its power moves by +-1
+  within its bounds, a random single factor joins a one-factor term, or one
+  factor of a two-factor term leaves. An edit that changes nothing or
+  duplicates another term is undone and the move above runs.
+* ``fill_probability`` -- with this probability, drawn after the move, the
+  move is replaced by the fill-and-prune move (``fill_prune``); when that
+  installs nothing, the drawn move runs.
 """
+from contextlib import contextmanager
+
 import numpy as np
 
 from epde import _loop_stats
 from epde.interface.search_config import active_config, plain_kept_terms_cap
-from epde.operators.common.plain_fit import gene_term, own_derivative_terms, target_gene
+from epde.operators.common.plain_fit import gene_term, own_derivative_terms, plain_params, target_gene
 
 #: Re-draws of a swapped term that keeps duplicating another (TermMutation's).
 MAX_REGEN_RETRIES = 3
@@ -86,9 +100,92 @@ def _nudge(equation, term) -> bool:
     return False
 
 
+#: The system ``SystemMutation`` is mutating (the fill reads the other equations' targets from it).
+_MUTATING = {'system': None}
+
+
+@contextmanager
+def mutating_system(system):
+    """Name ``system`` as the one whose equations are being mutated."""
+    previous = _MUTATING['system']
+    _MUTATING['system'] = system
+    try:
+        yield
+    finally:
+        _MUTATING['system'] = previous
+
+
+def _power_step(term) -> bool:
+    factor = term.structure[np.random.randint(len(term.structure))]
+    for idx, description in factor.params_description.items():
+        if description['name'] == 'power':
+            lo, hi = description['bounds'][:2]
+            new = factor.params[idx] + np.random.choice([-1.0, 1.0])
+            if lo <= new <= hi:
+                params = factor.params.copy()
+                params[idx] = new
+                factor.params = params
+                return True
+    return False
+
+
+def _add_factor(term) -> bool:
+    from epde.structure.main_structures import Term
+    if len(term.structure) >= 2:
+        return False
+    extra = Term(term.pool, max_factors_in_term=1).structure[0]
+    if extra.label in {f.label for f in term.structure}:
+        return False
+    term.structure = term.structure + [extra]
+    return True
+
+
+def _drop_factor(term) -> bool:
+    if len(term.structure) < 2:
+        return False
+    victim = np.random.randint(len(term.structure))
+    term.structure = [f for k, f in enumerate(term.structure) if k != victim]
+    return True
+
+
+_FACTOR_MOVES = (('power', _power_step), ('add', _add_factor), ('drop', _drop_factor))
+
+
+def _factor_move(equation) -> bool:
+    """One factor edit of a random non-target term (module docstring); True when it changed the equation,
+    which is then reset for a new fit, False (everything undone) otherwise."""
+    target = gene_term(equation)
+    features = [t for t in equation.structure if t is not target]
+    if not features:
+        return False
+    term = features[np.random.randint(len(features))]
+    kind, move = _FACTOR_MOVES[np.random.randint(len(_FACTOR_MOVES))]
+    original = list(term.structure)
+    saved = [(f, f.params.copy()) for f in original]
+    changed = move(term)
+    term.resetSavedState()
+    if changed and _duplicated(equation):
+        changed = False
+    if not changed:
+        term.structure = original
+        for f, params in saved:
+            f.params = params
+        term.resetSavedState()
+        equation._invalidate_label_cache()
+        return False
+    _loop_stats.record('PlainMutation.factor_' + kind, 1, 1)
+    equation._invalidate_label_cache()
+    equation.reset_state(reset_right_part=True)
+    return True
+
+
 def plain_mutation(equation):
     """One plain-mode move on ``equation``, in place; the equation is reset
     for a new fit when the move changed it (its target gene survives)."""
+    params = plain_params()
+    if params['factor_move_probability'] > 0 and np.random.random() < params['factor_move_probability']:
+        if _factor_move(equation):
+            return equation
     space = active_config().search_space
     cap = plain_kept_terms_cap(space.equation_terms_max_number)
     target = gene_term(equation)
@@ -110,8 +207,14 @@ def plain_mutation(equation):
     if not moves:
         return equation
     move = moves[np.random.randint(len(moves))]
+    if params['fill_probability'] > 0:
+        from epde.operators.common.fill_prune import fill
+        if fill(equation, target, features, _MUTATING['system'], params):
+            move = 'fill'
 
-    if move == 'swap':
+    if move == 'fill':
+        changed = True
+    elif move == 'swap':
         changed = _swap(equation, features[np.random.randint(len(features))])
     elif move == 'add':
         changed = equation.add_random_term()

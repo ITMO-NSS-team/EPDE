@@ -101,8 +101,19 @@ class ParetoLevelsCrossover(CompoundOperator):
             the new population, containing both parents and offsprings;
         
         """
-        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)        
-        
+        self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
+
+        # evolution.niching='per_variable': the selection planned the pairs and
+        # each makes an assembled child (epde.optimizers.nsga.per_variable).
+        plan = getattr(objective, 'pv_plan', None)
+        if plan is not None:
+            coins = objective.pv_coins
+            objective.pv_plan = objective.pv_coins = None
+            if plan:
+                from epde.optimizers.nsga.per_variable import crossover
+                crossover(self, objective, plan, coins, subop_args)
+                return objective
+
         crossover_pool = []
         for solution in objective.population:
             crossover_pool.extend([solution,] * solution.crossover_times())

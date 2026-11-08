@@ -133,11 +133,16 @@ def _axis_ranges() -> Optional[list]:
     return manager.axis_ranges() if hasattr(manager, 'axis_ranges') else None
 
 
-def redundant_equations(equations: list, ranges: list = None) -> List[int]:
+def redundant_equations(equations: list, ranges: list = None, order: list = None) -> List[int]:
     """Positions of the fitted ``equations`` (one system) that follow from the others, tested in order:
     an equation found to follow is left out of the others for the ones after it, so a relation stated
     twice loses one statement. [] for one equation, or when a token cannot be differentiated here.
-    ``ranges`` -- (min, max) per axis -- default to the registered data's."""
+    ``ranges`` -- (min, max) per axis -- default to the registered data's.
+
+    ``order`` (a permutation of the positions) tests in that order instead. The random points are the
+    same for every order: they are drawn by the test in the equations' own order, which runs first, and
+    the permuted test reuses them; its positions come back sorted, and the own order's result when the
+    two agree."""
     if len(equations) < 2:
         return []
     ranges = ranges if ranges is not None else _axis_ranges()
@@ -154,32 +159,41 @@ def redundant_equations(equations: list, ranges: list = None) -> List[int]:
     residuals = [_residual(eq, jet, ndim) for eq in equations]
     if any(r is None for r in residuals):
         return []
-    redundant = []
-    for i, eq in enumerate(equations):
-        value = residuals[i][0]
-        scale = np.linalg.norm(value)
-        if not np.isfinite(scale) or scale == 0:
-            continue
-        multipliers = [np.ones(n)] + [jet.field(var, (0,) * ndim) for var in fields]
-        for term in eq.structure:
-            for factor in term.structure:
-                evaluated = _factor(factor, jet, ndim)
-                multipliers.append(evaluated[0])
-        columns = []
-        for j, (other, grads) in enumerate(residuals):
-            if j == i or j in redundant:
+
+    def tested(sequence) -> list:
+        redundant = []
+        for i in sequence:
+            eq = equations[i]
+            value = residuals[i][0]
+            scale = np.linalg.norm(value)
+            if not np.isfinite(scale) or scale == 0:
                 continue
-            columns.extend(m * other for m in multipliers)
-            columns.extend(grads)
-        if not columns:
-            continue
-        basis = np.stack(columns, axis=1)
-        norms = np.linalg.norm(basis, axis=0)
-        keep = np.isfinite(norms) & (norms > 0)
-        if not keep.any():
-            continue
-        basis = basis[:, keep] / norms[keep]
-        coef, *_ = np.linalg.lstsq(basis, value / scale, rcond=None)
-        if np.linalg.norm(value / scale - basis @ coef) < REDUNDANCY_RTOL:
-            redundant.append(i)
-    return redundant
+            multipliers = [np.ones(n)] + [jet.field(var, (0,) * ndim) for var in fields]
+            for term in eq.structure:
+                for factor in term.structure:
+                    evaluated = _factor(factor, jet, ndim)
+                    multipliers.append(evaluated[0])
+            columns = []
+            for j, (other, grads) in enumerate(residuals):
+                if j == i or j in redundant:
+                    continue
+                columns.extend(m * other for m in multipliers)
+                columns.extend(grads)
+            if not columns:
+                continue
+            basis = np.stack(columns, axis=1)
+            norms = np.linalg.norm(basis, axis=0)
+            keep = np.isfinite(norms) & (norms > 0)
+            if not keep.any():
+                continue
+            basis = basis[:, keep] / norms[keep]
+            coef, *_ = np.linalg.lstsq(basis, value / scale, rcond=None)
+            if np.linalg.norm(value / scale - basis @ coef) < REDUNDANCY_RTOL:
+                redundant.append(i)
+        return redundant
+
+    own = tested(range(len(equations)))
+    if order is None or list(order) == list(range(len(equations))):
+        return own
+    permuted = sorted(tested(order))
+    return permuted if permuted != sorted(own) else own

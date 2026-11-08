@@ -22,6 +22,25 @@ term, move the target). Nothing is screened, sparsified or enumerated.
   scores the same objectives in both modes.
 * An equation that follows from the system's other equations (the same
   relation restated, ``system_redundancy``) is re-rolled.
+
+Plain-mode settings (``search_space.system_rps_params``; the ``'auto'`` values
+resolve by ``search_config.resolve_plain_params``: on under
+``evolution.engine='nsga2'``, off otherwise):
+
+* ``plain_target`` -- every target choice is restricted to a PLAIN
+  own-derivative token: one factor, a derivative of the equation's own
+  variable (any axis and order), power 1, no other parameter
+  (:func:`is_plain_term`). Decorated terms (squares, products, trig-weighted
+  derivatives) stay allowed on the right-hand side; a gene drifting onto one
+  no longer lets a near relation of the data pose as a law.
+* ``variable_order='random'`` -- the order in which the equations claim
+  their targets (step 1) and are tested for redundancy (step 4) is a random
+  permutation per fit, drawn from a generator of its own
+  (:func:`start_variable_order`), so the global random stream moves only when
+  the order changes an outcome. With the fixed order, the first equation
+  always wins a contested target and always loses a restated relation.
+* ``product_rule_decline`` -- a version solved for one member of a
+  product-rule pair is declined (``product_rule``).
 """
 import itertools
 import weakref
@@ -86,10 +105,164 @@ def gene_term(equation, taken=frozenset()):
 
 def own_derivative_terms(equation, taken=frozenset()) -> list:
     """The terms of ``equation`` that can be its target: those holding a
-    derivative of its own variable, minus the signatures in ``taken``."""
+    derivative of its own variable (plain ones only under ``plain_target``,
+    :func:`is_plain_term`), minus the signatures in ``taken``."""
     var = equation.main_var_to_explain
+    plain = plain_params()['plain_target']
     return [term for term in equation.structure
-            if term.contains_deriv(var) and term.factors_labels not in taken]
+            if term.contains_deriv(var) and term.factors_labels not in taken
+            and (not plain or is_plain_term(term, var))]
+
+
+def plain_params() -> dict:
+    """The active plain-mode settings, ``'auto'`` resolved."""
+    from epde.interface.search_config import resolve_plain_params
+    return resolve_plain_params(active_config())
+
+
+def is_plain_term(term, var) -> bool:
+    """A plain own-derivative token of ``var``: a single factor that is a
+    derivative of ``var`` (any axis, any order), with power 1 (read off the
+    factor's parameter, never off a label) and no other parameter."""
+    if len(term.structure) != 1 or not term.contains_deriv(var):
+        return False
+    factor = term.structure[0]
+    names = {d['name']: float(factor.params[i]) for i, d in factor.params_description.items()}
+    return set(names) <= {'power'} and names.get('power', 1.0) == 1.0
+
+
+#: (id(pool), variable) -> (weak reference to the pool, whether its library holds a plain own-derivative
+#: token). The reference is checked on lookup: a new pool at a freed pool's address is checked anew.
+_PLAIN_TOKENS = {}
+#: ``restore_property`` attempts before an equation without a plain target is given up (as
+#: ``right_part_selection._ensure_own_derivative``).
+ENSURE_MAX_ITER = 100
+
+
+def _check_plain_tokens(equation) -> None:
+    """Fail loud when the pool can draw no plain own-derivative token for the equation's variable: under
+    ``plain_target`` such an equation could never have a target."""
+    var = equation.main_var_to_explain
+    pool = equation.pool
+    key = (id(pool), var)
+    entry = _PLAIN_TOKENS.get(key)
+    if entry is not None and entry[0]() is pool:
+        return
+    from epde.operators.common.fill_prune import factors_setting, library_terms
+    library = library_terms(pool, factors_setting(equation))
+    found = any(is_plain_term(term, var) for term in library)
+    _PLAIN_TOKENS[key] = (weakref.ref(pool), found)
+    if not found:
+        raise ValueError(
+            "system_rps_params['plain_target']: the token pool can draw no plain derivative of {0!r} (a single "
+            "derivative factor of power 1), so no equation for it could have a target. Add such a token or set "
+            "plain_target=False.".format(var))
+
+
+def _ensure_target(equation, plain: bool) -> bool:
+    """Give ``equation`` a term that can be its target, through the same
+    ``restore_property`` step ``right_part_selection._ensure_own_derivative``
+    uses. Under ``plain_target`` the term must be plain: an equation without
+    one draws an own derivative up to :data:`ENSURE_MAX_ITER` times, its
+    structure rolled back after every draw that brought no plain one. False
+    when none appeared."""
+    from epde.operators.common.right_part_selection import _ensure_own_derivative
+    if not plain:
+        return _ensure_own_derivative(equation)
+    var = equation.main_var_to_explain
+    _check_plain_tokens(equation)
+    if any(is_plain_term(term, var) for term in equation.structure):
+        return True
+    snapshot = list(equation.structure)
+    for _ in range(ENSURE_MAX_ITER):
+        equation.restore_property(mandatory_family=False, deriv=True)
+        if any(is_plain_term(term, var) for term in equation.structure):
+            return True
+        equation.structure = list(snapshot)
+        equation._invalidate_label_cache()
+    return False
+
+
+# ------------------------------------------------------------------ the variable order
+#: The variable order's generator: one per fit (:func:`start_variable_order`).
+_ORDER = {'rng': None}
+_ORDER_TAG = 0x5256
+
+
+def start_variable_order(seed=None) -> None:
+    """A new generator for ``variable_order='random'``: from ``seed``, or, for
+    None, from the global random state (read, not drawn from)."""
+    if seed is None:
+        entropy = [int(x) for x in np.random.get_state()[1]] + [_ORDER_TAG]
+    else:
+        entropy = [int(seed), _ORDER_TAG]
+    _ORDER['rng'] = np.random.default_rng(entropy)
+
+
+def _claims(equations, fitted, order):
+    """Step 1's deterministic claims under ``order``, read without changing
+    anything: (kind per equation -- ('fit' | 'gene', signature) or ('ensure',
+    None) for an equation holding no own derivative --, the signatures taken,
+    the equations left to draw, the 'ensure' ones)."""
+    taken, kinds = set(), {}
+    fit = list(fitted)
+    for i in order:
+        eq = equations[i]
+        if fit[i]:
+            sig = eq.target.factors_labels
+            if sig not in taken:
+                kinds[i] = ('fit', sig)
+                taken.add(sig)
+                continue
+        fit[i] = False
+    for i in order:
+        if i in kinds:
+            continue
+        eq = equations[i]
+        var = eq.main_var_to_explain
+        if not any(term.contains_deriv(var) for term in eq.structure):
+            kinds[i] = ('ensure', None)
+            continue
+        term = gene_term(eq, taken)
+        if term is not None:
+            kinds[i] = ('gene', term.factors_labels)
+            taken.add(term.factors_labels)
+    draw = [i for i in order if i not in kinds]
+    ensure = [i for i in order if i in kinds and kinds[i][0] == 'ensure']
+    return kinds, taken, draw, ensure
+
+
+def _variable_order(equations, fitted, params):
+    """(order of step 1, order of step 4 or None) for one plain fit.
+
+    Under ``variable_order='random'`` a permutation is drawn for every fit of
+    two or more equations. Step 4 tests in that order. Step 1 uses it only
+    where it can matter -- its deterministic claims differ from the fixed
+    order's, or two equations left to draw could draw the same term and the
+    permutation reorders them, or an equation without an own derivative needs
+    the drawing repair -- and the fixed order otherwise: every outcome the
+    permutation could give then has the same law, and the global random stream
+    stays the fixed order's."""
+    n = len(equations)
+    ident = list(range(n))
+    if n < 2 or params['variable_order'] != 'random':
+        return ident, None
+    if _ORDER['rng'] is None:
+        start_variable_order(params['variable_order_seed'])
+    kinds, taken, draw, ensure = _claims(equations, fitted, ident)
+    overlap = False
+    if len(draw) > 1:
+        seen = {}
+        for i in draw:
+            for term in own_derivative_terms(equations[i], taken):
+                seen.setdefault(term.factors_labels, set()).add(i)
+        overlap = any(len(owners) > 1 for owners in seen.values())
+    perm = [int(x) for x in _ORDER['rng'].permutation(n)]
+    kinds_pi = _claims(equations, fitted, perm)[0] if perm != ident else kinds
+    changed = any(kinds_pi.get(i) != kinds.get(i) for i in range(n))
+    reorders = overlap and [i for i in perm if i in draw] != draw
+    unmodelled = bool(ensure) and len(draw) + len(ensure) >= 2 and perm != ident
+    return (perm if (changed or reorders or unmodelled) else ident), perm
 
 
 def _install_target(equation, term) -> None:
@@ -131,8 +304,10 @@ def _versions(equation, cap, coeff_calc, coeff_args, host, host_args) -> list:
     from epde.operators.common.subset_selection import (
         store_fit, subset_table, support_scores, trajectory_gram)
     from epde.operators.common.objectives import LOSS_NAN_VAL
+    from epde.operators.common.product_rule import declines
 
     cfg = active_config()
+    decline = plain_params()['product_rule_decline']
     metric = cfg.objectives.instability_metric
     gram_mode = cfg.objectives.gram_mode
     discrepancy = cfg.objectives.discrepancy_metric
@@ -203,7 +378,9 @@ def _versions(equation, cap, coeff_calc, coeff_args, host, host_args) -> list:
                   sw_weights, vc_scores)
         coeff_calc.apply(variant, coeff_args)
         variant.remove_zero_terms()
-        if _pruned_to_reducible(variant):
+        # A version the candidate rules refuse, or one solved for a member of a
+        # product-rule pair (product_rule_decline), is not built.
+        if _pruned_to_reducible(variant) or declines(variant, decline):
             continue
         host.apply(variant, host_args)
         _loop_stats.record('SoEqRPS.plain.fit', 1, 1)
@@ -232,7 +409,8 @@ def apply_plain(objective, eq_selector, eq_args) -> None:
     1. Targets. An equation that is still fitted keeps its target; the others
        re-find the term their gene names (:func:`gene_term`), then draw among
        their free own-derivative terms, restoring one when there is none. No
-       two equations share a target.
+       two equations share a target. The equations claim in the order of
+       :func:`_variable_order`.
     2. Every equation drops the terms equal to another equation's target and
        those related to its own target by division; a fitted equation that
        loses a term is refitted.
@@ -243,11 +421,11 @@ def apply_plain(objective, eq_selector, eq_args) -> None:
        (:func:`take_siblings`) -- mutually non-dominated, since the equations
        they share are the same structures.
     4. An equation that follows from the system's others
-       (``system_redundancy.redundant_equations``) is marked degenerate, so it
-       is re-rolled; a sibling holding one is not handed over.
+       (``system_redundancy.redundant_equations``, tested in the order of
+       :func:`_variable_order`) is marked degenerate, so it is re-rolled; a
+       sibling holding one is not handed over.
     """
-    from epde.operators.common.right_part_selection import (
-        _ensure_own_derivative, _mark_unassignable, _related_to_target)
+    from epde.operators.common.right_part_selection import _mark_unassignable, _related_to_target
 
     _, eq_subargs = eq_selector.parse_suboperator_args(arguments=eq_args)
     coeff_calc = eq_selector.suboperators['coeff_calc']
@@ -263,9 +441,12 @@ def apply_plain(objective, eq_selector, eq_args) -> None:
     degenerate = [False] * len(equations)
     targets = [None] * len(equations)
     taken = set()
+    params = plain_params()
+    order, test_order = _variable_order(equations, fitted, params)
 
     # 1. Targets: fitted equations first, then the genes, then fresh draws.
-    for i, eq in enumerate(equations):
+    for i in order:
+        eq = equations[i]
         if fitted[i] and eq.target.factors_labels not in taken:
             targets[i] = eq.target
             taken.add(eq.target.factors_labels)
@@ -273,17 +454,19 @@ def apply_plain(objective, eq_selector, eq_args) -> None:
                 eq._plain_genes = target_gene(eq.target)
         else:
             fitted[i] = False
-    for i, eq in enumerate(equations):
+    for i in order:
+        eq = equations[i]
         if targets[i] is not None:
             continue
-        if not _ensure_own_derivative(eq):
+        if not _ensure_target(eq, params['plain_target']):
             degenerate[i] = True
             continue
         term = gene_term(eq, taken)
         if term is not None:
             targets[i] = term
             taken.add(term.factors_labels)
-    for i, eq in enumerate(equations):
+    for i in order:
+        eq = equations[i]
         if targets[i] is not None or degenerate[i]:
             continue
         options = own_derivative_terms(eq, taken)
@@ -356,7 +539,7 @@ def apply_plain(objective, eq_selector, eq_args) -> None:
     # 4. An equation that follows from the others (system_redundancy) is re-rolled like one without a
     #    version; a sibling holding one was not kept above.
     if all(per_equation):
-        for i in redundant_equations(list(objective)):
+        for i in redundant_equations(list(objective), order=test_order):
             _loop_stats.record('SoEqRPS.plain.redundant', 1, 1)
             _mark_unassignable([objective.vals[keys[i]]], host)
     _hand_over(objective, siblings)

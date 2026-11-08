@@ -24,7 +24,7 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from epde.interface.search_config import load_search_config
+from epde.interface.search_config import load_search_config, resolve_niching
 from epde.operators.multiobjective import moeadd_specific as MS
 from epde.operators.multiobjective import selections as SEL
 
@@ -225,8 +225,12 @@ class TestTheMating:
 class TestTheSettings:
 
     def test_defaults(self):
-        cfg = load_search_config().evolution
-        assert cfg.niching == 'system' and cfg.complementary_mating_prob == 0.0
+        cfg = load_search_config()
+        evo = cfg.evolution
+        assert evo.niching == 'auto' and evo.complementary_mating_prob == 0.0
+        # 'auto' is 'system' everywhere except plain-mode NSGA-II.
+        assert resolve_niching(evo.niching, cfg.search_space.system_rps_mode,
+                               evo.engine) == 'system'
 
     @pytest.mark.parametrize('overrides', [{'niching': 'islands'},
                                            {'complementary_mating_prob': 1.5},

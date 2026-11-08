@@ -191,7 +191,7 @@ class TestTheHooks:
 
     def test_plain_mode_re_rolls_a_following_equation(self, uv_pool, monkeypatch):
         from test_plain_mode import _fresh, _run
-        monkeypatch.setattr(plain_fit, 'redundant_equations', lambda equations: [0])
+        monkeypatch.setattr(plain_fit, 'redundant_equations', lambda equations, order=None: [0])
         system = _run(_fresh(uv_pool))
         assert system.vals['u'].fitness_value >= LOSS_NAN_VAL
         assert system.vals['v'].fitness_value < LOSS_NAN_VAL
@@ -205,7 +205,7 @@ class TestTheHooks:
         monkeypatch.setattr(plain_fit, '_dominates', lambda a, b, attrs: False)
         asked, copied = [], []
         monkeypatch.setattr(plain_fit, 'redundant_equations',
-                            lambda equations: asked.append(list(equations)) or verdict)
+                            lambda equations, order=None: asked.append(list(equations)) or verdict)
         real_deepcopy = plain_fit.deepcopy
 
         def counting_deepcopy(obj, *args):

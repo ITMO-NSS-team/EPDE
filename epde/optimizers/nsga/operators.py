@@ -38,7 +38,9 @@ class NSGASelection(CompoundOperator):
     ``incr_counter`` puts it into ``ParetoLevelsCrossover``'s mating pool.
 
     Under ``evolution.niching='per_equation'`` the level is replaced by the
-    system's per-equation plane ranks (:func:`plane_ranks`). With
+    system's per-equation plane ranks (:func:`plane_ranks`). Under
+    ``'per_variable'`` the tournaments run in single planes and plan the
+    assembly crossover (``per_variable.select``). With
     ``evolution.complementary_mating_prob`` the second winner is, with that
     probability, redrawn from the systems holding some equation's own front
     where the first does not, and the two are paired first (MOEA/DD's
@@ -53,8 +55,12 @@ class NSGASelection(CompoundOperator):
     def apply(self, objective, arguments: dict):
         from epde.operators.multiobjective.moeadd_specific import niching_per_equation
         from epde.operators.multiobjective.selections import _complementary_partner
+        from epde.optimizers.nsga.per_variable import niching_per_variable, select
         self_args, subop_args = self.parse_suboperator_args(arguments=arguments)
         population = objective.population
+        if niching_per_variable(population):
+            select(self, objective)
+            return objective
         rank, crowding = {}, {}
         for level_idx, level in enumerate(objective.levels):
             for member, distance in zip(level, plane_crowding(level)):

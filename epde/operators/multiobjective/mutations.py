@@ -42,6 +42,11 @@ class SystemMutation(CompoundOperator):
     key = 'SystemMutation'
     @_loop_stats.timed('SystemMutation.apply')
     def apply(self, objective : SoEq, arguments : dict): # TODO: add setter for best_individuals & worst individuals
+        # evolution.niching='per_variable': an assembled child enters its first
+        # fit unmutated (epde.optimizers.nsga.per_variable).
+        from epde.optimizers.nsga.per_variable import skip_first_mutation
+        if skip_first_mutation(objective):
+            return objective
         self_args, subop_args = self.parse_suboperator_args(arguments = arguments)
 
         # The only caller is ``OffspringUpdater.apply``, which pops the
@@ -60,15 +65,19 @@ class SystemMutation(CompoundOperator):
         # altered_eq = self.suboperators['equation_mutation'].apply(altered_objective.vals[eq_key],
         #                                                           subop_args['equation_mutation'])
         affected_by_mutation = True
-        for eq_key in eqs_keys:
-            if len(eqs_keys) > 1:
-                affected_by_mutation = np.random.random() < self.params['indiv_mutation_prob']
+        # The plain-mode fill reads the other equations' targets from the
+        # system being mutated (plain_moves.mutating_system).
+        from epde.operators.multiobjective.plain_moves import mutating_system
+        with mutating_system(altered_objective):
+            for eq_key in eqs_keys:
+                if len(eqs_keys) > 1:
+                    affected_by_mutation = np.random.random() < self.params['indiv_mutation_prob']
 
-            if affected_by_mutation:
-                altered_eq = self.suboperators['equation_mutation'].apply(altered_objective.vals[eq_key],
-                                                                          subop_args['equation_mutation'])
+                if affected_by_mutation:
+                    altered_eq = self.suboperators['equation_mutation'].apply(altered_objective.vals[eq_key],
+                                                                              subop_args['equation_mutation'])
 
-                altered_objective.vals.replace_gene(gene_key = eq_key, value = altered_eq)
+                    altered_objective.vals.replace_gene(gene_key = eq_key, value = altered_eq)
 
         for param_key in params_keys:
             altered_param = self.suboperators['param_mutation'].apply(altered_objective.vals[param_key],

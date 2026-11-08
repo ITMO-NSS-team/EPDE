@@ -451,11 +451,17 @@ class TestAutoEpochs:
         assert init['population_floor'] == search_config.AUTO_POPULATION_FLOOR
 
     def test_the_defaults_and_the_refusals(self):
+        from epde.interface.search_config import resolve_patience
         evolution = load_search_config().evolution
-        assert (evolution.training_epochs, evolution.early_stopping_patience) == (100, 5)
+        assert (evolution.training_epochs, evolution.early_stopping_patience) == (100, 'auto')
+        # 'auto': 5 epochs, except for plain-mode NSGA-II, which runs them all.
+        assert resolve_patience('auto', 'repair', 'moeadd') == 5
+        assert resolve_patience('auto', 'plain', 'moeadd') == 5
+        assert resolve_patience('auto', 'plain', 'nsga2') is None
+        assert resolve_patience(3, 'plain', 'nsga2') == 3
         with pytest.raises(ValueError, match='training_epochs must be an int'):
             load_search_config(overrides={'training_epochs': 'auto'})
-        for patience in (0, 2.5, 'auto'):
+        for patience in (0, 2.5, 'some'):
             with pytest.raises(ValueError, match='early_stopping_patience'):
                 load_search_config(overrides={'early_stopping_patience': patience})
         assert load_search_config(overrides={'early_stopping_patience': None}).evolution.early_stopping_patience is None
@@ -468,6 +474,9 @@ class TestAutoEpochs:
         assert search.optimizer_exec_params['epochs'] == 8 and search.optimizer_exec_params['patience'] is None
         with pytest.raises(ValueError, match='early_stopping_patience'):
             search.set_moeadd_params(early_stopping_patience=0)
+        search.set_moeadd_params(early_stopping_patience='auto')
+        assert search.optimizer_exec_params['patience'] == 5
+        assert EpdeSearch(verbose_params={'show_iter_idx': False}).optimizer_exec_params['patience'] == 5
 
     def test_the_floor_covers_every_equation_under_per_equation_niching(self, monkeypatch):
         monkeypatch.setattr(search_config, 'AUTO_POPULATION_FLOOR', 2)
