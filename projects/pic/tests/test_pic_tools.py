@@ -155,10 +155,24 @@ class InterfaceTests(unittest.TestCase):
                 derivative_orders({'preprocessing': {'max_deriv_order': value}}, 1)
 
     def test_omitted_boundary_uses_epde_default(self):
+        # EPDE's default boundary_width is 'auto': the pool build sizes it from the
+        # preprocessing's edge reach. The interior must be the rows EPDE keeps.
         from epde_bench.library import _interior
-        from epde.interface.search_config import load_search_config
-        p = fixture(); width = load_search_config({}).domain.boundary_width
-        self.assertEqual(_interior(p, {}), (slice(width, p.shape[0]-width),))
+        from epde_bench.runner import build_search
+        supplied = fixture()
+        supplied.derivs = [np.gradient(supplied.data['u'], supplied.grids[0]).reshape(-1, 1)]
+        supplied.deriv_orders = [1]
+        for name, p in (('computed', fixture()), ('supplied', supplied)):
+            with self.subTest(derivatives=name):
+                search, trajectory, families = build_search(p, {})
+                try:
+                    with contextlib.redirect_stdout(io.StringIO()):
+                        search.create_pool(data=[trajectory], additional_tokens=families)
+                    widths = trajectory._domain.boundary_width_per_axis
+                finally:
+                    search.close()
+                self.assertEqual(_interior(p, {}),
+                                 tuple(slice(w, n - w) for w, n in zip(widths, p.shape)))
 
     def test_empty_interior_is_rejected(self):
         from epde_bench.library import _interior

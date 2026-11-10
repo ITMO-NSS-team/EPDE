@@ -68,10 +68,17 @@ def run_optimizer_demo():
             rows.append({'Epoch': entry['epoch'], 'Front size': len(values),
                          'Smallest discrepancy': float(values[:, 0].min()),
                          'Smallest instability': float(values[:, 1].min())})
-        equations = [line.strip() for solution in history[-1]['front']
-                     for line in solution['text_form'].splitlines()
-                     if '=' in line and not line.strip().startswith('{')]
-        return {'history': history, 'rows': rows, 'equations': equations,
+        # Every front member is a system of its own (one list of equations, as
+        # in ``runner.pareto_front``). MOEA/DD fills every population slot, with
+        # a copy of a placed system when the pool yields no further distinct
+        # one, so a system is listed once however many slots it holds.
+        systems = []
+        for solution in history[-1]['front']:
+            system = [line.strip() for line in solution['text_form'].splitlines()
+                      if '=' in line and not line.strip().startswith('{')]
+            if system not in systems:
+                systems.append(system)
+        return {'history': history, 'rows': rows, 'systems': systems,
                 'seconds': time.perf_counter() - started}
     finally:
         if search is not None:

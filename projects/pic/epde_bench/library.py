@@ -78,9 +78,33 @@ def _blocks(problem, data, search, method="epde"):
     return blocks, lhs
 
 
+def _auto_widths(problem, search):
+    """The widths EPDE gives ``boundary_width='auto'`` when it builds the pool
+    (``EpdeSearch._resolve_auto_boundaries``): per axis, the widest edge reach
+    of the preprocessing over the variables. Supplied derivatives are neither
+    smoothed nor differentiated, so they reach nowhere; a pipeline that cannot
+    say how far it reaches gets ``EpdeSearch.FALLBACK_BOUNDARY`` per end."""
+    from epde.interface.interface import EpdeSearch
+    from .preprocessing import derivative_orders, make_preprocessor
+    ndim = len(problem.shape)
+    if problem.derivs is not None:
+        return [0] * ndim
+    pipe = make_preprocessor(search)
+    orders = derivative_orders(search, ndim)
+    reach = [0] * ndim
+    for var in problem.variables:
+        own = pipe.edge_reach(np.asarray(problem.data[var]), orders)
+        if own is None:
+            return [EpdeSearch.FALLBACK_BOUNDARY] * ndim
+        reach = [max(a, int(b)) for a, b in zip(reach, own)]
+    return reach
+
+
 def _interior(problem, search):
     from epde.interface.search_config import load_search_config
     width = load_search_config(search).domain.boundary_width
+    if isinstance(width, str):
+        width = _auto_widths(problem, search)
     widths = [width] * len(problem.shape) if np.isscalar(width) else list(width)
     if len(widths) != len(problem.shape) or any(
             int(w) != w or w < 0 or 2*w >= n for w, n in zip(widths, problem.shape)):

@@ -24,7 +24,8 @@ def make_preprocessor(search):
     from epde.interface.search_config import load_search_config
     from epde.preprocessing.preprocessor import ConcretePrepBuilder
     from epde.preprocessing.preprocessor_setups import PreprocessorSetup
-    prep = load_search_config(search).preprocessing
+    cfg = load_search_config(search)
+    prep = cfg.preprocessing
     setup = PreprocessorSetup()
     setup.builder = ConcretePrepBuilder()
     builders = {'FD': setup.build_FD_preprocessing,
@@ -33,7 +34,11 @@ def make_preprocessor(search):
                 'ANN': setup.build_ANN_preprocessing}
     if prep.default_preprocessor_type not in builders:
         raise ValueError(f'Unsupported EPDE preprocessor: {prep.default_preprocessor_type}')
-    builders[prep.default_preprocessor_type](**(prep.preprocessor_kwargs or {}))
+    kwargs = dict(prep.preprocessor_kwargs or {})
+    if prep.default_preprocessor_type == 'FD':
+        # EpdeSearch hands FD the domain's time axis (the one-sided schemes run along it).
+        kwargs = {'time_axis': cfg.domain.time_axis, **kwargs}
+    builders[prep.default_preprocessor_type](**kwargs)
     return setup.builder.prep_pipeline
 
 

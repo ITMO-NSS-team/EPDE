@@ -31,8 +31,11 @@ class OptimizerDemoTests(unittest.TestCase):
         from epde_bench.metrics import coefficient_error_best
         truth = ['-1.0625 * u{power: 1.0} + -0.5 * du/dx0{power: 1.0} '
                  '= d^2u/dx0^2{power: 1.0}']
-        self.assertTrue(result['equations'])
-        self.assertLess(coefficient_error_best(result['equations'], [truth]), 1e-10)
+        self.assertTrue(result['systems'])
+        # Each front member is scored as a system of its own: the oscillator is
+        # recovered when one of them carries the true coefficients.
+        self.assertLess(min(coefficient_error_best(system, [truth])
+                            for system in result['systems']), 1e-10)
 
 
 if __name__ == '__main__':
