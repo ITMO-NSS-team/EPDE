@@ -69,6 +69,7 @@ PROVENANCE_FILES = (
     "epde/integrate/residual_terms.py",
     "epde/integrate/basis_integration.py",
     "epde/integrate/lr_free.py",
+    "epde/integrate/time_marching.py",
     "epde/interface/equation_translator.py",
     "projects/pinn/gate.py",
 )
@@ -226,6 +227,51 @@ ARMS["_smoke-L"] = {"backend": "deepxde", "config": dict(
     ARMS["_smoke"]["config"], epochs=0, input_transform="affine",
     pde_loss="sinv_live", obs_loss="sinv_live")}
 
+# ---- Stage 3: time marching on route S1 (G-0000), the PI's choice for the
+# Lorenz equilibrium collapse (epde.integrate.time_marching). Each arm is S1
+# plus ONE mechanism, at S1's own budget (lbfgs_maxiter is the TOTAL L-BFGS
+# budget, split over windows / stages). lr=None only makes S1's lr explicit:
+# the arm inherits the shipped lr=1e-4, which is inert at epochs=0 (bitwise,
+# TestTheNullChecks), and the marching keys refuse a learning rate.
+#   TM      time_marching='full'      windows of tau_min, hard hand-off
+#   TM-obs  time_marching='tail_obs'  the tail from the OBSERVED t_train state
+#                                     (a diagnostic upper bound, not a candidate)
+#   DE      time_marching='expand'    one net, expanding domains [t_lo, e_s]
+#                                     on TM's edges, the last stage S1's problem
+#   CW      causal_weights='frozen'   S1's problem with causal weights over
+#                                     chunks of tau_min, re-read every 200
+#                                     L-BFGS iterations (restarts)
+STAGE3_MECHANISMS = {"TM": {"time_marching": "full"},
+                     "TM-obs": {"time_marching": "tail_obs"},
+                     "DE": {"time_marching": "expand"},
+                     "CW": {"causal_weights": "frozen"}}
+for _name, _mechanism in STAGE3_MECHANISMS.items():
+    ARMS[_name] = {"backend": "deepxde",
+                   "config": dict(ARMS["S1"]["config"], lr=None, **_mechanism)}
+# TM-obs was the diagnostic upper bound of Round 1 (Lorenz seed 0: the only arm
+# that propagated, gate_v +6.16 in 44 s; TM, DE and CW all failed to fit the
+# train window lr-free). PI, Oct 6: promoted to a candidate. It spends the
+# tail's share of lbfgs_maxiter (march_stats 'budget_planned'), window for
+# window as TM's tail. analyze.py skips role "diagnostic" like "null".
+# The same with N = 3000 (the tail's share ~3/4 of TM-obs's): Burgers' TM-obs
+# solves took 116-121 s against T_B = 109 s (PI, Oct 7: "go ahead"); one
+# budget for every system the routed recipe sends to TM-obs.
+ARMS["TM-obs-3k"] = {"backend": "deepxde",
+                     "config": dict(ARMS["TM-obs"]["config"], lbfgs_maxiter=3000)}
+# harness mechanics for the Stage-3 code paths -- never a result
+ARMS["_smoke-TM"] = {"backend": "deepxde", "config": dict(
+    ARMS["_smoke"]["config"], epochs=0, lr=None, input_transform="affine",
+    time_marching="full")}
+ARMS["_smoke-TMo"] = {"backend": "deepxde", "config": dict(
+    ARMS["_smoke"]["config"], epochs=0, lr=None, input_transform="affine",
+    time_marching="tail_obs")}
+ARMS["_smoke-DE"] = {"backend": "deepxde", "config": dict(
+    ARMS["_smoke"]["config"], epochs=0, lr=None, input_transform="affine",
+    time_marching="expand")}
+ARMS["_smoke-CW"] = {"backend": "deepxde", "config": dict(
+    ARMS["_smoke"]["config"], epochs=0, lr=None, input_transform="affine",
+    causal_weights="frozen")}
+
 #: PRE-REGISTERED periodic EPDE axes, checked by `gate.py profile` before any
 #: GPU work: ac / burgers from test_data_profile.py; the 1-D systems have no
 #: spatial axis (time is never tested). ns: None = not pre-registered (an open
@@ -261,6 +307,35 @@ def unsupported(system, arm):
     if cfg.get("periodic_embedding") is not None and PERIODIC_AXES.get(system) is None:
         return "periodic axes of this system are not pre-registered"
     return None
+
+
+def untraceable(arm):
+    """Why ``--mode trace`` cannot replay this arm (None: it can). The replay
+    reads ONE L-BFGS phase on ONE fixed objective; LM has no L-BFGS phase, and
+    time marching / causal weights run several objectives (windows, stages,
+    restarts)."""
+    cfg = ARMS[arm]["config"]
+    if cfg.get("second_order") == "lm":
+        return "has no L-BFGS phase to trace"
+    keys = marching_keys(arm)
+    if keys:
+        return (f"runs one L-BFGS objective per window / stage / restart ({', '.join(keys)}); "
+                "a trace replays one fixed objective")
+    return None
+
+
+def marching_keys(arm):
+    """The Stage-3 keys this arm sets (time marching, causal weights)."""
+    cfg = ARMS[arm]["config"]
+    return [k for k in ("time_marching", "causal_weights") if cfg.get(k) is not None]
+
+
+def trace_refusals(arms):
+    """The arms a ``--mode trace`` batch refuses up front, with why: the
+    marching arms. An LM arm keeps its pre-Stage-3 behaviour (the batch runs,
+    its own solves fail in run_solve), so a batch without marching arms is
+    driven exactly as before."""
+    return {a: untraceable(a) for a in arms if marching_keys(a)}
 
 
 def arm_backend(arm):
@@ -679,8 +754,8 @@ def run_solve(system, arm, form, seed, mode="solve", tag="adhoc", write_trace=Tr
     sys.path.insert(0, REPO)
     if backend != "deepxde":
         raise NotImplementedError(backend)
-    if mode == "trace" and ARMS[arm]["config"].get("second_order") == "lm":
-        raise SystemExit(f"{arm} has no L-BFGS phase to trace; use --mode solve")
+    if mode == "trace" and untraceable(arm):
+        raise SystemExit(f"{arm} {untraceable(arm)}; use --mode solve")
     # Import order of the historical harnesses: deepxde first. The stored
     # reference RMSEs were produced this way, and bitwise reproduction is the
     # first check every batch has to pass.
@@ -691,6 +766,24 @@ def run_solve(system, arm, form, seed, mode="solve", tag="adhoc", write_trace=Tr
     import epde.integrate.deepxde_integration as dxi
     from epde.operators.common.fitness import SolverBasedFitness
     from epde.operators.common.objectives import Discrepancy
+
+    # Opt-in: keep the solved fields (every full-grid level, per variable) for
+    # the anatomy of a solve -- equilibrium collapse, tail spread, train fit.
+    # Written after the solve returns; the row does not depend on it.
+    dump_dir = os.environ.get("GATE_DUMP_DIR")
+    if dump_dir:
+        stock_solve = dxi.DeepXDEAdapter.solve
+
+        def solve_and_dump(self, *a, **k):
+            out = stock_solve(self, *a, **k)
+            os.makedirs(dump_dir, exist_ok=True)
+            fields = np.stack([np.asarray(s, dtype=np.float64).reshape(-1) for s in out[0]])
+            name = f"{tag}__{system}__{arm}__{form}__{seed}"
+            np.savez(os.path.join(dump_dir, name + ".npz"), fields=fields,
+                     loss=np.float64(out[1]), grids=np.asarray(a[1][0] if a else k["grids"][0]))
+            return out
+
+        dxi.DeepXDEAdapter.solve = solve_and_dump
 
     cfg = arm_config(arm)
     search = build_search(system)
@@ -808,6 +901,15 @@ def run_solve(system, arm, form, seed, mode="solve", tag="adhoc", write_trace=Tr
     if m is not None and m.opt._params and m.opt.state.get(m.opt._params[0]):
         final_n = int(m.opt.state[m.opt._params[0]]["n_iter"])
     adapter = host.adapter
+    march = getattr(adapter, "last_march_stats", None)
+    loss_weights_lbfgs = rec["loss_weights_lbfgs"]
+    if march is not None:
+        # A marching solve runs one L-BFGS phase per window / stage / restart,
+        # and install() saw each in turn: the last phase's weights (a tail
+        # window has no observation terms) and n_iter are not the solve's.
+        # The solve's are S1's frozen weights and the iterations summed.
+        loss_weights_lbfgs = list(march["loss_weights"])
+        final_n = (adapter.last_lbfgs_exit or {}).get("iterations")
     row = {
         "tag": tag, "system": system, "arm": arm, "form": form, "seed": seed,
         "mode": mode, "backend": "deepxde", "config": cfg,
@@ -822,10 +924,11 @@ def run_solve(system, arm, form, seed, mode="solve", tag="adhoc", write_trace=Tr
         "obs_stats": getattr(adapter, "last_obs_stats", None),
         "lr_stats": getattr(adapter, "last_lr_stats", None),
         "lm_stats": getattr(adapter, "last_lm_stats", None),
+        "march_stats": march,
         "pairing": getattr(adapter, "last_pairing", None),
         "embedding": getattr(adapter, "_embedding", None),
         "final_n_iter": final_n,
-        "loss_weights_lbfgs": rec["loss_weights_lbfgs"],
+        "loss_weights_lbfgs": loss_weights_lbfgs,
         "solve_device": str(dxi.DDE_SOLVE_DEVICE),
         "net_device": (str(next(m.net.parameters()).device) if m is not None else None),
         "net_dtype": (str(next(m.net.parameters()).dtype) if m is not None else None),
@@ -963,6 +1066,11 @@ def _code_state():
 
 def drive(system, arms, seeds, forms, mode, tag, cpu=False, force=False, no_alias=False):
     """Returns the number of solves that wrote no row (the caller exits non-zero)."""
+    if mode == "trace":
+        refused = trace_refusals(arms)
+        if refused:
+            raise SystemExit("--mode trace refused: " + "; ".join(
+                f"{a} {why}" for a, why in refused.items()) + " (use --mode solve)")
     existing = load_rows(tag)
     if any(r.get("intercept_rule", "forced") != intercept_rule() for r in existing):
         raise SystemExit(f"tag {tag} already holds rows of another intercept rule: "

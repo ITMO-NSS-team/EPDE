@@ -35,8 +35,8 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.abspath(os.path.join(HERE, "..", "pic", "data"))    # pinn_common
 sys.path.insert(0, HERE)
-from gate import (ARMS, RESULTS, SYSTEM_VARS, inert_reference, load_rows,  # noqa: E402
-                  system_forms)
+from gate import (ARMS, PERIODIC_AXES, RESULTS, SYSTEM_VARS, inert_reference,  # noqa: E402
+                  load_rows, system_forms)
 
 DEFAULT_TAGS = ("baseline,stage1_start,stage1,stage1_end,stage1_basis,"
                 "stage1b_start,stage1b,stage1b_end,stage1b_basis")
@@ -48,9 +48,14 @@ DEFAULT_TAGS = ("baseline,stage1_start,stage1,stage1_end,stage1_basis,"
 STAGE2_TAGS = "stage2_start,stage2,stage2_end"
 #: Stages 0 / 1 / 1b recalculated under the no-bias rule (run_recalc_gpu.sh)
 RECALC_TAGS = "r_baseline,r_start,r_stage1,r_stage1b,r_end"
+#: Stage 3 (time marching; worktree EPDE_lorenz): the promoted TM-obs on every
+#: system, read against the stage2 B rows (T_B). Lorenz Round 1 (lorenz_m1*:
+#: TM, DE, CW killed; TM-obs seed 0 rerun here) is read on its own.
+STAGE3_TAGS = "stage2_start,stage2,stage2_end,tmobs_start,tmobs"
 #: tags whose B-ctl rows are kept apart from the pre-patch baseline's
 CONTROL_TAGS = ("stage1_start", "stage1_end", "stage1b_start", "stage1b_end",
-                "stage2_start", "stage2_end", "stage2_legacy", "r_start", "r_end")
+                "stage2_start", "stage2_end", "stage2_legacy", "r_start", "r_end",
+                "tmobs_start", "tmobs2_start")
 
 # ------------------------------------------------------------ stored references
 # Per-seed held-out RMSE of the shipped recipe (cap 2000), gtol_{ac,duffing}.json
@@ -125,7 +130,35 @@ CONTRASTS = [
     ("L-ps - G-0000  scale-inv physics loss, live (on S1)", "L-ps", "G-0000", "T_B"),
     ("L-pos - G-0000  both scale-invariant", "L-pos", "G-0000", "T_B"),
     ("L-pos - L-ps  the data term's share", "L-pos", "L-ps", "T_B"),
+    # Stage 3: tail marching from the observed split state (PI, Oct 6)
+    ("TM-obs - B  tail marching vs shipped", "TM-obs", "B", "T_B"),
+    ("TM-obs - G-0000  tail marching vs S1", "TM-obs", "G-0000", "T_B"),
+    ("TM-obs-3k - TM-obs  budget 3000 vs 4000", "TM-obs-3k", "TM-obs", "T_B"),
+    ("TM-obs-3k - B  tail marching (3k) vs shipped", "TM-obs-3k", "B", "T_B"),
 ]
+#: Routed recipes (PI, Oct 7: "Route by periodicity"). From the initial state
+#: alone the held-out tail is an initial-value problem only when no spatial axis
+#: is open: TM-obs there; elsewhere the global fit, whose network carries the
+#: observed fields (and so the boundaries and NS's p gauge) on into the tail.
+#: The verdict is the data profile's (gate.py profile: PERIODIC_AXES checked
+#: against the train window at every Stage-2 launch); SPATIAL_AXES is the grid.
+SPATIAL_AXES = {"ac": (1,), "burgers": (1,), "duffing": (), "lv": (), "lorenz": (),
+                "ns": (1, 2)}
+#: NS is not pre-registered in PERIODIC_AXES (None); its profile, as every
+#: Stage-2 launch printed it (stage2.log): axis 1 seam 1.86, axis 2 seam 13.1,
+#: no periodic axis.
+PROFILED_AXES = {"ns": ()}
+ROUTES = {"R-route": ("TM-obs", "G-m000"),            # (IVP tail, open boundary)
+          "R-route-3k": ("TM-obs-3k", "G-m000")}
+
+
+def routed_arm(recipe, system):
+    ivp, open_ = ROUTES[recipe]
+    base = system.split(":")[0]
+    periodic = PERIODIC_AXES[base] if PERIODIC_AXES[base] is not None else PROFILED_AXES[base]
+    return ivp if set(SPATIAL_AXES[base]) <= set(periodic) else open_
+
+
 REPLAY_CAPS = [1000, 2000, 3000, 4000]
 TIE = 0.10
 #: the fitness host's failure value (LOSS_NAN_VAL): a failed solve, not an error
@@ -518,6 +551,9 @@ def gate_table(system, idx, T_B):
                          f"construction here (seed 0 checked bitwise)")
         if ARMS.get(arm.split("@")[0], {}).get("role") == "null":
             notes.append("placement null: a control, not a candidate (not ranked)")
+        if ARMS.get(arm.split("@")[0], {}).get("role") == "diagnostic":
+            notes.append("diagnostic upper bound (starts from observed data): not a "
+                         "candidate (not ranked)")
         if (arm in ARMS and inert_reference(system.split(":")[0], arm) and len(seeds) == 1
                 and (system.split(":")[0], arm) not in ALIASED):
             notes.append("inert cell NOT resolved: seed 0 only (reference missing, or a "
@@ -633,8 +669,8 @@ def ranking(tables):
         arms |= {a for a, _ in t}
     rows = []
     for arm in sorted(arms):
-        if ARMS.get(arm.split("@")[0], {}).get("role") == "null":
-            continue                          # a control, not a candidate
+        if ARMS.get(arm.split("@")[0], {}).get("role") in ("null", "diagnostic"):
+            continue                          # a control or a bound, not a candidate
         per = []
         eligible = True
         for system, t in tables.items():
@@ -657,6 +693,46 @@ def ranking(tables):
         tie = " (tie with top)" if top is not None and eligible and top - score <= TIE else ""
         print(f"  {arm:<16} {'ELIGIBLE' if eligible else 'not eligible':<13} score {score:+.3f}  "
               + " ".join(f"{s} {x:+.3f}" for s, x in zip(tables, per)) + tie)
+
+
+def add_recipes(tables):
+    """Every routed recipe as a virtual arm: per system, the routed arm's gates."""
+    for recipe in ROUTES:
+        for system, t in tables.items():
+            arm = routed_arm(recipe, system)
+            for key in ("own", "T_B", "0.9T_B"):
+                if (arm, key) in t:
+                    t[(recipe, key)] = t[(arm, key)]
+        print(f"  {recipe}: " + ", ".join(f"{s} -> {routed_arm(recipe, s)}" for s in tables))
+
+
+def ranking_own(tables):
+    """The PI's screening read (Oct 6, 'own budget first'): every seed of every
+    system positive at the arm's OWN budget; score = min own-budget gate."""
+    print("\n================ ranking at OWN budget (screening): eligible = finite + bar at "
+          "the arm's own budget on every system; score = min own-budget gate")
+    arms = set()
+    for t in tables.values():
+        arms |= {a for a, _ in t}
+    rows = []
+    for arm in sorted(arms):
+        if ARMS.get(arm.split("@")[0], {}).get("role") in ("null", "diagnostic") \
+                or "@" in arm:
+            continue
+        per, eligible = [], True
+        for system, t in tables.items():
+            full = set(t.get((BASELINE, "own"), ([], []))[0])
+            seeds, g = t.get((arm, "own"), ([], []))
+            ok = bool(g) and all(math.isfinite(x) and x > 0 for x in g) \
+                and (not full or full <= set(seeds)) and (system, arm) not in UNREADABLE
+            eligible &= ok
+            per.append(min(g) if g and all(math.isfinite(x) for x in g) else float("nan"))
+        score = min(per) if all(math.isfinite(x) for x in per) else float("nan")
+        rows.append((arm, eligible, score, per))
+    rows.sort(key=lambda r: (not r[1], -(r[2] if math.isfinite(r[2]) else -1e9)))
+    for arm, eligible, score, per in rows:
+        print(f"  {arm:<16} {'ELIGIBLE' if eligible else 'not eligible':<13} score {score:+.3f}  "
+              + " ".join(f"{s} {x:+.3f}" for s, x in zip(tables, per)))
 
 
 def _factor_label(token):
@@ -752,7 +828,10 @@ def main(argv=None):
         contrasts(system, tables[system])
     ranked = {s: t for s, t in tables.items() if bar[s]}
     if len(ranked) > 1:
+        print("\n================ routed recipes")
+        add_recipes(ranked)
         ranking(ranked)
+        ranking_own(ranked)
     report = coefficient_report(rows, a.systems.split(","))
     if report:
         path = os.path.join(RESULTS, f"coefficients_{rules.pop()}.json")
