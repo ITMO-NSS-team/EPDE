@@ -103,6 +103,7 @@ os.makedirs(os.path.expanduser('~/.deepxde'), exist_ok=True)
 # ``from epde.integrate.deepxde_integration import time_split`` keeps working.
 from epde.integrate.heldout import (DeepXDEConfigError, TimeSplit,   # noqa: E402,F401
                                     time_split, variance_weight)
+from epde.integrate import time_marching as _marching              # noqa: E402
 
 
 def _grad_norms(losses, params) -> List[float]:
@@ -858,6 +859,21 @@ class DeepXDEAdapter:
         #: Filled when a validation block exists: the selection trace and
         #: whether 'best' differed from 'last' at all.
         self.last_val_stats = None
+        #: Time marching (``epde.integrate.time_marching``), each ONE mechanism
+        #: on S1's path, lr-free and opt-in. 'full': windows of tau_min over the
+        #: solver's extent, each handed off to the next through a hard output
+        #: transform; 'tail_obs': the held-out tail windows only, started from
+        #: the OBSERVED state at t_train (a diagnostic upper bound); 'expand':
+        #: S1's one network on growing domains [t_lo, e_s], the last stage S1's
+        #: own problem. None: as is.
+        self.time_marching = self.config.get('time_marching', None)
+        #: 'frozen': S1's own problem with causal weights over chunks of tau_min
+        #: (Wang, Sankaran & Perdikaris 2022), re-read every 200 L-BFGS
+        #: iterations and dropped once all are >= 0.99. None: as is.
+        self.causal_weights = self.config.get('causal_weights', None)
+        _marching.validate_config(self)
+        #: Filled by a marching solve: the windows, budgets, exits and losses.
+        self.last_march_stats = None
 
         self.coordinate_mapping = self.config.get('coordinate_mapping', None)
         self.coord_names = None
@@ -1188,6 +1204,7 @@ class DeepXDEAdapter:
         self.last_sinv_stats = None
         self.last_lr_stats = None
         self.last_lm_stats = None
+        self.last_march_stats = None
         grids = [np.asarray(g) for g in grids]
         mask = self.domain_mask
         inner_coords = _input_columns([g[mask] for g in grids])
@@ -1274,6 +1291,14 @@ class DeepXDEAdapter:
             reference_weights = list(loss_weights)
             if self.last_pairing is not None:
                 self.last_pairing['loss_weights'] = [float(w) for w in reference_weights]
+            if _marching.active(self):
+                # Everything above is S1's: the network at its Glorot draw, the
+                # pairing digest, the weights probed on the FULL problem. The
+                # marching replaces only the single L-BFGS phase below, and
+                # keeps those weights frozen for every window / stage / restart.
+                return _marching.solve(self, eq_list, var_names, grids, mask, data_list,
+                                       split, inner_coords, pde_func, net, data_obj,
+                                       reference_weights)
             if self.init is not None:
                 self.last_init_stats = self._apply_init(net, inner_coords, data_list, split)
                 if getattr(self, '_stop_after_init', False):
