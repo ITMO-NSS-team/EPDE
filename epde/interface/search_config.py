@@ -917,6 +917,20 @@ def resolve_patience(patience, rps_mode, engine):
 AUTO_POPULATION_FLOOR = 8
 AUTO_POPULATION_CEILING = 32
 
+#: Relative residual below which an equation is taken to follow from the other equations of its system
+#: (``epde.operators.common.system_redundancy``). Fixed, not derived from the data: a restated relation
+#: leaves the fitted coefficients' error (about 1e-3 on the Lotka-Volterra fronts), an independent law
+#: leaves a residual of order 1.
+REDUNDANCY_RTOL = 0.1
+#: The largest probability with which one prune step of the fill-and-prune move removes a term
+#: (``epde.operators.common.fill_prune.prune_chain``). Fixed, not derived from the data: it keeps every
+#: term a chance to survive a step.
+FILL_PRUNE_CAP = 0.9
+#: The rows every block or slab of the partition-based instability estimators keeps per fitted column: a
+#: block holds at least ``SLAB_ROWS_PER_COLUMN * (w + 1)`` rows at reference width ``w``
+#: (``epde.operators.common.survival``). Fixed, not derived from the data.
+SLAB_ROWS_PER_COLUMN = 4
+
 
 def check_auto_settings(boundary_width, population_size, training_epochs,
                         early_stopping_patience=None) -> None:

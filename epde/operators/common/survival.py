@@ -82,11 +82,19 @@ _DEFAULT_N_TILES = 8              # tile: time slabs along storage axis 0
 _DEFAULT_N_BLOCKS_HET = 16        # het: refit blocks (clamped by the axis-0 levels)
 
 
+def _block_rows(width) -> int:
+    """The rows every block or slab keeps at reference width ``width``:
+    ``search_config.SLAB_ROWS_PER_COLUMN * (width + 1)``, read at call time."""
+    from epde.interface import search_config
+    return search_config.SLAB_ROWS_PER_COLUMN * (int(width) + 1)
+
+
 def _reference_width(p: int) -> int:
     """The candidate width the block-count clamp is allowed to depend on.
 
     ``tile`` and ``het`` size their partition so every block keeps
-    ``4*(w+1)`` rows, >= 4 samples per unknown (:func:`_level_slab_capacity`).
+    ``SLAB_ROWS_PER_COLUMN*(w+1)`` rows, that many samples per unknown
+    (:func:`_level_slab_capacity`).
     Using the CANDIDATE's own ``p`` for ``w`` made the partition
     candidate-dependent, and in the one direction that flatters complexity: a
     wider equation got fewer, larger blocks, hence lower between-block
@@ -100,7 +108,7 @@ def _reference_width(p: int) -> int:
     search can build), so within one search every candidate is scored on the
     SAME partition and score differences are differences in the equations.
 
-    ``max`` with the candidate's own ``p`` keeps the >= 4-samples-per-unknown
+    ``max`` with the candidate's own ``p`` keeps the samples-per-unknown
     guarantee intact when a caller hands over a matrix wider than the
     configured cap -- offline analysis tools do.
 
@@ -135,7 +143,7 @@ def row_floor(metric: str, grid_shape, w_ref: int):
 
     The estimators clamp their partitions rather than refuse (``tile`` and
     ``dyad`` to two slabs), so a short grid degrades them silently; the row
-    budget asks first. Every block or slab must keep ``4 (w_ref + 1)`` rows --
+    budget asks first. Every block or slab must keep ``SLAB_ROWS_PER_COLUMN * (w_ref + 1)`` rows --
     measured on the partition the estimator actually cuts, at whole levels of
     axis 0, not on the row total. Each estimator takes its block count from
     the axis-0 levels (:func:`_level_slab_capacity`), so a slab falls below
@@ -162,7 +170,7 @@ def row_floor(metric: str, grid_shape, w_ref: int):
     """
     shape = tuple(int(n) for n in grid_shape)
     rows = int(np.prod(shape))
-    block = 4 * (int(w_ref) + 1)
+    block = _block_rows(w_ref)
     if metric in ('chi2', 'chi2_centered'):
         if not any(n >= 3 for n in shape):
             return f'{metric} needs 3 levels along some axis, the grid is {shape}'
@@ -188,7 +196,7 @@ def row_floor(metric: str, grid_shape, w_ref: int):
     smallest = min(int(np.min(np.diff(edges))) for edges in parts)
     if smallest < block:
         return (f'{metric} cuts the grid {shape} into blocks along axis 0 as small as {smallest} rows, '
-                f'below {block} = 4 * (width {int(w_ref)} + 1)')
+                f'below {block} = {block // (int(w_ref) + 1)} * (width {int(w_ref)} + 1)')
     return None
 # chi2 needs no size knob: one score path per grid axis, each accumulated
 # at that axis's own level resolution, so there is nothing to tune.
@@ -382,7 +390,7 @@ def tile_scores(features, target, sample_weights, grid_shape,
     separable field can score at round-off, exactly like the truth, and
     transposing the storage flips which axis it sees.
 
-    ``n_tiles`` is clamped so each tile keeps >= 4 samples per unknown
+    ``n_tiles`` is clamped so each tile keeps ``SLAB_ROWS_PER_COLUMN`` samples per unknown
     (else the per-tile solves are meaninglessly under-determined), counted
     in whole levels of axis 0 as the tiles are cut
     (:func:`_level_slab_capacity`); below two tiles' worth of levels the
@@ -394,7 +402,7 @@ def tile_scores(features, target, sample_weights, grid_shape,
         X = X[:, None]
     n_samples, p = X.shape
     max_tiles = max(2, _level_slab_capacity(n_samples, grid_shape,
-                                            4 * (_reference_width(p) + 1)))
+                                            _block_rows(_reference_width(p))))
     n_tiles = max(2, min(int(n_tiles), max_tiles))
 
     G_blocks, Gy_blocks = block_gram_partition(
@@ -923,7 +931,7 @@ def dyad_t_scores(features, target, sample_weights, grid_shape,
     over the partitions. A constant-coefficient term agrees across slabs at
     every scale -> ~0; a drifting one disagrees at whichever scales resolve
     the drift, so no single slab count has to be guessed (``tile``'s
-    ``n_tiles``). The slab floor is ``tile``'s: >= 4 samples per unknown of
+    ``n_tiles``). The slab floor is ``tile``'s: ``SLAB_ROWS_PER_COLUMN`` samples per unknown of
     the SEARCH's widest equation (:func:`_reference_width`), so every
     candidate in one search is scored on the same partitions.
 
@@ -943,7 +951,7 @@ def dyad_t_scores(features, target, sample_weights, grid_shape,
     if X.ndim == 1:
         X = X[:, None]
     n_samples, p = X.shape
-    min_rows = 4 * (_reference_width(p) + 1)
+    min_rows = _block_rows(_reference_width(p))
     parts = _dyadic_slab_edges(n_samples, grid_shape, min_rows)
     fine = parts[-1]
     # As wide as the fit: the folded constant only with ``fit_intercept``.
@@ -1047,9 +1055,9 @@ def dyad_t_subset_scores(features, target, sample_weights, grid_shape, subsets, 
 
 def dyad_t_min_rows(size: int) -> int:
     """:func:`dyad_t_subset_scores`' slab floor for a subset of ``size``
-    columns: ``tile``'s 4 rows per unknown of the search-wide reference
-    width."""
-    return 4 * (_reference_width(size) + 1)
+    columns: ``tile``'s ``SLAB_ROWS_PER_COLUMN`` rows per unknown of the
+    search-wide reference width."""
+    return _block_rows(_reference_width(size))
 
 
 def dyad_t_blocks(X, y, sample_weights, grid_shape, n_samples, min_rows):
@@ -1175,13 +1183,13 @@ def _het_components(features, target, sample_weights, grid_shape,
     n_samples, p = X.shape
     k = p + 1 if fit_intercept else p
     # Blocks are cut at whole levels of axis 0, so their count is too
-    # (:func:`_level_slab_capacity`): every block keeps 4*(w+1) samples.
+    # (:func:`_level_slab_capacity`): every block keeps SLAB_ROWS_PER_COLUMN*(w+1) samples.
     max_blocks = _level_slab_capacity(n_samples, grid_shape,
-                                      4 * (_reference_width(p) + 1))
+                                      _block_rows(_reference_width(p)))
     if max_blocks < 3:
         n_0, stride = _axis0_layout(n_samples, grid_shape)
         raise ValueError(
-            'heterogeneity_scores needs >= 3 blocks of >= 4*(w+1) samples, '
+            f'heterogeneity_scores needs >= 3 blocks of >= {_block_rows(0)}*(w+1) samples, '
             'cut at whole levels of storage axis 0, to calibrate; got '
             f'n_samples={n_samples} ({n_0} levels of {stride}) with p={p} and '
             f'reference width w={_reference_width(p)} (equation_terms_max_number, or '

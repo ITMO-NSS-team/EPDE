@@ -11,7 +11,7 @@ and of their first derivatives along every axis -- the identity scorer's test. E
 derivative of a field (mixed ones included) and every coordinate is an independent random value; the
 coordinates are drawn over the data's axis ranges, so a factor like cos(7e-5 x), 1 to nine digits on the
 data, is not taken for 1. Columns are unit-normalised. The fitted coefficients are inexact, so "is a
-combination" is a relative residual below ``REDUNDANCY_RTOL``: a restated relation leaves the
+combination" is a relative residual below ``search_config.REDUNDANCY_RTOL``: a restated relation leaves the
 coefficients' error (about 1e-3 on the lv fronts), an independent law leaves one of order 1.
 
 Fields, their derivatives, grid tokens and sin / cos are differentiated here; a system holding any other
@@ -25,8 +25,6 @@ import numpy as np
 
 import epde.globals as global_var
 
-#: Relative residual below which an equation is a combination of the others (see the module docstring).
-REDUNDANCY_RTOL = 0.1
 #: Random points: at least this many, and four per basis column.
 _MIN_POINTS = 64
 #: The draws are the module's own, so the test leaves the search's random stream untouched.
@@ -166,6 +164,7 @@ def redundant_equations(equations: list, ranges: list = None, order: list = None
     same for every order: they are drawn by the test in the equations' own order, which runs first, and
     the permuted test reuses them; its positions come back sorted, and the own order's result when the
     two agree."""
+    from epde.interface import search_config
     if len(equations) < 2:
         return []
     ranges = ranges if ranges is not None else _axis_ranges()
@@ -211,7 +210,7 @@ def redundant_equations(equations: list, ranges: list = None, order: list = None
                 continue
             basis = basis[:, keep] / norms[keep]
             coef, *_ = np.linalg.lstsq(basis, value / scale, rcond=None)
-            if np.linalg.norm(value / scale - basis @ coef) < REDUNDANCY_RTOL:
+            if np.linalg.norm(value / scale - basis @ coef) < search_config.REDUNDANCY_RTOL:
                 redundant.append(i)
         return redundant
 

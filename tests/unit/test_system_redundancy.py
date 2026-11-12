@@ -21,7 +21,8 @@ import pytest
 import epde.operators.common.plain_fit as plain_fit
 import epde.operators.common.system_redundancy as redundancy
 from epde.operators.common.objectives import LOSS_NAN_VAL
-from epde.operators.common.system_redundancy import REDUNDANCY_RTOL, redundant_equations
+from epde.interface.search_config import REDUNDANCY_RTOL
+from epde.operators.common.system_redundancy import redundant_equations
 
 from test_duplicate_equation_guard import _system, uv_pool  # noqa: F401
 

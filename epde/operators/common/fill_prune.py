@@ -19,7 +19,7 @@ the equation from the whole library, followed by a probabilistic PRUNE:
 4. Fill: one support of size k, drawn among the ``fill_top`` best with
    weights 1 / residual.
 5. Prune: a chain from the fill down to two terms; at each stage every term i
-   leaves with probability ``min(0.9, fill_prune_alpha * w_i * n)``,
+   leaves with probability ``min(FILL_PRUNE_CAP, fill_prune_alpha * w_i * n)``,
    ``w_i ~ 1 / (residual rise when i alone leaves)``, at least one leaves
    (drawn by ``w``), never below two. One stage of the chain, drawn uniformly
    (the fill included), becomes the equation's terms besides its target.
@@ -40,7 +40,8 @@ first attempt. Beams are kept in memory per store.
 
 Every constant here is the setting of the measured universal search (13
 systems, clean and 5% noise): beam width 1000, top 20, prune alpha 0.3, the
-0.9 removal cap and the 1e-15 floor of the prune weights.
+removal cap ``search_config.FILL_PRUNE_CAP`` (0.9) and the 1e-15 floor of the
+prune weights.
 """
 import hashlib
 import itertools
@@ -58,8 +59,7 @@ CAND_MAX = 4096
 BEAM_MAX = 2048
 #: Free memory the Gram build leaves, besides its own arrays.
 MIN_FREE_BYTES = 2 ** 30
-#: The prune chain's removal cap and weight floor (see the module docstring).
-PRUNE_CAP = 0.9
+#: The prune chain's weight floor (see the module docstring).
 PRUNE_FLOOR = 1e-15
 #: A beam extension whose new column lies in the span of the support (``den`` below this) is not valid.
 SPAN_TOL = 1e-12
@@ -377,6 +377,7 @@ def draw_fill(top) -> int:
 
 def prune_chain(gm, S, alpha) -> list:
     """The stages [S, ..., two terms] of the probabilistic prune (module docstring, 5)."""
+    from epde.interface import search_config
     S = list(S)
     stages = [tuple(S)]
     while len(S) > 2:
@@ -384,7 +385,7 @@ def prune_chain(gm, S, alpha) -> list:
         loss = np.array([max(gm.rss(S[:i] + S[i + 1:]) - base, PRUNE_FLOOR) for i in range(len(S))])
         w = 1.0 / loss
         w = w / w.sum()
-        p = np.minimum(PRUNE_CAP, alpha * w * len(S))
+        p = np.minimum(search_config.FILL_PRUNE_CAP, alpha * w * len(S))
         drop = set(np.where(np.random.random(len(S)) < p)[0].tolist())
         if not drop:
             drop = {int(np.random.choice(len(S), p=w))}

@@ -547,3 +547,79 @@ class TestTokenRegistry:
         specs = load_search_config(path).search_space.tokens
         assert len(specs) == 1
         assert build_tokens(specs)[0].__class__.__name__ == 'GridTokens'
+
+
+class TestFixedCutoffs:
+    """Cut-offs declared once in ``search_config`` and read from there by the modules that use them."""
+
+    def test_the_declared_values(self):
+        from epde.interface import search_config
+        assert search_config.REDUNDANCY_RTOL == 0.1
+        assert search_config.FILL_PRUNE_CAP == 0.9
+        assert search_config.SLAB_ROWS_PER_COLUMN == 4
+
+    def test_the_row_floor_reads_the_slab_rows_at_call_time(self, monkeypatch):
+        from epde.interface import search_config
+        from epde.operators.common import survival
+        # 12 rows, width 0: three slabs of 4 rows fit, two slabs of 8 rows do not.
+        for metric in ('tile', 'dyad'):
+            assert survival.row_floor(metric, (12,), 0) is None
+        monkeypatch.setattr(search_config, 'SLAB_ROWS_PER_COLUMN', 8)
+        assert survival._block_rows(3) == 32
+        for metric in ('tile', 'dyad'):
+            assert survival.row_floor(metric, (12,), 0) is not None
+
+    def test_the_prune_chain_reads_the_cap_at_call_time(self, monkeypatch):
+        import numpy as np
+        from epde.interface import search_config
+        from epde.operators.common import fill_prune as FP
+        rng = np.random.default_rng(0)
+        X = rng.standard_normal((200, 8))
+        y = X[:, [1, 4]] @ np.array([1.5, -0.7]) + 0.2 * rng.standard_normal(200)
+        gm = FP.Gram(X.T @ X, X.T @ y, float(y @ y))
+        # A cap of 0 removes nothing by the draw, so every step falls back to one term: seven stages.
+        monkeypatch.setattr(search_config, 'FILL_PRUNE_CAP', 0.0)
+        np.random.seed(3)
+        assert len(FP.prune_chain(gm, list(range(8)), alpha=100.0)) == 7
+        monkeypatch.setattr(search_config, 'FILL_PRUNE_CAP', 0.9)
+        np.random.seed(3)
+        assert len(FP.prune_chain(gm, list(range(8)), alpha=100.0)) < 7
+
+    def test_the_redundancy_test_reads_the_tolerance_at_call_time(self, monkeypatch):
+        import numpy as np
+        import epde
+        from epde.interface import search_config
+        from epde.interface.equation_translator import translate_equation
+        from epde.operators.common.system_redundancy import redundant_equations
+        search = epde.EpdeSearch(use_solver=False, verbose_params={'show_iter_idx': False})
+        t = np.linspace(0.0, 4 * np.pi, 200)
+        _, domain = search.createDomain(t, boundary_width=10, ID=0)
+        search.set_preprocessor(default_preprocessor_type='FD', preprocessor_kwargs={})
+        _, trajectory = search.createTrajectory(
+            {'u': np.sin(t) + 2.0, 'v': np.cos(t) + 0.3 * np.sin(2 * t) + 2.0}, domain, cache_id=0)
+        search.create_pool(data=[trajectory], max_deriv_order=(2,), data_fun_pow=2)
+        du, dv = 'du/dx0{power: 1.0}', 'dv/dx0{power: 1.0}'
+        ddu, ddv = 'd^2u/dx0^2{power: 1.0}', 'd^2v/dx0^2{power: 1.0}'
+        u, v = 'u{power: 1.0}', 'v{power: 1.0}'
+        # u' + v' = 20 (u - v) beside its own time derivative: the derivative follows.
+        texts = {'u': f'-1.0 * {ddv} + 20.0 * {du} + -20.0 * {dv} + 0.0 = {ddu}',
+                 'v': f'-1.0 * {du} + 20.0 * {u} + -20.0 * {v} + 0.0 = {dv}'}
+        weights = {'u': [-1.0, 20.0, -20.0, 0.0], 'v': [-1.0, 20.0, -20.0, 0.0]}
+        system = translate_equation(texts, search.pool, all_vars=list(texts))
+        factors = {'factors_num': [1, 2], 'probas': [0.65, 0.35]}
+        for var in texts:
+            eq = system.vals[var]
+            eq.main_var_to_explain = var
+            eq.metaparameters['max_factors_in_term']['value'] = dict(factors)
+            for term in eq.structure:
+                term.max_factors_in_term = dict(factors)
+            eq.weights_internal = np.array(weights[var], dtype=float)
+            eq.weights_final = eq.weights_internal.copy()
+            eq.weights_internal_evald = True
+            eq.weights_final_evald = True
+            eq.target_idx = len(eq.structure) - 1
+        equations = [system.vals['u'], system.vals['v']]
+        ranges = [(0.0, 4 * np.pi)]
+        assert redundant_equations(equations, ranges) == [0]
+        monkeypatch.setattr(search_config, 'REDUNDANCY_RTOL', 0.0)
+        assert redundant_equations(equations, ranges) == []
