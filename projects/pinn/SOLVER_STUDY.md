@@ -1,8 +1,245 @@
-# EPDE solver-based fitness (PINN) study — onboarding
+# EPDE solver-based fitness (PINN) study
 
-*Written 2026-09-29 for a student joining the study. This is a local working
-doc (gitignored, not repo documentation). Numbers are quoted from the result
-files named next to them; when a number and a file disagree, the file wins.*
+*Tracked on branch `pinn` since 2026-11-12. **Part I** is the current assignment. **Part II** is the record of the first study (Sep–Oct 2026, DeepXDE backend), kept as background. Numbers are quoted from the result files named next to them; when a number and a file disagree, the file wins.*
+
+---
+
+# Part I. The assignment: a general PINN for equation discovery (Nov 2026)
+
+Read A (the problem) and B (what is already known), then do the tasks C to F in order. H says how to work. Part II is reference material; B points into it.
+
+Words used throughout:
+- **Candidate:** an equation, or a system of equations, proposed by EPDE's search, with its coefficients already fitted.
+- **Record:** the observed data of one system on its grid.
+- **True form, wrong form:** the equation that generated a record, and a deliberately wrong one (a term dropped). Both are refitted to the data before a solve.
+- **Gate:** `ln(RMSE_wrong / RMSE_true)` for one seed. Above 0 means the true form scores better.
+- **Arm:** one named solver configuration. Arms differ from their control by one mechanism, so a difference in results has one cause.
+- **PINN:** a physics-informed neural network: a network trained so that it satisfies the equation's residual.
+- **PI:** the supervisor of this study.
+
+## A. Why the PINN exists
+
+EPDE's search scores every candidate by a *discrepancy*. The solver-free discrepancy is WAPE. It evaluates the candidate's terms on finite-difference derivatives of the data and measures how far the target term is from the fitted combination of the others. It works in derivative space and never asks what field the equation would produce.
+
+The PINN answers that question. For a candidate with fixed coefficients it returns the field U that the equation produces, and the discrepancy becomes the error of U against the original data:
+
+```
+discrepancy(equation) = RMSE (or MSE) of U against the observed field
+```
+
+**Rules for the objective**
+- One value per equation, scored on that equation's own variable, never averaged over variables (§2, directive 9a).
+- Scored only on points the solve was not given. A network that fits the data it was shown scores well whatever the equation is.
+- The same solve is reused for forecasting: continued past the end of the record, it is the candidate's forecast.
+
+**The data regime** is what the solve is given. There are two, one arm each:
+
+| Regime | The solve is given | Scored on |
+|---|---|---|
+| `tail` | the observations on the first 80 % of time levels | the last 20 % of time levels. This is the first study's definition, and it is a forecasting test inside the record. |
+| `ic` | the initial state only; on an open domain also the observed values on the side boundaries | the whole record after the initial state |
+
+**The reference.** A candidate that can be solved for its highest time derivative can also be integrated by an ordinary numerical integrator, with no network. That field, U_ref, has two uses:
+- It gives the objective a perfect solver would report. This tells us whether the objective itself separates the true form from the wrong one.
+- It gives the PINN's own error, ‖U − U_ref‖. This tells us whether the optimiser reached the solution.
+
+The first study could not separate these two questions. Lorenz failed the gate under every arm of its Stage 2, while an integrator started from the true state at the train/tail split gave a gate of about +7 (§5.0). The failure was the optimiser's.
+
+The PINN stays the solver because the search proposes forms an integrator cannot take: targets that are not a time derivative, constraint equations such as continuity, open domains. The reference exists only for the benchmark forms. Its job is to check the PINN there.
+
+## B. What is already known
+
+Every row was measured. "Local" means the result files exist only on the machine that ran them.
+
+| Finding | What it means for this work | Where |
+|---|---|---|
+| A learning rate moves the gate: Allen-Cahn (AC) +0.195 … +0.650 and Duffing −2.03 … +4.28 across rates. | No tuned learning rate. Use a line search, curvature or a trust region. | §2 directive 1, §4 |
+| L-BFGS alone, with the inputs scaled to [−1, 1], ties the Adam recipe on AC, Duffing and Burgers. Without the input scaling it fails Duffing (−1.81). | This is the starting recipe, arm `G0`. | §5 |
+| DoG, Prodigy and a learning rate computed from the data fail a system each. A second data-computed rate clears AC by only 0.01. | Not repeated. | §5.0, "Recalculation" |
+| Levenberg–Marquardt on a [32]×4 network beats L-BFGS at completion on AC and Duffing, loses on Burgers, and is slow. | The first optimiser arm. | §5.0, "Recalculation" |
+| In float32, L-BFGS can stop on a zero line-search step while the loss is still falling (Duffing, Lotka-Volterra). Float64 removes the stall but runs to the iteration cap. | Float64 is an arm. Every row records why the optimiser stopped. | §6.2, §5.0 |
+| Choosing the iterate on a validation block inverts the gate. | Always score the last iterate. | §4, §8 rule 6 |
+| Loss weights taken from the gradient norm at the start are fragile. On Lorenz they are probed at an equilibrium and range from 0.008 to 11 by seed. | Loss balancing is a component to study. | §5.0, "Stage 3" |
+| Dividing every loss term by the variance of its own signal gave a loss that trains at unit weights (double pendulum, Duffing, wave; Aug 2026). | The `var` loss terms with `unit` weights are the first balancing arm. | `projects/pic/data/dp/pinn_test_autoscale.py`, flag `PHYS_NORM`; results local |
+| A coefficient-constancy statistic used as a loss term collapses the field (3 of 3 systems). A sum of log-terms collapses onto an equilibrium (6 of 6 seeds). | Not repeated. `DY-mon` (section F) is a diagnostic, never a loss term. | same script, flags `STAT`, `LOSS_FORM`; results local |
+| The training loss cannot see a missing weak term: AC with and without diffusion tie on it, while integrating the two forms separates them 16–24× (3 seeds, Sep 14). | The objective must compare the solved field with the data. A loss value is not an objective. | `projects/pic/data/ac/pinn_test_autoscale.py`, flag `DIFFUSION`; results local |
+| A scale-invariant observation loss collapses on fields that change sign. The scale-invariant physics loss gave near-zero gates in Stage 1 but propagated Lotka-Volterra (LV) on 3 of 3 seeds in Stage 2. | One physics-loss arm (`sinv_live`); no observation variant. | §5, §5.0, §6.3b |
+| Outputs scaled by the train-window mean and standard deviation win on Navier-Stokes (NS) and propagate LV on 12 of 12 solves, but alone they fail Duffing at the time bar (−0.845). | The output-transform arm. | §5, §5.0 |
+| The equilibrium trap: a freshly initialised network outputs about 0, which is a zero-residual equilibrium of Lorenz and LV, and fitted solutions slide onto an equilibrium where there is no data. | Report a collapse flag with every score. Short time windows remove the trap. | §5.0, "Stage 3" |
+| Marching the tail in short windows from the last observed state (arm TM-obs) passes the five systems whose tail is an initial-value problem. Marching the whole window, growing domains and causal weights all fail, because none fits the train window without a learning rate. | `G-tm` is the second baseline arm. `DY-cont` (section F) targets the train-window fit. | §5.0, "Stage 3" |
+| On an open domain (NS) the tail is not an initial-value problem: the pressure drifts by a free function and TM-obs scores −2.20. | An open domain needs boundary data or the global solve. | §5.0, "Stage 3" |
+| Under DeepXDE a solve's result depended on what its process had solved before (−20 % on AC, −53 % on Duffing). | Keep one fresh process per solve until a probe shows the general PINN is free of this. | §4, §8 rule 1 |
+| Wall-clock time moved by up to 49 % between identical runs. | Compare arms at equal iteration budgets and report seconds beside them. | §5.0, "Stage 2" |
+
+## C. Task 1: build the general PINN
+
+Build the package `projects/pinn/gpinn/`. Nothing in it exists yet.
+
+**Why not DeepXDE.** The first study changed losses, optimisers and weighting through hooks around DeepXDE; `epde/integrate/deepxde_integration.py` grew to over 1,900 lines. A plain PyTorch solver that owns its training loop makes each of those a named option.
+
+**All code lives inside `projects/pinn/`.**
+- The library imports only numpy, torch and scipy: no deepxde, and nothing from `epde/` or `projects/pic/`.
+- Helpers that already exist elsewhere are copied in, not imported. Each copy names its source file and commit and leaves the DeepXDE-only parts behind.
+- One file, `bridge_epde.py`, is the only one that imports `epde`. It turns a fitted EPDE system into the library's own `Problem`.
+- Nothing under `epde/` changes.
+- The datasets stay under `projects/pic/data/` and are read by path. They are data, not code.
+
+| File (to build) | Content | Copy the logic from |
+|---|---|---|
+| `spec.py` | The equation spec and its residual, `Σ c_k · (product of factors) + free term − target`, on numpy or torch; the list of derivatives a spec needs. | `epde/integrate/residual_terms.py` (`EquationSpec`, `residual`, `required_fields`) |
+| `data.py` | `Problem`: the specs, the axes, the inner mask, the observed fields. The time split (what the solve is given, what is scored). The data profile (bounds, periodic axes). | `epde/integrate/heldout.py` (`time_split`), `epde/integrate/data_profile.py` (`build_profile`) |
+| `bridge_epde.py` | A fitted EPDE system → `Problem`. It reads the grids, the inner mask and the observed fields from the samples manager, as `_held_out_replica` in `projects/pinn/gate.py` does. | new |
+| `net.py` | The network (tanh layers, Glorot start) and its transforms: affine inputs, periodic embedding, outputs scaled by train moments, a hard initial state. | `hard_ic_transform` in `epde/integrate/time_marching.py` |
+| `fields.py` | The autograd table `{(variable, orders): tensor}` for the derivatives a spec needs, sharing the lower orders. `orders` counts derivatives per axis; axis 0 is time. | new |
+| `terms.py` | Loss terms as residual vectors. Physics: `mse`, `var` (divided by the variance of the target term), `sinv_live` (divided pointwise by the summed size of the terms). Observation: `mse`, `var`. | new; the scale-invariant ratio is `cancellation_ratio` in `residual_terms.py` |
+| `balance.py` | Loss weights: `unit`, `variance`, `grad_init` (1/gradient norm at the start, then frozen: the first study's rule), `grad_ema` (the same, tracked during training). | new |
+| `optim.py` | `lbfgs` (an own loop around torch's strong-Wolfe L-BFGS that records why it stopped and calls back after every iterate), `adam`, `lm` (Levenberg–Marquardt on the residual vectors), `dog`, `prodigy`. | `epde/integrate/lr_free.py` (`DoG`, `Prodigy`; `levenberg_marquardt` for the damping rule) |
+| `marching.py` | The regimes `tail` and `ic`. Window plans: windows of length τ_min, dyadic slabs, and the observed state at a window's left edge. | `tau_min`, `window_edges`, `window_caps`, `observed_edge_state` in `time_marching.py`; `_dyadic_slab_edges` in `epde/operators/common/survival.py` |
+| `solve.py` | `solve(problem, config, seed)` returns the prediction, the stats and a per-iterate trace. `forecast` continues a finished solve past the record, window by window, from its last state. | new |
+| `score.py` | RMSE and MSE per equation on the scoring points. The same for two trivial fields, "keep the last given state" and "the mean of the given data"; a score no better than those raises the collapse flag. | new |
+| `reference.py` | The exact integrator: `scipy.integrate.solve_ivp` for systems of ordinary differential equations, a Fourier method of lines for periodic 1-D equations. It reads the right-hand side from the same spec and refuses a form it cannot integrate (NS). | new |
+| `stats.py` | Paired-seed contrasts, the smallest difference a design can detect, the number of seeds needed. | `contrast`, `mde`, `seeds_needed`, `arm_table`, `contrast_table` in `projects/pic/data/pinn_common.py` |
+
+**Conventions**
+- The config is one flat dict. Every row stores it whole. An unknown key raises: the DeepXDE adapter ignored unknown keys silently, and that hid mistakes.
+- A solve is a pure function of `(problem, config, seed)`. On the CPU in float64 the same three give the same bits.
+- Nothing computed from the data may read the scoring points. Replace them by NaN and the solve must not change.
+
+**The two baseline recipes**
+- **`G0`, the starting recipe.** It repeats the first study's arm S1 (§10).
+  - Network: [64]×4 tanh, float32.
+  - Optimiser: L-BFGS only, up to 4000 iterations (strong-Wolfe line search, history 100, gradient tolerance 1e-8).
+  - Inputs scaled to [−1, 1]; 4000 collocation points.
+  - Loss weights `grad_init`; regime `tail`.
+- **`G-tm`, tail marching.** It repeats the first study's arm TM-obs.
+  - No solve on the train window.
+  - The tail is cut into windows of length τ_min = min over variables of std(x) / rms(dx/dt), measured on the train levels and snapped to whole grid levels.
+  - The first window starts from the observed state at the last train level; each later window starts from the end of the one before and from its weights.
+  - A window takes its start state exactly, through the hard initial-state form, so there is no continuity penalty.
+  - The iteration budget is split over the windows by their length.
+
+**Tests**, in `projects/pinn/tests/`:
+- the derivative table against an analytic field;
+- the bridge: the copied residual equals EPDE's own on the true forms of the six systems (the one test that imports `epde`);
+- an import scan: only `bridge_epde.py` imports `epde`, and nothing imports `deepxde`;
+- a repeatable solve: CPU, float64, same seed, same bits;
+- no leak: NaN on the scoring points leaves the solve unchanged;
+- the score equals the fitness host's rule on a toy field (predict on the full grid, keep the inner points, take the scored time levels);
+- the reference reproduces the record for the true forms;
+- an unknown config key is refused;
+- one Levenberg–Marquardt step lowers the loss on a linear toy problem.
+
+**Done when** `python -m pytest projects/pinn/tests -q` passes and `tests/unit` gives the counts in section H.
+
+## D. Task 2: reference, harness and baseline
+
+- **Harness.** Add a backend `gpinn` to `projects/pinn/gate.py`, next to `deepxde` and `basis`.
+  - It reaches the library through `bridge_epde.py`.
+  - `run_basis_solve` shows how a second backend is wired.
+  - Reuse the six systems and their forms (`system_forms`, `build_search`, `fitted_system`) and the driver (`drive`).
+- **Arms.** `G0`, `G-tm`, and `REF`, the integrator. `REF` has no seed, so it runs once per form, like the basis arms (`SEEDLESS_BACKENDS`).
+- **What `REF` integrates.** Under `tail` it starts from the observed state at the last train level and covers the scored tail. Under `ic` it starts from the initial state and covers the record. A second-order equation (Duffing) also needs the first time derivative at the start; take it by backward differences, as `observed_edge_state` does.
+- **Rows.** Keep today's fields (`tag`, `system`, `arm`, `form`, `seed`, `mode`, `config`, `rmse`, `seconds`, the optimiser's exit record, `env`, `provenance`), so `analyze.py` reads the new rows. Add `iterations`, `ref_error` (RMSE to the reference, per variable) and `collapse` (per variable). Add the library's files to `PROVENANCE_FILES`.
+- **Baseline batch**, tag `gpinn_base`:
+  - systems: Duffing, LV, Lorenz;
+  - forms: true and wrong; seeds 0–2;
+  - arms: `G0`, `G-tm`, `REF`, and the DeepXDE arm `TM-obs-3k` as a control on the same code;
+  - cost: about 1.5 GPU hours, one fresh process per solve.
+
+**Done when**
+- `G-tm` has the reference's gate sign on every seed of the three systems;
+- its error to the reference is reported per system and form;
+- `G0` repeats the known failure on LV and Lorenz (§5.0). If it passes there, find out why before going on.
+
+## E. Task 3: the training study
+
+**The question.** Which loss, optimiser and balancing reach the reference solution reliably and cheaply on every kind of record: one ordinary differential equation, a coupled system, a partial differential equation?
+
+**Every solve reports four things:**
+1. the error to the reference;
+2. the gate, per equation and seed;
+3. the cost, in iterations and in seconds;
+4. the collapse flag.
+
+**Arms.** Each arm is `G0` with one component changed. The evidence for each is in section B.
+
+| Component | In `G0` | First arms |
+|---|---|---|
+| Optimiser | L-BFGS only | Levenberg–Marquardt on a [32]×4 network; float64 |
+| Loss weights | `grad_init` | `var` terms with `unit` weights; `grad_ema` |
+| Physics loss | `mse` | `sinv_live` |
+| Outputs | the raw network | outputs scaled by train moments |
+| Solve order | one global solve | tail marching (`G-tm`); regime `ic` |
+
+**Rules**
+- **Systems, in order of cost:** Duffing, LV, Lorenz; then AC and Burgers; then NS. Do not start NS before an arm passes the five others.
+- **Write the arms and the contrasts into the source before the batch runs.** A contrast chosen after seeing the rows is not evidence (§8 rule 7).
+- **Compare arms at equal iteration budgets.** Report seconds beside them.
+- **Decision rule.** An arm is eligible when its gate is above 0 on every seed of every system and it raises no collapse flag. Among eligible arms the lower error to the reference wins; arms closer than the seed spread tie.
+- **Do not repeat** what section B lists as already failed.
+
+## F. Task 4: can the dyad idea help the training?
+
+**What dyad is.** It is EPDE's newest instability objective (`dyad_scores` in `epde/operators/common/survival.py`). It cuts each axis into 2, 4, 8, … equal slabs, refits the candidate's coefficients on every slab, and scores how much they scatter between slabs. A true equation has the same coefficients in every slab at every scale.
+
+**How it relates to the PINN objective.** Dyad lets the coefficients move per slab and measures their scatter. The PINN holds the coefficients fixed and measures how far the solved state drifts from the data. They test the same thing from two sides, and they can share the same slabs.
+
+**The slabs here** are 2, 4, 8, … equal, nested slabs of the time axis, for as long as a slab keeps at least the τ_min window's number of levels.
+
+Five ways to use them, one arm each:
+
+| Arm | Mechanism | Control |
+|---|---|---|
+| `DY-march` | March over the dyadic slabs, each slab started from the end of the one before. | `G-tm` (τ_min windows) |
+| `DY-cont` | Inside the train window, solve the short slabs first, each from its own observed start state, and use their union as the start of the long solve. This targets what killed full-window marching on Lorenz: no fit of the train window without a learning rate. | `G0` |
+| `DY-int` | The physics term is the residual integrated over each slab, at every dyadic scale. For a target that is a first time derivative the target integrates to u(end) − u(start), so no time derivative of the network is taken, and distant times are coupled directly. | `G0` |
+| `DY-bal` | Each slab's residual is divided by that slab's own signal energy, so quiet and busy stretches weigh the same. | `G0` |
+| `DY-mon` | A diagnostic only. Refit the candidate's coefficients per slab on the network's own field and compare them with the fixed ones. Where they disagree the solve has not converged; where the columns vanish it has collapsed. It needs no reference and no truth. | none |
+
+**Drop rule.** An arm is dropped unless it beats its control on the error to the reference or on cost, on at least one system, in a resolved paired contrast, without losing the gate on any system.
+
+**Judge `DY-mon` differently:** against the reference, does its verdict agree with the true error to the reference on the solves of tasks 2 and 3?
+
+## G. Later (not part of this assignment)
+
+- **Port the winning recipe into EPDE** as a solver backend beside `deepxde` and `basis`. This touches `fitness.py`, `objectives.py` and `search_config.py`, which other work is changing, so it needs the PI's go-ahead.
+- **End-to-end discovery** with the PINN objective against WAPE: found the true form or not, distance to it, solve time, reproducibility of a rerun.
+- **A forecasting demo:** keep the end of a record away from the search, discover, forecast, compare.
+- **Near-miss wrong forms.** Today's wrong forms drop a whole term. A real search mostly meets the true form plus a small extra term. Never use an equivalent true form as a wrong form (§12).
+- **Noisy and real records** (§12).
+
+## H. How to work
+
+- **Branch.** Everything is on branch `pinn`. Paths in this doc are relative to the repository root.
+- **Start a fresh baseline.** EPDE's default finite differences became 4th-order on Oct 22. The rows of Part II were made with 2nd-order differences, so their candidates have other coefficients. Never read old and new tags in one `analyze.py` call.
+- **Results.** Rows go to `projects/pinn/results/<tag>.jsonl`. That folder is not tracked. Quote a number in this doc only with the name of the file it came from.
+- **Bench rules.** §8 applies in full. The ones that cost the most when broken:
+  - one fresh process per solve;
+  - nothing CPU-heavy beside a timed GPU batch;
+  - pin the thread counts for anything compared bit by bit;
+  - per-seed rows stay unaggregated, with contrasts fixed in advance;
+  - one mechanism per arm.
+- **Commits** only with the PI's OK: explicit paths, a prose body with the numbers, no trailers (§8 rule 12).
+- **Environment.** §11.
+- **Tests.**
+  ```
+  OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 python -m pytest projects/pinn/tests -q
+  OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 python -m pytest tests/unit -q
+  ```
+  On `pinn` on Nov 11 the unit suite gave 2548 passed, 1 skipped, 5 failed. The 5 are bitwise pins of the DeepXDE solve in `tests/unit/test_lr_free_solve.py`. They were captured under 2nd-order differences and fail since the default changed. They are not caused by this work; whether to recapture them is the PI's call.
+
+### Progress log
+Add one line per finished step: date, what ran (tag), result file, verdict.
+
+| Date | Step | Result file | Verdict |
+|---|---|---|---|
+| 2026-11-12 | Assignment written; doc tracked | — | — |
+
+---
+
+# Part II. Record of the DeepXDE study (Sep–Oct 2026)
+
+*Written between Sep 29 and Nov 11 as the onboarding doc of the first study. The text is kept as it was, with stale statements corrected on Nov 12. Its "next" lists (§6.5, §13) are superseded by Part I.*
 
 ---
 
@@ -377,6 +614,8 @@ Warnings:
 - A **PINN that fails to propagate** gives a TRUE-form RMSE near the persistence or mean baseline (an equilibrium or persistence level: LV ≈ 2.3 / 2.4, Lorenz ≈ 7.5–7.7 at the origin or ≈ 13–14 near C+ with moment outputs). Read that as "solve failed", not as a verdict. Report RMSE / tail std beside the gate.
 
 ### 6.5 Next (Oct 7)
+*Superseded by Part I (Nov 12). Kept as the state at the end of the first study.*
+
 - **Done Nov 11:** the Stage-3 work is committed on branch `pinn` off `domain_refactor` (`9b42f48` adapter + `time_marching.py` + 129 tests; `1da0d71` harness arms, routed analysis, run scripts). The stored `tmobs2_analysis.txt` reproduces byte for byte on it. Not pushed, not merged.
 - **Port R-route into `SolverBasedFitness`**, routing at solve time from `data_profile`. Merge around the other uncommitted `epde/` work.
 - **Budget:** per-system budget, or an iteration-matched bar, to win back AC's margin.
@@ -392,7 +631,7 @@ Warnings:
 
 Code lives in **`projects/pinn/`**.
 
-**Current queue (started Sep 29, 13:46): `run_queue.sh`.**
+**The Sep 29 queue (started 13:46, finished): `run_queue.sh`.**
 - Results live in `projects/pinn/results/`. The old `projects/pic/data/solver_gate/` is a retired copy.
 - Order:
   1. patch neutrality under the old rule (`gate.py neutrality --tag stage2_legacy`; stops the queue on failure);
@@ -471,10 +710,10 @@ python analyze.py [--tags baseline,stage1,...] [--systems ac,duffing,burgers]
 | Path | What |
 |---|---|
 | `projects/pinn/gate.py`, `analyze.py`, `run_*.sh` | the gate harness (tracked) |
-| `projects/pinn/results/` (after the move; now `projects/pic/data/solver_gate/results/`) | `baseline.jsonl`, `stage1_start/stage1/stage1_end.jsonl` (network), `stage1_basis.jsonl` (basis), `stage1b*.jsonl` (running), `shared_fits.jsonl` + `shared_fits/*.pt`, `traces/<tag>/`, `stage1_analysis.txt` (the Stage-1 report), `*.log` (the shell output of each batch). Untracked. |
+| `projects/pinn/results/` | `baseline.jsonl`, `stage1_start/stage1/stage1_end.jsonl` (network), `stage1_basis.jsonl` (basis), `stage1b*.jsonl`, `shared_fits.jsonl` + `shared_fits/*.pt`, `traces/<tag>/`, `stage1_analysis.txt` (the Stage-1 report), the Stage-2 and Stage-3 rows and analyses (§5.0), `*.log` (the shell output of each batch). Untracked: the files exist only on the machine that ran them. |
 | `epde/integrate/*.py` | adapter and helpers (§3.2) |
 | `tests/unit/test_solver_path.py` | adapter behaviour: time split, weights, L-BFGS budget, stall guard, exit record, device, validation checkpoint, a real fixed-coefficient solve |
-| `tests/unit/test_lr_free_solve.py` | **bitwise pins** of the shipped solve (`'adam+lbfgs': 6f9cc574…`, `'lbfgs-only': 361e35ab…`, S1 `c28c0dc3…`), null checks, option validation, shared-fit cache/tail/RNG, DoG/Prodigy/LM mechanics |
+| `tests/unit/test_lr_free_solve.py` | **bitwise pins** of the shipped solve under 2nd-order differences; five fail since the default changed, see Part I, section H (`'adam+lbfgs': 6f9cc574…`, `'lbfgs-only': 361e35ab…`, S1 `c28c0dc3…`), null checks, option validation, shared-fit cache/tail/RNG, DoG/Prodigy/LM mechanics |
 | `tests/unit/test_basis_backend.py`, `test_data_profile.py` | the basis backend and the data profile |
 | `projects/pic/data/pinn_common.py`, `stat_common.py`, `<sys>/pinn_test_autoscale.py`, `dp/cv_metric.py` | the standalone PINN testbed. Configure by editing module constants, run from the script's own folder. |
 | `projects/pic/data/<system>/` | all datasets |
@@ -519,7 +758,7 @@ python analyze.py [--tags baseline,stage1,...] [--systems ac,duffing,burgers]
   ```
   OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 python -m pytest tests/unit -q
   ```
-  Sep 29: 983 passed, 1 skipped (the CUDA-fallback test, skipped because CUDA is present), ~107 s.
+  Sep 29: 983 passed, 1 skipped (the CUDA-fallback test, skipped because CUDA is present), ~107 s. Nov 11, on `pinn`: 2548 passed, 1 skipped, 5 failed (Part I, section H).
 
 ---
 
@@ -576,16 +815,18 @@ The 14 benchmark systems (true equations, `dx0 = t`; data under `projects/pic/da
 
 ## 13. Open questions / good starter tasks
 
-1. **Coupled-system baselines.**
+*Superseded by Part I. Items 2, 4, 5 and 6 are still open.*
+
+1. **Coupled-system baselines** (done in Stages 2 and 3, §5.0).
    - B and S1 on `lv` and `lorenz` (cheap: ~2–4 min per solve).
    - An NS `_smoke` run plus one timed B solve before committing to NS arms.
    - Report RMSE / tail std beside every gate.
 2. **NS cost.** Measure the two adapter-side savings (full-output Jacobian so DeepXDE's cache hits; one merged observation BC). Both change the baseline, so each is a labelled arm, not a silent change.
-3. **Duffing stall follow-up.** Float64 shared fits, then S9/S10 on them. Does a better start rescue S9 on Duffing?
+3. **Duffing stall follow-up** (superseded). The shared-fit arms were not continued after Stage 1b. Float64 is an arm of Part I, section E.
 4. **Ranking-rule artifact check.** The pre-registered rule ranked a ringing artifact (BL-n2) first. Propose a check, e.g. the resolution-convergence of the wrong form.
 5. **Live-search solver variance.** It is still unmeasured how much a candidate's fitness moves across seeds inside a real EPDE search (per-candidate seeding alone won't fix the process-state part).
 6. **Equivalent-forms audit** of every gate's wrong form (§12).
-7. **Phase 5** discovery driver (`run_discovery.py` is planned, not written).
+7. **Phase 5** discovery driver (`run_discovery.py` is planned, not written). Now Part I, section G.
 
 ---
 
@@ -594,6 +835,6 @@ The 14 benchmark systems (true equations, `dx0 = t`; data under `projects/pic/da
 - `REFERENCE_GATE` in `analyze.py` is declared but never read. `REFERENCE_RMSE` (Sep 18 values) is what the integrity check uses.
 - The Stage-1 ranking counts basis artifacts as eligible (§5).
 - Several "no floor" statements predate the floored Stage-1c arms. The unfloored arms are the default; the floored ones are follow-ups the PI chose.
-- EPDE's FD is 2nd-order `np.gradient`. On AC's 128×51 grid the diffusion coefficient is biased ~36 %, which sets AC's true-form floor at ~1.5e-3.
+- Every row in this record was produced with EPDE's 2nd-order finite differences (`np.gradient`). On AC's 128×51 grid that biases the diffusion coefficient ~36 %, which sets AC's true-form floor at ~1.5e-3. Since Oct 22 the default is 4th-order, so new solves get other candidate coefficients and cannot be compared with these rows (Part I, section H).
 - Code comments in `epde/` still cite three retired thesis files; they will be repointed to git revisions.
 - Trace paths written before the move use Windows backslashes. `projects/pinn/analyze.py` reads both forms; `projects/pinn/gate.py` now writes forward slashes.
