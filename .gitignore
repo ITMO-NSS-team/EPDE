@@ -134,7 +134,6 @@ dmypy.json
 /ARCHITECTURE.md
 /RIDGE_ALPHA_PLAN.md
 /SEARCH_CONFIG_PLAN.md
-/projects/pinn/SOLVER_STUDY.md
 
 # --- IDE ---
 .idea/
