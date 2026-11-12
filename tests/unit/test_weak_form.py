@@ -1,5 +1,7 @@
 """The weak-form engine (epde/preprocessing/weak_form.py): integration by parts, exact-moment kernels, window
 integrals, the AR(1) noise model and the pcr window choice."""
+import os
+
 import numpy as np
 import pytest
 
@@ -194,3 +196,29 @@ def test_pcr_window_fit_recovers_lotka_volterra():
                           plan.q)
     c = np.linalg.lstsq(M[:, 1:], M[:, 0], rcond=None)[0]
     assert np.allclose(c, [1.0, -0.5], rtol=0.05)
+
+
+# ------------------------------------------------------------------------------------------ spin heading
+def _spin_heading():
+    path = os.path.join(os.path.dirname(__file__), 'data', 'weak_noise_spin_heading.npy')
+    return np.load(path).astype(float) / 1e4
+
+
+def test_noise_model_stays_within_the_data_variance():
+    """sin(heading) of a spinning vibrobot at 25 frames/s (8250 samples, int16 x 1e4). Before the variance guard
+    the scan accepted order 196 at rho -> 1 and returned (431.3, [0.99999999888], [196])."""
+    y = _spin_heading()
+    sig, rhos, ms = WF.noise_model(y)
+    assert sig ** 2 <= np.var(y)
+    assert sig > 0
+
+
+def test_choose_window_on_a_spin_heading_is_feasible():
+    """Before the variance guard this raised RuntimeError (J_GUARD reached)."""
+    y = _spin_heading()
+    t = np.arange(y.size) * 0.04
+    fields = WF.Fields({'s': y}, [t])
+    library = [WF.WeakTerm([('s', (k,))], (0,)) for k in (0, 1, 2)] + [WF.WeakTerm([], (1,))]
+    plan = WF.choose_window(fields, library, [1, 2], np.random.default_rng([0, 0]))
+    assert plan.j < WF.J_GUARD
+    assert np.isfinite(plan.score)

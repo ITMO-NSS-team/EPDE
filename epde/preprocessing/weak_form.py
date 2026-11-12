@@ -324,11 +324,18 @@ def axis_fit(y: np.ndarray, a: int):
     order whose ratio falls outside that range is signal-dominated and skipped. The fit is kept while its sigma
     falls (first local minimum).
 
+    A fit whose sigma^2 exceeds the data's mean variance along the axis is impossible (the noise is part of the
+    data), so that order is skipped like a signal-dominated one. It happens where the low orders are smoother
+    than any AR(1) noise and the ratio first enters the range at its rho -> 1 edge; there
+    sigma = sqrt(r0 / g(m, rho, 0)) diverges. Example: a robot heading sin(phi), 8250 samples, gave sigma 431 at
+    order 196 and choose_window reached J_GUARD.
+
     The scan also ends:
     - at the first local minimum of the white-equivalent sigma, once a fit exists;
     - at the data limits: 2m + 2 >= n, roundoff of the samples, or float overflow."""
     n = y.shape[a]
     d = np.moveaxis(y, a, 0)
+    var0 = float(np.mean(np.var(d, axis=0)))
     floor = EPS * float(np.sqrt(np.mean(y * y)))
     best, prev, m = None, None, 0
     while n > 2 * (m + 1) + 2:
@@ -349,9 +356,10 @@ def axis_fit(y: np.ndarray, a: int):
         if f(lo) * f(hi) < 0:
             rho = brentq(f, lo, hi)
             sig = float(np.sqrt(r0 / _g(m, rho, 0)))
-            if best is not None and sig >= best[0]:
-                break
-            best = (sig, rho, m)
+            if sig * sig <= var0:
+                if best is not None and sig >= best[0]:
+                    break
+                best = (sig, rho, m)
         if stop and best is not None:
             break
     return best
@@ -359,7 +367,8 @@ def axis_fit(y: np.ndarray, a: int):
 
 def noise_model(y: np.ndarray):
     """Separable AR(1) noise of a field: ``(sigma, [rho per axis], [difference order per axis])``. Sigma is the
-    smallest per-axis estimate (least signal leakage); 0 when no axis has a noise-dominated order."""
+    smallest per-axis estimate (least signal leakage); 0 when no axis has a noise-dominated order. Sigma never
+    exceeds the data's variance along an axis."""
     fits = [axis_fit(y, a) for a in range(y.ndim)]
     ok = [f for f in fits if f is not None]
     sig = min(f[0] for f in ok) if ok else 0.0
