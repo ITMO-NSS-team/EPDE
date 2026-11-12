@@ -754,10 +754,14 @@ class OffspringUpdater(CompoundOperator):
             return self._update(objective, arguments)
 
     def _update(self, objective: ParetoLevels, arguments: dict):
+        from epde.optimizers.nsga.per_variable import take_plan_status
         self_args, subop_args = self.parse_suboperator_args(arguments=arguments)
 
         while objective.unplaced_candidates:
             offspring = objective.unplaced_candidates.pop()
+            # An assembled child (evolution.niching='per_variable') carries its plan status;
+            # the first pass of its loop is counted by it.
+            plan_status = take_plan_status(offspring)
             attempt = 0
             replaced = 0
             mutation_attempt_limit = self.params['mutation_attempt_limit']
@@ -802,6 +806,8 @@ class OffspringUpdater(CompoundOperator):
                 system = temp_offspring.equations_labels
                 if system in objective.history and self._swap_arrangement(temp_offspring, objective,
                                                                           subop_args):
+                    if plan_status is not None and total_attempts == 1:
+                        _loop_stats.record('PerVariable.first_fit.' + plan_status + '.swapped', 1, 1)
                     break
                 if system not in objective.history:
                     self.suboperators['chromosome_fitness'].apply(objective=temp_offspring,
@@ -835,12 +841,17 @@ class OffspringUpdater(CompoundOperator):
                         if global_var.verbose.candidate_objectives:
                             print(temp_offspring.obj_fun)
                         self._place_siblings(temp_offspring, objective, subop_args)
+                        if plan_status is not None and total_attempts == 1:
+                            _loop_stats.record('PerVariable.first_fit.' + plan_status + '.placed', 1, 1)
                         break
                     # Duplicate active form or unrecoverable degenerate: record
                     # the active label so an identical pruned candidate
                     # short-circuits, then keep searching for a novel one.
                     objective.history.add(final_label)
-                self._place_siblings(temp_offspring, objective, subop_args)
+                siblings_placed = self._place_siblings(temp_offspring, objective, subop_args)
+                if plan_status is not None and total_attempts == 1:
+                    _loop_stats.record('PerVariable.first_fit.' + plan_status
+                                       + ('.sibling' if siblings_placed else '.nothing'), 1, 1)
                 if replaced == offspring_attempt_limit:
                     hit_offspring_cap = True
                     if global_var.verbose.candidate_objectives:
@@ -861,12 +872,13 @@ class OffspringUpdater(CompoundOperator):
             )
         return objective
 
-    def _place_siblings(self, offspring, objective, subop_args) -> None:
+    def _place_siblings(self, offspring, objective, subop_args) -> int:
         """system_rps_mode='plain': the S+{1} versions of ``offspring`` that its
         fit could not rank against S enter the population too -- each one not
         yet in the history and not degenerate, through the same level updater.
-        Nothing is handed over in any other mode."""
+        Nothing is handed over in any other mode. Returns how many were placed."""
         from epde.operators.common.plain_fit import take_siblings
+        placed = 0
         for sibling in take_siblings(offspring):
             label = sibling.equations_labels
             if label in objective.history or has_degenerate_equation(sibling):
@@ -875,6 +887,8 @@ class OffspringUpdater(CompoundOperator):
             self.suboperators['pareto_level_updater'].apply(objective=(sibling, objective),
                                                             arguments=subop_args['pareto_level_updater'])
             objective.history.add(label)
+            placed += 1
+        return placed
 
     def _swap_arrangement(self, offspring, objective, subop_args) -> bool:
         """system_rps_mode='plain': one arrangement per structure (USER, Oct 23

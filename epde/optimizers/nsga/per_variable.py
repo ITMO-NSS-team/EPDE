@@ -18,11 +18,16 @@ representatives, identical points sharing one distance.
 * Selection (:func:`select`): pair p draws parent A by a binary tournament in
   plane (turn + p) mod n and parent B in another plane drawn uniformly; B is
   redrawn up to three times while the assembled child would repeat A, B or a
-  system in the history.
+  system in the history. A pair whose redraws are exhausted is planned anyway
+  and flagged as a planned duplicate (``objective.pv_duplicates``).
 * Crossover (:func:`crossover`): per pair, the ASSEMBLED child -- A with B's
   equation of B's plane (and, for more than two equations, each other
   equation from B by a fair coin) -- which skips its first mutation, and the
-  A-side child of the usual chromosome crossover.
+  A-side child of the usual chromosome crossover. The assembled child of a
+  planned duplicate skips its first mutation too under
+  ``evolution.planned_duplicates='fit'`` and is mutated before its first fit
+  under ``'mutate'``; every assembled child carries its plan status
+  (:func:`take_plan_status`).
 * Initial population (:class:`PerPlaneFirstLevelCount`): at most half the
   systems on level 0 of EVERY plane.
 
@@ -33,8 +38,14 @@ from types import SimpleNamespace
 
 import numpy as np
 
+from epde import _loop_stats
+
 #: The attribute an assembled child carries until its first mutation.
 SKIP_FIRST_MUTATION = '_skip_first_mutation'
+#: The attribute an assembled child carries until its first fit: its plan status.
+PLAN_STATUS = '_pv_plan_status'
+#: The plan statuses: the mating plan predicted a repeat (redraws exhausted) or did not.
+PLAN_DUPLICATE, PLAN_NEW = 'duplicate', 'new'
 #: Redraws of parent B while the assembled child repeats A, B or the history.
 PLAN_REDRAWS = 3
 
@@ -227,7 +238,8 @@ def predicted_label(A, kA, B, kB, keys, from_b=frozenset()) -> tuple:
 
 def select(operator, objective) -> None:
     """``NSGASelection`` under per-variable niching: the mating plan ``objective.pv_plan`` -- per pair
-    (A, kA, B, kB) -- and the coins ``objective.pv_coins`` (module docstring). Both parents' counters rise."""
+    (A, kA, B, kB) -- the coins ``objective.pv_coins`` and, per pair, whether its redraws were exhausted
+    (``objective.pv_duplicates``; module docstring). Both parents' counters rise."""
     population = objective.population
     T = plane_table(population)
     n_eq, n = T.n_eq, len(population)
@@ -237,7 +249,7 @@ def select(operator, objective) -> None:
     parents = int(n * operator.params['parents_fraction'])
     parents = min(max(2, parents + parents % 2), n + n % 2)
     history = getattr(objective, 'history', None) or ()
-    plan, coins = [], []
+    plan, coins, duplicates = [], [], []
     for p in range(parents // 2):
         eA = (turn + p) % n_eq
         others = [e for e in range(n_eq) if e != eA]
@@ -249,14 +261,20 @@ def select(operator, objective) -> None:
             B = population[_tournament(T, eB, n)]
             predicted = predicted_label(A, kA, B, kB, keys, from_b)
             if predicted not in (A.equations_labels, B.equations_labels) and predicted not in history:
+                exhausted = False
                 break
+        else:
+            exhausted = True
+        _loop_stats.record('PerVariable.plan.duplicate' if exhausted else 'PerVariable.plan.new', 1, 1)
         plan.append((A, kA, B, kB))
         coins.append(from_b)
+        duplicates.append(exhausted)
         A.incr_counter()
         B.incr_counter()
     objective.forced_pair = None
     objective.pv_plan = plan
     objective.pv_coins = coins
+    objective.pv_duplicates = duplicates
 
 
 def _replace(vals, key, value) -> None:
@@ -266,9 +284,11 @@ def _replace(vals, key, value) -> None:
         vals[key] = value
 
 
-def assemble(A, kA, B, kB, keys, from_b):
-    """deepcopy(A) with B's equation at kB and at every key of ``from_b``; no fit, no target; it skips its
-    first mutation."""
+def assemble(A, kA, B, kB, keys, from_b, planned_duplicate=False):
+    """deepcopy(A) with B's equation at kB and at every key of ``from_b``; no fit, no target. It carries its
+    plan status (:data:`PLAN_STATUS`) and skips its first mutation, unless ``planned_duplicate`` and
+    ``evolution.planned_duplicates='mutate'``."""
+    from epde.interface.search_config import active_config
     child = deepcopy(A)
     _replace(child.vals, kB, deepcopy(B.vals[kB]))
     for k in keys:
@@ -276,20 +296,25 @@ def assemble(A, kA, B, kB, keys, from_b):
             _replace(child.vals, k, deepcopy(B.vals[k]))
     if hasattr(child, 'reset_state'):
         child.reset_state(True)
-    child.__dict__[SKIP_FIRST_MUTATION] = True
+    child.__dict__[PLAN_STATUS] = PLAN_DUPLICATE if planned_duplicate else PLAN_NEW
+    if not (planned_duplicate and active_config().evolution.planned_duplicates == 'mutate'):
+        child.__dict__[SKIP_FIRST_MUTATION] = True
     return child
 
 
-def crossover(operator, objective, plan, coins, subop_args) -> None:
+def crossover(operator, objective, plan, coins, subop_args, duplicates=None) -> None:
     """``ParetoLevelsCrossover`` under per-variable niching: per planned pair the assembled child and the
-    A-side child of the chromosome crossover, into ``objective.unplaced_candidates``."""
+    A-side child of the chromosome crossover, into ``objective.unplaced_candidates``. ``duplicates`` holds
+    per pair whether the plan predicted a repeat (``None``: none did)."""
+    if duplicates is None:
+        duplicates = [False] * len(plan)
     for solution in objective.population:
         solution.reset_counter()
     objective.forced_pair = None
     keys = list(objective.population[0].vals.equation_keys)
     offspring = []
-    for (A, kA, B, kB), from_b in zip(plan, coins):
-        child1 = assemble(A, kA, B, kB, keys, from_b)
+    for (A, kA, B, kB), from_b, duplicate in zip(plan, coins, duplicates):
+        child1 = assemble(A, kA, B, kB, keys, from_b, duplicate)
         a1, b1 = deepcopy(A), deepcopy(B)
         a1.reset_state(True)
         b1.reset_state(True)
@@ -306,6 +331,12 @@ def skip_first_mutation(system) -> bool:
     """True (once) for an assembled child that has not been mutated yet; the flag is removed."""
     flags = getattr(system, '__dict__', None)
     return bool(flags is not None and flags.pop(SKIP_FIRST_MUTATION, False))
+
+
+def take_plan_status(system):
+    """``'duplicate'`` or ``'new'`` for an assembled child (once; the status is removed), None otherwise."""
+    flags = getattr(system, '__dict__', None)
+    return None if flags is None else flags.pop(PLAN_STATUS, None)
 
 
 # ------------------------------------------------------------------ the initial population

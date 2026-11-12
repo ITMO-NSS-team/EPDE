@@ -134,6 +134,7 @@ class EpdeSearch(object):
                  subregion_mating_limitation=UNSET, solution_params=UNSET,
                  director_params=UNSET, operators=UNSET,
                  niching=UNSET, complementary_mating_prob=UNSET, engine=UNSET,
+                 planned_duplicates=UNSET,
                  memory_for_cache=UNSET, verbose_params=UNSET,
                  **solver_kwargs):
         """Build a search from the grouped configuration.
@@ -207,6 +208,7 @@ class EpdeSearch(object):
             solution_params=solution_params, director_params=director_params,
             operators=operators, niching=niching,
             complementary_mating_prob=complementary_mating_prob, engine=engine,
+            planned_duplicates=planned_duplicates,
             memory_for_cache=memory_for_cache, verbose_params=verbose_params)
         overrides.update(solver_kwargs)
         self._config = cfg = load_search_config(config, overrides)

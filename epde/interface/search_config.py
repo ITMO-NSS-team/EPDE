@@ -893,6 +893,14 @@ class EvolutionConfig:
     * ``'auto'`` (the default) -- ``'per_variable'`` for plain-mode NSGA-II,
       ``'system'`` otherwise (:func:`resolve_niching`).
 
+    ``planned_duplicates`` (one of :data:`PLANNED_DUPLICATES`) applies under
+    ``niching='per_variable'``: an assembled child whose mating plan predicted
+    a repeat of a parent or of the history (the plan's redraws exhausted)
+    either enters its first fit unmutated like every assembled child
+    (``'fit'``, the default) or is mutated before its first fit
+    (``'mutate'``). ``'mutate'`` is refused unless ``niching`` resolves to
+    ``'per_variable'``.
+
     ``complementary_mating_prob`` is the probability that the second parent is
     drawn from the systems holding some equation's front where the first
     parent does not (e.g. an exact-v system for an exact-u one), so crossover
@@ -932,11 +940,15 @@ class EvolutionConfig:
     niching: str = 'auto'
     complementary_mating_prob: float = 0.0
     engine: str = 'moeadd'
+    planned_duplicates: str = 'fit'
 
 
 #: How a multi-equation system survives and mates; see
 #: :attr:`EvolutionConfig.niching`.
 NICHING_MODES = ('system', 'per_equation', 'per_variable')
+#: What an assembled child planned as a duplicate does before its first fit; see
+#: :attr:`EvolutionConfig.planned_duplicates`.
+PLANNED_DUPLICATES = ('fit', 'mutate')
 #: The multi-objective algorithm; see :attr:`EvolutionConfig.engine`.
 ENGINES = ('moeadd', 'nsga2')
 #: ``early_stopping_patience='auto'`` outside plain-mode NSGA-II.
@@ -1607,6 +1619,11 @@ def _check_types(resolved: dict) -> None:
         raise ValueError(
             'evolution.niching must be one of {0}, instead got {1!r}.'.format(
                 list(NICHING_MODES) + ['auto'], niching))
+    planned = resolved['evolution']['planned_duplicates']
+    if planned not in PLANNED_DUPLICATES:
+        raise ValueError(
+            'evolution.planned_duplicates must be one of {0}, instead got {1!r}.'.format(
+                list(PLANNED_DUPLICATES), planned))
     mating = resolved['evolution']['complementary_mating_prob']
     if isinstance(mating, bool) or not isinstance(mating, (int, float)) \
             or not 0.0 <= mating <= 1.0:
@@ -1651,6 +1668,10 @@ def _check_types(resolved: dict) -> None:
     # SearchSpaceConfig). The config keeps 'auto'; each reader resolves it
     # (resolve_niching, resolve_patience, resolve_plain_params).
     niching = resolve_niching(niching, rps_mode, engine)
+    if planned == 'mutate' and niching != 'per_variable':
+        raise ValueError(
+            "evolution.planned_duplicates='mutate' requires evolution.niching to resolve to "
+            "'per_variable' (search_space.system_rps_mode='plain' and evolution.engine='nsga2').")
     if niching == 'per_variable':
         if not _plain_nsga2(rps_mode, engine):
             raise ValueError(

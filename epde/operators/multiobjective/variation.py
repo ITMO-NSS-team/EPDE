@@ -107,10 +107,11 @@ class ParetoLevelsCrossover(CompoundOperator):
         plan = getattr(objective, 'pv_plan', None)
         if plan is not None:
             coins = objective.pv_coins
-            objective.pv_plan = objective.pv_coins = None
+            duplicates = getattr(objective, 'pv_duplicates', None)
+            objective.pv_plan = objective.pv_coins = objective.pv_duplicates = None
             if plan:
                 from epde.optimizers.nsga.per_variable import crossover
-                crossover(self, objective, plan, coins, subop_args)
+                crossover(self, objective, plan, coins, subop_args, duplicates)
                 return objective
 
         crossover_pool = []
