@@ -731,6 +731,7 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
         self._preprocessor_pipeline = preprocessor_pipeline
         self._derivs = derivs
         self._additional_cached_tokens = additional_cached_tokens
+        self._raw_token_tensors: Dict[str, np.ndarray] = {}
 
         if additional_cached_tokens is not None and not isinstance(additional_cached_tokens, dict):
             raise TypeError(f'additional_cached_tokens were passed incorrectly, expected dict, got {type(additional_cached_tokens)}')
@@ -894,6 +895,9 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
         External derivative tokens are refused under a row budget: they are
         differentiated from the masked tensors, which on a lattice would be a
         coarser scheme than the full-grid derivatives of the variables.
+
+        The full-grid tensors of every other family are kept by reference, before the mask, for the weak
+        rows (``raw_token``); external derivative tokens keep none, their tensors are bases.
         """
         if (self._domain.evaluation_stride is not None
                 and isinstance(family, ExternalDerivativesTokens)):
@@ -902,6 +906,9 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
                 f'under a row budget (evaluation_stride {self._domain.evaluation_stride}) its '
                 'derivatives would come from the sub-lattice. Build the domain without a row '
                 'budget to use them.')
+        if not isinstance(family, ExternalDerivativesTokens):
+            for label, tensor in tensors.items():
+                self._raw_token_tensors[label] = np.asarray(tensor)
         masked = {label: np.asarray(tensor)[self._domain.g_func_mask]
                   for label, tensor in tensors.items()}
         family.upload(trajectory = masked, cache = self._cache,
@@ -968,6 +975,18 @@ class Trajectory(object): # Pass around in evo. operators or init in globals. Us
                 return entry.raw_tensor
         raise KeyError(f'no variable {var_name!r} in trajectory {self.ID}; '
                        f'has {self.variable_names}')
+
+    def raw_token(self, label: str) -> np.ndarray:
+        """The full-grid tensor of the stored token ``label`` as uploaded (before the domain mask)."""
+        try:
+            return self._raw_token_tensors[label]
+        except KeyError:
+            raise KeyError(f'no stored token {label!r} in trajectory {self.ID}; '
+                           f'has {sorted(self._raw_token_tensors)}') from None
+
+    def raw_tokens(self) -> Dict[str, np.ndarray]:
+        """Every stored token's full-grid tensor of this trajectory, by label (a shallow copy)."""
+        return dict(self._raw_token_tensors)
 
     def box_field(self, var_name: str) -> np.ndarray:
         """The preprocessed field of ``var_name`` on EVERY point of the

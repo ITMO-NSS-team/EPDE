@@ -9,6 +9,11 @@ The pieces:
   - Every other factor (trigonometric, constant, user grid functions) is OPAQUE: a pointwise factor whose
     values come from its evaluator on the full grid (``CustomEvaluator.full_grid``). A term with an opaque
     factor gets no integration by parts.
+  - A stored-token factor (``CacheStoredTokens``) is opaque too: its values are the trajectory's full-grid
+    tensors (``Trajectory.raw_token``), raised to the factor's power. Weak rows integrate the full grid (no
+    domain boundary), so a stored tensor must hold valid values on every grid point. Stored tokens are not
+    window-selection columns. ``ExternalDerivativesTokens`` stay refused: their tensors are differentiated
+    after the domain mask and no full-grid tensor exists.
 - :class:`WeakRows`: per trajectory, the raw fields; per (trajectory, equation slot), the window plan. Term
   columns are cached by (slot, ``Term.factors_labels``).
 - :func:`build_weak_rows`: picks each slot's window once per fit (``weak_form.choose_window``).
@@ -91,8 +96,17 @@ def _inner_evaluator(evaluator):
     return getattr(evaluator, '_evaluator', evaluator)
 
 
-def weak_term(term, D: int):
-    """``(WeakTerm, {opaque label: factor})`` of an EPDE term on a ``D``-axis grid."""
+def _is_stored_family(ftype, variable, evaluator, family_of_derivs) -> bool:
+    """A family of tokens whose values are supplied as tensors (``CacheStoredTokens``)."""
+    return (evaluator is simple_function_evaluator and not _is_data_family(ftype, variable, evaluator)
+            and ftype != 'grids' and not family_of_derivs)
+
+
+def weak_term(term, D: int, stored=frozenset()):
+    """``(WeakTerm, {opaque label: factor})`` of an EPDE term on a ``D``-axis grid.
+
+    ``stored`` is the set of token labels that have full-grid tensors; a factor with one of those labels (and
+    no other reading) is opaque like a coordinate function."""
     data, coords, opaque, factors = [], [0] * D, [], {}
     for factor in term.structure:
         power = _integer(_param(factor, 'power'))
@@ -108,6 +122,11 @@ def weak_term(term, D: int):
             label = factor.structural_label
             opaque.append(label)
             factors[label] = factor
+        elif (not factor.is_deriv and evaluator is simple_function_evaluator and factor.ftype != 'grids'
+              and not _is_data_family(factor.ftype, factor.variable, evaluator) and factor.label in stored):
+            label = factor.structural_label
+            opaque.append(label)
+            factors[label] = factor
         else:
             raise ValueError(f"domain.evaluation_form='weak' cannot evaluate token {factor.label!r} (family "
                              f'{factor.ftype!r}): it is neither the data, a derivative, a grid coordinate nor a '
@@ -115,17 +134,28 @@ def weak_term(term, D: int):
     return WF.WeakTerm(data, coords, opaque), factors
 
 
-def check_families(pool) -> None:
-    """Refuse a pool with a family whose values the weak rows cannot compute on the full grid."""
+def check_families(pool, stored_labels=frozenset()) -> None:
+    """Refuse a pool with a family whose values the weak rows cannot compute on the full grid.
+
+    ``stored_labels`` are the token labels with full-grid tensors on every trajectory."""
     for family in pool.families:
         evaluator = _inner_evaluator(getattr(family, '_evaluator', None))
         if _is_data_family(family.ftype, family.variable, evaluator) or family.ftype == 'grids':
             continue
-        if isinstance(evaluator, CustomEvaluator) and not family.family_of_derivs:
+        derivs = getattr(family, 'family_of_derivs', False)
+        if isinstance(evaluator, CustomEvaluator) and not derivs:
             continue
-        raise ValueError(f"domain.evaluation_form='weak' cannot evaluate the token family {family.ftype!r}: "
-                         'weak rows integrate the data, its derivatives and functions of the coordinates over '
-                         'the full grid, and this family is none of them.')
+        message = (f"domain.evaluation_form='weak' cannot evaluate the token family {family.ftype!r}: "
+                   'weak rows integrate the data, its derivatives and functions of the coordinates over '
+                   'the full grid, and this family is none of them.')
+        if _is_stored_family(family.ftype, family.variable, evaluator, derivs):
+            missing = [label for label in family.tokens if label not in stored_labels]
+            if not missing:
+                continue
+            message += (' A stored token family needs its full-grid tensors on every trajectory '
+                        '(CacheStoredTokens(token_tensors=...) or createTrajectory(cached_token_tensors=...)); '
+                        f'missing for the tokens {missing}.')
+        raise ValueError(message)
 
 
 def selection_library(pool, D: int) -> List[WF.WeakTerm]:
@@ -176,10 +206,12 @@ class WeakRows:
     columns built on them."""
 
     def __init__(self, fields: Dict[Hashable, WF.Fields], plans: Dict[Tuple[Hashable, str], WF.WindowPlan],
-                 keys: Sequence[Hashable]):
+                 keys: Sequence[Hashable], tokens: Optional[Dict[Hashable, Dict[str, np.ndarray]]] = None):
         self.fields = fields
         self.plans = plans
         self.keys = list(keys)
+        #: {trajectory key: {stored token label: full-grid tensor}}
+        self.tokens = {key: dict((tokens or {}).get(key, {})) for key in self.keys}
         self._columns: Dict[tuple, Dict[Hashable, np.ndarray]] = {}
 
     def _plan(self, key, slot) -> WF.WindowPlan:
@@ -197,6 +229,19 @@ class WeakRows:
         """Unit row weights: the test function already weights each row's window."""
         return {key: np.ones(self._plan(key, slot).rows) for key in self.keys}
 
+    def _opaque_values(self, factor, key) -> np.ndarray:
+        """The full-grid values of an opaque factor on trajectory ``key``."""
+        evaluator = _inner_evaluator(factor.evaluator)
+        shape = self.fields[key].shape
+        if isinstance(evaluator, CustomEvaluator):
+            return np.broadcast_to(np.asarray(evaluator.full_grid(factor)[key], dtype=float), shape)
+        power = _param(factor, 'power')
+        values = np.asarray(self.tokens[key][factor.label], dtype=float)
+        if values.shape != tuple(shape):
+            raise ValueError(f'the stored token {factor.label!r} has shape {values.shape}, but the grid is '
+                             f'{tuple(shape)}: stored tensors must be on the full grid.')
+        return values ** (1.0 if power is None else float(power))
+
     def columns(self, term, slot) -> Dict[Hashable, np.ndarray]:
         """The term's weak column on each trajectory's rows for ``slot``."""
         cache_key = (slot, term.factors_labels)
@@ -206,11 +251,10 @@ class WeakRows:
         out = {}
         for key in self.keys:
             fields = self.fields[key]
-            wterm, factors = weak_term(term, fields.D)
+            wterm, factors = weak_term(term, fields.D, frozenset(self.tokens.get(key, {})))
             plan = self._plan(key, slot)
             for label, factor in factors.items():
-                values = _inner_evaluator(factor.evaluator).full_grid(factor)[key]
-                fields.opaque[label] = np.broadcast_to(np.asarray(values, dtype=float), fields.shape)
+                fields.opaque[label] = self._opaque_values(factor, key)
             try:
                 monos = wterm.monomials(psi_cap=plan.q)
                 M, _ = WF.weak_matrix([monos], [wterm.opaque], fields, plan.cut, plan.ms, plan.ss, plan.q)
@@ -227,8 +271,10 @@ def build_weak_rows(pool, manager, row_ok, slots: Optional[Sequence[str]] = None
 
     ``row_ok(shape)`` is the instability metric's row floor. The noise draw of the window score is seeded per
     trajectory position, so a fit's windows are reproducible."""
-    check_families(pool)
     keys = list(manager.trajecatoryIDs)
+    tokens = {key: manager[key].raw_tokens() for key in keys}
+    label_sets = [set(stored) for stored in tokens.values()]
+    check_families(pool, frozenset.intersection(*map(frozenset, label_sets)) if label_sets else frozenset())
     if slots is None:
         slots = [family.variable for family in pool.families_demand_equation]
     fields, plans = {}, {}
@@ -243,4 +289,4 @@ def build_weak_rows(pool, manager, row_ok, slots: Optional[Sequence[str]] = None
                        and t.data[0][0] == slot and sum(t.data[0][1]) > 0]
             plans[(key, slot)] = WF.choose_window(fields[key], library, targets, np.random.default_rng([0, idx]),
                                                   rows_ok=row_ok)
-    return WeakRows(fields, plans, keys)
+    return WeakRows(fields, plans, keys, tokens)

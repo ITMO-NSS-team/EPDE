@@ -73,8 +73,60 @@ class TestWeakTerm:
         with pytest.raises(ValueError, match='cannot evaluate token'):
             WR.weak_term(SimpleNamespace(structure=[stored]), 1)
 
+    def test_a_stored_token_with_full_grid_values_is_opaque(self):
+        f = _factor('stored', 'stored', 1, simple_function_evaluator, label='w')
+        wt, factors = WR.weak_term(SimpleNamespace(structure=[f]), 1, stored={'w'})
+        assert wt.opaque == (f.structural_label,) and factors == {f.structural_label: f}
+
+
+def _stored_pool(labels=('w',)):
+    family = SimpleNamespace(ftype='stored', variable='stored', _evaluator=simple_function_evaluator,
+                             family_of_derivs=False, tokens=list(labels))
+    return SimpleNamespace(families=[family])
+
+
+class TestCheckFamilies:
+
+    def test_a_stored_family_needs_its_tensors(self):
+        with pytest.raises(ValueError, match=r"full-grid tensors.*\['w'\]"):
+            WR.check_families(_stored_pool())
+        with pytest.raises(ValueError, match='cannot evaluate the token family'):
+            WR.check_families(_stored_pool(('w', 'v')), stored_labels={'w'})
+        WR.check_families(_stored_pool(), stored_labels={'w'})
+
 
 class TestColumns:
+
+    def _stored_setup(self, monkeypatch, tensor):
+        t = np.linspace(0, 20, 801)
+        monkeypatch.setattr(global_var, 'samples_manager',
+                            SimpleNamespace(grids=lambda: {0: [t]}, trajecatoryIDs=[0]), raising=False)
+        fields = WF.Fields({'u': np.sin(t)}, [t])
+        plan = WF.WindowPlan(1, (1,), (32,), (16,), (4,), (WF.lattice_shape([793], [32], [16])), 0.0)
+        return fields, WR.WeakRows({0: fields}, {(0, 'u'): plan}, [0], tokens={0: {'w': tensor}})
+
+    def test_a_stored_token_column_matches_the_coordinate_function(self, monkeypatch):
+        t = np.linspace(0, 20, 801)
+        fields, rows = self._stored_setup(monkeypatch, np.cos(t))
+        cos = CustomEvaluator(lambda x, power: np.cos(x) ** power, ['power'], native_vectorized=True)
+        for power in (1, 2):
+            stored = SimpleNamespace(structure=[_factor('stored', 'stored', power, simple_function_evaluator,
+                                                        label='w')], factors_labels=frozenset({f'w{power}'}))
+            trig = SimpleNamespace(structure=[_factor('trigonometric', 'trigonometric', power, cos, label='cos')],
+                                   factors_labels=frozenset({f'cos{power}'}))
+            a, b = rows.columns(stored, 'u')[0], rows.columns(trig, 'u')[0]
+            assert np.abs(b).max() > 0
+            np.testing.assert_allclose(a, b, rtol=0, atol=1e-12 * np.abs(b).max())
+        assert fields.opaque == {}
+
+    def test_a_stored_tensor_of_the_wrong_shape_is_refused(self, monkeypatch):
+        t = np.linspace(0, 20, 801)
+        fields, rows = self._stored_setup(monkeypatch, np.cos(t[:-1]))
+        stored = SimpleNamespace(structure=[_factor('stored', 'stored', 1, simple_function_evaluator, label='w')],
+                                 factors_labels=frozenset({'w'}))
+        with pytest.raises(ValueError, match="shape.*'w'|'w'.*shape"):
+            rows.columns(stored, 'u')
+        assert fields.opaque == {}
 
     def test_the_opaque_path_agrees_with_integration_by_parts(self, monkeypatch):
         """u = sin(t): the IBP column of u' (-u psi') and the pointwise column of cos(t) are one column."""
@@ -200,5 +252,36 @@ def test_weak_heat_recovers_the_diffusivity():
                 c = eq.weights_final[eq.weight_index(1 - tgt, tgt)]
                 coefs.append(c if eq.structure[tgt].name.startswith('du/dx0') else 1.0 / c)
         assert coefs and all(abs(c - 0.3) < 1e-3 for c in coefs)
+    finally:
+        global_var.samples_manager.reset()
+
+
+def test_weak_fit_with_a_stored_token_family():
+    """u' = 3 g with g supplied as a full-grid tensor: the stored token is an opaque pointwise factor of the
+    weak rows, and the fit recovers the coefficient. The trajectory keeps the tensor by reference."""
+    t = np.linspace(0, 12, 600)
+    g = np.cos(2 * t) + 0.3 * np.sin(5 * t)
+    u = 1.5 * np.sin(2 * t) - 0.18 * np.cos(5 * t)
+    search = _search('weak', epochs=3)
+    try:
+        domain = search.createDomain(t, ID=0)[1]
+        trajectory = search.createTrajectory({'u': u}, domain, cache_id=0)[1]
+        family = epde.CacheStoredTokens(token_type='stored', token_labels=['g'], token_tensors={'g': g},
+                                        params_ranges={'power': (1, 1)}, params_equality_ranges=None,
+                                        meaningful=True)
+        _fit(search, [trajectory], max_deriv_order=(1,), additional_tokens=[family])
+        coefs = []
+        for eq in _equations(search):
+            names = {term.name for term in eq.structure}
+            if names == {'du/dx0{power: 1.0}', 'g{power: 1.0}'} and eq.weights_final[-1] == 0:
+                tgt = eq.target_idx
+                c = eq.weights_final[eq.weight_index(1 - tgt, tgt)]
+                coefs.append(c if eq.structure[tgt].name.startswith('du/dx0') else 1.0 / c)
+        assert coefs and all(abs(c - 3.0) < 1e-3 for c in coefs)
+
+        stored = global_var.samples_manager[0]
+        assert np.shares_memory(stored.raw_token('g'), g) and set(stored.raw_tokens()) == {'g'}
+        with pytest.raises(KeyError, match="'missing'"):
+            stored.raw_token('missing')
     finally:
         global_var.samples_manager.reset()
