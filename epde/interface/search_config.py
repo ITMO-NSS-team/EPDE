@@ -172,12 +172,22 @@ class DomainConfig:
     judged on the product columns the search fits. ``'off'`` (the default)
     scores the one-factor columns only. ``'pairs'`` requires
     ``evaluation_form='weak'``.
+
+    ``weak_window_gate`` (one of :data:`WEAK_WINDOW_GATES`) restricts which
+    weak windows may be picked. ``'half_power'`` (the default) admits a
+    window only if its averaging keeps at least half of every field's
+    variance (:func:`epde.preprocessing.weak_form.kept_shares`, level
+    :data:`epde.preprocessing.weak_form.HALF_POWER`); the pick is the
+    smallest score among the admissible windows, and the ungated pick when
+    none is admissible. ``'off'`` picks the smallest score over every
+    window. It is read only under ``evaluation_form='weak'``.
     """
     boundary_width: Union[str, int, list, tuple] = 'auto'
     time_axis: int = 0
     evaluation_stride: Union[None, int, list, tuple] = None
     evaluation_form: str = 'strong'
     weak_window_products: str = 'off'
+    weak_window_gate: str = 'half_power'
 
 
 @dataclass(frozen=True)
@@ -409,6 +419,8 @@ def check_evaluation_budget(stride, use_solver) -> None:
 EVALUATION_FORMS = ('strong', 'weak')
 #: ``domain.weak_window_products`` values.
 WEAK_WINDOW_PRODUCTS = ('off', 'pairs')
+#: ``domain.weak_window_gate`` values.
+WEAK_WINDOW_GATES = ('half_power', 'off')
 
 
 def check_weak_window_products(products, form) -> None:
@@ -423,6 +435,15 @@ def check_weak_window_products(products, form) -> None:
     if products != 'off' and form != 'weak':
         raise ValueError("domain.weak_window_products={0!r} scores the weak-form window; it requires "
                          "domain.evaluation_form='weak', instead got {1!r}.".format(products, form))
+
+
+def check_weak_window_gate(gate) -> None:
+    """``domain.weak_window_gate`` refusals: it must be one of
+    :data:`WEAK_WINDOW_GATES`. Every value is accepted under
+    ``evaluation_form='strong'``, where the setting is not read."""
+    if gate not in WEAK_WINDOW_GATES:
+        raise ValueError('domain.weak_window_gate must be one of {0}, instead got {1!r}.'.format(
+            list(WEAK_WINDOW_GATES), gate))
 
 
 def check_evaluation_form(form, stride, use_solver, instability_metric) -> None:
@@ -1729,6 +1750,7 @@ def _check_types(resolved: dict) -> None:
                           resolved['objectives']['instability_metric'])
     check_weak_window_products(resolved['domain']['weak_window_products'],
                                resolved['domain']['evaluation_form'])
+    check_weak_window_gate(resolved['domain']['weak_window_gate'])
     check_auto_settings(resolved['domain']['boundary_width'],
                         resolved['evolution']['population_size'],
                         resolved['evolution']['training_epochs'],

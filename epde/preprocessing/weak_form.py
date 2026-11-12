@@ -34,6 +34,14 @@ the capped noise shares of the product columns on its stride-m rows (:func:`prod
 derivatives pointwise, so their columns can be noisier than any one-factor column of the library. The minimum is
 then taken over the summed scores.
 
+With a gate level (``DomainConfig.weak_window_gate='half_power'``, level :data:`HALF_POWER`), each window whose
+score is finite also gets its kept share (:func:`kept_shares`): per field, the centred energy of the field's weak
+column on the window's stride-m rows, less that of its change under the noise draw, per row, over the field's
+variance at the row centres, less that of its change. The window's share is the minimum over the fields. A window
+is admissible when its share reaches the level, and the pick is the smallest score among the admissible windows;
+when none is admissible, the pick is the ungated one. The candidate table and the smoothness extension are the
+ungated chooser's.
+
 Kernels are exact-moment quadrature weights (:func:`exact_kernel`). Each window's weights are divided by the
 window's mass ``int psi dx``, so a constant's weak column is exactly 1 and the intercept keeps its meaning. The
 factor is common to every column of a window, so coefficients are unchanged.
@@ -64,7 +72,8 @@ from epde.preprocessing.deriv_calculators import _central4
 
 __all__ = ['WeakTerm', 'WindowPlan', 'Fields', 'reduce', 'ibp_options', 'max_order', 'exact_kernel',
            'window_kernels', 'wint_s', 'noise_model', 'ar_noise', 'weak_matrix', 'choose_window', 'pcr_score',
-           'product_noise', 'FD_REACH', 'J_START', 'J_GUARD', 'NOISE_DOMINATED', 'PRODUCT_GROUP_BYTES']
+           'product_noise', 'kept_shares', 'FD_REACH', 'J_START', 'J_GUARD', 'NOISE_DOMINATED',
+           'PRODUCT_GROUP_BYTES', 'HALF_POWER']
 
 #: Samples the fourth-order central stencil reaches per derivative order.
 FD_REACH = 2
@@ -76,6 +85,8 @@ J_GUARD = 16
 NOISE_DOMINATED = 0.5
 #: Memory bound of :func:`product_noise`: the bytes of cropped pointwise arrays one group of products may hold.
 PRODUCT_GROUP_BYTES = 2 ** 27
+#: The share of a field's variance a window's averaging must keep to be admissible under the gate: half power.
+HALF_POWER = 0.5
 
 EPS = np.finfo(float).eps
 
@@ -545,6 +556,43 @@ def product_noise(fields: Fields, draw: Fields, products: Sequence[WeakTerm], cu
     return total
 
 
+def kept_shares(fields: Fields, draw: Fields, cut: Sequence[int], ms: Sequence[int], q: Sequence[int],
+                caches: Optional[Tuple[dict, dict]] = None) -> List[float]:
+    """The share of each field's variance the window ``(ms, q)`` keeps, in the order of ``fields.values``.
+
+    Per field ``v``, ``x`` is the weak column of the one-factor term ``(v, zero orders)`` on the window's own rows
+    (stride ``ms``) on ``fields``, and ``e`` the same column on ``draw`` (the data with the noise draw) minus
+    ``x``. ``a`` and ``b`` are the field on ``fields`` and on ``draw`` cropped by ``cut``, read at the row centres
+    ``C`` (per axis ``m + m * arange(rows)``: row ``i`` covers samples ``[i m, i m + 2 m]``)::
+
+        kept(v) = (sum (x - mean x)^2 - sum (e - mean e)^2) / rows / (var(a[C]) - var((b - a)[C]))
+
+    and 0.0 when the denominator is not positive (the field's variance over the row centres does not exceed its
+    change's, e.g. a constant field). The reference is the field at the row centres, not on the whole grid: a test
+    function vanishes at its window's edge, so the rows hardly see a strip along the grid's edge.
+
+    ``caches`` is an optional pair of :func:`weak_matrix` caches for ``fields`` and for ``draw``."""
+    D = fields.D
+    zero = (0,) * D
+    names = list(fields.values)
+    monos = [WeakTerm([(v, zero)], zero).monomials() for v in names]
+    opq = [()] * len(names)
+    own, drawn = (None, None) if caches is None else caches
+    M, shape = weak_matrix(monos, opq, fields, cut, ms, ms, q, own)
+    Md, _ = weak_matrix(monos, opq, draw, cut, ms, ms, q, drawn)
+    centres = np.ix_(*[int(m) + int(m) * np.arange(n) for m, n in zip(ms, shape)])
+    out = []
+    for k, v in enumerate(names):
+        a = _crop(fields.values[v], cut)
+        b = _crop(draw.values[v], cut)
+        x = M[:, k]
+        e = Md[:, k] - x
+        num = (float(np.sum((x - x.mean()) ** 2)) - float(np.sum((e - e.mean()) ** 2))) / x.size
+        den = float(np.var(a[centres])) - float(np.var((b - a)[centres]))
+        out.append(num / den if den > 0 else 0.0)
+    return out
+
+
 class WindowPlan:
     """A slot's window.
 
@@ -555,23 +603,32 @@ class WindowPlan:
     - ``cut``: samples cropped off each end of every axis;
     - ``shape``: the row lattice;
     - ``score``: the pcr median, plus the product noise shares when :func:`choose_window` is given products;
-    - ``table``: one ``(j, ms, ss, shape, score)`` per candidate window, for diagnostics."""
-    __slots__ = ('j', 'r', 'q', 'ms', 'ss', 'cut', 'shape', 'score', 'table')
+    - ``table``: one ``(j, ms, ss, shape, score)`` per candidate window, for diagnostics;
+    - ``kept``: the chosen window's kept share (:func:`kept_shares`, minimum over the fields), ``None`` without
+      a gate;
+    - ``admissible``: the number of windows whose kept share reaches the gate level, ``None`` without a gate;
+      0 means the window is the ungated pick;
+    - ``shares``: ``{(j, ms): kept share}`` of the windows with a finite score, empty without a gate."""
+    __slots__ = ('j', 'r', 'q', 'ms', 'ss', 'cut', 'shape', 'score', 'table', 'kept', 'admissible', 'shares')
 
-    def __init__(self, j, r, ms, ss, cut, shape, score, table=()):
+    def __init__(self, j, r, ms, ss, cut, shape, score, table=(), *, kept=None, admissible=None, shares=None):
         self.j, self.r = int(j), tuple(int(x) for x in r)
         self.q = tuple(x + self.j for x in self.r)
         self.ms, self.ss = tuple(int(x) for x in ms), tuple(int(x) for x in ss)
         self.cut, self.shape = tuple(int(x) for x in cut), tuple(int(x) for x in shape)
         self.score, self.table = float(score), list(table)
+        self.kept = None if kept is None else float(kept)
+        self.admissible = None if admissible is None else int(admissible)
+        self.shares = dict(shares or {})
 
     @property
     def rows(self) -> int:
         return int(np.prod(self.shape))
 
     def __repr__(self):
+        kept = '' if self.kept is None else f', kept={self.kept:.2f}'
         return (f'WindowPlan(j={self.j}, q={self.q}, m={self.ms}, s={self.ss}, cut={self.cut}, '
-                f'rows={self.shape}, score={self.score:.3g})')
+                f'rows={self.shape}, score={self.score:.3g}{kept})')
 
 
 def _stride(n_eff, ms, p, rows_ok):
@@ -592,7 +649,7 @@ def choose_window(fields: Fields, library: Sequence[WeakTerm], targets: Sequence
                   rng: np.random.Generator, cut: Optional[Sequence[int]] = None,
                   rows_ok: Callable[[Tuple[int, ...]], bool] = lambda shape: True,
                   noise_vars: Optional[Sequence[Hashable]] = None, products: Optional[Sequence[WeakTerm]] = None,
-                  product_cache: Optional[dict] = None) -> WindowPlan:
+                  product_cache: Optional[dict] = None, gate: Optional[float] = None) -> WindowPlan:
     """The slot's window by the pcr rule (module docstring).
 
     Arguments:
@@ -606,7 +663,11 @@ def choose_window(fields: Fields, library: Sequence[WeakTerm], targets: Sequence
       window whose own score is finite. The table, the minimum and the smoothness extension read the sum.
       ``None`` or empty: the one-factor score alone;
     - ``product_cache``: ``{(q, ms): product_noise}``, shared by the caller between calls with the same fields,
-      noise draw and cut (the slots of one trajectory); ``None`` keeps a private one.
+      noise draw and cut (the slots of one trajectory); ``None`` keeps a private one;
+    - ``gate``: the kept-share level (:func:`kept_shares`) a window must reach in every field to be admissible,
+      e.g. :data:`HALF_POWER`. Every window whose score is finite gets its share; the pick is the smallest
+      ``(score, j)`` among the admissible windows, or the ungated pick when none is. The table and the
+      smoothness extension are those of the ungated chooser. ``None``: no gate.
 
     Raises ``ValueError`` when no window is feasible."""
     D = fields.D
@@ -648,6 +709,7 @@ def choose_window(fields: Fields, library: Sequence[WeakTerm], targets: Sequence
         product_cache = {}
     caches = ({}, {}, {})
     table = []
+    shares = {}
     js = list(J_START)
     done = set()
     while True:
@@ -681,6 +743,8 @@ def choose_window(fields: Fields, library: Sequence[WeakTerm], targets: Sequence
                     if key not in product_cache:
                         product_cache[key] = product_noise(fields, draw, products, cut, ms, q)
                     score = score + product_cache[key]
+                if gate is not None and np.isfinite(score):
+                    shares[(j, tuple(ms))] = min(kept_shares(fields, draw, cut, ms, q, caches[:2]))
                 table.append((j, tuple(ms), ss, shape, score))
         if not table:
             raise ValueError(f'no feasible weak-form window: grid {fields.shape}, edge cut {cut}, '
@@ -688,11 +752,20 @@ def choose_window(fields: Fields, library: Sequence[WeakTerm], targets: Sequence
         best = min(table, key=lambda x: (x[4], x[0]))
         if not np.isfinite(best[4]):
             raise ValueError('no weak-form window has a finite score (no direction with signal above noise).')
+        pick, inside = best, None
+        if gate is not None:
+            inside = [x for x in table if np.isfinite(x[4]) and shares[(x[0], x[1])] >= gate]
+            if inside:
+                pick = min(inside, key=lambda x: (x[4], x[0]))
+        lead = best                                           # the smoothness extension follows the ungated best
         top = max(js)
-        if best[0] < top or not any(x[0] == top and np.isfinite(x[4]) for x in table):
+        if lead[0] < top or not any(x[0] == top and np.isfinite(x[4]) for x in table):
             break
         if top + 1 > J_GUARD:
             raise RuntimeError(f'weak-form smoothness extension reached the compute guard J_GUARD={J_GUARD}.')
         js.append(top + 1)
-    j, ms, ss, shape, score = best
-    return WindowPlan(j, r, ms, ss, cut, shape, score, table)
+    j, ms, ss, shape, score = pick
+    if gate is None:
+        return WindowPlan(j, r, ms, ss, cut, shape, score, table)
+    return WindowPlan(j, r, ms, ss, cut, shape, score, table, kept=shares[(j, ms)], admissible=len(inside),
+                      shares=shares)

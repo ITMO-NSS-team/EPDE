@@ -121,7 +121,7 @@ class EpdeSearch(object):
                  use_solver=UNSET, solver_backend=UNSET, device=UNSET,
                  boundary_width=UNSET, time_axis=UNSET,
                  evaluation_stride=UNSET, evaluation_form=UNSET,
-                 weak_window_products=UNSET,
+                 weak_window_products=UNSET, weak_window_gate=UNSET,
                  default_preprocessor_type=UNSET, preprocessor_kwargs=UNSET,
                  max_deriv_order=UNSET,
                  data_fun_pow=UNSET, deriv_fun_pow=UNSET,
@@ -194,7 +194,7 @@ class EpdeSearch(object):
             use_solver=use_solver, solver_backend=solver_backend, device=device,
             boundary_width=boundary_width, time_axis=time_axis,
             evaluation_stride=evaluation_stride, evaluation_form=evaluation_form,
-            weak_window_products=weak_window_products,
+            weak_window_products=weak_window_products, weak_window_gate=weak_window_gate,
             default_preprocessor_type=default_preprocessor_type,
             preprocessor_kwargs=preprocessor_kwargs,
             max_deriv_order=max_deriv_order,
@@ -1523,7 +1523,9 @@ class EpdeSearch(object):
         the instability metric's row floor at the configured equation width. In plain mode a slot whose
         variable has allowed target axes (``system_rps_params['target_axes']``) scores its window on the
         derivatives along those axes only. ``domain.weak_window_products='pairs'`` adds the noise shares of
-        the pairwise products of the data and derivative tokens to every window's score."""
+        the pairwise products of the data and derivative tokens to every window's score.
+        ``domain.weak_window_gate='half_power'`` admits only the windows that keep at least half of every
+        field's variance, falling back to the ungated pick when none does."""
         manager = global_var.samples_manager
         manager.weak = None
         cfg = active_config()
@@ -1542,7 +1544,8 @@ class EpdeSearch(object):
                                for family in self.pool.families_demand_equation}
         start = perf_counter()
         weak = build_weak_rows(self.pool, manager, lambda shape: row_floor(metric, shape, width) is None,
-                               target_axes=target_axes, window_products=cfg.domain.weak_window_products)
+                               target_axes=target_axes, window_products=cfg.domain.weak_window_products,
+                               window_gate=cfg.domain.weak_window_gate)
         manager.weak = weak
         print(f'Weak-form windows ({perf_counter() - start:.1f} s):')
         for (key, slot), plan in weak.plans.items():

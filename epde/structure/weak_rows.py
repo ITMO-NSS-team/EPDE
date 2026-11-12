@@ -26,6 +26,9 @@ window study's ``tok1 / med`` rule).
 ``domain.weak_window_products='pairs'`` their noise shares are added to every window's score
 (``weak_form.product_noise``).
 
+With ``domain.weak_window_gate='half_power'`` a slot's window must keep at least half of every field's variance
+(``weak_form.kept_shares``); when no window does, the slot takes the ungated pick with an ``EPDEUsageWarning``.
+
 The edge cut is the selection library's own, which is none: one-factor power-1 terms integrate by parts
 completely. A search term that keeps a pointwise derivative (``u_x^2``, a product with an opaque factor)
 takes ``_central4``'s second-order rule on its two end samples per nesting. The test function vanishes at
@@ -281,7 +284,7 @@ class WeakRows:
 
 def build_weak_rows(pool, manager, row_ok, slots: Optional[Sequence[str]] = None,
                     target_axes: Optional[Dict[str, Optional[frozenset]]] = None,
-                    window_products: str = 'off') -> WeakRows:
+                    window_products: str = 'off', window_gate: Optional[str] = None) -> WeakRows:
     """Pick every (trajectory, slot) window of ``pool`` on the trajectories of ``manager``.
 
     ``row_ok(shape)`` is the instability metric's row floor. The noise draw of the window score is seeded per
@@ -292,11 +295,23 @@ def build_weak_rows(pool, manager, row_ok, slots: Optional[Sequence[str]] = None
 
     ``window_products`` is ``domain.weak_window_products``. With ``'pairs'`` each window's score also counts
     the noise shares of :func:`product_library`, built once per trajectory; the slots of a trajectory share
-    one noise draw, so they share one cache of those shares."""
-    from epde.interface.search_config import WEAK_WINDOW_PRODUCTS
+    one noise draw, so they share one cache of those shares.
+
+    ``window_gate`` is ``domain.weak_window_gate``; ``None`` reads it from the active configuration. With
+    ``'half_power'`` a window is admissible only if it keeps at least ``weak_form.HALF_POWER`` of every field's
+    variance; a slot with no admissible window takes the ungated pick, with one ``EPDEUsageWarning`` naming the
+    trajectory, the slot and the kept share of that window. ``'off'`` picks among every window."""
+    import warnings
+    import epde.globals as global_var
+    from epde.interface.search_config import WEAK_WINDOW_GATES, WEAK_WINDOW_PRODUCTS, active_config
     if window_products not in WEAK_WINDOW_PRODUCTS:
         raise ValueError(f'window_products must be one of {list(WEAK_WINDOW_PRODUCTS)}, instead got '
                          f'{window_products!r}.')
+    if window_gate is None:
+        window_gate = active_config().domain.weak_window_gate
+    if window_gate not in WEAK_WINDOW_GATES:
+        raise ValueError(f'window_gate must be one of {list(WEAK_WINDOW_GATES)}, instead got {window_gate!r}.')
+    gate = WF.HALF_POWER if window_gate == 'half_power' else None
     keys = list(manager.trajecatoryIDs)
     tokens = {key: manager[key].raw_tokens() for key in keys}
     label_sets = [set(stored) for stored in tokens.values()]
@@ -324,6 +339,11 @@ def build_weak_rows(pool, manager, row_ok, slots: Optional[Sequence[str]] = None
                     raise ValueError(f"system_rps_params['target_axes']: equation slot {slot!r} has no derivative "
                                      f'token along the allowed grid axes {sorted(allowed)} to score its weak-form '
                                      'window on.')
-            plans[(key, slot)] = WF.choose_window(fields[key], library, targets, np.random.default_rng([0, idx]),
-                                                  rows_ok=row_ok, **extra)
+            plan = WF.choose_window(fields[key], library, targets, np.random.default_rng([0, idx]),
+                                    rows_ok=row_ok, gate=gate, **extra)
+            if plan.admissible == 0:
+                warnings.warn(f'weak-form window of trajectory {key!r}, equation slot {slot!r}: no window keeps '
+                              f'{gate:g} of every field\'s variance; the slot takes the ungated pick {plan}, '
+                              f'which keeps {plan.kept:.2f}.', global_var.EPDEUsageWarning, stacklevel=2)
+            plans[(key, slot)] = plan
     return WeakRows(fields, plans, keys, tokens)
