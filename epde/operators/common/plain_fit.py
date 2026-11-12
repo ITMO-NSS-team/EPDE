@@ -33,6 +33,9 @@ resolve by ``search_config.resolve_plain_params``: on under
   (:func:`is_plain_term`). Decorated terms (squares, products, trig-weighted
   derivatives) stay allowed on the right-hand side; a gene drifting onto one
   no longer lets a near relation of the data pose as a law.
+* ``target_axes`` -- under ``plain_target``, the grid axes along which each
+  variable's target derivative may be taken (``search_config.target_axes_of``;
+  None: any axis). :func:`is_target_term` is the one test of a target.
 * ``variable_order='random'`` -- the order in which the equations claim
   their targets (step 1) and are tested for redundancy (step 4) is a random
   permutation per fit, drawn from a generator of its own
@@ -50,7 +53,7 @@ import numpy as np
 
 import epde.globals as global_var
 from epde import _loop_stats
-from epde.interface.search_config import active_config, plain_kept_terms_cap
+from epde.interface.search_config import active_config, plain_kept_terms_cap, target_axes_of
 from epde.operators.common.system_redundancy import redundant_equations
 from epde.structure.weak_rows import slot_of
 
@@ -104,14 +107,27 @@ def gene_term(equation, taken=frozenset()):
 
 
 def own_derivative_terms(equation, taken=frozenset()) -> list:
-    """The terms of ``equation`` that can be its target: those holding a
-    derivative of its own variable (plain ones only under ``plain_target``,
-    :func:`is_plain_term`), minus the signatures in ``taken``."""
+    """The terms of ``equation`` that can be its target (:func:`is_target_term`
+    under the active plain settings), minus the signatures in ``taken``."""
     var = equation.main_var_to_explain
-    plain = plain_params()['plain_target']
+    params = plain_params()
+    plain = params['plain_target']
+    axes = target_axes_of(params, var)
+    # Without plain_target the first test is the whole predicate.
     return [term for term in equation.structure
             if term.contains_deriv(var) and term.factors_labels not in taken
-            and (not plain or is_plain_term(term, var))]
+            and (not plain or is_target_term(term, var, plain, axes))]
+
+
+def is_target_term(term, var, plain: bool, axes=None) -> bool:
+    """Whether ``term`` can be the target of an equation of ``var``: a term
+    holding a derivative of ``var``; under ``plain_target`` (``plain``) a
+    plain one (:func:`is_plain_term`) whose ``deriv_code`` axes all lie in
+    ``axes`` (a frozenset of grid axes, None for any axis;
+    ``system_rps_params['target_axes']``)."""
+    if not plain:
+        return term.contains_deriv(var)
+    return is_plain_term(term, var) and (axes is None or frozenset(term.structure[0].deriv_code) <= axes)
 
 
 def plain_params() -> dict:
@@ -131,53 +147,64 @@ def is_plain_term(term, var) -> bool:
     return set(names) <= {'power'} and names.get('power', 1.0) == 1.0
 
 
-#: (id(pool), variable) -> (weak reference to the pool, whether its library holds a plain own-derivative
-#: token). The reference is checked on lookup: a new pool at a freed pool's address is checked anew.
+#: (id(pool), variable, allowed target axes or None) -> (weak reference to the pool, whether its library holds
+#: a plain own-derivative token along those axes). The reference is checked on lookup: a new pool at a freed
+#: pool's address is checked anew.
 _PLAIN_TOKENS = {}
 #: ``restore_property`` attempts before an equation without a plain target is given up (as
 #: ``right_part_selection._ensure_own_derivative``).
 ENSURE_MAX_ITER = 100
 
 
-def _check_plain_tokens(equation) -> None:
-    """Fail loud when the pool can draw no plain own-derivative token for the equation's variable: under
-    ``plain_target`` such an equation could never have a target."""
+def _check_plain_tokens(equation, axes=None) -> None:
+    """Fail loud when the pool can draw no plain own-derivative token for the equation's variable along
+    ``axes`` (the variable's allowed target axes, None for any axis): under ``plain_target`` such an equation
+    could never have a target."""
+    from epde.operators.common.fill_prune import factors_setting, library_terms
     var = equation.main_var_to_explain
     pool = equation.pool
-    key = (id(pool), var)
+    key = (id(pool), var, axes)
     entry = _PLAIN_TOKENS.get(key)
     if entry is not None and entry[0]() is pool:
         found = entry[1]
     else:
-        from epde.operators.common.fill_prune import factors_setting, library_terms
         library = library_terms(pool, factors_setting(equation))
-        found = any(is_plain_term(term, var) for term in library)
+        found = any(is_target_term(term, var, True, axes) for term in library)
         _PLAIN_TOKENS[key] = (weakref.ref(pool), found)
-    if not found:
-        raise ValueError(
-            "system_rps_params['plain_target']: the token pool can draw no plain derivative of {0!r} (a single "
-            "derivative factor of power 1), so no equation for it could have a target. Add such a token or set "
-            "plain_target=False.".format(var))
+    if found:
+        return
+    if axes is not None:
+        if any(is_plain_term(term, var) for term in library_terms(pool, factors_setting(equation))):
+            raise ValueError(
+                "system_rps_params['target_axes']: the token pool can draw no plain derivative of {0!r} along "
+                "the allowed grid axes {1}, so no equation for it could have a target. Allow another axis in "
+                "target_axes or add a derivative along these axes (max_deriv_order).".format(var, sorted(axes)))
+    raise ValueError(
+        "system_rps_params['plain_target']: the token pool can draw no plain derivative of {0!r} (a single "
+        "derivative factor of power 1), so no equation for it could have a target. Add such a token or set "
+        "plain_target=False.".format(var))
 
 
 def _ensure_target(equation, plain: bool) -> bool:
     """Give ``equation`` a term that can be its target, through the same
     ``restore_property`` step ``right_part_selection._ensure_own_derivative``
-    uses. Under ``plain_target`` the term must be plain: an equation without
-    one draws an own derivative up to :data:`ENSURE_MAX_ITER` times, its
-    structure rolled back after every draw that brought no plain one. False
-    when none appeared."""
+    uses. Under ``plain_target`` the term must be plain and along the
+    variable's allowed axes (:func:`is_target_term`): an equation without one
+    draws an own derivative up to :data:`ENSURE_MAX_ITER` times, its structure
+    rolled back after every draw that brought none. False when none
+    appeared."""
     from epde.operators.common.right_part_selection import _ensure_own_derivative
     if not plain:
         return _ensure_own_derivative(equation)
     var = equation.main_var_to_explain
-    _check_plain_tokens(equation)
-    if any(is_plain_term(term, var) for term in equation.structure):
+    axes = target_axes_of(plain_params(), var)
+    _check_plain_tokens(equation, axes)
+    if any(is_target_term(term, var, True, axes) for term in equation.structure):
         return True
     snapshot = list(equation.structure)
     for _ in range(ENSURE_MAX_ITER):
         equation.restore_property(mandatory_family=False, deriv=True)
-        if any(is_plain_term(term, var) for term in equation.structure):
+        if any(is_target_term(term, var, True, axes) for term in equation.structure):
             return True
         equation.structure = list(snapshot)
         equation._invalidate_label_cache()
@@ -220,16 +247,17 @@ def start_fit(seed=None) -> None:
     start_variable_order(seed)
 
 
-def _claims(equations, fitted, order):
+def _claims(equations, fitted, order, params):
     """Step 1's deterministic claims under ``order``, read without changing
     anything: (kind per equation -- ('fit' | 'gene', signature) or ('ensure',
-    None) for an equation holding no own derivative --, the signatures taken,
-    the equations left to draw, the 'ensure' ones)."""
+    None) for an equation holding no own derivative, or, when its variable
+    has allowed target axes, no term :func:`is_target_term` accepts --, the
+    signatures taken, the equations left to draw, the 'ensure' ones)."""
     taken, kinds = set(), {}
     fit = list(fitted)
     for i in order:
         eq = equations[i]
-        if fit[i]:
+        if fit[i] and _keeps_target(eq, params):
             sig = eq.target.factors_labels
             if sig not in taken:
                 kinds[i] = ('fit', sig)
@@ -241,7 +269,12 @@ def _claims(equations, fitted, order):
             continue
         eq = equations[i]
         var = eq.main_var_to_explain
-        if not any(term.contains_deriv(var) for term in eq.structure):
+        axes = target_axes_of(params, var)
+        if axes is None:
+            holds = any(term.contains_deriv(var) for term in eq.structure)
+        else:
+            holds = any(is_target_term(term, var, params['plain_target'], axes) for term in eq.structure)
+        if not holds:
             kinds[i] = ('ensure', None)
             continue
         term = gene_term(eq, taken)
@@ -270,7 +303,7 @@ def _variable_order(equations, fitted, params):
         return ident, None
     if _ORDER['rng'] is None:
         start_variable_order(params['variable_order_seed'])
-    kinds, taken, draw, ensure = _claims(equations, fitted, ident)
+    kinds, taken, draw, ensure = _claims(equations, fitted, ident, params)
     overlap = False
     if len(draw) > 1:
         seen = {}
@@ -279,11 +312,20 @@ def _variable_order(equations, fitted, params):
                 seen.setdefault(term.factors_labels, set()).add(i)
         overlap = any(len(owners) > 1 for owners in seen.values())
     perm = [int(x) for x in _ORDER['rng'].permutation(n)]
-    kinds_pi = _claims(equations, fitted, perm)[0] if perm != ident else kinds
+    kinds_pi = _claims(equations, fitted, perm, params)[0] if perm != ident else kinds
     changed = any(kinds_pi.get(i) != kinds.get(i) for i in range(n))
     reorders = overlap and [i for i in perm if i in draw] != draw
     unmodelled = bool(ensure) and len(draw) + len(ensure) >= 2 and perm != ident
     return (perm if (changed or reorders or unmodelled) else ident), perm
+
+
+def _keeps_target(equation, params) -> bool:
+    """Whether a fitted ``equation`` may keep its target: always when its
+    variable has no allowed target axes, else when :func:`is_target_term`
+    accepts the target."""
+    var = equation.main_var_to_explain
+    axes = target_axes_of(params, var)
+    return axes is None or is_target_term(equation.target, var, params['plain_target'], axes)
 
 
 def _install_target(equation, term) -> None:
@@ -468,7 +510,7 @@ def apply_plain(objective, eq_selector, eq_args) -> None:
     # 1. Targets: fitted equations first, then the genes, then fresh draws.
     for i in order:
         eq = equations[i]
-        if fitted[i] and eq.target.factors_labels not in taken:
+        if fitted[i] and _keeps_target(eq, params) and eq.target.factors_labels not in taken:
             targets[i] = eq.target
             taken.add(eq.target.factors_labels)
             if getattr(eq, '_plain_genes', None) is None:

@@ -255,6 +255,15 @@ class SearchSpaceConfig:
       ``'auto'``: ``'random'`` / ``'fixed'``.
     * ``plain_target`` -- restrict every target to a plain own-derivative
       token (one derivative factor of power 1). ``'auto'``: True / False.
+    * ``target_axes`` -- the grid axes along which a variable's plain target
+      may be taken (axis indices as in a factor's ``deriv_code`` and in
+      ``max_deriv_order``, 0 the first axis): None (the default) any axis; an
+      int or a tuple / list of ints, the same axes for every variable; a dict
+      ``{variable: int | tuple / list of ints | None}`` per variable, a
+      variable not named (or mapped to None) taking any axis. A plain token
+      is allowed as a target when every axis of its ``deriv_code`` is among
+      the allowed ones (``target_axes_of``). It restricts plain targets, so
+      it requires ``plain_target`` to resolve to True.
     * ``factor_move_probability`` -- the chance that a mutation edits one
       factor of a term instead (power +-1, add or drop a factor).
       ``'auto'``: 1/6 / 0.
@@ -318,7 +327,7 @@ SYSTEM_RPS_PARAMS = {
     'plain': {'fill_probability': 'auto', 'fill_beam_width': 1000, 'fill_top': 20,
               'fill_prune_alpha': 0.3, 'fill_levels': 'all', 'product_rule_decline': 'auto',
               'variable_order': 'auto', 'variable_order_seed': None, 'plain_target': 'auto',
-              'factor_move_probability': 'auto'},
+              'factor_move_probability': 'auto', 'target_axes': None},
 }
 assert tuple(SYSTEM_RPS_PARAMS) == SYSTEM_RPS_MODES
 #: ``'plain'`` mode's ``'auto'`` settings: ``'universal'`` under
@@ -490,8 +499,9 @@ def check_plain_params(params) -> None:
     scale positive, ``fill_levels`` one of :data:`FILL_LEVELS`,
     ``product_rule_decline`` one of ``DECLINE_MODES`` (or ``'auto'``),
     ``variable_order`` one of :data:`VARIABLE_ORDERS` (or ``'auto'``),
-    ``plain_target`` a bool (or ``'auto'``) and ``variable_order_seed`` an int
-    or None."""
+    ``plain_target`` a bool (or ``'auto'``), ``variable_order_seed`` an int
+    or None and ``target_axes`` one of the shapes :func:`target_axes_of`
+    reads."""
     from epde.operators.common.product_rule import DECLINE_MODES
 
     def refuse(key, what):
@@ -523,6 +533,48 @@ def check_plain_params(params) -> None:
     seed = params['variable_order_seed']
     if not (seed is None or (isinstance(seed, Integral) and not isinstance(seed, bool))):
         refuse('variable_order_seed', 'an int or None')
+    axes = params['target_axes']
+    if not (_axes_entry_ok(axes) or (isinstance(axes, dict) and all(
+            isinstance(name, str) and (value is None or _axes_entry_ok(value)) for name, value in axes.items()))):
+        refuse('target_axes', 'None, a grid axis (an int >= 0), a non-empty tuple or list of grid axes, or a '
+                              'dict {variable name: axis, tuple or list of axes, or None}')
+
+
+def _axis_ok(axis) -> bool:
+    return isinstance(axis, Integral) and not isinstance(axis, bool) and axis >= 0
+
+
+def _axes_entry_ok(value) -> bool:
+    """None, an axis, or a non-empty tuple / list of axes (one ``target_axes`` entry)."""
+    if value is None or _axis_ok(value):
+        return True
+    return isinstance(value, (tuple, list)) and len(value) > 0 and all(_axis_ok(axis) for axis in value)
+
+
+def target_axes_of(params, variable) -> Optional[frozenset]:
+    """The grid axes along which ``variable``'s plain target may be taken under ``params`` (``'plain'`` mode's
+    settings, ``system_rps_params['target_axes']``): a frozenset of axis indices, or None for any axis."""
+    axes = params.get('target_axes')
+    if isinstance(axes, dict):
+        axes = axes.get(variable)
+    if axes is None:
+        return None
+    if isinstance(axes, (tuple, list)):
+        return frozenset(int(axis) for axis in axes)
+    return frozenset((int(axes),))
+
+
+def check_target_axes_variables(params, variables) -> None:
+    """Refuse a ``target_axes`` dict (``'plain'`` mode's ``params``) naming a variable that is not one of the
+    search's ``variables`` (known once the pool exists)."""
+    axes = params.get('target_axes')
+    if not isinstance(axes, dict):
+        return
+    unknown = sorted(name for name in axes if name not in variables)
+    if unknown:
+        raise ValueError(
+            "search_space.system_rps_params['target_axes'] names {0}, which {1} not among the search's "
+            'variables {2}.'.format(unknown, 'is' if len(unknown) == 1 else 'are', list(variables)))
 
 
 def rps_param(search_space, key):
@@ -1617,6 +1669,11 @@ def _check_types(resolved: dict) -> None:
             raise ValueError(
                 "search_space.system_rps_params['product_rule_decline'] reads the weak rows' "
                 "integration by parts; it requires domain.evaluation_form='weak'.")
+        if plain['target_axes'] is not None and not plain['plain_target']:
+            raise ValueError(
+                "search_space.system_rps_params['target_axes'] restricts plain targets; it requires "
+                "system_rps_params['plain_target'] to resolve to True (set it to True, or use "
+                "evolution.engine='nsga2', where 'auto' resolves to True).")
     check_evaluation_budget(resolved['domain']['evaluation_stride'],
                             resolved['solver']['use_solver'])
     check_evaluation_form(resolved['domain']['evaluation_form'],

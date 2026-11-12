@@ -266,11 +266,15 @@ class WeakRows:
         return out
 
 
-def build_weak_rows(pool, manager, row_ok, slots: Optional[Sequence[str]] = None) -> WeakRows:
+def build_weak_rows(pool, manager, row_ok, slots: Optional[Sequence[str]] = None,
+                    target_axes: Optional[Dict[str, Optional[frozenset]]] = None) -> WeakRows:
     """Pick every (trajectory, slot) window of ``pool`` on the trajectories of ``manager``.
 
     ``row_ok(shape)`` is the instability metric's row floor. The noise draw of the window score is seeded per
-    trajectory position, so a fit's windows are reproducible."""
+    trajectory position, so a fit's windows are reproducible. ``target_axes`` maps a slot to the grid axes its
+    target derivative may be taken along (plain mode's ``system_rps_params['target_axes']``); a slot it gives
+    axes scores its window on the derivative tokens along those axes only, and a slot absent or mapped to None
+    on every derivative token of its variable."""
     keys = list(manager.trajecatoryIDs)
     tokens = {key: manager[key].raw_tokens() for key in keys}
     label_sets = [set(stored) for stored in tokens.values()]
@@ -287,6 +291,14 @@ def build_weak_rows(pool, manager, row_ok, slots: Optional[Sequence[str]] = None
         for slot in slots:
             targets = [k for k, t in enumerate(library) if len(t.data) == 1 and not any(t.coords)
                        and t.data[0][0] == slot and sum(t.data[0][1]) > 0]
+            allowed = None if target_axes is None else target_axes.get(slot)
+            if allowed is not None:
+                targets = [k for k in targets
+                           if all(order == 0 or axis in allowed for axis, order in enumerate(library[k].data[0][1]))]
+                if not targets:
+                    raise ValueError(f"system_rps_params['target_axes']: equation slot {slot!r} has no derivative "
+                                     f'token along the allowed grid axes {sorted(allowed)} to score its weak-form '
+                                     'window on.')
             plans[(key, slot)] = WF.choose_window(fields[key], library, targets, np.random.default_rng([0, idx]),
                                                   rows_ok=row_ok)
     return WeakRows(fields, plans, keys, tokens)

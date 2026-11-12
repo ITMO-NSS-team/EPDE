@@ -25,9 +25,9 @@ from functools import reduce, singledispatchmethod
 import epde.globals as global_var
 from epde.operators.common.objectives import ideal_point
 from epde.interface.search_config import (UNSET, active_config, build_tokens, check_auto_settings,
-                                          check_rps_params, collect_overrides, load_search_config,
-                                          resolve_patience, resolve_plain_params,
-                                          set_active_config)
+                                          check_rps_params, check_target_axes_variables, collect_overrides,
+                                          load_search_config, resolve_patience, resolve_plain_params,
+                                          set_active_config, target_axes_of)
 from epde.interface.legacy_api import (LEGACY_DATA_KEYS, LEGACY_INIT_KEYS,
                                        reject_removed, split_legacy, warn_legacy)
 
@@ -1501,6 +1501,10 @@ class EpdeSearch(object):
         # samples registered by an earlier fit.
         self._check_evaluation_lattice(list(global_var.samples_manager._traj.values()),
                                        active_config().search_space)
+        if active_config().search_space.system_rps_mode == 'plain':
+            # A target_axes key must name one of the pool's variables.
+            check_target_axes_variables(active_config().search_space.system_rps_params,
+                                        [family.variable for family in self.pool.families_demand_equation])
         self._prepare_weak_rows()
         self._run_optimization(equation_terms_max_number, equation_factors_max_number,
                                eq_sparsity_interval, optimizer, population)
@@ -1512,7 +1516,9 @@ class EpdeSearch(object):
         (``domain.evaluation_form='weak'``) get one window per trajectory and
         equation slot, picked from the raw data of the registered trajectories
         (:func:`epde.structure.weak_rows.build_weak_rows`). The pick respects
-        the instability metric's row floor at the configured equation width."""
+        the instability metric's row floor at the configured equation width. In plain mode a slot whose
+        variable has allowed target axes (``system_rps_params['target_axes']``) scores its window on the
+        derivatives along those axes only."""
         manager = global_var.samples_manager
         manager.weak = None
         cfg = active_config()
@@ -1523,8 +1529,15 @@ class EpdeSearch(object):
         from epde.structure.weak_rows import build_weak_rows
         metric = cfg.objectives.instability_metric
         width = configured_width(cfg.search_space)
+        target_axes = None
+        if cfg.search_space.system_rps_mode == 'plain':
+            plain = resolve_plain_params(cfg)
+            if plain['target_axes'] is not None:
+                target_axes = {family.variable: target_axes_of(plain, family.variable)
+                               for family in self.pool.families_demand_equation}
         start = perf_counter()
-        weak = build_weak_rows(self.pool, manager, lambda shape: row_floor(metric, shape, width) is None)
+        weak = build_weak_rows(self.pool, manager, lambda shape: row_floor(metric, shape, width) is None,
+                               target_axes=target_axes)
         manager.weak = weak
         print(f'Weak-form windows ({perf_counter() - start:.1f} s):')
         for (key, slot), plan in weak.plans.items():
