@@ -1746,6 +1746,51 @@ class EpdeSearch(object):
                 else:
                     return self._resulting_population[:num]
 
+    def equations_by_variable(self, only_print: bool = True, only_str: bool = False):
+        """
+        Method for print or getting the own front of every variable
+
+        The systems the search reports -- the archive of the NSGA-II engine, every system of every Pareto
+        level otherwise -- hold one equation per variable. Each variable is ranked in its own plane (the
+        discrepancy and the second objective of its equation), and the equations of its first plane level
+        are reported, one per structure, sorted by their objective values.
+
+        Parameters
+        ----------
+        only_print : `bool`, optional
+            Flag about action (print ot get) for results, the default is True.
+        only_str : `bool`, optional
+            Return the text forms of the equations instead of the equations, when `only_print` == False,
+            the default is False.
+
+        Returns:
+            None, when `only_print` == True
+            dictionary {variable: list of equations (or of their text forms)}, when `only_print` == False
+
+        Raises:
+            AttributeError, before the search is conducted.
+            ValueError, in the single-objective mode: use ``equations`` there.
+        """
+        from epde.optimizers.nsga.per_variable import variable_fronts
+        population = self._resulting_population
+        if not self.multiobjective_mode:
+            raise ValueError('The per-variable fronts need the multi-objective mode; the single-objective '
+                             'results are read with ``equations``.')
+        if hasattr(self.optimizer, 'reported_front'):
+            systems = list(self.optimizer.reported_front())
+        else:
+            systems = [system for level in population for system in level]
+        fronts = variable_fronts(systems)
+        if only_print:
+            for variable, front in fronts.items():
+                print(f'\nfront of the variable {variable}\n')
+                for equation, objectives in front:
+                    print(f'{equation.text_form} , with objective function values of {objectives} \n')
+            return None
+        if only_str:
+            return {variable: [equation.text_form for equation, _ in front] for variable, front in fronts.items()}
+        return {variable: [equation for equation, _ in front] for variable, front in fronts.items()}
+
     def solver_forms(self, grids: list = None, num: int = 1, sample_key: int = None):
         '''
         Method returns solver forms of the equations in a form of Python list.

@@ -30,6 +30,8 @@ representatives, identical points sharing one distance.
   (:func:`take_plan_status`).
 * Initial population (:class:`PerPlaneFirstLevelCount`): at most half the
   systems on level 0 of EVERY plane.
+* Report (:func:`variable_fronts`): each variable's own first-level
+  representatives, one equation per structure label, sorted by objectives.
 
 Systems of one equation use the joint rules everywhere.
 """
@@ -201,6 +203,23 @@ def plane_layers(T, population) -> list:
         return []
     best = T.adj.min(axis=0)
     return [[population[i] for i in range(len(population)) if best[i] == r] for r in sorted(set(best.tolist()))]
+
+
+def variable_fronts(systems) -> dict:
+    """Every variable's own front over ``systems``: ``{key: [(equation, objectives), ...]}``. The list of a
+    key holds the first-level representatives of its plane (``plane_table(...).front``), one equation per
+    structure label, as the equation objects of the systems and the tuple of the equation's own objective
+    values, sorted by those values (the first objective first, ties in the systems' order)."""
+    systems = list(systems)
+    if not systems:
+        return {}
+    T = plane_table(systems)
+    fronts = {}
+    for e, key in enumerate(T.keys):
+        members = [(tuple(float(v) for v in np.atleast_1d(T.planes[e][i])), i) for i in np.flatnonzero(T.front[e])]
+        members.sort()
+        fronts[key] = [(systems[i].vals[key], objectives) for objectives, i in members]
+    return fronts
 
 
 def truncate(optimizer) -> None:
