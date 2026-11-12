@@ -163,11 +163,21 @@ class DomainConfig:
       does not enter them. They work neither with the solver nor with
       ``evaluation_stride`` (weak picks its own lattice), and they do not work
       with ``instability_metric='vcoef'``, which reads pointwise fields.
+
+    ``weak_window_products`` (one of :data:`WEAK_WINDOW_PRODUCTS`) widens the
+    weak window score. Under ``evaluation_form='weak'``, ``'pairs'`` adds to
+    each candidate window's score the capped noise shares of the pairwise
+    products of the pool's data and derivative tokens
+    (:func:`epde.preprocessing.weak_form.product_noise`), so a window is also
+    judged on the product columns the search fits. ``'off'`` (the default)
+    scores the one-factor columns only. ``'pairs'`` requires
+    ``evaluation_form='weak'``.
     """
     boundary_width: Union[str, int, list, tuple] = 'auto'
     time_axis: int = 0
     evaluation_stride: Union[None, int, list, tuple] = None
     evaluation_form: str = 'strong'
+    weak_window_products: str = 'off'
 
 
 @dataclass(frozen=True)
@@ -397,6 +407,22 @@ def check_evaluation_budget(stride, use_solver) -> None:
 
 #: ``domain.evaluation_form`` values.
 EVALUATION_FORMS = ('strong', 'weak')
+#: ``domain.weak_window_products`` values.
+WEAK_WINDOW_PRODUCTS = ('off', 'pairs')
+
+
+def check_weak_window_products(products, form) -> None:
+    """``domain.weak_window_products`` refusals.
+
+    - It must be one of :data:`WEAK_WINDOW_PRODUCTS`.
+    - ``'pairs'`` refuses ``evaluation_form='strong'``: it scores the weak
+      window, which only weak rows have."""
+    if products not in WEAK_WINDOW_PRODUCTS:
+        raise ValueError('domain.weak_window_products must be one of {0}, instead got {1!r}.'.format(
+            list(WEAK_WINDOW_PRODUCTS), products))
+    if products != 'off' and form != 'weak':
+        raise ValueError("domain.weak_window_products={0!r} scores the weak-form window; it requires "
+                         "domain.evaluation_form='weak', instead got {1!r}.".format(products, form))
 
 
 def check_evaluation_form(form, stride, use_solver, instability_metric) -> None:
@@ -1701,6 +1727,8 @@ def _check_types(resolved: dict) -> None:
                           resolved['domain']['evaluation_stride'],
                           resolved['solver']['use_solver'],
                           resolved['objectives']['instability_metric'])
+    check_weak_window_products(resolved['domain']['weak_window_products'],
+                               resolved['domain']['evaluation_form'])
     check_auto_settings(resolved['domain']['boundary_width'],
                         resolved['evolution']['population_size'],
                         resolved['evolution']['training_epochs'],

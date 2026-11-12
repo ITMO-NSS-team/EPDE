@@ -22,6 +22,10 @@ The selection library is the pool's data, derivative and grid tokens, each as a 
 The candidate targets are the slot variable's derivative tokens, and the window score is their median (the
 window study's ``tok1 / med`` rule).
 
+:func:`product_library` holds the pairwise products of the library's data and derivative tokens. With
+``domain.weak_window_products='pairs'`` their noise shares are added to every window's score
+(``weak_form.product_noise``).
+
 The edge cut is the selection library's own, which is none: one-factor power-1 terms integrate by parts
 completely. A search term that keeps a pointwise derivative (``u_x^2``, a product with an opaque factor)
 takes ``_central4``'s second-order rule on its two end samples per nesting. The test function vanishes at
@@ -37,8 +41,8 @@ import numpy as np
 from epde.evaluators import CustomEvaluator, simple_function_evaluator
 from epde.preprocessing import weak_form as WF
 
-__all__ = ['WeakRows', 'weak_term', 'selection_library', 'build_weak_rows', 'axes_of', 'active', 'slot_of',
-           'term_columns']
+__all__ = ['WeakRows', 'weak_term', 'selection_library', 'product_library', 'build_weak_rows', 'axes_of',
+           'active', 'slot_of', 'term_columns']
 
 
 def active() -> bool:
@@ -186,6 +190,15 @@ def selection_library(pool, D: int) -> List[WF.WeakTerm]:
     return library
 
 
+def product_library(pool, D: int) -> List[WF.WeakTerm]:
+    """The pairwise products, squares included, of the selection library's data and derivative tokens (its
+    entries with one data factor and no coordinate power), in the library's order: for tokens ``t_0 .. t_{n-1}``
+    the terms ``t_i t_j``, ``i <= j``."""
+    tokens = [t.data[0] for t in selection_library(pool, D) if len(t.data) == 1 and not any(t.coords)]
+    return [WF.WeakTerm([tokens[i], tokens[j]], (0,) * D) for i in range(len(tokens))
+            for j in range(i, len(tokens))]
+
+
 def axes_of(grids: Sequence[np.ndarray]) -> List[np.ndarray]:
     """1-D coordinate axes of a full meshgrid (``indexing='ij'``). Weak kernels need uniform steps."""
     D = len(grids)
@@ -267,14 +280,23 @@ class WeakRows:
 
 
 def build_weak_rows(pool, manager, row_ok, slots: Optional[Sequence[str]] = None,
-                    target_axes: Optional[Dict[str, Optional[frozenset]]] = None) -> WeakRows:
+                    target_axes: Optional[Dict[str, Optional[frozenset]]] = None,
+                    window_products: str = 'off') -> WeakRows:
     """Pick every (trajectory, slot) window of ``pool`` on the trajectories of ``manager``.
 
     ``row_ok(shape)`` is the instability metric's row floor. The noise draw of the window score is seeded per
     trajectory position, so a fit's windows are reproducible. ``target_axes`` maps a slot to the grid axes its
     target derivative may be taken along (plain mode's ``system_rps_params['target_axes']``); a slot it gives
     axes scores its window on the derivative tokens along those axes only, and a slot absent or mapped to None
-    on every derivative token of its variable."""
+    on every derivative token of its variable.
+
+    ``window_products`` is ``domain.weak_window_products``. With ``'pairs'`` each window's score also counts
+    the noise shares of :func:`product_library`, built once per trajectory; the slots of a trajectory share
+    one noise draw, so they share one cache of those shares."""
+    from epde.interface.search_config import WEAK_WINDOW_PRODUCTS
+    if window_products not in WEAK_WINDOW_PRODUCTS:
+        raise ValueError(f'window_products must be one of {list(WEAK_WINDOW_PRODUCTS)}, instead got '
+                         f'{window_products!r}.')
     keys = list(manager.trajecatoryIDs)
     tokens = {key: manager[key].raw_tokens() for key in keys}
     label_sets = [set(stored) for stored in tokens.values()]
@@ -288,6 +310,9 @@ def build_weak_rows(pool, manager, row_ok, slots: Optional[Sequence[str]] = None
         D = len(axes)
         library = selection_library(pool, D)
         fields[key] = WF.Fields(manager.raw_fields(key), axes)
+        extra = {}
+        if window_products == 'pairs':
+            extra = {'products': product_library(pool, D), 'product_cache': {}}
         for slot in slots:
             targets = [k for k, t in enumerate(library) if len(t.data) == 1 and not any(t.coords)
                        and t.data[0][0] == slot and sum(t.data[0][1]) > 0]
@@ -300,5 +325,5 @@ def build_weak_rows(pool, manager, row_ok, slots: Optional[Sequence[str]] = None
                                      f'token along the allowed grid axes {sorted(allowed)} to score its weak-form '
                                      'window on.')
             plans[(key, slot)] = WF.choose_window(fields[key], library, targets, np.random.default_rng([0, idx]),
-                                                  rows_ok=row_ok)
+                                                  rows_ok=row_ok, **extra)
     return WeakRows(fields, plans, keys, tokens)

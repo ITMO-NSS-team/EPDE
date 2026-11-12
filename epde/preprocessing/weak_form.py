@@ -29,6 +29,11 @@ Nov 2026 window study):
   feature columns, is the window's score;
 - the median over the slot's candidate targets, then the minimum over windows.
 
+With a product list (``DomainConfig.weak_window_products='pairs'``), each window whose score is finite also gets
+the capped noise shares of the product columns on its stride-m rows (:func:`product_noise`): products keep
+derivatives pointwise, so their columns can be noisier than any one-factor column of the library. The minimum is
+then taken over the summed scores.
+
 Kernels are exact-moment quadrature weights (:func:`exact_kernel`). Each window's weights are divided by the
 window's mass ``int psi dx``, so a constant's weak column is exactly 1 and the intercept keeps its meaning. The
 factor is common to every column of a window, so coefficients are unchanged.
@@ -59,7 +64,7 @@ from epde.preprocessing.deriv_calculators import _central4
 
 __all__ = ['WeakTerm', 'WindowPlan', 'Fields', 'reduce', 'ibp_options', 'max_order', 'exact_kernel',
            'window_kernels', 'wint_s', 'noise_model', 'ar_noise', 'weak_matrix', 'choose_window', 'pcr_score',
-           'FD_REACH', 'J_START', 'J_GUARD']
+           'product_noise', 'FD_REACH', 'J_START', 'J_GUARD', 'NOISE_DOMINATED', 'PRODUCT_GROUP_BYTES']
 
 #: Samples the fourth-order central stencil reaches per derivative order.
 FD_REACH = 2
@@ -67,6 +72,10 @@ FD_REACH = 2
 J_START = (0, 1, 2)
 #: Compute guard on the smoothness extension: never reached in the window study, and reaching it raises.
 J_GUARD = 16
+#: Noise-energy / column-energy ratio at which a column's noise equals its signal (SNR 1).
+NOISE_DOMINATED = 0.5
+#: Memory bound of :func:`product_noise`: the bytes of cropped pointwise arrays one group of products may hold.
+PRODUCT_GROUP_BYTES = 2 ** 27
 
 EPS = np.finfo(float).eps
 
@@ -453,7 +462,7 @@ def signal_directions(X: np.ndarray, N: np.ndarray) -> np.ndarray:
     keep = w > w.max() * len(w) * EPS
     B = U[:, keep] / np.sqrt(w[keep])                        # B' Xs B = I
     lam, Z = np.linalg.eigh(B.T @ Ns @ B)                    # noise / signal per direction
-    return (B @ Z)[:, lam < 0.5]
+    return (B @ Z)[:, lam < NOISE_DOMINATED]
 
 
 def pcr_score(G: np.ndarray, Gd: np.ndarray, Gc: np.ndarray, Gn: np.ndarray, t: int) -> float:
@@ -496,6 +505,46 @@ def pcr_score(G: np.ndarray, Gd: np.ndarray, Gc: np.ndarray, Gn: np.ndarray, t: 
     return s if np.isfinite(s) else np.inf
 
 
+def product_noise(fields: Fields, draw: Fields, products: Sequence[WeakTerm], cut: Sequence[int],
+                  ms: Sequence[int], q: Sequence[int]) -> float:
+    """The capped noise shares of the ``products`` columns on the window's own rows (stride ``ms``, smoothness
+    ``q``, monomials ``monomials(psi_cap=q)``).
+
+    Per product, ``x`` is its weak column on ``fields`` and ``x_d`` on ``draw`` (the data with the noise draw).
+    Both energies are centred over the rows, the part an equation's constant term cannot absorb:
+    ``X = sum (x - mean x)^2``, ``N = sum (e - mean e)^2`` with ``e = x_d - x``, and ``a = N / X``. The result
+    is ``sum min(a, NOISE_DOMINATED)^2`` over the products; a product with a non-finite ratio (``X == 0``, a
+    column constant over the rows) counts ``NOISE_DOMINATED^2``.
+
+    The products are evaluated in groups, each with its own throw-away caches. A group holds one cropped
+    pointwise array per monomial of its products; consecutive products join a group while those arrays stay
+    under ``PRODUCT_GROUP_BYTES`` (a group holds at least one product). The per-product terms are summed in
+    product order, so the grouping does not change the result."""
+    products = list(products)
+    monos = [t.monomials(psi_cap=q) for t in products]
+    n = int(np.prod([fields.shape[d] - 2 * int(cut[d]) for d in range(fields.D)]))
+    room = max(1, PRODUCT_GROUP_BYTES // (np.dtype(float).itemsize * max(n, 1)))     # pointwise arrays per group
+    total = 0.0
+    start = 0
+    while start < len(products):
+        stop, held = start + 1, len(monos[start])
+        while stop < len(products) and held + len(monos[stop]) <= room:
+            held += len(monos[stop])
+            stop += 1
+        opq = [t.opaque for t in products[start:stop]]
+        X, _ = weak_matrix(monos[start:stop], opq, fields, cut, ms, ms, q, {})
+        Xd, _ = weak_matrix(monos[start:stop], opq, draw, cut, ms, ms, q, {})
+        for k in range(stop - start):
+            x = X[:, k]
+            e = Xd[:, k] - x
+            xe = float(np.sum((x - np.mean(x)) ** 2))
+            ne = float(np.sum((e - np.mean(e)) ** 2))
+            a = ne / xe if xe > 0 else np.inf
+            total += min(a, NOISE_DOMINATED) ** 2 if np.isfinite(a) else NOISE_DOMINATED ** 2
+        start = stop
+    return total
+
+
 class WindowPlan:
     """A slot's window.
 
@@ -505,7 +554,7 @@ class WindowPlan:
     - ``ss``: row strides;
     - ``cut``: samples cropped off each end of every axis;
     - ``shape``: the row lattice;
-    - ``score``: the pcr median;
+    - ``score``: the pcr median, plus the product noise shares when :func:`choose_window` is given products;
     - ``table``: one ``(j, ms, ss, shape, score)`` per candidate window, for diagnostics."""
     __slots__ = ('j', 'r', 'q', 'ms', 'ss', 'cut', 'shape', 'score', 'table')
 
@@ -542,7 +591,8 @@ def _stride(n_eff, ms, p, rows_ok):
 def choose_window(fields: Fields, library: Sequence[WeakTerm], targets: Sequence[int],
                   rng: np.random.Generator, cut: Optional[Sequence[int]] = None,
                   rows_ok: Callable[[Tuple[int, ...]], bool] = lambda shape: True,
-                  noise_vars: Optional[Sequence[Hashable]] = None) -> WindowPlan:
+                  noise_vars: Optional[Sequence[Hashable]] = None, products: Optional[Sequence[WeakTerm]] = None,
+                  product_cache: Optional[dict] = None) -> WindowPlan:
     """The slot's window by the pcr rule (module docstring).
 
     Arguments:
@@ -551,7 +601,12 @@ def choose_window(fields: Fields, library: Sequence[WeakTerm], targets: Sequence
     - ``cut``: per-axis edge crop on the full grid. The default is the library's own pointwise derivatives,
       ``FD_REACH * order`` doubled for the every-other-sample grid;
     - ``rows_ok``: the instability metric's row floor on a lattice shape;
-    - ``noise_vars``: the fields that receive the noise draw (default: all).
+    - ``noise_vars``: the fields that receive the noise draw (default: all);
+    - ``products``: product terms whose noise shares (:func:`product_noise`) are added to the score of every
+      window whose own score is finite. The table, the minimum and the smoothness extension read the sum.
+      ``None`` or empty: the one-factor score alone;
+    - ``product_cache``: ``{(q, ms): product_noise}``, shared by the caller between calls with the same fields,
+      noise draw and cut (the slots of one trajectory); ``None`` keeps a private one.
 
     Raises ``ValueError`` when no window is feasible."""
     D = fields.D
@@ -589,6 +644,8 @@ def choose_window(fields: Fields, library: Sequence[WeakTerm], targets: Sequence
             m *= 2
         per_axis.append(ms_d)
     p = len(library)
+    if products and product_cache is None:
+        product_cache = {}
     caches = ({}, {}, {})
     table = []
     js = list(J_START)
@@ -619,6 +676,11 @@ def choose_window(fields: Fields, library: Sequence[WeakTerm], targets: Sequence
                 dM = Md - M
                 Gn = dM.T @ dM
                 score = float(np.median([pcr_score(G, Gd, Gc, Gn, t) for t in targets]))
+                if products and np.isfinite(score):
+                    key = (tuple(q), tuple(ms))
+                    if key not in product_cache:
+                        product_cache[key] = product_noise(fields, draw, products, cut, ms, q)
+                    score = score + product_cache[key]
                 table.append((j, tuple(ms), ss, shape, score))
         if not table:
             raise ValueError(f'no feasible weak-form window: grid {fields.shape}, edge cut {cut}, '
