@@ -858,9 +858,10 @@ class MOEADDOptimizer(object):
                     try:
                         should_stop = bool(early_stopping_callback(snapshot, int(epoch_idx)))
                     except Exception as exc:
-                        # A misbehaving callback must not abort the run; log
+                        # A misbehaving callback must not abort the run; warn
                         # and keep going so the user still gets a result.
-                        print(f'[early_stopping_callback] raised {exc!r}; ignoring.')
+                        warnings.warn(f'early_stopping_callback raised {exc!r}; the run goes on.',
+                                      global_var.EPDEUsageWarning)
                         should_stop = False
                     if should_stop:
                         if global_var.verbose.show_iter_idx:

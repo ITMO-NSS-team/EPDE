@@ -147,11 +147,12 @@ def _check_plain_tokens(equation) -> None:
     key = (id(pool), var)
     entry = _PLAIN_TOKENS.get(key)
     if entry is not None and entry[0]() is pool:
-        return
-    from epde.operators.common.fill_prune import factors_setting, library_terms
-    library = library_terms(pool, factors_setting(equation))
-    found = any(is_plain_term(term, var) for term in library)
-    _PLAIN_TOKENS[key] = (weakref.ref(pool), found)
+        found = entry[1]
+    else:
+        from epde.operators.common.fill_prune import factors_setting, library_terms
+        library = library_terms(pool, factors_setting(equation))
+        found = any(is_plain_term(term, var) for term in library)
+        _PLAIN_TOKENS[key] = (weakref.ref(pool), found)
     if not found:
         raise ValueError(
             "system_rps_params['plain_target']: the token pool can draw no plain derivative of {0!r} (a single "
@@ -197,6 +198,26 @@ def start_variable_order(seed=None) -> None:
     else:
         entropy = [int(seed), _ORDER_TAG]
     _ORDER['rng'] = np.random.default_rng(entropy)
+
+
+def release() -> None:
+    """Drop what plain mode keeps between calls: the sibling hand-over, the plain-token verdicts, the variable
+    order's generator, the fill-and-prune library and Gram stores, the product rule's group memo, and the
+    system-redundancy test's reported reasons."""
+    from epde.operators.common import fill_prune, product_rule, system_redundancy
+    _SIBLINGS.clear()
+    _PLAIN_TOKENS.clear()
+    _ORDER['rng'] = None
+    fill_prune.reset()
+    product_rule.reset()
+    system_redundancy.reset()
+
+
+def start_fit(seed=None) -> None:
+    """The per-fit state of plain mode, so that a fit does not depend on the fits before it in the process:
+    every cache released, then a new variable-order generator (:func:`start_variable_order`)."""
+    release()
+    start_variable_order(seed)
 
 
 def _claims(equations, fitted, order):

@@ -62,6 +62,11 @@ _GROUPS_MAX = 500_000
 _GROUPS = OrderedDict()
 
 
+def reset() -> None:
+    """Empty the group memo: a new fit builds its own (see ``plain_fit.start_fit``)."""
+    _GROUPS.clear()
+
+
 # ------------------------------------------------------------------ keys
 def factor_key(factor) -> str:
     params = {d['name']: float(factor.params[i]) for i, d in factor.params_description.items()}

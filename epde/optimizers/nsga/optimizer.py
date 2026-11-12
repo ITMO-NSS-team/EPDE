@@ -29,6 +29,8 @@ make the offspring of one MOEA/DD epoch at the same population size, so
 ``training_epochs`` -- and ``early_stopping_patience`` -- mean the same budget
 for both engines.
 """
+import warnings
+
 import numpy as np
 
 import epde.globals as global_var
@@ -301,7 +303,8 @@ class NSGAOptimizer(MOEADDOptimizer):
                 try:
                     should_stop = bool(early_stopping_callback(snapshot, int(epoch_idx)))
                 except Exception as exc:
-                    print(f'[early_stopping_callback] raised {exc!r}; ignoring.')
+                    warnings.warn(f'early_stopping_callback raised {exc!r}; the run goes on.',
+                                  global_var.EPDEUsageWarning)
                     should_stop = False
                 if should_stop:
                     if global_var.verbose.show_iter_idx:

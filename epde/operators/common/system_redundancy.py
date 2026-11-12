@@ -15,8 +15,10 @@ combination" is a relative residual below ``REDUNDANCY_RTOL``: a restated relati
 coefficients' error (about 1e-3 on the lv fronts), an independent law leaves one of order 1.
 
 Fields, their derivatives, grid tokens and sin / cos are differentiated here; a system holding any other
-kind of token is left as it is.
+kind of token is left as it is, and the test is then off: that, and data with no registered axis ranges,
+are warned of once per fit (:func:`reset` re-arms the warning).
 """
+import warnings
 from typing import List, Optional
 
 import numpy as np
@@ -29,6 +31,26 @@ REDUNDANCY_RTOL = 0.1
 _MIN_POINTS = 64
 #: The draws are the module's own, so the test leaves the search's random stream untouched.
 _SEED = 20261022
+
+_REPORTED = set()      # the reasons the test was found off for since the last reset
+
+_NO_RANGES = 'the data have no registered axis ranges.'
+_NOT_DIFFERENTIATED = ('a token of the system is of a kind the test does not differentiate (it differentiates '
+                       'fields, their derivatives, grid tokens and sin / cos).')
+
+
+def reset() -> None:
+    """Forget the reasons already reported, so that the next fit reports them again."""
+    _REPORTED.clear()
+
+
+def _off(reason: str) -> list:
+    """[], the test's result when it cannot run; the reason is warned of once until :func:`reset`."""
+    if reason not in _REPORTED:
+        _REPORTED.add(reason)
+        warnings.warn('The test for an equation that follows from the other equations of its system is off: '
+                      + reason, global_var.EPDEUsageWarning, stacklevel=3)
+    return []
 
 
 def _param(factor, name, default):
@@ -136,7 +158,8 @@ def _axis_ranges() -> Optional[list]:
 def redundant_equations(equations: list, ranges: list = None, order: list = None) -> List[int]:
     """Positions of the fitted ``equations`` (one system) that follow from the others, tested in order:
     an equation found to follow is left out of the others for the ones after it, so a relation stated
-    twice loses one statement. [] for one equation, or when a token cannot be differentiated here.
+    twice loses one statement. [] for one equation, or (with a warning, see the module docstring) when the
+    data have no axis ranges or a token cannot be differentiated here.
     ``ranges`` -- (min, max) per axis -- default to the registered data's.
 
     ``order`` (a permutation of the positions) tests in that order instead. The random points are the
@@ -147,7 +170,7 @@ def redundant_equations(equations: list, ranges: list = None, order: list = None
         return []
     ranges = ranges if ranges is not None else _axis_ranges()
     if not ranges:
-        return []
+        return _off(_NO_RANGES)
     ndim = len(ranges)
     fields = sorted({eq.main_var_to_explain for eq in equations})
     rng = np.random.default_rng(_SEED)
@@ -158,7 +181,7 @@ def redundant_equations(equations: list, ranges: list = None, order: list = None
     jet = _Jet(n, ranges, rng)
     residuals = [_residual(eq, jet, ndim) for eq in equations]
     if any(r is None for r in residuals):
-        return []
+        return _off(_NOT_DIFFERENTIATED)
 
     def tested(sequence) -> list:
         redundant = []

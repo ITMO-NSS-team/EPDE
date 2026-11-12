@@ -231,8 +231,8 @@ def select(operator, objective) -> None:
     population = objective.population
     T = plane_table(population)
     n_eq, n = T.n_eq, len(population)
-    turn = operator.__dict__.get('_pv_turn', 0)
-    operator._pv_turn = turn + 1
+    turn = objective.__dict__.get('_pv_turn', 0)
+    objective._pv_turn = turn + 1
     keys = list(population[0].vals.equation_keys)
     parents = int(n * operator.params['parents_fraction'])
     parents = min(max(2, parents + parents % 2), n + n % 2)

@@ -29,7 +29,9 @@ the equation from the whole library, followed by a probabilistic PRUNE:
 RNG order per call: the coin; then, once the beam is reached, the level (before
 the beam is looked up, so a cached beam draws the same), the fill, the prune
 stages, the stage. A fallback before that consumes the coin alone; the Gram,
-candidate and beam computations draw nothing.
+candidate and beam computations draw nothing. Every fallback is a loop-stats record
+(``PlainMutation.fill_fallback.<reason>``); a reason that holds for the whole equation is also warned of once
+per fit.
 
 The Gram: the library's columns on the evaluation rows (weak rows: one store
 per equation slot), weighted by the fit's row weights and normalised to a unit
@@ -49,6 +51,7 @@ from copy import deepcopy
 import numpy as np
 
 import epde.globals as global_var
+from epde import _loop_stats
 
 #: In-memory cache bounds (memory only: an evicted entry is recomputed identically).
 CAND_MAX = 4096
@@ -60,10 +63,27 @@ PRUNE_CAP = 0.9
 PRUNE_FLOOR = 1e-15
 #: A beam extension whose new column lies in the span of the support (``den`` below this) is not valid.
 SPAN_TOL = 1e-12
+#: The fallback reasons that hold for the whole equation (the move cannot run for it at all), warned of once
+#: per fit; the other reasons are states of one call.
+_FALLBACK_TEXTS = {
+    'target_not_in_library': "the target's term is not in the library (the library holds the terms the pool draws "
+                             "with discrete parameters)",
+    'target_column_unusable': "the target's column is zero or not finite on the evaluation rows",
+    'no_candidates': 'no library term is admissible beside the target',
+    'k_below_1': 'the equation has no room for a term beside its target',
+    'beam_linalg': 'the least-squares beam met a singular or non-finite system',
+}
 
 _LIBRARY = {}          # (id(pool), repr(cfg)) -> (pool, [Term]); one entry
 _STORES = {}           # slot (None for strong rows) -> Gram store
 _WARNED = set()
+
+
+def reset() -> None:
+    """Empty the library, the Gram stores and the warned set: a new fit builds its own (see ``plain_fit.start_fit``)."""
+    _LIBRARY.clear()
+    _STORES.clear()
+    _WARNED.clear()
 
 
 class _Fallback(Exception):
@@ -216,6 +236,12 @@ def factors_setting(equation):
         return equation.metaparameters['max_factors_in_term']['value']
     except Exception:
         return None
+
+
+def factor_cap(equation) -> int:
+    """The most factors a term of ``equation`` can hold under its factors setting."""
+    counts, _ = _counts_and_fmax(_factors_cfg(factors_setting(equation)))
+    return max(counts)
 
 
 # ------------------------------------------------------------------ the beam
@@ -633,6 +659,12 @@ def fill(equation, target, features, system, params) -> bool:
         return False
     try:
         _attempt(equation, target, features, system, params)
-    except _Fallback:
+    except _Fallback as exc:
+        reason = str(exc)
+        _loop_stats.record('PlainMutation.fill_fallback.' + reason, 1, 1)
+        if reason in _FALLBACK_TEXTS:
+            _warn_once(('fallback', equation.main_var_to_explain, reason),
+                       'plain mode fill_probability: the fill-and-prune move is skipped for %r (the drawn move '
+                       'runs instead): %s.' % (equation.main_var_to_explain, _FALLBACK_TEXTS[reason]))
         return False
     return True

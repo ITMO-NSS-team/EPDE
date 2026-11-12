@@ -23,8 +23,9 @@ under ``evolution.engine='nsga2'``, ``search_config.resolve_plain_params``):
 
 * ``factor_move_probability`` -- with this probability, drawn first, one
   factor of a non-target term is edited instead: its power moves by +-1
-  within its bounds, a random single factor joins a one-factor term, or one
-  factor of a two-factor term leaves. An edit that changes nothing or
+  within its bounds, a random single factor joins a term that holds fewer
+  factors than the equation's factors setting allows, or one factor of a
+  term holding several leaves. An edit that changes nothing or
   duplicates another term is undone and the move above runs.
 * ``fill_probability`` -- with this probability, drawn after the move, the
   move is replaced by the fill-and-prune move (``fill_prune``); when that
@@ -115,7 +116,7 @@ def mutating_system(system):
         _MUTATING['system'] = previous
 
 
-def _power_step(term) -> bool:
+def _power_step(term, cap) -> bool:
     factor = term.structure[np.random.randint(len(term.structure))]
     for idx, description in factor.params_description.items():
         if description['name'] == 'power':
@@ -129,9 +130,9 @@ def _power_step(term) -> bool:
     return False
 
 
-def _add_factor(term) -> bool:
+def _add_factor(term, cap) -> bool:
     from epde.structure.main_structures import Term
-    if len(term.structure) >= 2:
+    if len(term.structure) >= cap:
         return False
     extra = Term(term.pool, max_factors_in_term=1).structure[0]
     if extra.label in {f.label for f in term.structure}:
@@ -140,7 +141,7 @@ def _add_factor(term) -> bool:
     return True
 
 
-def _drop_factor(term) -> bool:
+def _drop_factor(term, cap) -> bool:
     if len(term.structure) < 2:
         return False
     victim = np.random.randint(len(term.structure))
@@ -154,6 +155,8 @@ _FACTOR_MOVES = (('power', _power_step), ('add', _add_factor), ('drop', _drop_fa
 def _factor_move(equation) -> bool:
     """One factor edit of a random non-target term (module docstring); True when it changed the equation,
     which is then reset for a new fit, False (everything undone) otherwise."""
+    from epde.operators.common.fill_prune import factor_cap
+    cap = factor_cap(equation)
     target = gene_term(equation)
     features = [t for t in equation.structure if t is not target]
     if not features:
@@ -162,7 +165,7 @@ def _factor_move(equation) -> bool:
     kind, move = _FACTOR_MOVES[np.random.randint(len(_FACTOR_MOVES))]
     original = list(term.structure)
     saved = [(f, f.params.copy()) for f in original]
-    changed = move(term)
+    changed = move(term, cap)
     term.resetSavedState()
     if changed and _duplicated(equation):
         changed = False

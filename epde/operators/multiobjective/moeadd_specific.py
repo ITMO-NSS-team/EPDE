@@ -1124,7 +1124,8 @@ class InitialParetoLevelSorting(CompoundOperator):
                         f"({len(objective.history)} unique systems placed of "
                         f"{len(objective.unplaced_candidates)} requested). Stopping "
                         f"the search; placed candidates are accessible via "
-                        f"pareto_levels.levels[0]."
+                        f"pareto_levels.levels[0].",
+                        global_var.EPDEUsageWarning
                     )
                     placed = list(objective.unplaced_candidates[:idx])
                     objective.population = placed
@@ -1172,6 +1173,13 @@ class InitialParetoLevelSorting(CompoundOperator):
                 print(f'Population size: {cut_at} systems, {distinct} distinct (the pool yields no '
                       f'further one in {uniqueness_attempt_limit} attempts; up to {allowed} allowed).')
             final = len(objective.unplaced_candidates)
+            # Slots filled with copies of a system (a dry pool, below the floor or not) hold no new system.
+            distinct = len({c.equations_labels for c in objective.unplaced_candidates})
+            if distinct < final:
+                warnings.warn(
+                    f'Initial population: {final} systems, {distinct} distinct. The pool yielded no further '
+                    f'system in {uniqueness_attempt_limit} attempts, so {final - distinct} slots hold copies.',
+                    global_var.EPDEUsageWarning)
             if final != requested:
                 # One weight vector per member: the optimizer adopts the resized
                 # weights after this call (MOEADDOptimizer._sync_weights).

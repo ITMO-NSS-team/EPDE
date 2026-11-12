@@ -1544,10 +1544,12 @@ class EpdeSearch(object):
 
         init_params, exec_params = self._resolved_budget()
         if active_config().search_space.system_rps_mode == 'plain':
-            # Plain mode's variable order draws from a generator of its own,
-            # seeded once per fit (system_rps_params['variable_order_seed']).
-            from epde.operators.common.plain_fit import start_variable_order
-            start_variable_order(resolve_plain_params(active_config())['variable_order_seed'])
+            # Plain mode's per-fit state: its caches (library, Gram stores, group memo,
+            # token verdicts) are emptied and the variable order's generator, which
+            # draws on its own, is seeded once per fit
+            # (system_rps_params['variable_order_seed']).
+            from epde.operators.common.plain_fit import start_fit
+            start_fit(resolve_plain_params(active_config())['variable_order_seed'])
         if optimizer is None:
             self.optimizer = self._create_optimizer(
                 self.multiobjective_mode, init_params,
@@ -1794,9 +1796,12 @@ class EpdeSearch(object):
                 eqs = search.equations(only_print=False)
 
         ``equations()`` keeps working either way -- it reads the recorded
-        population, not the caches.
+        population, not the caches. ``close`` also releases what plain mode
+        keeps between fits (the pool, the library terms and the Gram matrices).
         """
         global_var.delete_cache()
+        from epde.operators.common import plain_fit
+        plain_fit.release()
 
     def __enter__(self):
         return self

@@ -644,14 +644,15 @@ class Equation(ComplexStructure):
                 # structure -- stop, don't try further slots. Subsequent
                 # ``new_term`` draws would face the same exhausted pool,
                 # so the only honest outcome is a shorter equation.
-                # (D1 raises for the same exhaustion class in
-                # InitialParetoLevelSorting; here we warn-accept because
+                # (The initial sorting stops the search with a warning for
+                # the same exhaustion class; here we warn-accept because
                 # ``Equation.__init__`` is invoked during the initial
                 # population draw and aborting fit() entirely would be
                 # surprising user-facing behavior.)
                 warnings.warn(
                     f"Equation.__init__: no unique term in {max_iter} attempts at slot {i}; "
-                    "pool may be exhausted -- stopping with a shorter equation."
+                    "pool may be exhausted -- stopping with a shorter equation.",
+                    global_var.EPDEUsageWarning
                 )
                 break
             self.structure.append(new_term)
