@@ -1,0 +1,409 @@
+diff --git a/epde/interface/search_config.py b/epde/interface/search_config.py
+index 1feabbc..d81dc4c 100644
+--- a/epde/interface/search_config.py
++++ b/epde/interface/search_config.py
+@@ -287,6 +287,13 @@ class SearchSpaceConfig:
+     * ``factor_move_probability`` -- the chance that a mutation edits one
+       factor of a term instead (power +-1, add or drop a factor).
+       ``'auto'``: 1/6 / 0.
++    * ``invariant_terms`` -- one of :data:`INVARIANT_TERMS`: ``'keep'`` (the
++      default) every term; ``'refuse'`` reads the exact polynomial
++      invariants of the variables off the data (``c**2 + s**2 = 1`` of a
++      heading vector) with their derivatives and leaves out of every fit a
++      term they make redundant, so no identity of the variables can be
++      written (``epde.operators.common.invariant_terms``). Data without such
++      an invariant keep every term.
+ 
+     ``equation_terms_max_number`` bounds an equation's STRUCTURE in every
+     mode: the terms it holds, the target included -- the library
+@@ -347,7 +354,7 @@ SYSTEM_RPS_PARAMS = {
+     'plain': {'fill_probability': 'auto', 'fill_beam_width': 1000, 'fill_top': 20,
+               'fill_prune_alpha': 0.3, 'fill_levels': 'all', 'product_rule_decline': 'auto',
+               'variable_order': 'auto', 'variable_order_seed': None, 'plain_target': 'auto',
+-              'factor_move_probability': 'auto', 'target_axes': None},
++              'factor_move_probability': 'auto', 'target_axes': None, 'invariant_terms': 'keep'},
+ }
+ assert tuple(SYSTEM_RPS_PARAMS) == SYSTEM_RPS_MODES
+ #: ``'plain'`` mode's ``'auto'`` settings: ``'universal'`` under
+@@ -362,6 +369,8 @@ PLAIN_AUTO = {
+ #: ``fill_levels`` values, ``variable_order`` values (resolved).
+ FILL_LEVELS = ('all', 'max')
+ VARIABLE_ORDERS = ('fixed', 'random')
++#: ``'plain'`` mode's ``invariant_terms`` values.
++INVARIANT_TERMS = ('keep', 'refuse')
+ #: Which non-dominated variant a system takes in ``'assignment'`` mode
+ #: (its ``variant_pick`` setting).
+ VARIANT_PICKS = ('random', 'sector')
+@@ -546,9 +555,9 @@ def check_plain_params(params) -> None:
+     scale positive, ``fill_levels`` one of :data:`FILL_LEVELS`,
+     ``product_rule_decline`` one of ``DECLINE_MODES`` (or ``'auto'``),
+     ``variable_order`` one of :data:`VARIABLE_ORDERS` (or ``'auto'``),
+-    ``plain_target`` a bool (or ``'auto'``), ``variable_order_seed`` an int
+-    or None and ``target_axes`` one of the shapes :func:`target_axes_of`
+-    reads."""
++    ``invariant_terms`` one of :data:`INVARIANT_TERMS`, ``plain_target`` a
++    bool (or ``'auto'``), ``variable_order_seed`` an int or None and
++    ``target_axes`` one of the shapes :func:`target_axes_of` reads."""
+     from epde.operators.common.product_rule import DECLINE_MODES
+ 
+     def refuse(key, what):
+@@ -569,7 +578,8 @@ def check_plain_params(params) -> None:
+         refuse('fill_prune_alpha', 'a positive number')
+     choices = (('fill_levels', FILL_LEVELS, False),
+                ('product_rule_decline', DECLINE_MODES, True),
+-               ('variable_order', VARIABLE_ORDERS, True))
++               ('variable_order', VARIABLE_ORDERS, True),
++               ('invariant_terms', INVARIANT_TERMS, False))
+     for key, menu, auto in choices:
+         value = params[key]
+         if not (isinstance(value, str) and (value in menu or (auto and value == 'auto'))):
+diff --git a/epde/operators/common/invariant_terms.py b/epde/operators/common/invariant_terms.py
+new file mode 100644
+index 0000000..66536c7
+--- /dev/null
++++ b/epde/operators/common/invariant_terms.py
+@@ -0,0 +1,272 @@
++"""Terms an exact algebraic invariant of the variables makes redundant: plain mode's
++``system_rps_params['invariant_terms']='refuse'``.
++
++Variables that satisfy a polynomial identity at every sample -- a spinning robot's heading vector (c, s) on
++``c**2 + s**2 = 1`` -- carry exact identities into the term space. The invariant and its derivatives
++(``c c' + s s' = 0``, ``c'**2 + c c'' + s'**2 + s s'' = 0``, ...) let an equation write its target through itself
++(``dc/dt = c' s**2 - c s s'``) or one law in many forms (``dc/dt = -w s (c**2 + s**2)``). On derivatives estimated
++from data such a form can fit better than the law, and it fills the fronts.
++
++The rule, once per token pool:
++
++1. The invariants are read off the data: every polynomial of degree at most :data:`DEGREE` in the system's
++   variables that vanishes at every sample of every trajectory (``raw_fields``, the observed fields before any
++   preprocessing), to the machine-exactness tolerance of the exact-dependence tests
++   (``right_part_selection._LIN_DEP_RTOL``) on unit-normalised monomial columns. They are put in reduced echelon
++   form over the monomials (each led by its largest monomial), the coefficients rounded to fractions (denominator
++   at most :data:`MAX_DENOMINATOR`) and checked again on the data; one that fails the check is dropped and warned.
++2. Each invariant is differentiated along every grid axis, again and again, while every derivative the result
++   names is a token of the pool.
++3. The Groebner basis of these polynomials (sympy, grevlex; a higher derivative order ranks above a lower one, then
++   a later variable above an earlier one, then the larger per-axis orders) gives leading monomials. A term whose
++   monomial in the variables and their derivatives -- every other factor left out -- is divisible by one of them is
++   REFUSED: the plain fit leaves its column out of the support and the fitted version drops it
++   (``plain_fit._versions``).
++
++The monomials left (the standard monomials) are linearly independent modulo the identities and span every
++polynomial of the variables on the data: no identity can be written, and a polynomial law keeps exactly one form,
++its normal form -- ``dc/dt = -w s`` is one; a law in ``s**2`` is written with ``1 - c**2``. Data without such an
++invariant leave every term alone. The test reads only a term's structure, so it holds on weak rows too.
++
++sympy is imported only when the rule is on.
++"""
++import warnings
++import weakref
++from fractions import Fraction
++from itertools import combinations_with_replacement
++from typing import List, Optional
++
++import numpy as np
++
++import epde.globals as global_var
++
++#: The highest degree of an invariant looked for.
++DEGREE = 2
++#: The largest denominator an invariant's rounded coefficients may have.
++MAX_DENOMINATOR = 1 << 20
++
++_RULES = {}       # id(pool) -> (weak reference to the pool, the pool's rule or None)
++_REPORTED = set()
++
++
++def reset() -> None:
++    """Forget every pool's rule and the warnings already given."""
++    _RULES.clear()
++    _REPORTED.clear()
++
++
++def _warn_once(message: str) -> None:
++    if message not in _REPORTED:
++        _REPORTED.add(message)
++        warnings.warn(message, global_var.EPDEUsageWarning, stacklevel=3)
++
++
++def _param(factor, name, default):
++    for idx, description in factor.params_description.items():
++        if description['name'] == name:
++            return float(factor.params[idx])
++    return default
++
++
++def _orders(deriv_code, ndim: int) -> tuple:
++    """Per-axis derivative orders of a ``deriv_code`` (``[None]`` is the field itself)."""
++    orders = [0] * ndim
++    for axis in deriv_code:
++        if axis is not None:
++            orders[axis] += 1
++    return tuple(orders)
++
++
++def _grevlex_key(exps: tuple):
++    """Sort key of an exponent tuple (generators listed from the largest): graded reverse lexicographic."""
++    return sum(exps), tuple(-e for e in reversed(exps))
++
++
++def _monomials(n: int, degree: int) -> List[tuple]:
++    out = [(0,) * n]
++    for d in range(1, degree + 1):
++        for combo in combinations_with_replacement(range(n), d):
++            exps = [0] * n
++            for i in combo:
++                exps[i] += 1
++            out.append(tuple(exps))
++    return out
++
++
++def detect(values: List[np.ndarray], degree: int = DEGREE) -> List[dict]:
++    """The exact polynomial invariants of the 1-D sample arrays ``values`` (one per variable, generators from
++    the largest): reduced-echelon polynomials ``{exponent tuple: Fraction}`` of degree at most ``degree`` that
++    vanish at every sample (module docstring, step 1). Rows with a non-finite value are left out."""
++    from epde.operators.common.right_part_selection import _LIN_DEP_RTOL
++    V = np.stack([np.asarray(v, dtype=float).reshape(-1) for v in values], axis=1)
++    V = V[np.all(np.isfinite(V), axis=1)]
++    if V.shape[0] == 0:
++        return []
++    monos = sorted(_monomials(V.shape[1], degree), key=_grevlex_key, reverse=True)
++    M = np.stack([np.prod(V ** np.array(e), axis=1) for e in monos], axis=1)
++    norms = np.linalg.norm(M, axis=0)
++    if np.any(norms == 0):
++        return []
++    _, sv, vt = np.linalg.svd(M / norms, full_matrices=False)
++    null = vt[sv <= _LIN_DEP_RTOL * sv[0]]
++    if null.shape[0] == 0:
++        return []
++    C = null / norms
++    rows, col = [], 0
++    for col in range(C.shape[1]):              # reduced echelon form, pivots in monomial order
++        if len(rows) == C.shape[0]:
++            break
++        r = len(rows)
++        pivot = r + int(np.argmax(np.abs(C[r:, col])))
++        if abs(C[pivot, col]) <= _LIN_DEP_RTOL * np.max(np.abs(C[r:])):
++            continue
++        C[[r, pivot]] = C[[pivot, r]]
++        C[r] = C[r] / C[r, col]
++        for k in range(C.shape[0]):
++            if k != r:
++                C[k] = C[k] - C[k, col] * C[r]
++        rows.append(r)
++    out = []
++    for r in rows:
++        coefs = {monos[j]: Fraction(float(C[r, j])).limit_denominator(MAX_DENOMINATOR)
++                 for j in range(len(monos)) if C[r, j] != 0}
++        coefs = {e: q for e, q in coefs.items() if q != 0}
++        raw = np.array([float(coefs.get(e, 0)) for e in monos])
++        scale = float(np.sum(np.abs(raw) * norms))
++        if scale > 0 and np.linalg.norm(M @ raw) <= _LIN_DEP_RTOL * scale:
++            out.append(coefs)
++        else:
++            _warn_once('invariant_terms: an exact invariant of the variables has coefficients that are no '
++                       'fractions with a denominator up to {0}; it is left out.'.format(MAX_DENOMINATOR))
++    return out
++
++
++class _Rule(object):
++    """The leading monomials of one pool's invariants (module docstring)."""
++
++    def __init__(self, variables, ndim, gens, lms, text):
++        self.variables, self.ndim, self.lms, self.text = frozenset(variables), ndim, lms, text
++        self.index = {key: i for i, key in enumerate(gens)}
++
++    def reducible(self, term) -> bool:
++        exps = [0] * len(self.index)
++        for factor in term.structure:
++            if factor.deriv_code is None or getattr(factor, 'variable', None) not in self.variables:
++                continue
++            pos = self.index.get((factor.variable, _orders(factor.deriv_code, self.ndim)))
++            if pos is None:
++                continue
++            power = _param(factor, 'power', 1.0)
++            if power < 0 or power != int(power):
++                return False
++            exps[pos] += int(power)
++        return any(all(e >= l for e, l in zip(exps, lm)) for lm in self.lms)
++
++
++def _pool_symbols(pool, variables, ndim) -> set:
++    """(variable, per-axis orders) of every field and derivative token of ``variables`` in ``pool``."""
++    keys = set()
++    for family in pool.families:
++        if not getattr(family, 'family_of_derivs', False) or family.variable not in variables:
++            continue
++        for code in getattr(family, 'derivs_ords', {}).values():
++            keys.add((family.variable, _orders(code, ndim)))
++    return keys
++
++
++def _build(pool) -> Optional[_Rule]:
++    try:
++        import sympy
++    except ImportError as exc:      # pragma: no cover - sympy ships with the scientific stack
++        raise ImportError("system_rps_params['invariant_terms']='refuse' needs sympy (its Groebner bases).") \
++            from exc
++    manager = global_var.samples_manager
++    ids = list(manager.trajecatoryIDs)
++    variables = list(manager.raw_fields(ids[0]))
++    ndim = manager.ndim
++    keys = _pool_symbols(pool, variables, ndim)
++    variables = [v for v in variables if (v, (0,) * ndim) in keys]
++    if not variables:
++        return None
++    # generators from the largest: a higher total derivative order, then a later variable, then larger orders
++    gens_keys = sorted(keys, key=lambda k: (sum(k[1]), variables.index(k[0]), k[1]), reverse=True)
++    sym = {k: sympy.Symbol('g%d' % i) for i, k in enumerate(gens_keys)}
++    base = sorted(variables, key=variables.index, reverse=True)
++    stacked = [np.concatenate([np.asarray(manager.raw_fields(i)[v], dtype=float).reshape(-1) for i in ids])
++               for v in base]
++    found = detect(stacked)
++    if not found:
++        _warn_once("invariant_terms='refuse': the variables {0} satisfy no exact polynomial identity of degree "
++                   "up to {1} on the data; every term is kept.".format(variables, DEGREE))
++        return None
++    polys = []
++    for coefs in found:
++        expr = sympy.Integer(0)
++        for exps, q in coefs.items():
++            mono = sympy.Integer(1)
++            for v, e in zip(base, exps):
++                mono = mono * sym[(v, (0,) * ndim)] ** e
++            expr = expr + sympy.Rational(q.numerator, q.denominator) * mono
++        polys.append(sympy.expand(expr))
++
++    def derivative(expr, axis):
++        out = sympy.Integer(0)
++        for s in expr.free_symbols:
++            key = next(k for k, v in sym.items() if v == s)
++            up = (key[0], tuple(o + (a == axis) for a, o in enumerate(key[1])))
++            if up not in sym:
++                return None
++            out = out + sympy.diff(expr, s) * sym[up]
++        return sympy.expand(out)
++
++    closure, frontier = list(polys), list(polys)
++    while frontier:
++        nxt = []
++        for expr in frontier:
++            for axis in range(ndim):
++                d = derivative(expr, axis)
++                if d is not None and d != 0 and all(sympy.expand(d - c) != 0 for c in closure):
++                    closure.append(d)
++                    nxt.append(d)
++        frontier = nxt
++    gens = [sym[k] for k in gens_keys]
++    basis = sympy.groebner(closure, *gens, order='grevlex')
++    lms = [sympy.Poly(g, *gens).monoms(order='grevlex')[0] for g in basis.exprs]
++    names = {v: k for k, v in sym.items()}
++
++    def show(expr):
++        return str(expr.subs({s: sympy.Symbol(_label(*names[s])) for s in expr.free_symbols}))
++
++    text = '; '.join('%s = 0' % show(p) for p in polys)
++    leading = ', '.join(show(sympy.Mul(*[g ** e for g, e in zip(gens, lm)])) for lm in lms)
++    _warn_once("invariant_terms='refuse': the data satisfy {0} exactly; terms divisible by {1} are refused."
++               .format(text, leading))
++    return _Rule(variables, ndim, gens_keys, lms, text)
++
++
++def _label(variable, orders) -> str:
++    if not any(orders):
++        return variable
++    return 'd%s_%s' % (variable, ''.join('x%d' % a * o for a, o in enumerate(orders)))
++
++
++def rule(pool) -> Optional[_Rule]:
++    """``pool``'s rule (built on first use), or None when the data have no exact invariant."""
++    entry = _RULES.get(id(pool))
++    if entry is not None and entry[0]() is pool:
++        return entry[1]
++    built = _build(pool)
++    _RULES[id(pool)] = (weakref.ref(pool), built)
++    return built
++
++
++def refused(equation, terms) -> List[bool]:
++    """Per term of ``terms`` (terms of ``equation``): whether ``invariant_terms='refuse'`` refuses it. All False
++    under ``'keep'`` (nothing is computed) and on data without an exact invariant."""
++    from epde.operators.common.plain_fit import plain_params
++    if plain_params()['invariant_terms'] != 'refuse':
++        return [False] * len(terms)
++    found = rule(equation.pool)
++    if found is None:
++        return [False] * len(terms)
++    return [found.reducible(term) for term in terms]
+diff --git a/epde/operators/common/plain_fit.py b/epde/operators/common/plain_fit.py
+index b2b17b7..4c21ba4 100644
+--- a/epde/operators/common/plain_fit.py
++++ b/epde/operators/common/plain_fit.py
+@@ -229,13 +229,14 @@ def start_variable_order(seed=None) -> None:
+ 
+ def release() -> None:
+     """Drop what plain mode keeps between calls: the sibling hand-over, the plain-token verdicts, the variable
+-    order's generator, the fill-and-prune library and Gram stores, the product rule's group memo, and the
+-    system-redundancy test's reported reasons."""
+-    from epde.operators.common import fill_prune, product_rule, system_redundancy
++    order's generator, the fill-and-prune library and Gram stores, the product rule's group memo, the
++    system-redundancy test's reported reasons and the invariant rule of every pool."""
++    from epde.operators.common import fill_prune, invariant_terms, product_rule, system_redundancy
+     _SIBLINGS.clear()
+     _PLAIN_TOKENS.clear()
+     _ORDER['rng'] = None
+     fill_prune.reset()
++    invariant_terms.reset()
+     product_rule.reset()
+     system_redundancy.reset()
+ 
+@@ -361,13 +362,17 @@ def _versions(equation, cap, coeff_calc, coeff_args, host, host_args) -> list:
+     """The fitted versions of ``equation`` -- S, and S+{1} when the cap leaves
+     room for the constant -- that the fitness host accepts, minus one the other
+     dominates. Each is a fitted, pruned and scored copy, built exactly as
+-    ``right_part_selection._equation_variants`` builds a support."""
++    ``right_part_selection._equation_variants`` builds a support. S is every
++    term but the target, less the terms ``invariant_terms='refuse'`` refuses
++    (:mod:`epde.operators.common.invariant_terms`): left out of S, they drop
++    with the version's zero terms."""
+     from epde.operators.common.right_part_selection import (
+         _pruned_to_reducible, _subset_rank_deficient, _subset_reducible)
+     from epde.operators.common.subset_selection import (
+         store_fit, subset_table, support_scores, trajectory_gram)
+     from epde.operators.common.objectives import LOSS_NAN_VAL
+     from epde.operators.common.product_rule import declines
++    from epde.operators.common import invariant_terms
+ 
+     cfg = active_config()
+     decline = plain_params()['product_rule_decline']
+@@ -394,8 +399,15 @@ def _versions(equation, cap, coeff_calc, coeff_args, host, host_args) -> list:
+     if not finite:
+         return []
+     p = finite[0][1].shape[1]
+-    every_feature = (1 << p) - 1
+-    masks = [every_feature] + ([every_feature | (1 << p)] if p + 1 <= cap else [])
++    feature_terms = [term for i, term in enumerate(equation.structure) if i != equation.target_idx]
++    # system_rps_params['invariant_terms']='refuse': a term an exact invariant of the variables makes redundant
++    # stays out of the support, so the fitted version drops it (invariant_terms; every column under 'keep').
++    refused = invariant_terms.refused(equation, feature_terms)
++    cols = [j for j in range(p) if not refused[j]]
++    if not cols:
++        return []
++    every_feature = sum(1 << j for j in cols)
++    masks = [every_feature] + ([every_feature | (1 << p)] if len(cols) + 1 <= cap else [])
+ 
+     samples = []
+     for key, X, y, sw in finite:
+@@ -410,12 +422,10 @@ def _versions(equation, cap, coeff_calc, coeff_args, host, host_args) -> list:
+     amp = np.mean([s[6] for s in samples], axis=0)
+ 
+     work_target = equation.target
+-    feature_terms = [term for i, term in enumerate(equation.structure) if i != equation.target_idx]
+     X0 = samples[0][1]
+     norms = np.linalg.norm(X0, axis=0)
+     unit_cols = X0 / np.where(norms > 0, norms, 1.0)
+     unit_constant = np.full(X0.shape[0], 1.0 / np.sqrt(X0.shape[0]))
+-    cols = list(range(p))
+ 
+     inst_attr = host.objectives[1].value_attr if len(host.objectives) > 1 else None
+     versions = []
