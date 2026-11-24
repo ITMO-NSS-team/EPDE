@@ -257,8 +257,7 @@ def test_weak_heat_recovers_the_diffusivity():
 
 
 def test_weak_fit_with_a_stored_token_family():
-    """u' = 3 g with g supplied as a full-grid tensor: the stored token is an opaque pointwise factor of the
-    weak rows, and the fit recovers the coefficient. The trajectory keeps the tensor by reference."""
+    """Recover u' = 3 g from weak rows with g supplied on the full grid."""
     t = np.linspace(0, 12, 600)
     g = np.cos(2 * t) + 0.3 * np.sin(5 * t)
     u = 1.5 * np.sin(2 * t) - 0.18 * np.cos(5 * t)
@@ -280,7 +279,8 @@ def test_weak_fit_with_a_stored_token_family():
         assert coefs and all(abs(c - 3.0) < 1e-3 for c in coefs)
 
         stored = global_var.samples_manager[0]
-        assert np.shares_memory(stored.raw_token('g'), g) and set(stored.raw_tokens()) == {'g'}
+        np.testing.assert_array_equal(stored.raw_token('g'), g)
+        assert not np.shares_memory(stored.raw_token('g'), g) and set(stored.raw_tokens()) == {'g'}
         with pytest.raises(KeyError, match="'missing'"):
             stored.raw_token('missing')
     finally:

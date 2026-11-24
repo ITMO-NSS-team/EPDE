@@ -17,7 +17,7 @@ import warnings
 import numpy as np
 import torch
 
-from copy import deepcopy
+from copy import copy, deepcopy
 from typing import Union, Callable, List, Tuple, Dict
 from collections import OrderedDict
 from functools import reduce, singledispatchmethod
@@ -118,6 +118,7 @@ class EpdeSearch(object):
                  single_objective_metric=UNSET, discrepancy_metric=UNSET,
                  anchor_on_residual=UNSET, sparsity_cls=UNSET,
                  sparsity_kwargs=UNSET,
+                 multisample_mode=UNSET, multisample_weighting=UNSET,
                  use_solver=UNSET, solver_backend=UNSET, device=UNSET,
                  boundary_width=UNSET, time_axis=UNSET,
                  evaluation_stride=UNSET, evaluation_form=UNSET,
@@ -140,22 +141,14 @@ class EpdeSearch(object):
                  **solver_kwargs):
         """Build a search from the grouped configuration.
 
-        Every setting has a default in
-        ``epde/interface/parameters/default_search_config.json``, grouped by
-        concern. Resolution order is strictly::
-
-            built-in JSON  <  ``config``  <  the keyword arguments here
-
-        so a keyword always wins, whatever group its key belongs to --
-        ``EpdeSearch(use_solver=True)`` enables the solver without the caller
-        needing to know that ``use_solver`` lives under ``solver``. Pass
-        ``None`` explicitly to override a file value back to "unset"; omit an
-        argument entirely to leave the resolved value alone.
+        The ``config`` argument overrides the built-in defaults. Explicit
+        keyword arguments take precedence over both. Pass ``None`` to reset
+        an optional setting, or omit the keyword to keep the resolved value.
 
         Args:
             config: path to a JSON/YAML search config, a nested
                 ``{group: {key: value}}`` dict, or None for the shipped
-                defaults. See :mod:`epde.interface.search_config`.
+                defaults.
             director: a pre-built optimization strategy director. When given
                 it is used as-is and the ``objectives``/``solver`` groups do
                 not assemble one. (This replaces the former
@@ -191,6 +184,7 @@ class EpdeSearch(object):
             discrepancy_metric=discrepancy_metric,
             anchor_on_residual=anchor_on_residual,
             sparsity_cls=sparsity_cls, sparsity_kwargs=sparsity_kwargs,
+            multisample_mode=multisample_mode, multisample_weighting=multisample_weighting,
             use_solver=use_solver, solver_backend=solver_backend, device=device,
             boundary_width=boundary_width, time_axis=time_axis,
             evaluation_stride=evaluation_stride, evaluation_form=evaluation_form,
@@ -214,13 +208,6 @@ class EpdeSearch(object):
             memory_for_cache=memory_for_cache, verbose_params=verbose_params)
         overrides.update(solver_kwargs)
         self._config = cfg = load_search_config(config, overrides)
-        if isinstance(self, EpdeMultisample) and (
-                cfg.search_space.system_rps_mode == 'plain' or cfg.evolution.engine != 'moeadd'):
-            # EpdeMultisample.fit builds its optimizer without the single
-            # search's fit path (the plain term cap, the engine choice).
-            raise ValueError("EpdeMultisample supports neither search_space.system_rps_mode='plain' "
-                             "nor evolution.engine='nsga2'.")
-
         self.multiobjective_mode = cfg.objectives.multiobjective_mode
 
         # Must be published BEFORE the director is built: ``use_baseline``
@@ -547,15 +534,40 @@ class EpdeSearch(object):
             raise ValueError("boundary_width='auto' needs a callable (or no) gfunction: an array "
                              'test function fixes the excluded samples itself. Pass boundary_width.')
 
-        self.set_memory_properties(grids[0], mem_for_cache_frac=self._mem_for_cache)
+        arrays = [grids] if isinstance(grids, np.ndarray) else list(grids)
+        if not arrays or not all(isinstance(g, np.ndarray) and g.size for g in arrays):
+            raise ValueError('A domain needs at least one nonempty numpy coordinate array.')
+        shape = arrays[0].shape
+        if len(shape) != len(arrays) or any(g.shape != shape for g in arrays):
+            raise ValueError('Domain coordinate arrays must share a shape and provide one '
+                             'mesh coordinate per axis; use numpy.meshgrid(indexing="ij").')
+        if not isinstance(time_axis, (int, np.integer)) or isinstance(time_axis, bool) \
+                or not 0 <= time_axis < len(arrays):
+            raise ValueError(f'time_axis must name one of the {len(arrays)} domain axes.')
+        for axis, grid in enumerate(arrays):
+            if not np.issubdtype(grid.dtype, np.number) or np.iscomplexobj(grid) \
+                    or not np.all(np.isfinite(grid)):
+                raise ValueError(f'Domain {ID!r} axis {axis} coordinates must be finite real numbers.')
+        previous = self.grid_cache.memory_default.get(ID, {})
+        if previous and (set(previous) != {str(i) for i in range(len(arrays))}
+                         or any(not np.array_equal(previous[str(i)], g)
+                                for i, g in enumerate(arrays))):
+            raise ValueError(f'Domain ID {ID!r} already holds different coordinates. '
+                             'Reuse the existing Domain or choose a new ID.')
+        self.set_memory_properties(arrays[0], mem_for_cache_frac=self._mem_for_cache)
 
-        domain = Domain(grids, self.grid_cache, time_axis, ID, boundary=boundary_width,
-                        evaluation_stride=domain_cfg.evaluation_stride)
-        domain.g_func_form = gfunction
-        if not auto:
-            domain.g_func = self._get_g_func(gfunction, boundary_width)
-            domain.validateTestFunction()
-        self._warn_if_grid_non_uniform(grids)
+        try:
+            domain = Domain(arrays, self.grid_cache, time_axis, ID, boundary=boundary_width,
+                            evaluation_stride=domain_cfg.evaluation_stride)
+            domain.g_func_form = gfunction
+            if not auto:
+                domain.g_func = self._get_g_func(gfunction, boundary_width)
+                domain.validateTestFunction()
+            self._warn_if_grid_non_uniform(arrays)
+        except Exception:
+            if not previous:
+                self.grid_cache.drop_subcache(ID)
+            raise
         # TODO: consider implementing domain.set_pruner()
         
         return domain.ID, domain
@@ -845,6 +857,7 @@ class EpdeSearch(object):
         data = self._as_trajectories(data, legacy_kwargs, 'create_pool')
         if isinstance(data, Trajectory):
             data = [data,]
+        self._validate_trajectories(data)
         self._install_dimensionality(additional_tokens, data)
         self._resolve_auto_boundaries(data, max_deriv_order)
         self._check_evaluation_lattice(data)
@@ -898,8 +911,15 @@ class EpdeSearch(object):
             warnings.warn('Missing code for ANN pretraining!')
 
         self._register_trajectories(data)
-        self.pool = TFPool(data[0].tokens + [tf if isinstance(tf, TokenFamily) else tf.token_family
-                                             for tf in additional_tokens])
+        declared_families = data[0].tokens + [
+            tf if isinstance(tf, TokenFamily) else tf.token_family for tf in additional_tokens]
+        # Filter copies so a later fit can reuse the declared tokens.
+        pool_families = []
+        for family in declared_families:
+            pooled = copy(family)
+            pooled.tokens = list(family.tokens)
+            pool_families.append(pooled)
+        self.pool = TFPool(pool_families)
         #TODO: add check, if all trajectories have the same tokens 
         print(f'The cardinality of defined token pool is {self.pool.families_cardinality()}')
         print(f'Among them, the pool contains {self.pool.families_cardinality(meaningful_only=True)}')
@@ -926,6 +946,51 @@ class EpdeSearch(object):
         self._pool_data = list(data)
         self.pool_params = self._pool_params(
             data, additional_tokens, max_deriv_order, data_fun_pow, deriv_fun_pow)
+
+    @staticmethod
+    def _validate_trajectories(data) -> None:
+        """Check shared variable order, unique cache IDs, and per-record shapes."""
+        if not isinstance(data, (list, tuple)) or not data:
+            raise ValueError('Pass at least one Trajectory; the sample list cannot be empty.')
+        if not all(isinstance(item, Trajectory) for item in data):
+            raise AssertionError('Individual trajectories have to be passed as Trajectory '
+                                 'objects created with createTrajectory.')
+        ids = [trajectory.ID for trajectory in data]
+        if len(set(ids)) != len(ids):
+            raise ValueError(f'Duplicate trajectory IDs in one fit: {ids!r}. '
+                             'Give independent records distinct cache_id values.')
+        names = data[0].variable_names
+        if not names or len(set(names)) != len(names):
+            raise ValueError('A trajectory needs nonempty, unique variable names.')
+        ndim = len(data[0]._domain.initial_shape)
+        time_axis = data[0]._domain._time_axis
+        for trajectory in data:
+            key = trajectory.ID
+            if trajectory.variable_names != names:
+                raise ValueError(f'Trajectory {key!r} must have the same variables in the same '
+                                 f'order: expected {names!r}, got {trajectory.variable_names!r}.')
+            domain = trajectory._domain
+            if len(domain.initial_shape) != ndim or domain._time_axis != time_axis:
+                raise ValueError(f'Trajectory {key!r} has incompatible domain axes; all records '
+                                 'must have the same dimensionality and time_axis.')
+            for idx, entry in enumerate(trajectory._entries):
+                raw = np.asarray(entry.raw_tensor)
+                label = f'Trajectory {key!r}, variable {entry.var_name!r}'
+                if raw.shape != tuple(domain.initial_shape):
+                    raise ValueError(f'{label}: data shape {raw.shape} does not match '
+                                     f'domain shape {tuple(domain.initial_shape)}.')
+                if not np.issubdtype(raw.dtype, np.number) or np.iscomplexobj(raw) \
+                        or not np.all(np.isfinite(raw)):
+                    raise ValueError(f'{label}: data must contain finite real numbers.')
+                derivatives = trajectory._entry_derivs(entry, idx)
+                if derivatives is not None:
+                    derivatives = np.asarray(derivatives)
+                    if derivatives.ndim != 2 or derivatives.shape[0] != raw.size:
+                        raise ValueError(f'{label}: derivatives must have shape '
+                                         '(number of grid points, number of derivatives).')
+                    if not np.issubdtype(derivatives.dtype, np.number) \
+                            or np.iscomplexobj(derivatives) or not np.all(np.isfinite(derivatives)):
+                        raise ValueError(f'{label}: derivatives must contain finite real numbers.')
 
     @staticmethod
     def _prepare_trajectories(data, additional_tokens, max_deriv_order, data_fun_pow, deriv_fun_pow,
@@ -1149,6 +1214,8 @@ class EpdeSearch(object):
             raise TypeError('{0}() got unexpected keyword argument(s) {1}.'.format(
                 where, sorted(unknown)))
 
+        if isinstance(data, (list, tuple)) and not data:
+            raise ValueError('Pass at least one Trajectory; the sample list cannot be empty.')
         already_new = (data is None or isinstance(data, Trajectory) or
                        (isinstance(data, (list, tuple)) and data and
                         isinstance(data[0], Trajectory)))
@@ -1189,6 +1256,9 @@ class EpdeSearch(object):
         """Resolve the three settings that describe the pool, not the sample."""
         if max_deriv_order is UNSET:
             max_deriv_order = self._config.preprocessing.max_deriv_order
+        # Copy mutable derivative orders before saving the pool key.
+        if isinstance(max_deriv_order, list):
+            max_deriv_order = tuple(max_deriv_order)
         if data_fun_pow is UNSET:
             data_fun_pow = self._config.search_space.data_fun_pow
         if deriv_fun_pow is UNSET:
@@ -1471,6 +1541,7 @@ class EpdeSearch(object):
             raise ValueError('Data has to be specified beforehand or passed in '
                              'fit as an argument.')
         if data is not None:
+            self._validate_trajectories(data)
             self._resolve_auto_boundaries(data, max_deriv_order)
             self._check_evaluation_lattice(data, active_config().search_space)
         self._install_dimensionality(additional_tokens, data if data is not None else
@@ -2082,327 +2153,129 @@ class ExperimentCombiner(object):
         return self.create_best_for_complexity(best_qualities_compl, pool)
     
 class EpdeMultisample(EpdeSearch):
-    def __init__(self, data_samples : List[List], multiobjective_mode: bool = True, 
-                 use_default_strategy: bool = True, director=None, 
-                 director_params: dict = {'variation_params': {}, 'mutation_params': {},
-                                           'pareto_combiner_params': {}, 'pareto_updater_params': {}}, 
-                 time_axis: int = 0, function_form=None, boundary: int = 0, 
-                 use_solver: bool = False, verbose_params: dict = {'show_iter_idx' : True},
-                 memory_for_cache=5, prune_domain: bool = False, 
-                 pivotal_tensor_label=None, pruner=None, threshold: float = 1e-2, 
-                 division_fractions=3, rectangular: bool = True):
+    """Run a search on independent ``(grids, fields)`` records.
+
+    Pass fields by variable name, as a single array named ``u``, or as a list
+    of arrays with explicit variable names. Supply precomputed derivatives
+    per record. Use ``Trajectory`` objects for record-specific preprocessors
+    or boundary widths.
+    """
+
+    def __init__(self, data_samples=None, **kwargs):
+        super().__init__(**kwargs)
+        self._sample_records = data_samples
+        self._sample_trajectories = None
+        self._sample_pool_options = {}
+
+    @staticmethod
+    def _sample_fields(values, names, index):
+        if isinstance(values, dict):
+            if names is None:
+                names = list(values)
+            if set(values) != set(names):
+                raise ValueError(f'Sample {index}: expected variables {names!r}, '
+                                 f'got {list(values)!r}.')
+            return {name: values[name] for name in names}, names
+        arrays = [values] if isinstance(values, np.ndarray) else values
+        if not isinstance(arrays, (list, tuple)) or not arrays:
+            raise ValueError(f'Sample {index}: fields must be an array, a nonempty '
+                             'variable dictionary, or a list of variable arrays.')
+        if names is None:
+            if len(arrays) != 1:
+                raise ValueError('Give variable_names for multiple positional fields, '
+                                 'or use a dictionary keyed by variable name.')
+            names = ['u']
+        if len(arrays) != len(names):
+            raise ValueError(f'Sample {index}: {len(arrays)} fields for '
+                             f'{len(names)} variable names.')
+        return dict(zip(names, arrays)), names
+
+    def _make_samples(self, records, derivatives=None, names=None):
+        if not isinstance(records, (list, tuple)) or not records:
+            raise ValueError('Pass at least one (grids, fields) sample.')
+        if names is not None:
+            names = [names] if isinstance(names, str) else list(names)
+            if not names or len(set(names)) != len(names) or not all(isinstance(n, str) for n in names):
+                raise ValueError('Variable names must be nonempty, unique strings.')
+        if derivatives is None:
+            derivatives = [None] * len(records)
+        elif len(records) == 1 and isinstance(derivatives, (np.ndarray, dict)):
+            derivatives = [derivatives]
+        if not isinstance(derivatives, (list, tuple)) or len(derivatives) != len(records):
+            raise ValueError('Pass one derivative entry per independent sample.')
+        prepared = []
+        for i, record in enumerate(records):
+            if not isinstance(record, (list, tuple)) or len(record) != 2:
+                raise ValueError(f'Sample {i} must be a (grids, fields) pair.')
+            fields, names = self._sample_fields(record[1], names, i)
+            if not fields or not all(isinstance(v, np.ndarray) for v in fields.values()):
+                raise TypeError(f'Sample {i}: every field must be a numpy array.')
+            prepared.append((record[0], fields))
+        used = set(self.grid_cache.memory_default) | set(self.tensor_cache.memory_default)
+        next_id = max([int(k) for k in used if isinstance(k, (int, np.integer))] + [-1]) + 1
+        trajectories = []
+        for i, ((grids, fields), derivs) in enumerate(zip(prepared, derivatives)):
+            key = next_id + i
+            domain = self.createDomain(grids, ID=key)[1]
+            trajectories.append(self.createTrajectory(fields, domain, cache_id=key, derivs=derivs)[1])
+        self._validate_trajectories(trajectories)
+        return trajectories
+
+    def set_samples(self, data_samples, sample_derivs=None, var_names=None,
+                    max_deriv_orders=UNSET, additional_tokens=None,
+                    data_fun_pow=UNSET, deriv_fun_pow=UNSET):
+        """Prepare the records and build their common token pool.
+
+        Supply one derivative entry per record in ``sample_derivs``.
         """
-        Args:
-            use_default_strategy (`bool`): optional
-                True (base and recommended value), if the default evolutionary strategy will be used, 
-                False if the user-defined strategy will be passed further. Otherwise, the search will 
-                not be conducted.  
-            time_axis (`int`): optional
-                Indicator of time axis in data and grids. Used in normalization for regressions.
-            function_form (`callable`): optional
-                Auxilary function, used in the weak derivative definition. Default function is negative square function 
-                with maximum values in the center of the domain.
-            boundary (`int|tuple/list of integers`): optional
-                Boundary width for the domain. Boundary points will be ignored for the purposes of equation discovery
-            use_solver (`bool`): optional
-                Allow use of the automaic partial differential solver to evaluate fitness of the candidate solutions.
-            dimensionality (`int`): optional
-                Dimensionality of the problem. ! Currently you should pass value, reduced by one !
-            verbose_params (`dict`): optional
-                Description, of algorithm details, that will be demonstrated to the user. Usual
-            memory_for_cache (`int|float`): optional
-                Rough estimation of the memory, which can be used for cache of pre-evaluated tensors during the equation
-            prune_domain (`bool`): optional
-                If ``True``, subdomains with no dynamics will be pruned from data. Default value: ``False``.
-            pivotal_tensor_label (`str`): optional
-                Indicator, according to which token data will be pruned. Default value - ``'du/dt'``, where 
-                ``t`` is selected as a time axis from ``time_axis`` parameter.
-            pruner (`object`): optional
-                Pruner object, which will remove subdomains with no dynamics i.e. with derivative 
-                identically equal to zero.
-            threshold (`float`): optional
-                Pruner parameter, indicating the boundary of interval in which the pivotal tensor values are 
-                considered as zeros. Default value: 1e-2
-            division_fractions (`int`): optional
-                Number of subdomains along each axis, defining the division of the domain for pruning.
-                Default value: 3
-            rectangular(`bool`): optional
-                A line of subdomains along an axis can be removed if all values inside them are identical to zero.
-        """
-        super().__init__(multiobjective_mode = multiobjective_mode, use_default_strategy = use_default_strategy, 
-                         director = director, director_params = director_params, time_axis = time_axis,
-                         define_domain = False, function_form = function_form, boundary = boundary, 
-                         use_solver = use_solver, verbose_params = verbose_params,
-                         coordinate_tensors = None, memory_for_cache = memory_for_cache, prune_domain = prune_domain, 
-                         pivotal_tensor_label = pivotal_tensor_label, pruner = pruner, threshold = threshold, 
-                         division_fractions = division_fractions, rectangular = rectangular)
-        self._memory_for_cache = memory_for_cache
-        self._boundary = boundary
-        self._function_form = function_form
+        trajectories = self._make_samples(data_samples, sample_derivs, var_names)
+        options = dict(max_deriv_order=max_deriv_orders, additional_tokens=additional_tokens,
+                       data_fun_pow=data_fun_pow, deriv_fun_pow=deriv_fun_pow)
+        self.create_pool(trajectories, **options)
+        self._sample_records = data_samples
+        self._sample_trajectories = trajectories
+        self._sample_pool_options = options
 
-        grids = [sample[0] for sample in data_samples]
-        # print('grids shape is', [(type(subgrid), len(subgrid)) for subgrid in grids])
-
-        subgrids = [list() for var_grid in grids[0]]
-        for sample_grids in grids:
-            for idx, var_grid in enumerate(sample_grids):
-                subgrids[idx].append(var_grid)
-
-        grids_stacked = [np.concatenate(var_grid) for var_grid in subgrids]
-        # self.set_domain_properties(grids_stacked, self._memory_for_cache, self._boundary, self._function_form)
-
-        global_var.grid_cache.g_func = np.concatenate([self.g_func(grid) for grid in grids])
-
-        # Domain will not be set properly in init, thus a separate initialization is necessary
-
-    def set_domain_properties(self, coordinate_tensors, memory_for_cache, boundary_width: Union[int, list],
-                              function_form: Callable = None, prune_domain: bool = False,
-                              pivotal_tensor_label=None, pruner=None, threshold: float = 1e-5,
-                              division_fractions: int = 3, rectangular: bool = True):
-        """
-        Setting properties for processing considered domain, such as removing areas with no dynamics,
-        and setting bounderes. Can be used for uploading test function. In enseble equation learning can not 
-        take coordinates as the argument.
-
-        Parameters
-        ----------
-        memory_for_cache : int
-            Allowed amount of memory (in percentage) for data storage.
-        boundary_width : int|list
-            The number of unaccountable elements at the edges of the domain.
-        function_form : callable, optional
-            Testing function connected to the weak derivative notion, the default value is None, that 
-            corresponds with the product of normalized inverse square functions of the coordinates, 
-            centered at the middle of the domain.
-        prune_domain : bool
-            Flag, enabling area cropping by removing subdomains with constant values, default - False.
-        pivotal_tensor_label : np.ndarray
-            Pattern that guides the domain pruning, the default is None.
-        pruner : DomainPruner
-            Object for selecting domain region, the default is None.
-        threshold : float, optional
-            The boundary at which values are considered zero, the default is 1e-5.
-        division_fractions : int, optional
-            Number of fraction for each axis (if this is integer than all axis are dividing by 
-            same fractions), the default is 3.
-        rectangular : bool, optional
-            Flag indecating that crop subdomains are rectangle, default - True.
-
-        Returns
-        -------
-        None.
-
-        """
-        raise NotImplementedError('This method has been depricated!')
-    
-        # assert self.coodinate_tensors is not None, 'Coordinate tensors for the sample have to be set beforehand.'
-        # self._create_caches(coordinate_tensors=coordinate_tensors, memory_for_cache=memory_for_cache)
-        # if prune_domain:
-        #     self.domain_pruning(pivotal_tensor_label, pruner, threshold, division_fractions, rectangular)
-        # self.set_boundaries(boundary_width)
-
-        # # TODO$
-        # self._upload_g_func(function_form)
-
-    def _upload_g_func(self, function_form: Union[Callable, np.ndarray, list] = None, boundary_width: int = None):
-        """
-        Loading testing function connected to the weak derivative notion. In contrast to a single equation
-        discovery approach the testing function is not immediately stored in cache, but saved to be used 
-        later and applied to equations.
-
-        Args:
-            function_form (`callable`, or `np.ndarray`, or `list[np.ndarray]`)
-                Test function, default using inverse polynomial with max in the domain center.
-
-        Returns:
-            None 
-        """
-        boundary_width = boundary_width if boundary_width is not None else global_var.grid_cache.boundary_width
-        if isinstance(function_form, (np.ndarray, list)):
-            self.g_func = function_form
+    def fit(self, samples=None, equation_terms_max_number=UNSET,
+            equation_factors_max_number=UNSET, variable_names=None,
+            eq_sparsity_interval=UNSET, derivs=None, max_deriv_order=UNSET,
+            additional_tokens=None, data_fun_pow=UNSET, deriv_fun_pow=UNSET,
+            optimizer=None, pool=None, population=None, **kwargs):
+        """Fit the supplied samples or reuse the current ones."""
+        if 'data' in kwargs:
+            if samples is not None:
+                raise TypeError('Pass either samples or data, not both.')
+            samples = kwargs.pop('data')
+        if samples is not None:
+            if isinstance(samples, Trajectory):
+                trajectories = [samples]
+            elif isinstance(samples, (list, tuple)) and samples and isinstance(samples[0], Trajectory):
+                trajectories = list(samples)
+            else:
+                trajectories = self._make_samples(samples, derivs, variable_names)
+            self._sample_records = samples
+            self._sample_trajectories = trajectories
+            self._sample_pool_options = {}
+        elif self._sample_trajectories is not None:
+            if derivs is not None or variable_names is not None:
+                raise ValueError('Pass samples again when replacing their derivatives or variable names.')
+            trajectories = self._sample_trajectories
+        elif self._sample_records is not None:
+            trajectories = self._make_samples(self._sample_records, derivs, variable_names)
+            self._sample_trajectories = trajectories
+        elif pool is not None:
+            trajectories = None
         else:
-            try:
-                decorator = BoundaryExclusion(boundary_width=boundary_width)
-                if function_form is None:
-                    def baseline_exp_function(grids):
-                        def uniformize(data):
-                            temp = -(data - np.mean(data))**2
-                            if np.min(temp) == np.max(temp):
-                                return np.ones_like(temp)
-                            else:
-                                return (temp - np.min(temp)) / (np.max(temp) - np.min(temp))
-
-                        exponent_partial = np.array([uniformize(grid) for grid in grids])
-                        exponent = np.multiply.reduce(exponent_partial, axis=0)
-                        return exponent
-
-                    self.g_func = decorator(baseline_exp_function)
-                else:
-                    self.g_func = decorator(function_form)
-
-            except NameError:
-                raise NameError('Cache for grids has not been initilized yet!')
-
-
-    def set_samples(self, data_samples: List[List], sample_derivs: List[List[np.ndarray]] = None, var_names: List[str] = ['u',], 
-                    max_deriv_orders: Union[int, list[int]] = 1, additional_tokens: list = [], data_fun_pow: int = 1,
-                    deriv_fun_pow: int = 1):
-        if isinstance(data_samples[0][1], np.ndarray):
-            data_comb = [sample[1] for sample in data_samples]
-            print('Samples are np.ndarrays somehow')
-        elif isinstance(data_samples[0][1], tuple) or isinstance(data_samples[0][1], list):
-            data_comb = []
-            assert all([isinstance(sample_var, np.ndarray) for sample_var in data_samples[0][1]]), f'Samples must be passed as \
-                a list of multiple numpy ndarrays, if the equations are derived for mutiple dependent variables.'
-            print(f'Presumably we have {len(data_samples[0][1])} dependent variables')
-            for var_idx in range(len(data_samples[0][1])):
-                data_comb.append([sample[1][var_idx] for sample in data_samples])
-
-        grids = [sample[0] for sample in data_samples]
-                
-        # subgrids = [list() for var_grid in grids[0]]
-        # for sample_grids in grids:
-        #     for idx, var_grid in sample_grids:
-        #         subgrids[idx].append(var_grid)
-
-        # grids_stacked = [np.concatenate(var_grid) for var_grid in subgrids]
-
-        self.create_pool(data = data_comb, variable_names = var_names, derivs = sample_derivs, 
-                         max_deriv_order = max_deriv_orders, additional_tokens = additional_tokens,
-                         data_fun_pow = data_fun_pow, deriv_fun_pow=deriv_fun_pow, grid = grids) # Implement sample-wise differentiation.
-
-        # for sample in data_samples[1:]:
-            # if multi_var_mode:
-                # pass
-        # TODO: calculated derivatives, combine them into single arrays to correctly create tokens. 
-    
-        
-    # def set_derivatives(self, variable:str, deriv:np.ndarray):
-    #     '''
-    #     Pass the derivatives of a variable as a np.ndarray.
-    
-    #     Parameters
-    #     ----------
-    #     variable : str
-    #         Key for the variable to have the derivatives set.
-    #     deriv : np.ndarray
-    #         Arrays of derivatives. Have to be shaped as (n, m), where n is the number of passed derivatives 
-    #         (for example, when you differentiate the dataset once for the first axis, and up to the second order for 
-    #          the second, and you have no mixed derivatives, *n = 3*), and m is the number of data points in the domain.
-
-    #     Returns
-    #     -------
-    #     None.
-    #     '''
-    #     try:
-    #         self._derivatives
-    #     except AttributeError:
-    #         self._derivatives = {}
-    #     self._derivatives[variable] = deriv
-
-
-    def fit(self, samples: List[Tuple], equation_terms_max_number=6, equation_factors_max_number=1, variable_names=['u',], 
-            eq_sparsity_interval=UNSET, derivs=None, max_deriv_order=1, additional_tokens=[],
-            data_fun_pow: int = 1, deriv_fun_pow: int = 1, optimizer: Union[SimpleOptimizer, MOEADDOptimizer] = None, 
-            pool: TFPool = None, population: Union[ParetoLevels, Population] = None):
-        """
-        Fit epde search algorithm to obtain differential equations, describing passed data.
-
-        Parameters
-        ----------
-        data  : np.ndarray | list | tuple, optional
-            Values of modeled variables. If the variable is single (i.e. deriving a single equation),
-            it can be passed as the numpy.ndarray or as the list/tuple with a single element;
-            multiple variables are not supported yet, use older interfaces. Default value is None, but it 
-            shall be used only for retraining, when the pool argument is passed.
-        equation_terms_max_number  : int, optional
-            The maximum number of terms, present in the derived equations, the default is 6.
-        equation_factors_max_number : int, optional
-            The maximum number of factors (token functions; real-valued coefficients are not counted here),
-            present in terms of the equaton, the default is 1.
-        variable_names : list | str, optional
-            Names of the independent variables, passed into search mechanism. Length of the list must correspond
-            to the number of np.ndarrays, sent with in ``data`` parameter. In case of system of differential equation discovery, 
-            all variables shall be named here, default - ``['u',]``, representing a single variable *u*.
-        eq_sparsity_interval : tuple, optional
-            Deprecated, as in :meth:`EpdeSearch.fit`: the interval seeding the legacy LASSO alpha is that
-            operator's parameter, ``sparsity_kwargs={'initial_sparsity_interval': (lo, hi)}`` (by default
-            ``LASSOSparsity.initial_sparsity_interval``, (1e-4, 2.5)).
-        derivs : list or list of lists of np.ndarrays, optional
-            Pre-computed values of derivatives. If ``None`` is passed, the derivatives are calculated in the
-            method. Recommended to use, if the computations of derivatives take too long. For further information
-            about using data, prepared in advance, check ``epde.preprocessing.derivatives.preprocess_derivatives`` 
-            function, default - None.
-        max_deriv_order : int | list | tuple, optional
-            Highest order of calculated derivatives, the default is 1.
-        additional_tokens : list of TokenFamily or Prepared_tokens, optional
-            Additional tokens, that would be used to construct the equations among the main variables and their
-            derivatives. Objects of this list must be of type ``epde.interface.token_family.TokenFamily`` or
-            of ``epde.interface.prepared_tokens.Prepared_tokens`` subclasses types. The default is None.
-        field_smooth : bool, optional
-            Parameter, if the input variable fields shall be smoothed to avoid the errors. If the data is
-            assumed to be noiseless, shall be set to False, otherwise - True, the default - False.
-        memory_for_cache : int | float, optional
-            Limit for the cache (in fraction of the memory) for precomputed tensor values to be stored:
-            if int, will be considered as the percentage of the entire memory, and if float,
-            then as a fraction of memory, the default is 5.
-        data_fun_pow : int, optional
-            Maximum power of token, the default is 1.
-        optimizer : SimpleOptimizer | MOEADDOptimizer, optional
-            Pre-defined optimizer, that will be used during evolution. Shall correspond with the mode 
-            (single- and multiobjective). The default is None, matching no use of pre-defined optimizer.
-        pool : TFPool, optional
-            Pool of tokens, that can be explicitly passed. The default is None, matching no use of passed pool.
-        population : Population | ParetoLevels, optional
-            Population of candidate equatons, that can be optionally passed in explicit form. The type of objects
-            must match the optimization algorithm: epde.optimizers.single_criterion.optimizer.Population for 
-            single-objective mode and epde.optimizers.moeadd.moeadd.ParetoLevels for multiobjective optimization.
-            The default is None, specifing no passed population.
-    
-        Returns
-        -------
-        None.
-        """
-        # TODO: ADD EXPLICITLY SENT POPULATION PROCESSING
-        cur_params = {'variable_names' : variable_names, 'max_deriv_order' : max_deriv_order,
-                      'additional_tokens' : [family.token_family.ftype for family in additional_tokens]}
-
-        # if pool is None:
-        #     if self.pool == None or self.pool_params != cur_params:
-        #         if data is None:
-        #             raise ValueError('Data has to be specified beforehand or passed in fit as an argument.')
-        #         self.create_pool(data = data, variable_names=variable_names, 
-        #                          derivs=derivs, max_deriv_order=max_deriv_order, 
-        #                          additional_tokens=additional_tokens, 
-        #                          data_fun_pow=data_fun_pow)
-        # else:
-        #     self.pool = pool; self.pool_params = cur_params
-        if pool is None:
-            self.set_samples(samples, sample_derivs=derivs, var_names = variable_names, max_deriv_orders = max_deriv_order, 
-                             additional_tokens = additional_tokens, data_fun_pow = data_fun_pow, deriv_fun_pow=deriv_fun_pow)
-        else:
-            self.pool = pool; self.pool_params = cur_params
-        self._check_evaluation_lattice(list(global_var.samples_manager._traj.values()))
-        self._prepare_weak_rows()
-
-        eq_sparsity_interval = self._seeding_interval(eq_sparsity_interval, stacklevel=3)
-        self.optimizer_init_params['population_instruct'] = {"pool": self.pool, "terms_number": equation_terms_max_number,
-                                                             "max_factors_in_term": equation_factors_max_number,
-                                                             "sparsity_interval": eq_sparsity_interval}
-        
-        if optimizer is None:
-            self.optimizer = self._create_optimizer(self.multiobjective_mode, self.optimizer_init_params, 
-                                                    self.director)
-        else:
-            self.optimizer = optimizer
-            
-        # Pass only the exec params this optimizer's ``optimize`` accepts:
-        # SimpleOptimizer.optimize has no ``early_stopping_callback`` (a
-        # MOEA/D-only exec param that set_moeadd_params leaves behind when an
-        # EpdeSearch built multiobjective-by-default is run single-objective).
-        _exec_keys = set(inspect.signature(self.optimizer.optimize).parameters) - {'self'}
-        _exec_params = {k: v for k, v in self.optimizer_exec_params.items() if k in _exec_keys}
-        self.optimizer.optimize(**_exec_params)
-        
-        print('The optimization has been conducted.')
-        self.search_conducted = True    
+            raise ValueError('Supply samples in the constructor, set_samples, or fit.')
+        options = dict(self._sample_pool_options)
+        for name, value in (('max_deriv_order', max_deriv_order), ('data_fun_pow', data_fun_pow),
+                            ('deriv_fun_pow', deriv_fun_pow)):
+            if value is not UNSET or name not in options:
+                options[name] = value
+        if additional_tokens is not None or 'additional_tokens' not in options:
+            options['additional_tokens'] = additional_tokens
+        return super().fit(data=trajectories,
+                           equation_terms_max_number=equation_terms_max_number,
+                           equation_factors_max_number=equation_factors_max_number,
+                           eq_sparsity_interval=eq_sparsity_interval, optimizer=optimizer,
+                           pool=pool, population=population, **options, **kwargs)

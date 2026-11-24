@@ -368,6 +368,7 @@ def _versions(equation, cap, coeff_calc, coeff_args, host, host_args) -> list:
         store_fit, subset_table, support_scores, trajectory_gram)
     from epde.operators.common.objectives import LOSS_NAN_VAL
     from epde.operators.common.product_rule import declines
+    from epde.operators.common.multisample import joint_enabled, joint_subset_table
 
     cfg = active_config()
     decline = plain_params()['product_rule_decline']
@@ -381,6 +382,7 @@ def _versions(equation, cap, coeff_calc, coeff_args, host, host_args) -> list:
     target, features = equation.evaluate()
     if features is None:
         return []
+    joint = joint_enabled(len(target))
     finite = []
     for key in target.keys():
         X = np.asarray(features[key], dtype=float)
@@ -389,6 +391,8 @@ def _versions(equation, cap, coeff_calc, coeff_args, host, host_args) -> list:
         y = np.asarray(target[key], dtype=float).reshape(-1)
         sw = np.asarray(gfuncs[key], dtype=float).reshape(-1)
         if not (np.all(np.isfinite(X)) and np.all(np.isfinite(y))):
+            if joint:
+                return []
             continue
         finite.append((key, X, y, sw))
     if not finite:
@@ -397,8 +401,15 @@ def _versions(equation, cap, coeff_calc, coeff_args, host, host_args) -> list:
     every_feature = (1 << p) - 1
     masks = [every_feature] + ([every_feature | (1 << p)] if p + 1 <= cap else [])
 
+    shared_coefficients = full_rank = None
+    if joint:
+        disc, amp, _, shared_coefficients, full_rank = joint_subset_table(
+            finite, discrepancy=discrepancy, subsets=masks,
+            penalty_coeff=host.params['penalty_coeff'])
     samples = []
     for key, X, y, sw in finite:
+        if joint:
+            continue
         gram = trajectory_gram(None, X, y, sw, shapes[key], gram_mode,
                                equation.main_var_to_explain, key)
         # The table's own solve gives each version's coefficients (what
@@ -406,12 +417,13 @@ def _versions(equation, cap, coeff_calc, coeff_args, host, host_args) -> list:
         disc_tab, amp_tab, _, coef_tab = subset_table(X, y, sw, discrepancy=discrepancy, subsets=masks,
                                                       return_coefs=True)
         samples.append((key, X, y, sw, gram, disc_tab, amp_tab, coef_tab))
-    disc = np.mean([s[5] for s in samples], axis=0)
-    amp = np.mean([s[6] for s in samples], axis=0)
+    if not joint:
+        disc = np.mean([s[5] for s in samples], axis=0)
+        amp = np.mean([s[6] for s in samples], axis=0)
 
     work_target = equation.target
     feature_terms = [term for i, term in enumerate(equation.structure) if i != equation.target_idx]
-    X0 = samples[0][1]
+    X0 = finite[0][1]
     norms = np.linalg.norm(X0, axis=0)
     unit_cols = X0 / np.where(norms > 0, norms, 1.0)
     unit_constant = np.full(X0.shape[0], 1.0 / np.sqrt(X0.shape[0]))
@@ -423,9 +435,10 @@ def _versions(equation, cap, coeff_calc, coeff_args, host, host_args) -> list:
         with_constant = bool((S >> p) & 1)
         if not np.isfinite(disc[position]) or (amp_cap is not None and amp[position] > amp_cap):
             continue
-        if any(norms[j] == 0 for j in cols) \
-                or _subset_reducible(work_target, feature_terms, cols, with_constant) \
-                or _subset_rank_deficient(unit_cols, unit_constant, cols, with_constant):
+        rank_bad = (not full_rank[position] if joint else
+                    any(norms[j] == 0 for j in cols)
+                    or _subset_rank_deficient(unit_cols, unit_constant, cols, with_constant))
+        if rank_bad or _subset_reducible(work_target, feature_terms, cols, with_constant):
             continue
         coefs, sw_weights, vc_scores = [], {}, {}
         for key, X, y, sw, gram, disc_tab, amp_tab, coef_tab in samples:
@@ -437,8 +450,10 @@ def _versions(equation, cap, coeff_calc, coeff_args, host, host_args) -> list:
         # the variant until a prune wipes it -- read-only, as the variant may
         # only read it.
         variant._eval_cache = {tgt: _read_only(result) for tgt, result in equation._eval_cache.items()}
-        store_fit(variant, np.mean(np.stack(coefs, axis=1), axis=1),
-                  sw_weights, vc_scores)
+        # Reuse the screened joint coefficients. Fitness scores the shared support on each grid.
+        weights = (shared_coefficients[position].copy() if joint else
+                   np.mean(np.stack(coefs, axis=1), axis=1))
+        store_fit(variant, weights, sw_weights, vc_scores)
         coeff_calc.apply(variant, coeff_args)
         variant.remove_zero_terms()
         # A version the candidate rules refuse, or one solved for a member of a
